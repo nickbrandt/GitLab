@@ -3,15 +3,18 @@ require 'spec_helper'
 describe 'EE > Projects > Settings > User manages approval rule settings' do
   let(:project) { create(:project) }
   let(:user) { project.owner }
+  let(:path) { edit_project_path(project) }
 
   before do
     sign_in(user)
     stub_licensed_features(licensed_features)
-    visit edit_project_path(project)
+    visit path
   end
 
   context 'when `code_owner_approval_required` is available' do
     let(:licensed_features) { { code_owner_approval_required: true } }
+
+    it_behaves_like 'dirty submit form', [{ form: '#js-merge-request-approval-settings', input: '#project_merge_requests_author_approval' }]
 
     it 'allows the user to enforce code owner approval' do
       within('.require-code-owner-approval') do

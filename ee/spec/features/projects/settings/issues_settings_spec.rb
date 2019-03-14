@@ -17,14 +17,14 @@ describe 'Project settings > Issues', :js do
       end
 
       it 'shows the Issues settings' do
-        expect(page).to have_content('Customize your issue restrictions')
+        expect(page).to have_content('Set a default template for issue descriptions.')
 
         within('.sharing-permissions-form') do
           find('.project-feature-controls[data-for="project[project_feature_attributes][issues_access_level]"] .project-feature-toggle').click
           click_on('Save changes')
         end
 
-        expect(page).not_to have_content('Customize your issue restrictions')
+        expect(page).not_to have_content('Set a default template for issue descriptions.')
       end
     end
   end
@@ -36,14 +36,14 @@ describe 'Project settings > Issues', :js do
     end
 
     it 'does not show the Issues settings' do
-      expect(page).not_to have_content('Customize your issue restrictions')
+      expect(page).not_to have_content('Set a default template for issue descriptions.')
 
       within('.sharing-permissions-form') do
         find('.project-feature-controls[data-for="project[project_feature_attributes][issues_access_level]"] .project-feature-toggle').click
         click_on('Save changes')
       end
 
-      expect(page).to have_content('Customize your issue restrictions')
+      expect(page).to have_content('Set a default template for issue descriptions.')
     end
   end
 
