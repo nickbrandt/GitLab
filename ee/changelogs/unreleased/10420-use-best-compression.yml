@@ -1,0 +1,5 @@
+---
+title: 'elasticsearch: Switch from LZ4 to DEFLATE compression'
+merge_request: 10072
+author:
+type: changed
