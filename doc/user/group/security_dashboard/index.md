@@ -30,7 +30,8 @@ each one separately.
 
 ## Supported features
 
-The group security dashboard supports [SAST](../../project/merge_requests/sast.md), and [Dependency Scanning](../../project/merge_requests/dependency_scanning.md) reports.
+The group security dashboard supports [SAST](../../project/merge_requests/sast.md), [Dependency Scanning](../../project/merge_requests/dependency_scanning.md),
+[Container Scanning](../../project/merge_requests/container_scanning.md), and [DAST](../../project/merge_requests/dast.md) reports.
 
 ## Requirements
 
