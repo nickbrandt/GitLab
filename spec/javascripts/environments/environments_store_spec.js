@@ -1,5 +1,5 @@
 import Store from '~/environments/stores/environments_store';
-import { serverData, deployBoardMockData } from './mock_data';
+import { environmentsList, serverData } from './mock_data';
 
 describe('Store', () => {
   let store;
@@ -16,31 +16,10 @@ describe('Store', () => {
   });
 
   it('should store environments', () => {
-    const expectedResult = {
-      name: 'DEV',
-      size: 1,
-      id: 7,
-      state: 'available',
-      external_url: null,
-      environment_type: null,
-      last_deployment: null,
-      has_stop_action: false,
-      environment_path: '/root/review-app/environments/7',
-      stop_path: '/root/review-app/environments/7/stop',
-      created_at: '2017-01-31T10:53:46.894Z',
-      updated_at: '2017-01-31T10:53:46.894Z',
-      rollout_status: {},
-      hasDeployBoard: true,
-      isDeployBoardVisible: true,
-      deployBoardData: {},
-      isLoadingDeployBoard: false,
-      isEmptyDeployBoard: false,
-    };
-
     store.storeEnvironments(serverData);
 
     expect(store.state.environments.length).toEqual(serverData.length);
-    expect(store.state.environments[0]).toEqual(expectedResult);
+    expect(store.state.environments[0]).toEqual(environmentsList[0]);
   });
 
   it('should store available count', () => {
@@ -55,73 +34,46 @@ describe('Store', () => {
     expect(store.state.stoppedCounter).toEqual(2);
   });
 
-  describe('store environments', () => {
-    it('should store environments', () => {
-      store.storeEnvironments(serverData);
+  it('should add folder keys when environment is a folder', () => {
+    const environment = {
+      name: 'bar',
+      size: 3,
+      id: 2,
+    };
 
-      expect(store.state.environments.length).toEqual(serverData.length);
-    });
+    store.storeEnvironments([environment]);
 
-    it('should store a non folder environment with deploy board if rollout_status key is provided', () => {
-      const environment = {
-        name: 'foo',
-        size: 1,
-        latest: {
-          id: 1,
-          rollout_status: deployBoardMockData,
-        },
-      };
+    expect(store.state.environments[0].isFolder).toEqual(true);
+    expect(store.state.environments[0].folderName).toEqual('bar');
+  });
 
-      store.storeEnvironments([environment]);
+  it('should extract content of `latest` key when provided', () => {
+    const environment = {
+      name: 'bar',
+      size: 3,
+      id: 2,
+      latest: {
+        last_deployment: {},
+        isStoppable: true,
+      },
+    };
 
-      expect(store.state.environments[0].hasDeployBoard).toEqual(true);
-      expect(store.state.environments[0].isDeployBoardVisible).toEqual(true);
-      expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
-    });
+    store.storeEnvironments([environment]);
 
-    it('should add folder keys when environment is a folder', () => {
-      const environment = {
-        name: 'bar',
-        size: 3,
-        latest: {
-          id: 2,
-        },
-      };
+    expect(store.state.environments[0].last_deployment).toEqual({});
+    expect(store.state.environments[0].isStoppable).toEqual(true);
+  });
 
-      store.storeEnvironments([environment]);
+  it('should store latest.name when the environment is not a folder', () => {
+    store.storeEnvironments(serverData);
 
-      expect(store.state.environments[0].isFolder).toEqual(true);
-      expect(store.state.environments[0].folderName).toEqual('bar');
-    });
+    expect(store.state.environments[0].name).toEqual(serverData[0].latest.name);
+  });
 
-    it('should extract content of `latest` key when provided', () => {
-      const environment = {
-        name: 'bar',
-        size: 3,
-        id: 2,
-        latest: {
-          last_deployment: {},
-          isStoppable: true,
-        },
-      };
+  it('should store root level name when environment is a folder', () => {
+    store.storeEnvironments(serverData);
 
-      store.storeEnvironments([environment]);
-
-      expect(store.state.environments[0].last_deployment).toEqual({});
-      expect(store.state.environments[0].isStoppable).toEqual(true);
-    });
-
-    it('should store latest.name when the environment is not a folder', () => {
-      store.storeEnvironments(serverData);
-
-      expect(store.state.environments[2].name).toEqual(serverData[2].latest.name);
-    });
-
-    it('should store root level name when environment is a folder', () => {
-      store.storeEnvironments(serverData);
-
-      expect(store.state.environments[1].folderName).toEqual(serverData[1].name);
-    });
+    expect(store.state.environments[1].folderName).toEqual(serverData[1].name);
   });
 
   describe('toggleFolder', () => {
@@ -199,43 +151,6 @@ describe('Store', () => {
     });
   });
 
-  describe('deploy boards', () => {
-    beforeEach(() => {
-      const environment = {
-        name: 'foo',
-        size: 1,
-        latest: {
-          id: 1,
-        },
-        rollout_status: deployBoardMockData,
-      };
-
-      store.storeEnvironments([environment]);
-    });
-
-    it('should toggle deploy board property for given environment id', () => {
-      store.toggleDeployBoard(1);
-
-      expect(store.state.environments[0].isDeployBoardVisible).toEqual(false);
-    });
-
-    it('should keep deploy board data when updating environments', () => {
-      expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
-
-      const environment = {
-        name: 'foo',
-        size: 1,
-        latest: {
-          id: 1,
-        },
-        rollout_status: deployBoardMockData,
-      };
-      store.storeEnvironments([environment]);
-
-      expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
-    });
-  });
-
   describe('getOpenFolders', () => {
     it('should return open folder', () => {
       store.storeEnvironments(serverData);
@@ -245,20 +160,4 @@ describe('Store', () => {
       expect(store.getOpenFolders()[0]).toEqual(store.state.environments[1]);
     });
   });
-
-  // ee-only start
-  describe('canaryCallout', () => {
-    it('should add banner underneath the second environment', () => {
-      store.storeEnvironments(serverData);
-
-      expect(store.state.environments[1].showCanaryCallout).toEqual(true);
-    });
-
-    it('should add banner underneath first environment when only one environment', () => {
-      store.storeEnvironments(serverData.slice(0, 1));
-
-      expect(store.state.environments[0].showCanaryCallout).toEqual(true);
-    });
-  });
-  // ee-only end
 });
