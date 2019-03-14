@@ -13,6 +13,7 @@ module Elastic
 
       settings \
         index: {
+          codec: 'best_compression',
           analysis: {
             analyzer: {
               default: {
