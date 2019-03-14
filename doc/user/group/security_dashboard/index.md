@@ -88,8 +88,8 @@ If you hover over a row, there will appear some actions you can take:
 Clicking the "More info" button opens a modal with more information about the
 selected vulnerability where you can get a better description, as well as the
 file it came from, and a possible solution. You get access to the
-["Dismiss vulnerability"](#dismissing-a-vulnerability)
-["Create merge request"](#autoremediation) and
+["Dismiss vulnerability"](#dismissing-a-vulnerability),
+["Create merge request"](#autoremediation), and
 ["Create issue"](#creating-an-issue-for-a-vulnerability) buttons inside this
 modal as well.
 
