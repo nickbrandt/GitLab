@@ -1,14 +1,21 @@
 # frozen_string_literal: true
+require_relative '../concerns/saml_authorization.rb' # frozen_string_literal: true
 
 class Groups::SamlProvidersController < Groups::ApplicationController
+  include SamlAuthorization
   before_action :require_top_level_group
   before_action :authorize_manage_saml!
   before_action :check_group_saml_available!
   before_action :check_group_saml_configured
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def show
     @saml_provider = @group.saml_provider || @group.build_saml_provider
+
+    @scim_token_exists = ScimOauthAccessToken.exists?(group: @group)
+    @scim_token_url = group_scim_oauth_url(@group)
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def create
     @saml_provider = @group.build_saml_provider(saml_provider_params)
@@ -27,18 +34,6 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   end
 
   private
-
-  def authorize_manage_saml!
-    render_404 unless can?(current_user, :admin_group_saml, @group)
-  end
-
-  def check_group_saml_configured
-    render_404 unless Gitlab::Auth::GroupSaml::Config.enabled?
-  end
-
-  def require_top_level_group
-    render_404 if @group.subgroup?
-  end
 
   def saml_provider_params
     allowed_params = %i[sso_url certificate_fingerprint enabled]

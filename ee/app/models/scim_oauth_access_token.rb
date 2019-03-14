@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ScimOauthAccessToken < ActiveRecord::Base
+class ScimOauthAccessToken < ApplicationRecord
   include TokenAuthenticatable
 
   belongs_to :group
