@@ -28,7 +28,8 @@ module API
           optional :approvals_before_merge, type: Integer, desc: 'The amount of approvals required before an MR can be merged'
           optional :reset_approvals_on_push, type: Boolean, desc: 'Should the approval count be reset on a new push'
           optional :disable_overriding_approvers_per_merge_request, type: Boolean, desc: 'Should MRs be able to override approvers and approval count'
-          at_least_one_of :approvals_before_merge, :reset_approvals_on_push, :disable_overriding_approvers_per_merge_request
+          optional :merge_requests_author_approval, type: Boolean, desc: 'Should authors be able to self approve merge requests'
+          at_least_one_of :approvals_before_merge, :reset_approvals_on_push, :disable_overriding_approvers_per_merge_request, :merge_requests_author_approval
         end
         post '/' do
           project_params = declared(params, include_missing: false, include_parent_namespaces: false)

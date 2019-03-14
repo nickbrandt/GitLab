@@ -1,0 +1,5 @@
+---
+title: Add self approval of merge requests setting to merge requests approvals API
+merge_request: 10050
+author:
+type: changed
