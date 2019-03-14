@@ -1,5 +1,6 @@
 <script>
 import Flash from '~/flash';
+import { __ } from '~/locale';
 import serviceDeskSetting from './service_desk_setting.vue';
 import ServiceDeskStore from '../stores/service_desk_store';
 import ServiceDeskService from '../services/service_desk_service';
@@ -65,14 +66,14 @@ export default {
         .then(data => {
           const email = data.service_desk_address;
           if (!email) {
-            throw new Error("Response didn't include `service_desk_address`");
+            throw new Error(__("Response didn't include `service_desk_address`"));
           }
 
           this.store.setIncomingEmail(email);
         })
         .catch(() => {
-          this.flash = new Flash(
-            'An error occurred while fetching the Service Desk address.',
+          this.flash = Flash(
+            __('An error occurred while fetching the Service Desk address.'),
             'alert',
             this.$el,
           );
@@ -83,7 +84,8 @@ export default {
       this.isEnabled = isChecked;
       this.store.resetIncomingEmail();
       if (this.flash) {
-        this.flash.destroy();
+        this.flash.remove();
+        this.flash = undefined;
       }
 
       this.service
@@ -92,18 +94,17 @@ export default {
         .then(data => {
           const email = data.service_desk_address;
           if (isChecked && !email) {
-            throw new Error("Response didn't include `service_desk_address`");
+            throw new Error(__("Response didn't include `service_desk_address`"));
           }
 
           this.store.setIncomingEmail(email);
         })
         .catch(() => {
-          const verb = isChecked ? 'enabling' : 'disabling';
-          this.flash = new Flash(
-            `An error occurred while ${verb} Service Desk.`,
-            'alert',
-            this.$el,
-          );
+          const message = isChecked
+            ? __('An error occurred while enabling Service Desk.')
+            : __('An error occurred while disabling Service Desk.');
+
+          this.flash = Flash(message, 'alert', this.$el);
         });
     },
   },

@@ -18,15 +18,15 @@ describe 'Service Desk Setting', :js do
   end
 
   it 'shows activation checkbox' do
-    expect(page).to have_selector("#service-desk-enabled-checkbox")
+    expect(page).to have_selector("#service-desk-checkbox")
   end
 
   it 'shows incoming email after activating' do
-    find("#service-desk-enabled-checkbox").click
+    find("#service-desk-checkbox").click
     wait_for_requests
     project.reload
     expect(project.service_desk_enabled).to be_truthy
     expect(project.service_desk_address).to be_present
-    expect(find('.js-service-desk-setting-wrapper .card-body')).to have_content(project.service_desk_address)
+    expect(find('.incoming-email').value).to eq(project.service_desk_address)
   end
 end

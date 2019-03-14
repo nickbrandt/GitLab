@@ -28,7 +28,9 @@ describe('ServiceDeskSetting', () => {
         });
 
         it('should see activation checkbox (not disabled)', () => {
-          expect(vm.$refs['enabled-checkbox'].getAttribute('disabled')).toEqual(null);
+          const checkbox = vm.$refs['service-desk-checkbox'].$el;
+
+          expect(checkbox.querySelector('.project-feature-toggle:not(.is-checked)')).toEqual(null);
         });
 
         it('should see main panel with the email info', () => {
@@ -56,28 +58,16 @@ describe('ServiceDeskSetting', () => {
       });
 
       it('should see email', () => {
-        expect(vm.$refs['service-desk-incoming-email'].textContent.trim()).toEqual(incomingEmail);
+        expect(vm.$refs['service-desk-incoming-email'].value.trim()).toEqual(incomingEmail);
         expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
         expect(vm.$el.querySelector('.fa-exclamation-circle')).toBeNull();
       });
 
       it('renders a copy to clipboard button', () => {
-        const button = vm.$el.querySelector('.btn-clipboard');
+        const button = vm.$el.querySelector('.qa-clipboard-button');
 
         expect(button).not.toBe(null);
         expect(button.dataset.clipboardText).toBe(incomingEmail);
-      });
-
-      it('renders a help question icon which links to gitlab docs', () => {
-        const link = vm.$el.querySelector('.card-body a');
-
-        expect(link).not.toBeNull();
-
-        expect(link.href).toContain('docs.gitlab.com');
-
-        const icon = link.querySelector('i.fa-question-circle');
-
-        expect(icon).not.toBeNull();
       });
     });
   });
@@ -121,22 +111,14 @@ describe('ServiceDeskSetting', () => {
 
       it('when getting checked', () => {
         expect(onCheckboxToggleSpy).not.toHaveBeenCalled();
-        vm.onCheckboxToggle({
-          target: {
-            checked: true,
-          },
-        });
+        vm.onCheckboxToggle(true);
 
         expect(onCheckboxToggleSpy).toHaveBeenCalledWith(true);
       });
 
       it('when getting unchecked', () => {
         expect(onCheckboxToggleSpy).not.toHaveBeenCalled();
-        vm.onCheckboxToggle({
-          target: {
-            checked: false,
-          },
-        });
+        vm.onCheckboxToggle(false);
 
         expect(onCheckboxToggleSpy).toHaveBeenCalledWith(false);
       });
