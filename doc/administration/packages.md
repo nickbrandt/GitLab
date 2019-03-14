@@ -18,7 +18,7 @@ to GitLab. This [development documentation](../development/packages.md) will gui
 ## Enabling the Packages feature
 
 NOTE: **Note:**
-After the Packages feature is enabled, the repositories are available for
+After the Packages feature is enabled, the repositories are available
 for all new projects by default. To enable it for existing projects, users will
 have to explicitly do so in the project's settings.
 
