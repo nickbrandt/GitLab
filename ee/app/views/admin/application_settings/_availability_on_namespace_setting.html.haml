@@ -1,0 +1,10 @@
+- return unless ::Gitlab.dev_env_or_com?
+
+- form = local_assigns.fetch(:form)
+
+.form-group
+  = form.label :check_namespace_plan, _('Check feature availability on namespace plan'), class: 'label-bold'
+  .form-check
+    = form.check_box :check_namespace_plan, class: 'form-check-input'
+    = form.label :check_namespace_plan, class: 'form-check-label' do
+      = _("Enabling this will only make licensed EE features available to projects if the project namespace's plan includes the feature or if the project is public.")
