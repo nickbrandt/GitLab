@@ -42,7 +42,7 @@ module Gitlab
             WHEN #{Gitlab::Database.pg_last_wal_receive_lsn}() = #{Gitlab::Database.pg_last_wal_replay_lsn}()
               THEN 0
             ELSE
-              EXTRACT (EPOCH FROM now() - pg_last_xact_replay_timestamp())::INTEGER
+              EXTRACT (EPOCH FROM now() - #{Gitlab::Database.pg_last_xact_replay_timestamp}())::INTEGER
             END
             AS replication_lag
           SQL

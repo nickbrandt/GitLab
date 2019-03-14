@@ -195,6 +195,12 @@ describe Gitlab::Database do
     end
   end
 
+  describe '.pg_last_xact_replay_timestamp' do
+    it 'returns pg_last_xact_replay_timestamp' do
+      expect(described_class.pg_last_xact_replay_timestamp).to eq('pg_last_xact_replay_timestamp')
+    end
+  end
+
   describe '.nulls_last_order' do
     context 'when using PostgreSQL' do
       before do
