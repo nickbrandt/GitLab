@@ -246,6 +246,29 @@ module EE
       update_column :admin_email_unsubscribed_at, Time.now
     end
 
+    override :allow_password_authentication_for_web?
+    def allow_password_authentication_for_web?(*)
+      return false if group_managed_account?
+
+      super
+    end
+
+    override :allow_password_authentication_for_git?
+    def allow_password_authentication_for_git?(*)
+      return false if group_managed_account?
+
+      super
+    end
+
+    protected
+
+    override :password_required?
+    def password_required?(*)
+      return false if group_managed_account?
+
+      super
+    end
+
     private
 
     def namespace_union(select = :id)
