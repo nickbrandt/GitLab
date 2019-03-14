@@ -1,0 +1,5 @@
+---
+title: 'Geo: Support archive recovery or streaming replication types in health check'
+merge_request: 9935
+author:
+type: fixed
