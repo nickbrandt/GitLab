@@ -3,6 +3,6 @@ HealthCheck.setup do |config|
   config.full_checks = %w(database migrations cache)
 
   config.add_custom_check('geo') do
-    Gitlab::Geo::HealthCheck.perform_checks
+    Gitlab::Geo::HealthCheck.new.perform_checks
   end
 end

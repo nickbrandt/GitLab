@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "allOf": [
+    { "$ref": "../../../../../../spec/fixtures/api/schemas/entities/issue_boards.json" },
+    {
+      "required" : [
+        "total_weight"
+      ],
+      "properties": {
+        "total_weight": { "type": "integer" }
+      }
+    }
+  ]
+}

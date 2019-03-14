@@ -15,7 +15,7 @@ class Admin::Geo::NodesController < Admin::ApplicationController
       flash.now[:alert] = _('You need a different license to enable Geo replication.')
     end
 
-    unless Gitlab::Database.pg_stat_wal_receiver_supported?
+    unless Gitlab::Database.postgresql_minimum_supported_version?
       flash.now[:warning] = _('Please upgrade PostgreSQL to version 9.6 or greater. The status of the replication cannot be determined reliably with the current version.')
     end
   end

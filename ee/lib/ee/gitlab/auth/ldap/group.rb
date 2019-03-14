@@ -164,11 +164,9 @@ module EE
             end
 
             members.select do |dn|
-              begin
-                ::Gitlab::Auth::LDAP::DN.new(dn).to_a.last(base.length) == base
-              rescue ::Gitlab::Auth::LDAP::DN::FormatError => e
-                Rails.logger.warn "Received invalid member DN from LDAP group '#{cn}': '#{dn}'. Error: \"#{e.message}\". Skipping"
-              end
+              ::Gitlab::Auth::LDAP::DN.new(dn).to_a.last(base.length) == base
+            rescue ::Gitlab::Auth::LDAP::DN::FormatError => e
+              Rails.logger.warn "Received invalid member DN from LDAP group '#{cn}': '#{dn}'. Error: \"#{e.message}\". Skipping"
             end
           end
 

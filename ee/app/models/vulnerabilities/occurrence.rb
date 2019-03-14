@@ -144,11 +144,9 @@ module Vulnerabilities
 
     def metadata
       strong_memoize(:metadata) do
-        begin
-          JSON.parse(raw_metadata)
-        rescue JSON::ParserError
-          {}
-        end
+        JSON.parse(raw_metadata)
+      rescue JSON::ParserError
+        {}
       end
     end
 

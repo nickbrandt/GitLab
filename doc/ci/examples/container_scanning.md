@@ -1,20 +1,73 @@
-# Container Scanning with GitLab CI/CD
-
-CAUTION: **Caution:**
-The job definition shown below is supported on GitLab 11.5 and later versions.
-It also requires the GitLab Runner 11.5 or later.
-For earlier versions, use the [previous job definitions](#previous-job-definitions).
+# Container Scanning with GitLab CI/CD **[ULTIMATE]**
 
 You can check your Docker images (or more precisely the containers) for known
 vulnerabilities by using [Clair](https://github.com/coreos/clair) and
 [clair-scanner](https://github.com/arminc/clair-scanner), two open source tools
 for Vulnerability Static Analysis for containers.
 
-First, you need GitLab Runner with
-[docker-in-docker executor](../docker/using_docker_build.md#use-docker-in-docker-executor).
+These examples show how to run Container Scanning on your Docker image by using GitLab CI/CD.
 
-Once you set up the Runner, add a new job to `.gitlab-ci.yml` that
-generates the expected report:
+CAUTION: **Caution:**
+Starting with GitLab 11.5, Container Scanning feature is licensed under the name `container_scanning`.
+While the old name `sast_container` is still maintained, it has been deprecated with GitLab 11.5 and
+may be removed in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
+configuration to reflect that change if you are using the `$GITLAB_FEATURES` environment variable.
+
+## Prerequisites
+
+To run a Container Scanning job, you need:
+
+- a GitLab Runner with
+[docker-in-docker executor](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
+- to [build and push](../../ci/docker/using_docker_build.md#container-registry-examples) your Docker image
+using the [Container Registry](https://docs.gitlab.com/ee/user/project/container_registry.html) running within your GitLab installation.
+
+## Configuring with templates
+
+Since GitLab 11.9, a CI/CD template with the default Container Scanning job definition is provided as a part of your GitLab installation.
+This section describes how to use it and customize its execution.
+
+### Using job definition template
+
+CAUTION: **Caution:**
+The CI/CD template for job definition is supported on GitLab 11.9 and later versions.
+For earlier versions, use the [manual job definition](#manual-job-definition).
+
+Once you set up the Runner, add a new job to `.gitlab-ci.yml` using [the CI/CD template](../../ci/yaml/README.md#includetemplate) for Container Scanning:
+
+```yaml
+include:
+  template: Container-Scanning.gitlab-ci.yml
+```
+
+If you want to whitelist some specific vulnerabilities, you can do so by defining
+them in a [YAML file](https://github.com/arminc/clair-scanner/blob/master/README.md#example-whitelist-yaml-file),
+in our case its named `clair-whitelist.yml`.
+
+### Scanning results
+
+The above example will create a `container_scanning` job in your CI/CD pipeline, pull
+the image from the [Container Registry](../../user/project/container_registry.md)
+(whose name is defined from the two `CI_APPLICATION_` variables) and scan it
+for possible vulnerabilities. The report will be saved as a
+[Container Scanning report artifact](../yaml/README.md#artifactsreportscontainer_scanning-ultimate)
+that you can later download and analyze.
+Due to implementation limitations we always take the latest Container Scanning artifact available.
+
+TIP: **Tip:**
+For [GitLab Ultimate][ee] users, this information will
+be automatically extracted and shown right in the merge request widget.
+[Learn more on Container Scanning in merge requests](../../user/project/merge_requests/container_scanning.html).
+
+## Manual job definition
+
+CAUTION: **Caution:**
+The job definition shown below is supported on GitLab 11.5 and later versions _(although it's preferred to use 
+[the job definition template](#using-job-definition-template) since 11.9)_.
+It also requires the GitLab Runner 11.5 or later.
+For earlier versions, use the [previous job definitions](#previous-job-definitions).
+
+If you are using GitLab prior to 11.9, you can define it manually using the following snippet:
 
 ```yaml
 container_scanning:
@@ -46,29 +99,6 @@ container_scanning:
     reports:
       container_scanning: gl-container-scanning-report.json
 ```
-
-The above example will create a `container_scanning` job in your CI/CD pipeline, pull
-the image from the [Container Registry](../../user/project/container_registry.md)
-(whose name is defined from the two `CI_APPLICATION_` variables) and scan it
-for possible vulnerabilities. The report will be saved as a
-[Container Scanning report artifact](../yaml/README.md#artifactsreportscontainer_scanning-ultimate)
-that you can later download and analyze.
-Due to implementation limitations we always take the latest Container Scanning artifact available.
-
-If you want to whitelist some specific vulnerabilities, you can do so by defining
-them in a [YAML file](https://github.com/arminc/clair-scanner/blob/master/README.md#example-whitelist-yaml-file),
-in our case its named `clair-whitelist.yml`.
-
-TIP: **Tip:**
-For [GitLab Ultimate][ee] users, this information will
-be automatically extracted and shown right in the merge request widget.
-[Learn more on Container Scanning in merge requests](../../user/project/merge_requests/container_scanning.html).
-
-CAUTION: **Caution:**
-Starting with GitLab 11.5, Container Scanning feature is licensed under the name `container_scanning`.
-While the old name `sast_container` is still maintained, it has been deprecated with GitLab 11.5 and
-may be removed in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
-configuration to reflect that change if you are using the `$GITLAB_FEATURES` environment variable.
 
 ## Previous job definitions
 
@@ -111,7 +141,7 @@ container_scanning:
     paths: [gl-container-scanning-report.json]
 ```
 
-Alternatively the job name could be `sast:container`
+Alternatively, the job name could be `sast:container`
 and the artifact name could be `gl-sast-container-report.json`.
 These names have been deprecated with GitLab 11.0
 and may be removed in next major release, GitLab 12.0.

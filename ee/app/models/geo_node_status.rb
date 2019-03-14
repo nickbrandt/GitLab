@@ -209,7 +209,7 @@ class GeoNodeStatus < ActiveRecord::Base
 
   def load_secondary_data
     if Gitlab::Geo.secondary?
-      self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.db_replication_lag_seconds
+      self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
       self.cursor_last_event_id = current_cursor_last_event_id
       self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
       self.repositories_synced_count = projects_finder.count_synced_repositories

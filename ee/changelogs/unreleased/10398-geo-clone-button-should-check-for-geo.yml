@@ -1,0 +1,6 @@
+---
+title: 'Geo: Only display Geo-specific clone instructions button on a Geo Secondary
+  node'
+merge_request: 10007
+author:
+type: fixed

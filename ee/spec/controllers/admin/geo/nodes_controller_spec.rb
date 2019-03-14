@@ -65,7 +65,7 @@ describe Admin::Geo::NodesController, :postgresql do
 
     context 'with Postgres 9.6 or greater' do
       before do
-        allow(Gitlab::Database).to receive(:pg_stat_wal_receiver_supported?).and_return(true)
+        allow(Gitlab::Database).to receive(:postgresql_minimum_supported_version?).and_return(true)
       end
 
       it_behaves_like 'no flash message', :warning
@@ -73,7 +73,7 @@ describe Admin::Geo::NodesController, :postgresql do
 
     context 'without Postgres 9.6 or greater' do
       before do
-        allow(Gitlab::Database).to receive(:pg_stat_wal_receiver_supported?).and_return(false)
+        allow(Gitlab::Database).to receive(:postgresql_minimum_supported_version?).and_return(false)
       end
 
       it_behaves_like 'with flash message', :warning, 'Please upgrade PostgreSQL to version 9.6 or greater.'

@@ -35,7 +35,6 @@ The following languages and frameworks are supported.
 | Language / framework    | Scan tool                                                                              |
 |-------------------------|----------------------------------------------------------------------------------------|
 | .NET                    | [Security Code Scan](https://security-code-scan.github.io)                             |
-| Any                     | [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog) and [Diffence](https://github.com/techjacker/diffence) (secret detectors) |
 | C/C++                   | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     |
 | Go                      | [Gosec](https://github.com/securego/gosec)                                             |
 | Groovy (Ant, Gradle, Maven and SBT) | [find-sec-bugs](https://find-sec-bugs.github.io/)                          |
@@ -47,6 +46,17 @@ The following languages and frameworks are supported.
 | Ruby on Rails           | [brakeman](https://brakemanscanner.org)                                                |
 | Scala (Ant, Gradle, Maven and SBT) | [find-sec-bugs](https://find-sec-bugs.github.io/)                           |
 | Typescript              | [TSLint Config Security](https://github.com/webschik/tslint-config-security/)          |
+
+## Secret Detection
+
+GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the repository.
+For example, an API key that allows write access to third-party deployment environments.
+
+This check is performed by a specific analyzer during the `sast` job. It runs regardless of the programming
+language of your app, and you don't need to change anything to your
+CI/CD configuration file to turn it on. Results are available in the SAST report.
+
+GitLab currently includes [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog), and [Diffence](https://github.com/techjacker/diffence).
 
 ## How it works
 

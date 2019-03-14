@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "allOf": [
+    { "$ref": "../../../../../spec/fixtures/api/schemas/issue.json" },
+    {
+      "properties": {
+        "weight": { "type": ["integer", "null"] }
+      }
+    }
+  ]
+}

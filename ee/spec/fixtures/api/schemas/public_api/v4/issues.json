@@ -1,4 +1,5 @@
 {
+  "type": "array",
   "allOf": [
     { "$ref": "../../../../../../../spec/fixtures/api/schemas/public_api/v4/issues.json" },
     {
