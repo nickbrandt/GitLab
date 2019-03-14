@@ -3613,9 +3613,6 @@ msgstr ""
 msgid "Embed"
 msgstr ""
 
-msgid "Emojis|Something went wrong while loading emojis."
-msgstr ""
-
 msgid "Empty file"
 msgstr ""
 
@@ -5761,7 +5758,10 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
-msgid "Label actions dropdown"
+msgid "Modify commit message"
+msgstr ""
+
+msgid "Modify commit messages"
 msgstr ""
 
 msgid "Label lists show all issues with the selected label."
@@ -11971,6 +11971,9 @@ msgid "missing"
 msgstr ""
 
 msgid "mrWidgetCommitsAdded|%{commitCount} and %{mergeCommitCount} will be added to %{targetBranch}."
+msgstr ""
+
+msgid "mrWidgetCommitsAdded|%{commitCount} will be added to %{targetBranch}."
 msgstr ""
 
 msgid "mrWidgetCommitsAdded|1 merge commit"
