@@ -12,8 +12,9 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   def show
     @saml_provider = @group.saml_provider || @group.build_saml_provider
 
-    @scim_token_exists = ScimOauthAccessToken.exists?(group: @group)
-    @scim_token_url = group_scim_oauth_url(@group)
+    scim_token = ScimOauthAccessToken.find_by_group_id(@group.id)
+
+    @scim_token_url = scim_token.as_entity_json[:scim_api_url] if scim_token
   end
   # rubocop: enable CodeReuse/ActiveRecord
 

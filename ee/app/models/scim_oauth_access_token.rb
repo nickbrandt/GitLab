@@ -9,4 +9,8 @@ class ScimOauthAccessToken < ApplicationRecord
 
   validates :group, presence: true
   before_save :ensure_token
+
+  def as_entity_json
+    ScimOauthAccessTokenEntity.new(self).as_json
+  end
 end

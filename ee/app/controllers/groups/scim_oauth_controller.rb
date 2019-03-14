@@ -15,7 +15,7 @@ class Groups::ScimOauthController < Groups::ApplicationController
     respond_to do |format|
       format.json do
         if scim_token
-          render json: ScimOauthAccessTokenEntity.new(scim_token).as_json
+          render json: scim_token.as_entity_json
         else
           render json: {}
         end
@@ -36,7 +36,7 @@ class Groups::ScimOauthController < Groups::ApplicationController
     respond_to do |format|
       format.json do
         if scim_token.valid?
-          render json: ScimOauthAccessTokenEntity.new(scim_token).as_json
+          render json: scim_token.as_entity_json
         else
           render json: { errors: scim_token.errors.full_messages }, status: :unprocessable_entity
         end
