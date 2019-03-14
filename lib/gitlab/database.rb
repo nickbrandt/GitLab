@@ -80,7 +80,7 @@ module Gitlab
       postgresql? && version.to_f >= 9.4
     end
 
-    def self.pg_stat_wal_receiver_supported?
+    def self.postgresql_minimum_supported_version?
       postgresql? && version.to_f >= 9.6
     end
 
