@@ -10,6 +10,10 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   before_action :feature_flag, only: [:edit, :update, :destroy]
 
+  before_action do
+    push_frontend_feature_flag(:feature_flag_permissions)
+  end
+
   def index
     @feature_flags = FeatureFlagsFinder
       .new(project, current_user, scope: params[:scope])

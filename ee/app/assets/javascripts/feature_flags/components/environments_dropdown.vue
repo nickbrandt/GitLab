@@ -53,6 +53,10 @@ export default {
       required: false,
       default: __('Create'),
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -175,10 +179,12 @@ export default {
         :aria-label="placeholder"
         :value="filter"
         :placeholder="placeholder"
+        :disabled="disabled"
         @input="fetchEnvironments"
       />
 
       <gl-button
+        v-if="!disabled"
         class="js-clear-search-input btn-transparent clear-search-input position-right-0"
         @click="clearInput"
       >

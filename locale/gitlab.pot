@@ -4468,6 +4468,9 @@ msgstr ""
 msgid "FeatureFlags|New Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Protected"
+msgstr ""
+
 msgid "FeatureFlags|Status"
 msgstr ""
 
