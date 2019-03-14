@@ -402,8 +402,8 @@ describe EE::User do
       end
 
       it 'does not require password to be present' do
-        expect(user).not_to  validate_presence_of(:password)
-        expect(user).not_to  validate_presence_of(:password_confirmation)
+        expect(user).not_to validate_presence_of(:password)
+        expect(user).not_to validate_presence_of(:password_confirmation)
       end
     end
   end
