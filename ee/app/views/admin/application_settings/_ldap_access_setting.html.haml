@@ -1,0 +1,13 @@
+- return unless ldap_enabled?
+
+- form = local_assigns.fetch(:form)
+
+.form-group
+  = form.label :allow_group_owners_to_manage_ldap, _('LDAP settings'), class: 'label-bold'
+  .form-check
+    = form.check_box :allow_group_owners_to_manage_ldap, class: 'form-check-input'
+    = form.label :allow_group_owners_to_manage_ldap, class: 'form-check-label' do
+      = _('Allow group owners to manage LDAP-related settings')
+  %span.form-text.text-muted
+    = _('If checked, group owners can manage LDAP group links and LDAP member overrides')
+    = link_to icon('question-circle'), help_page_path('administration/auth/ldap-ee')
