@@ -88,7 +88,6 @@ module QA
             end
 
             expect(push.output).to match(/Locking support detected on remote/)
-            expect(push.output).to match(%r{Uploading LFS objects: 100% \(1/1\)})
 
             # Validate git push worked and file exists with content
             Page::Project::Show.perform do |show|

@@ -151,7 +151,6 @@ module QA
               # internally.
               expect(push.output).to match(/warning: redirecting to #{primary_uri.to_s}/)
               expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
-              expect(push.output).to match(%r{Uploading LFS objects: 100% \(2/2\)})
 
               # Validate git push worked and new content is visible
               Page::Project::Show.perform do |show|
