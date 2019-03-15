@@ -9,7 +9,7 @@ shared_examples 'returns recently visited boards' do
     it 'returns a 401' do
       sign_out(user)
 
-      get_recent_boards
+      list_boards(recent: true)
 
       expect(response).to have_gitlab_http_status(401)
     end
@@ -20,27 +20,69 @@ shared_examples 'returns recently visited boards' do
       visit_board(boards[board_index], Time.now + i.minutes)
     end
 
-    get_recent_boards
+    list_boards(recent: true)
 
     expect(json_response.length).to eq(4)
     expect(json_response.map { |b| b['id'] }).to eq([1, 7, 3, 5].map { |i| boards[i].id })
   end
+end
 
-  def visit_board(board, time)
-    if parent.is_a?(Group)
-      create(:board_group_recent_visit, group: parent, board: board, user: user, updated_at: time)
-    else
-      create(:board_project_recent_visit, project: parent, board: board, user: user, updated_at: time)
+shared_examples 'redirects to last visited board' do
+  let(:boards) { create_list(:board, 3, parent: parent) }
+
+  before do
+    visit_board(boards[2], Time.now + 1.minute)
+    visit_board(boards[0], Time.now + 2.minutes)
+    visit_board(boards[1], Time.now + 5.minutes)
+  end
+
+  context 'when multiple boards are disabled' do
+    before do
+      stub_licensed_features(multiple_project_issue_boards: false, multiple_group_issue_boards: false)
+    end
+
+    it 'renders first board' do
+      list_boards
+
+      expect(response).to render_template :index
+      expect(response.content_type).to eq 'text/html'
     end
   end
 
-  def get_recent_boards
-    params = if parent.is_a?(Group)
-               { group_id: parent }
-             else
-               { namespace_id: parent.namespace, project_id: parent }
-             end
+  context 'when multiple boards are enabled' do
+    before do
+      stub_licensed_features(multiple_project_issue_boards: true, multiple_group_issue_boards: true)
+    end
 
-    get :recent, params: params, format: :json
+    it 'redirects to latest visited board' do
+      list_boards
+
+      board_path = if parent.is_a?(Group)
+                     group_board_path(group_id: parent, id: boards[1].id)
+                   else
+                     namespace_project_board_path(namespace_id: parent.namespace, project_id: parent, id: boards[1].id)
+                   end
+
+      expect(response).to redirect_to(board_path)
+    end
+  end
+end
+
+def list_boards(recent: false)
+  action = recent ? :recent : :index
+  params = if parent.is_a?(Group)
+             { group_id: parent }
+           else
+             { namespace_id: parent.namespace, project_id: parent }
+           end
+
+  get action, params: params, format: :json
+end
+
+def visit_board(board, time)
+  if parent.is_a?(Group)
+    create(:board_group_recent_visit, group: parent, board: board, user: user, updated_at: time)
+  else
+    create(:board_project_recent_visit, project: parent, board: board, user: user, updated_at: time)
   end
 end
