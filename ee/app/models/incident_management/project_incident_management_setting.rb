@@ -8,10 +8,8 @@ module IncidentManagement
 
     validate :issue_template_exists, if: :create_issue?
 
-    def issue_template_content
-      strong_memoize(:issue_template_content) do
-        issue_template&.content if issue_template_key.present?
-      end
+    def available_issue_templates
+      Gitlab::Template::IssueTemplate.all(project)
     end
 
     def issue_template_content

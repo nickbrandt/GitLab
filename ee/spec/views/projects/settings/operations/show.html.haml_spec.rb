@@ -11,7 +11,7 @@ describe 'projects/settings/operations/show' do
     assign(:repository, project.repository)
     allow(view).to receive(:current_ref).and_return('master')
     allow(view).to receive(:error_tracking_setting).and_return(error_tracking_setting)
-
+    allow(view).to receive(:incident_management_available?) { false }
     stub_licensed_features(tracing: true)
   end
 
