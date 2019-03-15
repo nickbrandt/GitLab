@@ -17,7 +17,7 @@ describe 'projects/merge_requests/edit.html.haml' do
       source_project: forked_project,
       target_project: project,
       author: user,
-      assignee: user,
+      assignees: [user],
       milestone: milestone)
   end
 
@@ -41,7 +41,7 @@ describe 'projects/merge_requests/edit.html.haml' do
 
       expect(rendered).to have_field('merge_request[title]')
       expect(rendered).to have_field('merge_request[description]')
-      expect(rendered).to have_selector('#merge_request_assignee_id', visible: false)
+      expect(rendered).to have_selector('input[name="merge_request[label_ids][]"]', visible: false)
       expect(rendered).to have_selector('#merge_request_milestone_id', visible: false)
       expect(rendered).not_to have_selector('#merge_request_target_branch', visible: false)
     end
@@ -53,7 +53,7 @@ describe 'projects/merge_requests/edit.html.haml' do
 
       expect(rendered).to have_field('merge_request[title]')
       expect(rendered).to have_field('merge_request[description]')
-      expect(rendered).to have_selector('#merge_request_assignee_id', visible: false)
+      expect(rendered).to have_selector('input[name="merge_request[label_ids][]"]', visible: false)
       expect(rendered).to have_selector('#merge_request_milestone_id', visible: false)
       expect(rendered).to have_selector('#merge_request_target_branch', visible: false)
     end

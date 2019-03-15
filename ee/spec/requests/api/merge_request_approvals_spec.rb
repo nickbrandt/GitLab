@@ -3,9 +3,10 @@ require 'spec_helper'
 describe API::MergeRequestApprovals do
   set(:user)          { create(:user) }
   set(:user2)         { create(:user) }
+  set(:user3)         { create(:user) }
   set(:admin)         { create(:user, :admin) }
   set(:project)       { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
-  set(:merge_request) { create(:merge_request, :simple, author: user, assignee: user, source_project: project, target_project: project, title: "Test", created_at: Time.now) }
+  set(:merge_request) { create(:merge_request, :simple, author: user, assignees: [user, user3], source_project: project, target_project: project, title: "Test", created_at: Time.now) }
 
   before do
     project.update_attribute(:approvals_before_merge, 2)
@@ -394,7 +395,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
   set(:user2)         { create(:user) }
   set(:admin)         { create(:user, :admin) }
   set(:project)       { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
-  set(:merge_request) { create(:merge_request, :simple, author: user, assignee: user, source_project: project, target_project: project, title: "Test", created_at: Time.now) }
+  set(:merge_request) { create(:merge_request, :simple, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: Time.now) }
 
   set(:approver) { create :user }
   set(:group) { create :group }

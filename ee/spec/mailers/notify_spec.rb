@@ -12,12 +12,13 @@ describe Notify do
   set(:user) { create(:user) }
   set(:current_user) { create(:user, email: "current@email.com") }
   set(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
+  set(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
 
   set(:merge_request) do
     create(:merge_request, source_project: project,
                            target_project: project,
                            author: current_user,
-                           assignee: assignee,
+                           assignees: [assignee, assignee2],
                            description: 'Awesome description')
   end
 
@@ -85,9 +86,7 @@ describe Notify do
         end
 
         subject do
-          described_class.new_merge_request_email(
-            merge_request.assignee_id, merge_request.id
-          )
+          described_class.new_merge_request_email(assignee.id, merge_request.id)
         end
 
         it "contains the approvers list" do
@@ -100,7 +99,7 @@ describe Notify do
         subject { described_class.approved_merge_request_email(recipient.id, merge_request.id, last_approver.id) }
 
         before do
-          merge_request.approvals.create(user: merge_request.assignee)
+          merge_request.approvals.create(user: assignee)
           merge_request.approvals.create(user: last_approver)
         end
 
@@ -130,13 +129,20 @@ describe Notify do
         end
 
         it 'contains the names of all of the approvers' do
-          is_expected.to have_body_text /#{merge_request.assignee.name}/
-          is_expected.to have_body_text /#{last_approver.name}/
+          merge_request.approvals.each do |approval|
+            is_expected.to have_body_text /#{approval.user.name}/
+          end
+        end
+
+        it 'contains the names of all assignees' do
+          merge_request.assignees.each do |assignee|
+            is_expected.to have_body_text /#{assignee.name}/
+          end
         end
 
         context 'when merge request has no assignee' do
           before do
-            merge_request.update(assignee: nil)
+            merge_request.update(assignees: [])
           end
 
           it 'does not show the assignee' do
@@ -150,7 +156,7 @@ describe Notify do
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request.id, last_unapprover.id) }
 
         before do
-          merge_request.approvals.create(user: merge_request.assignee)
+          merge_request.approvals.create(user: assignee)
         end
 
         it_behaves_like 'a multiple recipients email'
@@ -179,7 +185,15 @@ describe Notify do
         end
 
         it 'contains the names of all of the approvers' do
-          is_expected.to have_body_text /#{merge_request.assignee.name}/
+          merge_request.approvals.each do |approval|
+            is_expected.to have_body_text /#{approval.user.name}/
+          end
+        end
+
+        it 'contains the names of all assignees' do
+          merge_request.assignees.each do |assignee|
+            is_expected.to have_body_text /#{assignee.name}/
+          end
         end
       end
     end
@@ -190,7 +204,7 @@ describe Notify do
         subject { described_class.unapproved_merge_request_email(recipient.id, merge_request_without_assignee.id, last_unapprover.id) }
 
         before do
-          merge_request_without_assignee.approvals.create(user: merge_request_without_assignee.assignee)
+          merge_request_without_assignee.approvals.create(user: merge_request_without_assignee.assignees.first)
         end
 
         it 'contains the new status' do

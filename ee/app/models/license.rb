@@ -26,6 +26,7 @@ class License < ApplicationRecord
     merge_request_approvers
     multiple_ldap_servers
     multiple_issue_assignees
+    multiple_merge_request_assignees
     multiple_project_issue_boards
     push_rules
     protected_refs_for_users

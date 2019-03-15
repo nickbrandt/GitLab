@@ -9,10 +9,10 @@ describe API::MergeRequests do
   let(:project)     { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   let(:milestone)   { create(:milestone, title: '1.0.0', project: project) }
   let(:milestone1)  { create(:milestone, title: '0.9', project: project) }
-  let!(:merge_request) { create(:merge_request, :simple, milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Test", created_at: base_time) }
-  let!(:merge_request_closed) { create(:merge_request, state: "closed", milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Closed test", created_at: base_time + 1.second) }
-  let!(:merge_request_merged) { create(:merge_request, state: "merged", author: user, assignee: user, source_project: project, target_project: project, title: "Merged test", created_at: base_time + 2.seconds, merge_commit_sha: '9999999999999999999999999999999999999999') }
-  let!(:merge_request_locked) { create(:merge_request, state: "locked", milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Locked test", created_at: base_time + 1.second) }
+  let!(:merge_request) { create(:merge_request, :simple, milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: base_time) }
+  let!(:merge_request_closed) { create(:merge_request, state: "closed", milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: "Closed test", created_at: base_time + 1.second) }
+  let!(:merge_request_merged) { create(:merge_request, state: "merged", author: user, assignees: [user], source_project: project, target_project: project, title: "Merged test", created_at: base_time + 2.seconds, merge_commit_sha: '9999999999999999999999999999999999999999') }
+  let!(:merge_request_locked) { create(:merge_request, state: "locked", milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: "Locked test", created_at: base_time + 1.second) }
   let!(:note)       { create(:note_on_merge_request, author: user, project: project, noteable: merge_request, note: "a comment on a MR") }
   let!(:note2)      { create(:note_on_merge_request, author: user, project: project, noteable: merge_request, note: "another comment on a MR") }
   let(:label) { create(:label, title: 'label', color: '#FFAABB', project: project) }
@@ -45,9 +45,9 @@ describe API::MergeRequests do
           get api(endpoint_path, user)
         end
 
-        create(:merge_request, state: 'closed', milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: 'Test', created_at: base_time)
+        create(:merge_request, state: 'closed', milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: 'Test', created_at: base_time)
 
-        merge_request = create(:merge_request, milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: 'Test', created_at: base_time)
+        merge_request = create(:merge_request, milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: 'Test', created_at: base_time)
 
         merge_request.metrics.update!(merged_by: user,
                                       latest_closed_by: user,
@@ -333,7 +333,7 @@ describe API::MergeRequests do
                    state: 'closed',
                    milestone: milestone1,
                    author: user,
-                   assignee: user,
+                   assignees: [user],
                    source_project: project,
                    target_project: project,
                    title: "Test",
@@ -451,7 +451,7 @@ describe API::MergeRequests do
 
     context 'when authenticated' do
       let!(:project2) { create(:project, :public, namespace: user.namespace) }
-      let!(:merge_request2) { create(:merge_request, :simple, author: user, assignee: user, source_project: project2, target_project: project2) }
+      let!(:merge_request2) { create(:merge_request, :simple, author: user, assignees: [user], source_project: project2, target_project: project2) }
       let(:user2) { create(:user) }
 
       it 'returns an array of all merge requests except unauthorized ones' do
@@ -494,7 +494,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests created by current user if no scope is given' do
-        merge_request3 = create(:merge_request, :simple, author: user2, assignee: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user2, assignees: [user], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user2)
 
@@ -502,7 +502,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests authored by the given user' do
-        merge_request3 = create(:merge_request, :simple, author: user2, assignee: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user2, assignees: [user], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user), params: { author_id: user2.id, scope: :all }
 
@@ -510,7 +510,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests assigned to the given user' do
-        merge_request3 = create(:merge_request, :simple, author: user, assignee: user2, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user, assignees: [user2], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user), params: { assignee_id: user2.id, scope: :all }
 
@@ -535,7 +535,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests assigned to me' do
-        merge_request3 = create(:merge_request, :simple, author: user, assignee: user2, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user, assignees: [user2], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user2), params: { scope: 'assigned_to_me' }
 
@@ -543,7 +543,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests assigned to me (kebab-case)' do
-        merge_request3 = create(:merge_request, :simple, author: user, assignee: user2, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user, assignees: [user2], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user2), params: { scope: 'assigned-to-me' }
 
@@ -551,7 +551,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests created by me' do
-        merge_request3 = create(:merge_request, :simple, author: user2, assignee: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user2, assignees: [user], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user2), params: { scope: 'created_by_me' }
 
@@ -559,7 +559,7 @@ describe API::MergeRequests do
       end
 
       it 'returns an array of merge requests created by me (kebab-case)' do
-        merge_request3 = create(:merge_request, :simple, author: user2, assignee: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user2, assignees: [user], source_project: project2, target_project: project2, source_branch: 'other-branch')
 
         get api('/merge_requests', user2), params: { scope: 'created-by-me' }
 
@@ -567,7 +567,7 @@ describe API::MergeRequests do
       end
 
       it 'returns merge requests reacted by the authenticated user by the given emoji' do
-        merge_request3 = create(:merge_request, :simple, author: user, assignee: user, source_project: project2, target_project: project2, source_branch: 'other-branch')
+        merge_request3 = create(:merge_request, :simple, author: user, assignees: [user], source_project: project2, target_project: project2, source_branch: 'other-branch')
         award_emoji = create(:award_emoji, awardable: merge_request3, user: user2, name: 'star')
 
         get api('/merge_requests', user2), params: { my_reaction_emoji: award_emoji.name, scope: 'all' }
@@ -700,7 +700,7 @@ describe API::MergeRequests do
         get api("/projects/#{project.id}/merge_requests", user)
       end.count
 
-      create(:merge_request, author: user, assignee: user, source_project: project, target_project: project, created_at: base_time)
+      create(:merge_request, author: user, assignees: [user], source_project: project, target_project: project, created_at: base_time)
 
       expect do
         get api("/projects/#{project.id}/merge_requests", user)
@@ -851,7 +851,7 @@ describe API::MergeRequests do
     end
 
     context 'Work in Progress' do
-      let!(:merge_request_wip) { create(:merge_request, author: user, assignee: user, source_project: project, target_project: project, title: "WIP: Test", created_at: base_time + 1.second) }
+      let!(:merge_request_wip) { create(:merge_request, author: user, assignees: [user], source_project: project, target_project: project, title: "WIP: Test", created_at: base_time + 1.second) }
 
       it "returns merge request" do
         get api("/projects/#{project.id}/merge_requests/#{merge_request_wip.iid}", user)
@@ -867,7 +867,7 @@ describe API::MergeRequests do
 
         merge_request_overflow = create(:merge_request, :simple,
                                         author: user,
-                                        assignee: user,
+                                        assignees: [user],
                                         source_project: project,
                                         source_branch: 'expand-collapse-files',
                                         target_project: project,
@@ -1749,7 +1749,7 @@ describe API::MergeRequests do
       issue = create(:issue, project: jira_project)
       description = "Closes #{ext_issue.to_reference(jira_project)}\ncloses #{issue.to_reference}"
       merge_request = create(:merge_request,
-        :simple, author: user, assignee: user, source_project: jira_project, description: description)
+        :simple, author: user, assignees: [user], source_project: jira_project, description: description)
 
       get api("/projects/#{jira_project.id}/merge_requests/#{merge_request.iid}/closes_issues", user)
 
