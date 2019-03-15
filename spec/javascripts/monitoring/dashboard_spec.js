@@ -33,6 +33,11 @@ describe('Dashboard', () => {
       <div class="layout-page"></div>
     `);
 
+    window.gon = {
+      ...window.gon,
+      ee: false,
+    };
+
     mock = new MockAdapter(axios);
     DashboardComponent = Vue.extend(Dashboard);
   });
@@ -160,7 +165,7 @@ describe('Dashboard', () => {
           ...propsData,
           hasMetrics: true,
           showPanels: false,
-          showEnvironmentDropdown: false,
+          environmentsEndpoint: '',
         },
       });
 

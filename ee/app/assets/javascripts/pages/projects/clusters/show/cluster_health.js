@@ -15,7 +15,6 @@ export default () => {
             showLegend: false,
             showPanels: false,
             forceSmallGraph: true,
-            showEnvironmentDropdown: false,
             currentEnvironmentName: '',
             environmentsEndpoint: '',
           },

@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import Dashboard from '~/monitoring/components/dashboard.vue';
+import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import axios from '~/lib/utils/axios_utils';
 import { metricsGroupsAPIResponse, mockApiEndpoint } from 'spec/monitoring/mock_data';
 import propsData from 'spec/monitoring/dashboard_spec';
@@ -17,6 +17,12 @@ describe('Dashboard', () => {
       <div class="prometheus-graphs"></div>
       <div class="layout-page"></div>
     `);
+
+    window.gon = {
+      ...window.gon,
+      ee: true,
+    };
+
     mock = new MockAdapter(axios);
     Component = localVue.extend(Dashboard);
   });

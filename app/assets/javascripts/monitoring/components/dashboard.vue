@@ -1,9 +1,8 @@
 <script>
-// ee-only
-import DashboardMixin from 'ee/monitoring/components/dashboard_mixin';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import '~/vue_shared/mixins/is_ee';
 import Flash from '../../flash';
 import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
@@ -23,9 +22,6 @@ export default {
     GlDropdown,
     GlDropdownItem,
   },
-
-  // ee-only
-  mixins: [DashboardMixin],
 
   props: {
     hasMetrics: {
@@ -91,11 +87,6 @@ export default {
       type: String,
       required: true,
     },
-    showEnvironmentDropdown: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   data() {
     return {
@@ -131,7 +122,7 @@ export default {
     if (!this.hasMetrics) {
       this.state = 'gettingStarted';
     } else {
-      if (this.showEnvironmentDropdown) {
+      if (this.environmentsEndpoint) {
         this.servicePromises.push(
           this.service
             .getEnvironmentsData()
@@ -180,7 +171,7 @@ export default {
 
 <template>
   <div v-if="!showEmptyState" class="prometheus-graphs prepend-top-default">
-    <div v-if="showEnvironmentDropdown" class="environments d-flex align-items-center">
+    <div v-if="environmentsEndpoint" class="environments d-flex align-items-center">
       <strong>{{ s__('Metrics|Environment') }}</strong>
       <gl-dropdown
         class="prepend-left-10 js-environments-dropdown"
@@ -212,9 +203,8 @@ export default {
         :container-width="elWidth"
         group-id="monitor-area-chart"
       >
-        <!-- EE content -->
         <alert-widget
-          v-if="prometheusAlertsAvailable && alertsEndpoint && graphData.id"
+          v-if="isEE && prometheusAlertsAvailable && alertsEndpoint && graphData.id"
           :alerts-endpoint="alertsEndpoint"
           :label="getGraphLabel(graphData)"
           :current-alerts="getQueryAlerts(graphData)"
