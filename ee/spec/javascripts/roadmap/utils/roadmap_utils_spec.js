@@ -8,6 +8,7 @@ import {
   extendTimeframeForAvailableWidth,
   getEpicsPathForPreset,
   sortEpics,
+  assignDates,
 } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
@@ -432,5 +433,116 @@ describe('sortEpics', () => {
     epics.forEach((epic, index) => {
       expect(epic.endDate.getTime()).toBe(sortedOrder[index].getTime());
     });
+  });
+});
+
+describe('assignDates', () => {
+  const startDateProps = {
+    dateUndefined: 'startDateUndefined',
+    outOfRange: 'startDateOutOfRange',
+    originalDate: 'originalStartDate',
+    date: 'startDate',
+    proxyDate: new Date('1900'),
+  };
+  const endDateProps = {
+    dateUndefined: 'endDateUndefined',
+    outOfRange: 'endDateOutOfRange',
+    originalDate: 'originalEndDate',
+    date: 'endDate',
+    proxyDate: new Date('2200'),
+  };
+
+  it('returns proxyDate if startDate is undefined', () => {
+    const epic1 = { startDateUndefined: true };
+    const epic2 = { startDateUndefined: false };
+
+    let [aDate, bDate] = assignDates(epic1, epic2, startDateProps);
+
+    expect(aDate).toEqual(startDateProps.proxyDate);
+    expect(bDate).not.toEqual(startDateProps.proxyDate);
+
+    epic1.startDateUndefined = false;
+    epic2.startDateUndefined = true;
+    [aDate, bDate] = assignDates(epic1, epic2, startDateProps);
+
+    expect(aDate).not.toEqual(startDateProps.proxyDate);
+    expect(bDate).toEqual(startDateProps.proxyDate);
+  });
+
+  it('returns proxyDate if endDate is undefined', () => {
+    const epic1 = { endDateUndefined: true };
+    const epic2 = { endDateUndefined: false };
+
+    let [aDate, bDate] = assignDates(epic1, epic2, endDateProps);
+
+    expect(aDate).toEqual(endDateProps.proxyDate);
+    expect(bDate).not.toEqual(endDateProps.proxyDate);
+
+    epic1.endDateUndefined = false;
+    epic2.endDateUndefined = true;
+    [aDate, bDate] = assignDates(epic1, epic2, endDateProps);
+
+    expect(aDate).not.toEqual(endDateProps.proxyDate);
+    expect(bDate).toEqual(endDateProps.proxyDate);
+  });
+
+  it('assigns originalStartDate if date is out of range', () => {
+    const epic1 = {
+      startDateUndefined: false,
+      originalStartDate: new Date('2000'),
+      startDate: new Date('2010'),
+      startDateOutOfRange: true,
+    };
+    const epic2 = { ...epic1, originalStartDate: new Date('2005') };
+
+    const [aDate, bDate] = assignDates(epic1, epic2, startDateProps);
+
+    expect(aDate).toEqual(epic1.originalStartDate);
+    expect(bDate).toEqual(epic2.originalStartDate);
+  });
+
+  it('assigns originalEndDate if date is out of range', () => {
+    const epic1 = {
+      endDateUndefined: false,
+      originalEndDate: new Date('2000'),
+      endDate: new Date('2010'),
+      endDateOutOfRange: true,
+    };
+    const epic2 = { ...epic1, originalEndDate: new Date('2005') };
+
+    const [aDate, bDate] = assignDates(epic1, epic2, endDateProps);
+
+    expect(aDate).toEqual(epic1.originalEndDate);
+    expect(bDate).toEqual(epic2.originalEndDate);
+  });
+
+  it('assigns startDate if date is in the range', () => {
+    const epic1 = {
+      startDateUndefined: false,
+      originalStartDate: new Date('2000'),
+      startDate: new Date('2010'),
+      startDateOutOfRange: false,
+    };
+    const epic2 = { ...epic1, startDate: new Date('2005') };
+
+    const [aDate, bDate] = assignDates(epic1, epic2, startDateProps);
+
+    expect(aDate).toEqual(epic1.startDate);
+    expect(bDate).toEqual(epic2.startDate);
+  });
+
+  it('assigns endDate if date is in the range', () => {
+    const epic1 = {
+      endDateUndefined: false,
+      originalEndDate: new Date('2000'),
+      endDate: new Date('2010'),
+      endDateOutOfRange: false,
+    };
+    const epic2 = { ...epic1, endDate: new Date('2005') };
+
+    const [aDate, bDate] = assignDates(epic1, epic2, endDateProps);
+
+    expect(aDate).toEqual(epic1.endDate);
+    expect(bDate).toEqual(epic2.endDate);
   });
 });
