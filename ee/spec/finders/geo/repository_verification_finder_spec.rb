@@ -252,4 +252,56 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
   describe '#find_reverifiable_wikis' do
     it_behaves_like 'find reverifiable projects', :wiki
   end
+
+  describe '#count_verified_repositories' do
+    context 'when a repository is verified' do
+      it 'includes the repository' do
+        create(:repository_state, :repository_verified)
+
+        expect(subject.count_verified_repositories).to eq(1)
+      end
+    end
+
+    context 'when a repository failed verification' do
+      it 'excludes the repository' do
+        create(:repository_state, :repository_failed)
+
+        expect(subject.count_verified_repositories).to eq(0)
+      end
+    end
+
+    context 'when a repository has outdated verification' do
+      it 'excludes the repository' do
+        create(:repository_state, :repository_outdated)
+
+        expect(subject.count_verified_repositories).to eq(0)
+      end
+    end
+  end
+
+  describe '#count_verified_wikis' do
+    context 'when a wiki is verified' do
+      it 'includes the wiki' do
+        create(:repository_state, :wiki_verified)
+
+        expect(subject.count_verified_wikis).to eq(1)
+      end
+    end
+
+    context 'when a wiki failed verification' do
+      it 'excludes the wiki' do
+        create(:repository_state, :wiki_failed)
+
+        expect(subject.count_verified_wikis).to eq(0)
+      end
+    end
+
+    context 'when a wiki has outdated verification' do
+      it 'excludes the wiki' do
+        create(:repository_state, :wiki_outdated)
+
+        expect(subject.count_verified_wikis).to eq(0)
+      end
+    end
+  end
 end
