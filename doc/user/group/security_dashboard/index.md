@@ -123,7 +123,7 @@ Clicking on the "Create merge request" button inside the more info modal will cr
 a merge request onto the default branch, then redirect you to that merge request.
 
 CAUTION: **Warning:** Automatic Patch creation is only available for a subset of
-[Dependency Scanning](dependency_scanning.md). At the moment only Node.JS projects
+[Dependency Scanning](../../project/merge_requests/dependency_scanning.md). At the moment only Node.JS projects
 managed with yarn are supported.
 
 ### Dismissing a vulnerability
