@@ -9,10 +9,6 @@ describe IssueSerializer do
       .with_indifferent_access
   end
 
-  before do
-    create(:epic_issue, issue: resource)
-  end
-
   context 'non-sidebar issue serialization' do
     let(:serializer) { nil }
 
