@@ -1,12 +1,15 @@
 require 'spec_helper'
 
 describe GroupsHelper do
-  describe '#group_sidebar_links' do
-    let(:user) { create(:user) }
-    let(:group) { create(:group, :private) }
+  before do
+    allow(helper).to receive(:current_user) { user }
+  end
 
+  let(:user) { create(:user, group_view: :security_dashboard) }
+  let(:group) { create(:group, :private) }
+
+  describe '#group_sidebar_links' do
     before do
-      allow(helper).to receive(:current_user) { user }
       group.add_owner(user)
       helper.instance_variable_set(:@group, group)
       allow(helper).to receive(:can?) { |*args| Ability.allowed?(*args) }
