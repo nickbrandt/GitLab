@@ -17,6 +17,9 @@
           type: 'dashed'
         area:
           opacity: 0
+    - query_range: 'sum(kube_pod_container_resource_requests_cpu_cores{kubernetes_namespace="gitlab-managed-apps"})'
+      label: Requested
+      unit: "cores"
   - title: "Memory usage"
     y_label: "Memory"
     required_metrics: ['container_memory_usage_bytes']
@@ -33,3 +36,6 @@
           type: 'dashed'
         area:
           opacity: 0
+    - query_range: 'sum(kube_pod_container_resource_requests_memory_bytes{kubernetes_namespace="gitlab-managed-apps"})/2^30'
+      label: Requested
+      unit: "GiB"
