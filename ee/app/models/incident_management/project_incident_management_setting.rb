@@ -6,6 +6,10 @@ module IncidentManagement
 
     validate :issue_template_exists, if: :create_issue?
 
+    def available_issue_templates
+      Gitlab::Template::IssueTemplate.all(project)
+    end
+
     private
 
     def issue_template_exists
