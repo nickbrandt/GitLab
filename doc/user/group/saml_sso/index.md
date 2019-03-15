@@ -1,10 +1,10 @@
-# SAML SSO for Groups **[PREMIUM]**
+# SAML SSO for GitLab.com Groups **[PREMIUM]**
 
 > Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 11.0.
 
-This allows SAML to be used for adding users to a group on GitLab.com and other instances where using [site-wide SAML](../../../integration/saml.md) is not possible.
+This topic is for SAML on GitLab.com. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
 
-When using a group SAML SSO link, users should already have an account on the GitLab instance with the email address that matches the user account from the provider.
+Currently SAML on GitLab.com can be used to automatically add users to a group, and does not yet sign users into GitLab.com. Users should already have an account on the GitLab instance, or can create one when logging in for the first time.
 
 NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
 
@@ -12,15 +12,18 @@ NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add user
 
 1. Navigate to the group and click Settings -> SAML SSO.
 1. Configure your SAML server using the **Assertion consumer service URL** and **Issuer**. See [your identity provider's documentation](#providers) for more details.
+1. Configure the SAML response to include a NameID that uniquely identifies each user.
 1. Configure required assertions using the table below.
 1. Find the SSO URL from your Identity Provider and enter it on GitLab.
 1. Find and enter the fingerprint for the SAML token signing certificate.
 
 ## NameID
 
-GitLab.com uses the SAML NameID to identify users, so it must be present in the SAML response and unique to the user.
+GitLab.com uses the SAML NameID to identify users. The NameID element:
 
-The value should be something that will never change for that user, such as a unique ID or username. Email could also be used as the NameID, but only if it can be guaranteed to never change.
+- Is a required field in the SAML response.
+- Must be unique to each user.
+- Must be a persistent value that will never change, such as a unique ID or username. Email could also be used as the NameID, but only if it can be guaranteed to never change.
 
 ## Assertions
 
