@@ -23,6 +23,8 @@ the risk. You can also action these vulnerabilities by creating an issue for the
 
 Having your vulnerabilities in GitLab allows you to keep track of them and action them, all in the same application.
 
+![dashboard with action buttons and metrics](img/dashboard.png)
+
 ## Use cases
 
 You want to measure how secure your projects are without having to look into
@@ -63,14 +65,12 @@ Once you're on the dashboard, at the top you should see a series of filters for:
 - Report type
 - Project
 
-Selecting one or more of these will filter
-the results in the sectons below. The first section is an overview of all the
-vulnerabilities, grouped by severity. Underneath these overviews is a timeline
-chart that shows how many open vulnerabilities you had at various points in time.
-You can hover over the chart to get more details about the open vulnerabilities
-at that time.
-
-![dashboard with action buttons and metrics](img/dashboard.png)
+Selecting one or more filters will filter the results in this page.
+The first section is an overview of all the vulnerabilities, grouped by severity.
+Underneath this overview is a timeline chart that shows how many open
+vulnerabilities your projects had at various points in time. You can filter among 30, 60, and
+90 days, with the default being 90. Hover over the chart to get more details about
+the open vulnerabilities at a specific time.
 
 Finally, there is a list of all the vulnerabilities in the group, sorted by severity.
 In that list, you can see the severity of the vulnerability, its name, its
