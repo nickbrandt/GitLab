@@ -3621,6 +3621,7 @@ ActiveRecord::Schema.define(version: 20190305162221) do
   add_foreign_key "reviews", "projects", on_delete: :cascade
   add_foreign_key "reviews", "users", column: "author_id", on_delete: :nullify
   add_foreign_key "saml_providers", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "scim_oauth_access_tokens", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
   add_foreign_key "smartcard_identities", "users", on_delete: :cascade
