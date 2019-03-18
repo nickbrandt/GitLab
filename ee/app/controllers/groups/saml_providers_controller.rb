@@ -8,7 +8,6 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   before_action :check_group_saml_available!
   before_action :check_group_saml_configured
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def show
     @saml_provider = @group.saml_provider || @group.build_saml_provider
 
@@ -16,7 +15,6 @@ class Groups::SamlProvidersController < Groups::ApplicationController
 
     @scim_token_url = scim_token.as_entity_json[:scim_api_url] if scim_token
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def create
     @saml_provider = @group.build_saml_provider(saml_provider_params)

@@ -5,7 +5,7 @@ class ScimOauthAccessToken < ApplicationRecord
 
   belongs_to :group
 
-  add_authentication_token_field :token
+  add_authentication_token_field :token, encrypted: :required
 
   validates :group, presence: true
   before_save :ensure_token
