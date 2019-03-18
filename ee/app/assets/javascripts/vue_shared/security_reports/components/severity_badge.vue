@@ -1,4 +1,6 @@
 <script>
+import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
+
 export default {
   name: 'SeverityBadge',
   props: {
@@ -9,15 +11,17 @@ export default {
   },
   computed: {
     className() {
-      return `severity-badge-${this.severity}`;
+      return `severity-badge-${this.severity.toLowerCase()}`;
+    },
+    severityTitle() {
+      return SEVERITY_LEVELS[this.severity] || this.severity;
     },
   },
 };
 </script>
 
 <template>
-  <!-- TODO: How on earth do I get this translated in a DRY manner? -->
-  <div class="severity-badge" :class="className">{{ severity }}</div>
+  <div class="severity-badge" :class="className">{{ severityTitle }}</div>
 </template>
 
 <style>
