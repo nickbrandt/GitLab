@@ -1,0 +1,5 @@
+---
+title: Geo - Add selective sync support for the FDW queries to count synced registries
+merge_request: 9445
+author:
+type: changed

@@ -44,6 +44,40 @@ describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
+  describe '.enabled_for_selective_sync?' do
+    context 'when the feature flag is enabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: true)
+      end
+
+      it 'returns false when FDW is disabled' do
+        allow(described_class).to receive(:enabled?).and_return(false)
+
+        expect(described_class.enabled_for_selective_sync?).to eq false
+      end
+
+      it 'returns true when FDW is enabled' do
+        expect(described_class.enabled_for_selective_sync?).to eq true
+      end
+    end
+
+    context 'when the feature flag is disabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: false)
+      end
+
+      it 'returns false when FDW is disabled' do
+        allow(described_class).to receive(:enabled?).and_return(false)
+
+        expect(described_class.enabled_for_selective_sync?).to eq false
+      end
+
+      it 'returns false when FDW is enabled' do
+        expect(described_class.enabled_for_selective_sync?).to eq false
+      end
+    end
+  end
+
   describe '.foreign_tables_up_to_date?' do
     it 'returns false when foreign schema does not exist' do
       drop_foreign_schema

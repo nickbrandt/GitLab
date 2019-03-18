@@ -2,6 +2,7 @@
 
 class GeoNode < ActiveRecord::Base
   include Presentable
+  include Geo::SelectiveSync
 
   SELECTIVE_SYNC_TYPES = %w[namespaces shards].freeze
 
@@ -213,22 +214,10 @@ class GeoNode < ActiveRecord::Base
     end
   end
 
-  def selective_sync_by_namespaces?
-    selective_sync_type == 'namespaces'
-  end
-
-  def selective_sync_by_shards?
-    selective_sync_type == 'shards'
-  end
-
   def projects_include?(project_id)
     return true unless selective_sync?
 
     projects.where(id: project_id).exists?
-  end
-
-  def selective_sync?
-    selective_sync_type.present?
   end
 
   def replication_slots_count

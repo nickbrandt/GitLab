@@ -58,7 +58,9 @@ describe 'geo rake tasks', :geo do
     end
   end
 
-  describe 'status task' do
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  describe 'status task', :delete do
     let!(:current_node) { create(:geo_node) }
     let!(:primary_node) { create(:geo_node, :primary) }
     let!(:geo_event_log) { create(:geo_event_log) }

@@ -88,6 +88,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(project: Geo::Fdw::Project.search(query))
   end
 
+  def self.synced(type)
+    case type
+    when :repository
+      synced_repos
+    when :wiki
+      synced_wikis
+    else
+      none
+    end
+  end
+
   def self.flag_repositories_for_resync!
     update_all(
       resync_repository: true,
