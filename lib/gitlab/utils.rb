@@ -104,7 +104,6 @@ module Gitlab
       nil
     end
 
-    # EE below
     def try_megabytes_to_bytes(size)
       Integer(size).megabytes
     rescue ArgumentError
