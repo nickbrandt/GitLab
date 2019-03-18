@@ -39,15 +39,15 @@ describe Groups::ScimOauthController do
       context 'with token' do
         let!(:scim_token) { create(:scim_oauth_access_token, group: group) }
 
-        before do
-          subject
-        end
-
         it 'shows the token' do
+          subject
+
           expect(json_response['scim_token']).to eq(scim_token.token)
         end
 
         it 'shows the url' do
+          subject
+
           expect(json_response['scim_api_url']).not_to be_empty
         end
       end

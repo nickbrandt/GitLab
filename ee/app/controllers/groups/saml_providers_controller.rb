@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative '../concerns/saml_authorization.rb' # frozen_string_literal: true
+require_relative '../concerns/saml_authorization.rb'
 
 class Groups::SamlProvidersController < Groups::ApplicationController
   include SamlAuthorization

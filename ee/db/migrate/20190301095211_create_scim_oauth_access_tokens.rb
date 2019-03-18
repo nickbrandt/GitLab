@@ -1,4 +1,6 @@
 class CreateScimOauthAccessTokens < ActiveRecord::Migration[5.0]
+  DOWNTIME = false
+
   def change
     create_table :scim_oauth_access_tokens do |t|
       t.timestamps_with_timezone null: false
