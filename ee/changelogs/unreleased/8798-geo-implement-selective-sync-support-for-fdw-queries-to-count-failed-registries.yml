@@ -1,0 +1,5 @@
+---
+title: Geo - Add selective sync support for the FDW queries to count failed registries
+merge_request: 9527
+author:
+type: changed
