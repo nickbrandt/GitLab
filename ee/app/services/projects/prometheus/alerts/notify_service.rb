@@ -4,12 +4,15 @@ module Projects
   module Prometheus
     module Alerts
       class NotifyService < BaseService
+        include Gitlab::Utils::StrongMemoize
+
         def execute(token)
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
           send_alert_email if send_email?
-          persist_events(project, params)
+          process_incident_issues if create_issue?
+          persist_events
 
           true
         end
@@ -24,13 +27,28 @@ module Projects
           Feature.enabled?(:incident_management)
         end
 
+        def incident_management_available?
+          has_incident_management_license? && incident_management_feature_enabled?
+        end
+
+        def incident_management_setting
+          strong_memoize(:incident_management_setting) do
+            project.incident_management_setting ||
+              project.build_incident_management_setting
+          end
+        end
+
         def send_email?
-          return firings.any? unless incident_management_feature_enabled? &&
-              has_incident_management_license?
+          return firings.any? unless incident_management_available?
 
-          setting = project.incident_management_setting || project.build_incident_management_setting
+          incident_management_setting.send_email && firings.any?
+        end
 
-          setting.send_email && firings.any?
+        def create_issue?
+          return unless firings.any?
+          return unless incident_management_available?
+
+          incident_management_setting.create_issue?
         end
 
         def firings
@@ -112,7 +130,14 @@ module Projects
             .prometheus_alerts_fired(project, firings)
         end
 
-        def persist_events(project, params)
+        def process_incident_issues
+          firings.each do |alert|
+            IncidentManagement::ProcessAlertWorker
+              .perform_async(project.id, alert)
+          end
+        end
+
+        def persist_events
           CreateEventsService.new(project, nil, params).execute
         end
       end

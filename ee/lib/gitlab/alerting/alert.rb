@@ -31,6 +31,12 @@ module Gitlab
         gitlab_alert&.environment
       end
 
+      def annotations
+        strong_memoize(:annotations) do
+          parse_annotations_from_payload || []
+        end
+      end
+
       def valid?
         project && title
       end
@@ -59,6 +65,12 @@ module Gitlab
 
       def parse_description_from_payload
         payload&.dig('annotations', 'description')
+      end
+
+      def parse_annotations_from_payload
+        payload&.dig('annotations')&.map do |label, value|
+          Alerting::AlertAnnotation.new(label: label, value: value)
+        end
       end
     end
   end
