@@ -329,16 +329,13 @@ describe('actions', () => {
     });
   });
 
-  describe('searchProjects', () => {
-    const mockQuery = 'mock-query';
-
+  describe('fetchSearchResults', () => {
     it('commits the SEARCHED_WITH_NO_QUERY if the search query was empty', done => {
-      mockAxios.onAny().replyOnce(200, mockProjects);
       store.state.searchQuery = '';
 
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.fetchSearchResults,
+        null,
         store.state,
         [
           {
@@ -350,23 +347,76 @@ describe('actions', () => {
       );
     });
 
-    it('sets project search results', done => {
-      mockAxios.onAny().replyOnce(200, mockProjects);
-      store.state.searchQuery = mockQuery;
+    it(`commits the SEARCHED_WITH_TOO_SHORT_QUERY type if the search query wasn't long enough`, done => {
+      store.state.searchQuery = 'a';
 
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.fetchSearchResults,
+        null,
+        store.state,
+        [
+          {
+            type: types.SEARCHED_WITH_TOO_SHORT_QUERY,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it(`dispatches the correct actions when the query is valid`, done => {
+      mockAxios.onAny().replyOnce(200, mockProjects);
+      store.state.searchQuery = 'mock-query';
+
+      testAction(
+        actions.fetchSearchResults,
+        null,
         store.state,
         [
           {
             type: types.INCREMENT_PROJECT_SEARCH_COUNT,
             payload: 1,
           },
+        ],
+        [
+          {
+            type: 'requestSearchResults',
+          },
+          {
+            type: 'receiveSearchResultsSuccess',
+            payload: mockProjects,
+          },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('requestSearchResults', () => {
+    it(`unsets the 'query is too short' warning status`, done => {
+      testAction(
+        actions.requestSearchResults,
+        null,
+        store.state,
+        [
           {
             type: types.SET_MESSAGE_MINIMUM_QUERY,
             payload: false,
           },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveSearchResultsSuccess', () => {
+    it('sets project search results', done => {
+      testAction(
+        actions.receiveSearchResultsSuccess,
+        mockProjects,
+        store.state,
+        [
           {
             type: types.SEARCHED_SUCCESSFULLY_WITH_RESULTS,
             payload: mockProjects,
@@ -381,41 +431,14 @@ describe('actions', () => {
       );
     });
 
-    it(`commits the SEARCHED_WITH_TOO_SHORT_QUERY type if the search query wasn't long enough`, done => {
-      mockAxios.onAny().replyOnce(200, []);
-      store.state.searchQuery = 'a';
-
-      testAction(
-        actions.searchProjects,
-        mockQuery,
-        store.state,
-        [
-          {
-            type: types.SEARCHED_WITH_TOO_SHORT_QUERY,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-
     it('commits the SEARCHED_SUCCESSFULLY_NO_RESULTS type (among others) if the search returns with no results', done => {
-      mockAxios.onAny().replyOnce(200, []);
-      store.state.searchQuery = mockQuery;
+      store.state.searchQuery = 'mock-query';
 
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.receiveSearchResultsSuccess,
+        [],
         store.state,
         [
-          {
-            type: types.INCREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
-          {
-            type: types.SET_MESSAGE_MINIMUM_QUERY,
-            payload: false,
-          },
           {
             type: types.SEARCHED_SUCCESSFULLY_NO_RESULTS,
           },
@@ -428,24 +451,15 @@ describe('actions', () => {
         done,
       );
     });
+  });
 
+  describe('receiveSearchResultsError', () => {
     it('commits the SEARCHED_WITH_API_ERROR type (among others) if the search API returns an error code', done => {
-      store.state.searchQuery = mockQuery;
-      mockAxios.onAny().replyOnce(500);
-
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.receiveSearchResultsError,
+        ['error'],
         store.state,
         [
-          {
-            type: types.INCREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
-          {
-            type: types.SET_MESSAGE_MINIMUM_QUERY,
-            payload: false,
-          },
           {
             type: types.SEARCHED_WITH_API_ERROR,
           },

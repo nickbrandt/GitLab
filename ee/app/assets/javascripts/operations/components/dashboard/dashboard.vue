@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'searchProjects',
+      'fetchSearchResults',
       'addProjectsToDashboard',
       'fetchProjects',
       'setProjectEndpoints',
@@ -84,7 +84,7 @@ export default {
     },
     searched(query) {
       this.setSearchQuery(query);
-      this.searchProjects();
+      this.fetchSearchResults();
     },
     projectClicked(project) {
       this.toggleSelectedProject(project);

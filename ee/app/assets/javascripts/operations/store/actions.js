@@ -147,7 +147,7 @@ export const setSearchQuery = ({ commit }, query) => {
   commit(types.SET_SEARCH_QUERY, query);
 };
 
-export const searchProjects = ({ commit, state }) => {
+export const fetchSearchResults = ({ commit, state, dispatch }) => {
   if (!state.searchQuery) {
     commit(types.SEARCHED_WITH_NO_QUERY);
   } else if (state.searchQuery.length < API_MINIMUM_QUERY_LENGTH) {
@@ -155,26 +155,33 @@ export const searchProjects = ({ commit, state }) => {
   } else {
     commit(types.INCREMENT_PROJECT_SEARCH_COUNT, 1);
 
-    // Flipping this property separately to allows the UI
-    // to hide the "minimum query" message
-    // before the seach results arrive from the API
-    commit(types.SET_MESSAGE_MINIMUM_QUERY, false);
+    dispatch('requestSearchResults');
 
     Api.projects(state.searchQuery, {})
-      .then(results => {
-        if (results.length === 0) {
-          commit(types.SEARCHED_SUCCESSFULLY_NO_RESULTS);
-        } else {
-          commit(types.SEARCHED_SUCCESSFULLY_WITH_RESULTS, results);
-        }
-
-        commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
-      })
-      .catch(() => {
-        commit(types.SEARCHED_WITH_API_ERROR);
-        commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
-      });
+      .then(results => dispatch('receiveSearchResultsSuccess', results))
+      .catch(() => dispatch('receiveSearchResultsError'));
   }
+};
+
+export const requestSearchResults = ({ commit }) => {
+  // Flipping this property separately to allows the UI
+  // to hide the "minimum query" message
+  // before the seach results arrive from the API
+  commit(types.SET_MESSAGE_MINIMUM_QUERY, false);
+};
+
+export const receiveSearchResultsSuccess = ({ commit }, results) => {
+  if (results.length === 0) {
+    commit(types.SEARCHED_SUCCESSFULLY_NO_RESULTS);
+  } else {
+    commit(types.SEARCHED_SUCCESSFULLY_WITH_RESULTS, results);
+  }
+  return commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
+};
+
+export const receiveSearchResultsError = ({ commit }) => {
+  commit(types.SEARCHED_WITH_API_ERROR);
+  commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
 };
 
 export const setProjectEndpoints = ({ commit }, endpoints) => {
