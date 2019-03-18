@@ -376,6 +376,19 @@ Some Vulnerabilities can be fixed by applying a patch that is automatically gene
 
 ![Solutions for dependency scanning](img/vulnerability_solution.png)
 
+### Create a merge request from a vulnerability **[ULTIMATE]**
+
+> Introduced in [GitLab Ultimate][products] 11.9.
+
+CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the moment only Node.JS projects managed with yarn are supported.
+
+Any vulnerability that has a [solution](#solutions-for-dependency-scanning-ultimate) can have a merge request created to automatically solve the issue.
+
+If this action is available there will be a "Create merge request" button in the vulnerability modal.
+Clicking on this button will create a merge request to apply the solution onto the source branch.
+
+![Create merge request from vulnerability](img/create-issue-with-list-hover.png)
+
 ## Live preview with Review Apps
 
 If you configured [Review Apps](https://about.gitlab.com/features/review-apps/) for your project,
