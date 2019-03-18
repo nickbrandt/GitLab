@@ -10,9 +10,16 @@ module QA
               view 'ee/app/views/projects/_project_templates.html.haml' do
                 element :group_templates_tab
                 element :group_template_tab_badge
+                element :instance_templates_tab
+                element :instance_template_tab_badge
               end
 
               view 'ee/app/views/users/_custom_project_templates_from_groups.html.haml' do
+                element :use_template_button
+                element :template_option_row
+              end
+
+              view 'ee/app/views/users/_custom_project_templates.html.haml' do
                 element :use_template_button
                 element :template_option_row
               end
@@ -24,8 +31,17 @@ module QA
             click_element(:group_templates_tab)
           end
 
+          def go_to_create_from_template_instance_tab
+            go_to_create_from_template
+            click_element(:instance_templates_tab)
+          end
+
           def group_template_tab_badge_text
             find_element(:group_template_tab_badge).text
+          end
+
+          def instance_template_tab_badge_text
+            find_element(:instance_template_tab_badge).text
           end
 
           def use_template_for_project(project_name)

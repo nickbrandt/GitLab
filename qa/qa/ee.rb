@@ -44,6 +44,10 @@ module QA
             autoload :New, 'qa/ee/page/admin/geo/nodes/new'
           end
         end
+
+        module Settings
+          autoload :Templates, 'qa/ee/page/admin/settings/templates'
+        end
       end
 
       module Profile
