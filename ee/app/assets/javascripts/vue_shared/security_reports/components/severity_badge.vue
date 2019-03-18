@@ -16,6 +16,7 @@ export default {
 </script>
 
 <template>
+  <!-- TODO: How on earth do I get this translated in a DRY manner? -->
   <div class="severity-badge" :class="className">{{ severity }}</div>
 </template>
 

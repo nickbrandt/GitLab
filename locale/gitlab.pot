@@ -11180,6 +11180,9 @@ msgstr ""
 msgid "Too many changes to show."
 msgstr ""
 
+msgid "Total"
+msgstr ""
+
 msgid "Total Contributions"
 msgstr ""
 
@@ -12602,6 +12605,30 @@ msgstr ""
 msgid "commented on %{link_to_project}"
 msgstr ""
 
+msgid "confidence|Confirmed"
+msgstr ""
+
+msgid "confidence|Experimental"
+msgstr ""
+
+msgid "confidence|High"
+msgstr ""
+
+msgid "confidence|Ignore"
+msgstr ""
+
+msgid "confidence|Low"
+msgstr ""
+
+msgid "confidence|Medium"
+msgstr ""
+
+msgid "confidence|Undefined"
+msgstr ""
+
+msgid "confidence|Unknown"
+msgstr ""
+
 msgid "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue."
 msgstr ""
 
@@ -13108,6 +13135,27 @@ msgid "score"
 msgstr ""
 
 msgid "security Reports|There was an error creating the merge request"
+msgstr ""
+
+msgid "severity|Critical"
+msgstr ""
+
+msgid "severity|High"
+msgstr ""
+
+msgid "severity|Info"
+msgstr ""
+
+msgid "severity|Low"
+msgstr ""
+
+msgid "severity|Medium"
+msgstr ""
+
+msgid "severity|Undefined"
+msgstr ""
+
+msgid "severity|Unknown"
 msgstr ""
 
 msgid "should be higher than %{access} inherited membership from group %{group_name}"
