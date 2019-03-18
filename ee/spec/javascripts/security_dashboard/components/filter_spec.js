@@ -11,7 +11,7 @@ describe('Filter component', () => {
 
   describe('severity', () => {
     beforeEach(() => {
-      props = { filterId: 'severity', dashboardDocumentation: '' };
+      props = { filterId: 'severity' };
       vm = mountComponentWithStore(Component, { store, props });
     });
 
@@ -29,21 +29,6 @@ describe('Filter component', () => {
 
     it('should display "Severity" as the option name', () => {
       expect(vm.$el.querySelector('.js-name').textContent).toContain('Severity');
-    });
-
-    it('should not display the help popover', () => {
-      expect(vm.$el.querySelector('.js-help')).toBeNull();
-    });
-  });
-
-  describe('Report type', () => {
-    beforeEach(() => {
-      props = { filterId: 'report_type', dashboardDocumentation: '' };
-      vm = mountComponentWithStore(Component, { store, props });
-    });
-
-    it('should display the help popover', () => {
-      expect(vm.$el.querySelector('.js-help')).not.toBeNull();
     });
   });
 });

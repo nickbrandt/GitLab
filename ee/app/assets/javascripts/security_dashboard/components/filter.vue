@@ -2,21 +2,15 @@
 import { mapGetters, mapActions } from 'vuex';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import ReportTypePopover from './report_type_popover.vue';
 
 export default {
   components: {
     GlDropdown,
     GlDropdownItem,
-    ReportTypePopover,
     Icon,
   },
   props: {
     filterId: {
-      type: String,
-      required: true,
-    },
-    dashboardDocumentation: {
       type: String,
       required: true,
     },
@@ -51,10 +45,6 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <report-type-popover
-      v-if="filterId === 'report_type'"
-      :dashboard-documentation="dashboardDocumentation"
-    />
     <gl-dropdown class="d-block mt-1">
       <template slot="button-content">
         <span class="text-truncate">
