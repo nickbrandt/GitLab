@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe GeoNodeStatus, :geo do
+# Disable transactions via :delete method because a foreign table
+# can't see changes inside a transaction of a different connection.
+describe GeoNodeStatus, :geo, :delete do
   include ::EE::GeoHelpers
 
   let!(:primary) { create(:geo_node, :primary) }

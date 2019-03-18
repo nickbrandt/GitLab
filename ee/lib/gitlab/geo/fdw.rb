@@ -19,6 +19,10 @@ module Gitlab
           value.nil? ? true : value
         end
 
+        def enabled_for_selective_sync?
+          enabled? && Feature.enabled?(:use_fdw_queries_for_selective_sync)
+        end
+
         # Return full table name with foreign schema
         #
         # @param [String] table_name
