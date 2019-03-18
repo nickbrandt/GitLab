@@ -14,6 +14,12 @@ module IncidentManagement
       end
     end
 
+    def issue_template_content
+      strong_memoize(:issue_template_content) do
+        issue_template&.content if issue_template_key.present?
+      end
+    end
+
     private
 
     def issue_template_exists
