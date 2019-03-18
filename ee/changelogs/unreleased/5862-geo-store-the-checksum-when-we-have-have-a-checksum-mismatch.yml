@@ -1,0 +1,5 @@
+---
+title: Geo - Store the invalid checksum when we have a mismatch
+merge_request: 10101
+author:
+type: changed
