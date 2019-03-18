@@ -34,7 +34,7 @@ describe('filters module getters', () => {
         );
 
         expect(selectedOptions).toHaveLength(1);
-        expect(selectedOptions[0].name).toEqual('All');
+        expect(selectedOptions[0].name).toContain('All');
       });
     });
 
@@ -62,7 +62,8 @@ describe('filters module getters', () => {
         'severity',
       );
 
-      expect(selectedOptionNames).toEqual({ firstOption: 'All', extraOptionCount: '' });
+      expect(selectedOptionNames.firstOption).toContain('All');
+      expect(selectedOptionNames.extraOptionCount).toBe('');
     });
 
     it('should return the correct message when multiple filters are selected', () => {

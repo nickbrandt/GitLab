@@ -22,7 +22,7 @@ describe('moderator', () => {
       'filters/setFilterOptions',
       Object({
         filterId: 'project_id',
-        options: [{ name: 'All', id: 'all' }, { name: 'foo', id: '1' }],
+        options: [{ name: 'All projects', id: 'all' }, { name: 'foo', id: '1' }],
       }),
     );
   });
