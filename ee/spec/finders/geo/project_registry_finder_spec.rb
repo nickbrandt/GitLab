@@ -146,22 +146,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     describe '#count_verified_repositories' do
-      it 'delegates to #find_verified_repositories when use_legacy_queries is false' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(false)
-
-        expect(subject).to receive(:find_verified_repositories).and_call_original
-
-        subject.count_verified_repositories
-      end
-
-      it 'delegates to #legacy_find_verified_repositories when use_legacy_queries is true' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(true)
-
-        expect(subject).to receive(:legacy_find_verified_repositories).and_call_original
-
-        subject.count_verified_repositories
-      end
-
       it 'counts projects that verified' do
         create(:geo_project_registry, :repository_verified, project: project_repository_verified)
         create(:geo_project_registry, :repository_verified, project: build(:project))
@@ -172,12 +156,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     describe '#count_verified_wikis' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_verified_wikis".to_sym).and_call_original
-
-        subject.count_verified_wikis
-      end
-
       it 'counts wikis that verified' do
         create(:geo_project_registry, :wiki_verified, project: project_wiki_verified)
         create(:geo_project_registry, :wiki_verified, project: build(:project))
