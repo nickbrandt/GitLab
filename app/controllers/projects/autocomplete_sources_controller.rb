@@ -28,7 +28,7 @@ class Projects::AutocompleteSourcesController < Projects::ApplicationController
   end
 
   def snippets
-    render json: autocomplete_service.snippets
+    render json: autocomplete_service.snippets.to_json(only: [:id, :title])
   end
 
   private

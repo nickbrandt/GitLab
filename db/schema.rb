@@ -3490,6 +3490,9 @@ ActiveRecord::Schema.define(version: 2019_10_29_191901) do
     t.integer "cached_markdown_version"
     t.text "description"
     t.text "description_html"
+    t.string "encrypted_secret_token", limit: 255
+    t.string "encrypted_secret_token_iv", limit: 255
+    t.string "encrypted_secret_token_salt", limit: 255
     t.index ["author_id"], name: "index_snippets_on_author_id"
     t.index ["content"], name: "index_snippets_on_content_trigram", opclass: :gin_trgm_ops, using: :gin
     t.index ["file_name"], name: "index_snippets_on_file_name_trigram", opclass: :gin_trgm_ops, using: :gin

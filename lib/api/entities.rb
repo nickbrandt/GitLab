@@ -532,6 +532,7 @@ module API
       expose :raw_url do |snippet|
         Gitlab::UrlBuilder.build(snippet) + "/raw"
       end
+      expose :secret_token, if: -> (entity, _) { entity.secret? }
     end
 
     class IssuableEntity < Grape::Entity

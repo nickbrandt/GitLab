@@ -5,6 +5,8 @@ class SnippetsController < ApplicationController
   include ToggleAwardEmoji
   include SpammableActions
   include SnippetsActions
+  include SnippetsHelper
+  # include SnippetsUrl
   include RendersBlob
   include PreviewMarkdown
   include PaginatedCollection
@@ -17,6 +19,9 @@ class SnippetsController < ApplicationController
 
   # Allow read snippet
   before_action :authorize_read_snippet!, only: [:show, :raw]
+
+  # Ensure we're displaying the correct url, specifically for secret snippets
+  # before_action :ensure_complete_url, only: [:show, :raw]
 
   # Allow modify snippet
   before_action :authorize_update_snippet!, only: [:edit, :update]
@@ -119,17 +124,14 @@ class SnippetsController < ApplicationController
   alias_method :spammable, :snippet
 
   def spammable_path
-    snippet_path(@snippet)
+    reliable_snippet_path(@snippet)
   end
 
   def authorize_read_snippet!
-    return if can?(current_user, :read_personal_snippet, @snippet)
+    return if can?(current_user, :read_personal_snippet, snippet)
+    return if snippet&.secret? && snippet&.valid_secret_token?(params[:token])
 
-    if current_user
-      render_404
-    else
-      authenticate_user!
-    end
+    current_user ? render_404 : authenticate_user!
   end
 
   def authorize_update_snippet!

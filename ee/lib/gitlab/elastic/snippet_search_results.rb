@@ -8,9 +8,9 @@ module Gitlab
 
         case scope
         when 'snippet_titles'
-          eager_load(snippet_titles, page, eager: { project: [:route, :namespace] })
+          eager_load(snippet_titles, page, eager: { project: [:route, :namespace], author: :status })
         when 'snippet_blobs'
-          eager_load(snippet_blobs, page, eager: { project: [:route, :namespace] })
+          eager_load(snippet_blobs, page, eager: { project: [:route, :namespace], author: :status })
         end
       end
 

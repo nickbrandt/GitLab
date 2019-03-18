@@ -18743,6 +18743,9 @@ msgstr ""
 msgid "VisibilityLevel|Public"
 msgstr ""
 
+msgid "VisibilityLevel|Secret"
+msgstr ""
+
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
@@ -20569,9 +20572,6 @@ msgid "point"
 msgid_plural "points"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "private"
-msgstr ""
 
 msgid "private key does not match certificate."
 msgstr ""

@@ -53,11 +53,11 @@ module Gitlab
     # rubocop: enable CodeReuse/ActiveRecord
 
     def snippet_titles
-      snippets.search(query)
+      snippets.search(query).inc_relations_for_view
     end
 
     def snippet_blobs
-      snippets.search_code(query)
+      snippets.search_code(query).inc_relations_for_view
     end
 
     def default_scope

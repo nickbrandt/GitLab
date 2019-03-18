@@ -46,11 +46,12 @@ class Snippet < ApplicationRecord
     length: { maximum: 255 }
 
   validates :content, presence: true
-  validates :visibility_level, inclusion: { in: Gitlab::VisibilityLevel.values }
+  validates :visibility_level, inclusion: { in: Gitlab::VisibilityLevel.all_values }
 
   # Scopes
-  scope :are_internal, -> { where(visibility_level: Snippet::INTERNAL) }
   scope :are_private, -> { where(visibility_level: Snippet::PRIVATE) }
+  scope :are_secret, -> { where(visibility_level: Snippet::SECRET) }
+  scope :are_internal, -> { where(visibility_level: Snippet::INTERNAL) }
   scope :are_public, -> { where(visibility_level: Snippet::PUBLIC) }
   scope :public_and_internal, -> { where(visibility_level: [Snippet::PUBLIC, Snippet::INTERNAL]) }
   scope :fresh, -> { order("created_at DESC") }
@@ -62,6 +63,12 @@ class Snippet < ApplicationRecord
 
   attr_spammable :title, spam_title: true
   attr_spammable :content, spam_description: true
+
+  attr_encrypted :secret_token,
+    key:       Settings.attr_encrypted_db_key_base_truncated,
+    mode:      :per_attribute_iv_and_salt,
+    insecure_mode: true,
+    algorithm: 'aes-256-cbc'
 
   def self.with_optional_visibility(value = nil)
     if value
@@ -220,6 +227,10 @@ class Snippet < ApplicationRecord
 
   def to_ability_name
     model_name.singular
+  end
+
+  def valid_secret_token?(secret)
+    ActiveSupport::SecurityUtils.secure_compare(secret.to_s, secret_token)
   end
 
   class << self

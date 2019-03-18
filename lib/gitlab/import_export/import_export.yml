@@ -163,6 +163,9 @@ excluded_attributes:
     - :identifier
   snippets:
     - :expired_at
+    - :encrypted_secret_token
+    - :encrypted_secret_token_iv
+    - :encrypted_secret_token_salt
   merge_request_diff:
     - :external_diff
     - :stored_externally

@@ -11,20 +11,48 @@ module SnippetsHelper
     end
   end
 
-  def reliable_snippet_path(snippet, opts = nil)
-    if snippet.project_id?
-      project_snippet_path(snippet.project, snippet, opts)
-    else
-      snippet_path(snippet, opts)
+  def reliable_snippet_path(snippet, opts = {})
+    reliable_snippet_url(snippet, opts.merge(only_path: true))
+  end
+
+  def reliable_raw_snippet_path(snippet, opts = {})
+    reliable_raw_snippet_url(snippet, opts.merge(only_path: true))
+  end
+
+  def reliable_snippet_url(snippet, opts = {})
+    reliable_snippet_helper(snippet, opts) do |updated_opts|
+      if snippet.project_id?
+        project_snippet_url(snippet.project, snippet, nil, updated_opts)
+      else
+        snippet_url(snippet, nil, updated_opts)
+      end
     end
   end
 
-  def download_snippet_path(snippet)
-    if snippet.project_id
-      raw_project_snippet_path(@project, snippet, inline: false)
-    else
-      raw_snippet_path(snippet, inline: false)
+  def reliable_raw_snippet_url(snippet, opts = {})
+    reliable_snippet_helper(snippet, opts) do |updated_opts|
+      if snippet.project_id?
+        raw_project_snippet_url(snippet.project, snippet, nil, updated_opts)
+      else
+        raw_snippet_url(snippet, nil, updated_opts)
+      end
     end
+  end
+
+  def reliable_snippet_helper(snippet, opts)
+    opts[:token] = snippet.secret_token if snippet.secret?
+    opts[:only_path] = opts.fetch(:only_path, false)
+
+    yield(opts)
+  end
+
+  def download_raw_snippet_button(snippet)
+    link_to(icon('download'), reliable_raw_snippet_path(snippet, inline: false), target: '_blank', rel: 'noopener noreferrer', class: "btn btn-sm has-tooltip", title: 'Download', data: { container: 'body' })
+  end
+
+  def shareable_snippets_link(snippet)
+    url = reliable_snippet_url(snippet)
+    link_to(url, url, id: 'shareable_link_url', title: 'Open')
   end
 
   # Return the path of a snippets index for a user or for a project
@@ -114,8 +142,28 @@ module SnippetsHelper
     { snippet_object: snippet, snippet_chunks: snippet_chunks }
   end
 
-  def snippet_embed
-    "<script src=\"#{url_for(only_path: false, overwrite_params: nil)}.js\"></script>"
+  def snippet_embed_url(snippet)
+    content_tag(:script, nil, src: reliable_snippet_url(snippet, format: :js, only_path: false))
+  end
+
+  def snippet_badge(snippet)
+    attrs = snippet_badge_attributes(snippet)
+    if attrs
+      css_class, text = attrs
+      tag.span(class: ['badge', 'badge-gray']) do
+        concat(tag.i(class: ['fa', css_class]))
+        concat(' ')
+        concat(_(text))
+      end
+    end
+  end
+
+  def snippet_badge_attributes(snippet)
+    if snippet.private?
+      ['fa-lock', 'private']
+    elsif snippet.secret?
+      ['fa-user-secret', 'secret']
+    end
   end
 
   def embedded_snippet_raw_button
