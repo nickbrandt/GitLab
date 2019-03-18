@@ -8,16 +8,17 @@ Currently SAML on GitLab.com can be used to automatically add users to a group, 
 
 NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
 
-## How to configure
+## Configuring your Identity Provider
 
 1. Navigate to the group and click Settings -> SAML SSO.
 1. Configure your SAML server using the **Assertion consumer service URL** and **Issuer**. See [your identity provider's documentation](#providers) for more details.
 1. Configure the SAML response to include a NameID that uniquely identifies each user.
-1. Configure required assertions using the table below.
-1. Find the SSO URL from your Identity Provider and enter it on GitLab.
-1. Find and enter the fingerprint for the SAML token signing certificate.
+1. Configure required assertions using the [table below](#assertions).
+1. Once the identity provider is set up, move on to [configuring GitLab](#configuring-gitlab).
 
-## NameID
+![Issuer and callback for configuring SAML identity provider with GitLab.com](img/group_saml_configuration_information.png)
+
+### NameID
 
 GitLab.com uses the SAML NameID to identify users. The NameID element:
 
@@ -25,7 +26,7 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 - Must be unique to each user.
 - Must be a persistent value that will never change, such as a unique ID or username. Email could also be used as the NameID, but only if it can be guaranteed to never change.
 
-## Assertions
+### Assertions
 
 | Field | Supported keys | Notes |
 |-|----------------|-------------|
@@ -33,6 +34,18 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 | Full Name | `name` |  |
 | First Name | `first_name`, `firstname`, `firstName` |  |
 | Last Name | `last_name`, `lastname`, `lastName` |  |
+
+## Configuring GitLab
+
+Once you've set up your identity provider to work with GitLab, you'll need to configure GitLab to use it for authentication:
+
+1. Navigate to the group's **Settings > SAML SSO**.
+1. Find the SSO URL from your Identity Provider and enter it the **Identity provider single sign on URL** field.
+1. Find and enter the fingerprint for the SAML token signing certificate in the **Certificate** field.
+1. Check the **Enable SAML authentication for this group** checkbox.
+1. Click the **Save changes** button.
+
+![Group SAML Settings for GitLab.com](img/group_saml_settings.png)
 
 ## Providers
 
@@ -46,6 +59,17 @@ GitLab.com uses the SAML NameID to identify users. The NameID element:
 | Okta | [Setting up a SAML application in Okta](https://developer.okta.com/standards/SAML/setting_up_a_saml_application_in_okta) |
 | OneLogin | [Use the OneLogin SAML Test Connector](https://onelogin.service-now.com/support?id=kb_article&sys_id=93f95543db109700d5505eea4b96198f) |
 | Ping Identity | [Add and configure a new SAML application](https://docs.pingidentity.com/bundle/p1_enterpriseConfigSsoSaml_cas/page/enableAppWithoutURL.html) |
+
+## Unlinking accounts
+
+Users can unlink SAML for a group from their profile page. This can be helpful if:
+
+- You no longer want a group to be able to sign you in to GitLab.com.
+- Your SAML NameID has changed and so GitLab can no longer find your user.
+
+For example, to unlink the `MyOrg` account, the following **Disconnect** button will be available under **Profile -> Accounts**:
+
+![Unlink Group SAML](img/unlink_group_saml.png)
 
 ## Glossary
 
