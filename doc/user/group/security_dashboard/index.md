@@ -88,7 +88,8 @@ If you hover over a row, there will appear some actions you can take:
 Clicking the "More info" button opens a modal with more information about the
 selected vulnerability where you can get a better description, as well as the
 file it came from, and a possible solution. You get access to the
-["Dismiss vulnerability"](#dismissing-a-vulnerability) and
+["Dismiss vulnerability"](#dismissing-a-vulnerability),
+["Create merge request"](#create-a-merge-request-from-a-vulnerability), and
 ["Create issue"](#creating-an-issue-for-a-vulnerability) buttons inside this
 modal as well.
 
@@ -109,6 +110,21 @@ will now have an associated issue next to the name.
 
 You can get the same result if you select the **Create issue** button from inside
 the "More info" modal.
+
+### Create a Merge Request from a vulnerability
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9224) in
+  [GitLab Ultimate](https://about.gitlab.com/pricing) 11.9.
+
+In certain cases, GitLab will allow you to create a merge request that will
+automatically remediate the vulnerability.
+
+Clicking on the "Create merge request" button inside the more info modal will create
+a merge request onto the default branch, then redirect you to that merge request.
+
+CAUTION: **Warning:** Automatic Patch creation is only available for a subset of
+[Dependency Scanning](../../project/merge_requests/dependency_scanning.md). At the moment only Node.JS projects
+managed with yarn are supported.
 
 ### Dismissing a vulnerability
 
