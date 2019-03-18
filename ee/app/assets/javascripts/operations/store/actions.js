@@ -4,8 +4,8 @@ import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
-import * as types from './mutation_types';
 import _ from 'underscore';
+import * as types from './mutation_types';
 
 const API_MINIMUM_QUERY_LENGTH = 3;
 
@@ -29,8 +29,8 @@ export const addProjectsToDashboard = ({ state, dispatch }) => {
     .post(state.projectEndpoints.add, {
       project_ids: state.selectedProjects.map(p => p.id),
     })
-    .then(response => dispatch('requestAddProjectsToDashboardSuccess', response.data))
-    .catch(() => dispatch('requestAddProjectsToDashboardError'));
+    .then(response => dispatch('receiveAddProjectsToDashboardSuccess', response.data))
+    .catch(() => dispatch('receiveAddProjectsToDashboardError'));
 };
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
@@ -45,7 +45,7 @@ export const clearSearchResults = ({ commit }) => {
   commit(types.CLEAR_SEARCH_RESULTS);
 };
 
-export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
+export const receiveAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
   const { added, invalid } = data;
 
   if (invalid.length) {
@@ -80,7 +80,7 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
   }
 };
 
-export const requestAddProjectsToDashboardError = ({ state }) => {
+export const receiveAddProjectsToDashboardError = ({ state }) => {
   createFlash(
     sprintf(__('Something went wrong, unable to add %{project} to dashboard'), {
       project: n__('project', 'projects', state.selectedProjects.length),
@@ -131,15 +131,15 @@ export const receiveProjectsError = ({ commit }) => {
 export const removeProject = ({ dispatch }, removePath) => {
   axios
     .delete(removePath)
-    .then(() => dispatch('requestRemoveProjectSuccess'))
-    .catch(() => dispatch('requestRemoveProjectError'));
+    .then(() => dispatch('receiveRemoveProjectSuccess'))
+    .catch(() => dispatch('receiveRemoveProjectError'));
 };
 
-export const requestRemoveProjectSuccess = ({ dispatch }) => {
-  dispatch('forceProjectsRequest');
+export const receiveRemoveProjectSuccess = ({ dispatch }) => {
+  dispatch('fetchProjects');
 };
 
-export const requestRemoveProjectError = () => {
+export const receiveRemoveProjectError = () => {
   createFlash(__('Something went wrong, unable to remove project'));
 };
 

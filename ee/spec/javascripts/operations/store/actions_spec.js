@@ -38,7 +38,7 @@ describe('actions', () => {
         [],
         [
           {
-            type: 'requestAddProjectsToDashboardSuccess',
+            type: 'receiveAddProjectsToDashboardSuccess',
             payload: mockResponse,
           },
         ],
@@ -54,7 +54,7 @@ describe('actions', () => {
         null,
         store.state,
         [],
-        [{ type: 'requestAddProjectsToDashboardError' }],
+        [{ type: 'receiveAddProjectsToDashboardError' }],
         done,
       );
     });
@@ -96,10 +96,10 @@ describe('actions', () => {
     });
   });
 
-  describe('requestAddProjectsToDashboardSuccess', () => {
+  describe('receiveAddProjectsToDashboardSuccess', () => {
     it('fetches projects when new projects are added to the dashboard', done => {
       testAction(
-        actions.requestAddProjectsToDashboardSuccess,
+        actions.receiveAddProjectsToDashboardSuccess,
         {
           added: [1],
           invalid: [],
@@ -127,7 +127,7 @@ describe('actions', () => {
       }
     };
     const addInvalidProjects = invalid =>
-      store.dispatch('requestAddProjectsToDashboardSuccess', {
+      store.dispatch('receiveAddProjectsToDashboardSuccess', {
         added: [],
         invalid,
         duplicate: [],
@@ -160,10 +160,10 @@ describe('actions', () => {
     });
   });
 
-  describe('requestAddProjectsToDashboardError', () => {
+  describe('receiveAddProjectsToDashboardError', () => {
     it('shows error message', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      store.dispatch('requestAddProjectsToDashboardError');
+      store.dispatch('receiveAddProjectsToDashboardError');
 
       expect(spy).toHaveBeenCalledWith(mockText.ADD_PROJECTS_ERROR);
     });
@@ -287,7 +287,7 @@ describe('actions', () => {
         mockRemovePath,
         null,
         [],
-        [{ type: 'requestRemoveProjectSuccess' }],
+        [{ type: 'receiveRemoveProjectSuccess' }],
         done,
       );
     });
@@ -300,16 +300,16 @@ describe('actions', () => {
         mockRemovePath,
         null,
         [],
-        [{ type: 'requestRemoveProjectError' }],
+        [{ type: 'receiveRemoveProjectError' }],
         done,
       );
     });
   });
 
-  describe('requestRemoveProjectSuccess', () => {
+  describe('receiveRemoveProjectSuccess', () => {
     it('fetches operations dashboard projects', done => {
       testAction(
-        actions.requestRemoveProjectSuccess,
+        actions.receiveRemoveProjectSuccess,
         null,
         null,
         [],
@@ -319,11 +319,11 @@ describe('actions', () => {
     });
   });
 
-  describe('requestRemoveProjectError', () => {
+  describe('receiveRemoveProjectError', () => {
     it('displays project removal error', done => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
 
-      testAction(actions.requestRemoveProjectError, null, null, [], [], done);
+      testAction(actions.receiveRemoveProjectError, null, null, [], [], done);
 
       expect(spy).toHaveBeenCalledWith(mockText.REMOVE_PROJECT_ERROR);
     });
