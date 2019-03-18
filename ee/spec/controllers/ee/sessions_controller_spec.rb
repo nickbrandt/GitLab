@@ -28,7 +28,7 @@ describe SessionsController do
 
           expect(response).to have_gitlab_http_status(302)
           expect(response).to redirect_to %r(\A#{primary_node.url}oauth/geo/auth)
-          expect(redirect_params['state'].first).to end_with(':/')
+          expect(redirect_params['state'].first).to end_with(':')
         end
       end
 
