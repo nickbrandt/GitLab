@@ -72,4 +72,40 @@ describe IncidentManagement::ProjectIncidentManagementSetting do
       end
     end
   end
+
+  describe '#issue_template_content' do
+    subject { build(:project_incident_management_setting, project: project) }
+
+    shared_examples 'no content' do
+      it 'returns no content' do
+        expect(subject.issue_template_content).to be_nil
+      end
+    end
+
+    context 'with valid issue_template_key' do
+      before do
+        subject.issue_template_key = 'bug'
+      end
+
+      it 'returns issue content' do
+        expect(subject.issue_template_content).to eq('something valid')
+      end
+    end
+
+    context 'with unknown issue_template_key' do
+      before do
+        subject.issue_template_key = 'unknown'
+      end
+
+      it_behaves_like 'no content'
+    end
+
+    context 'without issue_template_key' do
+      before do
+        subject.issue_template_key = nil
+      end
+
+      it_behaves_like 'no content'
+    end
+  end
 end
