@@ -166,28 +166,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     describe '#count_verification_failed_repositories' do
-      it 'delegates to #find_verification_failed_project_registries' do
-        expect(subject).to receive(:find_verification_failed_project_registries).with('repository').and_call_original
-
-        subject.count_verification_failed_repositories
-      end
-
-      it 'delegates to #legacy_find_filtered_verification_failed_projects when use_legacy_queries is true' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(true)
-
-        expect(subject).to receive(:legacy_find_filtered_verification_failed_projects).with('repository').and_call_original
-
-        subject.count_verification_failed_repositories
-      end
-
-      it 'delegates to #find_filtered_verification_failed_project_registries when use_legacy_queries is false' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(false)
-
-        expect(subject).to receive(:find_filtered_verification_failed_project_registries).with('repository').and_call_original
-
-        subject.count_verification_failed_repositories
-      end
-
       it 'counts projects that verification has failed' do
         create(:geo_project_registry, :repository_verified, project: project_repository_verified)
         create(:geo_project_registry, :repository_verification_failed, project: project_repository_verification_failed)
@@ -208,28 +186,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     describe '#count_verification_failed_wikis' do
-      it 'delegates to #find_verification_failed_project_registries' do
-        expect(subject).to receive(:find_verification_failed_project_registries).with('wiki').and_call_original
-
-        subject.count_verification_failed_wikis
-      end
-
-      it 'delegates to #legacy_find_filtered_verification_failed_projects when use_legacy_queries is true' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(true)
-
-        expect(subject).to receive(:legacy_find_filtered_verification_failed_projects).with('wiki').and_call_original
-
-        subject.count_verification_failed_wikis
-      end
-
-      it 'delegates to #find_filtered_verification_failed_project_registries when use_legacy_queries is false' do
-        expect(subject).to receive(:use_legacy_queries?).and_return(false)
-
-        expect(subject).to receive(:find_filtered_verification_failed_project_registries).with('wiki').and_call_original
-
-        subject.count_verification_failed_wikis
-      end
-
       it 'counts projects that verification has failed' do
         create(:geo_project_registry, :repository_verified, project: project_repository_verified)
         create(:geo_project_registry, :repository_verification_failed, project: project_repository_verification_failed)
