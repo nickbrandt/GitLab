@@ -245,7 +245,7 @@ describe Geo::RepositoryVerificationPrimaryService do
       project.wiki.full_path,
       project,
       disk_path: project.wiki.disk_path,
-      is_wiki: true
+      repo_type: Gitlab::GlRepository::WIKI
     ).and_return(repository)
   end
 end

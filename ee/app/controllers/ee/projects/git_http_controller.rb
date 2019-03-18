@@ -10,7 +10,7 @@ module EE
       def render_ok
         set_workhorse_internal_api_content_type
 
-        render json: ::Gitlab::Workhorse.git_http_ok(repository, wiki?, user, action_name, show_all_refs: geo_request?)
+        render json: ::Gitlab::Workhorse.git_http_ok(repository, repo_type, user, action_name, show_all_refs: geo_request?)
       end
 
       private

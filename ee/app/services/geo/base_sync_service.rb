@@ -203,7 +203,7 @@ module Geo
     end
 
     def temp_repo
-      @temp_repo ||= ::Repository.new(repository.full_path, repository.project, disk_path: disk_path_temp, is_wiki: repository.is_wiki)
+      @temp_repo ||= ::Repository.new(repository.full_path, repository.project, disk_path: disk_path_temp, repo_type: repository.repo_type)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

@@ -96,7 +96,7 @@ module EE
     end
 
     def geo_updated_event_source
-      is_wiki ? Geo::RepositoryUpdatedEvent::WIKI : Geo::RepositoryUpdatedEvent::REPOSITORY
+      repo_type.wiki? ? Geo::RepositoryUpdatedEvent::WIKI : Geo::RepositoryUpdatedEvent::REPOSITORY
     end
 
     def code_owners_blob(ref: 'HEAD')
