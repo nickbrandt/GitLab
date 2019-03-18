@@ -41,7 +41,7 @@ module EE
     end
 
     def geo_return_to_after_login
-      ::Gitlab::Utils.append_path(root_url, sanitize_redirect(session[:user_return_to].to_s))
+      sanitize_redirect(::Gitlab::Utils.append_path(root_url, session[:user_return_to].to_s))
     end
 
     def geo_return_to_after_logout
