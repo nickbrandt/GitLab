@@ -113,6 +113,14 @@ module Gitlab
       def string_level(level)
         string_options.key(level)
       end
+
+      def values_for(form_model, user = nil)
+        if form_model.class.respond_to?(:visibility_level_values)
+          form_model.class.visibility_level_values(user)
+        else
+          values
+        end
+      end
     end
 
     def visibility_level_decreased?

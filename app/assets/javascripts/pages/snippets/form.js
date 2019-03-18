@@ -14,4 +14,18 @@ export default () => {
     snippets: false,
   });
   new ZenMode(); // eslint-disable-line no-new
+
+  const secretElement = $('.snippet-form input.snippet_secret');
+
+  $(
+    '.snippet-form .visibility-level-setting input[data-track-property="visibility_level_secret"]',
+  ).click(() => {
+    secretElement.val('true');
+  });
+
+  $(
+    '.snippet-form .visibility-level-setting input[data-track-property!="visibility_level_secret"]',
+  ).click(() => {
+    secretElement.val('false');
+  });
 };

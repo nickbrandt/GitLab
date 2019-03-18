@@ -87,4 +87,13 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_nee
       expect(described_class.new(nil, 'xyz', []).snippet_blobs_count).to eq(0)
     end
   end
+
+  context 'when the snippet is secret' do
+    let(:snippet) { create(:personal_snippet, :secret, content: 'foo', file_name: 'foo') }
+
+    it 'returns nothing' do
+      expect(results.snippet_titles_count).to eq(0)
+      expect(results.snippet_blobs_count).to eq(0)
+    end
+  end
 end

@@ -1,16 +1,15 @@
-- Gitlab::VisibilityLevel.values.each do |level|
+- Gitlab::VisibilityLevel.values_for(form_model, current_user).each do |level|
   - disallowed = disallowed_visibility_level?(form_model, level)
   - restricted = restricted_visibility_levels.include?(level)
   - next if disallowed || restricted
 
+  - params = { form: form, form_model: form_model, model_method: model_method, selected_level: selected_level, level: level }
+
   .form-check
-    = form.radio_button model_method, level, checked: (selected_level == level), class: 'form-check-input', data: { track_label: "blank_project", track_event: "activate_form_input", track_property: "#{model_method}_#{level}", track_value: "", qa_selector: "#{visibility_level_label(level).downcase}_radio" }
-    = form.label "#{model_method}_#{level}", class: 'form-check-label' do
-      = visibility_level_icon(level)
-      .option-title
-        = visibility_level_label(level)
-      .option-description
-        = visibility_level_description(level, form_model)
+    - if Feature.enabled?(:secret_snippets, current_user) && form_model.is_a?(PersonalSnippet)
+      = render 'snippets/visibility_radio_option', params
+    - else
+      = render 'shared/visibility_radio_option', params
 
 .text-muted
   - if all_visibility_levels_restricted?

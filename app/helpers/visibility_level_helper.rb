@@ -61,7 +61,13 @@ module VisibilityLevelHelper
     when Gitlab::VisibilityLevel::INTERNAL
       _("The snippet is visible to any logged in user.")
     when Gitlab::VisibilityLevel::PUBLIC
-      _("The snippet can be accessed without any authentication.")
+      if snippet&.secret?
+        _("The snippet can be accessed without any authentication, but is not searchable.")
+      else
+        _("The snippet can be accessed without any authentication.")
+      end
+    when Snippet::VISIBILITY_SECRET
+      _("The snippet can be accessed without any authentication, but is not searchable.")
     end
   end
 

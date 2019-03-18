@@ -67,7 +67,7 @@ class SnippetsFinder < UnionFinder
 
     items = init_collection
     items = by_ids(items)
-    items.with_optional_visibility(visibility_from_scope).fresh
+    items.with_optional_visibility(*visibility_from_scope).fresh
   end
 
   private
@@ -89,7 +89,10 @@ class SnippetsFinder < UnionFinder
   # We only show personal snippets here because this page is meant for
   # discovery, and project snippets are of limited interest here.
   def snippets_for_explore
-    Snippet.public_to_user(current_user).only_personal_snippets
+    Snippet
+      .without_secret
+      .public_to_user(current_user)
+      .only_personal_snippets
   end
 
   # Produces a query that retrieves snippets from multiple projects.
@@ -159,9 +162,10 @@ class SnippetsFinder < UnionFinder
 
     if author == current_user
       # If the current user is also the author of all snippets, then we can
-      # include private snippets.
+      # include private and secret snippets.
       base
     else
+      base = base.without_secret unless current_user&.admin?
       base.public_to_user(current_user)
     end
   end
@@ -169,13 +173,15 @@ class SnippetsFinder < UnionFinder
   def visibility_from_scope
     case scope.to_s
     when 'are_private'
-      Snippet::PRIVATE
+      [Snippet::PRIVATE, false]
+    when 'are_secret'
+      [Snippet::PUBLIC, true]
     when 'are_internal'
-      Snippet::INTERNAL
+      [Snippet::INTERNAL, false]
     when 'are_public'
-      Snippet::PUBLIC
+      [Snippet::PUBLIC, false]
     else
-      nil
+      [nil, false]
     end
   end
 

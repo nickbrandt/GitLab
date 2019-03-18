@@ -2,6 +2,7 @@
 
 module AwardEmojiHelper
   def toggle_award_url(awardable)
+    return gitlab_toggle_award_emoji_snippet_path(awardable) if awardable.is_a?(PersonalSnippet)
     return url_for([:toggle_award_emoji, awardable]) unless @project || awardable.is_a?(Note)
 
     if awardable.is_a?(Note)

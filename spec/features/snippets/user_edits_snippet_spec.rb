@@ -58,4 +58,13 @@ describe 'User edits snippet', :js do
     expect(page).to have_no_xpath("//i[@class='fa fa-lock']")
     expect(page).to have_xpath("//i[@class='fa fa-globe']")
   end
+
+  it 'updates the snippet to make it secret' do
+    choose 'Secret'
+
+    click_button 'Save changes'
+    wait_for_requests
+
+    expect(page).to have_xpath("//i[@class='fa fa-user-secret']")
+  end
 end

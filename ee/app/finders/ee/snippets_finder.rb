@@ -43,7 +43,7 @@ module EE
       elsif current_user
         current_user.snippets
       else
-        ::Snippet.public_to_user
+        ::Snippet.public_to_user.without_secret
       end.only_personal_snippets
     end
   end

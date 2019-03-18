@@ -298,7 +298,7 @@ export default class Notes {
     this.refreshing = true;
 
     axios
-      .get(`${this.notes_url}?html=true`, {
+      .get(this.urlWithHtmlParam(this.notes_url), {
         headers: {
           'X-Last-Fetched-At': this.last_fetched_at,
         },
@@ -1230,7 +1230,7 @@ export default class Notes {
 
     $editForm
       .find('form')
-      .attr('action', `${postUrl}?html=true`)
+      .attr('action', this.urlWithHtmlParam(postUrl))
       .attr('data-remote', 'true');
     $editForm.find('.js-form-target-id').val(targetId);
     $editForm.find('.js-form-target-type').val(targetType);
@@ -1667,7 +1667,7 @@ export default class Notes {
 
     // Make request to submit comment on server
     return axios
-      .post(`${formAction}?html=true`, formData)
+      .post(this.urlWithHtmlParam(formAction), formData)
       .then(res => {
         const note = res.data;
 
@@ -1818,7 +1818,7 @@ export default class Notes {
 
     // Make request to update comment on server
     axios
-      .post(`${formAction}?html=true`, formData)
+      .post(this.urlWithHtmlParam(formAction), formData)
       .then(({ data }) => {
         // Submission successful! render final note element
         this.updateNote(data, $editingNote);
@@ -1834,6 +1834,20 @@ export default class Notes {
       });
 
     return $closeBtn.text($closeBtn.data('originalText'));
+  }
+
+  urlWithHtmlParam(url) {
+    const urlHash = new URL(url, this.noteable_url);
+    let search;
+
+    if (urlHash.search) {
+      search = `${urlHash.search}&html=true`;
+    } else {
+      search = `?html=true`;
+    }
+
+    urlHash.search = search;
+    return urlHash.toString();
   }
 }
 

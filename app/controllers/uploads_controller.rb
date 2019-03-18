@@ -65,6 +65,10 @@ class UploadsController < ApplicationController
       case model
       when User
         can?(current_user, :update_user, model)
+      when PersonalSnippet
+        if can?(current_user, :create_note, model)
+          authorize_secret_snippet
+        end
       else
         can?(current_user, :create_note, model)
       end
@@ -105,5 +109,12 @@ class UploadsController < ApplicationController
     return true unless upload_model_class_has_mounts?
 
     upload_model_class.uploader_options.has_key?(upload_mount)
+  end
+
+  def authorize_secret_snippet
+    return true if Feature.disabled?(:secret_snippets, current_user) || !model.secret?
+    return true if can?(current_user, :admin_personal_snippet, model)
+
+    model.valid_secret_token?(params[:token])
   end
 end

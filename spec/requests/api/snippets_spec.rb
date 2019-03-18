@@ -10,6 +10,7 @@ describe API::Snippets do
       public_snippet = create(:personal_snippet, :public, author: user)
       private_snippet = create(:personal_snippet, :private, author: user)
       internal_snippet = create(:personal_snippet, :internal, author: user)
+      secret_snippet = create(:personal_snippet, :secret, author: user)
 
       get api("/snippets/", user)
 
@@ -19,7 +20,8 @@ describe API::Snippets do
       expect(json_response.map { |snippet| snippet['id']} ).to contain_exactly(
         public_snippet.id,
         internal_snippet.id,
-        private_snippet.id)
+        private_snippet.id,
+        secret_snippet.id)
       expect(json_response.last).to have_key('web_url')
       expect(json_response.last).to have_key('raw_url')
       expect(json_response.last).to have_key('visibility')
@@ -27,6 +29,7 @@ describe API::Snippets do
 
     it 'hides private snippets from regular user' do
       create(:personal_snippet, :private)
+      create(:personal_snippet, :secret)
 
       get api("/snippets/", user)
 
@@ -38,6 +41,7 @@ describe API::Snippets do
 
     it 'returns 404 for non-authenticated' do
       create(:personal_snippet, :internal)
+      create(:personal_snippet, :secret)
 
       get api("/snippets/")
 
@@ -63,6 +67,7 @@ describe API::Snippets do
     let!(:public_snippet) { create(:personal_snippet, :public, author: user) }
     let!(:private_snippet) { create(:personal_snippet, :private, author: user) }
     let!(:internal_snippet) { create(:personal_snippet, :internal, author: user) }
+    let!(:secret_snippet) { create(:personal_snippet, :secret, author: user) }
     let!(:public_snippet_other) { create(:personal_snippet, :public, author: other_user) }
     let!(:private_snippet_other) { create(:personal_snippet, :private, author: other_user) }
     let!(:internal_snippet_other) { create(:personal_snippet, :internal, author: other_user) }
@@ -137,10 +142,67 @@ describe API::Snippets do
   end
 
   describe 'GET /snippets/:id' do
-    set(:admin) { create(:user, :admin) }
-    set(:author) { create(:user) }
-    set(:private_snippet) { create(:personal_snippet, :private, author: author) }
-    set(:internal_snippet) { create(:personal_snippet, :internal, author: author) }
+    let_it_be(:admin) { create(:user, :admin) }
+    let_it_be(:author) { create(:user) }
+    let_it_be(:public_snippet) { create(:personal_snippet, :public, author: author) }
+    let_it_be(:private_snippet) { create(:personal_snippet, :private, author: author) }
+    let_it_be(:internal_snippet) { create(:personal_snippet, :internal, author: author) }
+    let_it_be(:secret_snippet) { create(:personal_snippet, :secret, author: author) }
+
+    context 'attributes' do
+      subject { get api("/snippets/#{snippet.id}", author) }
+
+      before do
+        subject
+      end
+
+      shared_examples 'returns basic attributes' do
+        it do
+          expect(json_response['title']).to eq(snippet.title)
+          expect(json_response['description']).to eq(snippet.description)
+          expect(json_response['file_name']).to eq(snippet.file_name)
+          expect(json_response['visibility']).to eq(snippet.visibility)
+          expect(json_response['raw_url']).to eq(snippet.raw_url)
+          expect(json_response['web_url']).to eq(snippet.web_url)
+        end
+      end
+
+      shared_examples 'does not include secret_token attribute' do
+        it do
+          expect(json_response).not_to include('secret_token')
+        end
+      end
+
+      context 'public snippet' do
+        let(:snippet) { public_snippet }
+
+        it_behaves_like 'does not include secret_token attribute'
+      end
+
+      context 'private snippet' do
+        let(:snippet) { private_snippet }
+
+        it_behaves_like 'does not include secret_token attribute'
+      end
+
+      context 'internal snippet' do
+        let(:snippet) { internal_snippet }
+
+        it_behaves_like 'does not include secret_token attribute'
+      end
+
+      context 'secret snippet' do
+        let(:snippet) { secret_snippet }
+
+        it 'web_url includes token' do
+          expect(json_response['web_url']).to include("?token=#{snippet.secret_token}")
+        end
+
+        it 'raw_url includes token' do
+          expect(json_response['raw_url']).to include("?token=#{snippet.secret_token}")
+        end
+      end
+    end
 
     it 'requires authentication' do
       get api("/snippets/#{private_snippet.id}", nil)
@@ -152,11 +214,6 @@ describe API::Snippets do
       get api("/snippets/#{private_snippet.id}", author)
 
       expect(response).to have_gitlab_http_status(200)
-
-      expect(json_response['title']).to eq(private_snippet.title)
-      expect(json_response['description']).to eq(private_snippet.description)
-      expect(json_response['file_name']).to eq(private_snippet.file_name)
-      expect(json_response['visibility']).to eq(private_snippet.visibility)
     end
 
     it 'shows private snippets to an admin' do

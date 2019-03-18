@@ -18,6 +18,7 @@ describe SnippetsFinder do
 
   describe '#execute' do
     let_it_be(:user) { create(:user) }
+    let_it_be(:other_user) { create(:user) }
     let_it_be(:admin) { create(:admin) }
     let_it_be(:group) { create(:group, :public) }
     let_it_be(:project) { create(:project, :public, group: group) }
@@ -25,6 +26,8 @@ describe SnippetsFinder do
     let_it_be(:private_personal_snippet) { create(:personal_snippet, :private, author: user) }
     let_it_be(:internal_personal_snippet) { create(:personal_snippet, :internal, author: user) }
     let_it_be(:public_personal_snippet) { create(:personal_snippet, :public, author: user) }
+    let_it_be(:secret_personal_snippet) { create(:personal_snippet, :secret, author: user) }
+    let_it_be(:other_secret_personal_snippet) { create(:personal_snippet, :secret) }
 
     let_it_be(:private_project_snippet) { create(:project_snippet, :private, project: project) }
     let_it_be(:internal_project_snippet) { create(:project_snippet, :internal, project: project) }
@@ -32,84 +35,113 @@ describe SnippetsFinder do
 
     context 'filter by scope' do
       it "returns all snippets for 'all' scope" do
-        snippets = described_class.new(user, scope: :all).execute
-
-        expect(snippets).to contain_exactly(
+        expect(find_snippets(:all)).to contain_exactly(
           private_personal_snippet, internal_personal_snippet, public_personal_snippet,
-          internal_project_snippet, public_project_snippet
+          internal_project_snippet, public_project_snippet, secret_personal_snippet
         )
       end
 
       it "returns all snippets for 'are_private' scope" do
-        snippets = described_class.new(user, scope: :are_private).execute
-
-        expect(snippets).to contain_exactly(private_personal_snippet)
+        expect(find_snippets(:are_private)).to contain_exactly(private_personal_snippet)
       end
 
       it "returns all snippets for 'are_internal' scope" do
-        snippets = described_class.new(user, scope: :are_internal).execute
-
-        expect(snippets).to contain_exactly(internal_personal_snippet, internal_project_snippet)
+        expect(find_snippets(:are_internal)).to contain_exactly(internal_personal_snippet, internal_project_snippet)
       end
 
       it "returns all snippets for 'are_public' scope" do
-        snippets = described_class.new(user, scope: :are_public).execute
+        expect(find_snippets(:are_public)).to contain_exactly(public_personal_snippet, public_project_snippet)
+      end
 
-        expect(snippets).to contain_exactly(public_personal_snippet, public_project_snippet)
+      it "returns all snippets for 'are_secret' scope" do
+        expect(find_snippets(:are_secret)).to contain_exactly(secret_personal_snippet)
+      end
+
+      context 'when the user it not the author' do
+        let(:user) { other_user }
+
+        it "returns all snippets for 'all' scope except secret snippet" do
+          expect(find_snippets(:all)).to contain_exactly(
+            internal_personal_snippet, public_personal_snippet,
+            internal_project_snippet, public_project_snippet
+          )
+        end
+      end
+
+      context 'when the user is an admin' do
+        let(:user) { admin }
+
+        it "returns all snippets for 'all' scope" do
+          expect(find_snippets(:all)).to contain_exactly(
+            private_personal_snippet, internal_personal_snippet, public_personal_snippet,
+            internal_project_snippet, public_project_snippet, secret_personal_snippet,
+            other_secret_personal_snippet, private_project_snippet
+          )
+        end
+
+        it "returns all snippets for 'are_private' scope" do
+          expect(find_snippets(:are_private)).to contain_exactly(private_personal_snippet, private_project_snippet)
+        end
+
+        it "returns all snippets for 'are_internal' scope" do
+          expect(find_snippets(:are_internal)).to contain_exactly(internal_personal_snippet, internal_project_snippet)
+        end
+
+        it "returns all snippets for 'are_public' scope" do
+          expect(find_snippets(:are_public)).to contain_exactly(public_personal_snippet, public_project_snippet)
+        end
+
+        it "returns all snippets for 'are_secret' scope" do
+          expect(find_snippets(:are_secret)).to contain_exactly(secret_personal_snippet, other_secret_personal_snippet)
+        end
+      end
+
+      def find_snippets(scope)
+        described_class.new(user, scope: scope).execute
       end
     end
 
     context 'filter by author' do
-      context 'when the author is a User object' do
-        it 'returns all public and internal snippets' do
-          snippets = described_class.new(create(:user), author: user).execute
+      let(:author) { user }
 
-          expect(snippets).to contain_exactly(internal_personal_snippet, public_personal_snippet)
+      shared_examples 'scope filters with author' do
+        it 'returns internal snippets' do
+          expect(find_snippets(scope: :are_internal)).to contain_exactly(internal_personal_snippet)
+        end
+
+        it 'returns private snippets' do
+          expect(find_snippets(scope: :are_private)).to contain_exactly(private_personal_snippet)
+        end
+
+        it 'returns public snippets' do
+          expect(find_snippets(scope: :are_public)).to contain_exactly(public_personal_snippet)
+        end
+
+        it 'returns secret snippets' do
+          expect(find_snippets(scope: :are_secret)).to contain_exactly(secret_personal_snippet)
+        end
+
+        it 'returns all snippets' do
+          expect(find_snippets).to contain_exactly(private_personal_snippet, internal_personal_snippet, public_personal_snippet, secret_personal_snippet)
         end
       end
 
-      context 'when the author is the User id' do
-        it 'returns all public and internal snippets' do
-          snippets = described_class.new(create(:user), author: user.id).execute
+      it_behaves_like 'scope filters with author' do
+        let(:search_user) { user }
+      end
 
-          expect(snippets).to contain_exactly(internal_personal_snippet, public_personal_snippet)
+      context 'when the user is an admin' do
+        it_behaves_like 'scope filters with author' do
+          let(:search_user) { admin }
         end
       end
 
-      it 'returns internal snippets' do
-        snippets = described_class.new(user, author: user, scope: :are_internal).execute
+      context 'when the search user is different from author' do
+        let(:search_user) { other_user }
 
-        expect(snippets).to contain_exactly(internal_personal_snippet)
-      end
-
-      it 'returns private snippets' do
-        snippets = described_class.new(user, author: user, scope: :are_private).execute
-
-        expect(snippets).to contain_exactly(private_personal_snippet)
-      end
-
-      it 'returns public snippets' do
-        snippets = described_class.new(user, author: user, scope: :are_public).execute
-
-        expect(snippets).to contain_exactly(public_personal_snippet)
-      end
-
-      it 'returns all snippets' do
-        snippets = described_class.new(user, author: user).execute
-
-        expect(snippets).to contain_exactly(private_personal_snippet, internal_personal_snippet, public_personal_snippet)
-      end
-
-      it 'returns only public snippets if unauthenticated user' do
-        snippets = described_class.new(nil, author: user).execute
-
-        expect(snippets).to contain_exactly(public_personal_snippet)
-      end
-
-      it 'returns all snippets for an admin' do
-        snippets = described_class.new(admin, author: user).execute
-
-        expect(snippets).to contain_exactly(private_personal_snippet, internal_personal_snippet, public_personal_snippet)
+        it 'returns all public and internal snippets' do
+          expect(find_snippets).to contain_exactly(internal_personal_snippet, public_personal_snippet)
+        end
       end
 
       context 'when author is not valid' do
@@ -120,6 +152,10 @@ describe SnippetsFinder do
           expect(Snippet).to receive(:none).and_call_original
           expect(finder.execute).to be_empty
         end
+      end
+
+      def find_snippets(scope: nil)
+        described_class.new(search_user, author: author, scope: scope).execute
       end
     end
 
@@ -141,15 +177,11 @@ describe SnippetsFinder do
       end
 
       it 'returns public and internal snippets for non project members' do
-        snippets = described_class.new(user, project: project).execute
-
-        expect(snippets).to contain_exactly(internal_project_snippet, public_project_snippet)
+        expect(find_snippets(user)).to contain_exactly(internal_project_snippet, public_project_snippet)
       end
 
       it 'returns public snippets for non project members' do
-        snippets = described_class.new(user, project: project, scope: :are_public).execute
-
-        expect(snippets).to contain_exactly(public_project_snippet)
+        expect(find_snippets(user, scope: :are_public)).to contain_exactly(public_project_snippet)
       end
 
       it 'returns internal snippets for non project members' do
@@ -159,31 +191,23 @@ describe SnippetsFinder do
       end
 
       it 'does not return private snippets for non project members' do
-        snippets = described_class.new(user, project: project, scope: :are_private).execute
-
-        expect(snippets).to be_empty
+        expect(find_snippets(user, scope: :are_private)).to be_empty
       end
 
       it 'returns all snippets for project members' do
         project.add_developer(user)
 
-        snippets = described_class.new(user, project: project).execute
-
-        expect(snippets).to contain_exactly(private_project_snippet, internal_project_snippet, public_project_snippet)
+        expect(find_snippets(user)).to contain_exactly(private_project_snippet, internal_project_snippet, public_project_snippet)
       end
 
       it 'returns private snippets for project members' do
         project.add_developer(user)
 
-        snippets = described_class.new(user, project: project, scope: :are_private).execute
-
-        expect(snippets).to contain_exactly(private_project_snippet)
+        expect(find_snippets(user, scope: :are_private)).to contain_exactly(private_project_snippet)
       end
 
       it 'returns all snippets for an admin' do
-        snippets = described_class.new(admin, project: project).execute
-
-        expect(snippets).to contain_exactly(private_project_snippet, internal_project_snippet, public_project_snippet)
+        expect(find_snippets(admin)).to contain_exactly(private_project_snippet, internal_project_snippet, public_project_snippet)
       end
 
       context 'filter by author' do
@@ -215,6 +239,10 @@ describe SnippetsFinder do
           expect(finder.execute).to be_empty
         end
       end
+
+      def find_snippets(search_user, author: nil, scope: nil)
+        described_class.new(search_user, author: author, scope: scope, project: project).execute
+      end
     end
 
     context 'filter by snippet type' do
@@ -224,7 +252,9 @@ describe SnippetsFinder do
 
           expect(snippets).to contain_exactly(private_personal_snippet,
                                               internal_personal_snippet,
-                                              public_personal_snippet)
+                                              public_personal_snippet,
+                                              secret_personal_snippet,
+                                              other_secret_personal_snippet)
         end
       end
 
@@ -252,25 +282,23 @@ describe SnippetsFinder do
 
     context 'explore snippets' do
       it 'returns only public personal snippets for unauthenticated users' do
-        snippets = described_class.new(nil, explore: true).execute
-
-        expect(snippets).to contain_exactly(public_personal_snippet)
+        expect(find_snippets(nil)).to contain_exactly(public_personal_snippet)
       end
 
       it 'also returns internal personal snippets for authenticated users' do
-        snippets = described_class.new(user, explore: true).execute
-
-        expect(snippets).to contain_exactly(
+        expect(find_snippets(user)).to contain_exactly(
           internal_personal_snippet, public_personal_snippet
         )
       end
 
       it 'returns all personal snippets for admins' do
-        snippets = described_class.new(admin, explore: true).execute
-
-        expect(snippets).to contain_exactly(
+        expect(find_snippets(admin)).to contain_exactly(
           private_personal_snippet, internal_personal_snippet, public_personal_snippet
         )
+      end
+
+      def find_snippets(search_user)
+        described_class.new(search_user, explore: true).execute
       end
     end
 
@@ -281,7 +309,9 @@ describe SnippetsFinder do
       end
 
       it 'returns only personal snippets when the user cannot read cross project' do
-        expect(described_class.new(user).execute).to contain_exactly(private_personal_snippet, internal_personal_snippet, public_personal_snippet)
+        expect(described_class.new(user).execute).to contain_exactly(
+          private_personal_snippet, internal_personal_snippet, public_personal_snippet, secret_personal_snippet
+        )
       end
     end
   end
@@ -292,6 +322,8 @@ describe SnippetsFinder do
     let(:user) { create(:user) }
     let(:project) { create(:project) }
     let!(:snippet) { create(:project_snippet, :public, project: project) }
+
+    subject { described_class.new(user, project: project).execute }
 
     before do
       project.add_maintainer(user)
@@ -305,17 +337,13 @@ describe SnippetsFinder do
     it 'includes the result if the external service allows access' do
       external_service_allow_access(user, project)
 
-      results = described_class.new(user, project: project).execute
-
-      expect(results).to contain_exactly(snippet)
+      expect(subject).to contain_exactly(snippet)
     end
 
     it 'does not include any results if the external service denies access' do
       external_service_deny_access(user, project)
 
-      results = described_class.new(user, project: project).execute
-
-      expect(results).to be_empty
+      expect(subject).to be_empty
     end
   end
 end

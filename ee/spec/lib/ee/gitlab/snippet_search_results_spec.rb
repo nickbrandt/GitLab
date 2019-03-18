@@ -2,8 +2,11 @@
 require 'spec_helper'
 
 describe Gitlab::SnippetSearchResults do
-  let!(:snippet) { create(:snippet, content: 'foo', file_name: 'foo') }
-  let(:user) { snippet.author }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:snippet) { create(:snippet, author: user, content: 'foo', file_name: 'foo') }
+  let_it_be(:secret_snippet) { create(:personal_snippet, :secret, author: user, content: 'foo', file_name: 'foo') }
+  let_it_be(:other_secret_snippet) { create(:personal_snippet, :secret, content: 'foo', file_name: 'foo') }
+
   let(:com_value) { true }
   let(:flag_enabled) { true }
 
@@ -19,6 +22,10 @@ describe Gitlab::SnippetSearchResults do
       expect(SnippetsFinder).to receive(:new).with(user, authorized_and_user_personal: true).and_call_original
 
       subject
+    end
+
+    it 'returns the amount of matched snippet titles' do
+      expect(subject.count).to eq(1)
     end
   end
 

@@ -282,6 +282,10 @@ module GitlabRoutingHelper
              {}
            end
 
+    if Feature.enabled?(:secret_snippets, @current_user) && snippet.secret?
+      opts[:token] = snippet.secret_token
+    end
+
     args << opts
   end
 end

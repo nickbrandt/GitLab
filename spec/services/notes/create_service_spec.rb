@@ -334,16 +334,26 @@ describe Notes::CreateService do
         { note: 'comment', noteable_type: 'Snippet', noteable_id: snippet.id }
       end
 
-      it 'returns a valid note' do
-        expect(subject).to be_valid
+      shared_examples 'creates valid content' do
+        it 'returns a valid note' do
+          expect(subject).to be_valid
+        end
+
+        it 'returns a persisted note' do
+          expect(subject).to be_persisted
+        end
+
+        it 'note has valid content' do
+          expect(subject.note).to eq(params[:note])
+        end
       end
 
-      it 'returns a persisted note' do
-        expect(subject).to be_persisted
-      end
+      it_behaves_like 'creates valid content'
 
-      it 'note has valid content' do
-        expect(subject.note).to eq(params[:note])
+      context 'when snippet is secret' do
+        let(:snippet) { create(:personal_snippet, :secret) }
+
+        it_behaves_like 'creates valid content'
       end
     end
 

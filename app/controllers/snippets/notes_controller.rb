@@ -5,6 +5,7 @@ class Snippets::NotesController < ApplicationController
   include ToggleAwardEmoji
 
   skip_before_action :authenticate_user!, only: [:index]
+  before_action :authorize_secret_snippet!
   before_action :authorize_read_snippet!, only: [:show, :index]
   before_action :authorize_create_note!, only: [:create]
 
@@ -38,5 +39,12 @@ class Snippets::NotesController < ApplicationController
 
   def authorize_create_note!
     access_denied! unless can?(current_user, :create_note, noteable)
+  end
+
+  def authorize_secret_snippet!
+    return unless Feature.enabled?(:secret_snippets, current_user)
+    return if can?(current_user, :admin_personal_snippet, snippet)
+
+    render_404 if snippet.secret? && !snippet.valid_secret_token?(params[:token])
   end
 end

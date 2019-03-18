@@ -5,7 +5,7 @@ module SnippetsHelper
     return unless user
 
     if snippet&.persisted?
-      upload_path('personal_snippet', id: snippet.id)
+      upload_path('personal_snippet', id: snippet.id, token: snippet.secret_token)
     else
       upload_path('user', id: user.id)
     end
@@ -137,6 +137,8 @@ module SnippetsHelper
   def snippet_badge_attributes(snippet)
     if snippet.private?
       ['fa-lock', _('private')]
+    elsif snippet.secret?
+      ['fa-user-secret', _('secret')]
     end
   end
 
@@ -159,5 +161,31 @@ module SnippetsHelper
             target: '_blank',
             title: 'Download',
             rel: 'noopener noreferrer')
+  end
+
+  def snippet_visibility_level_icon(resource)
+    return icon('user-secret') if secret_snippet_or_visibility_level?(resource)
+
+    level = resource.is_a?(Snippet) ? resource.visibility_level : resource
+
+    visibility_level_icon(level, fw: false)
+  end
+
+  def snippet_visibility_level_label(resource)
+    return s_('Snippets|Secret') if secret_snippet_or_visibility_level?(resource)
+
+    level = resource.is_a?(Snippet) ? resource.visibility_level : resource
+
+    visibility_level_label(level)
+  end
+
+  private
+
+  def secret_snippet_or_visibility_level?(resource)
+    resource.is_a?(Snippet) ? resource.secret? : snippet_visibility_secret?(resource)
+  end
+
+  def snippet_visibility_secret?(level)
+    level == Snippet::VISIBILITY_SECRET
   end
 end

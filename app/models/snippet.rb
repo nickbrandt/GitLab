@@ -16,6 +16,8 @@ class Snippet < ApplicationRecord
   include FromUnion
   extend ::Gitlab::Utils::Override
 
+  VISIBILITY_SECRET = 'secret'.freeze
+
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
   cache_markdown_field :content
@@ -64,8 +66,10 @@ class Snippet < ApplicationRecord
   # Scopes
   scope :are_internal, -> { where(visibility_level: Snippet::INTERNAL) }
   scope :are_private, -> { where(visibility_level: Snippet::PRIVATE) }
-  scope :are_public, -> { public_only }
   scope :are_secret, -> { public_only.where(secret: true) }
+  scope :are_public, -> { public_only.without_secret }
+  scope :without_secret, -> { where(secret: false) }
+
   scope :fresh, -> { order("created_at DESC") }
   scope :inc_author, -> { includes(:author) }
   scope :inc_relations_for_view, -> { includes(author: :status) }
@@ -83,9 +87,9 @@ class Snippet < ApplicationRecord
     mode:      :per_attribute_iv,
     algorithm: 'aes-256-cbc'
 
-  def self.with_optional_visibility(value = nil)
-    if value
-      where(visibility_level: value)
+  def self.with_optional_visibility(visibility_level = nil, secret = false)
+    if visibility_level
+      where(visibility_level: visibility_level, secret: secret)
     else
       all
     end
@@ -133,6 +137,8 @@ class Snippet < ApplicationRecord
 
   def self.visible_to_or_authored_by(user)
     query = where(visibility_level: Gitlab::VisibilityLevel.levels_for_user(user))
+    query = query.without_secret unless user.admin?
+
     query.or(where(author_id: user.id))
   end
 
@@ -278,6 +284,12 @@ class Snippet < ApplicationRecord
     def parent_class
       ::Project
     end
+  end
+
+  protected
+
+  def snippet_can_be_secret?
+    false
   end
 end
 

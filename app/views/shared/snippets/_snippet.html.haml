@@ -19,8 +19,8 @@
           = notes_count
       %li
         %span.sr-only
-          = visibility_level_label(snippet.visibility_level)
-        = visibility_level_icon(snippet.visibility_level, fw: false)
+          = snippet_visibility_level_label(snippet)
+        = snippet_visibility_level_icon(snippet)
 
   .snippet-info
     #{snippet.to_reference} &middot;

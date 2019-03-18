@@ -25,11 +25,62 @@ describe UploadsController do
   let!(:user) { create(:user, avatar: fixture_file_upload("spec/fixtures/dk.png", "image/png")) }
 
   describe 'POST #authorize' do
+    let(:uploader_class) { PersonalFileUploader }
+    let(:params) do
+      { model: 'personal_snippet', id: model.id }
+    end
+
     it_behaves_like 'handle uploads authorize' do
-      let(:uploader_class) { PersonalFileUploader }
       let(:model) { create(:personal_snippet, :public) }
-      let(:params) do
-        { model: 'personal_snippet', id: model.id }
+    end
+
+    context 'when snippet is secret' do
+      let(:model) { create(:personal_snippet, :secret) }
+
+      context 'when the user can admin the snippet' do
+        it_behaves_like 'handle uploads authorize'
+      end
+
+      context 'when the user cannot admin the snippet' do
+        before do
+          sign_in(user)
+        end
+
+        context 'when the token is not present' do
+          it 'returns 404 status' do
+            expect(post_authorize.status).to eq(404)
+          end
+        end
+
+        context 'when the token is not valid' do
+          let(:params) do
+            { model: 'personal_snippet', id: model.id, token: 'foo' }
+          end
+
+          it 'returns 404 status' do
+            expect(post_authorize.status).to eq(404)
+          end
+        end
+
+        context 'when the token is valid' do
+          let(:params) do
+            { model: 'personal_snippet', id: model.id, token: model.secret_token }
+          end
+
+          before do
+            post_authorize
+          end
+
+          it 'responds with status 200' do
+            expect(response.status).to eq 200
+          end
+
+          it 'uses the gitlab-workhorse content type' do
+            post_authorize
+
+            expect(response.headers["Content-Type"]).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+          end
+        end
       end
     end
   end
@@ -44,7 +95,7 @@ describe UploadsController do
 
       context 'when a user does not have permissions to upload a file' do
         it "returns 401 when the user is not logged in" do
-          post :create, params: { model: model, id: snippet.id }, format: :json
+          create_request
 
           expect(response).to have_gitlab_http_status(401)
         end
@@ -53,9 +104,19 @@ describe UploadsController do
           private_snippet = create(:personal_snippet, :private)
 
           sign_in(user)
-          post :create, params: { model: model, id: private_snippet.id }, format: :json
+          create_request(id: private_snippet.id)
 
           expect(response).to have_gitlab_http_status(404)
+        end
+
+        context 'when the snippet is secret' do
+          let(:snippet) { create(:personal_snippet, :secret) }
+
+          it "returns 401 when the user is not logged in" do
+            create_request
+
+            expect(response).to have_gitlab_http_status(401)
+          end
         end
       end
 
@@ -65,29 +126,29 @@ describe UploadsController do
         end
 
         it "returns an error without file" do
-          post :create, params: { model: model, id: snippet.id }, format: :json
+          create_request
 
           expect(response).to have_gitlab_http_status(422)
         end
 
         it "returns an error with invalid model" do
-          expect { post :create, params: { model: 'invalid', id: snippet.id }, format: :json }
+          expect { create_request(model: 'invalid') }
             .to raise_error(ActionController::UrlGenerationError)
         end
 
         it "returns 404 status when object not found" do
-          post :create, params: { model: model, id: 9999 }, format: :json
+          create_request(id: 9999)
 
           expect(response).to have_gitlab_http_status(404)
         end
 
-        context 'with valid image' do
+        shared_examples 'sucessfully uploads the file' do
           before do
-            post :create, params: { model: 'personal_snippet', id: snippet.id, file: jpg }, format: :json
+            request
           end
 
           it 'returns a content with original filename, new link, and correct type.' do
-            expect(response.body).to match '\"alt\":\"rails_sample\"'
+            expect(response.body).to match "\"alt\":\"#{file_name}\""
             expect(response.body).to match "\"url\":\"/uploads"
           end
 
@@ -97,29 +158,85 @@ describe UploadsController do
             aggregate_failures do
               expect(upload).to exist
               expect(upload.model).to eq snippet
+            end
+          end
+        end
+
+        context 'with valid image' do
+          it_behaves_like 'sucessfully uploads the file' do
+            let(:request) { create_request(file: jpg)}
+            let(:file_name) { 'rails_sample' }
+          end
+
+          context 'when the snippet is secret' do
+            let(:snippet) { create(:personal_snippet, :secret) }
+
+            context 'when the token is not present' do
+              it 'returns 404' do
+                create_request(file: jpg)
+
+                expect(response).to have_gitlab_http_status(404)
+              end
+            end
+
+            context 'when the token is not valid' do
+              it 'returns 404' do
+                create_request(file: jpg, token: 'foo')
+
+                expect(response).to have_gitlab_http_status(404)
+              end
+            end
+
+            context 'when the token is valid' do
+              it_behaves_like 'sucessfully uploads the file' do
+                let(:request) { create_request(file: jpg, token: snippet.secret_token)}
+                let(:file_name) { 'rails_sample' }
+              end
             end
           end
         end
 
         context 'with valid non-image file' do
-          before do
-            post :create, params: { model: 'personal_snippet', id: snippet.id, file: txt }, format: :json
+          it_behaves_like 'sucessfully uploads the file' do
+            let(:request) { create_request(file: txt)}
+            let(:file_name) { 'doc_sample.txt' }
           end
 
-          it 'returns a content with original filename, new link, and correct type.' do
-            expect(response.body).to match '\"alt\":\"doc_sample.txt\"'
-            expect(response.body).to match "\"url\":\"/uploads"
-          end
+          context 'when the snippet is secret' do
+            let(:snippet) { create(:personal_snippet, :secret) }
 
-          it 'creates a corresponding Upload record' do
-            upload = Upload.last
+            context 'when the token is not present' do
+              it 'returns 404' do
+                create_request(file: txt)
 
-            aggregate_failures do
-              expect(upload).to exist
-              expect(upload.model).to eq snippet
+                expect(response).to have_gitlab_http_status(404)
+              end
+            end
+
+            context 'when the token is not valid' do
+              it 'returns 404' do
+                create_request(file: txt, token: 'foo')
+
+                expect(response).to have_gitlab_http_status(404)
+              end
+            end
+
+            context 'when the token is valid' do
+              it_behaves_like 'sucessfully uploads the file' do
+                let(:request) { create_request(file: txt, token: snippet.secret_token)}
+                let(:file_name) { 'doc_sample.txt' }
+              end
             end
           end
         end
+      end
+
+      def create_request(model: 'personal_snippet', id: snippet.id, file: nil, token: nil)
+        params = { model: model, id: id }
+        params[:file] = file if file
+        params[:token] = token if token
+
+        post :create, params: params, format: :json
       end
     end
 
@@ -651,6 +768,6 @@ describe UploadsController do
   def post_authorize(verified: true)
     request.headers.merge!(workhorse_internal_api_request_header) if verified
 
-    post :authorize, params: { model: 'personal_snippet', id: model.id }, format: :json
+    post :authorize, params: params, format: :json
   end
 end

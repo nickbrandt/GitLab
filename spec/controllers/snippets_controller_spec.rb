@@ -5,9 +5,79 @@ require 'spec_helper'
 describe SnippetsController do
   let(:user) { create(:user) }
 
-  describe 'GET #index' do
-    let(:user) { create(:user) }
+  shared_examples 'allow read access to secret snippets' do
+    let_it_be(:secret_snippet) { create(:personal_snippet, :secret) }
+    let(:author) { secret_snippet.author }
+    let(:snippet_params) { { id: secret_snippet.to_param } }
+    let(:secret_token) { secret_snippet.secret_token }
+    let(:params) { snippet_params }
 
+    before do
+      sign_in(user) if user
+
+      subject
+    end
+
+    context 'when not signed in' do
+      let(:user) { nil }
+
+      it 'redirects to the sign in page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'when user is not the author' do
+      context 'when the token is not present' do
+        it 'responds with status 404' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the token is not valid' do
+        let(:params) { snippet_params.merge(token: 'foo') }
+
+        it 'responds with status 404' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the token is valid' do
+        let(:params) { snippet_params.merge(token: secret_token) }
+
+        it 'responds with status 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+    end
+
+    context 'when user is the author' do
+      let(:user) { author }
+
+      context 'when the token is not present' do
+        it 'responds with status 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'when the token is not valid' do
+        let(:params) { snippet_params.merge(token: 'foo') }
+
+        it 'responds with status 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'when the token is valid' do
+        let(:params) { snippet_params.merge(token: secret_token) }
+
+        it 'responds with status 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+    end
+  end
+
+  describe 'GET #index' do
     context 'when username parameter is present' do
       it_behaves_like 'paginated collection' do
         let(:collection) { Snippet.all }
@@ -75,6 +145,10 @@ describe SnippetsController do
   end
 
   describe 'GET #show' do
+    it_behaves_like 'allow read access to secret snippets' do
+      subject { get :show, params: params }
+    end
+
     context 'when the personal snippet is private' do
       let(:personal_snippet) { create(:personal_snippet, :private, author: user) }
 
@@ -332,12 +406,59 @@ describe SnippetsController do
     end
   end
 
+  describe 'GET #edit' do
+    context 'when the snippet is secret' do
+      let_it_be(:snippet) { create :personal_snippet, :secret }
+      let(:user) { snippet.author }
+      let(:params) { { id: snippet.id, token: snippet.secret_token } }
+
+      subject { get :edit, params: params }
+
+      before do
+        sign_in(user) if user
+
+        subject
+      end
+
+      context 'when the user is not signed in' do
+        let(:user) { nil }
+
+        it 'redirects to the sign in page' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+
+      context 'when the user not the author' do
+        let(:user) { create(:user) }
+
+        it 'responds with 404' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the user is the author' do
+        it 'responds with 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        context 'without the token param' do
+          let(:params) { { id: snippet.id } }
+
+          it 'responds with 200' do
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+      end
+    end
+  end
+
   describe 'PUT #update' do
     let(:project) { create :project }
-    let(:snippet) { create :personal_snippet, author: user, project: project, visibility_level: visibility_level }
+    let(:snippet) { create :personal_snippet, visibility_level }
+    let(:user) { snippet.author }
 
     def update_snippet(snippet_params = {}, additional_params = {})
-      sign_in(user)
+      sign_in(user) if user
 
       put :update, params: {
         id: snippet.id,
@@ -355,7 +476,7 @@ describe SnippetsController do
       end
 
       context 'when the snippet is private' do
-        let(:visibility_level) { Snippet::PRIVATE }
+        let(:visibility_level) { :private }
 
         it 'updates the snippet' do
           expect { update_snippet(title: 'Foo') }
@@ -364,7 +485,7 @@ describe SnippetsController do
       end
 
       context 'when a private snippet is made public' do
-        let(:visibility_level) { Snippet::PRIVATE }
+        let(:visibility_level) { :private }
 
         it 'rejects the snippet' do
           expect { update_snippet(title: 'Foo', visibility_level: Snippet::PUBLIC) }
@@ -409,7 +530,7 @@ describe SnippetsController do
       end
 
       context 'when the snippet is public' do
-        let(:visibility_level) { Snippet::PUBLIC }
+        let(:visibility_level) { :public }
 
         it 'rejects the shippet' do
           expect { update_snippet(title: 'Foo') }
@@ -453,6 +574,39 @@ describe SnippetsController do
         end
       end
     end
+
+    context 'when the snippet is secret' do
+      let(:visibility_level) { :secret }
+
+      subject { update_snippet({ title: 'Foo' }, { token: snippet.secret_token }) }
+
+      before do
+        subject
+      end
+
+      context 'when the user is not authenticated' do
+        let(:user) { nil }
+
+        it 'redirects to the sign in page' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+
+      context 'when the user is not the author' do
+        let(:user) { create(:user) }
+
+        it 'responds with 404' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the user is the author' do
+        it 'responds with 302' do
+          expect(response).to have_gitlab_http_status(302)
+          expect(snippet.title).to eq 'Foo'
+        end
+      end
+    end
   end
 
   describe 'POST #mark_as_spam' do
@@ -481,6 +635,10 @@ describe SnippetsController do
   end
 
   describe "GET #raw" do
+    it_behaves_like 'allow read access to secret snippets' do
+      subject { get :raw, params: params }
+    end
+
     context 'when the personal snippet is private' do
       let(:personal_snippet) { create(:personal_snippet, :private, author: user) }
 
@@ -625,31 +783,57 @@ describe SnippetsController do
   end
 
   context 'award emoji on snippets' do
-    let(:personal_snippet) { create(:personal_snippet, :public, author: user) }
-    let(:another_user) { create(:user) }
+    let(:personal_snippet) { create(:personal_snippet, visibility, author: user) }
+    let(:snippet_params) { { id: personal_snippet.to_param, name: "thumbsup" } }
+    let(:params) { snippet_params }
+    let_it_be(:another_user) { create(:user) }
 
     before do
       sign_in(another_user)
     end
 
-    describe 'POST #toggle_award_emoji' do
-      it "toggles the award emoji" do
+    shared_examples 'handles award emoji' do
+      it 'toggles the award emoji' do
         expect do
-          post(:toggle_award_emoji, params: { id: personal_snippet.to_param, name: "thumbsup" })
+          toggle_award_emoji(params)
         end.to change { personal_snippet.award_emoji.count }.from(0).to(1)
 
         expect(response.status).to eq(200)
       end
 
-      it "removes the already awarded emoji" do
-        post(:toggle_award_emoji, params: { id: personal_snippet.to_param, name: "thumbsup" })
+      it 'removes the already awarded emoji' do
+        toggle_award_emoji(params)
 
         expect do
-          post(:toggle_award_emoji, params: { id: personal_snippet.to_param, name: "thumbsup" })
+          toggle_award_emoji(params)
         end.to change { personal_snippet.award_emoji.count }.from(1).to(0)
 
         expect(response.status).to eq(200)
       end
+    end
+
+    describe 'POST #toggle_award_emoji' do
+      it_behaves_like 'handles award emoji' do
+        let(:visibility) { :public }
+      end
+
+      context 'when snippet is secret' do
+        let(:visibility) { :secret }
+
+        it_behaves_like 'handles award emoji' do
+          let(:params) { snippet_params.merge(token: personal_snippet.secret_token) }
+        end
+
+        it 'does not toggle the award emoji when token is not present' do
+          toggle_award_emoji(params)
+
+          expect(response.status).to eq(404)
+        end
+      end
+    end
+
+    def toggle_award_emoji(params = {})
+      post(:toggle_award_emoji, params: params)
     end
   end
 
@@ -662,6 +846,52 @@ describe SnippetsController do
       post :preview_markdown, params: { id: snippet, text: '*Markdown* text' }
 
       expect(json_response.keys).to match_array(%w(body references))
+    end
+  end
+
+  describe "DELETE #destroy" do
+    context 'when the snippet is secret' do
+      let_it_be(:snippet) { create :personal_snippet, :secret }
+      let(:user) { snippet.author }
+      let(:params) { { id: snippet.id, token: snippet.secret_token } }
+
+      subject { delete :destroy, params: params }
+
+      before do
+        sign_in(user) if user
+
+        subject
+      end
+
+      context 'when the user is not signed in' do
+        let(:user) { nil }
+
+        it 'redirects to the sign in page' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+
+      context 'when the user not the author' do
+        let(:user) { create(:user) }
+
+        it 'responds with 404' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'when the user is the author' do
+        it 'responds with 302' do
+          expect(response).to have_gitlab_http_status(302)
+        end
+
+        context 'without the token param' do
+          let(:params) { { id: snippet.id } }
+
+          it 'responds with 200' do
+            expect(response).to have_gitlab_http_status(302)
+          end
+        end
+      end
     end
   end
 end

@@ -16354,6 +16354,9 @@ msgstr ""
 msgid "SnippetsEmptyState|They can be either public or private."
 msgstr ""
 
+msgid "Snippets|Secret"
+msgstr ""
+
 msgid "Snowplow"
 msgstr ""
 
@@ -17712,6 +17715,9 @@ msgid "The roadmap shows the progress of your epics along a timeline"
 msgstr ""
 
 msgid "The schedule time must be in the future!"
+msgstr ""
+
+msgid "The snippet can be accessed without any authentication, but is not searchable."
 msgstr ""
 
 msgid "The snippet can be accessed without any authentication."
@@ -21715,6 +21721,9 @@ msgid "reset it."
 msgstr ""
 
 msgid "score"
+msgstr ""
+
+msgid "secret"
 msgstr ""
 
 msgid "security Reports|There was an error creating the merge request"

@@ -24,4 +24,12 @@ describe 'Projects > Snippets > User updates a snippet' do
 
     expect(page).to have_content('Snippet new title')
   end
+
+  it 'does not include secret hidden field' do
+    page.within('.detail-page-header') do
+      first(:link, 'Edit').click
+    end
+
+    expect(page).not_to have_css('input.snippet_secret', visible: false)
+  end
 end

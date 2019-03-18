@@ -68,15 +68,27 @@ describe Notes::BuildService do
 
         let(:snippet_author) { create(:user) }
 
-        context 'when a snippet is public' do
-          it 'creates a reply note' do
-            snippet = create(:personal_snippet, :public)
+        shared_examples 'creates a reply note' do
+          it do
+            snippet = create(:personal_snippet, visibility)
             note = create(:discussion_note_on_personal_snippet, noteable: snippet)
 
             new_note = reply(note)
 
             expect(new_note).to be_valid
             expect(new_note.in_reply_to?(note)).to be_truthy
+          end
+        end
+
+        context 'when a snippet is public' do
+          it_behaves_like 'creates a reply note' do
+            let(:visibility) { :public }
+          end
+        end
+
+        context 'when a snippet is secret' do
+          it_behaves_like 'creates a reply note' do
+            let(:visibility) { :secret }
           end
         end
 

@@ -18,6 +18,16 @@ describe AwardEmojiHelper do
 
         expect(subject).to eq(expected_url)
       end
+
+      context 'when snippet is secret' do
+        let(:snippet) { create(:personal_snippet, :secret) }
+
+        it 'returns correct url' do
+          expected_url = "/snippets/#{note.noteable.id}/notes/#{note.id}/toggle_award_emoji?token=#{snippet.secret_token}"
+
+          expect(subject).to eq(expected_url)
+        end
+      end
     end
 
     context 'note on project item' do
@@ -41,6 +51,26 @@ describe AwardEmojiHelper do
         expected_url = "/snippets/#{snippet.id}/toggle_award_emoji"
 
         expect(subject).to eq(expected_url)
+      end
+
+      context 'when snippet is secret' do
+        let(:snippet) { create(:personal_snippet, :secret) }
+
+        context 'when feature flag secret_snippets is enabled' do
+          it 'returns correct url' do
+            expected_url = "/snippets/#{snippet.id}/toggle_award_emoji?token=#{snippet.secret_token}"
+
+            expect(subject).to eq(expected_url)
+          end
+        end
+
+        context 'when feature flag secret_snippets is disabled' do
+          it 'does not include token' do
+            stub_feature_flags(secret_snippets: false)
+
+            expect(subject).to eq "/snippets/#{snippet.id}/toggle_award_emoji"
+          end
+        end
       end
     end
 

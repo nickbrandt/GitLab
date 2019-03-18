@@ -47,6 +47,7 @@ module Gitlab
     def snippets
       SnippetsFinder.new(current_user, finder_params)
         .execute
+        .without_secret
         .includes(:author)
         .reorder(updated_at: :desc)
     end

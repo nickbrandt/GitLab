@@ -32,9 +32,11 @@ describe SnippetsFinder do
     let_it_be(:private_personal_snippet) { create(:personal_snippet, :private, author: user) }
     let_it_be(:internal_personal_snippet) { create(:personal_snippet, :internal, author: user) }
     let_it_be(:public_personal_snippet) { create(:personal_snippet, :public, author: user) }
+    let_it_be(:secret_personal_snippet) { create(:personal_snippet, :secret, author: user) }
     let_it_be(:other_private_personal_snippet) { create(:personal_snippet, :private, author: other_user) }
     let_it_be(:other_internal_personal_snippet) { create(:personal_snippet, :internal, author: other_user) }
     let_it_be(:other_public_personal_snippet) { create(:personal_snippet, :public, author: other_user) }
+    let_it_be(:other_secret_personal_snippet) { create(:personal_snippet, :secret, author: other_user) }
     let_it_be(:other_private_project_snippet) { create(:project_snippet, :private, project: other_project, author: other_user) }
     let_it_be(:other_internal_project_snippet) { create(:project_snippet, :internal, project: other_project, author: other_user) }
     let_it_be(:other_public_project_snippet) { create(:project_snippet, :public, project: other_project, author: other_user) }
@@ -52,7 +54,7 @@ describe SnippetsFinder do
 
     context 'when user is not a member of any project' do
       it 'returns only user personal snippets' do
-        expect(subject).to match_array([public_personal_snippet, internal_personal_snippet, private_personal_snippet])
+        expect(subject).to match_array([public_personal_snippet, internal_personal_snippet, private_personal_snippet, secret_personal_snippet])
       end
     end
 
@@ -66,6 +68,7 @@ describe SnippetsFinder do
               public_personal_snippet,
               internal_personal_snippet,
               private_personal_snippet,
+              secret_personal_snippet,
               public_project_snippet,
               internal_project_snippet,
               private_project_snippet
@@ -83,6 +86,7 @@ describe SnippetsFinder do
               public_personal_snippet,
               internal_personal_snippet,
               private_personal_snippet,
+              secret_personal_snippet,
               public_project_snippet,
               internal_project_snippet,
               private_project_snippet,
@@ -102,7 +106,7 @@ describe SnippetsFinder do
         end
 
         it 'returns only user personal snippets' do
-          expect(subject).to contain_exactly(public_personal_snippet, internal_personal_snippet, private_personal_snippet)
+          expect(subject).to contain_exactly(public_personal_snippet, internal_personal_snippet, private_personal_snippet, secret_personal_snippet)
         end
       end
     end
@@ -117,6 +121,7 @@ describe SnippetsFinder do
               public_personal_snippet,
               internal_personal_snippet,
               private_personal_snippet,
+              secret_personal_snippet,
               public_project_snippet,
               internal_project_snippet,
               private_project_snippet

@@ -13,7 +13,9 @@ class SnippetsController < ApplicationController
   skip_before_action :verify_authenticity_token,
     if: -> { action_name == 'show' && js_request? }
 
-  before_action :snippet, only: [:show, :edit, :destroy, :update, :raw]
+  before_action :snippet, only: [:show, :edit, :destroy, :update, :raw, :toggle_award_emoji]
+
+  before_action :authorize_secret_snippet!, only: [:show, :raw, :toggle_award_emoji]
 
   before_action :authorize_create_snippet!, only: [:new, :create]
   before_action :authorize_read_snippet!, only: [:show, :raw]
@@ -119,13 +121,7 @@ class SnippetsController < ApplicationController
   end
 
   def authorize_read_snippet!
-    return if can?(current_user, :read_personal_snippet, @snippet)
-
-    if current_user
-      render_404
-    else
-      authenticate_user!
-    end
+    return access_error unless can?(current_user, :read_personal_snippet, @snippet)
   end
 
   def authorize_update_snippet!
@@ -140,8 +136,18 @@ class SnippetsController < ApplicationController
     return render_404 unless can?(current_user, :create_personal_snippet)
   end
 
+  def authorize_secret_snippet!
+    return if Feature.disabled?(:secret_snippets, current_user)
+    return if can?(current_user, :admin_personal_snippet, @snippet)
+    return access_error if snippet&.secret? && !snippet&.valid_secret_token?(params[:token])
+  end
+
+  def access_error
+    current_user ? render_404 : authenticate_user!
+  end
+
   def snippet_params
-    params.require(:personal_snippet).permit(:title, :content, :file_name, :private, :visibility_level, :description)
+    params.require(:personal_snippet).permit(:title, :content, :file_name, :private, :visibility_level, :description, :secret)
   end
 
   def move_temporary_files

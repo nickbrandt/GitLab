@@ -6,6 +6,9 @@
              html: { class: "snippet-form js-requires-input js-quick-submit common-note-form" } do |f|
     = form_errors(@snippet)
 
+    - if @snippet.is_a?(PersonalSnippet) && Feature.enabled?(:secret_snippets, current_user)
+      = f.hidden_field :secret, class: 'snippet_secret'
+
     .form-group.row
       .col-sm-2.col-form-label
         = f.label :title

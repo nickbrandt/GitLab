@@ -37,22 +37,31 @@ describe 'Dashboard snippets' do
         create(:personal_snippet, :public, author: user),
         create(:personal_snippet, :internal, author: user),
         create(:personal_snippet, :private, author: user),
+        create(:personal_snippet, :secret, author: user),
         create(:personal_snippet, :public)
       ]
     end
+    let(:flag_value) { true }
 
     before do
+      stub_feature_flags(secret_snippets: flag_value)
+
       sign_in(user)
 
       visit dashboard_snippets_path
     end
 
+    it 'contains 5 snippet sections' do
+      expect(page).to have_selector('.snippet-scope-menu li', count: 5)
+    end
+
     it 'contains all snippets of logged user' do
-      expect(page).to have_selector('.snippet-row', count: 3)
+      expect(page).to have_selector('.snippet-row', count: 4)
 
       expect(page).to have_content(snippets[0].title)
       expect(page).to have_content(snippets[1].title)
       expect(page).to have_content(snippets[2].title)
+      expect(page).to have_content(snippets[3].title)
     end
 
     it 'contains all private snippets of logged user when clicking on private' do
@@ -74,6 +83,21 @@ describe 'Dashboard snippets' do
 
       expect(page).to have_selector('.snippet-row', count: 1)
       expect(page).to have_content(snippets[0].title)
+    end
+
+    it 'contains all secret snippets of logged user when clicking on secret' do
+      click_link('Secret')
+
+      expect(page).to have_selector('.snippet-row', count: 1)
+      expect(page).to have_content(snippets[3].title)
+    end
+
+    context 'when secret_snippets feature flag is disabled' do
+      let(:flag_value) { false }
+
+      it 'does not contain secret snippets section' do
+        expect(page).to have_selector('.snippet-scope-menu li', count: 4)
+      end
     end
   end
 end

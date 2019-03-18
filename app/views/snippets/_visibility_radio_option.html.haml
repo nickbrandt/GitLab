@@ -1,0 +1,12 @@
+- model_method = :visibility_level
+- is_secret = snippet_visibility_secret?(level) && form_model.secret?
+- is_visibility_level = form_model.visibility_level == level
+- value = snippet_visibility_secret?(level) ? Snippet::PUBLIC : level
+
+= form.radio_button model_method, value, checked: (is_secret || is_visibility_level), id: "#{form_model.class.underscore}_#{model_method}_#{level}", class: 'form-check-input', data: { track_label: "blank_project", track_event: "activate_form_input", track_property: "#{model_method}_#{level}", track_value: "", qa_selector: "#{snippet_visibility_level_label(level).downcase}_radio" }
+= form.label "#{model_method}_#{level}", class: 'form-check-label' do
+  = snippet_visibility_level_icon(level)
+  .option-title
+    = snippet_visibility_level_label(level)
+  .option-description
+    = snippet_visibility_level_description(level)
