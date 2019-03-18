@@ -79,7 +79,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
 
     context 'when the checksum mismatch' do
       before do
-        allow(repository).to receive(:checksum).and_return('other_checksum')
+        allow(repository).to receive(:checksum).and_return('99fc1ec4ce60')
       end
 
       it 'keeps track of failures' do
@@ -87,6 +87,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
 
         expect(registry).to have_attributes(
           "#{type}_verification_checksum_sha" => nil,
+          "#{type}_verification_checksum_mismatched" => '99fc1ec4ce60',
           "#{type}_checksum_mismatch" => true,
           "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
           "last_#{type}_verification_failure" => "#{type.to_s.capitalize} checksum mismatch",
@@ -120,6 +121,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
 
         expect(registry).to have_attributes(
           "#{type}_verification_checksum_sha" => nil,
+          "#{type}_verification_checksum_mismatched" => nil,
           "#{type}_checksum_mismatch" => false,
           "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
           "last_#{type}_verification_failure" => "Error calculating #{type} checksum",
