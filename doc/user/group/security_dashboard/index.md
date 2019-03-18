@@ -89,7 +89,7 @@ Clicking the "More info" button opens a modal with more information about the
 selected vulnerability where you can get a better description, as well as the
 file it came from, and a possible solution. You get access to the
 ["Dismiss vulnerability"](#dismissing-a-vulnerability),
-["Create merge request"](#autoremediation), and
+["Create merge request"](#create-a-merge-request-from-a-vulnerability), and
 ["Create issue"](#creating-an-issue-for-a-vulnerability) buttons inside this
 modal as well.
 
@@ -111,7 +111,7 @@ will now have an associated issue next to the name.
 You can get the same result if you select the **Create issue** button from inside
 the "More info" modal.
 
-### Autoremediation
+### Create a Merge Request from a vulnerability
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9224) in
   [GitLab Ultimate](https://about.gitlab.com/pricing) 11.9.

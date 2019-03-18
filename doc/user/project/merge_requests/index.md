@@ -376,7 +376,7 @@ Some Vulnerabilities can be fixed by applying a patch that is automatically gene
 
 ![Solutions for dependency scanning](img/vulnerability_solution.png)
 
-### Auto Remediation for Dependency Scanning **[ULTIMATE]**
+### Create a merge request from a vulnerability **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][products] 11.9.
 
