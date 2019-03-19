@@ -30,15 +30,15 @@ export const REPORT_TYPES = {
 
 export const BASE_FILTERS = {
   severity: {
-    name: 'All severities',
+    name: s__('ciReport|All severities'),
     id: 'all',
   },
   report_type: {
-    name: 'All report types',
+    name: s__('ciReport|All report types'),
     id: 'all',
   },
   project_id: {
-    name: 'All projects',
+    name: s__('ciReport|All projects'),
     id: 'all',
   },
 };
