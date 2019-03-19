@@ -7,11 +7,15 @@ module Gitlab
 
       # Limit search results by passed project ids
       # It allows us to search only for projects user has access to
-      attr_reader :limit_project_ids
+      attr_reader :limit_project_ids, :limit_projects
 
-      def initialize(current_user, query, limit_project_ids, public_and_internal_projects = true)
+      delegate :users, to: :generic_search_results
+      delegate :limited_users_count, to: :generic_search_results
+
+      def initialize(current_user, query, limit_project_ids, limit_projects = nil, public_and_internal_projects = true)
         @current_user = current_user
         @limit_project_ids = limit_project_ids
+        @limit_projects = limit_projects
         @query = query
         @public_and_internal_projects = public_and_internal_projects
       end
@@ -32,9 +36,15 @@ module Gitlab
           wiki_blobs.page(page).per(per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
+        when 'users'
+          users.page(page).per(per_page)
         else
           Kaminari.paginate_array([])
         end
+      end
+
+      def generic_search_results
+        @generic_search_results ||= Gitlab::SearchResults.new(current_user, limit_projects, query)
       end
 
       def projects_count
