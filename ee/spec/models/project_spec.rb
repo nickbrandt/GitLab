@@ -1735,6 +1735,38 @@ describe Project do
     end
   end
 
+  describe "#insights_config" do
+    context 'when project has no Insights config file' do
+      it 'returns nil' do
+        expect(create(:project).insights_config).to be_nil
+      end
+    end
+
+    context 'when project has an Insights config file' do
+      let(:project) do
+        create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+      end
+
+      context 'with a valid config file' do
+        let(:insights_file_content) { 'key: monthlyBugsCreated' }
+
+        it 'returns the insights config data' do
+          insights_config = project.insights_config
+
+          expect(insights_config).to eq(key: 'monthlyBugsCreated')
+        end
+      end
+
+      context 'with an invalid config file' do
+        let(:insights_file_content) { ': foo bar' }
+
+        it 'returns the insights config data' do
+          expect(project.insights_config).to be_nil
+        end
+      end
+    end
+  end
+
   # Despite stubbing the current node as the primary or secondary, the
   # behaviour for EE::Project#lfs_http_url_to_repo() is to call
   # Project#lfs_http_url_to_repo() which does not have a Geo context.
