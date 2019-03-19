@@ -1,17 +1,17 @@
 # Repository Storage Rake Tasks
 
-This is a collection of rake tasks you can use to help you list and migrate 
-existing projects and attachments associated with it from Legacy storage to 
+This is a collection of rake tasks you can use to help you list and migrate
+existing projects and attachments associated with it from Legacy storage to
 the new Hashed storage type.
 
 You can read more about the storage types [here][storage-types].
 
 ## Migrate existing projects to Hashed storage
 
-Before migrating your existing projects, you should 
+Before migrating your existing projects, you should
 [enable hashed storage][storage-migration] for the new projects as well.
 
-This task will schedule all your existing projects and attachments associated with it to be migrated to the 
+This task will schedule all your existing projects and attachments associated with it to be migrated to the
 **Hashed** storage type:
 
 **Omnibus Installation**
@@ -30,15 +30,15 @@ They both also accept a range as environment variable:
 
 ```bash
 # to migrate any non migrated project from ID 20 to 50.
-export ID_FROM=20 
+export ID_FROM=20
 export ID_TO=50
 ```
 
 You can monitor the progress in the **Admin Area > Monitoring > Background Jobs** page.
-There is a specific Queue you can watch to see how long it will take to finish: 
+There is a specific Queue you can watch to see how long it will take to finish:
 `hashed_storage:hashed_storage_project_migrate`
 
-After it reaches zero, you can confirm every project has been migrated by running the commands bellow. 
+After it reaches zero, you can confirm every project has been migrated by running the commands bellow.
 If you find it necessary, you can run this migration script again to schedule missing projects.
 
 Any error or warning will be logged in Sidekiq's log file.
@@ -55,7 +55,7 @@ If you need to rollback the storage migration for any reason, you can follow the
 
 NOTE: **Note:** Hashed Storage will be required in future version of GitLab.
 
-To prevent new projects from being created in the Hashed storage, 
+To prevent new projects from being created in the Hashed storage,
 you need to undo the [enable hashed storage][storage-migration] changes.
 
 This task will schedule all your existing projects and associated attachments to be rolled back to the
@@ -77,7 +77,7 @@ Both commands accept a range as environment variable:
 
 ```bash
 # to rollback any migrated project from ID 20 to 50.
-export ID_FROM=20 
+export ID_FROM=20
 export ID_TO=50
 ```
 
@@ -85,7 +85,7 @@ You can monitor the progress in the **Admin Area > Monitoring > Background Jobs*
 On the **Queues** tab, you can watch the `hashed_storage:hashed_storage_project_rollback` queue to see how long the process will take to finish.
 
 
-After it reaches zero, you can confirm every project has been rolled back by running the commands bellow. 
+After it reaches zero, you can confirm every project has been rolled back by running the commands bellow.
 If some projects weren't rolled back, you can run this rollback script again to schedule further rollbacks.
 
 Any error or warning will be logged in Sidekiq's log file.
