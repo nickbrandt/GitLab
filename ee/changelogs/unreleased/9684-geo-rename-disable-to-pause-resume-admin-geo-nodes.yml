@@ -1,0 +1,5 @@
+---
+title: 'Geo: Rename "Disable" to "Pause|Resume" (Admin > Geo Nodes)'
+merge_request: 10297
+author:
+type: changed

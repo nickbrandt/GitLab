@@ -31,7 +31,10 @@ export default {
       return !this.node.primary && this.nodeEditAllowed;
     },
     nodeToggleLabel() {
-      return this.node.enabled ? __('Disable') : __('Enable');
+      return this.node.enabled ? __('Pause replication') : __('Resume replication');
+    },
+    nodeToggleIcon() {
+      return this.node.enabled ? 'pause' : 'play';
     },
     isSecondaryNode() {
       return !this.node.primary;
@@ -42,7 +45,7 @@ export default {
       eventHub.$emit('showNodeActionModal', {
         actionType: NODE_ACTIONS.TOGGLE,
         node: this.node,
-        modalMessage: s__('GeoNodes|Disabling a node stops the sync process. Are you sure?'),
+        modalMessage: s__('GeoNodes|Pausing replication stops the sync process.'),
         modalActionLabel: this.nodeToggleLabel,
       });
     },
@@ -98,6 +101,7 @@ export default {
           class="btn btn-sm btn-node-action"
           @click="onToggleNode"
         >
+          <icon :name="nodeToggleIcon" />
           {{ nodeToggleLabel }}
         </button>
       </div>

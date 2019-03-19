@@ -4926,9 +4926,6 @@ msgstr ""
 msgid "GeoNodes|Data replication lag"
 msgstr ""
 
-msgid "GeoNodes|Disabling a node stops the sync process. Are you sure?"
-msgstr ""
-
 msgid "GeoNodes|Does not match the primary storage configuration"
 msgstr ""
 
@@ -4993,6 +4990,9 @@ msgid "GeoNodes|Not checksummed"
 msgstr ""
 
 msgid "GeoNodes|Out of sync"
+msgstr ""
+
+msgid "GeoNodes|Pausing replication stops the sync process."
 msgstr ""
 
 msgid "GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?"
@@ -7836,6 +7836,9 @@ msgstr ""
 msgid "Pause"
 msgstr ""
 
+msgid "Pause replication"
+msgstr ""
+
 msgid "Paused Runners don't accept new jobs"
 msgstr ""
 
@@ -9298,6 +9301,9 @@ msgid "Restart Terminal"
 msgstr ""
 
 msgid "Resume"
+msgstr ""
+
+msgid "Resume replication"
 msgstr ""
 
 msgid "Retry"
