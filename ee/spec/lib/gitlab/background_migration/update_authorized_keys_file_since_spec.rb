@@ -80,14 +80,18 @@ describe Gitlab::BackgroundMigration::UpdateAuthorizedKeysFileSince do
 
         background_migration.batch_add_keys_in_db_starting_from(@keys[3].id)
 
-        file = File.read(Rails.root.join('tmp/tests/.ssh/authorized_keys'))
+        file = File.read(Rails.root.join(Gitlab.config.gitlab_shell.authorized_keys_file))
         expect(file.scan(/ssh-rsa/).count).to eq(7)
 
-        expect(file).not_to include(Gitlab::Shell.strip_key(@keys[0].key))
-        expect(file).not_to include(Gitlab::Shell.strip_key(@keys[2].key))
-        expect(file).to include(Gitlab::Shell.strip_key(@keys[3].key))
-        expect(file).to include(Gitlab::Shell.strip_key(@keys[9].key))
+        expect(file).not_to include(strip_key(@keys[0].key))
+        expect(file).not_to include(strip_key(@keys[2].key))
+        expect(file).to include(strip_key(@keys[3].key))
+        expect(file).to include(strip_key(@keys[9].key))
       end
+    end
+
+    def strip_key(key)
+      key.split(/[ ]+/)[0, 2].join(' ')
     end
   end
 end
