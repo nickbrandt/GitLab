@@ -9,7 +9,9 @@ module EE
       override :execute
       def execute
         if ::Gitlab::CurrentSettings.elasticsearch_search?
-          ::Gitlab::Elastic::SearchResults.new(current_user, params[:search], elastic_projects, elastic_global)
+          ::Gitlab::Elastic::SearchResults.new(current_user, params[:search],
+                                               elastic_projects, projects,
+                                               elastic_global)
         else
           super
         end

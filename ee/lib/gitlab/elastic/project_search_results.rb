@@ -8,6 +8,9 @@ module Gitlab
     class ProjectSearchResults < Gitlab::Elastic::SearchResults
       attr_reader :project, :repository_ref
 
+      delegate :users, to: :generic_search_results
+      delegate :limited_users_count, to: :generic_search_results
+
       def initialize(current_user, query, project_id, repository_ref = nil)
         @current_user = current_user
         @project = Project.find(project_id)
@@ -26,9 +29,15 @@ module Gitlab
           wiki_blobs.page(page).per(per_page)
         when 'commits'
           commits(page: page, per_page: per_page)
+        when 'users'
+          users.page(page).per(per_page)
         else
           super
         end
+      end
+
+      def generic_search_results
+        @generic_search_results ||= Gitlab::ProjectSearchResults.new(current_user, project, query, repository_ref)
       end
 
       def blobs_count

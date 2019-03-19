@@ -1,3 +1,11 @@
+- users = capture_haml do
+  - if search_tabs?(:members)
+    %li{ class: active_when(@scope == 'users') }
+      = link_to search_filter_path(scope: 'users') do
+        Users
+        %span.badge.badge-pill
+          = limited_count(@search_results.limited_users_count)
+
 .scrolling-tabs-container.inner-page-scroll-tabs.is-smaller
   .fade-left= icon('angle-left')
   .fade-right= icon('angle-right')
@@ -45,6 +53,7 @@
             = _("Commits")
             %span.badge.badge-pill
               = @search_results.commits_count
+      = users
 
     - elsif @show_snippets
       %li{ class: active_when(@scope == 'snippet_blobs') }
@@ -94,3 +103,4 @@
             = _("Wiki")
             %span.badge.badge-pill
               = limited_count(@search_results.wiki_blobs_count)
+      = users
