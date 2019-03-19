@@ -275,7 +275,9 @@ describe('vulnerabilities module mutations', () => {
       });
 
       it('should set the modal file', () => {
-        expect(state.modal.data.file.value).toEqual(vulnerability.location.file);
+        expect(state.modal.data.file.value).toEqual(
+          `${vulnerability.location.file}:${vulnerability.location.start_line}`,
+        );
       });
 
       it('should set the modal identifiers', () => {
