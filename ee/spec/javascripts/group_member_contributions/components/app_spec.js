@@ -56,7 +56,7 @@ describe('AppComponent', () => {
           const loadingEl = vm.$el.querySelector('.loading-animation');
 
           expect(loadingEl).not.toBeNull();
-          expect(loadingEl.querySelector('i').getAttribute('aria-label')).toBe(
+          expect(loadingEl.querySelector('span').getAttribute('aria-label')).toBe(
             'Loading contribution stats for group members',
           );
         })
