@@ -91,7 +91,7 @@ export default {
         :placeholder="__('Filter...')"
       />
 
-      <div class="dropdown-content" style="max-height: 280px">
+      <div :class="{ 'dropdown-content': filterId === 'project_id' }">
         <button
           v-for="option in filteredOptions"
           :key="option.id"
