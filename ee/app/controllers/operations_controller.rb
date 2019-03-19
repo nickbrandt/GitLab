@@ -3,10 +3,6 @@
 class OperationsController < ApplicationController
   before_action :authorize_read_operations_dashboard!
 
-  before_action do
-    push_frontend_feature_flag(:pipeline_dashboard)
-  end
-
   respond_to :json, only: [:list]
 
   POLLING_INTERVAL = 120_000

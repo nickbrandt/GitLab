@@ -1,48 +1,92 @@
 <script>
 import { mapActions } from 'vuex';
-import timeago from '~/vue_shared/mixins/timeago';
+import _ from 'underscore';
+import { GlTooltip } from '@gitlab/ui';
+import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import timeagoMixin from '~/vue_shared/mixins/timeago';
+import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Commit from '~/vue_shared/components/commit.vue';
-import DashboardAlerts from './alerts.vue';
 import ProjectHeader from './project_header.vue';
+import Alerts from './alerts.vue';
+import ProjectPipeline from './project_pipeline.vue';
+import { STATUS_FAILED, STATUS_RUNNING } from '../../constants';
 
 export default {
   components: {
-    Icon,
-    Commit,
-    DashboardAlerts,
     ProjectHeader,
+    UserAvatarLink,
+    Commit,
+    Alerts,
+    ProjectPipeline,
+    GlTooltip,
+    Icon,
   },
-  mixins: [timeago],
+  mixins: [timeagoMixin],
   props: {
     project: {
       type: Object,
       required: true,
     },
   },
+  tooltips: {
+    timeAgo: __('Finished'),
+    triggerer: __('Triggerer'),
+  },
   computed: {
-    author() {
-      return this.hasDeployment && this.project.last_deployment.user
-        ? {
-            avatar_url: this.project.last_deployment.user.avatar_url,
-            path: this.project.last_deployment.user.web_url,
-            username: this.project.last_deployment.user.username,
-          }
+    hasPipelineFailed() {
+      return (
+        this.lastPipeline &&
+        this.lastPipeline.details &&
+        this.lastPipeline.details.status &&
+        this.lastPipeline.details.status.group === STATUS_FAILED
+      );
+    },
+    hasPipelineErrors() {
+      return this.project.alert_count > 0;
+    },
+    cardClasses() {
+      return {
+        'dashboard-card-body-warning': !this.hasPipelineFailed && this.hasPipelineErrors,
+        'dashboard-card-body-failed': this.hasPipelineFailed,
+        'bg-secondary': !this.hasPipelineFailed && !this.hasPipelineErrors,
+      };
+    },
+    noPipelineMessage() {
+      return __('The branch for this project has no active pipeline configuration.');
+    },
+    user() {
+      return this.lastPipeline && !_.isEmpty(this.lastPipeline.user)
+        ? this.lastPipeline.user
         : null;
+    },
+    lastPipeline() {
+      return !_.isEmpty(this.project.last_pipeline) ? this.project.last_pipeline : null;
     },
     commitRef() {
-      return this.hasDeployment && this.project.last_deployment.ref
+      return this.lastPipeline && !_.isEmpty(this.lastPipeline.ref)
         ? {
-            name: this.project.last_deployment.ref.name,
-            ref_url: this.project.last_deployment.ref.ref_path,
+            ...this.lastPipeline.ref,
+            ref_url: this.lastPipeline.ref.path,
           }
-        : null;
+        : {};
     },
-    hasDeployment() {
-      return this.project.last_deployment !== null;
+    finishedTime() {
+      return (
+        this.lastPipeline && this.lastPipeline.details && this.lastPipeline.details.finished_at
+      );
     },
-    lastDeployed() {
-      return this.hasDeployment ? this.timeFormated(this.project.last_deployment.created_at) : null;
+    finishedTimeTitle() {
+      return this.tooltipTitle(this.finishedTime);
+    },
+    shouldShowTimeAgo() {
+      return (
+        this.lastPipeline &&
+        this.lastPipeline.details &&
+        this.lastPipeline.details.status &&
+        this.lastPipeline.details.status.group !== STATUS_RUNNING &&
+        this.finishedTime
+      );
     },
   },
   methods: {
@@ -50,41 +94,70 @@ export default {
   },
 };
 </script>
-
 <template>
-  <div class="card">
-    <project-header :project="project" class="card-header" @remove="removeProject" />
-    <div class="card-body">
-      <div class="row">
-        <div class="col-6 col-sm-4 col-md-6 col-lg-4 pr-1">
-          <dashboard-alerts
-            :count="project.alert_count"
-            :last-alert="project.last_alert"
-            :alert-path="project.alert_path"
+  <div class="dashboard-card card border-0">
+    <project-header
+      :project="project"
+      :has-pipeline-failed="hasPipelineFailed"
+      :has-errors="hasPipelineErrors"
+      @remove="removeProject"
+    />
+
+    <div :class="cardClasses" class="dashboard-card-body card-body">
+      <div v-if="lastPipeline" class="row">
+        <div class="col-1 align-self-center">
+          <user-avatar-link
+            v-if="user"
+            :link-href="user.path"
+            :img-src="user.avatar_url"
+            :tooltip-text="user.name"
+            :img-size="32"
           />
         </div>
-        <template v-if="project.last_deployment">
-          <div class="col-6 col-sm-4 col-md-6 col-lg-4 px-1">
-            <commit
-              :commit-ref="commitRef"
-              :short-sha="project.last_deployment.commit.short_id"
-              :commit-url="project.last_deployment.commit.commit_url"
-              :title="project.last_deployment.commit.title"
-              :author="author"
-              :tag="project.last_deployment.tag"
+
+        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center align-middle ci-table">
+          <commit
+            :tag="commitRef.tag"
+            :commit-ref="commitRef"
+            :short-sha="lastPipeline.commit.short_id"
+            :commit-url="lastPipeline.commit.commit_url"
+            :title="lastPipeline.commit.title"
+            :author="lastPipeline.commit.author"
+            :show-branch="true"
+          />
+        </div>
+
+        <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
+          <div v-if="shouldShowTimeAgo" class="text-secondary">
+            <icon
+              name="clock"
+              class="dashboard-card-time-ago-icon align-text-bottom js-dashboard-project-clock-icon"
             />
+
+            <time ref="timeAgo" class="js-dashboard-project-time-ago">
+              {{ timeFormated(finishedTime) }}
+            </time>
+            <gl-tooltip :target="() => $refs.timeAgo">
+              <div class="bold">{{ $options.tooltips.timeAgo }}</div>
+              <div>{{ finishedTimeTitle }}</div>
+            </gl-tooltip>
           </div>
-          <div
-            class="js-project-container col-12 col-sm-4 col-md-12 col-lg-4 pl-1 d-flex justify-content-end"
-          >
-            <div class="d-flex align-items-end justify-content-end">
-              <div class="prepend-top-default text-secondary d-flex align-items-center flex-wrap">
-                <icon name="calendar" class="append-right-4 js-dashboard-project-calendar-icon" />
-                {{ lastDeployed }}
-              </div>
-            </div>
-          </div>
-        </template>
+          <alerts :count="project.alert_count" />
+        </div>
+
+        <div class="col-12">
+          <project-pipeline
+            :project-name="project.name_with_namespace"
+            :last-pipeline="lastPipeline"
+            :has-pipeline-failed="hasPipelineFailed"
+          />
+        </div>
+      </div>
+
+      <div v-else class="h-100 d-flex justify-content-center align-items-center">
+        <div class="text-plain text-metric text-center bold w-75">
+          {{ noPipelineMessage }}
+        </div>
       </div>
     </div>
   </div>
