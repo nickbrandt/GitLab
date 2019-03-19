@@ -1,16 +1,18 @@
-# SAML SSO for GitLab.com Groups **[PREMIUM]**
+# SAML SSO for GitLab.com Groups
 
 > Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 11.0.
 
+NOTE: **Note:**
 This topic is for SAML on GitLab.com. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
 
 Currently SAML on GitLab.com can be used to automatically add users to a group, and does not yet sign users into GitLab.com. Users should already have an account on the GitLab instance, or can create one when logging in for the first time.
 
-NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
+NOTE: **Note:**
+SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
 
 ## Configuring your Identity Provider
 
-1. Navigate to the group and click Settings -> SAML SSO.
+1. Navigate to the group and click **Settings > SAML SSO**.
 1. Configure your SAML server using the **Assertion consumer service URL** and **Issuer**. See [your identity provider's documentation](#providers) for more details.
 1. Configure the SAML response to include a NameID that uniquely identifies each user.
 1. Configure required assertions using the [table below](#assertions).
@@ -67,7 +69,7 @@ Users can unlink SAML for a group from their profile page. This can be helpful i
 - You no longer want a group to be able to sign you in to GitLab.com.
 - Your SAML NameID has changed and so GitLab can no longer find your user.
 
-For example, to unlink the `MyOrg` account, the following **Disconnect** button will be available under **Profile -> Accounts**:
+For example, to unlink the `MyOrg` account, the following **Disconnect** button will be available under **Profile > Accounts**:
 
 ![Unlink Group SAML](img/unlink_group_saml.png)
 
