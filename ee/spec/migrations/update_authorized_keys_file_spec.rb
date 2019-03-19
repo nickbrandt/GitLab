@@ -3,6 +3,7 @@ require Rails.root.join('ee', 'db', 'migrate', '20170626202753_update_authorized
 
 describe UpdateAuthorizedKeysFile, :migration do
   let(:migration) { described_class.new }
+  let(:authorized_keys_file) { Rails.root.join(Gitlab.config.gitlab_shell.authorized_keys_file) }
 
   describe '#up' do
     context 'when authorized_keys_enabled is nil' do
@@ -15,6 +16,8 @@ describe UpdateAuthorizedKeysFile, :migration do
       end
 
       it 'sets authorized_keys_enabled to true' do
+        FileUtils.touch(authorized_keys_file)
+
         migration.up
 
         expect(described_class::ApplicationSetting.last.authorized_keys_enabled).to be_truthy
@@ -39,13 +42,14 @@ describe UpdateAuthorizedKeysFile, :migration do
 
           migration.up
 
-          file = File.read(Rails.root.join('tmp/tests/.ssh/authorized_keys'))
+          file = File.read(authorized_keys_file)
+
           expect(file.scan(/ssh-rsa/).count).to eq(2)
 
-          expect(file).not_to include(Gitlab::Shell.strip_key(@keys[0].key))
-          expect(file).not_to include(Gitlab::Shell.strip_key(@keys[1].key))
-          expect(file).to include(Gitlab::Shell.strip_key(@keys[2].key))
-          expect(file).to include(Gitlab::Shell.strip_key(@keys[3].key))
+          expect(file).not_to include(strip_key(@keys[0].key))
+          expect(file).not_to include(strip_key(@keys[1].key))
+          expect(file).to include(strip_key(@keys[2].key))
+          expect(file).to include(strip_key(@keys[3].key))
         end
       end
 
@@ -57,17 +61,23 @@ describe UpdateAuthorizedKeysFile, :migration do
         end
 
         it 'deletes the SSH key from authorized_keys' do
-          file = File.read(Rails.root.join('tmp/tests/.ssh/authorized_keys'))
-          expect(file).to include(Gitlab::Shell.strip_key(@key_to_stay.key))
-          expect(file).to include(Gitlab::Shell.strip_key(@key_to_delete.key))
+          file = File.read(authorized_keys_file)
+
+          expect(file).to include(strip_key(@key_to_stay.key))
+          expect(file).to include(strip_key(@key_to_delete.key))
 
           migration.up
 
-          file = File.read(Rails.root.join('tmp/tests/.ssh/authorized_keys'))
-          expect(file).to include(Gitlab::Shell.strip_key(@key_to_stay.key))
-          expect(file).not_to include(Gitlab::Shell.strip_key(@key_to_delete.key))
+          file = File.read(authorized_keys_file)
+
+          expect(file).to include(strip_key(@key_to_stay.key))
+          expect(file).not_to include(strip_key(@key_to_delete.key))
         end
       end
+    end
+
+    def strip_key(key)
+      key.split(/[ ]+/)[0, 2].join(' ')
     end
   end
 
