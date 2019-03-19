@@ -3071,9 +3071,6 @@ msgstr ""
 msgid "Current Branch"
 msgstr ""
 
-msgid "Current Project"
-msgstr ""
-
 msgid "Current node"
 msgstr ""
 
@@ -9814,9 +9811,6 @@ msgstr ""
 msgid "The X509 Certificate to use when mutual TLS is required to communicate with the external authorization service. If left blank, the server certificate is still validated when accessing over HTTPS."
 msgstr ""
 
-msgid "The branch for this project has no active pipeline configuration."
-msgstr ""
-
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
@@ -10593,9 +10587,6 @@ msgid "Trigger token:"
 msgstr ""
 
 msgid "Trigger variables:"
-msgstr ""
-
-msgid "Triggerer"
 msgstr ""
 
 msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."

@@ -1,40 +1,37 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
+import Vue from 'vue';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import Commit from '~/vue_shared/components/commit.vue';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import Alerts from 'ee/operations/components/dashboard/alerts.vue';
-import store from 'ee/operations/store';
+import { getChildInstances } from '../../helpers';
 import { mockOneProject } from '../../mock_data';
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
-
 describe('project component', () => {
-  const ProjectComponent = localVue.extend(Project);
-  let wrapper;
+  const ProjectComponent = Vue.extend(Project);
+  const ProjectHeaderComponent = Vue.extend(ProjectHeader);
+  const AlertsComponent = Vue.extend(Alerts);
+  const CommitComponent = Vue.extend(Commit);
+  let vm;
 
   beforeEach(() => {
-    wrapper = shallowMount(ProjectComponent, {
-      sync: false,
-      store,
-      localVue,
-      propsData: {
+    vm = mountComponentWithStore(ProjectComponent, {
+      props: {
         project: mockOneProject,
       },
     });
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    vm.$destroy();
   });
 
   describe('wrapped components', () => {
     describe('project header', () => {
       it('binds project', () => {
-        const header = wrapper.find(ProjectHeader);
+        const [header] = getChildInstances(vm, ProjectHeaderComponent);
 
-        expect(header.props('project')).toEqual(mockOneProject);
+        expect(header.project).toEqual(mockOneProject);
       });
     });
 
@@ -42,62 +39,64 @@ describe('project component', () => {
       let alert;
 
       beforeEach(() => {
-        alert = wrapper.find(Alerts);
+        [alert] = getChildInstances(vm, AlertsComponent);
       });
 
       it('binds alert count to count', () => {
-        expect(alert.props('count')).toBe(mockOneProject.alert_count);
+        expect(alert.count).toBe(mockOneProject.alert_count);
       });
 
       it('binds last alert', () => {
-        expect(alert.props('lastAlert')).toEqual(mockOneProject.last_alert);
+        expect(alert.lastAlert).toEqual(mockOneProject.last_alert);
       });
     });
 
     describe('commit', () => {
+      let commits;
       let commit;
 
       beforeEach(() => {
-        commit = wrapper.find(Commit);
+        commits = getChildInstances(vm, CommitComponent);
+        [commit] = commits;
+      });
+
+      it('renders', () => {
+        expect(commits.length).toBe(1);
       });
 
       it('binds commitRef', () => {
-        expect(commit.props('commitRef')).toBe(wrapper.vm.commitRef);
+        expect(commit.commitRef).toBe(vm.commitRef);
       });
 
       it('binds short_id to shortSha', () => {
-        expect(commit.props().shortSha).toBe(
-          wrapper.props().project.last_deployment.commit.short_id,
-        );
+        expect(commit.shortSha).toBe(vm.project.last_deployment.commit.short_id);
       });
 
       it('binds commitUrl', () => {
-        expect(commit.props().commitUrl).toBe(
-          wrapper.props().project.last_deployment.commit.commit_url,
-        );
+        expect(commit.commitUrl).toBe(vm.project.last_deployment.commit.commit_url);
       });
 
       it('binds title', () => {
-        expect(commit.props().title).toBe(wrapper.props().project.last_deployment.commit.title);
+        expect(commit.title).toBe(vm.project.last_deployment.commit.title);
       });
 
       it('binds author', () => {
-        expect(commit.props().author).toBe(wrapper.vm.author);
+        expect(commit.author).toBe(vm.author);
       });
 
       it('binds tag', () => {
-        expect(commit.props().tag).toBe(wrapper.props().project.last_deployment.tag);
+        expect(commit.tag).toBe(vm.project.last_deployment.tag);
       });
     });
 
     describe('last deploy', () => {
       it('renders calendar icon', () => {
-        expect(wrapper.contains('.js-dashboard-project-calendar-icon')).toBe(true);
+        expect(vm.$el.querySelector('.ic-calendar')).not.toBe(null);
       });
 
       it('renders time ago of last deploy', () => {
         const timeago = '1 day ago';
-        const container = wrapper.element.querySelector('.js-project-container');
+        const container = vm.$el.querySelector('.js-project-container');
 
         expect(container.innerText.trim()).toBe(timeago);
       });

@@ -79,8 +79,7 @@ export default {
           >
             <div class="d-flex align-items-end justify-content-end">
               <div class="prepend-top-default text-secondary d-flex align-items-center flex-wrap">
-                <icon name="calendar" class="append-right-4 js-dashboard-project-calendar-icon" />
-                {{ lastDeployed }}
+                <icon name="calendar" class="append-right-4" /> {{ lastDeployed }}
               </div>
             </div>
           </div>

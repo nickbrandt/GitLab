@@ -27,7 +27,6 @@ export default {
   },
   [types.SET_PROJECTS](state, projects) {
     state.projects = projects || [];
-    state.isLoadingProjects = false;
   },
   [types.SET_PROJECT_TOKENS](state, tokens) {
     state.projectTokens = tokens;
@@ -35,7 +34,7 @@ export default {
   [types.REMOVE_PROJECT_TOKEN_AT](state, index) {
     state.projectTokens.splice(index, 1);
   },
-  [types.REQUEST_PROJECTS](state) {
-    state.isLoadingProjects = true;
+  [types.TOGGLE_IS_LOADING_PROJECTS](state) {
+    state.isLoadingProjects = !state.isLoadingProjects;
   },
 };

@@ -284,10 +284,6 @@ describe('actions', () => {
   });
 
   describe('fetchProjects', () => {
-    afterEach(() => {
-      actions.clearProjectsEtagPoll();
-    });
-
     it('calls project list endpoint', done => {
       store.state.projectEndpoints.list = mockListEndpoint;
       mockAxios.onGet(mockListEndpoint).replyOnce(200);
@@ -297,7 +293,11 @@ describe('actions', () => {
         null,
         store.state,
         [],
-        [{ type: 'requestProjects' }, { type: 'receiveProjectsSuccess' }],
+        [
+          { type: 'requestProjects' },
+          { type: 'receiveProjectsSuccess' },
+          { type: 'requestProjects' },
+        ],
         done,
       );
     });
@@ -311,7 +311,11 @@ describe('actions', () => {
         null,
         store.state,
         [],
-        [{ type: 'requestProjects' }, { type: 'receiveProjectsError' }],
+        [
+          { type: 'requestProjects' },
+          { type: 'receiveProjectsError' },
+          { type: 'requestProjects' },
+        ],
         done,
       );
     });
@@ -323,7 +327,7 @@ describe('actions', () => {
         actions.requestProjects,
         null,
         store.state,
-        [{ type: types.REQUEST_PROJECTS }],
+        [{ type: types.TOGGLE_IS_LOADING_PROJECTS }],
         [],
         done,
       );
@@ -408,7 +412,7 @@ describe('actions', () => {
         null,
         null,
         [],
-        [{ type: 'forceProjectsRequest' }],
+        [{ type: 'fetchProjects' }],
         done,
       );
     });
