@@ -26,8 +26,7 @@ describe('Filter component', () => {
     });
   }
 
-  const findSearchInput = () =>
-    (vm.$refs.searchBox || null) && vm.$refs.searchBox.$el.querySelector('input');
+  const findSearchInput = () => vm.$refs.searchBox && vm.$refs.searchBox.$el.querySelector('input');
 
   beforeEach(() => {
     store = createStore();
@@ -57,7 +56,7 @@ describe('Filter component', () => {
     });
 
     it('should not have a search box', () => {
-      expect(findSearchInput()).toBeNull();
+      expect(findSearchInput()).not.toEqual(jasmine.any(HTMLElement));
     });
 
     it('should not be open', () => {
@@ -101,7 +100,7 @@ describe('Filter component', () => {
       });
 
       it('should display a search box', () => {
-        expect(findSearchInput()).not.toBeNull();
+        expect(findSearchInput()).toEqual(jasmine.any(HTMLElement));
       });
 
       it(`should show all projects`, () => {
