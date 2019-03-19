@@ -1,12 +1,11 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { GlDropdown, GlDropdownItem, GlSearchBox } from '@gitlab/ui';
+import { GlDropdown, GlSearchBox } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     GlDropdown,
-    GlDropdownItem,
     GlSearchBox,
     Icon,
   },
