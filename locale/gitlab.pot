@@ -473,6 +473,9 @@ msgstr ""
 msgid "Account and limit"
 msgstr ""
 
+msgid "Action to take when receiving an alert."
+msgstr ""
+
 msgid "Active"
 msgstr ""
 
@@ -2978,6 +2981,9 @@ msgstr ""
 msgid "Create a personal access token on your account to pull or push via %{protocol}."
 msgstr ""
 
+msgid "Create an issue. Issues are created for each alert triggered."
+msgstr ""
+
 msgid "Create branch"
 msgstr ""
 
@@ -5444,6 +5450,9 @@ msgstr ""
 msgid "In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Incidents"
+msgstr ""
+
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
 msgstr ""
 
@@ -5576,6 +5585,9 @@ msgid "Issue events"
 msgstr ""
 
 msgid "Issue settings"
+msgstr ""
+
+msgid "Issue template (optional)"
 msgstr ""
 
 msgid "IssueBoards|Board"
@@ -8856,6 +8868,9 @@ msgid "Selecting a GitLab user will add a link to the GitLab user in the descrip
 msgstr ""
 
 msgid "Selective synchronization"
+msgstr ""
+
+msgid "Send an email notification to Developers."
 msgstr ""
 
 msgid "Send email"

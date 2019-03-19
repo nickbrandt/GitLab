@@ -95,6 +95,7 @@ class License < ActiveRecord::Base
     tracing
     insights
     web_ide_terminal
+    incident_management
   ]
   EEU_FEATURES.freeze
 

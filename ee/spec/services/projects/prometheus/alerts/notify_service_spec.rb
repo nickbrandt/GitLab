@@ -9,9 +9,13 @@ describe Projects::Prometheus::Alerts::NotifyService do
   let(:token_input) { 'token' }
   let(:subject) { service.execute(token_input) }
 
-  shared_examples 'notifies alerts' do
+  before do
+    # We use `set(:project)` so we make sure to clear caches
+    project.clear_memoization(:licensed_feature_available)
+  end
+
+  shared_examples 'sends notification email' do
     let(:notification_service) { spy }
-    let(:create_events_service) { spy }
 
     it 'sends a notification for firing alerts only' do
       expect(NotificationService)
@@ -23,6 +27,34 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       expect(subject).to eq(true)
     end
+  end
+
+  shared_examples 'processes incident issues', :sidekiq do |amount|
+    let(:create_incident_service) { spy }
+
+    it 'processes issues' do
+      expect(IncidentManagement::ProcessAlertWorker)
+        .to receive(:perform_async)
+        .with(project.id, kind_of(Hash))
+        .exactly(amount).times
+
+      Sidekiq::Testing.inline! do
+        expect(subject).to eq(true)
+      end
+    end
+  end
+
+  shared_examples 'does not process incident issues' do
+    it 'does not process issues' do
+      expect(IncidentManagement::ProcessAlertWorker)
+        .not_to receive(:perform_async)
+
+      expect(subject).to eq(true)
+    end
+  end
+
+  shared_examples 'persists events' do
+    let(:create_events_service) { spy }
 
     it 'persists events' do
       expect(Projects::Prometheus::Alerts::CreateEventsService)
@@ -34,6 +66,11 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       expect(subject).to eq(true)
     end
+  end
+
+  shared_examples 'notifies alerts' do
+    it_behaves_like 'sends notification email'
+    it_behaves_like 'persists events'
   end
 
   shared_examples 'no notifications' do
@@ -73,6 +110,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       with_them do
         before do
+          stub_feature_flags(incident_management: false)
+
           cluster = create(:cluster, :provided_by_user,
                            projects: [project],
                            enabled: cluster_enabled)
@@ -112,6 +151,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       before do
+        stub_feature_flags(incident_management: false)
+
         stub_licensed_features(multiple_clusters: true)
 
         create(:clusters_applications_prometheus, :installed,
@@ -152,6 +193,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
         let(:alert_manager_token) { token_input }
 
         before do
+          stub_feature_flags(incident_management: false)
+
           create(:prometheus_service, project: project)
 
           if alerting_setting
@@ -169,6 +212,119 @@ describe Projects::Prometheus::Alerts::NotifyService do
         else
           raise "invalid result: #{result.inspect}"
         end
+      end
+    end
+
+    context 'incident_management feature flag disabled' do
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+        create(:project_incident_management_setting, send_email: true, project: project)
+
+        stub_feature_flags(incident_management: false)
+      end
+
+      it_behaves_like 'notifies alerts'
+    end
+
+    context 'no incident_management license' do
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+        create(:project_incident_management_setting, send_email: true, project: project)
+
+        stub_licensed_features(incident_management: false)
+      end
+
+      it_behaves_like 'notifies alerts'
+    end
+
+    context 'with incident_management license' do
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'when incident_management_setting does not exist' do
+        it_behaves_like 'notifies alerts'
+      end
+
+      context 'when incident_management_setting.send_email is true' do
+        before do
+          create(:project_incident_management_setting, send_email: true, project: project)
+        end
+
+        it_behaves_like 'notifies alerts'
+      end
+
+      context 'incident_management_setting.send_email is false' do
+        before do
+          create(:project_incident_management_setting, send_email: false, project: project)
+        end
+
+        it_behaves_like 'persists events'
+
+        it 'does not send notification' do
+          expect(project.feature_available?(:incident_management)).to eq(true)
+          expect(NotificationService).not_to receive(:new)
+
+          expect(subject).to eq(true)
+        end
+      end
+    end
+
+    context 'process incident issues' do
+      let!(:setting) do
+        create(
+          :project_incident_management_setting,
+          project: project,
+          create_issue: true
+        )
+      end
+
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+      end
+
+      context 'with license' do
+        before do
+          stub_licensed_features(incident_management: true)
+        end
+
+        context 'with create_issue setting enabled' do
+          before do
+            setting.update!(create_issue: true)
+          end
+
+          it_behaves_like 'processes incident issues', 1
+
+          context 'without firing alerts' do
+            let(:payload_raw) do
+              payload_for(firing: [], resolved: [alert_resolved])
+            end
+
+            it_behaves_like 'does not process incident issues'
+          end
+        end
+
+        context 'with create_issue setting disabled' do
+          before do
+            setting.update!(create_issue: false)
+          end
+
+          it_behaves_like 'does not process incident issues'
+        end
+      end
+
+      context 'without license' do
+        before do
+          stub_licensed_features(incident_management: false)
+        end
+
+        it_behaves_like 'does not process incident issues'
       end
     end
   end

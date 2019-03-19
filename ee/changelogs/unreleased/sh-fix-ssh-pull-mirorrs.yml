@@ -1,0 +1,5 @@
+---
+title: Fix SSH pull mirrors not working
+merge_request: 10272
+author:
+type: fixed

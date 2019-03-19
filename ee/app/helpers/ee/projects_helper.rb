@@ -214,5 +214,10 @@ module EE
 
       @project.feature_available?(:tracing, current_user) && can?(current_user, :read_environment, @project)
     end
+
+    def project_incident_management_setting
+      @project_incident_management_setting ||= @project.incident_management_setting ||
+        @project.build_incident_management_setting
+    end
   end
 end

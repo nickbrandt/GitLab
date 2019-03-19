@@ -27,7 +27,7 @@ module EE
         # rubocop: disable CodeReuse/ActiveRecord
         def define_protected_env_variables
           @protected_environments = @project.protected_environments.order(:name)
-          @protected_environment = @project.protected_environments.new
+          @protected_environment = ProtectedEnvironment.new(project: @project)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 

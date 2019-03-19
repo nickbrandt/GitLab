@@ -12,6 +12,7 @@ module EE
           super
             .merge(tracing_setting_params)
             .merge(alerting_setting_params)
+            .merge(incident_management_setting_params)
         end
 
         private
@@ -40,6 +41,10 @@ module EE
           end
 
           { alerting_setting_attributes: attr }
+        end
+
+        def incident_management_setting_params
+          params.slice(:incident_management_setting_attributes)
         end
       end
     end

@@ -4,17 +4,52 @@ module Projects
   module Prometheus
     module Alerts
       class NotifyService < BaseService
+        include Gitlab::Utils::StrongMemoize
+
         def execute(token)
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          send_alert_email(project, firings) if firings.any?
-          persist_events(project, params)
+          send_alert_email if send_email?
+          process_incident_issues if create_issue?
+          persist_events
 
           true
         end
 
         private
+
+        def has_incident_management_license?
+          project.feature_available?(:incident_management)
+        end
+
+        def incident_management_feature_enabled?
+          Feature.enabled?(:incident_management)
+        end
+
+        def incident_management_available?
+          has_incident_management_license? && incident_management_feature_enabled?
+        end
+
+        def incident_management_setting
+          strong_memoize(:incident_management_setting) do
+            project.incident_management_setting ||
+              project.build_incident_management_setting
+          end
+        end
+
+        def send_email?
+          return firings.any? unless incident_management_available?
+
+          incident_management_setting.send_email && firings.any?
+        end
+
+        def create_issue?
+          return unless firings.any?
+          return unless incident_management_available?
+
+          incident_management_setting.create_issue?
+        end
 
         def firings
           @firings ||= alerts_by_status('firing')
@@ -89,13 +124,20 @@ module Projects
           ActiveSupport::SecurityUtils.variable_size_secure_compare(expected, actual)
         end
 
-        def send_alert_email(projects, firing_alerts)
+        def send_alert_email
           notification_service
             .async
             .prometheus_alerts_fired(project, firings)
         end
 
-        def persist_events(project, params)
+        def process_incident_issues
+          firings.each do |alert|
+            IncidentManagement::ProcessAlertWorker
+              .perform_async(project.id, alert.to_h)
+          end
+        end
+
+        def persist_events
           CreateEventsService.new(project, nil, params).execute
         end
       end

@@ -29,17 +29,6 @@ describe Projects::UpdateService, '#execute' do
 
       update_project(project, user, opts)
     end
-
-    it 'clears credentials' do
-      project = create(:project, :mirror, import_url: 'https://username:password@github.com/vbim/vim.git')
-
-      expect(project.import_data.credentials[:user]).to eq('username')
-      expect(project.import_data.credentials[:password]).to eq('password')
-
-      project.reload
-      update_project(project, user, clear_import_data_credentials: true)
-      expect(project.import_data.credentials).to eq({})
-    end
   end
 
   context 'audit events' do
