@@ -119,6 +119,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Creates an EE component for the pipeline graph.
 
 
+## 11.7.7 (2019-03-19)
+
+- No changes.
+
 ## 11.7.5 (2019-02-05)
 
 ### Fixed (2 changes)
