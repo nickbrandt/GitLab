@@ -33,10 +33,16 @@ module Gitlab
             storage: project.repository_storage
           }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
         end
+
+        # Use the eager-loaded association if available.
+        @index_status = project.index_status
       end
 
       def run(from_sha = nil, to_sha = nil)
         to_sha = nil if to_sha == Gitlab::Git::BLANK_SHA
+
+        # Project has not been indexed before, therefore index from beginning
+        from_sha = nil unless @index_status
 
         head_commit = repository.try(:commit)
 
@@ -94,11 +100,9 @@ module Gitlab
       def update_index_status(to_sha)
         head_commit = repository.try(:commit)
 
-        # Use the eager-loaded association if available. An index_status should
-        # always be created, even if the repository is empty, so we know it's
-        # been looked at.
-        index_status = project.index_status
-        index_status ||=
+        # An index_status should always be created,
+        # even if the repository is empty, so we know it's been looked at.
+        @index_status ||=
           begin
             IndexStatus.find_or_create_by(project_id: project.id)
           rescue ActiveRecord::RecordNotUnique
@@ -110,7 +114,7 @@ module Gitlab
 
         sha = head_commit.try(:sha)
         sha ||= Gitlab::Git::BLANK_SHA
-        index_status.update(last_commit: sha, indexed_at: Time.now)
+        @index_status.update(last_commit: sha, indexed_at: Time.now)
         project.reload_index_status
       end
       # rubocop: enable CodeReuse/ActiveRecord
