@@ -133,7 +133,7 @@ module Projects
         def process_incident_issues
           firings.each do |alert|
             IncidentManagement::ProcessAlertWorker
-              .perform_async(project.id, alert)
+              .perform_async(project.id, alert.to_h)
           end
         end
 
