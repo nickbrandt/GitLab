@@ -12,6 +12,6 @@ class ElasticCommitIndexerWorker
 
     return true unless project.use_elasticsearch?
 
-    Gitlab::Elastic::Indexer.new(project).run(oldrev, newrev)
+    Gitlab::Elastic::Indexer.new(project).run(newrev)
   end
 end

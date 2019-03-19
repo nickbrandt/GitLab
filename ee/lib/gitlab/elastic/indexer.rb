@@ -38,11 +38,8 @@ module Gitlab
         @index_status = project.index_status
       end
 
-      def run(from_sha = nil, to_sha = nil)
+      def run(to_sha = nil)
         to_sha = nil if to_sha == Gitlab::Git::BLANK_SHA
-
-        # Project has not been indexed before, therefore index from beginning
-        from_sha = nil unless @index_status
 
         head_commit = repository.try(:commit)
 
@@ -51,7 +48,7 @@ module Gitlab
           return
         end
 
-        run_indexer!(from_sha, to_sha)
+        run_indexer!(to_sha)
         update_index_status(to_sha)
 
         true
@@ -77,7 +74,7 @@ module Gitlab
         end
       end
 
-      def run_indexer!(from_sha, to_sha)
+      def run_indexer!(to_sha)
         command = [path_to_indexer, project.id.to_s, repository_path]
 
         vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
@@ -85,6 +82,20 @@ module Gitlab
         output, status = Gitlab::Popen.popen(command, nil, vars)
 
         raise Error, output unless status&.zero?
+      end
+
+      def last_commit
+        @index_status&.last_commit
+      end
+
+      def from_sha
+        repository_contains_last_indexed_commit? ? last_commit : Gitlab::Git::EMPTY_TREE_ID
+      end
+
+      def repository_contains_last_indexed_commit?
+        strong_memoize(:repository_contains_last_indexed_commit) do
+          last_commit.present? && repository.commit(last_commit).present?
+        end
       end
 
       def repository_path
