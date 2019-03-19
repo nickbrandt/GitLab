@@ -1,5 +1,6 @@
 import createState from 'ee/security_dashboard/store/modules/filters/state';
 import * as getters from 'ee/security_dashboard/store/modules/filters/getters';
+import { BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
 
 describe('filters module getters', () => {
   const mockedGetters = state => {
@@ -28,13 +29,13 @@ describe('filters module getters', () => {
 
   describe('getSelectedOptions', () => {
     describe('with one selected option', () => {
-      it('should return "All" as the selected option', () => {
+      it('should return the base filter as the selected option', () => {
         const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
           'report_type',
         );
 
         expect(selectedOptions).toHaveLength(1);
-        expect(selectedOptions[0].name).toContain('All');
+        expect(selectedOptions[0].name).toBe(BASE_FILTERS.report_type.name);
       });
     });
 
@@ -57,12 +58,12 @@ describe('filters module getters', () => {
   });
 
   describe('getSelectedOptionNames', () => {
-    it('should return "All" as the selected option', () => {
+    it('should return the base filter as the selected option', () => {
       const selectedOptionNames = getters.getSelectedOptionNames(state, mockedGetters(state))(
         'severity',
       );
 
-      expect(selectedOptionNames.firstOption).toContain('All');
+      expect(selectedOptionNames.firstOption).toBe(BASE_FILTERS.severity.name);
       expect(selectedOptionNames.extraOptionCount).toBe('');
     });
 
