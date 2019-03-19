@@ -53,7 +53,7 @@ describe('Split security reports app', () => {
     });
 
     it('renders loading summary text + spinner', done => {
-      expect(vm.$el.querySelector('.fa-spinner')).not.toBeNull();
+      expect(vm.$el.querySelector('.spinner')).not.toBeNull();
 
       expect(vm.$el.textContent).toContain('SAST is loading');
       expect(vm.$el.textContent).toContain('Dependency scanning is loading');

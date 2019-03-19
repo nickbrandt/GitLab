@@ -121,7 +121,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('renders loading summary text + spinner', done => {
-      expect(vm.$el.querySelector('.fa-spinner')).not.toBeNull();
+      expect(vm.$el.querySelector('.spinner')).not.toBeNull();
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning is loading',
       );

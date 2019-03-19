@@ -5,6 +5,9 @@ import Designs from 'ee/design_management/pages/index.vue';
 import DesignDetail from 'ee/design_management/pages/design/index.vue';
 import router from 'ee/design_management/router';
 import '~/commons/bootstrap';
+import { setTestTimeout } from 'helpers/timeout';
+
+setTestTimeout(500);
 
 describe('Design management router', () => {
   let vm;
