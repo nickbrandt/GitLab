@@ -120,6 +120,7 @@ The following table depicts the various user permission levels in a project.
 | Remove protected branches [^4]        |         |            |             |          |        |
 | View project Audit Events             |         |            |             | ✓        | ✓      |
 | View project statistics               |         | ✓          | ✓           | ✓        | ✓      |
+| View Insights charts **[ULTIMATE]**   | ✓       | ✓         | ✓           | ✓        | ✓      |
 
 ## Project features permissions
 
@@ -200,6 +201,7 @@ group.
 | Create/edit group epic **[ULTIMATE]**  |         | ✓        | ✓         | ✓      | ✓     |
 | Delete group epic **[ULTIMATE]**       |         |          |           |        | ✓     |
 | View group Audit Events  |         |          |           |        | ✓     |
+| View Insights charts **[ULTIMATE]** | ✓       | ✓         | ✓           | ✓        | ✓      |
 
 ### Subgroup permissions
 
