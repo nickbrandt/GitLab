@@ -33,7 +33,7 @@ module EE
     end
 
     def geo_login_state
-      ::Gitlab::Geo::Oauth::LoginState.new(return_to: geo_return_to_after_login)
+      ::Gitlab::Geo::Oauth::LoginState.new(return_to: sanitize_redirect(geo_return_to_after_login))
     end
 
     def geo_logout_state
@@ -41,7 +41,7 @@ module EE
     end
 
     def geo_return_to_after_login
-      sanitize_redirect(::Gitlab::Utils.append_path(root_url, session[:user_return_to].to_s))
+      stored_redirect_uri || ::Gitlab::Utils.append_path(root_url, session[:user_return_to].to_s)
     end
 
     def geo_return_to_after_logout
