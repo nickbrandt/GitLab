@@ -12,7 +12,7 @@ describe "Git HTTP requests (Geo)" do
   set(:secondary) { create(:geo_node) }
 
   # Ensure the token always comes from the real time of the request
-  let!(:auth_token) { Gitlab::Geo::BaseRequest.new(scope: "repository-#{project.id}").authorization }
+  let!(:auth_token) { Gitlab::Geo::BaseRequest.new(scope: project.full_path).authorization }
   let!(:user) { create(:user) }
   let!(:user_without_any_access) { create(:user) }
   let!(:user_without_push_access) { create(:user) }
@@ -21,6 +21,7 @@ describe "Git HTTP requests (Geo)" do
   let!(:key_for_user_without_push_access) { create(:key, user: user_without_push_access) }
 
   let(:env) { valid_geo_env }
+  let(:auth_token_with_invalid_scope) { Gitlab::Geo::BaseRequest.new(scope: "invalid").authorization }
 
   before do
     project.add_maintainer(user)
@@ -343,6 +344,53 @@ describe "Git HTTP requests (Geo)" do
               expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository.gl_repository(project, false))
             end
           end
+        end
+      end
+    end
+
+    context 'invalid scope' do
+      subject do
+        make_request
+        response
+      end
+
+      def make_request
+        get "/#{repository_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
+      end
+
+      shared_examples_for 'unauthorized because of invalid scope' do
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
+
+        it 'returns correct error' do
+          expect(subject.parsed_body).to eq('Geo JWT authentication failed: Unauthorized scope')
+        end
+      end
+
+      context 'invalid scope of Geo JWT token' do
+        let(:repository_path) { project.full_path }
+        let(:env) { geo_env(auth_token_with_invalid_scope) }
+
+        include_examples 'unauthorized because of invalid scope'
+      end
+
+      context 'Geo JWT token scopes for wiki and repository are not interchangeable' do
+        context 'for a repository but using a wiki scope' do
+          let(:repository_path) { project.full_path }
+          let(:scope) { project.wiki.full_path }
+          let(:auth_token_with_valid_wiki_scope) { Gitlab::Geo::BaseRequest.new(scope: scope).authorization }
+          let(:env) { geo_env(auth_token_with_valid_wiki_scope) }
+
+          include_examples 'unauthorized because of invalid scope'
+        end
+
+        context 'for a wiki but using a repository scope' do
+          let(:project) { create(:project, :wiki_repo) }
+          let(:repository_path) { project.wiki.full_path }
+          let(:scope) { project.full_path }
+          let(:auth_token_with_valid_repository_scope) { Gitlab::Geo::BaseRequest.new(scope: scope).authorization }
+          let(:env) { geo_env(auth_token_with_valid_repository_scope) }
+
+          include_examples 'unauthorized because of invalid scope'
         end
       end
     end
