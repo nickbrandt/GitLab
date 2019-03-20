@@ -1,0 +1,3 @@
+- group_managed_account = @user.group_managed_account?
+
+= render_ce 'profiles/email_settings', form: form, email_change_disabled: group_managed_account
