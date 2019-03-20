@@ -5,6 +5,8 @@ module EE
     module GitAccess
       prepend GeoGitAccess
       extend ::Gitlab::Utils::Override
+      include ActionView::Helpers::SanitizeHelper
+      include PathLocksHelper
 
       override :check
       def check(cmd, changes)

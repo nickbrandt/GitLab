@@ -18,7 +18,7 @@ gem 'gitlab-default_value_for', '~> 3.1.1', require: 'default_value_for'
 gem 'mysql2', '~> 0.4.10', group: :mysql
 gem 'pg', '~> 1.1', group: :postgres
 
-gem 'rugged', '~> 0.27'
+gem 'rugged', '~> 0.28'
 gem 'grape-path-helpers', '~> 1.0'
 
 gem 'faraday', '~> 0.12'
@@ -180,7 +180,7 @@ gem 'gitlab-sidekiq-fetcher', '~> 0.4.0', require: 'sidekiq-reliable-fetch'
 gem 'fugit', '~> 1.1'
 
 # HTTP requests
-gem 'httparty', '~> 0.13.3'
+gem 'httparty', '~> 0.16.4'
 
 # Colored output to console
 gem 'rainbow', '~> 3.0'

@@ -44,7 +44,7 @@ module Elastic
 
       # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
       # fields together instead of per model
-      mappings do
+      mappings dynamic: 'strict' do
         ### Shared fields
         indexes :id, type: :integer
         indexes :created_at, type: :date
@@ -182,7 +182,7 @@ module Elastic
             indexes :time, type: :date, format: :basic_date_time_no_millis
           end
 
-          indexes :commiter do
+          indexes :committer do
             indexes :name, type: :text, index_options: 'offsets'
             indexes :email, type: :text, index_options: 'offsets'
             indexes :time, type: :date, format: :basic_date_time_no_millis

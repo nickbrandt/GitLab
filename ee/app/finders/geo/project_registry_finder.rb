@@ -15,19 +15,15 @@ module Geo
     end
 
     def count_failed_repositories
-      find_failed_project_registries('repository').count
+      registries_for_failed_projects(:repository).count
     end
 
     def count_failed_wikis
-      find_failed_project_registries('wiki').count
+      registries_for_failed_projects(:wiki).count
     end
 
     def find_failed_project_registries(type = nil)
-      if selective_sync?
-        legacy_find_filtered_failed_projects(type)
-      else
-        find_filtered_failed_project_registries(type)
-      end
+      registries_for_failed_projects(type)
     end
 
     def count_verified_repositories
@@ -143,19 +139,22 @@ module Geo
         .execute
     end
 
-    def find_verified_repositories
-      Geo::ProjectRegistry.verified_repos
+    def finder_klass_for_failed_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistrySyncFailedFinder
+      else
+        Geo::LegacyProjectRegistrySyncFailedFinder
+      end
     end
 
-    def find_filtered_failed_project_registries(type = nil)
-      case type
-      when 'repository'
-        Geo::ProjectRegistry.failed_repos
-      when 'wiki'
-        Geo::ProjectRegistry.failed_wikis
-      else
-        Geo::ProjectRegistry.failed
-      end
+    def registries_for_failed_projects(type)
+      finder_klass_for_failed_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def find_verified_repositories
+      Geo::ProjectRegistry.verified_repos
     end
 
     def find_filtered_verification_failed_project_registries(type = nil)
@@ -298,18 +297,6 @@ module Geo
         current_node.projects,
         project_registries.pluck(:project_id),
         Project
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of projects that sync has failed
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_filtered_failed_projects(type = nil)
-      legacy_inner_join_registry_ids(
-        find_filtered_failed_project_registries(type),
-        current_node.projects.pluck(:id),
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
       )
     end
     # rubocop: enable CodeReuse/ActiveRecord

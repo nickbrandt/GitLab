@@ -224,4 +224,15 @@ describe Gitlab::Elastic::ProjectSearchResults do
       expect(results.issues_count).to eq 3
     end
   end
+
+  context 'user search' do
+    subject(:results) { described_class.new(user, project.owner.username, project.id) }
+
+    before do
+      expect(Gitlab::ProjectSearchResults).to receive(:new).and_call_original
+    end
+
+    it { expect(results.objects('users')).to eq([project.owner]) }
+    it { expect(results.limited_users_count).to eq(1) }
+  end
 end

@@ -4,7 +4,7 @@ import Item from 'ee/design_management/components/list/item.vue';
 describe('Design management list item component', () => {
   let vm;
 
-  function createComponent(commentsCount) {
+  function createComponent(commentsCount = 1) {
     vm = shallowMount(Item, {
       propsData: {
         id: 1,
@@ -13,6 +13,7 @@ describe('Design management list item component', () => {
         commentsCount,
         updatedAt: '01-01-2019',
       },
+      stubs: ['router-link'],
     });
   }
 
@@ -21,13 +22,19 @@ describe('Design management list item component', () => {
   });
 
   it('renders item with single comment', () => {
-    createComponent(1);
+    createComponent();
 
     expect(vm.element).toMatchSnapshot();
   });
 
   it('renders item with multiple comments', () => {
     createComponent(2);
+
+    expect(vm.element).toMatchSnapshot();
+  });
+
+  it('hides comment count', () => {
+    createComponent(0);
 
     expect(vm.element).toMatchSnapshot();
   });

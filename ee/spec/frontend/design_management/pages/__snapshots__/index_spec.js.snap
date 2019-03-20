@@ -2,6 +2,8 @@
 
 exports[`Design management index page designs renders designs list 1`] = `
 <div>
+  <uploadform-stub />
+   
   <div
     class="mt-4"
   >
@@ -14,6 +16,8 @@ exports[`Design management index page designs renders designs list 1`] = `
 
 exports[`Design management index page designs renders empty text 1`] = `
 <div>
+  <uploadform-stub />
+   
   <div
     class="mt-4"
   >
@@ -26,6 +30,8 @@ exports[`Design management index page designs renders empty text 1`] = `
 
 exports[`Design management index page designs renders error 1`] = `
 <div>
+  <uploadform-stub />
+   
   <div
     class="mt-4"
   >
@@ -42,12 +48,15 @@ exports[`Design management index page designs renders error 1`] = `
 
 exports[`Design management index page designs renders loading icon 1`] = `
 <div>
+  <uploadform-stub />
+   
   <div
     class="mt-4"
   >
     <glloadingicon-stub
+      color="orange"
       label="Loading"
-      size="2"
+      size="md"
     />
   </div>
 </div>

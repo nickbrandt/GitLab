@@ -358,7 +358,7 @@ by GitLab before installing any of the applications.
 | ----------- | :------------: | ----------- | --------------- |
 | [Helm Tiller](https://docs.helm.sh/) | 10.2+ | Helm is a package manager for Kubernetes and is required to install all the other applications. It is installed in its own pod inside the cluster which can run the `helm` CLI in a safe environment. | n/a |
 | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) | 10.2+ | Ingress can provide load balancing, SSL termination, and name-based virtual hosting. It acts as a web proxy for your applications and is useful if you want to use [Auto DevOps] or deploy your own web apps. | [stable/nginx-ingress](https://github.com/helm/charts/tree/master/stable/nginx-ingress) |
-| [Cert Manager](http://docs.cert-manager.io/en/latest/) | 11.6+ | Cert Manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing Cert Manager on your cluster will issue a certificate by [Let's Encrypt](https://letsencrypt.org/) and ensure that certificates are valid and up-to-date. | [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager) |
+| [Cert-Manager](https://docs.cert-manager.io/en/latest/) | 11.6+ | Cert-Manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing Cert-Manager on your cluster will issue a certificate by [Let's Encrypt](https://letsencrypt.org/) and ensure that certificates are valid and up-to-date. | [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager) |
 | [Prometheus](https://prometheus.io/docs/introduction/overview/) | 10.4+ | Prometheus is an open-source monitoring and alerting system useful to supervise your deployed applications. | [stable/prometheus](https://github.com/helm/charts/tree/master/stable/prometheus) |
 | [GitLab Runner](https://docs.gitlab.com/runner/) | 10.6+ | GitLab Runner is the open source project that is used to run your jobs and send the results back to GitLab. It is used in conjunction with [GitLab CI/CD](https://about.gitlab.com/features/gitlab-ci-cd/), the open-source continuous integration service included with GitLab that coordinates the jobs. When installing the GitLab Runner via the applications, it will run in **privileged mode** by default. Make sure you read the [security implications](#security-implications) before doing so. | [runner/gitlab-runner](https://gitlab.com/charts/gitlab-runner) |
 | [JupyterHub](http://jupyter.org/) | 11.0+ | [JupyterHub](https://jupyterhub.readthedocs.io/en/stable/) is a multi-user service for managing notebooks across a team. [Jupyter Notebooks](https://jupyter-notebook.readthedocs.io/en/latest/) provide a web-based interactive programming environment used for data analysis, visualization, and machine learning. We use a [custom Jupyter image](https://gitlab.com/gitlab-org/jupyterhub-user-image/blob/master/Dockerfile) that installs additional useful packages on top of the base Jupyter. Authentication will be enabled only for [project members](../members/index.md) with [Developer or higher](../../permissions.md) access to the project. You will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/amit1rrr/rubix). More information on creating executable runbooks can be found in [our Nurtch documentation](runbooks/index.md#nurtch-executable-runbooks). Note that Ingress must be installed and have an IP address assigned before JupyterHub can be installed. | [jupyter/jupyterhub](https://jupyterhub.github.io/helm-chart/) |
@@ -556,26 +556,27 @@ NOTE: **NOTE:**
 Prior to GitLab 11.5, `KUBE_TOKEN` was the Kubernetes token of the main
 service account of the cluster integration.
 
-### Troubleshooting missing `KUBECONFIG` or `KUBE_TOKEN`
+### Troubleshooting failed deployment jobs
 
-GitLab will create a new service account specifically for your CI builds. The
-new service account is created when the cluster is added to the project.
-Sometimes there may be errors that cause the service account creation to fail.
+GitLab will create a namespace and service account specifically for your
+deployment jobs. These resources are created just before the deployment
+job starts. Sometimes there may be errors that cause their creation to fail.
 
-In such instances, your build will not be passed the `KUBECONFIG` or
-`KUBE_TOKEN` variables and, if you are using Auto DevOps, your Auto DevOps
-pipelines will no longer trigger a `production` deploy build. You will need to
-check the [logs](../../../administration/logs.md) to debug why the service
-account creation failed.
+In such instances, your job will fail with the message:
+
+```The job failed to complete prerequisite tasks```
+
+You will need to check the [logs](../../../administration/logs.md) to debug
+why the namespace and service account creation failed.
 
 A common reason for failure is that the token you gave GitLab did not have
 [`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
 privileges as GitLab expects.
 
-Another common problem for why these variables are not being passed to your
-builds is that they must have a matching
+Another common problem is caused by a missing `KUBECONFIG` or `KUBE_TOKEN`.
+To be passed to your job, it must have a matching
 [`environment:name`](../../../ci/environments.md#defining-environments). If
-your build has no `environment:name` set, it will not be passed the Kubernetes
+your job has no `environment:name` set, it will not be passed the Kubernetes
 credentials.
 
 ## Monitoring your Kubernetes cluster **[ULTIMATE]**

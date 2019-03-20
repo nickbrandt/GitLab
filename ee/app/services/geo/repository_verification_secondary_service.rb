@@ -48,7 +48,7 @@ module Geo
       checksum = calculate_checksum(repository)
 
       if mismatch?(checksum)
-        update_registry!(mismatch: true, failure: "#{type.to_s.capitalize} checksum mismatch")
+        update_registry!(mismatch: checksum, failure: "#{type.to_s.capitalize} checksum mismatch")
       else
         update_registry!(checksum: checksum)
       end
@@ -56,7 +56,7 @@ module Geo
       update_registry!(failure: "Error calculating #{type} checksum", exception: e)
     end
 
-    def update_registry!(checksum: nil, mismatch: false, failure: nil, exception: nil)
+    def update_registry!(checksum: nil, mismatch: nil, failure: nil, exception: nil)
       reverify, verification_retry_count =
         if mismatch || failure.present?
           log_error(failure, exception, type: type)
@@ -72,7 +72,8 @@ module Geo
 
       registry.update!(
         "#{type}_verification_checksum_sha" => checksum,
-        "#{type}_checksum_mismatch" => mismatch,
+        "#{type}_verification_checksum_mismatched" => mismatch,
+        "#{type}_checksum_mismatch" => mismatch.present?,
         "last_#{type}_verification_ran_at" => Time.now,
         "last_#{type}_verification_failure" => failure,
         "#{type}_verification_retry_count" => verification_retry_count,

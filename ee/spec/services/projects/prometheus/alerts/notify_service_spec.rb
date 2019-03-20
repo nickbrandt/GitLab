@@ -29,6 +29,30 @@ describe Projects::Prometheus::Alerts::NotifyService do
     end
   end
 
+  shared_examples 'processes incident issues' do |amount|
+    let(:create_incident_service) { spy }
+
+    it 'processes issues', :sidekiq do
+      expect(IncidentManagement::ProcessAlertWorker)
+        .to receive(:perform_async)
+        .with(project.id, kind_of(Hash))
+        .exactly(amount).times
+
+      Sidekiq::Testing.inline! do
+        expect(subject).to eq(true)
+      end
+    end
+  end
+
+  shared_examples 'does not process incident issues' do
+    it 'does not process issues' do
+      expect(IncidentManagement::ProcessAlertWorker)
+        .not_to receive(:perform_async)
+
+      expect(subject).to eq(true)
+    end
+  end
+
   shared_examples 'persists events' do
     let(:create_events_service) { spy }
 
@@ -248,6 +272,59 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
           expect(subject).to eq(true)
         end
+      end
+    end
+
+    context 'process incident issues' do
+      let!(:setting) do
+        create(
+          :project_incident_management_setting,
+          project: project,
+          create_issue: true
+        )
+      end
+
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+      end
+
+      context 'with license' do
+        before do
+          stub_licensed_features(incident_management: true)
+        end
+
+        context 'with create_issue setting enabled' do
+          before do
+            setting.update!(create_issue: true)
+          end
+
+          it_behaves_like 'processes incident issues', 1
+
+          context 'without firing alerts' do
+            let(:payload_raw) do
+              payload_for(firing: [], resolved: [alert_resolved])
+            end
+
+            it_behaves_like 'does not process incident issues'
+          end
+        end
+
+        context 'with create_issue setting disabled' do
+          before do
+            setting.update!(create_issue: false)
+          end
+
+          it_behaves_like 'does not process incident issues'
+        end
+      end
+
+      context 'without license' do
+        before do
+          stub_licensed_features(incident_management: false)
+        end
+
+        it_behaves_like 'does not process incident issues'
       end
     end
   end

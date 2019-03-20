@@ -851,6 +851,7 @@ production: &base
   ## GitLab Shell settings
   gitlab_shell:
     path: /home/git/gitlab-shell/
+    authorized_keys_file: /home/git/.ssh/authorized_keys
 
     # File that contains the secret key for verifying access for gitlab-shell.
     # Default is '.gitlab_shell_secret' relative to Rails.root (i.e. root of the GitLab app).
@@ -1019,6 +1020,7 @@ test:
         region: us-east-1
   gitlab_shell:
     path: tmp/tests/gitlab-shell/
+    authorized_keys_file: tmp/tests/authorized_keys
   issues_tracker:
     redmine:
       title: "Redmine"

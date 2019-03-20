@@ -79,10 +79,10 @@ describe 'SAML provider settings' do
     context 'with existing SAML provider' do
       let!(:saml_provider) { create(:saml_provider, group: group) }
 
-      it 'allows provider to be disabled' do
+      it 'allows provider to be disabled', :js do
         visit group_saml_providers_path(group)
 
-        find('input#saml_provider_enabled').click
+        find('.js-group-saml-enable-toggle-area button').click
 
         expect { submit }.to change { saml_provider.reload.enabled }.to false
       end

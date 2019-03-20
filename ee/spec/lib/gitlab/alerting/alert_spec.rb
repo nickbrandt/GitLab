@@ -52,6 +52,27 @@ describe Gitlab::Alerting::Alert do
     end
   end
 
+  context 'with annotations' do
+    before do
+      payload['annotations'] = {
+        'label' => 'value',
+        'another' => 'value2'
+      }
+    end
+
+    it 'parses annotations' do
+      expect(alert.annotations.size).to eq(2)
+      expect(alert.annotations.map(&:label)).to eq(%w(label another))
+      expect(alert.annotations.map(&:value)).to eq(%w(value value2))
+    end
+  end
+
+  context 'without annotations' do
+    it 'has no annotations' do
+      expect(alert.annotations).to be_empty
+    end
+  end
+
   context 'with empty payload' do
     it 'cannot load gitlab_alert' do
       expect(alert.gitlab_alert).to be_nil

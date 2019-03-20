@@ -34,9 +34,7 @@
     = render 'banner'
     = render 'form'
 
-  -# EE-specific
-  - if @cluster.project_type? && @cluster.project.feature_available?(:cluster_health)
-    = render 'health'
+  = render_if_exists 'health'
 
   .cluster-applications-table#js-cluster-applications
 

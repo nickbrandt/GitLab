@@ -57,9 +57,9 @@ describe 'Issues' do
     describe 'Edit issue' do
       let!(:issue) do
         create(:issue,
-              author: user,
-              assignees: [user],
-              project: project)
+               author: user,
+               assignees: [user],
+               project: project)
       end
 
       before do
@@ -75,9 +75,9 @@ describe 'Issues' do
     describe 'Editing issue assignee' do
       let!(:issue) do
         create(:issue,
-              author: user,
-              assignees: [user],
-              project: project)
+               author: user,
+               assignees: [user],
+               project: project)
       end
 
       it 'allows user to select unassigned', :js do
@@ -187,27 +187,16 @@ describe 'Issues' do
         expect(page).to have_content 'foobar'
         expect(page.all('.no-comments').first.text).to eq "0"
       end
-
-      it 'shows weight on issue row' do
-        create(:issue, author: user, project: project, weight: 2)
-
-        visit project_issues_path(project)
-
-        page.within(first('.issuable-info')) do
-          expect(page).to have_selector('.issue-weight-icon')
-          expect(page).to have_content(2)
-        end
-      end
     end
 
     describe 'Filter issue' do
       before do
         %w(foobar barbaz gitlab).each do |title|
           create(:issue,
-                author: user,
-                assignees: [user],
-                project: project,
-                title: title)
+                 author: user,
+                 assignees: [user],
+                 project: project,
+                 title: title)
         end
 
         @issue = Issue.find_by(title: 'foobar')
@@ -508,13 +497,20 @@ describe 'Issues' do
 
         it 'allows user to unselect themselves', :js do
           issue2 = create(:issue, project: project, author: user)
+
           visit project_issue_path(project, issue2)
+
+          def close_dropdown_menu_if_visible
+            find('.dropdown-menu-toggle', visible: :all).tap do |toggle|
+              toggle.click if toggle.visible?
+            end
+          end
 
           page.within '.assignee' do
             click_link 'Edit'
             click_link user.name
 
-            find('.dropdown-menu-toggle').click
+            close_dropdown_menu_if_visible
 
             page.within '.value .author' do
               expect(page).to have_content user.name
@@ -523,7 +519,7 @@ describe 'Issues' do
             click_link 'Edit'
             click_link user.name
 
-            find('.dropdown-menu-toggle').click
+            close_dropdown_menu_if_visible
 
             page.within '.value .assign-yourself' do
               expect(page).to have_content "No assignee"
@@ -545,27 +541,6 @@ describe 'Issues' do
 
           visit project_issue_path(project, issue)
           expect(page).to have_content issue.assignees.first.name
-        end
-      end
-    end
-
-    describe 'update weight from issue#show', :js do
-      let!(:issue) { create(:issue, project: project) }
-
-      before do
-        visit project_issue_path(project, issue)
-      end
-
-      it 'allows user to update to a weight' do
-        page.within('.weight') do
-          expect(page).to have_content "None"
-          click_link 'Edit'
-
-          find('.block.weight input').send_keys 1, :enter
-
-          page.within('.value') do
-            expect(page).to have_content "1"
-          end
         end
       end
     end

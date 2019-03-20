@@ -72,7 +72,7 @@ describe('Feature Flags', () => {
       const loadingElement = component.$el.querySelector('.js-loading-state');
 
       expect(loadingElement).not.toBeNull();
-      expect(loadingElement.querySelector('i').getAttribute('aria-label')).toEqual(
+      expect(loadingElement.querySelector('span').getAttribute('aria-label')).toEqual(
         'Loading Feature Flags',
       );
 

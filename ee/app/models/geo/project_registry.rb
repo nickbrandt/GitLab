@@ -17,7 +17,9 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   ignore_column :wiki_verification_checksum
 
   sha_attribute :repository_verification_checksum_sha
+  sha_attribute :repository_verification_checksum_mismatched
   sha_attribute :wiki_verification_checksum_sha
+  sha_attribute :wiki_verification_checksum_mismatched
 
   belongs_to :project
 
@@ -96,6 +98,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
       synced_wikis
     else
       none
+    end
+  end
+
+  def self.sync_failed(type)
+    case type
+    when :repository
+      failed_repos
+    when :wiki
+      failed_wikis
+    else
+      failed
     end
   end
 

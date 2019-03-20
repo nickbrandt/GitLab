@@ -3,7 +3,6 @@
 module Gitlab
   module Regex
     extend self
-    extend EE::Gitlab::Regex # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def namespace_name_regex
       @namespace_name_regex ||= /\A[\p{Alnum}\p{Pd}_\. ]*\z/.freeze
@@ -108,3 +107,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Regex.prepend(EE::Gitlab::Regex)

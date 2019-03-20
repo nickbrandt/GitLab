@@ -51,3 +51,5 @@ class UpdateDeploymentService
     environment_options[:action] || 'start'
   end
 end
+
+UpdateDeploymentService.prepend(EE::UpdateDeploymentService)

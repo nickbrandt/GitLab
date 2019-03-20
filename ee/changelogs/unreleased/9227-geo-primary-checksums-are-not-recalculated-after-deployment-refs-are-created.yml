@@ -1,0 +1,5 @@
+---
+title: Geo - Reset the verification checksum after deployment refs are created
+merge_request: 10160
+author:
+type: fixed

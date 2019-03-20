@@ -14,7 +14,7 @@ These examples show how to run DAST on your running web application by using Git
 ## Prerequisites
 
 To run a DAST job, you need GitLab Runner with
-[docker executor](https://docs.gitlab.com/runner/executors/docker.html).
+[docker-in-docker executor](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
 
 ## Configuring with templates
 

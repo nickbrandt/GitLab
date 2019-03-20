@@ -6,6 +6,8 @@ import {
   EXTEND_AS,
   TIMELINE_CELL_MIN_WIDTH,
   DAYS_IN_WEEK,
+  PAST_DATE,
+  FUTURE_DATE,
 } from '../constants';
 
 const monthsForQuarters = {
@@ -408,45 +410,44 @@ export const getEpicsPathForPreset = ({
   return epicsPath;
 };
 
+/**
+ * This function takes two epics and return sortable dates depending on the '
+ * type of sorting order -- startDate or endDate.
+ */
+export function assignDates(a, b, { dateUndefined, outOfRange, originalDate, date, proxyDate }) {
+  let aDate;
+  let bDate;
+
+  if (a[dateUndefined]) {
+    // Set proxy date to be either far in the past or
+    // far in the future to ensure sort order is
+    // correct.
+    aDate = proxyDate;
+  } else {
+    aDate = a[outOfRange] ? a[originalDate] : a[date];
+  }
+
+  if (b[dateUndefined]) {
+    bDate = proxyDate;
+  } else {
+    bDate = b[outOfRange] ? b[originalDate] : b[date];
+  }
+
+  return [aDate, bDate];
+}
+
 export const sortEpics = (epics, sortedBy) => {
   const sortByStartDate = sortedBy.indexOf('start_date') > -1;
   const sortOrderAsc = sortedBy.indexOf('asc') > -1;
-  const pastDate = new Date(new Date().getFullYear() - 100, 0, 1);
-  const futureDate = new Date(new Date().getFullYear() + 100, 0, 1);
 
   epics.sort((a, b) => {
-    let aDate;
-    let bDate;
-
-    if (sortByStartDate) {
-      if (a.startDateUndefined) {
-        // Set proxy date to be far in the past
-        // to ensure sort order is correct.
-        aDate = pastDate;
-      } else {
-        aDate = a.startDateOutOfRange ? a.originalStartDate : a.startDate;
-      }
-
-      if (b.startDateUndefined) {
-        bDate = pastDate;
-      } else {
-        bDate = b.startDateOutOfRange ? b.originalStartDate : b.startDate;
-      }
-    } else {
-      if (a.endDateUndefined) {
-        // Set proxy date to be far into the future
-        // to ensure sort order is correct.
-        aDate = futureDate;
-      } else {
-        aDate = a.endDateOutOfRange ? a.originalEndDate : a.endDate;
-      }
-
-      if (b.endDateUndefined) {
-        bDate = futureDate;
-      } else {
-        bDate = b.endDateOutOfRange ? b.originalEndDate : b.endDate;
-      }
-    }
+    const [aDate, bDate] = assignDates(a, b, {
+      dateUndefined: sortByStartDate ? 'startDateUndefined' : 'endDateUndefined',
+      outOfRange: sortByStartDate ? 'startDateOutOfRange' : 'endDateOutOfRange',
+      originalDate: sortByStartDate ? 'originalStartDate' : 'originalEndDate',
+      date: sortByStartDate ? 'startDate' : 'endDate',
+      proxyDate: sortByStartDate ? PAST_DATE : FUTURE_DATE,
+    });
 
     // Sort in ascending or descending order
     if (aDate.getTime() < bDate.getTime()) {

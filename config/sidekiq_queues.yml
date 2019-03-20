@@ -103,6 +103,7 @@
   - [elastic_indexer, 1]
   - [elastic_commit_indexer, 1]
   - [export_csv, 1]
+  - [incident_management, 2]
 
   # Deprecated queues: Remove after 10.7
   - geo_base_scheduler

@@ -1,34 +1,83 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Design management list item component renders item with multiple comments 1`] = `
-<div
-  class="card js-design-list-item"
-  id="1"
+exports[`Design management list item component hides comment count 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item"
+  to="[object Object]"
 >
   <div
     class="card-body p-0"
   >
     <img
       alt="test"
-      class="block ml-auto mr-auto design-img"
+      class="block ml-auto mr-auto mw-100 design-img"
       height="230"
       src="http://via.placeholder.com/300"
     />
   </div>
    
   <div
-    class="card-footer d-flex"
+    class="card-footer d-flex w-100"
   >
     <div
-      class="d-flex flex-column"
+      class="d-flex flex-column str-truncated-100"
     >
       <span
-        class="bold"
+        class="bold str-truncated-100"
       >
         test
       </span>
        
-      <span>
+      <span
+        class="str-truncated-100"
+      >
+        
+        Updated 
+        <timeago-stub
+          cssclass=""
+          time="01-01-2019"
+          tooltipplacement="bottom"
+        />
+      </span>
+    </div>
+     
+    <!---->
+  </div>
+</router-link-stub>
+`;
+
+exports[`Design management list item component renders item with multiple comments 1`] = `
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item"
+  to="[object Object]"
+>
+  <div
+    class="card-body p-0"
+  >
+    <img
+      alt="test"
+      class="block ml-auto mr-auto mw-100 design-img"
+      height="230"
+      src="http://via.placeholder.com/300"
+    />
+  </div>
+   
+  <div
+    class="card-footer d-flex w-100"
+  >
+    <div
+      class="d-flex flex-column str-truncated-100"
+    >
+      <span
+        class="bold str-truncated-100"
+      >
+        test
+      </span>
+       
+      <span
+        class="str-truncated-100"
+      >
+        
         Updated 
         <timeago-stub
           cssclass=""
@@ -42,6 +91,7 @@ exports[`Design management list item component renders item with multiple commen
       class="ml-auto d-flex align-items-center text-secondary"
     >
       <icon-stub
+        class="ml-1"
         cssclasses=""
         name="comments"
         size="16"
@@ -57,38 +107,41 @@ exports[`Design management list item component renders item with multiple commen
       </span>
     </div>
   </div>
-</div>
+</router-link-stub>
 `;
 
 exports[`Design management list item component renders item with single comment 1`] = `
-<div
-  class="card js-design-list-item"
-  id="1"
+<router-link-stub
+  class="card cursor-pointer text-plain js-design-list-item"
+  to="[object Object]"
 >
   <div
     class="card-body p-0"
   >
     <img
       alt="test"
-      class="block ml-auto mr-auto design-img"
+      class="block ml-auto mr-auto mw-100 design-img"
       height="230"
       src="http://via.placeholder.com/300"
     />
   </div>
    
   <div
-    class="card-footer d-flex"
+    class="card-footer d-flex w-100"
   >
     <div
-      class="d-flex flex-column"
+      class="d-flex flex-column str-truncated-100"
     >
       <span
-        class="bold"
+        class="bold str-truncated-100"
       >
         test
       </span>
        
-      <span>
+      <span
+        class="str-truncated-100"
+      >
+        
         Updated 
         <timeago-stub
           cssclass=""
@@ -102,6 +155,7 @@ exports[`Design management list item component renders item with single comment 
       class="ml-auto d-flex align-items-center text-secondary"
     >
       <icon-stub
+        class="ml-1"
         cssclasses=""
         name="comments"
         size="16"
@@ -117,5 +171,5 @@ exports[`Design management list item component renders item with single comment 
       </span>
     </div>
   </div>
-</div>
+</router-link-stub>
 `;

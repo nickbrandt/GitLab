@@ -53,12 +53,9 @@ Remember that the performance of each test depends on the environment.
 ## Karma test suite
 
 GitLab uses the [Karma][karma] test runner with [Jasmine] as its test
-framework for our JavaScript unit and integration tests. For integration tests,
-we generate HTML files using RSpec (see `spec/javascripts/fixtures/*.rb` for examples).
-Some fixtures are still HAML templates that are translated to HTML files using the same mechanism (see `static_fixtures.rb`).
-Adding these static fixtures should be avoided as they are harder to keep up to date with real views.
-The existing static fixtures will be migrated over time.
-Please see [gitlab-org/gitlab-ce#24753](https://gitlab.com/gitlab-org/gitlab-ce/issues/24753) to track our progress.
+framework for our JavaScript unit and integration tests.
+We generate HTML and JSON fixtures from backend views and controllers
+using RSpec (see `spec/javascripts/fixtures/*.rb` for examples).
 Fixtures are served during testing by the [jasmine-jquery][jasmine-jquery] plugin.
 
 JavaScript tests live in `spec/javascripts/`, matching the folder structure
@@ -228,14 +225,12 @@ See this [section][vue-test].
 
 ### Running frontend tests
 
-`rake karma` runs the frontend-only (JavaScript) tests.
-It consists of two subtasks:
+For running the frontend tests, you need the following commands:
 
-- `rake karma:fixtures` (re-)generates fixtures
-- `rake karma:tests` actually executes the tests
+- `rake karma:fixtures` (re-)generates fixtures.
+- `yarn test` executes the tests.
 
-As long as the fixtures don't change, `rake karma:tests` (or `yarn karma`)
-is sufficient (and saves you some time).
+As long as the fixtures don't change, `yarn test` is sufficient (and saves you some time).
 
 ### Live testing and focused testing
 
