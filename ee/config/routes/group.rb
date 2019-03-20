@@ -89,6 +89,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       delete :unlink, to: 'sso#unlink'
     end
 
+    resource :scim_oauth, only: [:show, :create], controller: :scim_oauth
+
     resource :roadmap, only: [:show], controller: 'roadmap'
 
     legacy_ee_group_boards_redirect = redirect do |params, request|
