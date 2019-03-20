@@ -12392,6 +12392,15 @@ msgstr ""
 msgid "ciReport|(is loading, errors when loading results)"
 msgstr ""
 
+msgid "ciReport|All projects"
+msgstr ""
+
+msgid "ciReport|All report types"
+msgstr ""
+
+msgid "ciReport|All severities"
+msgstr ""
+
 msgid "ciReport|Class"
 msgstr ""
 
