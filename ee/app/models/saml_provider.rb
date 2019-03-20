@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SamlProvider < ActiveRecord::Base
+  USER_ATTRIBUTES_LOCKED_FOR_MANAGED_ACCOUNTS = %i(email public_email commit_email notification_email).freeze
+
   belongs_to :group
   has_many :identities
 
