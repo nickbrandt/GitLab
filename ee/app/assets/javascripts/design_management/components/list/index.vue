@@ -18,6 +18,7 @@ export default {
   <ol class="list-unstyled row">
     <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4">
       <design
+        :id="design.id"
         :comments-count="design.commentsCount"
         :image="design.image"
         :name="design.name"

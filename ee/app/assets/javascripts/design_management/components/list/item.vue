@@ -9,6 +9,10 @@ export default {
     Timeago,
   },
   props: {
+    id: {
+      type: Number,
+      required: true,
+    },
     commentsCount: {
       type: Number,
       required: true,
@@ -35,21 +39,32 @@ export default {
 </script>
 
 <template>
-  <div class="card js-design-list-item">
+  <router-link
+    :to="{ name: 'design', params: { id } }"
+    class="card cursor-pointer text-plain js-design-list-item"
+  >
     <div class="card-body p-0">
-      <img :src="image" :alt="name" class="block ml-auto mr-auto design-img" height="230" />
+      <img :src="image" :alt="name" class="block ml-auto mr-auto mw-100 design-img" height="230" />
     </div>
-    <div class="card-footer d-flex">
-      <div class="d-flex flex-column">
-        <span class="bold">{{ name }}</span>
-        <span>{{ __('Updated') }} <timeago :time="updatedAt" tooltip-placement="bottom"/></span>
+    <div class="card-footer d-flex w-100">
+      <div class="d-flex flex-column str-truncated-100">
+        <span class="bold str-truncated-100">{{ name }}</span>
+        <span class="str-truncated-100">
+          {{ __('Updated') }} <timeago :time="updatedAt" tooltip-placement="bottom" />
+        </span>
       </div>
-      <div class="ml-auto d-flex align-items-center text-secondary">
-        <icon name="comments" />
+      <div v-if="commentsCount" class="ml-auto d-flex align-items-center text-secondary">
+        <icon name="comments" class="ml-1" />
         <span :aria-label="commentsLabel" class="ml-1">
           {{ commentsCount }}
         </span>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
+
+<style scoped>
+.card:hover {
+  text-decoration: none;
+}
+</style>

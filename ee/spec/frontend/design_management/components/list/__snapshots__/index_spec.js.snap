@@ -9,6 +9,7 @@ exports[`Design management list component renders list 1`] = `
   >
     <design-stub
       commentscount="2"
+      id="1"
       image="test"
       name="test"
       updatedat="01-01-2019"
@@ -19,6 +20,7 @@ exports[`Design management list component renders list 1`] = `
   >
     <design-stub
       commentscount="2"
+      id="2"
       image="test"
       name="test"
       updatedat="01-01-2019"
