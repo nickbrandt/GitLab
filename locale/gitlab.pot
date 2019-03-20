@@ -1992,6 +1992,9 @@ msgstr ""
 msgid "CiStatusLabel|pending"
 msgstr ""
 
+msgid "CiStatusLabel|preparing"
+msgstr ""
+
 msgid "CiStatusLabel|skipped"
 msgstr ""
 
@@ -2023,6 +2026,9 @@ msgid "CiStatusText|passed"
 msgstr ""
 
 msgid "CiStatusText|pending"
+msgstr ""
+
+msgid "CiStatusText|preparing"
 msgstr ""
 
 msgid "CiStatusText|skipped"
