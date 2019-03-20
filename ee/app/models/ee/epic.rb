@@ -157,30 +157,13 @@ module EE
       # epic2 - parent: epic1
       # Returns: 2
       def deepest_relationship_level
-        return unless ::Group.supports_nested_objects?
+        return unless supports_nested_objects?
 
-        result =
-          ApplicationRecord.connection.execute(
-            <<-SQL
-              WITH RECURSIVE descendants AS (
-                  SELECT id, 1 depth
-                  FROM epics
-                  WHERE parent_id IS NOT NULL
-              UNION
-                  SELECT e.id, d.depth + 1
-                  FROM epics e
-                  INNER JOIN descendants d
-                  ON e.parent_id = d.id
-              )
-              SELECT MAX(depth) as deepest_level FROM descendants
-            SQL
-          )
+        hierarchy = ::Gitlab::ObjectHierarchy.new(self.where.not(parent_id: nil))
+        deepest_level = hierarchy.max_descendants_depth || 0
 
-        deepest_level = result.first["deepest_level"] || 0
-
-        # For performance reason epics without a parent_id are being
-        # ignored in the query.
-        # So we sum 1 to the result to take into account first parent.
+        # For performance reasons, epics without a parent_id are being ignored in the query.
+        # So we add 1 to the result to take into account the first parent.
         deepest_level + 1
       end
 

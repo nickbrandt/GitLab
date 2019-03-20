@@ -1,0 +1,5 @@
+---
+title: Fixed bug preventing users from adding child epics with multiple children
+merge_request: 10331
+author:
+type: fixed
