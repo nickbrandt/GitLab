@@ -5184,6 +5184,12 @@ msgstr ""
 msgid "GroupRoadmap|Until %{dateWord}"
 msgstr ""
 
+msgid "GroupSAML|Enable SAML authentication for this group"
+msgstr ""
+
+msgid "GroupSAML|Toggle SAML authentication"
+msgstr ""
+
 msgid "GroupSettings|Auto DevOps pipeline was updated for the group"
 msgstr ""
 

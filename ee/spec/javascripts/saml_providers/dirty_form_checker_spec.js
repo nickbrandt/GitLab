@@ -25,7 +25,7 @@ describe('DirtyFormChecker', () => {
     it('tracks starting states for editable inputs', () => {
       const enabledStartState = dirtyFormChecker.startingStates['saml_provider[enabled]'];
 
-      expect(enabledStartState).toEqual('1');
+      expect(enabledStartState).toEqual('true');
     });
   });
 
