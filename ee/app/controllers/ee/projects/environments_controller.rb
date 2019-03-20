@@ -15,6 +15,7 @@ module EE
         respond_to do |format|
           format.html
           format.json do
+            ::Gitlab::PodLogsUsageCounter.increment(project.id)
             ::Gitlab::PollingInterval.set_header(response, interval: 3_000)
 
             render json: {

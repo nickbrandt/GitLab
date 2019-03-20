@@ -52,6 +52,7 @@ describe Gitlab::UsageData do
         license_id
         elasticsearch_enabled
         geo_enabled
+        pod_logs_usages
       ))
     end
 
