@@ -145,6 +145,8 @@ module Elastic
 
         ### REPOSITORIES
         indexes :blob do
+          indexes :type, type: :keyword
+
           indexes :id, type: :text,
                        index_options: 'offsets',
                        analyzer: :sha_analyzer
@@ -168,6 +170,8 @@ module Elastic
         end
 
         indexes :commit do
+          indexes :type, type: :keyword
+
           indexes :id, type: :text,
                        index_options: 'offsets',
                        analyzer: :sha_analyzer
