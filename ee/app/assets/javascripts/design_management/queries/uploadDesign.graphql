@@ -1,0 +1,9 @@
+mutation addDesigns($name: String) {
+  uploadDesign(name: $name) @client {
+    id
+    image
+    name
+    updatedAt
+    commentsCount
+  }
+}
