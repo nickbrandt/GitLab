@@ -1,10 +1,13 @@
 import $ from 'jquery';
 import { __ } from '~/locale';
 import DirtyFormChecker from './dirty_form_checker';
+import setupToggleButtons from '~/toggle_buttons';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default class SamlSettingsForm {
   constructor(formSelector) {
     this.form = document.querySelector(formSelector);
+    this.samlToggleArea = this.form.querySelector('.js-group-saml-enable-toggle-area');
     this.enabledToggle = this.form.querySelector('#saml_provider_enabled');
     this.testButtonTooltipWrapper = this.form.querySelector('#js-saml-test-button');
     this.testButton = this.testButtonTooltipWrapper.querySelector('a');
@@ -13,10 +16,12 @@ export default class SamlSettingsForm {
 
   init() {
     this.dirtyFormChecker.init();
+
+    setupToggleButtons(this.samlToggleArea);
+    $(this.enabledToggle).on('trigger-change', () => this.onEnableToggle());
+
     this.updateEnabled();
     this.updateView();
-
-    this.enabledToggle.addEventListener('change', () => this.onEnableToggle());
   }
 
   onEnableToggle() {
@@ -25,7 +30,7 @@ export default class SamlSettingsForm {
   }
 
   updateEnabled() {
-    this.enabled = this.enabledToggle.checked;
+    this.enabled = parseBoolean(this.enabledToggle.value);
   }
 
   testButtonTooltip() {

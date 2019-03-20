@@ -5,7 +5,9 @@ export default class DirtyFormChecker {
     this.isDirty = false;
 
     this.editableInputs = Array.from(this.form.querySelectorAll('input[name]')).filter(
-      el => el.type !== 'submit' && el.type !== 'hidden',
+      el =>
+        (el.type !== 'submit' && el.type !== 'hidden') ||
+        el.classList.contains('js-project-feature-toggle-input'),
     );
 
     this.startingStates = {};
