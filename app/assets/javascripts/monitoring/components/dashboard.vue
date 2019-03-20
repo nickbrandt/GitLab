@@ -1,7 +1,7 @@
 <script>
 // ee-only
 import DashboardMixin from 'ee/monitoring/components/dashboard_mixin';
-
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import Flash from '../../flash';
@@ -20,6 +20,8 @@ export default {
     GraphGroup,
     EmptyState,
     Icon,
+    GlDropdown,
+    GlDropdownItem,
   },
 
   // ee-only
@@ -179,28 +181,21 @@ export default {
 <template>
   <div v-if="!showEmptyState" class="prometheus-graphs prepend-top-default">
     <div v-if="showEnvironmentDropdown" class="environments d-flex align-items-center">
-      {{ s__('Metrics|Environment') }}
-      <div class="dropdown prepend-left-10">
-        <button class="dropdown-menu-toggle" data-toggle="dropdown" type="button">
-          <span>{{ currentEnvironmentName }}</span>
-          <icon name="chevron-down" />
-        </button>
-        <div
-          v-if="store.environmentsData.length > 0"
-          class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up"
+      <strong>{{ s__('Metrics|Environment') }}</strong>
+      <gl-dropdown
+        class="prepend-left-10 js-environments-dropdown"
+        toggle-class="dropdown-menu-toggle"
+        :text="currentEnvironmentName"
+        :disabled="store.environmentsData.length === 0"
+      >
+        <gl-dropdown-item
+          v-for="environment in store.environmentsData"
+          :key="environment.id"
+          :active="environment.name === currentEnvironmentName"
+          active-class="is-active"
+          >{{ environment.name }}</gl-dropdown-item
         >
-          <ul>
-            <li v-for="environment in store.environmentsData" :key="environment.id">
-              <a
-                :href="environment.metrics_path"
-                :class="{ 'is-active': environment.name == currentEnvironmentName }"
-                class="dropdown-item"
-                >{{ environment.name }}</a
-              >
-            </li>
-          </ul>
-        </div>
-      </div>
+      </gl-dropdown>
     </div>
     <graph-group
       v-for="(groupData, index) in store.groups"
