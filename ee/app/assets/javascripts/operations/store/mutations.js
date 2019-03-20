@@ -2,13 +2,6 @@ import _ from 'underscore';
 import * as types from './mutation_types';
 
 export default {
-  [types.DECREMENT_PROJECT_SEARCH_COUNT](state, value) {
-    state.searchCount -= value;
-  },
-  [types.INCREMENT_PROJECT_SEARCH_COUNT](state, value) {
-    state.searchCount += value;
-  },
-
   [types.SET_PROJECT_ENDPOINT_LIST](state, url) {
     state.projectEndpoints.list = url;
   },
@@ -26,9 +19,6 @@ export default {
   [types.SET_MESSAGE_MINIMUM_QUERY](state, bool) {
     state.messages.minimumQuery = bool;
   },
-  [types.REQUEST_PROJECTS](state) {
-    state.isLoadingProjects = true;
-  },
 
   [types.ADD_SELECTED_PROJECT](state, project) {
     if (!state.selectedProjects.some(p => p.id === project.id)) {
@@ -42,8 +32,16 @@ export default {
     );
   },
 
-  [types.TOGGLE_IS_LOADING_PROJECTS](state) {
-    state.isLoadingProjects = !state.isLoadingProjects;
+  [types.REQUEST_PROJECTS](state) {
+    state.isLoadingProjects = true;
+  },
+  [types.RECEIVE_PROJECTS_SUCCESS](state, projects) {
+    state.projects = projects;
+    state.isLoadingProjects = false;
+  },
+  [types.RECEIVE_PROJECTS_ERROR](state) {
+    state.projects = null;
+    state.isLoadingProjects = false;
   },
 
   [types.CLEAR_SEARCH_RESULTS](state) {
@@ -51,38 +49,26 @@ export default {
     state.selectedProjects = [];
   },
 
-  [types.SEARCHED_WITH_NO_QUERY](state) {
-    state.projectSearchResults = [];
-    state.messages.noResults = false;
+  [types.REQUEST_SEARCH_RESULTS](state) {
+    // Flipping this property separately to allows the UI
+    // to hide the "minimum query" message
+    // before the seach results arrive from the API
+    state.messages.minimumQuery = false;
+
+    state.searchCount += 1;
+  },
+  [types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, results) {
+    state.projectSearchResults = results;
+    state.messages.noResults = state.projectSearchResults.length === 0;
     state.messages.searchError = false;
     state.messages.minimumQuery = false;
+    state.searchCount -= 1;
   },
-
-  [types.SEARCHED_WITH_TOO_SHORT_QUERY](state) {
-    state.projectSearchResults = [];
-    state.messages.noResults = false;
-    state.messages.searchError = false;
-    state.messages.minimumQuery = true;
-  },
-
-  [types.SEARCHED_WITH_API_ERROR](state) {
+  [types.RECEIVE_SEARCH_RESULTS_ERROR](state, message) {
     state.projectSearchResults = [];
     state.messages.noResults = false;
     state.messages.searchError = true;
-    state.messages.minimumQuery = false;
-  },
-
-  [types.SEARCHED_SUCCESSFULLY_WITH_RESULTS](state, results) {
-    state.projectSearchResults = results;
-    state.messages.noResults = false;
-    state.messages.searchError = false;
-    state.messages.minimumQuery = false;
-  },
-
-  [types.SEARCHED_SUCCESSFULLY_NO_RESULTS](state) {
-    state.projectSearchResults = [];
-    state.messages.noResults = true;
-    state.messages.searchError = false;
-    state.messages.minimumQuery = false;
+    state.messages.minimumQuery = message === 'minimumQuery';
+    state.searchCount -= 1;
   },
 };

@@ -120,11 +120,11 @@ export const requestProjects = ({ commit }) => {
 };
 
 export const receiveProjectsSuccess = ({ commit }, data) => {
-  commit(types.SET_PROJECTS, data.projects);
+  commit(types.RECEIVE_PROJECTS_SUCCESS, data.projects);
 };
 
 export const receiveProjectsError = ({ commit }) => {
-  commit(types.SET_PROJECTS, null);
+  commit(types.RECEIVE_PROJECTS_ERROR);
   createFlash(__('Something went wrong, unable to get operations projects'));
 };
 
@@ -135,53 +135,36 @@ export const removeProject = ({ dispatch }, removePath) => {
     .catch(() => dispatch('receiveRemoveProjectError'));
 };
 
-export const receiveRemoveProjectSuccess = ({ dispatch }) => {
-  dispatch('fetchProjects');
-};
+export const receiveRemoveProjectSuccess = ({ dispatch }) => dispatch('fetchProjects');
 
 export const receiveRemoveProjectError = () => {
   createFlash(__('Something went wrong, unable to remove project'));
 };
 
-export const setSearchQuery = ({ commit }, query) => {
-  commit(types.SET_SEARCH_QUERY, query);
-};
+export const setSearchQuery = ({ commit }, query) => commit(types.SET_SEARCH_QUERY, query);
 
-export const fetchSearchResults = ({ commit, state, dispatch }) => {
+export const fetchSearchResults = ({ state, dispatch }) => {
+  dispatch('requestSearchResults');
+
   if (!state.searchQuery) {
-    commit(types.SEARCHED_WITH_NO_QUERY);
-  } else if (state.searchQuery.length < API_MINIMUM_QUERY_LENGTH) {
-    commit(types.SEARCHED_WITH_TOO_SHORT_QUERY);
+    dispatch('receiveSearchResultsError');
+  } else if (state.searchQuery.lengh < API_MINIMUM_QUERY_LENGTH) {
+    dispatch('receiveSearchResultsError', 'minimumQuery');
   } else {
-    commit(types.INCREMENT_PROJECT_SEARCH_COUNT, 1);
-
-    dispatch('requestSearchResults');
-
     Api.projects(state.searchQuery, {})
       .then(results => dispatch('receiveSearchResultsSuccess', results))
       .catch(() => dispatch('receiveSearchResultsError'));
   }
 };
 
-export const requestSearchResults = ({ commit }) => {
-  // Flipping this property separately to allows the UI
-  // to hide the "minimum query" message
-  // before the seach results arrive from the API
-  commit(types.SET_MESSAGE_MINIMUM_QUERY, false);
-};
+export const requestSearchResults = ({ commit }) => commit(types.REQUEST_SEARCH_RESULTS);
 
 export const receiveSearchResultsSuccess = ({ commit }, results) => {
-  if (results.length === 0) {
-    commit(types.SEARCHED_SUCCESSFULLY_NO_RESULTS);
-  } else {
-    commit(types.SEARCHED_SUCCESSFULLY_WITH_RESULTS, results);
-  }
-  return commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
+  commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, results);
 };
 
 export const receiveSearchResultsError = ({ commit }) => {
-  commit(types.SEARCHED_WITH_API_ERROR);
-  commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
+  commit(types.RECEIVE_SEARCH_RESULTS_ERROR);
 };
 
 export const setProjectEndpoints = ({ commit }, endpoints) => {

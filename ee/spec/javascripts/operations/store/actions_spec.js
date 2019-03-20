@@ -243,7 +243,7 @@ describe('actions', () => {
         store.state,
         [
           {
-            type: types.SET_PROJECTS,
+            type: types.RECEIVE_PROJECTS_SUCCESS,
             payload: mockProjects,
           },
         ],
@@ -264,8 +264,7 @@ describe('actions', () => {
         store.state,
         [
           {
-            type: types.SET_PROJECTS,
-            payload: null,
+            type: types.RECEIVE_PROJECTS_ERROR,
           },
         ],
         [],
@@ -313,7 +312,7 @@ describe('actions', () => {
         null,
         null,
         [],
-        [{ type: 'forceProjectsRequest' }],
+        [{ type: 'fetchProjects' }],
         done,
       );
     });
@@ -330,36 +329,42 @@ describe('actions', () => {
   });
 
   describe('fetchSearchResults', () => {
-    it('commits the SEARCHED_WITH_NO_QUERY if the search query was empty', done => {
+    it('dispatches an error if the search query was empty', done => {
       store.state.searchQuery = '';
 
       testAction(
         actions.fetchSearchResults,
         null,
         store.state,
+        [],
         [
           {
-            type: types.SEARCHED_WITH_NO_QUERY,
+            type: 'requestSearchResults',
+          },
+          {
+            type: 'receiveSearchResultsError',
           },
         ],
-        [],
         done,
       );
     });
 
-    it(`commits the SEARCHED_WITH_TOO_SHORT_QUERY type if the search query wasn't long enough`, done => {
+    it(`dispatches an error if the search query wasn't long enough`, done => {
       store.state.searchQuery = 'a';
 
       testAction(
         actions.fetchSearchResults,
         null,
         store.state,
+        [],
         [
           {
-            type: types.SEARCHED_WITH_TOO_SHORT_QUERY,
+            type: 'requestSearchResults',
+          },
+          {
+            type: 'receiveSearchResultsError',
           },
         ],
-        [],
         done,
       );
     });
@@ -372,12 +377,7 @@ describe('actions', () => {
         actions.fetchSearchResults,
         null,
         store.state,
-        [
-          {
-            type: types.INCREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
-        ],
+        [],
         [
           {
             type: 'requestSearchResults',
@@ -393,15 +393,14 @@ describe('actions', () => {
   });
 
   describe('requestSearchResults', () => {
-    it(`unsets the 'query is too short' warning status`, done => {
+    it(`commits the REQUEST_SEARCH_RESULTS mutation`, done => {
       testAction(
         actions.requestSearchResults,
         null,
         store.state,
         [
           {
-            type: types.SET_MESSAGE_MINIMUM_QUERY,
-            payload: false,
+            type: types.REQUEST_SEARCH_RESULTS,
           },
         ],
         [],
@@ -411,40 +410,15 @@ describe('actions', () => {
   });
 
   describe('receiveSearchResultsSuccess', () => {
-    it('sets project search results', done => {
+    it('commits the RECEIVE_SEARCH_RESULTS_SUCCESS mutation', done => {
       testAction(
         actions.receiveSearchResultsSuccess,
         mockProjects,
         store.state,
         [
           {
-            type: types.SEARCHED_SUCCESSFULLY_WITH_RESULTS,
+            type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
             payload: mockProjects,
-          },
-          {
-            type: types.DECREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-
-    it('commits the SEARCHED_SUCCESSFULLY_NO_RESULTS type (among others) if the search returns with no results', done => {
-      store.state.searchQuery = 'mock-query';
-
-      testAction(
-        actions.receiveSearchResultsSuccess,
-        [],
-        store.state,
-        [
-          {
-            type: types.SEARCHED_SUCCESSFULLY_NO_RESULTS,
-          },
-          {
-            type: types.DECREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
           },
         ],
         [],
@@ -454,18 +428,14 @@ describe('actions', () => {
   });
 
   describe('receiveSearchResultsError', () => {
-    it('commits the SEARCHED_WITH_API_ERROR type (among others) if the search API returns an error code', done => {
+    it('commits the RECEIVE_SEARCH_RESULTS_ERROR mutation', done => {
       testAction(
         actions.receiveSearchResultsError,
         ['error'],
         store.state,
         [
           {
-            type: types.SEARCHED_WITH_API_ERROR,
-          },
-          {
-            type: types.DECREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
+            type: types.RECEIVE_SEARCH_RESULTS_ERROR,
           },
         ],
         [],
