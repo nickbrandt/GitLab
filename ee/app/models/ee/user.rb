@@ -70,21 +70,32 @@ module EE
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
+
+      enum bot_type: {
+        support_bot: 1
+      }
     end
 
     class_methods do
+      extend ::Gitlab::Utils::Override
+
       def support_bot
         email_pattern = "support%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(support_bot: true), 'support-bot', email_pattern) do |u|
+        unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
           u.bio = 'The GitLab support bot used for Service Desk'
           u.name = 'GitLab Support Bot'
         end
       end
 
-      # override
-      def internal_attributes
-        super + [:support_bot]
+      override :internal
+      def internal
+        super.or(where.not(bot_type: nil))
+      end
+
+      override :non_internal
+      def non_internal
+        super.where(bot_type: nil)
       end
 
       def non_ldap
@@ -222,6 +233,14 @@ module EE
       return false if group_managed_account?
 
       super
+    end
+
+    def internal?
+      super || bot?
+    end
+
+    def bot?
+      bot_type.present?
     end
 
     protected
