@@ -1,0 +1,5 @@
+---
+title: 'Elasticsearch API: Fix project_id showing as 0 for all blobs. A reindex will be required'
+merge_request: 10020
+author:
+type: fixed
