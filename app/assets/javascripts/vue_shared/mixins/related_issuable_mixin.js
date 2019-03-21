@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import { sprintf, __ } from '~/locale';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
@@ -83,6 +84,16 @@ const mixins = {
       required: false,
       default: false,
     },
+    isMergeRequest: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    pipelineStatus: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   components: {
     icon,
@@ -95,11 +106,17 @@ const mixins = {
     hasState() {
       return this.state && this.state.length > 0;
     },
+    hasPipeline() {
+      return this.isMergeRequest && this.pipelineStatus && Object.keys(this.pipelineStatus).length;
+    },
     isOpen() {
       return this.state === 'opened';
     },
     isClosed() {
       return this.state === 'closed';
+    },
+    isMerged() {
+      return this.state === 'merged';
     },
     hasTitle() {
       return this.title.length > 0;
@@ -108,9 +125,17 @@ const mixins = {
       return !_.isEmpty(this.milestone);
     },
     iconName() {
+      if (this.isMergeRequest && this.isMerged) {
+        return 'merge';
+      }
+
       return this.isOpen ? 'issue-open-m' : 'issue-close';
     },
     iconClass() {
+      if (this.isMergeRequest && this.isClosed) {
+        return 'merge-request-status closed issue-token-state-icon-closed';
+      }
+
       return this.isOpen ? 'issue-token-state-icon-open' : 'issue-token-state-icon-closed';
     },
     computedLinkElementType() {
@@ -136,6 +161,11 @@ const mixins = {
     },
     closedAtTimestamp() {
       return this.closedAt ? formatDate(new Date(this.closedAt)) : '';
+    },
+    pipelineStatusTooltip() {
+      return this.hasPipeline
+        ? sprintf(__('Pipeline: %{status}'), { status: this.pipelineStatus.label })
+        : '';
     },
   },
   methods: {
