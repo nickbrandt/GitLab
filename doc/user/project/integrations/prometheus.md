@@ -170,7 +170,7 @@ Once enabled, an issue will be opened automatically when an alert is triggered. 
 
 If the metric exceeds the threshold of the alert for over 5 minutes, an email will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
-NOTE: **Note:**
+**Note:**
 If you are running a self-managed instance, the new interface shown on
 this page will not be available unless the feature flag
 `incident_management` is enabled, which can be done from the Rails console by
