@@ -71,7 +71,7 @@ module Gitlab
         end
 
         def name
-          attribute_value(:name).first
+          attribute_value(:name)&.first
         end
 
         def uid
