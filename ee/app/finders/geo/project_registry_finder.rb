@@ -339,6 +339,7 @@ module Geo
       end
     end
 
+
     def registries_for_synced_projects(type)
       finder_klass_for_synced_registries
         .new(current_node: current_node, type: type)
