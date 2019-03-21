@@ -1,5 +1,0 @@
----
-title: Eliminate N+1 queries in Epics API
-merge_request: 9897
-author:
-type: performance

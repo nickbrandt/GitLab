@@ -1,5 +1,0 @@
----
-title: 'sidekiq-cluster: put each sidekiq in a new pgroup'
-merge_request: 9775
-author:
-type: other

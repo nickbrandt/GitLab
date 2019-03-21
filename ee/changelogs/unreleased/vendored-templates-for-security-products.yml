@@ -1,5 +1,0 @@
----
-title: Add vendored templates for SAST, DAST, Container Scanning and License Management job definitions
-merge_request: 9921
-author:
-type: added
