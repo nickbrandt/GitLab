@@ -6,6 +6,7 @@ describe API::Scim do
   let(:user) { create(:user) }
   let(:identity) { create(:group_saml_identity, user: user) }
   let(:group) { identity.saml_provider.group }
+  let(:scim_token) { create(:scim_oauth_access_token, group: group) }
 
   before do
     stub_licensed_features(group_saml: true)
@@ -14,15 +15,23 @@ describe API::Scim do
   end
 
   describe 'GET api/scim/v2/groups/:group/Users' do
+    context 'without token auth' do
+      it 'responds with 401' do
+        get scim_api("scim/v2/groups/#{group.full_path}/Users?filter=id eq \"#{identity.extern_uid}\"", token: false)
+
+        expect(response).to have_gitlab_http_status(401)
+      end
+    end
+
     it 'responds with an error if there is no filter' do
-      get api("scim/v2/groups/#{group.full_path}/Users", user, version: '')
+      get scim_api("scim/v2/groups/#{group.full_path}/Users")
 
       expect(response).to have_gitlab_http_status(409)
     end
 
     context 'existing user' do
       it 'responds with 200' do
-        get api("scim/v2/groups/#{group.full_path}/Users?filter=id eq \"#{identity.extern_uid}\"", user, version: '')
+        get scim_api("scim/v2/groups/#{group.full_path}/Users?filter=id eq \"#{identity.extern_uid}\"")
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['Resources']).not_to be_empty
@@ -32,7 +41,7 @@ describe API::Scim do
 
     context 'no user' do
       it 'responds with 200' do
-        get api("scim/v2/groups/#{group.full_path}/Users?filter=id eq \"nonexistent\"", user, version: '')
+        get scim_api("scim/v2/groups/#{group.full_path}/Users?filter=id eq \"nonexistent\"")
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['Resources']).to be_empty
@@ -43,14 +52,14 @@ describe API::Scim do
 
   describe 'GET api/scim/v2/groups/:group/Users/:id' do
     it 'responds with 404 if there is no user' do
-      get api("scim/v2/groups/#{group.full_path}/Users/123", user, version: '')
+      get scim_api("scim/v2/groups/#{group.full_path}/Users/123")
 
       expect(response).to have_gitlab_http_status(404)
     end
 
     context 'existing user' do
       it 'responds with 200' do
-        get api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}", user, version: '')
+        get scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['id']).to eq(identity.extern_uid)
@@ -60,7 +69,7 @@ describe API::Scim do
 
   describe 'PATCH api/scim/v2/groups/:group/Users/:id' do
     it 'responds with 404 if there is no user' do
-      patch api("scim/v2/groups/#{group.full_path}/Users/123", user, version: '')
+      patch scim_api("scim/v2/groups/#{group.full_path}/Users/123")
 
       expect(response).to have_gitlab_http_status(404)
     end
@@ -70,7 +79,7 @@ describe API::Scim do
         before do
           params = { Operations: [{ 'op': 'Replace', 'path': 'id', 'value': 'new_uid' }] }.to_query
 
-          patch api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}", user, version: '')
+          patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
         end
 
         it 'responds with 204' do
@@ -86,7 +95,7 @@ describe API::Scim do
         before do
           params = { Operations: [{ 'op': 'Replace', 'path': 'name.formatted', 'value': 'new_name' }] }.to_query
 
-          patch api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}", user, version: '')
+          patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
         end
 
         it 'responds with 204' do
@@ -102,7 +111,7 @@ describe API::Scim do
         before do
           params = { Operations: [{ 'op': 'Replace', 'path': 'active', 'value': 'False' }] }.to_query
 
-          patch api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}", user, version: '')
+          patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
         end
 
         it 'responds with 204' do
@@ -119,7 +128,7 @@ describe API::Scim do
   describe 'DELETE/scim/v2/groups/:group/Users/:id' do
     context 'existing user' do
       before do
-        delete api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}", user, version: '')
+        delete scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")
       end
 
       it 'responds with 204' do
@@ -132,9 +141,13 @@ describe API::Scim do
     end
 
     it 'responds with 404 if there is no user' do
-      delete api("scim/v2/groups/#{group.full_path}/Users/123", user, version: '')
+      delete scim_api("scim/v2/groups/#{group.full_path}/Users/123")
 
       expect(response).to have_gitlab_http_status(404)
     end
+  end
+
+  def scim_api(url, token: true)
+    api(url, user, version: '', oauth_access_token: token ? scim_token : nil)
   end
 end

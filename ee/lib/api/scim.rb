@@ -34,6 +34,20 @@ module API
           error!({ with: EE::Gitlab::Scim::Error }.merge(detail: message), 409)
         end
 
+        def find_and_authenticate_group!(group_path)
+          group = find_group(group_path)
+
+          scim_not_found!(message: "Group #{group_path} not found") unless group
+
+          token = Doorkeeper::OAuth::Token.from_request(current_request, *Doorkeeper.configuration.access_token_methods)
+          unauthorized! unless token
+
+          scim_token = ScimOauthAccessToken.token_matches_for_group?(token, group)
+          unauthorized! unless scim_token
+
+          group
+        end
+
         # rubocop: disable CodeReuse/ActiveRecord
         def email_taken?(email, identity)
           return unless email
@@ -53,7 +67,7 @@ module API
           detail 'This feature was introduced in GitLab 11.9.'
         end
         get do
-          group = find_group(params[:group])
+          group = find_and_authenticate_group!(params[:group])
 
           scim_error!(message: 'Missing filter params') unless params[:filter]
 
@@ -69,7 +83,7 @@ module API
           detail 'This feature was introduced in GitLab 11.9.'
         end
         get ':id' do
-          group = find_group(params[:group])
+          group = find_and_authenticate_group!(params[:group])
 
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: params[:id])
 
@@ -87,7 +101,7 @@ module API
         patch ':id' do
           scim_error!(message: 'Missing ID') unless params[:id]
 
-          group = find_group(params[:group])
+          group = find_and_authenticate_group!(params[:group])
 
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
           parsed_hash = parser.to_hash
@@ -125,7 +139,7 @@ module API
         delete ":id" do
           scim_error!(message: 'Missing ID') unless params[:id]
 
-          group = find_group(params[:group])
+          group = find_and_authenticate_group!(params[:group])
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: params[:id])
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless identity

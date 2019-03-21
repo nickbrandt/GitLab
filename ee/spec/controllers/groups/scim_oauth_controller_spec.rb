@@ -77,7 +77,7 @@ describe Groups::ScimOauthController do
           end
 
           it 'shows the url' do
-            expect(json_response['scim_api_url']).not_to be_empty
+            expect(json_response['scim_api_url']).to eq("http://localhost/groups/#{group.full_path}/-/scim_oauth")
           end
         end
       end
