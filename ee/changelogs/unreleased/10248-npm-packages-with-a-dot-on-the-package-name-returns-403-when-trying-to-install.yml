@@ -1,5 +1,0 @@
----
-title: Fix npm package install with a dot in the name
-merge_request: 9900
-author:
-type: fixed

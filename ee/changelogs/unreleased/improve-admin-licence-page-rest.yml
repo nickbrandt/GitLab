@@ -1,5 +1,0 @@
----
-title: Added GET /licenses and DELETE /license/:id endpoints
-merge_request: 9733
-author:
-type: added

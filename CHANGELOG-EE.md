@@ -1,5 +1,97 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.0 (2019-03-22)
+
+### Security (4 changes)
+
+- Prevent Group SAML authorizing sign in without prior user approval.
+- Respect group membership lock when importing a member from another group.
+- Remove the possibility to share a project with a group that a user is not a member of.
+- Prevent SAML access when disabled by group admin on GitLab.com.
+
+### Fixed (22 changes)
+
+- Allow assigning Prometheus alerts to multiple environments. !7361
+- Fix repo pushes while initial Elasticsearch indexing not permitting initial indexing to complete. !9478
+- Fix vulnerability occurrence scope to trailing 30 days. !9494
+- Skip whitelisted vulnerabilities in Container Scanning reports. !9528
+- Fix npm registry for yarn. !9599
+- Renders inline downstream & upstream pipelines. !9627
+- Prunes whole Geo event when there's only a primary. !9630
+- Fix alert notifications for non-public projects. !9636
+- Fix 500 error when visiting merged merge request. !9648
+- Allow plus symbol in maven package version. !9657
+- Show commands applied message when promoting issues to epics. !9669
+- Ensure comments from merge request review is displayed in the same order as user commenting order. !9684
+- Geo - Fix selective sync by namespace. !9732
+- Fix bridge jobs than can be hidden keys too. !9796
+- Fix approval-related UI showing up in free plan. !9819
+- Add 'No approvals required' view to approval rules (behind feature flag). !9899
+- Fix npm package install with a dot in the name. !9900
+- GroupSAML for GitLab.com prevents blank NameID. !9907
+- Fix protected environment initializer. !10150
+- Fix SSH pull mirrors not working. !10272
+- Fix HTML spew in Locked Files page.
+- Fixes Broken new/edit feature flag form.
+
+### Changed (9 changes, 1 of them is from the community)
+
+- Remove authorization from /managed_licenses. !8541
+- Consider dismissed items in security reports summary. !9275
+- Add backend for cross-project pipeline dashboard MVC. !9396
+- Create merge request approval rule for each code owner entry. !9455
+- Split severity and confidence values for vulnerabilities. !9495
+- Enforce Geo JWT tokens scope for file uploads and Geo API. !9502
+- Update cluster health empty state. !9540 (George Tsiolis)
+- Add extra graph spacing on the Security Dashboard Group Vulnerability Chart. !9780
+- Add Kerberos URL back to clone panel. !9840
+
+### Performance (1 change)
+
+- Eliminate N+1 queries in Epics API. !9897
+
+### Added (23 changes, 1 of them is from the community)
+
+- Enabled setting the Security Dashboard as a default view for groups. !7889
+- Add reordering of child epics. !9283
+- Create MR from Vulnerability Solution. !9326
+- Create pool repositories on Geo secondaries. !9428
+- Add date range for security dashboard graph. !9446
+- Add filtering merge requests by approvers. !9468
+- Add audit log for managing feature flags. !9487
+- Add DELETE package API endpoint. !9623
+- Enrich container scanning report. !9641
+- Adapt feedback for Container Scanning vulnerabilities. !9655
+- Enforce merge request approvals from code owners. !9656
+- Added vendored CI/CD template for Dependency Scanning job. !9660
+- Add Insights config behind the "group_insights" feature flag. !9665
+- Add single package API endpoint. !9667
+- Added GET /licenses and DELETE /license/:id endpoints. !9733
+- Add container scanning results to group security dashboard. !9736
+- Add an incident management settings form and create issues from alertmanager alerts. !9773
+- Add API for reordering child epics. !9781
+- Allow guests to comment on epics. !9783
+- Display Recent Boards in Board switcher. !9808
+- Add Ancestors in Epic Sidebar. !9817
+- Add vendored templates for SAST, DAST, Container Scanning and License Management job definitions. !9921
+- Add realtime validation for user fullname and username on validation. !25017 (Ehsan Abdulqader @EhsanZ)
+
+### Other (12 changes, 1 of them is from the community)
+
+- Use export-import svg from gitlab-svgs. !9453
+- Renames 'revert dismissal' to 'undo dismiss' on the Group security dashboard. !9500
+- Using positional arguments in request specs have been deprecated. !9506 (Jasper Maes)
+- Splits the severity and confidence constants in the group security dashboard frontend. !9535
+- Add Gitlab.com gold trial callout to /billings. !9611
+- Update project settings section titles and info. !9614
+- Improve visual consistency of values in vulnerability modal. !9616
+- Limit Group Security Dashboard to selected types of report. !9626
+- Make related issues components reusable. !9730
+- sidekiq-cluster: put each sidekiq in a new pgroup. !9775
+- License Management: Load up to a 100 licenses per default. !9913
+- Adds documentation for autoremediation. !10054
+
+
 ## 11.8.3 (2019-03-19)
 
 - No changes.
