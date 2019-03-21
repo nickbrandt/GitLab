@@ -51,9 +51,9 @@ describe MergeRequests::ApprovalService do
       end
 
       context 'with remaining approvals' do
-        it 'does not fire a webhook' do
+        it 'fires an approval webhook' do
           expect(merge_request).to receive(:approvals_left).and_return(5)
-          expect(service).not_to receive(:execute_hooks)
+          expect(service).to receive(:execute_hooks).with(merge_request, 'approval')
 
           service.execute(merge_request)
         end
@@ -75,7 +75,7 @@ describe MergeRequests::ApprovalService do
           allow(service).to receive(:notification_service).and_return(notification_service)
         end
 
-        it 'fires a webhook' do
+        it 'fires an approved webhook' do
           expect(service).to receive(:execute_hooks).with(merge_request, 'approved')
 
           service.execute(merge_request)

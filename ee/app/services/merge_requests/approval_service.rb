@@ -14,6 +14,8 @@ module MergeRequests
         if merge_request.approvals_left.zero?
           notification_service.async.approve_mr(merge_request, current_user)
           execute_hooks(merge_request, 'approved')
+        else
+          execute_hooks(merge_request, 'approval')
         end
       end
     end
