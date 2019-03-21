@@ -7572,6 +7572,9 @@ msgstr ""
 msgid "Pipeline|Commit"
 msgstr ""
 
+msgid "Pipeline|Coverage"
+msgstr ""
+
 msgid "Pipeline|Create for"
 msgstr ""
 
@@ -7617,7 +7620,19 @@ msgstr ""
 msgid "Pipeline|all"
 msgstr ""
 
+msgid "Pipeline|for"
+msgstr ""
+
+msgid "Pipeline|into"
+msgstr ""
+
+msgid "Pipeline|on"
+msgstr ""
+
 msgid "Pipeline|success"
+msgstr ""
+
+msgid "Pipeline|with"
 msgstr ""
 
 msgid "Pipeline|with stage"
