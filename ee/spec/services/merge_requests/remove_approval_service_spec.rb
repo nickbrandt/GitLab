@@ -35,6 +35,12 @@ describe MergeRequests::RemoveApprovalService do
         execute!
       end
 
+      it 'fires an unapproval webhook' do
+        expect(service).to receive(:execute_hooks).with(merge_request, 'unapproval')
+
+        execute!
+      end
+
       it 'does not send a notification' do
         expect(service).not_to receive(:notification_service)
 
@@ -54,6 +60,12 @@ describe MergeRequests::RemoveApprovalService do
       before do
         merge_request.approvals.create(user: user)
         allow(service).to receive(:notification_service).and_return(notification_service)
+      end
+
+      it 'fires an unapproved webhook' do
+        expect(service).to receive(:execute_hooks).with(merge_request, 'unapproved')
+
+        execute!
       end
 
       it 'sends a notification' do
