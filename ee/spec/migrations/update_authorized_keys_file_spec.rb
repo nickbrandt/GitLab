@@ -16,8 +16,6 @@ describe UpdateAuthorizedKeysFile, :migration do
       end
 
       it 'sets authorized_keys_enabled to true' do
-        FileUtils.touch(authorized_keys_file)
-
         migration.up
 
         expect(described_class::ApplicationSetting.last.authorized_keys_enabled).to be_truthy
