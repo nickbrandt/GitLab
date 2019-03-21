@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/86
-  context 'Geo', :orchestrated, :geo, :quarantine do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab HTTP push' do
       let(:file_name) { 'README.md' }
 
