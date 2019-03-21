@@ -3,5 +3,9 @@
   .provider-btn-group
     .provider-btn-image
       = _("SAML for %{group_name}") % { group_name: group.name }
-    = link_to unlink_group_saml_providers_path(group), method: :delete, class: 'provider-btn' do
-      Disconnect
+    - if unlink_provider_allowed?(identity.saml_provider)
+      = link_to unlink_group_saml_providers_path(group), method: :delete, class: 'provider-btn' do
+        = s_('Profiles|Disconnect')
+    - else
+      %a.provider-btn
+        = s_('Profiles|Active')

@@ -5,6 +5,10 @@ FactoryBot.modify do
     trait :auditor do
       auditor true
     end
+
+    trait :group_managed do
+      association :managing_group, factory: :group
+    end
   end
 
   factory :omniauth_user do

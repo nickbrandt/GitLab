@@ -380,16 +380,55 @@ describe EE::User do
   end
 
   describe '#group_managed_account?' do
+    subject { user.group_managed_account? }
+
     context 'when user has managing group linked' do
       before do
-        subject.managing_group = Group.new
+        user.managing_group = Group.new
       end
 
-      it { is_expected.to be_group_managed_account }
+      it { is_expected.to eq true }
     end
 
     context 'when user has no linked managing group' do
-      it { is_expected.not_to be_group_managed_account }
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe '#password_required?' do
+    context 'when user has managing group linked' do
+      before do
+        user.managing_group = Group.new
+      end
+
+      it 'does not require password to be present' do
+        expect(user).not_to validate_presence_of(:password)
+        expect(user).not_to validate_presence_of(:password_confirmation)
+      end
+    end
+  end
+
+  describe '#allow_password_authentication_for_web?' do
+    context 'when user has managing group linked' do
+      before do
+        user.managing_group = Group.new
+      end
+
+      it 'is false' do
+        expect(user.allow_password_authentication_for_web?).to eq false
+      end
+    end
+  end
+
+  describe '#allow_password_authentication_for_git?' do
+    context 'when user has managing group linked' do
+      before do
+        user.managing_group = Group.new
+      end
+
+      it 'is false' do
+        expect(user.allow_password_authentication_for_git?).to eq false
+      end
     end
   end
 end
