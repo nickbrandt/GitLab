@@ -8,9 +8,15 @@ class AddProjectCreationLevelToNamespaces < ActiveRecord::Migration[5.0]
 
   DOWNTIME = false
 
-  def change
+  def up
     unless column_exists?(:namespaces, :project_creation_level)
       add_column :namespaces, :project_creation_level, :integer
+    end
+  end
+
+  def down
+    unless column_exists?(:namespaces, :project_creation_level)
+      remove_column :namespaces, :project_creation_level, :integer
     end
   end
 end
