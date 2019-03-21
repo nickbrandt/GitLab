@@ -85,7 +85,7 @@ describe VisibleApprovableForRule do
     end
 
     context 'when committer is approver' do
-      let(:approver) { create(:user, email: resource.commits.first.committer_email) }
+      let(:approver) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
 
       it_behaves_like 'able to exclude authors'
     end

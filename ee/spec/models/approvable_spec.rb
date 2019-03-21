@@ -79,7 +79,7 @@ describe Approvable do
       end
 
       context 'when user is committer' do
-        let(:user) { create(:user, email: merge_request.commits.first.committer_email) }
+        let(:user) { create(:user, email: merge_request.commits.without_merge_commits.first.committer_email) }
 
         before do
           project.add_developer(user)
@@ -109,7 +109,7 @@ describe Approvable do
       end
 
       it 'returns false when user is a committer' do
-        user = create(:user, email: merge_request.commits.first.committer_email)
+        user = create(:user, email: merge_request.commits.without_merge_commits.first.committer_email)
         project.add_developer(user)
         create(:approver, target: merge_request, user: user)
 
