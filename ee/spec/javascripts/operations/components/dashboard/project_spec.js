@@ -19,9 +19,7 @@ describe('project component', () => {
       sync: false,
       store,
       localVue,
-      propsData: {
-        project: mockOneProject,
-      },
+      propsData: { project: mockOneProject },
     });
   });
 
@@ -39,18 +37,10 @@ describe('project component', () => {
     });
 
     describe('alerts', () => {
-      let alert;
-
-      beforeEach(() => {
-        alert = wrapper.find(Alerts);
-      });
-
       it('binds alert count to count', () => {
-        expect(alert.props('count')).toBe(mockOneProject.alert_count);
-      });
+        const alert = wrapper.find(Alerts);
 
-      it('binds last alert', () => {
-        expect(alert.props('lastAlert')).toEqual(mockOneProject.last_alert);
+        expect(alert.props('count')).toBe(mockOneProject.alert_count);
       });
     });
 
@@ -66,38 +56,38 @@ describe('project component', () => {
       });
 
       it('binds short_id to shortSha', () => {
-        expect(commit.props().shortSha).toBe(
-          wrapper.props().project.last_deployment.commit.short_id,
+        expect(commit.props('shortSha')).toBe(
+          wrapper.props().project.last_pipeline.commit.short_id,
         );
       });
 
       it('binds commitUrl', () => {
-        expect(commit.props().commitUrl).toBe(
-          wrapper.props().project.last_deployment.commit.commit_url,
+        expect(commit.props('commitUrl')).toBe(
+          wrapper.props().project.last_pipeline.commit.commit_url,
         );
       });
 
       it('binds title', () => {
-        expect(commit.props().title).toBe(wrapper.props().project.last_deployment.commit.title);
+        expect(commit.props('title')).toBe(wrapper.props().project.last_pipeline.commit.title);
       });
 
       it('binds author', () => {
-        expect(commit.props().author).toBe(wrapper.vm.author);
+        expect(commit.props('author')).toBe(wrapper.props().project.last_pipeline.commit.author);
       });
 
       it('binds tag', () => {
-        expect(commit.props().tag).toBe(wrapper.props().project.last_deployment.tag);
+        expect(commit.props('tag')).toBe(wrapper.props().project.last_pipeline.ref.tag);
       });
     });
 
-    describe('last deploy', () => {
-      it('renders calendar icon', () => {
-        expect(wrapper.contains('.js-dashboard-project-calendar-icon')).toBe(true);
+    describe('deploy finished at', () => {
+      it('renders clock icon', () => {
+        expect(wrapper.contains('.js-dashboard-project-clock-icon')).toBe(true);
       });
 
-      it('renders time ago of last deploy', () => {
+      it('renders time ago of finished time', () => {
         const timeago = '1 day ago';
-        const container = wrapper.element.querySelector('.js-project-container');
+        const container = wrapper.element.querySelector('.js-dashboard-project-time-ago');
 
         expect(container.innerText.trim()).toBe(timeago);
       });
