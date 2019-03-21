@@ -8,8 +8,8 @@ module EE
 
     def rollout_status(environment)
       result = with_reactive_cache do |data|
-        deployments = filter_by_label(data[:deployments], app: environment.slug)
-        pods = filter_by_label(data[:pods], app: environment.slug) if data[:pods]&.any?
+        deployments = filter_by_project_environment(data[:deployments], project.full_path_slug, environment.slug)
+        pods = filter_by_project_environment(data[:pods], project.full_path_slug, environment.slug) if data[:pods]&.any?
 
         ::Gitlab::Kubernetes::RolloutStatus.from_deployments(*deployments, pods: pods)
       end

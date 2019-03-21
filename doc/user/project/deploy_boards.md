@@ -73,15 +73,21 @@ To display the Deploy Boards for a specific [environment] you should:
 1. Configure the [Kubernetes service][kube-service] in your project for the
    cluster. The Kubernetes namespace is of particular note as you will need it
    for your deployment scripts (exposed by the `KUBE_NAMESPACE` env variable).
-1. Ensure a Kubernetes label of `app: $CI_ENVIRONMENT_SLUG` is applied to the
-   deployments, replica sets, and pods, where `$CI_ENVIRONMENT_SLUG` the value
-   of the CI variable. This is so we can lookup the proper environment in a
-   cluster/namespace which may have more than one. These resources should be
-   contained in the namespace defined in the Kubernetes service setting.
-   You can use an [Autodeploy] `.gitlab-ci.yml` template which has predefined
-   stages and commands to use, and automatically applies the labeling.
-   Each project will need to have a unique namespace in Kubernetes as well.
-   The image below demonstrates how this is shown inside Kubernetes.
+1. Ensure Kubernetes annotations of `app.gitlab.com/env: $CI_ENVIRONMENT_SLUG`
+   and `app.gitlab.com/app: $CI_PROJECT_PATH_SLUG` are applied to the
+   deployments, replica sets, and pods, where `$CI_ENVIRONMENT_SLUG` and
+   `$CI_PROJECT_PATH_SLUG` are the values of the CI variables. This is so we can
+   lookup the proper environment in a cluster/namespace which may have more
+   than one. These resources should be contained in the namespace defined in
+   the Kubernetes service setting. You can use an [Autodeploy] `.gitlab-ci.yml`
+   template which has predefined stages and commands to use, and automatically
+   applies the annotations. Each project will need to have a unique namespace in
+   Kubernetes as well. The image below demonstrates how this is shown inside
+   Kubernetes.
+
+   NOTE: **Note:**
+   The Kubernetes label of `app` is deprecated and will not be used for deploy
+   boards in the future.
 
     ![Deploy Boards Kubernetes Label](img/deploy_boards_kubernetes_label.png)
 
