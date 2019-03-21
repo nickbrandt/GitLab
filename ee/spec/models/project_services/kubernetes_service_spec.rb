@@ -13,17 +13,24 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
       subject(:rollout_status) { service.rollout_status(environment) }
 
       context 'with valid deployments' do
+        let(:matched_deployment) { kube_deployment(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+        let(:unmatched_deployment) { kube_deployment }
+        let(:matched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+        let(:unmatched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug, status: 'Pending') }
+
         before do
           stub_reactive_cache(
             service,
-            deployments: [kube_deployment(app: environment.slug), kube_deployment],
-            pods: [kube_pod(app: environment.slug), kube_pod(app: environment.slug, status: 'Pending')]
+            deployments: [matched_deployment, unmatched_deployment],
+            pods: [matched_pod, unmatched_pod]
           )
         end
 
         it 'creates a matching RolloutStatus' do
           expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
-          expect(rollout_status.deployments.map(&:labels)).to eq([{ 'app' => 'env-000000' }])
+          expect(rollout_status.deployments.map(&:annotations)).to eq([
+            { 'app.gitlab.com/app' => project.full_path_slug, 'app.gitlab.com/env' => 'env-000000' }
+          ])
         end
       end
 

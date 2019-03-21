@@ -20,6 +20,10 @@ module Gitlab
         metadata.fetch('labels', {})
       end
 
+      def annotations
+        metadata.fetch('annotations', {})
+      end
+
       def track
         labels.fetch('track', STABLE_TRACK_VALUE)
       end
