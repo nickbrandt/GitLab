@@ -111,48 +111,6 @@ module Geo
 
     protected
 
-    def finder_klass_for_synced_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncedFinder
-      else
-        Geo::LegacyProjectRegistrySyncedFinder
-      end
-    end
-
-    def registries_for_synced_projects(type)
-      finder_klass_for_synced_registries
-        .new(current_node: current_node, type: type)
-        .execute
-    end
-
-    def finder_klass_for_failed_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncFailedFinder
-      else
-        Geo::LegacyProjectRegistrySyncFailedFinder
-      end
-    end
-
-    def registries_for_failed_projects(type)
-      finder_klass_for_failed_registries
-        .new(current_node: current_node, type: type)
-        .execute
-    end
-
-    def finder_klass_for_verified_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryVerifiedFinder
-      else
-        Geo::LegacyProjectRegistryVerifiedFinder
-      end
-    end
-
-    def registries_for_verified_projects(type)
-      finder_klass_for_verified_registries
-        .new(current_node: current_node, type: type)
-        .execute
-    end
-
     def find_filtered_verification_failed_project_registries(type = nil)
       case type
       when 'repository'
@@ -369,6 +327,50 @@ module Geo
 
     def wiki_missing_on_primary_is_not_true
       Arel::Nodes::SqlLiteral.new("project_registry.wiki_missing_on_primary IS NOT TRUE")
+    end
+
+    private
+
+    def finder_klass_for_synced_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistrySyncedFinder
+      else
+        Geo::LegacyProjectRegistrySyncedFinder
+      end
+    end
+
+    def registries_for_synced_projects(type)
+      finder_klass_for_synced_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_failed_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistrySyncFailedFinder
+      else
+        Geo::LegacyProjectRegistrySyncFailedFinder
+      end
+    end
+
+    def registries_for_failed_projects(type)
+      finder_klass_for_failed_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_verified_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistryVerifiedFinder
+      else
+        Geo::LegacyProjectRegistryVerifiedFinder
+      end
+    end
+
+    def registries_for_verified_projects(type)
+      finder_klass_for_verified_registries
+        .new(current_node: current_node, type: type)
+        .execute
     end
   end
 end
