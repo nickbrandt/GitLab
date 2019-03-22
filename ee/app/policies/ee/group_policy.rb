@@ -26,6 +26,10 @@ module EE
         enable :admin_board
       end
 
+      rule { maintainer }.policy do
+        enable :create_jira_connect_subscription
+      end
+
       rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
 

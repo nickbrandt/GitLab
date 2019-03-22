@@ -12,7 +12,7 @@ class JiraConnect::AppDescriptorController < JiraConnect::ApplicationController
       name: "GitLab for Jira (#{Gitlab.config.gitlab.host})",
       description: 'Integrate commits, branches and merge requests from GitLab into Jira',
       key: "gitlab-jira-connect-#{Gitlab.config.gitlab.host}",
-      baseUrl: jira_connect_base_url,
+      baseUrl: jira_connect_base_url(protocol: 'https'),
       lifecycle: {
         installed: relative_to_base_path(jira_connect_events_installed_path),
         uninstalled: relative_to_base_path(jira_connect_events_uninstalled_path)
@@ -44,8 +44,11 @@ class JiraConnect::AppDescriptorController < JiraConnect::ApplicationController
           name: {
             value: 'GitLab Configuration'
           },
-          url: relative_to_base_path(jira_connect_configuration_path)
+          url: relative_to_base_path(jira_connect_subscriptions_path)
         }
+      },
+      apiMigrations: {
+        gdpr: true
       }
     }
   end

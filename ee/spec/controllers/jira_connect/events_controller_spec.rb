@@ -51,6 +51,16 @@ describe JiraConnect::EventsController do
         expect(installation.shared_secret).to eq('secret')
         expect(installation.base_url).to eq('https://test.atlassian.net')
       end
+
+      context 'client key already exists' do
+        it 'returns 422' do
+          create(:jira_connect_installation, client_key: '1234')
+
+          subject
+
+          expect(response).to have_gitlab_http_status(422)
+        end
+      end
     end
 
     describe '#uninstalled' do
