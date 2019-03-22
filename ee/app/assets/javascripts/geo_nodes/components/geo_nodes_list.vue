@@ -18,6 +18,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    geoTroubleshootingHelpPath: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>
@@ -31,6 +35,7 @@ export default {
       :primary-node="node.primary"
       :node-actions-allowed="nodeActionsAllowed"
       :node-edit-allowed="nodeEditAllowed"
+      :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
   </div>
 </template>

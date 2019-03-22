@@ -23,10 +23,67 @@ to help identify if something is wrong:
 
 ![Geo health check](img/geo_node_healthcheck.png)
 
-There is also an option to check the status of the **secondary** node by running a special rake task:
+If the UI is not working, or you are unable to log in, you can run the Geo
+health check manually to get this information as well as a few more details.
+This rake task can be run on an app node in the **primary** or **secondary**
+Geo nodes:
+
+```sh
+sudo gitlab-rake gitlab:geo:check
+```
+
+Example output:
+
+```
+Checking Geo ...
+
+GitLab Geo is available ... yes
+GitLab Geo is enabled ... yes
+GitLab Geo secondary database is correctly configured ... yes
+Using database streaming replication? ... yes
+GitLab Geo tracking database is configured to use Foreign Data Wrapper? ... yes
+GitLab Geo tracking database Foreign Data Wrapper schema is up-to-date? ... yes
+GitLab Geo HTTP(S) connectivity ...
+* Can connect to the primary node ... yes
+HTTP/HTTPS repository cloning is enabled ... yes
+Machine clock is synchronized ... yes
+Git user has default SSH configuration? ... yes
+OpenSSH configured to use AuthorizedKeysCommand ... yes
+GitLab configured to disable writing to authorized_keys file ... yes
+GitLab configured to store new projects in hashed storage? ... yes
+All projects are in hashed storage? ... yes
+
+Checking Geo ... Finished
+```
+
+Current sync information can be found manually by running this rake task on any
+**secondary** app node:
 
 ```sh
 sudo gitlab-rake geo:status
+```
+
+Example output:
+
+```
+http://secondary.example.com/
+-----------------------------------------------------
+                        GitLab Version: 11.8.1-ee
+                              Geo Role: Secondary
+                         Health Status: Healthy
+                          Repositories: 190/190 (100%)
+                 Verified Repositories: 190/190 (100%)
+                                 Wikis: 190/190 (100%)
+                        Verified Wikis: 190/190 (100%)
+                           LFS Objects: 35/35 (100%)
+                           Attachments: 528/528 (100%)
+                      CI job artifacts: 477/477 (100%)
+                  Repositories Checked: 0/190 (0%)
+                         Sync Settings: Full
+              Database replication lag: 0 seconds
+       Last event ID seen from primary: 2158 (about 2 minute ago)
+     Last event ID processed by cursor: 2158 (about 2 minute ago)
+                Last status report was: 4 minutes ago
 ```
 
 ## Is Postgres replication working?

@@ -11,6 +11,7 @@ const createComponent = () => {
     nodes: mockNodes,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    geoTroubleshootingHelpPath: '/foo/bar',
   });
 };
 
