@@ -79,7 +79,7 @@ module Projects
 
         next if old_tag_target == tag_target
 
-        GitTagPushService.new(
+        Git::TagPushService.new(
           project,
           current_user,
           {
