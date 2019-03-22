@@ -1,0 +1,5 @@
+---
+title: Enforce Geo JWT tokens scope for repository sync
+merge_request: 10303
+author:
+type: changed
