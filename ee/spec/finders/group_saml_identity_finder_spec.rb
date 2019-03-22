@@ -21,10 +21,6 @@ describe GroupSamlIdentityFinder do
 
       expect(described_class.find_by_group_and_uid(group: group, uid: identity.extern_uid)).to eq(nil)
     end
-
-    it "returns nil when group is nil" do
-      expect(described_class.find_by_group_and_uid(group: nil, uid: identity.extern_uid)).to eq(nil)
-    end
   end
 
   describe "#find_linked" do
