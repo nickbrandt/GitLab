@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { mapActions } from 'vuex';
 
 import Translate from '~/vue_shared/translate';
 
@@ -9,6 +10,7 @@ import { PRESET_TYPES, EPIC_DETAILS_CELL_WIDTH } from './constants';
 
 import { getTimeframeForPreset, getEpicsPathForPreset } from './utils/roadmap_utils';
 
+import createStore from './store';
 import RoadmapStore from './store/roadmap_store';
 import RoadmapService from './service/roadmap_service';
 
@@ -36,6 +38,7 @@ export default () => {
 
   return new Vue({
     el,
+    store: createStore(),
     components: {
       roadmapApp,
     },
@@ -82,7 +85,23 @@ export default () => {
         epicsState: dataset.epicsState,
         newEpicEndpoint: dataset.newEpicEndpoint,
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
+
+        // Part of Vuex Store
+        currentGroupId: parseInt(dataset.groupId, 0),
+        sortedBy: dataset.sortedBy,
+        timeframe,
       };
+    },
+    created() {
+      this.setInitialData({
+        currentGroupId: this.currentGroupId,
+        sortedBy: this.sortedBy,
+        presetType: this.presetType,
+        timeframe: this.timeframe,
+      });
+    },
+    methods: {
+      ...mapActions(['setInitialData']),
     },
     render(createElement) {
       return createElement('roadmap-app', {
