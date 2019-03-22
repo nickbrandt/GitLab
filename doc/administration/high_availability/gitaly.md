@@ -56,7 +56,6 @@ Omnibus:
     pgbouncer_exporter['enable'] = false
     redis_exporter['enable'] = false
     gitlab_monitor['enable'] = false
-    gitaly['enable'] = false 
 
     # Prevent database connections during 'gitlab-ctl reconfigure'
     gitlab_rails['rake_cache_clear'] = false
