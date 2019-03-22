@@ -189,6 +189,7 @@ describe('Epic Store Mutations', () => {
       expect(state.epicStartDateSaveInProgress).toBe(false);
       expect(state.startDateIsFixed).toBe(startDateIsFixed);
       expect(state.startDate).toBe(startDate);
+      expect(state.startDateFixed).toBe(startDate);
     });
 
     it('Should set `epicDueDateSaveInProgress` flag on state to `false` and set `dueDateIsFixed` & `dueDate` values based on provided `dateTypeIsFixed` & `newDate` params when `dateType` param is `due`', () => {
@@ -205,6 +206,35 @@ describe('Epic Store Mutations', () => {
       expect(state.epicDueDateSaveInProgress).toBe(false);
       expect(state.dueDateIsFixed).toBe(dueDateIsFixed);
       expect(state.dueDate).toBe(dueDate);
+      expect(state.dueDateFixed).toBe(dueDate);
+    });
+
+    it('Should not set `startDateFixed` on state when date changed is not of type fixed', () => {
+      const startDateIsFixed = false;
+      const startDate = '2018-1-1';
+      const state = {};
+
+      mutations[types.REQUEST_EPIC_DATE_SAVE_SUCCESS](state, {
+        dateType: dateTypes.start,
+        dateTypeIsFixed: startDateIsFixed,
+        newDate: startDate,
+      });
+
+      expect(state.startDateFixed).toBeUndefined();
+    });
+
+    it('Should not set `dueDateFixed` on state when date changed is not of type fixed', () => {
+      const dueDateIsFixed = false;
+      const dueDate = '2018-1-1';
+      const state = {};
+
+      mutations[types.REQUEST_EPIC_DATE_SAVE_SUCCESS](state, {
+        dateType: dateTypes.due,
+        dateTypeIsFixed: dueDateIsFixed,
+        newDate: dueDate,
+      });
+
+      expect(state.dueDateFixed).toBeUndefined();
     });
   });
 
