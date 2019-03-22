@@ -1,13 +1,14 @@
 # GitLab CI/CD for external repositories **[PREMIUM]**
 
 NOTE: **Note:**
-To [promote its release](https://about.gitlab.com/2018/03/22/gitlab-10-6-released/#gitlab-cicd-for-external-repos), GitLab.com users are receiving this feature for free through March 22, 2019.
+This feature [is available for free](https://about.gitlab.com/2019/03/21/six-more-months-ci-cd-github/) to
+GitLab.com users until September 22nd, 2019.
 
 >[Introduced][ee-4642] in [GitLab Premium][eep] 10.6.
 
 GitLab CI/CD can be used with GitHub or any other Git server.
 Instead of moving your entire project to GitLab, you can connect your
-external repository to get the benefits of GitLab CI/CD. 
+external repository to get the benefits of GitLab CI/CD.
 
 - [GitHub](github_integration.md)
 - [Bitbucket Cloud](bitbucket_integration.md)
