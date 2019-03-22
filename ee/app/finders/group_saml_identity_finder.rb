@@ -3,9 +3,13 @@
 class GroupSamlIdentityFinder
   attr_reader :user
 
+  # rubocop: disable CodeReuse/ActiveRecord
   def self.find_by_group_and_uid(group:, uid:)
-    group&.saml_provider&.identities&.find_by(extern_uid: uid)
+    return unless group.saml_provider
+
+    group.saml_provider.identities.find_by(extern_uid: uid)
   end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def initialize(user:)
     @user = user

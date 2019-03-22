@@ -48,12 +48,12 @@ module EE
         def process_filter(hash)
           return unless @filter
 
-          attribute, operator, value = @filter.split
+          attribute, operator, value = @filter.split(' ')
 
           return unless FILTER_OPERATORS.include?(operator)
           return unless ATTRIBUTE_MAP[attribute]
 
-          hash[ATTRIBUTE_MAP[attribute]] = coerce(value.tr('\"', ''))
+          hash[ATTRIBUTE_MAP[attribute]] = coerce(value.delete('\"'))
         end
 
         def process_operations(hash)

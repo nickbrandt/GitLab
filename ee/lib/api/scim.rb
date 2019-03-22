@@ -49,10 +49,31 @@ module API
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
+        def update_scim_user(identity)
+          parser = EE::Gitlab::Scim::ParamsParser.new(params)
+          parsed_hash = parser.to_hash
+
+          if parser.deprovision_user?
+            destroy_identity(identity)
+          elsif parsed_hash[:extern_uid]
+            identity.update(parsed_hash.slice(:extern_uid))
+          else
+            scim_error!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
+
+            result = ::Users::UpdateService.new(identity.user,
+                                                parsed_hash.except(:extern_uid, :provider)
+                                                  .merge(user: identity.user)).execute
+
+            result[:status] == :success
+          end
+        end
+        # rubocop: enable CodeReuse/ActiveRecord
+
+        # rubocop: disable CodeReuse/ActiveRecord
         def email_taken?(email, identity)
           return unless email
 
-          User.by_any_email(email.downcase).where.not(id: identity.user.id).count > 0
+          User.by_any_email(email.downcase).where.not(id: identity.user.id).exists?
         end
         # rubocop: enable CodeReuse/ActiveRecord
       end
@@ -64,7 +85,7 @@ module API
         end
 
         desc 'Get SAML users' do
-          detail 'This feature was introduced in GitLab 11.9.'
+          detail 'This feature was introduced in GitLab 11.10.'
         end
         get do
           group = find_and_authenticate_group!(params[:group])
@@ -80,7 +101,7 @@ module API
         end
 
         desc 'Get a SAML user' do
-          detail 'This feature was introduced in GitLab 11.9.'
+          detail 'This feature was introduced in GitLab 11.10.'
         end
         get ':id' do
           group = find_and_authenticate_group!(params[:group])
@@ -93,48 +114,30 @@ module API
 
           present identity, with: ::EE::Gitlab::Scim::User
         end
-
-        # rubocop: disable CodeReuse/ActiveRecord
         desc 'Updates a SAML user' do
-          detail 'This feature was introduced in GitLab 11.9.'
+          detail 'This feature was introduced in GitLab 11.10.'
         end
         patch ':id' do
           scim_error!(message: 'Missing ID') unless params[:id]
 
           group = find_and_authenticate_group!(params[:group])
-
-          parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          parsed_hash = parser.to_hash
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: params[:id])
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless identity
 
-          updated = if parser.deprovision_user?
-                      destroy_identity(identity)
-                    elsif parsed_hash[:extern_uid]
-                      identity.update(parsed_hash.slice(:extern_uid))
-                    else
-                      scim_error!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
-
-                      result = ::Users::UpdateService.new(identity.user,
-                                                          parsed_hash.except(:extern_uid, :provider)
-                                                            .merge(user: identity.user)).execute
-
-                      result[:status] == :success
-                    end
+          updated = update_scim_user(identity)
 
           if updated
             status 204
 
             {}
           else
-            scim_error!(message: "Error updating #{identity.user.name} with #{parsed_hash.inspect}")
+            scim_error!(message: "Error updating #{identity.user.name} with #{params.inspect}")
           end
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         desc 'Removes a SAML user' do
-          detail 'This feature was introduced in GitLab 11.9.'
+          detail 'This feature was introduced in GitLab 11.10.'
         end
         delete ":id" do
           scim_error!(message: 'Missing ID') unless params[:id]
@@ -144,9 +147,9 @@ module API
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless identity
 
-          status 204
-
           scim_not_found!(message: "Resource #{params[:id]} not found") unless destroy_identity(identity)
+
+          status 204
 
           {}
         end
