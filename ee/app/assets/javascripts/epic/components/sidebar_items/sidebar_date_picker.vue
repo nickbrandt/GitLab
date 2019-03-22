@@ -246,8 +246,8 @@ export default {
               css-classes="date-warning-icon append-right-5 prepend-left-5"
               tab-index="0"
             />
-            <span v-if="selectedAndEditable" class="no-value">
-              &nbsp;&ndash;
+            <span v-if="selectedAndEditable" class="no-value d-flex">
+              &nbsp;&ndash;&nbsp;
               <gl-button
                 variant="link"
                 class="btn-sidebar-date-remove"
