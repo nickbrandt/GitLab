@@ -34,6 +34,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    geoTroubleshootingHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -213,6 +217,7 @@ export default {
       :primary-node="node.primary"
       :node-actions-allowed="nodeActionsAllowed"
       :node-edit-allowed="nodeEditAllowed"
+      :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
     <deprecated-modal
       v-show="showModal"

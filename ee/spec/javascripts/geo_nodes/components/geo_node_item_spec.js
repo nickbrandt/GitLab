@@ -13,6 +13,7 @@ const createComponent = (node = mockNode) => {
     primaryNode: true,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    geoTroubleshootingHelpPath: '/foo/bar',
   });
 };
 
@@ -147,8 +148,11 @@ describe('GeoNodeItemComponent', () => {
       vm.isNodeDetailsFailed = true;
       vm.errorMessage = err;
       Vue.nextTick(() => {
-        expect(vm.$el.querySelectorAll('p.health-message').length).not.toBe(0);
-        expect(vm.$el.querySelector('p.health-message').innerText.trim()).toBe(err);
+        expect(vm.$el.querySelectorAll('p.node-health-message').length).not.toBe(0);
+        expect(vm.$el.querySelector('p.node-health-message').innerText.trim()).toContain(err);
+        expect(vm.$el.querySelector('p.node-health-message a').getAttribute('href')).toBe(
+          '/foo/bar',
+        );
         done();
       });
     });

@@ -24,9 +24,10 @@ export default () => {
     },
     data() {
       const { dataset } = this.$options.el;
+      const { primaryVersion, primaryRevision, geoTroubleshootingHelpPath } = dataset;
       const nodeActionsAllowed = parseBoolean(dataset.nodeActionsAllowed);
       const nodeEditAllowed = parseBoolean(dataset.nodeEditAllowed);
-      const store = new GeoNodesStore(dataset.primaryVersion, dataset.primaryRevision);
+      const store = new GeoNodesStore(primaryVersion, primaryRevision);
       const service = new GeoNodesService();
 
       return {
@@ -34,6 +35,7 @@ export default () => {
         service,
         nodeActionsAllowed,
         nodeEditAllowed,
+        geoTroubleshootingHelpPath,
       };
     },
     render(createElement) {
@@ -43,6 +45,7 @@ export default () => {
           service: this.service,
           nodeActionsAllowed: this.nodeActionsAllowed,
           nodeEditAllowed: this.nodeEditAllowed,
+          geoTroubleshootingHelpPath: this.geoTroubleshootingHelpPath,
         },
       });
     },

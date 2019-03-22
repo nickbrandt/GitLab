@@ -1,4 +1,6 @@
 <script>
+import { GlLink } from '@gitlab/ui';
+
 import eventHub from '../event_hub';
 
 import GeoNodeHeader from './geo_node_header.vue';
@@ -6,6 +8,7 @@ import GeoNodeDetails from './geo_node_details.vue';
 
 export default {
   components: {
+    GlLink,
     GeoNodeHeader,
     GeoNodeDetails,
   },
@@ -24,6 +27,10 @@ export default {
     },
     nodeEditAllowed: {
       type: Boolean,
+      required: true,
+    },
+    geoTroubleshootingHelpPath: {
+      type: String,
       required: true,
     },
   },
@@ -84,9 +91,15 @@ export default {
       :node-details="nodeDetails"
       :node-edit-allowed="nodeEditAllowed"
       :node-actions-allowed="nodeActionsAllowed"
+      :geo-troubleshooting-help-path="geoTroubleshootingHelpPath"
     />
     <div v-if="isNodeDetailsFailed" class="node-health-message-container">
-      <p class="health-message node-health-message">{{ errorMessage }}</p>
+      <p class="node-health-message">
+        {{ errorMessage
+        }}<gl-link :href="geoTroubleshootingHelpPath">{{
+          s__('Geo|Please refer to Geo Troubleshooting.')
+        }}</gl-link>
+      </p>
     </div>
   </div>
 </template>
