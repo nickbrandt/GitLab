@@ -1,9 +1,9 @@
 # SAML SSO for GitLab.com Groups
 
-> Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 11.0.
+> Introduced in [GitLab Silver](https://about.gitlab.com/pricing/) 11.0.
 
 NOTE: **Note:**
-This topic is for SAML on GitLab.com. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
+This topic is for SAML on GitLab.com Silver tier and above. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
 
 Currently SAML on GitLab.com can be used to automatically add users to a group, and does not yet sign users into GitLab.com. Users should already have an account on the GitLab instance, or can create one when logging in for the first time.
 
