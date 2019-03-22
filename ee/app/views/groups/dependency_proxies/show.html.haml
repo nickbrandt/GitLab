@@ -1,0 +1,20 @@
+- page_title "Dependency Proxy"
+
+%h3 Dependency proxy for container registries
+
+- if can?(current_user, :admin_group, @group)
+  = form_for(@dependency_proxy, method: :put, url: group_dependency_proxy_path(@group)) do |f|
+    .form-check
+      = f.check_box :enabled, class: 'form-check-input'
+      = f.label :enabled, class: 'form-check-label' do
+        %span Enabled?
+    = f.submit 'Save', class: 'btn btn-success'
+
+- if @dependency_proxy.enabled
+  %h5 Dependency proxy URL
+
+  %div
+    = text_field_tag :url, "#{group_url(@group)}/dependency_proxy/containers", class: 'form-control', readonly: true
+
+  .help-block.prepend-top-5
+    Contains #{@blobs_count} blobs of images (#{number_to_human_size(@blobs_total_size)})
