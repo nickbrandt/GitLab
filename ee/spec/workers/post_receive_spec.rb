@@ -23,7 +23,7 @@ describe PostReceive do
         # silence hooks so we can isolate
         allow_any_instance_of(Key).to receive(:post_create_hook).and_return(true)
         allow_any_instance_of(Git::TagPushService).to receive(:execute).and_return(true)
-        allow_any_instance_of(GitPushService).to receive(:execute).and_return(true)
+        allow_any_instance_of(Git::BranchPushService).to receive(:execute).and_return(true)
       end
 
       it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do

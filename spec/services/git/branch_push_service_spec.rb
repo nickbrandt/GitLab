@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GitPushService do
+describe Git::BranchPushService, services: true do
   include RepoHelpers
 
   set(:user)     { create(:user) }
@@ -203,28 +203,6 @@ describe GitPushService do
     end
   end
 
-  describe "ES indexing" do
-    before do
-      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    end
-
-    after do
-      stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
-    end
-
-    it "does not trigger indexer when push to non-default branch" do
-      expect_any_instance_of(Gitlab::Elastic::Indexer).not_to receive(:run)
-
-      execute_service(project, user, oldrev, newrev, 'refs/heads/other')
-    end
-
-    it "triggers indexer when push to default branch" do
-      expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
-
-      execute_service(project, user, oldrev, newrev, ref)
-    end
-  end
-
   describe "Push Event" do
     context "with an existing branch" do
       let!(:push_data) { push_data_from_service(project, user, oldrev, newrev, ref) }
@@ -346,8 +324,7 @@ describe GitPushService do
       it "when pushing a branch for the first time with an existing branch permission configured" do
         stub_application_setting(default_branch_protection: Gitlab::Access::PROTECTION_DEV_CAN_PUSH)
 
-        create(:protected_branch, :no_one_can_push, :developers_can_merge,
-               project: project, name: 'master')
+        create(:protected_branch, :no_one_can_push, :developers_can_merge, project: project, name: 'master')
         expect(project).to receive(:execute_hooks)
         expect(project.default_branch).to eq("master")
         expect_any_instance_of(ProtectedBranches::CreateService).not_to receive(:execute)

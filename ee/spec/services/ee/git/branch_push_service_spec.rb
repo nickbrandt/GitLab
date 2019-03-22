@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GitPushService do
+describe Git::BranchPushService do
   include RepoHelpers
 
   set(:user)     { create(:user) }
@@ -53,6 +53,24 @@ describe GitPushService do
 
         subject.execute
       end
+
+      it "does not trigger indexer when push to non-default branch" do
+        expect_any_instance_of(Gitlab::Elastic::Indexer).not_to receive(:run)
+
+        execute_service(project, user, oldrev, newrev, 'refs/heads/other')
+      end
+
+      it "triggers indexer when push to default branch" do
+        expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
+
+        execute_service(project, user, oldrev, newrev, ref)
+      end
     end
+  end
+
+  def execute_service(project, user, oldrev, newrev, ref)
+    service = described_class.new(project, user, oldrev: oldrev, newrev: newrev, ref: ref)
+    service.execute
+    service
   end
 end
