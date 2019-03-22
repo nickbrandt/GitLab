@@ -58,10 +58,18 @@ export default {
       state.epicStartDateSaveInProgress = false;
       state.startDateIsFixed = dateTypeIsFixed;
       state.startDate = newDate;
+
+      if (dateTypeIsFixed) {
+        state.startDateFixed = newDate;
+      }
     } else {
       state.epicDueDateSaveInProgress = false;
       state.dueDateIsFixed = dateTypeIsFixed;
       state.dueDate = newDate;
+
+      if (dateTypeIsFixed) {
+        state.dueDateFixed = newDate;
+      }
     }
   },
   [types.REQUEST_EPIC_DATE_SAVE_FAILURE](state, { dateType, dateTypeIsFixed }) {

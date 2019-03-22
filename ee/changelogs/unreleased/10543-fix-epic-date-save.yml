@@ -1,0 +1,5 @@
+---
+title: Fix date save for Epic to reflect on UI immediately after save
+merge_request: 10321
+author:
+type: fixed
