@@ -34,8 +34,11 @@ module QA
 
           geo_project_renamed = "geo-after-rename-#{SecureRandom.hex(8)}"
           Page::Project::Settings::Main.perform do |settings|
+            settings.rename_project_to(geo_project_renamed)
+            expect(page).to have_content "Project '#{geo_project_renamed}' was successfully updated."
+
             settings.expand_advanced_settings do |page|
-              page.rename_to(geo_project_renamed)
+              page.update_project_path_to(geo_project_renamed)
             end
           end
 

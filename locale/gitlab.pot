@@ -2103,9 +2103,6 @@ msgstr ""
 msgid "Choose between <code>clone</code> or <code>fetch</code> to get the recent application code"
 msgstr ""
 
-msgid "Choose file..."
-msgstr ""
-
 msgid "Choose file…"
 msgstr ""
 
@@ -2241,12 +2238,9 @@ msgstr ""
 msgid "CiVariable|Validation failed"
 msgstr ""
 
-<<<<<<< HEAD
-=======
 msgid "Classification Label (optional)"
 msgstr ""
 
->>>>>>> Improve project settings page
 msgid "ClassificationLabelUnavailable|is unavailable: %{reason}"
 msgstr ""
 
@@ -3452,12 +3446,9 @@ msgstr ""
 msgid "Default classification label"
 msgstr ""
 
-<<<<<<< HEAD
-=======
 msgid "Default description template for issues"
 msgstr ""
 
->>>>>>> Improve project settings page
 msgid "Default first day of the week"
 msgstr ""
 
@@ -3847,11 +3838,10 @@ msgstr ""
 msgid "Download asset"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Download license"
-=======
 msgid "Download export"
->>>>>>> Improve project settings page
+msgstr ""
+
+msgid "Download license"
 msgstr ""
 
 msgid "Download source code"
@@ -4508,12 +4498,6 @@ msgstr ""
 msgid "External authorization request timeout"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "ExternalAuthorizationService|Classification Label"
-msgstr ""
-
-=======
->>>>>>> Improve project settings page
 msgid "ExternalAuthorizationService|Classification label"
 msgstr ""
 
@@ -8608,9 +8592,6 @@ msgstr ""
 msgid "Project avatar"
 msgstr ""
 
-msgid "Project avatar in repository: %{link}"
-msgstr ""
-
 msgid "Project configuration, including services"
 msgstr ""
 
@@ -9183,11 +9164,10 @@ msgstr ""
 msgid "Removing group will cause all child projects and resources to be removed."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Removing license…"
-=======
+msgstr ""
+
 msgid "Removing the project will delete its repository and all related resources including issues, merge requests etc."
->>>>>>> Improve project settings page
 msgstr ""
 
 msgid "Rename"

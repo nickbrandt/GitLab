@@ -3,7 +3,7 @@
   %section.settings.issues-feature.no-animate#js-issue-settings{ class: [('expanded' if expanded), ('hidden' if @project.project_feature.send(:issues_access_level) == 0)] }
     .settings-header
       %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only= _('Default issue template')
-      %button.btn.btn-default.js-settings-toggle{ type: 'button' }= expanded ? _('Collapse') : _('Expand')
+      %button.btn.btn-default.js-settings-toggle= expanded ? _('Collapse') : _('Expand')
       %p= _('Set a default template for issue descriptions.')
 
     .settings-content
