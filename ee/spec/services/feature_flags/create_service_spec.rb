@@ -55,22 +55,6 @@ describe FeatureFlags::CreateService do
         expect { subject }.to change { AuditEvent.count }.by(1)
         expect(AuditEvent.last.present.action).to eq(expected_message)
       end
-
-      context 'when feature flag audit is disabled' do
-        before do
-          stub_feature_flags(feature_flag_audit: false)
-        end
-
-        it { expect(subject[:status]).to eq(:success) }
-
-        it 'creates feature flag' do
-          expect { subject }.to change { Operations::FeatureFlag.count }.by(1)
-        end
-
-        it 'does not create audit log' do
-          expect { subject }.not_to change { AuditEvent.count }
-        end
-      end
     end
   end
 end

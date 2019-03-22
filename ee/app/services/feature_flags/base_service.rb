@@ -6,13 +6,7 @@ module FeatureFlags
 
     protected
 
-    def audit_enabled?
-      Feature.enabled?(:feature_flag_audit, project, default_enabled: true)
-    end
-
     def audit_event(feature_flag)
-      return unless audit_enabled?
-
       message = audit_message(feature_flag)
 
       return if message.blank?
@@ -33,7 +27,7 @@ module FeatureFlags
     end
 
     def save_audit_event(audit_event)
-      return unless audit_event # feature_flag_audit is disabled or audit_message is blank
+      return unless audit_event
 
       audit_event.security_event
     end
