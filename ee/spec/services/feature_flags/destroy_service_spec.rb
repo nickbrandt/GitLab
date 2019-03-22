@@ -24,20 +24,6 @@ describe FeatureFlags::DestroyService do
       expect(audit_event_message).to eq("Deleted feature flag <strong>#{feature_flag.name.tr('_', ' ')}</strong>.")
     end
 
-    context 'when feature flag audit is disabled' do
-      before do
-        stub_feature_flags(feature_flag_audit: false)
-      end
-
-      it 'works successfully' do
-        expect(subject[:status]).to eq(:success)
-      end
-
-      it 'does not create audit event' do
-        expect { subject }.not_to change { AuditEvent.count }
-      end
-    end
-
     context 'when feature flag can not be destroyed' do
       before do
         allow(feature_flag).to receive(:destroy).and_return(false)
