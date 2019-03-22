@@ -9,20 +9,6 @@ module EE
         helpers do
           extend ::Gitlab::Utils::Override
 
-          params :optional_filter_params_ee do
-            optional :wiki_checksum_failed, type: Grape::API::Boolean, default: false, desc: 'Limit by projects where wiki checksum is failed'
-            optional :repository_checksum_failed, type: Grape::API::Boolean, default: false, desc: 'Limit by projects where repository checksum is failed'
-          end
-
-          params :optional_update_params_ee do
-            optional :mirror_user_id, type: Integer, desc: 'User responsible for all the activity surrounding a pull mirror event'
-            optional :only_mirror_protected_branches, type: Grape::API::Boolean, desc: 'Only mirror protected branches'
-            optional :mirror_overwrites_diverged_branches, type: Grape::API::Boolean, desc: 'Pull mirror overwrites diverged branches'
-            optional :import_url, type: String, desc: 'URL from which the project is imported'
-            optional :packages_enabled, type: Grape::API::Boolean, desc: 'Enable project packages feature'
-            optional :fallback_approvals_required, type: Integer, desc: 'Overall approvals required when no rule is present'
-          end
-
           def apply_filters(projects)
             projects = super(projects)
             projects = projects.verification_failed_wikis if params[:wiki_checksum_failed]
@@ -55,22 +41,6 @@ module EE
               attrs.delete(:import_data_attributes)
             end
           end
-        end
-      end
-
-      class_methods do
-        extend ::Gitlab::Utils::Override
-
-        override :update_params_at_least_one_of
-        def update_params_at_least_one_of
-          super.concat [
-            :approvals_before_merge,
-            :repository_storage,
-            :external_authorization_classification_label,
-            :import_url,
-            :packages_enabled,
-            :fallback_approvals_required
-          ]
         end
       end
     end
