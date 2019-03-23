@@ -48,7 +48,7 @@ describe 'Update Epic', :js do
 
         page.within('.detail-page-description') do
           click_button('Preview')
-          expect(find('.md-preview')).to have_content('New epic description')
+          expect(find('.md-preview-holder')).to have_content('New epic description')
         end
 
         click_button 'Save changes'
@@ -100,7 +100,7 @@ describe 'Update Epic', :js do
           click_button('Preview')
           wait_for_requests
 
-          within('.md-preview') do
+          within('.md-preview-holder') do
             link = find(link_css)['src']
             expect(link).to match(link_match)
           end
