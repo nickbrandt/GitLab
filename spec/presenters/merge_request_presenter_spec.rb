@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe MergeRequestPresenter do
-  let(:resource) { create :merge_request, source_project: project }
-  let(:project) { create(:project, :repository) }
+  let(:resource) { create(:merge_request, source_project: project) }
+  let(:project) { create(:project) }
   let(:user) { create(:user) }
 
   describe '#ci_status' do
@@ -416,107 +416,25 @@ describe MergeRequestPresenter do
     end
   end
 
-  describe '#can_push_to_source_branch' do
-    before do
-      allow(resource).to receive(:source_branch_exists?) { source_branch_exists }
-
-      allow_any_instance_of(Gitlab::UserAccess::RequestCacheExtension)
-        .to receive(:can_push_to_branch?)
-        .with(resource.source_branch)
-        .and_return(can_push_to_branch)
-    end
-
+  describe '#target_branch_path' do
     subject do
-      described_class.new(resource, current_user: user).can_push_to_source_branch?
+      described_class.new(resource, current_user: user).target_branch_path
     end
 
-    context 'when source branch exists AND user can push to source branch' do
-      let(:source_branch_exists) { true }
-      let(:can_push_to_branch) { true }
-
-      it 'returns true' do
-        is_expected.to eq(true)
-      end
-    end
-
-    context 'when source branch does not exists' do
-      let(:source_branch_exists) { false }
-      let(:can_push_to_branch) { true }
-
-      it 'returns false' do
-        is_expected.to eq(false)
-      end
-    end
-
-    context 'when user cannot push to source branch' do
-      let(:source_branch_exists) { true }
-      let(:can_push_to_branch) { false }
-
-      it 'returns false' do
-        is_expected.to eq(false)
-      end
-    end
-  end
-
-  describe '#rebase_path' do
-    before do
-      allow(resource).to receive(:rebase_in_progress?) { rebase_in_progress }
-      allow(resource).to receive(:should_be_rebased?) { should_be_rebased }
-
-      allow_any_instance_of(Gitlab::UserAccess::RequestCacheExtension)
-        .to receive(:can_push_to_branch?)
-        .with(resource.source_branch)
-        .and_return(can_push_to_branch)
-    end
-
-    subject do
-      described_class.new(resource, current_user: user).rebase_path
-    end
-
-    context 'when can rebase' do
-      let(:rebase_in_progress) { false }
-      let(:can_push_to_branch) { true }
-      let(:should_be_rebased) { true }
-
-      before do
-        allow(resource).to receive(:source_branch_exists?) { true }
-      end
-
+    context 'when target branch exists' do
       it 'returns path' do
+        allow(resource).to receive(:target_branch_exists?) { true }
+
         is_expected
-          .to eq("/#{project.full_path}/merge_requests/#{resource.iid}/rebase")
+          .to eq("/#{resource.source_project.full_path}/branches/#{resource.target_branch}")
       end
     end
 
-    context 'when cannot rebase' do
-      context 'when rebase in progress' do
-        let(:rebase_in_progress) { true }
-        let(:can_push_to_branch) { true }
-        let(:should_be_rebased) { true }
+    context 'when target branch does not exist' do
+      it 'returns nil' do
+        allow(resource).to receive(:target_branch_exists?) { false }
 
-        it 'returns nil' do
-          is_expected.to be_nil
-        end
-      end
-
-      context 'when user cannot merge' do
-        let(:rebase_in_progress) { false }
-        let(:can_push_to_branch) { false }
-        let(:should_be_rebased) { true }
-
-        it 'returns nil' do
-          is_expected.to be_nil
-        end
-      end
-
-      context 'should not be rebased' do
-        let(:rebase_in_progress) { false }
-        let(:can_push_to_branch) { true }
-        let(:should_be_rebased) { false }
-
-        it 'returns nil' do
-          is_expected.to be_nil
-        end
+        is_expected.to be_nil
       end
     end
   end
@@ -602,6 +520,48 @@ describe MergeRequestPresenter do
         it 'returns nil' do
           is_expected.to be_nil
         end
+      end
+    end
+  end
+
+  describe '#can_push_to_source_branch' do
+    before do
+      allow(resource).to receive(:source_branch_exists?) { source_branch_exists }
+
+      allow_any_instance_of(Gitlab::UserAccess::RequestCacheExtension)
+        .to receive(:can_push_to_branch?)
+              .with(resource.source_branch)
+              .and_return(can_push_to_branch)
+    end
+
+    subject do
+      described_class.new(resource, current_user: user).can_push_to_source_branch?
+    end
+
+    context 'when source branch exists AND user can push to source branch' do
+      let(:source_branch_exists) { true }
+      let(:can_push_to_branch) { true }
+
+      it 'returns true' do
+        is_expected.to eq(true)
+      end
+    end
+
+    context 'when source branch does not exists' do
+      let(:source_branch_exists) { false }
+      let(:can_push_to_branch) { true }
+
+      it 'returns false' do
+        is_expected.to eq(false)
+      end
+    end
+
+    context 'when user cannot push to source branch' do
+      let(:source_branch_exists) { true }
+      let(:can_push_to_branch) { false }
+
+      it 'returns false' do
+        is_expected.to eq(false)
       end
     end
   end
