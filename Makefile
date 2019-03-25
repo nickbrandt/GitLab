@@ -106,7 +106,7 @@ testdata/data/group/test.git:
 	git clone --quiet --bare https://gitlab.com/gitlab-org/gitlab-test.git $@
 
 .PHONY: verify
-verify: lint vet detect-context check-formatting megacheck
+verify: lint vet detect-context check-formatting staticcheck
 
 .PHONY: lint
 lint: $(TARGET_SETUP) govendor-sync
@@ -132,11 +132,11 @@ check-formatting: $(TARGET_SETUP) install-goimports
 # Megacheck will tailor some responses given a minimum Go version, so pass that through the CLI
 # Additionally, megacheck will not return failure exit codes unless explicitely told to via the
 # `-simple.exit-non-zero` `-unused.exit-non-zero` and `-staticcheck.exit-non-zero` flags
-.PHONY: megacheck
-megacheck: $(TARGET_SETUP) govendor-sync
+.PHONY: staticcheck
+staticcheck: $(TARGET_SETUP) govendor-sync
 	$(call message,Verify: $@)
-	@command -v megacheck || go get -v honnef.co/go/tools/cmd/megacheck
-	@megacheck -go $(MINIMUM_SUPPORTED_GO_VERSION) -simple.exit-non-zero -unused.exit-non-zero -staticcheck.exit-non-zero $(LOCAL_PACKAGES)
+	@command -v staticcheck || go get -v honnef.co/go/tools/cmd/staticcheck
+	@staticcheck -go $(MINIMUM_SUPPORTED_GO_VERSION) $(LOCAL_PACKAGES)
 
 # Some vendor components, used for testing are GPL, so we don't distribute them
 # and need to go a sync before using them

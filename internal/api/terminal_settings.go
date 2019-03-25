@@ -63,20 +63,20 @@ func (t *TerminalSettings) Dial() (*websocket.Conn, *http.Response, error) {
 
 func (t *TerminalSettings) Validate() error {
 	if t == nil {
-		return fmt.Errorf("Terminal details not specified")
+		return fmt.Errorf("terminal details not specified")
 	}
 
 	if len(t.Subprotocols) == 0 {
-		return fmt.Errorf("No subprotocol specified")
+		return fmt.Errorf("no subprotocol specified")
 	}
 
 	parsedURL, err := t.URL()
 	if err != nil {
-		return fmt.Errorf("Invalid URL")
+		return fmt.Errorf("invalid URL")
 	}
 
 	if parsedURL.Scheme != "ws" && parsedURL.Scheme != "wss" {
-		return fmt.Errorf("Invalid websocket scheme: %q", parsedURL.Scheme)
+		return fmt.Errorf("invalid websocket scheme: %q", parsedURL.Scheme)
 	}
 
 	return nil
