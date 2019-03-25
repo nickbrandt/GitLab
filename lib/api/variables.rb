@@ -56,8 +56,9 @@ module API
         requires :value, type: String, desc: 'The value of the variable'
         optional :protected, type: String, desc: 'Whether the variable is protected'
 
-        # EE
-        optional :environment_scope, type: String, desc: 'The environment_scope of the variable'
+        if Gitlab.ee?
+          optional :environment_scope, type: String, desc: 'The environment_scope of the variable'
+        end
       end
       post ':id/variables' do
         variable_params = declared_params(include_missing: false)
@@ -80,8 +81,9 @@ module API
         optional :value, type: String, desc: 'The value of the variable'
         optional :protected, type: String, desc: 'Whether the variable is protected'
 
-        # EE
-        optional :environment_scope, type: String, desc: 'The environment_scope of the variable'
+        if Gitlab.ee?
+          optional :environment_scope, type: String, desc: 'The environment_scope of the variable'
+        end
       end
       # rubocop: disable CodeReuse/ActiveRecord
       put ':id/variables/:key' do
