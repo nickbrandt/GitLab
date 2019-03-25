@@ -54,4 +54,17 @@ describe Search::GroupService do
 
     include_examples 'group search'
   end
+
+  describe 'elasticsearch result' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+
+    before do
+      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    end
+
+    subject(:results) { described_class.new(user, group, search: '*').execute }
+
+    it { is_expected.to be_a(::Gitlab::Elastic::GroupSearchResults) }
+  end
 end
