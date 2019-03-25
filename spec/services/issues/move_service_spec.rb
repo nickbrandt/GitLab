@@ -138,20 +138,6 @@ describe Issues::MoveService do
             .not_to raise_error # Sidekiq::Worker::EnqueueFromTransactionError
         end
       end
-
-      context 'group issue hooks' do
-        let!(:hook) { create(:group_hook, group: new_project.group, issues_events: true) }
-
-        it 'executes group issue hooks' do
-          allow_any_instance_of(WebHookService).to receive(:execute)
-
-          # Ideally, we'd test that `WebHookWorker.jobs.size` increased by 1,
-          # but since the entire spec run takes place in a transaction, we never
-          # actually get to the `after_commit` hook that queues these jobs.
-          expect { move_service.execute(old_issue, new_project) }
-            .not_to raise_error # Sidekiq::Worker::EnqueueFromTransactionError
-        end
-      end
     end
 
     describe 'move permissions' do
