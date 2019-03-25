@@ -11,11 +11,20 @@ module EE
     end
 
     override :find_project_for_result_blob
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_project_for_result_blob(result)
-      super || ::Project.find_by(id: result.dig('_source', 'join_field', 'parent')&.split('_')&.last)
+    def find_project_for_result_blob(projects, result)
+      return super if result.is_a?(::Gitlab::Search::FoundBlob)
+
+      super || projects&.find { |project| project.id == blob_project_id(result) }
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+
+    override :blob_projects
+    def blob_projects(results)
+      return super if results.first.is_a?(::Gitlab::Search::FoundBlob)
+
+      project_ids = results.map(&method(:blob_project_id))
+
+      ::ProjectsFinder.new(current_user: current_user, project_ids_relation: project_ids).execute
+    end
 
     override :parse_search_result
     def parse_search_result(result)
@@ -40,6 +49,10 @@ module EE
 
       type == :issues && (context == :dashboard ||
         context.feature_available?(:multiple_issue_assignees))
+    end
+
+    def blob_project_id(blob_result)
+      blob_result.dig('_source', 'join_field', 'parent')&.split('_')&.last.to_i
     end
   end
 end

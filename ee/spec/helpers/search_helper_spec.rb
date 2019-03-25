@@ -49,17 +49,12 @@ describe SearchHelper do
     end
   end
 
-  describe '#parse_search_result_from_elastic' do
+  describe '#parse_search_result with elastic enabled', :elastic do
     let(:user) { create(:user) }
 
     before do
+      allow(self).to receive(:current_user).and_return(user)
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-      Gitlab::Elastic::Helper.create_empty_index
-    end
-
-    after do
-      Gitlab::Elastic::Helper.delete_index
-      stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
     end
 
     it "returns parsed result" do
@@ -82,28 +77,37 @@ describe SearchHelper do
       expect(parsed_result.startline).to eq(2)
       expect(parsed_result.data).to include("Popen")
     end
+  end
 
-    it 'does not return project that does not exist' do
-      Gitlab::Elastic::Helper.create_empty_index
+  describe '#blob_projects', :elastic do
+    let(:user) { create(:user) }
 
-      @project_2 = create :project, :repository
+    before do
+      allow(self).to receive(:current_user).and_return(user)
+      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    end
 
-      @project_2.repository.create_file(
-        user,
-        'thing.txt',
-        ' function application.js ',
-        message: 'Find me',
-        branch_name: 'master')
+    def es_blob_search
+      Repository.search(
+        'def popen',
+        type: :blob,
+        options: { highlight: true }
+      )[:blobs][:results]
+    end
 
-      @project_2.repository.index_blobs
+    it 'returns all projects in the result page without causing an N+1' do
+      control_count = ActiveRecord::QueryRecorder.new { blob_projects(es_blob_search) }.count
+
+      projects = create_list :project, 3, :repository, :public
+      projects.each { |project| project.repository.index_blobs }
+
       Gitlab::Elastic::Helper.refresh_index
-      @project_2.destroy
 
-      blob = { _source: { join_field: { parent: @project_2.es_id } } }.as_json
+      # So we can access it outside the following block
+      result_projects = nil
 
-      result = find_project_for_result_blob(blob)
-
-      expect(result).to be(nil)
+      expect { result_projects = blob_projects(es_blob_search) }.not_to exceed_query_limit(control_count)
+      expect(result_projects).to match_array(projects)
     end
   end
 end
