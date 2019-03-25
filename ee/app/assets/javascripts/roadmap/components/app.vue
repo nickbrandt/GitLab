@@ -1,7 +1,6 @@
 <script>
+import { mapState, mapActions } from 'vuex';
 import _ from 'underscore';
-import Flash from '~/flash';
-import { s__ } from '~/locale';
 
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
@@ -15,14 +14,6 @@ export default {
     roadmapShell,
   },
   props: {
-    store: {
-      type: Object,
-      required: true,
-    },
-    service: {
-      type: Object,
-      required: true,
-    },
     presetType: {
       type: String,
       required: true,
@@ -42,19 +33,20 @@ export default {
   },
   data() {
     return {
-      isLoading: false,
-      isEpicsListEmpty: false,
-      hasError: false,
       handleResizeThrottled: {},
     };
   },
   computed: {
-    epics() {
-      return this.store.getEpics();
-    },
-    timeframe() {
-      return this.store.getTimeframe();
-    },
+    ...mapState([
+      'currentGroupId',
+      'epics',
+      'timeframe',
+      'extendedTimeframe',
+      'epicsFetchInProgress',
+      'epicsFetchForTimeframeInProgress',
+      'epicsFetchResultEmpty',
+      'epicsFetchFailure',
+    ]),
     timeframeStart() {
       return this.timeframe[0];
     },
@@ -62,11 +54,20 @@ export default {
       const last = this.timeframe.length - 1;
       return this.timeframe[last];
     },
-    currentGroupId() {
-      return this.store.getCurrentGroupId();
-    },
     showRoadmap() {
-      return !this.hasError && !this.isLoading && !this.isEpicsListEmpty;
+      return !this.epicsFetchFailure && !this.epicsFetchInProgress && !this.epicsFetchResultEmpty;
+    },
+  },
+  watch: {
+    epicsFetchInProgress(value) {
+      if (!value && this.epics.length) {
+        this.$nextTick(() => {
+          eventHub.$emit('refreshTimeline', {
+            todayBarReady: true,
+            initialRender: true,
+          });
+        });
+      }
     },
   },
   mounted() {
@@ -78,55 +79,7 @@ export default {
     window.removeEventListener('resize', this.handleResizeThrottled, false);
   },
   methods: {
-    fetchEpics() {
-      this.hasError = false;
-      this.service
-        .getEpics()
-        .then(res => res.data)
-        .then(epics => {
-          if (epics.length) {
-            this.store.setEpics(epics);
-            this.$nextTick(() => {
-              // Render timeline bars as we're already having timeline
-              // rendered before fetch
-              eventHub.$emit('refreshTimeline', {
-                todayBarReady: true,
-                initialRender: true,
-              });
-            });
-          } else {
-            this.isEpicsListEmpty = true;
-          }
-        })
-        .catch(() => {
-          this.isLoading = false;
-          this.hasError = true;
-          Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
-        });
-    },
-    fetchEpicsForTimeframe({ timeframe, roadmapTimelineEl, extendType }) {
-      this.hasError = false;
-      this.service
-        .getEpicsForTimeframe(this.presetType, timeframe)
-        .then(res => res.data)
-        .then(epics => {
-          if (epics.length) {
-            this.store.addEpics(epics);
-          }
-          this.$nextTick(() => {
-            // Re-render timeline bars with updated timeline
-            this.processExtendedTimeline({
-              itemsCount: timeframe ? timeframe.length : 0,
-              extendType,
-              roadmapTimelineEl,
-            });
-          });
-        })
-        .catch(() => {
-          this.hasError = true;
-          Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
-        });
-    },
+    ...mapActions(['fetchEpics', 'fetchEpicsForTimeframe', 'extendTimeframe', 'refreshEpicDates']),
     /**
      * Roadmap view works with absolute sizing and positioning
      * of following child components of RoadmapShell;
@@ -175,13 +128,24 @@ export default {
       }
     },
     handleScrollToExtend(roadmapTimelineEl, extendType = EXTEND_AS.PREPEND) {
-      const timeframe = this.store.extendTimeframe(extendType);
+      this.extendTimeframe({ extendAs: extendType });
+      this.refreshEpicDates();
+
       this.$nextTick(() => {
         this.fetchEpicsForTimeframe({
-          timeframe,
-          extendType,
-          roadmapTimelineEl,
-        });
+          timeframe: this.extendedTimeframe,
+        })
+          .then(() => {
+            this.$nextTick(() => {
+              // Re-render timeline bars with updated timeline
+              this.processExtendedTimeline({
+                itemsCount: this.extendedTimeframe ? this.extendedTimeframe.length : 0,
+                extendType,
+                roadmapTimelineEl,
+              });
+            });
+          })
+          .catch(() => {});
       });
     },
   },
@@ -189,7 +153,7 @@ export default {
 </script>
 
 <template>
-  <div :class="{ 'overflow-reset': isEpicsListEmpty }" class="roadmap-container">
+  <div :class="{ 'overflow-reset': epicsFetchResultEmpty }" class="roadmap-container">
     <roadmap-shell
       v-if="showRoadmap"
       :preset-type="presetType"
@@ -200,7 +164,7 @@ export default {
       @onScrollToEnd="handleScrollToExtend"
     />
     <epics-list-empty
-      v-if="isEpicsListEmpty"
+      v-if="epicsFetchResultEmpty"
       :preset-type="presetType"
       :timeframe-start="timeframeStart"
       :timeframe-end="timeframeEnd"

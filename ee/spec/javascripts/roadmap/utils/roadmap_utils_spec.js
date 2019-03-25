@@ -161,7 +161,7 @@ describe('getTimeframeForMonthsView', () => {
 describe('extendTimeframeForMonthsView', () => {
   it('returns extended timeframe into the past from current timeframe startDate', () => {
     const initialDate = mockTimeframeMonths[0];
-    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, -6);
+    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, -8);
 
     expect(extendedTimeframe.length).toBe(mockTimeframeMonthsPrepend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
@@ -171,7 +171,7 @@ describe('extendTimeframeForMonthsView', () => {
 
   it('returns extended timeframe into the future from current timeframe endDate', () => {
     const initialDate = mockTimeframeMonths[mockTimeframeMonths.length - 1];
-    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, 7);
+    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, 8);
 
     expect(extendedTimeframe.length).toBe(mockTimeframeMonthsAppend.length);
     extendedTimeframe.forEach((timeframeItem, index) => {
