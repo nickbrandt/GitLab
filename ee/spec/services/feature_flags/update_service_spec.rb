@@ -29,24 +29,6 @@ describe FeatureFlags::UpdateService do
       )
     end
 
-    shared_examples 'disabled feature flag audit' do
-      context 'when feature flag audit is disabled' do
-        before do
-          stub_feature_flags(feature_flag_audit: false)
-        end
-
-        it 'returns success status' do
-          expect(subject[:status]).to eq(:success)
-        end
-
-        it 'does not create audit event' do
-          expect { subject }.not_to change { AuditEvent.count }
-        end
-      end
-    end
-
-    include_examples 'disabled feature flag audit'
-
     context 'with invalid params' do
       let(:params) { { name: nil } }
 
@@ -85,8 +67,6 @@ describe FeatureFlags::UpdateService do
                   " to <strong>\"new description\"</strong>.")
         )
       end
-
-      include_examples 'disabled feature flag audit'
     end
 
     context 'when active state is changed' do
@@ -103,8 +83,6 @@ describe FeatureFlags::UpdateService do
                   "from <strong>true</strong> to <strong>false</strong>.")
         )
       end
-
-      include_examples 'disabled feature flag audit'
     end
 
     context 'when scope is renamed' do
@@ -122,8 +100,6 @@ describe FeatureFlags::UpdateService do
                   "from <strong>review</strong> to <strong>staging</strong>.")
         )
       end
-
-      include_examples 'disabled feature flag audit'
 
       context 'when scope can not be updated' do
         let(:params) do
@@ -159,8 +135,6 @@ describe FeatureFlags::UpdateService do
         expect(audit_event_message).to include("Deleted rule <strong>review</strong>.")
       end
 
-      include_examples 'disabled feature flag audit'
-
       context 'when scope can not be deleted' do
         RSpec::Matchers.define_negated_matcher :not_change, :change
 
@@ -190,8 +164,6 @@ describe FeatureFlags::UpdateService do
           include("Created rule <strong>review</strong> and set it as <strong>active</strong>.")
         )
       end
-
-      include_examples 'disabled feature flag audit'
 
       context 'when scope can not be created' do
         let(:new_environment_scope) { '' }
