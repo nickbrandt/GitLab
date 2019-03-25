@@ -172,7 +172,7 @@ describe('Security Reports modal', () => {
       it('renders severity with a badge', () => {
         const badge = vm.$el.querySelector('.severity-badge');
 
-        expect(badge.textContent).toContain('critical');
+        expect(badge.textContent).toContain('Critical');
       });
     });
   });
