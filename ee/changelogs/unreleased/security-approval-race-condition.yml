@@ -1,0 +1,5 @@
+---
+title: Handle race condition when creating an MR approval
+merge_request:
+author:
+type: security

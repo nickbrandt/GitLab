@@ -5,7 +5,7 @@ module MergeRequests
     def execute(merge_request)
       approval = merge_request.approvals.new(user: current_user)
 
-      if approval.save
+      if save_approval(approval)
         merge_request.reset_approval_cache!
 
         create_approval_note(merge_request)
@@ -21,6 +21,12 @@ module MergeRequests
     end
 
     private
+
+    def save_approval(approval)
+      approval.save
+    rescue ActiveRecord::RecordNotUnique
+      false
+    end
 
     def create_approval_note(merge_request)
       SystemNoteService.approve_mr(merge_request, current_user)
