@@ -41,7 +41,7 @@ specific environment, there are lot of uses cases. To name a few:
 
 - You want to promote what's running in staging, to production. You go to the
   environments list, verify that what's running in staging is what you think is
-  running, then click on the [manual action] to deploy to production.
+  running, then click on the [manual action](../../ci/yaml/README.md#whenmanual) to deploy to production.
 - You trigger a deploy, and you've got lots of containers to upgrade so you know
   it'll take a while (you've also throttled your deploy to only take down X
   containers at a time). But you need to tell someone when it's deployed, so you
@@ -129,5 +129,4 @@ version of your application.
 [variables]: ../../ci/variables/README.md "GitLab CI variables"
 [autodeploy]: ../../ci/autodeploy/index.md "GitLab Autodeploy"
 [kube-image]: https://gitlab.com/gitlab-examples/kubernetes-deploy/container_registry "Kubernetes deploy Container Registry"
-[manual action]: ../../ci/yaml/README.md#manual-actions
 [runners]: ../../ci/runners/README.md
