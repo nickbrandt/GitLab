@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190204115450) do
+ActiveRecord::Schema.define(version: 20190404143330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -289,6 +289,7 @@ ActiveRecord::Schema.define(version: 20190204115450) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["merge_request_id"], name: "index_approvals_on_merge_request_id", using: :btree
+    t.index ["user_id", "merge_request_id"], name: "index_approvals_on_user_id_and_merge_request_id", unique: true, using: :btree
   end
 
   create_table "approver_groups", force: :cascade do |t|
