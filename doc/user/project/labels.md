@@ -99,9 +99,9 @@ From the group epic list page, you can [filter](../search/index.md#issues-and-me
 ### Filtering in issue boards
 
 - From [project boards](issue_board.md), you can filter by both group labels and project labels in the [search and filter bar](../search/index.md#issue-boards).
-- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [search and filter bar](../search/index.md#issue-boards). **[PREMIUM]**
-- From [project boards](issue_board.md), you can filter by both group labels and project labels in the [issue board configuration](issue_board.md#board-with-configuration). **[PREMIUM]**
-- From [group issue boards](issue_board.md#group-issue-boards), you can filter by only group labels in the [issue board configuration](issue_board.md#board-with-configuration). **[PREMIUM]**
+- From [group issue boards](issue_board.md#group-issue-boards-premium), you can filter by only group labels in the [search and filter bar](../search/index.md#issue-boards). **[PREMIUM]**
+- From [project boards](issue_board.md), you can filter by both group labels and project labels in the [issue board configuration](issue_board.md#configurable-issue-boards-starter). **[STARTER]**
+- From [group issue boards](issue_board.md#group-issue-boards-premium), you can filter by only group labels in the [issue board configuration](issue_board.md#configurable-issue-boards-starter). **[PREMIUM]**
 
 ## Subscribing to labels
 
