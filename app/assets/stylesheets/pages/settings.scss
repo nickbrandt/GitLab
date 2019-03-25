@@ -292,6 +292,17 @@
     }
   }
 
+  .loading-metrics,
+  .empty-metrics {
+    padding: 30px 10px;
+
+    p,
+    .btn {
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+  }
+
   .loading-metrics .metrics-load-spinner {
     color: $gl-gray-700;
   }
