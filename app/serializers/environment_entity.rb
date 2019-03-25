@@ -2,7 +2,6 @@
 
 class EnvironmentEntity < Grape::Entity
   include RequestAwareEntity
-  prepend ::EE::EnvironmentEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :id
   expose :name
@@ -12,7 +11,6 @@ class EnvironmentEntity < Grape::Entity
   expose :name_without_type
   expose :last_deployment, using: DeploymentEntity
   expose :stop_action_available?, as: :has_stop_action
-  expose :rollout_status, if: -> (*) { can_read_deploy_board? }, using: RolloutStatusEntity
 
   expose :metrics_path, if: -> (*) { environment.has_metrics? } do |environment|
     metrics_project_environment_path(environment.project, environment)
@@ -52,10 +50,6 @@ class EnvironmentEntity < Grape::Entity
     request.current_user
   end
 
-  def can_read_deploy_board?
-    can?(current_user, :read_deploy_board, environment.project)
-  end
-
   def can_access_terminal?
     can?(request.current_user, :create_environment_terminal, environment)
   end
@@ -72,3 +66,5 @@ class EnvironmentEntity < Grape::Entity
     deployment_platform.cluster
   end
 end
+
+EnvironmentEntity.prepend(::EE::EnvironmentEntity)

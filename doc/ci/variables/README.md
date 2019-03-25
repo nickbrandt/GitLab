@@ -593,7 +593,7 @@ If any of the conditions in `variables` evaluates to truth when using `only`,
 a new job is going to be created. If any of the expressions evaluates to truth
 when `except` is being used, a job is not going to be created.
 
-This follows usual rules for [`only` / `except` policies][builds-policies].
+This follows usual rules for [`only` / `except` policies](../yaml/README.md#onlyexcept-advanced).
 
 ### Supported syntax
 
@@ -659,7 +659,6 @@ Below you can find supported syntax reference:
 [protected tags]: ../../user/project/protected_tags.md
 [shellexecutors]: https://docs.gitlab.com/runner/executors/
 [triggered]: ../triggers/README.md
-[builds-policies]: ../yaml/README.md#only-and-except-complex
 [trigger-job-token]: ../triggers/README.md#ci-job-token
 [gitlab-deploy-token]: ../../user/project/deploy_tokens/index.md#gitlab-deploy-token
 [registry]: ../../user/project/container_registry.md

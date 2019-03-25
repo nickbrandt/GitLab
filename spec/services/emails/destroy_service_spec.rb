@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Emails::DestroyService do
@@ -6,17 +8,9 @@ describe Emails::DestroyService do
 
   subject(:service) { described_class.new(user, user: user) }
 
-  before do
-    stub_licensed_features(extended_audit_events: true)
-  end
-
   describe '#execute' do
     it 'removes an email' do
       expect { service.execute(email) }.to change { user.emails.count }.by(-1)
-    end
-
-    it 'registers a security event' do
-      expect { service.execute(email) }.to change { SecurityEvent.count }.by(1)
     end
   end
 end

@@ -30,7 +30,8 @@ module EE
         primary_version: version.to_s,
         primary_revision: revision.to_s,
         node_actions_allowed: ::Gitlab::Database.db_read_write?.to_s,
-        node_edit_allowed: ::Gitlab::Geo.license_allows?.to_s
+        node_edit_allowed: ::Gitlab::Geo.license_allows?.to_s,
+        geo_troubleshooting_help_path: help_page_path('administration/geo/replication/troubleshooting.md')
       }
     end
 

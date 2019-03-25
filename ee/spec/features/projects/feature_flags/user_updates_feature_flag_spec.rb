@@ -37,154 +37,94 @@ describe 'User updates feature flag', :js do
   end
 
   context 'when user updates a status of a scope' do
-    shared_examples 'succesfully updates feature flag' do
-      before do
-        within_scope_row(2) do
-          within_status { find('.project-feature-toggle').click }
-        end
-
-        click_button 'Save changes'
-        expect(page).to have_current_path(project_feature_flags_path(project))
+    before do
+      within_scope_row(2) do
+        within_status { find('.project-feature-toggle').click }
       end
 
-      it 'shows the updated feature flag' do
-        within_feature_flag_row(1) do
-          expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-          expect(page).to have_css('.js-feature-flag-status .badge-danger')
+      click_button 'Save changes'
+      expect(page).to have_current_path(project_feature_flags_path(project))
+    end
 
-          within_feature_flag_scopes do
-            expect(page.find('.badge:nth-child(1)')).to have_content('*')
-            expect(page.find('.badge:nth-child(1)')['class']).to include('badge-inactive')
-            expect(page.find('.badge:nth-child(2)')).to have_content('review/*')
-            expect(page.find('.badge:nth-child(2)')['class']).to include('badge-inactive')
-          end
+    it 'shows the updated feature flag' do
+      within_feature_flag_row(1) do
+        expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
+        expect(page).to have_css('.js-feature-flag-status .badge-danger')
+
+        within_feature_flag_scopes do
+          expect(page.find('.badge:nth-child(1)')).to have_content('*')
+          expect(page.find('.badge:nth-child(1)')['class']).to include('badge-inactive')
+          expect(page.find('.badge:nth-child(2)')).to have_content('review/*')
+          expect(page.find('.badge:nth-child(2)')['class']).to include('badge-inactive')
         end
       end
     end
 
-    context 'when feature flag audit enabled' do
-      include_examples 'succesfully updates feature flag'
+    it 'records audit event' do
+      visit(project_audit_events_path(project))
 
-      it 'records audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to(
-          have_text("Updated feature flag ci live trace. Updated rule review/* active state from true to false.")
-        )
-      end
-    end
-
-    context 'when feature flag audit is disabled' do
-      before do
-        stub_feature_flags(feature_flag_audit: false)
-      end
-
-      include_examples 'succesfully updates feature flag'
-
-      it 'does not record audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to have_no_text("Updated feature flag")
-      end
+      expect(page).to(
+        have_text("Updated feature flag ci live trace. Updated rule review/* active state from true to false.")
+      )
     end
   end
 
   context 'when user adds a new scope' do
-    shared_examples 'succesfully updates feature flag' do
-      before do
-        within_scope_row(3) do
-          within_environment_spec do
-            find('.js-env-input').set('production')
-            find('.js-create-button').click
-          end
+    before do
+      within_scope_row(3) do
+        within_environment_spec do
+          find('.js-env-input').set('production')
+          find('.js-create-button').click
         end
-
-        click_button 'Save changes'
-        expect(page).to have_current_path(project_feature_flags_path(project))
       end
 
-      it 'shows the newly created scope' do
-        within_feature_flag_row(1) do
-          within_feature_flag_scopes do
-            expect(page.find('.badge:nth-child(3)')).to have_content('production')
-            expect(page.find('.badge:nth-child(3)')['class']).to include('badge-inactive')
-          end
+      click_button 'Save changes'
+      expect(page).to have_current_path(project_feature_flags_path(project))
+    end
+
+    it 'shows the newly created scope' do
+      within_feature_flag_row(1) do
+        within_feature_flag_scopes do
+          expect(page.find('.badge:nth-child(3)')).to have_content('production')
+          expect(page.find('.badge:nth-child(3)')['class']).to include('badge-inactive')
         end
       end
     end
 
-    context 'when feature flag audit enabled' do
-      include_examples 'succesfully updates feature flag'
+    it 'records audit event' do
+      visit(project_audit_events_path(project))
 
-      it 'records audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to(
-          have_text("Updated feature flag ci live trace")
-        )
-      end
-    end
-
-    context 'when feature flag audit is disabled' do
-      before do
-        stub_feature_flags(feature_flag_audit: false)
-      end
-
-      include_examples 'succesfully updates feature flag'
-
-      it 'does not record audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to have_no_text("Updated feature flag")
-      end
+      expect(page).to(
+        have_text("Updated feature flag ci live trace")
+      )
     end
   end
 
   context 'when user deletes a scope' do
-    shared_examples 'succesfully updates feature flag' do
-      before do
-        within_scope_row(2) do
-          within_delete { find('.js-delete-scope').click }
-        end
-
-        click_button 'Save changes'
-        expect(page).to have_current_path(project_feature_flags_path(project))
+    before do
+      within_scope_row(2) do
+        within_delete { find('.js-delete-scope').click }
       end
 
-      it 'shows the updated feature flag' do
-        within_feature_flag_row(1) do
-          within_feature_flag_scopes do
-            expect(page).to have_css('.badge:nth-child(1)')
-            expect(page).not_to have_css('.badge:nth-child(2)')
-          end
+      click_button 'Save changes'
+      expect(page).to have_current_path(project_feature_flags_path(project))
+    end
+
+    it 'shows the updated feature flag' do
+      within_feature_flag_row(1) do
+        within_feature_flag_scopes do
+          expect(page).to have_css('.badge:nth-child(1)')
+          expect(page).not_to have_css('.badge:nth-child(2)')
         end
       end
     end
 
-    context 'when feature flag audit enabled' do
-      include_examples 'succesfully updates feature flag'
+    it 'records audit event' do
+      visit(project_audit_events_path(project))
 
-      it 'records audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to(
-          have_text("Updated feature flag ci live trace")
-        )
-      end
-    end
-
-    context 'when feature flag audit is disabled' do
-      before do
-        stub_feature_flags(feature_flag_audit: false)
-      end
-
-      include_examples 'succesfully updates feature flag'
-
-      it 'does not record audit event' do
-        visit(project_audit_events_path(project))
-
-        expect(page).to have_no_text("Updated feature flag")
-      end
+      expect(page).to(
+        have_text("Updated feature flag ci live trace")
+      )
     end
   end
 end

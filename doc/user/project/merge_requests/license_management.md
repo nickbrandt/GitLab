@@ -13,7 +13,7 @@ your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto License Management](../../../topics/autodevops/index.md#auto-license-management-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
-In addition, you can [manually approve or blacklist](#manual-license-management) licenses in the project's settings.
+In addition, you can [manually approve or blacklist](#project-policies-for-license-management) licenses in the project's settings.
 
 Going a step further, GitLab can show the licenses list right in the merge
 request widget area, highlighting the presence of licenses you don't want to use, or new

@@ -26,6 +26,7 @@ const createComponent = () => {
     service,
     nodeActionsAllowed: true,
     nodeEditAllowed: true,
+    geoTroubleshootingHelpPath: '/foo/bar',
   });
 };
 

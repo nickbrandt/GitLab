@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::ReferenceExtractor do
-  let(:group)   { create(:group) }
-  let(:project) { create(:project, group: group) }
+  let(:project) { create(:project) }
 
   before do
-    group.add_developer(project.creator)
+    project.add_developer(project.creator)
   end
 
   subject { described_class.new(project, project.creator) }
@@ -161,20 +162,6 @@ describe Gitlab::ReferenceExtractor do
     subject.analyze("$#{@s0.id}, $999, $#{@s2.id}, $#{@s1.id}")
 
     expect(subject.snippets).to match_array([@s0, @s1])
-  end
-
-  it 'accesses valid epics' do
-    stub_licensed_features(epics: true)
-
-    @e0 = create(:epic, group: group)
-    @e1 = create(:epic, group: group)
-    @e2 = create(:epic, group: create(:group, :private))
-
-    text = "#{@e0.to_reference(group, full: true)}, &999, #{@e1.to_reference(group, full: true)}, #{@e2.to_reference(group, full: true)}"
-
-    subject.analyze(text, { group: group })
-
-    expect(subject.epics).to match_array([@e0, @e1])
   end
 
   it 'accesses valid commits' do

@@ -48,7 +48,7 @@ outbound connections for upstream and downstream pipeline dependencies.
 ### Triggering a downstream pipeline using a bridge job
 
 Before GitLab 11.8, it was necessary to implement a pipeline job that was
-responsible for making the API request [to trigger a pipeline](triggers/README.md#creating-cross-project-pipeline-through-API)
+responsible for making the API request [to trigger a pipeline](#triggering-multi-project-pipelines-through-api)
 in a different project.
 
 In GitLab 11.8, GitLab provides a new CI/CD configuration syntax to make this
