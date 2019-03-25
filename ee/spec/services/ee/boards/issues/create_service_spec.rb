@@ -15,6 +15,28 @@ describe Boards::Issues::CreateService do
       project.add_developer(user)
     end
 
+    context 'saved board configuration' do
+      let(:list) { create(:list, board: board, label: label, position: 0) }
+
+      it 'adds the board assignee, weight, labels and milestone to the issue' do
+        board_assignee = create(:user)
+        project.add_developer(board_assignee)
+        board_milestone = create(:milestone, project: project)
+        board_label = create(:label, project: project)
+        board.update!(assignee: board_assignee,
+                      milestone: board_milestone,
+                      label_ids: [board_label.id],
+                      weight: 4)
+
+        issue = service.execute
+
+        expect(issue.assignees).to eq([board_assignee])
+        expect(issue.weight).to eq(board.weight)
+        expect(issue.milestone).to eq(board_milestone)
+        expect(issue.labels).to contain_exactly(label, board_label)
+      end
+    end
+
     context 'assignees list' do
       before do
         stub_licensed_features(board_assignee_lists: true)
