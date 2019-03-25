@@ -52,8 +52,9 @@ module API
           optional :private_profile, type: Boolean, desc: 'Flag indicating the user has a private profile'
           all_or_none_of :extern_uid, :provider
 
-          # EE
-          optional :shared_runners_minutes_limit, type: Integer, desc: 'Pipeline minutes quota for this user'
+          if Gitlab.ee?
+            optional :shared_runners_minutes_limit, type: Integer, desc: 'Pipeline minutes quota for this user'
+          end
         end
 
         params :sort_params do
@@ -84,8 +85,9 @@ module API
         use :pagination
         use :with_custom_attributes
 
-        # EE
-        optional :skip_ldap, type: Boolean, default: false, desc: 'Skip LDAP users'
+        if Gitlab.ee?
+          optional :skip_ldap, type: Boolean, default: false, desc: 'Skip LDAP users'
+        end
       end
       # rubocop: disable CodeReuse/ActiveRecord
       get do
