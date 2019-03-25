@@ -1,0 +1,5 @@
+---
+title: Fix ChatOps Slack responder for gitlab.com
+merge_request: 10416
+author:
+type: fixed
