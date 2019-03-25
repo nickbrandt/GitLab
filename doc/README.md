@@ -307,7 +307,7 @@ The following documentation relates to the DevOps **Configure** stage:
 | [GitLab ChatOps](ci/chatops/README.md)                                                                                             | Interact with CI/CD jobs through chat services.                           |
 | [Installing Applications](user/project/clusters/index.md#installing-applications)                                                  | Deploy Helm, Ingress, and Prometheus on Kubernetes.                       |
 | [Mattermost slash commands](user/project/integrations/mattermost_slash_commands.md)                                                | Enable and use slash commands from within Mattermost.                     |
-| [Multiple Kubernetes Clusters](user/project/clusters/index.md#multiple-kubernetes-clusters) **[PREMIUM]**                          | Associate more than one Kubernetes clusters to your project.              |
+| [Multiple Kubernetes Clusters](user/project/clusters/index.md#multiple-kubernetes-clusters-premium) **[PREMIUM]**                  | Associate more than one Kubernetes clusters to your project.              |
 | [Protected variables](ci/variables/README.md#protected-variables)                                                                  | Restrict variables to protected branches and tags.                        |
 | [Serverless](user/project/clusters/serverless/index.md)                                                                            | Run serverless workloads on Kubernetes.                                   |
 | [Slack slash commands](user/project/integrations/slack_slash_commands.md)                                                          | Enable and use slash commands from within Slack.                          |

@@ -12,7 +12,7 @@ You can leave a comment in the following places:
 - commit diffs
 
 There are standard comments, and you also have the option to create a comment
-in the form of a threaded discussion. A comment can also be [turned into a discussion](#start-a-discussion-by-replying-to-a-non-discussion-comment)
+in the form of a threaded discussion. A comment can also be [turned into a discussion](#start-a-discussion-by-replying-to-a-standard-comment)
 when it receives a reply.
 
 The comment area supports [Markdown] and [quick actions]. You can edit your own
@@ -317,7 +317,7 @@ This will add the comment to the review.
 
 ### Resolving/Unresolving discussions
 
-Review comments can also resolve/unresolve [resolvable discussions](#resolvable-discussions).
+Review comments can also resolve/unresolve [resolvable discussions](#resolvable-comments-and-discussions).
 When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
 the discussion once published.
 
