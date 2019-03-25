@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.1 (2019-03-25)
+
+### Fixed (1 change)
+
+- Fix date save for Epic to reflect on UI immediately after save. !10321
+
+
 ## 11.9.0 (2019-03-22)
 
 ### Security (4 changes)
