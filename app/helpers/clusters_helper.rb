@@ -14,6 +14,12 @@ module ClustersHelper
       render 'clusters/clusters/gcp_signup_offer_banner'
     end
   end
+
+  def has_rbac_enabled?(cluster)
+    return cluster.platform_kubernetes_rbac? if cluster.platform_kubernetes
+
+    !cluster.provider.legacy_abac?
+  end
 end
 
 ClustersHelper.prepend(EE::ClustersHelper)
