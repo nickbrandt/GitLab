@@ -21,7 +21,7 @@ module API
 
           true
         rescue => e
-          logger.error(e.message)
+          logger.error(identity: identity, error: e.class.name, message: e.message, source: "#{__FILE__}:#{__LINE__}")
 
           false
         end

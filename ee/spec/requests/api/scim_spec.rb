@@ -125,7 +125,7 @@ describe API::Scim do
     end
   end
 
-  describe 'DELETE/scim/v2/groups/:group/Users/:id' do
+  describe 'DELETE /scim/v2/groups/:group/Users/:id' do
     context 'existing user' do
       before do
         delete scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}")

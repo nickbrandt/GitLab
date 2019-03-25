@@ -12,7 +12,7 @@ module EE
           'name.formatted': :name,
           'emails[type eq "work"].value': :email,
           active: :active
-        }.with_indifferent_access
+        }.with_indifferent_access.freeze
 
         COERCED_VALUES = {
           'True' => true,
