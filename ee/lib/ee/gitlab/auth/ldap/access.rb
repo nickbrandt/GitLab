@@ -12,7 +12,7 @@ module EE
           def update_user
             return if ::Gitlab::Database.read_only?
 
-            update_email
+            update_user_attributes
             update_memberships
             update_identity
             update_ssh_keys if sync_ssh_keys?
@@ -89,15 +89,18 @@ module EE
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
-          # Update user email if it changed in LDAP
-          def update_email
-            return false unless ldap_user.try(:email)
+          # Update user attributes (name and email) if they changed in LDAP
+          def update_user_attributes
+            ldap_email = ldap_user.try(:email)&.last.to_s.downcase
+            ldap_name = ldap_user.try(:name)
 
-            ldap_email = ldap_user.email.last.to_s.downcase
+            return if ldap_email.blank? && ldap_name.blank?
 
-            return false if user.email == ldap_email
+            attrs = { user: user }
+            attrs[:email] = ldap_email if ldap_email.present?
+            attrs[:name] = ldap_name if ldap_name.present?
 
-            ::Users::UpdateService.new(user, user: user, email: ldap_email).execute do |user|
+            ::Users::UpdateService.new(user, attrs).execute do |user|
               user.skip_reconfirmation!
             end
           end
