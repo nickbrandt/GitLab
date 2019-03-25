@@ -406,7 +406,7 @@ describe ProjectsController do
               id: project.id,
               project: params
             }
-        end.not_to change {project.namespace}
+        end.not_to change {project.reload.namespace}
       end
 
       def update_project(**parameters)
