@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { throttle } from 'underscore';
 import {
   GlLoadingIcon,
-  GlSearchBox,
+  GlSearchBoxByType,
   GlDropdown,
   GlDropdownDivider,
   GlDropdownHeader,
@@ -25,7 +25,7 @@ export default {
     Icon,
     BoardForm,
     GlLoadingIcon,
-    GlSearchBox,
+    GlSearchBoxByType,
     GlDropdown,
     GlDropdownDivider,
     GlDropdownHeader,
@@ -258,7 +258,7 @@ export default {
         </div>
 
         <gl-dropdown-header class="mt-0">
-          <gl-search-box ref="searchBox" v-model="filterTerm" />
+          <gl-search-box-by-type ref="searchBox" v-model="filterTerm" />
         </gl-dropdown-header>
 
         <div
