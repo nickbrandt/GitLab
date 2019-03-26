@@ -35,7 +35,7 @@ module EE
 
         # We only support a single resource at the moment
         def resources
-          [object].reject(&:empty?)
+          [object].select(&:present?)
         end
       end
     end
