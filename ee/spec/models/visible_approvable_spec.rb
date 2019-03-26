@@ -69,7 +69,7 @@ describe VisibleApprovable do
     end
 
     context 'when committer is approver' do
-      let(:user) { create(:user, email: resource.commits.first.committer_email) }
+      let(:user) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
       let!(:committer_approver) { create(:approver, target: project, user: user) }
 
       before do
