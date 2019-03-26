@@ -31,7 +31,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
   end
 
   describe ProjectsController, '(JavaScript fixtures)', type: :controller do
-    it 'projects/dashboard.html.raw' do |example|
+    it 'projects/dashboard.html' do |example|
       get :show, params: {
         namespace_id: project.namespace.to_param,
         id: project
@@ -41,7 +41,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
       store_frontend_fixture(response, example.description)
     end
 
-    it 'projects/overview.html.raw' do |example|
+    it 'projects/overview.html' do |example|
       get :show, params: {
         namespace_id: project_with_repo.namespace.to_param,
         id: project_with_repo
@@ -51,7 +51,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
       store_frontend_fixture(response, example.description)
     end
 
-    it 'projects/edit.html.raw' do |example|
+    it 'projects/edit.html' do |example|
       get :edit, params: {
         namespace_id: project.namespace.to_param,
         id: project
@@ -63,7 +63,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
   end
 
   describe Projects::Settings::CiCdController, '(JavaScript fixtures)', type: :controller do
-    it 'projects/ci_cd_settings.html.raw' do |example|
+    it 'projects/ci_cd_settings.html' do |example|
       get :show, params: {
         namespace_id: project.namespace.to_param,
         project_id: project
@@ -73,7 +73,7 @@ describe 'Projects (JavaScript fixtures)', type: :controller do
       store_frontend_fixture(response, example.description)
     end
 
-    it 'projects/ci_cd_settings_with_variables.html.raw' do |example|
+    it 'projects/ci_cd_settings_with_variables.html' do |example|
       create(:ci_variable, project: project_variable_populated)
       create(:ci_variable, project: project_variable_populated)
 

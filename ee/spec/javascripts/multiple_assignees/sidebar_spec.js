@@ -1,7 +1,7 @@
 describe('Sidebar', () => {
-  preloadFixtures('issues/open-issue.html.raw');
+  preloadFixtures('issues/open-issue.html');
 
-  beforeEach(() => loadFixtures('issues/open-issue.html.raw'));
+  beforeEach(() => loadFixtures('issues/open-issue.html'));
 
   it('does not have a max select', () => {
     const dropdown = document.querySelector('.js-author-search');
