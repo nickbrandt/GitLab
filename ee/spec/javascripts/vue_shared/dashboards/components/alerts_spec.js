@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Alerts from 'ee/operations/components/dashboard/alerts.vue';
+import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 
 const localVue = createLocalVue();
 

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import TokenizedInput from 'ee/operations/components/tokenized_input/input.vue';
+import TokenizedInput from 'ee/vue_shared/dashboards/components/input.vue';
 import { clearState } from '../../helpers';
 import { mockProjectData } from '../../mock_data';
 

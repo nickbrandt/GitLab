@@ -5,8 +5,8 @@ import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
-import TokenizedInput from '../tokenized_input/input.vue';
-import inputFocus from '../../mixins';
+import TokenizedInput from './input.vue';
+import inputFocus from '../mixins';
 
 const inputSearchDelay = 300;
 

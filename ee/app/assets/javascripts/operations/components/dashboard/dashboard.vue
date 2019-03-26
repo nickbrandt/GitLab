@@ -1,8 +1,8 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon, GlDashboardSkeleton } from '@gitlab/ui';
+import ProjectSearch from 'ee/vue_shared/dashboards/components/project_search.vue';
 import DashboardProject from './project.vue';
-import ProjectSearch from './project_search.vue';
 
 export default {
   components: {

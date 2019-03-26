@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
-import inputFocus from '../../mixins';
+import inputFocus from '../mixins';
 
 export default {
   components: {
