@@ -118,7 +118,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		if err == filestore.ErrEntityTooLarge {
 			return err
 		}
-		return fmt.Errorf("Persisting multipart file: %v", err)
+		return fmt.Errorf("persisting multipart file: %v", err)
 	}
 
 	for key, value := range fh.GitLabFinalizeFields(name) {

@@ -15,7 +15,7 @@ import (
 type SizeError error
 
 // ErrEntityTooLarge means that the uploaded content is bigger then maximum allowed size
-var ErrEntityTooLarge = errors.New("Entity is too large")
+var ErrEntityTooLarge = errors.New("entity is too large")
 
 // FileHandler represent a file that has been processed for upload
 // it may be either uploaded to an ObjectStore and/or saved on local path.
@@ -125,7 +125,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}
 
 	if len(writers) == 1 {
-		return nil, errors.New("Missing upload destination")
+		return nil, errors.New("missing upload destination")
 	}
 
 	multiWriter := io.MultiWriter(writers...)
@@ -135,7 +135,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}
 
 	if size != -1 && size != fh.Size {
-		return nil, SizeError(fmt.Errorf("Expected %d bytes but got only %d", size, fh.Size))
+		return nil, SizeError(fmt.Errorf("expected %d bytes but got only %d", size, fh.Size))
 	}
 
 	fh.hashes = hashes.finish()

@@ -52,7 +52,7 @@ var (
 	kubeMsg       = append([]byte{0}, msg...)
 	kubeMsgBase64 = append([]byte{'0'}, msgBase64...)
 
-	fakeErr = errors.New("fake error")
+	errFake = errors.New("fake error")
 
 	text   = websocket.TextMessage
 	binary = websocket.BinaryMessage
@@ -81,25 +81,25 @@ func assertEqual(t *testing.T, expected, actual *fakeConn, msg string, args ...i
 func TestReadMessage(t *testing.T) {
 	testCases := map[string][]testcase{
 		"channel.k8s.io": {
-			{fake(binary, kubeMsg, fakeErr), fake(binary, kubeMsg, fakeErr)},
+			{fake(binary, kubeMsg, errFake), fake(binary, kubeMsg, errFake)},
 			{fake(binary, kubeMsg, nil), fake(binary, msg, nil)},
 			{fake(text, kubeMsg, nil), fake(binary, msg, nil)},
 			{fakeOther, fakeOther},
 		},
 		"base64.channel.k8s.io": {
-			{fake(text, kubeMsgBase64, fakeErr), fake(text, kubeMsgBase64, fakeErr)},
+			{fake(text, kubeMsgBase64, errFake), fake(text, kubeMsgBase64, errFake)},
 			{fake(text, kubeMsgBase64, nil), fake(binary, msg, nil)},
 			{fake(binary, kubeMsgBase64, nil), fake(binary, msg, nil)},
 			{fakeOther, fakeOther},
 		},
 		"terminal.gitlab.com": {
-			{fake(binary, msg, fakeErr), fake(binary, msg, fakeErr)},
+			{fake(binary, msg, errFake), fake(binary, msg, errFake)},
 			{fake(binary, msg, nil), fake(binary, msg, nil)},
 			{fake(text, msg, nil), fake(binary, msg, nil)},
 			{fakeOther, fakeOther},
 		},
 		"base64.terminal.gitlab.com": {
-			{fake(text, msgBase64, fakeErr), fake(text, msgBase64, fakeErr)},
+			{fake(text, msgBase64, errFake), fake(text, msgBase64, errFake)},
 			{fake(text, msgBase64, nil), fake(binary, msg, nil)},
 			{fake(binary, msgBase64, nil), fake(binary, msg, nil)},
 			{fakeOther, fakeOther},
@@ -119,25 +119,25 @@ func TestReadMessage(t *testing.T) {
 func TestWriteMessage(t *testing.T) {
 	testCases := map[string][]testcase{
 		"channel.k8s.io": {
-			{fake(binary, msg, fakeErr), fake(binary, kubeMsg, fakeErr)},
+			{fake(binary, msg, errFake), fake(binary, kubeMsg, errFake)},
 			{fake(binary, msg, nil), fake(binary, kubeMsg, nil)},
 			{fake(text, msg, nil), fake(binary, kubeMsg, nil)},
 			{fakeOther, fakeOther},
 		},
 		"base64.channel.k8s.io": {
-			{fake(binary, msg, fakeErr), fake(text, kubeMsgBase64, fakeErr)},
+			{fake(binary, msg, errFake), fake(text, kubeMsgBase64, errFake)},
 			{fake(binary, msg, nil), fake(text, kubeMsgBase64, nil)},
 			{fake(text, msg, nil), fake(text, kubeMsgBase64, nil)},
 			{fakeOther, fakeOther},
 		},
 		"terminal.gitlab.com": {
-			{fake(binary, msg, fakeErr), fake(binary, msg, fakeErr)},
+			{fake(binary, msg, errFake), fake(binary, msg, errFake)},
 			{fake(binary, msg, nil), fake(binary, msg, nil)},
 			{fake(text, msg, nil), fake(binary, msg, nil)},
 			{fakeOther, fakeOther},
 		},
 		"base64.terminal.gitlab.com": {
-			{fake(binary, msg, fakeErr), fake(text, msgBase64, fakeErr)},
+			{fake(binary, msg, errFake), fake(text, msgBase64, errFake)},
 			{fake(binary, msg, nil), fake(text, msgBase64, nil)},
 			{fake(text, msg, nil), fake(text, msgBase64, nil)},
 			{fakeOther, fakeOther},

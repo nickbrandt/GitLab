@@ -59,7 +59,7 @@ func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, erro
 	scrubbedArchivePath := helper.ScrubURLParams(archivePath)
 	req, err := http.NewRequest(http.MethodGet, archivePath, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Can't create HTTP GET %q: %v", scrubbedArchivePath, err)
+		return nil, fmt.Errorf("can't create HTTP GET %q: %v", scrubbedArchivePath, err)
 	}
 	req = req.WithContext(ctx)
 

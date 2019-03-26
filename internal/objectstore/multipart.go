@@ -18,7 +18,7 @@ import (
 )
 
 // ErrNotEnoughParts will be used when writing more than size * len(partURLs)
-var ErrNotEnoughParts = errors.New("Not enough Parts")
+var ErrNotEnoughParts = errors.New("not enough Parts")
 
 // Multipart represents a MultipartUpload on a S3 compatible Object Store service.
 // It can be used as io.WriteCloser for uploading an object
@@ -76,7 +76,7 @@ func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL,
 
 		n, err := io.Copy(ioutil.Discard, pr)
 		if err != nil {
-			m.uploadError = fmt.Errorf("Cannot drain pipe: %v", err)
+			m.uploadError = fmt.Errorf("cannot drain pipe: %v", err)
 			return
 		}
 		if n > 0 {
@@ -120,12 +120,12 @@ func (m *Multipart) cleanup(ctx context.Context) {
 func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 	body, err := xml.Marshal(cmu)
 	if err != nil {
-		return fmt.Errorf("Cannot marshal CompleteMultipartUpload request: %v", err)
+		return fmt.Errorf("cannot marshal CompleteMultipartUpload request: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", m.CompleteURL, bytes.NewReader(body))
 	if err != nil {
-		return fmt.Errorf("Cannot create CompleteMultipartUpload request: %v", err)
+		return fmt.Errorf("cannot create CompleteMultipartUpload request: %v", err)
 	}
 	req.ContentLength = int64(len(body))
 	req.Header.Set("Content-Type", "application/xml")
@@ -144,7 +144,7 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 	result := &compoundCompleteMultipartUploadResult{}
 	decoder := xml.NewDecoder(resp.Body)
 	if err := decoder.Decode(&result); err != nil {
-		return fmt.Errorf("Cannot decode CompleteMultipartUpload answer: %v", err)
+		return fmt.Errorf("cannot decode CompleteMultipartUpload answer: %v", err)
 	}
 
 	if result.isError() {
@@ -152,7 +152,7 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 	}
 
 	if result.CompleteMultipartUploadResult == nil {
-		return fmt.Errorf("Cannot read CompleteMultipartUpload answer")
+		return fmt.Errorf("cannot read CompleteMultipartUpload answer")
 	}
 
 	m.extractETag(result.ETag)
@@ -178,7 +178,7 @@ func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
 func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {
 	file, err := ioutil.TempFile("", "part-buffer")
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create a temporary file for buffering: %v", err)
+		return nil, fmt.Errorf("unable to create a temporary file for buffering: %v", err)
 	}
 	defer func(path string) {
 		if err := os.Remove(path); err != nil {
@@ -188,19 +188,19 @@ func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]s
 
 	n, err := io.Copy(file, src)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot write part %d to disk: %v", partNumber, err)
+		return nil, fmt.Errorf("cannot write part %d to disk: %v", partNumber, err)
 	}
 	if n == 0 {
 		return nil, nil
 	}
 
 	if _, err = file.Seek(0, io.SeekStart); err != nil {
-		return nil, fmt.Errorf("Cannot rewind part %d temporary dump : %v", partNumber, err)
+		return nil, fmt.Errorf("cannot rewind part %d temporary dump : %v", partNumber, err)
 	}
 
 	etag, err := m.uploadPart(partURL, putHeaders, file, n)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot upload part %d: %v", partNumber, err)
+		return nil, fmt.Errorf("cannot upload part %d: %v", partNumber, err)
 	}
 	return &completeMultipartUploadPart{PartNumber: partNumber, ETag: etag}, nil
 }
@@ -208,7 +208,7 @@ func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]s
 func (m *Multipart) uploadPart(url string, headers map[string]string, body io.Reader, size int64) (string, error) {
 	deadline, ok := m.ctx.Deadline()
 	if !ok {
-		return "", fmt.Errorf("Missing deadline")
+		return "", fmt.Errorf("missing deadline")
 	}
 
 	part, err := newObject(m.ctx, url, "", headers, deadline, size, false)

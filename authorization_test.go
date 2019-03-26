@@ -83,7 +83,7 @@ func TestPreAuthorizeContentTypeFailure(t *testing.T) {
 
 func TestPreAuthorizeRedirect(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}))
 	defer ts.Close()
 

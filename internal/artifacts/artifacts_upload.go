@@ -77,10 +77,10 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 	//  ProcessFile for artifacts requires file form-data field name to eq `file`
 
 	if formName != "file" {
-		return fmt.Errorf("Invalid form field: %q", formName)
+		return fmt.Errorf("invalid form field: %q", formName)
 	}
 	if a.stored {
-		return fmt.Errorf("Artifacts request contains more than one file")
+		return fmt.Errorf("artifacts request contains more than one file")
 	}
 	a.stored = true
 

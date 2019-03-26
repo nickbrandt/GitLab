@@ -150,7 +150,7 @@ func (a *alwaysLocalPreparer) Prepare(_ *api.Response) (*filestore.SaveFileOpts,
 
 type alwaysFailsVerifier struct{}
 
-func (_ alwaysFailsVerifier) Verify(handler *filestore.FileHandler) error {
+func (alwaysFailsVerifier) Verify(handler *filestore.FileHandler) error {
 	return fmt.Errorf("Verification failed")
 }
 
