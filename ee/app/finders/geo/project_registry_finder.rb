@@ -27,25 +27,11 @@ module Geo
     end
 
     def count_verified_repositories
-      relation =
-        if use_legacy_queries?
-          legacy_find_verified_repositories
-        else
-          find_verified_repositories
-        end
-
-      relation.count
+      registries_for_verified_projects(:repository).count
     end
 
     def count_verified_wikis
-      relation =
-        if use_legacy_queries?
-          legacy_find_verified_wikis
-        else
-          fdw_find_verified_wikis
-        end
-
-      relation.count
+      registries_for_verified_projects(:wiki).count
     end
 
     def count_repositories_checksum_mismatch
@@ -125,38 +111,6 @@ module Geo
 
     protected
 
-    def finder_klass_for_synced_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncedFinder
-      else
-        Geo::LegacyProjectRegistrySyncedFinder
-      end
-    end
-
-    def registries_for_synced_projects(type)
-      finder_klass_for_synced_registries
-        .new(current_node: current_node, type: type)
-        .execute
-    end
-
-    def finder_klass_for_failed_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncFailedFinder
-      else
-        Geo::LegacyProjectRegistrySyncFailedFinder
-      end
-    end
-
-    def registries_for_failed_projects(type)
-      finder_klass_for_failed_registries
-        .new(current_node: current_node, type: type)
-        .execute
-    end
-
-    def find_verified_repositories
-      Geo::ProjectRegistry.verified_repos
-    end
-
     def find_filtered_verification_failed_project_registries(type = nil)
       case type
       when 'repository'
@@ -221,11 +175,6 @@ module Geo
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>]
-    def fdw_find_verified_wikis
-      Geo::ProjectRegistry.verified_wikis
-    end
-
     def fdw_inner_join_projects
       local_registry_table
         .join(fdw_project_table, Arel::Nodes::InnerJoin)
@@ -279,27 +228,6 @@ module Geo
     def quote_value(value)
       ::Gitlab::SQL::Glob.q(value)
     end
-
-    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of verified projects
-    def legacy_find_verified_repositories
-      legacy_find_project_registries(Geo::ProjectRegistry.verified_repos)
-    end
-
-    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of verified wikis
-    def legacy_find_verified_wikis
-      legacy_find_project_registries(Geo::ProjectRegistry.verified_wikis)
-    end
-
-    # @return [ActiveRecord::Relation<Project>] list of synced projects
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_project_registries(project_registries)
-      legacy_inner_join_registry_ids(
-        current_node.projects,
-        project_registries.pluck(:project_id),
-        Project
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of projects that verification has failed
     # rubocop: disable CodeReuse/ActiveRecord
@@ -399,6 +327,50 @@ module Geo
 
     def wiki_missing_on_primary_is_not_true
       Arel::Nodes::SqlLiteral.new("project_registry.wiki_missing_on_primary IS NOT TRUE")
+    end
+
+    private
+
+    def finder_klass_for_synced_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistrySyncedFinder
+      else
+        Geo::LegacyProjectRegistrySyncedFinder
+      end
+    end
+
+    def registries_for_synced_projects(type)
+      finder_klass_for_synced_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_failed_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistrySyncFailedFinder
+      else
+        Geo::LegacyProjectRegistrySyncFailedFinder
+      end
+    end
+
+    def registries_for_failed_projects(type)
+      finder_klass_for_failed_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_verified_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistryVerifiedFinder
+      else
+        Geo::LegacyProjectRegistryVerifiedFinder
+      end
+    end
+
+    def registries_for_verified_projects(type)
+      finder_klass_for_verified_registries
+        .new(current_node: current_node, type: type)
+        .execute
     end
   end
 end

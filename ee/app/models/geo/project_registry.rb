@@ -112,6 +112,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.verified(type)
+    case type
+    when :repository
+      verified_repos
+    when :wiki
+      verified_wikis
+    else
+      none
+    end
+  end
+
   def self.flag_repositories_for_resync!
     update_all(
       resync_repository: true,
