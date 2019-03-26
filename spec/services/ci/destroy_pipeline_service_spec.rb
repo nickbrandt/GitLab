@@ -17,16 +17,6 @@ describe ::Ci::DestroyPipelineService do
       expect { pipeline.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    context 'when audit events is enabled' do
-      before do
-        stub_licensed_features(extended_audit_events: true, admin_audit_log: true)
-      end
-
-      it 'does not log an audit event' do
-        expect { subject }.not_to change { SecurityEvent.count }
-      end
-    end
-
     context 'when the pipeline has jobs' do
       let!(:build) { create(:ci_build, project: project, pipeline: pipeline) }
 
