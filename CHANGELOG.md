@@ -2,6 +2,10 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 11.8.4 (2019-03-26)
+
+- No changes.
+
 ## 11.8.3 (2019-03-19)
 
 ### Security (1 change)
