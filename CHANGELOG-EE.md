@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.2 (2019-03-26)
+
+### Security (2 changes)
+
+- Geo - Improve security while redirecting user back to the secondary after a logout & re-login via the primary.
+- Check label_ids parent when updating issue board.
+
+
 ## 11.9.1 (2019-03-25)
 
 ### Fixed (1 change)
