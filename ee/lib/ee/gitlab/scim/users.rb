@@ -35,7 +35,7 @@ module EE
 
         # We only support a single resource at the moment
         def resources
-          object.present? ? [object] : []
+          [object].reject(&:empty?)
         end
       end
     end

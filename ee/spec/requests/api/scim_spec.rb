@@ -105,6 +105,46 @@ describe API::Scim do
         it 'updates the name' do
           expect(user.reload.name).to eq('new_name')
         end
+
+        it 'responds with an empty response' do
+          expect(json_response).to eq({})
+        end
+      end
+
+      context 'email' do
+        context 'non existent email' do
+          before do
+            params = { Operations: [{ 'op': 'Replace', 'path': 'emails[type eq "work"].value', 'value': 'new@mail.com' }] }.to_query
+
+            patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+          end
+
+          it 'updates the email' do
+            expect(user.reload.unconfirmed_email).to eq('new@mail.com')
+          end
+
+          it 'responds with 204' do
+            expect(response).to have_gitlab_http_status(204)
+          end
+        end
+
+        context 'existent email' do
+          before do
+            create(:user, email: 'new@mail.com')
+
+            params = { Operations: [{ 'op': 'Replace', 'path': 'emails[type eq "work"].value', 'value': 'new@mail.com' }] }.to_query
+
+            patch scim_api("scim/v2/groups/#{group.full_path}/Users/#{identity.extern_uid}?#{params}")
+          end
+
+          it 'does not update a duplicated email' do
+            expect(user.reload.unconfirmed_email).not_to eq('new@mail.com')
+          end
+
+          it 'responds with 209' do
+            expect(response).to have_gitlab_http_status(409)
+          end
+        end
       end
 
       context 'Remove user' do
@@ -137,6 +177,10 @@ describe API::Scim do
 
       it 'removes the identity link' do
         expect { identity.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it 'responds with an empty response' do
+        expect(json_response).to eq({})
       end
     end
 

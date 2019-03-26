@@ -61,7 +61,7 @@ module API
             scim_error!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
 
             result = ::Users::UpdateService.new(identity.user,
-                                                parsed_hash.except(:extern_uid, :provider)
+                                                parsed_hash.except(:extern_uid)
                                                   .merge(user: identity.user)).execute
 
             result[:status] == :success

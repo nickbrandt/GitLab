@@ -25,11 +25,11 @@ module EE
         end
 
         def deprovision_user?
-          hash[:active] == false
+          data[:active] == false
         end
 
         def to_hash
-          @hash ||=
+          @data ||=
             begin
               hash = {}
 
@@ -40,8 +40,8 @@ module EE
             end
         end
 
-        alias_method :hash, :to_hash
-        private :hash
+        alias_method :data, :to_hash
+        private :data
 
         private
 

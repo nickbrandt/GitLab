@@ -3,7 +3,19 @@
 module EE
   module Gitlab
     module Scim
-      class Error < EE::Gitlab::Scim::NotFound
+      class Error < Grape::Entity
+        expose :schemas
+        expose :detail, safe: true
+        expose :status
+
+        private
+
+        DEFAULT_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:Error'
+
+        def schemas
+          [DEFAULT_SCHEMA]
+        end
+
         def status
           409
         end
