@@ -11,12 +11,18 @@ module GroupSaml
         @identity = identity
       end
 
-      def execute
-        identity.destroy!
-        remove_group_access
+      def execute(transactional: false)
+        with_transaction(transactional) do
+          identity.destroy!
+          remove_group_access
+        end
       end
 
       private
+
+      def with_transaction(transactional, &block)
+        transactional ? ::Identity.transaction { yield } : yield
+      end
 
       def remove_group_access
         return unless group_membership

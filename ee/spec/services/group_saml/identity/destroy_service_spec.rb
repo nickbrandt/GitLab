@@ -21,6 +21,18 @@ describe GroupSaml::Identity::DestroyService do
     expect(identity).to be_destroyed
   end
 
+  it "does not use a transaction" do
+    expect(::Identity).to receive(:transaction).and_yield.once
+
+    subject.execute
+  end
+
+  it "uses a transaction when transactional is set" do
+    expect(::Identity).to receive(:transaction).and_yield.twice
+
+    subject.execute(transactional: true)
+  end
+
   it "removes access to the group" do
     expect do
       subject.execute

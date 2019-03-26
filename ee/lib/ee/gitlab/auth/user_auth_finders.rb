@@ -5,6 +5,7 @@ module EE
     module Auth
       module UserAuthFinders
         extend ActiveSupport::Concern
+        extend ::Gitlab::Utils::Override
 
         JOB_TOKEN_HEADER = "HTTP_JOB_TOKEN".freeze
         JOB_TOKEN_PARAM = :job_token
@@ -21,6 +22,17 @@ module EE
           @job_token_authentication = true # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
           job.user
+        end
+
+        override :find_oauth_access_token
+        def find_oauth_access_token
+          return if scim_request?
+
+          super
+        end
+
+        def scim_request?
+          current_request.path.starts_with?("/api/scim/")
         end
       end
     end
