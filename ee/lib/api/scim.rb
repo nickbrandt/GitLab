@@ -147,7 +147,9 @@ module API
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless identity
 
-          scim_not_found!(message: "Resource #{params[:id]} not found") unless destroy_identity(identity)
+          destroyed = destroy_identity(identity)
+
+          scim_not_found!(message: "Resource #{params[:id]} not found") unless destroyed
 
           status 204
 
