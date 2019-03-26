@@ -59,10 +59,10 @@ describe Projects::UpdateMirrorService do
         expect(project.repository.tag_names).to include('new-tag')
       end
 
-      it "only invokes GitTagPushService for tags pointing to commits" do
+      it "only invokes Git::TagPushService for tags pointing to commits" do
         stub_fetch_mirror(project)
 
-        expect(GitTagPushService).to receive(:new)
+        expect(Git::TagPushService).to receive(:new)
           .with(project, project.owner, hash_including(ref: 'refs/tags/new-tag'))
           .and_return(double(execute: true))
 
