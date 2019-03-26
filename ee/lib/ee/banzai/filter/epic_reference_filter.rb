@@ -29,13 +29,13 @@ module EE
         end
 
         def data_attributes_for(text, group, object, link_content: false, link_reference: false)
-          data_attribute(
+          {
             original:       text,
             link:           link_content,
             link_reference: link_reference,
             group:          group.id,
             object_sym =>   object.id
-          )
+          }
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
