@@ -1,0 +1,156 @@
+.burndown-hint.container-fluid {
+  border: 1px solid $border-color;
+  border-radius: $border-radius-default;
+  position: relative;
+  margin: $gl-padding 0;
+  overflow: hidden;
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  .dismiss-icon {
+    position: absolute;
+    right: $gl-padding;
+    cursor: pointer;
+    color: $cycle-analytics-dismiss-icon-color;
+    z-index: 1;
+  }
+
+  .svg-container {
+    text-align: center;
+
+    svg {
+      max-width: 200px;
+      max-height: 200px;
+    }
+  }
+
+  .inner-content {
+    @include media-breakpoint-down(xs) {
+      padding: 0 28px;
+      text-align: center;
+    }
+
+    h4 {
+      color: $gl-text-color;
+      font-size: 17px;
+    }
+
+    p {
+      color: $cycle-analytics-box-text-color;
+      margin-bottom: $gl-padding;
+    }
+  }
+}
+
+.burndown-docs-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.burndown-header {
+  margin: 24px 0 12px;
+
+  h3 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .btn-group {
+    margin-left: 20px;
+    margin-bottom: 2px;
+  }
+
+  .btn {
+    @include btn-outline($white-light, $blue-500, $blue-500, $blue-500, $white-light, $blue-600, $blue-600, $blue-700);
+
+    font-size: 12px;
+
+    &.active {
+      background-color: $blue-500;
+      border-color: $blue-600;
+      color: $white-light;
+    }
+  }
+}
+
+.burndown-chart {
+  width: 100%;
+  height: 380px;
+  margin: 5px 0;
+
+  @include media-breakpoint-down(sm) {
+    height: 320px;
+  }
+
+  @include media-breakpoint-down(xs) {
+    height: 200px;
+  }
+
+  .axis {
+    font-size: 12px;
+
+    line,
+    path {
+      fill: none;
+      stroke: $gl-gray-350;
+      shape-rendering: crispEdges;
+    }
+  }
+
+  .axis-label {
+    text {
+      fill: $gl-text-color-secondary;
+    }
+
+    line {
+      stroke: $border-color;
+    }
+  }
+
+  .legend {
+    shape-rendering: crispEdges;
+
+    text {
+      font-size: 13px;
+      fill: $gl-text-color-tertiary;
+    }
+
+    rect {
+      stroke: $border-color;
+      fill: none;
+    }
+  }
+
+  .line {
+    stroke-width: 2px;
+    fill: none;
+
+    &.actual {
+      stroke: $green-500;
+    }
+
+    &.ideal {
+      stroke: $gl-gray-350;
+      stroke-dasharray: 6px 6px;
+    }
+  }
+
+  .focus {
+    circle {
+      fill: $white-light;
+      stroke: $green-500;
+      stroke-width: 2px;
+    }
+  }
+
+  .chart-tooltip {
+    text {
+      font-size: 12px;
+      fill: $white-light;
+    }
+
+    rect {
+      fill: $black;
+    }
+  }
+}
