@@ -2,13 +2,13 @@ import $ from 'jquery';
 import setup from 'ee/approvals/setup_single_rule_approvals';
 
 describe('EE setup_single_rule_approvals', () => {
-  preloadFixtures('merge_requests_ee/merge_request_edit.html.raw');
+  preloadFixtures('merge_requests_ee/merge_request_edit.html');
 
   let $approversEl;
   let $suggestionEl;
 
   beforeEach(() => {
-    loadFixtures('merge_requests_ee/merge_request_edit.html.raw');
+    loadFixtures('merge_requests_ee/merge_request_edit.html');
     $approversEl = $('ul.approver-list');
     $suggestionEl = $('.suggested-approvers');
     setup();

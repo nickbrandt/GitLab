@@ -3,14 +3,14 @@ import VariableList from '~/ci_variable_list/ci_variable_list';
 import getSetTimeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 
 describe('VariableList (EE features)', () => {
-  preloadFixtures('projects/ci_cd_settings.html.raw');
+  preloadFixtures('projects/ci_cd_settings.html');
 
   let $wrapper;
   let variableList;
 
   describe('with all inputs(key, value, protected, environment)', () => {
     beforeEach(() => {
-      loadFixtures('projects/ci_cd_settings.html.raw');
+      loadFixtures('projects/ci_cd_settings.html');
       $wrapper = $('.js-ci-variable-list-section');
 
       variableList = new VariableList({

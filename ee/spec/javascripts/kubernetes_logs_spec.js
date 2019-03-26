@@ -5,7 +5,7 @@ import axios from '~/lib/utils/axios_utils';
 import { logMockData, podMockData } from './kubernetes_mock_data';
 
 describe('Kubernetes Logs', () => {
-  const fixtureTemplate = 'static/environments_logs.html.raw';
+  const fixtureTemplate = 'static/environments_logs.html';
   const mockPodName = 'production-tanuki-1';
   const logMockPath = '/root/kubernetes-app/environments/1/logs';
   let kubernetesLogContainer;

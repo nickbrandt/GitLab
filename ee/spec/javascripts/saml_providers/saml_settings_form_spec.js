@@ -1,7 +1,7 @@
 import SamlSettingsForm from 'ee/saml_providers/saml_settings_form';
 
 describe('SamlSettingsForm', () => {
-  const FIXTURE = 'groups/saml_providers/show.html.raw';
+  const FIXTURE = 'groups/saml_providers/show.html';
   preloadFixtures(FIXTURE);
 
   beforeEach(() => {
