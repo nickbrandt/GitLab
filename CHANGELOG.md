@@ -552,6 +552,10 @@ entry.
 - Creates mixin to reduce code duplication between CE and EE in graph component.
 
 
+## 11.7.8 (2019-03-26)
+
+- No changes.
+
 ## 11.7.7 (2019-03-19)
 
 ### Security (2 changes)
