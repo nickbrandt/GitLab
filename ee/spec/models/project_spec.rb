@@ -325,6 +325,12 @@ describe Project do
     end
   end
 
+  describe '#beta_feature_available?' do
+    it_behaves_like 'an entity with beta feature support' do
+      let(:entity) { create(:project) }
+    end
+  end
+
   describe '#feature_available?' do
     let(:namespace) { create(:namespace) }
     let(:plan_license) { nil }
@@ -1729,9 +1735,35 @@ describe Project do
     end
   end
 
-  describe '#insights_available?' do
-    it_behaves_like 'an entity with the Insights feature' do
-      let(:entity) { create(:project) }
+  describe "#insights_config" do
+    context 'when project has no Insights config file' do
+      it 'returns nil' do
+        expect(create(:project).insights_config).to be_nil
+      end
+    end
+
+    context 'when project has an Insights config file' do
+      let(:project) do
+        create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+      end
+
+      context 'with a valid config file' do
+        let(:insights_file_content) { 'key: monthlyBugsCreated' }
+
+        it 'returns the insights config data' do
+          insights_config = project.insights_config
+
+          expect(insights_config).to eq(key: 'monthlyBugsCreated')
+        end
+      end
+
+      context 'with an invalid config file' do
+        let(:insights_file_content) { ': foo bar' }
+
+        it 'returns the insights config data' do
+          expect(project.insights_config).to be_nil
+        end
+      end
     end
   end
 

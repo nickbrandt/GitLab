@@ -26,6 +26,12 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resource :issues_analytics, only: [:show]
 
+    resource :insights, only: [:show] do
+      collection do
+        post :query
+      end
+    end
+
     resource :notification_setting, only: [:update]
 
     resources :ldap_group_links, only: [:index, :create, :destroy]
