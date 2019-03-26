@@ -3,7 +3,6 @@ require 'spec_helper'
 describe NamespacePolicy do
   let(:user) { create(:user) }
   let(:owner) { create(:user) }
-  let(:auditor) { create(:user, :auditor) }
   let(:admin) { create(:admin) }
   let(:namespace) { create(:namespace, owner: owner) }
 
@@ -32,20 +31,6 @@ describe NamespacePolicy do
       let(:owner) { create(:user, projects_limit: 0) }
 
       it { is_expected.to be_disallowed(:create_projects) }
-    end
-  end
-
-  context 'auditor' do
-    let(:current_user) { auditor }
-
-    context 'owner' do
-      let(:namespace) { create(:namespace, owner: auditor) }
-
-      it { is_expected.to be_allowed(*owner_permissions) }
-    end
-
-    context 'non-owner' do
-      it { is_expected.to be_disallowed(*owner_permissions) }
     end
   end
 
