@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
-import ProjectSearch from 'ee/operations/components/dashboard/project_search.vue';
+import ProjectSearch from 'ee/vue_shared/dashboards/components/project_search.vue';
 import DashboardProject from 'ee/operations/components/dashboard/project.vue';
 import { getChildInstances, clearState } from '../../helpers';
 import { mockProjectData, mockText } from '../../mock_data';

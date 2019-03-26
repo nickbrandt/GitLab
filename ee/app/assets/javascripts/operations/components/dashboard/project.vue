@@ -7,10 +7,11 @@ import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import Commit from '~/vue_shared/components/commit.vue';
+import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
+import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
+import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
+import { STATUS_FAILED, STATUS_RUNNING } from 'ee/vue_shared/dashboards/constants';
 import ProjectHeader from './project_header.vue';
-import Alerts from './alerts.vue';
-import ProjectPipeline from './project_pipeline.vue';
-import { STATUS_FAILED, STATUS_RUNNING } from '../../constants';
 
 export default {
   components: {
@@ -19,6 +20,7 @@ export default {
     Commit,
     Alerts,
     ProjectPipeline,
+    TimeAgo,
     GlTooltip,
     Icon,
   },
@@ -128,20 +130,11 @@ export default {
         </div>
 
         <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
-          <div v-if="shouldShowTimeAgo" class="text-secondary">
-            <icon
-              name="clock"
-              class="dashboard-card-time-ago-icon align-text-bottom js-dashboard-project-clock-icon"
-            />
-
-            <time ref="timeAgo" class="js-dashboard-project-time-ago">
-              {{ timeFormated(finishedTime) }}
-            </time>
-            <gl-tooltip :target="() => $refs.timeAgo">
-              <div class="bold">{{ $options.tooltips.timeAgo }}</div>
-              <div>{{ finishedTimeTitle }}</div>
-            </gl-tooltip>
-          </div>
+          <time-ago
+            v-if="shouldShowTimeAgo"
+            :time="finishedTime"
+            :tooltip-text="$options.tooltips.timeAgo"
+          />
           <alerts :count="project.alert_count" />
         </div>
 

@@ -4,7 +4,7 @@ import CiBadgeLink from '~/vue_shared/components/ci_badge_link.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { GlLink, GlTooltip } from '@gitlab/ui';
-import { STATUS_FAILED } from '../../constants';
+import { STATUS_FAILED } from '../constants';
 
 export default {
   components: {

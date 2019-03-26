@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import Commit from '~/vue_shared/components/commit.vue';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
-import Alerts from 'ee/operations/components/dashboard/alerts.vue';
+import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
 import store from 'ee/operations/store';
 import { mockOneProject } from '../../mock_data';
 
@@ -77,19 +77,6 @@ describe('project component', () => {
 
       it('binds tag', () => {
         expect(commit.props('tag')).toBe(wrapper.props().project.last_pipeline.ref.tag);
-      });
-    });
-
-    describe('deploy finished at', () => {
-      it('renders clock icon', () => {
-        expect(wrapper.contains('.js-dashboard-project-clock-icon')).toBe(true);
-      });
-
-      it('renders time ago of finished time', () => {
-        const timeago = '1 day ago';
-        const container = wrapper.element.querySelector('.js-dashboard-project-time-ago');
-
-        expect(container.innerText.trim()).toBe(timeago);
       });
     });
   });
