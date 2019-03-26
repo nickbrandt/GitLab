@@ -103,5 +103,9 @@ module EE
       possible_code_owner_blobs = ::Gitlab::CodeOwners::FILE_PATHS.map { |path| [ref, path] }
       blobs_at(possible_code_owner_blobs).compact.first
     end
+
+    def insights_config_for(sha)
+      blob_data_at(sha, ::Gitlab::Insights::CONFIG_FILE_PATH)
+    end
   end
 end

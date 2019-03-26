@@ -187,4 +187,24 @@ describe Repository do
         .not_to change { ::Geo::RepositoryUpdatedEvent.count }
     end
   end
+
+  describe "#insights_config_for" do
+    context 'when no config file exists' do
+      it 'returns nil if does not exist' do
+        expect(repository.insights_config_for(repository.root_ref)).to be_nil
+      end
+    end
+
+    it 'returns nil for an empty repository' do
+      allow(repository).to receive(:empty?).and_return(true)
+
+      expect(repository.insights_config_for(repository.root_ref)).to be_nil
+    end
+
+    it 'returns a valid Insights config file' do
+      project = create(:project, :custom_repo, files: { Gitlab::Insights::CONFIG_FILE_PATH => "monthlyBugsCreated:\n  title: My chart" })
+
+      expect(project.repository.insights_config_for(project.repository.root_ref)).to eq("monthlyBugsCreated:\n  title: My chart")
+    end
+  end
 end
