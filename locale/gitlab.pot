@@ -3478,7 +3478,7 @@ msgstr ""
 msgid "DesignManagement|Error uploading a new design. Please try again"
 msgstr ""
 
-msgid "DesignManagement|Upload new designs"
+msgid "DesignManagement|Upload designs"
 msgstr ""
 
 msgid "Designs"
