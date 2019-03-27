@@ -77,12 +77,10 @@
 			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "mE9XW26JSpe4meBObM6J/Oeq0eg=",
+			"checksumSHA1": "Y2MOwzNZfl4NRNDbLCZa6sgx7O0=",
 			"path": "github.com/golang/protobuf/proto",
-			"revision": "aa810b61a9c79d51363740d207bb46cf8e620ed5",
-			"revisionTime": "2018-08-14T21:14:27Z",
-			"version": "v1",
-			"versionExact": "v1.2.0"
+			"revision": "c823c79ea1570fb5ff454033735a8e68575d1d0f",
+			"revisionTime": "2019-02-05T22:20:52Z"
 		},
 		{
 			"checksumSHA1": "WOkXetG3AqJnfVVuqTJvdukcHps=",
@@ -571,12 +569,12 @@
 			"revisionTime": "2018-11-02T16:30:54Z"
 		},
 		{
-			"checksumSHA1": "pPdDKql6e61B46RD1vrjUOXXZFs=",
+			"checksumSHA1": "0SRNhL8pjnvbTuxsGBM0a1KECl4=",
 			"path": "gitlab.com/gitlab-org/gitaly-proto/go/gitalypb",
-			"revision": "5a6b2cb914313dcb6e90c50deec98c294e3d5788",
-			"revisionTime": "2019-02-27T11:19:13Z",
-			"version": "v1.13.0",
-			"versionExact": "v1.13.0"
+			"revision": "a78297381af20d4ac7108c07c09539ae70ebf074",
+			"revisionTime": "2019-03-27T06:54:18Z",
+			"version": "v1.19.0",
+			"versionExact": "v1.19.0"
 		},
 		{
 			"checksumSHA1": "SbYAalNU5azT8lJGerDI4I/Nw84=",
