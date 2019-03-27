@@ -6,7 +6,10 @@ module EE
 
     override :group_overview_nav_link_paths
     def group_overview_nav_link_paths
-      super + %w(groups/security/dashboard#show)
+      super + %w[
+        groups/security/dashboard#show
+        groups/insights#show
+      ]
     end
 
     override :group_nav_link_paths
@@ -39,6 +42,10 @@ module EE
 
       if @group.feature_available?(:issues_analytics)
         links << :analytics
+      end
+
+      if @group.insights_available?
+        links << :group_insights
       end
 
       links
