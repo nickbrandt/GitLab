@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import '~/commons/bootstrap';
 import axios from '~/lib/utils/axios_utils';
 import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';

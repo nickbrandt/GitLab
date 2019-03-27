@@ -67,6 +67,10 @@ import {
   containerScanningFeedbacks,
 } from '../mock_data';
 
+jest.mock('~/lib/utils/url_utility', () => ({
+  visitUrl: jest.fn().mockName('visitUrlMock')
+}));
+
 describe('security reports actions', () => {
   let mockedState;
   let mock;
@@ -1504,10 +1508,6 @@ describe('security reports actions', () => {
   });
 
   describe('createNewIssue', () => {
-    beforeEach(() => {
-      spyOnDependency(actions, 'visitUrl');
-    });
-
     it('with success should dispatch `receiveDismissIssue`', done => {
       mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
       mockedState.vulnerabilityFeedbackPath = 'create_issue_path';
@@ -1607,10 +1607,6 @@ describe('security reports actions', () => {
   });
 
   describe('createMergeRequest', () => {
-    beforeEach(() => {
-      spyOnDependency(actions, 'visitUrl');
-    });
-
     it('with success should dispatch `receiveCreateMergeRequestSuccess`', done => {
       const data = { merge_request_path: 'fakepath.html' };
       mock.onPost('create_merge_request_path').reply(200, data);
