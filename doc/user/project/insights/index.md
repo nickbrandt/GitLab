@@ -28,6 +28,11 @@ NOTE: **Note:**
 Once the configuration file is created, you can also
 [use it for your project's group](../../group/insights/index.md#configure-your-insights).
 
+NOTE: **Note:**
+If the project doesn't have any configuration file, it'll try to use
+the group configuration if possible. If the group doesn't have any
+configuration, the default configuration will be used.
+
 ## Permissions
 
 If you have access to view a project, then you have access to view their

@@ -403,8 +403,8 @@ describe Group do
 
   describe "#insights_config" do
     context 'when group has no Insights project configured' do
-      it 'returns nil' do
-        expect(group.insights_config).to be_nil
+      it 'returns the default config' do
+        expect(group.insights_config).to eq(group.default_insights_config)
       end
     end
 
@@ -414,8 +414,8 @@ describe Group do
         group.create_insight!(project: project)
       end
 
-      it 'returns nil' do
-        expect(group.insights_config).to be_nil
+      it 'returns the default config' do
+        expect(group.insights_config).to eq(group.default_insights_config)
       end
     end
 
