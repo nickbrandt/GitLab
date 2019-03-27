@@ -242,7 +242,7 @@ module EE
     end
 
     def bot?
-      bot_type.present?
+      has_bot_type? ? bot_type.present? : old_support_bot
     end
 
     protected
@@ -255,6 +255,14 @@ module EE
     end
 
     private
+
+    def has_bot_type?
+      has_attribute?(:bot_type)
+    end
+
+    def old_support_bot
+      read_attribute(:support_bot)
+    end
 
     def namespace_union(select = :id)
       ::Gitlab::SQL::Union.new([
