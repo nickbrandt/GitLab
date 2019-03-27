@@ -46,13 +46,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(repository_sync_failed.or(wiki_sync_failed))
   end
 
-  def self.verification_failed
-    repository_verification_failed = arel_table[:last_repository_verification_failure].not_eq(nil)
-    wiki_verification_failed = arel_table[:last_wiki_verification_failure].not_eq(nil)
-
-    where(repository_verification_failed.or(wiki_verification_failed))
-  end
-
   def self.checksum_mismatch
     repository_checksum_mismatch = arel_table[:repository_checksum_mismatch].eq(true)
     wiki_checksum_mismatch = arel_table[:wiki_checksum_mismatch].eq(true)
@@ -120,6 +113,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
       verified_wikis
     else
       none
+    end
+  end
+
+  def self.verification_failed(type)
+    case type
+    when :repository
+      verification_failed_repos
+    when :wiki
+      verification_failed_wikis
+    else
+      verification_failed_repos.or(verification_failed_wikis)
     end
   end
 

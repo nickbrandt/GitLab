@@ -1,0 +1,5 @@
+---
+title: Geo - Add selective sync support for FDW queries to find registries where verification has failed
+merge_request: 10266
+author:
+type: changed

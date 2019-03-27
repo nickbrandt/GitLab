@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Finder for retrieving project registries that have verification succeeded
+# Finder for retrieving project registries that have verification failed
 # scoped to a type (repository or wiki) using FDW queries.
 #
 # Basic usage:
 #
-#     Geo::ProjectRegistryVerifiedFinder.new(current_node: Gitlab::Geo.current_node, :repository).execute
+#     Geo::ProjectRegistryVerificationFailedFinder.new(current_node: Gitlab::Geo.current_node, :repository).execute
 #
 # Valid `type` values are:
 #
@@ -14,14 +14,14 @@
 #
 # Any other value will be ignored.
 module Geo
-  class ProjectRegistryVerifiedFinder
+  class ProjectRegistryVerificationFailedFinder
     def initialize(current_node:, type:)
       @current_node = Geo::Fdw::GeoNode.find(current_node.id)
-      @type = type.to_sym
+      @type = type.to_s.to_sym
     end
 
     def execute
-      current_node.project_registries.verified(type)
+      current_node.project_registries.verification_failed(type)
     end
 
     private
