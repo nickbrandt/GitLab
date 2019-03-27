@@ -449,14 +449,6 @@ describe GroupPolicy do
   describe 'private nested group use the highest access level from the group and inherited permissions', :nested_groups do
     let(:nested_group) { create(:group, :private, parent: group) }
 
-    def expect_allowed(*permissions)
-      permissions.each { |p| is_expected.to be_allowed(p) }
-    end
-
-    def expect_disallowed(*permissions)
-      permissions.each { |p| is_expected.not_to be_allowed(p) }
-    end
-
     before do
       nested_group.add_guest(guest)
       nested_group.add_guest(reporter)

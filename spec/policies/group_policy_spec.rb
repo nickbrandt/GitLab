@@ -3,14 +3,6 @@ require 'spec_helper'
 describe GroupPolicy do
   include_context 'GroupPolicy context'
 
-  def expect_allowed(*permissions)
-    permissions.each { |p| is_expected.to be_allowed(p) }
-  end
-
-  def expect_disallowed(*permissions)
-    permissions.each { |p| is_expected.not_to be_allowed(p) }
-  end
-
   context 'with no user' do
     let(:group) { create(:group, :public) }
     let(:current_user) { nil }
