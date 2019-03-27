@@ -1,12 +1,12 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { GlDropdown, GlSearchBox } from '@gitlab/ui';
+import { GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     GlDropdown,
-    GlSearchBox,
+    GlSearchBoxByType,
     Icon,
   },
   props: {
@@ -83,7 +83,7 @@ export default {
         </button>
       </div>
 
-      <gl-search-box
+      <gl-search-box-by-type
         v-if="filter.options.length >= 20"
         ref="searchBox"
         v-model="filterTerm"
