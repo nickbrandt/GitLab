@@ -10,17 +10,7 @@ module InsightsActions
 
   def show
     respond_to do |format|
-      # FIXME: This is temporary until we have the frontend
-      format.html do
-        insights_config = config_data
-        if insights_config
-          first_chart_hash = insights_config.first.last
-          params.merge!(
-            chart_type: first_chart_hash[:type],
-            query: first_chart_hash[:query])
-          @insights_json = insights_json # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        end
-      end
+      format.html
       format.json do
         render json: config_data
       end
