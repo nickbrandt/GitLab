@@ -35,7 +35,14 @@ export default {
   },
   methods: {
     onUploadDesign(files) {
-      const file = files[0];
+      const optimisticResponse = [...files].map(file => ({
+        __typename: 'Design',
+        id: -1,
+        image: '',
+        name: file.name,
+        commentsCount: 0,
+        updatedAt: new Date().toString(),
+      }));
 
       this.isSaving = true;
 
@@ -43,24 +50,17 @@ export default {
         .mutate({
           mutation: uploadDesignQuery,
           variables: {
-            name: file.name,
+            name: [...files].map(({ name }) => name),
           },
           update: (store, { data: { uploadDesign } }) => {
             const data = store.readQuery({ query: allDesignsQuery });
 
-            data.designs.unshift(uploadDesign);
+            data.designs.unshift(...uploadDesign);
             store.writeQuery({ query: allDesignsQuery, data });
           },
           optimisticResponse: {
             __typename: 'Mutation',
-            uploadDesign: {
-              __typename: 'Design',
-              id: -1,
-              image: '',
-              name: file.name,
-              commentsCount: 0,
-              updatedAt: new Date().toString(),
-            },
+            uploadDesign: optimisticResponse,
           },
         })
         .then(() => {

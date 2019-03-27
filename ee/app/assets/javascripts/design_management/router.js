@@ -12,7 +12,7 @@ const router = new VueRouter({
     {
       name: 'root',
       path: '/',
-      component: null,
+      component: Home,
       meta: {
         el: 'discussion',
       },

@@ -40,10 +40,10 @@ describe('Design management router', () => {
   });
 
   describe('root', () => {
-    it('pushes empty component', () => {
+    it('pushes home component', () => {
       router.push('/');
 
-      expect(vm.isEmpty()).toBe(true);
+      expect(vm.find(Designs).exists()).toBe(true);
     });
   });
 

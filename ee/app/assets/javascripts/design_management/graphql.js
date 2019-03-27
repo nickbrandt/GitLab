@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import _ from 'underscore';
 import createDefaultClient from '~/lib/graphql';
+import allDesigns from './queries/allDesigns.graphql';
 
 Vue.use(VueApollo);
 
@@ -14,31 +15,45 @@ const createMockDesign = id => ({
   __typename: 'Design',
 });
 
-export default new VueApollo({
-  defaultClient: createDefaultClient({
-    defaults: {
-      designs: [
-        createMockDesign(_.uniqueId()),
-        createMockDesign(_.uniqueId()),
-        createMockDesign(_.uniqueId()),
-        createMockDesign(_.uniqueId()),
-        createMockDesign(_.uniqueId()),
-      ],
-    },
-    resolvers: {
-      Mutation: {
-        uploadDesign(ctx, { name }, { cache }) {
-          const design = {
-            ...createMockDesign(_.uniqueId()),
-            name,
-            commentsCount: 0,
-          };
+const defaultClient = createDefaultClient({
+  defaults: {
+    designs: [
+      createMockDesign(_.uniqueId()),
+      createMockDesign(_.uniqueId()),
+      createMockDesign(_.uniqueId()),
+      createMockDesign(_.uniqueId()),
+      createMockDesign(_.uniqueId()),
+    ],
+  },
+  resolvers: {
+    Mutation: {
+      uploadDesign(ctx, { name }, { cache }) {
+        const designs = name.map(n => ({
+          ...createMockDesign(_.uniqueId()),
+          name: n,
+          commentsCount: 0,
+        }));
 
-          cache.writeData({ data: design });
+        cache.writeData({ data: designs });
 
-          return design;
-        },
+        return designs;
       },
     },
-  }),
+  },
+});
+
+defaultClient
+  .watchQuery({
+    query: allDesigns,
+  })
+  .subscribe(({ data: { designs } }) => {
+    const badge = document.querySelector('.js-designs-count');
+
+    if (badge) {
+      badge.textContent = designs.length;
+    }
+  });
+
+export default new VueApollo({
+  defaultClient,
 });

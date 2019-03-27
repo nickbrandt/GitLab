@@ -1,4 +1,4 @@
-mutation addDesigns($name: String) {
+mutation addDesigns($name: [String]) {
   uploadDesign(name: $name) @client {
     id
     image

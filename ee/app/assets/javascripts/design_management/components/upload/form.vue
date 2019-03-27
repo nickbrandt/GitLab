@@ -24,10 +24,15 @@ export default {
 </script>
 
 <template>
-  <header class="row-content-block border-top-0 pt-2 pb-2 pl-0 pr-0 d-flex">
-    <div class="ml-auto">
-      <gl-button :disabled="isSaving" variant="primary" @click="openFileUpload">
-        {{ s__('DesignManagement|Upload new designs') }}
+  <header class="row-content-block border-top-0 p-2 d-flex">
+    <div>
+      <gl-button
+        :disabled="isSaving"
+        variant="primary"
+        class="btn-inverted"
+        @click="openFileUpload"
+      >
+        {{ s__('DesignManagement|Upload designs') }}
         <gl-loading-icon v-if="isSaving" inline class="ml-1" />
       </gl-button>
       <input
@@ -36,6 +41,7 @@ export default {
         name="design_file"
         accept="image/*"
         class="hide"
+        multiple
         @change="onFileUploadChange"
       />
     </div>

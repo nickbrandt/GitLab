@@ -66,18 +66,20 @@ describe('Design management index page', () => {
             mutation: uploadDesignQuery,
             update: expect.any(Function),
             variables: {
-              name: 'test',
+              name: ['test'],
             },
             optimisticResponse: {
               __typename: 'Mutation',
-              uploadDesign: {
-                __typename: 'Design',
-                id: -1,
-                image: '',
-                name: 'test',
-                commentsCount: 0,
-                updatedAt: expect.any(String),
-              },
+              uploadDesign: [
+                {
+                  __typename: 'Design',
+                  id: -1,
+                  image: '',
+                  name: 'test',
+                  commentsCount: 0,
+                  updatedAt: expect.any(String),
+                },
+              ],
             },
           });
         });
