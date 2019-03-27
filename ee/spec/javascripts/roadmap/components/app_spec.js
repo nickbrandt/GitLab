@@ -1,55 +1,49 @@
 import Vue from 'vue';
 
-import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-
 import appComponent from 'ee/roadmap/components/app.vue';
-import RoadmapStore from 'ee/roadmap/store/roadmap_store';
-import RoadmapService from 'ee/roadmap/service/roadmap_service';
+import createStore from 'ee/roadmap/store';
 import eventHub from 'ee/roadmap/event_hub';
 
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import {
   mockTimeframeInitialDate,
   mockGroupId,
-  basePath,
-  epicsPath,
   mockNewEpicEndpoint,
   rawEpics,
   mockSvgPath,
   mockSortedBy,
+  basePath,
+  epicsPath,
 } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = () => {
   const Component = Vue.extend(appComponent);
-  const timeframe = mockTimeframeMonths;
 
-  const store = new RoadmapStore({
-    groupId: mockGroupId,
-    presetType: PRESET_TYPES.MONTHS,
+  const store = createStore();
+  store.dispatch('setInitialData', {
+    currentGroupId: mockGroupId,
     sortedBy: mockSortedBy,
-    timeframe,
-  });
-
-  const service = new RoadmapService({
+    presetType: PRESET_TYPES.MONTHS,
+    timeframe: mockTimeframeMonths,
+    filterQueryString: '',
     initialEpicsPath: epicsPath,
-    epicsState: 'all',
     basePath,
   });
 
-  return mountComponent(Component, {
+  return mountComponentWithStore(Component, {
     store,
-    service,
-    presetType: PRESET_TYPES.MONTHS,
-    hasFiltersApplied: true,
-    newEpicEndpoint: mockNewEpicEndpoint,
-    emptyStateIllustrationPath: mockSvgPath,
+    props: {
+      presetType: PRESET_TYPES.MONTHS,
+      hasFiltersApplied: true,
+      newEpicEndpoint: mockNewEpicEndpoint,
+      emptyStateIllustrationPath: mockSvgPath,
+    },
   });
 };
 
@@ -66,26 +60,11 @@ describe('AppComponent', () => {
 
   describe('data', () => {
     it('returns default data props', () => {
-      expect(vm.isLoading).toBe(false);
-      expect(vm.isEpicsListEmpty).toBe(false);
-      expect(vm.hasError).toBe(false);
       expect(vm.handleResizeThrottled).toBeDefined();
     });
   });
 
   describe('computed', () => {
-    describe('epics', () => {
-      it('returns array of epics', () => {
-        expect(Array.isArray(vm.epics)).toBe(true);
-      });
-    });
-
-    describe('timeframe', () => {
-      it('returns array of timeframe', () => {
-        expect(Array.isArray(vm.timeframe)).toBe(true);
-      });
-    });
-
     describe('timeframeStart', () => {
       it('returns first item of timeframe array', () => {
         expect(vm.timeframeStart instanceof Date).toBe(true);
@@ -98,35 +77,29 @@ describe('AppComponent', () => {
       });
     });
 
-    describe('currentGroupId', () => {
-      it('returns current group Id', () => {
-        expect(vm.currentGroupId).toBe(mockGroupId);
-      });
-    });
-
     describe('showRoadmap', () => {
-      it('returns true if `isLoading`, `isEpicsListEmpty` and `hasError` are all `false`', () => {
-        vm.isLoading = false;
-        vm.isEpicsListEmpty = false;
-        vm.hasError = false;
+      it('returns true if `epicsFetchInProgress`, `epicsFetchResultEmpty` and `epicsFetchFailure` are all `false`', () => {
+        vm.$store.state.epicsFetchInProgress = false;
+        vm.$store.state.epicsFetchResultEmpty = false;
+        vm.$store.state.epicsFetchFailure = false;
 
         expect(vm.showRoadmap).toBe(true);
       });
 
-      it('returns false if either of `isLoading`, `isEpicsListEmpty` and `hasError` is `true`', () => {
-        vm.isLoading = true;
-        vm.isEpicsListEmpty = false;
-        vm.hasError = false;
+      it('returns false if either of `epicsFetchInProgress`, `epicsFetchResultEmpty` and `epicsFetchFailure` is `true`', () => {
+        vm.$store.state.epicsFetchInProgress = true;
+        vm.$store.state.epicsFetchResultEmpty = false;
+        vm.$store.state.epicsFetchFailure = false;
 
         expect(vm.showRoadmap).toBe(false);
-        vm.isLoading = false;
-        vm.isEpicsListEmpty = true;
-        vm.hasError = false;
+        vm.$store.state.epicsFetchInProgress = false;
+        vm.$store.state.epicsFetchResultEmpty = true;
+        vm.$store.state.epicsFetchFailure = false;
 
         expect(vm.showRoadmap).toBe(false);
-        vm.isLoading = false;
-        vm.isEpicsListEmpty = false;
-        vm.hasError = true;
+        vm.$store.state.epicsFetchInProgress = false;
+        vm.$store.state.epicsFetchResultEmpty = false;
+        vm.$store.state.epicsFetchFailure = true;
 
         expect(vm.showRoadmap).toBe(false);
       });
@@ -134,153 +107,10 @@ describe('AppComponent', () => {
   });
 
   describe('methods', () => {
-    describe('fetchEpics', () => {
-      let mock;
-
-      beforeEach(() => {
-        mock = new MockAdapter(axios);
-        document.body.innerHTML += '<div class="flash-container"></div>';
-      });
-
-      afterEach(() => {
-        mock.restore();
-        document.querySelector('.flash-container').remove();
-      });
-
-      it('calls service.getEpics and sets response to the store on success', done => {
-        mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
-        spyOn(vm.store, 'setEpics');
-        spyOn(eventHub, '$emit');
-
-        vm.fetchEpics();
-
-        expect(vm.hasError).toBe(false);
-        setTimeout(() => {
-          expect(vm.isLoading).toBe(false);
-          expect(vm.store.setEpics).toHaveBeenCalledWith(rawEpics);
-
-          vm.$nextTick()
-            .then(() => {
-              expect(eventHub.$emit).toHaveBeenCalledWith(
-                'refreshTimeline',
-                jasmine.objectContaining({
-                  todayBarReady: true,
-                  initialRender: true,
-                }),
-              );
-            })
-            .then(done)
-            .catch(done.fail);
-        }, 0);
-      });
-
-      it('calls service.getEpics and sets `isEpicsListEmpty` to true if response is empty', done => {
-        mock.onGet(vm.service.epicsPath).reply(200, []);
-        spyOn(vm.store, 'setEpics');
-
-        vm.fetchEpics();
-
-        expect(vm.isEpicsListEmpty).toBe(false);
-        setTimeout(() => {
-          expect(vm.isEpicsListEmpty).toBe(true);
-          expect(vm.store.setEpics).not.toHaveBeenCalled();
-          done();
-        }, 0);
-      });
-
-      it('calls service.getEpics and sets `hasError` to true and shows flash message if request failed', done => {
-        mock.onGet(vm.service.epicsPath).reply(500, {});
-
-        vm.fetchEpics();
-
-        expect(vm.hasError).toBe(false);
-        setTimeout(() => {
-          expect(vm.hasError).toBe(true);
-          expect(document.querySelector('.flash-text').innerText.trim()).toBe(
-            'Something went wrong while fetching epics',
-          );
-          done();
-        }, 0);
-      });
-    });
-
-    describe('fetchEpicsForTimeframe', () => {
-      const roadmapTimelineEl = {
-        offsetTop: 0,
-      };
-      let mock;
-
-      beforeEach(() => {
-        mock = new MockAdapter(axios);
-        document.body.innerHTML += '<div class="flash-container"></div>';
-      });
-
-      afterEach(() => {
-        mock.restore();
-        document.querySelector('.flash-container').remove();
-      });
-
-      it('calls service.fetchEpicsForTimeframe and adds response to the store on success', done => {
-        mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
-
-        const extendType = EXTEND_AS.APPEND;
-
-        spyOn(vm.service, 'getEpicsForTimeframe').and.callThrough();
-        spyOn(vm.store, 'addEpics');
-        spyOn(vm, 'processExtendedTimeline');
-
-        vm.fetchEpicsForTimeframe({
-          timeframe: mockTimeframeMonths,
-          extendType,
-          roadmapTimelineEl,
-        });
-
-        expect(vm.hasError).toBe(false);
-        expect(vm.service.getEpicsForTimeframe).toHaveBeenCalledWith(
-          PRESET_TYPES.MONTHS,
-          mockTimeframeMonths,
-        );
-        setTimeout(() => {
-          expect(vm.store.addEpics).toHaveBeenCalledWith(rawEpics);
-          vm.$nextTick()
-            .then(() => {
-              expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
-                jasmine.objectContaining({
-                  itemsCount: 8,
-                  extendType,
-                  roadmapTimelineEl,
-                }),
-              );
-            })
-            .then(done)
-            .catch(done.fail);
-        }, 0);
-      });
-
-      it('calls service.fetchEpicsForTimeframe and sets `hasError` to true and shows flash message when request failed', done => {
-        mock.onGet(vm.service.fetchEpicsForTimeframe).reply(500, {});
-
-        vm.fetchEpicsForTimeframe({
-          timeframe: mockTimeframeMonths,
-          extendType: EXTEND_AS.APPEND,
-          roadmapTimelineEl,
-        });
-
-        expect(vm.hasError).toBe(false);
-        setTimeout(() => {
-          expect(vm.hasError).toBe(true);
-          expect(document.querySelector('.flash-text').innerText.trim()).toBe(
-            'Something went wrong while fetching epics',
-          );
-          done();
-        }, 0);
-      });
-    });
-
     describe('processExtendedTimeline', () => {
       it('updates timeline by extending timeframe from the start when called with extendType as `prepend`', done => {
-        vm.store.setEpics(rawEpics);
-        vm.isLoading = false;
+        vm.$store.dispatch('receiveEpicsSuccess', { rawEpics });
+        vm.$store.state.epicsFetchInProgress = false;
 
         Vue.nextTick()
           .then(() => {
@@ -303,8 +133,8 @@ describe('AppComponent', () => {
       });
 
       it('updates timeline by extending timeframe from the end when called with extendType as `append`', done => {
-        vm.store.setEpics(rawEpics);
-        vm.isLoading = false;
+        vm.$store.dispatch('receiveEpicsSuccess', { rawEpics });
+        vm.$store.state.epicsFetchInProgress = false;
 
         Vue.nextTick()
           .then(() => {
@@ -326,58 +156,40 @@ describe('AppComponent', () => {
     });
 
     describe('handleScrollToExtend', () => {
-      beforeEach(() => {
-        vm.store.setEpics(rawEpics);
-        vm.isLoading = false;
+      let roadmapTimelineEl;
+
+      beforeAll(() => {
+        vm.$store.dispatch('receiveEpicsSuccess', { rawEpics });
+        vm.$store.state.epicsFetchInProgress = false;
+        roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
       });
 
-      it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `prepend`', done => {
-        spyOn(vm.store, 'extendTimeframe');
-        spyOn(vm, 'fetchEpicsForTimeframe');
+      it('updates the store and refreshes roadmap with extended timeline based on provided extendType', () => {
+        spyOn(vm, 'extendTimeframe');
+        spyOn(vm, 'refreshEpicDates');
 
         const extendType = EXTEND_AS.PREPEND;
-        const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
 
         vm.handleScrollToExtend(roadmapTimelineEl, extendType);
 
-        expect(vm.store.extendTimeframe).toHaveBeenCalledWith(extendType);
-
-        vm.$nextTick()
-          .then(() => {
-            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
-              jasmine.objectContaining({
-                // During tests, we don't extend timeframe
-                // as we spied on `vm.store.extendTimeframe` above
-                timeframe: undefined,
-                roadmapTimelineEl,
-                extendType,
-              }),
-            );
-          })
-          .then(done)
-          .catch(done.fail);
+        expect(vm.extendTimeframe).toHaveBeenCalledWith({ extendAs: extendType });
+        expect(vm.refreshEpicDates).toHaveBeenCalled();
       });
 
-      it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `append`', done => {
-        spyOn(vm.store, 'extendTimeframe');
-        spyOn(vm, 'fetchEpicsForTimeframe');
+      it('calls `fetchEpicsForTimeframe` with extended timeframe array', done => {
+        spyOn(vm, 'extendTimeframe').and.stub();
+        spyOn(vm, 'refreshEpicDates').and.stub();
+        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
 
-        const extendType = EXTEND_AS.APPEND;
-        const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+        const extendType = EXTEND_AS.PREPEND;
 
         vm.handleScrollToExtend(roadmapTimelineEl, extendType);
-
-        expect(vm.store.extendTimeframe).toHaveBeenCalledWith(extendType);
 
         vm.$nextTick()
           .then(() => {
             expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
               jasmine.objectContaining({
-                // During tests, we don't extend timeframe
-                // as we spied on `vm.store.extendTimeframe` above
-                timeframe: undefined,
-                roadmapTimelineEl,
-                extendType,
+                timeframe: vm.extendedTimeframe,
               }),
             );
           })
@@ -422,7 +234,7 @@ describe('AppComponent', () => {
     });
 
     it('renders roadmap container with classes `roadmap-container overflow-reset` when isEpicsListEmpty prop is true', done => {
-      vm.isEpicsListEmpty = true;
+      vm.$store.state.epicsFetchResultEmpty = true;
       Vue.nextTick()
         .then(() => {
           expect(vm.$el.classList.contains('roadmap-container')).toBe(true);

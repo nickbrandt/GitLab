@@ -54,6 +54,8 @@ export const mockTimeframeQuartersAppend = [
 ];
 
 export const mockTimeframeMonthsPrepend = [
+  new Date(2017, 2, 1),
+  new Date(2017, 3, 1),
   new Date(2017, 4, 1),
   new Date(2017, 5, 1),
   new Date(2017, 6, 1),
@@ -66,7 +68,8 @@ export const mockTimeframeMonthsAppend = [
   new Date(2018, 7, 1),
   new Date(2018, 8, 1),
   new Date(2018, 9, 1),
-  new Date(2018, 10, 30),
+  new Date(2018, 10, 1),
+  new Date(2018, 11, 31),
 ];
 
 export const mockTimeframeWeeksPrepend = [
@@ -99,6 +102,37 @@ export const mockEpic = {
   startDate: new Date('2017-07-10'),
   endDate: new Date('2018-06-02'),
   webUrl: '/groups/gitlab-org/-/epics/1',
+};
+
+export const mockRawEpic = {
+  id: 41,
+  iid: 2,
+  description: null,
+  title: 'Another marketing',
+  group_id: 56,
+  group_name: 'Marketing',
+  group_full_name: 'Gitlab Org / Marketing',
+  start_date: '2017-6-26',
+  end_date: '2018-03-10',
+  web_url: '/groups/gitlab-org/marketing/-/epics/2',
+};
+
+export const mockFormattedEpic = {
+  id: 41,
+  iid: 2,
+  description: null,
+  title: 'Another marketing',
+  groupId: 56,
+  groupName: 'Marketing',
+  groupFullName: 'Gitlab Org / Marketing',
+  startDate: new Date(2017, 10, 1),
+  originalStartDate: new Date(2017, 5, 26),
+  endDate: new Date(2018, 2, 10),
+  originalEndDate: new Date(2018, 2, 10),
+  startDateOutOfRange: true,
+  endDateOutOfRange: false,
+  webUrl: '/groups/gitlab-org/marketing/-/epics/2',
+  newEpic: undefined,
 };
 
 export const rawEpics = [

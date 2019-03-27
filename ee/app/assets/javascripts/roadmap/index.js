@@ -11,8 +11,6 @@ import { PRESET_TYPES, EPIC_DETAILS_CELL_WIDTH } from './constants';
 import { getTimeframeForPreset, getEpicsPathForPreset } from './utils/roadmap_utils';
 
 import createStore from './store';
-import RoadmapStore from './store/roadmap_store';
-import RoadmapService from './service/roadmap_service';
 
 import roadmapApp from './components/app.vue';
 
@@ -45,7 +43,6 @@ export default () => {
     data() {
       const supportedPresetTypes = Object.keys(PRESET_TYPES);
       const { dataset } = this.$options.el;
-      const hasFiltersApplied = parseBoolean(dataset.hasFiltersApplied);
       const presetType =
         supportedPresetTypes.indexOf(dataset.presetType) > -1
           ? dataset.presetType
@@ -63,32 +60,17 @@ export default () => {
         timeframe,
       });
 
-      const store = new RoadmapStore({
-        groupId: parseInt(dataset.groupId, 0),
-        sortedBy: dataset.sortedBy,
-        timeframe,
-        presetType,
-      });
-
-      const service = new RoadmapService({
-        initialEpicsPath,
-        filterQueryString,
-        basePath: dataset.epicsPath,
-        epicsState: dataset.epicsState,
-      });
-
       return {
-        store,
-        service,
-        presetType,
-        hasFiltersApplied,
-        epicsState: dataset.epicsState,
-        newEpicEndpoint: dataset.newEpicEndpoint,
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
-
-        // Part of Vuex Store
+        hasFiltersApplied: parseBoolean(dataset.hasFiltersApplied),
         currentGroupId: parseInt(dataset.groupId, 0),
+        newEpicEndpoint: dataset.newEpicEndpoint,
+        epicsState: dataset.epicsState,
+        basePath: dataset.epicsPath,
         sortedBy: dataset.sortedBy,
+        filterQueryString,
+        initialEpicsPath,
+        presetType,
         timeframe,
       };
     },
@@ -98,6 +80,9 @@ export default () => {
         sortedBy: this.sortedBy,
         presetType: this.presetType,
         timeframe: this.timeframe,
+        basePath: this.basePath,
+        filterQueryString: this.filterQueryString,
+        initialEpicsPath: this.initialEpicsPath,
       });
     },
     methods: {
@@ -107,7 +92,6 @@ export default () => {
       return createElement('roadmap-app', {
         props: {
           store: this.store,
-          service: this.service,
           presetType: this.presetType,
           hasFiltersApplied: this.hasFiltersApplied,
           epicsState: this.epicsState,

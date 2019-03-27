@@ -1,30 +1,37 @@
 import Vue from 'vue';
 
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
-import RoadmapStore from 'ee/roadmap/store/roadmap_store';
+import createStore from 'ee/roadmap/store';
 import eventHub from 'ee/roadmap/event_hub';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import {
-  rawEpics,
+  mockShellWidth,
   mockTimeframeInitialDate,
   mockGroupId,
-  mockShellWidth,
+  rawEpics,
   mockSortedBy,
+  basePath,
+  epicsPath,
 } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
-const store = new RoadmapStore({
-  groupId: mockGroupId,
-  presetType: PRESET_TYPES.MONTHS,
+const store = createStore();
+store.dispatch('setInitialData', {
+  currentGroupId: mockGroupId,
   sortedBy: mockSortedBy,
+  presetType: PRESET_TYPES.MONTHS,
   timeframe: mockTimeframeMonths,
+  filterQueryString: '',
+  initialEpicsPath: epicsPath,
+  basePath,
 });
 
-store.setEpics(rawEpics);
-const mockEpics = store.getEpics();
+store.dispatch('receiveEpicsSuccess', { rawEpics });
+
+const mockEpics = store.state.epics;
 
 const createComponent = ({
   epics = mockEpics,
