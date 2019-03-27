@@ -76,7 +76,7 @@ module EE
       end
 
       def proxying_to_primary_message
-        ::Gitlab::Geo::GitPushSSHProxy.inform_client_message(primary_ssh_url_to_repo)
+        "You're pushing to a Geo secondary.\nWe'll help you by proxying this request to the primary: #{primary_ssh_url_to_repo}"
       end
 
       def custom_action_api_endpoints

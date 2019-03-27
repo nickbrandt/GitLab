@@ -35,12 +35,6 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
     }
   end
 
-  describe '.inform_client_message' do
-    it 'returns a message, with the ssh address' do
-      expect(described_class.inform_client_message(primary_repo_ssh)).to eql("You're pushing to a Geo secondary.\nWe'll help you by proxying this request to the primary: #{primary_repo_ssh}")
-    end
-  end
-
   context 'instance methods' do
     subject { described_class.new(data) }
 
