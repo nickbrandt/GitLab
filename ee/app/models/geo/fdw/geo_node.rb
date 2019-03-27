@@ -14,6 +14,44 @@ module Geo
       has_many :geo_node_namespace_links, class_name: 'Geo::Fdw::GeoNodeNamespaceLink'
       has_many :namespaces, class_name: 'Geo::Fdw::Namespace', through: :geo_node_namespace_links
 
+      def self.fdw_inner_join_projects
+        project_registries_table = Geo::ProjectRegistry.arel_table
+        fdw_projects_table = Geo::Fdw::Project.arel_table
+
+        project_registries_table
+          .join(fdw_projects_table, Arel::Nodes::InnerJoin)
+          .on(project_registries_table[:project_id].eq(fdw_projects_table[:id]))
+          .join_sources
+      end
+
+      def self.fdw_inner_join_repository_state
+        project_registries_table = Geo::ProjectRegistry.arel_table
+        fdw_repository_state_table = Geo::Fdw::ProjectRepositoryState.arel_table
+
+        project_registries_table
+          .join(fdw_repository_state_table, Arel::Nodes::InnerJoin)
+          .on(project_registries_table[:project_id].eq(fdw_repository_state_table[:project_id]))
+          .join_sources
+      end
+
+      def self.fdw_registries_pending_verification
+        fdw_repositories_pending_verification.or(fdw_wikis_pending_verification)
+      end
+
+      def self.fdw_repositories_pending_verification
+        fdw_repository_state_table = Geo::Fdw::ProjectRepositoryState.arel_table
+
+        Geo::ProjectRegistry.repositories_pending_verification
+          .and(fdw_repository_state_table[:repository_verification_checksum].not_eq(nil))
+      end
+
+      def self.fdw_wikis_pending_verification
+        fdw_repository_state_table = Geo::Fdw::ProjectRepositoryState.arel_table
+
+        Geo::ProjectRegistry.wikis_pending_verification
+          .and(fdw_repository_state_table[:wiki_verification_checksum].not_eq(nil))
+      end
+
       def project_registries
         return Geo::ProjectRegistry.all unless selective_sync?
 
@@ -32,7 +70,7 @@ module Geo
         query = selected_namespaces_and_descendants
 
         Geo::ProjectRegistry
-          .joins(fdw_inner_join_projects)
+          .joins(self.class.fdw_inner_join_projects)
           .where(fdw_projects_table.name => { namespace_id: query.select(:id) })
       end
 
@@ -61,12 +99,8 @@ module Geo
 
       def registries_for_selected_shards
         Geo::ProjectRegistry
-          .joins(fdw_inner_join_projects)
+          .joins(self.class.fdw_inner_join_projects)
           .where(fdw_projects_table.name => { repository_storage: selective_sync_shards })
-      end
-
-      def project_registries_table
-        Geo::ProjectRegistry.arel_table
       end
 
       def fdw_projects_table
@@ -79,13 +113,6 @@ module Geo
 
       def fdw_geo_node_namespace_links_table
         Geo::Fdw::GeoNodeNamespaceLink.arel_table
-      end
-
-      def fdw_inner_join_projects
-        project_registries_table
-          .join(fdw_projects_table, Arel::Nodes::InnerJoin)
-          .on(project_registries_table[:project_id].eq(fdw_projects_table[:id]))
-          .join_sources
       end
     end
   end

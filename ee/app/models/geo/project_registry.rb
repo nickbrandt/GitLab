@@ -141,6 +141,30 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.registries_pending_verification
+    repositories_pending_verification.or(wikis_pending_verification)
+  end
+
+  def self.repositories_pending_verification
+    repository_exists_on_primary =
+      Arel::Nodes::SqlLiteral.new("project_registry.repository_missing_on_primary IS NOT TRUE")
+
+    arel_table[:repository_verification_checksum_sha].eq(nil)
+      .and(arel_table[:last_repository_verification_failure].eq(nil))
+      .and(arel_table[:resync_repository].eq(false))
+      .and(repository_exists_on_primary)
+  end
+
+  def self.wikis_pending_verification
+    wiki_exists_on_primary =
+      Arel::Nodes::SqlLiteral.new("project_registry.wiki_missing_on_primary IS NOT TRUE")
+
+    arel_table[:wiki_verification_checksum_sha].eq(nil)
+      .and(arel_table[:last_wiki_verification_failure].eq(nil))
+      .and(arel_table[:resync_wiki].eq(false))
+      .and(wiki_exists_on_primary)
+  end
+
   def self.flag_repositories_for_resync!
     update_all(
       resync_repository: true,
