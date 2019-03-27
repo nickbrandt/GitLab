@@ -30,6 +30,8 @@ class RemoveCyclicHierarchiesInEpics < ActiveRecord::Migration[5.0]
     # We only need to update the first epic of the loop to break the cycle
     epic_ids_to_update = epics_grouped_by_loop.map { |path, epics| epics.first['id'] }
 
+    # rubocop:disable Lint/UnneededCopDisableDirective
+    # rubocop:disable Migration/UpdateColumnInBatches
     update_column_in_batches(:epics, :parent_id, nil) do |table, query|
       query.where(
         table[:id].in(epic_ids_to_update)

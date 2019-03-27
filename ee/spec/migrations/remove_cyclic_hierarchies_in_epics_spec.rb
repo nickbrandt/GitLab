@@ -11,7 +11,15 @@ describe RemoveCyclicHierarchiesInEpics, :migration, :postgresql do
   def create_epic_with_defaults!(attributes = {})
     @last_iid += 1
 
-    epics.create!({iid: @last_iid, group_id: group.id, author_id: user.id, title: "Epic", title_html: "Epic"}.merge(attributes))
+    epics.create!(
+      attributes.reverse_merge(
+        iid: @last_iid,
+        group_id: group.id,
+        author_id: user.id,
+        title: "Epic",
+        title_html: "Epic"
+      )
+    )
   end
 
   let!(:epic_self_loop) { create_epic_with_defaults! }
@@ -53,5 +61,3 @@ describe RemoveCyclicHierarchiesInEpics, :migration, :postgresql do
     expect(epic_not_in_loop.reload.parent_id).not_to be_nil
   end
 end
-
-
