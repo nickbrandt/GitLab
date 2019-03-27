@@ -16,7 +16,7 @@ describe GeoNode, type: :model do
   let(:api_version) { API::API.version }
 
   context 'associations' do
-    it { is_expected.to belong_to(:oauth_application).dependent(:destroy) }
+    it { is_expected.to belong_to(:oauth_application).class_name('Doorkeeper::Application').dependent(:destroy).autosave(true) }
 
     it { is_expected.to have_many(:geo_node_namespace_links) }
     it { is_expected.to have_many(:namespaces).through(:geo_node_namespace_links) }
@@ -193,6 +193,51 @@ describe GeoNode, type: :model do
 
             expect(primary_node.clone_url_prefix).to eq(Gitlab.config.gitlab_shell.ssh_path_prefix)
           end
+        end
+      end
+    end
+
+    context 'when saving' do
+      let(:oauth_application) { node.oauth_application }
+
+      context 'when url is changed' do
+        it "updates the associated OAuth application's redirect_uri" do
+          node.update!(url: 'http://modified-url')
+
+          expect(oauth_application.reload.redirect_uri).to eq('http://modified-url/oauth/geo/callback')
+        end
+      end
+
+      context 'when alternate_url is added' do
+        it "adds a callback URL to the associated OAuth application's redirect_uri" do
+          expected_redirect_uri = "#{oauth_application.redirect_uri}\nhttp://alternate-url/oauth/geo/callback"
+
+          node.update!(alternate_url: 'http://alternate-url')
+
+          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
+        end
+      end
+
+      context 'when alternate_url is modified' do
+        it "updates the alternate callback URL in the associated OAuth application's redirect_uri" do
+          node.update!(alternate_url: 'http://alternate-url')
+          oauth_application.update!(redirect_uri: "#{node.oauth_callback_url}\nhttp://alternate-url/oauth/geo/callback")
+          expected_redirect_uri = "#{node.oauth_callback_url}\nhttp://modified-alternate-url/oauth/geo/callback"
+
+          node.update!(alternate_url: 'http://modified-alternate-url')
+
+          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
+        end
+      end
+
+      context 'when alternate_url is cleared' do
+        it "removes the alternate callback URL in the associated OAuth application's redirect_uri" do
+          expected_redirect_uri = oauth_application.redirect_uri
+          oauth_application.update!(redirect_uri: "#{node.oauth_callback_url}\nhttp://alternate-url/oauth/geo/callback")
+
+          node.update!(alternate_url: nil)
+
+          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
         end
       end
     end

@@ -9,7 +9,7 @@ class GeoNode < ActiveRecord::Base
   # Array of repository storages to synchronize for selective sync by shards
   serialize :selective_sync_shards, Array # rubocop:disable Cop/ActiveRecordSerialize
 
-  belongs_to :oauth_application, class_name: 'Doorkeeper::Application', dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
+  belongs_to :oauth_application, class_name: 'Doorkeeper::Application', dependent: :destroy, autosave: true # rubocop: disable Cop/ActiveRecordDependent
 
   has_many :geo_node_namespace_links
   has_many :namespaces, through: :geo_node_namespace_links
