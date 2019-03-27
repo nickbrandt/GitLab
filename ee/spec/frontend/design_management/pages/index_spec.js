@@ -18,6 +18,7 @@ describe('Design management index page', () => {
 
     vm = shallowMount(Index, {
       mocks: { $apollo },
+      stubs: ['router-view'],
     });
   }
 

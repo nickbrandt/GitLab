@@ -17,12 +17,14 @@ describe('Design management router', () => {
 
     localVue.use(VueRouter);
 
+    window.gon = { sprite_icons: '' };
+
     vm = mount(App, {
       localVue,
       router,
       mocks: {
         $apollo: {
-          queries: { designs: { loading: true } },
+          queries: { designs: { loading: true }, design: { loading: true } },
         },
       },
     });

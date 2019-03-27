@@ -12,20 +12,31 @@ const createMockDesign = id => ({
   name: 'test.jpg',
   commentsCount: 2,
   updatedAt: new Date().toString(),
+  updatedBy: {
+    name: 'Test Name',
+    __typename: 'Author',
+  },
   __typename: 'Design',
 });
 
+const designsStore = [
+  createMockDesign(_.uniqueId()),
+  createMockDesign(_.uniqueId()),
+  createMockDesign(_.uniqueId()),
+  createMockDesign(_.uniqueId()),
+  createMockDesign(_.uniqueId()),
+];
+
 const defaultClient = createDefaultClient({
   defaults: {
-    designs: [
-      createMockDesign(_.uniqueId()),
-      createMockDesign(_.uniqueId()),
-      createMockDesign(_.uniqueId()),
-      createMockDesign(_.uniqueId()),
-      createMockDesign(_.uniqueId()),
-    ],
+    designs: designsStore,
   },
   resolvers: {
+    Query: {
+      design(ctx, { id }) {
+        return designsStore.find(design => design.id === id);
+      },
+    },
     Mutation: {
       uploadDesign(ctx, { name }, { cache }) {
         const designs = name.map(n => ({

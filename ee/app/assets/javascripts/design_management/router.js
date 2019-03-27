@@ -24,15 +24,17 @@ const router = new VueRouter({
       meta: {
         el: 'designs',
       },
-    },
-    {
-      name: 'design',
-      path: '/designs/:id',
-      component: DesignDetail,
-      meta: {
-        el: 'designs',
-      },
-      props: ({ params: { id } }) => ({ id: parseInt(id, 10) }),
+      children: [
+        {
+          name: 'design',
+          path: ':id',
+          component: DesignDetail,
+          meta: {
+            el: 'designs',
+          },
+          props: ({ params: { id } }) => ({ id: parseInt(id, 10) }),
+        },
+      ],
     },
   ],
 });

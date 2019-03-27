@@ -11,6 +11,8 @@ exports[`Design management index page designs renders designs list 1`] = `
       designs="design"
     />
   </div>
+   
+  <router-view-stub />
 </div>
 `;
 
@@ -25,6 +27,8 @@ exports[`Design management index page designs renders empty text 1`] = `
       No designs found.
     </div>
   </div>
+   
+  <router-view-stub />
 </div>
 `;
 
@@ -43,6 +47,8 @@ exports[`Design management index page designs renders error 1`] = `
     
     </div>
   </div>
+   
+  <router-view-stub />
 </div>
 `;
 
@@ -59,5 +65,7 @@ exports[`Design management index page designs renders loading icon 1`] = `
       size="md"
     />
   </div>
+   
+  <router-view-stub />
 </div>
 `;

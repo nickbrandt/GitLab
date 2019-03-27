@@ -3487,6 +3487,9 @@ msgstr ""
 msgid "DesignManagement|Error uploading a new design. Please try again"
 msgstr ""
 
+msgid "DesignManagement|Go back to designs"
+msgstr ""
+
 msgid "DesignManagement|Upload designs"
 msgstr ""
 
@@ -11175,6 +11178,9 @@ msgid "Update your project name, tags, description and avatar."
 msgstr ""
 
 msgid "Updated"
+msgstr ""
+
+msgid "Updated %{updated_at} by %{updated_by}"
 msgstr ""
 
 msgid "Updating"
