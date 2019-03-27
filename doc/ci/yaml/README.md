@@ -1636,7 +1636,7 @@ test:
 from `trigger` definition is started by GitLab, a downstream pipeline gets
 created.
 
-Learn more about [multi-project pipelines](../multi_project_pipelines.md#creating-cross-project-pipelines-from-gitlab-ci-yml).
+Learn more about [multi-project pipelines](../multi_project_pipelines.md#creating-multi-project-pipelines-from-gitlab-ciyml).
 
 #### Simple `trigger` syntax
 

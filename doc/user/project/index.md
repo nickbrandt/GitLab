@@ -34,7 +34,7 @@ When you create a project in GitLab, you'll have access to a large number of
 
 - [Issue tracker](issues/index.md): Discuss implementations with your team within issues
   - [Issue Boards](issue_board.md): Organize and prioritize your workflow
-  - [Multiple Issue Boards](issue_board.md#multiple-issue-boards): Allow your teams to create their own workflows (Issue Boards) for the same project **[STARTER]**
+  - [Multiple Issue Boards](issue_board.md#multiple-issue-boards-starter): Allow your teams to create their own workflows (Issue Boards) for the same project **[STARTER]**
 - [Merge Requests](merge_requests/index.md): Apply your branching
   strategy and get reviewed by your team
   - [Merge Request Approvals](https://docs.gitlab.com/ee/user/project/merge_requests/merge_request_approvals.html): Ask for approval before
@@ -62,11 +62,11 @@ When you create a project in GitLab, you'll have access to a large number of
   - [Auto Deploy](../../ci/autodeploy/index.md): Configure GitLab CI/CD
   to automatically set up your app's deployment
   - [Enable and disable GitLab CI](../../ci/enable_or_disable_ci.md)
-  - [Pipelines](../../ci/pipelines.md#pipelines): Configure and visualize
+  - [Pipelines](../../ci/pipelines.md): Configure and visualize
   your GitLab CI/CD pipelines from the UI
      - [Scheduled Pipelines](pipelines/schedules.md): Schedule a pipeline
      to start at a chosen time
-     - [Pipeline Graphs](../../ci/pipelines.md#pipeline-graphs): View your
+     - [Pipeline Graphs](../../ci/pipelines.md#visualizing-pipelines): View your
      entire pipeline from the UI
      - [Job artifacts](pipelines/job_artifacts.md): Define,
      browse, and download job artifacts
