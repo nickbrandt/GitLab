@@ -2106,6 +2106,9 @@ msgstr ""
 msgid "CiVariables|Remove variable row"
 msgstr ""
 
+msgid "CiVariables|This variable will not be masked"
+msgstr ""
+
 msgid "CiVariable|* (All environments)"
 msgstr ""
 
@@ -3868,10 +3871,7 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
-msgid "Environment variables"
-msgstr ""
-
-msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. You can use environment variables for passwords, secret keys, or whatever you want."
+msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. Additionally, they will be masked by default so they are hidden in job logs, though they must match certain regexp requirements to do so. You can use environment variables for passwords, secret keys, or whatever you want."
 msgstr ""
 
 msgid "Environment variables are configured by your administrator to be %{link_start}protected%{link_end} by default"
