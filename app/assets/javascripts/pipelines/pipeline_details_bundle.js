@@ -34,7 +34,6 @@ export default () => {
         props: {
           isLoading: this.mediator.state.isLoading,
           pipeline: this.mediator.store.state.pipeline,
-          mediator: this.mediator,
         },
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
