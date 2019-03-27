@@ -51,7 +51,7 @@ With GitLab Enterprise Edition, you can also:
 
 - Provide support with [Service Desk](project/service_desk.md).
 - Improve collaboration with
-  [Merge Request Approvals](project/merge_requests/index.md#merge-request-approvals),
+  [Merge Request Approvals](project/merge_requests/index.md#merge-request-approvals-starter),
   [Multiple Assignees for Issues](project/issues/multiple_assignees_for_issues.md),
   and [Multiple Issue Boards](project/issue_board.md#multiple-issue-boards-starter).
 - Create formal relationships between issues with [Related Issues](project/issues/related_issues.md).

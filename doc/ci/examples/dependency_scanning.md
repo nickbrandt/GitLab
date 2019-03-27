@@ -47,7 +47,7 @@ is used to detect the languages/package managers and in turn runs the matching s
 Some security scanners require to send a list of project dependencies to GitLab
 central servers to check for vulnerabilities. To learn more about this or to
 disable it, check the [GitLab Dependency Scanning documentation](https://gitlab.com/gitlab-org/security-products/dependency-scanning#remote-checks)
-and the [customization guide](#job-execution-customization).
+and the [customization guide](#customizing-the-template).
 
 TIP: **Tip:**
 For [GitLab Ultimate][ee] users, this information will
