@@ -195,6 +195,56 @@ describe Geo::ProjectRegistryFinder, :geo do
         expect(subject.count_verification_failed_wikis).to eq 1
       end
     end
+
+    describe '#count_repositories_retrying_verification' do
+      before do
+        project_1_in_synced_group = create(:project, group: synced_group)
+        project_2_in_synced_group = create(:project, group: synced_group)
+
+        create(:geo_project_registry, :repository_retrying_verification, :wiki_retrying_verification, project: project_synced)
+        create(:geo_project_registry, :repository_retrying_verification, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_retrying_verification, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that repository retrying verification' do
+        expect(subject.count_repositories_retrying_verification).to eq 2
+      end
+
+      context 'with selective sync' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts registries that repository retrying verification' do
+          expect(subject.count_repositories_retrying_verification).to eq 1
+        end
+      end
+    end
+
+    describe '#count_wikis_retrying_verification' do
+      before do
+        project_1_in_synced_group = create(:project, group: synced_group)
+        project_2_in_synced_group = create(:project, group: synced_group)
+
+        create(:geo_project_registry, :repository_retrying_verification, :wiki_retrying_verification, project: project_synced)
+        create(:geo_project_registry, :repository_retrying_verification, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_retrying_verification, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that wiki retrying verification' do
+        expect(subject.count_wikis_retrying_verification).to eq 2
+      end
+
+      context 'with selective sync' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts registries that wiki retrying verification' do
+          expect(subject.count_wikis_retrying_verification).to eq 1
+        end
+      end
+    end
   end
 
   describe '#find_checksum_mismatch_project_registries' do

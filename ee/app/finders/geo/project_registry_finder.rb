@@ -55,11 +55,11 @@ module Geo
     end
 
     def count_repositories_retrying_verification
-      Geo::ProjectRegistry.repositories_retrying_verification.count
+      registries_retrying_verification(:repository).count
     end
 
     def count_wikis_retrying_verification
-      Geo::ProjectRegistry.wikis_retrying_verification.count
+      registries_retrying_verification(:wiki).count
     end
 
     def find_checksum_mismatch_project_registries(type = nil)
@@ -356,6 +356,20 @@ module Geo
 
     def registries_for_verification_failed_projects(type)
       finder_klass_for_verification_failed_registries
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_registries_retrying_verification
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistryRetryingVerificationFinder
+      else
+        Geo::LegacyProjectRegistryRetryingVerificationFinder
+      end
+    end
+
+    def registries_retrying_verification(type)
+      finder_klass_for_registries_retrying_verification
         .new(current_node: current_node, type: type)
         .execute
     end

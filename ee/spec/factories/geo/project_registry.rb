@@ -95,6 +95,11 @@ FactoryBot.define do
       last_repository_verification_failure nil
     end
 
+    trait :repository_retrying_verification do
+      repository_verification_retry_count 1
+      resync_repository true
+    end
+
     trait :wiki_verified do
       wiki_verification_checksum_sha 'e079a831cab27bcda7d81cd9b48296d0c3dd92ef'
       last_wiki_verification_failure nil
@@ -113,6 +118,11 @@ FactoryBot.define do
     trait :wiki_verification_outdated do
       wiki_verification_checksum_sha nil
       last_wiki_verification_failure nil
+    end
+
+    trait :wiki_retrying_verification do
+      wiki_verification_retry_count 1
+      resync_wiki true
     end
   end
 end

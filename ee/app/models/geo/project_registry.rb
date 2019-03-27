@@ -127,6 +127,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.retrying_verification(type)
+    case type
+    when :repository
+      repositories_retrying_verification
+    when :wiki
+      wikis_retrying_verification
+    else
+      none
+    end
+  end
+
   def self.flag_repositories_for_resync!
     update_all(
       resync_repository: true,
