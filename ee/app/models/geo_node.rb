@@ -160,7 +160,7 @@ class GeoNode < ActiveRecord::Base
 
   def snapshot_url(repository)
     url = api_url("projects/#{repository.project.id}/snapshot")
-    url += "?wiki=1" if repository.is_wiki
+    url += "?wiki=1" if repository.repo_type.wiki?
 
     url
   end

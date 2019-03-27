@@ -341,7 +341,7 @@ describe "Git HTTP requests (Geo)" do
             it 'returns a 200' do
               is_expected.to have_gitlab_http_status(:ok)
               expect(json_response['GL_ID']).to match("user-#{user.id}")
-              expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository.gl_repository(project, false))
+              expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository::PROJECT.identifier_for_subject(project))
             end
           end
         end
