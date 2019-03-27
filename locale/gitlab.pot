@@ -485,6 +485,9 @@ msgstr ""
 msgid "Action to take when receiving an alert."
 msgstr ""
 
+msgid "Activate Service Desk"
+msgstr ""
+
 msgid "Active"
 msgstr ""
 
@@ -880,10 +883,16 @@ msgstr ""
 msgid "An error occurred while detecting host keys"
 msgstr ""
 
+msgid "An error occurred while disabling Service Desk."
+msgstr ""
+
 msgid "An error occurred while dismissing the alert. Refresh the page and try again."
 msgstr ""
 
 msgid "An error occurred while dismissing the feature highlight. Refresh the page and try dismissing again."
+msgstr ""
+
+msgid "An error occurred while enabling Service Desk."
 msgstr ""
 
 msgid "An error occurred while fetching markdown preview"
@@ -896,6 +905,9 @@ msgid "An error occurred while fetching sidebar data"
 msgstr ""
 
 msgid "An error occurred while fetching stages."
+msgstr ""
+
+msgid "An error occurred while fetching the Service Desk address."
 msgstr ""
 
 msgid "An error occurred while fetching the job log."
@@ -2996,9 +3008,6 @@ msgstr ""
 msgid "Copy file path to clipboard"
 msgstr ""
 
-msgid "Copy incoming email address to clipboard"
-msgstr ""
-
 msgid "Copy link"
 msgstr ""
 
@@ -3784,6 +3793,9 @@ msgstr ""
 msgid "Enable usage ping to get an overview of how you are using GitLab from a feature perspective."
 msgstr ""
 
+msgid "Enable/disable your service desk. %{link_start}Learn more about service desk%{link_end}."
+msgstr ""
+
 msgid "Enabled"
 msgstr ""
 
@@ -4438,6 +4450,9 @@ msgstr ""
 msgid "February"
 msgstr ""
 
+msgid "Fetching incoming email"
+msgstr ""
+
 msgid "Fields on this page are now uneditable, you can configure"
 msgstr ""
 
@@ -4609,6 +4624,9 @@ msgid "Forks"
 msgstr ""
 
 msgid "Format"
+msgstr ""
+
+msgid "Forward external support email address to"
 msgstr ""
 
 msgid "Found errors in your %{gitlab_ci_yml}:"
@@ -6145,9 +6163,6 @@ msgid "Learn more about custom project templates"
 msgstr ""
 
 msgid "Learn more about group-level project templates"
-msgstr ""
-
-msgid "Learn more about incoming email addresses"
 msgstr ""
 
 msgid "Learn more about signing commits"
@@ -8761,6 +8776,9 @@ msgid "Resolved"
 msgstr ""
 
 msgid "Response"
+msgstr ""
+
+msgid "Response didn't include `service_desk_address`"
 msgstr ""
 
 msgid "Response metrics (AWS ELB)"
