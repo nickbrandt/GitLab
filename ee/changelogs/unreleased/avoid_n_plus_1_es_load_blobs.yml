@@ -1,0 +1,5 @@
+---
+title: Avoid N+1 when loading Code search results with Elasticsearch enabled
+merge_request: 10394
+author:
+type: performance
