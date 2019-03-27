@@ -108,7 +108,6 @@ describe Groups::Security::VulnerabilitiesController do
         context 'with multiple report types' do
           before do
             projects.each do |project|
-              create_vulnerabilities(1, project_guest, { report_type: :dast })
               create_vulnerabilities(2, project_guest, { report_type: :sast })
               create_vulnerabilities(1, project_dev, { report_type: :dependency_scanning })
             end
@@ -219,14 +218,14 @@ describe Groups::Security::VulnerabilitiesController do
           group.add_developer(user)
         end
 
-        it 'returns vulnerabilities counts for :sast and :dependency_scanning' do
+        it 'returns vulnerabilities counts for all report types' do
           subject
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response).to be_an(Hash)
           expect(json_response['high']).to eq(3)
-          expect(json_response['low']).to eq(3)
-          expect(json_response['medium']).to eq(0)
+          expect(json_response['low']).to eq(4)
+          expect(json_response['medium']).to eq(1)
           expect(response).to match_response_schema('vulnerabilities/summary', dir: 'ee')
         end
 
@@ -323,11 +322,11 @@ describe Groups::Security::VulnerabilitiesController do
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response).to be_an(Hash)
-          expect(json_response['total']).to eq({ '2018-11-10' => 5, '2018-11-12' => 3 })
+          expect(json_response['total']).to eq({ '2018-11-10' => 5, '2018-11-12' => 5 })
           expect(json_response['critical']).to eq({ '2018-11-10' => 1 })
           expect(json_response['high']).to eq({ '2018-11-10' => 2, '2018-11-12' => 1 })
-          expect(json_response['medium']).to eq({})
-          expect(json_response['low']).to eq({ '2018-11-10' => 2, '2018-11-12' => 2 })
+          expect(json_response['medium']).to eq({ '2018-11-12' => 1 })
+          expect(json_response['low']).to eq({ '2018-11-10' => 2, '2018-11-12' => 3 })
           expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
         end
 
