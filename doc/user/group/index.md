@@ -204,6 +204,12 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 
 > Introduced in [GitLab Ultimate][ee] 11.9 behind the `insights` feature flag.
 
+Configure the Insights that matter for your groups or projects to explore data
+such as triage hygiene, issues created/closed per a given period, average time
+for merge requests to be merged and much more.
+
+[Learn more about Insights](insights/index.md).
+
 ## Transferring groups
 
 From GitLab 10.5, groups can be transferred in the following ways:
