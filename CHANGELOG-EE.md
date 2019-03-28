@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.8.6 (2019-03-28)
+
+### Security (1 change)
+
+- Check label_ids parent when updating issue board.
+
+
 ## 11.8.5 (2019-03-27)
 
 - Unreleased due to QA failure.
