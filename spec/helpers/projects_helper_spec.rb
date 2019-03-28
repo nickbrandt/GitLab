@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ProjectsHelper do
@@ -348,15 +350,6 @@ describe ProjectsHelper do
         allow(helper).to receive(:current_user).and_return(nil)
 
         expect(helper.send(:default_clone_protocol)).to eq('https')
-      end
-    end
-
-    context 'when gitlab.config.kerberos is enabled and user is logged in' do
-      it 'returns krb5 as default protocol' do
-        allow(Gitlab.config.kerberos).to receive(:enabled).and_return(true)
-        allow(helper).to receive(:current_user).and_return(double)
-
-        expect(helper.send(:default_clone_protocol)).to eq('krb5')
       end
     end
   end

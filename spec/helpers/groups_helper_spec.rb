@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe GroupsHelper do
@@ -90,7 +92,7 @@ describe GroupsHelper do
     let(:deep_nested_group) { create(:group, parent: nested_group) }
     let!(:very_deep_nested_group) { create(:group, parent: deep_nested_group) }
 
-    it 'outputs the groups in the correct order', :postgresql do
+    it 'outputs the groups in the correct order' do
       expect(helper.group_title(very_deep_nested_group))
         .to match(%r{<li style="text-indent: 16px;"><a.*>#{deep_nested_group.name}.*</li>.*<a.*>#{very_deep_nested_group.name}</a>}m)
     end
