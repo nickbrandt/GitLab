@@ -1,4 +1,6 @@
 <script>
+import createFlash from '~/flash';
+import { s__ } from '~/locale';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
 import getDesignQuery from '../../queries/getDesign.graphql';
@@ -26,6 +28,12 @@ export default {
         return {
           id: this.id,
         };
+      },
+      result({ data }) {
+        if (!data) {
+          createFlash(s__('DesignManagement|Could not find design, please try again.'));
+          this.$router.push('/designs');
+        }
       },
     },
   },

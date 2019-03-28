@@ -75,9 +75,8 @@ describe('Design management index page', () => {
         .then(() => {
           expect(mutate).toHaveBeenCalledWith({
             mutation: uploadDesignQuery,
-            update: expect.any(Function),
             variables: {
-              name: ['test'],
+              files: [{ name: 'test' }],
             },
             optimisticResponse: {
               __typename: 'Mutation',
