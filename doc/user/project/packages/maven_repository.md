@@ -31,7 +31,9 @@ repository.
 If a project is private or you want to upload Maven artifacts to GitLab,
 credentials will need to be provided for authorization. Support is available for
 [personal access tokens](#authenticating-with-a-personal-access-token) and
-[CI job tokens](#authenticating-with-a-ci-job-token).
+[CI job tokens](#authenticating-with-a-ci-job-token) only.
+[Deploy tokens](../deploy_tokens/index.md) and regular username/password
+credentials do not work.
 
 ### Authenticating with a personal access token
 
