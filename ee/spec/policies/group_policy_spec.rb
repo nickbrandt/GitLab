@@ -1,24 +1,7 @@
 require 'spec_helper'
 
 describe GroupPolicy do
-  let(:guest) { create(:user) }
-  let(:reporter) { create(:user) }
-  let(:developer) { create(:user) }
-  let(:maintainer) { create(:user) }
-  let(:owner) { create(:user) }
-  let(:auditor) { create(:user, :auditor) }
-  let(:admin) { create(:admin) }
-  let(:group) { create(:group) }
-
-  before do
-    group.add_guest(guest)
-    group.add_reporter(reporter)
-    group.add_developer(developer)
-    group.add_maintainer(maintainer)
-    group.add_owner(owner)
-  end
-
-  subject { described_class.new(current_user, group) }
+  include_context 'GroupPolicy context'
 
   context 'when epics feature is disabled' do
     let(:current_user) { owner }
@@ -406,8 +389,6 @@ describe GroupPolicy do
       stub_licensed_features(security_dashboard: true)
     end
 
-    subject { described_class.new(current_user, group) }
-
     context 'with admin' do
       let(:current_user) { admin }
 
@@ -465,9 +446,39 @@ describe GroupPolicy do
     end
   end
 
+  describe 'private nested group use the highest access level from the group and inherited permissions', :nested_groups do
+    let(:nested_group) { create(:group, :private, parent: group) }
+
+    before do
+      nested_group.add_guest(guest)
+      nested_group.add_guest(reporter)
+      nested_group.add_guest(developer)
+      nested_group.add_guest(maintainer)
+
+      group.owners.destroy_all # rubocop: disable DestroyAll
+
+      group.add_guest(owner)
+      nested_group.add_owner(owner)
+    end
+
+    subject { described_class.new(current_user, nested_group) }
+
+    context 'auditor' do
+      let(:current_user) { create(:user, :auditor) }
+
+      it do
+        expect_allowed(:read_group)
+        expect_disallowed(:upload_file)
+        expect_disallowed(*reporter_permissions)
+        expect_disallowed(*developer_permissions)
+        expect_disallowed(*maintainer_permissions)
+        expect_disallowed(*owner_permissions)
+      end
+    end
+  end
+
   it_behaves_like 'ee clusterable policies' do
     let(:clusterable) { create(:group) }
-
     let(:cluster) do
       create(:cluster,
              :provided_by_gcp,

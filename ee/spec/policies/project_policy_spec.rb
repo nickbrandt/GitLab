@@ -11,19 +11,94 @@ describe ProjectPolicy do
   set(:guest) { create(:user) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
+  subject { described_class.new(current_user, project) }
+
   before do
     project.add_maintainer(maintainer)
     project.add_developer(developer)
     project.add_reporter(reporter)
     project.add_guest(guest)
+    stub_licensed_features(license_management: true)
+  end
+
+  context 'basic permissions' do
+    include_context 'ProjectPolicy context'
+
+    let(:additional_guest_permissions) do
+      %i[read_issue_link read_vulnerability_feedback read_software_license_policy]
+    end
+    let(:additional_reporter_permissions) { [:admin_issue_link] }
+    let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag] }
+    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches] }
+    let(:auditor_permissions) do
+      %i[
+        download_code download_wiki_code read_project read_board read_list
+        read_project_for_iids read_issue_iid read_merge_request_iid read_wiki
+        read_issue read_label read_issue_link read_milestone read_release
+        read_project_snippet read_project_member read_note read_cycle_analytics
+        read_pipeline read_build read_commit_status read_container_image
+        read_environment read_deployment read_merge_request read_pages
+        create_merge_request_in award_emoji
+        read_vulnerability_feedback read_software_license_policy
+      ]
+    end
+
+    it_behaves_like 'project policies as anonymous'
+    it_behaves_like 'project policies as guest'
+    it_behaves_like 'project policies as reporter'
+    it_behaves_like 'project policies as developer'
+    it_behaves_like 'project policies as maintainer'
+    it_behaves_like 'project policies as owner'
+    it_behaves_like 'project policies as admin'
+
+    context 'auditor' do
+      let(:current_user) { create(:user, :auditor) }
+
+      context 'who is not a team member' do
+        it do
+          is_expected.to be_disallowed(*developer_permissions)
+          is_expected.to be_disallowed(*maintainer_permissions)
+          is_expected.to be_disallowed(*owner_permissions)
+          is_expected.to be_disallowed(*(guest_permissions - auditor_permissions))
+          is_expected.to be_allowed(*auditor_permissions)
+        end
+      end
+
+      context 'who is a team member' do
+        before do
+          project.add_guest(current_user)
+        end
+
+        it do
+          is_expected.to be_disallowed(*developer_permissions)
+          is_expected.to be_disallowed(*maintainer_permissions)
+          is_expected.to be_disallowed(*owner_permissions)
+          is_expected.to be_allowed(*(guest_permissions - auditor_permissions))
+          is_expected.to be_allowed(*auditor_permissions)
+        end
+      end
+    end
+  end
+
+  context 'issues feature' do
+    subject { described_class.new(owner, project) }
+
+    context 'when the feature is disabled' do
+      before do
+        project.issues_enabled = false
+        project.save!
+      end
+
+      it 'disables boards permissions' do
+        expect_disallowed :admin_board
+      end
+    end
   end
 
   context 'admin_mirror' do
     context 'with remote mirror setting enabled' do
       context 'with admin' do
-        subject do
-          described_class.new(admin, project)
-        end
+        let(:current_user) { admin }
 
         it do
           is_expected.to be_allowed(:admin_mirror)
@@ -31,9 +106,7 @@ describe ProjectPolicy do
       end
 
       context 'with owner' do
-        subject do
-          described_class.new(owner, project)
-        end
+        let(:current_user) { owner }
 
         it do
           is_expected.to be_allowed(:admin_mirror)
@@ -41,9 +114,7 @@ describe ProjectPolicy do
       end
 
       context 'with developer' do
-        subject do
-          described_class.new(developer, project)
-        end
+        let(:current_user) { developer }
 
         it do
           is_expected.to be_disallowed(:admin_mirror)
@@ -57,9 +128,7 @@ describe ProjectPolicy do
       end
 
       context 'with admin' do
-        subject do
-          described_class.new(admin, project)
-        end
+        let(:current_user) { admin }
 
         it do
           is_expected.to be_allowed(:admin_mirror)
@@ -67,9 +136,7 @@ describe ProjectPolicy do
       end
 
       context 'with owner' do
-        subject do
-          described_class.new(owner, project)
-        end
+        let(:current_user) { owner }
 
         it do
           is_expected.to be_disallowed(:admin_mirror)
@@ -83,9 +150,7 @@ describe ProjectPolicy do
       end
 
       context 'with admin' do
-        subject do
-          described_class.new(admin, project)
-        end
+        let(:current_user) { admin }
 
         it do
           is_expected.to be_disallowed(:admin_mirror)
@@ -93,9 +158,7 @@ describe ProjectPolicy do
       end
 
       context 'with owner' do
-        subject do
-          described_class.new(owner, project)
-        end
+        let(:current_user) { owner }
 
         it do
           is_expected.to be_disallowed(:admin_mirror)
@@ -109,9 +172,7 @@ describe ProjectPolicy do
       end
 
       context 'with admin' do
-        subject do
-          described_class.new(admin, project)
-        end
+        let(:current_user) { admin }
 
         it do
           is_expected.to be_allowed(:admin_mirror)
@@ -119,9 +180,7 @@ describe ProjectPolicy do
       end
 
       context 'with owner' do
-        subject do
-          described_class.new(owner, project)
-        end
+        let(:current_user) { owner }
 
         it do
           is_expected.to be_allowed(:admin_mirror)
@@ -190,14 +249,6 @@ describe ProjectPolicy do
   end
 
   describe 'read_vulnerability_feedback' do
-    subject { described_class.new(current_user, project) }
-
-    context 'with public project' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_allowed(:read_vulnerability_feedback) }
-    end
-
     context 'with private project' do
       let(:current_user) { admin }
       let(:project) { create(:project, :private, namespace: owner.namespace) }
@@ -252,87 +303,9 @@ describe ProjectPolicy do
     end
   end
 
-  describe 'admin_vulnerability_feedback' do
-    subject { described_class.new(current_user, project) }
-
-    context 'with admin' do
-      let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with developer' do
-      let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_disallowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_disallowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_disallowed(:admin_vulnerability_feedback) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_disallowed(:admin_vulnerability_feedback) }
-    end
-  end
-
   describe 'read_project_security_dashboard' do
-    before do
-      stub_licensed_features(security_dashboard: true)
-    end
-
-    subject { described_class.new(current_user, project) }
-
-    context 'with admin' do
-      let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:read_project_security_dashboard) }
-    end
-
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:read_project_security_dashboard) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:read_project_security_dashboard) }
-    end
-
     context 'with developer' do
       let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:read_project_security_dashboard) }
 
       context 'when security dashboard features is not available' do
         before do
@@ -342,35 +315,9 @@ describe ProjectPolicy do
         it { is_expected.to be_disallowed(:read_project_security_dashboard) }
       end
     end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_disallowed(:read_project_security_dashboard) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_disallowed(:read_project_security_dashboard) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_disallowed(:read_project_security_dashboard) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_disallowed(:read_project_security_dashboard) }
-    end
   end
 
   describe 'read_package' do
-    subject { described_class.new(current_user, project) }
-
     context 'with admin' do
       let(:current_user) { admin }
 
@@ -429,16 +376,8 @@ describe ProjectPolicy do
   end
 
   describe 'read_feature_flag' do
-    before do
-      stub_licensed_features(feature_flags: true)
-    end
-
-    subject { described_class.new(current_user, project) }
-
     context 'with admin' do
       let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:read_feature_flag) }
 
       context 'when repository is disabled' do
         before do
@@ -449,22 +388,8 @@ describe ProjectPolicy do
       end
     end
 
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:read_feature_flag) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:read_feature_flag) }
-    end
-
     context 'with developer' do
       let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:read_feature_flag) }
 
       context 'when feature flags features is not available' do
         before do
@@ -474,39 +399,9 @@ describe ProjectPolicy do
         it { is_expected.to be_disallowed(:read_feature_flag) }
       end
     end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_disallowed(:read_feature_flag) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_disallowed(:read_feature_flag) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_disallowed(:read_feature_flag) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_disallowed(:read_feature_flag) }
-    end
   end
 
   describe 'admin_license_management' do
-    before do
-      stub_licensed_features(license_management: true)
-    end
-
-    subject { described_class.new(current_user, project) }
-
     context 'without license management feature available' do
       before do
         stub_licensed_features(license_management: false)
@@ -567,12 +462,6 @@ describe ProjectPolicy do
   end
 
   describe 'read_license_management' do
-    before do
-      stub_licensed_features(license_management: true)
-    end
-
-    subject { described_class.new(current_user, project) }
-
     context 'without license management feature available' do
       before do
         stub_licensed_features(license_management: false)
@@ -582,62 +471,12 @@ describe ProjectPolicy do
 
       it { is_expected.to be_disallowed(:read_software_license_policy) }
     end
-
-    context 'with admin' do
-      let(:current_user) { admin }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with owner' do
-      let(:current_user) { owner }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with maintainer' do
-      let(:current_user) { maintainer }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with developer' do
-      let(:current_user) { developer }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with reporter' do
-      let(:current_user) { reporter }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with guest' do
-      let(:current_user) { guest }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with non member' do
-      let(:current_user) { create(:user) }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
-
-    context 'with anonymous' do
-      let(:current_user) { nil }
-
-      it { is_expected.to be_allowed(:read_software_license_policy) }
-    end
   end
 
   describe 'create_web_ide_terminal' do
     before do
       stub_licensed_features(web_ide_terminal: true)
     end
-
-    subject { described_class.new(current_user, project) }
 
     context 'without ide terminal feature available' do
       before do
