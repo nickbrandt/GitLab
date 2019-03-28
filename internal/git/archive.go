@@ -104,7 +104,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 	var archiveReader io.Reader
 
-	archiveReader, err = handleArchiveWithGitaly(w, r, params, format)
+	archiveReader, err = handleArchiveWithGitaly(r, params, format)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("operations.GetArchive: %v", err))
 		return
@@ -132,7 +132,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	}
 }
 
-func handleArchiveWithGitaly(w http.ResponseWriter, r *http.Request, params archiveParams, format gitalypb.GetArchiveRequest_Format) (io.Reader, error) {
+func handleArchiveWithGitaly(r *http.Request, params archiveParams, format gitalypb.GetArchiveRequest_Format) (io.Reader, error) {
 	var request *gitalypb.GetArchiveRequest
 	c, err := gitaly.NewRepositoryClient(params.GitalyServer)
 	if err != nil {
@@ -143,8 +143,7 @@ func handleArchiveWithGitaly(w http.ResponseWriter, r *http.Request, params arch
 		request = &gitalypb.GetArchiveRequest{}
 
 		if err := proto.Unmarshal(params.GetArchiveRequest, request); err != nil {
-			helper.Fail500(w, r, fmt.Errorf("SendArchive: unmarshal GetArchiveRequest: %v", err))
-			return nil, err
+			return nil, fmt.Errorf("unmarshal GetArchiveRequest: %v", err)
 		}
 	} else {
 		request = &gitalypb.GetArchiveRequest{
