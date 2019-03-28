@@ -39,15 +39,6 @@ describe API::V3::Github do
   end
 
   shared_examples_for 'Jira-specific mimicked GitHub endpoints' do
-    describe 'GET /repos/.../events' do
-      it 'returns an empty array' do
-        jira_get v3_api("/repos/#{path}/events", user)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response).to eq([])
-      end
-    end
-
     describe 'GET /.../issues/:id/comments' do
       context 'when user has access to the merge request' do
         let(:merge_request) do
@@ -116,11 +107,69 @@ describe API::V3::Github do
     it_behaves_like 'Jira-specific mimicked GitHub endpoints' do
       let(:path) { '-/jira' }
     end
+
+    it 'returns an empty Array for events' do
+      jira_get v3_api("/repos/-/jira/events", user)
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response).to eq([])
+    end
   end
 
   context 'new :namespace/:project jira endpoints' do
     it_behaves_like 'Jira-specific mimicked GitHub endpoints' do
       let(:path) { "#{project.namespace.path}/#{project.path}" }
+    end
+
+    describe 'GET events' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, :empty_repo, group: group) }
+      let(:events_path) { "/repos/#{group.path}/#{project.path}/events" }
+
+      before do
+        stub_licensed_features(jira_dev_panel_integration: true)
+      end
+
+      context 'if there are no merge requests' do
+        it 'returns an empty array' do
+          jira_get v3_api(events_path, user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to eq([])
+        end
+      end
+
+      context 'if there is a merge request' do
+        let!(:merge_request) { create(:merge_request, source_project: project, target_project: project, author: user) }
+
+        it 'returns an event' do
+          jira_get v3_api(events_path, user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.size).to eq(1)
+        end
+      end
+
+      context 'if there are more merge requests' do
+        let!(:merge_request) { create(:merge_request, id: 10000, source_project: project, target_project: project, author: user) }
+        let!(:merge_request2) { create(:merge_request, id: 10001, source_project: project, source_branch: generate(:branch), target_project: project, author: user) }
+
+        it 'returns the expected amount of events' do
+          jira_get v3_api(events_path, user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Array)
+          expect(json_response.size).to eq(2)
+        end
+
+        it 'ensures each event has a unique id' do
+          jira_get v3_api(events_path, user)
+
+          ids = json_response.map { |event| event['id'] }.uniq
+          expect(ids.size).to eq(2)
+        end
+      end
     end
   end
 
@@ -156,6 +205,17 @@ describe API::V3::Github do
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(1)
         expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
+      end
+    end
+
+    describe 'GET /repos/:namespace/:project/pulls/:id' do
+      it 'returns the requested merge request in github format' do
+        stub_licensed_features(jira_dev_panel_integration: true)
+
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
       end
     end
   end

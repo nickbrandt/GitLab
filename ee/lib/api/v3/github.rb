@@ -131,6 +131,10 @@ module API
           present find_merge_requests, with: ::API::Github::Entities::PullRequest
         end
 
+        get '/-/jira/events' do
+          present []
+        end
+
         params do
           use :project_full_path
         end
@@ -140,6 +144,15 @@ module API
           merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
 
           present paginate(merge_requests), with: ::API::Github::Entities::PullRequest
+        end
+
+        params do
+          use :project_full_path
+        end
+        get ':namespace/:project/pulls/:id', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
+          mr = find_merge_request_with_access(params[:id])
+
+          present mr, with: ::API::Github::Entities::PullRequest
         end
 
         # In Github, each Merge Request is automatically also an issue.
@@ -166,10 +179,12 @@ module API
 
         # Self-hosted Jira (tested on 7.11.1) requests this endpoint right
         # after fetching branches.
-        # We need to respond with a 200 request to avoid breaking the
-        # integration flow (fetching merge requests).
         get ':namespace/:project/events' do
-          present []
+          user_project = find_project_with_access(params)
+
+          merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
+
+          present paginate(merge_requests), with: ::API::Github::Entities::PullRequestEvent
         end
 
         params do

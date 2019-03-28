@@ -170,6 +170,38 @@ module API
           expose :target_project, as: :repo, using: Repository
         end
       end
+
+      class PullRequestPayload < Grape::Entity
+        expose :action do |merge_request|
+          case merge_request.state
+          when 'merged', 'closed'
+            'closed'
+          else
+            'opened'
+          end
+        end
+
+        expose :id
+        expose :pull_request, using: PullRequest do |merge_request|
+          merge_request
+        end
+      end
+
+      class PullRequestEvent < Grape::Entity
+        expose :id do |merge_request|
+          updated_at = merge_request.updated_at.to_i
+          "#{merge_request.id}-#{updated_at}"
+        end
+        expose :type do |_merge_request|
+          'PullRequestEvent'
+        end
+        expose :updated_at, as: :created_at
+        expose :payload, using: PullRequestPayload do |merge_request|
+          # The merge request data is used by PullRequestPayload and PullRequest, so we just provide it
+          # here. Otherwise Grape::Entity would try to access a field "payload" on Merge Request.
+          merge_request
+        end
+      end
     end
   end
 end
