@@ -47,11 +47,15 @@ module Geo
     end
 
     def count_repositories_checksum_mismatch
-      Geo::ProjectRegistry.repository_checksum_mismatch.count
+      registries_for_mismatch_projects(:repository).count
     end
 
     def count_wikis_checksum_mismatch
-      Geo::ProjectRegistry.wiki_checksum_mismatch.count
+      registries_for_mismatch_projects(:wiki).count
+    end
+
+    def find_checksum_mismatch_project_registries(type = nil)
+      registries_for_mismatch_projects(type)
     end
 
     def count_repositories_retrying_verification
@@ -60,14 +64,6 @@ module Geo
 
     def count_wikis_retrying_verification
       registries_retrying_verification(:wiki).count
-    end
-
-    def find_checksum_mismatch_project_registries(type = nil)
-      if use_legacy_queries?
-        legacy_find_filtered_checksum_mismatch_projects(type)
-      else
-        find_filtered_checksum_mismatch_project_registries(type)
-      end
     end
 
     # Find all registries that need a repository or wiki verification
@@ -106,17 +102,6 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     protected
-
-    def find_filtered_checksum_mismatch_project_registries(type = nil)
-      case type
-      when 'repository'
-        Geo::ProjectRegistry.repository_checksum_mismatch
-      when 'wiki'
-        Geo::ProjectRegistry.wiki_checksum_mismatch
-      else
-        Geo::ProjectRegistry.checksum_mismatch
-      end
-    end
 
     #
     # FDW accessors
@@ -213,18 +198,6 @@ module Geo
     def quote_value(value)
       ::Gitlab::SQL::Glob.q(value)
     end
-
-    # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of projects where there is a checksum_mismatch
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_filtered_checksum_mismatch_projects(type = nil)
-      legacy_inner_join_registry_ids(
-        find_filtered_checksum_mismatch_project_registries(type),
-        current_node.projects.pluck(:id),
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of registries that need verification
     # rubocop: disable CodeReuse/ActiveRecord
@@ -370,6 +343,20 @@ module Geo
 
     def registries_retrying_verification(type)
       finder_klass_for_registries_retrying_verification
+        .new(current_node: current_node, type: type)
+        .execute
+    end
+
+    def finder_klass_for_mismatch_registries
+      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
+        Geo::ProjectRegistryMismatchFinder
+      else
+        Geo::LegacyProjectRegistryMismatchFinder
+      end
+    end
+
+    def registries_for_mismatch_projects(type)
+      finder_klass_for_mismatch_registries
         .new(current_node: current_node, type: type)
         .execute
     end

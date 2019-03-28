@@ -138,6 +138,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.mismatch(type)
+    case type
+    when :repository
+      repository_checksum_mismatch
+    when :wiki
+      wiki_checksum_mismatch
+    else
+      repository_checksum_mismatch.or(wiki_checksum_mismatch)
+    end
+  end
+
   def self.flag_repositories_for_resync!
     update_all(
       resync_repository: true,
