@@ -4,10 +4,6 @@ entry.
 
 ## 11.9.3 (2019-03-27)
 
-- No changes.
-
-## 11.9.2 (2019-03-26)
-
 ### Security (8 changes)
 
 - Disallow guest users from accessing Releases.
@@ -18,6 +14,10 @@ entry.
 - Return cached languages if they've been detected before.
 - Disallow updating namespace when updating a project.
 - Use UntrustedRegexp for matching refs policy.
+
+## 11.9.2 (2019-03-26)
+
+- Unreleased due to QA failure.
 
 ## 11.9.1 (2019-03-25)
 
