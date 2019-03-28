@@ -18,7 +18,7 @@ module QA
         end
 
         Page::MergeRequest::Show.perform do |show_page|
-          show_page.go_to_discussions_tab
+          show_page.click_discussions_tab
 
           show_page.start_discussion("I'm starting a new discussion")
           expect(show_page).to have_content("I'm starting a new discussion")
@@ -34,7 +34,7 @@ module QA
           expect(show_page).to have_content("Could you also check that?")
           expect(show_page).to have_content("Finish review 1")
 
-          show_page.go_to_diffs_tab
+          show_page.click_diffs_tab
 
           show_page.add_comment_to_diff("Can you check this line of code?")
           show_page.comment_now
@@ -56,7 +56,7 @@ module QA
         end
 
         Page::MergeRequest::Show.perform do |show_page|
-          show_page.go_to_discussions_tab
+          show_page.click_discussions_tab
 
           show_page.type_reply_to_discussion("Planning to discard this comment")
           show_page.start_review

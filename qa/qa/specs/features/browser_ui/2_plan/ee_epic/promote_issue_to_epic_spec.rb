@@ -31,7 +31,7 @@ module QA
         end
 
         group.visit!
-        QA::EE::Page::Group::Menu.perform(&:go_to_group_epics)
+        QA::EE::Page::Group::Menu.perform(&:click_group_epics_link)
         QA::EE::Page::Group::Epic::Index.perform(&:click_first_epic)
 
         expect(page).to have_content(issue_title)

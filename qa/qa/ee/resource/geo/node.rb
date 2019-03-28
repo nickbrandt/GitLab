@@ -9,8 +9,8 @@ module QA
 
           def fabricate!
             QA::Page::Main::Login.perform(&:sign_in_using_credentials)
-            QA::Page::Main::Menu.perform(&:go_to_admin_area)
-            QA::Page::Admin::Menu.perform(&:go_to_geo_nodes)
+            QA::Page::Main::Menu.perform(&:click_admin_area)
+            QA::Page::Admin::Menu.perform(&:click_geo_menu_link)
             EE::Page::Admin::Geo::Nodes::Show.perform(&:new_node!)
 
             EE::Page::Admin::Geo::Nodes::New.perform do |page|

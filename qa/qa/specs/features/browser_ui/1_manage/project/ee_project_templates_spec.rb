@@ -43,7 +43,7 @@ module QA
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_credentials)
 
-          Page::Main::Menu.perform(&:go_to_admin_area)
+          Page::Main::Menu.perform(&:click_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
           EE::Page::Admin::Settings::Templates.perform do |page|
@@ -81,8 +81,8 @@ module QA
           Page::Main::Login.perform(&:sign_in_using_credentials)
 
           Page::Main::Menu.perform(&:go_to_groups)
-          Page::Dashboard::Groups.perform { |page| page.go_to_group(Runtime::Namespace.sandbox_name) }
-          Page::Project::Menu.perform(&:go_to_settings)
+          Page::Dashboard::Groups.perform { |page| page.click_group(Runtime::Namespace.sandbox_name) }
+          Page::Project::Menu.perform(&:click_settings)
 
           EE::Page::Group::Settings::General.perform do |settings|
             settings.choose_custom_project_template("#{@template_container_group_name}")

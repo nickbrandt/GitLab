@@ -19,7 +19,7 @@ module QA
         end
         project.visit!
 
-        Page::Project::Menu.perform(&:click_members_settings)
+        Page::Project::Menu.perform(&:go_to_members_settings)
         Page::Project::Settings::Members.perform do |members_page|
           members_page.add_member(approver.username)
           members_page.add_member(non_approver.username)

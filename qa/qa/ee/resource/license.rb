@@ -6,8 +6,8 @@ module QA
       class License < QA::Resource::Base
         def fabricate!(license)
           QA::Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-          QA::Page::Main::Menu.perform(&:go_to_admin_area)
-          QA::Page::Admin::Menu.perform(&:go_to_license)
+          QA::Page::Main::Menu.perform(&:click_admin_area)
+          QA::Page::Admin::Menu.perform(&:click_license_menu_link)
 
           EE::Page::Admin::License.perform do |page|
             page.add_new_license(license) unless page.license?

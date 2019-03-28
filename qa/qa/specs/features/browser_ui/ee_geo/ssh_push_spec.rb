@@ -51,7 +51,7 @@ module QA
               end
 
               # Ensure the SSH key has replicated
-              Page::Main::Menu.act { go_to_profile_settings }
+              Page::Main::Menu.act { click_settings_link }
               Page::Profile::Menu.act { click_ssh_keys }
 
               expect(page).to have_content(key_title)
@@ -125,7 +125,7 @@ module QA
               end
 
               # Ensure the SSH key has replicated
-              Page::Main::Menu.act { go_to_profile_settings }
+              Page::Main::Menu.act { click_settings_link }
               Page::Profile::Menu.act { click_ssh_keys }
 
               expect(page).to have_content(key_title)
