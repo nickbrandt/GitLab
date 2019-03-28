@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe IssuablesHelper do
@@ -185,7 +187,6 @@ describe IssuablesHelper do
         updateEndpoint: "/#{@project.full_path}/issues/#{issue.iid}.json",
         canUpdate: true,
         canDestroy: true,
-        canAdmin: true,
         issuableRef: "##{issue.iid}",
         markdownPreviewPath: "/#{@project.full_path}/preview_markdown",
         markdownDocsPath: '/help/user/markdown',
@@ -199,7 +200,7 @@ describe IssuablesHelper do
         initialDescriptionText: 'issue text',
         initialTaskStatus: '0 of 0 tasks completed'
       }
-      expect(helper.issuable_initial_data(issue)).to eq(expected_data)
+      expect(helper.issuable_initial_data(issue)).to match(hash_including(expected_data))
     end
   end
 end
