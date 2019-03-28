@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UsersOpsDashboardProject < ActiveRecord::Base
+class UsersOpsDashboardProject < ApplicationRecord
   belongs_to :project
   belongs_to :user
 

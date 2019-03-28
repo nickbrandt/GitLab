@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class HashedStorageAttachmentsEvent < ActiveRecord::Base
+  class HashedStorageAttachmentsEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

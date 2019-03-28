@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class EpicIssue < ActiveRecord::Base
+class EpicIssue < ApplicationRecord
   include RelativePositioning
 
   validates :epic, :issue, presence: true

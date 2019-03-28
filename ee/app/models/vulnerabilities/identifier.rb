@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Identifier < ActiveRecord::Base
+  class Identifier < ApplicationRecord
     include ShaAttribute
 
     self.table_name = "vulnerability_identifiers"

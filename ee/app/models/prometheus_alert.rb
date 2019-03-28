@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PrometheusAlert < ActiveRecord::Base
+class PrometheusAlert < ApplicationRecord
   include Sortable
 
   OPERATORS_MAP = {

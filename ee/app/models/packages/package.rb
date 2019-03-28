@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class Packages::Package < ActiveRecord::Base
+class Packages::Package < ApplicationRecord
   belongs_to :project
   has_many :package_files
   has_one :maven_metadatum, inverse_of: :package

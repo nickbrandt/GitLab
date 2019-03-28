@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class EventLog < ActiveRecord::Base
+  class EventLog < ApplicationRecord
     include Geo::Model
     include ::EachBatch
 

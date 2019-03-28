@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Occurrence < ActiveRecord::Base
+  class Occurrence < ApplicationRecord
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
 

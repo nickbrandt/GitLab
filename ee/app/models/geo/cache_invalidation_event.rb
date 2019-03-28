@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class CacheInvalidationEvent < ActiveRecord::Base
+  class CacheInvalidationEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

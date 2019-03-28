@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BoardLabel < ActiveRecord::Base
+class BoardLabel < ApplicationRecord
   belongs_to :board
   belongs_to :label
 

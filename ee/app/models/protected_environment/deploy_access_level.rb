@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
+class ProtectedEnvironment::DeployAccessLevel < ApplicationRecord
   ALLOWED_ACCESS_LEVELS = [
     Gitlab::Access::MAINTAINER,
     Gitlab::Access::DEVELOPER,

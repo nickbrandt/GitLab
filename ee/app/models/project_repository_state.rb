@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProjectRepositoryState < ActiveRecord::Base
+class ProjectRepositoryState < ApplicationRecord
   include IgnorableColumn
   include ShaAttribute
 

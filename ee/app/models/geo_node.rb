@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GeoNode < ActiveRecord::Base
+class GeoNode < ApplicationRecord
   include Presentable
   include Geo::SelectiveSync
 

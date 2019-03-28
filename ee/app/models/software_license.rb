@@ -2,7 +2,7 @@
 
 # This class represents a software license.
 # For use in the License Management feature.
-class SoftwareLicense < ActiveRecord::Base
+class SoftwareLicense < ApplicationRecord
   include Presentable
 
   validates :name, presence: true

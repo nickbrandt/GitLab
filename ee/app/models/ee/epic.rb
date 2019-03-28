@@ -160,7 +160,7 @@ module EE
         return unless ::Group.supports_nested_objects?
 
         result =
-          ActiveRecord::Base.connection.execute(
+          ApplicationRecord.connection.execute(
             <<-SQL
               WITH RECURSIVE descendants AS (
                   SELECT id, 1 depth

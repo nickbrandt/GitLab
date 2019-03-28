@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GitlabSubscription < ActiveRecord::Base
+class GitlabSubscription < ApplicationRecord
   default_value_for :start_date, Date.today
 
   belongs_to :namespace

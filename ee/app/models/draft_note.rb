@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class DraftNote < ActiveRecord::Base
+class DraftNote < ApplicationRecord
   include DiffPositionableNote
   include Gitlab::Utils::StrongMemoize
   include Sortable

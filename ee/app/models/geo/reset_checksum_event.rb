@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class ResetChecksumEvent < ActiveRecord::Base
+  class ResetChecksumEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

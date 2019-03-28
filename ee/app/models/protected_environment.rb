@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class ProtectedEnvironment < ActiveRecord::Base
+class ProtectedEnvironment < ApplicationRecord
   include ::Gitlab::Utils::StrongMemoize
 
   belongs_to :project
