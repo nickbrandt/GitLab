@@ -92,7 +92,7 @@ export default {
 
 <template>
   <div>
-    <filters :dashboard-documentation="dashboardDocumentation" />
+    <filters />
     <vulnerability-count-list />
 
     <vulnerability-chart />

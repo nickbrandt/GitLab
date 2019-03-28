@@ -5,13 +5,12 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 
 describe('Filter component', () => {
   let vm;
-  const props = { dashboardDocumentation: '' };
   const store = createStore();
   const Component = Vue.extend(component);
 
   describe('severity', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(Component, { store, props });
+      vm = mountComponentWithStore(Component, { store });
     });
 
     afterEach(() => {

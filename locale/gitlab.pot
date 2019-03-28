@@ -9206,9 +9206,6 @@ msgstr ""
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
-msgid "Security Reports|At this time, the security dashboard only supports SAST and dependency scanning."
-msgstr ""
-
 msgid "Security Reports|Create issue"
 msgstr ""
 
@@ -9222,9 +9219,6 @@ msgid "Security Reports|More info"
 msgstr ""
 
 msgid "Security Reports|No Vulnerabilities"
-msgstr ""
-
-msgid "Security Reports|Security dashboard documentation"
 msgstr ""
 
 msgid "Security Reports|There was an error creating the issue."
@@ -12663,9 +12657,6 @@ msgid "from"
 msgstr ""
 
 msgid "group"
-msgstr ""
-
-msgid "help"
 msgstr ""
 
 msgid "here"

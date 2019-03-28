@@ -23,6 +23,7 @@ export const CONFIDENCE_LEVELS = {
 
 export const REPORT_TYPES = {
   container_scanning: s__('ciReport|Container Scanning'),
+  dast: s__('ciReport|DAST'),
   dependency_scanning: s__('ciReport|Dependency Scanning'),
   sast: s__('ciReport|SAST'),
 };
