@@ -1,0 +1,10 @@
+query getDesign($id: ID!) {
+  design(id: $id) @client {
+    image
+    name
+    updatedAt
+    updatedBy {
+      name
+    }
+  }
+}

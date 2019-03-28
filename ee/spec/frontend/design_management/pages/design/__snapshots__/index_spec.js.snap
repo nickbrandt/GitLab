@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Design management design index page sets loading state 1`] = `
+<div
+  class="design-detail fixed-top w-100 h-100"
+>
+  <toolbar-stub
+    isloading="true"
+    name=""
+    updatedat=""
+    updatedby="[object Object]"
+  />
+</div>
+`;
+
+exports[`Design management design index page sets loading state 2`] = `
+<div
+  class="design-detail fixed-top w-100 h-100"
+>
+  <toolbar-stub
+    name="test.jpg"
+    updatedat="01-01-2019"
+    updatedby="[object Object]"
+  />
+</div>
+`;

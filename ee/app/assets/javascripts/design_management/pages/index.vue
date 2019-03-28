@@ -89,5 +89,6 @@ export default {
       <design-list v-else-if="designs.length" :designs="designs" />
       <div v-else>{{ __('No designs found.') }}</div>
     </div>
+    <router-view />
   </div>
 </template>

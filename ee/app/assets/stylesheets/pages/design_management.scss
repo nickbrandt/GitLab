@@ -1,0 +1,12 @@
+.design-detail {
+  background-color: rgba($black, 0.9);
+
+  .with-performance-bar & {
+    top: 35px;
+  }
+
+  h2 {
+    font-size: 14px;
+    line-height: 1;
+  }
+}
