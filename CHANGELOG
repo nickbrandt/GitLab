@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.3.3
+
+- Preserve orientation when removing EXIF
+
 v8.3.2
 
 - Remove EXIF from JPEG/TIFF images
