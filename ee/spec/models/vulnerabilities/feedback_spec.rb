@@ -21,4 +21,74 @@ describe Vulnerabilities::Feedback do
     it { is_expected.to validate_presence_of(:category) }
     it { is_expected.to validate_presence_of(:project_fingerprint) }
   end
+
+  describe '#find_or_init_for' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project, :public, :repository, namespace: group) }
+    let(:user) { create(:user) }
+    let(:pipeline) { create(:ci_pipeline, project: project) }
+
+    let(:feedback_params) do
+      {
+        feedback_type: 'dismissal', pipeline_id: pipeline.id, category: 'sast',
+        project_fingerprint: '418291a26024a1445b23fe64de9380cdcdfd1fa8',
+        vulnerability_data: {
+          category: 'sast',
+          priority: 'Low', line: '41',
+          file: 'subdir/src/main/java/com/gitlab/security_products/tests/App.java',
+          cve: '818bf5dacb291e15d9e6dc3c5ac32178:PREDICTABLE_RANDOM',
+          name: 'Predictable pseudorandom number generator',
+          description: 'Description of Predictable pseudorandom number generator',
+          tool: 'find_sec_bugs'
+        }
+      }
+    end
+
+    context 'when params are valid' do
+      subject(:feedback) { described_class.find_or_init_for(feedback_params) }
+
+      before do
+        feedback.author = user
+        feedback.project = project
+      end
+
+      it 'inits the feedback' do
+        is_expected.to be_new_record
+      end
+
+      it 'finds the existing feedback' do
+        feedback.save!
+
+        existing_feedback = described_class.find_or_init_for(feedback_params)
+
+        expect(existing_feedback).to eq(feedback)
+      end
+
+      context 'when attempting to save duplicate' do
+        it 'raises ActiveRecord::RecordInvalid' do
+          duplicate = described_class.find_or_init_for(feedback_params)
+          duplicate.author = user
+          duplicate.project = project
+
+          feedback.save!
+
+          expect { duplicate.save! }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+    end
+
+    context 'when params are invalid' do
+      it 'raises ArgumentError when given a bad feedback_type value' do
+        feedback_params[:feedback_type] = 'foo'
+
+        expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /feedback_type/)
+      end
+
+      it 'raises ArgumentError when given a bad category value' do
+        feedback_params[:category] = 'foo'
+
+        expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /category/)
+      end
+    end
+  end
 end

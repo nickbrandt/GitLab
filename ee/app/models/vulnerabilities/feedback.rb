@@ -29,5 +29,26 @@ module Vulnerabilities
     scope :all_preloaded, -> do
       preload(:author, :project, :issue, :merge_request, :pipeline)
     end
+
+    def self.find_or_init_for(feedback_params)
+      validate_enums(feedback_params)
+
+      record = find_or_initialize_by(feedback_params.slice(:category, :feedback_type, :project_fingerprint))
+      record.assign_attributes(feedback_params)
+      record
+    end
+
+    # Rails 5.0 does not properly handle validation of enums in select queries such as find_or_initialize_by.
+    # This method, and calls to it can be removed when we are on Rails 5.2.
+    def self.validate_enums(feedback_params)
+      unless feedback_types.include?(feedback_params[:feedback_type])
+
+        raise ArgumentError.new("'#{feedback_params[:feedback_type]}' is not a valid feedback_type")
+      end
+
+      unless categories.include?(feedback_params[:category])
+        raise ArgumentError.new("'#{feedback_params[:category]}' is not a valid category")
+      end
+    end
   end
 end
