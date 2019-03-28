@@ -1,0 +1,5 @@
+---
+title: Fix project approval rule with only private group being considered as approved when override is allowed
+merge_request: 10356
+author:
+type: fixed

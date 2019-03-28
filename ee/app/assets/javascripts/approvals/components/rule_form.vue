@@ -5,7 +5,7 @@ import { GlButton } from '@gitlab/ui';
 import { sprintf, __ } from '~/locale';
 import ApproversList from './approvers_list.vue';
 import ApproversSelect from './approvers_select.vue';
-import { TYPE_USER, TYPE_GROUP } from '../constants';
+import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from '../constants';
 
 const DEFAULT_NAME = 'Default';
 
@@ -31,6 +31,7 @@ export default {
       approversToAdd: [],
       showValidation: false,
       isFallback: false,
+      containsHiddenGroups: false,
       ...this.getInitialData(),
     };
   },
@@ -102,6 +103,9 @@ export default {
         this.settings.allowMultiRule && this.isFallback && !this.name && !this.approvers.length
       );
     },
+    removeHiddenGroups() {
+      return this.containsHiddenGroups && !this.approversByType[TYPE_HIDDEN_GROUPS];
+    },
     submissionData() {
       return {
         id: this.initRule && this.initRule.id,
@@ -111,6 +115,7 @@ export default {
         groups: this.groupIds,
         userRecords: this.users,
         groupRecords: this.groups,
+        removeHiddenGroups: this.removeHiddenGroups,
       };
     },
   },
@@ -191,6 +196,8 @@ export default {
         };
       }
 
+      const { containsHiddenGroups = false, removeHiddenGroups = false } = this.initRule;
+
       const users = this.initRule.users.map(x => ({ ...x, type: TYPE_USER }));
       const groups = this.initRule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
 
@@ -198,7 +205,12 @@ export default {
         name: this.initRule.name || '',
         approvalsRequired: this.initRule.approvalsRequired || 0,
         minApprovalsRequired: this.initRule.minApprovalsRequired || 0,
-        approvers: groups.concat(users),
+        containsHiddenGroups,
+        approvers: groups
+          .concat(users)
+          .concat(
+            containsHiddenGroups && !removeHiddenGroups ? [{ type: TYPE_HIDDEN_GROUPS }] : [],
+          ),
       };
     },
   },
