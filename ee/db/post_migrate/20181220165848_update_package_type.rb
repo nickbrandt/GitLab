@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:disable Migration/UpdateColumnInBatches
 class UpdatePackageType < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
 
