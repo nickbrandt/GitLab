@@ -35,10 +35,6 @@ module Geo
       project.repository.after_sync
     end
 
-    def ssh_url_to_repo
-      "#{primary_ssh_path_prefix}#{project.full_path}.git"
-    end
-
     def repository
       project.repository
     end

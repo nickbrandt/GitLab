@@ -26,10 +26,6 @@ module Geo
       expire_repository_caches
     end
 
-    def ssh_url_to_wiki
-      "#{primary_ssh_path_prefix}#{project.full_path}.wiki.git"
-    end
-
     def repository
       project.wiki.repository
     end
