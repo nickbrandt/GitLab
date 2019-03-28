@@ -237,6 +237,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Creates an EE component for the pipeline graph.
 
 
+## 11.7.10 (2019-03-28)
+
+### Security (1 change)
+
+- Check label_ids parent when updating issue board.
+
+
 ## 11.7.8 (2019-03-26)
 
 ### Security (2 changes)
