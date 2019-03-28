@@ -67,6 +67,7 @@ func (c *cleaner) startProcessing(stdin io.Reader) error {
 		"-ImageSize",
 		"-Copyright",
 		"-CopyrightNotice",
+		"-Orientation",
 	}
 
 	args := append([]string{"-all=", "--IPTC:all", "--XMP-iptcExt:all", "-tagsFromFile", "@"}, whitelisted_tags...)
