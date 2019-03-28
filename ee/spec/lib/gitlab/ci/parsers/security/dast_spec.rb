@@ -24,8 +24,8 @@ describe Gitlab::Ci::Parsers::Security::Dast do
     end
 
     it 'generates expected location fingerprint' do
-      expected1 = Digest::SHA1.hexdigest('X-Content-Type-Options GET ')
-      expected2 = Digest::SHA1.hexdigest('X-Content-Type-Options GET /')
+      expected1 = Digest::SHA1.hexdigest(':X-Content-Type-Options:GET')
+      expected2 = Digest::SHA1.hexdigest('/:X-Content-Type-Options:GET')
 
       expect(report.occurrences.first[:location_fingerprint]).to eq(expected1)
       expect(report.occurrences.last[:location_fingerprint]).to eq(expected2)
