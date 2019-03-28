@@ -1,6 +1,6 @@
 # SAML SSO for GitLab.com Groups
 
-> Introduced in [GitLab Silver](https://about.gitlab.com/pricing/) 11.0.
+> Introduced in [GitLab.com Silver](https://about.gitlab.com/pricing/) 11.0.
 
 NOTE: **Note:**
 This topic is for SAML on GitLab.com Silver tier and above. For SAML on self-managed GitLab instances, see [SAML OmniAuth Provider](../../../integration/saml.md).
