@@ -38,7 +38,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="js-approval-rules">
     <gl-loading-icon v-if="!hasLoaded" :size="2" />
     <template v-else>
       <div class="border-bottom">

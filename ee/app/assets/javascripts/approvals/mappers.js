@@ -6,6 +6,7 @@ export const mapApprovalRuleRequest = req => ({
   approvals_required: req.approvalsRequired,
   users: req.users,
   groups: req.groups,
+  remove_hidden_groups: req.removeHiddenGroups,
 });
 
 export const mapApprovalFallbackRuleRequest = req => ({
@@ -19,6 +20,7 @@ export const mapApprovalRuleResponse = res => ({
   approvalsRequired: res.approvals_required,
   minApprovalsRequired: res.source_rule ? res.source_rule.approvals_required : 0,
   approvers: res.approvers,
+  containsHiddenGroups: res.contains_hidden_groups,
   users: res.users,
   groups: res.groups,
 });

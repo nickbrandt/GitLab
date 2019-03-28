@@ -54,6 +54,61 @@ describe ApprovalRules::UpdateService do
       end
     end
 
+    context 'when existing groups are inaccessible to user' do
+      let(:private_accessible_group) { create(:group, :private) }
+      let(:private_inaccessible_group) { create(:group, :private) }
+      let(:new_group) { create(:group) }
+
+      before do
+        approval_rule.groups = [private_accessible_group, private_inaccessible_group]
+        private_accessible_group.add_guest user
+      end
+
+      context 'when remove_hidden_groups is false' do
+        it 'preserves inaccessible groups' do
+          result = described_class.new(approval_rule, user, {
+            remove_hidden_groups: false,
+            group_ids: [new_group.id]
+          }).execute
+
+          expect(result[:status]).to eq(:success)
+
+          rule = result[:rule]
+
+          expect(rule.groups).to contain_exactly(private_inaccessible_group, new_group)
+        end
+      end
+
+      context 'when remove_hidden_groups is not specified' do
+        it 'removes inaccessible groups' do
+          result = described_class.new(approval_rule, user, {
+            group_ids: [new_group.id]
+          }).execute
+
+          expect(result[:status]).to eq(:success)
+
+          rule = result[:rule]
+
+          expect(rule.groups).to contain_exactly(private_inaccessible_group, new_group)
+        end
+      end
+
+      context 'when remove_hidden_groups is true' do
+        it 'removes inaccessible groups' do
+          result = described_class.new(approval_rule, user, {
+            remove_hidden_groups: true,
+            group_ids: [new_group.id]
+          }).execute
+
+          expect(result[:status]).to eq(:success)
+
+          rule = result[:rule]
+
+          expect(rule.groups).to contain_exactly(new_group)
+        end
+      end
+    end
+
     context 'when validation fails' do
       it 'returns error message' do
         result = described_class.new(approval_rule, user, {
