@@ -92,4 +92,4 @@ module Git
   end
 end
 
-Git::BranchPushService.prepend(EE::Git::BranchPushService)
+Git::BranchPushService.prepend(::EE::Git::BranchPushService)

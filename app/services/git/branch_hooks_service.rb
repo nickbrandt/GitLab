@@ -142,3 +142,5 @@ module Git
     end
   end
 end
+
+Git::BranchHooksService.prepend(::EE::Git::BranchHooksService)

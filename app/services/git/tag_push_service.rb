@@ -12,5 +12,3 @@ module Git
     end
   end
 end
-
-Git::TagPushService.prepend(EE::Git::TagPushService)
