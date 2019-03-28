@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import Vue from 'vue';
 import * as types from './mutation_types';
 
 export default {
@@ -26,10 +26,7 @@ export default {
     }
   },
   [types.REMOVE_SELECTED_PROJECT](state, project) {
-    state.selectedProjects = _.without(
-      state.selectedProjects,
-      ..._.where(state.selectedProjects, { id: project.id }),
-    );
+    state.selectedProjects = state.selectedProjects.filter(p => p.id !== project.id);
   },
 
   [types.REQUEST_PROJECTS](state) {
@@ -53,22 +50,22 @@ export default {
     // Flipping this property separately to allows the UI
     // to hide the "minimum query" message
     // before the seach results arrive from the API
-    state.messages.minimumQuery = false;
+    Vue.set(state.messages, 'minimumQuery', false);
 
     state.searchCount += 1;
   },
   [types.RECEIVE_SEARCH_RESULTS_SUCCESS](state, results) {
     state.projectSearchResults = results;
-    state.messages.noResults = state.projectSearchResults.length === 0;
-    state.messages.searchError = false;
-    state.messages.minimumQuery = false;
+    Vue.set(state.messages, 'noResults', state.projectSearchResults.length === 0);
+    Vue.set(state.messages, 'searchError', false);
+    Vue.set(state.messages, 'minimumQuery', false);
     state.searchCount -= 1;
   },
   [types.RECEIVE_SEARCH_RESULTS_ERROR](state, message) {
     state.projectSearchResults = [];
-    state.messages.noResults = false;
-    state.messages.searchError = true;
-    state.messages.minimumQuery = message === 'minimumQuery';
+    Vue.set(state.messages, 'noResults', false);
+    Vue.set(state.messages, 'searchError', true);
+    Vue.set(state.messages, 'minimumQuery', message === 'minimumQuery');
     state.searchCount -= 1;
   },
 };

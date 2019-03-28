@@ -125,7 +125,6 @@ export default {
       <gl-button
         v-if="projects.length"
         v-gl-modal="$options.modalId"
-        type="button"
         class="js-add-projects-button btn btn-success"
       >
         {{ s__('OperationsDashboard|Add projects') }}
@@ -158,7 +157,6 @@ export default {
         <div class="col-12">
           <gl-button
             v-gl-modal="$options.modalId"
-            type="button"
             class="js-add-projects-button btn btn-success prepend-top-default append-bottom-default"
           >
             {{ s__('OperationsDashboard|Add projects') }}

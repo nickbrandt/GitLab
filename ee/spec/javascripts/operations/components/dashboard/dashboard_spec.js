@@ -50,7 +50,7 @@ describe('dashboard component', () => {
       expect(button.innerText.trim()).toBe(mockText.ADD_PROJECTS);
     });
 
-    it('opens the Add Projects modal', () => {
+    it('renders the projects modal', () => {
       button.click();
 
       expect(vm.$el.querySelector('.add-projects-modal')).toBeDefined();
