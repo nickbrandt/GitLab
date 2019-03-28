@@ -68,7 +68,7 @@ module QA
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:go_to_members)
+          EE::Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do
@@ -117,7 +117,7 @@ module QA
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:go_to_members)
+          EE::Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do

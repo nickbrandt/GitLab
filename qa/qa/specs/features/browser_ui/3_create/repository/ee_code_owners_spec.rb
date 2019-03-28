@@ -29,7 +29,7 @@ module QA
         end
         @project.visit!
 
-        Page::Project::Menu.perform(&:click_members_settings)
+        Page::Project::Menu.perform(&:go_to_members_settings)
         Page::Project::Settings::Members.perform do |members_page|
           members_page.add_member(@user.username)
           members_page.add_member(@user2.username)
@@ -57,7 +57,7 @@ module QA
 
         # Check the files and code owners
         Page::Project::Show.perform do |project_page|
-          project_page.go_to_file 'file.txt'
+          project_page.click_file 'file.txt'
         end
 
         expect(page).to have_content(@user.name)
@@ -65,7 +65,7 @@ module QA
 
         @project.visit!
         Page::Project::Show.perform do |project_page|
-          project_page.go_to_file 'README.md'
+          project_page.click_file 'README.md'
         end
 
         expect(page).to have_content(@user2.name)

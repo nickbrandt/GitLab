@@ -49,7 +49,7 @@ module QA
               end
 
               # Ensure the SSH key has replicated
-              Page::Main::Menu.perform(&:go_to_profile_settings)
+              Page::Main::Menu.perform(&:click_settings_link)
               Page::Profile::Menu.perform do |menu|
                 menu.click_ssh_keys
                 menu.wait_for_key_to_replicate(key_title)
@@ -141,7 +141,7 @@ module QA
               end
 
               # Ensure the SSH key has replicated
-              Page::Main::Menu.perform(&:go_to_profile_settings)
+              Page::Main::Menu.perform(&:click_settings_link)
               Page::Profile::Menu.perform do |menu|
                 menu.click_ssh_keys
                 menu.wait_for_key_to_replicate(key_title)

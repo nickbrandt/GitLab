@@ -30,7 +30,7 @@ module QA
             dashboard.go_to_project(geo_project_name)
           end
 
-          Page::Project::Menu.act { go_to_settings }
+          Page::Project::Menu.act { click_settings }
 
           geo_project_renamed = "geo-after-rename-#{SecureRandom.hex(8)}"
           Page::Project::Settings::Main.perform do |settings|

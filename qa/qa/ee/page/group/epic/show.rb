@@ -41,7 +41,7 @@ module QA
               click_element :remove_issue_button
             end
 
-            def go_to_edit_page
+            def click_edit_button
               click_element :edit_button
             end
 

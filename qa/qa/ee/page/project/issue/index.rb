@@ -20,7 +20,7 @@ module QA
                 page.has_content?(issue.title)
               end
 
-              go_to_issue(issue.title)
+              click_issue_link(issue.title)
             end
 
             def filter_by_title(title)

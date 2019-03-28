@@ -37,13 +37,13 @@ module QA
             end
           end
 
-          def go_to_members
+          def click_group_members_item
             within_sidebar do
               click_element(:group_members_item)
             end
           end
 
-          def go_to_group_epics
+          def click_group_epics_link
             within_sidebar do
               click_element(:group_epics_link)
             end

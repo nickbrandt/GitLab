@@ -15,11 +15,11 @@ module QA
             end
           end
 
-          def go_to_geo_nodes
+          def click_geo_menu_link
             click_element :link_geo_menu
           end
 
-          def go_to_license
+          def click_license_menu_link
             click_element :link_license_menu
           end
 
