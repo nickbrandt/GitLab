@@ -103,7 +103,7 @@ Learn more in the [Issue Weight documentation](../../../workflow/issue_weight.md
 - Unsubscribe: if you are receiving notifications on that issue but no
   longer want to receive them, unsubscribe from it.
 
-Read more in the [notifications documentation](../../../workflow/notifications.md#issue--merge-request-events).
+Read more in the [notifications documentation](../../../workflow/notifications.md#issue--epics--merge-request-events).
 
 #### 11. Reference
 
