@@ -33,7 +33,7 @@ updated automatically. Elasticsearch can be installed on the same machine as
 GitLab, or on a separate server, or you can use the [Amazon Elasticsearch](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html)
 service.
 
-You can follow the steps as described in the [official web site](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html "Elasticsearch installation documentation") or
+You can follow the steps as described in the [official web site](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html "Elasticsearch installation documentation") or
 use the packages that are available for your OS.
 
 ## Elasticsearch repository indexer (beta)
