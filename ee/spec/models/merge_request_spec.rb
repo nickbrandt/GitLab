@@ -769,4 +769,62 @@ describe MergeRequest do
       end
     end
   end
+
+  describe '#mergeable_ci_state?' do
+    subject { merge_request.mergeable_ci_state? }
+
+    let(:project) { create(:project, :repository) }
+
+    let(:merge_request) do
+      create(:merge_request,
+        :with_merge_request_pipeline,
+        source_branch: 'feature',
+        source_project: project,
+        target_branch: 'master',
+        target_project: project)
+    end
+
+    shared_examples_for 'merge pipelines project option is disabled' do
+      before do
+        project.merge_pipelines_enabled = false
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    before do
+      stub_licensed_features(merge_pipelines: true)
+      project.merge_pipelines_enabled = true
+      merge_request.update_head_pipeline
+    end
+
+    it { is_expected.to be_truthy }
+
+    context 'when head pipeline is a detached merge request pipeline' do
+      before do
+        merge_request.head_pipeline.update_column(:target_sha, nil)
+      end
+
+      it { is_expected.to be_falsy }
+      it_behaves_like 'merge pipelines project option is disabled'
+    end
+
+    context 'when source sha of the merge request pipeline is not HEAD' do
+      before do
+        merge_request.head_pipeline.update_column(:source_sha, 'old-commit')
+      end
+
+      it { is_expected.to be_falsy }
+      it_behaves_like 'merge pipelines project option is disabled'
+    end
+
+    context 'when target sha of the merge request pipeline is not HEAD' do
+      before do
+        merge_request.head_pipeline.update_column(:target_sha, 'old-commit')
+      end
+
+      it { is_expected.to be_falsy }
+      it_behaves_like 'merge pipelines project option is disabled'
+    end
+  end
 end
