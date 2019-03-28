@@ -42,7 +42,9 @@ export default {
       return Boolean(this.vulnerability.dismissal_feedback);
     },
     hasIssue() {
-      return Boolean(this.vulnerability.issue_feedback);
+      return Boolean(
+        this.vulnerability.issue_feedback && this.vulnerability.issue_feedback.issue_iid,
+      );
     },
     canDismissVulnerability() {
       const path = this.vulnerability.vulnerability_feedback_dismissal_path;

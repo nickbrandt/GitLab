@@ -17,19 +17,19 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
     end
   end
 
-  expose :issue_iid, if: -> (feedback, _) { feedback.issue? } do |feedback|
+  expose :issue_iid, if: -> (feedback, _) { feedback.issue.present? } do |feedback|
     feedback.issue.iid
   end
 
-  expose :issue_url, if: -> (feedback, _) { feedback.issue? } do |feedback|
+  expose :issue_url, if: -> (feedback, _) { feedback.issue.present? } do |feedback|
     project_issue_url(feedback.project, feedback.issue)
   end
 
-  expose :merge_request_iid, if: -> (feedback, _) { feedback.merge_request? } do |feedback|
+  expose :merge_request_iid, if: -> (feedback, _) { feedback.merge_request.present? } do |feedback|
     feedback.merge_request.iid
   end
 
-  expose :merge_request_path, if: -> (feedback, _) { feedback.merge_request? } do |feedback|
+  expose :merge_request_path, if: -> (feedback, _) { feedback.merge_request.present? } do |feedback|
     project_merge_request_path(feedback.project, feedback.merge_request)
   end
 

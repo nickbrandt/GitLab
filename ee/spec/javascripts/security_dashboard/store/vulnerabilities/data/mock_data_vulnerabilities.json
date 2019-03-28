@@ -406,5 +406,79 @@
         "url": "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
       }
     ]
+  },
+  {
+    "id": 7,
+    "report_type": "sast",
+    "name": "Insecure variable usage",
+    "severity": "high",
+    "confidence": "low",
+    "scanner": {
+      "external_id": "find_sec_bugs",
+      "name": "Find Security Bugs"
+    },
+    "identifiers": [
+      {
+        "external_type": "CVE",
+        "external_id": "CVE-2018-1234",
+        "name": "CVE-2018-1234",
+        "url": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=2018-1234"
+      },
+      {
+        "external_type": "CVE",
+        "external_id": "CVE-2018-1234",
+        "name": "CVE-2018-1234",
+        "url": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=2018-1234"
+      }
+    ],
+    "project_fingerprint": "4e5b6966dd100170b4b1ad599c7058cce91b57b4",
+    "project": {
+      "id": 1,
+      "name": "project1",
+      "full_path": "/namespace1/project1",
+      "full_name": "Gitab.org / security-products / codequality"
+    },
+    "dismissal_feedback": null,
+    "issue_feedback": {
+      "id": 7,
+      "project_id": 1,
+      "author": {
+        "id": 8,
+        "name": "John Doe9",
+        "username": "user8",
+        "state": "active",
+        "avatar_url": "https://www.gravatar.com/avatar/51798cfc94af924ac2dffb7083baa6f4?s=80&d=identicon",
+        "web_url": "http://localhost/user8",
+        "status_tooltip_html": null,
+        "path": "/user8"
+      },
+      "issue_iid": null,
+      "pipeline": {
+        "id": 3,
+        "path": "/namespace6/project6/pipelines/3"
+      },
+      "issue_url": null,
+      "category": "sast",
+      "feedback_type": "issue",
+      "branch": "master",
+      "project_fingerprint": "4e5b6966dd100170b4b1ad599c7058cce91b57b4"
+    },
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
+    "description": "The cipher does not provide data integrity update 1",
+    "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
+    "location": {
+      "file": "maven/src/main/java/com/gitlab/security_products/tests/App.java",
+      "start_line": 29,
+      "end_line": 29,
+      "class": "com.gitlab.security_products.tests.App",
+      "method": "insecureCypher"
+    },
+    "links": [
+      {
+        "name": "Cipher does not check for integrity first?",
+        "url": "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
+      }
+    ]
   }
 ]

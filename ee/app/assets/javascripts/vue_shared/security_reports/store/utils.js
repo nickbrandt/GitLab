@@ -53,13 +53,13 @@ function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
           isDismissed: true,
           dismissalFeedback: fb,
         };
-      } else if (fb.feedback_type === 'issue') {
+      } else if (fb.feedback_type === 'issue' && fb.issue_iid) {
         return {
           ...vuln,
           hasIssue: true,
           issue_feedback: fb,
         };
-      } else if (fb.feedback_type === 'merge_request') {
+      } else if (fb.feedback_type === 'merge_request' && fb.merge_request_iid) {
         return {
           ...vuln,
           hasMergeRequest: true,

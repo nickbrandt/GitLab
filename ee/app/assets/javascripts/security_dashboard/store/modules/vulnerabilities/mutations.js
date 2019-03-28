@@ -93,11 +93,17 @@ export default {
     Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal, 'vulnerability', vulnerability);
-    Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
+    Vue.set(
+      state.modal.vulnerability,
+      'hasIssue',
+      Boolean(vulnerability.issue_feedback && vulnerability.issue_feedback.issue_iid),
+    );
     Vue.set(
       state.modal.vulnerability,
       'hasMergeRequest',
-      Boolean(vulnerability.merge_request_feedback),
+      Boolean(
+        vulnerability.merge_request_feedback && vulnerability.merge_request.merge_request_iid,
+      ),
     );
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);

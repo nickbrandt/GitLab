@@ -108,4 +108,55 @@ describe('Security Dashboard Table Row', () => {
       expect(vm.$el.textContent).toContain('DISMISSED');
     });
   });
+
+  describe('with valid issue feedback', () => {
+    const vulnerability = mockDataVulnerabilities[3];
+
+    beforeEach(() => {
+      props = { vulnerability };
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
+    });
+
+    it('should have a `ic-issue-created` class', () => {
+      expect(vm.$el.querySelectorAll('.ic-issue-created')).toHaveLength(1);
+    });
+  });
+
+  describe('with invalid issue feedback', () => {
+    const vulnerability = mockDataVulnerabilities[6];
+
+    beforeEach(() => {
+      props = { vulnerability };
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
+    });
+
+    it('should not have a `ic-issue-created` class', () => {
+      expect(vm.$el.querySelectorAll('.ic-issue-created')).toHaveLength(0);
+    });
+  });
+
+  describe('with no issue feedback', () => {
+    const vulnerability = mockDataVulnerabilities[0];
+
+    beforeEach(() => {
+      props = { vulnerability };
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
+    });
+
+    it('should not have a `ic-issue-created` class', () => {
+      expect(vm.$el.querySelectorAll('.ic-issue-created')).toHaveLength(0);
+    });
+  });
 });

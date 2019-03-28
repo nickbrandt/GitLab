@@ -314,10 +314,31 @@ describe('vulnerabilities module mutations', () => {
       });
 
       it('should set hasIssue when the vulnerabilitiy has a related issue', () => {
-        const payload = { vulnerability: { ...vulnerability, issue_feedback: 'I am an issue' } };
+        const payload = {
+          vulnerability: {
+            ...vulnerability,
+            issue_feedback: {
+              issue_iid: 123,
+            },
+          },
+        };
         mutations[types.SET_MODAL_DATA](state, payload);
 
         expect(state.modal.vulnerability.hasIssue).toEqual(true);
+      });
+
+      it('should not set hasIssue when the issue_iid in null', () => {
+        const payload = {
+          vulnerability: {
+            ...vulnerability,
+            issue_feedback: {
+              issue_iid: null,
+            },
+          },
+        };
+        mutations[types.SET_MODAL_DATA](state, payload);
+
+        expect(state.modal.vulnerability.hasIssue).toEqual(false);
       });
 
       it('should nullify the modal links', () => {
