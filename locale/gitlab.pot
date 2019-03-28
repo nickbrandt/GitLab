@@ -7326,6 +7326,9 @@ msgid_plural "%d more items"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "One or more groups that you don't have access to."
+msgstr ""
+
 msgid "One or more of your Bitbucket projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
 msgstr ""
 
@@ -7873,6 +7876,9 @@ msgid "Private - Project access must be granted explicitly to each user."
 msgstr ""
 
 msgid "Private - The group and its projects can only be viewed by members."
+msgstr ""
+
+msgid "Private group(s)"
 msgstr ""
 
 msgid "Private projects can be created in your personal namespace with:"

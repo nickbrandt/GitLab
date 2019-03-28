@@ -8,6 +8,8 @@ const INPUT_APPROVALS_REQUIRED = 'merge_request[approval_rules_attributes][][app
 const INPUT_USER_IDS = 'merge_request[approval_rules_attributes][][user_ids][]';
 const INPUT_GROUP_IDS = 'merge_request[approval_rules_attributes][][group_ids][]';
 const INPUT_DELETE = 'merge_request[approval_rules_attributes][][_destroy]';
+const INPUT_REMOVE_HIDDEN_GROUPS =
+  'merge_request[approval_rules_attributes][][remove_hidden_groups]';
 const INPUT_FALLBACK_APPROVALS_REQUIRED = 'merge_request[approvals_before_merge]';
 
 export default {
@@ -26,6 +28,7 @@ export default {
   INPUT_USER_IDS,
   INPUT_GROUP_IDS,
   INPUT_DELETE,
+  INPUT_REMOVE_HIDDEN_GROUPS,
   INPUT_FALLBACK_APPROVALS_REQUIRED,
 };
 </script>
@@ -80,6 +83,12 @@ export default {
         :key="group.id"
         :value="group.id"
         :name="$options.INPUT_GROUP_IDS"
+        type="hidden"
+      />
+      <input
+        v-if="rule.removeHiddenGroups"
+        value="true"
+        :name="$options.INPUT_REMOVE_HIDDEN_GROUPS"
         type="hidden"
       />
     </div>

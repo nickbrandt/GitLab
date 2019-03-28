@@ -2,15 +2,17 @@
 import { GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import Avatar from '~/vue_shared/components/project_avatar/default.vue';
-import { TYPE_USER, TYPE_GROUP } from '../constants';
+import HiddenGroupsItem from './hidden_groups_item.vue';
+import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from '../constants';
 
-const types = [TYPE_USER, TYPE_GROUP];
+const types = [TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS];
 
 export default {
   components: {
     GlButton,
     Icon,
     Avatar,
+    HiddenGroupsItem,
   },
   props: {
     approver: {
@@ -23,6 +25,9 @@ export default {
     isGroup() {
       return this.approver.type === TYPE_GROUP;
     },
+    isHiddenGroups() {
+      return this.approver.type === TYPE_HIDDEN_GROUPS;
+    },
     displayName() {
       return this.isGroup ? this.approver.full_path : this.approver.name;
     },
@@ -34,7 +39,10 @@ export default {
   <transition name="fade">
     <li class="settings-flex-row">
       <div class="px-3 d-flex align-items-center">
-        <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
+        <hidden-groups-item v-if="isHiddenGroups" />
+        <template v-else>
+          <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
+        </template>
         <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
           <icon name="remove" :aria-label="__('Remove')" />
         </gl-button>

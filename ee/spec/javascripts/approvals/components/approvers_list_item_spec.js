@@ -1,8 +1,9 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 import Avatar from '~/vue_shared/components/project_avatar/default.vue';
-import { TYPE_USER, TYPE_GROUP } from 'ee/approvals/constants';
+import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from 'ee/approvals/constants';
 import ApproversListItem from 'ee/approvals/components/approvers_list_item.vue';
+import HiddenGroupsItem from 'ee/approvals/components/hidden_groups_item.vue';
 
 const localVue = createLocalVue();
 const TEST_USER = {
@@ -68,6 +69,28 @@ describe('Approvals ApproversListItem', () => {
     it('renders full_path', () => {
       expect(wrapper.text()).toContain(TEST_GROUP.full_path);
       expect(wrapper.text()).not.toContain(TEST_GROUP.name);
+    });
+
+    it('does not render hidden-groups-item', () => {
+      expect(wrapper.find(HiddenGroupsItem).exists()).toBe(false);
+    });
+  });
+
+  describe('when hidden groups', () => {
+    beforeEach(() => {
+      factory({
+        propsData: {
+          approver: { type: TYPE_HIDDEN_GROUPS },
+        },
+      });
+    });
+
+    it('renders hidden-groups-item', () => {
+      expect(wrapper.find(HiddenGroupsItem).exists()).toBe(true);
+    });
+
+    it('does not render avatar', () => {
+      expect(wrapper.find(Avatar).exists()).toBe(false);
     });
   });
 });

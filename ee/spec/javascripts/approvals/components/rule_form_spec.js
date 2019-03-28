@@ -4,8 +4,9 @@ import { GlButton } from '@gitlab/ui';
 import { createStoreOptions } from 'ee/approvals/stores';
 import projectSettingsModule from 'ee/approvals/stores/modules/project_settings';
 import ApproversSelect from 'ee/approvals/components/approvers_select.vue';
+import ApproversList from 'ee/approvals/components/approvers_list.vue';
 import RuleForm from 'ee/approvals/components/rule_form.vue';
-import { TYPE_USER, TYPE_GROUP } from 'ee/approvals/constants';
+import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from 'ee/approvals/constants';
 
 const TEST_PROJECT_ID = '7';
 const TEST_RULE = {
@@ -24,6 +25,8 @@ const TEST_FALLBACK_RULE = {
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+
+const addType = type => x => Object.assign(x, { type });
 
 describe('EE Approvals RuleForm', () => {
   let wrapper;
@@ -48,6 +51,7 @@ describe('EE Approvals RuleForm', () => {
   const findApprovalsRequiredValidation = () => findValidation(findApprovalsRequiredInput(), false);
   const findApproversSelect = () => wrapper.find(ApproversSelect);
   const findApproversValidation = () => findValidation(findApproversSelect(), true);
+  const findApproversList = () => wrapper.find(ApproversList);
   const findValidations = () => [
     findNameValidation(),
     findApprovalsRequiredValidation(),
@@ -156,6 +160,7 @@ describe('EE Approvals RuleForm', () => {
           groups,
           userRecords,
           groupRecords,
+          removeHiddenGroups: false,
         };
 
         findNameInput().setValue(expected.name);
@@ -192,6 +197,15 @@ describe('EE Approvals RuleForm', () => {
         });
       });
 
+      it('shows approvers', () => {
+        const list = findApproversList();
+
+        expect(list.props('value')).toEqual([
+          ...TEST_RULE.groups.map(addType(TYPE_GROUP)),
+          ...TEST_RULE.users.map(addType(TYPE_USER)),
+        ]);
+      });
+
       it('on submit, puts rule', () => {
         const userRecords = TEST_RULE.users.map(x => ({ ...x, type: TYPE_USER }));
         const groupRecords = TEST_RULE.groups.map(x => ({ ...x, type: TYPE_GROUP }));
@@ -204,6 +218,7 @@ describe('EE Approvals RuleForm', () => {
           groups,
           userRecords,
           groupRecords,
+          removeHiddenGroups: false,
         };
 
         wrapper.vm.submit();
@@ -296,6 +311,77 @@ describe('EE Approvals RuleForm', () => {
         it('posts new rule', () => {
           expect(actions.postRule).toHaveBeenCalled();
         });
+      });
+    });
+
+    describe('with hidden groups rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: {
+            ...TEST_RULE,
+            containsHiddenGroups: true,
+          },
+        });
+      });
+
+      it('shows approvers and hidden group', () => {
+        const list = findApproversList();
+
+        expect(list.props('value')).toEqual([
+          ...TEST_RULE.groups.map(addType(TYPE_GROUP)),
+          ...TEST_RULE.users.map(addType(TYPE_USER)),
+          { type: TYPE_HIDDEN_GROUPS },
+        ]);
+      });
+
+      it('on submit, does not remove hidden groups', () => {
+        wrapper.vm.submit();
+
+        expect(actions.putRule).toHaveBeenCalledWith(
+          jasmine.anything(),
+          jasmine.objectContaining({
+            removeHiddenGroups: false,
+          }),
+          undefined,
+        );
+      });
+
+      describe('and hidden groups removed', () => {
+        beforeEach(() => {
+          wrapper.vm.approvers = wrapper.vm.approvers.filter(x => x.type !== TYPE_HIDDEN_GROUPS);
+        });
+
+        it('on submit, removes hidden groups', () => {
+          wrapper.vm.submit();
+
+          expect(actions.putRule).toHaveBeenCalledWith(
+            jasmine.anything(),
+            jasmine.objectContaining({
+              removeHiddenGroups: true,
+            }),
+            undefined,
+          );
+        });
+      });
+    });
+
+    describe('with removed hidden groups rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: {
+            ...TEST_RULE,
+            containsHiddenGroups: true,
+            removeHiddenGroups: true,
+          },
+        });
+      });
+
+      it('does not add hidden groups in approvers', () => {
+        expect(
+          findApproversList()
+            .props('value')
+            .every(x => x.type !== TYPE_HIDDEN_GROUPS),
+        ).toBe(true);
       });
     });
   });

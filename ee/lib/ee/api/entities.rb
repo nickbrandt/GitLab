@@ -280,6 +280,7 @@ module EE
         expose :approvals_required
         expose :users, using: ::API::Entities::UserBasic
         expose :groups, using: ::API::Entities::Group
+        expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
       class MergeRequestApprovalRule < ApprovalRule
