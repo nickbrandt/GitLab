@@ -31,11 +31,9 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def registries_pending_verification
-      Geo::ProjectRegistry
-        .joins(Geo::Fdw::GeoNode.fdw_inner_join_projects)
-        .joins(Geo::Fdw::GeoNode.fdw_inner_join_repository_state)
-        .where(Geo::Fdw::GeoNode.fdw_registries_pending_verification)
-        .where(Geo::Fdw::Project.within_shard(shard_name))
+      Geo::ProjectRegistry.all
+        .merge(Geo::Fdw::ProjectRegistry.registries_pending_verification)
+        .merge(Geo::Fdw::ProjectRegistry.within_shards(shard_name))
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord

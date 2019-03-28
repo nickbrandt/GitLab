@@ -17,17 +17,25 @@ module Geo
       @batch_size = batch_size
     end
 
+    # rubocop:disable CodeReuse/ActiveRecord
     def execute
+      return Geo::ProjectRegistry.none unless valid_shard?
+
       current_node.project_registries
-        .joins(Geo::Fdw::GeoNode.fdw_inner_join_projects)
-        .joins(Geo::Fdw::GeoNode.fdw_inner_join_repository_state)
-        .where(Geo::Fdw::GeoNode.fdw_registries_pending_verification)
-        .where(Geo::Fdw::Project.within_shard(shard_name))
+        .merge(Geo::Fdw::ProjectRegistry.registries_pending_verification)
+        .merge(Geo::Fdw::ProjectRegistry.within_shards(shard_name))
         .limit(batch_size)
     end
+    # rubocop:enable CodeReuse/ActiveRecord
 
     private
 
-    attr_reader :current_node, :shard_name,:batch_size
+    attr_reader :current_node, :shard_name, :batch_size
+
+    def valid_shard?
+      return true unless current_node.selective_sync_by_shards?
+
+      current_node.selective_sync_shards.include?(shard_name)
+    end
   end
 end
