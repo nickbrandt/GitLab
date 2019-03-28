@@ -4,10 +4,6 @@ entry.
 
 ## 11.8.5 (2019-03-27)
 
-- No changes.
-
-## 11.8.4 (2019-03-26)
-
 ### Security (7 changes)
 
 - Disallow guest users from accessing Releases.
@@ -18,6 +14,10 @@ entry.
 - Disallow updating namespace when updating a project.
 - Use UntrustedRegexp for matching refs policy.
 
+
+## 11.8.4 (2019-03-26)
+
+- Unreleased due to QA failure.
 
 ## 11.8.3 (2019-03-19)
 
