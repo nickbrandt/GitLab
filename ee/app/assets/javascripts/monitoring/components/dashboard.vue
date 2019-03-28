@@ -1,9 +1,12 @@
+<script>
+import CeDashboard from '~/monitoring/components/dashboard.vue';
 import AlertWidget from './alert_widget.vue';
 
 export default {
   components: {
     AlertWidget,
   },
+  extends: CeDashboard,
   props: {
     alertsEndpoint: {
       type: String,
@@ -35,3 +38,4 @@ export default {
     },
   },
 };
+</script>
