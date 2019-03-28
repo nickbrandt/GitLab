@@ -1,0 +1,5 @@
+---
+title: Fix merge requests being added to Jira Development Panel
+merge_request: 10342
+author:
+type: fixed
