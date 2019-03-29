@@ -8,7 +8,7 @@ Vue.use(VueApollo);
 
 const createMockDesign = id => ({
   id: Number(id),
-  image: 'http://via.placeholder.com/300',
+  image: 'http://via.placeholder.com/1000',
   name: 'test.jpg',
   commentsCount: 2,
   updatedAt: new Date().toString(),

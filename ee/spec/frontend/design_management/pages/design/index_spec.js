@@ -25,12 +25,13 @@ describe('Design management design index page', () => {
     expect(vm.element).toMatchSnapshot();
   });
 
-  it('sets loading state', () => {
+  it('renders design index', () => {
     createComponent();
 
     vm.setData({
       design: {
         name: 'test.jpg',
+        image: 'test.jpg',
         updatedAt: '01-01-2019',
         updatedBy: {
           name: 'test',
