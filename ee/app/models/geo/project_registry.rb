@@ -31,6 +31,10 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   scope :wiki_checksum_mismatch, -> { where(wiki_checksum_mismatch: true) }
   scope :with_routes, -> { includes(project: :route).includes(project: { namespace: :route }) }
 
+  def self.project_id_in(ids)
+    where(project_id: ids)
+  end
+
   def self.failed
     repository_sync_failed = arel_table[:repository_retry_count].gt(0)
     wiki_sync_failed = arel_table[:wiki_retry_count].gt(0)

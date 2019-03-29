@@ -70,11 +70,11 @@ module Geo
           .or(legacy_repository_state_table[:wiki_verification_checksum].not_eq(nil)
             .and(project_registry_sync_table[:want_to_sync_wiki].eq(true))))
         .limit(batch_size)
-        .pluck(:project_id)
+        .pluck_project_key
 
       legacy_inner_join_registry_ids(
-        Geo::ProjectRegistry.where(project_id: project_ids),
-        current_node.projects.pluck(:id),
+        Geo::ProjectRegistry.project_id_in(project_ids),
+        current_node.projects.pluck_primary_key,
         Geo::ProjectRegistry,
         foreign_key: :project_id
       )
