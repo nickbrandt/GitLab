@@ -25,7 +25,7 @@ module Elastic
 
       def self.import
         Project.with_wiki_enabled.find_each do |project|
-          unless project.wiki.empty?
+          if project.use_elasticsearch? && !project.wiki.empty?
             project.wiki.index_blobs
           end
         end

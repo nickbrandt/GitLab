@@ -45,15 +45,64 @@ describe 'Admin updates EE-only settings' do
     expect(page).to have_content "Application settings saved successfully"
   end
 
-  it 'Enable elastic search indexing' do
-    visit integrations_admin_application_settings_path
-    page.within('.as-elasticsearch') do
-      check 'Elasticsearch indexing'
-      click_button 'Save changes'
+  context 'Elasticsearch settings' do
+    before do
+      visit integrations_admin_application_settings_path
     end
 
-    expect(Gitlab::CurrentSettings.elasticsearch_indexing).to be_truthy
-    expect(page).to have_content "Application settings saved successfully"
+    it 'Enable elastic search indexing' do
+      page.within('.as-elasticsearch') do
+        check 'Elasticsearch indexing'
+        click_button 'Save changes'
+      end
+
+      expect(Gitlab::CurrentSettings.elasticsearch_indexing).to be_truthy
+      expect(page).to have_content "Application settings saved successfully"
+    end
+
+    it 'Allows limiting projects and namespaces to index', :js do
+      project = create(:project)
+      namespace = create(:namespace)
+
+      page.within('.as-elasticsearch') do
+        expect(page).not_to have_content('Namespaces to index')
+        expect(page).not_to have_content('Projects to index')
+
+        check 'Limit namespaces and projects that can be indexed'
+
+        expect(page).to have_content('Namespaces to index')
+        expect(page).to have_content('Projects to index')
+
+        fill_in 'Namespaces to index', with: namespace.name
+        wait_for_requests
+      end
+
+      page.within('#select2-drop') do
+        expect(page).to have_content(namespace.full_path)
+      end
+
+      page.within('.as-elasticsearch') do
+        find('.js-limit-namespaces .select2-choices input[type=text]').native.send_keys(:enter)
+
+        fill_in 'Projects to index', with: project.name
+        wait_for_requests
+      end
+
+      page.within('#select2-drop') do
+        expect(page).to have_content(project.full_name)
+      end
+
+      page.within('.as-elasticsearch') do
+        find('.js-limit-projects .select2-choices input[type=text]').native.send_keys(:enter)
+
+        click_button 'Save changes'
+      end
+
+      expect(Gitlab::CurrentSettings.elasticsearch_limit_indexing).to be_truthy
+      expect(ElasticsearchIndexedNamespace.exists?(namespace_id: namespace.id)).to be_truthy
+      expect(ElasticsearchIndexedProject.exists?(project_id: project.id)).to be_truthy
+      expect(page).to have_content "Application settings saved successfully"
+    end
   end
 
   it 'Enable Slack application' do

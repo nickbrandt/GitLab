@@ -87,7 +87,7 @@
           = _("Milestones")
           %span.badge.badge-pill
             = limited_count(@search_results.limited_milestones_count)
-      - if Gitlab::CurrentSettings.elasticsearch_search?
+      - if search_service.use_elasticsearch?
         %li{ class: active_when(@scope == 'blobs') }
           = link_to search_filter_path(scope: 'blobs') do
             = _("Code")

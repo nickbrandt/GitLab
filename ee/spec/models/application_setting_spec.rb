@@ -209,6 +209,79 @@ describe ApplicationSetting do
         aws_secret_access_key: 'test-secret-access-key'
       )
     end
+
+    context 'limiting namespaces and projects' do
+      before do
+        setting.update!(elasticsearch_indexing: true)
+        setting.update!(elasticsearch_limit_indexing: true)
+      end
+
+      context 'namespaces' do
+        let(:namespaces) { create_list(:namespace, 3) }
+
+        it 'creates ElasticsearchIndexedNamespace objects when given elasticsearch_namespace_ids' do
+          expect do
+            setting.update!(elasticsearch_namespace_ids: namespaces.map(&:id).join(','))
+          end.to change { ElasticsearchIndexedNamespace.count }.by(3)
+        end
+
+        it 'deletes ElasticsearchIndexedNamespace objects not in elasticsearch_namespace_ids' do
+          create :elasticsearch_indexed_namespace, namespace: namespaces.last
+
+          expect do
+            setting.update!(elasticsearch_namespace_ids: namespaces.first(2).map(&:id).join(','))
+          end.to change { ElasticsearchIndexedNamespace.count }.from(1).to(2)
+
+          expect(ElasticsearchIndexedNamespace.where(namespace_id: namespaces.last.id)).not_to exist
+        end
+
+        it 'tells you if a namespace is allowed to be indexed' do
+          create :elasticsearch_indexed_namespace, namespace: namespaces.last
+
+          expect(setting.elasticsearch_indexes_namespace?(namespaces.last)).to be_truthy
+          expect(setting.elasticsearch_indexes_namespace?(namespaces.first)).to be_falsey
+        end
+      end
+
+      context 'projects' do
+        let(:projects) { create_list(:project, 3) }
+
+        it 'creates ElasticsearchIndexedProject objects when given elasticsearch_project_ids' do
+          expect do
+            setting.update!(elasticsearch_project_ids: projects.map(&:id).join(','))
+          end.to change { ElasticsearchIndexedProject.count }.by(3)
+        end
+
+        it 'deletes ElasticsearchIndexedProject objects not in elasticsearch_project_ids' do
+          create :elasticsearch_indexed_project, project: projects.last
+
+          expect do
+            setting.update!(elasticsearch_project_ids: projects.first(2).map(&:id).join(','))
+          end.to change { ElasticsearchIndexedProject.count }.from(1).to(2)
+
+          expect(ElasticsearchIndexedProject.where(project_id: projects.last.id)).not_to exist
+        end
+
+        it 'tells you if a project is allowed to be indexed' do
+          create :elasticsearch_indexed_project, project: projects.last
+
+          expect(setting.elasticsearch_indexes_project?(projects.last)).to be_truthy
+          expect(setting.elasticsearch_indexes_project?(projects.first)).to be_falsey
+        end
+      end
+
+      it 'returns projects that are allowed to be indexed' do
+        project1 = create(:project)
+        projects = create_list(:project, 3)
+
+        setting.update!(
+          elasticsearch_project_ids: projects.map(&:id).join(','),
+          elasticsearch_namespace_ids: project1.namespace.id.to_s
+        )
+
+        expect(setting.elasticsearch_limited_projects).to match_array(projects << project1)
+      end
+    end
   end
 
   describe 'custom project templates' do

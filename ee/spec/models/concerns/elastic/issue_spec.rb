@@ -7,6 +7,52 @@ describe Issue, :elastic do
 
   let(:project) { create :project }
 
+  context 'when limited indexing is on' do
+    set(:project) { create :project, name: 'test1' }
+    set(:issue) { create :issue, project: project}
+
+    before do
+      stub_ee_application_setting(elasticsearch_limit_indexing: true)
+    end
+
+    context 'when the project is not enabled specifically' do
+      context '#searchable?' do
+        it 'returns false' do
+          expect(issue.searchable?).to be_falsey
+        end
+      end
+    end
+
+    context 'when a project is enabled specifically' do
+      before do
+        create :elasticsearch_indexed_project, project: project
+      end
+
+      context '#searchable?' do
+        it 'returns true' do
+          expect(issue.searchable?).to be_truthy
+        end
+      end
+    end
+
+    context 'when a group is enabled' do
+      set(:group) { create(:group) }
+
+      before do
+        create :elasticsearch_indexed_namespace, namespace: group
+      end
+
+      context '#searchable?' do
+        it 'returns true' do
+          project = create :project, name: 'test1', group: group
+          issue = create :issue, project: project
+
+          expect(issue.searchable?).to be_truthy
+        end
+      end
+    end
+  end
+
   it "searches issues" do
     Sidekiq::Testing.inline! do
       create :issue, title: 'bla-bla term1', project: project

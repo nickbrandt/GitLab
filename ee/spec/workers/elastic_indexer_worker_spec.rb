@@ -106,4 +106,31 @@ describe ElasticIndexerWorker, :elastic do
 
     expect(Elasticsearch::Model.search('*').total_count).to be(0)
   end
+
+  it 'indexes all nested objects for a Project' do
+    # To be able to access it outside the following block
+    project = nil
+
+    Sidekiq::Testing.disable! do
+      project = create :project, :repository
+      create :issue, project: project
+      create :milestone, project: project
+      create :note, project: project
+      create :merge_request, target_project: project, source_project: project
+      create :project_snippet, project: project
+    end
+
+    expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id).and_call_original
+
+    # Nothing should be in the index at this point
+    expect(Elasticsearch::Model.search('*').total_count).to be(0)
+
+    Sidekiq::Testing.inline! do
+      subject.perform("index", "Project", project.id, project.es_id)
+    end
+    Gitlab::Elastic::Helper.refresh_index
+
+    ## All database objects + data from repository. The absolute value does not matter
+    expect(Elasticsearch::Model.search('*').total_count).to be > 40
+  end
 end

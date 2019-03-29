@@ -17,11 +17,9 @@ class ElasticIndexerWorker
       record = klass.find(record_id)
       record.__elasticsearch__.client = client
 
-      if klass.nested?
-        record.__elasticsearch__.__send__ "#{operation}_document", routing: record.es_parent # rubocop:disable GitlabSecurity/PublicSend
-      else
-        record.__elasticsearch__.__send__ "#{operation}_document" # rubocop:disable GitlabSecurity/PublicSend
-      end
+      import(operation, record, klass)
+
+      initial_index_project(record) if klass == Project && operation.to_s.match?(/index/)
 
       update_issue_notes(record, options["changed_fields"]) if klass == Issue
     when /delete/
@@ -57,6 +55,30 @@ class ElasticIndexerWorker
 
   def clear_project_data(record_id, es_id)
     remove_children_documents('project', record_id, es_id)
+    IndexStatus.for_project(record_id).delete_all
+  end
+
+  def initial_index_project(project)
+    {
+      Issue        => project.issues,
+      MergeRequest => project.merge_requests,
+      Snippet      => project.snippets,
+      Note         => project.notes.searchable,
+      Milestone    => project.milestones
+    }.each do |klass, objects|
+      objects.find_each { |object| import(:index, object, klass) }
+    end
+
+    # Finally, index blobs/commits/wikis
+    ElasticCommitIndexerWorker.perform_async(project.id)
+  end
+
+  def import(operation, record, klass)
+    if klass.nested?
+      record.__elasticsearch__.__send__ "#{operation}_document", routing: record.es_parent # rubocop:disable GitlabSecurity/PublicSend
+    else
+      record.__elasticsearch__.__send__ "#{operation}_document" # rubocop:disable GitlabSecurity/PublicSend
+    end
   end
 
   def remove_documents_by_project_id(record_id)

@@ -19,6 +19,8 @@ class ElasticBatchProjectIndexerWorker
   private
 
   def run_indexer(project, update_index)
+    return unless project.use_elasticsearch?
+
     # Ensure we remove the hold on the project, no matter what, so ElasticCommitIndexerWorker can do its thing
     # We do this before the indexer starts to avoid the possibility of pushes coming in during this time not
     # being indexed.

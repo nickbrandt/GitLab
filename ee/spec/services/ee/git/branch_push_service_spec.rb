@@ -65,6 +65,47 @@ describe Git::BranchPushService do
 
         execute_service(project, user, oldrev, newrev, ref)
       end
+
+      context 'when limited indexing is on' do
+        before do
+          stub_ee_application_setting(elasticsearch_limit_indexing: true)
+        end
+
+        context 'when the project is not enabled specifically' do
+          it 'does not run ElasticCommitIndexerWorker' do
+            expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+
+            subject.execute
+          end
+        end
+
+        context 'when a project is enabled specifically' do
+          before do
+            create :elasticsearch_indexed_project, project: project
+          end
+
+          it 'runs ElasticCommitIndexerWorker' do
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+
+            subject.execute
+          end
+        end
+
+        context 'when a group is enabled' do
+          let(:group) { create(:group) }
+          let(:project) { create(:project, :repository, :mirror, group: group) }
+
+          before do
+            create :elasticsearch_indexed_namespace, namespace: group
+          end
+
+          it 'runs ElasticCommitIndexerWorker' do
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, oldrev, newrev)
+
+            subject.execute
+          end
+        end
+      end
     end
   end
 

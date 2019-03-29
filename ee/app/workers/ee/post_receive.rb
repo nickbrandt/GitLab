@@ -29,8 +29,7 @@ module EE
     end
 
     def update_wiki_es_indexes(post_received)
-      return unless ::Gitlab::CurrentSettings.current_application_settings
-        .elasticsearch_indexing?
+      return unless post_received.project.use_elasticsearch?
 
       post_received.project.wiki.index_blobs
     end

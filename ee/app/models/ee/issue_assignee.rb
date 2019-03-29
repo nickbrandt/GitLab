@@ -8,7 +8,7 @@ module EE
     end
 
     def update_elasticsearch_index
-      if ::Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
+      if issue.project&.use_elasticsearch?
         ::ElasticIndexerWorker.perform_async(
           :update,
           'Issue',

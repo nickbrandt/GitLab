@@ -5,6 +5,35 @@ describe Note, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
+  it_behaves_like 'limited indexing is enabled' do
+    set(:object) { create :note, project: project }
+    set(:group) { create(:group) }
+    let(:group_object) do
+      project = create :project, name: 'test1', group: group
+      create :note, project: project
+    end
+
+    context '#searchable?' do
+      before do
+        create :elasticsearch_indexed_project, project: project
+      end
+
+      it 'also works on diff notes' do
+        notes = []
+        notes << create(:diff_note_on_merge_request, note: "term")
+        notes << create(:diff_note_on_commit, note: "term")
+        notes << create(:legacy_diff_note_on_merge_request, note: "term")
+        notes << create(:legacy_diff_note_on_commit, note: "term")
+
+        notes.each do |note|
+          create :elasticsearch_indexed_project, project: note.noteable.project
+
+          expect(note.searchable?).to be_truthy
+        end
+      end
+    end
+  end
+
   it "searches notes" do
     issue = create :issue
 

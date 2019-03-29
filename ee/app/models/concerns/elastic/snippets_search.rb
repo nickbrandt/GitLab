@@ -32,6 +32,10 @@ module Elastic
         data
       end
 
+      def use_elasticsearch?
+        ::Gitlab::CurrentSettings.elasticsearch_indexing?
+      end
+
       def self.elastic_search(query, options: {})
         query_hash = basic_query_hash(%w(title file_name), query)
 

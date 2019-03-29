@@ -5,6 +5,15 @@ describe MergeRequest, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
+  it_behaves_like 'limited indexing is enabled' do
+    set(:object) { create :merge_request, source_project: project }
+    set(:group) { create(:group) }
+    let(:group_object) do
+      project = create :project, name: 'test1', group: group
+      create :merge_request, source_project: project
+    end
+  end
+
   it "searches merge requests" do
     project = create :project, :repository
 
