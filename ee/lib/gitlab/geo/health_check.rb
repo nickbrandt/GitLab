@@ -34,6 +34,16 @@ module Gitlab
           .fetch('replication_lag').to_i
       end
 
+      def replication_enabled?
+        streaming_replication_enabled? || archive_recovery_replication_enabled?
+      end
+
+      def replication_working?
+        return streaming_replication_active? if streaming_replication_enabled?
+
+        some_replication_active?
+      end
+
       private
 
       def db_replication_lag_seconds_query
@@ -105,10 +115,6 @@ module Gitlab
         gitlab_schema_tables_count == foreign_schema_tables_count
       end
 
-      def replication_enabled?
-        streaming_replication_enabled? || archive_recovery_replication_enabled?
-      end
-
       def archive_recovery_replication_enabled?
         !streaming_replication_enabled? && some_replication_active?
       end
@@ -132,12 +138,6 @@ module Gitlab
         # This only works for Postgresql 9.6 and greater
         ActiveRecord::Base.connection
           .select_values('SELECT pid FROM pg_stat_wal_receiver').first.to_i > 0
-      end
-
-      def replication_working?
-        return streaming_replication_active? if streaming_replication_enabled?
-
-        some_replication_active?
       end
     end
   end

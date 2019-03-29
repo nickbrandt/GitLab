@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Geo::HealthCheck, :geo do
   include ::EE::GeoHelpers
+  using RSpec::Parameterized::TableSyntax
 
   set(:secondary) { create(:geo_node) }
 
@@ -173,6 +174,46 @@ describe Gitlab::Geo::HealthCheck, :geo do
 
       it 'returns the number of seconds' do
         expect(subject.db_replication_lag_seconds).to eq(7)
+      end
+    end
+  end
+
+  describe '#replication_enabled?' do
+    where(:streaming_replication_enabled, :archive_recovery_replication_enabled, :result) do
+      false | false | false
+      true  | false | true
+      false | true  | true
+    end
+
+    with_them do
+      before do
+        allow(subject).to receive(:streaming_replication_enabled?).and_return(streaming_replication_enabled)
+        allow(subject).to receive(:archive_recovery_replication_enabled?).and_return(archive_recovery_replication_enabled)
+      end
+
+      it 'returns the correct result' do
+        expect(subject.replication_enabled?).to eq(result)
+      end
+    end
+  end
+
+  describe '#replication_working?' do
+    where(:streaming_replication_enabled, :streaming_replication_active, :some_replication_active, :result) do
+      false | nil   | false | false
+      false | nil   | true  | true
+      true  | false | nil   | false
+      true  | true  | nil   | true
+    end
+
+    with_them do
+      before do
+        allow(subject).to receive(:streaming_replication_enabled?).and_return(streaming_replication_enabled)
+        allow(subject).to receive(:streaming_replication_active?).and_return(streaming_replication_active)
+        allow(subject).to receive(:some_replication_active?).and_return(some_replication_active)
+      end
+
+      it 'returns the correct result' do
+        expect(subject.replication_working?).to eq(result)
       end
     end
   end
