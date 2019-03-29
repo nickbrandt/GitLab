@@ -181,6 +181,7 @@ Example response:
       "user_id":null,
       "group_id":null,
       "access_level_description":"Maintainers"
+    }
   ],
   "unprotect_access_levels": [
     {
