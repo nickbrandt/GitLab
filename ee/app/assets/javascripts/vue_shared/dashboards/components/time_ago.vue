@@ -35,7 +35,7 @@ export default {
   <div class="text-secondary">
     <icon
       name="clock"
-      class="dashboard-card-time-ago-icon align-text-bottom js-dashboard-project-clock-icon"
+      class="dashboard-card-icon align-text-bottom js-dashboard-project-clock-icon"
     />
 
     <time ref="timeAgo" class="js-dashboard-project-time-ago">

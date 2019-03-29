@@ -13,7 +13,6 @@ class OperationsController < ApplicationController
   end
 
   def environments
-    render :index
   end
 
   def dashboard_feature_flag

@@ -1,6 +1,5 @@
 <script>
 import _ from 'underscore';
-import { mapState, mapActions } from 'vuex';
 import {
   GlLoadingIcon,
   GlModal,
@@ -8,21 +7,40 @@ import {
   GlButton,
   GlDashboardSkeleton,
 } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
-import DashboardProject from './project.vue';
+import ProjectHeader from './project_header.vue';
+import Environment from './environment.vue';
 
 export default {
+  addProjectsModalHeader: s__('EnvironmentsDashboard|Add projects'),
+  addProjectsModalSubmit: s__('EnvironmentsDashboard|Add projects'),
+
+  dashboardHeader: s__('EnvironmentsDashboard|Environments Dashboard'),
+
+  addProjectsButton: s__('EnvironmentsDashboard|Add projects'),
+
+  emptyDashboardHeader: s__('EnvironmentsDashboard|Add a project to the dashboard'),
+
+  emptyDashboardDocs: s__(
+    "EnvironmentsDashboard|The environments dashboard provides a summary of each project's environments' status, including pipeline and alert statuses.",
+  ),
+
+  viewDocumentationButton: s__('View documentation'),
+
   components: {
-    DashboardProject,
     GlModal,
     GlDashboardSkeleton,
     GlLoadingIcon,
     GlButton,
     ProjectSelector,
+    Environment,
+    ProjectHeader,
   },
   directives: {
     'gl-modal': GlModalDirective,
   },
+  modalId: 'add-projects-modal',
   props: {
     addPath: {
       type: String,
@@ -41,18 +59,19 @@ export default {
       required: true,
     },
   },
-  modalId: 'add-projects-modal',
+  data() {
+    return {
+      projects: [],
+      projectTokens: '',
+      isLoadingProjects: false,
+      selectedProjects: [],
+      projectSearchResults: [],
+      searchCount: 0,
+      searchQuery: '',
+      messages: {},
+    };
+  },
   computed: {
-    ...mapState([
-      'projects',
-      'projectTokens',
-      'isLoadingProjects',
-      'selectedProjects',
-      'projectSearchResults',
-      'searchCount',
-      'searchQuery',
-      'messages',
-    ]),
     isSearchingProjects() {
       return this.searchCount > 0;
     },
@@ -68,15 +87,13 @@ export default {
     this.fetchProjects();
   },
   methods: {
-    ...mapActions([
-      'fetchSearchResults',
-      'addProjectsToDashboard',
-      'fetchProjects',
-      'setProjectEndpoints',
-      'clearSearchResults',
-      'toggleSelectedProject',
-      'setSearchQuery',
-    ]),
+    fetchSearchResults() {},
+    addProjectsToDashboard() {},
+    fetchProjects() {},
+    setProjectEndpoints() {},
+    clearSearchResults() {},
+    toggleSelectedProject() {},
+    setSearchQuery() {},
     addProjects() {
       this.addProjectsToDashboard();
     },
@@ -104,8 +121,8 @@ export default {
   <div class="operations-dashboard">
     <gl-modal
       :modal-id="$options.modalId"
-      :title="s__('OperationsDashboard|Add projects')"
-      :ok-title="s__('OperationsDashboard|Add projects')"
+      :title="$options.addProjectsModalHeader"
+      :ok-title="$options.addProjectsModalSubmit"
       :ok-disabled="okDisabled"
       ok-variant="success"
       @shown="onModalShown"
@@ -124,23 +141,26 @@ export default {
         @projectClicked="projectClicked"
       />
     </gl-modal>
-
     <div class="page-title-holder flex-fill d-flex align-items-center">
       <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
-        {{ s__('OperationsDashboard|Operations Dashboard') }}
+        {{ $options.dashboardHeader }}
       </h1>
-      <gl-button
-        v-if="projects.length"
-        v-gl-modal="$options.modalId"
-        class="js-add-projects-button btn btn-success"
-      >
-        {{ s__('OperationsDashboard|Add projects') }}
+      <gl-button v-gl-modal="$options.modalId" class="js-add-projects-button btn btn-success">
+        {{ $options.addProjectsButton }}
       </gl-button>
     </div>
     <div class="prepend-top-default">
-      <div v-if="projects.length" class="row prepend-top-default dashboard-cards">
-        <div v-for="project in projects" :key="project.id" class="col-12 col-md-6 col-xl-4 px-2">
-          <dashboard-project :project="project" />
+      <div v-if="projects.length" class="dashboard-cards">
+        <div v-for="project in projects" :key="project.id" class="column prepend-top-default">
+          <project-header :project="project" />
+          <div class="row">
+            <environment
+              v-for="environment in project.environments"
+              :key="environment.id"
+              :environment="environment"
+              class="col-12 col-md-6 col-xl-4 px-2 prepend-top-default"
+            />
+          </div>
         </div>
       </div>
       <div v-else-if="!isLoadingProjects" class="row prepend-top-20 text-center">
@@ -148,26 +168,20 @@ export default {
           <img :src="emptyDashboardSvgPath" class="js-empty-state-svg col-12 prepend-top-20" />
         </div>
         <h4 class="js-title col-12 prepend-top-20">
-          {{ s__('OperationsDashboard|Add a project to the dashboard') }}
+          {{ $options.emptyDashboardHeader }}
         </h4>
         <div class="col-12 d-flex justify-content-center">
           <span class="js-sub-title mw-460 text-tertiary text-left">
-            {{
-              s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
-              operational health, including pipeline and alert statuses.`)
-            }}
-            <a :href="emptyDashboardHelpPath" class="js-documentation-link">
-              {{ s__('OperationsDashboard|More information') }}
-            </a>
+            {{ $options.emptyDashboardDocs }}
           </span>
         </div>
         <div class="col-12">
-          <gl-button
-            v-gl-modal="$options.modalId"
-            class="js-add-projects-button btn btn-success prepend-top-default append-bottom-default"
+          <a
+            :href="emptyDashboardHelpPath"
+            class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
           >
-            {{ s__('OperationsDashboard|Add projects') }}
-          </gl-button>
+            {{ $options.viewDocumentationButton }}
+          </a>
         </div>
       </div>
       <gl-dashboard-skeleton v-else />

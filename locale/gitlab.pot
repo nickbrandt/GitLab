@@ -135,9 +135,6 @@ msgstr ""
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
 msgstr ""
 
-msgid "%{count} %{alerts}"
-msgstr ""
-
 msgid "%{count} approval required from %{name}"
 msgid_plural "%{count} approvals required from %{name}"
 msgstr[0] ""
@@ -261,6 +258,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "%{text} is available"
+msgstr ""
+
+msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
 msgid "%{title} changes"
@@ -4264,6 +4264,9 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
+msgid "EnviornmentDashboard|You are looking at the last updated environment"
+msgstr ""
+
 msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. Additionally, they will be masked by default so they are hidden in job logs, though they must match certain regexp requirements to do so. You can use environment variables for passwords, secret keys, or whatever you want."
 msgstr ""
 
@@ -4276,7 +4279,31 @@ msgstr ""
 msgid "Environments"
 msgstr ""
 
+msgid "Environments Dashboard"
+msgstr ""
+
 msgid "Environments allow you to track deployments of your application %{link_to_read_more}."
+msgstr ""
+
+msgid "EnvironmentsDashboard|Add a project to the dashboard"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Add projects"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Environments Dashboard"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Job: %{job}"
+msgstr ""
+
+msgid "EnvironmentsDashboard|More actions"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Remove"
+msgstr ""
+
+msgid "EnvironmentsDashboard|The environments dashboard provides a summary of each project's environments' status, including pipeline and alert statuses."
 msgstr ""
 
 msgid "Environments|An error occurred while fetching the environments."
@@ -11961,6 +11988,9 @@ msgstr ""
 msgid "This domain is not verified. You will need to verify ownership before access is enabled."
 msgstr ""
 
+msgid "This environment has no deployments yet."
+msgstr ""
+
 msgid "This field is required."
 msgstr ""
 
@@ -13070,6 +13100,9 @@ msgid "View deployment"
 msgstr ""
 
 msgid "View details: %{details_url}"
+msgstr ""
+
+msgid "View documentation"
 msgstr ""
 
 msgid "View eligible approvers"
