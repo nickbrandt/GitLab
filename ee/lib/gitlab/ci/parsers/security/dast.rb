@@ -46,7 +46,7 @@ module Gitlab
           end
 
           def generate_location_fingerprint(location)
-            Digest::SHA1.hexdigest("#{location['path']}:#{location['param']}:#{location['method']}")
+            Digest::SHA1.hexdigest("#{location['path']}:#{location['method']}:#{location['param']}")
           end
         end
       end
