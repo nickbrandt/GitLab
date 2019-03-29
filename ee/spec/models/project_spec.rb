@@ -1767,6 +1767,27 @@ describe Project do
     end
   end
 
+  describe "#design_management_enabled?" do
+    let(:project) { build(:project) }
+    where(:feature_enabled, :license_enabled, :expected) do
+      false | false | false
+      false | true  | false
+      true  | false | false
+      true  | true  | true
+    end
+
+    with_them do
+      before do
+        stub_licensed_features(design_management: license_enabled)
+        stub_feature_flags(design_management: feature_enabled)
+      end
+
+      it "knows if design management is available" do
+        expect(project.design_management_enabled?).to be(expected)
+      end
+    end
+  end
+
   # Despite stubbing the current node as the primary or secondary, the
   # behaviour for EE::Project#lfs_http_url_to_repo() is to call
   # Project#lfs_http_url_to_repo() which does not have a Geo context.

@@ -25,3 +25,5 @@ class IssuePolicy < IssuablePolicy
     prevent :reopen_issue
   end
 end
+
+IssuePolicy.prepend(::EE::IssuePolicy)
