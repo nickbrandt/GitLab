@@ -1,46 +1,25 @@
-import { SEVERITY_LEVELS, REPORT_TYPES } from './constants';
+import { SEVERITY_LEVELS, REPORT_TYPES, BASE_FILTERS } from './constants';
+
+const optionsObjectToArray = obj => Object.entries(obj).map(([id, name]) => ({ id, name }));
 
 export default () => ({
   filters: [
     {
       name: 'Severity',
       id: 'severity',
-      options: [
-        {
-          name: 'All',
-          id: 'all',
-        },
-        ...Object.entries(SEVERITY_LEVELS).map(severity => {
-          const [id, name] = severity;
-          return { id, name };
-        }),
-      ],
+      options: [BASE_FILTERS.severity, ...optionsObjectToArray(SEVERITY_LEVELS)],
       selection: new Set(['all']),
     },
     {
       name: 'Report type',
       id: 'report_type',
-      options: [
-        {
-          name: 'All',
-          id: 'all',
-        },
-        ...Object.entries(REPORT_TYPES).map(type => {
-          const [id, name] = type;
-          return { id, name };
-        }),
-      ],
+      options: [BASE_FILTERS.report_type, ...optionsObjectToArray(REPORT_TYPES)],
       selection: new Set(['all']),
     },
     {
       name: 'Project',
       id: 'project_id',
-      options: [
-        {
-          name: 'All',
-          id: 'all',
-        },
-      ],
+      options: [BASE_FILTERS.project_id],
       selection: new Set(['all']),
     },
   ],

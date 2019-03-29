@@ -1,6 +1,7 @@
 import * as vulnerabilitiesMutationTypes from './modules/vulnerabilities/mutation_types';
 import * as filtersMutationTypes from './modules/filters/mutation_types';
 import * as projectsMutationTypes from './modules/projects/mutation_types';
+import { BASE_FILTERS } from './modules/filters/constants';
 
 export default function configureModerator(store) {
   store.$router.beforeEach((to, from, next) => {
@@ -19,10 +20,7 @@ export default function configureModerator(store) {
         store.dispatch('filters/setFilterOptions', {
           filterId: 'project_id',
           options: [
-            {
-              name: 'All',
-              id: 'all',
-            },
+            BASE_FILTERS.project_id,
             ...payload.projects.map(project => ({
               name: project.name,
               id: project.id.toString(),

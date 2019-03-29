@@ -1,12 +1,12 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     GlDropdown,
-    GlDropdownItem,
+    GlSearchBoxByType,
     Icon,
   },
   props: {
@@ -14,6 +14,11 @@ export default {
       type: String,
       required: true,
     },
+  },
+  data() {
+    return {
+      filterTerm: '',
+    };
   },
   computed: {
     ...mapGetters('filters', ['getFilter', 'getSelectedOptions', 'getSelectedOptionNames']),
@@ -25,6 +30,11 @@ export default {
     },
     selectedOptionText() {
       return this.getSelectedOptionNames(this.filterId) || '-';
+    },
+    filteredOptions() {
+      return this.filter.options.filter(option =>
+        option.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
+      );
     },
   },
   methods: {
@@ -38,6 +48,9 @@ export default {
     isSelected(option) {
       return this.selection.has(option.id);
     },
+    closeDropdown(event) {
+      this.$root.$emit('clicked::link', event);
+    },
   },
 };
 </script>
@@ -45,7 +58,7 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <gl-dropdown class="d-block mt-1">
+    <gl-dropdown class="d-block mt-1" menu-class="dropdown-extended-height">
       <template slot="button-content">
         <span class="text-truncate">
           {{ selectedOptionText.firstOption }}
@@ -57,20 +70,56 @@ export default {
         <i class="fa fa-chevron-down" aria-hidden="true"></i>
       </template>
 
-      <gl-dropdown-item
-        v-for="option in filter.options"
-        :key="option.id"
-        @click="clickFilter(option)"
+      <div class="dropdown-title mb-0">
+        {{ filter.name }}
+        <button
+          ref="close"
+          class="btn-blank float-right"
+          type="button"
+          :aria-label="__('Close')"
+          @click="closeDropdown"
+        >
+          <icon name="close" aria-hidden="true" class="vertical-align-middle" />
+        </button>
+      </div>
+
+      <gl-search-box-by-type
+        v-if="filter.options.length >= 20"
+        ref="searchBox"
+        v-model="filterTerm"
+        class="m-2"
+        :placeholder="__('Filter...')"
+      />
+
+      <div :class="{ 'dropdown-content': filterId === 'project_id' }">
+        <button
+          v-for="option in filteredOptions"
+          :key="option.id"
+          role="menuitem"
+          type="button"
+          class="dropdown-item"
+          @click="clickFilter(option)"
+        >
+          <span class="d-flex">
+            <icon
+              v-if="isSelected(option)"
+              class="flex-shrink-0 js-check"
+              name="mobile-issue-close"
+            />
+            <span :class="isSelected(option) ? 'prepend-left-4' : 'prepend-left-20'">{{
+              option.name
+            }}</span>
+          </span>
+        </button>
+      </div>
+
+      <button
+        v-if="filteredOptions.length === 0"
+        type="button"
+        class="dropdown-item no-pointer-events text-secondary"
       >
-        <icon
-          v-if="isSelected(option)"
-          class="vertical-align-middle js-check"
-          name="mobile-issue-close"
-        />
-        <span class="vertical-align-middle" :class="{ 'prepend-left-20': !isSelected(option) }">{{
-          option.name
-        }}</span>
-      </gl-dropdown-item>
+        {{ __('No matching results') }}
+      </button>
     </gl-dropdown>
   </div>
 </template>

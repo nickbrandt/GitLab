@@ -2,6 +2,7 @@ import createStore from 'ee/security_dashboard/store/index';
 import * as projectsMutationTypes from 'ee/security_dashboard/store/modules/projects/mutation_types';
 import * as filtersMutationTypes from 'ee/security_dashboard/store/modules/filters/mutation_types';
 import * as vulnerabilitiesMutationTypes from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
+import { BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
 
 describe('moderator', () => {
   let store;
@@ -22,7 +23,7 @@ describe('moderator', () => {
       'filters/setFilterOptions',
       Object({
         filterId: 'project_id',
-        options: [{ name: 'All', id: 'all' }, { name: 'foo', id: '1' }],
+        options: [BASE_FILTERS.project_id, { name: 'foo', id: '1' }],
       }),
     );
   });
