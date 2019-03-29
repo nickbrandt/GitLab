@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class JobArtifactDeletedEvent < ActiveRecord::Base
+  class JobArtifactDeletedEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

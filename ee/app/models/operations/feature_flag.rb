@@ -6,7 +6,7 @@ module Operations
   # "operations_feature_flags.active" column is not used in favor of
   # operations_feature_flag_scopes's override policy.
   # You can calculate actual `active` values with `for_environment` method.
-  class FeatureFlag < ActiveRecord::Base
+  class FeatureFlag < ApplicationRecord
     self.table_name = 'operations_feature_flags'
 
     belongs_to :project

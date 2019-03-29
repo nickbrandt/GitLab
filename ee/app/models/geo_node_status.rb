@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GeoNodeStatus < ActiveRecord::Base
+class GeoNodeStatus < ApplicationRecord
   include ShaAttribute
 
   belongs_to :geo_node

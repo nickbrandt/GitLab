@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Vulnerabilities
-  class Feedback < ActiveRecord::Base
+  class Feedback < ApplicationRecord
     self.table_name = 'vulnerability_feedback'
 
     belongs_to :project

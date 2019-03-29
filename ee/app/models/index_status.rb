@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IndexStatus < ActiveRecord::Base
+class IndexStatus < ApplicationRecord
   belongs_to :project
 
   validates :project_id, uniqueness: true, presence: true

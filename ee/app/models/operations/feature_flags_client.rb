@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Operations
-  class FeatureFlagsClient < ActiveRecord::Base
+  class FeatureFlagsClient < ApplicationRecord
     include TokenAuthenticatable
 
     self.table_name = 'operations_feature_flags_clients'

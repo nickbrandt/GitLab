@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class HistoricalData < ActiveRecord::Base
+class HistoricalData < ApplicationRecord
   validates :date, presence: true
 
   # HistoricalData.during((Date.today - 1.year)..Date.today).average(:active_user_count)

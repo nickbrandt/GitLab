@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Plan < ActiveRecord::Base
+class Plan < ApplicationRecord
   PAID_HOSTED_PLANS = %w[bronze silver gold].freeze
   ALL_HOSTED_PLANS = (PAID_HOSTED_PLANS + ['early_adopter']).freeze
 

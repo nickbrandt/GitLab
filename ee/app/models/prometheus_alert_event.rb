@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PrometheusAlertEvent < ActiveRecord::Base
+class PrometheusAlertEvent < ApplicationRecord
   belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alert_events
   belongs_to :prometheus_alert, required: true, validate: true, inverse_of: :prometheus_alert_events
 

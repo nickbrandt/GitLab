@@ -121,7 +121,7 @@ module EE
       owners = code_owners
 
       if owners.present?
-        ActiveRecord::Base.transaction do
+        ApplicationRecord.transaction do
           rule = approval_rules.code_owner.first
           rule ||= approval_rules.code_owner.create!(name: ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER)
 

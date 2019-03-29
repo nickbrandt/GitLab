@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class Packages::PackageFile < ActiveRecord::Base
+class Packages::PackageFile < ApplicationRecord
   belongs_to :package
 
   validates :package, presence: true

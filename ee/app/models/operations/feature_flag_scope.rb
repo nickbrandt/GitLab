@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Operations
-  class FeatureFlagScope < ActiveRecord::Base
+  class FeatureFlagScope < ApplicationRecord
     prepend HasEnvironmentScope
 
     self.table_name = 'operations_feature_flag_scopes'

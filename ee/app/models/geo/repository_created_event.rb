@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class RepositoryCreatedEvent < ActiveRecord::Base
+  class RepositoryCreatedEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

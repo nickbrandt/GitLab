@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class NamespaceStatistics < ActiveRecord::Base
+class NamespaceStatistics < ApplicationRecord
   belongs_to :namespace
 
   validates :namespace, presence: true

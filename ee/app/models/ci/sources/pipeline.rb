@@ -2,7 +2,7 @@
 
 module Ci
   module Sources
-    class Pipeline < ActiveRecord::Base
+    class Pipeline < ApplicationRecord
       self.table_name = "ci_sources_pipelines"
 
       belongs_to :project, class_name: Project

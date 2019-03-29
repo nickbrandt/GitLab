@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class License < ActiveRecord::Base
+class License < ApplicationRecord
   include ActionView::Helpers::NumberHelper
 
   STARTER_PLAN = 'starter'.freeze

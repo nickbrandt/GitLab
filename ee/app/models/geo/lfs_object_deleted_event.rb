@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class LfsObjectDeletedEvent < ActiveRecord::Base
+  class LfsObjectDeletedEvent < ApplicationRecord
     include Geo::Model
     include Geo::Eventable
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PathLock < ActiveRecord::Base
+class PathLock < ApplicationRecord
   belongs_to :project
   belongs_to :user
 
