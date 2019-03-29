@@ -171,8 +171,9 @@ export default {
       this.editing = false;
       this.$emit('toggleDateType', true, true);
     },
-    toggleDatePicker() {
+    toggleDatePicker(e) {
       this.editing = !this.editing;
+      e.stopPropagation();
     },
     newDateSelected(date = null) {
       this.editing = false;

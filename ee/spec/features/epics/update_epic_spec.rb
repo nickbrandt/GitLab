@@ -121,6 +121,16 @@ describe 'Update Epic', :js do
       end
     end
 
+    context 'epic sidebar' do
+      it 'opens datepicker when clicking Edit button' do
+        page.within('.issuable-sidebar .block.start-date') do
+          click_button('Edit')
+          expect(find('.value-type-fixed')).to have_selector('.pikaday-container')
+          expect(find('.value-type-fixed')).to have_selector('.pikaday-container .pika-single.is-bound')
+        end
+      end
+    end
+
     it 'updates the tasklist' do
       expect(page).to have_selector('ul.task-list',      count: 1)
       expect(page).to have_selector('li.task-list-item', count: 1)
