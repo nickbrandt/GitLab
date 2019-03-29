@@ -50,6 +50,7 @@
 - admin_emails
 - create_github_webhook
 - elastic_batch_project_indexer
+- elastic_namespace_indexer
 - elastic_commit_indexer
 - elastic_indexer
 - export_csv

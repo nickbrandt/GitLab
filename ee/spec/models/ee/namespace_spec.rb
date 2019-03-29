@@ -30,4 +30,30 @@ describe Namespace do
       it_behaves_like 'plan helper', namespace_plan
     end
   end
+
+  describe '#use_elasticsearch?' do
+    let(:namespace) { create :namespace }
+
+    it 'returns false if elasticsearch indexing is disabled' do
+      stub_ee_application_setting(elasticsearch_indexing: false)
+
+      expect(namespace.use_elasticsearch?).to eq(false)
+    end
+
+    it 'returns true if elasticsearch indexing enabled but limited indexing disabled' do
+      stub_ee_application_setting(elasticsearch_indexing: true, elasticsearch_limit_indexing: false)
+
+      expect(namespace.use_elasticsearch?).to eq(true)
+    end
+
+    it 'returns true if it is enabled specifically' do
+      stub_ee_application_setting(elasticsearch_indexing: true, elasticsearch_limit_indexing: true)
+
+      expect(namespace.use_elasticsearch?).to eq(false)
+
+      ::Gitlab::CurrentSettings.update!(elasticsearch_namespace_ids: namespace.id.to_s)
+
+      expect(namespace.use_elasticsearch?).to eq(true)
+    end
+  end
 end

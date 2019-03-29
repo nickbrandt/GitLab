@@ -14,8 +14,9 @@ module EE
       scope :searchable, -> { where(system: false) }
     end
 
+    # Original method in Elastic::ApplicationSearch
     def searchable?
-      !system
+      !system && super
     end
 
     def for_epic?

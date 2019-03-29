@@ -749,6 +749,9 @@ msgstr ""
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
 msgstr ""
 
+msgid "Advanced search functionality"
+msgstr ""
+
 msgid "Advanced settings"
 msgstr ""
 
@@ -3742,6 +3745,12 @@ msgstr ""
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
 
+msgid "Elastic|None. Select namespaces to index."
+msgstr ""
+
+msgid "Elastic|None. Select projects to index."
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
@@ -6327,6 +6336,9 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "Limit namespaces and projects that can be indexed"
+msgstr ""
+
 msgid "Limited to showing %d event at most"
 msgid_plural "Limited to showing %d events at most"
 msgstr[0] ""
@@ -6906,6 +6918,9 @@ msgid "Name your individual key via a title"
 msgstr ""
 
 msgid "Name:"
+msgstr ""
+
+msgid "Namespaces to index"
 msgstr ""
 
 msgid "Naming, tags, avatar"
@@ -8305,6 +8320,9 @@ msgid "Projects shared with %{group_name}"
 msgstr ""
 
 msgid "Projects that belong to a group are prefixed with the group namespace. Existing projects may be moved into a group."
+msgstr ""
+
+msgid "Projects to index"
 msgstr ""
 
 msgid "Projects with write access"

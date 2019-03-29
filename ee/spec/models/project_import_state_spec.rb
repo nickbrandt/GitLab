@@ -52,16 +52,18 @@ describe ProjectImportState, type: :model do
 
         context 'no index status' do
           it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, nil)
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, Gitlab::Git::BLANK_SHA)
 
             import_state.finish
           end
         end
 
         context 'with index status' do
-          let!(:index_status) { import_state.project.create_index_status!(indexed_at: Time.now, last_commit: 'foo') }
+          let!(:index_status) { import_state.project.index_status }
 
           it 'schedules a progressive index of the repository' do
+            index_status.update!(indexed_at: Time.now, last_commit: 'foo')
+
             expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, index_status.last_commit)
 
             import_state.finish

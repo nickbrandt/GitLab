@@ -228,7 +228,11 @@ module Elastic
 
       # Should be overridden in the models where some records should be skipped
       def searchable?
-        true
+        self.use_elasticsearch?
+      end
+
+      def use_elasticsearch?
+        self.project&.use_elasticsearch?
       end
 
       def generic_attributes

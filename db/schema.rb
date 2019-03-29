@@ -217,6 +217,7 @@ ActiveRecord::Schema.define(version: 20190322132835) do
     t.string "runners_registration_token_encrypted"
     t.integer "local_markdown_version", default: 0, null: false
     t.integer "first_day_of_week", default: 0, null: false
+    t.boolean "elasticsearch_limit_indexing", default: false, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
@@ -1063,6 +1064,20 @@ ActiveRecord::Schema.define(version: 20190322132835) do
     t.index ["author_id"], name: "index_draft_notes_on_author_id", using: :btree
     t.index ["discussion_id"], name: "index_draft_notes_on_discussion_id", using: :btree
     t.index ["merge_request_id"], name: "index_draft_notes_on_merge_request_id", using: :btree
+  end
+
+  create_table "elasticsearch_indexed_namespaces", id: false, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "namespace_id"
+    t.index ["namespace_id"], name: "index_elasticsearch_indexed_namespaces_on_namespace_id", unique: true, using: :btree
+  end
+
+  create_table "elasticsearch_indexed_projects", id: false, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "project_id"
+    t.index ["project_id"], name: "index_elasticsearch_indexed_projects_on_project_id", unique: true, using: :btree
   end
 
   create_table "emails", force: :cascade do |t|
@@ -3456,6 +3471,8 @@ ActiveRecord::Schema.define(version: 20190322132835) do
   add_foreign_key "design_management_versions", "design_management_designs", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
+  add_foreign_key "elasticsearch_indexed_namespaces", "namespaces", on_delete: :cascade
+  add_foreign_key "elasticsearch_indexed_projects", "projects", on_delete: :cascade
   add_foreign_key "environments", "projects", name: "fk_d1c8c1da6a", on_delete: :cascade
   add_foreign_key "epic_issues", "epics", on_delete: :cascade
   add_foreign_key "epic_issues", "issues", on_delete: :cascade

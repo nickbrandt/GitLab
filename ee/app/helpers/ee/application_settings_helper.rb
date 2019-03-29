@@ -62,6 +62,9 @@ module EE
         :elasticsearch_indexing,
         :elasticsearch_search,
         :elasticsearch_url,
+        :elasticsearch_limit_indexing,
+        :elasticsearch_namespace_ids,
+        :elasticsearch_project_ids,
         :geo_status_timeout,
         :help_text,
         :pseudonymizer_enabled,
@@ -76,6 +79,18 @@ module EE
         :snowplow_enabled,
         :snowplow_site_id
       ]
+    end
+
+    def elasticsearch_objects_options(objects)
+      objects.map { |g| { id: g.id, text: g.full_name } }
+    end
+
+    def elasticsearch_namespace_ids
+      ElasticsearchIndexedNamespace.namespace_ids.join(',')
+    end
+
+    def elasticsearch_project_ids
+      ElasticsearchIndexedProject.project_ids.join(',')
     end
 
     def self.repository_mirror_attributes

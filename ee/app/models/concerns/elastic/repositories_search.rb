@@ -25,7 +25,7 @@ module Elastic
 
       def self.import
         Project.find_each do |project|
-          if project.repository.exists? && !project.repository.empty?
+          if project.repository.exists? && !project.repository.empty? && project.use_elasticsearch?
             project.repository.index_commits
             project.repository.index_blobs
           end

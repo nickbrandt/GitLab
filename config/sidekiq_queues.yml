@@ -103,6 +103,7 @@
   - [elastic_batch_project_indexer, 1]
   - [elastic_indexer, 1]
   - [elastic_commit_indexer, 1]
+  - [elastic_namespace_indexer, 1]
   - [export_csv, 1]
   - [incident_management, 2]
 

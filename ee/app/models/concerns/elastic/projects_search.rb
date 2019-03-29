@@ -15,6 +15,10 @@ module Elastic
     included do
       include ApplicationSearch
 
+      def use_elasticsearch?
+        ::Gitlab::CurrentSettings.elasticsearch_indexes_project?(self)
+      end
+
       def as_indexed_json(options = {})
         # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
         # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
