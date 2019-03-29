@@ -30,6 +30,7 @@ const designsStore = [
 const defaultClient = createDefaultClient({
   defaults: {
     designs: designsStore,
+    canUploadDesign: true,
   },
   resolvers: {
     Query: {

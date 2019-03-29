@@ -1,4 +1,4 @@
-- if Feature.enabled?(:versioned_designs)
+- if @project.feature_available?(:design_management, current_user) && Feature.enabled?(:design_management)
   %ul.nav-tabs.nav.nav-links{ role: 'tablist' }
     %li
       = link_to '#discussion-tab', class: 'active js-issue-tabs', id: 'discussion', role: 'tab', 'aria-controls': 'js-discussion', 'aria-selected': 'true', data: { toggle: 'tab', target: '#discussion-tab' } do

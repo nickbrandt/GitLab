@@ -75,6 +75,7 @@ class License < ApplicationRecord
     batch_comments
     issues_analytics
     merge_pipelines
+    design_management
   ]
   EEP_FEATURES.freeze
 

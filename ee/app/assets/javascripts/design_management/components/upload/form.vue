@@ -11,6 +11,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    canUploadDesign: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     openFileUpload() {
@@ -27,6 +31,7 @@ export default {
   <header class="row-content-block border-top-0 p-2 d-flex">
     <div>
       <gl-button
+        v-if="canUploadDesign"
         :disabled="isSaving"
         variant="primary"
         class="btn-inverted"

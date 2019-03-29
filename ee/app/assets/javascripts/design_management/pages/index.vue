@@ -6,6 +6,7 @@ import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import allDesignsQuery from '../queries/allDesigns.graphql';
 import uploadDesignQuery from '../queries/uploadDesign.graphql';
+import canUploadDesignPermission from '../queries/canUploadDesignPermission.graphql';
 
 export default {
   components: {
@@ -20,10 +21,14 @@ export default {
         this.error = true;
       },
     },
+    canUploadDesign: {
+      query: canUploadDesignPermission,
+    },
   },
   data() {
     return {
       designs: [],
+      canUploadDesign: false,
       error: false,
       isSaving: false,
     };
@@ -35,6 +40,8 @@ export default {
   },
   methods: {
     onUploadDesign(files) {
+      if (!this.canUploadDesign) return null;
+
       const optimisticResponse = [...files].map(file => ({
         __typename: 'Design',
         id: -1,
@@ -80,7 +87,12 @@ export default {
 
 <template>
   <div>
-    <upload-form :is-saving="isSaving" @upload="onUploadDesign" />
+    <upload-form
+      v-if="canUploadDesign"
+      :can-upload-design="canUploadDesign"
+      :is-saving="isSaving"
+      @upload="onUploadDesign"
+    />
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
       <div v-else-if="error" class="alert alert-danger">

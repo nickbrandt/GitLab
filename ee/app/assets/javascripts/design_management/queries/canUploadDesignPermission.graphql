@@ -1,0 +1,3 @@
+query canUploadDesign {
+  canUploadDesign @client
+}
