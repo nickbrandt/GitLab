@@ -1,0 +1,5 @@
+---
+title: Fix approval rule sourcing from forked MR
+merge_request: 10474
+author:
+type: fixed
