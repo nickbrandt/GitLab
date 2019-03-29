@@ -1735,6 +1735,45 @@ describe Project do
     end
   end
 
+  describe '#merge_pipelines_enabled?' do
+    subject { project.merge_pipelines_enabled? }
+
+    let(:project) { create(:project) }
+    let(:merge_pipelines_enabled) { true }
+
+    before do
+      project.merge_pipelines_enabled = merge_pipelines_enabled
+    end
+
+    context 'when Merge pipelines (EEP) is available' do
+      before do
+        stub_licensed_features(merge_pipelines: true)
+      end
+
+      it { is_expected.to be_truthy }
+
+      context 'when project setting is disabled' do
+        let(:merge_pipelines_enabled) { false }
+
+        it { is_expected.to be_falsy }
+      end
+    end
+
+    context 'when Merge pipelines (EEP) is unavailable' do
+      before do
+        stub_licensed_features(merge_pipelines: false)
+      end
+
+      it { is_expected.to be_falsy }
+
+      context 'when project setting is disabled' do
+        let(:merge_pipelines_enabled) { false }
+
+        it { is_expected.to be_falsy }
+      end
+    end
+  end
+
   describe "#insights_config" do
     context 'when project has no Insights config file' do
       it 'returns nil' do
