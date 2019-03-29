@@ -169,10 +169,14 @@ describe('SidebarDatePicker', () => {
 
     describe('toggleDatePicker', () => {
       it('flips value of `editing` prop from `true` to `false` and vice-versa', () => {
+        const e = new Event('click');
+        spyOn(e, 'stopPropagation');
+
         vm.editing = true;
-        vm.toggleDatePicker();
+        vm.toggleDatePicker(e);
 
         expect(vm.editing).toBe(false);
+        expect(e.stopPropagation).toHaveBeenCalled();
       });
     });
 
