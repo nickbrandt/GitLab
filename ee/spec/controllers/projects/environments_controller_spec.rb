@@ -117,6 +117,12 @@ describe Projects::EnvironmentsController do
         expect(json_response["logs"]).to match_array(["Log 1", "Log 2", "Log 3"])
         expect(json_response["pods"]).to match_array([pod_name])
       end
+
+      it 'registers a usage of the endpoint' do
+        expect(::Gitlab::PodLogsUsageCounter).to receive(:increment).with(project.id)
+
+        get :logs, params: environment_params(pod_name: pod_name, format: :json)
+      end
     end
   end
 

@@ -132,6 +132,13 @@ module EE
           usage_data
         end
 
+        override :usage_counters
+        def usage_counters
+          super.merge(
+            pod_logs_usages: ::Gitlab::PodLogsUsageCounter.usage_totals
+          )
+        end
+
         override :jira_usage
         def jira_usage
           super.merge(
