@@ -6,7 +6,8 @@ import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import allDesignsQuery from '../queries/allDesigns.graphql';
 import uploadDesignQuery from '../queries/uploadDesign.graphql';
-import canUploadDesignPermission from '../queries/canUploadDesignPermission.graphql';
+import appDataQuery from '../queries/appData.graphql';
+import permissionsQuery from '../queries/permissions.graphql';
 
 export default {
   components: {
@@ -15,32 +16,52 @@ export default {
     UploadForm,
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectFullPath, issueIid } }) {
+        this.projectFullPath = projectFullPath;
+        this.issueIid = issueIid;
+      },
+    },
     designs: {
       query: allDesignsQuery,
       error() {
         this.error = true;
       },
     },
-    canUploadDesign: {
-      query: canUploadDesignPermission,
+    permissions: {
+      query: permissionsQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+          iid: this.issueIid,
+        };
+      },
+      update: data => data.project.issue.userPermissions,
     },
   },
   data() {
     return {
       designs: [],
-      canUploadDesign: false,
+      permissions: {},
       error: false,
       isSaving: false,
+      projectFullPath: '',
+      issueIid: null,
     };
   },
   computed: {
     isLoading() {
-      return this.$apollo.queries.designs.loading;
+      return this.$apollo.queries.designs.loading && this.$apollo.queries.permissions.loading;
+    },
+    canCreateDesign() {
+      return this.permissions.createDesign;
     },
   },
   methods: {
     onUploadDesign(files) {
-      if (!this.canUploadDesign) return null;
+      if (!this.canCreateDesign) return null;
 
       const optimisticResponse = [...files].map(file => ({
         __typename: 'Design',
@@ -88,8 +109,8 @@ export default {
 <template>
   <div>
     <upload-form
-      v-if="canUploadDesign"
-      :can-upload-design="canUploadDesign"
+      v-if="canCreateDesign"
+      :can-upload-design="canCreateDesign"
       :is-saving="isSaving"
       @upload="onUploadDesign"
     />
