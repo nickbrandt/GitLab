@@ -1,4 +1,13 @@
 <script>
+/* === WARNING ===
+ * This file will be removed pending the removal of the `approval_rules` feature flag.
+ *
+ * If a new feature needs to be added, please please make changes in the `./multiple_rule`
+ * directory (see the feature issue https://gitlab.com/gitlab-org/gitlab-ee/issues/1979).
+ *
+ * Follow along via this issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/10685.
+ */
+
 import createFlash from '~/flash';
 import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
 import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
