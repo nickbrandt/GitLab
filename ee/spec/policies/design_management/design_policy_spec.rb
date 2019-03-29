@@ -146,7 +146,7 @@ describe DesignManagement::DesignPolicy do
       context "for anonymous users" do
         let(:current_user) { nil }
 
-        it { is_expected.to be_disallowed(*design_abilities)}
+        it { is_expected.to be_disallowed(*design_abilities) }
       end
     end
   end

@@ -579,7 +579,7 @@ module EE
       # Checking both feature availability on the license, as well as the feature
       # flag, because we don't want to enable design_management by default on
       # on prem installs yet.
-      feature_available?(:design_management) && ::Feature.enabled?(:design_management)
+      feature_available?(:design_management) && ::Feature.enabled?(:design_management, self)
     end
 
     private
