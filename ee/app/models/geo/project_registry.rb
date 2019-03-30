@@ -3,18 +3,10 @@
 class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::Delay
   include ::EachBatch
-  include ::IgnorableColumn
   include ::ShaAttribute
 
   REGISTRY_TYPES = %i{repository wiki}.freeze
   RETRIES_BEFORE_REDOWNLOAD = 5
-
-  ignore_column :last_repository_verification_at
-  ignore_column :last_repository_verification_failed
-  ignore_column :last_wiki_verification_at
-  ignore_column :last_wiki_verification_failed
-  ignore_column :repository_verification_checksum
-  ignore_column :wiki_verification_checksum
 
   sha_attribute :repository_verification_checksum_sha
   sha_attribute :repository_verification_checksum_mismatched
