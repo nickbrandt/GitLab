@@ -131,5 +131,25 @@ FactoryBot.define do
           Rails.root.join('spec/fixtures/security-reports/master/gl-dast-report.json'), 'text/plain')
       end
     end
+
+    trait :metrics do
+      file_format :gzip
+      file_type :metrics
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/metrics.gz'), 'application/x-gzip')
+      end
+    end
+
+    trait :metrics_feature_branch do
+      file_format :gzip
+      file_type :metrics
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/alternate_metrics.gz'), 'application/x-gzip')
+      end
+    end
   end
 end

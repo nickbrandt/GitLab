@@ -131,6 +131,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :rebase
           get :test_reports
 
+          ## EE-specific
+          get :metrics_reports
+
           scope constraints: { format: nil }, action: :show do
             get :commits, defaults: { tab: 'commits' }
             get :pipelines, defaults: { tab: 'pipelines' }

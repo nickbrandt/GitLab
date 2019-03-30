@@ -42,6 +42,23 @@ module EE
         render_approvals_json
       end
 
+      def metrics_reports
+        result = merge_request.compare_metrics_reports
+
+        case result[:status]
+        when :parsing
+          ::Gitlab::PollingInterval.set_header(response, interval: 3000)
+
+          render json: '', status: :no_content
+        when :parsed
+          render json: result[:data].to_json, status: :ok
+        when :error
+          render json: { status_reason: result[:status_reason] }, status: :bad_request
+        else
+          render json: { status_reason: 'Unknown error' }, status: :internal_server_error
+        end
+      end
+
       protected
 
       # rubocop:disable Gitlab/ModuleWithInstanceVariables

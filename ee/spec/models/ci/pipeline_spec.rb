@@ -60,6 +60,26 @@ describe Ci::Pipeline do
     end
   end
 
+  describe '.with_metrics_reports' do
+    subject { described_class.with_metrics_reports }
+
+    context 'when pipeline has a metrics report' do
+      let!(:pipeline_with_metrics) { create(:ee_ci_pipeline, :with_metrics_report) }
+
+      it 'selects the pipeline' do
+        is_expected.to eq([pipeline_with_metrics])
+      end
+    end
+
+    context 'when pipeline does not have metrics reports' do
+      let!(:pipeline_without_metrics) { create(:ci_empty_pipeline) }
+
+      it 'does not select the pipeline' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
   shared_examples 'unlicensed report type' do
     context 'when there is no licensed feature for artifact file type' do
       it 'returns the artifact' do
@@ -166,7 +186,9 @@ describe Ci::Pipeline do
 
     subject { pipeline.legacy_report_artifact_for_file_type(file_type) }
 
-    described_class::REPORT_LICENSED_FEATURES.each do |file_type, licensed_features|
+    described_class::LEGACY_REPORT_FORMATS.each do |file_type, _|
+      licensed_features = described_class::REPORT_LICENSED_FEATURES[file_type]
+
       context "for file_type: #{file_type}" do
         let(:file_type) { file_type }
         let(:expected) { OpenStruct.new(build: build, path: artifact_path) }
@@ -406,6 +428,80 @@ describe Ci::Pipeline do
     context 'when pipeline does not have any builds with license management reports' do
       it 'returns an empty license management report' do
         expect(subject.licenses).to be_empty
+      end
+    end
+  end
+
+  describe '#has_metrics_reports?' do
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+    subject { pipeline.has_metrics_reports? }
+
+    before do
+      stub_licensed_features(metrics_reports: true)
+    end
+
+    context 'when pipeline has builds with metrics reports' do
+      before do
+        create(:ee_ci_build, :metrics, pipeline: pipeline, project: project)
+      end
+
+      it { is_expected.to be_truthy }
+
+      context 'when pipeline status is running' do
+        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
+
+        it { is_expected.to be_falsey }
+      end
+    end
+
+    context 'when pipeline does not have builds with metrics reports' do
+      before do
+        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
+      end
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when retried build has metrics reports' do
+      before do
+        create(:ee_ci_build, :retried, :metrics, pipeline: pipeline, project: project)
+      end
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#metrics_report' do
+    subject { pipeline.metrics_report }
+
+    before do
+      stub_licensed_features(metrics_reports: true)
+    end
+
+    context 'when pipeline has multiple builds with metrics reports' do
+      before do
+        create(:ee_ci_build, :success, :metrics, pipeline: pipeline, project: project)
+      end
+
+      it 'returns a metrics report with collected data' do
+        expect(subject.metrics.count).to eq(2)
+      end
+    end
+
+    context 'when pipeline has multiple builds with metrics reports that are retried' do
+      before do
+        create_list(:ee_ci_build, 2, :retried, :success, :metrics, pipeline: pipeline, project: project)
+      end
+
+      it 'does not take retried builds into account' do
+        expect(subject.metrics).to be_empty
+      end
+    end
+
+    context 'when pipeline does not have any builds with metrics reports' do
+      it 'returns an empty metrics report' do
+        expect(subject.metrics).to be_empty
       end
     end
   end

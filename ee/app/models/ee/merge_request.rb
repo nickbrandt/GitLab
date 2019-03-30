@@ -114,6 +114,18 @@ module EE
       compare_reports(::Ci::CompareLicenseManagementReportsService)
     end
 
+    def has_metrics_reports?
+      actual_head_pipeline&.has_metrics_reports?
+    end
+
+    def compare_metrics_reports
+      unless has_metrics_reports?
+        return { status: :error, status_reason: 'This merge request does not have metrics reports' }
+      end
+
+      compare_reports(::Ci::CompareMetricsReportsService)
+    end
+
     def sync_code_owners_with_approvers
       return if merged?
 

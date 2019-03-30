@@ -42,6 +42,10 @@ module EE
           where('EXISTS (?)', ::Vulnerabilities::OccurrencePipeline.where('ci_pipelines.id=vulnerability_occurrence_pipelines.pipeline_id').select(1))
         end
 
+        scope :with_metrics_reports, -> do
+          where('EXISTS (?)', ::Ci::Build.latest.with_metrics_reports.where('ci_pipelines.id=ci_builds.commit_id').select(1))
+        end
+
         # This structure describes feature levels
         # to access the file types for given reports
         REPORT_LICENSED_FEATURES = {
@@ -51,7 +55,8 @@ module EE
           container_scanning: %i[container_scanning sast_container],
           dast: %i[dast],
           performance: %i[merge_request_performance_metrics],
-          license_management: %i[license_management]
+          license_management: %i[license_management],
+          metrics: %i[metrics_reports]
         }.freeze
 
         # Deprecated, to be removed in 12.0
@@ -169,6 +174,18 @@ module EE
         ::Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |license_management_report|
           builds.latest.with_license_management_reports.each do |build|
             build.collect_license_management_reports!(license_management_report)
+          end
+        end
+      end
+
+      def has_metrics_reports?
+        complete? && builds.latest.with_metrics_reports.any?
+      end
+
+      def metrics_report
+        ::Gitlab::Ci::Reports::Metrics::Report.new.tap do |metrics_report|
+          builds.latest.with_metrics_reports.each do |build|
+            build.collect_metrics_reports!(metrics_report)
           end
         end
       end

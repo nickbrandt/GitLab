@@ -32,6 +32,11 @@ module EE
           with_existing_job_artifacts(::Ci::JobArtifact.license_management_reports)
               .eager_load_job_artifacts
         end
+
+        scope :with_metrics_reports, -> do
+          with_existing_job_artifacts(::Ci::JobArtifact.metrics_reports)
+              .eager_load_job_artifacts
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -87,6 +92,16 @@ module EE
         end
 
         license_management_report
+      end
+
+      def collect_metrics_reports!(metrics_report)
+        each_report(::Ci::JobArtifact::METRICS_REPORT_FILE_TYPES) do |file_type, blob|
+          next unless project.feature_available?(:metrics_reports)
+
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, metrics_report)
+        end
+
+        metrics_report
       end
 
       private

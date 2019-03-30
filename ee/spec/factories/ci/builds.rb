@@ -27,17 +27,29 @@ FactoryBot.define do
         end
       end
     end
-  end
 
-  trait :license_management_feature_branch do
-    after(:build) do |build|
-      build.job_artifacts << create(:ee_ci_job_artifact, :license_management_feature_branch, job: build)
+    trait :metrics do
+      after(:build) do |build|
+        build.job_artifacts << build(:ee_ci_job_artifact, :metrics, job: build)
+      end
     end
-  end
 
-  trait :corrupted_license_management_report do
-    after(:build) do |build|
-      build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_license_management_report, job: build)
+    trait :metrics_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :metrics_feature_branch, job: build)
+      end
+    end
+
+    trait :license_management_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :license_management_feature_branch, job: build)
+      end
+    end
+
+    trait :corrupted_license_management_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_license_management_report, job: build)
+      end
     end
   end
 end
