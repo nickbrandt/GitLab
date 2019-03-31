@@ -1,0 +1,5 @@
+---
+title: Notify owner that group is invalid when LDAP "Sync now" fails
+merge_request: 10509
+author:
+type: fixed
