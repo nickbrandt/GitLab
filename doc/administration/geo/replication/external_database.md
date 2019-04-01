@@ -11,6 +11,21 @@ developed and tested. We aim to be compatible with most external
 
 ## **Primary** node
 
+1. SSH into a GitLab **primary** application server and login as root:
+
+    ```sh
+    sudo -i
+    ```
+
+1. Execute the command below to define the node as **primary** node:
+
+    ```sh
+    gitlab-ctl set-geo-primary-node
+    ```
+
+    This command will use your defined `external_url` in `/etc/gitlab/gitlab.rb`.
+
+
 ### Configure the external database to be replicated
 
 To set up an external database, you can either:
@@ -18,8 +33,17 @@ To set up an external database, you can either:
 - Set up streaming replication yourself (for example, in AWS RDS).
 - Perform the Omnibus configuration manually as follows.
 
-In an Omnibus install, the
-[geo_primary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
+#### Leverage your cloud provider's tools to replicate the primary database
+
+Given you have a primary node set up on AWS EC2 that uses RDS.
+You can now just create a read-only replica in a different region and the
+replication process will be managed by AWS. Make sure you've set Network ACL, Subnet, and
+Security Group according to your needs, so the secondary application node can access the database.
+Skip to the [Configure secondary application node](#configure-secondary-application-node) section below.
+
+#### Manually configure the primary database for replication
+
+The [geo_primary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
 configures the **primary** node's database to be replicated by making changes to
 `pg_hba.conf` and `postgresql.conf`. Make the following configuration changes
 manually to your external database configuration:
@@ -47,24 +71,10 @@ hot_standby = on
 
 ## **Secondary** nodes
 
-With Omnibus, the
-[geo_secondary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
-has three main functions:
+### Manually configure the replica database
 
-1. Configure the replica database.
-1. Configure the tracking database.
-1. Enable the Geo Log Cursor (`geo_logcursor`) (irrelevant to this doc).
-
-### Configure the external replica database
-
-To set up an external replica database, you can either:
-
-- Set up streaming replication yourself (for example, in AWS RDS).
-- Perform the Omnibus configuration manually as follows.
-
-In an Omnibus install, the `geo_secondary_role` makes configuration changes to
-`postgresql.conf`. Make the following configuration changes manually to your
-external replica database configuration:
+Make the following configuration changes manually to your `postgresql.conf`
+of external replica database:
 
 ```
 ##
@@ -77,17 +87,63 @@ wal_keep_segments = 10
 hot_standby = on
 ```
 
+### Configure **secondary** application nodes to use the external read-replica
+
+With Omnibus, the
+[geo_secondary_role](https://docs.gitlab.com/omnibus/roles/#gitlab-geo-roles)
+has three main functions:
+
+1. Configure the replica database.
+1. Configure the tracking database.
+1. Enable the [Geo Log Cursor](index.md#geo-log-cursor) (not covered in this section).
+
+To configure the connection to the external read-replica database and enable Log Cursor:
+
+1. SSH into a GitLab **secondary** application server and login as root:
+
+    ```bash
+    sudo -i
+    ```
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the following
+
+    ```ruby
+    ##
+    ## Geo Secondary role
+    ## - configure dependent flags automatically to enable Geo
+    ##
+    roles ['geo_secondary_role']
+
+    # note this is shared between both databases,
+    # make sure you define the same password in both
+    gitlab_rails['db_password'] = 'mypassword'
+
+    gitlab_rails['db_username'] = 'gitlab'
+    gitlab_rails['db_host'] = 'my-database-read-replica.dbs.com'
+    ```
+1. Save the file and [reconfigure GitLab](../../restart_gitlab.md#omnibus-gitlab-reconfigure)
+
 ### Configure the tracking database
 
 **Secondary** nodes use a separate PostgreSQL installation as a tracking
 database to keep track of replication status and automatically recover from
-potential replication issues.
+potential replication issues. Omnibus automatically configures a tracking database
+when `roles ['geo_secondary_role']` is set. For high availability,
+refer to [Geo High Availability](https://docs.gitlab.com/ee/administration/high_availability).
+If you want to run this database external to Omnibus, please follow the instructions below.
 
-It requires an [FDW](https://www.postgresql.org/docs/9.6/static/postgres-fdw.html)
+The tracking database requires an [FDW](https://www.postgresql.org/docs/9.6/static/postgres-fdw.html)
 connection with the **secondary** replica database for improved performance.
 
 If you have an external database ready to be used as the tracking database,
 follow the instructions below to use it:
+
+NOTE: **Note:**
+If you want to use AWS RDS as a tracking database, make sure it has access to
+the secondary database. Unfortunately, just assigning the same security group is not enough as
+outbound rules do not apply to RDS PostgreSQL databases. Therefore, you need to explicitly add an inbound
+rule to the read-replica's security group allowing any TCP traffic from
+the tracking database on port 5432.
 
 1. SSH into a GitLab **secondary** server and login as root:
 
@@ -99,25 +155,21 @@ follow the instructions below to use it:
     the machine with the PostgreSQL instance:
 
     ```ruby
-    # note this is shared between both databases,
-    # make sure you define the same password in both
-    gitlab_rails['db_password'] = 'mypassword'
+    geo_secondary['db_username'] = 'gitlab_geo'
+    geo_secondary['db_password'] = 'my password'
 
-    geo_secondary['db_host'] = '<change to the tracking DB public IP>'
-    geo_secondary['db_port'] = 5431      # change to the correct port
+    geo_secondary['db_host'] = '<change to the tracking DB host>'
+    geo_secondary['db_port'] = 5432      # change to the correct port
     geo_secondary['db_fdw'] = true       # enable FDW
     geo_postgresql['enable'] = false     # don't use internal managed instance
     ```
 
-1. Reconfigure GitLab for the changes to take effect:
-
-    ```bash
-    gitlab-ctl reconfigure
-    ```
+1. Save the file and [reconfigure GitLab](../../restart_gitlab.md#omnibus-gitlab-reconfigure)
 
 1. Run the tracking database migrations:
 
     ```bash
+    gitlab-rake geo:db:create
     gitlab-rake geo:db:migrate
     ```
 
@@ -135,6 +187,7 @@ follow the instructions below to use it:
     DB_HOST="<change to the public IP or VPC private IP>"
     DB_NAME="gitlabhq_production"
     DB_USER="gitlab"
+    DB_PASS="my password"
     DB_PORT="5432"
 
     # Tracking Database connection params:
@@ -149,19 +202,16 @@ follow the instructions below to use it:
 
     query_exec "CREATE EXTENSION postgres_fdw;"
     query_exec "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '${DB_HOST}', dbname '${DB_NAME}', port '${DB_PORT}');"
-    query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}');"
+    query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}', password '${DB_PASS}');"
     query_exec "CREATE SCHEMA gitlab_secondary;"
     query_exec "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO ${GEO_DB_USER};"
     ```
 
     NOTE: **Note:** The script template above uses `gitlab-psql` as it's intended to be executed from the Geo machine,
-    but you can change it to `psql` and run it from any machine that has access to the database.
+    but you can change it to `psql` and run it from any machine that has access to the database. We also recommend using
+    `psql` for AWS RDS.
 
-1. Restart GitLab:
-
-    ```bash
-    gitlab-ctl restart
-    ```
+1. Save the file and [restart GitLab](../../restart_gitlab.md#omnibus-gitlab-restart)
 1. Populate the FDW tables:
 
     ```bash
