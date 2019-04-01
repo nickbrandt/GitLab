@@ -16,7 +16,7 @@ module Gitlab
         Gitlab::Utils.which(EXPERIMENTAL_INDEXER).present?
       end
 
-      attr_reader :project
+      attr_reader :project, :index_status
 
       def initialize(project)
         @project = project
@@ -75,6 +75,10 @@ module Gitlab
       end
 
       def run_indexer!(to_sha)
+        if index_status && !repository_contains_last_indexed_commit?
+          project.repository.delete_index_for_commits_and_blobs
+        end
+
         command = [path_to_indexer, project.id.to_s, repository_path]
 
         vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
@@ -85,7 +89,7 @@ module Gitlab
       end
 
       def last_commit
-        @index_status&.last_commit
+        index_status&.last_commit
       end
 
       def from_sha
