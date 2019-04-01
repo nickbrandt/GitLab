@@ -22,7 +22,7 @@ module Ci
       dast: 'gl-dast-report.json',
       license_management: 'gl-license-management-report.json',
       performance: 'performance.json',
-      metrics: 'metrics'
+      metrics: 'metrics.txt'
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = {

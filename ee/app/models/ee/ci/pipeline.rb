@@ -33,17 +33,8 @@ module EE
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
         end
 
-        # The new `reports:` syntax reports
-        scope :with_security_reports, -> do
-          where('EXISTS (?)', ::Ci::Build.latest.with_security_reports.where('ci_pipelines.id=ci_builds.commit_id').select(1))
-        end
-
         scope :with_vulnerabilities, -> do
           where('EXISTS (?)', ::Vulnerabilities::OccurrencePipeline.where('ci_pipelines.id=vulnerability_occurrence_pipelines.pipeline_id').select(1))
-        end
-
-        scope :with_metrics_reports, -> do
-          where('EXISTS (?)', ::Ci::Build.latest.with_metrics_reports.where('ci_pipelines.id=ci_builds.commit_id').select(1))
         end
 
         # This structure describes feature levels
@@ -96,7 +87,7 @@ module EE
 
         state_machine :status do
           after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
-            next unless pipeline.has_security_reports? && pipeline.default_branch?
+            next unless pipeline.has_reports?(::Ci::JobArtifact.security_reports) && pipeline.default_branch?
 
             pipeline.run_after_commit do
               StoreSecurityReportsWorker.perform_async(pipeline.id)
@@ -154,37 +145,25 @@ module EE
         any_report_artifact_for_type(:license_management)
       end
 
-      def has_security_reports?
-        complete? && builds.latest.with_security_reports.any?
-      end
-
       def security_reports
         ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
-          builds.latest.with_security_reports.each do |build|
+          builds.latest.with_reports(::Ci::JobArtifact.security_reports).each do |build|
             build.collect_security_reports!(security_reports)
           end
         end
       end
 
-      def has_license_management_reports?
-        complete? && builds.latest.with_license_management_reports.any?
-      end
-
       def license_management_report
         ::Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |license_management_report|
-          builds.latest.with_license_management_reports.each do |build|
+          builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
             build.collect_license_management_reports!(license_management_report)
           end
         end
       end
 
-      def has_metrics_reports?
-        complete? && builds.latest.with_metrics_reports.any?
-      end
-
       def metrics_report
         ::Gitlab::Ci::Reports::Metrics::Report.new.tap do |metrics_report|
-          builds.latest.with_metrics_reports.each do |build|
+          builds.latest.with_reports(::Ci::JobArtifact.metrics_reports).each do |build|
             build.collect_metrics_reports!(metrics_report)
           end
         end

@@ -60,26 +60,6 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '.with_metrics_reports' do
-    subject { described_class.with_metrics_reports }
-
-    context 'when pipeline has a metrics report' do
-      let!(:pipeline_with_metrics) { create(:ee_ci_pipeline, :with_metrics_report) }
-
-      it 'selects the pipeline' do
-        is_expected.to eq([pipeline_with_metrics])
-      end
-    end
-
-    context 'when pipeline does not have metrics reports' do
-      let!(:pipeline_without_metrics) { create(:ci_empty_pipeline) }
-
-      it 'does not select the pipeline' do
-        is_expected.to be_empty
-      end
-    end
-  end
-
   shared_examples 'unlicensed report type' do
     context 'when there is no licensed feature for artifact file type' do
       it 'returns the artifact' do
@@ -204,48 +184,6 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#has_security_reports?' do
-    subject { pipeline.has_security_reports? }
-
-    context 'when pipeline has builds with security reports' do
-      before do
-        create(:ee_ci_build, :sast, pipeline: pipeline, project: project)
-      end
-
-      context 'when pipeline status is running' do
-        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when pipeline status is success' do
-        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-
-    context 'when pipeline does not have builds with security reports' do
-      before do
-        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
-      end
-
-      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when retried build has security reports' do
-      before do
-        create(:ee_ci_build, :retried, :sast, pipeline: pipeline, project: project)
-      end
-
-      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-      it { is_expected.to be_falsey }
-    end
-  end
-
   describe '#security_reports' do
     subject { pipeline.security_reports }
 
@@ -348,52 +286,6 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#has_license_management_reports?' do
-    subject { pipeline.has_license_management_reports? }
-
-    before do
-      stub_licensed_features(license_management: true)
-    end
-
-    context 'when pipeline has builds with license_management reports' do
-      before do
-        create(:ee_ci_build, :license_management, pipeline: pipeline, project: project)
-      end
-
-      context 'when pipeline status is running' do
-        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when pipeline status is success' do
-        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-
-    context 'when pipeline does not have builds with license_management reports' do
-      before do
-        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
-      end
-
-      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when retried build has license management reports' do
-      before do
-        create(:ee_ci_build, :retried, :license_management, pipeline: pipeline, project: project)
-      end
-
-      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-      it { is_expected.to be_falsey }
-    end
-  end
-
   describe '#license_management_reports' do
     subject { pipeline.license_management_report }
 
@@ -429,46 +321,6 @@ describe Ci::Pipeline do
       it 'returns an empty license management report' do
         expect(subject.licenses).to be_empty
       end
-    end
-  end
-
-  describe '#has_metrics_reports?' do
-    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-
-    subject { pipeline.has_metrics_reports? }
-
-    before do
-      stub_licensed_features(metrics_reports: true)
-    end
-
-    context 'when pipeline has builds with metrics reports' do
-      before do
-        create(:ee_ci_build, :metrics, pipeline: pipeline, project: project)
-      end
-
-      it { is_expected.to be_truthy }
-
-      context 'when pipeline status is running' do
-        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
-
-        it { is_expected.to be_falsey }
-      end
-    end
-
-    context 'when pipeline does not have builds with metrics reports' do
-      before do
-        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
-      end
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when retried build has metrics reports' do
-      before do
-        create(:ee_ci_build, :retried, :metrics, pipeline: pipeline, project: project)
-      end
-
-      it { is_expected.to be_falsey }
     end
   end
 

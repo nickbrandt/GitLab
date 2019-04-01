@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Ci::CompareMetricsReportsService do
+  set(:project) { create(:project, :repository) }
   let(:service) { described_class.new(project) }
-  let(:project) { create(:project, :repository) }
 
   before do
     stub_licensed_features(metrics_reports: true)
@@ -25,7 +25,7 @@ describe Ci::CompareMetricsReportsService do
 
     context 'when base and head pipelines have metrics reports' do
       let!(:base_pipeline) { create(:ee_ci_pipeline, :with_metrics_report, project: project) }
-      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_metrics_feature_branch_report, project: project) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_metrics_alternate_report, project: project) }
 
       it 'reports status as parsed' do
         expect(subject[:status]).to eq(:parsed)

@@ -34,9 +34,9 @@ FactoryBot.define do
       end
     end
 
-    trait :metrics_feature_branch do
+    trait :metrics_alternate do
       after(:build) do |build|
-        build.job_artifacts << create(:ee_ci_job_artifact, :metrics_feature_branch, job: build)
+        build.job_artifacts << create(:ee_ci_job_artifact, :metrics_alternate, job: build)
       end
     end
 

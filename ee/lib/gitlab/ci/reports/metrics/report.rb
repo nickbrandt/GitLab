@@ -5,18 +5,14 @@ module Gitlab
     module Reports
       module Metrics
         class Report
-          attr_reader :found_metrics
+          attr_reader :metrics
 
           def initialize
-            @found_metrics = {}
-          end
-
-          def metrics
-            @found_metrics.values
+            @metrics = {}
           end
 
           def add_metric(key, value)
-            @found_metrics[key] = ::Gitlab::Ci::Reports::Metrics::Metric.new(key, value)
+            @metrics[key] = value
           end
         end
       end

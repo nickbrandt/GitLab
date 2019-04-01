@@ -14,7 +14,7 @@ module EE
                 container_scanning: ::Gitlab::Ci::Parsers::Security::ContainerScanning,
                 dast: ::Gitlab::Ci::Parsers::Security::Dast,
                 sast: ::Gitlab::Ci::Parsers::Security::Sast,
-                metrics: ::Gitlab::Ci::Parsers::Metrics::Metrics
+                metrics: ::Gitlab::Ci::Parsers::Metrics::Generic
             })
           end
         end

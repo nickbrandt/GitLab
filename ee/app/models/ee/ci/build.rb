@@ -22,21 +22,6 @@ module EE
         has_many :sourced_pipelines,
           class_name: ::Ci::Sources::Pipeline,
           foreign_key: :source_job_id
-
-        scope :with_security_reports, -> do
-          with_existing_job_artifacts(::Ci::JobArtifact.security_reports)
-            .eager_load_job_artifacts
-        end
-
-        scope :with_license_management_reports, -> do
-          with_existing_job_artifacts(::Ci::JobArtifact.license_management_reports)
-              .eager_load_job_artifacts
-        end
-
-        scope :with_metrics_reports, -> do
-          with_existing_job_artifacts(::Ci::JobArtifact.metrics_reports)
-              .eager_load_job_artifacts
-        end
       end
 
       def shared_runners_minutes_limit_enabled?

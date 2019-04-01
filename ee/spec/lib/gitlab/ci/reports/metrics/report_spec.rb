@@ -6,9 +6,10 @@ describe Gitlab::Ci::Reports::Metrics::Report do
   let(:report) { described_class.new }
 
   describe '#add_metric' do
-    let(:metric_params) { %w[metric_name metric_value] }
+    let(:key) { 'metric_name' }
+    let(:value) { 'metric_value' }
 
-    subject { report.add_metric(*metric_params) }
+    subject { report.add_metric(key, value) }
 
     it 'stores given metric' do
       subject
@@ -19,9 +20,7 @@ describe Gitlab::Ci::Reports::Metrics::Report do
     it 'correctly stores metric params' do
       subject
 
-      metric = report.metrics.first
-      expect(metric.name).to eq(metric_params.first)
-      expect(metric.value).to eq(metric_params.second)
+      expect(report.metrics[key]).to eq(value)
     end
   end
 end

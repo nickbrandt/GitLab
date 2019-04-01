@@ -103,7 +103,7 @@ module EE
     end
 
     def has_license_management_reports?
-      actual_head_pipeline&.has_license_management_reports?
+      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports)
     end
 
     def compare_license_management_reports
@@ -115,7 +115,7 @@ module EE
     end
 
     def has_metrics_reports?
-      actual_head_pipeline&.has_metrics_reports?
+      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.metrics_reports)
     end
 
     def compare_metrics_reports
