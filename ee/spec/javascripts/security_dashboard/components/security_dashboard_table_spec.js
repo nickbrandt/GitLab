@@ -49,6 +49,7 @@ describe('Security Dashboard Table', () => {
     beforeEach(() => {
       store.commit(`vulnerabilities/${RECEIVE_VULNERABILITIES_SUCCESS}`, {
         vulnerabilities: mockDataVulnerabilities,
+        pageInfo: {},
       });
       vm = mountComponentWithStore(Component, { store, props });
     });
@@ -62,7 +63,10 @@ describe('Security Dashboard Table', () => {
 
   describe('with no vulnerabilties', () => {
     beforeEach(() => {
-      store.commit(`vulnerabilities/${RECEIVE_VULNERABILITIES_SUCCESS}`, { vulnerabilities: [] });
+      store.commit(`vulnerabilities/${RECEIVE_VULNERABILITIES_SUCCESS}`, {
+        vulnerabilities: [],
+        pageInfo: {},
+      });
       vm = mountComponentWithStore(Component, { store, props });
     });
 

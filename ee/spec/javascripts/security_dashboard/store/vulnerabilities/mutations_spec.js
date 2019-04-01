@@ -16,6 +16,17 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('SET_VULNERABILITIES_PAGE', () => {
+    const page = 3;
+    it(`should set pageInfo.page to ${page}`, () => {
+      const state = createState();
+
+      mutations[types.SET_VULNERABILITIES_PAGE](state, page);
+
+      expect(state.pageInfo.page).toEqual(page);
+    });
+  });
+
   describe('REQUEST_VULNERABILITIES', () => {
     let state;
 
