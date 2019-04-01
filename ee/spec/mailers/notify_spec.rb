@@ -278,8 +278,8 @@ describe Notify do
   end
 
   describe 'merge request reviews' do
-    let(:review) { create(:review, project: project, merge_request: merge_request) }
-    let(:notes) { create_list(:notes, 3, review: review, project: project, author: review.author, noteable: merge_request) }
+    let!(:review) { create(:review, project: project, merge_request: merge_request) }
+    let!(:notes) { create_list(:note, 3, review: review, project: project, author: review.author, noteable: merge_request) }
 
     subject { described_class.new_review_email(recipient.id, review.id) }
 
@@ -302,6 +302,19 @@ describe Notify do
     it 'contains the message from the notes of the review' do
       review.notes.each do |note|
         is_expected.to have_body_text note.note
+      end
+    end
+
+    context 'when diff note' do
+      let!(:notes) { create_list(:diff_note_on_merge_request, 3, review: review, project: project, author: review.author, noteable: merge_request) }
+
+      it 'links to notes' do
+        review.notes.each do |note|
+          # Text part
+          expect(subject.text_part.body.raw_source).to include(
+            project_merge_request_url(project, merge_request, anchor: "note_#{note.id}")
+          )
+        end
       end
     end
 
