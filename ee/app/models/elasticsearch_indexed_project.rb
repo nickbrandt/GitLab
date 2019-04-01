@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ElasticsearchIndexedProject < ActiveRecord::Base
+class ElasticsearchIndexedProject < ApplicationRecord
   include EachBatch
 
   self.primary_key = 'project_id'
