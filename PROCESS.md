@@ -19,11 +19,14 @@ The final merge must be performed by a maintainer.
 New versions of Workhorse can be released by one of the Workhorse
 maintainers. The release process is:
 
-- create a merge request to update CHANGELOG and VERSION on the
-  respective release branch (usually `master`)
-- make sure the new version number adheres to our [versioning standard](#versioning)
-- merge the merge request
-- run `make release` on the release branch
+-   pick a release branch. For x.y.0, use `master`. For all other
+    versions (x.y.1, x.y.2 etc.) , use `x-y-stable`. Also see [below](#versioning)
+-   create a merge request to update CHANGELOG and VERSION on the
+    release branch
+-   merge the merge request
+-   run `make tag` or `make signed_tag` on the release branch. This will
+    make a tag matching the VERSION file.
+-   push the tag to gitlab.com
 
 ## Versioning
 
