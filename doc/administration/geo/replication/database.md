@@ -8,8 +8,8 @@ from source, follow the
 NOTE: **Note:**
 If your GitLab installation uses external (not managed by Omnibus) PostgreSQL
 instances, the Omnibus roles will not be able to perform all necessary
-configuration steps. In this case, refer to
-[additional instructions](external_database.md).
+configuration steps. In this case,
+[follow the Geo with external PostgreSQL instances document instead](external_database.md).
 
 NOTE: **Note:**
 The stages of the setup process must be completed in the documented order.
@@ -333,7 +333,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
     ##
     ## Secondary address
-    ## - replace '198.51.100.2' with the public or VPC address of your Geo secondary node 
+    ## - replace '198.51.100.2' with the public or VPC address of your Geo secondary node
     ##
     postgresql['listen_address'] = '198.51.100.2'
     postgresql['md5_auth_cidr_addresses'] = ['198.51.100.2/32']

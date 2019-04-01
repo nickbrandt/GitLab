@@ -1,0 +1,5 @@
+---
+title: Documented Guide to using Geo in HA with RDS cross-region replicas
+merge_request: 9985
+author:
+type: changed

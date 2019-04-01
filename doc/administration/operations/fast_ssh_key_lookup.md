@@ -79,7 +79,7 @@ file will still be scanned. So git SSH performance will still be slow for many
 users as long as a large file exists.
 
 You can disable any more writes to the `authorized_keys` file by unchecking
-`Write to "authorized_keys" file` in the Application Settings of your GitLab
+`Write to "authorized_keys" file` in the **Admin Area > Settings > Network > Performance optimization** of your GitLab
 installation.
 
 ![Write to authorized keys setting](img/write_to_authorized_keys_setting.png)
