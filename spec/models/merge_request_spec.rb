@@ -476,6 +476,7 @@ describe MergeRequest do
       it 'does not cache issues from external trackers' do
         issue  = ExternalIssue.new('JIRA-123', subject.project)
         commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
+
         allow(subject).to receive(:commits).and_return([commit])
 
         expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to raise_error
