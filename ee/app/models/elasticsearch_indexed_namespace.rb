@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ElasticsearchIndexedNamespace < ActiveRecord::Base
+class ElasticsearchIndexedNamespace < ApplicationRecord
   include EachBatch
 
   self.primary_key = 'namespace_id'
