@@ -13,7 +13,7 @@ describe DesignManagement::DesignPolicy do
   let(:issue) { create(:issue, project: project) }
   let(:design) { create(:design, issue: issue) }
 
-  subject { described_class.new(current_user, design) }
+  subject(:design_policy) { described_class.new(current_user, design) }
 
   shared_examples_for "design abilities not available" do
     context "for owners" do
@@ -147,6 +147,19 @@ describe DesignManagement::DesignPolicy do
         let(:current_user) { nil }
 
         it { is_expected.to be_disallowed(*design_abilities) }
+      end
+    end
+
+    context "when the project is archived" do
+      let(:current_user) { owner }
+
+      before do
+        project.update!(archived: true)
+      end
+
+      it "only allows reading designs" do
+        expect(design_policy).to be_allowed(:read_design)
+        expect(design_policy).to be_disallowed(:create_design, :destroy_design)
       end
     end
   end

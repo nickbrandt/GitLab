@@ -11,6 +11,7 @@ module EE
       vulnerability_feedback
       license_management
       feature_flag
+      design
     ].freeze
 
     prepended do
