@@ -325,6 +325,27 @@ describe('vulnerabilities actions', () => {
       );
     });
   });
+
+  describe('setVulnerabilitiesPage', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const page = 3;
+
+      testAction(
+        actions.setVulnerabilitiesPage,
+        page,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_PAGE,
+            payload: page,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
 });
 
 describe('openModal', () => {

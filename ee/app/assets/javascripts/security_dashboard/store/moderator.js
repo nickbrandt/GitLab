@@ -1,19 +1,8 @@
-import * as vulnerabilitiesMutationTypes from './modules/vulnerabilities/mutation_types';
 import * as filtersMutationTypes from './modules/filters/mutation_types';
 import * as projectsMutationTypes from './modules/projects/mutation_types';
 import { BASE_FILTERS } from './modules/filters/constants';
 
 export default function configureModerator(store) {
-  store.$router.beforeEach((to, from, next) => {
-    const updatedFromState = (to.params && to.params.updatedFromState) || false;
-
-    if (to.name === 'dashboard' && !updatedFromState) {
-      store.dispatch(`filters/setAllFilters`, to.query);
-    }
-
-    next();
-  });
-
   store.subscribe(({ type, payload }) => {
     switch (type) {
       case `projects/${projectsMutationTypes.RECEIVE_PROJECTS_SUCCESS}`:
@@ -34,15 +23,6 @@ export default function configureModerator(store) {
         store.dispatch('vulnerabilities/fetchVulnerabilities', activeFilters);
         store.dispatch('vulnerabilities/fetchVulnerabilitiesCount', activeFilters);
         store.dispatch('vulnerabilities/fetchVulnerabilitiesHistory', activeFilters);
-        break;
-      }
-      case `vulnerabilities/${vulnerabilitiesMutationTypes.RECEIVE_VULNERABILITIES_SUCCESS}`: {
-        const activeFilters = store.getters['filters/activeFilters'];
-        store.$router.push({
-          name: 'dashboard',
-          query: activeFilters,
-          params: { updatedFromState: true },
-        });
         break;
       }
       default:

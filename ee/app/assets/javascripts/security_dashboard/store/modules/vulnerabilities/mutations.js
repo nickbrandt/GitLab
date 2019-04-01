@@ -24,6 +24,9 @@ export default {
   [types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, payload) {
     state.vulnerabilitiesCountEndpoint = payload;
   },
+  [types.SET_VULNERABILITIES_PAGE](state, payload) {
+    state.pageInfo = { ...state.pageInfo, page: payload };
+  },
   [types.REQUEST_VULNERABILITIES_COUNT](state) {
     state.isLoadingVulnerabilitiesCount = true;
     state.errorLoadingVulnerabilitiesCount = false;

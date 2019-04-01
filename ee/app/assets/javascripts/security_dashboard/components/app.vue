@@ -47,7 +47,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('vulnerabilities', ['modal']),
+    ...mapState('vulnerabilities', ['modal', 'pageInfo']),
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
     canCreateIssuePermission() {
@@ -67,7 +67,7 @@ export default {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
-    this.fetchVulnerabilities(this.activeFilters);
+    this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
     this.fetchProjects();

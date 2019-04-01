@@ -45,6 +45,10 @@ export const receiveVulnerabilitiesCountError = ({ commit }) => {
   commit(types.RECEIVE_VULNERABILITIES_COUNT_ERROR);
 };
 
+export const setVulnerabilitiesPage = ({ commit }, page) => {
+  commit(types.SET_VULNERABILITIES_PAGE, page);
+};
+
 export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
   if (!state.vulnerabilitiesEndpoint) {
     return;
