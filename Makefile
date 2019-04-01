@@ -88,10 +88,15 @@ clean-workhorse:
 	$(call message,$@)
 	rm -f $(EXE_ALL)
 
-.PHONY:	release
-release:
+.PHONY:	tag
+tag:
 	$(call message,$@)
-	sh _support/release.sh
+	sh _support/tag.sh
+
+.PHONY:	signed_tag
+signed_tag:
+	$(call message,$@)
+	TAG_OPTS=-s sh _support/tag.sh
 
 .PHONY:	clean-build
 clean-build:
