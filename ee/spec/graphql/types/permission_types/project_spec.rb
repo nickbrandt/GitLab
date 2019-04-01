@@ -1,10 +1,9 @@
 require 'spec_helper'
 
-describe Types::PermissionTypes::Issue do
-  it do
+describe Types::PermissionTypes::Project do
+  it "exposes design permissions" do
     expected_permissions = [
-      :read_issue, :admin_issue, :update_issue,
-      :create_note, :reopen_issue
+      :read_design, :create_design, :destroy_design
     ]
 
     expected_permissions.each do |permission|

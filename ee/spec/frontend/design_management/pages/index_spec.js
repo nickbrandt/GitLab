@@ -3,13 +3,17 @@ import Index from 'ee/design_management/pages/index.vue';
 import uploadDesignQuery from 'ee/design_management/queries/uploadDesign.graphql';
 
 describe('Design management index page', () => {
-  const mutate = jest.fn(() => Promise.resolve());
+  let mutate;
   let vm;
 
   function createComponent(loading = false) {
+    mutate = jest.fn(() => Promise.resolve());
     const $apollo = {
       queries: {
         designs: {
+          loading,
+        },
+        permissions: {
           loading,
         },
       },
@@ -19,6 +23,12 @@ describe('Design management index page', () => {
     vm = shallowMount(Index, {
       mocks: { $apollo },
       stubs: ['router-view'],
+    });
+
+    vm.setData({
+      permissions: {
+        createDesign: true,
+      },
     });
   }
 
@@ -84,6 +94,20 @@ describe('Design management index page', () => {
             },
           });
         });
+    });
+
+    it('does not call apollo mutate if createDesign is false', () => {
+      createComponent();
+
+      vm.setData({
+        permissions: {
+          createDesign: false,
+        },
+      });
+
+      vm.vm.onUploadDesign([]);
+
+      expect(mutate).not.toHaveBeenCalled();
     });
 
     it('sets isSaving', () => {

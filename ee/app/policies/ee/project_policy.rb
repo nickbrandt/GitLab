@@ -11,6 +11,7 @@ module EE
       vulnerability_feedback
       license_management
       feature_flag
+      design
     ].freeze
 
     prepended do
@@ -75,7 +76,16 @@ module EE
         !@subject.feature_available?(:feature_flags)
       end
 
+      with_scope :subject
+      condition(:design_management_disabled) do
+        !@subject.design_management_enabled?
+      end
+
       rule { admin }.enable :change_repository_storage
+
+      rule { can?(:public_access) }.policy do
+        enable :read_design
+      end
 
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
@@ -114,6 +124,8 @@ module EE
         enable :update_feature_flag
         enable :destroy_feature_flag
         enable :admin_feature_flag
+        enable :create_design
+        enable :destroy_design
       end
 
       rule { can?(:public_access) }.enable :read_package
@@ -209,6 +221,14 @@ module EE
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
+
+      # Design abilities could also be prevented in the issue policy.
+      # If the user cannot read the issue, then they cannot see the designs.
+      rule { design_management_disabled }.policy do
+        prevent :read_design
+        prevent :create_design
+        prevent :destroy_design
+      end
     end
   end
 end

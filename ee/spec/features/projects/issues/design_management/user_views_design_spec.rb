@@ -5,6 +5,8 @@ describe 'User views issue designs', :js do
   let(:issue) { create(:issue, project: project) }
 
   before do
+    stub_licensed_features(design_management: true)
+
     visit project_issue_path(project, issue)
 
     click_link 'Designs'

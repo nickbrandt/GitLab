@@ -6,6 +6,8 @@ import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import allDesignsQuery from '../queries/allDesigns.graphql';
 import uploadDesignQuery from '../queries/uploadDesign.graphql';
+import appDataQuery from '../queries/appData.graphql';
+import permissionsQuery from '../queries/permissions.graphql';
 
 export default {
   components: {
@@ -14,27 +16,53 @@ export default {
     UploadForm,
   },
   apollo: {
+    appData: {
+      query: appDataQuery,
+      manual: true,
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
+        this.issueIid = issueIid;
+      },
+    },
     designs: {
       query: allDesignsQuery,
       error() {
         this.error = true;
       },
     },
+    permissions: {
+      query: permissionsQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+          iid: this.issueIid,
+        };
+      },
+      update: data => data.project.issue.userPermissions,
+    },
   },
   data() {
     return {
       designs: [],
+      permissions: {},
       error: false,
       isSaving: false,
+      projectPath: '',
+      issueIid: null,
     };
   },
   computed: {
     isLoading() {
-      return this.$apollo.queries.designs.loading;
+      return this.$apollo.queries.designs.loading && this.$apollo.queries.permissions.loading;
+    },
+    canCreateDesign() {
+      return this.permissions.createDesign;
     },
   },
   methods: {
     onUploadDesign(files) {
+      if (!this.canCreateDesign) return null;
+
       const optimisticResponse = [...files].map(file => ({
         __typename: 'Design',
         id: -1,
@@ -80,7 +108,12 @@ export default {
 
 <template>
   <div>
-    <upload-form :is-saving="isSaving" @upload="onUploadDesign" />
+    <upload-form
+      v-if="canCreateDesign"
+      :can-upload-design="canCreateDesign"
+      :is-saving="isSaving"
+      @upload="onUploadDesign"
+    />
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" size="md" />
       <div v-else-if="error" class="alert alert-danger">

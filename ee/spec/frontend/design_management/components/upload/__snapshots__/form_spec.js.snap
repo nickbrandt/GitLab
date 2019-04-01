@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Design management upload form component hides button if cant upload 1`] = `
+<header
+  class="row-content-block border-top-0 p-2 d-flex"
+>
+  <div>
+    <!---->
+     
+    <input
+      accept="image/*"
+      class="hide"
+      multiple="multiple"
+      name="design_file"
+      type="file"
+    />
+  </div>
+</header>
+`;
+
 exports[`Design management upload form component renders loading icon 1`] = `
 <header
   class="row-content-block border-top-0 p-2 d-flex"

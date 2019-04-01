@@ -4,10 +4,11 @@ import UploadForm from 'ee/design_management/components/upload/form.vue';
 describe('Design management upload form component', () => {
   let vm;
 
-  function createComponent(isSaving = false) {
+  function createComponent(isSaving = false, canUploadDesign = true) {
     vm = shallowMount(UploadForm, {
       propsData: {
         isSaving,
+        canUploadDesign,
       },
     });
   }
@@ -20,6 +21,12 @@ describe('Design management upload form component', () => {
 
   it('renders loading icon', () => {
     createComponent(true);
+
+    expect(vm.element).toMatchSnapshot();
+  });
+
+  it('hides button if cant upload', () => {
+    createComponent(false, false);
 
     expect(vm.element).toMatchSnapshot();
   });

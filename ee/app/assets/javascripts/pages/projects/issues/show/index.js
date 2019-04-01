@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSidebarBundle();
   initRelatedIssues();
 
-  if (gon.features.versionedDesigns) {
+  if (document.getElementById('js-design-management')) {
     import(/* webpackChunkName: 'design_management' */ 'ee/design_management')
       .then(module => module.default())
       .catch(() => {});

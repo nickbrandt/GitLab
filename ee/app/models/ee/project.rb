@@ -575,6 +575,13 @@ module EE
       super.presence || build_feature_usage
     end
 
+    def design_management_enabled?
+      # Checking both feature availability on the license, as well as the feature
+      # flag, because we don't want to enable design_management by default on
+      # on prem installs yet.
+      feature_available?(:design_management) && ::Feature.enabled?(:design_management, self)
+    end
+
     private
 
     def set_override_pull_mirror_available

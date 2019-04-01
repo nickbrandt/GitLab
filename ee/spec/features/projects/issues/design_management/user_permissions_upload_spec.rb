@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'User views issue designs', :js do
+describe 'User design permissions', :js do
   let(:project) { create(:project_empty_repo, :public) }
   let(:issue) { create(:issue, project: project) }
 
@@ -14,7 +14,7 @@ describe 'User views issue designs', :js do
     wait_for_requests
   end
 
-  it 'fetches list of designs' do
-    expect(page).to have_selector('.js-design-list-item', count: 5)
+  it 'user does not have permissions to upload design' do
+    expect(page).not_to have_field('design_file')
   end
 end

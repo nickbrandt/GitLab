@@ -1,0 +1,9 @@
+query permissions($fullPath: ID!, $iid: ID!) {
+  project(fullPath: $fullPath) {
+    issue(iid: $iid) {
+      userPermissions {
+        createDesign
+      }
+    }
+  }
+}

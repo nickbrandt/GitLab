@@ -1,4 +1,4 @@
-- if Feature.enabled?(:versioned_designs)
+- if can?(current_user, :read_design, @issue)
   %ul.nav-tabs.nav.nav-links{ role: 'tablist' }
     %li
       = link_to '#discussion-tab', class: 'active js-issue-tabs', id: 'discussion', role: 'tab', 'aria-controls': 'js-discussion', 'aria-selected': 'true', data: { toggle: 'tab', target: '#discussion-tab' } do
@@ -12,6 +12,6 @@
     #discussion-tab.tab-pane.show.active{ role: 'tabpanel', 'aria-labelledby': 'discussion' }
       = render_ce 'projects/issues/discussion'
     #designs-tab.tab-pane{ role: 'tabpanel', 'aria-labelledby': 'designs' }
-      #js-design-management
+      #js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid } }
 - else
   = render_ce 'projects/issues/discussion'
