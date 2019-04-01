@@ -24,7 +24,11 @@ describe('Design management router', () => {
       router,
       mocks: {
         $apollo: {
-          queries: { designs: { loading: true }, design: { loading: true } },
+          queries: {
+            designs: { loading: true },
+            design: { loading: true },
+            permissions: { loading: true },
+          },
         },
       },
     });
