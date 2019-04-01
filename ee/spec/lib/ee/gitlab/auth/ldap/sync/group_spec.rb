@@ -117,6 +117,28 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
     include_examples :group_state_machine
   end
 
+  describe '.fail_stuck_group' do
+    let(:ldap_group1) { ldap_group_entry(user_dn(user.username)) }
+
+    it 'handles nil ldap_sync_last_sync_at' do
+      group = create(:group_with_ldap_group_link,
+                     cn: 'ldap_group1',
+                     group_access: ::Gitlab::Access::DEVELOPER,
+                     ldap_sync_status: 'started',
+                     ldap_sync_last_sync_at: nil,
+                     visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+      create(:project, group: group, visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+      group.update_columns(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+
+      expect(group).not_to be_valid
+
+      described_class.fail_stuck_group(group)
+
+      expect(group.ldap_sync_status).to eq('failed')
+      expect(group.ldap_sync_error).to eq('The sync failed because the group is an inconsistent state: Visibility level private is not allowed since this group contains projects with higher visibility.')
+    end
+  end
+
   describe '.ldap_sync_ready?' do
     let(:ldap_group1) { nil }
 

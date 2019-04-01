@@ -66,9 +66,23 @@ module EE
               def fail_stuck_group(group)
                 return unless group.ldap_sync_started?
 
-                if group.ldap_sync_last_sync_at < 1.hour.ago
+                if group.ldap_sync_last_sync_at.nil?
+                  fail_due_to_no_sync_time(group)
+                elsif group.ldap_sync_last_sync_at < 1.hour.ago
                   group.mark_ldap_sync_as_failed('The sync took too long to complete.')
                 end
+              end
+
+              def fail_due_to_no_sync_time(group)
+                # If the group sync is in the started state but no sync
+                # time was available, then something may be invalid with
+                # this group. Do some validation and bubble up the error.
+                details = group.errors.full_messages.join(', ') unless group.valid?
+
+                message = +'The sync failed because the group is an inconsistent state'
+                message += ": #{details}" if details
+
+                group.mark_ldap_sync_as_failed(message, skip_validation: true)
               end
             end
 
