@@ -17,10 +17,17 @@ module Epics
 
       super
 
+      track_event
       new_entity
     end
 
     private
+
+    def track_event
+      ::Gitlab::SnowplowTracker.track_event(
+        'epics', 'promote', property: 'issue_id', value: original_entity.id
+      )
+    end
 
     def create_new_entity
       @new_entity = Epics::CreateService.new(@group, current_user, params).execute

@@ -8,9 +8,7 @@ module Gitlab
 
     class << self
       def track_event(category, action, label: nil, property: nil, value: nil, context: nil)
-        return unless enabled?
-
-        tracker.track_struct_event(category, action, label, property, value, context, Time.now.to_i)
+        tracker&.track_struct_event(category, action, label, property, value, context, Time.now.to_i)
       end
 
       private

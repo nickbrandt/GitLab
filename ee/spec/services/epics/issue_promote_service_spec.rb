@@ -56,6 +56,8 @@ describe Epics::IssuePromoteService do
 
         context 'when issue is promoted' do
           before do
+            allow(Gitlab::SnowplowTracker).to receive(:track_event).with('epics', 'promote', an_instance_of(Hash))
+
             subject.execute(issue)
           end
 
