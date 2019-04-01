@@ -82,7 +82,7 @@ describe 'SAML provider settings' do
       it 'allows provider to be disabled', :js do
         visit group_saml_providers_path(group)
 
-        find('.js-group-saml-enable-toggle-area button').click
+        find('.js-group-saml-enabled-toggle-area button').click
 
         expect { submit }.to change { saml_provider.reload.enabled }.to false
       end
@@ -96,15 +96,14 @@ describe 'SAML provider settings' do
         expect(login_url).to end_with "?token=#{group.reload.saml_discovery_token}"
       end
 
-      context 'enforced sso enabled' do
+      context 'enforced sso enabled', :js do
         it 'updates the flag' do
           stub_feature_flags(enforced_sso: true)
 
           visit group_saml_providers_path(group)
 
-          find('input#saml_provider_enforced_sso').click
+          find('.js-group-saml-enforced-sso-toggle').click
 
-          expect(page).to have_selector('#saml_provider_enforced_sso')
           expect { submit }.to change { saml_provider.reload.enforced_sso }.to(true)
         end
       end
@@ -115,23 +114,20 @@ describe 'SAML provider settings' do
 
           visit group_saml_providers_path(group)
 
-          expect(page).not_to have_selector('#saml_provider_enforced_sso')
+          expect(page).not_to have_selector('.js-group-saml-enforced-sso-toggle')
         end
       end
 
-      context 'enforced_group_managed_accounts enabled' do
+      context 'enforced_group_managed_accounts enabled', :js do
         it 'updates the flag' do
           stub_feature_flags(group_managed_accounts: true)
 
           visit group_saml_providers_path(group)
 
-          find('input#saml_provider_enforced_group_managed_accounts').click
+          find('.js-group-saml-enforced-sso-toggle').click
+          find('.js-group-saml-enforced-group-managed-accounts-toggle').click
 
-          expect(page).to have_selector('#saml_provider_enforced_group_managed_accounts')
-          expect do
-            submit
-            saml_provider.reload
-          end.to change { saml_provider.enforced_group_managed_accounts }.to(true)
+          expect { submit }.to change { saml_provider.reload.enforced_group_managed_accounts }.to(true)
         end
       end
 
@@ -141,7 +137,7 @@ describe 'SAML provider settings' do
 
           visit group_saml_providers_path(group)
 
-          expect(page).not_to have_selector('#saml_provider_enforced_group_managed_accounts')
+          expect(page).not_to have_selector('.js-group-saml-enforced-group-managed-accounts-toggle')
         end
       end
     end
