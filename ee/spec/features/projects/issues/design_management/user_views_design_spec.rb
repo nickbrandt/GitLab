@@ -19,5 +19,7 @@ describe 'User views issue designs', :js do
       expect(page).to have_content('test.jpg')
       expect(page).to have_content('Test Name')
     end
+
+    expect(page).to have_selector('.js-design-image')
   end
 end

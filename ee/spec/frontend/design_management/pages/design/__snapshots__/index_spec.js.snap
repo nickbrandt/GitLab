@@ -1,8 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Design management design index page renders design index 1`] = `
+<div
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column"
+>
+  <toolbar-stub
+    name="test.jpg"
+    updatedat=""
+    updatedby="[object Object]"
+  />
+   
+  <designimage-stub
+    image="test.jpg"
+    name="test.jpg"
+  />
+</div>
+`;
+
 exports[`Design management design index page sets loading state 1`] = `
 <div
-  class="design-detail fixed-top w-100 h-100"
+  class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column"
 >
   <toolbar-stub
     isloading="true"
@@ -10,17 +27,11 @@ exports[`Design management design index page sets loading state 1`] = `
     updatedat=""
     updatedby="[object Object]"
   />
-</div>
-`;
-
-exports[`Design management design index page sets loading state 2`] = `
-<div
-  class="design-detail fixed-top w-100 h-100"
->
-  <toolbar-stub
-    name="test.jpg"
-    updatedat="01-01-2019"
-    updatedby="[object Object]"
+   
+  <designimage-stub
+    image=""
+    isloading="true"
+    name=""
   />
 </div>
 `;

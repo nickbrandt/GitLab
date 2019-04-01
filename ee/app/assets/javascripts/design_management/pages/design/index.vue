@@ -1,9 +1,11 @@
 <script>
 import Toolbar from '../../components/toolbar/index.vue';
+import DesignImage from '../../components/image.vue';
 import getDesignQuery from '../../queries/getDesign.graphql';
 
 export default {
   components: {
+    DesignImage,
     Toolbar,
   },
   props: {
@@ -36,12 +38,13 @@ export default {
 </script>
 
 <template>
-  <div class="design-detail fixed-top w-100 h-100">
+  <div class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column">
     <toolbar
       :is-loading="isLoading"
       :name="design.name"
       :updated-at="design.updatedAt"
       :updated-by="design.updatedBy"
     />
+    <design-image :is-loading="isLoading" :image="design.image" :name="design.name" />
   </div>
 </template>
