@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Environment do
@@ -93,6 +95,47 @@ describe Environment do
 
         it { is_expected.to be_truthy }
       end
+    end
+  end
+
+  describe '#rollout_status' do
+    shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
+      subject { environment.rollout_status }
+
+      context 'when the environment has rollout status' do
+        before do
+          allow(environment).to receive(:has_terminals?).and_return(true)
+        end
+
+        it 'returns the rollout status from the deployment service' do
+          expect(environment.deployment_platform)
+            .to receive(:rollout_status).with(environment)
+            .and_return(:fake_rollout_status)
+
+          is_expected.to eq(:fake_rollout_status)
+        end
+      end
+
+      context 'when the environment does not have rollout status' do
+        before do
+          allow(environment).to receive(:has_terminals?).and_return(false)
+        end
+
+        it { is_expected.to eq(nil) }
+      end
+    end
+
+    context 'when user configured kubernetes from Integration > Kubernetes' do
+      let(:project) { create(:kubernetes_project) }
+
+      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+    end
+
+    context 'when user configured kubernetes from CI/CD > Clusters' do
+      let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+      let(:project) { cluster.project }
+
+      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
     end
   end
 end
