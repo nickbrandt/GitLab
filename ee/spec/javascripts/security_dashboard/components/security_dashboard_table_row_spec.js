@@ -52,15 +52,15 @@ describe('Security Dashboard Table Row', () => {
     });
 
     it('should render the severity', () => {
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[0].textContent).toContain(
-        props.vulnerability.severity,
-      );
+      expect(
+        vm.$el.querySelectorAll('.table-mobile-content')[0].textContent.toLowerCase(),
+      ).toContain(props.vulnerability.severity);
     });
 
     it('should render the confidence', () => {
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
-        props.vulnerability.confidence,
-      );
+      expect(
+        vm.$el.querySelectorAll('.table-mobile-content')[2].textContent.toLowerCase(),
+      ).toContain(props.vulnerability.confidence);
     });
 
     describe('the project name', () => {
