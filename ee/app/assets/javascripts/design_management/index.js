@@ -6,6 +6,7 @@ import apolloProvider from './graphql';
 
 export default () => {
   const el = document.getElementById('js-design-management');
+  const { issueIid, projectPath } = el.dataset;
 
   $('.js-issue-tabs').on('shown.bs.tab', ({ target: { id } }) => {
     if (id === 'designs' && router.currentRoute.name === 'root') {
@@ -17,8 +18,8 @@ export default () => {
 
   apolloProvider.clients.defaultClient.cache.writeData({
     data: {
-      projectFullPath: el.dataset.projectPath,
-      issueIid: el.dataset.issueIid,
+      projectPath,
+      issueIid,
     },
   });
 

@@ -1,4 +1,4 @@
 query projectFullPath {
-  projectFullPath @client
+  projectPath @client
   issueIid @client
 }

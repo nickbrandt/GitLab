@@ -19,8 +19,8 @@ export default {
     appData: {
       query: appDataQuery,
       manual: true,
-      result({ data: { projectFullPath, issueIid } }) {
-        this.projectFullPath = projectFullPath;
+      result({ data: { projectPath, issueIid } }) {
+        this.projectPath = projectPath;
         this.issueIid = issueIid;
       },
     },
@@ -34,7 +34,7 @@ export default {
       query: permissionsQuery,
       variables() {
         return {
-          fullPath: this.projectFullPath,
+          fullPath: this.projectPath,
           iid: this.issueIid,
         };
       },
@@ -47,7 +47,7 @@ export default {
       permissions: {},
       error: false,
       isSaving: false,
-      projectFullPath: '',
+      projectPath: '',
       issueIid: null,
     };
   },
