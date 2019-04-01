@@ -2,7 +2,7 @@
 
 # Finder for retrieving project registries that need a repository or
 # wiki verification where projects belong to the specific shard
-# using cross-database joins for selective sync.
+# using cross-database joins.
 #
 # Basic usage:
 #
@@ -18,11 +18,18 @@ module Geo
     end
 
     def execute
-      if use_legacy_queries?
-        registries_pending_verification_for_selective_sync
-      else
-        registries_pending_verification
-      end
+      registries = find_registries_pending_verification_on_secondary
+      return Geo::ProjectRegistry.none if registries.empty?
+
+      registries_to_verify = filter_registries_verified_in_primary(registries)
+      return registries_to_verify unless selective_sync?
+
+      legacy_inner_join_registry_ids(
+        registries_to_verify,
+        current_node.projects.pluck_primary_key,
+        Geo::ProjectRegistry,
+        foreign_key: :project_id
+      )
     end
 
     private
@@ -30,55 +37,58 @@ module Geo
     attr_reader :batch_size, :shard_name
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def registries_pending_verification
-      Geo::ProjectRegistry.all
-        .merge(Geo::Fdw::ProjectRegistry.registries_pending_verification)
-        .merge(Geo::Fdw::ProjectRegistry.within_shards(shard_name))
+    def find_registries_pending_verification_on_secondary
+      Geo::ProjectRegistry
+        .where(Geo::ProjectRegistry.registries_pending_verification)
+        .pluck(
+          :project_id,
+          Geo::ProjectRegistry.repositories_pending_verification.to_sql,
+          Geo::ProjectRegistry.wikis_pending_verification.to_sql
+        )
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
+
+    def filter_registries_verified_in_primary(registries)
+      filtered_project_ids = filter_projects_verified_on_primary(registries)
+      Geo::ProjectRegistry.project_id_in(filtered_project_ids)
+    end
+
+    # rubocop:disable CodeReuse/ActiveRecord
+    def filter_projects_verified_on_primary(registries)
+      inner_join_project_repository_state(registries)
+        .joins(:project)
+        .merge(Project.within_shards(shard_name))
+        .where(
+          legacy_repository_state_table[:repository_verification_checksum].not_eq(nil)
+            .and(project_registry_verify_table[:want_to_verify_repo].eq(true))
+          .or(legacy_repository_state_table[:wiki_verification_checksum].not_eq(nil)
+            .and(project_registry_verify_table[:want_to_verify_wiki].eq(true))))
         .limit(batch_size)
+        .pluck_project_key
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def registries_pending_verification_for_selective_sync
-      registries = Geo::ProjectRegistry
-        .where(Geo::ProjectRegistry.registries_pending_verification)
-        .pluck(:project_id, Geo::ProjectRegistry.repositories_pending_verification.to_sql, Geo::ProjectRegistry.wikis_pending_verification.to_sql)
-
-      return Geo::ProjectRegistry.none if registries.empty?
-
-      id_and_want_to_sync = registries.map do |project_id, want_to_sync_repo, want_to_sync_wiki|
-        "(#{project_id}, #{quote_value(want_to_sync_repo)}, #{quote_value(want_to_sync_wiki)})"
+    def inner_join_project_repository_state(registries)
+      id_and_want_to_verify = registries.map do |project_id, want_to_verify_repo, want_to_verify_wiki|
+        "(#{project_id}, #{quote_value(want_to_verify_repo)}, #{quote_value(want_to_verify_wiki)})"
       end
 
-      legacy_repository_state_table = ::ProjectRepositoryState.arel_table
-      project_registry_sync_table = Arel::Table.new(:project_registry_sync_table)
-
-      joined_relation =
-        ProjectRepositoryState.joins(<<~SQL_REPO)
-          INNER JOIN
-          (VALUES #{id_and_want_to_sync.join(',')})
-          project_registry_sync_table(project_id, want_to_sync_repo, want_to_sync_wiki)
-          ON #{legacy_repository_state_table.name}.project_id = project_registry_sync_table.project_id
-        SQL_REPO
-
-      project_ids = joined_relation
-        .joins(:project)
-        .where(projects: { repository_storage: shard_name })
-        .where(
-          legacy_repository_state_table[:repository_verification_checksum].not_eq(nil)
-            .and(project_registry_sync_table[:want_to_sync_repo].eq(true))
-          .or(legacy_repository_state_table[:wiki_verification_checksum].not_eq(nil)
-            .and(project_registry_sync_table[:want_to_sync_wiki].eq(true))))
-        .limit(batch_size)
-        .pluck_project_key
-
-      legacy_inner_join_registry_ids(
-        Geo::ProjectRegistry.project_id_in(project_ids),
-        current_node.projects.pluck_primary_key,
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
-      )
+      ProjectRepositoryState.joins(<<~SQL_REPO)
+        INNER JOIN
+        (VALUES #{id_and_want_to_verify.join(',')})
+        #{project_registry_verify_table.name}(project_id, want_to_verify_repo, want_to_verify_wiki)
+        ON #{legacy_repository_state_table.name}.project_id = #{project_registry_verify_table.name}.project_id
+      SQL_REPO
     end
     # rubocop:enable CodeReuse/ActiveRecord
+
+    def legacy_repository_state_table
+      @legacy_repository_state_table ||= ProjectRepositoryState.arel_table
+    end
+
+    def project_registry_verify_table
+      @project_registry_verify_table ||= Arel::Table.new(:project_registry_verify_table)
+    end
   end
 end

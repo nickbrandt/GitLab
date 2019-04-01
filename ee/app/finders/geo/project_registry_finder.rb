@@ -67,7 +67,9 @@ module Geo
     end
 
     def find_registries_to_verify(shard_name:, batch_size:)
-      registries_pending_verification(shard_name, batch_size)
+      finder_klass_for_registries_pending_verification
+        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
+        .execute
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -161,6 +163,10 @@ module Geo
 
     private
 
+    def use_legacy_queries_for_selective_sync?
+      selective_sync? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
+    end
+
     def finder_klass_for_synced_registries
       if Gitlab::Geo::Fdw.enabled_for_selective_sync?
         Geo::ProjectRegistrySyncedFinder
@@ -246,17 +252,11 @@ module Geo
     end
 
     def finder_klass_for_registries_pending_verification
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryPendingVerificationFinder
-      else
+      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryPendingVerificationFinder
+      else
+        Geo::ProjectRegistryPendingVerificationFinder
       end
-    end
-
-    def registries_pending_verification(shard_name, batch_size)
-      finder_klass_for_registries_pending_verification
-        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
-        .execute
     end
   end
 end

@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Geo::ProjectRegistryFinder, :geo do
+  using RSpec::Parameterized::TableSyntax
+
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly
@@ -466,16 +468,6 @@ describe Geo::ProjectRegistryFinder, :geo do
 
       include_examples 'counts all the things', 'fdw'
       include_examples 'finds all the things', 'fdw'
-
-      describe '#find_registries_to_verify' do
-        it 'delegates to Geo::LegacyProjectRegistryPendingVerificationFinder' do
-          expect_next_instance_of(Geo::LegacyProjectRegistryPendingVerificationFinder, current_node: secondary, shard_name: 'default', batch_size: 100) do |finder|
-            expect(finder).to receive(:execute).once
-          end
-
-          subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)
-        end
-      end
     end
 
     context 'with use_fdw_queries_for_selective_sync enabled' do
@@ -485,16 +477,6 @@ describe Geo::ProjectRegistryFinder, :geo do
 
       include_examples 'counts all the things', 'fdw'
       include_examples 'finds all the things', 'fdw'
-
-      describe '#find_registries_to_verify' do
-        it 'delegates to Geo::ProjectRegistryPendingVerificationFinder' do
-          expect_next_instance_of(Geo::ProjectRegistryPendingVerificationFinder, current_node: secondary, shard_name: 'default', batch_size: 100) do |finder|
-            expect(finder).to receive(:execute).once
-          end
-
-          subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)
-        end
-      end
     end
   end
 
@@ -505,10 +487,29 @@ describe Geo::ProjectRegistryFinder, :geo do
 
     include_examples 'counts all the things', 'legacy'
     include_examples 'finds all the things', 'legacy'
+  end
 
-    describe '#find_registries_to_verify' do
-      it 'delegates to Geo::LegacyProjectRegistryPendingVerificationFinder' do
-        expect_next_instance_of(Geo::LegacyProjectRegistryPendingVerificationFinder, current_node: secondary, shard_name: 'default', batch_size: 100) do |finder|
+  describe '#find_registries_to_verify', :delete do
+    where(:selective_sync, :fdw_enabled, :use_fdw_queries_for_selective_sync, :finder) do
+      false | false | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+      false | false | true  | Geo::LegacyProjectRegistryPendingVerificationFinder
+      false | true  | true  | Geo::ProjectRegistryPendingVerificationFinder
+      false | true  | false | Geo::ProjectRegistryPendingVerificationFinder
+      true  | false | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+      true  | false | true  | Geo::LegacyProjectRegistryPendingVerificationFinder
+      true  | true  | true  | Geo::ProjectRegistryPendingVerificationFinder
+      true  | true  | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+    end
+
+    with_them do
+      before do
+        stub_fdw(fdw_enabled)
+        stub_feature_flags(use_fdw_queries_for_selective_sync: use_fdw_queries_for_selective_sync)
+        stub_selective_sync(secondary, selective_sync)
+      end
+
+      it 'delegates to Geo::ProjectRegistryPendingVerificationFinder' do
+        expect_next_instance_of(finder, current_node: secondary, shard_name: 'default', batch_size: 100) do |finder|
           expect(finder).to receive(:execute).once
         end
 
