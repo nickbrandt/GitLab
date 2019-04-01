@@ -30,10 +30,6 @@ module Projects
       success
     end
 
-    def chat_responder
-      Gitlab::Chat::Responder::Slack
-    end
-
     private
 
     # rubocop: disable CodeReuse/ActiveRecord
