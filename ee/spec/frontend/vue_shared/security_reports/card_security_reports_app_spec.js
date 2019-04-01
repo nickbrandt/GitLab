@@ -1,75 +1,77 @@
 import Vue from 'vue';
-import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
+import '~/commons/bootstrap';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import component from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
 import state from 'ee/vue_shared/security_reports/store/state';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
+import { mountComponentWithStore } from 'helpers/vue_mount_component_helper';
+import { trimText } from 'helpers/vue_component_helper';
 
 import { sastIssues, dast, dockerReport } from './mock_data';
+
+jest.mock(
+  'ee/vue_shared/security_reports/store/actions',
+  () => jest.genMockFromModule('ee/vue_shared/security_reports/store/actions').default,
+);
 
 describe('Card security reports app', () => {
   const Component = Vue.extend(component);
 
   let vm;
-  let mock;
-
   const runDate = new Date();
   runDate.setDate(runDate.getDate() - 7);
 
-  beforeEach(() => {
-    mock = new MockAdapter(axios);
+  const props = {
+    hasPipelineData: true,
+    emptyStateIllustrationPath: `${TEST_HOST}/img`,
+    securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
+    commit: {
+      id: '1234adf',
+      path: `${TEST_HOST}/commit`,
+    },
+    branch: {
+      id: 'master',
+      path: `${TEST_HOST}/branch`,
+    },
+    pipeline: {
+      id: '55',
+      created: runDate.toISOString(),
+      path: `${TEST_HOST}/pipeline`,
+    },
+    triggeredBy: {
+      path: `${TEST_HOST}/user`,
+      avatarPath: `${TEST_HOST}/img`,
+      name: 'TestUser',
+    },
+    headBlobPath: 'path',
+    baseBlobPath: 'path',
+    sastHeadPath: `${TEST_HOST}/sast_head`,
+    dependencyScanningHeadPath: `${TEST_HOST}/dss_head`,
+    dastHeadPath: `${TEST_HOST}/dast_head`,
+    sastContainerHeadPath: `${TEST_HOST}/sast_container_head`,
+    sastHelpPath: 'path',
+    dependencyScanningHelpPath: 'path',
+    vulnerabilityFeedbackPath: `${TEST_HOST}/vulnerability_feedback_path`,
+    vulnerabilityFeedbackHelpPath: 'path',
+    dastHelpPath: 'path',
+    sastContainerHelpPath: 'path',
+    pipelineId: 123,
+    canCreateFeedback: true,
+    canCreateIssue: true,
+  };
 
+  beforeEach(() => {
     vm = mountComponentWithStore(Component, {
       store: createStore(),
-      props: {
-        hasPipelineData: true,
-        emptyStateIllustrationPath: `${TEST_HOST}/img`,
-        securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
-        commit: {
-          id: '1234adf',
-          path: `${TEST_HOST}/commit`,
-        },
-        branch: {
-          id: 'master',
-          path: `${TEST_HOST}/branch`,
-        },
-        pipeline: {
-          id: '55',
-          created: runDate.toISOString(),
-          path: `${TEST_HOST}/pipeline`,
-        },
-        triggeredBy: {
-          path: `${TEST_HOST}/user`,
-          avatarPath: `${TEST_HOST}/img`,
-          name: 'TestUser',
-        },
-        headBlobPath: 'path',
-        baseBlobPath: 'path',
-        sastHeadPath: `${TEST_HOST}/sast_head`,
-        dependencyScanningHeadPath: `${TEST_HOST}/dss_head`,
-        dastHeadPath: `${TEST_HOST}/dast_head`,
-        sastContainerHeadPath: `${TEST_HOST}/sast_container_head`,
-        sastHelpPath: 'path',
-        dependencyScanningHelpPath: 'path',
-        vulnerabilityFeedbackPath: `${TEST_HOST}/vulnerability_feedback_path`,
-        vulnerabilityFeedbackHelpPath: 'path',
-        dastHelpPath: 'path',
-        sastContainerHelpPath: 'path',
-        pipelineId: 123,
-        canCreateFeedback: true,
-        canCreateIssue: true,
-      },
+      props,
     });
   });
 
   afterEach(() => {
     vm.$store.replaceState(state());
     vm.$destroy();
-    mock.restore();
   });
 
   describe('computed properties', () => {
@@ -134,9 +136,9 @@ describe('Card security reports app', () => {
   });
 
   describe('Empty State renders correctly', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       vm.hasPipelineData = false;
-      Vue.nextTick(done);
+      return Vue.nextTick();
     });
 
     it('image illustration is set to defined path', () => {
@@ -170,90 +172,94 @@ describe('Card security reports app', () => {
   describe('Report renders correctly', () => {
     describe('while loading', () => {
       beforeEach(() => {
-        mock.onGet(`${TEST_HOST}/sast_head`).reply(200, sastIssues);
-        mock.onGet(`${TEST_HOST}/dss_head`).reply(200, sastIssues);
-        mock.onGet(`${TEST_HOST}/dast_head`).reply(200, dast);
-        mock.onGet(`${TEST_HOST}/sast_container_head`).reply(200, dockerReport);
-        mock.onGet(`${TEST_HOST}/vulnerability_feedback_path`).reply(200, []);
+        Object.assign(vm.$store.state.sast, { isLoading: true });
+        Object.assign(vm.$store.state.sastContainer, { isLoading: true });
+        Object.assign(vm.$store.state.dast, { isLoading: true });
+        Object.assign(vm.$store.state.dependencyScanning, { isLoading: true });
+
+        return Vue.nextTick();
       });
 
-      it('renders loading summary text + spinner', done => {
+      it('renders loading summary text + spinner', () => {
         expect(vm.$el.querySelector('.spinner')).not.toBeNull();
 
         expect(vm.$el.textContent).toContain('SAST is loading');
         expect(vm.$el.textContent).toContain('Dependency scanning is loading');
         expect(vm.$el.textContent).toContain('Container scanning is loading');
         expect(vm.$el.textContent).toContain('DAST is loading');
-
-        setTimeout(() => {
-          done();
-        }, 0);
       });
     });
 
     describe('with all reports', () => {
       beforeEach(() => {
-        mock.onGet(`${TEST_HOST}/sast_head`).reply(200, sastIssues);
-        mock.onGet(`${TEST_HOST}/dss_head`).reply(200, sastIssues);
-        mock.onGet(`${TEST_HOST}/dast_head`).reply(200, dast);
-        mock.onGet(`${TEST_HOST}/sast_container_head`).reply(200, dockerReport);
-        mock.onGet(`${TEST_HOST}/vulnerability_feedback_path`).reply(200, []);
+        Object.assign(vm.$store.state.sast.paths, {
+          head: props.sastHeadPath,
+        });
+        Object.assign(vm.$store.state.sastContainer.paths, {
+          head: props.sastContainerHeadPath,
+        });
+        Object.assign(vm.$store.state.dast.paths, {
+          head: props.dastHeadPath,
+        });
+        Object.assign(vm.$store.state.dependencyScanning.paths, {
+          head: props.dependencyScanningHeadPath,
+        });
+
+        vm.$store.commit(types.RECEIVE_SAST_REPORTS, { head: sastIssues });
+        vm.$store.commit(types.RECEIVE_DAST_REPORTS, { head: dast });
+        vm.$store.commit(types.RECEIVE_SAST_CONTAINER_REPORTS, {
+          head: dockerReport,
+        });
+        vm.$store.commit(types.RECEIVE_DEPENDENCY_SCANNING_REPORTS, {
+          head: sastIssues,
+        });
+
+        return Vue.nextTick();
       });
 
-      it('renders reports', done => {
-        setTimeout(() => {
-          expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+      it('renders reports', () => {
+        expect(vm.$el.querySelector('.spinner')).toBeNull();
 
-          expect(vm.$el.textContent).toContain('SAST detected 3 vulnerabilities');
-          expect(vm.$el.textContent).toContain('Dependency scanning detected 3 vulnerabilities');
+        expect(vm.$el.textContent).toContain('SAST detected 3 vulnerabilities');
+        expect(vm.$el.textContent).toContain('Dependency scanning detected 3 vulnerabilities');
 
-          // Renders container scanning result
-          expect(vm.$el.textContent).toContain('Container scanning detected 2 vulnerabilities');
+        // Renders container scanning result
+        expect(vm.$el.textContent).toContain('Container scanning detected 2 vulnerabilities');
 
-          // Renders DAST result
-          expect(vm.$el.textContent).toContain('DAST detected 2 vulnerabilities');
+        // Renders DAST result
+        expect(vm.$el.textContent).toContain('DAST detected 2 vulnerabilities');
 
-          expect(vm.$el.textContent).not.toContain('for the source branch only');
-
-          done();
-        }, 0);
+        expect(vm.$el.textContent).not.toContain('for the source branch only');
       });
 
-      it('renders all reports expanded and with no way to collapse', done => {
-        setTimeout(() => {
-          expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
-          expect(vm.$el.querySelector('.js-collapse-btn')).toBeNull();
+      it('renders all reports expanded and with no way to collapse', () => {
+        expect(vm.$el.querySelector('.spinner')).toBeNull();
+        expect(vm.$el.querySelector('.js-collapse-btn')).toBeNull();
 
-          const reports = vm.$el.querySelectorAll('.js-report-section-container');
+        const reports = vm.$el.querySelectorAll('.js-report-section-container');
 
-          reports.forEach(report => {
-            expect(report).not.toHaveCss({ display: 'none' });
-          });
-
-          done();
-        }, 0);
+        reports.forEach(report => {
+          expect(report).not.toHaveCss({ display: 'none' });
+        });
       });
     });
 
     describe('with error', () => {
       beforeEach(() => {
-        mock.onGet(`${TEST_HOST}/sast_head`).reply(500);
-        mock.onGet(`${TEST_HOST}/dss_head`).reply(500);
-        mock.onGet(`${TEST_HOST}/dast_head`).reply(500);
-        mock.onGet(`${TEST_HOST}/sast_container_head`).reply(500);
-        mock.onGet(`${TEST_HOST}/vulnerability_feedback_path`).reply(500, []);
+        Object.assign(vm.$store.state.sast, { isLoading: false, hasError: true });
+        Object.assign(vm.$store.state.sastContainer, { isLoading: false, hasError: true });
+        Object.assign(vm.$store.state.dast, { isLoading: false, hasError: true });
+        Object.assign(vm.$store.state.dependencyScanning, { isLoading: false, hasError: true });
+        return Vue.nextTick();
       });
 
-      it('renders error state', done => {
-        setTimeout(() => {
-          expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+      it('renders error state', () => {
+        expect(vm.$el.querySelector('.spinner')).toBeNull();
 
-          expect(vm.$el.textContent).toContain('SAST: Loading resulted in an error');
-          expect(vm.$el.textContent).toContain('Dependency scanning: Loading resulted in an error');
-          expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
-          expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
-          done();
-        }, 0);
+        expect(vm.$el.textContent).toContain('SAST: Loading resulted in an error');
+        expect(vm.$el.textContent).toContain('Dependency scanning: Loading resulted in an error');
+        expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
+        expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
       });
     });
   });

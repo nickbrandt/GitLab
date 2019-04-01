@@ -1,6 +1,22 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import actions, {
+import actions from 'ee/vue_shared/security_reports/store/actions';
+import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
+import state from 'ee/vue_shared/security_reports/store/state';
+import testAction from 'helpers/vuex_action_helper';
+import {
+  sastIssues,
+  sastIssuesBase,
+  dast,
+  dastBase,
+  dockerReport,
+  dockerBaseReport,
+  sastFeedbacks,
+  dastFeedbacks,
+  containerScanningFeedbacks,
+} from '../mock_data';
+
+const {
   setHeadBlobPath,
   setBaseBlobPath,
   setVulnerabilityFeedbackPath,
@@ -51,24 +67,10 @@ import actions, {
   updateDependencyScanningIssue,
   updateContainerScanningIssue,
   updateDastIssue,
-} from 'ee/vue_shared/security_reports/store/actions';
-import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
-import state from 'ee/vue_shared/security_reports/store/state';
-import testAction from 'spec/helpers/vuex_action_helper';
-import {
-  sastIssues,
-  sastIssuesBase,
-  dast,
-  dastBase,
-  dockerReport,
-  dockerBaseReport,
-  sastFeedbacks,
-  dastFeedbacks,
-  containerScanningFeedbacks,
-} from '../mock_data';
+} = actions;
 
 jest.mock('~/lib/utils/url_utility', () => ({
-  visitUrl: jest.fn().mockName('visitUrlMock')
+  visitUrl: jest.fn().mockName('visitUrlMock'),
 }));
 
 describe('security reports actions', () => {

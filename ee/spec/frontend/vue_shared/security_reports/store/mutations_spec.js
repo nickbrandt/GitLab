@@ -25,7 +25,7 @@ import {
 import { visitUrl } from '~/lib/utils/url_utility';
 
 jest.mock('~/lib/utils/url_utility', () => ({
-  visitUrl: jest.fn().mockName('visitUrlMock')
+  visitUrl: jest.fn().mockName('visitUrlMock'),
 }));
 
 describe('security reports mutations', () => {

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/modal.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('Security Reports modal', () => {
   const Component = Vue.extend(component);
@@ -36,7 +36,7 @@ describe('Security Reports modal', () => {
       });
 
       it('emits revertDismissIssue when undo dismiss button is clicked', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
 
         const button = vm.$el.querySelector('.js-dismiss-btn');
         button.click();
@@ -73,7 +73,7 @@ describe('Security Reports modal', () => {
       });
 
       it('emits dismissIssue when dismiss issue button is clicked', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
 
         const button = vm.$el.querySelector('.js-dismiss-btn');
         button.click();
@@ -104,7 +104,7 @@ describe('Security Reports modal', () => {
       });
 
       it('emits createIssue when create issue button is clicked', () => {
-        spyOn(vm, '$emit');
+        jest.spyOn(vm, '$emit');
 
         const button = vm.$el.querySelector('.js-action-button');
         button.click();
