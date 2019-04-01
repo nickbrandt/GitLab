@@ -303,6 +303,9 @@ gem 'peek-pg', '~> 1.3.0', group: :postgres
 gem 'peek-rblineprof', '~> 0.2.0'
 gem 'peek-redis', '~> 1.2.0'
 
+# Snowplow events tracking
+gem 'snowplow-tracker', '~> 0.6.1'
+
 # Metrics
 group :metrics do
   gem 'method_source', '~> 0.8', require: false
