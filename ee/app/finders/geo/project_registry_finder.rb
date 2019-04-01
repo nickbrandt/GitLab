@@ -196,10 +196,10 @@ module Geo
     end
 
     def finder_klass_for_verified_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryVerifiedFinder
-      else
+      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryVerifiedFinder
+      else
+        Geo::ProjectRegistryVerifiedFinder
       end
     end
 

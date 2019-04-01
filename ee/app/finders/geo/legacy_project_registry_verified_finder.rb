@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 # Finder for retrieving project registries that have been verified
-# scoped to a type (repository or wiki) using cross-database joins
-# for selective sync.
+# scoped to a type (repository or wiki) using cross-database joins.
 #
 # Basic usage:
 #
@@ -22,30 +21,16 @@ module Geo
     end
 
     def execute
-      if selective_sync?
-        verified_registries_for_selective_sync
-      else
-        verified_registries
-      end
+      legacy_inner_join_registry_ids(
+        Geo::ProjectRegistry.verified(type),
+        current_node.projects.pluck_primary_key,
+        Geo::ProjectRegistry,
+        foreign_key: :project_id
+      )
     end
 
     private
 
     attr_reader :type
-
-    def verified_registries
-      Geo::ProjectRegistry.verified(type)
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def verified_registries_for_selective_sync
-      legacy_inner_join_registry_ids(
-        verified_registries,
-        current_node.projects.pluck(:id),
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
