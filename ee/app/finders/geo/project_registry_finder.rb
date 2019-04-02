@@ -163,12 +163,16 @@ module Geo
 
     private
 
+    def fdw_disabled?
+      !Gitlab::Geo::Fdw.enabled?
+    end
+
     def use_legacy_queries_for_selective_sync?
-      selective_sync? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
+      fdw_disabled? || selective_sync? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
     end
 
     def finder_klass_for_synced_registries
-      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistrySyncedFinder
       else
         Geo::ProjectRegistrySyncedFinder
@@ -182,7 +186,7 @@ module Geo
     end
 
     def finder_klass_for_failed_registries
-      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistrySyncFailedFinder
       else
         Geo::ProjectRegistrySyncFailedFinder
@@ -196,7 +200,7 @@ module Geo
     end
 
     def finder_klass_for_verified_registries
-      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryVerifiedFinder
       else
         Geo::ProjectRegistryVerifiedFinder
@@ -210,10 +214,10 @@ module Geo
     end
 
     def finder_klass_for_verification_failed_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryVerificationFailedFinder
-      else
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryVerificationFailedFinder
+      else
+        Geo::ProjectRegistryVerificationFailedFinder
       end
     end
 
@@ -224,10 +228,10 @@ module Geo
     end
 
     def finder_klass_for_registries_retrying_verification
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryRetryingVerificationFinder
-      else
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryRetryingVerificationFinder
+      else
+        Geo::ProjectRegistryRetryingVerificationFinder
       end
     end
 
@@ -238,10 +242,10 @@ module Geo
     end
 
     def finder_klass_for_mismatch_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistryMismatchFinder
-      else
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryMismatchFinder
+      else
+        Geo::ProjectRegistryMismatchFinder
       end
     end
 
@@ -252,7 +256,7 @@ module Geo
     end
 
     def finder_klass_for_registries_pending_verification
-      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
+      if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistryPendingVerificationFinder
       else
         Geo::ProjectRegistryPendingVerificationFinder
