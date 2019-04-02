@@ -26,10 +26,6 @@ describe Ci::Pipeline, :mailer do
   it { is_expected.to have_many(:builds) }
   it { is_expected.to have_many(:auto_canceled_pipelines) }
   it { is_expected.to have_many(:auto_canceled_jobs) }
-  it { is_expected.to have_one(:source_pipeline) }
-  it { is_expected.to have_many(:sourced_pipelines) }
-  it { is_expected.to have_one(:triggered_by_pipeline) }
-  it { is_expected.to have_many(:triggered_pipelines) }
   it { is_expected.to have_one(:chat_data) }
 
   it { is_expected.to validate_presence_of(:sha) }
@@ -820,8 +816,7 @@ describe Ci::Pipeline, :mailer do
 
   describe 'pipeline stages' do
     describe '#stage_seeds' do
-      let(:project) { create(:project, :repository) }
-      let(:pipeline) { build(:ci_pipeline, project: project, config: config) }
+      let(:pipeline) { build(:ci_pipeline, config: config) }
       let(:config) { { rspec: { script: 'rake' } } }
 
       it 'returns preseeded stage seeds object' do
@@ -851,7 +846,7 @@ describe Ci::Pipeline, :mailer do
 
       context 'when refs policy is specified' do
         let(:pipeline) do
-          build(:ci_pipeline, ref: 'feature', tag: true, project: project, config: config)
+          build(:ci_pipeline, ref: 'feature', tag: true, config: config)
         end
 
         let(:config) do
@@ -869,9 +864,7 @@ describe Ci::Pipeline, :mailer do
       end
 
       context 'when source policy is specified' do
-        let(:pipeline) do
-          build(:ci_pipeline, source: :schedule, project: project, config: config)
-        end
+        let(:pipeline) { build(:ci_pipeline, source: :schedule, config: config) }
 
         let(:config) do
           { production: { stage: 'deploy', script: 'cap prod', only: ['triggers'] },
@@ -911,7 +904,7 @@ describe Ci::Pipeline, :mailer do
           end
 
           context 'when user configured kubernetes from Integration > Kubernetes' do
-            let(:project) { create(:kubernetes_project, :repository) }
+            let(:project) { create(:kubernetes_project) }
             let(:pipeline) { build(:ci_pipeline, project: project, config: config) }
 
             it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
@@ -953,15 +946,13 @@ describe Ci::Pipeline, :mailer do
 
     describe '#seeds_size' do
       context 'when refs policy is specified' do
-        let(:project) { create(:project, :repository) }
-
         let(:config) do
           { production: { stage: 'deploy', script: 'cap prod', only: ['master'] },
             spinach: { stage: 'test', script: 'spinach', only: ['tags'] } }
         end
 
         let(:pipeline) do
-          build(:ci_pipeline, ref: 'feature', tag: true, project: project, config: config)
+          build(:ci_pipeline, ref: 'feature', tag: true, config: config)
         end
 
         it 'returns real seeds size' do
@@ -1945,23 +1936,6 @@ describe Ci::Pipeline, :mailer do
       end
     end
 
-    context 'the source is the repository' do
-      let(:implied_yml) { Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content }
-
-      before do
-        pipeline.repository_source!
-      end
-
-      it 'returns the configuration if found' do
-        allow(pipeline.project.repository).to receive(:gitlab_ci_yml_for)
-          .and_return('config')
-
-        expect(pipeline.ci_yaml_file).to be_a(String)
-        expect(pipeline.ci_yaml_file).not_to eq(implied_yml)
-        expect(pipeline.yaml_errors).to be_nil
-      end
-    end
-
     context 'when pipeline is for auto-devops' do
       before do
         pipeline.config_source = 'auto_devops_source'
@@ -2642,9 +2616,8 @@ describe Ci::Pipeline, :mailer do
     end
 
     context 'when pipeline does not have errors' do
-      let(:project) { create(:project, :repository) }
       let(:pipeline) do
-        create(:ci_pipeline, project: project, config: { rspec: { script: 'rake test' } })
+        create(:ci_pipeline, config: { rspec: { script: 'rake test' } })
       end
 
       it 'does not contain yaml errors' do

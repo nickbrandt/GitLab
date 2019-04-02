@@ -20,10 +20,6 @@ describe User do
 
   describe 'delegations' do
     it { is_expected.to delegate_method(:path).to(:namespace).with_prefix }
-
-    # EE
-    it { is_expected.to delegate_method(:shared_runners_minutes_limit).to(:namespace) }
-    it { is_expected.to delegate_method(:shared_runners_minutes_limit=).to(:namespace).with_arguments(133) }
   end
 
   describe 'associations' do
@@ -44,7 +40,6 @@ describe User do
     it { is_expected.to have_many(:spam_logs).dependent(:destroy) }
     it { is_expected.to have_many(:todos) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
-    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:triggers).dependent(:destroy) }
     it { is_expected.to have_many(:builds).dependent(:nullify) }
     it { is_expected.to have_many(:pipelines).dependent(:nullify) }
@@ -100,10 +95,6 @@ describe User do
         expect(user.project_members).to be_empty
       end
     end
-  end
-
-  describe 'nested attributes' do
-    it { is_expected.to respond_to(:namespace_attributes=) }
   end
 
   describe 'validations' do
@@ -387,25 +378,6 @@ describe User do
           expect(user).to be_valid
         end
       end
-    end
-
-    it 'does not allow a user to be both an auditor and an admin' do
-      user = build(:user, :admin, :auditor)
-
-      expect(user).to be_invalid
-    end
-  end
-
-  describe "non_ldap" do
-    it "retuns non-ldap user" do
-      described_class.delete_all
-      create :user
-      ldap_user = create :omniauth_user, provider: "ldapmain"
-      create :omniauth_user, provider: "gitlub"
-
-      users = described_class.non_ldap
-      expect(users.count).to eq 2
-      expect(users.detect { |user| user.username == ldap_user.username }).to be_nil
     end
   end
 
@@ -2603,60 +2575,6 @@ describe User do
       user = build(:user, :admin)
 
       expect(user.full_private_access?).to be_truthy
-    end
-  end
-
-  describe 'the GitLab_Auditor_User add-on' do
-    context 'creating an auditor user' do
-      it "does not allow creating an auditor user if the addon isn't enabled" do
-        stub_licensed_features(auditor_user: false)
-
-        expect(build(:user, :auditor)).to be_invalid
-      end
-
-      it "does not allow creating an auditor user if no license is present" do
-        allow(License).to receive(:current).and_return nil
-
-        expect(build(:user, :auditor)).to be_invalid
-      end
-
-      it "allows creating an auditor user if the addon is enabled" do
-        stub_licensed_features(auditor_user: true)
-
-        expect(build(:user, :auditor)).to be_valid
-      end
-
-      it "allows creating a regular user if the addon isn't enabled" do
-        stub_licensed_features(auditor_user: false)
-
-        expect(build(:user)).to be_valid
-      end
-    end
-
-    context '#auditor?' do
-      it "returns true for an auditor user if the addon is enabled" do
-        stub_licensed_features(auditor_user: true)
-
-        expect(build(:user, :auditor)).to be_auditor
-      end
-
-      it "returns false for an auditor user if the addon is not enabled" do
-        stub_licensed_features(auditor_user: false)
-
-        expect(build(:user, :auditor)).not_to be_auditor
-      end
-
-      it "returns false for an auditor user if a license is not present" do
-        stub_licensed_features(auditor_user: false)
-
-        expect(build(:user, :auditor)).not_to be_auditor
-      end
-
-      it "returns false for a non-auditor user even if the addon is present" do
-        stub_licensed_features(auditor_user: true)
-
-        expect(build(:user)).not_to be_auditor
-      end
     end
   end
 

@@ -51,7 +51,6 @@ describe Project do
     it { is_expected.to have_one(:bamboo_service) }
     it { is_expected.to have_one(:teamcity_service) }
     it { is_expected.to have_one(:jira_service) }
-    it { is_expected.to have_one(:github_service) }
     it { is_expected.to have_one(:redmine_service) }
     it { is_expected.to have_one(:youtrack_service) }
     it { is_expected.to have_one(:custom_issue_tracker_service) }
@@ -158,18 +157,6 @@ describe Project do
     it { is_expected.to include_module(Sortable) }
   end
 
-  describe 'scopes' do
-    context '#with_wiki_enabled' do
-      it 'returns a project' do
-        project = create(:project_empty_repo, wiki_access_level: ProjectFeature::ENABLED)
-        project1 = create(:project, wiki_access_level: ProjectFeature::DISABLED)
-
-        expect(described_class.with_wiki_enabled).to include(project)
-        expect(described_class.with_wiki_enabled).not_to include(project1)
-      end
-    end
-  end
-
   describe '.missing_kubernetes_namespace' do
     let!(:project) { create(:project) }
     let!(:cluster) { create(:cluster, :provided_by_user, :group) }
@@ -258,28 +245,6 @@ describe Project do
         expect(project2).not_to be_valid
         expect(project2.errors[:repository_storage].first).to match(/is not included in the list/)
       end
-    end
-
-    context '#mark_stuck_remote_mirrors_as_failed!' do
-      it 'fails stuck remote mirrors' do
-        project = create(:project, :repository, :remote_mirror)
-
-        project.remote_mirrors.first.update(
-          update_status: :started,
-          last_update_at: 2.days.ago
-        )
-
-        expect do
-          project.mark_stuck_remote_mirrors_as_failed!
-        end.to change { project.remote_mirrors.stuck.count }.from(1).to(0)
-      end
-    end
-
-    context 'mirror' do
-      subject { build(:project, mirror: true) }
-
-      it { is_expected.to validate_presence_of(:import_url) }
-      it { is_expected.to validate_presence_of(:mirror_user) }
     end
 
     describe 'import_url' do
@@ -376,14 +341,6 @@ describe Project do
           end
         end
       end
-    end
-
-    it 'creates import state when mirror gets enabled' do
-      project2 = create(:project)
-
-      expect do
-        project2.update(mirror: true, import_url: generate(:url), mirror_user: project.creator)
-      end.to change { ProjectImportState.where(project: project2).count }.from(0).to(1)
     end
 
     describe 'project pending deletion' do
@@ -663,14 +620,6 @@ describe Project do
     end
   end
 
-  describe "#kerberos_url_to_repo" do
-    let(:project) { create(:project, path: "somewhere") }
-
-    it 'returns valid kerberos url for this repo' do
-      expect(project.kerberos_url_to_repo).to eq("#{Gitlab.config.build_gitlab_kerberos_url}/#{project.namespace.path}/somewhere.git")
-    end
-  end
-
   describe "#readme_url" do
     context 'with a non-existing repository' do
       let(:project) { create(:project) }
@@ -904,92 +853,6 @@ describe Project do
 
     it 'returns valid repo' do
       expect(project.repository).to be_kind_of(Repository)
-    end
-  end
-
-  describe 'repository size restrictions' do
-    let(:project) { build(:project) }
-
-    before do
-      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
-    end
-
-    describe '#changes_will_exceed_size_limit?' do
-      before do
-        allow(project).to receive(:repository_and_lfs_size).and_return(49)
-      end
-      it 'returns true when changes go over' do
-        expect(project.changes_will_exceed_size_limit?(5)).to be_truthy
-      end
-    end
-
-    describe '#actual_size_limit' do
-      it 'returns the limit set in the application settings' do
-        expect(project.actual_size_limit).to eq(50)
-      end
-
-      it 'returns the value set in the group' do
-        group = create(:group, repository_size_limit: 100)
-        project.update_attribute(:namespace_id, group.id)
-
-        expect(project.actual_size_limit).to eq(100)
-      end
-
-      it 'returns the value set locally' do
-        project.update_attribute(:repository_size_limit, 75)
-
-        expect(project.actual_size_limit).to eq(75)
-      end
-    end
-
-    describe '#size_limit_enabled?' do
-      it 'returns false when disabled' do
-        project.update_attribute(:repository_size_limit, 0)
-
-        expect(project.size_limit_enabled?).to be_falsey
-      end
-
-      it 'returns true when a limit is set' do
-        project.update_attribute(:repository_size_limit, 75)
-
-        expect(project.size_limit_enabled?).to be_truthy
-      end
-    end
-
-    describe '#above_size_limit?' do
-      let(:project) do
-        create(:project,
-               statistics: build(:project_statistics))
-      end
-
-      it 'returns true when above the limit' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
-
-        expect(project.above_size_limit?).to be_truthy
-      end
-
-      it 'returns false when not over the limit' do
-        expect(project.above_size_limit?).to be_falsey
-      end
-    end
-
-    describe '#size_to_remove' do
-      it 'returns the correct value' do
-        allow(project).to receive(:repository_and_lfs_size).and_return(100)
-
-        expect(project.size_to_remove).to eq(50)
-      end
-    end
-  end
-
-  describe '#repository_size_limit column' do
-    it 'support values up to 8 exabytes' do
-      project = create(:project)
-      project.update_column(:repository_size_limit, 8.exabytes - 1)
-
-      project.reload
-
-      expect(project.repository_size_limit).to eql(8.exabytes - 1)
     end
   end
 
@@ -1995,24 +1858,12 @@ describe Project do
   end
 
   describe 'handling import URL' do
-    context 'when project is a mirror' do
-      it 'returns the full URL' do
-        project = create(:project, :mirror, import_url: 'http://user:pass@test.com')
+    it 'returns the sanitized URL' do
+      project = create(:project, :import_started, import_url: 'http://user:pass@test.com')
 
-        project.import_state.finish
+      project.import_state.finish
 
-        expect(project.reload.import_url).to eq('http://user:pass@test.com')
-      end
-    end
-
-    context 'when project is not a mirror' do
-      it 'returns the sanitized URL' do
-        project = create(:project, :import_started, import_url: 'http://user:pass@test.com')
-
-        project.import_state.finish
-
-        expect(project.reload.import_url).to eq('http://test.com')
-      end
+      expect(project.reload.import_url).to eq('http://test.com')
     end
   end
 
@@ -2293,28 +2144,11 @@ describe Project do
         expect(project.add_import_job).to eq(import_jid)
       end
 
-      context 'without mirror' do
-        it 'returns nil' do
-          project = create(:project)
-
-          expect(project.add_import_job).to be nil
-        end
-      end
-
       context 'without repository' do
         it 'schedules RepositoryImportWorker' do
           project = create(:project, import_url: generate(:url))
 
           expect(RepositoryImportWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
-          expect(project.add_import_job).to eq(import_jid)
-        end
-      end
-
-      context 'with mirror' do
-        it 'schedules RepositoryUpdateMirrorWorker' do
-          project = create(:project, :mirror, :repository)
-
-          expect(RepositoryUpdateMirrorWorker).to receive(:perform_async).with(project.id).and_return(import_jid)
           expect(project.add_import_job).to eq(import_jid)
         end
       end
@@ -2526,82 +2360,6 @@ describe Project do
 
         it_behaves_like 'it always returns false'
       end
-    end
-  end
-
-  describe '.where_full_path_in' do
-    context 'without any paths' do
-      it 'returns an empty relation' do
-        expect(described_class.where_full_path_in([])).to eq([])
-      end
-    end
-
-    context 'without any valid paths' do
-      it 'returns an empty relation' do
-        expect(described_class.where_full_path_in(%w[foo])).to eq([])
-      end
-    end
-
-    context 'with valid paths' do
-      let!(:project1) { create(:project) }
-      let!(:project2) { create(:project) }
-
-      it 'returns the projects matching the paths' do
-        projects = described_class.where_full_path_in([project1.full_path,
-                                                       project2.full_path])
-
-        expect(projects).to contain_exactly(project1, project2)
-      end
-
-      it 'returns projects regardless of the casing of paths' do
-        projects = described_class.where_full_path_in([project1.full_path.upcase,
-                                                       project2.full_path.upcase])
-
-        expect(projects).to contain_exactly(project1, project2)
-      end
-    end
-  end
-
-  describe '#change_repository_storage' do
-    let(:project) { create(:project, :repository) }
-    let(:read_only_project) { create(:project, :repository, repository_read_only: true) }
-
-    before do
-      FileUtils.mkdir('tmp/tests/extra_storage')
-      stub_storage_settings('extra' => { 'path' => 'tmp/tests/extra_storage' })
-    end
-
-    after do
-      FileUtils.rm_rf('tmp/tests/extra_storage')
-    end
-
-    it 'schedule the transfer of the repository to the new storage and locks the project' do
-      expect(ProjectUpdateRepositoryStorageWorker).to receive(:perform_async).with(project.id, 'extra')
-
-      project.change_repository_storage('extra')
-      project.save
-
-      expect(project).to be_repository_read_only
-    end
-
-    it "doesn't schedule the transfer if the repository is already read-only" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      read_only_project.change_repository_storage('extra')
-      read_only_project.save
-    end
-
-    it "doesn't lock or schedule the transfer if the storage hasn't changed" do
-      expect(ProjectUpdateRepositoryStorageWorker).not_to receive(:perform_async)
-
-      project.change_repository_storage(project.repository_storage)
-      project.save
-
-      expect(project).not_to be_repository_read_only
-    end
-
-    it 'throws an error if an invalid repository storage is provided' do
-      expect { project.change_repository_storage('unknown') }.to raise_error(ArgumentError)
     end
   end
 
@@ -2817,35 +2575,6 @@ describe Project do
       3.times { project.increment_pushes_since_gc }
 
       expect(project.pushes_since_gc).to eq(3)
-    end
-  end
-
-  describe '#repository_and_lfs_size' do
-    let(:project) { create(:project, :repository) }
-    let(:size) { 50 }
-
-    before do
-      allow(project.statistics).to receive(:total_repository_size).and_return(size)
-    end
-
-    it 'returns the total repository and lfs size' do
-      expect(project.repository_and_lfs_size).to eq(size)
-    end
-  end
-
-  describe '#approver_group_ids=' do
-    let(:project) { create(:project) }
-
-    it 'create approver_groups' do
-      group = create :group
-      group1 = create :group
-
-      project = create :project
-
-      project.approver_group_ids = "#{group.id}, #{group1.id}"
-      project.save!
-
-      expect(project.approver_groups.map(&:group)).to match_array([group, group1])
     end
   end
 
@@ -3162,16 +2891,6 @@ describe Project do
       project.update(namespace: namespace)
 
       expect(project.statistics.namespace_id).to eq namespace.id
-    end
-  end
-
-  describe '#create_import_state' do
-    it 'it is called after save' do
-      project = create(:project)
-
-      expect(project).to receive(:create_import_state)
-
-      project.update(mirror: true, mirror_user: project.owner, import_url: 'http://foo.com')
     end
   end
 

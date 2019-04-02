@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require "spec_helper"
@@ -53,14 +52,6 @@ describe ProjectWiki do
 
       expect(project_wiki.http_url_to_repo).to eq(expected_url)
       expect(project_wiki.http_url_to_repo).not_to include('@')
-    end
-  end
-
-  describe "#kerberos_url_to_repo" do
-    it 'returns valid kerberos url for this repo' do
-      gitlab_kerberos_url = Gitlab.config.build_gitlab_kerberos_url
-      repo_kerberos_url = "#{gitlab_kerberos_url}/#{subject.full_path}.git"
-      expect(subject.kerberos_url_to_repo).to eq(repo_kerberos_url)
     end
   end
 

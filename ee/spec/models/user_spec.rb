@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe EE::User do
-  subject(:user) { User.new }
+describe User do
+  subject(:user) { described_class.new }
 
   describe 'user creation' do
     describe 'with defaults' do
@@ -11,14 +13,46 @@ describe EE::User do
     end
   end
 
+  describe 'delegations' do
+    it { is_expected.to delegate_method(:shared_runners_minutes_limit).to(:namespace) }
+    it { is_expected.to delegate_method(:shared_runners_minutes_limit=).to(:namespace).with_arguments(133) }
+  end
+
   describe 'associations' do
     subject { build(:user) }
 
     it { is_expected.to have_many(:reviews) }
     it { is_expected.to have_many(:vulnerability_feedback) }
+    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
+  end
+
+  describe 'nested attributes' do
+    it { is_expected.to respond_to(:namespace_attributes=) }
+  end
+
+  describe 'validations' do
+    it 'does not allow a user to be both an auditor and an admin' do
+      user = build(:user, :admin, :auditor)
+
+      expect(user).to be_invalid
+    end
   end
 
   describe "scopes" do
+    describe ".non_ldap" do
+      it "retuns non-ldap user" do
+        described_class.delete_all
+        create(:user)
+        ldap_user = create(:omniauth_user, provider: "ldapmain")
+        create(:omniauth_user, provider: "gitlub")
+
+        users = described_class.non_ldap
+
+        expect(users.count).to eq(2)
+        expect(users.detect { |user| user.username == ldap_user.username }).to be_nil
+      end
+    end
+
     describe '.excluding_guests' do
       let!(:user_without_membership) { create(:user).id }
       let!(:project_guest_user)      { create(:project_member, :guest).user_id }
@@ -27,7 +61,7 @@ describe EE::User do
       let!(:group_reporter_user)     { create(:group_member, :reporter).user_id }
 
       it 'exclude users with a Guest role in a Project/Group' do
-        user_ids = User.excluding_guests.pluck(:id)
+        user_ids = described_class.excluding_guests.pluck(:id)
 
         expect(user_ids).to include(project_reporter_user)
         expect(user_ids).to include(group_reporter_user)
@@ -44,9 +78,63 @@ describe EE::User do
     let!(:smartcard_identity) { create(:smartcard_identity, user: user) }
 
     it 'returns the user' do
-      expect(User.find_by_smartcard_identity(smartcard_identity.subject,
+      expect(described_class.find_by_smartcard_identity(smartcard_identity.subject,
                                              smartcard_identity.issuer))
         .to eq(user)
+    end
+  end
+
+  describe 'the GitLab_Auditor_User add-on' do
+    context 'creating an auditor user' do
+      it "does not allow creating an auditor user if the addon isn't enabled" do
+        stub_licensed_features(auditor_user: false)
+
+        expect(build(:user, :auditor)).to be_invalid
+      end
+
+      it "does not allow creating an auditor user if no license is present" do
+        allow(License).to receive(:current).and_return nil
+
+        expect(build(:user, :auditor)).to be_invalid
+      end
+
+      it "allows creating an auditor user if the addon is enabled" do
+        stub_licensed_features(auditor_user: true)
+
+        expect(build(:user, :auditor)).to be_valid
+      end
+
+      it "allows creating a regular user if the addon isn't enabled" do
+        stub_licensed_features(auditor_user: false)
+
+        expect(build(:user)).to be_valid
+      end
+    end
+
+    context '#auditor?' do
+      it "returns true for an auditor user if the addon is enabled" do
+        stub_licensed_features(auditor_user: true)
+
+        expect(build(:user, :auditor)).to be_auditor
+      end
+
+      it "returns false for an auditor user if the addon is not enabled" do
+        stub_licensed_features(auditor_user: false)
+
+        expect(build(:user, :auditor)).not_to be_auditor
+      end
+
+      it "returns false for an auditor user if a license is not present" do
+        stub_licensed_features(auditor_user: false)
+
+        expect(build(:user, :auditor)).not_to be_auditor
+      end
+
+      it "returns false for a non-auditor user even if the addon is present" do
+        stub_licensed_features(auditor_user: true)
+
+        expect(build(:user)).not_to be_auditor
+      end
     end
   end
 
