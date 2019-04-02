@@ -168,10 +168,10 @@ module Geo
     end
 
     def finder_klass_for_synced_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncedFinder
-      else
+      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistrySyncedFinder
+      else
+        Geo::ProjectRegistrySyncedFinder
       end
     end
 

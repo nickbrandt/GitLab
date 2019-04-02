@@ -28,27 +28,34 @@ describe Geo::ProjectRegistryFinder, :geo do
 
   shared_examples 'counts all the things' do |method_prefix|
     describe '#count_synced_repositories' do
-      it 'counts repositories that have been synced' do
-        create(:geo_project_registry, :sync_failed)
-        create(:geo_project_registry, :synced, project: project_synced)
-        create(:geo_project_registry, :synced, :repository_dirty, project: project_repository_dirty)
-        create(:geo_project_registry, :synced, :wiki_dirty, project: project_wiki_dirty)
+      before do
+        project_1_in_synced_group = create(:project, group: synced_group)
+        project_2_in_synced_group = create(:project, group: synced_group)
+        project_3_in_synced_group = create(:project, group: synced_group)
+        project_4_broken_storage = create(:project, :broken_storage)
 
-        expect(subject.count_synced_repositories).to eq 2
+        create(:geo_project_registry, :synced, project: project_synced)
+        create(:geo_project_registry, :synced, :repository_dirty, project: project_1_in_synced_group)
+        create(:geo_project_registry, :synced, :wiki_dirty, project: project_2_in_synced_group)
+        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :synced, :wiki_dirty, project: project_4_broken_storage)
       end
 
-      context 'with selective sync' do
-        before do
+      it 'counts registries that repository have been synced' do
+        expect(subject.count_synced_repositories).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that repository have been synced where projects belongs to the namespaces' do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_synced_repositories).to eq 1
         end
+      end
 
-        it 'counts projects that has been synced' do
-          project_1_in_synced_group = create(:project, group: synced_group)
-          project_2_in_synced_group = create(:project, group: synced_group)
-
-          create(:geo_project_registry, :synced, project: project_synced)
-          create(:geo_project_registry, :synced, project: project_1_in_synced_group)
-          create(:geo_project_registry, :sync_failed, project: project_2_in_synced_group)
+      context 'with selective sync by shard' do
+        it 'counts registries that repository have been synced where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
 
           expect(subject.count_synced_repositories).to eq 1
         end
@@ -56,35 +63,34 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     describe '#count_synced_wikis' do
-      it 'counts wiki that have been synced' do
-        create(:geo_project_registry, :sync_failed)
-        create(:geo_project_registry, :synced, project: project_synced)
-        create(:geo_project_registry, :synced, :repository_dirty, project: project_repository_dirty)
-        create(:geo_project_registry, :synced, :wiki_dirty, project: project_wiki_dirty)
-
-        expect(subject.count_synced_wikis).to eq 2
-      end
-
-      it 'counts synced wikis with nil wiki_access_level (which means enabled wiki)' do
-        project_synced.project_feature.update!(wiki_access_level: nil)
+      before do
+        project_1_in_synced_group = create(:project, group: synced_group)
+        project_2_in_synced_group = create(:project, group: synced_group)
+        project_3_in_synced_group = create(:project, group: synced_group)
+        project_4_broken_storage = create(:project, :broken_storage)
 
         create(:geo_project_registry, :synced, project: project_synced)
-
-        expect(subject.count_synced_wikis).to eq 1
+        create(:geo_project_registry, :synced, :wiki_dirty, project: project_1_in_synced_group)
+        create(:geo_project_registry, :synced, :repository_dirty, project: project_2_in_synced_group)
+        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :synced, :repository_dirty, project: project_4_broken_storage)
       end
 
-      context 'with selective sync' do
-        before do
+      it 'counts registries that wiki have been synced' do
+        expect(subject.count_synced_wikis).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that wiki have been synced where projects belongs to the namespaces' do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_synced_wikis).to eq 1
         end
+      end
 
-        it 'counts projects that has been synced' do
-          project_1_in_synced_group = create(:project, group: synced_group)
-          project_2_in_synced_group = create(:project, group: synced_group)
-
-          create(:geo_project_registry, :synced, project: project_synced)
-          create(:geo_project_registry, :synced, project: project_1_in_synced_group)
-          create(:geo_project_registry, :sync_failed, project: project_2_in_synced_group)
+      context 'with selective sync by shard' do
+        it 'counts registries that wiki have been synced where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
 
           expect(subject.count_synced_wikis).to eq 1
         end
