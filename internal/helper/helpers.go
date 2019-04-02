@@ -37,7 +37,11 @@ func LogError(r *http.Request, err error) {
 }
 
 func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
-	http.Error(w, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
+	CaptureAndFail(w, r, err, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
+}
+
+func CaptureAndFail(w http.ResponseWriter, r *http.Request, err error, msg string, code int) {
+	http.Error(w, msg, code)
 	captureRavenError(r, err)
 	printError(r, err)
 }

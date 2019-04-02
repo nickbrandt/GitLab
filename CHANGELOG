@@ -2,6 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.3.3
+
+- Preserve orientation when removing EXIF
+
+v8.3.2
+
+- Remove EXIF from JPEG/TIFF images
+
 v 8.3.1
 
 - Update gitaly-proto to 1.10.0 !363
@@ -26,6 +34,14 @@ v 8.1.0
 - Upgrade the gitaly client to v1.13.0 (includes TLS support) !351
 - Update gitaly-proto to 0.124.0 !331
 - Add distributed tracing with LabKit !325
+
+v 8.0.4
+
+- Preserve orientation when removing EXIF
+
+v 8.0.3
+
+- Remove EXIF from JPEG/TIFF images
 
 v 8.0.2
 

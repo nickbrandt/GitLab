@@ -12,9 +12,12 @@ import (
 	"net/http/httptest"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
@@ -321,6 +324,93 @@ func TestInvalidFileNames(t *testing.T) {
 		HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &savedFileTracker{request: httpRequest})
 		testhelper.AssertResponseCode(t, response, testCase.code)
 	}
+}
+
+func TestUploadHandlerRemovingExif(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempPath)
+
+	var buffer bytes.Buffer
+
+	content, err := ioutil.ReadFile("exif/testdata/sample_exif.jpg")
+	require.NoError(t, err)
+
+	writer := multipart.NewWriter(&buffer)
+	file, err := writer.CreateFormFile("file", "test.jpg")
+	require.NoError(t, err)
+
+	_, err = file.Write(content)
+	require.NoError(t, err)
+
+	err = writer.Close()
+	require.NoError(t, err)
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseMultipartForm(100000)
+		require.NoError(t, err)
+
+		size, err := strconv.Atoi(r.FormValue("file.size"))
+		require.NoError(t, err)
+		require.True(t, size < len(content), "Expected the file to be smaller after removal of exif")
+		require.True(t, size > 0, "Expected to receive not empty file")
+
+		w.WriteHeader(200)
+		fmt.Fprint(w, "RESPONSE")
+	})
+	defer ts.Close()
+
+	httpRequest, err := http.NewRequest("POST", ts.URL+"/url/path", &buffer)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	httpRequest = httpRequest.WithContext(ctx)
+	httpRequest.ContentLength = int64(buffer.Len())
+	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+	response := httptest.NewRecorder()
+
+	handler := newProxy(ts.URL)
+	HandleFileUploads(response, httpRequest, handler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
+	testhelper.AssertResponseCode(t, response, 200)
+}
+
+func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempPath)
+
+	var buffer bytes.Buffer
+
+	writer := multipart.NewWriter(&buffer)
+	file, err := writer.CreateFormFile("file", "test.jpg")
+	require.NoError(t, err)
+
+	fmt.Fprint(file, "this is not valid image data")
+	err = writer.Close()
+	require.NoError(t, err)
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseMultipartForm(100000)
+		require.Error(t, err)
+	})
+	defer ts.Close()
+
+	httpRequest, err := http.NewRequest("POST", ts.URL+"/url/path", &buffer)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	httpRequest = httpRequest.WithContext(ctx)
+	httpRequest.ContentLength = int64(buffer.Len())
+	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+	response := httptest.NewRecorder()
+
+	handler := newProxy(ts.URL)
+	HandleFileUploads(response, httpRequest, handler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
+	testhelper.AssertResponseCode(t, response, 422)
 }
 
 func newProxy(url string) *proxy.Proxy {
