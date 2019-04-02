@@ -77,12 +77,12 @@ describe VisibleApprovable do
       end
 
       it 'excludes committer if committers cannot approve' do
+        project.update(merge_requests_disable_committers_approval: true)
+
         is_expected.not_to include(committer_approver.user)
       end
 
       it 'includes committer if committers are able to approve' do
-        project.update(merge_requests_author_approval: true)
-
         is_expected.to include(committer_approver.user)
       end
     end

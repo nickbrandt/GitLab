@@ -3823,9 +3823,6 @@ msgstr ""
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
 msgstr ""
 
-msgid "Enable self approval of merge requests"
-msgstr ""
-
 msgid "Enable shared Runners"
 msgstr ""
 
@@ -7861,6 +7858,12 @@ msgid "Press Enter or click to search"
 msgstr ""
 
 msgid "Prevent adding new members to project membership within this group"
+msgstr ""
+
+msgid "Prevent approval of merge requests by merge request author"
+msgstr ""
+
+msgid "Prevent approval of merge requests by merge request committers"
 msgstr ""
 
 msgid "Preview"

@@ -36,19 +36,23 @@ describe ApprovalState do
 
   subject { merge_request.approval_state }
 
-  shared_examples 'filtering author' do
+  shared_examples 'filtering author and committers' do
+    let(:committers) { [merge_request.author, create(:user, username: 'commiter')] }
+    let(:merge_requests_disable_committers_approval) { nil }
+
     before do
-      allow(merge_request).to receive(:authors).and_return([merge_request.author, create(:user, username: 'commiter')])
+      allow(merge_request).to receive(:committers).and_return(User.where(id: committers))
 
       project.update(merge_requests_author_approval: merge_requests_author_approval)
-      create_rule(users: merge_request.authors)
+      project.update(merge_requests_disable_committers_approval: merge_requests_disable_committers_approval)
+      create_rule(users: committers)
     end
 
     context 'when self approval is disabled' do
       let(:merge_requests_author_approval) { false }
 
       it 'excludes authors' do
-        expect(results).not_to include(*merge_request.authors)
+        expect(results).not_to include(merge_request.author)
       end
     end
 
@@ -56,7 +60,25 @@ describe ApprovalState do
       let(:merge_requests_author_approval) { true }
 
       it 'includes author' do
-        expect(results).to include(*merge_request.authors)
+        expect(results).to include(merge_request.author)
+      end
+    end
+
+    context 'when committers approval is enabled' do
+      let(:merge_requests_author_approval) { true }
+      let(:merge_requests_disable_committers_approval) { false }
+
+      it 'excludes committers' do
+        expect(results).to include(*committers)
+      end
+    end
+
+    context 'when committers approval is disabled' do
+      let(:merge_requests_author_approval) { true }
+      let(:merge_requests_disable_committers_approval) { true }
+
+      it 'includes committers' do
+        expect(results).not_to include(*committers)
       end
     end
   end
@@ -330,7 +352,7 @@ describe ApprovalState do
         expect(subject.approvers).to contain_exactly(approver1, group_approver1)
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.approvers }
       end
     end
@@ -368,7 +390,7 @@ describe ApprovalState do
         end
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.filtered_approvers }
       end
     end
@@ -383,7 +405,7 @@ describe ApprovalState do
         expect(subject.unactioned_approvers).to contain_exactly(approver1)
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.unactioned_approvers }
       end
     end
@@ -900,7 +922,7 @@ describe ApprovalState do
         expect(subject.approvers).to contain_exactly(*approvers)
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.approvers }
       end
     end
@@ -938,7 +960,7 @@ describe ApprovalState do
         end
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.filtered_approvers }
       end
     end
@@ -953,7 +975,7 @@ describe ApprovalState do
         expect(subject.unactioned_approvers).to contain_exactly(approver1)
       end
 
-      it_behaves_like 'filtering author' do
+      it_behaves_like 'filtering author and committers' do
         let(:results) { subject.unactioned_approvers }
       end
     end

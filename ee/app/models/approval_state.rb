@@ -18,14 +18,25 @@ class ApprovalState
     @project = merge_request.target_project
   end
 
-  # Excludes the author if 'self-approval' isn't explicitly enabled on project settings.
+  # Excludes the author if 'author-approval' is explicitly disabled on project settings.
   def self.filter_author(users, merge_request)
     return users if merge_request.target_project.merge_requests_author_approval?
 
     if users.is_a?(ActiveRecord::Relation) && !users.loaded?
-      users.where.not(id: merge_request.authors)
+      users.where.not(id: merge_request.author_id)
     else
-      users - merge_request.authors
+      users - [merge_request.author]
+    end
+  end
+
+  # Excludes the author if 'committers-approval' is explicitly disabled on project settings.
+  def self.filter_committers(users, merge_request)
+    return users unless merge_request.target_project.merge_requests_disable_committers_approval?
+
+    if users.is_a?(ActiveRecord::Relation) && !users.loaded?
+      users.where.not(id: merge_request.committers.select(:id))
+    else
+      users - merge_request.committers
     end
   end
 
@@ -111,7 +122,8 @@ class ApprovalState
 
     users -= approved_approvers if unactioned
 
-    self.class.filter_author(users, merge_request)
+    users = self.class.filter_author(users, merge_request)
+    self.class.filter_committers(users, merge_request)
   end
 
   # approvers_left
@@ -124,8 +136,9 @@ class ApprovalState
     # The check below considers authors being able to approve the MR.
     # That is, they're included/excluded from that list accordingly.
     return true if unactioned_approvers.include?(user)
-    # We can safely unauthorize authors if it reaches this guard clause.
-    return false if merge_request.authors.include?(user)
+    # We can safely unauthorize author and committers if it reaches this guard clause.
+    return false if merge_request.author == user
+    return false if merge_request.committers.include?(user)
     return false unless user.can?(:update_merge_request, merge_request)
 
     any_approver_allowed? && merge_request.approvals.where(user: user).empty?
