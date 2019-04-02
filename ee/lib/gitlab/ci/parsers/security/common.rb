@@ -44,29 +44,28 @@ module Gitlab
           def create_vulnerability(report, data, version)
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
-
             report.add_occurrence(
-              uuid: SecureRandom.uuid,
-              report_type: report.type,
-              name: data['message'],
-              primary_identifier: identifiers.first,
-              project_fingerprint: generate_project_fingerprint(data['cve']),
-              location_fingerprint: generate_location_fingerprint(data['location']),
-              severity: parse_level(data['severity']),
-              confidence: parse_level(data['confidence']),
-              scanner: scanner,
-              identifiers: identifiers,
-              raw_metadata: data.to_json,
-              metadata_version: version
-            )
+              ::Gitlab::Ci::Reports::Security::Occurrence.new(
+                uuid: SecureRandom.uuid,
+                report_type: report.type,
+                name: data['message'],
+                compare_key: data['cve'],
+                location_fingerprint: generate_location_fingerprint(data['location']),
+                severity: parse_level(data['severity']),
+                confidence: parse_level(data['confidence']),
+                scanner: scanner,
+                identifiers: identifiers,
+                raw_metadata: data.to_json,
+                metadata_version: version))
           end
 
           def create_scanner(report, scanner)
             return unless scanner.is_a?(Hash)
 
             report.add_scanner(
-              external_id: scanner['id'],
-              name: scanner['name'])
+              ::Gitlab::Ci::Reports::Security::Scanner.new(
+                external_id: scanner['id'],
+                name: scanner['name']))
           end
 
           def create_identifiers(report, identifiers)
@@ -81,27 +80,20 @@ module Gitlab
             return unless identifier.is_a?(Hash)
 
             report.add_identifier(
-              external_type: identifier['type'],
-              external_id: identifier['value'],
-              name: identifier['name'],
-              fingerprint: generate_identifier_fingerprint(identifier),
-              url: identifier['url'])
+              ::Gitlab::Ci::Reports::Security::Identifier.new(
+                external_type: identifier['type'],
+                external_id: identifier['value'],
+                name: identifier['name'],
+                url: identifier['url']))
           end
 
+          # TODO: this can be removed as of `12.0`
           def mutate_scanner_tool(tool)
             { 'id' => tool, 'name' => tool.capitalize } if tool
           end
 
           def parse_level(input)
             input.blank? ? 'undefined' : input.downcase
-          end
-
-          def generate_project_fingerprint(compare_key)
-            Digest::SHA1.hexdigest(compare_key)
-          end
-
-          def generate_identifier_fingerprint(identifier)
-            Digest::SHA1.hexdigest("#{identifier['type']}:#{identifier['value']}")
           end
 
           def generate_location_fingerprint(location)

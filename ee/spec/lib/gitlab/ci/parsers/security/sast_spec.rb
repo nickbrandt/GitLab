@@ -27,11 +27,11 @@ describe Gitlab::Ci::Parsers::Security::Sast do
       end
 
       it "generates expected location fingerprint" do
-        expect(report.occurrences.first[:location_fingerprint]).to eq('d869ba3f0b3347eb2749135a437dc07c8ae0f420')
+        expect(report.occurrences.first.location_fingerprint).to eq('d869ba3f0b3347eb2749135a437dc07c8ae0f420')
       end
 
       it "generates expected metadata_version" do
-        expect(report.occurrences.first[:metadata_version]).to eq('1.2')
+        expect(report.occurrences.first.metadata_version).to eq('1.2')
       end
     end
   end

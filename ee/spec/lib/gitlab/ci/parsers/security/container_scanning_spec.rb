@@ -34,15 +34,15 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
     it "generates expected location fingerprint" do
       expected = Digest::SHA1.hexdigest('debian:9:glibc')
 
-      expect(report.occurrences.first[:location_fingerprint]).to eq(expected)
+      expect(report.occurrences.first.location_fingerprint).to eq(expected)
     end
 
     it "generates expected metadata_version" do
-      expect(report.occurrences.first[:metadata_version]).to eq('1.3')
+      expect(report.occurrences.first.metadata_version).to eq('1.3')
     end
 
     it "adds report image's name to raw_metadata" do
-      expect(JSON.parse(report.occurrences.first[:raw_metadata]).dig('location', 'image'))
+      expect(JSON.parse(report.occurrences.first.raw_metadata).dig('location', 'image'))
         .to eq('registry.gitlab.com/groulot/container-scanning-test/master:5f21de6956aee99ddb68ae49498662d9872f50ff')
     end
   end
