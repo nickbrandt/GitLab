@@ -52,6 +52,7 @@ class License < ApplicationRecord
     geo
     github_project_service_integration
     jira_dev_panel_integration
+    scoped_labels
     ldap_group_sync_filter
     multiple_clusters
     multiple_group_issue_boards

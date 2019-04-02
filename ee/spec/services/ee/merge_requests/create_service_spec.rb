@@ -52,5 +52,9 @@ describe MergeRequests::CreateService do
         end
       end
     end
+
+    it_behaves_like 'new issuable with scoped labels' do
+      let(:parent) { project }
+    end
   end
 end
