@@ -35,6 +35,14 @@ v 8.1.0
 - Update gitaly-proto to 0.124.0 !331
 - Add distributed tracing with LabKit !325
 
+v 8.0.4
+
+- Preserve orientation when removing EXIF
+
+v 8.0.3
+
+- Remove EXIF from JPEG/TIFF images
+
 v 8.0.2
 
 - Fixed svg recognition to get the proper content type !353
