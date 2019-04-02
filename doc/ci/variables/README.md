@@ -333,7 +333,7 @@ about which variables are [not supported](where_variables_can_be_used.md).
 
 > Introduced in GitLab 9.3.
 
-Variables could be protected. Whenever a variable is
+Variables can be protected. Whenever a variable is
 protected, it would only be securely passed to pipelines running on the
 [protected branches] or [protected tags]. The other pipelines would not get any
 protected variables.
