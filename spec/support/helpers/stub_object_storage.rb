@@ -74,4 +74,5 @@ module StubObjectStorage
   end
 end
 
+require_relative '../../../ee/spec/support/helpers/ee/stub_object_storage'
 StubObjectStorage.prepend(EE::StubObjectStorage)

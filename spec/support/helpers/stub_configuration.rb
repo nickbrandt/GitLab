@@ -121,4 +121,5 @@ module StubConfiguration
   end
 end
 
+require_relative '../../../ee/spec/support/helpers/ee/stub_configuration'
 StubConfiguration.prepend(EE::StubConfiguration)
