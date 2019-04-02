@@ -1737,8 +1737,48 @@ describe Project do
 
   describe "#insights_config" do
     context 'when project has no Insights config file' do
-      it 'returns nil' do
-        expect(create(:project).insights_config).to be_nil
+      let(:project) { create(:project) }
+
+      it 'returns the project default config' do
+        expect(project.insights_config).to eq(project.default_insights_config)
+      end
+
+      context 'when the project is inside a group' do
+        let(:group) { create(:group) }
+        let(:project) { create(:project, group: group) }
+
+        context 'when the group has no Insights config' do
+          it 'returns the group default config' do
+            expect(project.insights_config).to eq(group.default_insights_config)
+          end
+        end
+
+        context 'when the group has an Insights config from another project' do
+          let(:config_project) do
+            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+          end
+
+          before do
+            group.create_insight!(project: config_project)
+          end
+
+          context 'with a valid config file' do
+            let(:insights_file_content) { 'key: monthlyBugsCreated' }
+
+            it 'returns the group config data from the other project' do
+              expect(project.insights_config).to eq(config_project.insights_config)
+              expect(project.insights_config).to eq(group.insights_config)
+            end
+          end
+
+          context 'with an invalid config file' do
+            let(:insights_file_content) { ': foo bar' }
+
+            it 'returns nil' do
+              expect(project.insights_config).to be_nil
+            end
+          end
+        end
       end
     end
 
@@ -1755,13 +1795,45 @@ describe Project do
 
           expect(insights_config).to eq(key: 'monthlyBugsCreated')
         end
+
+        context 'when the project is inside a group having another config' do
+          let(:config_project) do
+            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => ': foo bar' })
+          end
+
+          before do
+            project.group = create(:group)
+            project.group.create_insight!(project: config_project)
+          end
+
+          it 'returns the project insights config data' do
+            insights_config = project.insights_config
+
+            expect(insights_config).to eq(key: 'monthlyBugsCreated')
+          end
+        end
       end
 
       context 'with an invalid config file' do
         let(:insights_file_content) { ': foo bar' }
 
-        it 'returns the insights config data' do
+        it 'returns nil' do
           expect(project.insights_config).to be_nil
+        end
+
+        context 'when the project is inside a group having another config' do
+          let(:config_project) do
+            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => 'key: monthlyBugsCreated' })
+          end
+
+          before do
+            project.group = create(:group)
+            project.group.create_insight!(project: config_project)
+          end
+
+          it 'returns nil' do
+            expect(project.insights_config).to be_nil
+          end
         end
       end
     end

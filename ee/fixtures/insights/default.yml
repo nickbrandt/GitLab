@@ -1,0 +1,39 @@
+weeklyMerged:
+  title: Weekly merged merge requests
+  type: bar
+  query:
+    issuable_type: merge_request
+    issuable_state: merged
+    group_by: week
+
+monthlyMerged:
+  title: Monthly merged merge requests
+  type: bar
+  query:
+    issuable_type: merge_request
+    issuable_state: merged
+    group_by: month
+
+monthlyByPriority:
+  title: Monthly issues by priority
+  type: stacked-bar
+  query:
+    issuable_type: issue
+    collection_labels:
+      - priority::1
+      - priority::2
+      - priority::3
+      - priority::4
+    group_by: month
+
+monthlyBySeverity:
+  title: Monthly issues by severity
+  type: stacked-bar
+  query:
+    issuable_type: issue
+    collection_labels:
+      - severity::1
+      - severity::2
+      - severity::3
+      - severity::4
+    group_by: month
