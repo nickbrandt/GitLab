@@ -369,7 +369,7 @@ There are two ways to use GitLab:
 - [GitLab.com](#gitlabcom): GitLab's SaaS offering. You don't need to install anything to use GitLab.com,
   you only need to [sign up](https://gitlab.com/users/sign_in) and start using GitLab straight away.
 
-For more information on managing your subscription and [customers portal](https://customers.gitlab.com) account, please see [Getting Started with Subscriptions](getting-started/subscription.md).
+For more information on managing your subscription and [Customers Portal](https://customers.gitlab.com) account, please see [Getting Started with Subscriptions](getting-started/subscription.md).
 
 The following sections outline tiers and features within GitLab self-managed and GitLab.com.
 
