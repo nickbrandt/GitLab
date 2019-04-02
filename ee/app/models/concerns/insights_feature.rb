@@ -19,9 +19,11 @@ module InsightsFeature
       return unless insights_config_yml
 
       strong_memoize(:insights_config) do
-        ::Gitlab::Config::Loader::Yaml.new(insights_config_yml).load!
-      rescue Gitlab::Config::Loader::FormatError
-        nil
+        begin
+          ::Gitlab::Config::Loader::Yaml.new(insights_config_yml).load!
+        rescue Gitlab::Config::Loader::FormatError
+          nil
+        end
       end
     end
   end
