@@ -378,6 +378,8 @@ export default () => {
         groupId: Number(dataset.groupId),
         scopedIssueBoardFeatureEnabled: parseBoolean(dataset.scopedIssueBoardFeatureEnabled),
         weights: JSON.parse(dataset.weights),
+        enableScopedLabels: $boardApp.dataset.scopedLabels,
+        keyValueDocumentationLink: $boardApp.dataset.keyValueDocumentationLink,
       };
 
       return { boardsSelectorProps };

@@ -61,6 +61,16 @@ export default {
       required: false,
       default: () => [],
     },
+    enableScopedLabels: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    scopedLabelsDocumentationLink: {
+      type: String,
+      required: false,
+      default: '#',
+    },
   },
   data() {
     return {
@@ -244,6 +254,8 @@ export default {
               :context="board"
               :labels-path="labelsPath"
               :can-edit="canAdminBoard"
+              :scoped-labels-documentation-link="scopedLabelsDocumentationLink"
+              :enable-scoped-labels="enableScopedLabels"
               ability-name="issue"
               @onLabelClick="handleLabelClick"
             >
