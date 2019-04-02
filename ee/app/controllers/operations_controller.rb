@@ -10,6 +10,10 @@ class OperationsController < ApplicationController
   def index
   end
 
+  def environments
+    render :index
+  end
+
   def list
     Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
     projects = load_projects(current_user)
