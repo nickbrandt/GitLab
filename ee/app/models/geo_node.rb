@@ -199,9 +199,9 @@ class GeoNode < ApplicationRecord
 
     if selective_sync_by_namespaces?
       query = Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
-      Project.where(namespace_id: query.select(:id))
+      Project.in_namespace(query.select(:id))
     elsif selective_sync_by_shards?
-      Project.where(repository_storage: selective_sync_shards)
+      Project.within_shards(selective_sync_shards)
     else
       Project.none
     end
