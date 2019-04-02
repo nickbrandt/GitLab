@@ -5,7 +5,11 @@ class RemoveDuplicatesFromApprovals < ActiveRecord::Migration[5.0]
 
   DOWNTIME = false
 
+  disable_ddl_transaction!
+
   def up
+    add_concurrent_index :approvals, [:user_id, :merge_request_id, :id]
+
     if Gitlab::Database.mysql?
       execute <<-SQL
         DELETE FROM a
@@ -34,6 +38,8 @@ class RemoveDuplicatesFromApprovals < ActiveRecord::Migration[5.0]
         AND approvals_with_duplicates.min_id <> approvals.id;
       SQL
     end
+
+    remove_concurrent_index :approvals, [:user_id, :merge_request_id, :id]
   end
 
   def down
