@@ -17,10 +17,12 @@ describe QuickActions::InterpretService do
   end
 
   describe '#execute' do
+    let(:merge_request) { create(:merge_request, source_project: project) }
+
     context 'assign command' do
       context 'Issue' do
         it 'fetches assignees and populates them if content contains /assign' do
-          issue.update(assignee_ids: [user.id, user2.id])
+          issue.update!(assignee_ids: [user.id, user2.id])
 
           _, updates = service.execute("/unassign @#{user2.username}\n/assign @#{user3.username}", issue)
 
@@ -29,7 +31,7 @@ describe QuickActions::InterpretService do
 
         context 'assign command with multiple assignees' do
           it 'fetches assignee and populates assignee_ids if content contains /assign' do
-            issue.update(assignee_ids: [user.id])
+            issue.update!(assignee_ids: [user.id])
 
             _, updates = service.execute("/unassign @#{user.username}\n/assign @#{user2.username} @#{user3.username}", issue)
 
@@ -44,7 +46,7 @@ describe QuickActions::InterpretService do
 
       context 'Issue' do
         it 'unassigns user if content contains /unassign @user' do
-          issue.update(assignee_ids: [user.id, user2.id])
+          issue.update!(assignee_ids: [user.id, user2.id])
 
           _, updates = service.execute("/assign @#{user3.username}\n/unassign @#{user2.username}", issue)
 
@@ -52,7 +54,7 @@ describe QuickActions::InterpretService do
         end
 
         it 'unassigns both users if content contains /unassign @user @user1' do
-          issue.update(assignee_ids: [user.id, user2.id])
+          issue.update!(assignee_ids: [user.id, user2.id])
 
           _, updates = service.execute("/assign @#{user3.username}\n/unassign @#{user2.username} @#{user3.username}", issue)
 
@@ -60,7 +62,7 @@ describe QuickActions::InterpretService do
         end
 
         it 'unassigns all the users if content contains /unassign' do
-          issue.update(assignee_ids: [user.id, user2.id])
+          issue.update!(assignee_ids: [user.id, user2.id])
 
           _, updates = service.execute("/assign @#{user3.username}\n/unassign", issue)
 
@@ -86,7 +88,7 @@ describe QuickActions::InterpretService do
         let(:content) { "/reassign @#{current_user.username}" }
 
         before do
-          issue.update(assignee_ids: [user.id])
+          issue.update!(assignee_ids: [user.id])
         end
 
         context 'unlicensed' do
@@ -296,6 +298,97 @@ describe QuickActions::InterpretService do
         end
       end
     end
+
+    shared_examples 'weight command' do
+      it 'populates weight specified by the /weight command' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(weight: weight)
+      end
+    end
+
+    shared_examples 'clear weight command' do
+      it 'populates weight: nil if content contains /clear_weight' do
+        issuable.update!(weight: 5)
+
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to eq(weight: nil)
+      end
+    end
+
+    context 'issuable weights licensed' do
+      before do
+        stub_licensed_features(issue_weights: true)
+      end
+
+      it_behaves_like 'weight command' do
+        let(:weight) { 5 }
+        let(:content) { "/weight #{weight}"}
+        let(:issuable) { issue }
+      end
+
+      it_behaves_like 'clear weight command' do
+        let(:content) { '/clear_weight' }
+        let(:issuable) { issue }
+      end
+    end
+
+    context 'issuable weights unlicensed' do
+      before do
+        stub_licensed_features(issue_weights: false)
+      end
+
+      it 'does not recognise /weight X' do
+        _, updates = service.execute('/weight 5', issue)
+
+        expect(updates).to be_empty
+      end
+
+      it 'does not recognise /clear_weight' do
+        _, updates = service.execute('/clear_weight', issue)
+
+        expect(updates).to be_empty
+      end
+    end
+
+    shared_examples 'empty command' do
+      it 'populates {} if content contains an unsupported command' do
+        _, updates = service.execute(content, issuable)
+
+        expect(updates).to be_empty
+      end
+    end
+
+    context 'not persisted merge request can not be merged' do
+      it_behaves_like 'empty command' do
+        let(:content) { "/merge" }
+        let(:issuable) { build(:merge_request, source_project: project) }
+      end
+    end
+
+    context 'not approved merge request can not be merged' do
+      before do
+        merge_request.target_project.update!(approvals_before_merge: 1)
+      end
+
+      it_behaves_like 'empty command' do
+        let(:content) { "/merge" }
+        let(:issuable) { build(:merge_request, source_project: project) }
+      end
+    end
+
+    context 'approved merge request can be merged' do
+      before do
+        merge_request.update!(approvals_before_merge: 1)
+        merge_request.approvals.create(user: current_user)
+      end
+
+      it_behaves_like 'empty command' do
+        let(:content) { "/merge" }
+        let(:issuable) { build(:merge_request, source_project: project) }
+      end
+    end
   end
 
   describe '#explain' do
@@ -329,6 +422,15 @@ describe QuickActions::InterpretService do
         _, explanations = service.explain(content, issue)
 
         expect(explanations).to eq(["Removes assignee @#{user.username}."])
+      end
+    end
+
+    describe 'weight command' do
+      let(:content) { '/weight 4' }
+
+      it 'includes the number' do
+        _, explanations = service.explain(content, issue)
+        expect(explanations).to eq(['Sets weight to 4.'])
       end
     end
   end
