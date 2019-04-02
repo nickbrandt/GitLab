@@ -35,20 +35,15 @@ module EE
       # rubocop: enable CodeReuse/ActiveRecord
 
       def set_labels
-        labels = params.delete(:labels)
+        if params[:label_ids]
+          params[:label_ids] = labels_service.filter_labels_ids_in_param(:label_ids)
+        elsif params[:labels]
+          params[:label_ids] = labels_service.find_or_create_by_titles.map(&:id)
+        end
+      end
 
-        return unless labels
-
-        params[:label_ids] = labels.split(",").map do |label_name|
-          label = Labels::FindOrCreateService.new(
-            current_user,
-            parent,
-            title: label_name.strip,
-            include_ancestor_groups: true
-          ).execute
-
-          label.try(:id)
-        end.compact
+      def labels_service
+        @labels_service ||= ::Labels::AvailableLabelsService.new(current_user, parent, params)
       end
     end
   end
