@@ -24,7 +24,10 @@ class ApprovalWrappedRule
   end
 
   def approvers
-    ApprovalState.filter_author(@approval_rule.approvers, merge_request)
+    filtered_approvers =
+      ApprovalState.filter_author(@approval_rule.approvers, merge_request)
+
+    ApprovalState.filter_committers(filtered_approvers, merge_request)
   end
 
   # @return [Array<User>] all approvers related to this rule

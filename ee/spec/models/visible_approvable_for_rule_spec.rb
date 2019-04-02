@@ -64,30 +64,36 @@ describe VisibleApprovableForRule do
       end
     end
 
-    shared_examples_for 'able to exclude authors' do
-      it 'excludes author if authors cannot approve' do
+    context 'when author is an approver' do
+      let!(:approver) { resource.author }
+
+      it 'excludes author if author cannot approve' do
         project.update(merge_requests_author_approval: false)
 
         is_expected.not_to include(approver)
       end
 
-      it 'includes author if authors are able to approve' do
+      it 'includes author if author is able to approve' do
         project.update(merge_requests_author_approval: true)
 
         is_expected.to include(approver)
       end
     end
 
-    context 'when author is approver' do
-      let!(:approver) { resource.author }
+    context 'when a committer is an approver' do
+      let!(:approver) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
 
-      it_behaves_like 'able to exclude authors'
-    end
+      it 'excludes the committer if committers cannot approve' do
+        project.update(merge_requests_disable_committers_approval: true)
 
-    context 'when committer is approver' do
-      let(:approver) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
+        is_expected.not_to include(approver)
+      end
 
-      it_behaves_like 'able to exclude authors'
+      it 'includes the committer if committers are able to approve' do
+        project.update(merge_requests_disable_committers_approval: false)
+
+        is_expected.to include(approver)
+      end
     end
   end
 

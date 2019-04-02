@@ -72,11 +72,12 @@ module Approvable
 
   def can_approve?(user)
     return false unless user
-    # The check below considers authors being able to approve the MR. That is,
-    # they're included/excluded from that list accordingly.
+    # The check below considers authors and committers being able to approve the MR.
+    # That is, they're included/excluded from that list accordingly.
     return true if approvers_left.include?(user)
-    # We can safely unauthorize authors if it reaches this guard clause.
-    return false if authors.include?(user)
+    # We can safely unauthorize authors and committers if it reaches this guard clause.
+    return false if author == user
+    return false if committers.include?(user)
     return false unless user.can?(:update_merge_request, self)
 
     any_approver_allowed? && approvals.where(user: user).empty?
@@ -100,6 +101,10 @@ module Approvable
 
   def authors_can_approve?
     target_project.merge_requests_author_approval?
+  end
+
+  def committers_can_approve?
+    !target_project.merge_requests_disable_committers_approval?
   end
 
   def approver_ids=(value)

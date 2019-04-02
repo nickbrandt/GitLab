@@ -2500,6 +2500,7 @@ ActiveRecord::Schema.define(version: 20190325165127) do
     t.string "runners_token_encrypted"
     t.string "bfg_object_map"
     t.boolean "merge_requests_require_code_owner_approval"
+    t.boolean "merge_requests_disable_committers_approval"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))", using: :btree
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree

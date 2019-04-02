@@ -1064,31 +1064,17 @@ describe MergeRequest do
     end
   end
 
-  describe '#commit_authors' do
-    it 'returns all the authors of every commit in the merge request' do
-      users = subject.commits.without_merge_commits.map(&:author_email).uniq.map do |email|
+  describe '#committers' do
+    it 'returns all the committers of every commit in the merge request' do
+      users = subject.commits.without_merge_commits.map(&:committer_email).uniq.map do |email|
         create(:user, email: email)
       end
 
-      expect(subject.commit_authors).to match_array(users)
+      expect(subject.committers).to match_array(users)
     end
 
-    it 'returns an empty array if no author is associated with a user' do
-      expect(subject.commit_authors).to be_empty
-    end
-  end
-
-  describe '#authors' do
-    it 'returns a list with all the commit authors in the merge request and author' do
-      users = subject.commits.without_merge_commits.map(&:author_email).uniq.map do |email|
-        create(:user, email: email)
-      end
-
-      expect(subject.authors).to match_array([subject.author, *users])
-    end
-
-    it 'returns only the author if no committer is associated with a user' do
-      expect(subject.authors).to contain_exactly(subject.author)
+    it 'returns an empty array if no committer is associated with a user' do
+      expect(subject.committers).to be_empty
     end
   end
 

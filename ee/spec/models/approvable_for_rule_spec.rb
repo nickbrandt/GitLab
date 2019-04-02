@@ -42,58 +42,56 @@ describe ApprovableForRule do
       expect(merge_request.can_approve?(user)).to be true
     end
 
-    context 'when authors can approve' do
-      before do
-        project.update(merge_requests_author_approval: true)
-      end
-
-      context 'when the user is the author' do
-        it 'returns true when user is approver' do
+    context 'when the user is the author' do
+      context 'and user is an approver' do
+        before do
           create(:approver, target: merge_request, user: author)
+        end
+
+        it 'return true when authors can approve' do
+          project.update(merge_requests_author_approval: true)
 
           expect(merge_request.can_approve?(author)).to be true
         end
 
-        it 'returns false when user is not approver' do
+        it 'return false when authors cannot approve' do
+          project.update(merge_requests_author_approval: false)
+
           expect(merge_request.can_approve?(author)).to be false
         end
       end
 
-      context 'when user is committer' do
-        let(:user) { create(:user, email: merge_request.commits.without_merge_commits.first.committer_email) }
+      it 'returns false when user is not an approver' do
+        expect(merge_request.can_approve?(author)).to be false
+      end
+    end
 
+    context 'when user is a committer' do
+      let(:user) { create(:user, email: merge_request.commits.without_merge_commits.first.committer_email) }
+
+      before do
+        project.add_developer(user)
+      end
+
+      context 'and user is an approver' do
         before do
-          project.add_developer(user)
+          create(:approver, target: merge_request, user: user)
         end
 
-        it 'returns true when user is approver' do
-          create(:approver, target: merge_request, user: user)
+        it 'return true when committers can approve' do
+          project.update(merge_requests_disable_committers_approval: false)
 
           expect(merge_request.can_approve?(user)).to be true
         end
 
-        it 'returns false when user is not approver' do
+        it 'return false when committers cannot approve' do
+          project.update(merge_requests_disable_committers_approval: true)
+
           expect(merge_request.can_approve?(user)).to be false
         end
       end
-    end
 
-    context 'when authors cannot approve' do
-      before do
-        project.update(merge_requests_author_approval: false)
-      end
-
-      it 'returns false when user is the author' do
-        create(:approver, target: merge_request, user: author)
-
-        expect(merge_request.can_approve?(author)).to be false
-      end
-
-      it 'returns false when user is a committer' do
-        user = create(:user, email: merge_request.commits.without_merge_commits.first.committer_email)
-        project.add_developer(user)
-        create(:approver, target: merge_request, user: user)
-
+      it 'returns false when user is not an approver' do
         expect(merge_request.can_approve?(user)).to be false
       end
     end

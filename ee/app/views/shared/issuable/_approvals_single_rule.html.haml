@@ -5,7 +5,7 @@
 - can_update_approvers = can?(current_user, :update_approvers, issuable)
 
 - if can_update_approvers
-  - skip_users = [*presenter.all_approvers_including_groups, *(issuable.authors unless presenter.authors_can_approve?)].compact
+  - skip_users = [*presenter.all_approvers_including_groups, (issuable.author unless presenter.authors_can_approve?), *(issuable.committers unless presenter.committers_can_approve?)].compact
 
   = users_select_tag("merge_request[approver_ids]",
     multiple: true,

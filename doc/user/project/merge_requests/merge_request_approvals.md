@@ -111,9 +111,11 @@ A group can also be added as an approver. [In the future](https://gitlab.com/git
 group approvers will be restricted.
 
 If a user is added as an individual approver and is also part of a group approver,
-then that user is just counted once. The merge request author and users who have authored
-commits in the merge request do not count as eligible approvers,
-unless [self-approval] is explicitly enabled on the project settings.
+then that user is just counted once. The merge request author, as well as users who have committed
+to the merge request, do not count as eligible approvers,
+if [**Prevent author approval**](#allowing-merge-request-authors-to-approve-their-own-merge-requests) (enabled by default)
+and [**Prevent committers approval**](#prevent-approval-of-merge-requests-by-their-committers) (disabled by default)
+are enabled on the project settings.
 
 ### Implicit approvers
 
@@ -145,7 +147,7 @@ the following is possible:
 
 NOTE: **Note:**
 The merge request author is only allowed to approve their own merge request
-if [self-approval] is enabled on the project settings.
+if [**Prevent author approval**](#allowing-merge-request-authors-to-approve-their-own-merge-requests) is disabled on the project settings.
 
 For a given merge request, if the approval restrictions have been satisfied,
 the merge request is unblocked and can be merged.
@@ -264,15 +266,27 @@ turn this setting to off by unchecking the box and saving the changes.
 
 ## Allowing merge request authors to approve their own merge requests
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3349) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.3.
+
 You can allow merge request authors to self-approve merge requests by
 enabling it [at the project level](#editing-approvals). Authors
 also need to be included in the approvers list in order to be able to
 approve their merge request.
 
-1. Navigate to your project's **Settings > General** and expand
-   **Merge request approvals**
-1. Tick the "Enable self approval of merge requests" checkbox
-1. Click **Save changes**
+1. Navigate to your project's **Settings > General** and expand **Merge request approvals**.
+1. Uncheck the **Prevent approval of merge requests by merge request author** checkbox, which is enabled by default.
+1. Click **Save changes**.
+
+## Prevent approval of merge requests by their committers
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/10441) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.10.
+
+You can prevent users that have committed to a merge request from approving it by
+enabling [**Prevent approval of merge requests by their committers**](#prevent-approval-of-merge-requests-by-their-committers).
+
+1. Navigate to your project's **Settings > General** and expand **Merge request approvals**.
+1. Tick the checkbox **Prevent approval of merge requests by their committers**.
+1. Click **Save changes**.
 
 ## Merge requests with different source branch and target branch projects
 
@@ -284,8 +298,6 @@ branch's project, the relevant settings are the target project's. The source
 branch's project settings are not applicable. Even if you start the merge
 request from the source branch's project UI, pay attention to the created merge
 request itself. It belongs to the target branch's project.
-
-[self-approval]: #allowing-merge-request-authors-to-approve-their-own-merge-requests
 
 ## Approver suggestions
 
