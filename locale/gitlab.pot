@@ -7650,9 +7650,6 @@ msgstr ""
 msgid "Pipelines need to be configured to enable this feature."
 msgstr ""
 
-msgid "Pipelines page"
-msgstr ""
-
 msgid "Pipelines settings for '%{project_name}' were successfully updated."
 msgstr ""
 
@@ -10165,7 +10162,7 @@ msgstr ""
 msgid "Successfully removed email."
 msgstr ""
 
-msgid "Successfully scheduled a pipeline to run. Go to the %{link_to_pipelines} for details."
+msgid "Successfully scheduled a pipeline to run. Go to the %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details."
 msgstr ""
 
 msgid "Successfully unblocked"
