@@ -28,28 +28,35 @@ const designsStore = [
 ];
 
 const defaultClient = createDefaultClient({
-  defaults: {
-    designs: designsStore,
+  Query: {
+    design(ctx, { id }) {
+      return designsStore.find(design => design.id === id);
+    },
   },
-  resolvers: {
-    Query: {
-      design(ctx, { id }) {
-        return designsStore.find(design => design.id === id);
-      },
-    },
-    Mutation: {
-      uploadDesign(ctx, { name }, { cache }) {
-        const designs = name.map(n => ({
-          ...createMockDesign(_.uniqueId()),
-          name: n,
-          commentsCount: 0,
-        }));
+  Mutation: {
+    uploadDesign(ctx, { files }, { cache }) {
+      const previousDesigns = cache.readQuery({ query: allDesigns });
+      const designs = Array.from(files).map(n => ({
+        ...createMockDesign(_.uniqueId()),
+        name: n.name,
+        commentsCount: 0,
+      }));
+      const data = {
+        designs: designs.concat(previousDesigns.designs),
+      };
 
-        cache.writeData({ data: designs });
+      designsStore.unshift(...designs);
 
-        return designs;
-      },
+      cache.writeQuery({ query: allDesigns, data });
+
+      return designs;
     },
+  },
+});
+
+defaultClient.cache.writeData({
+  data: {
+    designs: designsStore,
   },
 });
 

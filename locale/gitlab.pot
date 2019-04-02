@@ -3520,6 +3520,9 @@ msgstr ""
 msgid "Description:"
 msgstr ""
 
+msgid "DesignManagement|Could not find design, please try again."
+msgstr ""
+
 msgid "DesignManagement|Error uploading a new design. Please try again"
 msgstr ""
 

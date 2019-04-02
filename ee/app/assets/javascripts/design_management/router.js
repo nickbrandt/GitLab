@@ -32,6 +32,15 @@ const router = new VueRouter({
           meta: {
             el: 'designs',
           },
+          beforeEnter(
+            {
+              params: { id },
+            },
+            from,
+            next,
+          ) {
+            if (id !== -1) next();
+          },
           props: ({ params: { id } }) => ({ id: parseInt(id, 10) }),
         },
       ],

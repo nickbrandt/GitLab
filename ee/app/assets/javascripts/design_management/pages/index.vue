@@ -63,7 +63,7 @@ export default {
     onUploadDesign(files) {
       if (!this.canCreateDesign) return null;
 
-      const optimisticResponse = [...files].map(file => ({
+      const optimisticResponse = Array.from(files).map(file => ({
         __typename: 'Design',
         id: -1,
         image: '',
@@ -78,14 +78,15 @@ export default {
         .mutate({
           mutation: uploadDesignQuery,
           variables: {
-            name: [...files].map(({ name }) => name),
+            files,
           },
-          update: (store, { data: { uploadDesign } }) => {
-            const data = store.readQuery({ query: allDesignsQuery });
+          // update: (store, { data: { uploadDesign } }) => {
+          //   const data = store.readQuery({ query: allDesignsQuery });
+          //   console.log(data, uploadDesign);
 
-            data.designs.unshift(...uploadDesign);
-            store.writeQuery({ query: allDesignsQuery, data });
-          },
+          //   data.designs.unshift(...uploadDesign);
+          //   store.writeQuery({ query: allDesignsQuery, data });
+          // },
           optimisticResponse: {
             __typename: 'Mutation',
             uploadDesign: optimisticResponse,
