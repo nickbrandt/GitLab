@@ -182,10 +182,10 @@ module Geo
     end
 
     def finder_klass_for_failed_registries
-      if Gitlab::Geo::Fdw.enabled_for_selective_sync?
-        Geo::ProjectRegistrySyncFailedFinder
-      else
+      if !Gitlab::Geo::Fdw.enabled? || use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectRegistrySyncFailedFinder
+      else
+        Geo::ProjectRegistrySyncFailedFinder
       end
     end
 
