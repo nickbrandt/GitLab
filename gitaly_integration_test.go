@@ -186,6 +186,48 @@ func TestAllowedGetGitArchive(t *testing.T) {
 
 	// Create the repository in the Gitaly server
 	apiResponse := realGitalyOkBody(t)
+	require.NoError(t, ensureGitalyRepository(t, apiResponse))
+
+	archivePath := path.Join(scratchDir, "my/path")
+	archivePrefix := "repo-1"
+
+	msg := serializedProtoMessage("GetArchiveRequest", &gitalypb.GetArchiveRequest{
+		Repository: &apiResponse.Repository,
+		CommitId:   "HEAD",
+		Prefix:     archivePrefix,
+		Format:     gitalypb.GetArchiveRequest_TAR,
+		Path:       []byte("files"),
+	})
+	jsonParams := buildGitalyRPCParams(gitalyAddress, rpcArg{"ArchivePath", archivePath}, msg)
+
+	resp, body, err := doSendDataRequest("/archive.tar", "git-archive", jsonParams)
+	require.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+
+	// Ensure the tar file is readable
+	foundEntry := false
+	tr := tar.NewReader(bytes.NewReader(body))
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			break
+		}
+
+		if hdr.Name == archivePrefix+"/" {
+			foundEntry = true
+			break
+		}
+	}
+
+	assert.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
+}
+
+func TestAllowedGetGitArchiveOldPayload(t *testing.T) {
+	skipUnlessRealGitaly(t)
+
+	// Create the repository in the Gitaly server
+	apiResponse := realGitalyOkBody(t)
 	repo := apiResponse.Repository
 	require.NoError(t, ensureGitalyRepository(t, apiResponse))
 

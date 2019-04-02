@@ -168,3 +168,11 @@ func (s *GitalyTestServer) SetConfig(context.Context, *gitalypb.SetConfigRequest
 func (s *GitalyTestServer) DiffStats(*gitalypb.DiffStatsRequest, gitalypb.DiffService_DiffStatsServer) error {
 	return nil
 }
+
+func (s *GitalyTestServer) FetchHTTPRemote(context.Context, *gitalypb.FetchHTTPRemoteRequest) (*gitalypb.FetchHTTPRemoteResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) PreFetch(context.Context, *gitalypb.PreFetchRequest) (*gitalypb.PreFetchResponse, error) {
+	return nil, nil
+}

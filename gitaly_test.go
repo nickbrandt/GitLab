@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -633,6 +634,16 @@ func serializedMessage(name string, arg proto.Message) rpcArg {
 	}
 
 	return rpcArg{name, str}
+}
+
+func serializedProtoMessage(name string, arg proto.Message) rpcArg {
+	msg, err := proto.Marshal(arg)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return rpcArg{name, base64.URLEncoding.EncodeToString(msg)}
 }
 
 type combinedServer struct {

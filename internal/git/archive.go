@@ -15,6 +15,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
@@ -26,12 +28,13 @@ import (
 
 type archive struct{ senddata.Prefix }
 type archiveParams struct {
-	ArchivePath      string
-	ArchivePrefix    string
-	CommitId         string
-	GitalyServer     gitaly.Server
-	GitalyRepository gitalypb.Repository
-	DisableCache     bool
+	ArchivePath       string
+	ArchivePrefix     string
+	CommitId          string
+	GitalyServer      gitaly.Server
+	GitalyRepository  gitalypb.Repository
+	DisableCache      bool
+	GetArchiveRequest []byte
 }
 
 var (
@@ -130,16 +133,25 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 }
 
 func handleArchiveWithGitaly(r *http.Request, params archiveParams, format gitalypb.GetArchiveRequest_Format) (io.Reader, error) {
+	var request *gitalypb.GetArchiveRequest
 	c, err := gitaly.NewRepositoryClient(params.GitalyServer)
 	if err != nil {
 		return nil, err
 	}
 
-	request := &gitalypb.GetArchiveRequest{
-		Repository: &params.GitalyRepository,
-		CommitId:   params.CommitId,
-		Prefix:     params.ArchivePrefix,
-		Format:     format,
+	if params.GetArchiveRequest != nil {
+		request = &gitalypb.GetArchiveRequest{}
+
+		if err := proto.Unmarshal(params.GetArchiveRequest, request); err != nil {
+			return nil, fmt.Errorf("unmarshal GetArchiveRequest: %v", err)
+		}
+	} else {
+		request = &gitalypb.GetArchiveRequest{
+			Repository: &params.GitalyRepository,
+			CommitId:   params.CommitId,
+			Prefix:     params.ArchivePrefix,
+			Format:     format,
+		}
 	}
 
 	return c.ArchiveReader(r.Context(), request)
