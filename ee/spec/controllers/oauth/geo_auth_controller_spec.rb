@@ -27,12 +27,34 @@ describe Oauth::GeoAuthController do
       expect(response).to redirect_to(root_url)
     end
 
-    it "redirects to primary node's oauth endpoint" do
-      oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
+    shared_examples "a valid redirect to to primary node's oauth endpoint" do
+      it "redirects to primary node's oauth endpoint" do
+        oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
 
-      get :auth, params: { state: login_state }
+        get :auth, params: { state: login_state }
 
-      expect(response).to redirect_to(oauth_endpoint)
+        expect(response).to redirect_to(oauth_endpoint)
+      end
+    end
+
+    context 'without a tampered header' do
+      it_behaves_like "a valid redirect to to primary node's oauth endpoint"
+    end
+
+    context 'with a tampered HOST header' do
+      before do
+        request.headers['HOST'] = 'http://this.is.not.my.host'
+      end
+
+      it_behaves_like "a valid redirect to to primary node's oauth endpoint"
+    end
+
+    context 'with a tampered X-Forwarded-Host header' do
+      before do
+        request.headers['X-Forwarded-Host'] = 'http://this.is.not.my.host'
+      end
+
+      it_behaves_like "a valid redirect to to primary node's oauth endpoint"
     end
   end
 
@@ -55,16 +77,40 @@ describe Oauth::GeoAuthController do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'redirects to redirect_url if state is valid' do
-        get :callback, params: { state: login_state }
+      context 'with a valid state' do
+        shared_examples 'a valid redirect to redirect_url' do
+          it "redirects to primary node's oauth endpoint" do
+            get :callback, params: { state: login_state }
 
-        expect(response).to redirect_to(secondary_node.url)
-      end
+            expect(response).to redirect_to('/')
+          end
+        end
 
-      it 'does not display a flash message if state is valid' do
-        get :callback, params: { state: login_state }
+        context 'without a tampered header' do
+          it_behaves_like 'a valid redirect to redirect_url'
+        end
 
-        expect(controller).to set_flash[:alert].to(nil)
+        context 'with a tampered HOST header' do
+          before do
+            request.headers['HOST'] = 'http://this.is.not.my.host'
+          end
+
+          it_behaves_like 'a valid redirect to redirect_url'
+        end
+
+        context 'with a tampered X-Forwarded-Host header' do
+          before do
+            request.headers['X-Forwarded-Host'] = 'http://this.is.not.my.host'
+          end
+
+          it_behaves_like 'a valid redirect to redirect_url'
+        end
+
+        it 'does not display a flash message' do
+          get :callback, params: { state: login_state }
+
+          expect(controller).to set_flash[:alert].to(nil)
+        end
       end
     end
 

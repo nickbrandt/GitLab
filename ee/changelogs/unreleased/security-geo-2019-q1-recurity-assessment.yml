@@ -1,0 +1,6 @@
+---
+title: Geo - Improve security while redirecting user back to the secondary after a
+  logout & re-login via the primary
+merge_request:
+author:
+type: security
