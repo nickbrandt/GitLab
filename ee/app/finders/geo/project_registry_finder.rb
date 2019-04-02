@@ -72,18 +72,11 @@ module Geo
         .execute
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_unsynced_projects(batch_size:)
-      relation =
-        if use_legacy_queries?
-          legacy_find_unsynced_projects
-        else
-          fdw_find_unsynced_projects
-        end
-
-      relation.limit(batch_size)
+    def find_unsynced_projects(shard_name:, batch_size:)
+      finder_klass_for_unsynced_projects
+        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
+        .execute
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_projects_updated_recently(batch_size:)
@@ -100,39 +93,12 @@ module Geo
 
     protected
 
-    #
-    # FDW accessors
-    #
-
-    # @return [ActiveRecord::Relation<Geo::Fdw::Project>]
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find_unsynced_projects
-      Geo::Fdw::Project.joins("LEFT OUTER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
-        .where(project_registry: { project_id: nil })
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
     # @return [ActiveRecord::Relation<Geo::Fdw::Project>]
     # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_projects_updated_recently
       Geo::Fdw::Project.joins("INNER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
           .merge(Geo::ProjectRegistry.dirty)
           .merge(Geo::ProjectRegistry.retry_due)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    #
-    # Legacy accessors (non FDW)
-    #
-
-    # @return [ActiveRecord::Relation<Project>] list of unsynced projects
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_unsynced_projects
-      legacy_left_outer_join_registry_ids(
-        current_node.projects,
-        Geo::ProjectRegistry.pluck(:project_id),
-        Project
-      )
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -169,6 +135,14 @@ module Geo
 
     def use_legacy_queries_for_selective_sync?
       fdw_disabled? || selective_sync? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
+    end
+
+    def finder_klass_for_unsynced_projects
+      if use_legacy_queries_for_selective_sync?
+        Geo::LegacyProjectUnsyncedFinder
+      else
+        Geo::ProjectUnsyncedFinder
+      end
     end
 
     def finder_klass_for_synced_registries
