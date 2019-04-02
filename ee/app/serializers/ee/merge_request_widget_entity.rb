@@ -119,6 +119,10 @@ module EE
       expose :rebase_commit_sha
       expose :rebase_in_progress?, as: :rebase_in_progress
 
+      expose :merge_pipelines_enabled?, as: :merge_pipelines_enabled do |merge_request|
+        merge_request.target_project.merge_pipelines_enabled?
+      end
+
       expose :can_push_to_source_branch do |merge_request|
         presenter(merge_request).can_push_to_source_branch?
       end

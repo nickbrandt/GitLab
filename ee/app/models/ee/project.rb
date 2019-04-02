@@ -531,6 +531,10 @@ module EE
       feature_available?(:protected_environments)
     end
 
+    def merge_pipelines_enabled?
+      feature_available?(:merge_pipelines) && super
+    end
+
     # Because we use default_value_for we need to be sure
     # packages_enabled= method does exist even if we rollback migration.
     # Otherwise many tests from spec/migrations will fail.
