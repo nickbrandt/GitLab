@@ -2,13 +2,13 @@
 
 Thank you for purchasing a subscription for GitLab. This page will help get you started with your subscription, whether you have subscribed to GitLab.com or self-managed GitLab. For more information on the types of subscriptions, please see [Subscribe to GitLab](../README.md#subscribe-to-gitlab) on the GitLab Documentation landing page.
 
-## Know our product
+## Set up GitLab
 
 Learn how GitLab helps you in the stages of the DevOps lifecycle by learning more [about the GitLab product](https://about.gitlab.com/product/), [GitLab features](https://about.gitlab.com/features/), and [GitLab Documentation Overview](../README.md).
 
 ### Self-managed: Install GitLab
 
-Take a look at [installing GitLab](https://about.gitlab.com/install/), and our [administrator documentation](../administration/index.md).
+Take a look at [installing GitLab](https://about.gitlab.com/install/) and our [administrator documentation](../administration/index.md). Then, follow the instructions below under [Your subscription](#your-subscription) to apply your license file. 
 
 ### GitLab.com: Create a user and group
 
@@ -16,29 +16,29 @@ Start with creating a user account for yourself using our [sign up page](https:/
 
 [GitLab groups](../user/group/index.md) help assemble related projects together allowing you to grant members access to several projects at once. A group is not required if you plan on having [projects](../user/project/) inside a personal namespace.
 
-## Your Subscription
+## Your subscription
 
 You can view and manage subscriptions through our [Customers portal](https://customers.gitlab.com/). Information on applying your subscription is below.
 
 Please also see our [subscription FAQ](https://about.gitlab.com/pricing/licensing-faq/)
 
-### View Subscription and Seats
+### View subscription and seats
 
 To view and manage the subscriptions you have purchased and the number of seats associated with the subscription, please visit and log into the [Customers’ Portal](https://customers.gitlab.com/subscriptions). For more information, please see our [subscription FAQ](https://about.gitlab.com/pricing/licensing-faq/) and [pricing page](https://about.gitlab.com/pricing/), which includes information on our [true-up pricing policy](https://about.gitlab.com/handbook/product/pricing/#true-up-pricing) when adding more users than at time of purchase.
 
 Please note that this account may have the same email, but is a _separate_ login from your GitLab.com account. If the two accounts are linked together, then you can use the "sign in with GitLab.com account" link underneath the `Sign In` button.
 
-### Change Billing Information
+### Change billing information
 
 In the customers portal, go to the `My Account` page, then revise the `Account Details` information and click on the `Update Account` button.
 
 Future purchases will use the information in this section. The email listed in this section is used for the Customers Portal login and for license related email communication.
 
-### Self-Managed: Apply Your License File
+### Self-managed: Apply your license file
 
 After purchase, the license file is sent to the email address tied to the Customers portal account, which needs to be [uploaded to the GitLab instance](../user/admin_area/license.md#uploading-your-license).
 
-### Link Your GitLab.com Account with Your Customers Portal Account
+### Link your GitLab.com account with your Customers Portal account
 
 NOTE: **Note:** This is *required* for GitLab.com subscriptions.
 
@@ -46,7 +46,7 @@ Once signed into the customers portal, if your account is not already linked, yo
 
 You can also go to the [My Account](https://customers.gitlab.com/customers/edit) page to add or change the GitLab.com account link.
 
-### Change the Linked GitLab.com Account for Your Customers Portal Account
+### Change the linked GitLab.com account for your Customers Portal account
 
 To change which GitLab.com account is associated with a Customers Portal account, please follow these steps:
 
@@ -56,23 +56,22 @@ To change which GitLab.com account is associated with a Customers Portal account
 1. Under `Your GitLab.com account`, click the `Change linked account` button.
 1. Have the user you want associated log in to their [GitLab.com](https://gitlab.com) account.
 
-### GitLab.com: Associate Your Namespace with Your Subscription
+### GitLab.com: Associate your namespace with your subscription
 
 Once your GitLab.com account is linked, you can go to your [Subscriptions](https://customers.gitlab.com/subscriptions) page to choose or change the namespace your subscription applies to.
 
 Please note that you need to be a group owner to associate a group to your subscription.
 
-## Need Help?
+## Need help?
 
 [GitLab's Documentation](https://docs.gitlab.com/) offers a wide range of topics covering the use and administration of GitLab.
 
 We also encourage all users to search our project trackers for known issues and existing feature requests in:
 
 - [GitLab CE](https://gitlab.com/gitlab-org/gitlab-ce/issues/) for features included in all tiers, and
+- [GitLab EE](https://gitlab.com/gitlab-org/gitlab-ee/issues/) for paid-tier features.
 
-- [GitLab EE](https://gitlab.com/gitlab-org/gitlab-ee/issues/) for paid tier features.
-
-Project issues are the best avenue for getting updates on existing issues and for communicating directly with the relevant GitLab team members.
+These issues are the best avenue for getting updates on specific product plans and for communicating directly with the relevant GitLab team members.
 
 ### Contacting Support
 
