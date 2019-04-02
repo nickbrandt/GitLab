@@ -43,7 +43,7 @@ describe ElasticBatchProjectIndexerWorker do
 
       expect_index(projects.first, false).and_call_original
       expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
-        expect(indexer).to receive(:run).with(nil)
+        expect(indexer).to receive(:run)
       end
 
       expect { worker.perform(projects.first.id, projects.first.id) }
@@ -56,7 +56,7 @@ describe ElasticBatchProjectIndexerWorker do
 
         expect_index(projects.first, false).and_call_original
         expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
-          expect(indexer).to receive(:run).with(nil)
+          expect(indexer).to receive(:run)
         end
 
         worker.perform(projects.first.id, projects.first.id)
@@ -75,7 +75,7 @@ describe ElasticBatchProjectIndexerWorker do
         projects.first.index_status.update!(last_commit: 'foo')
 
         expect_index(projects.first, true).and_call_original
-        expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run).with('foo')
+        expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
 
         worker.perform(projects.first.id, projects.first.id, true)
       end

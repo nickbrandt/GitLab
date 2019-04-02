@@ -5,13 +5,15 @@ describe Gitlab::Elastic::Indexer do
 
   before do
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'true')
-    stub_ee_application_setting(elasticsearch_url: ['http://localhost:9200'])
+    stub_ee_application_setting(ee_application_setting) if ee_application_setting.present?
   end
 
-  let(:project)  { create(:project, :repository) }
-  let(:from_sha) { Gitlab::Git::BLANK_SHA }
-  let(:to_sha)   { project.commit.try(:sha) }
-  let(:indexer)  { described_class.new(project) }
+  let(:ee_application_setting) { { elasticsearch_url: ['http://localhost:9200'] } }
+  let(:project) { create(:project, :repository) }
+  let(:expected_from_sha) { Gitlab::Git::EMPTY_TREE_ID }
+  let(:to_commit) { project.commit }
+  let(:to_sha) { to_commit.try(:sha) }
+  let(:indexer) { described_class.new(project) }
 
   let(:popen_success) { [[''], 0] }
   let(:popen_failure) { [['error'], 1] }
@@ -53,18 +55,50 @@ describe Gitlab::Elastic::Indexer do
         hash_including(
           'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env,
-          'FROM_SHA'                => from_sha,
+          'FROM_SHA'                => expected_from_sha,
           'TO_SHA'                  => to_sha
         )
       ).and_return(popen_success)
 
-      indexer.run(from_sha, to_sha)
+      indexer.run(to_sha)
+    end
+
+    context 'when IndexStatus exists' do
+      context 'when last_commit exists' do
+        let(:last_commit) { to_commit.parent_ids.first }
+
+        before do
+          project.create_index_status!(last_commit: last_commit)
+        end
+
+        it 'uses last_commit as from_sha' do
+          expect_popen.and_return(popen_success)
+
+          indexer.run(to_sha)
+
+          expect_index_status(to_sha)
+        end
+      end
+
+      context 'when last_commit no longer exists' do
+        before do
+          project.create_index_status!(last_commit: '51749675fc22nononononononono343bd54a3c95')
+        end
+
+        it 'use nil as from_sha' do
+          expect_popen.and_return(popen_success)
+
+          indexer.run(to_sha)
+
+          expect_index_status(to_sha)
+        end
+      end
     end
 
     it 'updates the index status when the indexing is a success' do
       expect_popen.and_return(popen_success)
 
-      indexer.run(from_sha, to_sha)
+      indexer.run(to_sha)
 
       expect_index_status(to_sha)
     end
@@ -72,7 +106,7 @@ describe Gitlab::Elastic::Indexer do
     it 'leaves the index status untouched when indexing a non-HEAD commit' do
       expect_popen.and_return(popen_success)
 
-      indexer.run(from_sha, project.repository.commit('HEAD~1'))
+      indexer.run(project.repository.commit('HEAD~1'))
 
       expect(project.index_status).to be_nil
     end
@@ -125,12 +159,82 @@ describe Gitlab::Elastic::Indexer do
             'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
             'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
             'RAILS_ENV'               => Rails.env,
-            'FROM_SHA'                => from_sha,
+            'FROM_SHA'                => expected_from_sha,
             'TO_SHA'                  => to_sha
           )
         ).and_return(popen_success)
 
-        indexer.run(from_sha, to_sha)
+        indexer.run(to_sha)
+      end
+    end
+  end
+
+  context 'reverting a change', :elastic do
+    let(:user) { project.owner }
+    let!(:initial_commit) { project.repository.commit('master').sha }
+    let(:ee_application_setting) { nil }
+
+    def change_repository_and_index(project, &blk)
+      yield blk
+
+      current_commit = project.repository.commit('master').sha
+
+      described_class.new(project).run(current_commit)
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    def indexed_file_paths_for(term)
+      blobs = Repository.search(
+        term,
+        type: :blob
+      )[:blobs][:results].response
+
+      blobs.map do |blob|
+        blob['_source']['blob']['path']
+      end
+    end
+
+    context 'when IndexStatus#last_commit is no longer in repository', :pending do
+      before do
+        change_repository_and_index(project) do
+          project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
+          project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
+        end
+
+        expect(indexed_file_paths_for('12')).to include('12')
+        expect(indexed_file_paths_for('23')).to include('23')
+
+        project.index_status.update(last_commit: 'ABCDABCDABCD')
+      end
+
+      it 'reindexes from scratch if IndexStatus#last_commit is no longer in repository' do
+        change_repository_and_index(project) do
+          project.repository.write_ref('master', initial_commit)
+        end
+
+        expect(indexed_file_paths_for('12')).not_to include('12')
+        expect(indexed_file_paths_for('23')).not_to include('23')
+      end
+    end
+
+    context 'when branch is reset to an earlier commit' do
+      before do
+        change_repository_and_index(project) do
+          project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
+          project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
+        end
+
+        expect(indexed_file_paths_for('12')).to include('12')
+        expect(indexed_file_paths_for('23')).to include('23')
+      end
+
+      it 'reverses already indexed commits' do
+        change_repository_and_index(project) do
+          project.repository.write_ref('master', initial_commit)
+        end
+
+        expect(indexed_file_paths_for('12')).not_to include('12')
+        expect(indexed_file_paths_for('23')).not_to include('23')
       end
     end
   end

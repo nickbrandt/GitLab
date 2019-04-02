@@ -28,9 +28,7 @@ class ElasticBatchProjectIndexerWorker
 
     logger.info "Indexing #{project.full_name} (ID=#{project.id})..."
 
-    # Get the last commit if we're updating indexed projects - otherwise we'll want to index everything
-    last_commit = project.index_status.try(:last_commit) if update_index
-    Gitlab::Elastic::Indexer.new(project).run(last_commit)
+    Gitlab::Elastic::Indexer.new(project).run
 
     logger.info "Indexing #{project.full_name} (ID=#{project.id}) is done!"
   rescue => err
