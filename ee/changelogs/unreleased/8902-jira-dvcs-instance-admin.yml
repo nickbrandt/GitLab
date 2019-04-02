@@ -1,0 +1,5 @@
+---
+title: Allow instance admins to link all projects to Jira DVCS
+merge_request: 10541
+author:
+type: added
