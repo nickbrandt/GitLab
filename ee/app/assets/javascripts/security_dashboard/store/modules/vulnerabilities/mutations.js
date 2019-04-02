@@ -81,7 +81,12 @@ export default {
       'url',
       vulnerability.project && vulnerability.project.full_path,
     );
-    Vue.set(state.modal.data.file, 'value', vulnerability.location && vulnerability.location.file);
+    Vue.set(
+      state.modal.data.file,
+      'value',
+      vulnerability.location &&
+        `${vulnerability.location.file}:${vulnerability.location.start_line}`,
+    );
     Vue.set(
       state.modal.data.identifiers,
       'value',
