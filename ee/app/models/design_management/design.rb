@@ -4,10 +4,9 @@ module DesignManagement
   class Design < ApplicationRecord
     belongs_to :project
     belongs_to :issue
-    has_many :versions, class_name: 'DesignManagement::Version', inverse_of: :design
+    has_and_belongs_to_many :versions, class_name: 'DesignManagement::Version', inverse_of: :designs
 
     validates :project, :issue, :filename, presence: true
-    validates :issue, uniqueness: true
     validates :filename, uniqueness: { scope: :issue_id }
   end
 end
