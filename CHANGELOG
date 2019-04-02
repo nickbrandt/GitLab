@@ -2,6 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.4.0
+
+- Adds X-Request-Id response header for Workhorse !363
+- Change content type detection header size to 4k !366
+- Allow unknown fields in jsonpb gitaly-proto messages !367
+- Filter `sharedSecret` param from Jira !369
+- Get git-archive with GetArchiveRequest !375
+
 v8.3.3
 
 - Preserve orientation when removing EXIF
