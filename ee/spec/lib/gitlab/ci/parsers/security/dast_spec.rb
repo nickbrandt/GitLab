@@ -27,8 +27,8 @@ describe Gitlab::Ci::Parsers::Security::Dast do
       expected1 = Digest::SHA1.hexdigest(':GET:X-Content-Type-Options')
       expected2 = Digest::SHA1.hexdigest('/:GET:X-Content-Type-Options')
 
-      expect(report.occurrences.first[:location_fingerprint]).to eq(expected1)
-      expect(report.occurrences.last[:location_fingerprint]).to eq(expected2)
+      expect(report.occurrences.first.location_fingerprint).to eq(expected1)
+      expect(report.occurrences.last.location_fingerprint).to eq(expected2)
     end
 
     describe 'occurrence properties' do
@@ -44,7 +44,7 @@ describe Gitlab::Ci::Parsers::Security::Dast do
         it 'saves properly occurrence' do
           occurrence = report.occurrences.last
 
-          expect(occurrence[attribute]).to eq(value)
+          expect(occurrence.public_send(attribute)).to eq(value)
         end
       end
     end

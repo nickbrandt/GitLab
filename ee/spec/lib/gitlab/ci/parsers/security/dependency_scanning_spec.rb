@@ -34,11 +34,11 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
       end
 
       it "generates expected location fingerprint" do
-        expect(report.occurrences.first[:location_fingerprint]).to eq(fingerprint)
+        expect(report.occurrences.first.location_fingerprint).to eq(fingerprint)
       end
 
       it "generates expected metadata_version" do
-        expect(report.occurrences.first[:metadata_version]).to eq(version)
+        expect(report.occurrences.first.metadata_version).to eq(version)
       end
     end
 
@@ -53,9 +53,9 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
 
       it "generates occurrence with expected remediation" do
         occurrence = report.occurrences.last
-        raw_metadata = JSON.parse!(occurrence[:raw_metadata])
+        raw_metadata = JSON.parse!(occurrence.raw_metadata)
 
-        expect(occurrence[:name]).to eq("Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js")
+        expect(occurrence.name).to eq("Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js")
         expect(raw_metadata["remediations"].first["summary"]).to eq("Upgrade saml2-js")
         expect(raw_metadata["remediations"].first["diff"]).to start_with("ZGlmZiAtLWdpdCBhL3lhcm4")
       end

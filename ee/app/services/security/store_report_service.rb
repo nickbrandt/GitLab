@@ -38,7 +38,7 @@ module Security
     def create_vulnerability(occurrence)
       vulnerability = create_or_find_vulnerability_object(occurrence)
 
-      occurrence[:identifiers].map do |identifier|
+      occurrence.identifiers.map do |identifier|
         create_vulnerability_identifier_object(vulnerability, identifier)
       end
 
@@ -48,14 +48,13 @@ module Security
     # rubocop: disable CodeReuse/ActiveRecord
     def create_or_find_vulnerability_object(occurrence)
       find_params = {
-        scanner: scanners_objects[occurrence[:scanner]],
-        primary_identifier: identifiers_objects[occurrence[:primary_identifier]],
-        location_fingerprint: occurrence[:location_fingerprint]
+        scanner: scanners_objects[occurrence.scanner.key],
+        primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
+        location_fingerprint: occurrence.location_fingerprint
       }
 
-      create_params = occurrence.except(
-        :scanner, :primary_identifier,
-        :location_fingerprint, :identifiers)
+      create_params = occurrence.to_hash
+        .except(:compare_key, :identifiers, :scanner) # rubocop: disable CodeReuse/ActiveRecord
 
       begin
         project.vulnerabilities
@@ -69,7 +68,7 @@ module Security
 
     def create_vulnerability_identifier_object(vulnerability, identifier)
       vulnerability.occurrence_identifiers.find_or_create_by!( # rubocop: disable CodeReuse/ActiveRecord
-        identifier: identifiers_objects[identifier])
+        identifier: identifiers_objects[identifier.key])
     rescue ActiveRecord::RecordNotUnique
     end
 
@@ -81,13 +80,13 @@ module Security
     def scanners_objects
       strong_memoize(:scanners_objects) do
         @report.scanners.map do |key, scanner|
-          [key, existing_scanner_objects[key] || project.vulnerability_scanners.build(scanner)]
+          [key, existing_scanner_objects[key] || project.vulnerability_scanners.build(scanner.to_hash)]
         end.to_h
       end
     end
 
     def all_scanners_external_ids
-      @report.scanners.values.map { |scanner| scanner[:external_id] }
+      @report.scanners.values.map(&:external_id)
     end
 
     def existing_scanner_objects
@@ -101,13 +100,13 @@ module Security
     def identifiers_objects
       strong_memoize(:identifiers_objects) do
         @report.identifiers.map do |key, identifier|
-          [key, existing_identifiers_objects[key] || project.vulnerability_identifiers.build(identifier)]
+          [key, existing_identifiers_objects[key] || project.vulnerability_identifiers.build(identifier.to_hash)]
         end.to_h
       end
     end
 
     def all_identifiers_fingerprints
-      @report.identifiers.values.map { |identifier| identifier[:fingerprint] }
+      @report.identifiers.values.map(&:fingerprint)
     end
 
     def existing_identifiers_objects

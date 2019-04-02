@@ -22,32 +22,16 @@ module Gitlab
             error.present?
           end
 
-          def add_scanner(params)
-            scanner_key(params).tap do |key|
-              scanners[key] ||= params
-            end
+          def add_scanner(scanner)
+            scanners[scanner.key] ||= scanner
           end
 
-          def add_identifier(params)
-            identifier_key(params).tap do |key|
-              identifiers[key] ||= params
-            end
+          def add_identifier(identifier)
+            identifiers[identifier.key] ||= identifier
           end
 
-          def add_occurrence(params)
-            params.tap do |occurrence|
-              occurrences << occurrence
-            end
-          end
-
-          private
-
-          def scanner_key(params)
-            params.fetch(:external_id)
-          end
-
-          def identifier_key(params)
-            params.fetch(:fingerprint)
+          def add_occurrence(occurrence)
+            occurrences << occurrence
           end
         end
       end
