@@ -129,6 +129,7 @@ excluded_attributes:
     - :mirror_last_update_at
     - :mirror_last_successful_update_at
     - :bfg_object_map
+    - :detected_repository_languages
     - :tag_list
   namespaces:
     - :runners_token
