@@ -27,4 +27,18 @@ describe Geo::UploadRegistry, :geo do
   it 'finds associated Upload record' do
     expect(described_class.find(attachment_registry.id).upload).to be_an_instance_of(Upload)
   end
+
+  describe '#file' do
+    it 'returns the path of the upload of a registry' do
+      registry = create(:geo_upload_registry, :avatar, :with_file)
+
+      expect(registry.file).to eq('uploads/-/system/project/avatar/avatar.jpg')
+    end
+
+    it 'return "removed" message when the upload no longer exists' do
+      registry = create(:geo_upload_registry, :avatar)
+
+      expect(registry.file).to match(/^Removed avatar with id/)
+    end
+  end
 end
