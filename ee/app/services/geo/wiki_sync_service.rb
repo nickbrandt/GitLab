@@ -14,8 +14,13 @@ module Geo
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
       # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]
-        log_info('Wiki repository is not found, marking it as successfully synced')
-        mark_sync_as_successful(missing_on_primary: true)
+        if repository_presumably_exists_on_primary?
+          log_info('Wiki is not found, but it seems to exist on the primary')
+          fail_registry!('Wiki is not found', e)
+        else
+          log_info('Wiki is not found, marking it as successfully synced')
+          mark_sync_as_successful(missing_on_primary: true)
+        end
       else
         fail_registry!('Error syncing wiki repository', e)
       end

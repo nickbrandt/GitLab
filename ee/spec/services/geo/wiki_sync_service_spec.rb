@@ -118,6 +118,24 @@ RSpec.describe Geo::WikiSyncService do
       expect(Geo::ProjectRegistry.last.resync_wiki).to be true
     end
 
+    context 'wiki repository presumably exists on primary' do
+      it 'increases retry count if no wiki repository found' do
+        registry = create(:geo_project_registry, project: project)
+        create(:repository_state, :wiki_verified, project: project)
+
+        allow(repository).to receive(:fetch_as_mirror)
+          .with(url_to_repo, remote_name: 'geo', forced: true)
+          .and_raise(Gitlab::Shell::Error.new(Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]))
+
+        subject.execute
+
+        expect(registry.reload).to have_attributes(
+          resync_wiki: true,
+          wiki_retry_count: 1
+        )
+      end
+    end
+
     context 'tracking database' do
       context 'temporary repositories' do
         include_examples 'cleans temporary repositories' do
