@@ -19,15 +19,6 @@ describe 'layouts/nav/sidebar/_project' do
 
       expect(rendered).to have_css('a[title="Boards"]')
     end
-
-    it 'has board tab when multiple issue boards is not available' do
-      allow(License).to receive(:feature_available?).and_call_original
-      allow(License).to receive(:feature_available?).with(:multiple_project_issue_boards) { false }
-
-      render
-
-      expect(rendered).to have_css('a[title="Board"]')
-    end
   end
 
   describe 'container registry tab' do
