@@ -12,7 +12,10 @@ class IndexUsersBotType < ActiveRecord::Migration[5.0]
   end
 
   def up
+    remove_concurrent_index :users, :bot_type
     add_concurrent_index :users, :bot_type
+
+    remove_concurrent_index :users, :state, name: internal_index
     add_concurrent_index :users, :state,
       name: internal_index,
       where: 'ghost <> true AND bot_type IS NULL'
