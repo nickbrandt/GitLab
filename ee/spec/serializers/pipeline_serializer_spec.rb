@@ -10,7 +10,7 @@ describe PipelineSerializer do
 
   subject { serializer.represent(pipeline, details: true) }
 
-  context 'when pipeline contains bridge jobs' do
+  context 'when pipeline contains failed bridge jobs' do
     let(:pipeline) do
       create(:ci_empty_pipeline,
              project: project,
@@ -19,7 +19,7 @@ describe PipelineSerializer do
     end
 
     before do
-      create(:ci_bridge, pipeline: pipeline)
+      create(:ci_bridge, pipeline: pipeline, status: :failed)
     end
 
     it 'serializes bridge job correctly' do
