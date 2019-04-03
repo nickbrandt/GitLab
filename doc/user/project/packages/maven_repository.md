@@ -197,9 +197,8 @@ domain name.
 
 NOTE: **Note:**
 For retrieving artifacts, you can use either the
-[URL encoded](../../../api/README.md#namespaced-path-encoding) path of the project
-(e.g., `group%2Fproject`) or the project's ID (e.g., `42`). However, only the
-project's ID can be used for uploading.
+[URL encoded](../../../api/README.md#namespaced-path-encoding) path of the group
+(e.g., `group%2Fsubgroup`) or the group's ID (e.g., `12`). 
 
 ### Instance level Maven endpoint
 
