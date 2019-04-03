@@ -143,6 +143,11 @@ Endpoints are available for:
 - [GitLab CI YAML templates](templates/gitlab_ci_ymls.md).
 - [Open source license templates](templates/licenses.md).
 
+## SCIM
+
+[GitLab.com Silver and above](https://about.gitlab.com/pricing/) provides an [SCIM API](scim.md) that implements [the RFC7644 protocol](https://tools.ietf.org/html/rfc7644) and provides
+the `/Users` endpoint. The base URL is: `/api/scim/v2/groups/:group_path/Users/`.
+
 ## Road to GraphQL
 
 Going forward, we will start on moving to
