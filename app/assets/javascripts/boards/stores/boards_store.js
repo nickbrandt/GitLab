@@ -34,13 +34,6 @@ const boardsStore = {
       issue: {},
     };
   },
-  createNewListDropdownData() {
-    this.state.currentBoard = {
-      labels: [],
-    };
-    this.state.currentPage = '';
-    this.state.reload = false;
-  },
   showPage(page) {
     this.state.reload = false;
     this.state.currentPage = page;
