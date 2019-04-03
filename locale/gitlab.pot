@@ -4366,6 +4366,9 @@ msgstr ""
 msgid "Failed to reset key. Please try again."
 msgstr ""
 
+msgid "Failed to save new settings"
+msgstr ""
+
 msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
