@@ -56,7 +56,7 @@ This check is performed by a specific analyzer during the `sast` job. It runs re
 language of your app, and you don't need to change anything to your
 CI/CD configuration file to turn it on. Results are available in the SAST report.
 
-GitLab currently includes [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog), and [Diffence](https://github.com/techjacker/diffence).
+GitLab currently includes [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) checks.
 
 ## How it works
 
