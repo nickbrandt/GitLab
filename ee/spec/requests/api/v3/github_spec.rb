@@ -242,6 +242,18 @@ describe API::V3::Github do
       expect(json_response.size).to eq(projects.size)
     end
 
+    context 'when instance admin' do
+      let(:project) { create(:project, group: group) }
+
+      before do
+        stub_licensed_features(jira_dev_panel_integration: true)
+      end
+
+      it 'returns an array of projects belonging to group with github format' do
+        expect_project_under_namespace([project], group, create(:user, :admin))
+      end
+    end
+
     context 'group namespace' do
       let(:project) { create(:project, group: group) }
 
