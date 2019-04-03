@@ -1,5 +1,0 @@
----
-title: Guard against ldap_sync_last_sync_at being nil
-merge_request: 10505
-author:
-type: fixed
