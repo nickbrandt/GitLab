@@ -19,6 +19,14 @@ module EE
         group.repository_size_limit = ::Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
       end
 
+      override :remove_unallowed_params
+      def remove_unallowed_params
+        unless current_user&.admin?
+          params.delete(:shared_runners_minutes_limit)
+          params.delete(:extra_shared_runners_minutes_limit)
+        end
+      end
+
       def log_audit_event
         ::AuditEventService.new(
           current_user,

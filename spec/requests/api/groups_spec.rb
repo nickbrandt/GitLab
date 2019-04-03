@@ -467,15 +467,6 @@ describe API::Groups do
         expect(response).to have_gitlab_http_status(404)
       end
 
-      # EE
-      it 'returns 403 for updating shared_runners_minutes_limit' do
-        expect do
-          put api("/groups/#{group1.id}", user1), params: { shared_runners_minutes_limit: 133 }
-        end.not_to change { group1.shared_runners_minutes_limit }
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-
       it 'returns 200 if shared_runners_minutes_limit is not changing' do
         group1.update(shared_runners_minutes_limit: 133)
 

@@ -21,6 +21,8 @@
         Unlimited
       = namespace_shared_runner_limits_progress_bar(namespace)
 
+  = render 'namespaces/pipelines_quota/extra_shared_runners_minutes_quota', namespace: namespace
+
 %table.table.pipeline-project-metrics
   %thead
     %tr

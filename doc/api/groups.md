@@ -240,6 +240,7 @@ Example response:
   "file_template_project_id": 1,
   "parent_id": null,
   "shared_runners_minutes_limit": 133,
+  "extra_shared_runners_minutes_limit": 133,
   "projects": [
     {
       "id": 7,
@@ -420,6 +421,7 @@ Parameters:
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
 | `parent_id` | integer | no | The parent group id for creating nested group. |
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group. |
+| `extra_shared_runners_minutes_limit` | integer | no | (admin-only) Extra pipeline minutes quota for this group. |
 
 ## Transfer project to group
 
@@ -457,6 +459,7 @@ PUT /groups/:id
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
 | `file_template_project_id` | integer | no | **(Premium)** The ID of a project to load custom file templates from |
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group |
+| `extra_shared_runners_minutes_limit` | integer | no | (admin-only) Extra pipeline minutes quota for this group |
 
 ```bash
 curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"

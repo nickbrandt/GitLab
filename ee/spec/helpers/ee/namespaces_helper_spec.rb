@@ -79,4 +79,52 @@ describe EE::NamespacesHelper, :postgresql do
       end
     end
   end
+
+  describe '#namespace_shared_runner_limits_quota' do
+    context "when it's unlimited" do
+      before do
+        allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(false)
+      end
+
+      it 'returns Unlimited for the limit section' do
+        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{0 / Unlimited})
+      end
+
+      it 'returns the proper value for the used section' do
+        allow(user_group).to receive(:shared_runners_minutes).and_return(100)
+
+        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{100 / Unlimited})
+      end
+    end
+
+    context "when it's limited" do
+      before do
+        allow(user_group).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
+        allow(user_group).to receive(:shared_runners_minutes).and_return(100)
+
+        user_group.update!(shared_runners_minutes_limit: 500)
+      end
+
+      it 'returns the proper values for used and limit sections' do
+        expect(helper.namespace_shared_runner_limits_quota(user_group)).to match(%r{100 / 500})
+      end
+    end
+  end
+
+  describe '#namespace_extra_shared_runner_limits_quota' do
+    context 'when extra minutes are assigned' do
+      it 'returns the proper values for used and limit sections' do
+        allow(user_group).to receive(:extra_shared_runners_minutes).and_return(50)
+        user_group.update!(extra_shared_runners_minutes_limit: 100)
+
+        expect(helper.namespace_extra_shared_runner_limits_quota(user_group)).to match(%r{50 / 100})
+      end
+    end
+
+    context 'when extra minutes are not assigned' do
+      it 'returns the proper values for used and limit sections' do
+        expect(helper.namespace_extra_shared_runner_limits_quota(user_group)).to match(%r{0 / 0})
+      end
+    end
+  end
 end

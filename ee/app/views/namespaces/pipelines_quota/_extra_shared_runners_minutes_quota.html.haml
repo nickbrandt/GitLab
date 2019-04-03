@@ -1,0 +1,12 @@
+- return unless Gitlab.com? && namespace.shared_runners_minutes_limit_enabled?
+
+.row
+  .col-sm-6
+    %strong
+      = _("Aditional minutes")
+    %div
+      = namespace_extra_shared_runner_limits_quota(namespace)
+      minutes
+  .col-sm-6.right
+    #{namespace_extra_shared_runner_limits_percent_used(namespace)}% used
+    = namespace_shared_runner_limits_progress_bar(namespace, extra: true)

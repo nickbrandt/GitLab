@@ -57,6 +57,32 @@ describe Groups::CreateService, '#execute' do
     end
   end
 
+  context 'updating protected params' do
+    let(:attrs) do
+      group_params.merge(shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100)
+    end
+
+    context 'as an admin' do
+      let(:user) { create(:admin) }
+
+      it 'updates the attributes' do
+        group = create_group(user, attrs)
+
+        expect(group.shared_runners_minutes_limit).to eq(1000)
+        expect(group.extra_shared_runners_minutes_limit).to eq(100)
+      end
+    end
+
+    context 'as a regular user' do
+      it 'ignores the attributes' do
+        group = create_group(user, attrs)
+
+        expect(group.shared_runners_minutes_limit).to be_nil
+        expect(group.extra_shared_runners_minutes_limit).to be_nil
+      end
+    end
+  end
+
   def create_group(user, opts)
     described_class.new(user, opts).execute
   end
