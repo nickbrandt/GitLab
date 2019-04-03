@@ -7,12 +7,14 @@ describe 'Issues > User uses quick actions', :js do
 
   describe 'issue-only commands' do
     let(:user) { create(:user) }
-    let(:project) { create(:project, :public) }
+    let(:project) { create(:project, :public, :repository) }
+    let(:issue) { create(:issue, project: project) }
 
     before do
       project.add_maintainer(user)
       sign_in(user)
       visit project_issue_path(project, issue)
+      wait_for_all_requests
     end
 
     after do
@@ -20,8 +22,6 @@ describe 'Issues > User uses quick actions', :js do
     end
 
     describe 'adding a weight from a note' do
-      let(:issue) { create(:issue, project: project) }
-
       context 'when the user can update the weight' do
         it 'does not create a note, and sets the weight accordingly' do
           add_note("/weight 5")
