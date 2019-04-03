@@ -18,4 +18,8 @@ class Geo::UploadRegistry < Geo::FileRegistry
   def file
     upload&.path || s_('Removed %{type} with id %{id}') % { type: file_type, id: file_id }
   end
+
+  def project
+    return upload.model if upload&.model.is_a?(Project)
+  end
 end

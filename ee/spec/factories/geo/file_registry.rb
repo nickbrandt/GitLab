@@ -15,6 +15,11 @@ FactoryBot.define do
 
     factory :geo_upload_registry, class: Geo::UploadRegistry
 
+    trait :failed do
+      success false
+      retry_count 1
+    end
+
     trait :with_file do
       after(:build, :stub) do |registry, _|
         file =

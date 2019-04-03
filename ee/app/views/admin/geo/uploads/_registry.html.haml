@@ -1,0 +1,32 @@
+.card.upload-card.prepend-top-15
+  .card-header{ id: "upload-#{upload_registry.id}-header" }
+    .d-flex
+      %strong.header-text-primary.flex-fill
+        = upload_registry.file
+      - unless upload_registry.success?
+        = link_to('sync_admin_geo_upload_path(upload_registry)', method: :post, class: 'btn btn-default btn-sm mr-2') do
+          = s_('Geo|Sync')
+      - unless upload_registry.upload
+        = link_to(admin_geo_upload_path(upload_registry), data: { confirm: s_('Geo|Tracking entry will be removed. Are you sure?')}, method: :delete, class: 'btn btn-inverted btn-remove btn-sm') do
+          = s_('Geo|Remove')
+  .card-body
+    .container.upload-container
+      .row
+        .col-sm.upload-status-container
+          .upload-status-title.text-muted
+            = s_('Geo|Status')
+          = geo_registry_status(upload_registry)
+        .col-sm.upload-status-container
+          .upload-status-title.text-muted
+            = s_('Geo|Synced at')
+          .upload-status-content
+            - if upload_registry.success?
+              = time_ago_with_tooltip(upload_registry.created_at, placement: 'bottom')
+            - else
+              = s_('Geo|Never')
+        - if upload_registry.project
+          .col-sm.upload-status-container
+            .upload-status-title.text-muted
+              = s_('Geo|Project')
+            .upload-status-content
+              = link_to(upload_registry.project.full_name, admin_namespace_project_path(upload_registry.project.namespace, upload_registry.project))

@@ -178,13 +178,9 @@
 }
 
 .geo-admin-projects,
+.geo-admin-uploads,
 .admin-projects {
   .card-header {
-    .header-text-primary,
-    .header-text-secondary {
-      color: $blue-600;
-    }
-
     .header-text-primary {
       line-height: 28px;
       text-overflow: ellipsis;
@@ -213,12 +209,13 @@
   }
 
   .card-body {
-    .project-container {
+    .project-container,
+    .upload-container {
       margin-left: 0;
       padding-left: 0;
     }
 
-    .project-status-content {
+    .geo-status-content {
       &.status-type-success {
         color: $green-600;
       }
@@ -229,7 +226,8 @@
     }
 
     @include media-breakpoint-down(xs) {
-      .project-status-container + .project-status-container {
+      .project-status-container + .project-status-container,
+      .upload-status-container + .upload-status-container {
         margin-top: 15px;
       }
     }
