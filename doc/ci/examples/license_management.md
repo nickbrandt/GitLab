@@ -121,6 +121,31 @@ license_management:
       license_management: gl-license-management-report.json
 ```
 
+## Maven projects configuration
+
+The License Management tool provides a `MAVEN_CLI_OPTS` environment variable which can hold
+the command line arguments to pass to the `mvn install` command which is executed under the hood.
+Feel free to use it for the customization of Maven execution, e.g.:
+
+```yaml
+include:
+  template: License-Management.gitlab-ci.yml
+
+license_management:
+  variables:
+    MAVEN_CLI_OPTS: --debug
+```
+
+CAUTION: **Caution:**
+`mvn install` runs through all of the [build life cycle](http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
+stages prior to `"install"`, including `"test"`. Running unit tests is not directly necessary
+for the license scanning purposes and consumes time, so it's skipped by having the default value of `MAVEN_CLI_OPTS`
+as `-DskipTests`. If you want to supply custom `MAVEN_CLI_OPTS`, don't forget to add `-DskipTests` to your
+options.
+
+TIP: **Tip:**
+If you still need to run tests during `mvn install`, supply `MAVEN_CLI_OPTS` with value `-DskipTests=false`. 
+ 
 ## Previous job definitions
 
 CAUTION: **Caution:**

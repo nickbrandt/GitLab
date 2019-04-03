@@ -1,0 +1,5 @@
+---
+title: Added MAVEN_CLI_OPTS env var support to License Management CI job
+merge_request: 10012
+author:
+type: added
