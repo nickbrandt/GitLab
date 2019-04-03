@@ -2,6 +2,16 @@
 
 class ApprovalRulePresenter < Gitlab::View::Presenter::Delegated
   def groups
-    super.public_or_visible_to_user(current_user)
+    group_query_service.visible_groups
+  end
+
+  def contains_hidden_groups?
+    group_query_service.contains_hidden_groups?
+  end
+
+  private
+
+  def group_query_service
+    @group_query_service ||= ApprovalRules::GroupFinder.new(@subject, current_user)
   end
 end

@@ -16,6 +16,7 @@ const {
   INPUT_USER_IDS,
   INPUT_GROUP_IDS,
   INPUT_DELETE,
+  INPUT_REMOVE_HIDDEN_GROUPS,
   INPUT_FALLBACK_APPROVALS_REQUIRED,
 } = MRRulesHiddenInputs;
 const TEST_USERS = [{ id: 1 }, { id: 10 }];
@@ -181,6 +182,21 @@ describe('EE Approvlas MRRulesHiddenInputs', () => {
               name: INPUT_SOURCE_ID,
               value: rule.sourceId.toString(),
             });
+          });
+        });
+      });
+
+      describe('with remove hidden groups', () => {
+        beforeEach(() => {
+          rule.removeHiddenGroups = true;
+        });
+
+        it('renders input to remove hidden groups', () => {
+          factory();
+
+          expect(findHiddenInputs()).toContain({
+            name: INPUT_REMOVE_HIDDEN_GROUPS,
+            value: 'true',
           });
         });
       });

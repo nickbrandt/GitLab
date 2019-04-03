@@ -130,11 +130,20 @@ module EE
       (::Gitlab.config.ldap.enabled && ldap_group_links.any?(&:active?)) || super
     end
 
-    def mark_ldap_sync_as_failed(error_message)
+    def mark_ldap_sync_as_failed(error_message, skip_validation: false)
       return false unless ldap_sync_started?
 
-      fail_ldap_sync
-      update_column(:ldap_sync_error, ::Gitlab::UrlSanitizer.sanitize(error_message))
+      error_message = ::Gitlab::UrlSanitizer.sanitize(error_message)
+
+      if skip_validation
+        # A group that does not validate cannot transition out of its
+        # current state, so manually set the ldap_sync_status
+        update_columns(ldap_sync_error: error_message,
+                       ldap_sync_status: 'failed')
+      else
+        fail_ldap_sync
+        update_column(:ldap_sync_error, error_message)
+      end
     end
 
     # This token conveys that the anonymous user is allowed to know of the group

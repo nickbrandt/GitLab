@@ -2,6 +2,7 @@
 
 module Gitlab
   module Insights
+    CONFIG_FILE_PATH = '.gitlab/insights.yml'
     COLOR_SCHEME = {
       red: '#e6194b',
       green: '#3cb44b',

@@ -6,7 +6,10 @@ module EE
 
     override :sidebar_projects_paths
     def sidebar_projects_paths
-      super + %w(projects/security/dashboard#show)
+      super + %w[
+        projects/security/dashboard#show
+        projects/insights#show
+      ]
     end
 
     override :sidebar_settings_paths
@@ -42,6 +45,10 @@ module EE
 
       if can?(current_user, :read_feature_flag, project) && !nav_tabs.include?(:operations)
         nav_tabs << :operations
+      end
+
+      if project.insights_available?
+        nav_tabs << :project_insights
       end
 
       nav_tabs

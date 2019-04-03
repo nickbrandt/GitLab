@@ -395,9 +395,53 @@ describe Group do
     end
   end
 
-  describe '#insights_available?' do
-    it_behaves_like 'an entity with the Insights feature' do
+  describe '#beta_feature_available?' do
+    it_behaves_like 'an entity with beta feature support' do
       let(:entity) { group }
+    end
+  end
+
+  describe "#insights_config" do
+    context 'when group has no Insights project configured' do
+      it 'returns nil' do
+        expect(group.insights_config).to be_nil
+      end
+    end
+
+    context 'when group has an Insights project configured without a config file' do
+      before do
+        project = create(:project, group: group)
+        group.create_insight!(project: project)
+      end
+
+      it 'returns nil' do
+        expect(group.insights_config).to be_nil
+      end
+    end
+
+    context 'when group has an Insights project configured' do
+      before do
+        project = create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+        group.create_insight!(project: project)
+      end
+
+      context 'with a valid config file' do
+        let(:insights_file_content) { 'key: monthlyBugsCreated' }
+
+        it 'returns the insights config data' do
+          insights_config = group.insights_config
+
+          expect(insights_config).to eq(key: 'monthlyBugsCreated')
+        end
+      end
+
+      context 'with an invalid config file' do
+        let(:insights_file_content) { ': foo bar' }
+
+        it 'returns the insights config data' do
+          expect(group.insights_config).to be_nil
+        end
+      end
     end
   end
 end

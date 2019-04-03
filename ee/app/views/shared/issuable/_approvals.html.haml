@@ -11,7 +11,7 @@
   = form.label :approver_ids, class: 'col-form-label col-sm-2' do
     Approvers
   .col-sm-10
-    - if Feature.enabled?(:approval_rules, @project)
+    - if Feature.enabled?(:approval_rules, @target_project)
       = render 'shared/issuable/approvals_multiple_rule', issuable: issuable
     - else
       = render 'shared/issuable/approvals_single_rule', issuable: issuable, presenter: presenter, form: form

@@ -34,6 +34,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resource :insights, only: [:show] do
+        collection do
+          post :query
+        end
+      end
+
       scope '-' do
         resources :packages, only: [:index, :show, :destroy], module: :packages
         resources :package_files, only: [], module: :packages do

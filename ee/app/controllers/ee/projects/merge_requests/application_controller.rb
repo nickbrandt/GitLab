@@ -14,13 +14,28 @@ module EE
 
         def merge_request_params_attributes
           attrs = super.push(
-            { approval_rules_attributes: [:id, :name, { user_ids: [] }, { group_ids: [] }, :approvals_required, :approval_project_rule_id, :_destroy] },
+            approval_rule_attributes,
             :approvals_before_merge,
             :approver_group_ids,
             :approver_ids
           )
 
           attrs
+        end
+
+        def approval_rule_attributes
+          {
+            approval_rules_attributes: [
+              :id,
+              :name,
+              { user_ids: [] },
+              { group_ids: [] },
+              :approvals_required,
+              :approval_project_rule_id,
+              :remove_hidden_groups,
+              :_destroy
+            ]
+          }
         end
 
         # If the number of approvals is not greater than the project default, set to
