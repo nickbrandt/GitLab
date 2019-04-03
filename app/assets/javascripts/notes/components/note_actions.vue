@@ -88,9 +88,6 @@ export default {
   },
   computed: {
     ...mapGetters(['getUserDataByProp']),
-    showReplyButton() {
-      return gon.features && gon.features.replyToIndividualNotes && this.showReply;
-    },
     shouldShowActionsDropdown() {
       return this.currentUserId && (this.canEdit || this.canReportAsAbuse);
     },
@@ -172,7 +169,7 @@ export default {
       </a>
     </div>
     <reply-button
-      v-if="showReplyButton"
+      v-if="showReply"
       ref="replyButton"
       class="js-reply-button"
       @startReplying="$emit('startReplying')"
