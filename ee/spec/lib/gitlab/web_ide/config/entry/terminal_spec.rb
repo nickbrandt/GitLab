@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::WebIde::Config::Entry::Terminal do
-  let(:entry) { described_class.new(config) }
+  let(:entry) { described_class.new(config, with_image_ports: true) }
 
   describe '.nodes' do
     context 'when filtering all the entry/node names' do
@@ -28,6 +28,21 @@ describe Gitlab::WebIde::Config::Entry::Terminal do
       describe '#valid?' do
         it 'is valid' do
           expect(entry).to be_valid
+        end
+      end
+
+      context 'when the same port is not duplicated' do
+        let(:config) do
+          {
+            image: { name: "ruby", ports: [80] },
+            services: [{ name: "mysql", alias: "service1", ports: [81] }, { name: "mysql", alias: "service2", ports: [82] }]
+          }
+        end
+
+        describe '#valid?' do
+          it 'is valid' do
+            expect(entry).to be_valid
+          end
         end
       end
     end
@@ -63,6 +78,23 @@ describe Gitlab::WebIde::Config::Entry::Terminal do
           end
         end
       end
+
+      context 'when the same port is duplicated' do
+        let(:config) do
+          {
+            image: { name: "ruby", ports: [80] },
+            services: [{ name: "mysql", ports: [80] }, { name: "mysql", ports: [81] }]
+          }
+        end
+
+        describe '#valid?' do
+          it 'is invalid' do
+            expect(entry).not_to be_valid
+            expect(entry.errors.count).to eq 1
+            expect(entry.errors.first).to match "each port number can only be referenced once"
+          end
+        end
+      end
     end
   end
 
@@ -80,10 +112,6 @@ describe Gitlab::WebIde::Config::Entry::Terminal do
     end
 
     describe '#value' do
-      before do
-        entry.compose!
-      end
-
       context 'when entry is correct' do
         let(:config) do
           { before_script: %w[ls pwd],
