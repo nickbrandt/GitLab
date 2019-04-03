@@ -21,9 +21,10 @@ module Geo
     def execute
       return Geo::ProjectRegistry.none unless valid_shard?
 
-      current_node.project_registries
-        .merge(Geo::Fdw::ProjectRegistry.registries_pending_verification)
-        .merge(Geo::Fdw::ProjectRegistry.within_shards(shard_name))
+      Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder
+        .new(current_node.project_registries)
+        .registries_pending_verification
+        .within_shards(shard_name)
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord

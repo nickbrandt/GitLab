@@ -29,7 +29,7 @@ module Geo
       private
 
       def registries_for_selected_namespaces
-        Geo::Fdw::ProjectRegistry
+        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
           .within_namespaces(selected_namespaces_and_descendants.select(:id))
       end
 
@@ -57,7 +57,8 @@ module Geo
       end
 
       def registries_for_selected_shards
-        Geo::Fdw::ProjectRegistry.within_shards(selective_sync_shards)
+        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
+          .within_shards(selective_sync_shards)
       end
 
       def fdw_namespaces_table

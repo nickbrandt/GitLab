@@ -17,6 +17,14 @@ module Geo
         def search(query)
           fuzzy_search(query, [:path, :name, :description])
         end
+
+        def within_namespaces(namespace_ids)
+          where(arel_table.name => { namespace_id: namespace_ids })
+        end
+
+        def within_shards(shard_names)
+          where(repository_storage: Array(shard_names))
+        end
       end
     end
   end
