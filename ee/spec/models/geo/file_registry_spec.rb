@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Geo::FileRegistry do
-  set(:failed) { create(:geo_file_registry, success: false) }
-  set(:synced) { create(:geo_file_registry, success: true) }
+  set(:failed) { create(:geo_file_registry, :failed) }
+  set(:synced) { create(:geo_file_registry) }
 
   describe '.failed' do
     it 'returns registries in the failed state' do
@@ -27,10 +27,9 @@ describe Geo::FileRegistry do
 
   describe '.never' do
     it 'returns registries that are never synced' do
-      create(:geo_file_registry, retry_count: 1, success: true)
-      create(:geo_file_registry, retry_count: 2, success: false)
+      never = create(:geo_file_registry, retry_count: nil, success: false)
 
-      expect(described_class.never).to match_ids([failed, synced])
+      expect(described_class.never).to match_ids([never])
     end
   end
 
@@ -59,7 +58,7 @@ describe Geo::FileRegistry do
     end
 
     it 'returns :never for a successful registry never synced' do
-      never = build(:geo_file_registry, success: nil)
+      never = build(:geo_file_registry, success: false, retry_count: nil)
 
       expect(never.synchronization_state).to eq(:never)
     end
