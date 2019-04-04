@@ -105,17 +105,19 @@ module API
         params do
           use :pagination
         end
-        # rubocop: disable CodeReuse/ActiveRecord
+
         get ':namespace/repos', requirements: NAMESPACE_ENDPOINT_REQUIREMENTS do
           namespace = Namespace.find_by_full_path(params[:namespace])
           not_found!('Namespace') unless namespace
 
-          projects = current_user.authorized_projects.where(namespace_id: namespace.self_and_descendants).to_a
+          projects = Project.public_or_visible_to_user(current_user)
+                            .in_namespace(namespace.self_and_descendants)
+                            .to_a
           projects.select! { |project| licensed_project?(project) }
           projects = ::Kaminari.paginate_array(projects)
+
           present paginate(projects), with: ::API::Github::Entities::Repository
         end
-        # rubocop: enable CodeReuse/ActiveRecord
       end
 
       # Jira dev panel integration weirdly requests for "/-/jira/pulls" instead

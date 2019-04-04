@@ -20,7 +20,7 @@ is one GitLab project to the entire Jira instance.
 
 We recommend that a GitLab group admin
 or instance admin (in the case of self-hosted GitLab) set up the integration,
-in order to simplify administration (subject to [limitations](#limitations)).
+in order to simplify administration.
 
 TIP: **Tip:**
 Create and use a single-purpose "jira" user in GitLab, so that removing
@@ -123,8 +123,6 @@ Click the links to see your GitLab repository data.
 ## Limitations
 
 - This integration is currently not supported on GitLab instances under a [relative url][relative-url] (e.g. `http://example.com/gitlab`).
-- The GitLab user that you use to configure this integration must be a member of all
-    projects you wish to link to Jira. We're investigating removing this limitation in in [a feature proposal](https://gitlab.com/gitlab-org/gitlab-ee/issues/8902).
 
 ## Changelog
 

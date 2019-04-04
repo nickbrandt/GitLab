@@ -476,6 +476,7 @@ describe MergeRequest do
       it 'does not cache issues from external trackers' do
         issue  = ExternalIssue.new('JIRA-123', subject.project)
         commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
+
         allow(subject).to receive(:commits).and_return([commit])
 
         expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to raise_error
@@ -804,6 +805,14 @@ describe MergeRequest do
 
       expect(merge_request.commits).not_to be_empty
       expect(merge_request.related_notes.count).to eq(3)
+    end
+
+    it "excludes system notes for commits" do
+      system_note = create(:note_on_commit, :system, commit_id: merge_request.commits.first.id,
+                                                     project: merge_request.project)
+
+      expect(merge_request.related_notes.count).to eq(2)
+      expect(merge_request.related_notes).not_to include(system_note)
     end
   end
 

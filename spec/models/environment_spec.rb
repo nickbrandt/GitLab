@@ -557,10 +557,6 @@ describe Environment do
   end
 
   describe '#deployment_platform' do
-    before do
-      stub_licensed_features(multiple_clusters: true)
-    end
-
     context 'when there is a deployment platform for environment' do
       let!(:cluster) do
         create(:cluster, :provided_by_gcp,
@@ -596,7 +592,9 @@ describe Environment do
 
       shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
         it 'returns the terminals from the deployment service' do
-          expect(environment.deployment_platform)
+          deployment_platform_target = Gitlab.ee? ? environment : project
+
+          expect(deployment_platform_target.deployment_platform)
             .to receive(:terminals).with(environment)
             .and_return(:fake_terminals)
 
@@ -624,47 +622,6 @@ describe Environment do
       end
 
       it { is_expected.to be_nil }
-    end
-  end
-
-  describe '#rollout_status' do
-    shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-      subject { environment.rollout_status }
-
-      context 'when the environment has rollout status' do
-        before do
-          allow(environment).to receive(:has_terminals?).and_return(true)
-        end
-
-        it 'returns the rollout status from the deployment service' do
-          expect(environment.deployment_platform)
-            .to receive(:rollout_status).with(environment)
-            .and_return(:fake_rollout_status)
-
-          is_expected.to eq(:fake_rollout_status)
-        end
-      end
-
-      context 'when the environment does not have rollout status' do
-        before do
-          allow(environment).to receive(:has_terminals?).and_return(false)
-        end
-
-        it { is_expected.to eq(nil) }
-      end
-    end
-
-    context 'when user configured kubernetes from Integration > Kubernetes' do
-      let(:project) { create(:kubernetes_project) }
-
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-    end
-
-    context 'when user configured kubernetes from CI/CD > Clusters' do
-      let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-      let(:project) { cluster.project }
-
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
     end
   end
 
@@ -730,19 +687,34 @@ describe Environment do
 
   describe '#additional_metrics' do
     let(:project) { create(:prometheus_project) }
-    subject { environment.additional_metrics }
+    let(:metric_params) { [] }
+    subject { environment.additional_metrics(*metric_params) }
 
-    context 'when the environment has metrics' do
+    context 'when the environment has additional metrics' do
       before do
         allow(environment).to receive(:has_metrics?).and_return(true)
       end
 
       it 'returns the additional metrics from the deployment service' do
-        expect(environment.prometheus_adapter).to receive(:query)
-                                                .with(:additional_metrics_environment, environment)
-                                                .and_return(:fake_metrics)
+        expect(environment.prometheus_adapter)
+          .to receive(:query)
+          .with(:additional_metrics_environment, environment)
+          .and_return(:fake_metrics)
 
         is_expected.to eq(:fake_metrics)
+      end
+
+      context 'when time window arguments are provided' do
+        let(:metric_params) { [1552642245.067, Time.now] }
+
+        it 'queries with the expected parameters' do
+          expect(environment.prometheus_adapter)
+            .to receive(:query)
+            .with(:additional_metrics_environment, environment, *metric_params.map(&:to_f))
+            .and_return(:fake_metrics)
+
+          is_expected.to eq(:fake_metrics)
+        end
       end
     end
 

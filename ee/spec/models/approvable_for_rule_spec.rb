@@ -43,26 +43,36 @@ describe ApprovableForRule do
     end
 
     context 'when the user is the author' do
-      context 'and user is an approver' do
+      context 'and author is an approver' do
         before do
           create(:approver, target: merge_request, user: author)
         end
 
-        it 'return true when authors can approve' do
-          project.update(merge_requests_author_approval: true)
+        it 'returns true when authors can approve' do
+          project.update!(merge_requests_author_approval: true)
 
           expect(merge_request.can_approve?(author)).to be true
         end
 
-        it 'return false when authors cannot approve' do
-          project.update(merge_requests_author_approval: false)
+        it 'returns false when authors cannot approve' do
+          project.update!(merge_requests_author_approval: false)
 
           expect(merge_request.can_approve?(author)).to be false
         end
       end
 
-      it 'returns false when user is not an approver' do
-        expect(merge_request.can_approve?(author)).to be false
+      context 'and author is not an approver' do
+        it 'returns true when authors can approve' do
+          project.update!(merge_requests_author_approval: true)
+
+          expect(merge_request.can_approve?(author)).to be true
+        end
+
+        it 'returns false when authors cannot approve' do
+          project.update!(merge_requests_author_approval: false)
+
+          expect(merge_request.can_approve?(author)).to be false
+        end
       end
     end
 
@@ -73,26 +83,36 @@ describe ApprovableForRule do
         project.add_developer(user)
       end
 
-      context 'and user is an approver' do
+      context 'and committer is an approver' do
         before do
           create(:approver, target: merge_request, user: user)
         end
 
         it 'return true when committers can approve' do
-          project.update(merge_requests_disable_committers_approval: false)
+          project.update!(merge_requests_disable_committers_approval: false)
 
           expect(merge_request.can_approve?(user)).to be true
         end
 
         it 'return false when committers cannot approve' do
-          project.update(merge_requests_disable_committers_approval: true)
+          project.update!(merge_requests_disable_committers_approval: true)
 
           expect(merge_request.can_approve?(user)).to be false
         end
       end
 
-      it 'returns false when user is not an approver' do
-        expect(merge_request.can_approve?(user)).to be false
+      context 'and committer is not an approver' do
+        it 'return true when committers can approve' do
+          project.update!(merge_requests_disable_committers_approval: false)
+
+          expect(merge_request.can_approve?(user)).to be true
+        end
+
+        it 'return false when committers cannot approve' do
+          project.update!(merge_requests_disable_committers_approval: true)
+
+          expect(merge_request.can_approve?(user)).to be false
+        end
       end
     end
 
@@ -105,7 +125,7 @@ describe ApprovableForRule do
 
     context 'when approvals are required' do
       before do
-        project.update(approvals_before_merge: 1)
+        project.update!(approvals_before_merge: 1)
       end
 
       it 'returns true when approvals are still accepted and user still has not approved' do

@@ -130,6 +130,30 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'repository_size_limit assignment as Bytes' do
+    let(:group) { create(:group, :public, repository_size_limit: 0) }
+
+    context 'when param present' do
+      let(:opts) { { repository_size_limit: '100' } }
+
+      it 'converts from MB to Bytes' do
+        update_group(group, user, opts)
+
+        expect(group.reload.repository_size_limit).to eql(100 * 1024 * 1024)
+      end
+    end
+
+    context 'when param not present' do
+      let(:opts) { { repository_size_limit: '' } }
+
+      it 'assign nil value' do
+        update_group(group, user, opts)
+
+        expect(group.reload.repository_size_limit).to be_nil
+      end
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end

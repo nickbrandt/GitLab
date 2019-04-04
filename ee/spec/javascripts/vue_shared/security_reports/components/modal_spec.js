@@ -2,8 +2,6 @@ import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/modal.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
-import { TEST_HOST } from 'spec/test_constants';
 
 describe('Security Reports modal', () => {
   const Component = Vue.extend(component);
@@ -115,31 +113,6 @@ describe('Security Reports modal', () => {
       });
     });
 
-    describe('with instances', () => {
-      beforeEach(() => {
-        const props = {
-          modal: createState().modal,
-        };
-        props.modal.data.instances.value = [
-          { uri: 'http://192.168.32.236:3001/explore?sort=latest_activity_desc' },
-          { uri: 'http://192.168.32.236:3001/help/user/group/subgroups/index.md' },
-        ];
-        vm = mountComponent(Component, props);
-      });
-
-      it('renders instances list', () => {
-        const instances = vm.$el.querySelectorAll('.report-block-list li');
-
-        expect(instances[0].textContent).toContain(
-          'http://192.168.32.236:3001/explore?sort=latest_activity_desc',
-        );
-
-        expect(instances[1].textContent).toContain(
-          'http://192.168.32.236:3001/help/user/group/subgroups/index.md',
-        );
-      });
-    });
-
     describe('data', () => {
       beforeEach(() => {
         const props = {
@@ -147,32 +120,17 @@ describe('Security Reports modal', () => {
           vulnerabilityFeedbackHelpPath: 'feedbacksHelpPath',
         };
         props.modal.title = 'Arbitrary file existence disclosure in Action Pack';
-        props.modal.data.file.value = 'Gemfile.lock';
-        props.modal.data.file.url = `${TEST_HOST}/path/Gemfile.lock`;
-        props.modal.data.severity = { value: 'critical' };
         vm = mountComponent(Component, props);
       });
 
-      it('renders keys in `data`', () => {
+      it('renders title', () => {
         expect(vm.$el.textContent).toContain('Arbitrary file existence disclosure in Action Pack');
-      });
-
-      it('renders link fields with link', () => {
-        expect(vm.$el.querySelector('.js-link-file').getAttribute('href')).toEqual(
-          `${TEST_HOST}/path/Gemfile.lock`,
-        );
       });
 
       it('renders help link', () => {
         expect(
           vm.$el.querySelector('.js-link-vulnerabilityFeedbackHelpPath').getAttribute('href'),
         ).toEqual('feedbacksHelpPath');
-      });
-
-      it('renders severity with a badge', () => {
-        const badge = vm.$el.querySelector('.severity-badge');
-
-        expect(badge.textContent).toContain('Critical');
       });
     });
   });
@@ -206,6 +164,21 @@ describe('Security Reports modal', () => {
 
     it('does not display the footer', () => {
       expect(vm.$el.classList.contains('modal-hide-footer')).toBeTruthy();
+    });
+  });
+
+  describe('Vulnerability Details', () => {
+    it('is rendered', () => {
+      const props = {
+        modal: createState().modal,
+      };
+      props.modal.data.namespace.value = 'foobar';
+      vm = mountComponent(Component, props);
+
+      const vulnerabilityDetails = vm.$el.querySelector('.js-vulnerability-details');
+
+      expect(vulnerabilityDetails).not.toBeNull();
+      expect(vulnerabilityDetails.textContent).toContain('foobar');
     });
   });
 
@@ -251,69 +224,6 @@ describe('Security Reports modal', () => {
 
       expect(solutionCard).toBeNull();
       expect(vm.$el.querySelector('hr')).not.toBeNull();
-    });
-  });
-
-  describe('does not render XSS links', () => {
-    // eslint-disable-next-line no-script-url
-    const badUrl = 'javascript:alert("")';
-
-    beforeEach(() => {
-      const props = {
-        modal: createState().modal,
-      };
-
-      props.modal.data.file.value = 'badFile.lock';
-      props.modal.data.file.url = badUrl;
-      props.modal.data.links.value = [
-        {
-          url: badUrl,
-        },
-      ];
-      props.modal.data.identifiers.value = [
-        {
-          type: 'CVE',
-          name: 'BAD_URL',
-          url: badUrl,
-        },
-      ];
-      props.modal.data.instances.value = [
-        {
-          param: 'X-Content-Type-Options',
-          method: 'GET',
-          uri: badUrl,
-        },
-      ];
-
-      vm = mountComponent(Component, props);
-    });
-
-    it('for the link field', () => {
-      const linkEl = vm.$el.querySelector('.js-link-links');
-
-      expect(linkEl.tagName).not.toBe('A');
-      expect(trimText(linkEl.textContent)).toBe(badUrl);
-    });
-
-    it('for the identifiers field', () => {
-      const linkEl = vm.$el.querySelector('.js-link-identifiers');
-
-      expect(linkEl.tagName).not.toBe('A');
-      expect(trimText(linkEl.textContent)).toBe('BAD_URL');
-    });
-
-    it('for the file field', () => {
-      const linkEl = vm.$el.querySelector('.js-link-file');
-
-      expect(linkEl.tagName).not.toBe('A');
-      expect(trimText(linkEl.textContent)).toBe('badFile.lock');
-    });
-
-    it('for the instances field', () => {
-      const linkEl = vm.$el.querySelector('.report-block-list-issue-description-link .break-link');
-
-      expect(linkEl.tagName).not.toBe('A');
-      expect(trimText(linkEl.textContent)).toBe(badUrl);
     });
   });
 });

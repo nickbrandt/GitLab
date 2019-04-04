@@ -50,6 +50,26 @@ describe Ci::CreateWebIdeTerminalService do
 
           it_behaves_like 'be successful'
         end
+
+        context 'for configuration with ports' do
+          let(:config_content) do
+            <<-EOS
+              terminal:
+                image:
+                  name: ruby:2.2
+                  ports:
+                    - 80
+                script: rspec
+                services:
+                  - name: test
+                    alias: test
+                    ports:
+                      - 8080
+            EOS
+          end
+
+          it_behaves_like 'be successful'
+        end
       end
     end
 

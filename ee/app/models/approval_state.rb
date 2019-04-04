@@ -133,15 +133,17 @@ class ApprovalState
 
   def can_approve?(user)
     return false unless user
-    # The check below considers authors being able to approve the MR.
-    # That is, they're included/excluded from that list accordingly.
     return true if unactioned_approvers.include?(user)
-    # We can safely unauthorize author and committers if it reaches this guard clause.
-    return false if merge_request.author == user
-    return false if merge_request.committers.include?(user)
+    return false unless any_approver_allowed?
     return false unless user.can?(:update_merge_request, merge_request)
+    # Users can only approve once.
+    return false if approvals.where(user: user).any?
+    # At this point, follow self-approval rules. Otherwise authors must
+    # have been in the list of unactioned_approvers to have been approved.
+    return committers_can_approve? if merge_request.committers.include?(user)
+    return authors_can_approve? if merge_request.author == user
 
-    any_approver_allowed? && merge_request.approvals.where(user: user).empty?
+    true
   end
 
   def has_approved?(user)
@@ -152,6 +154,10 @@ class ApprovalState
 
   def authors_can_approve?
     project.merge_requests_author_approval?
+  end
+
+  def committers_can_approve?
+    !project.merge_requests_disable_committers_approval?
   end
 
   # TODO: remove after #1979 is closed

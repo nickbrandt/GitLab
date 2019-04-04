@@ -18,15 +18,4 @@ By displaying the logs directly in GitLab, developers can avoid having to manage
 
 ## Requirements
 
-There are a few key requirements in order to be able to use Pod Logs:
-
-1. [Create or connect a Kubernetes cluster to the project](index.md#adding-and-creating-a-new-gke-cluster-via-gitlab)
-1. A GitLab Runner. If one is not available, they can be easily [deployed](index.md#installing-applications).
-1. Ensure a Kubernetes label of `app: $CI_ENVIRONMENT_SLUG` is applied to the
-   deployments, replica sets, and pods, where `$CI_ENVIRONMENT_SLUG` is the value
-   of the [CI variable](../../../ci/variables/README.md#predefined-environment-variables).
-   This needed to determine the environment a pod belongs to
-   when is more than one. These resources should be
-   contained in the namespace defined in the Kubernetes service setting.
-   The [Auto DevOps](../../../topics/autodevops/index.md) `.gitlab-ci.yml` template has predefined
-   stages and commands to use, and automatically applies the labeling.
+[Enabling Deploy Boards](../deploy_boards.md#enabling-deploy-boards) is required in order to be able to use Pod Logs.

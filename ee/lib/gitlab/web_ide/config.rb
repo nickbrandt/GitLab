@@ -11,7 +11,8 @@ module Gitlab
       def initialize(config, opts = {})
         @config = build_config(config, opts)
 
-        @global = Entry::Global.new(@config)
+        @global = Entry::Global.new(@config,
+          with_image_ports: true)
         @global.compose!
       rescue Gitlab::Config::Loader::FormatError => e
         raise Config::ConfigError, e.message

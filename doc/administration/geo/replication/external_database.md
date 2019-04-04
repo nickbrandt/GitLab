@@ -116,10 +116,10 @@ To configure the connection to the external read-replica database and enable Log
 
     # note this is shared between both databases,
     # make sure you define the same password in both
-    gitlab_rails['db_password'] = 'mypassword'
+    gitlab_rails['db_password'] = '<your_password_here>'
 
     gitlab_rails['db_username'] = 'gitlab'
-    gitlab_rails['db_host'] = 'my-database-read-replica.dbs.com'
+    gitlab_rails['db_host'] = '<database_read_replica_host>'
     ```
 1. Save the file and [reconfigure GitLab](../../restart_gitlab.md#omnibus-gitlab-reconfigure)
 
@@ -156,10 +156,10 @@ the tracking database on port 5432.
 
     ```ruby
     geo_secondary['db_username'] = 'gitlab_geo'
-    geo_secondary['db_password'] = 'my password'
+    geo_secondary['db_password'] = '<your_password_here>'
 
-    geo_secondary['db_host'] = '<change to the tracking DB host>'
-    geo_secondary['db_port'] = 5432      # change to the correct port
+    geo_secondary['db_host'] = '<tracking_database_host>'
+    geo_secondary['db_port'] = <tracking_database_port>      # change to the correct port
     geo_secondary['db_fdw'] = true       # enable FDW
     geo_postgresql['enable'] = false     # don't use internal managed instance
     ```
@@ -184,14 +184,14 @@ the tracking database on port 5432.
     #!/bin/bash
 
     # Secondary Database connection params:
-    DB_HOST="<change to the public IP or VPC private IP>"
+    DB_HOST="<public_ip_or_vpc_private_ip>"
     DB_NAME="gitlabhq_production"
     DB_USER="gitlab"
-    DB_PASS="my password"
+    DB_PASS="<your_password_here>"
     DB_PORT="5432"
 
     # Tracking Database connection params:
-    GEO_DB_HOST="<change to the public IP or VPC private IP>"
+    GEO_DB_HOST="<public_ip_or_vpc_private_ip>"
     GEO_DB_NAME="gitlabhq_geo_production"
     GEO_DB_USER="gitlab_geo"
     GEO_DB_PORT="5432"

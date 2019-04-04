@@ -7,6 +7,8 @@ This topic is for SAML on GitLab.com Silver tier and above. For SAML on self-man
 
 Currently SAML on GitLab.com can be used to automatically add users to a group, and does not yet sign users into GitLab.com. Users should already have an account on the GitLab instance, or can create one when logging in for the first time.
 
+User synchronization for GitLab.com is partially supported using [SCIM](scim_setup.md).
+
 NOTE: **Note:**
 SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
 

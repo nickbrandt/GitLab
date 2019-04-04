@@ -43,8 +43,10 @@ describe ApprovalState do
     before do
       allow(merge_request).to receive(:committers).and_return(User.where(id: committers))
 
-      project.update(merge_requests_author_approval: merge_requests_author_approval)
-      project.update(merge_requests_disable_committers_approval: merge_requests_disable_committers_approval)
+      project.update!(
+        merge_requests_author_approval: merge_requests_author_approval,
+        merge_requests_disable_committers_approval: merge_requests_disable_committers_approval
+      )
       create_rule(users: committers)
     end
 
@@ -81,6 +83,13 @@ describe ApprovalState do
         expect(results).not_to include(*committers)
       end
     end
+  end
+
+  shared_examples_for 'a MR that all members with write access can approve' do
+    it { expect(subject.can_approve?(developer)).to be_truthy }
+    it { expect(subject.can_approve?(reporter)).to be_falsey }
+    it { expect(subject.can_approve?(stranger)).to be_falsey }
+    it { expect(subject.can_approve?(nil)).to be_falsey }
   end
 
   context '#approval_rules_overwritten?' do
@@ -155,7 +164,7 @@ describe ApprovalState do
 
       context 'when overall approvals required is not zero' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         it 'returns true' do
@@ -219,7 +228,7 @@ describe ApprovalState do
 
       shared_examples_for 'checking fallback_approvals_required' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         context 'when it is not met' do
@@ -252,7 +261,7 @@ describe ApprovalState do
 
       context 'when regular rules present' do
         before do
-          project.update(approvals_before_merge: 999)
+          project.update!(approvals_before_merge: 999)
           2.times { create_rule(users: [create(:user)]) }
         end
 
@@ -435,8 +444,8 @@ describe ApprovalState do
         end
       end
 
-      def create_project_member(role)
-        user = create(:user)
+      def create_project_member(role, user_attrs = {})
+        user = create(:user, user_attrs)
         project.add_user(user, role)
         user
       end
@@ -446,10 +455,167 @@ describe ApprovalState do
       let(:author) { create_project_member(:developer) }
       let(:approver) { create_project_member(:developer) }
       let(:approver2) { create_project_member(:developer) }
+      let(:committer) { create_project_member(:developer, email: merge_request.commits.without_merge_commits.first.committer_email) }
       let(:developer) { create_project_member(:developer) }
       let(:other_developer) { create_project_member(:developer) }
       let(:reporter) { create_project_member(:reporter) }
       let(:stranger) { create(:user) }
+
+      context 'when there are no approval rules' do
+        before do
+          project.update!(approvals_before_merge: 1)
+        end
+
+        it_behaves_like 'a MR that all members with write access can approve'
+
+        it 'has fallback rules apply' do
+          expect(subject.use_fallback?).to be_truthy
+        end
+
+        it 'requires one approval' do
+          expect(subject.approvals_left).to eq(1)
+        end
+
+        context 'when authors are authorized to approve their own MRs' do
+          before do
+            project.update!(merge_requests_author_approval: true)
+          end
+
+          it 'allows the author to approve the MR if within the approvers list' do
+            expect(subject.can_approve?(author)).to be_truthy
+          end
+
+          it 'allows the author to approve the MR if not within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([])
+
+            expect(subject.can_approve?(author)).to be_truthy
+          end
+
+          context 'when the author has approved the MR already' do
+            before do
+              create(:approval, user: author, merge_request: merge_request)
+            end
+
+            it 'does not allow the author to approve the MR again' do
+              expect(subject.can_approve?(author)).to be_falsey
+            end
+          end
+        end
+
+        context 'when authors are not authorized to approve their own MRs' do
+          before do
+            project.update!(merge_requests_author_approval: false)
+          end
+
+          it 'allows the author to approve the MR if within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([author])
+
+            expect(subject.can_approve?(author)).to be_truthy
+          end
+
+          it 'does not allow the author to approve the MR if not within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([])
+
+            expect(subject.can_approve?(author)).to be_falsey
+          end
+        end
+
+        context 'when committers are authorized to approve their own MRs' do
+          before do
+            project.update!(merge_requests_disable_committers_approval: false)
+          end
+
+          it 'allows the committer to approve the MR if within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([committer])
+
+            expect(subject.can_approve?(committer)).to be_truthy
+          end
+
+          it 'allows the committer to approve the MR if not within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([])
+
+            expect(subject.can_approve?(committer)).to be_truthy
+          end
+
+          context 'when the committer has approved the MR already' do
+            before do
+              create(:approval, user: committer, merge_request: merge_request)
+            end
+
+            it 'does not allow the committer to approve the MR again' do
+              expect(subject.can_approve?(committer)).to be_falsey
+            end
+          end
+        end
+
+        context 'when committers are not authorized to approve their own MRs' do
+          before do
+            project.update!(merge_requests_disable_committers_approval: true)
+          end
+
+          it 'allows the committer to approve the MR if within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([committer])
+
+            expect(subject.can_approve?(committer)).to be_truthy
+          end
+
+          it 'does not allow the committer to approve the MR if not within the approvers list' do
+            allow(subject).to receive(:approvers).and_return([])
+
+            expect(subject.can_approve?(committer)).to be_falsey
+          end
+        end
+
+        context 'when the user is both an author and a committer' do
+          let(:user) { committer }
+
+          before do
+            merge_request.update!(author: committer)
+          end
+
+          context 'when authors are authorized to approve their own MRs, but not committers' do
+            before do
+              project.update!(
+                merge_requests_author_approval: true,
+                merge_requests_disable_committers_approval: true
+              )
+            end
+
+            it 'allows the user to approve the MR if within the approvers list' do
+              allow(subject).to receive(:approvers).and_return([user])
+
+              expect(subject.can_approve?(user)).to be_truthy
+            end
+
+            it 'does not allow the user to approve the MR if not within the approvers list' do
+              allow(subject).to receive(:approvers).and_return([])
+
+              expect(subject.can_approve?(user)).to be_falsey
+            end
+          end
+
+          context 'when committers are authorized to approve their own MRs, but not authors' do
+            before do
+              project.update!(
+                merge_requests_author_approval: false,
+                merge_requests_disable_committers_approval: false
+              )
+            end
+
+            it 'allows the user to approve the MR if within the approvers list' do
+              allow(subject).to receive(:approvers).and_return([user])
+
+              expect(subject.can_approve?(user)).to be_truthy
+            end
+
+            it 'allows the user to approve the MR if not within the approvers list' do
+              allow(subject).to receive(:approvers).and_return([])
+
+              expect(subject.can_approve?(user)).to be_truthy
+            end
+          end
+        end
+      end
 
       context 'when there is one approver required' do
         let!(:rule) { create_rule(approvals_required: 1) }
@@ -461,15 +627,10 @@ describe ApprovalState do
 
           it_behaves_like 'authors self-approval authorization'
 
+          it_behaves_like 'a MR that all members with write access can approve'
+
           it 'requires one approval' do
             expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(subject.can_approve?(developer)).to be_truthy
-
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
           end
 
           it 'does not allow a logged-out user to approve the MR' do
@@ -526,6 +687,8 @@ describe ApprovalState do
               create(:approval, user: approver2, merge_request: merge_request)
             end
 
+            it_behaves_like 'a MR that all members with write access can approve'
+
             it 'requires the original number of approvals' do
               expect(subject.approvals_left).to eq(1)
             end
@@ -537,14 +700,6 @@ describe ApprovalState do
             it 'does not allow the approvers to approve the MR again' do
               expect(subject.can_approve?(approver)).to be_falsey
               expect(subject.can_approve?(approver2)).to be_falsey
-            end
-
-            it 'allows any other project member with write access to approve the MR' do
-              expect(subject.can_approve?(developer)).to be_truthy
-
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
             end
           end
 
@@ -657,7 +812,7 @@ describe ApprovalState do
     describe '#authors_can_approve?' do
       context 'when project allows author approval' do
         before do
-          project.update(merge_requests_author_approval: true)
+          project.update!(merge_requests_author_approval: true)
         end
 
         it 'returns true' do
@@ -667,7 +822,7 @@ describe ApprovalState do
 
       context 'when project disallows author approval' do
         before do
-          project.update(merge_requests_author_approval: false)
+          project.update!(merge_requests_author_approval: false)
         end
 
         it 'returns true' do
@@ -739,7 +894,7 @@ describe ApprovalState do
 
       context 'when overall approvals required is not zero' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         it 'returns true' do
@@ -795,7 +950,7 @@ describe ApprovalState do
 
       shared_examples_for 'checking fallback_approvals_required' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         context 'when it is not met' do
@@ -829,7 +984,7 @@ describe ApprovalState do
 
       context 'when regular rules present' do
         before do
-          project.update(approvals_before_merge: 999)
+          project.update!(approvals_before_merge: 999)
           2.times { create_rule(users: [create(:user)]) }
         end
 
@@ -1031,15 +1186,10 @@ describe ApprovalState do
 
           it_behaves_like 'authors self-approval authorization'
 
+          it_behaves_like 'a MR that all members with write access can approve'
+
           it 'requires one approval' do
             expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(subject.can_approve?(developer)).to be_truthy
-
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
           end
 
           it 'does not allow a logged-out user to approve the MR' do
@@ -1096,6 +1246,8 @@ describe ApprovalState do
               create(:approval, user: approver2, merge_request: merge_request)
             end
 
+            it_behaves_like 'a MR that all members with write access can approve'
+
             it 'requires the original number of approvals' do
               expect(subject.approvals_left).to eq(1)
             end
@@ -1107,14 +1259,6 @@ describe ApprovalState do
             it 'does not allow the approvers to approve the MR again' do
               expect(subject.can_approve?(approver)).to be_falsey
               expect(subject.can_approve?(approver2)).to be_falsey
-            end
-
-            it 'allows any other project member with write access to approve the MR' do
-              expect(subject.can_approve?(developer)).to be_truthy
-
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
             end
           end
 
@@ -1227,7 +1371,7 @@ describe ApprovalState do
     describe '#authors_can_approve?' do
       context 'when project allows author approval' do
         before do
-          project.update(merge_requests_author_approval: true)
+          project.update!(merge_requests_author_approval: true)
         end
 
         it 'returns true' do
@@ -1237,7 +1381,7 @@ describe ApprovalState do
 
       context 'when project disallows author approval' do
         before do
-          project.update(merge_requests_author_approval: false)
+          project.update!(merge_requests_author_approval: false)
         end
 
         it 'returns true' do

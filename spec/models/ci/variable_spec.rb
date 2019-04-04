@@ -6,12 +6,6 @@ describe Ci::Variable do
   subject { build(:ci_variable) }
 
   describe 'validations' do
-    # EE
-    before do
-      stub_licensed_features(variable_environment_scope: true)
-    end
-
-    it { is_expected.to include_module(HasEnvironmentScope) }
     it { is_expected.to include_module(HasVariable) }
     it { is_expected.to include_module(Presentable) }
     it { is_expected.to include_module(Maskable) }

@@ -11,8 +11,16 @@ The relationship only shows up in the UI if the user can see both issues.
 ## Adding a related issue
 
 You can relate one issue to another by clicking the related issues "+" button
-in the header of the related issue block. Then input the issue reference number
-or paste in a link to the issue.
+in the header of the related issue block. Then, input the issue reference number
+or paste in the full URL of the issue.
+
+Issues of the same project can be specified just by the reference number.
+Issues from a different project require additional information like the
+group and the project name. For example:
+
+- same project: `#44`
+- same group: `project#44 `
+- different group: `group/project#44`
 
 Valid references will be added to a temporary list that you can review.
 When ready, click the green "Add related issues" button to submit.
