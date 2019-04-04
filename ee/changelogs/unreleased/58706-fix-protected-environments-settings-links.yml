@@ -1,0 +1,5 @@
+---
+title: Fix broken links to protected environments on the CI/CD settings page.
+merge_request: 10470
+author:
+type: fixed
