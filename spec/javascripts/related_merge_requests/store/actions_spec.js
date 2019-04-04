@@ -74,14 +74,14 @@ describe('RelatedMergeRequest store actions', () => {
     describe('for a successful request', () => {
       it('should dispatch success action', done => {
         const data = { a: 1 };
-        mock.onGet(state.apiEndpoint).replyOnce(200, data);
+        mock.onGet(`${state.apiEndpoint}?per_page=100`).replyOnce(200, data, { 'x-total': 2 });
 
         testAction(
           actions.fetchMergeRequests,
           null,
           state,
           [],
-          [{ type: 'requestData' }, { type: 'receiveDataSuccess', payload: data }],
+          [{ type: 'requestData' }, { type: 'receiveDataSuccess', payload: { data, total: 2 } }],
           done,
         );
       });
@@ -89,7 +89,7 @@ describe('RelatedMergeRequest store actions', () => {
 
     describe('for a failing request', () => {
       it('should dispatch error action', done => {
-        mock.onGet(state.apiEndpoint).replyOnce(400);
+        mock.onGet(`${state.apiEndpoint}?per_page=100`).replyOnce(400);
 
         testAction(
           actions.fetchMergeRequests,

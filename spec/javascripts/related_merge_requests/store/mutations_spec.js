@@ -28,10 +28,11 @@ describe('RelatedMergeRequests Store Mutations', () => {
       const state = {};
       const mrs = [1, 2, 3];
 
-      mutations[types.RECEIVE_DATA_SUCCESS](state, mrs);
+      mutations[types.RECEIVE_DATA_SUCCESS](state, { data: mrs, total: mrs.length });
 
       expect(state.isFetchingMergeRequests).toEqual(false);
       expect(state.mergeRequests).toEqual(mrs);
+      expect(state.totalCount).toEqual(mrs.length);
     });
   });
 

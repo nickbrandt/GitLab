@@ -18,7 +18,7 @@ describe('RelatedMergeRequests', () => {
     loadFixtures(FIXTURE_PATH);
     mockData = getJSONFixture(FIXTURE_PATH);
     mock = new MockAdapter(axios);
-    mock.onGet(API_ENDPOINT).reply(200, mockData);
+    mock.onGet(`${API_ENDPOINT}?per_page=100`).reply(200, mockData, { 'x-total': 2 });
 
     wrapper = mount(RelatedMergeRequests, {
       localVue,

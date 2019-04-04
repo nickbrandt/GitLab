@@ -7,9 +7,10 @@ export default {
   [types.REQUEST_DATA](state) {
     state.isFetchingMergeRequests = true;
   },
-  [types.RECEIVE_DATA_SUCCESS](state, mrs) {
+  [types.RECEIVE_DATA_SUCCESS](state, { data, total }) {
     state.isFetchingMergeRequests = false;
-    state.mergeRequests = mrs;
+    state.mergeRequests = data;
+    state.totalCount = total;
   },
   [types.RECEIVE_DATA_ERROR](state) {
     state.isFetchingMergeRequests = false;

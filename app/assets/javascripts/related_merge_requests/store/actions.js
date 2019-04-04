@@ -2,6 +2,9 @@ import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import * as types from './mutation_types';
+import { normalizeHeaders } from '../../lib/utils/common_utils';
+
+const REQUEST_PAGE_COUNT = 100;
 
 export const setInitialState = ({ commit }, props) => {
   commit(types.SET_INITIAL_STATE, props);
@@ -17,9 +20,12 @@ export const fetchMergeRequests = ({ state, dispatch }) => {
   dispatch('requestData');
 
   return axios
-    .get(state.apiEndpoint)
+    .get(`${state.apiEndpoint}?per_page=${REQUEST_PAGE_COUNT}`)
     .then(res => {
-      dispatch('receiveDataSuccess', res.data);
+      const { headers, data } = res;
+      const total = parseInt(normalizeHeaders(headers)['X-TOTAL'], 10) || 0;
+
+      dispatch('receiveDataSuccess', { data, total });
     })
     .catch(() => {
       dispatch('receiveDataError');

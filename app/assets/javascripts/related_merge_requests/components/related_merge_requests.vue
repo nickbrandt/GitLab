@@ -26,7 +26,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['isFetchingMergeRequests', 'mergeRequests']),
+    ...mapState(['isFetchingMergeRequests', 'mergeRequests', 'totalCount']),
   },
   mounted() {
     this.setInitialState({ apiEndpoint: this.endpoint });
@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <div class="card-slim mt-3">
+  <div class="card-slim mt-3" v-if="totalCount">
     <div class="card-header">
       <div class="card-title mt-0 mb-0 h5 merge-requests-title">
         <span class="mr-1">
@@ -58,7 +58,7 @@ export default {
               <svg class="s16 mr-1 text-secondary">
                 <icon name="merge-request" class="mr-1 text-secondary" />
               </svg>
-              <span class="js-items-count">{{ mergeRequests.length }}</span>
+              <span class="js-items-count">{{ totalCount }}</span>
             </div>
           </div>
         </div>
