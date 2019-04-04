@@ -4782,9 +4782,6 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
-msgid "GeoNodes|Alternate URL"
-msgstr ""
-
 msgid "GeoNodes|Checksummed"
 msgstr ""
 
@@ -4968,9 +4965,6 @@ msgstr ""
 msgid "Geo|All projects are being scheduled for re-sync"
 msgstr ""
 
-msgid "Geo|Alternate URL"
-msgstr ""
-
 msgid "Geo|Batch operations"
 msgstr ""
 
@@ -5098,9 +5092,6 @@ msgid "Geo|The URL defined on the primary node that secondary nodes should use t
 msgstr ""
 
 msgid "Geo|This is a primary node"
-msgstr ""
-
-msgid "Geo|To support OAuth logins to this node at a different domain than URL"
 msgstr ""
 
 msgid "Geo|Tracking entry for project (%{project_id}) was successfully removed."

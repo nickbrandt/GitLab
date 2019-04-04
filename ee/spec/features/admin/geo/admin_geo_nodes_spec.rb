@@ -143,27 +143,6 @@ describe 'admin Geo Nodes', :js do
         end
       end
     end
-
-    it "allows the admin to update a secondary node's alternate URL" do
-      visit admin_geo_nodes_path
-      wait_for_requests
-
-      page.within(find('.geo-node-actions', match: :first)) do
-        page.click_link('Edit')
-      end
-
-      fill_in 'Alternate URL', with: 'http://someloadbalancer.com'
-      click_button 'Save changes'
-
-      expect(current_path).to eq admin_geo_nodes_path
-      wait_for_requests
-
-      page.within(find('.geo-node-item', match: :first)) do
-        click_button 'Other information'
-
-        expect(page).to have_content('http://someloadbalancer.com')
-      end
-    end
   end
 
   describe 'remove an existing Geo Node' do

@@ -113,7 +113,6 @@ describe Admin::Geo::NodesController, :postgresql do
     let(:geo_node_attributes) do
       {
         url: 'http://example.com',
-        alternate_url: 'http://anotherexample.com',
         internal_url: 'http://internal-url.com',
         selective_sync_shards: %w[foo bar]
       }
@@ -144,7 +143,6 @@ describe Admin::Geo::NodesController, :postgresql do
 
         geo_node.reload
         expect(geo_node.url.chomp('/')).to eq(geo_node_attributes[:url])
-        expect(geo_node.alternate_url.chomp('/')).to eq(geo_node_attributes[:alternate_url])
         expect(geo_node.internal_url.chomp('/')).to eq(geo_node_attributes[:internal_url])
         expect(geo_node.selective_sync_shards).to eq(%w[foo bar])
       end

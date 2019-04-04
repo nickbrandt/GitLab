@@ -57,7 +57,7 @@ describe('NodeDetailsSectionOther', () => {
       it('returns array containing items to show under secondary node when prop `nodeTypePrimary` is false', () => {
         const items = vm.nodeDetailItems;
 
-        expect(items.length).toBe(2);
+        expect(items.length).toBe(1);
         expect(items[0].itemTitle).toBe('Storage config');
       });
     });

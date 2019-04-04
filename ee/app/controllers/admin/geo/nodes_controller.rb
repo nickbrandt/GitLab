@@ -50,7 +50,6 @@ class Admin::Geo::NodesController < Admin::ApplicationController
   def geo_node_params
     params.require(:geo_node).permit(
       :url,
-      :alternate_url,
       :internal_url,
       :primary,
       :selective_sync_type,

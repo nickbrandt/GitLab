@@ -60,28 +60,6 @@ describe GeoNode, type: :model do
       end
     end
 
-    context 'when validating alternate_url' do
-      subject { build(:geo_node, alternate_url: alternate_url) }
-
-      context 'when alternate_url is http' do
-        let(:alternate_url) { 'http://foo' }
-
-        it { is_expected.to be_valid }
-      end
-
-      context 'when alternate_url is https' do
-        let(:alternate_url) { 'https://foo' }
-
-        it { is_expected.to be_valid }
-      end
-
-      context 'when alternate_url is not http or https' do
-        let(:alternate_url) { 'nothttp://foo' }
-
-        it { is_expected.not_to be_valid }
-      end
-    end
-
     context 'when validating internal_url' do
       subject { build(:geo_node, internal_url: internal_url) }
 
@@ -157,17 +135,6 @@ describe GeoNode, type: :model do
 
           expect(node.oauth_application.redirect_uri).to eq(node.oauth_callback_url)
         end
-
-        context 'when the node has an alternate_url' do
-          it 'adds an alternate callback URL' do
-            node.alternate_url = 'http://alternate-url.com:1234/gitlab/'
-
-            expect(node).to be_valid
-
-            expected = [node.oauth_callback_url, node.alternate_oauth_callback_url].join("\n")
-            expect(node.oauth_application.redirect_uri).to eq(expected)
-          end
-        end
       end
 
       context 'when it is a primary node' do
@@ -227,39 +194,6 @@ describe GeoNode, type: :model do
           node.update!(url: 'http://modified-url')
 
           expect(oauth_application.reload.redirect_uri).to eq('http://modified-url/oauth/geo/callback')
-        end
-      end
-
-      context 'when alternate_url is added' do
-        it "adds a callback URL to the associated OAuth application's redirect_uri" do
-          expected_redirect_uri = "#{oauth_application.redirect_uri}\nhttp://alternate-url/oauth/geo/callback"
-
-          node.update!(alternate_url: 'http://alternate-url')
-
-          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
-        end
-      end
-
-      context 'when alternate_url is modified' do
-        it "updates the alternate callback URL in the associated OAuth application's redirect_uri" do
-          node.update!(alternate_url: 'http://alternate-url')
-          oauth_application.update!(redirect_uri: "#{node.oauth_callback_url}\nhttp://alternate-url/oauth/geo/callback")
-          expected_redirect_uri = "#{node.oauth_callback_url}\nhttp://modified-alternate-url/oauth/geo/callback"
-
-          node.update!(alternate_url: 'http://modified-alternate-url')
-
-          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
-        end
-      end
-
-      context 'when alternate_url is cleared' do
-        it "removes the alternate callback URL in the associated OAuth application's redirect_uri" do
-          expected_redirect_uri = oauth_application.redirect_uri
-          oauth_application.update!(redirect_uri: "#{node.oauth_callback_url}\nhttp://alternate-url/oauth/geo/callback")
-
-          node.update!(alternate_url: nil)
-
-          expect(oauth_application.reload.redirect_uri).to eq(expected_redirect_uri)
         end
       end
     end
@@ -473,82 +407,6 @@ describe GeoNode, type: :model do
     end
   end
 
-  describe '#alternate_uri' do
-    let(:alternate_url) { 'https://foo:3003/bar' }
-    let(:node) { create(:geo_node, url: 'https://localhost:3000/gitlab', alternate_url: alternate_url) }
-
-    context 'when all fields are filled' do
-      it 'returns an URI object' do
-        expect(node.alternate_uri).to be_a URI
-      end
-
-      it 'includes schema, host, port and relative_url_root with a terminating /' do
-        expected_uri = URI.parse(alternate_url)
-        expected_uri.path += '/'
-        expect(node.alternate_uri).to eq(expected_uri)
-      end
-    end
-  end
-
-  describe '#alternate_url' do
-    let(:alternate_url) { 'https://foo:3003/bar' }
-    let(:node) { create(:geo_node, url: 'https://localhost:3000/gitlab', alternate_url: alternate_url) }
-
-    it 'returns a string' do
-      expect(node.alternate_url).to be_a String
-    end
-
-    it 'includes schema home port and relative_url with a terminating /' do
-      expected_url = "#{alternate_url}/"
-      expect(node.alternate_url).to eq(expected_url)
-    end
-
-    it 'can be nil' do
-      stub_config_setting(port: 443)
-      stub_config_setting(protocol: 'https')
-      stub_config_setting(relative_url_root: '/gitlab')
-
-      expect(empty_node.alternate_url).to be_nil
-    end
-  end
-
-  describe '#alternate_url=' do
-    subject { described_class.new(alternate_url: 'https://foo:3003/bar') }
-
-    it 'sets schema field based on url' do
-      expect(subject.alternate_uri.scheme).to eq('https')
-    end
-
-    it 'sets host field based on url' do
-      expect(subject.alternate_uri.host).to eq('foo')
-    end
-
-    it 'sets port field based on specified by url' do
-      expect(subject.alternate_uri.port).to eq(3003)
-    end
-
-    context 'when using unspecified ports' do
-      let(:dummy_http) { 'http://example.com/' }
-      let(:dummy_https) { 'https://example.com/' }
-
-      context 'when schema is http' do
-        it 'sets port 80' do
-          subject.alternate_url = dummy_http
-
-          expect(subject.alternate_uri.port).to eq(80)
-        end
-      end
-
-      context 'when schema is https' do
-        it 'sets port 443' do
-          subject.alternate_url = dummy_https
-
-          expect(subject.alternate_uri.port).to eq(443)
-        end
-      end
-    end
-  end
-
   describe '#internal_url' do
     let(:internal_url) { 'https://foo:3003/bar' }
     let(:node) { create(:geo_node, url: dummy_url, internal_url: internal_url) }
@@ -664,20 +522,6 @@ describe GeoNode, type: :model do
     it 'returns url that matches rails url_helpers generated one' do
       route = url_helpers.oauth_geo_callback_url(protocol: 'https:', host: 'localhost', port: 3000, script_name: '/gitlab')
       expect(new_node.oauth_callback_url).to eq(route)
-    end
-  end
-
-  describe '#alternate_oauth_callback_url' do
-    let(:node) { create(:geo_node, url: 'https://localhost:3000/gitlab', alternate_url: 'https://alternate:4444/gitlabalternate') }
-    let(:alternate_oauth_callback_url) { 'https://alternate:4444/gitlabalternate/oauth/geo/callback' }
-
-    it 'returns oauth callback url based on node uri' do
-      expect(node.alternate_oauth_callback_url).to eq(alternate_oauth_callback_url)
-    end
-
-    it 'returns url that matches rails url_helpers generated one' do
-      route = url_helpers.oauth_geo_callback_url(protocol: 'https:', host: 'alternate', port: 4444, script_name: '/gitlabalternate')
-      expect(node.alternate_oauth_callback_url).to eq(route)
     end
   end
 

@@ -78,12 +78,6 @@ export default {
           itemValueType: VALUE_TYPE.PLAIN,
           cssClass: this.storageShardsCssClass,
         },
-        {
-          itemTitle: s__('GeoNodes|Alternate URL'),
-          itemValue: this.node.alternateUrl,
-          itemValueType: VALUE_TYPE.PLAIN,
-          cssClass: 'node-detail-value-bold',
-        },
       ];
     },
     storageShardsStatus() {

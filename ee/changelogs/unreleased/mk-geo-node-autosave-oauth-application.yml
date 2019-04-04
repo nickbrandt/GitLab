@@ -1,5 +1,0 @@
----
-title: 'Geo: Persist OAuth callback changes for Alternate URL'
-merge_request: 10358
-author:
-type: fixed
