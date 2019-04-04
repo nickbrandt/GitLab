@@ -74,10 +74,6 @@ module EE
 
       rule { admin }.enable :change_repository_storage
 
-      rule { can?(:public_access) }.policy do
-        enable :read_design
-      end
-
       rule { support_bot }.enable :guest_access
       rule { support_bot & ~service_desk_enabled }.policy do
         prevent :create_note
@@ -96,7 +92,10 @@ module EE
         prevent :admin_issue_link
       end
 
-      rule { can?(:read_issue) }.enable :read_issue_link
+      rule { can?(:read_issue) }.policy do
+        enable :read_issue_link
+        enable :read_design
+      end
 
       rule { can?(:reporter_access) }.policy do
         enable :admin_board

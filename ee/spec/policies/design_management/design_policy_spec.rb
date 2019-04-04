@@ -118,14 +118,15 @@ describe DesignManagement::DesignPolicy do
 
     it_behaves_like "design abilities available for members"
 
-    context "for guests" do
+    context "for guests in private projects" do
+      let(:project) { create(:project, :private) }
       let(:current_user) { guest }
 
       it { is_expected.to be_allowed(*guest_design_abilities) }
       it { is_expected.to be_disallowed(*developer_design_abilities) }
     end
 
-    context "for anonymous users" do
+    context "for anonymous users in public projects" do
       let(:current_user) { nil }
 
       it { is_expected.to be_allowed(*guest_design_abilities) }
