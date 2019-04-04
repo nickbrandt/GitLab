@@ -22,30 +22,16 @@ module Geo
     end
 
     def execute
-      if selective_sync?
-        failed_registries_for_selective_sync
-      else
-        failed_registries
-      end
+      legacy_inner_join_registry_ids(
+        Geo::ProjectRegistry.verification_failed(type),
+        current_node.projects.pluck_primary_key,
+        Geo::ProjectRegistry,
+        foreign_key: :project_id
+      )
     end
 
     private
 
     attr_reader :type
-
-    def failed_registries
-      Geo::ProjectRegistry.verification_failed(type)
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def failed_registries_for_selective_sync
-      legacy_inner_join_registry_ids(
-        failed_registries,
-        current_node.projects.pluck(:id),
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
