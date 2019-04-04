@@ -1,0 +1,5 @@
+---
+title: Allow self-approvals in fallback approval rules
+merge_request: 10218
+author:
+type: changed
