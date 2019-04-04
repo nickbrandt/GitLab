@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// ANSI "end of terminal" code
+// ANSI "end of channel" code
 var eot = []byte{0x04}
 
 // An abstraction of gorilla's *websocket.Conn
@@ -31,7 +31,7 @@ func NewProxy(stoppers int) *Proxy {
 }
 
 func (p *Proxy) Serve(upstream, downstream Connection, upstreamAddr, downstreamAddr string) error {
-	// This signals the upstream terminal to kill the exec'd process
+	// This signals the upstream channel to kill the exec'd process
 	defer upstream.WriteMessage(websocket.BinaryMessage, eot)
 
 	go p.proxy(upstream, downstream, upstreamAddr, downstreamAddr)

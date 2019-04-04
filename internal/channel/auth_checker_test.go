@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"testing"
@@ -7,8 +7,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 )
 
-func checkerSeries(values ...*api.TerminalSettings) AuthCheckerFunc {
-	return func() *api.TerminalSettings {
+func checkerSeries(values ...*api.ChannelSettings) AuthCheckerFunc {
+	return func() *api.ChannelSettings {
 		if len(values) == 0 {
 			return nil
 		}
@@ -19,7 +19,7 @@ func checkerSeries(values ...*api.TerminalSettings) AuthCheckerFunc {
 }
 
 func TestAuthCheckerStopsWhenAuthFails(t *testing.T) {
-	template := &api.TerminalSettings{Url: "ws://example.com"}
+	template := &api.ChannelSettings{Url: "ws://example.com"}
 	stopCh := make(chan error)
 	series := checkerSeries(template, template, template)
 	ac := NewAuthChecker(series, template, stopCh)
@@ -35,7 +35,7 @@ func TestAuthCheckerStopsWhenAuthFails(t *testing.T) {
 }
 
 func TestAuthCheckerStopsWhenAuthChanges(t *testing.T) {
-	template := &api.TerminalSettings{Url: "ws://example.com"}
+	template := &api.ChannelSettings{Url: "ws://example.com"}
 	changed := template.Clone()
 	changed.Url = "wss://example.com"
 	stopCh := make(chan error)

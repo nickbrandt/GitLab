@@ -1,10 +1,11 @@
-# Terminal support
+# Websocket channel support
 
 In some cases, GitLab can provide in-browser terminal access to an
 environment (which is a running server or container, onto which a
-project has been deployed) through a WebSocket. Workhorse manages
-the WebSocket upgrade and long-lived connection to the terminal for
-the environment, which frees up GitLab to process other requests.
+project has been deployed), or even access to services running in CI
+through a WebSocket. Workhorse manages the WebSocket upgrade and
+long-lived connection to the websocket connection, which frees
+up GitLab to process other requests.
 
 This document outlines the architecture of these connections.
 
@@ -47,8 +48,9 @@ UTF-8 strings, in addition to any subprotocol expectations.
 
 ## Browser to Workhorse
 
-GitLab serves a JavaScript terminal emulator to the browser on
-a URL like `https://gitlab.com/group/project/environments/1/terminal`.
+Using the terminal as an example, GitLab serves a JavaScript terminal
+emulator to the browser on a URL like
+`https://gitlab.com/group/project/environments/1/terminal`.
 This opens a websocket connection to, e.g.,
 `wss://gitlab.com/group/project/environments/1/terminal.ws`,
 This endpoint doesn't exist in GitLab - only in Workhorse.
@@ -80,12 +82,12 @@ Control frames, such as `PingMessage` or `CloseMessage`, have
 their usual meanings.
 
 `BinaryMessage` frames sent from the browser to the server are
-arbitrary terminal input.
+arbitrary text input.
 
 `BinaryMessage` frames sent from the server to the browser are
-arbitrary terminal output.
+arbitrary text output.
 
-These frames are expected to contain ANSI terminal control codes
+These frames are expected to contain ANSI text control codes
 and may be in any encoding.
 
 ### `base64.terminal.gitlab.com`
@@ -95,11 +97,11 @@ Control frames, such as `PingMessage` or `CloseMessage`, have
 their usual meanings.
 
 `TextMessage` frames sent from the browser to the server are
-base64-encoded arbitrary terminal input (so the server must
+base64-encoded arbitrary text input (so the server must
 base64-decode them before inputting them).
 
 `TextMessage` frames sent from the server to the browser are
-base64-encoded arbitrary terminal output (so the browser must
+base64-encoded arbitrary text output (so the browser must
 base64-decode them before outputting them).
 
 In their base64-encoded form, these frames are expected to
@@ -107,8 +109,8 @@ contain ANSI terminal control codes, and may be in any encoding.
 
 ## Workhorse to GitLab
 
-Before upgrading the browser, Workhorse sends a normal HTTP
-request to GitLab on a URL like
+Using again the terminal as an example, before upgrading the browser,
+Workhorse sends a normal HTTP request to GitLab on a URL like
 `https://gitlab.com/group/project/environments/1/terminal.ws/authorize`.
 This returns a JSON response containing details of where the
 terminal can be found, and how to connect it. In particular,
@@ -123,11 +125,11 @@ Workhorse periodically re-checks this endpoint, and if it gets an
 error response, or the details of the terminal change, it will
 terminate the websocket session.
 
-## Workhorse to Terminal
+## Workhorse to the WebSocket server
 
-In GitLab, environments may have a deployment service (e.g.,
+In GitLab, environments or CI jobs may have a deployment service (e.g.,
 `KubernetesService`) associated with them. This service knows
-where the terminals for an environment may be found, and these
+where the terminals or the service for an environment may be found, and these
 details are returned to Workhorse by GitLab.
 
 These URLs are *also* WebSocket URLs, and GitLab tells Workhorse
@@ -143,19 +145,19 @@ also upgraded.
 
 Workhorse now has two websocket connections, albeit with
 differing subprotocols. It decodes incoming frames from the
-browser, re-encodes them to the terminal's subprotocol, and
-sends them to the terminal. Similarly, it decodes incoming
-frames from the terminal, re-encodes them to the browser's
+browser, re-encodes them to the the channel's subprotocol, and
+sends them to the channel. Similarly, it decodes incoming
+frames from the channel, re-encodes them to the browser's
 subprotocol, and sends them to the browser.
 
 When either connection closes or enters an error state,
 Workhorse detects the error and closes the other connection,
-terminating the terminal session. If the browser is the
+terminating the channel session. If the browser is the
 connection that has disconnected, Workhorse will send an ANSI
 `End of Transmission` control code (the `0x04` byte) to the
-terminal, encoded according to the appropriate subprotocol.
+channel, encoded according to the appropriate subprotocol.
 Workhorse will automatically reply to any websocket ping frame
-sent by the terminal, to avoid being disconnected.
+sent by the channel, to avoid being disconnected.
 
 Currently, Workhorse only supports the following subprotocols.
 Supporting new deployment services will require new subprotocols

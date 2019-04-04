@@ -13,6 +13,7 @@ import (
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/builds"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/channel"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -25,7 +26,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendurl"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/terminal"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 )
 
@@ -187,8 +187,8 @@ func (u *upstream) configureRoutes() {
 		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
 
 		// Terminal websocket
-		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, terminal.Handler(api)),
-		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, terminal.Handler(api)),
+		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
+		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 
 		// Long poll and limit capacity given to jobs/request and builds/register.json
 		route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),

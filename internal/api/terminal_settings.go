@@ -3,7 +3,6 @@ package api
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -13,7 +12,7 @@ import (
 )
 
 type TerminalSettings struct {
-	// The terminal provider may require use of a particular subprotocol. If so,
+	// The channel provider may require use of a particular subprotocol. If so,
 	// it must be specified here, and Workhorse must have a matching codec.
 	Subprotocols []string
 
@@ -61,62 +60,11 @@ func (t *TerminalSettings) Dial() (*websocket.Conn, *http.Response, error) {
 	return t.Dialer().Dial(t.Url, t.Header)
 }
 
-func (t *TerminalSettings) Validate() error {
-	if t == nil {
-		return fmt.Errorf("terminal details not specified")
+func (t *TerminalSettings) Channel() *ChannelSettings {
+	return &ChannelSettings{
+		Subprotocols:   t.Subprotocols,
+		Url:            t.Url,
+		CAPem:          t.CAPem,
+		MaxSessionTime: t.MaxSessionTime,
 	}
-
-	if len(t.Subprotocols) == 0 {
-		return fmt.Errorf("no subprotocol specified")
-	}
-
-	parsedURL, err := t.URL()
-	if err != nil {
-		return fmt.Errorf("invalid URL")
-	}
-
-	if parsedURL.Scheme != "ws" && parsedURL.Scheme != "wss" {
-		return fmt.Errorf("invalid websocket scheme: %q", parsedURL.Scheme)
-	}
-
-	return nil
-}
-
-func (t *TerminalSettings) IsEqual(other *TerminalSettings) bool {
-	if t == nil && other == nil {
-		return true
-	}
-
-	if t == nil || other == nil {
-		return false
-	}
-
-	if len(t.Subprotocols) != len(other.Subprotocols) {
-		return false
-	}
-
-	for i, subprotocol := range t.Subprotocols {
-		if other.Subprotocols[i] != subprotocol {
-			return false
-		}
-	}
-
-	if len(t.Header) != len(other.Header) {
-		return false
-	}
-
-	for header, values := range t.Header {
-		if len(values) != len(other.Header[header]) {
-			return false
-		}
-		for i, value := range values {
-			if other.Header[header][i] != value {
-				return false
-			}
-		}
-	}
-
-	return t.Url == other.Url &&
-		t.CAPem == other.CAPem &&
-		t.MaxSessionTime == other.MaxSessionTime
 }
