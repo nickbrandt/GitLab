@@ -3667,19 +3667,10 @@ msgstr ""
 msgid "Download asset"
 msgstr ""
 
-msgid "Download tar"
+msgid "Download source code"
 msgstr ""
 
-msgid "Download tar.bz2"
-msgstr ""
-
-msgid "Download tar.gz"
-msgstr ""
-
-msgid "Download zip"
-msgstr ""
-
-msgid "DownloadArtifacts|Download"
+msgid "Download this directory"
 msgstr ""
 
 msgid "DownloadCommit|Email Patches"
@@ -7882,6 +7873,9 @@ msgid "Preview"
 msgstr ""
 
 msgid "Preview payload"
+msgstr ""
+
+msgid "Previous Artifacts"
 msgstr ""
 
 msgid "Primary"
