@@ -126,6 +126,10 @@ Click the links to see your GitLab repository data.
 
 ## Changelog
 
+### 11.10
+
+- [Instance admins can now setup integration for all namespaces](https://gitlab.com/gitlab-org/gitlab-ee/issues/8902)
+
 ### 11.1
 
 - [Support GitLab subgroups in Jira development panel](https://gitlab.com/gitlab-org/gitlab-ee/issues/3561)
