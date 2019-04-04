@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RemoveDuplicatesFromApprovals < ActiveRecord::Migration[5.0]
+class AddUniqueConstraintToApprovalsUserIdAndMergeRequestId < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
@@ -8,6 +8,17 @@ class RemoveDuplicatesFromApprovals < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
+    remove_duplicates
+    add_concurrent_index :approvals, [:user_id, :merge_request_id], unique: true
+  end
+
+  def down
+    remove_concurrent_index :approvals, [:user_id, :merge_request_id]
+  end
+
+  private
+
+  def remove_duplicates
     add_concurrent_index :approvals, [:user_id, :merge_request_id, :id]
 
     if Gitlab::Database.mysql?
@@ -40,8 +51,5 @@ class RemoveDuplicatesFromApprovals < ActiveRecord::Migration[5.0]
     end
 
     remove_concurrent_index :approvals, [:user_id, :merge_request_id, :id]
-  end
-
-  def down
   end
 end

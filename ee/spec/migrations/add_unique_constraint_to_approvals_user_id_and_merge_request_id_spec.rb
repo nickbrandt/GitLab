@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require Rails.root.join('ee', 'db', 'migrate', '20190322025939_remove_duplicates_from_approvals.rb')
+require Rails.root.join('ee', 'db', 'post_migrate', '20190404143330_add_unique_constraint_to_approvals_user_id_and_merge_request_id.rb')
 
-describe RemoveDuplicatesFromApprovals, :migration do
+describe AddUniqueConstraintToApprovalsUserIdAndMergeRequestId, :migration do
   let(:migration) { described_class.new }
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
@@ -37,6 +37,21 @@ describe RemoveDuplicatesFromApprovals, :migration do
       migration.up
 
       expect(approvals.all.to_a).to contain_exactly(*unique_approvals)
+    end
+
+    it 'creates unique index' do
+      migration.up
+
+      expect(migration.index_exists?(:approvals, [:user_id, :merge_request_id], unique: true)).to be_truthy
+    end
+  end
+
+  describe '#down' do
+    it 'removes unique index' do
+      migration.up
+      migration.down
+
+      expect(migration.index_exists?(:approvals, [:user_id, :merge_request_id], unique: true)).to be_falsey
     end
   end
 end
