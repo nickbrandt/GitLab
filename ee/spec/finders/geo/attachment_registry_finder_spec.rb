@@ -87,7 +87,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
 
       it 'counts attachments that have been synced' do
-        create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
         create(:geo_file_registry, :attachment, file_id: upload_2.id)
         create(:geo_file_registry, :attachment, file_id: upload_3.id)
 
@@ -114,7 +114,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
         end
 
         it 'counts attachments that has been synced' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
           create(:geo_file_registry, :attachment, file_id: upload_2.id)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
 
@@ -142,7 +142,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
         end
 
         it 'counts attachments that has been synced' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
           create(:geo_file_registry, :attachment, file_id: upload_2.id)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
 
@@ -177,17 +177,17 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
 
       it 'counts attachments that sync has failed' do
-        create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
         create(:geo_file_registry, :attachment, file_id: upload_2.id)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, success: false)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_3.id)
 
         expect(subject.count_failed).to eq 2
       end
 
       it 'ignores remote attachments' do
-        create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, success: false)
-        create(:geo_file_registry, :attachment, file_id: upload_2.id, success: false)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, success: false)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_remote_1.id)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_2.id)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_3.id)
 
         expect(subject.count_failed).to eq 2
       end
@@ -204,22 +204,22 @@ describe Geo::AttachmentRegistryFinder, :geo do
         end
 
         it 'counts attachments that sync has failed' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
 
           expect(subject.count_failed).to eq 1
         end
 
         it 'does not count attachments of unsynced projects' do
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_2.id)
 
           expect(subject.count_failed).to eq 0
         end
 
         it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, success: false)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_2.id)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_3.id)
           upload_1.update!(store: ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
@@ -238,22 +238,22 @@ describe Geo::AttachmentRegistryFinder, :geo do
         end
 
         it 'counts attachments that sync has failed' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
 
           expect(subject.count_failed).to eq 1
         end
 
         it 'does not count attachments of unsynced projects' do
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_2.id)
 
           expect(subject.count_failed).to eq 0
         end
 
         it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, success: false)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, success: false)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_2.id)
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_3.id)
           upload_1.update!(store: ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
@@ -292,7 +292,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
 
       it 'excludes attachments that are not synced' do
-        create(:geo_file_registry, :attachment, file_id: upload_1.id, success: false, missing_on_primary: true)
+        create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
 
         expect(subject.count_synced_missing_on_primary).to eq 0
       end
@@ -340,7 +340,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
 
       it 'returns uploads without an entry on the tracking database' do
-        create(:geo_file_registry, :avatar, file_id: upload_1.id, success: true)
+        create(:geo_file_registry, :avatar, file_id: upload_1.id)
 
         uploads = subject.find_unsynced(batch_size: 10)
 
@@ -397,8 +397,8 @@ describe Geo::AttachmentRegistryFinder, :geo do
       it 'excludes except_file_ids' do
         upload_a = create(:upload, :object_storage, model: synced_group)
         upload_b = create(:upload, :object_storage, model: unsynced_group)
-        create(:geo_file_registry, :avatar, file_id: upload_a.id, success: true)
-        create(:geo_file_registry, :avatar, file_id: upload_b.id, success: true)
+        create(:geo_file_registry, :avatar, file_id: upload_a.id)
+        create(:geo_file_registry, :avatar, file_id: upload_b.id)
 
         uploads = subject.find_migrated_local(batch_size: 10, except_file_ids: [upload_a.id])
 
