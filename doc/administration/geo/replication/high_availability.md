@@ -160,22 +160,22 @@ following modifications:
     ## Configure the connection to the tracking DB. And disable application
     ## servers from running tracking databases.
     ##
-    geo_secondary['db_host'] = '10.1.4.1'
-    geo_secondary['db_password'] = 'plaintext Geo tracking DB password'
+    geo_secondary['db_host'] = '<geo_tracking_db_host>'
+    geo_secondary['db_password'] = '<geo_tracking_db_password>'
     geo_postgresql['enable'] = false
 
     ##
     ## Configure connection to the streaming replica database, if you haven't
     ## already
     ##
-    gitlab_rails['db_host'] = '10.1.3.1'
-    gitlab_rails['db_password'] = 'plaintext DB password'
+    gitlab_rails['db_host'] = '<replica_database_host>'
+    gitlab_rails['db_password'] = '<replica_database_password>'
 
     ##
     ## Configure connection to Redis, if you haven't already
     ##
-    gitlab_rails['redis_host'] = '10.1.2.1'
-    gitlab_rails['redis_password'] = 'Redis password'
+    gitlab_rails['redis_host'] = '<redis_host>'
+    gitlab_rails['redis_password'] = '<redis_password>'
 
     ##
     ## If you are using custom users not managed by Omnibus, you need to specify

@@ -109,8 +109,8 @@ keys must be manually replicated to the **secondary** node.
     If you can access your **primary** node using the **root** user:
 
     ```sh
-    # Run this from the secondary node, change `primary-node-fqdn` for the IP or FQDN of the server
-    scp root@primary-node-fqdn:/etc/ssh/ssh_host_*_key* /etc/ssh
+    # Run this from the secondary node, change `<primary_node_fqdn>` for the IP or FQDN of the server
+    scp root@<primary_node_fqdn>:/etc/ssh/ssh_host_*_key* /etc/ssh
     ```
 
     If you only have access through a user with **sudo** privileges:
@@ -120,7 +120,7 @@ keys must be manually replicated to the **secondary** node.
     sudo tar --transform 's/.*\///g' -zcvf ~/geo-host-key.tar.gz /etc/ssh/ssh_host_*_key*
 
     # Run this from your secondary node:
-    scp user-with-sudo@primary-node-fqdn:geo-host-key.tar.gz .
+    scp <user_with_sudo>@<primary_node_fqdn>:geo-host-key.tar.gz .
     tar zxvf ~/geo-host-key.tar.gz -C /etc/ssh
     ```
 
