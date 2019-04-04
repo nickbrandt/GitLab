@@ -140,7 +140,11 @@ Re-run `gitlab-ctl replicate-geo-database`, but include a larger value for
 `--backup-timeout`:
 
 ```sh
-sudo gitlab-ctl replicate-geo-database --host=primary.geo.example.com --slot-name=secondary_geo_example_com --backup-timeout=21600
+sudo gitlab-ctl \
+   replicate-geo-database \
+   --host=<primary_node_hostname> \
+   --slot-name=<secondary_slot_name> \
+   --backup-timeout=21600
 ```
 
 This will give the initial replication up to six hours to complete, rather than
@@ -174,7 +178,7 @@ Slots where `active` is `f` are not active.
   PostgreSQL console session:
 
     ```sql
-    SELECT pg_drop_replication_slot('name_of_extra_slot');
+    SELECT pg_drop_replication_slot('<name_of_extra_slot>');
     ```
 
 ## Very large repositories never successfully synchronize on the **secondary** node
@@ -357,7 +361,7 @@ should see something like this:
     following queries demonstrate how:
 
     ```sql
-    ALTER SERVER gitlab_secondary OPTIONS (SET host 'my-new-host');
+    ALTER SERVER gitlab_secondary OPTIONS (SET host '<my_new_host>');
     ALTER SERVER gitlab_secondary OPTIONS (SET port 5432);
     ```
 
@@ -383,13 +387,19 @@ should see something like this:
 
     ```sh
     # Connect to the tracking database as the `gitlab_geo` user
-    sudo -u git /opt/gitlab/embedded/bin/psql -h /var/opt/gitlab/geo-postgresql -p 5431 -U gitlab_geo -W -d gitlabhq_geo_production
+    sudo \
+       -u git /opt/gitlab/embedded/bin/psql \
+       -h /var/opt/gitlab/geo-postgresql \
+       -p 5431 \
+       -U gitlab_geo \
+       -W \
+       -d gitlabhq_geo_production
     ```
 
     If you need to correct the password, the following query shows how:
 
     ```sql
-    ALTER USER MAPPING FOR gitlab_geo SERVER gitlab_secondary OPTIONS (SET password 'my-new-password');
+    ALTER USER MAPPING FOR gitlab_geo SERVER gitlab_secondary OPTIONS (SET password '<my_new_password>');
     ```
 
     If you change the user or password, you will also have to adjust the
@@ -415,7 +425,13 @@ reload of the FDW schema. To manually reload the FDW schema:
    the `gitlab_geo` user:
 
     ```sh
-    sudo -u git /opt/gitlab/embedded/bin/psql -h /var/opt/gitlab/geo-postgresql -p 5431 -U gitlab_geo -W -d gitlabhq_geo_production
+    sudo \
+       -u git /opt/gitlab/embedded/bin/psql \
+       -h /var/opt/gitlab/geo-postgresql \
+       -p 5431 \
+       -U gitlab_geo \
+       -W \
+       -d gitlabhq_geo_production
     ```
 
     Be sure to adjust the port and hostname for your configuration. You

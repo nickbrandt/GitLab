@@ -177,7 +177,7 @@ secondary domain, like changing Git remotes and API URLs.
 
     ```ruby
     # Change the existing external_url configuration
-    external_url 'https://gitlab.example.com'
+    external_url 'https://<new_external_url>'
     ```
 
     NOTE: **Note**
@@ -242,11 +242,10 @@ and after that you also need two extra steps.
     roles ['geo_primary_role']
 
     ##
-    # Primary and Secondary addresses
-    # - replace '198.51.100.1' with the public or VPC address of your Geo primary node
-    # - replace '198.51.100.2' with the public or VPC address of your Geo secondary node
+    # Allow PostgreSQL client authentication from the primary and secondary IPs. These IPs may be
+    # public or VPC addresses in CIDR format, for example ['198.51.100.1/32', '198.51.100.2/32']
     ##
-    postgresql['md5_auth_cidr_addresses'] = ['198.51.100.1/32', '198.51.100.2/32']
+    postgresql['md5_auth_cidr_addresses'] = ['<primary_node_ip>/32', '<secondary_node_ip>/32']
 
     # Every secondary server needs to have its own slot so specify the number of secondary nodes you're going to have
     postgresql['max_replication_slots'] = 1

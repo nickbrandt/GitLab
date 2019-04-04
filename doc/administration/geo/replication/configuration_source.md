@@ -138,12 +138,11 @@ You can safely skip this step if your **primary** node uses a CA-issued HTTPS ce
 If your **primary** node is using a self-signed certificate for *HTTPS* support, you will
 need to add that certificate to the **secondary** node's trust store. Retrieve the
 certificate from the **primary** node and follow your distribution's instructions for
-adding it to the **secondary** node's trust store. In Debian/Ubuntu, for example, with a
-certificate file of `primary.geo.example.com.crt`, you would follow these steps:
+adding it to the **secondary** node's trust store. In Debian/Ubuntu, you would follow these steps:
 
 ```sh
 sudo -i
-cp primary.geo.example.com.crt /usr/local/share/ca-certificates
+cp <primary_node_certification_file> /usr/local/share/ca-certificates
 update-ca-certificates
 ```
 
