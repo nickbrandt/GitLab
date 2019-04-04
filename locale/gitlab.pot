@@ -8535,6 +8535,9 @@ msgstr ""
 msgid "Protected Environments"
 msgstr ""
 
+msgid "Not ready yet. Try again later."
+msgstr ""
+
 msgid "ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?"
 msgstr ""
 
@@ -13235,6 +13238,9 @@ msgid "private"
 msgstr ""
 
 msgid "private key does not match certificate."
+msgstr ""
+
+msgid "processing"
 msgstr ""
 
 msgid "project"
