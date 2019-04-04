@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.5.0
+
+- Replace terminal terminology to channel !382
+
 v8.4.0
 
 - Adds X-Request-Id response header for Workhorse !363
