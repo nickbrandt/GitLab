@@ -17,6 +17,7 @@ export default () => ({
   // UI Flags
   defaultInnerHeight: 0,
   isChildEpics: false,
+  windowResizeInProgress: false,
   epicsFetchInProgress: false,
   epicsFetchForTimeframeInProgress: false,
   epicsFetchFailure: false,
