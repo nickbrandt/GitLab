@@ -76,4 +76,39 @@ describe HistoricalData do
       end
     end
   end
+
+  describe '.max_historical_user_count with data outside of the license period' do
+    let!(:license) { create(:license) }
+
+    context 'with stats before the license period' do
+      before do
+        described_class.create!(date: license.starts_at.ago(2.days), active_user_count: 10)
+      end
+
+      it 'ignore those records' do
+        expect(described_class.max_historical_user_count).to eq(0)
+      end
+    end
+
+    context 'with stats after the license period' do
+      before do
+        described_class.create!(date: license.expires_at.in(2.days), active_user_count: 10)
+      end
+
+      it 'ignore those records' do
+        expect(described_class.max_historical_user_count).to eq(0)
+      end
+    end
+
+    context 'with stats inside license period' do
+      before do
+        described_class.create!(date: license.starts_at.in(2.days), active_user_count: 10)
+        described_class.create!(date: license.starts_at.in(5.days), active_user_count: 15)
+      end
+
+      it 'returns max value for active_user_count' do
+        expect(described_class.max_historical_user_count).to eq(15)
+      end
+    end
+  end
 end

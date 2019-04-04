@@ -1,0 +1,5 @@
+---
+title: Fix query used to calculate number of users over license
+merge_request: 10556
+author:
+type: fixed
