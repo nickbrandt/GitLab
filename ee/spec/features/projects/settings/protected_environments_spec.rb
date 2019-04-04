@@ -15,6 +15,7 @@ describe 'Protected Environments' do
     end
 
     create(:protected_environment, project: project, name: 'production')
+    create(:protected_environment, project: project, name: 'removed environment')
 
     sign_in(user)
   end
@@ -45,6 +46,7 @@ describe 'Protected Environments' do
     it 'allows seeing a list of protected environments' do
       within('.protected-environments-list') do
         expect(page).to have_content('production')
+        expect(page).to have_content('removed environment')
       end
     end
 
@@ -64,7 +66,7 @@ describe 'Protected Environments' do
     end
 
     it 'allows updating access to a protected environment', :js do
-      within('.protected-environments-list') do
+      within('.protected-environments-list tr', text: 'production') do
         set_allowed_to_deploy('Developers + Maintainers')
       end
 
@@ -76,7 +78,7 @@ describe 'Protected Environments' do
     end
 
     it 'allows unprotecting an environment', :js do
-      within('.protected-environments-list') do
+      within('.protected-environments-list tr', text: 'production') do
         accept_alert { click_on('Unprotect') }
       end
 

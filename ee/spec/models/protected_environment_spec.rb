@@ -90,6 +90,32 @@ describe ProtectedEnvironment do
     end
   end
 
+  describe '.sorted_by_name' do
+    subject(:protected_environments) { described_class.sorted_by_name }
+
+    it "sorts protected environments by name" do
+      %w(staging production development).each {|name| create(:protected_environment, name: name)}
+
+      expect(protected_environments.map(&:name)).to eq %w(development production staging)
+    end
+  end
+
+  describe '.with_environment_id' do
+    subject(:protected_environments) { described_class.with_environment_id }
+
+    it "sets corresponding environment id if there is environment matching by name and project" do
+      project = create(:project)
+      environment = create(:environment, project: project, name: 'production')
+
+      production = create(:protected_environment, project: project, name: 'production')
+      removed_environment = create(:protected_environment, project: project, name: 'removed environment')
+
+      expect(protected_environments).to match_array [production, removed_environment]
+      expect(protected_environments.find {|e| e.name == 'production'}.environment_id).to eq environment.id
+      expect(protected_environments.find {|e| e.name == 'removed environment'}.environment_id).to be_nil
+    end
+  end
+
   def create_deploy_access_level(**opts)
     protected_environment.deploy_access_levels.create(**opts)
   end
