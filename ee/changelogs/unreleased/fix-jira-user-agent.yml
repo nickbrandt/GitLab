@@ -1,0 +1,5 @@
+---
+title: Fix user agent string for Hosted Jira
+merge_request: 10545
+author:
+type: fixed

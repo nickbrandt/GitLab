@@ -104,12 +104,6 @@ describe('Report issue', () => {
         dockerReportParsed.unapproved[0].title,
       );
     });
-
-    it('renders namespace', () => {
-      expect(vm.$el.textContent.trim()).toContain(dockerReportParsed.unapproved[0].path);
-
-      expect(vm.$el.textContent.trim()).toContain('in');
-    });
   });
 
   describe('for dast issue', () => {

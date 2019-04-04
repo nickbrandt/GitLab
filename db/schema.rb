@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190325165127) do
+ActiveRecord::Schema.define(version: 20190328210840) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1972,6 +1972,7 @@ ActiveRecord::Schema.define(version: 20190325165127) do
     t.string "runners_token_encrypted"
     t.integer "custom_project_templates_group_id"
     t.boolean "auto_devops_enabled"
+    t.integer "extra_shared_runners_minutes_limit"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
@@ -1987,6 +1988,7 @@ ActiveRecord::Schema.define(version: 20190325165127) do
     t.index ["require_two_factor_authentication"], name: "index_namespaces_on_require_two_factor_authentication", using: :btree
     t.index ["runners_token"], name: "index_namespaces_on_runners_token", unique: true, using: :btree
     t.index ["runners_token_encrypted"], name: "index_namespaces_on_runners_token_encrypted", unique: true, using: :btree
+    t.index ["shared_runners_minutes_limit", "extra_shared_runners_minutes_limit"], name: "index_namespaces_on_shared_and_extra_runners_minutes_limit", using: :btree
     t.index ["trial_ends_on"], name: "index_namespaces_on_trial_ends_on", where: "(trial_ends_on IS NOT NULL)", using: :btree
     t.index ["type"], name: "index_namespaces_on_type", using: :btree
   end

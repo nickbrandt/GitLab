@@ -20,11 +20,11 @@ describe API::Namespaces do
         expect(group_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                  'parent_id', 'members_count_with_descendants',
                                                                  'plan', 'shared_runners_minutes_limit',
-                                                                 'billable_members_count')
+                                                                 'extra_shared_runners_minutes_limit', 'billable_members_count')
 
         expect(user_kind_json_response.keys).to contain_exactly('id', 'kind', 'name', 'path', 'full_path',
                                                                 'parent_id', 'plan', 'shared_runners_minutes_limit',
-                                                                'billable_members_count')
+                                                                'extra_shared_runners_minutes_limit', 'billable_members_count')
       end
     end
 

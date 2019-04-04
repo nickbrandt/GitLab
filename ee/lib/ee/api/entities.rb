@@ -26,6 +26,7 @@ module EE
 
         prepended do
           expose :shared_runners_minutes_limit
+          expose :extra_shared_runners_minutes_limit
         end
       end
 
@@ -66,6 +67,7 @@ module EE
 
         prepended do
           expose :shared_runners_minutes_limit
+          expose :extra_shared_runners_minutes_limit
         end
       end
 
@@ -107,6 +109,7 @@ module EE
 
         prepended do
           expose :shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
+          expose :extra_shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
           expose :billable_members_count do |namespace, options|
             namespace.billable_members_count(options[:requested_hosted_plan])
           end

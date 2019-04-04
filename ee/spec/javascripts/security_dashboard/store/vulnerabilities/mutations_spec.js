@@ -280,6 +280,18 @@ describe('vulnerabilities module mutations', () => {
         );
       });
 
+      it('should set the modal className', () => {
+        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
+      });
+
+      it('should set the modal image', () => {
+        expect(state.modal.data.image.value).toEqual(vulnerability.location.image);
+      });
+
+      it('should set the modal namespace', () => {
+        expect(state.modal.data.namespace.value).toEqual(vulnerability.location.operating_system);
+      });
+
       it('should set the modal identifiers', () => {
         expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
       });

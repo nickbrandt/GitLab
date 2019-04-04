@@ -10,6 +10,10 @@ describe Gitlab::Jira::Middleware do
       expect(described_class.jira_dvcs_connector?('HTTP_USER_AGENT' => jira_user_agent)).to eq(true)
     end
 
+    it 'returns true if user agent starts with "Jira DVCS Connector"' do
+      expect(described_class.jira_dvcs_connector?('HTTP_USER_AGENT' => 'Jira DVCS Connector')).to eq(true)
+    end
+
     it 'returns false when not DVCS connector' do
       expect(described_class.jira_dvcs_connector?('HTTP_USER_AGENT' => 'pokemon')).to eq(false)
     end

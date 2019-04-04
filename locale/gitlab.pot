@@ -617,6 +617,9 @@ msgstr ""
 msgid "Additional text"
 msgstr ""
 
+msgid "Aditional minutes"
+msgstr ""
+
 msgid "Admin Area"
 msgstr ""
 
@@ -3664,19 +3667,10 @@ msgstr ""
 msgid "Download asset"
 msgstr ""
 
-msgid "Download tar"
+msgid "Download source code"
 msgstr ""
 
-msgid "Download tar.bz2"
-msgstr ""
-
-msgid "Download tar.gz"
-msgstr ""
-
-msgid "Download zip"
-msgstr ""
-
-msgid "DownloadArtifacts|Download"
+msgid "Download this directory"
 msgstr ""
 
 msgid "DownloadCommit|Email Patches"
@@ -7881,6 +7875,9 @@ msgstr ""
 msgid "Preview payload"
 msgstr ""
 
+msgid "Previous Artifacts"
+msgstr ""
+
 msgid "Primary"
 msgstr ""
 
@@ -11753,10 +11750,16 @@ msgstr ""
 msgid "Vulnerability|Identifiers"
 msgstr ""
 
+msgid "Vulnerability|Image"
+msgstr ""
+
 msgid "Vulnerability|Instances"
 msgstr ""
 
 msgid "Vulnerability|Links"
+msgstr ""
+
+msgid "Vulnerability|Namespace"
 msgstr ""
 
 msgid "Vulnerability|Project"
@@ -12413,6 +12416,9 @@ msgstr ""
 msgid "ciReport|%{reportType}: Loading resulted in an error"
 msgstr ""
 
+msgid "ciReport|%{vulnerability} in %{featurename}"
+msgstr ""
+
 msgid "ciReport|(errors when loading results)"
 msgstr ""
 
@@ -12498,6 +12504,9 @@ msgid "ciReport|Fixed:"
 msgstr ""
 
 msgid "ciReport|Identifiers"
+msgstr ""
+
+msgid "ciReport|Image"
 msgstr ""
 
 msgid "ciReport|Implement this solution by creating a merge request"
@@ -12598,6 +12607,12 @@ msgid "ciReport|Undo dismiss"
 msgstr ""
 
 msgid "ciReport|Upgrade %{name} from %{version} to %{fixed}."
+msgstr ""
+
+msgid "ciReport|Upgrade %{name} to %{fixed}."
+msgstr ""
+
+msgid "ciReport|Upgrade to %{fixed}."
 msgstr ""
 
 msgid "ciReport|Used by %{packagesString}"

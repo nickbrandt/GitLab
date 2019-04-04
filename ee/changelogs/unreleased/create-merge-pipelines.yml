@@ -1,0 +1,5 @@
+---
+title: Use merge request MERGE ref for attached merge request pipelines
+merge_request: 9622
+author:
+type: added
