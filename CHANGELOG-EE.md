@@ -1,5 +1,18 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.6 (2019-04-04)
+
+### Fixed (3 changes)
+
+- Fix project approval rule with only private group being considered as approved when override is allowed. !10356
+- Fix approval rule sourcing from forked MR. !10474
+- Guard against ldap_sync_last_sync_at being nil. !10505
+
+### Added (1 change)
+
+- Add Insights frontend to retrieve and render chart. !9856
+
+
 ## 11.9.5 (2019-04-03)
 
 ### Fixed (3 changes)

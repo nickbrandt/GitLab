@@ -103,7 +103,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def render_draft_note(note)
-    params = { quick_actions_target_id: merge_request.id, quick_actions_target_type: 'MergeRequest', text: note.note }
+    params = { target_id: merge_request.id, target_type: 'MergeRequest', text: note.note }
     result = PreviewMarkdownService.new(@project, current_user, params).execute
     markdown_params = { markdown_engine: result[:markdown_engine], issuable_state_filter_enabled: true }
 
