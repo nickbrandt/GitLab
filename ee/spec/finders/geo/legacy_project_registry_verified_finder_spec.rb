@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Geo::LegacyProjectRegistryVerifiedFinder, :geo do
-  include EE::GeoHelpers
-
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
@@ -21,10 +19,6 @@ describe Geo::LegacyProjectRegistryVerifiedFinder, :geo do
     let!(:registry_wiki_verification_failed) { create(:geo_project_registry, :repository_verified, :wiki_verification_failed, project: project_3) }
     let!(:registry_wiki_verification_failed_broken_shard) { create(:geo_project_registry, :repository_verified, :wiki_verification_failed, project: project_4) }
     let!(:registry_verification_failed) { create(:geo_project_registry, :repository_verification_failed, :wiki_verification_failed) }
-
-    before do
-      stub_fdw_disabled
-    end
 
     context 'with repository type' do
       subject { described_class.new(current_node: node, type: :repository) }

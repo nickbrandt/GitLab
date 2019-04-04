@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Geo::LegacyProjectRegistryPendingVerificationFinder, :geo do
-  include EE::GeoHelpers
-
   describe '#execute' do
     let(:node) { create(:geo_node) }
 

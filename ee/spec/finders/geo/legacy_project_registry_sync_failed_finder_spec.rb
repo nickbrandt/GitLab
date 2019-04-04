@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Geo::LegacyProjectRegistrySyncFailedFinder, :geo do
-  include EE::GeoHelpers
-
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
@@ -21,10 +19,6 @@ describe Geo::LegacyProjectRegistrySyncFailedFinder, :geo do
     let!(:registry_wiki_failed_broken_shard) { create(:geo_project_registry, :synced, :wiki_sync_failed, project: project_4) }
     let!(:registry_repository_failed_broken_shard) { create(:geo_project_registry, :synced, :repository_sync_failed, project: project_5) }
     let!(:registry_synced) { create(:geo_project_registry, :synced) }
-
-    before do
-      stub_fdw_disabled
-    end
 
     context 'with repository type' do
       subject { described_class.new(current_node: node, type: :repository) }
