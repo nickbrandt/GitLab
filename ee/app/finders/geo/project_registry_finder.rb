@@ -78,53 +78,10 @@ module Geo
         .execute
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    def find_projects_updated_recently(batch_size:)
-      relation =
-        if use_legacy_queries?
-          legacy_find_projects_updated_recently
-        else
-          fdw_find_projects_updated_recently
-        end
-
-      relation.limit(batch_size)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    protected
-
-    # @return [ActiveRecord::Relation<Geo::Fdw::Project>]
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find_projects_updated_recently
-      Geo::Fdw::Project.joins("INNER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
-          .merge(Geo::ProjectRegistry.dirty)
-          .merge(Geo::ProjectRegistry.retry_due)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # @return [ActiveRecord::Relation<Project>] list of projects updated recently
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_projects_updated_recently
-      registries = Geo::ProjectRegistry.dirty.retry_due.pluck(:project_id, :last_repository_synced_at)
-      return Project.none if registries.empty?
-
-      id_and_last_sync_values = registries.map do |id, last_repository_synced_at|
-        "(#{id}, #{quote_value(last_repository_synced_at)})"
-      end
-
-      joined_relation = current_node.projects.joins(<<~SQL)
-        INNER JOIN
-        (VALUES #{id_and_last_sync_values.join(',')})
-        project_registry(id, last_repository_synced_at)
-        ON #{Project.table_name}.id = project_registry.id
-      SQL
-
-      joined_relation
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    def fdw_project_table
-      Geo::Fdw::Project.arel_table
+    def find_projects_updated_recently(shard_name:, batch_size:)
+      finder_klass_for_projects_updated_recently
+        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
+        .execute
     end
 
     private
@@ -142,6 +99,14 @@ module Geo
         Geo::LegacyProjectUnsyncedFinder
       else
         Geo::ProjectUnsyncedFinder
+      end
+    end
+
+    def finder_klass_for_projects_updated_recently
+      if use_legacy_queries_for_selective_sync?
+        Geo::LegacyProjectUpdatedRecentlyFinder
+      else
+        Geo::ProjectUpdatedRecentlyFinder
       end
     end
 
