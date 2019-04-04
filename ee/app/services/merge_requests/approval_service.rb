@@ -23,9 +23,9 @@ module MergeRequests
     private
 
     def save_approval(approval)
-      approval.save
-    rescue ActiveRecord::RecordNotUnique
-      false
+      Approval.safe_ensure_unique do
+        approval.save
+      end
     end
 
     def create_approval_note(merge_request)
