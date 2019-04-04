@@ -5028,6 +5028,9 @@ msgstr ""
 msgid "Geo|Could not remove tracking entry for an existing project."
 msgstr ""
 
+msgid "Geo|Could not remove tracking entry for an existing upload."
+msgstr ""
+
 msgid "Geo|Failed"
 msgstr ""
 
@@ -5079,6 +5082,9 @@ msgstr ""
 msgid "Geo|Please refer to Geo Troubleshooting."
 msgstr ""
 
+msgid "Geo|Project"
+msgstr ""
+
 msgid "Geo|Project (ID: %{project_id}) no longer exists on the primary. It is safe to remove this entry, as this will not remove any data on disk."
 msgstr ""
 
@@ -5127,7 +5133,13 @@ msgstr ""
 msgid "Geo|Status"
 msgstr ""
 
+msgid "Geo|Sync"
+msgstr ""
+
 msgid "Geo|Synced"
+msgstr ""
+
+msgid "Geo|Synced at"
 msgstr ""
 
 msgid "Geo|Synchronization failed - %{error}"
@@ -5143,6 +5155,9 @@ msgid "Geo|To support OAuth logins to this node at a different domain than URL"
 msgstr ""
 
 msgid "Geo|Tracking entry for project (%{project_id}) was successfully removed."
+msgstr ""
+
+msgid "Geo|Tracking entry for upload (%{type}/%{id}) was successfully removed."
 msgstr ""
 
 msgid "Geo|Tracking entry will be removed. Are you sure?"
@@ -5167,9 +5182,6 @@ msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to mak
 msgstr ""
 
 msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page."
-msgstr ""
-
-msgid "Geo|You need a different license to use Geo replication"
 msgstr ""
 
 msgid "Geo|misconfigured"
@@ -8918,6 +8930,9 @@ msgstr ""
 msgid "Removed"
 msgstr ""
 
+msgid "Removed %{type} with id %{id}"
+msgstr ""
+
 msgid "Removed group can not be restored!"
 msgstr ""
 
@@ -11701,6 +11716,9 @@ msgstr ""
 msgid "Uploaded on"
 msgstr ""
 
+msgid "Uploads"
+msgstr ""
+
 msgid "Upstream"
 msgstr ""
 
@@ -12445,7 +12463,7 @@ msgstr ""
 msgid "You need a different license to enable FileLocks feature"
 msgstr ""
 
-msgid "You need a different license to enable Geo replication."
+msgid "You need a different license to use Geo replication."
 msgstr ""
 
 msgid "You need git-lfs version %{min_git_lfs_version} (or greater) to continue. Please visit https://git-lfs.github.com"
