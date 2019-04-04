@@ -42,13 +42,13 @@ describe ProtectedEnvironment do
         create_deploy_access_level(group: group)
       end
 
-      it 'should allow members of the group' do
+      it 'allows members of the group' do
         group.add_developer(user)
 
         expect(subject).to be_truthy
       end
 
-      it 'should reject non-members of the group' do
+      it 'rejects non-members of the group' do
         expect(subject).to be_falsy
       end
     end
@@ -58,13 +58,13 @@ describe ProtectedEnvironment do
         create_deploy_access_level(access_level: Gitlab::Access::MAINTAINER)
       end
 
-      it 'should allow maintainers' do
+      it 'allows maintainers' do
         project.add_maintainer(user)
 
         expect(subject).to be_truthy
       end
 
-      it 'should reject developers' do
+      it 'rejects developers' do
         project.add_developer(user)
 
         expect(subject).to be_falsy
@@ -76,13 +76,13 @@ describe ProtectedEnvironment do
         create_deploy_access_level(access_level: Gitlab::Access::DEVELOPER)
       end
 
-      it 'should allow maintainers' do
+      it 'allows maintainers' do
         project.add_maintainer(user)
 
         expect(subject).to be_truthy
       end
 
-      it 'should allow developers' do
+      it 'allows developers' do
         project.add_developer(user)
 
         expect(subject).to be_truthy

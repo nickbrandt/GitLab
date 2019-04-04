@@ -37,7 +37,7 @@ describe ProtectedEnvironments::SearchService, '#execute' do
   context 'when no match' do
     let(:environment_name) { 'no_match' }
 
-    it 'should return an empty array' do
+    it 'returns an empty array' do
       expect(subject).to eq([])
     end
   end

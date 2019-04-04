@@ -57,7 +57,7 @@ describe API::ProjectClusters do
     end
 
     context 'when user sets specific environment scope' do
-      it 'should create a cluster with that specific environment' do
+      it 'creates a cluster with that specific environment' do
         post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
 
         expect(json_response['environment_scope']).to eq('production/*')
@@ -72,7 +72,7 @@ describe API::ProjectClusters do
         }
       end
 
-      it 'should set default environment' do
+      it 'sets default environment' do
         post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
 
         expect(json_response['environment_scope']).to eq('*')
@@ -89,11 +89,11 @@ describe API::ProjectClusters do
         post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
       end
 
-      it 'should respond with 201' do
+      it 'responds with 201' do
         expect(response).to have_gitlab_http_status(201)
       end
 
-      it 'should allow to associate multiple cluster to project' do
+      it 'allows to associate multiple cluster to project' do
         expect(project.reload.clusters.count).to eq(2)
       end
     end
@@ -124,7 +124,7 @@ describe API::ProjectClusters do
                projects: [project])
       end
 
-      it 'should update the environment scope' do
+      it 'updates the environment scope' do
         expect(cluster.environment_scope).to eq('test/*')
       end
     end
@@ -135,7 +135,7 @@ describe API::ProjectClusters do
                projects: [project])
       end
 
-      it 'should update the environment scope' do
+      it 'updates the environment scope' do
         expect(cluster.environment_scope).to eq('test/*')
       end
     end

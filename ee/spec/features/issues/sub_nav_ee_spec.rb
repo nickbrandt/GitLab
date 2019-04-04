@@ -11,7 +11,7 @@ describe 'Issues sub nav EE' do
     visit project_issues_path(project)
   end
 
-  it 'should have a `Boards` item' do
+  it 'has a `Boards` item' do
     expect(find('.nav-sidebar')).to have_content 'Boards'
   end
 end

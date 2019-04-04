@@ -89,7 +89,7 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
                  started_at: started_at)
         end
 
-        it 'it does not create an additional event' do
+        it 'does not create an additional event' do
           expect { service.execute }.not_to change { PrometheusAlertEvent.count }
         end
 
@@ -105,7 +105,7 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
         context 'with duplicate payload' do
           let(:alerts_payload) { { 'alerts' => [resolved_event, resolved_event] } }
 
-          it 'it does not create an additional event' do
+          it 'does not create an additional event' do
             expect { service.execute }.not_to change { PrometheusAlertEvent.count }
           end
 

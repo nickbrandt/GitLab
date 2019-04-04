@@ -15,7 +15,7 @@ describe 'Promotions', :js do
       project.add_maintainer(user)
     end
 
-    it 'should show no promotion at all' do
+    it 'shows no promotion at all' do
       sign_in(user)
       visit edit_project_path(project)
 
@@ -31,14 +31,14 @@ describe 'Promotions', :js do
         project.add_maintainer(user)
       end
 
-      it 'should have the contact admin line' do
+      it 'has the contact admin line' do
         sign_in(user)
         visit edit_project_path(project)
 
         expect(find('#promote_service_desk')).to have_content 'Contact your Administrator to upgrade your license.'
       end
 
-      it 'should have the start trial button' do
+      it 'has the start trial button' do
         sign_in(admin)
         visit edit_project_path(project)
 
@@ -59,13 +59,13 @@ describe 'Promotions', :js do
         sign_in(user)
       end
 
-      it 'should have the Upgrade your plan button' do
+      it 'has the Upgrade your plan button' do
         visit edit_project_path(project)
 
         expect(find('#promote_service_desk')).to have_content 'Upgrade your plan'
       end
 
-      it 'should have the contact owner line' do
+      it 'has the contact owner line' do
         visit edit_project_path(otherproject)
 
         expect(find('#promote_service_desk')).to have_content 'Contact owner'
@@ -82,7 +82,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear in project edit page' do
+    it 'appears in project edit page' do
       visit edit_project_path(project)
 
       expect(find('#promote_service_desk')).to have_content 'Improve customer support with GitLab Service Desk.'
@@ -112,7 +112,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear in project edit page' do
+    it 'appears in project edit page' do
       visit edit_project_path(project)
 
       expect(find('#promote_mr_features')).to have_content 'Improve Merge Requests'
@@ -142,7 +142,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear in repository settings page' do
+    it 'appears in repository settings page' do
       visit project_settings_repository_path(project)
 
       expect(find('#promote_repository_features')).to have_content 'Improve repositories with GitLab Enterprise Edition'
@@ -170,7 +170,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear in milestone page' do
+    it 'appears in milestone page' do
       visit project_milestone_path(project, milestone)
 
       expect(find('#promote_burndown_charts')).to have_content "Upgrade your plan to improve milestones with Burndown Charts."
@@ -198,7 +198,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear in milestone page' do
+    it 'appears in milestone page' do
       visit project_boards_path(project)
 
       expect(find('.board-promotion-state')).to have_content "Upgrade your plan to improve Issue boards"
@@ -226,7 +226,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on export modal' do
+    it 'appears on export modal' do
       visit project_issues_path(project)
 
       click_on 'Export as CSV'
@@ -237,7 +237,7 @@ describe 'Promotions', :js do
 
   describe 'for epics in issues sidebar', :js do
     shared_examples 'Epics promotion' do
-      it 'should appear on the page' do
+      it 'appears on the page' do
         visit project_issue_path(project, issue)
         wait_for_requests
 
@@ -246,7 +246,7 @@ describe 'Promotions', :js do
         expect(find('.promotion-issue-sidebar-message')).to have_content 'Epics let you manage your portfolio of projects more efficiently'
       end
 
-      it 'should be removed after dismissal' do
+      it 'is removed after dismissal' do
         visit project_issue_path(project, issue)
         wait_for_requests
 
@@ -256,7 +256,7 @@ describe 'Promotions', :js do
         expect(page).not_to have_selector('.promotion-issue-sidebar-message')
       end
 
-      it 'should not appear on page after dismissal and reload' do
+      it 'does not appear on page after dismissal and reload' do
         visit project_issue_path(project, issue)
         wait_for_requests
 
@@ -267,7 +267,7 @@ describe 'Promotions', :js do
         expect(page).not_to have_selector('.js-epics-sidebar-callout')
       end
 
-      it 'should close dialog when clicking on X, but not dismiss it' do
+      it 'closes dialog when clicking on X, but not dismiss it' do
         visit project_issue_path(project, issue)
         wait_for_requests
 
@@ -313,7 +313,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on the page', :js do
+    it 'appears on the page', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
@@ -322,7 +322,7 @@ describe 'Promotions', :js do
       expect(find('.promotion-issue-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
     end
 
-    it 'should be removed after dismissal' do
+    it 'is removed after dismissal' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
@@ -332,7 +332,7 @@ describe 'Promotions', :js do
       expect(page).not_to have_selector('.js-weight-sidebar-callout')
     end
 
-    it 'should not appear on page after dismissal and reload' do
+    it 'does not appear on page after dismissal and reload' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
@@ -343,7 +343,7 @@ describe 'Promotions', :js do
       expect(page).not_to have_selector('.js-weight-sidebar-callout')
     end
 
-    it 'should close dialog when clicking on X, but not dismiss it' do
+    it 'closes dialog when clicking on X, but not dismiss it' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
@@ -364,7 +364,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on the page', :js do
+    it 'appears on the page', :js do
       visit new_project_issue_path(project)
       wait_for_requests
 
@@ -383,7 +383,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on the page' do
+    it 'appears on the page' do
       visit project_audit_events_path(project)
 
       expect(find('.user-callout-copy')).to have_content 'Track your project with Audit Events'
@@ -399,7 +399,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on the page' do
+    it 'appears on the page' do
       visit group_analytics_path(group)
 
       expect(find('.user-callout-copy')).to have_content 'Track activity with Contribution Analytics.'
@@ -415,7 +415,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on the page' do
+    it 'appears on the page' do
       visit group_hooks_path(group)
 
       expect(find('.user-callout-copy')).to have_content 'Add Group Webhooks'
@@ -430,7 +430,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'should appear on seearch page' do
+    it 'appears on seearch page' do
       visit search_path
 
       fill_in 'search', with: 'chosen'

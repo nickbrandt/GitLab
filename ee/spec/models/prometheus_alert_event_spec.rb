@@ -53,7 +53,7 @@ describe PrometheusAlertEvent do
       context 'when status is none' do
         subject { build(:prometheus_alert_event, :none) }
 
-        it 'it fires an event' do
+        it 'fires an event' do
           result = subject.fire(started_at)
 
           expect(result).to eq(true)
@@ -79,7 +79,7 @@ describe PrometheusAlertEvent do
       context 'when firing' do
         subject { build(:prometheus_alert_event) }
 
-        it 'it resolves an event' do
+        it 'resolves an event' do
           result = subject.resolve!(ended_at)
 
           expect(result).to eq(true)
