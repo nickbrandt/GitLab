@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import Vue from 'vue';
-import Weight from 'ee/sidebar/components/weight/weight.vue';
 import Flash from '../../flash';
 import { sprintf, __ } from '../../locale';
 import Sidebar from '../../right_sidebar';
@@ -23,7 +22,6 @@ export default Vue.extend({
     Assignees,
     RemoveBtn,
     Subscriptions,
-    Weight,
   },
   props: {
     currentUser: {
