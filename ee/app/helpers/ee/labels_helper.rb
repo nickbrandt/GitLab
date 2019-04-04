@@ -32,8 +32,14 @@ module EE
 
     def label_dropdown_data(project, opts = {})
       super.merge({
-        scoped_labels: License.feature_available?(:scoped_labels)&.to_s,
+        scoped_labels: project&.feature_available?(:scoped_labels)&.to_s,
         scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+      })
+    end
+
+    def sidebar_label_dropdown_data(issuable_type, issuable_sidebar)
+      super.merge({
+        scoped_labels: issuable_sidebar[:scoped_labels_available].to_s
       })
     end
 

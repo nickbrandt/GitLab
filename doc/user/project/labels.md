@@ -12,7 +12,7 @@ In GitLab, you can create project and group labels:
 - **Group labels** can be assigned to any issue or merge request of any project in that group or any subgroups of the group.
 
 ## Scoped labels
-A scoped label is a specific kind of label defined only by a special colon syntax in the label’s title, namely `key::value`. There is no different way to create and otherwise manage scoped labels. A label is a scoped label when its title follow the syntax.
+A scoped label is a specific kind of label defined only by a special colon syntax in the label’s title, namely `key::value`. There is no different way to create and otherwise manage scoped labels. A label is a scoped label when its title follows the syntax.
 
 ![A sample scoped label](img/key_value_labels.png)
 

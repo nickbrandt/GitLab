@@ -7,7 +7,7 @@ module EE
     SCOPED_LABEL_PATTERN = /^.*::/.freeze
 
     def scoped_label?
-      SCOPED_LABEL_PATTERN.match?(name) && ::License.feature_available?(:scoped_labels)
+      SCOPED_LABEL_PATTERN.match?(name) && subject.feature_available?(:scoped_labels)
     end
 
     def scoped_label_key
