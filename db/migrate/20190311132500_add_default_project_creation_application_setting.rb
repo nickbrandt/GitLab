@@ -8,11 +8,9 @@ class AddDefaultProjectCreationApplicationSetting < ActiveRecord::Migration[5.0]
 
   DOWNTIME = false
 
-  disable_ddl_transaction!
-
   def up
     unless column_exists?(:application_settings, :default_project_creation)
-      add_column_with_default(:application_settings, :default_project_creation, :integer, default: 2)
+      add_column(:application_settings, :default_project_creation, :integer, default: 2, null: false)
     end
   end
 
