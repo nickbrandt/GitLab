@@ -68,6 +68,7 @@ export default {
   },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
+    const { location } = vulnerability;
 
     Vue.set(state.modal, 'title', vulnerability.name);
     Vue.set(state.modal.data.description, 'value', vulnerability.description);
@@ -81,22 +82,38 @@ export default {
       'url',
       vulnerability.project && vulnerability.project.full_path,
     );
-    Vue.set(
-      state.modal.data.file,
-      'value',
-      vulnerability.location &&
-        `${vulnerability.location.file}:${vulnerability.location.start_line}`,
-    );
+
     Vue.set(
       state.modal.data.identifiers,
       'value',
       vulnerability.identifiers.length && vulnerability.identifiers,
     );
-    Vue.set(
-      state.modal.data.className,
-      'value',
-      vulnerability.location && vulnerability.location.class,
-    );
+
+    if (location) {
+      const {
+        file,
+        start_line: startLine,
+        end_line: endLine,
+        image,
+        operating_system: namespace,
+        class: className,
+      } = location;
+
+      let lineSuffix = '';
+
+      if (startLine) {
+        lineSuffix += `:${startLine}`;
+        if (endLine && startLine !== endLine) {
+          lineSuffix += `-${endLine}`;
+        }
+      }
+
+      Vue.set(state.modal.data.className, 'value', className);
+      Vue.set(state.modal.data.file, 'value', `${file}${lineSuffix}`);
+      Vue.set(state.modal.data.image, 'value', image);
+      Vue.set(state.modal.data.namespace, 'value', namespace);
+    }
+
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
     Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);

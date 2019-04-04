@@ -4,11 +4,11 @@ import {
   parseSastIssues,
   parseDependencyScanningIssues,
   filterByKey,
-  parseSastContainer,
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
 } from './utils';
+import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 
 export default {
@@ -118,11 +118,11 @@ export default {
   [types.RECEIVE_SAST_CONTAINER_REPORTS](state, reports) {
     if (reports.base && reports.head) {
       const headIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData),
+        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
         reports.head.unapproved,
       );
       const baseIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.base.vulnerabilities, reports.enrichData),
+        parseSastContainer(reports.base.vulnerabilities, reports.enrichData, reports.base.image),
         reports.base.unapproved,
       );
       const filterKey = 'vulnerability';
@@ -135,7 +135,7 @@ export default {
       Vue.set(state.sastContainer, 'isLoading', false);
     } else if (reports.head && !reports.base) {
       const newIssues = getUnapprovedVulnerabilities(
-        parseSastContainer(reports.head.vulnerabilities, reports.enrichData),
+        parseSastContainer(reports.head.vulnerabilities, reports.enrichData, reports.head.image),
         reports.head.unapproved,
       );
 
@@ -265,7 +265,8 @@ export default {
     Vue.set(state.modal.data.file, 'url', issue.urlPath);
     Vue.set(state.modal.data.className, 'value', issue.location && issue.location.class);
     Vue.set(state.modal.data.methodName, 'value', issue.location && issue.location.method);
-    Vue.set(state.modal.data.namespace, 'value', issue.namespace);
+    Vue.set(state.modal.data.image, 'value', issue.location && issue.location.image);
+    Vue.set(state.modal.data.namespace, 'value', issue.location && issue.location.operating_system);
 
     if (issue.identifiers && issue.identifiers.length > 0) {
       Vue.set(state.modal.data.identifiers, 'value', issue.identifiers);

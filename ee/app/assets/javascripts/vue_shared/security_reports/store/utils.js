@@ -43,8 +43,8 @@ export const findMatchingRemediations = (remediations, vulnerability) => {
  * @param {Object} vulnerability
  * @param {Array} feedback
  */
-function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
-  return feedback
+export const enrichVulnerabilityWithfeedback = (vulnerability, feedback = []) =>
+  feedback
     .filter(fb => fb.project_fingerprint === vulnerability.project_fingerprint)
     .reduce((vuln, fb) => {
       if (fb.feedback_type === 'dismissal') {
@@ -68,7 +68,6 @@ function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
       }
       return vuln;
     }, vulnerability);
-}
 
 /**
  * Generates url to repository file and highlight section between start and end lines.
@@ -197,62 +196,6 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
     };
   });
 };
-
-/**
- * Parses Container Scanning results into a common format to allow to use the same Vue component.
- * Container Scanning report is currently the straigh output from the underlying tool
- * (clair scanner) hence the formatting happenning here.
- *
- * @param {Array} issues
- * @param {Array} feedback
- * @returns {Array}
- */
-export const parseSastContainer = (issues = [], feedback = []) =>
-  issues.map(issue => {
-    const parsed = {
-      ...issue,
-      category: 'container_scanning',
-      project_fingerprint: sha1(
-        `${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`,
-      ),
-      title: issue.vulnerability,
-      description: !_.isEmpty(issue.description)
-        ? issue.description
-        : sprintf(s__('ciReport|%{namespace} is affected by %{vulnerability}.'), {
-            namespace: issue.namespace,
-            vulnerability: issue.vulnerability,
-          }),
-      path: issue.namespace,
-      identifiers: [
-        {
-          type: 'CVE',
-          name: issue.vulnerability,
-          value: issue.vulnerability,
-          url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
-        },
-      ],
-    };
-
-    // Generate solution
-    if (
-      !_.isEmpty(issue.fixedby) &&
-      !_.isEmpty(issue.featurename) &&
-      !_.isEmpty(issue.featureversion)
-    ) {
-      Object.assign(parsed, {
-        solution: sprintf(s__('ciReport|Upgrade %{name} from %{version} to %{fixed}.'), {
-          name: issue.featurename,
-          version: issue.featureversion,
-          fixed: issue.fixedby,
-        }),
-      });
-    }
-
-    return {
-      ...parsed,
-      ...enrichVulnerabilityWithfeedback(parsed, feedback),
-    };
-  });
 
 /**
  * Parses DAST into a common format to allow to use the same Vue component.

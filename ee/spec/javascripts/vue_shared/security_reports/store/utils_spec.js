@@ -4,7 +4,6 @@ import {
   findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
-  parseSastContainer,
   parseDastIssues,
   filterByKey,
   getUnapprovedVulnerabilities,
@@ -12,6 +11,14 @@ import {
   statusIcon,
   countIssues,
 } from 'ee/vue_shared/security_reports/store/utils';
+import {
+  formatContainerScanningDescription,
+  formatContainerScanningMessage,
+  formatContainerScanningSolution,
+  parseContainerScanningSeverity,
+  parseSastContainer,
+} from 'ee/vue_shared/security_reports/store/utils/container_scanning';
+import { SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import {
   oldSastIssues,
   sastIssues,
@@ -226,13 +233,93 @@ describe('security reports utils', () => {
     });
   });
 
+  describe('container scanning utils', () => {
+    describe('formatContainerScanningSolution', () => {
+      it('should return false if there is no data', () => {
+        expect(formatContainerScanningSolution({})).toBe(null);
+      });
+
+      it('should return the correct sentence', () => {
+        expect(formatContainerScanningSolution({ fixedby: 'v9000' })).toBe('Upgrade to v9000.');
+        expect(
+          formatContainerScanningSolution({ fixedby: 'v9000', featurename: 'Dependency' }),
+        ).toBe('Upgrade Dependency to v9000.');
+
+        expect(
+          formatContainerScanningSolution({
+            fixedby: 'v9000',
+            featurename: 'Dependency',
+            featureversion: '1.0-beta',
+          }),
+        ).toBe('Upgrade Dependency from 1.0-beta to v9000.');
+      });
+    });
+
+    describe('formatContainerScanningMessage', () => {
+      it('should return concatenated message if vulnerability and featurename are provided', () => {
+        expect(
+          formatContainerScanningMessage({ vulnerability: 'CVE-124', featurename: 'grep' }),
+        ).toBe('CVE-124 in grep');
+      });
+
+      it('should return vulnerability if only that is provided', () => {
+        expect(formatContainerScanningMessage({ vulnerability: 'Foo' })).toBe('Foo');
+      });
+    });
+
+    describe('formatContainerScanningDescription', () => {
+      it('should return description', () => {
+        expect(formatContainerScanningDescription({ description: 'Foobar' })).toBe('Foobar');
+      });
+
+      it('should build description from available fields', () => {
+        const featurename = 'Dependency';
+        const featureversion = '1.0';
+        const namespace = 'debian:8';
+        const vulnerability = 'CVE-123';
+
+        expect(
+          formatContainerScanningDescription({
+            featurename,
+            featureversion,
+            namespace,
+            vulnerability,
+          }),
+        ).toBe('Dependency:1.0 is affected by CVE-123.');
+
+        expect(formatContainerScanningDescription({ featurename, namespace, vulnerability })).toBe(
+          'Dependency is affected by CVE-123.',
+        );
+
+        expect(formatContainerScanningDescription({ namespace, vulnerability })).toBe(
+          'debian:8 is affected by CVE-123.',
+        );
+      });
+    });
+
+    describe('parseContainerScanningSeverity', () => {
+      it('should return `Critical` for `Defcon1`', () => {
+        expect(parseContainerScanningSeverity('Defcon1')).toBe(SEVERITY_LEVELS.critical);
+      });
+
+      it('should return `Low` for `Negligible`', () => {
+        expect(parseContainerScanningSeverity('Negligible')).toBe('Low');
+      });
+
+      it('should not touch other severities', () => {
+        expect(parseContainerScanningSeverity('oxofrmbl')).toBe('oxofrmbl');
+        expect(parseContainerScanningSeverity('Medium')).toBe('Medium');
+        expect(parseContainerScanningSeverity('High')).toBe('High');
+      });
+    });
+  });
+
   describe('parseSastContainer', () => {
     it('parses sast container issues', () => {
       const parsed = parseSastContainer(dockerReport.vulnerabilities)[0];
       const issue = dockerReport.vulnerabilities[0];
 
       expect(parsed.title).toEqual(issue.vulnerability);
-      expect(parsed.path).toEqual(issue.namespace);
       expect(parsed.identifiers).toEqual([
         {
           type: 'CVE',

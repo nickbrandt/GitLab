@@ -396,11 +396,12 @@ describe('security reports mutations', () => {
         title: 'Arbitrary file existence disclosure in Action Pack',
         path: 'Gemfile.lock',
         urlPath: 'path/Gemfile.lock',
-        namespace: 'debian:8',
         location: {
           file: 'Gemfile.lock',
           class: 'User',
           method: 'do_something',
+          image: 'https://example.org/docker/example:v1.2.3',
+          operating_system: 'debian:8',
         },
         links: [
           {
@@ -434,7 +435,8 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.data.file.url).toEqual(issue.urlPath);
       expect(stateCopy.modal.data.className.value).toEqual(issue.location.class);
       expect(stateCopy.modal.data.methodName.value).toEqual(issue.location.method);
-      expect(stateCopy.modal.data.namespace.value).toEqual(issue.namespace);
+      expect(stateCopy.modal.data.namespace.value).toEqual(issue.location.operating_system);
+      expect(stateCopy.modal.data.image.value).toEqual(issue.location.image);
       expect(stateCopy.modal.data.identifiers.value).toEqual(issue.identifiers);
       expect(stateCopy.modal.data.severity.value).toEqual(issue.severity);
       expect(stateCopy.modal.data.confidence.value).toEqual(issue.confidence);
@@ -615,7 +617,6 @@ describe('security reports mutations', () => {
 
   describe('UPDATE_CONTAINER_SCANNING_ISSUE', () => {
     it('updates issue in the new issues list', () => {
-      // TODO pas dast
       stateCopy.sastContainer.newIssues = dockerNewIssues;
       stateCopy.sastContainer.resolvedIssues = [];
       const updatedIssue = {
