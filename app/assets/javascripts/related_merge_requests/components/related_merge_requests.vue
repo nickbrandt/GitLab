@@ -1,8 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { sprintf, n__, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
+import { parseIssuableData } from '../../issue_show/utils/parse_data';
 
 export default {
   name: 'RelatedMergeRequests',
@@ -27,10 +29,26 @@ export default {
   },
   computed: {
     ...mapState(['isFetchingMergeRequests', 'mergeRequests', 'totalCount']),
+    closingMergeRequestsText() {
+      if (this.closingMergeRequestsCount === 0) {
+        return '';
+      }
+
+      const mrText = n__(
+        'When this merge request is accepted',
+        'When these merge requests are accepted',
+        this.closingMergeRequestsCount,
+      );
+
+      return sprintf(s__('%{mrText}, this issue will be closed automatically.'), { mrText });
+    },
   },
   mounted() {
     this.setInitialState({ apiEndpoint: this.endpoint });
     this.fetchMergeRequests();
+  },
+  created() {
+    this.closingMergeRequestsCount = parseIssuableData().closingMergeRequestsCount;
   },
   methods: {
     ...mapActions(['setInitialState', 'fetchMergeRequests']),
@@ -46,49 +64,54 @@ export default {
 </script>
 
 <template>
-  <div class="card-slim mt-3" v-if="totalCount">
-    <div class="card-header">
-      <div class="card-title mt-0 mb-0 h5 merge-requests-title">
-        <span class="mr-1">
-          {{ __('Related merge requests') }}
-        </span>
-        <div class="d-inline-flex lh-100 align-middle">
-          <div class="mr-count-badge">
-            <div class="mr-count-badge-count">
-              <svg class="s16 mr-1 text-secondary">
-                <icon name="merge-request" class="mr-1 text-secondary" />
-              </svg>
-              <span class="js-items-count">{{ totalCount }}</span>
+  <div v-if="totalCount">
+    <div class="card-slim mt-3">
+      <div class="card-header">
+        <div class="card-title mt-0 mb-0 h5 merge-requests-title">
+          <span class="mr-1">
+            {{ __('Related merge requests') }}
+          </span>
+          <div class="d-inline-flex lh-100 align-middle">
+            <div class="mr-count-badge">
+              <div class="mr-count-badge-count">
+                <svg class="s16 mr-1 text-secondary">
+                  <icon name="merge-request" class="mr-1 text-secondary" />
+                </svg>
+                <span class="js-items-count">{{ totalCount }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div>
-      <div
-        v-if="isFetchingMergeRequests"
-        class="related-related-merge-requests-icon qa-related-merge-requests-loading-icon"
-      >
-        <gl-loading-icon label="Fetching related merge requests" class="py-2" />
+      <div>
+        <div
+          v-if="isFetchingMergeRequests"
+          class="related-related-merge-requests-icon qa-related-merge-requests-loading-icon"
+        >
+          <gl-loading-icon label="Fetching related merge requests" class="py-2" />
+        </div>
+        <ul v-else class="content-list related-items-list">
+          <li v-for="mr in mergeRequests" :key="mr.id" class="list-item pt-0 pb-0">
+            <related-issuable-item
+              :id-key="mr.id"
+              :display-reference="mr.reference"
+              :title="mr.title"
+              :milestone="mr.milestone"
+              :assignees="getAssignees(mr)"
+              :created-at="mr.created_at"
+              :closed-at="mr.closed_at"
+              :path="mr.web_url"
+              :state="mr.state"
+              :is-merge-request="true"
+              :pipeline-status="mr.head_pipeline && mr.head_pipeline.detailed_status"
+              path-id-separator="!"
+            />
+          </li>
+        </ul>
       </div>
-      <ul v-else class="content-list related-items-list">
-        <li v-for="mr in mergeRequests" :key="mr.id" class="list-item pt-0 pb-0">
-          <related-issuable-item
-            :id-key="mr.id"
-            :display-reference="mr.reference"
-            :title="mr.title"
-            :milestone="mr.milestone"
-            :assignees="getAssignees(mr)"
-            :created-at="mr.created_at"
-            :closed-at="mr.closed_at"
-            :path="mr.web_url"
-            :state="mr.state"
-            :is-merge-request="true"
-            :pipeline-status="mr.head_pipeline && mr.head_pipeline.detailed_status"
-            path-id-separator="!"
-          />
-        </li>
-      </ul>
+    </div>
+    <div class="issue-closed-by-widget second-block">
+      {{ closingMergeRequestsText }}
     </div>
   </div>
 </template>

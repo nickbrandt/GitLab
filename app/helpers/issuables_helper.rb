@@ -277,6 +277,8 @@ module IssuablesHelper
       initialTaskStatus: issuable.task_status
     }
 
+    data[:closingMergeRequestsCount] = issuable.merge_requests_count if issuable.is_a?(Issue)
+
     if parent.is_a?(Group)
       data[:groupPath] = parent.path
     else
