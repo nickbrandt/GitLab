@@ -54,15 +54,4 @@ describe('sast container issue body', () => {
 
     expect(vm.$el.querySelector('button').textContent.trim()).toEqual(sastContainerIssue.title);
   });
-
-  describe('path', () => {
-    it('renders path', () => {
-      vm = mountComponent(Component, {
-        issue: sastContainerIssue,
-        status,
-      });
-
-      expect(vm.$el.textContent.trim()).toContain(sastContainerIssue.path);
-    });
-  });
 });

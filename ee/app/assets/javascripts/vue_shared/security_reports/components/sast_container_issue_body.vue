@@ -34,7 +34,5 @@ export default {
 
       <modal-open-name :issue="issue" :status="status" />
     </div>
-
-    <report-link v-if="issue.path" :issue="issue" />
   </div>
 </template>
