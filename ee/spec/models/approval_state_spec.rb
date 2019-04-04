@@ -43,8 +43,10 @@ describe ApprovalState do
     before do
       allow(merge_request).to receive(:committers).and_return(User.where(id: committers))
 
-      project.update(merge_requests_author_approval: merge_requests_author_approval)
-      project.update(merge_requests_disable_committers_approval: merge_requests_disable_committers_approval)
+      project.update!(
+        merge_requests_author_approval: merge_requests_author_approval,
+        merge_requests_disable_committers_approval: merge_requests_disable_committers_approval
+      )
       create_rule(users: committers)
     end
 
@@ -162,7 +164,7 @@ describe ApprovalState do
 
       context 'when overall approvals required is not zero' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         it 'returns true' do
@@ -226,7 +228,7 @@ describe ApprovalState do
 
       shared_examples_for 'checking fallback_approvals_required' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         context 'when it is not met' do
@@ -259,7 +261,7 @@ describe ApprovalState do
 
       context 'when regular rules present' do
         before do
-          project.update(approvals_before_merge: 999)
+          project.update!(approvals_before_merge: 999)
           2.times { create_rule(users: [create(:user)]) }
         end
 
@@ -810,7 +812,7 @@ describe ApprovalState do
     describe '#authors_can_approve?' do
       context 'when project allows author approval' do
         before do
-          project.update(merge_requests_author_approval: true)
+          project.update!(merge_requests_author_approval: true)
         end
 
         it 'returns true' do
@@ -820,7 +822,7 @@ describe ApprovalState do
 
       context 'when project disallows author approval' do
         before do
-          project.update(merge_requests_author_approval: false)
+          project.update!(merge_requests_author_approval: false)
         end
 
         it 'returns true' do
@@ -892,7 +894,7 @@ describe ApprovalState do
 
       context 'when overall approvals required is not zero' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         it 'returns true' do
@@ -948,7 +950,7 @@ describe ApprovalState do
 
       shared_examples_for 'checking fallback_approvals_required' do
         before do
-          project.update(approvals_before_merge: 1)
+          project.update!(approvals_before_merge: 1)
         end
 
         context 'when it is not met' do
@@ -982,7 +984,7 @@ describe ApprovalState do
 
       context 'when regular rules present' do
         before do
-          project.update(approvals_before_merge: 999)
+          project.update!(approvals_before_merge: 999)
           2.times { create_rule(users: [create(:user)]) }
         end
 
@@ -1369,7 +1371,7 @@ describe ApprovalState do
     describe '#authors_can_approve?' do
       context 'when project allows author approval' do
         before do
-          project.update(merge_requests_author_approval: true)
+          project.update!(merge_requests_author_approval: true)
         end
 
         it 'returns true' do
@@ -1379,7 +1381,7 @@ describe ApprovalState do
 
       context 'when project disallows author approval' do
         before do
-          project.update(merge_requests_author_approval: false)
+          project.update!(merge_requests_author_approval: false)
         end
 
         it 'returns true' do
