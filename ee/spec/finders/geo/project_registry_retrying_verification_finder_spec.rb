@@ -37,7 +37,7 @@ describe Geo::ProjectRegistryRetryingVerificationFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns registries retrying verification where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(retrying_verification, repository_retrying_verification)
         end
@@ -63,7 +63,7 @@ describe Geo::ProjectRegistryRetryingVerificationFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns registries retrying verification where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(retrying_verification, wiki_retrying_verification)
         end

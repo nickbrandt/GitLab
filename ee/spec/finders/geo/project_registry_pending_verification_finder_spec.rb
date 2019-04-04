@@ -149,7 +149,7 @@ describe Geo::ProjectRegistryPendingVerificationFinder, :geo do
         registry_outdated_secondary = create(:geo_project_registry, :synced, :repository_verification_outdated, :wiki_verification_outdated, project: project_2)
         create(:geo_project_registry, :synced, :repository_verification_outdated, :wiki_verified, project: project_3)
 
-        node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+        node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
         expect(subject.execute)
           .to contain_exactly(

@@ -31,7 +31,7 @@ describe Geo::LegacyProjectRegistryMismatchFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns mismatch registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_mismatch, registry_repository_mismatch)
         end
@@ -57,7 +57,7 @@ describe Geo::LegacyProjectRegistryMismatchFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns mismatch registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_mismatch, registry_wiki_mismatch)
         end
@@ -83,7 +83,7 @@ describe Geo::LegacyProjectRegistryMismatchFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns all mismatch registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_mismatch, registry_repository_mismatch, registry_wiki_mismatch)
         end

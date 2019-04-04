@@ -31,7 +31,7 @@ describe Geo::LegacyProjectRegistryVerificationFailedFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns failed registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_verification_failed, registry_repository_verification_failed)
         end
@@ -57,7 +57,7 @@ describe Geo::LegacyProjectRegistryVerificationFailedFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns failed registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_verification_failed, registry_wiki_verification_failed)
         end
@@ -83,7 +83,7 @@ describe Geo::LegacyProjectRegistryVerificationFailedFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns all failed registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to contain_exactly(registry_verification_failed, registry_repository_verification_failed, registry_wiki_verification_failed)
         end
