@@ -147,6 +147,45 @@ describe Ci::RegisterJobService do
       end
     end
 
+    context 'for project with shared runners when limit is set only on namespace' do
+      let(:build) { execute(shared_runner) }
+      let(:runners_seconds_used) { 0 }
+
+      before do
+        project.update(shared_runners_enabled: true)
+        project.namespace.update(shared_runners_minutes_limit: 100)
+        project.namespace.create_namespace_statistics(shared_runners_seconds: runners_seconds_used)
+      end
+
+      context 'when we are under the limit' do
+        let(:runners_seconds_used) { 5000 }
+
+        it "does return a build" do
+          expect(build).not_to be_nil
+        end
+      end
+
+      context 'when we are over the limit' do
+        let(:runners_seconds_used) { 6001 }
+
+        it "does not return a build" do
+          expect(build).to be_nil
+        end
+      end
+
+      context 'when namespace has extra minutes' do
+        let(:runners_seconds_used) { 6001 }
+
+        before do
+          project.namespace.update(extra_shared_runners_minutes_limit: 5)
+        end
+
+        it "does return a build" do
+          expect(build).not_to be_nil
+        end
+      end
+    end
+
     def execute(runner)
       described_class.new(runner).execute.build
     end

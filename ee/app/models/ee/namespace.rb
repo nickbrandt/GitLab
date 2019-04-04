@@ -36,9 +36,11 @@ module EE
       accepts_nested_attributes_for :gitlab_subscription
 
       scope :with_plan, -> { where.not(plan_id: nil) }
+      scope :with_shared_runners_minutes_limit, -> { where("namespaces.shared_runners_minutes_limit > 0") }
+      scope :with_extra_shared_runners_minutes_limit, -> { where("namespaces.extra_shared_runners_minutes_limit > 0") }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
-        to: :namespace_statistics, allow_nil: true
+        :extra_shared_runners_minutes, to: :namespace_statistics, allow_nil: true
 
       # Opportunistically clear the +file_template_project_id+ if invalid
       before_validation :clear_file_template_project_id
@@ -151,9 +153,14 @@ module EE
       end
     end
 
-    def actual_shared_runners_minutes_limit
-      shared_runners_minutes_limit ||
-        ::Gitlab::CurrentSettings.shared_runners_minutes
+    def actual_shared_runners_minutes_limit(include_extra: true)
+      extra_minutes = include_extra ? extra_shared_runners_minutes_limit.to_i : 0
+
+      if shared_runners_minutes_limit
+        shared_runners_minutes_limit + extra_minutes
+      else
+        ::Gitlab::CurrentSettings.shared_runners_minutes + extra_minutes
+      end
     end
 
     def shared_runners_minutes_limit_enabled?
@@ -165,6 +172,12 @@ module EE
     def shared_runners_minutes_used?
       shared_runners_minutes_limit_enabled? &&
         shared_runners_minutes.to_i >= actual_shared_runners_minutes_limit
+    end
+
+    def extra_shared_runners_minutes_used?
+      shared_runners_minutes_limit_enabled? &&
+        extra_shared_runners_minutes_limit &&
+        extra_shared_runners_minutes.to_i >= extra_shared_runners_minutes_limit
     end
 
     def shared_runners_enabled?

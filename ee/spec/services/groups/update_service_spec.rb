@@ -154,6 +154,30 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'updating protected params' do
+    let(:attrs) { { shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100 } }
+
+    context 'as an admin' do
+      let(:user) { create(:admin) }
+
+      it 'updates the attributes' do
+        update_group(group, user, attrs)
+
+        expect(group.shared_runners_minutes_limit).to eq(1000)
+        expect(group.extra_shared_runners_minutes_limit).to eq(100)
+      end
+    end
+
+    context 'as a regular user' do
+      it 'ignores the attributes' do
+        update_group(group, user, attrs)
+
+        expect(group.shared_runners_minutes_limit).to be_nil
+        expect(group.extra_shared_runners_minutes_limit).to be_nil
+      end
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end

@@ -617,6 +617,9 @@ msgstr ""
 msgid "Additional text"
 msgstr ""
 
+msgid "Aditional minutes"
+msgstr ""
+
 msgid "Admin Area"
 msgstr ""
 

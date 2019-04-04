@@ -3,10 +3,16 @@
 %h3.page-title
   Group pipelines quota
   = link_to icon('question-circle'), help_page_path("user/admin_area/settings/continuous_integration", anchor: "shared-runners-build-minutes-quota"), target: '_blank'
-%p.light
-  Monthly pipeline minutes usage across shared Runners for the
-  %strong= @group.name
-  group
+
+.row
+  .col-sm-6
+    Monthly pipeline minutes usage across shared Runners for the
+    %strong= @group.name
+    group
+
+  .col-sm-6
+    %p.text-right
+      = link_to 'Buy additional minutes', 'https://customers.gitlab.com/subscriptions', target: '_blank', class: 'btn btn-inverted btn-success right text-right'
 
 = render "namespaces/pipelines_quota/list",
   locals: { namespace: @group, projects: @projects }

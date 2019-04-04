@@ -13,6 +13,7 @@ describe Namespace do
   it { is_expected.to have_one(:gitlab_subscription).dependent(:destroy) }
   it { is_expected.to belong_to(:plan) }
 
+  it { is_expected.to delegate_method(:extra_shared_runners_minutes).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_seconds).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_seconds_last_reset).to(:namespace_statistics) }
@@ -379,6 +380,20 @@ describe Namespace do
           is_expected.to eq(500)
         end
       end
+
+      context 'when extra minutes limit is set' do
+        before do
+          namespace.update_attribute(:extra_shared_runners_minutes_limit, 100)
+        end
+
+        it 'returns the extra minutes by default' do
+          is_expected.to eq(1100)
+        end
+
+        it 'can exclude the extra minutes if required' do
+          expect(namespace.actual_shared_runners_minutes_limit(include_extra: false)).to eq(1000)
+        end
+      end
     end
   end
 
@@ -495,6 +510,77 @@ describe Namespace do
       it "returns false" do
         is_expected.to eq(false)
       end
+    end
+  end
+
+  describe '#extra_shared_runners_minutes_used?' do
+    subject { namespace.extra_shared_runners_minutes_used? }
+
+    context 'with project' do
+      let!(:project) do
+        create(:project, namespace: namespace, shared_runners_enabled: true)
+      end
+
+      context 'shared_runners_minutes_limit is not enabled' do
+        before do
+          allow(namespace).to receive(:shared_runners_minutes_limit_enabled?).and_return(false)
+        end
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'shared_runners_minutes_limit is enabled' do
+        context 'when limit is defined' do
+          before do
+            namespace.update_attribute(:extra_shared_runners_minutes_limit, 100)
+          end
+
+          context "when usage is below the quota" do
+            before do
+              allow(namespace).to receive(:extra_shared_runners_minutes).and_return(50)
+            end
+
+            it { is_expected.to be_falsey }
+          end
+
+          context "when usage is above the quota" do
+            before do
+              allow(namespace).to receive(:extra_shared_runners_minutes).and_return(101)
+            end
+
+            it { is_expected.to be_truthy }
+          end
+
+          context 'and main limit is unlimited' do
+            before do
+              namespace.update_attribute(:shared_runners_minutes_limit, 0)
+            end
+
+            context "and it's above the quota" do
+              it { is_expected.to be_falsey }
+            end
+          end
+        end
+
+        context 'without limit' do
+          before do
+            namespace.update_attribute(:shared_runners_minutes_limit, 100)
+            namespace.update_attribute(:extra_shared_runners_minutes_limit, nil)
+          end
+
+          context 'when main usage is above the quota' do
+            before do
+              allow(namespace).to receive(:shared_runners_minutes).and_return(101)
+            end
+
+            it { is_expected.to be_falsey }
+          end
+        end
+      end
+    end
+
+    context 'without project' do
+      it { is_expected.to be_falsey }
     end
   end
 

@@ -26,6 +26,7 @@ module EE
       validate :cannot_be_admin_and_auditor
 
       delegate :shared_runners_minutes_limit, :shared_runners_minutes_limit=,
+               :extra_shared_runners_minutes_limit, :extra_shared_runners_minutes_limit=,
                to: :namespace
 
       has_many :reviews,                  foreign_key: :author_id, inverse_of: :author
