@@ -123,7 +123,10 @@ type Response struct {
 	Archive string `json:"archive"`
 	// Entry is a filename inside the archive point to file that needs to be extracted
 	Entry string `json:"entry"`
-	// Used to communicate terminal session details
+	// Used to communicate channel session details
+	Channel *ChannelSettings
+	// Used to communicate terminal session details (Deprecated)
+	// Issue to remove this field https://gitlab.com/gitlab-org/gitlab-workhorse/issues/214
 	Terminal *TerminalSettings
 	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
 	GitalyServer gitaly.Server

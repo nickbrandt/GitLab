@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"bytes"

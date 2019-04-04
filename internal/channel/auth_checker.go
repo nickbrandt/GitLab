@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"errors"
@@ -8,13 +8,13 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 )
 
-type AuthCheckerFunc func() *api.TerminalSettings
+type AuthCheckerFunc func() *api.ChannelSettings
 
-// Regularly checks that authorization is still valid for a terminal, outputting
+// Regularly checks that authorization is still valid for a channel, outputting
 // to the stopper when it isn't
 type AuthChecker struct {
 	Checker  AuthCheckerFunc
-	Template *api.TerminalSettings
+	Template *api.ChannelSettings
 	StopCh   chan error
 	Done     chan struct{}
 	Count    int64
@@ -22,7 +22,7 @@ type AuthChecker struct {
 
 var ErrAuthChanged = errors.New("connection closed: authentication changed or endpoint unavailable")
 
-func NewAuthChecker(f AuthCheckerFunc, template *api.TerminalSettings, stopCh chan error) *AuthChecker {
+func NewAuthChecker(f AuthCheckerFunc, template *api.ChannelSettings, stopCh chan error) *AuthChecker {
 	return &AuthChecker{
 		Checker:  f,
 		Template: template,
@@ -53,7 +53,7 @@ func (c *AuthChecker) Close() error {
 
 // Generates a CheckerFunc from an *api.API + request needing authorization
 func authCheckFunc(myAPI *api.API, r *http.Request, suffix string) AuthCheckerFunc {
-	return func() *api.TerminalSettings {
+	return func() *api.ChannelSettings {
 		httpResponse, authResponse, err := myAPI.PreAuthorize(suffix, r)
 		if err != nil {
 			return nil
@@ -64,6 +64,6 @@ func authCheckFunc(myAPI *api.API, r *http.Request, suffix string) AuthCheckerFu
 			return nil
 		}
 
-		return authResponse.Terminal
+		return authResponse.Channel
 	}
 }

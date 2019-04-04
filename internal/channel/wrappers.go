@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"encoding/base64"

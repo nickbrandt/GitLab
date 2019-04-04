@@ -1,4 +1,4 @@
-package terminal
+package channel
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	// See doc/terminal.md for documentation of this subprotocol
+	// See doc/channel.md for documentation of this subprotocol
 	subprotocols             = []string{"terminal.gitlab.com", "base64.terminal.gitlab.com"}
 	upgrader                 = &websocket.Upgrader{Subprotocols: subprotocols}
 	ReauthenticationInterval = 5 * time.Minute
@@ -22,7 +22,15 @@ var (
 
 func Handler(myAPI *api.API) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		if err := a.Terminal.Validate(); err != nil {
+		// Used during the transition from Terminal to Channel
+		// Once we remove the TerminalSettings object we can remove
+		// this condition
+		// https://gitlab.com/gitlab-org/gitlab-workhorse/issues/214
+		if a.Terminal != nil {
+			a.Channel = a.Terminal.Channel()
+		}
+
+		if err := a.Channel.Validate(); err != nil {
 			helper.Fail500(w, r, err)
 			return
 		}
@@ -30,22 +38,22 @@ func Handler(myAPI *api.API) http.Handler {
 		proxy := NewProxy(2) // two stoppers: auth checker, max time
 		checker := NewAuthChecker(
 			authCheckFunc(myAPI, r, "authorize"),
-			a.Terminal,
+			a.Channel,
 			proxy.StopCh,
 		)
 		defer checker.Close()
 		go checker.Loop(ReauthenticationInterval)
-		go closeAfterMaxTime(proxy, a.Terminal.MaxSessionTime)
+		go closeAfterMaxTime(proxy, a.Channel.MaxSessionTime)
 
-		ProxyTerminal(w, r, a.Terminal, proxy)
+		ProxyChannel(w, r, a.Channel, proxy)
 	}, "authorize")
 }
 
-func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.TerminalSettings, proxy *Proxy) {
-	server, err := connectToServer(terminal, r)
+func ProxyChannel(w http.ResponseWriter, r *http.Request, settings *api.ChannelSettings, proxy *Proxy) {
+	server, err := connectToServer(settings, r)
 	if err != nil {
 		helper.Fail500(w, r, err)
-		log.WithError(r.Context(), err).Print("Terminal: connecting to server failed")
+		log.WithError(r.Context(), err).Print("Channel: connecting to server failed")
 		return
 	}
 	defer server.UnderlyingConn().Close()
@@ -53,7 +61,7 @@ func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.Termina
 
 	client, err := upgradeClient(w, r)
 	if err != nil {
-		log.WithError(r.Context(), err).Print("Terminal: upgrading client to websocket failed")
+		log.WithError(r.Context(), err).Print("Channel: upgrading client to websocket failed")
 		return
 	}
 
@@ -69,12 +77,12 @@ func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.Termina
 		"serverAddr": serverAddr,
 	})
 
-	logEntry.Print("Terminal: started proxying")
+	logEntry.Print("Channel: started proxying")
 
-	defer logEntry.Print("Terminal: finished proxying")
+	defer logEntry.Print("Channel: finished proxying")
 
 	if err := proxy.Serve(server, client, serverAddr, clientAddr); err != nil {
-		logEntry.WithError(err).Print("Terminal: error proxying")
+		logEntry.WithError(err).Print("Channel: error proxying")
 	}
 }
 
@@ -105,12 +113,12 @@ func pingLoop(conn Connection) {
 	}
 }
 
-func connectToServer(terminal *api.TerminalSettings, r *http.Request) (Connection, error) {
-	terminal = terminal.Clone()
+func connectToServer(settings *api.ChannelSettings, r *http.Request) (Connection, error) {
+	settings = settings.Clone()
 
-	helper.SetForwardedFor(&terminal.Header, r)
+	helper.SetForwardedFor(&settings.Header, r)
 
-	conn, _, err := terminal.Dial()
+	conn, _, err := settings.Dial()
 	if err != nil {
 		return nil, err
 	}
