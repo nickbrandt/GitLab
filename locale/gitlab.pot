@@ -3520,6 +3520,9 @@ msgstr ""
 msgid "Description:"
 msgstr ""
 
+msgid "DesignManagement|%{current_design} of %{designs_count}"
+msgstr ""
+
 msgid "DesignManagement|Could not find design, please try again."
 msgstr ""
 
@@ -3527,6 +3530,12 @@ msgid "DesignManagement|Error uploading a new design. Please try again"
 msgstr ""
 
 msgid "DesignManagement|Go back to designs"
+msgstr ""
+
+msgid "DesignManagement|Go to next design"
+msgstr ""
+
+msgid "DesignManagement|Go to previous design"
 msgstr ""
 
 msgid "DesignManagement|Upload designs"

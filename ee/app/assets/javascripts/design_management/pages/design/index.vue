@@ -48,6 +48,7 @@ export default {
 <template>
   <div class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column">
     <toolbar
+      :id="id"
       :is-loading="isLoading"
       :name="design.name"
       :updated-at="design.updatedAt"

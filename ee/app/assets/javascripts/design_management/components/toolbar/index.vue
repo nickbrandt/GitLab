@@ -3,14 +3,20 @@ import { __, sprintf } from '~/locale';
 import { GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
+import Pagination from './pagination.vue';
 
 export default {
   components: {
     GlLoadingIcon,
     Icon,
+    Pagination,
   },
   mixins: [timeagoMixin],
   props: {
+    id: {
+      type: Number,
+      required: true,
+    },
     isLoading: {
       type: Boolean,
       required: true,
@@ -58,5 +64,6 @@ export default {
         <small class="text-secondary">{{ updatedText }}</small>
       </template>
     </div>
+    <pagination :id="id" class="ml-auto" />
   </header>
 </template>

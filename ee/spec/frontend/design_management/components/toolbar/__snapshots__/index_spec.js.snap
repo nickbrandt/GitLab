@@ -28,6 +28,11 @@ exports[`Design management toolbar component renders design and updated data 1`]
       Updated 1 hour ago by Test Name
     </small>
   </div>
+   
+  <pagination-stub
+    class="ml-auto"
+    id="1"
+  />
 </header>
 `;
 
@@ -54,5 +59,10 @@ exports[`Design management toolbar component renders loading icon 1`] = `
       size="md"
     />
   </div>
+   
+  <pagination-stub
+    class="ml-auto"
+    id="1"
+  />
 </header>
 `;
