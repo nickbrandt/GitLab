@@ -2124,6 +2124,9 @@ msgstr ""
 msgid "CiVariable|Error occurred while saving variables"
 msgstr ""
 
+msgid "CiVariable|Masked"
+msgstr ""
+
 msgid "CiVariable|New environment"
 msgstr ""
 
@@ -2131,6 +2134,9 @@ msgid "CiVariable|Protected"
 msgstr ""
 
 msgid "CiVariable|Search environments"
+msgstr ""
+
+msgid "CiVariable|Toggle masked"
 msgstr ""
 
 msgid "CiVariable|Toggle protected"
@@ -10909,9 +10915,6 @@ msgstr ""
 msgid "Timeago|%s months remaining"
 msgstr ""
 
-msgid "Timeago|%s seconds ago"
-msgstr ""
-
 msgid "Timeago|%s seconds remaining"
 msgstr ""
 
@@ -11619,6 +11622,9 @@ msgid "Validations failed."
 msgstr ""
 
 msgid "Value"
+msgstr ""
+
+msgid "Variables"
 msgstr ""
 
 msgid "Various container registry settings."
