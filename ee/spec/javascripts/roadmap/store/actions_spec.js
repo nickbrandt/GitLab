@@ -63,6 +63,19 @@ describe('Roadmap Vuex Actions', () => {
     });
   });
 
+  describe('setWindowResizeInProgress', () => {
+    it('Should set value of `state.windowResizeInProgress` based on provided value', done => {
+      testAction(
+        actions.setWindowResizeInProgress,
+        true,
+        state,
+        [{ type: types.SET_WINDOW_RESIZE_IN_PROGRESS, payload: true }],
+        [],
+        done,
+      );
+    });
+  });
+
   describe('requestEpics', () => {
     it('Should set `epicsFetchInProgress` to true', done => {
       testAction(actions.requestEpics, {}, state, [{ type: 'REQUEST_EPICS' }], [], done);
