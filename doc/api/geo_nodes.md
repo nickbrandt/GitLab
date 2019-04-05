@@ -20,6 +20,8 @@ Example response:
   {
     "id": 1,
     "url": "https://primary.example.com/",
+    "alternate_url": null,
+    "internal_url": "https://internal.example.com/",
     "primary": true,
     "enabled": true,
     "current": true,
@@ -32,6 +34,7 @@ Example response:
     "id": 2,
     "url": "https://secondary.example.com/",
     "alternate_url": "https://alternate.example.com/",
+    "internal_url": "https://secondary.example.com/",
     "primary": false,
     "enabled": true,
     "current": false,
@@ -59,6 +62,8 @@ Example response:
 {
   "id": 1,
   "url": "https://primary.example.com/",
+  "alternate_url": null,
+  "internal_url": "https://primary.example.com/",
   "primary": true,
   "enabled": true,
   "current": true,
@@ -84,7 +89,8 @@ PUT /geo_nodes/:id
 | `id`                 | integer | yes       | The ID of the Geo node.                                                   |
 | `enabled`            | boolean | no        | Flag indicating if the Geo node is enabled.                               |
 | `url`                | string  | no        | The URL to connect to the Geo node.                                       |
-| `alternate_url`      | string  | no        | Allows users to log in to the secondary at an alternate URL (required for OAuth) |
+| `alternate_url`      | string  | no        | Allows users to log in to the secondary node at an alternate URL (required for OAuth). |
+| `internal_url`       | string  | no        | The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set.|
 | `files_max_capacity` | integer | no        | Control the maximum concurrency of LFS/attachment backfill for this secondary node. |
 | `repos_max_capacity` | integer | no        | Control the maximum concurrency of repository backfill for this secondary node.     |
 | `verification_max_capacity` | integer | no | Control the maximum concurrency of verification for this node. |
@@ -96,6 +102,7 @@ Example response:
   "id": 1,
   "url": "https://secondary.example.com/",
   "alternate_url": "https://alternate.example.com/",
+  "internal_url": "https://secondary.example.com/",
   "primary": false,
   "enabled": true,
   "current": true,
@@ -137,6 +144,8 @@ Example response:
 {
   "id": 1,
   "url": "https://primary.example.com/",
+  "alternate_url": null,
+  "internal_url": "https://primary.example.com/",
   "primary": true,
   "enabled": true,
   "current": true,

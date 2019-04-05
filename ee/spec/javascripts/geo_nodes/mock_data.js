@@ -45,6 +45,7 @@ export const mockNode = {
   id: 1,
   url: 'http://127.0.0.1:3001/',
   alternateUrl: '',
+  internalUrl: 'http://127.0.0.1:3001/',
   primary: true,
   current: true,
   enabled: true,

@@ -16,12 +16,12 @@ describe Gitlab::Geo::Oauth::Session do
 
   describe '#authorized_url' do
     it 'returns a valid url to the primary node' do
-      expect(subject.authorize_url).to start_with(primary_node.url)
+      expect(subject.authorize_url).to start_with(primary_node.internal_url)
     end
   end
 
   describe '#authenticate' do
-    let(:api_url) { "#{primary_node.url.chomp('/')}/api/v4/user" }
+    let(:api_url) { "#{primary_node.internal_url.chomp('/')}/api/v4/user" }
     let(:user_json) { ActiveSupport::JSON.encode({ id: 555, email: 'user@example.com' }.as_json) }
 
     context 'on success' do

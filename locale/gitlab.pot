@@ -4824,6 +4824,9 @@ msgstr ""
 msgid "GeoNodes|Health status"
 msgstr ""
 
+msgid "GeoNodes|Internal URL"
+msgstr ""
+
 msgid "GeoNodes|Last event ID processed by cursor"
 msgstr ""
 
@@ -5010,6 +5013,9 @@ msgstr ""
 msgid "Geo|In sync"
 msgstr ""
 
+msgid "Geo|Internal URL"
+msgstr ""
+
 msgid "Geo|Last repository check run"
 msgstr ""
 
@@ -5095,6 +5101,9 @@ msgid "Geo|Synced"
 msgstr ""
 
 msgid "Geo|Synchronization failed - %{error}"
+msgstr ""
+
+msgid "Geo|The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set"
 msgstr ""
 
 msgid "Geo|This is a primary node"

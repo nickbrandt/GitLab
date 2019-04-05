@@ -56,3 +56,13 @@ this URL must be specified as the "Alternate URL" on every secondary behind it.
 
 Additionally, the load balancer should use sticky sessions, since users must
 authenticate each first request to each secondary.
+
+## Using a different URL for synchronization
+
+The **primary** node's Internal URL is used by **secondary** nodes to contact it
+(to sync repositories, for example). The name Internal URL distinguishes it from
+[External URL](https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab)
+which is used by users. Internal URL does not need to be a private address.
+
+Internal URL defaults to External URL, but you can customize it under
+**Admin area > Geo Nodes**.

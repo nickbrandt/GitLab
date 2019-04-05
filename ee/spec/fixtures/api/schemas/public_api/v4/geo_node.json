@@ -18,6 +18,7 @@
     "url": { "type": ["string", "null"] },
     "alternate_url": { "type": ["string", "null"] },
     "primary": { "type": "boolean" },
+    "internal_url": { "type": ["string", "null"] },
     "enabled": { "type": "boolean" },
     "current": { "type": "boolean" },
     "files_max_capacity": { "type": "integer" },

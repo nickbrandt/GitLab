@@ -81,6 +81,28 @@ describe GeoNode, type: :model do
         it { is_expected.not_to be_valid }
       end
     end
+
+    context 'when validating internal_url' do
+      subject { build(:geo_node, internal_url: internal_url) }
+
+      context 'when internal_url is http' do
+        let(:internal_url) { 'http://foo' }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'when internal_url is https' do
+        let(:internal_url) { 'https://foo' }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'when internal_url is not http or https' do
+        let(:internal_url) { 'nothttp://foo' }
+
+        it { is_expected.not_to be_valid }
+      end
+    end
   end
 
   context 'default values' do
@@ -491,7 +513,7 @@ describe GeoNode, type: :model do
   end
 
   describe '#alternate_url=' do
-    subject { GeoNode.new(alternate_url: 'https://foo:3003/bar') }
+    subject { described_class.new(alternate_url: 'https://foo:3003/bar') }
 
     it 'sets schema field based on url' do
       expect(subject.alternate_uri.scheme).to eq('https')
@@ -522,6 +544,70 @@ describe GeoNode, type: :model do
           subject.alternate_url = dummy_https
 
           expect(subject.alternate_uri.port).to eq(443)
+        end
+      end
+    end
+  end
+
+  describe '#internal_url' do
+    let(:internal_url) { 'https://foo:3003/bar' }
+    let(:node) { create(:geo_node, url: dummy_url, internal_url: internal_url) }
+
+    it 'returns a string' do
+      expect(node.internal_url).to be_a String
+    end
+
+    it 'includes schema home port and relative_url with a terminating /' do
+      expect(node.internal_url).to eq("#{internal_url}/")
+    end
+
+    it 'falls back to url' do
+      empty_node.url = dummy_url
+      empty_node.internal_url = nil
+
+      expect(empty_node.internal_url).to eq "#{dummy_url}/"
+    end
+
+    it 'resets internal_url if it matches #url' do
+      empty_node.url = dummy_url
+      empty_node.internal_url = dummy_url
+
+      expect(empty_node.attributes[:internal_url]).to be_nil
+    end
+  end
+
+  describe '#internal_url=' do
+    subject { described_class.new(internal_url: 'https://foo:3003/bar') }
+
+    it 'sets schema field based on url' do
+      expect(subject.internal_uri.scheme).to eq('https')
+    end
+
+    it 'sets host field based on url' do
+      expect(subject.internal_uri.host).to eq('foo')
+    end
+
+    it 'sets port field based on specified by url' do
+      expect(subject.internal_uri.port).to eq(3003)
+    end
+
+    context 'when using unspecified ports' do
+      let(:dummy_http) { 'http://example.com/' }
+      let(:dummy_https) { 'https://example.com/' }
+
+      context 'when schema is http' do
+        it 'sets port 80' do
+          subject.internal_url = dummy_http
+
+          expect(subject.internal_uri.port).to eq(80)
+        end
+      end
+
+      context 'when schema is https' do
+        it 'sets port 443' do
+          subject.internal_url = dummy_https
+
+          expect(subject.internal_uri.port).to eq(443)
         end
       end
     end

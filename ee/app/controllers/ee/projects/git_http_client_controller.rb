@@ -155,7 +155,7 @@ module EE
       end
 
       def primary_full_url
-        File.join(::Gitlab::Geo.primary_node.url, request_fullpath_for_primary)
+        ::Gitlab::Utils.append_path(::Gitlab::Geo.primary_node.internal_url, request_fullpath_for_primary)
       end
 
       def redirect?
