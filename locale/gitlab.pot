@@ -491,9 +491,6 @@ msgstr ""
 msgid "Access forbidden. Check your access level."
 msgstr ""
 
-msgid "Access to '%{classification_label}' not allowed"
-msgstr ""
-
 msgid "Account"
 msgstr ""
 
@@ -2154,9 +2151,6 @@ msgstr ""
 msgid "CiVariable|Validation failed"
 msgstr ""
 
-msgid "ClassificationLabelUnavailable|is unavailable: %{reason}"
-msgstr ""
-
 msgid "Clear"
 msgstr ""
 
@@ -2188,15 +2182,6 @@ msgid "Click to expand it."
 msgstr ""
 
 msgid "Click to expand text"
-msgstr ""
-
-msgid "Client authentication certificate"
-msgstr ""
-
-msgid "Client authentication key"
-msgstr ""
-
-msgid "Client authentication key password"
 msgstr ""
 
 msgid "Clients"
@@ -3326,9 +3311,6 @@ msgstr ""
 msgid "Default artifacts expiration"
 msgstr ""
 
-msgid "Default classification label"
-msgstr ""
-
 msgid "Default first day of the week"
 msgstr ""
 
@@ -3818,9 +3800,6 @@ msgid "Enable and configure InfluxDB metrics."
 msgstr ""
 
 msgid "Enable and configure Prometheus metrics."
-msgstr ""
-
-msgid "Enable classification control using an external service"
 msgstr ""
 
 msgid "Enable error tracking"
@@ -4322,24 +4301,6 @@ msgid "External URL"
 msgstr ""
 
 msgid "External Wiki"
-msgstr ""
-
-msgid "External authentication"
-msgstr ""
-
-msgid "External authorization denied access to this project"
-msgstr ""
-
-msgid "External authorization request timeout"
-msgstr ""
-
-msgid "ExternalAuthorizationService|Classification Label"
-msgstr ""
-
-msgid "ExternalAuthorizationService|Classification label"
-msgstr ""
-
-msgid "ExternalAuthorizationService|When no classification label is set the default label `%{default_label}` will be used."
 msgstr ""
 
 msgid "Facebook"
@@ -12802,9 +12763,6 @@ msgstr ""
 msgid "connecting"
 msgstr ""
 
-msgid "could not read private key, is the passphrase correct?"
-msgstr ""
-
 msgid "customize"
 msgstr ""
 
@@ -13259,9 +13217,6 @@ msgid "personal access token"
 msgstr ""
 
 msgid "private"
-msgstr ""
-
-msgid "private key does not match certificate."
 msgstr ""
 
 msgid "processing"
