@@ -40,7 +40,7 @@ module EE
       def update_approvers
         return yield unless project.feature_available?(:code_owners)
 
-        if ::Feature.enabled?(:approval_rules, project)
+        if ::Feature.enabled?(:approval_rules, project, default_enabled: true)
           results = yield
 
           merge_requests_for_source_branch.each do |merge_request|

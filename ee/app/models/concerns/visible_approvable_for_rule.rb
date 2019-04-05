@@ -34,6 +34,6 @@ module VisibleApprovableForRule
   end
 
   def approval_rules_disabled?
-    ::Feature.disabled?(:approval_rules, project)
+    ::Feature.disabled?(:approval_rules, project, default_enabled: true)
   end
 end

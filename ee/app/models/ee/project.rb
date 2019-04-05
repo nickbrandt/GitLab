@@ -323,7 +323,7 @@ module EE
     end
 
     def visible_regular_approval_rules
-      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self)
+      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self, default_enabled: true)
 
       strong_memoize(:visible_regular_approval_rules) do
         regular_rules = approval_rules.regular.order(:id)
