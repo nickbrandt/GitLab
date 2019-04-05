@@ -76,6 +76,7 @@ class License < ApplicationRecord
     issues_analytics
     merge_pipelines
     design_management
+    operations_dashboard
   ]
   EEP_FEATURES.freeze
 
@@ -92,7 +93,6 @@ class License < ApplicationRecord
     pod_logs
     pseudonymizer
     prometheus_alerts
-    operations_dashboard
     tracing
     insights
     web_ide_terminal
