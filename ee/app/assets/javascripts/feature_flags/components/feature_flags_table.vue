@@ -32,6 +32,9 @@ export default {
     };
   },
   computed: {
+    permissions() {
+      return gon && gon.features && gon.features.featureFlagPermissions;
+    },
     modalTitle() {
       return sprintf(
         s__('FeatureFlags|Delete %{name}?'),
@@ -64,6 +67,9 @@ export default {
     },
     scopeName(name) {
       return name === '*' ? s__('FeatureFlags|* (All environments)') : name;
+    },
+    canDeleteFlag(flag) {
+      return !this.permissions || (flag.scopes || []).every(scope => scope.can_update);
     },
     setDeleteModalData(featureFlag) {
       this.deleteFeatureFlagUrl = featureFlag.destroy_path;
@@ -149,6 +155,7 @@ export default {
                 v-gl-modal-directive="modalId"
                 class="js-feature-flag-delete-button"
                 variant="danger"
+                :disabled="!canDeleteFlag(featureFlag)"
                 @click="setDeleteModalData(featureFlag)"
               >
                 <icon name="remove" :size="16" />

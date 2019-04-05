@@ -23,6 +23,14 @@ describe('feature flag form', () => {
     });
   };
 
+  beforeAll(() => {
+    gon.features = { featureFlagPermissions: true };
+  });
+
+  afterAll(() => {
+    gon.features = null;
+  });
+
   afterEach(() => {
     wrapper.destroy();
   });
@@ -87,12 +95,23 @@ describe('feature flag form', () => {
           {
             environment_scope: 'production',
             active: false,
+            can_update: true,
+            protected: true,
             id: 2,
           },
           {
             environment_scope: 'review',
             active: true,
+            can_update: true,
+            protected: false,
             id: 4,
+          },
+          {
+            environment_scope: 'staging',
+            active: true,
+            can_update: false,
+            protected: true,
+            id: 5,
           },
         ],
       });
@@ -113,8 +132,27 @@ describe('feature flag form', () => {
             wrapper.find(ToggleButton).vm.$emit('change', true);
 
             expect(wrapper.vm.formScopes).toEqual([
-              { active: true, environment_scope: 'production', id: 2 },
-              { active: true, environment_scope: 'review', id: 4 },
+              {
+                active: true,
+                environment_scope: 'production',
+                id: 2,
+                can_update: true,
+                protected: true,
+              },
+              {
+                active: true,
+                environment_scope: 'review',
+                id: 4,
+                can_update: true,
+                protected: false,
+              },
+              {
+                environment_scope: 'staging',
+                active: true,
+                can_update: false,
+                protected: true,
+                id: 5,
+              },
             ]);
 
             expect(wrapper.vm.newScope).toEqual('');
@@ -134,14 +172,42 @@ describe('feature flag form', () => {
               active: false,
               _destroy: true,
               id: 2,
+              can_update: true,
+              protected: true,
             },
-            { active: true, environment_scope: 'review', id: 4 },
+            {
+              active: true,
+              environment_scope: 'review',
+              id: 4,
+              can_update: true,
+              protected: false,
+            },
+            {
+              environment_scope: 'staging',
+              active: true,
+              can_update: false,
+              protected: true,
+              id: 5,
+            },
           ]);
         });
 
         it('should not render deleted scopes', () => {
           expect(wrapper.vm.filteredScopes).toEqual([
-            { active: true, environment_scope: 'review', id: 4 },
+            {
+              active: true,
+              environment_scope: 'review',
+              id: 4,
+              can_update: true,
+              protected: false,
+            },
+            {
+              environment_scope: 'staging',
+              active: true,
+              can_update: false,
+              protected: true,
+              id: 5,
+            },
           ]);
         });
       });
@@ -157,6 +223,8 @@ describe('feature flag form', () => {
                 environment_scope: 'new_scope',
                 active: false,
                 id: _.uniqueId(internalKeyID),
+                can_update: true,
+                protected: false,
               },
             ],
           });
@@ -186,6 +254,28 @@ describe('feature flag form', () => {
           expect(wrapper.find('.js-scope-all').exists()).toEqual(true);
         });
       });
+
+      describe('without permission to update', () => {
+        it('should have the flag name input disabled', () => {
+          const input = wrapper.find('#feature-flag-name');
+
+          expect(input.element.disabled).toBe(true);
+        });
+
+        it('should have the flag discription text area disabled', () => {
+          const textarea = wrapper.find('#feature-flag-description');
+
+          expect(textarea.element.disabled).toBe(true);
+        });
+
+        it('should have the scope that cannot be updated be disabled', () => {
+          const row = wrapper.findAll('.gl-responsive-table-row').wrappers[3];
+
+          expect(row.find(EnvironmentsDropdown).vm.disabled).toBe(true);
+          expect(row.find(ToggleButton).vm.disabledInput).toBe(true);
+          expect(row.find('.js-delete-scope').exists()).toBe(false);
+        });
+      });
     });
 
     describe('on submit', () => {
@@ -197,6 +287,8 @@ describe('feature flag form', () => {
           scopes: [
             {
               environment_scope: 'production',
+              can_update: true,
+              protected: true,
               active: false,
             },
           ],
@@ -226,6 +318,8 @@ describe('feature flag form', () => {
         expect(data.scopes[0]).toEqual({
           active: false,
           environment_scope: 'production',
+          can_update: true,
+          protected: true,
         });
       });
     });
