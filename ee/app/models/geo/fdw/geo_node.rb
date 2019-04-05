@@ -29,11 +29,8 @@ module Geo
       private
 
       def registries_for_selected_namespaces
-        query = selected_namespaces_and_descendants
-
-        Geo::ProjectRegistry
-          .joins(fdw_inner_join_projects)
-          .where(fdw_projects_table.name => { namespace_id: query.select(:id) })
+        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
+          .within_namespaces(selected_namespaces_and_descendants.select(:id))
       end
 
       def selected_namespaces_and_descendants
@@ -60,17 +57,8 @@ module Geo
       end
 
       def registries_for_selected_shards
-        Geo::ProjectRegistry
-          .joins(fdw_inner_join_projects)
-          .where(fdw_projects_table.name => { repository_storage: selective_sync_shards })
-      end
-
-      def project_registries_table
-        Geo::ProjectRegistry.arel_table
-      end
-
-      def fdw_projects_table
-        Geo::Fdw::Project.arel_table
+        Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
+          .within_shards(selective_sync_shards)
       end
 
       def fdw_namespaces_table
@@ -79,13 +67,6 @@ module Geo
 
       def fdw_geo_node_namespace_links_table
         Geo::Fdw::GeoNodeNamespaceLink.arel_table
-      end
-
-      def fdw_inner_join_projects
-        project_registries_table
-          .join(fdw_projects_table, Arel::Nodes::InnerJoin)
-          .on(project_registries_table[:project_id].eq(fdw_projects_table[:id]))
-          .join_sources
       end
     end
   end

@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Geo::ProjectRegistryFinder, :geo do
+  using RSpec::Parameterized::TableSyntax
+
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly
@@ -450,126 +452,6 @@ describe Geo::ProjectRegistryFinder, :geo do
         end
       end
     end
-
-    describe '#find_registries_to_verify' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_registries_to_verify".to_sym).and_call_original
-
-        subject.find_registries_to_verify(shard_name: 'default', batch_size: 10)
-      end
-
-      it 'does not return registries that are verified on primary and secondary' do
-        project_verified    = create(:repository_state, :repository_verified, :wiki_verified).project
-        repository_verified = create(:repository_state, :repository_verified).project
-        wiki_verified       = create(:repository_state, :wiki_verified).project
-
-        create(:geo_project_registry, :repository_verified, :wiki_verified, project: project_verified)
-        create(:geo_project_registry, :repository_verified, project: repository_verified)
-        create(:geo_project_registry, :wiki_verified, project: wiki_verified)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'does not return registries that were unverified/outdated on primary' do
-        project_unverified_primary  = create(:project)
-        project_outdated_primary    = create(:repository_state, :repository_outdated, :wiki_outdated).project
-        repository_outdated_primary = create(:repository_state, :repository_outdated, :wiki_verified).project
-        wiki_outdated_primary       = create(:repository_state, :repository_verified, :wiki_outdated).project
-
-        create(:geo_project_registry, project: project_unverified_primary)
-        create(:geo_project_registry, :repository_verification_outdated, :wiki_verification_outdated, project: project_outdated_primary)
-        create(:geo_project_registry, :repository_verified, :wiki_verified, project: repository_outdated_primary)
-        create(:geo_project_registry, :repository_verified, :wiki_verified, project: wiki_outdated_primary)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'returns registries that were unverified/outdated on secondary' do
-        # Secondary unverified/outdated
-        project_unverified_secondary  = create(:repository_state, :repository_verified, :wiki_verified).project
-        project_outdated_secondary    = create(:repository_state, :repository_verified, :wiki_verified).project
-        repository_outdated_secondary = create(:repository_state, :repository_verified, :wiki_verified).project
-        wiki_outdated_secondary       = create(:repository_state, :repository_verified, :wiki_verified).project
-
-        registry_unverified_secondary          = create(:geo_project_registry, :synced, project: project_unverified_secondary)
-        registry_outdated_secondary            = create(:geo_project_registry, :synced, :repository_verification_outdated, :wiki_verification_outdated, project: project_outdated_secondary)
-        registry_repository_outdated_secondary = create(:geo_project_registry, :synced, :repository_verification_outdated, :wiki_verified, project: repository_outdated_secondary)
-        registry_wiki_outdated_secondary       = create(:geo_project_registry, :synced, :repository_verified, :wiki_verification_outdated, project: wiki_outdated_secondary)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100))
-          .to match_array([
-            registry_unverified_secondary,
-            registry_outdated_secondary,
-            registry_repository_outdated_secondary,
-            registry_wiki_outdated_secondary
-          ])
-      end
-
-      it 'does not return registries that failed on primary' do
-        verification_failed_primary = create(:repository_state, :repository_failed, :wiki_failed).project
-
-        create(:geo_project_registry, project: verification_failed_primary)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'returns registries where one failed and one verified on the primary' do
-        verification_failed_primary = create(:repository_state, :repository_failed, :wiki_failed).project
-        repository_failed_primary   = create(:repository_state, :repository_failed, :wiki_verified).project
-        wiki_failed_primary         = create(:repository_state, :repository_verified, :wiki_failed).project
-
-        create(:geo_project_registry, :synced, project: verification_failed_primary)
-        registry_repository_failed_primary = create(:geo_project_registry, :synced, project: repository_failed_primary)
-        registry_wiki_failed_primary       = create(:geo_project_registry, :synced, project: wiki_failed_primary)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100))
-          .to match_array([
-            registry_repository_failed_primary,
-            registry_wiki_failed_primary
-          ])
-      end
-
-      it 'does not return registries where verification failed on secondary' do
-        # Verification failed on secondary
-        verification_failed_secondary = create(:repository_state, :repository_verified, :wiki_verified).project
-        repository_failed_secondary   = create(:repository_state, :repository_verified).project
-        wiki_failed_secondary         = create(:repository_state, :wiki_verified).project
-
-        create(:geo_project_registry, :repository_verification_failed, :wiki_verification_failed, project: verification_failed_secondary)
-        create(:geo_project_registry, :repository_verification_failed, project: repository_failed_secondary)
-        create(:geo_project_registry, :wiki_verification_failed, project: wiki_failed_secondary)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'does not return registries when the repo needs to be resynced' do
-        project_verified = create(:repository_state, :repository_verified).project
-        create(:geo_project_registry, :repository_sync_failed, project: project_verified)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'does not return registries when the wiki needs to be resynced' do
-        project_verified = create(:repository_state, :wiki_verified).project
-        create(:geo_project_registry, :wiki_sync_failed, project: project_verified)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'does not return registries when the repository is missing on primary' do
-        project_verified = create(:repository_state, :repository_verified).project
-        create(:geo_project_registry, :synced, project: project_verified, repository_missing_on_primary: true)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-
-      it 'does not return registries when the wiki is missing on primary' do
-        project_verified = create(:repository_state, :wiki_verified).project
-        create(:geo_project_registry, :synced, project: project_verified, wiki_missing_on_primary: true)
-
-        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
-      end
-    end
   end
 
   # Disable transactions via :delete method because a foreign table
@@ -605,5 +487,34 @@ describe Geo::ProjectRegistryFinder, :geo do
 
     include_examples 'counts all the things', 'legacy'
     include_examples 'finds all the things', 'legacy'
+  end
+
+  describe '#find_registries_to_verify', :delete do
+    where(:selective_sync, :fdw_enabled, :use_fdw_queries_for_selective_sync, :finder) do
+      false | false | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+      false | false | true  | Geo::LegacyProjectRegistryPendingVerificationFinder
+      false | true  | true  | Geo::ProjectRegistryPendingVerificationFinder
+      false | true  | false | Geo::ProjectRegistryPendingVerificationFinder
+      true  | false | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+      true  | false | true  | Geo::LegacyProjectRegistryPendingVerificationFinder
+      true  | true  | true  | Geo::ProjectRegistryPendingVerificationFinder
+      true  | true  | false | Geo::LegacyProjectRegistryPendingVerificationFinder
+    end
+
+    with_them do
+      before do
+        stub_fdw(fdw_enabled)
+        stub_feature_flags(use_fdw_queries_for_selective_sync: use_fdw_queries_for_selective_sync)
+        stub_selective_sync(secondary, selective_sync)
+      end
+
+      it 'delegates to Geo::ProjectRegistryPendingVerificationFinder' do
+        expect_next_instance_of(finder, current_node: secondary, shard_name: 'default', batch_size: 100) do |finder|
+          expect(finder).to receive(:execute).once
+        end
+
+        subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)
+      end
+    end
   end
 end
