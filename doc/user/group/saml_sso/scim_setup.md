@@ -6,6 +6,7 @@ GitLab's [SCIM API](../../../api/scim.md) implements part of [the RFC7644 protoc
 
 Currently, the following actions are available:
 
+- CREATE
 - UPDATE
 - DELETE (deprovisioning)
 
@@ -71,8 +72,10 @@ You can then test the connection clicking on `Test Connection`.
 
 1. Click on `Synchronize Azure Active Directory Users to AppName`, to configure
 the attribute mapping.
-1. Select the unique identifier (in the example `objectId`) as the `id` and enable
-the`Update` and `Create` actions.
+1. Select the unique identifier (in the example `objectId`) as the `id` and `externalId`,
+and enable the `Create`, `Update`, and `Delete` actions.
+1. Map the `userPricipalName` to `emails[type eq "work"].value` and `mailNickname` to
+`userName`.
 
     Example configuration:
     

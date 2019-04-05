@@ -31,4 +31,12 @@ describe ::EE::Gitlab::Scim::User do
   it 'contains the email' do
     expect(subject[:emails].first[:value]).to eq(user.email)
   end
+
+  it 'contains the username' do
+    expect(subject[:userName]).to eq(user.username)
+  end
+
+  it 'contains the resource type' do
+    expect(subject[:meta][:resourceType]).to eq('User')
+  end
 end

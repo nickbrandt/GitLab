@@ -26,12 +26,20 @@ module API
           false
         end
 
+        def render_scim_error(error_class, message)
+          error!({ with: error_class }.merge(detail: message), error_class::STATUS)
+        end
+
         def scim_not_found!(message:)
-          error!({ with: EE::Gitlab::Scim::NotFound }.merge(detail: message), 404)
+          render_scim_error(EE::Gitlab::Scim::NotFound, message)
         end
 
         def scim_error!(message:)
-          error!({ with: EE::Gitlab::Scim::Error }.merge(detail: message), 409)
+          render_scim_error(EE::Gitlab::Scim::Error, message)
+        end
+
+        def scim_conflict!(message:)
+          render_scim_error(EE::Gitlab::Scim::Conflict, message)
         end
 
         def find_and_authenticate_group!(group_path)
@@ -51,14 +59,14 @@ module API
         # rubocop: disable CodeReuse/ActiveRecord
         def update_scim_user(identity)
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          parsed_hash = parser.to_hash
+          parsed_hash = parser.result
 
           if parser.deprovision_user?
             destroy_identity(identity)
           elsif parsed_hash[:extern_uid]
             identity.update(parsed_hash.slice(:extern_uid))
           else
-            scim_error!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
+            scim_conflict!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
 
             result = ::Users::UpdateService.new(identity.user,
                                                 parsed_hash.except(:extern_uid)
@@ -67,15 +75,12 @@ module API
             result[:status] == :success
           end
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def email_taken?(email, identity)
           return unless email
 
           User.by_any_email(email.downcase).where.not(id: identity.user.id).exists?
         end
-        # rubocop: enable CodeReuse/ActiveRecord
       end
 
       resource :Users do
@@ -88,11 +93,10 @@ module API
           detail 'This feature was introduced in GitLab 11.10.'
         end
         get do
-          group = find_and_authenticate_group!(params[:group])
-
           scim_error!(message: 'Missing filter params') unless params[:filter]
 
-          parsed_hash = EE::Gitlab::Scim::ParamsParser.new(params).to_hash
+          group = find_and_authenticate_group!(params[:group])
+          parsed_hash = EE::Gitlab::Scim::ParamsParser.new(params).result
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: parsed_hash[:extern_uid])
 
           status 200
@@ -114,6 +118,27 @@ module API
 
           present identity, with: ::EE::Gitlab::Scim::User
         end
+
+        desc 'Create a SAML user' do
+          detail 'This feature was introduced in GitLab 11.10.'
+        end
+        post do
+          group = find_and_authenticate_group!(params[:group])
+          parser = EE::Gitlab::Scim::ParamsParser.new(params)
+          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.result).execute
+
+          case result.status
+          when :success
+            status 201
+
+            present result.identity, with: ::EE::Gitlab::Scim::User
+          when :conflict
+            scim_conflict!(message: "Error saving user with #{params.inspect}: #{result.message}")
+          when :error
+            scim_error!(message: ["Error saving user with #{params.inspect}", result.message].compact.join(": "))
+          end
+        end
+
         desc 'Updates a SAML user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end

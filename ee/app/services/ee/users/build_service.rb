@@ -30,6 +30,11 @@ module EE
         ]
       end
 
+      override :identity_params
+      def identity_params
+        super.push(:saml_provider_id)
+      end
+
       def build_smartcard_identity(user, params)
         smartcard_identity_attrs = params.slice(:certificate_subject, :certificate_issuer)
 

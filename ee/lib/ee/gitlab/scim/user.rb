@@ -7,11 +7,17 @@ module EE
         expose :schemas
         expose :extern_uid, as: :id
         expose :active
+        expose :email_user, as: :emails, using: '::EE::Gitlab::Scim::Emails'
+
         expose 'name.formatted' do |identity, _options|
           identity.user.name
         end
-
-        expose :email_user, as: :emails, using: '::EE::Gitlab::Scim::Emails'
+        expose :meta do
+          expose :resource_type, as: :resourceType
+        end
+        expose :username, as: :userName do |identity, _options|
+          identity.user.username
+        end
 
         private
 
@@ -37,6 +43,10 @@ module EE
 
         def email_user
           [object.user]
+        end
+
+        def resource_type
+          'User'
         end
       end
     end
