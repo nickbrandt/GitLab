@@ -47,7 +47,6 @@ project_tree:
     - label_links:
       - label:
           :priorities
-    - :merge_request_assignees
     - milestone:
       - events:
         - :push_event_payload

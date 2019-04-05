@@ -20,11 +20,49 @@ describe API::MergeRequests do
   end
 
   describe 'PUT /projects/:id/merge_requests' do
-    context 'when updating existing approval rules' do
-      def update_merge_request(params)
-        put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user), params: params
+    def update_merge_request(params)
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user), params: params
+    end
+
+    context 'multiple assignees' do
+      let(:other_user) { create(:user) }
+      let(:params) do
+        { assignee_ids: [user.id, other_user.id] }
       end
 
+      context 'when licensed' do
+        before do
+          stub_licensed_features(multiple_merge_request_assignees: true)
+        end
+
+        it 'creates merge request with multiple assignees' do
+          update_merge_request(params)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['assignees'].size).to eq(2)
+          expect(json_response['assignees'].first['name']).to eq(user.name)
+          expect(json_response['assignees'].second['name']).to eq(other_user.name)
+          expect(json_response.dig('assignee', 'name')).to eq(user.name)
+        end
+      end
+
+      context 'when not licensed' do
+        before do
+          stub_licensed_features(multiple_merge_request_assignees: false)
+        end
+
+        it 'creates merge request with a single assignee' do
+          update_merge_request(params)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['assignees'].size).to eq(1)
+          expect(json_response['assignees'].first['name']).to eq(user.name)
+          expect(json_response.dig('assignee', 'name')).to eq(user.name)
+        end
+      end
+    end
+
+    context 'when updating existing approval rules' do
       let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 1) }
 
       it 'is successful' do
@@ -58,6 +96,40 @@ describe API::MergeRequests do
       defaults = defaults.merge(args)
       post api("/projects/#{project.id}/merge_requests", user), params: defaults
     end
+
+    context 'multiple assignees' do
+      context 'when licensed' do
+        before do
+          stub_licensed_features(multiple_merge_request_assignees: true)
+        end
+
+        it 'creates merge request with multiple assignees' do
+          create_merge_request(assignee_ids: [user.id, user2.id])
+
+          expect(response).to have_gitlab_http_status(201)
+          expect(json_response['assignees'].size).to eq(2)
+          expect(json_response['assignees'].first['name']).to eq(user.name)
+          expect(json_response['assignees'].second['name']).to eq(user2.name)
+          expect(json_response.dig('assignee', 'name')).to eq(user.name)
+        end
+      end
+
+      context 'when not licensed' do
+        before do
+          stub_licensed_features(multiple_merge_request_assignees: false)
+        end
+
+        it 'creates merge request with a single assignee' do
+          create_merge_request(assignee_ids: [user.id, user2.id])
+
+          expect(response).to have_gitlab_http_status(201)
+          expect(json_response['assignees'].size).to eq(1)
+          expect(json_response['assignees'].first['name']).to eq(user.name)
+          expect(json_response.dig('assignee', 'name')).to eq(user.name)
+        end
+      end
+    end
+
     context 'between branches projects' do
       it "returns merge_request" do
         create_merge_request(squash: true)
@@ -143,9 +215,19 @@ describe API::MergeRequests do
       create(:merge_request_with_approver, :simple, author: user, source_project: project, target_project: project, source_branch: 'other-branch')
     end
 
-    let(:another_user) {}
+    context 'filter merge requests by assignee ID' do
+      let!(:merge_request2) do
+        create(:merge_request, :simple, assignees: [user2], source_project: project, target_project: project, source_branch: 'other-branch-2')
+      end
 
-    context 'request merge requests' do
+      it 'returns merge requests with given assignee ID' do
+        get api('/merge_requests', user), params: { assignee_id: user2.id }
+
+        expect_response_contain_exactly(merge_request, merge_request2)
+      end
+    end
+
+    context 'filter merge requests by approver IDs' do
       before do
         get api('/merge_requests', user), params: { approver_ids: approvers_param, scope: :all }
       end

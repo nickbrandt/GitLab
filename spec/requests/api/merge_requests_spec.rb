@@ -5,6 +5,7 @@ describe API::MergeRequests do
 
   let(:base_time)   { Time.now }
   set(:user)        { create(:user) }
+  set(:user2)       { create(:user) }
   set(:admin)       { create(:user, :admin) }
   let(:project)     { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   let(:milestone)   { create(:milestone, title: '1.0.0', project: project) }
@@ -20,6 +21,9 @@ describe API::MergeRequests do
 
   before do
     project.add_reporter(user)
+    project.add_reporter(user2)
+
+    stub_licensed_features(multiple_merge_request_assignees: false)
   end
 
   shared_context 'with labels' do
@@ -730,7 +734,7 @@ describe API::MergeRequests do
 
   describe "GET /projects/:id/merge_requests/:merge_request_iid" do
     it 'matches json schema' do
-      merge_request = create(:merge_request, :with_test_reports, milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Test", created_at: base_time)
+      merge_request = create(:merge_request, :with_test_reports, milestone: milestone1, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: base_time)
       get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user)
 
       expect(response).to have_gitlab_http_status(200)
@@ -1005,6 +1009,71 @@ describe API::MergeRequests do
   end
 
   describe 'POST /projects/:id/merge_requests' do
+    context 'support for deprecated assignee_id' do
+      let(:params) do
+        {
+          title: 'Test merge request',
+          source_branch: 'feature_conflict',
+          target_branch: 'master',
+          author_id: user.id,
+          assignee_id: user2.id
+        }
+      end
+
+      it 'creates a new merge request' do
+        post api("/projects/#{project.id}/merge_requests", user), params: params
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['title']).to eq('Test merge request')
+        expect(json_response['assignee']['name']).to eq(user2.name)
+        expect(json_response['assignees'].first['name']).to eq(user2.name)
+      end
+
+      it 'creates a new merge request when assignee_id is empty' do
+        params[:assignee_id] = ''
+
+        post api("/projects/#{project.id}/merge_requests", user), params: params
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['title']).to eq('Test merge request')
+        expect(json_response['assignee']).to be_nil
+      end
+
+      it 'filters assignee_id of unauthorized user' do
+        private_project = create(:project, :private, :repository)
+        another_user = create(:user)
+        private_project.add_maintainer(user)
+        params[:assignee_id] = another_user.id
+
+        post api("/projects/#{private_project.id}/merge_requests", user), params: params
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['assignee']).to be_nil
+      end
+    end
+
+    context 'single assignee restrictions' do
+      let(:params) do
+        {
+          title: 'Test merge request',
+          source_branch: 'feature_conflict',
+          target_branch: 'master',
+          author_id: user.id,
+          assignee_ids: [user.id, user2.id]
+        }
+      end
+
+      it 'creates a new project merge request with no more than one assignee' do
+        post api("/projects/#{project.id}/merge_requests", user), params: params
+
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['title']).to eq('Test merge request')
+        expect(json_response['assignees'].count).to eq(1)
+        expect(json_response['assignees'].first['name']).to eq(user.name)
+        expect(json_response.dig('assignee', 'name')).to eq(user.name)
+      end
+    end
+
     context 'between branches projects' do
       context 'different labels' do
         let(:params) do
@@ -1593,6 +1662,19 @@ describe API::MergeRequests do
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['force_remove_source_branch']).to be_truthy
+    end
+
+    it 'filters assignee_id of unauthorized user' do
+      private_project = create(:project, :private, :repository)
+      mr = create(:merge_request, source_project: private_project, target_project: private_project)
+      another_user = create(:user)
+      private_project.add_maintainer(user)
+      params = { assignee_id: another_user.id }
+
+      put api("/projects/#{private_project.id}/merge_requests/#{mr.iid}", user), params: params
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response['assignee']).to be_nil
     end
 
     context 'when updating labels' do

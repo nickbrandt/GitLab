@@ -16,6 +16,7 @@ class MergeRequest < ApplicationRecord
   include LabelEventable
   include ReactiveCaching
   include FromUnion
+  include DeprecatedAssignee
 
   self.reactive_cache_key = ->(model) { [model.project.id, model.iid] }
   self.reactive_cache_refresh_interval = 10.minutes
@@ -327,30 +328,6 @@ class MergeRequest < ApplicationRecord
 
   def hook_attrs
     Gitlab::HookData::MergeRequestBuilder.new(self).build
-  end
-
-  # Used by APIs to keep backward compatibility
-  def assignee
-    assignees.first
-  end
-
-  def assignees
-    # We're willing to write in the DB if we can't find the relation
-    # (i.e. migration at #26496 is not finished yet).
-    return super if Gitlab::Database.read_only?
-
-    # If there's an assignee_id and no relation, it means the background
-    # migration at #26496 didn't reach this merge request yet.
-    # This code should be removed in the clean-up phase of the
-    # background migration (#59457).
-    if persisted? && assignee_id && merge_request_assignees.empty?
-      transaction do
-        merge_request_assignees.create(user_id: assignee_id, merge_request_id: id)
-        update_column(:assignee_id, nil)
-      end
-    end
-
-    super
   end
 
   # `from` argument can be a Namespace or Project.

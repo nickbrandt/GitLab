@@ -523,52 +523,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#assignees' do
-    let(:user) { create(:user) }
-
-    context 'when assignee_id exists and relation is not empty' do
-      it 'does not create assignees relation' do
-        merge_request = create(:merge_request, assignee_id: user.id)
-        merge_request.merge_request_assignees.create(user_id: user.id)
-
-        expect { merge_request.assignees }.not_to change { merge_request.reload.assignee_ids.size }
-      end
-    end
-
-    context 'when assignee_id exists and relation is empty' do
-      it 'creates assignees relation' do
-        merge_request = create(:merge_request, assignee_id: user.id)
-
-        expect { merge_request.assignees }.to change { merge_request.reload.assignee_ids.size }.from(0).to(1)
-        expect(merge_request.assignees.first).to eq(user)
-      end
-
-      it 'nullifies assignee_id' do
-        merge_request = create(:merge_request, assignee_id: user.id)
-
-        expect { merge_request.assignees }.to change { merge_request.reload.assignee_id }.to(nil)
-      end
-    end
-
-    context 'when assignee_id does not exists' do
-      it 'does not create assignees relation' do
-        merge_request = create(:merge_request, assignee_id: nil)
-
-        expect { merge_request.assignees }.not_to change { merge_request.reload.assignee_ids.size }
-      end
-    end
-
-    context 'when DB is read-only' do
-      it 'does not create assignees relation' do
-        allow(Gitlab::Database).to receive(:read_only?) { true }
-
-        merge_request = create(:merge_request, assignee_id: user.id)
-
-        expect { merge_request.assignees }.not_to change { merge_request.reload.assignee_ids.size }
-      end
-    end
-  end
-
   describe '#to_reference' do
     let(:project) { build(:project, name: 'sample-project') }
     let(:merge_request) { build(:merge_request, target_project: project, iid: 1) }
