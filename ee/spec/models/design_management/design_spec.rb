@@ -6,7 +6,7 @@ describe DesignManagement::Design do
   describe 'relations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:issue) }
-    it { is_expected.to have_many(:versions) }
+    it { is_expected.to have_and_belong_to_many(:versions) }
   end
 
   describe 'validations' do
@@ -16,7 +16,6 @@ describe DesignManagement::Design do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_presence_of(:issue) }
     it { is_expected.to validate_presence_of(:filename) }
-    it { is_expected.to validate_uniqueness_of(:issue) }
     it { is_expected.to validate_uniqueness_of(:filename).scoped_to(:issue_id) }
   end
 end

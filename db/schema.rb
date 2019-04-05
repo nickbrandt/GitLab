@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190328210840) do
+ActiveRecord::Schema.define(version: 20190403161806) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1042,14 +1042,19 @@ ActiveRecord::Schema.define(version: 20190328210840) do
     t.integer "issue_id", null: false
     t.string "filename", null: false
     t.index ["issue_id", "filename"], name: "index_design_management_designs_on_issue_id_and_filename", unique: true, using: :btree
-    t.index ["issue_id"], name: "index_design_management_designs_on_issue_id", unique: true, using: :btree
     t.index ["project_id"], name: "index_design_management_designs_on_project_id", using: :btree
   end
 
+  create_table "design_management_designs_versions", id: false, force: :cascade do |t|
+    t.bigint "design_id", null: false
+    t.bigint "version_id", null: false
+    t.index ["design_id", "version_id"], name: "design_management_designs_versions_uniqueness", unique: true, using: :btree
+    t.index ["design_id"], name: "index_design_management_designs_versions_on_design_id", using: :btree
+    t.index ["version_id"], name: "index_design_management_designs_versions_on_version_id", using: :btree
+  end
+
   create_table "design_management_versions", id: :bigserial, force: :cascade do |t|
-    t.bigint "design_management_design_id", null: false
     t.binary "sha", null: false
-    t.index ["design_management_design_id"], name: "index_design_management_versions_on_design_management_design_id", using: :btree
     t.index ["sha"], name: "index_design_management_versions_on_sha", unique: true, using: :btree
   end
 
@@ -3475,7 +3480,8 @@ ActiveRecord::Schema.define(version: 20190328210840) do
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
-  add_foreign_key "design_management_versions", "design_management_designs", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "elasticsearch_indexed_namespaces", "namespaces", on_delete: :cascade
