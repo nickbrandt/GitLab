@@ -6,7 +6,7 @@ describe Projects::ProjectMembersController do
   let(:namespace) { create :group }
 
   describe 'GET index' do
-    it 'should have the project_members address with a 200 status code' do
+    it 'has the project_members address with a 200 status code' do
       get :index, params: { namespace_id: project.namespace, project_id: project }
 
       expect(response).to have_gitlab_http_status(200)

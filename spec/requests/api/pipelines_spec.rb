@@ -435,7 +435,7 @@ describe API::Pipelines do
     end
 
     context 'unauthorized user' do
-      it 'should not return a project pipeline' do
+      it 'does not return a project pipeline' do
         get api("/projects/#{project.id}/pipelines/#{pipeline.id}", non_member)
 
         expect(response).to have_gitlab_http_status(404)
@@ -487,7 +487,7 @@ describe API::Pipelines do
 
     context 'unauthorized user' do
       context 'when user is not member' do
-        it 'should return a 404' do
+        it 'returns a 404' do
           delete api("/projects/#{project.id}/pipelines/#{pipeline.id}", non_member)
 
           expect(response).to have_gitlab_http_status(404)
@@ -502,7 +502,7 @@ describe API::Pipelines do
           project.add_developer(developer)
         end
 
-        it 'should return a 403' do
+        it 'returns a 403' do
           delete api("/projects/#{project.id}/pipelines/#{pipeline.id}", developer)
 
           expect(response).to have_gitlab_http_status(403)
@@ -532,7 +532,7 @@ describe API::Pipelines do
     end
 
     context 'unauthorized user' do
-      it 'should not return a project pipeline' do
+      it 'does not return a project pipeline' do
         post api("/projects/#{project.id}/pipelines/#{pipeline.id}/retry", non_member)
 
         expect(response).to have_gitlab_http_status(404)
