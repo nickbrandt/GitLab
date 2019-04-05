@@ -284,6 +284,10 @@ module EE
       actual_plan_name == GOLD_PLAN
     end
 
+    def paid_plan?
+      !(free_plan? || early_adopter_plan?)
+    end
+
     def use_elasticsearch?
       ::Gitlab::CurrentSettings.elasticsearch_indexes_namespace?(self)
     end
