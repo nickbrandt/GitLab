@@ -6,6 +6,8 @@ describe 'issue boards', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public) }
   let!(:board) { create(:board, project: project) }
+  let(:milestone) { create(:milestone, title: "v2.2", project: project) }
+  let!(:board_with_milestone) { create(:board, project: project, milestone: milestone) }
 
   context 'issue board focus mode' do
     before do
@@ -138,6 +140,22 @@ describe 'issue boards', :js do
         tooltip = find("##{badge(backlog)['aria-describedby']}")
         expect(tooltip.text).to eq('2 issues')
       end
+    end
+  end
+
+  context 'locked milestone' do
+    before do
+      visit project_board_path(project, board_with_milestone)
+      wait_for_requests
+    end
+
+    it 'should not have remove button' do
+      expect(page).to have_selector('.js-visual-token .remove-token', count: 0)
+    end
+
+    it 'should not be able to be backspaced' do
+      find('.input-token .filtered-search').native.send_key(:backspace)
+      expect(page).to have_selector('.js-visual-token', count: 1)
     end
   end
 
