@@ -3,8 +3,8 @@
 module EE
   module Gitlab
     module Scim
-      class NotFound < EE::Gitlab::Scim::Error
-        STATUS = 404
+      class Conflict < Error
+        STATUS = 409
       end
     end
   end

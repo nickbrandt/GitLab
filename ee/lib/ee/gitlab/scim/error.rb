@@ -4,6 +4,8 @@ module EE
   module Gitlab
     module Scim
       class Error < Grape::Entity
+        STATUS = 412
+
         expose :schemas
         expose :detail, safe: true
         expose :status
@@ -17,7 +19,7 @@ module EE
         end
 
         def status
-          409
+          self.class::STATUS
         end
       end
     end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ::EE::Gitlab::Scim::Error do
+describe ::EE::Gitlab::Scim::Conflict do
   let(:params) { { detail: 'error' } }
   let(:entity) do
     described_class.new(params)
@@ -19,6 +19,6 @@ describe ::EE::Gitlab::Scim::Error do
   end
 
   it 'contains the status' do
-    expect(subject[:status]).to eq(412)
+    expect(subject[:status]).to eq(409)
   end
 end

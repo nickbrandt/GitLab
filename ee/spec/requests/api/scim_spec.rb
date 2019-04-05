@@ -26,7 +26,7 @@ describe API::Scim do
     it 'responds with an error if there is no filter' do
       get scim_api("scim/v2/groups/#{group.full_path}/Users")
 
-      expect(response).to have_gitlab_http_status(409)
+      expect(response).to have_gitlab_http_status(412)
     end
 
     context 'existing user' do
@@ -63,6 +63,78 @@ describe API::Scim do
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['id']).to eq(identity.extern_uid)
+      end
+    end
+  end
+
+  describe 'POST api/scim/v2/groups/:group/Users' do
+    let(:post_params) do
+      {
+        externalId: 'test_uid',
+        active: nil,
+        userName: 'username',
+        emails: [
+          { primary: true, type: 'work', value: 'work@example.com' }
+        ],
+        name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
+      }.to_query
+    end
+
+    context 'without an existing user' do
+      let(:new_user) { User.find_by_email('work@example.com') }
+      let(:member) { GroupMember.find_by(user: new_user, group: group) }
+
+      before do
+        post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+      end
+
+      it 'responds with 201' do
+        expect(response).to have_gitlab_http_status(201)
+      end
+
+      it 'has the user external ID' do
+        expect(json_response['id']).to eq('test_uid')
+      end
+
+      it 'has the email' do
+        expect(json_response['emails'].first['value']).to eq('work@example.com')
+      end
+
+      it 'created the identity' do
+        expect(Identity.find_by_extern_uid(:group_saml, 'test_uid')).not_to be_nil
+      end
+
+      it 'has the right saml provider' do
+        identity = Identity.find_by_extern_uid(:group_saml, 'test_uid')
+
+        expect(identity.saml_provider_id).to eq(group.saml_provider.id)
+      end
+
+      it 'created the user' do
+        expect(new_user).not_to be_nil
+      end
+
+      it 'created the right member' do
+        expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+      end
+    end
+
+    context 'existing user' do
+      before do
+        old_user = create(:user, email: 'work@example.com')
+
+        create(:group_saml_identity, user: old_user, extern_uid: 'test_uid')
+        group.add_guest(old_user)
+
+        post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+      end
+
+      it 'responds with 201' do
+        expect(response).to have_gitlab_http_status(201)
+      end
+
+      it 'has the user external ID' do
+        expect(json_response['id']).to eq('test_uid')
       end
     end
   end
