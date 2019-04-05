@@ -110,5 +110,11 @@ module LicenseHelper
     !Gitlab::CurrentSettings.should_check_namespace_plan? && show_promotions? && show_callout?('promote_advanced_search_dismissed') && !License.feature_available?(:elastic_search)
   end
 
+  def license_app_data
+    { data: { current_active_user_count: current_active_user_count,
+              licenses_path: api_v4_licenses_path, delete_license_path: api_v4_license_path(id: ':id'),
+              new_license_path: new_admin_license_path, download_license_path: download_admin_license_path } }
+  end
+
   extend self
 end
