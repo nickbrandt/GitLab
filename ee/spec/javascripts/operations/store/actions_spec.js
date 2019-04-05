@@ -25,9 +25,9 @@ describe('actions', () => {
   });
 
   describe('addProjectsToDashboard', () => {
-    it('posts project token ids to project add endpoint', done => {
+    it('posts selected project ids to project add endpoint', done => {
       store.state.projectEndpoints.add = mockAddEndpoint;
-      store.state.projectTokens = mockProjects;
+      store.state.selectedProjects = mockProjects;
 
       mockAxios.onPost(mockAddEndpoint).replyOnce(200, mockResponse);
 
@@ -38,7 +38,7 @@ describe('actions', () => {
         [],
         [
           {
-            type: 'requestAddProjectsToDashboardSuccess',
+            type: 'receiveAddProjectsToDashboardSuccess',
             payload: mockResponse,
           },
         ],
@@ -54,22 +54,40 @@ describe('actions', () => {
         null,
         store.state,
         [],
-        [{ type: 'requestAddProjectsToDashboardError' }],
+        [{ type: 'receiveAddProjectsToDashboardError' }],
         done,
       );
     });
   });
 
-  describe('clearInputValue', () => {
-    it('sets inputValue to empty string', done => {
+  describe('toggleSelectedProject', () => {
+    it(`adds a project to selectedProjects if it doesn't already exist in the list`, done => {
       testAction(
-        actions.clearInputValue,
-        null,
+        actions.toggleSelectedProject,
+        mockOneProject,
         store.state,
         [
           {
-            type: types.SET_INPUT_VALUE,
-            payload: '',
+            type: types.ADD_SELECTED_PROJECT,
+            payload: mockOneProject,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it(`removes a project from selectedProjects if it already exist in the list`, done => {
+      store.state.selectedProjects = mockProjects;
+
+      testAction(
+        actions.toggleSelectedProject,
+        mockOneProject,
+        store.state,
+        [
+          {
+            type: types.REMOVE_SELECTED_PROJECT,
+            payload: mockOneProject,
           },
         ],
         [],
@@ -78,49 +96,10 @@ describe('actions', () => {
     });
   });
 
-  describe('clearProjectTokens', () => {
-    it('sets project tokens to an empty array', done => {
-      testAction(
-        actions.clearProjectTokens,
-        null,
-        store.state,
-        [
-          {
-            type: types.SET_PROJECT_TOKENS,
-            payload: [],
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('filterProjectTokensById', () => {
-    it('removes all project tokens except those with specified ids', done => {
-      store.state.projectTokens = mockProjects;
-      const ids = mockProjects.map(project => project.id);
-
-      testAction(
-        actions.filterProjectTokensById,
-        ids,
-        store.state,
-        [
-          {
-            type: types.SET_PROJECT_TOKENS,
-            payload: mockProjects,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('requestAddProjectsToDashboardSuccess', () => {
+  describe('receiveAddProjectsToDashboardSuccess', () => {
     it('fetches projects when new projects are added to the dashboard', done => {
       testAction(
-        actions.requestAddProjectsToDashboardSuccess,
+        actions.receiveAddProjectsToDashboardSuccess,
         {
           added: [1],
           invalid: [],
@@ -130,58 +109,7 @@ describe('actions', () => {
         [],
         [
           {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'clearProjectTokens',
-          },
-          {
             type: 'fetchProjects',
-          },
-        ],
-        done,
-      );
-    });
-
-    it('removes projectTokens when user tries to add duplicates to dashboard', done => {
-      testAction(
-        actions.requestAddProjectsToDashboardSuccess,
-        {
-          added: [],
-          invalid: [],
-          duplicate: [1],
-        },
-        store.state,
-        [],
-        [
-          {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'clearProjectTokens',
-          },
-        ],
-        done,
-      );
-    });
-
-    it('does not remove projectTokens when user adds invalid projects to dashbaord', done => {
-      testAction(
-        actions.requestAddProjectsToDashboardSuccess,
-        {
-          added: [],
-          invalid: [1],
-          duplicate: [],
-        },
-        store.state,
-        [],
-        [
-          {
-            type: 'clearInputValue',
-          },
-          {
-            type: 'filterProjectTokensById',
-            payload: [1],
           },
         ],
         done,
@@ -190,16 +118,16 @@ describe('actions', () => {
 
     const errorMessage =
       'The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.';
-    const addTokens = count => {
+    const selectProjects = count => {
       for (let i = 0; i < count; i += 1) {
-        store.dispatch('addProjectToken', {
+        store.dispatch('toggleSelectedProject', {
           id: i,
           name: 'mock-name',
         });
       }
     };
     const addInvalidProjects = invalid =>
-      store.dispatch('requestAddProjectsToDashboardSuccess', {
+      store.dispatch('receiveAddProjectsToDashboardSuccess', {
         added: [],
         invalid,
         duplicate: [],
@@ -207,7 +135,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add one invalid project to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(1);
+      selectProjects(1);
       addInvalidProjects([0]);
 
       expect(spy).toHaveBeenCalledWith(`Unable to add mock-name. ${errorMessage}`);
@@ -215,7 +143,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add two invalid projects to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(2);
+      selectProjects(2);
       addInvalidProjects([0, 1]);
 
       expect(spy).toHaveBeenCalledWith(`Unable to add mock-name and mock-name. ${errorMessage}`);
@@ -223,7 +151,7 @@ describe('actions', () => {
 
     it('displays an error when user tries to add more than two invalid projects to dashboard', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      addTokens(3);
+      selectProjects(3);
       addInvalidProjects([0, 1, 2]);
 
       expect(spy).toHaveBeenCalledWith(
@@ -232,49 +160,26 @@ describe('actions', () => {
     });
   });
 
-  describe('requestAddProjectsToDashboardError', () => {
+  describe('receiveAddProjectsToDashboardError', () => {
     it('shows error message', () => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
-      store.dispatch('requestAddProjectsToDashboardError');
+      store.dispatch('receiveAddProjectsToDashboardError');
 
       expect(spy).toHaveBeenCalledWith(mockText.ADD_PROJECTS_ERROR);
     });
   });
 
-  describe('addProjectToken', () => {
-    it('adds project token to state', done => {
-      testAction(
-        actions.addProjectToken,
-        mockOneProject,
-        null,
-        [
-          {
-            type: types.ADD_PROJECT_TOKEN,
-            payload: mockOneProject,
-          },
-          {
-            type: types.SET_INPUT_VALUE,
-            payload: '',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('clearProjectSearchResults', () => {
+  describe('clearSearchResults', () => {
     it('clears all project search results', done => {
       store.state.projectSearchResults = mockProjects;
 
       testAction(
-        actions.clearProjectSearchResults,
+        actions.clearSearchResults,
         null,
         store.state,
         [
           {
-            type: types.SET_PROJECT_SEARCH_RESULTS,
-            payload: [],
+            type: types.CLEAR_SEARCH_RESULTS,
           },
         ],
         [],
@@ -338,7 +243,7 @@ describe('actions', () => {
         store.state,
         [
           {
-            type: types.SET_PROJECTS,
+            type: types.RECEIVE_PROJECTS_SUCCESS,
             payload: mockProjects,
           },
         ],
@@ -359,8 +264,7 @@ describe('actions', () => {
         store.state,
         [
           {
-            type: types.SET_PROJECTS,
-            payload: null,
+            type: types.RECEIVE_PROJECTS_ERROR,
           },
         ],
         [],
@@ -382,7 +286,7 @@ describe('actions', () => {
         mockRemovePath,
         null,
         [],
-        [{ type: 'requestRemoveProjectSuccess' }],
+        [{ type: 'receiveRemoveProjectSuccess' }],
         done,
       );
     });
@@ -395,104 +299,108 @@ describe('actions', () => {
         mockRemovePath,
         null,
         [],
-        [{ type: 'requestRemoveProjectError' }],
+        [{ type: 'receiveRemoveProjectError' }],
         done,
       );
     });
   });
 
-  describe('requestRemoveProjectSuccess', () => {
+  describe('receiveRemoveProjectSuccess', () => {
     it('fetches operations dashboard projects', done => {
       testAction(
-        actions.requestRemoveProjectSuccess,
+        actions.receiveRemoveProjectSuccess,
         null,
         null,
         [],
-        [{ type: 'forceProjectsRequest' }],
+        [{ type: 'fetchProjects' }],
         done,
       );
     });
   });
 
-  describe('requestRemoveProjectError', () => {
+  describe('receiveRemoveProjectError', () => {
     it('displays project removal error', done => {
       const spy = spyOnDependency(defaultActions, 'createFlash');
 
-      testAction(actions.requestRemoveProjectError, null, null, [], [], done);
+      testAction(actions.receiveRemoveProjectError, null, null, [], [], done);
 
       expect(spy).toHaveBeenCalledWith(mockText.REMOVE_PROJECT_ERROR);
     });
   });
 
-  describe('removeProjectToken', () => {
-    it('removes project token', done => {
-      store.state.projectTokens = mockProjects;
-      const [{ id }] = store.state.projectTokens;
+  describe('fetchSearchResults', () => {
+    it('dispatches an error if the search query was empty', done => {
+      store.state.searchQuery = '';
 
       testAction(
-        actions.removeProjectTokenAt,
-        id,
+        actions.fetchSearchResults,
+        null,
         store.state,
+        [],
         [
           {
-            type: types.REMOVE_PROJECT_TOKEN_AT,
-            payload: 0,
+            type: 'requestSearchResults',
+          },
+          {
+            type: 'receiveSearchResultsError',
           },
         ],
-        [],
         done,
       );
     });
-  });
 
-  describe('searchProjects', () => {
-    const mockQuery = 'mock-query';
-
-    it('sets project search results', done => {
-      mockAxios.onAny().replyOnce(200, mockProjects);
+    it(`dispatches an error if the search query wasn't long enough`, done => {
+      store.state.searchQuery = 'a';
 
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.fetchSearchResults,
+        null,
         store.state,
+        [],
         [
           {
-            type: types.INCREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
+            type: 'requestSearchResults',
           },
           {
-            type: types.SET_PROJECT_SEARCH_RESULTS,
+            type: 'receiveSearchResultsError',
+          },
+        ],
+        done,
+      );
+    });
+
+    it(`dispatches the correct actions when the query is valid`, done => {
+      mockAxios.onAny().replyOnce(200, mockProjects);
+      store.state.searchQuery = 'mock-query';
+
+      testAction(
+        actions.fetchSearchResults,
+        null,
+        store.state,
+        [],
+        [
+          {
+            type: 'requestSearchResults',
+          },
+          {
+            type: 'receiveSearchResultsSuccess',
             payload: mockProjects,
           },
-          {
-            type: types.DECREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
         ],
-        [],
         done,
       );
     });
+  });
 
-    it('clears project search results on error', done => {
-      mockAxios.onAny().replyOnce(500);
-
+  describe('requestSearchResults', () => {
+    it(`commits the REQUEST_SEARCH_RESULTS mutation`, done => {
       testAction(
-        actions.searchProjects,
-        mockQuery,
+        actions.requestSearchResults,
+        null,
         store.state,
         [
           {
-            type: types.INCREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
-          },
-          {
-            type: types.SET_PROJECT_SEARCH_RESULTS,
-            payload: [],
-          },
-          {
-            type: types.DECREMENT_PROJECT_SEARCH_COUNT,
-            payload: 1,
+            type: types.REQUEST_SEARCH_RESULTS,
           },
         ],
         [],
@@ -501,18 +409,33 @@ describe('actions', () => {
     });
   });
 
-  describe('setInputValue', () => {
-    it('sets input value', done => {
-      const mockValue = 'mock-value';
-
+  describe('receiveSearchResultsSuccess', () => {
+    it('commits the RECEIVE_SEARCH_RESULTS_SUCCESS mutation', done => {
       testAction(
-        actions.setInputValue,
-        mockValue,
-        null,
+        actions.receiveSearchResultsSuccess,
+        mockProjects,
+        store.state,
         [
           {
-            type: types.SET_INPUT_VALUE,
-            payload: mockValue,
+            type: types.RECEIVE_SEARCH_RESULTS_SUCCESS,
+            payload: mockProjects,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveSearchResultsError', () => {
+    it('commits the RECEIVE_SEARCH_RESULTS_ERROR mutation', done => {
+      testAction(
+        actions.receiveSearchResultsError,
+        ['error'],
+        store.state,
+        [
+          {
+            type: types.RECEIVE_SEARCH_RESULTS_ERROR,
           },
         ],
         [],

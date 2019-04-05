@@ -4,43 +4,12 @@ import * as types from 'ee/operations/store/mutation_types';
 import { mockProjectData } from '../mock_data';
 
 describe('mutations', () => {
-  const projects = mockProjectData(1);
-  const [oneProject] = projects;
+  const projects = mockProjectData(3);
   const mockEndpoint = 'https://mock-endpoint';
-  const mockSearches = new Array(5).fill(null);
   let localState;
 
   beforeEach(() => {
     localState = state();
-  });
-
-  describe('ADD_PROJECT_TOKEN', () => {
-    it('adds project token to projectTokens', () => {
-      mutations[types.ADD_PROJECT_TOKEN](localState, oneProject);
-
-      expect(localState.projectTokens[0]).toEqual(oneProject);
-    });
-  });
-
-  describe('INCREMENT_PROJECT_SEARCH_COUNT', () => {
-    it('adds search to searchCount', () => {
-      mockSearches.forEach(() => {
-        mutations[types.INCREMENT_PROJECT_SEARCH_COUNT](localState, 1);
-      });
-
-      expect(localState.searchCount).toBe(mockSearches.length);
-    });
-  });
-
-  describe('DECREMENT_PROJECT_SEARCH_COUNT', () => {
-    it('removes search from searchCount', () => {
-      localState.searchCount = mockSearches.length + 2;
-      mockSearches.forEach(() => {
-        mutations[types.DECREMENT_PROJECT_SEARCH_COUNT](localState, 1);
-      });
-
-      expect(localState.searchCount).toBe(2);
-    });
   });
 
   describe('SET_PROJECT_ENDPOINT_LIST', () => {
@@ -59,14 +28,6 @@ describe('mutations', () => {
     });
   });
 
-  describe('SET_PROJECT_SEARCH_RESULTS', () => {
-    it('sets project search results', () => {
-      mutations[types.SET_PROJECT_SEARCH_RESULTS](localState, projects);
-
-      expect(localState.projectSearchResults).toEqual(projects);
-    });
-  });
-
   describe('SET_PROJECTS', () => {
     it('sets projects', () => {
       mutations[types.SET_PROJECTS](localState, projects);
@@ -76,12 +37,150 @@ describe('mutations', () => {
     });
   });
 
-  describe('REMOVE_PROJECT_TOKEN_AT', () => {
-    it('removes project token', () => {
-      localState.projectTokens = projects;
-      mutations[types.REMOVE_PROJECT_TOKEN_AT](localState, oneProject.id);
+  describe('SET_MESSAGE_MINIMUM_QUERY', () => {
+    it('sets the messages.minimumQuery boolean', () => {
+      mutations[types.SET_MESSAGE_MINIMUM_QUERY](localState, true);
 
-      expect(localState.projectTokens.length).toBe(0);
+      expect(localState.messages.minimumQuery).toEqual(true);
+
+      mutations[types.SET_MESSAGE_MINIMUM_QUERY](localState, false);
+    });
+  });
+
+  describe('SET_SEARCH_QUERY', () => {
+    it('sets the search query', () => {
+      const mockQuery = 'mock-query';
+      mutations[types.SET_SEARCH_QUERY](localState, mockQuery);
+
+      expect(localState.searchQuery).toBe(mockQuery);
+    });
+  });
+
+  describe('ADD_SELECTED_PROJECT', () => {
+    it('adds a project to the list of selected projects', () => {
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[0]);
+
+      expect(localState.selectedProjects).toEqual([projects[0]]);
+    });
+  });
+
+  describe('REMOVE_SELECTED_PROJECT', () => {
+    it('removes a project from the list of selected projects', () => {
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[0]);
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[1]);
+      mutations[types.REMOVE_SELECTED_PROJECT](localState, projects[0]);
+
+      expect(localState.selectedProjects).toEqual([projects[1]]);
+    });
+
+    it('removes a project from the list of selected projects, including duplicates', () => {
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[0]);
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[0]);
+      mutations[types.ADD_SELECTED_PROJECT](localState, projects[1]);
+      mutations[types.REMOVE_SELECTED_PROJECT](localState, projects[0]);
+
+      expect(localState.selectedProjects).toEqual([projects[1]]);
+    });
+  });
+
+  describe('RECEIVE_PROJECTS_SUCCESS', () => {
+    it('sets the project list and clears the loading status', () => {
+      mutations[types.RECEIVE_PROJECTS_SUCCESS](localState, projects);
+
+      expect(localState.projects).toEqual(projects);
+
+      expect(localState.isLoadingProjects).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_PROJECTS_ERROR', () => {
+    it('clears project list and the loading status', () => {
+      mutations[types.RECEIVE_PROJECTS_ERROR](localState);
+
+      expect(localState.projects).toEqual(null);
+
+      expect(localState.isLoadingProjects).toBe(false);
+    });
+  });
+
+  describe('CLEAR_SEARCH_RESULTS', () => {
+    it('empties both the search results and the list of selected projects', () => {
+      localState.selectedProjects = [{ id: 1 }];
+      localState.projectSearchResults = [{ id: 1 }];
+
+      mutations[types.CLEAR_SEARCH_RESULTS](localState);
+
+      expect(localState.projectSearchResults).toEqual([]);
+
+      expect(localState.selectedProjects).toEqual([]);
+    });
+  });
+
+  describe('REQUEST_SEARCH_RESULTS', () => {
+    it('turns off the minimum length warning and increments the search count', () => {
+      mutations[types.REQUEST_SEARCH_RESULTS](localState);
+
+      expect(localState.messages.minimumQuery).toBe(false);
+
+      expect(localState.searchCount).toEqual(1);
+    });
+  });
+
+  describe('RECEIVE_SEARCH_RESULTS_SUCCESS', () => {
+    it('resets all messages and sets state.projectSearchResults to the results from the API', () => {
+      localState.projectSearchResults = [];
+      localState.messages = {
+        noResults: true,
+        searchError: true,
+        minimumQuery: true,
+      };
+
+      const searchResults = [{ id: 1 }];
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](localState, searchResults);
+
+      expect(localState.projectSearchResults).toEqual(searchResults);
+
+      expect(localState.messages.noResults).toBe(false);
+
+      expect(localState.messages.searchError).toBe(false);
+
+      expect(localState.messages.minimumQuery).toBe(false);
+    });
+
+    it('resets all messages and sets state.projectSearchResults to an empty array if no results', () => {
+      localState.projectSearchResults = [];
+      localState.messages = {
+        noResults: false,
+        searchError: true,
+        minimumQuery: true,
+      };
+
+      const searchResults = [];
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](localState, searchResults);
+
+      expect(localState.projectSearchResults).toEqual(searchResults);
+
+      expect(localState.messages.noResults).toBe(true);
+
+      expect(localState.messages.searchError).toBe(false);
+
+      expect(localState.messages.minimumQuery).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_SEARCH_RESULTS_ERROR', () => {
+    it('clears the search results', () => {
+      mutations[types.RECEIVE_SEARCH_RESULTS_ERROR](localState);
+
+      expect(localState.projectSearchResults).toEqual([]);
+
+      expect(localState.messages.noResults).toBe(false);
+
+      expect(localState.messages.searchError).toBe(true);
+
+      expect(localState.messages.minimumQuery).toBe(false);
     });
   });
 

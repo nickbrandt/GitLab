@@ -5,8 +5,14 @@ export default () => ({
     list: null,
     add: null,
   },
+  searchQuery: '',
   projects: [],
-  projectTokens: [],
   projectSearchResults: [],
+  selectedProjects: [],
+  messages: {
+    noResults: false,
+    searchError: false,
+    minimumQuery: false,
+  },
   searchCount: 0,
 });

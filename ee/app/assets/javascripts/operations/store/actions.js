@@ -4,7 +4,10 @@ import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
+import _ from 'underscore';
 import * as types from './mutation_types';
+
+const API_MINIMUM_QUERY_LENGTH = 3;
 
 let eTagPoll;
 
@@ -24,32 +27,29 @@ export const forceProjectsRequest = () => {
 export const addProjectsToDashboard = ({ state, dispatch }) => {
   axios
     .post(state.projectEndpoints.add, {
-      project_ids: state.projectTokens.map(project => project.id),
+      project_ids: state.selectedProjects.map(p => p.id),
     })
-    .then(response => dispatch('requestAddProjectsToDashboardSuccess', response.data))
-    .catch(() => dispatch('requestAddProjectsToDashboardError'));
+    .then(response => dispatch('receiveAddProjectsToDashboardSuccess', response.data))
+    .catch(() => dispatch('receiveAddProjectsToDashboardError'));
 };
 
-export const clearInputValue = ({ commit }) => {
-  commit(types.SET_INPUT_VALUE, '');
+export const toggleSelectedProject = ({ commit, state }, project) => {
+  if (!_.findWhere(state.selectedProjects, { id: project.id })) {
+    commit(types.ADD_SELECTED_PROJECT, project);
+  } else {
+    commit(types.REMOVE_SELECTED_PROJECT, project);
+  }
 };
 
-export const clearProjectTokens = ({ commit }) => {
-  commit(types.SET_PROJECT_TOKENS, []);
+export const clearSearchResults = ({ commit }) => {
+  commit(types.CLEAR_SEARCH_RESULTS);
 };
 
-export const filterProjectTokensById = ({ commit, state }, ids) => {
-  const tokens = state.projectTokens.filter(token => ids.includes(token.id));
-  commit(types.SET_PROJECT_TOKENS, tokens);
-};
-
-export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
+export const receiveAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
   const { added, invalid } = data;
 
-  dispatch('clearInputValue');
-
   if (invalid.length) {
-    const projectNames = state.projectTokens.reduce((accumulator, project) => {
+    const projectNames = state.selectedProjects.reduce((accumulator, project) => {
       if (invalid.includes(project.id)) {
         accumulator.push(project.name);
       }
@@ -73,9 +73,6 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
         },
       ),
     );
-    dispatch('filterProjectTokensById', invalid);
-  } else {
-    dispatch('clearProjectTokens');
   }
 
   if (added.length) {
@@ -83,21 +80,12 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
   }
 };
 
-export const requestAddProjectsToDashboardError = ({ state }) => {
+export const receiveAddProjectsToDashboardError = ({ state }) => {
   createFlash(
     sprintf(__('Something went wrong, unable to add %{project} to dashboard'), {
-      project: n__('project', 'projects', state.projectTokens.length),
+      project: n__('project', 'projects', state.selectedProjects.length),
     }),
   );
-};
-
-export const addProjectToken = ({ commit }, project) => {
-  commit(types.ADD_PROJECT_TOKEN, project);
-  commit(types.SET_INPUT_VALUE, '');
-};
-
-export const clearProjectSearchResults = ({ commit }) => {
-  commit(types.SET_PROJECT_SEARCH_RESULTS, []);
 };
 
 export const fetchProjects = ({ state, dispatch }) => {
@@ -132,48 +120,51 @@ export const requestProjects = ({ commit }) => {
 };
 
 export const receiveProjectsSuccess = ({ commit }, data) => {
-  commit(types.SET_PROJECTS, data.projects);
+  commit(types.RECEIVE_PROJECTS_SUCCESS, data.projects);
 };
 
 export const receiveProjectsError = ({ commit }) => {
-  commit(types.SET_PROJECTS, null);
+  commit(types.RECEIVE_PROJECTS_ERROR);
   createFlash(__('Something went wrong, unable to get operations projects'));
 };
 
 export const removeProject = ({ dispatch }, removePath) => {
   axios
     .delete(removePath)
-    .then(() => dispatch('requestRemoveProjectSuccess'))
-    .catch(() => dispatch('requestRemoveProjectError'));
+    .then(() => dispatch('receiveRemoveProjectSuccess'))
+    .catch(() => dispatch('receiveRemoveProjectError'));
 };
 
-export const requestRemoveProjectSuccess = ({ dispatch }) => {
-  dispatch('forceProjectsRequest');
-};
+export const receiveRemoveProjectSuccess = ({ dispatch }) => dispatch('fetchProjects');
 
-export const requestRemoveProjectError = () => {
+export const receiveRemoveProjectError = () => {
   createFlash(__('Something went wrong, unable to remove project'));
 };
 
-export const removeProjectTokenAt = ({ commit }, index) => {
-  commit(types.REMOVE_PROJECT_TOKEN_AT, index);
+export const setSearchQuery = ({ commit }, query) => commit(types.SET_SEARCH_QUERY, query);
+
+export const fetchSearchResults = ({ state, dispatch }) => {
+  dispatch('requestSearchResults');
+
+  if (!state.searchQuery) {
+    dispatch('receiveSearchResultsError');
+  } else if (state.searchQuery.lengh < API_MINIMUM_QUERY_LENGTH) {
+    dispatch('receiveSearchResultsError', 'minimumQuery');
+  } else {
+    Api.projects(state.searchQuery, {})
+      .then(results => dispatch('receiveSearchResultsSuccess', results))
+      .catch(() => dispatch('receiveSearchResultsError'));
+  }
 };
 
-export const searchProjects = ({ commit }, query) => {
-  commit(types.INCREMENT_PROJECT_SEARCH_COUNT, 1);
+export const requestSearchResults = ({ commit }) => commit(types.REQUEST_SEARCH_RESULTS);
 
-  Api.projects(query, {})
-    .then(data => data)
-    .catch(() => [])
-    .then(results => {
-      commit(types.SET_PROJECT_SEARCH_RESULTS, results);
-      commit(types.DECREMENT_PROJECT_SEARCH_COUNT, 1);
-    })
-    .catch(() => {});
+export const receiveSearchResultsSuccess = ({ commit }, results) => {
+  commit(types.RECEIVE_SEARCH_RESULTS_SUCCESS, results);
 };
 
-export const setInputValue = ({ commit }, value) => {
-  commit(types.SET_INPUT_VALUE, value);
+export const receiveSearchResultsError = ({ commit }) => {
+  commit(types.RECEIVE_SEARCH_RESULTS_ERROR);
 };
 
 export const setProjectEndpoints = ({ commit }, endpoints) => {

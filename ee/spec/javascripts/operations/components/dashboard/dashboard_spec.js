@@ -1,16 +1,14 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
-import ProjectSearch from 'ee/vue_shared/dashboards/components/project_search.vue';
 import DashboardProject from 'ee/operations/components/dashboard/project.vue';
+import { trimText } from 'spec/helpers/vue_component_helper';
 import { getChildInstances, clearState } from '../../helpers';
 import { mockProjectData, mockText } from '../../mock_data';
 
 describe('dashboard component', () => {
   const DashboardComponent = Vue.extend(Dashboard);
-  const ProjectSearchComponent = Vue.extend(ProjectSearch);
   const DashboardProjectComponent = Vue.extend(DashboardProject);
-  const projectTokens = mockProjectData(1);
   const mount = () =>
     new DashboardComponent({
       store,
@@ -52,29 +50,14 @@ describe('dashboard component', () => {
       expect(button.innerText.trim()).toBe(mockText.ADD_PROJECTS);
     });
 
-    it('calls action to add projects on click if projectTokens have been added', () => {
-      const spy = spyOn(vm, 'addProjectsToDashboard').and.stub();
-      vm.$store.state.projectTokens = projectTokens;
+    it('renders the projects modal', () => {
       button.click();
 
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it('does not call action to add projects on click when projectTokens is empty', () => {
-      const spy = spyOn(vm, 'addProjectsToDashboard').and.stub();
-      button.click();
-
-      expect(spy).not.toHaveBeenCalled();
+      expect(vm.$el.querySelector('.add-projects-modal')).toBeDefined();
     });
   });
 
   describe('wrapped components', () => {
-    describe('project search component', () => {
-      it('renders project search component', () => {
-        expect(getChildInstances(vm, ProjectSearchComponent).length).toBe(1);
-      });
-    });
-
     describe('dashboard project component', () => {
       const projectCount = 1;
       const projects = mockProjectData(projectCount);
@@ -113,7 +96,7 @@ describe('dashboard component', () => {
       });
 
       it('renders sub-title', () => {
-        expect(vm.$el.querySelector('.js-sub-title').innerText.trim()).toBe(
+        expect(trimText(vm.$el.querySelector('.js-sub-title').innerText)).toBe(
           mockText.EMPTY_SUBTITLE,
         );
       });
@@ -121,7 +104,7 @@ describe('dashboard component', () => {
       it('renders link to documentation', () => {
         const link = vm.$el.querySelector('.js-documentation-link');
 
-        expect(link.innerText.trim()).toBe('View documentation');
+        expect(link.innerText.trim()).toBe('More information');
       });
 
       it('links to documentation', () => {
