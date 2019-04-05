@@ -94,7 +94,7 @@ describe MergeRequestWidgetEntity do
       stub_licensed_features(license_management: true)
     end
 
-    it 'should not be included, if missing artifacts' do
+    it 'is not included, if missing artifacts' do
       expect(subject.as_json).not_to include(:license_management)
     end
 
@@ -103,7 +103,7 @@ describe MergeRequestWidgetEntity do
         create(:ee_ci_build, :license_management, pipeline: pipeline)
       end
 
-      it 'should be included' do
+      it 'is included' do
         expect(subject.as_json).to include(:license_management)
         expect(subject.as_json[:license_management]).to include(:head_path)
         expect(subject.as_json[:license_management]).to include(:base_path)
@@ -118,7 +118,7 @@ describe MergeRequestWidgetEntity do
           stub_licensed_features(license_management: false)
         end
 
-        it 'should not be included' do
+        it 'is not included' do
           expect(subject.as_json).not_to include(:license_management)
         end
       end
@@ -143,7 +143,7 @@ describe MergeRequestWidgetEntity do
         create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
       end
 
-      it 'should be included, if license manage management features are on' do
+      it 'is included, if license manage management features are on' do
         expect(subject.as_json).to include(:license_management)
         expect(subject.as_json[:license_management]).to include(:head_path)
         expect(subject.as_json[:license_management]).to include(:base_path)
@@ -160,7 +160,7 @@ describe MergeRequestWidgetEntity do
         create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
       end
 
-      it 'should be a path for target project' do
+      it 'is a path for target project' do
         expect(subject.as_json[:license_management][:managed_licenses_path]).to eq(managed_licenses_path)
       end
 
@@ -174,7 +174,7 @@ describe MergeRequestWidgetEntity do
           stub_licensed_features(license_management: true)
         end
 
-        it 'should be a path for target project' do
+        it 'is a path for target project' do
           expect(subject_json[:license_management][:managed_licenses_path]).to eq(managed_licenses_path)
         end
       end

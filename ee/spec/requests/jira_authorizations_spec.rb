@@ -13,7 +13,7 @@ describe 'JIRA authorization requests' do
     let(:client_id) { application.uid }
     let(:client_secret) { application.secret }
 
-    it 'should return values similar to a POST to /oauth/token' do
+    it 'returns values similar to a POST to /oauth/token' do
       post_data = {
         client_id: client_id,
         client_secret: client_secret

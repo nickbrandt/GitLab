@@ -142,7 +142,7 @@ describe Projects::EnvironmentsController do
           get :terminal, params: environment_params
         end
 
-        it 'should response with access denied' do
+        it 'responds with access denied' do
           expect(response).to have_gitlab_http_status(404)
         end
       end
@@ -154,14 +154,14 @@ describe Projects::EnvironmentsController do
           get :terminal, params: environment_params
         end
 
-        it 'should be successful' do
+        it 'is successful' do
           expect(response).to have_gitlab_http_status(200)
         end
       end
     end
 
     context 'when environment is not protected' do
-      it 'should be successful' do
+      it 'is successful' do
         get :terminal, params: environment_params
 
         expect(response).to have_gitlab_http_status(200)

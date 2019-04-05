@@ -39,7 +39,7 @@ describe Burndown do
       expect(subject).to eq([].to_json)
     end
 
-    it "it counts until today if milestone due date > Date.today" do
+    it "counts until today if milestone due date > Date.today" do
       Timecop.travel(milestone.due_date - 1.day) do
         expect(JSON.parse(subject).last[0]).to eq(Time.now.strftime("%Y-%m-%d"))
       end

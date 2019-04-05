@@ -67,7 +67,7 @@ describe EE::Gitlab::ExternalAuthorization::Access, :clean_gitlab_redis_cache do
         expect(access.load!).to eq(access)
       end
 
-      it 'it stores the result in redis' do
+      it 'stores the result in redis' do
         Timecop.freeze do
           fake_cache = double
           expect(fake_cache).to receive(:store).with(true, nil, Time.now)
@@ -98,7 +98,7 @@ describe EE::Gitlab::ExternalAuthorization::Access, :clean_gitlab_redis_cache do
           expect(access.loaded_at).not_to be_nil
         end
 
-        it 'it does not store the result in redis' do
+        it 'does not store the result in redis' do
           fake_cache = double
           expect(fake_cache).not_to receive(:store)
           allow(access).to receive(:cache).and_return(fake_cache)

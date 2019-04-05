@@ -16,11 +16,11 @@ describe ProtectedEnvironments::CreateService, '#execute' do
   context 'with valid params' do
     it { is_expected.to be_truthy }
 
-    it 'should create a record on ProtectedEnvironment' do
+    it 'creates a record on ProtectedEnvironment' do
       expect { subject }.to change(ProtectedEnvironment, :count).by(1)
     end
 
-    it 'should create a record on ProtectedEnvironment record' do
+    it 'creates a record on ProtectedEnvironment record' do
       expect { subject }.to change(ProtectedEnvironment::DeployAccessLevel, :count).by(1)
     end
   end
@@ -28,7 +28,7 @@ describe ProtectedEnvironments::CreateService, '#execute' do
   context 'with invalid params' do
     let(:maintainer_access) { 0 }
 
-    it 'should return a non persisted Protected Environment record' do
+    it 'returns a non-persisted Protected Environment record' do
       expect(subject.persisted?).to be_falsy
     end
   end

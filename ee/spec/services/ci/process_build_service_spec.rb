@@ -34,7 +34,7 @@ describe Ci::ProcessBuildService, '#execute' do
       let(:feature_available) { true }
 
       context 'when user does not have access to the environment' do
-        it 'should fail the build' do
+        it 'fails the build' do
           subject
 
           expect(ci_build.failed?).to be_truthy
