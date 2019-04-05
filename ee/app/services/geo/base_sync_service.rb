@@ -264,5 +264,13 @@ module Geo
     def new_repository?
       @new_repository
     end
+
+    # If repository has a verification checksum, we can assume that it existed on the primary
+    def repository_presumably_exists_on_primary?
+      return false unless project.repository_state
+
+      checksum = project.repository_state.public_send("#{type}_verification_checksum") # rubocop:disable GitlabSecurity/PublicSend
+      checksum && checksum != Gitlab::Git::Repository::EMPTY_REPOSITORY_CHECKSUM
+    end
   end
 end

@@ -12,10 +12,14 @@ module Geo
       mark_sync_as_successful
     rescue Gitlab::Shell::Error, Gitlab::Git::BaseError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
-      # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]
-        log_info('Repository is not found, marking it as successfully synced')
-        mark_sync_as_successful(missing_on_primary: true)
+        if repository_presumably_exists_on_primary?
+          log_info('Repository is not found, but it seems to exist on the primary')
+          fail_registry!('Repository is not found', e)
+        else
+          log_info('Repository is not found, marking it as successfully synced')
+          mark_sync_as_successful(missing_on_primary: true)
+        end
       else
         fail_registry!('Error syncing repository', e)
       end

@@ -153,6 +153,24 @@ describe Geo::RepositorySyncService do
       expect(Geo::ProjectRegistry.last.resync_repository).to be true
     end
 
+    context 'repository presumably exists on primary' do
+      it 'increases retry count if no repository found' do
+        registry = create(:geo_project_registry, project: project)
+        create(:repository_state, :repository_verified, project: project)
+
+        allow(repository).to receive(:fetch_as_mirror)
+          .with(url_to_repo, remote_name: 'geo', forced: true)
+          .and_raise(Gitlab::Shell::Error.new(Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]))
+
+        subject.execute
+
+        expect(registry.reload).to have_attributes(
+          resync_repository: true,
+          repository_retry_count: 1
+        )
+      end
+    end
+
     context 'tracking database' do
       context 'temporary repositories' do
         include_examples 'cleans temporary repositories' do
