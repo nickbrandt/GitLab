@@ -50,10 +50,6 @@ module Gitlab
         @data = data
       end
 
-      def self.inform_client_message(primary_repo_ssh)
-        "You're pushing to a Geo secondary.\nWe'll help you by proxying this request to the primary: #{primary_repo_ssh}"
-      end
-
       def info_refs
         ensure_secondary!
 
