@@ -231,4 +231,30 @@ describe Notes::QuickActionsService do
       end
     end
   end
+
+  context 'Issue assignees' do
+    describe '/assign' do
+      let(:project) { create(:project) }
+      let(:maintainer) { create(:user).tap { |u| project.add_maintainer(u) } }
+      let(:assignee) { create(:user) }
+      let(:service) { described_class.new(project, maintainer) }
+      let(:note) { create(:note_on_issue, note: note_text, project: project) }
+
+      let(:note_text) do
+        %(/assign @#{assignee.username} @#{maintainer.username}\n")
+      end
+
+      before do
+        project.add_maintainer(maintainer)
+        project.add_maintainer(assignee)
+      end
+
+      it 'adds multiple assignees from the list' do
+        _, update_params = service.execute(note)
+        service.apply_updates(update_params, note)
+
+        expect(note.noteable.assignees.count).to eq(2)
+      end
+    end
+  end
 end
