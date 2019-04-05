@@ -108,7 +108,7 @@ module Geo
     end
 
     def remote_url
-      Gitlab::Geo.primary_node.url + repository.full_path + '.git'
+      Gitlab::Utils.append_path(Gitlab::Geo.primary_node.internal_url, "#{repository.full_path}.git")
     end
 
     # Use snapshotting for redownloads *only* when enabled.

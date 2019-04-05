@@ -136,7 +136,6 @@ export default {
           :failure-label="nodeDetailItem.failureLabel"
           :custom-type="nodeDetailItem.customType"
           :help-info="nodeDetailItem.helpInfo"
-          class="prepend-top-15 prepend-left-10"
         />
       </div>
     </template>

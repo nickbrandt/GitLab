@@ -36,9 +36,13 @@ module Gitlab
               oauth_application&.secret,
               site: Gitlab::Geo.primary_node.url,
               authorize_url: oauth_authorization_path,
-              token_url: oauth_token_path
+              token_url: token_url
             )
           end
+        end
+
+        def token_url
+          Gitlab::Utils.append_path(Gitlab::Geo.primary_node.internal_url, oauth_token_path)
         end
       end
     end

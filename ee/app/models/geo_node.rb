@@ -18,9 +18,9 @@ class GeoNode < ApplicationRecord
   default_values url: ->(record) { record.class.current_node_url },
                  primary: false
 
-  validates :url, presence: true, uniqueness: { case_sensitive: false }
-  validate :url_is_http
-  validate :alternate_url_is_http
+  validates :url, presence: true, uniqueness: { case_sensitive: false }, url: true
+  validates :alternate_url, url: true, allow_blank: true, allow_nil: true
+  validates :internal_url, url: true, allow_blank: true, allow_nil: true
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
   validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
@@ -142,12 +142,26 @@ class GeoNode < ApplicationRecord
     @alternate_uri = nil
   end
 
+  def internal_url
+    read_with_ending_slash(:internal_url).presence || read_with_ending_slash(:url)
+  end
+
+  def internal_url=(value)
+    value = add_ending_slash(value) != url ? value : nil
+    write_with_ending_slash(:internal_url, value)
+    @internal_uri = nil
+  end
+
   def uri
     @uri ||= URI.parse(url) if url.present?
   end
 
   def alternate_uri
     @alternate_uri ||= URI.parse(alternate_url) if alternate_url.present?
+  end
+
+  def internal_uri
+    @internal_uri ||= URI.parse(internal_url) if internal_url.present?
   end
 
   def geo_transfers_url(file_type, file_id)
@@ -249,7 +263,7 @@ class GeoNode < ApplicationRecord
   end
 
   def api_url(suffix)
-    Gitlab::Utils.append_path(uri.to_s, "api/#{API::API.version}/#{suffix}")
+    Gitlab::Utils.append_path(internal_uri.to_s, "api/#{API::API.version}/#{suffix}")
   end
 
   def ensure_access_keys!
@@ -287,24 +301,6 @@ class GeoNode < ApplicationRecord
     if url == self.class.current_node_url
       errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
     end
-  end
-
-  def url_is_http
-    url_is_http_for(:url, uri)
-  end
-
-  def alternate_url_is_http
-    url_is_http_for(:alternate_url, alternate_uri)
-  end
-
-  def url_is_http_for(attribute, uri_value)
-    return unless uri_value
-
-    unless %w[http https].include?(uri_value.scheme)
-      errors.add(attribute, 'scheme must be http or https')
-    end
-  rescue URI::InvalidURIError
-    errors.add(attribute, 'is not a valid URI')
   end
 
   def update_clone_url

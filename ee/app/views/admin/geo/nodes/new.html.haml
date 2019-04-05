@@ -11,3 +11,4 @@
     = render partial: 'form', locals: { form: f, geo_node: @node }
     .form-actions
       = f.submit 'Add Node', class: 'btn btn-success'
+      = link_to 'Cancel', admin_geo_nodes_path, class: 'btn btn-cancel'

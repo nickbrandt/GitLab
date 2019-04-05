@@ -43,11 +43,13 @@ describe('NodeDetailsSectionOther', () => {
 
         const items = vmNodePrimary.nodeDetailItems;
 
-        expect(items.length).toBe(2);
+        expect(items.length).toBe(3);
         expect(items[0].itemTitle).toBe('Replication slots');
         expect(items[0].itemValue).toBe(mockNodeDetails.replicationSlots);
         expect(items[1].itemTitle).toBe('Replication slot WAL');
         expect(items[1].itemValue).toBe(numberToHumanSize(mockNodeDetails.replicationSlotWAL));
+        expect(items[2].itemTitle).toBe('Internal URL');
+        expect(items[2].itemValue).toBe(mockNode.internalUrl);
 
         vmNodePrimary.$destroy();
       });
