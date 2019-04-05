@@ -22,7 +22,6 @@ describe 'Issue Boards', :js do
   end
 
   before do
-    stub_licensed_features(multiple_issue_assignees: false)
     project.add_maintainer(user)
 
     sign_in(user)
@@ -121,6 +120,12 @@ describe 'Issue Boards', :js do
       card_two = find('.board:nth-child(2)').find('.board-card:nth-child(2)')
       click_card(card_two)
 
+      def close_dropdown_menu_if_visible
+        find('.dropdown-menu-toggle', visible: :all).tap do |toggle|
+          toggle.click if toggle.visible?
+        end
+      end
+
       page.within('.assignee') do
         click_link 'Edit'
 
@@ -130,6 +135,7 @@ describe 'Issue Boards', :js do
           click_link 'Unassigned'
         end
 
+        close_dropdown_menu_if_visible
         wait_for_requests
 
         expect(page).to have_content('No assignee')
