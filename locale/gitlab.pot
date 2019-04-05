@@ -4357,6 +4357,9 @@ msgstr ""
 msgid "Failed to check related branches."
 msgstr ""
 
+msgid "Failed to create resources"
+msgstr ""
+
 msgid "Failed to deploy to"
 msgstr ""
 
