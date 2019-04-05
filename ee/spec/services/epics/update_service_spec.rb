@@ -211,5 +211,10 @@ describe Epics::UpdateService do
         end
       end
     end
+
+    it_behaves_like 'existing issuable with scoped labels' do
+      let(:issuable) { epic }
+      let(:parent) { group }
+    end
   end
 end

@@ -9209,6 +9209,9 @@ msgstr ""
 msgid "Scoped issue boards"
 msgstr ""
 
+msgid "Scoped label"
+msgstr ""
+
 msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
 msgstr ""
 

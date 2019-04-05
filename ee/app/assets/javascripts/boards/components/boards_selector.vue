@@ -80,6 +80,16 @@ export default {
       type: Array,
       required: true,
     },
+    enabledScopedLabels: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    scopedLabelsDocumentationLink: {
+      type: String,
+      required: false,
+      default: '#',
+    },
   },
   data() {
     return {
@@ -346,6 +356,8 @@ export default {
         :can-admin-board="canAdminBoard"
         :scoped-issue-board-feature-enabled="scopedIssueBoardFeatureEnabled"
         :weights="weights"
+        :enable-scoped-labels="enabledScopedLabels"
+        :scoped-labels-documentation-link="scopedLabelsDocumentationLink"
       />
     </span>
   </div>

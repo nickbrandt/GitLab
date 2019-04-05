@@ -118,5 +118,10 @@ describe Issues::UpdateService do
         end
       end
     end
+
+    it_behaves_like 'existing issuable with scoped labels' do
+      let(:issuable) { issue }
+      let(:parent) { project }
+    end
   end
 end
