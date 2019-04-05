@@ -3,7 +3,6 @@
 /* global ListIssue */
 
 import Vue from 'vue';
-import _ from 'underscore';
 
 import '~/vue_shared/models/label';
 import '~/vue_shared/models/assignee';
@@ -56,14 +55,12 @@ describe('Issue card component', () => {
           issue,
           issueLinkBase: '/test',
           rootPath: '/',
-          groupId: null,
         };
       },
       template: `
         <issue-card
           :issue="issue"
           :list="list"
-          :group-id="groupId"
           :issue-link-base="issueLinkBase"
           :root-path="rootPath"></issue-card>
       `,
@@ -282,48 +279,6 @@ describe('Issue card component', () => {
         .then(() => {
           expect(component.$el.querySelectorAll('.badge').length).toBe(2);
           expect(component.$el.textContent).not.toContain('closed');
-
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('shows group labels on group boards', done => {
-      component.issue.addLabel(
-        new ListLabel({
-          id: _.random(10000),
-          title: 'Group label',
-          type: 'GroupLabel',
-        }),
-      );
-      component.groupId = 1;
-
-      Vue.nextTick()
-        .then(() => {
-          expect(component.$el.querySelectorAll('.badge').length).toBe(3);
-
-          expect(component.$el.textContent).toContain('Group label');
-
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('shows project labels on group boards', done => {
-      component.issue.addLabel(
-        new ListLabel({
-          id: 123,
-          title: 'Project label',
-          type: 'ProjectLabel',
-        }),
-      );
-      component.groupId = 1;
-
-      Vue.nextTick()
-        .then(() => {
-          expect(component.$el.querySelectorAll('.badge').length).toBe(3);
-
-          expect(component.$el.textContent).toContain('Project label');
 
           done();
         })
