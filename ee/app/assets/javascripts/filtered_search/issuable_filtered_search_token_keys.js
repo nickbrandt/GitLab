@@ -29,23 +29,23 @@ const weightConditions = [
 
 /**
  * Filter tokens for issues in EE.
- *
- * @type {FilteredSearchTokenKeys}
  */
-const IssuesFilteredSearchTokenKeysEE = new FilteredSearchTokenKeys(
-  [...tokenKeys, weightTokenKey],
-  alternativeTokenKeys,
-  [...conditions, ...weightConditions],
-);
+class IssuesFilteredSearchTokenKeysEE extends FilteredSearchTokenKeys {
+  constructor() {
+    super([...tokenKeys, weightTokenKey], alternativeTokenKeys, [
+      ...conditions,
+      ...weightConditions,
+    ]);
+  }
 
-// cannot be an arrow function because it needs FilteredSearchTokenKeys instance
-IssuesFilteredSearchTokenKeysEE.init = function init(availableFeatures) {
-  // Enable multiple assignees when available
-  if (availableFeatures && availableFeatures.multipleAssignees) {
+  /**
+   * Changes assignee token to accept multiple values.
+   */
+  enableMultipleAssignees() {
     const assigneeTokenKey = this.tokenKeys.find(tk => tk.key === 'assignee');
     assigneeTokenKey.type = 'array';
     assigneeTokenKey.param = 'username[]';
   }
-};
+}
 
-export default IssuesFilteredSearchTokenKeysEE;
+export default new IssuesFilteredSearchTokenKeysEE();

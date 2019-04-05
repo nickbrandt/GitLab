@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import { getParameterByName, getUrlParamsArray } from '~/lib/utils/common_utils';
 import IssuableFilteredSearchTokenKeys from '~/filtered_search/issuable_filtered_search_token_keys';
+import recentSearchesStorageKeys from 'ee_else_ce/filtered_search/recent_searches_storage_keys';
 import { visitUrl } from '../lib/utils/url_utility';
 import Flash from '../flash';
 import FilteredSearchContainer from './container';
@@ -36,13 +37,11 @@ export default class FilteredSearchManager {
     this.tokensContainer = this.container.querySelector('.tokens-container');
     this.filteredSearchTokenKeys = filteredSearchTokenKeys;
     this.stateFiltersSelector = stateFiltersSelector;
-    this.recentsStorageKeyNames = {
-      issues: 'issue-recent-searches',
-      merge_requests: 'merge-request-recent-searches',
-    };
 
-    // EE specific setup
-    this.initEE();
+    const { multipleAssignees } = this.filteredSearchInput.dataset;
+    if (multipleAssignees && this.filteredSearchTokenKeys.enableMultipleAssignees) {
+      this.filteredSearchTokenKeys.enableMultipleAssignees();
+    }
 
     this.recentSearchesStore = new RecentSearchesStore({
       isLocalStorageAvailable: RecentSearchesService.isAvailable(),
@@ -54,28 +53,8 @@ export default class FilteredSearchManager {
     const fullPath = this.searchHistoryDropdownElement
       ? this.searchHistoryDropdownElement.dataset.fullPath
       : 'project';
-    const recentSearchesKey = `${fullPath}-${this.recentsStorageKeyNames[this.page]}`;
+    const recentSearchesKey = `${fullPath}-${recentSearchesStorageKeys[this.page]}`;
     this.recentSearchesService = new RecentSearchesService(recentSearchesKey);
-  }
-
-  /**
-   * Do EE specific initializations
-   */
-  initEE() {
-    // Setup token keys for multiple-assignees support
-    if (typeof this.filteredSearchTokenKeys.init === 'function') {
-      this.filteredSearchTokenKeys.init({
-        multipleAssignees: this.filteredSearchInput.dataset.multipleAssignees,
-      });
-    }
-
-    // Add localStorage key name for Epics recent searches
-    this.recentsStorageKeyNames.epics = 'epics-recent-searches';
-
-    // Update `isGroup` from DOM info
-    if (this.filteredSearchInput) {
-      this.isGroup = !!this.filteredSearchInput.getAttribute('data-group-id');
-    }
   }
 
   setup() {
