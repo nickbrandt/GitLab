@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Groups::EpicIssuesController do
   let(:group) { create(:group, :public) }
-  let(:project) { create(:project, :public, group: group) }
+  let(:project) { create(:project, group: group) }
   let(:milestone) { create(:milestone, project: project) }
   let(:epic) { create(:epic, group: group) }
   let(:user) { create(:user) }
@@ -35,18 +35,30 @@ describe Groups::EpicIssuesController do
     it_behaves_like 'unlicensed epics action'
 
     context 'when epics feature is enabled' do
-      before do
-        group.add_developer(user)
+      context 'when user has access to epic' do
+        before do
+          group.add_developer(user)
 
-        subject
+          subject
+        end
+
+        it 'returns status 200' do
+          expect(response.status).to eq(200)
+        end
+
+        it 'returns the correct json' do
+          expect(JSON.parse(response.body)).to match_schema('related_issues', dir: 'ee')
+        end
       end
 
-      it 'returns status 200' do
-        expect(response.status).to eq(200)
-      end
+      context 'when user does not have access to epic' do
+        it 'returns 404 status' do
+          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
-      it 'returns the correct json' do
-        expect(JSON.parse(response.body)).to match_schema('related_issues', dir: 'ee')
+          subject
+
+          expect(response).to have_gitlab_http_status(404)
+        end
       end
     end
   end

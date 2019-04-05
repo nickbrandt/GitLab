@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Groups::EpicLinksController < Groups::EpicsController
+class Groups::EpicLinksController < Groups::ApplicationController
   include EpicRelations
 
   before_action :check_nested_support!
