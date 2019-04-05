@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Gitlab::Geo, :geo, :request_store do
+  using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 
   set(:primary_node)   { create(:geo_node, :primary) }
@@ -239,6 +240,26 @@ describe Gitlab::Geo, :geo, :request_store do
 
           expect(described_class.repository_verification_enabled?).to eq false
         end
+      end
+    end
+  end
+
+  context '.allowed_ip?' do
+    where(:allowed_ips, :ip, :allowed) do
+      "192.1.1.1"                  | "192.1.1.1"     | true
+      "192.1.1.1, 192.1.2.1"       | "192.1.2.1"     | true
+      "192.1.1.0/24"               | "192.1.1.223"   | true
+      "192.1.0.0/16"               | "192.1.223.223" | true
+      "192.1.0.0/16, 192.1.2.0/24" | "192.1.2.223"   | true
+      "192.1.0.0/16"               | "192.2.1.1"     | false
+      "192.1.0.1"                  | "192.2.1.1"     | false
+    end
+
+    with_them do
+      it do
+        stub_application_setting(geo_node_allowed_ips: allowed_ips)
+
+        expect(described_class.allowed_ip?(ip)).to eq(allowed)
       end
     end
   end

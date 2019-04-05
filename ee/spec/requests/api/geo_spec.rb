@@ -34,6 +34,29 @@ describe API::Geo do
       stub_current_geo_node(secondary_node)
     end
 
+    describe 'allowed IPs' do
+      let(:note) { create(:note, :with_attachment) }
+      let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
+      let(:transfer) { Gitlab::Geo::FileTransfer.new(:attachment, upload) }
+      let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
+
+      it 'responds with 401 when IP is not allowed' do
+        stub_application_setting(geo_node_allowed_ips: '192.34.34.34')
+
+        get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+
+        expect(response).to have_gitlab_http_status(401)
+      end
+
+      it 'responds with 200 when IP is allowed' do
+        stub_application_setting(geo_node_allowed_ips: '127.0.0.1')
+
+        get api("/geo/transfers/attachment/#{upload.id}"), headers: req_header
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
     describe 'GET /geo/transfers/attachment/1' do
       let(:note) { create(:note, :with_attachment) }
       let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
@@ -270,6 +293,24 @@ describe API::Geo do
       request
 
       expect(response).to have_gitlab_http_status(401)
+    end
+
+    describe 'allowed IPs' do
+      it 'responds with 401 when IP is not allowed' do
+        stub_application_setting(geo_node_allowed_ips: '192.34.34.34')
+
+        request
+
+        expect(response).to have_gitlab_http_status(401)
+      end
+
+      it 'responds with 201 when IP is allowed' do
+        stub_application_setting(geo_node_allowed_ips: '127.0.0.1')
+
+        request
+
+        expect(response).to have_gitlab_http_status(201)
+      end
     end
 
     context 'when requesting primary node with valid auth header' do

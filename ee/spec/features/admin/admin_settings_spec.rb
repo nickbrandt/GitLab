@@ -15,10 +15,12 @@ describe 'Admin updates EE-only settings' do
         visit geo_admin_application_settings_path
         page.within('.as-geo') do
           fill_in 'Connection timeout', with: 15
+          fill_in 'Allowed Geo IP', with: '192.34.34.34'
           click_button 'Save changes'
         end
 
         expect(Gitlab::CurrentSettings.geo_status_timeout).to eq(15)
+        expect(Gitlab::CurrentSettings.geo_node_allowed_ips).to eq('192.34.34.34')
         expect(page).to have_content "Application settings saved successfully"
       end
     end

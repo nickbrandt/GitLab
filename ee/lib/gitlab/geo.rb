@@ -132,5 +132,11 @@ module Gitlab
         true
       end
     end
+
+    def self.allowed_ip?(ip)
+      allowed_ips = ::Gitlab::CurrentSettings.current_application_settings.geo_node_allowed_ips
+
+      Gitlab::CIDR.new(allowed_ips).match?(ip)
+    end
   end
 end
