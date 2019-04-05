@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Geo::LegacyProjectRegistryVerifiedFinder, :geo do
-  include EE::GeoHelpers
-
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
@@ -22,84 +20,64 @@ describe Geo::LegacyProjectRegistryVerifiedFinder, :geo do
     let!(:registry_wiki_verification_failed_broken_shard) { create(:geo_project_registry, :repository_verified, :wiki_verification_failed, project: project_4) }
     let!(:registry_verification_failed) { create(:geo_project_registry, :repository_verification_failed, :wiki_verification_failed) }
 
-    shared_examples 'finds verified registries' do
-      context 'with repository type' do
-        subject { described_class.new(current_node: node, type: :repository) }
+    context 'with repository type' do
+      subject { described_class.new(current_node: node, type: :repository) }
 
-        context 'without selective sync' do
-          it 'returns all verified registries' do
-            expect(subject.execute).to contain_exactly(registry_verified, registry_wiki_verification_failed, registry_wiki_verification_failed_broken_shard)
-          end
-        end
-
-        context 'with selective sync by namespace' do
-          it 'returns verified registries where projects belongs to the namespaces' do
-            node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
-
-            expect(subject.execute).to contain_exactly(registry_verified, registry_wiki_verification_failed)
-          end
-        end
-
-        context 'with selective sync by shard' do
-          it 'returns verified registries where projects belongs to the shards' do
-            node.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-            expect(subject.execute).to contain_exactly(registry_wiki_verification_failed_broken_shard)
-          end
+      context 'without selective sync' do
+        it 'returns all verified registries' do
+          expect(subject.execute).to contain_exactly(registry_verified, registry_wiki_verification_failed, registry_wiki_verification_failed_broken_shard)
         end
       end
 
-      context 'with wiki type' do
-        subject { described_class.new(current_node: node, type: :wiki) }
+      context 'with selective sync by namespace' do
+        it 'returns verified registries where projects belongs to the namespaces' do
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
-        context 'without selective sync' do
-          it 'returns all verified registries' do
-            expect(subject.execute).to contain_exactly(registry_verified, registry_repository_verification_failed, registry_repository_verification_failed_broken_shard)
-          end
-        end
-
-        context 'with selective sync by namespace' do
-          it 'returns verified registries where projects belongs to the namespaces' do
-            node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
-
-            expect(subject.execute).to contain_exactly(registry_verified, registry_repository_verification_failed)
-          end
-        end
-
-        context 'with selective sync by shard' do
-          it 'returns verified registries where projects belongs to the shards' do
-            node.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-            expect(subject.execute).to contain_exactly(registry_repository_verification_failed_broken_shard)
-          end
+          expect(subject.execute).to contain_exactly(registry_verified, registry_wiki_verification_failed)
         end
       end
 
-      context 'with invalid type' do
-        subject { described_class.new(current_node: node, type: :invalid) }
+      context 'with selective sync by shard' do
+        it 'returns verified registries where projects belongs to the shards' do
+          node.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
 
-        it 'returns nothing' do
-          expect(subject.execute).to be_empty
+          expect(subject.execute).to contain_exactly(registry_wiki_verification_failed_broken_shard)
         end
       end
     end
 
-    # Disable transactions via :delete method because a foreign table
-    # can't see changes inside a transaction of a different connection.
-    context 'FDW', :delete do
-      before do
-        skip('FDW is not configured') unless Gitlab::Geo::Fdw.enabled?
+    context 'with wiki type' do
+      subject { described_class.new(current_node: node, type: :wiki) }
+
+      context 'without selective sync' do
+        it 'returns all verified registries' do
+          expect(subject.execute).to contain_exactly(registry_verified, registry_repository_verification_failed, registry_repository_verification_failed_broken_shard)
+        end
       end
 
-      include_examples 'finds verified registries'
+      context 'with selective sync by namespace' do
+        it 'returns verified registries where projects belongs to the namespaces' do
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
+
+          expect(subject.execute).to contain_exactly(registry_verified, registry_repository_verification_failed)
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'returns verified registries where projects belongs to the shards' do
+          node.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.execute).to contain_exactly(registry_repository_verification_failed_broken_shard)
+        end
+      end
     end
 
-    context 'Legacy' do
-      before do
-        stub_fdw_disabled
-      end
+    context 'with invalid type' do
+      subject { described_class.new(current_node: node, type: :invalid) }
 
-      include_examples 'finds verified registries'
+      it 'returns nothing' do
+        expect(subject.execute).to be_empty
+      end
     end
   end
 end

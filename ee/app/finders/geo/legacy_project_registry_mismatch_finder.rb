@@ -22,30 +22,16 @@ module Geo
     end
 
     def execute
-      if selective_sync?
-        mismatch_registries_for_selective_sync
-      else
-        mismatch_registries
-      end
+      legacy_inner_join_registry_ids(
+        Geo::ProjectRegistry.mismatch(type),
+        current_node.projects.pluck_primary_key,
+        Geo::ProjectRegistry,
+        foreign_key: :project_id
+      )
     end
 
     private
 
     attr_reader :type
-
-    def mismatch_registries
-      Geo::ProjectRegistry.mismatch(type)
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def mismatch_registries_for_selective_sync
-      legacy_inner_join_registry_ids(
-        mismatch_registries,
-        current_node.projects.pluck(:id),
-        Geo::ProjectRegistry,
-        foreign_key: :project_id
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
