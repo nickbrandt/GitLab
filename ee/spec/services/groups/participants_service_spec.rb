@@ -74,12 +74,12 @@ describe Groups::ParticipantsService do
     describe 'avatar_url' do
       let(:groups) { described_class.new(group, user).groups }
 
-      it 'returns an url for the avatar' do
+      it 'returns a URL for the avatar' do
         expect(groups.size).to eq 1
         expect(groups.first[:avatar_url]).to eq("/uploads/-/system/group/avatar/#{group.id}/dk.png")
       end
 
-      it 'returns an url for the avatar with relative url' do
+      it 'returns a relative URL for the avatar' do
         stub_config_setting(relative_url_root: '/gitlab')
         stub_config_setting(url: Settings.send(:build_gitlab_url))
 

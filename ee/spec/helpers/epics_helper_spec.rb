@@ -126,7 +126,7 @@ describe EpicsHelper do
   end
 
   describe '#epic_endpoint_query_params' do
-    it 'includes epic specific options in JSON format' do
+    it 'includes Epic specific options in JSON format' do
       opts = epic_endpoint_query_params({})
 
       expected = "{\"only_group_labels\":true,\"include_ancestor_groups\":true,\"include_descendant_groups\":true}"

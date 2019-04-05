@@ -28,7 +28,7 @@ describe ProtectedEnvironments::CreateService, '#execute' do
   context 'with invalid params' do
     let(:maintainer_access) { 0 }
 
-    it 'returns a non persisted Protected Environment record' do
+    it 'returns a non-persisted Protected Environment record' do
       expect(subject.persisted?).to be_falsy
     end
   end

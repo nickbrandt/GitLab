@@ -59,7 +59,7 @@ describe 'Promotions', :js do
         sign_in(user)
       end
 
-      it 'has the Upgrade your plan button' do
+      it "has the 'Upgrade your plan' button" do
         visit edit_project_path(project)
 
         expect(find('#promote_service_desk')).to have_content 'Upgrade your plan'
