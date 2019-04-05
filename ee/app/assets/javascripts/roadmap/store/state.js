@@ -15,6 +15,8 @@ export default () => ({
   sortedBy: '',
 
   // UI Flags
+  defaultInnerHeight: 0,
+  isChildEpics: false,
   epicsFetchInProgress: false,
   epicsFetchForTimeframeInProgress: false,
   epicsFetchFailure: false,

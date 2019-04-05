@@ -157,6 +157,20 @@ describe('EpicsListEmptyComponent', () => {
             .catch(done.fail);
         });
       });
+
+      describe('with child epics context', () => {
+        it('returns empty state sub-message when `isChildEpics` is set to `true`', done => {
+          vm.isChildEpics = true;
+          Vue.nextTick()
+            .then(() => {
+              expect(vm.subMessage).toBe(
+                'To view the roadmap, add a start or due date to one of the <a href="https://docs.gitlab.com/ee/user/group/epics/#multi-level-child-epics" target="_blank" rel="noopener noreferrer nofollow">child epics</a>.',
+              );
+            })
+            .then(done)
+            .catch(done.fail);
+        });
+      });
     });
 
     describe('timeframeRange', () => {

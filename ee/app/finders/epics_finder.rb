@@ -3,6 +3,7 @@
 class EpicsFinder < IssuableFinder
   def self.scalar_params
     @scalar_params ||= %i[
+      parent_id
       author_id
       author_username
       label_name

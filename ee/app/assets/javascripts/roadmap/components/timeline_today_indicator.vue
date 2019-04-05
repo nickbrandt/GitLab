@@ -81,7 +81,7 @@ export default {
     },
     handleEpicsListScroll() {
       const indicatorX = this.$el.getBoundingClientRect().x;
-      const rootOffsetLeft = this.$root.$el.offsetLeft;
+      const rootOffsetLeft = this.$root.$el.parentElement.offsetLeft;
 
       // 3px to compensate size of bubble on top of Indicator
       this.todayBarReady = indicatorX - rootOffsetLeft >= EPIC_DETAILS_CELL_WIDTH + 3;

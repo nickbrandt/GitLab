@@ -43,6 +43,21 @@
   }
 }
 
+.epic-tabs-content {
+  .roadmap-container {
+    min-height: 600px;
+
+    .roadmap-shell {
+      border: 1px solid $white-dark;
+      border-top: 0;
+    }
+
+    .empty-state {
+      margin-top: 0;
+    }
+  }
+}
+
 @include media-breakpoint-down(xs) {
   .epic-page-container {
     .detail-page-header {

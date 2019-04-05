@@ -32,6 +32,11 @@ export default {
       type: String,
       required: true,
     },
+    isChildEpics: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     timeframeRange() {
@@ -78,6 +83,20 @@ export default {
       return s__('GroupRoadmap|The roadmap shows the progress of your epics along a timeline');
     },
     subMessage() {
+      if (this.isChildEpics) {
+        return sprintf(
+          s__(
+            'GroupRoadmap|To view the roadmap, add a start or due date to one of the %{linkStart}child epics%{linkEnd}.',
+          ),
+          {
+            linkStart:
+              '<a href="https://docs.gitlab.com/ee/user/group/epics/#multi-level-child-epics" target="_blank" rel="noopener noreferrer nofollow">',
+            linkEnd: '</a>',
+          },
+          false,
+        );
+      }
+
       if (this.hasFiltersApplied) {
         return sprintf(emptyStateWithFilters, {
           startDate: this.timeframeRange.startDate,
