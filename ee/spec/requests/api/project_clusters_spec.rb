@@ -93,7 +93,7 @@ describe API::ProjectClusters do
         expect(response).to have_gitlab_http_status(201)
       end
 
-      it 'allows to associate multiple cluster to project' do
+      it 'allows multiple clusters to be associated to project' do
         expect(project.reload.clusters.count).to eq(2)
       end
     end

@@ -11,7 +11,7 @@ describe Projects::ImportsController do
 
   context 'POST #create' do
     context 'mirror user is not the current user' do
-      it 'onlies assign the current user' do
+      it 'only assigns the current user' do
         allow_any_instance_of(EE::Project).to receive(:add_import_job)
 
         new_user = create(:user)

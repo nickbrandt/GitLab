@@ -26,7 +26,7 @@ describe ProtectedEnvironments::UpdateService, '#execute' do
   context 'with valid params' do
     it { is_expected.to be_truthy }
 
-    it 'changes update the deploy access levels' do
+    it 'updates the deploy access levels' do
       expect do
         subject
       end.to change { ProtectedEnvironment::DeployAccessLevel.count }.from(1).to(2)

@@ -122,7 +122,7 @@ describe Projects::ProtectedEnvironmentsController do
         expect(protected_environment.deploy_access_levels.count).to eq(2)
       end
 
-      it 'is success' do
+      it 'is successful' do
         expect(response).to have_gitlab_http_status(200)
       end
     end
@@ -134,7 +134,7 @@ describe Projects::ProtectedEnvironmentsController do
         subject
       end
 
-      it 'is not success' do
+      it 'is not successful' do
         expect(response).to have_gitlab_http_status(404)
       end
     end
@@ -181,7 +181,7 @@ describe Projects::ProtectedEnvironmentsController do
         project.add_developer(current_user)
       end
 
-      it 'is not success' do
+      it 'is not successful' do
         subject
 
         expect(response).to have_gitlab_http_status(404)
