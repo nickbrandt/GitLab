@@ -21,20 +21,21 @@ export default {
   },
   data() {
     return {
-      alertData: {},
+      allAlerts: {},
     };
   },
+  computed: {
+    alertsAvailable() {
+      return this.prometheusAlertsAvailable && this.alertsEndpoint;
+    },
+  },
   methods: {
-    getGraphLabel(graphData) {
-      if (!graphData.queries || !graphData.queries[0]) return undefined;
-      return graphData.queries[0].label || graphData.y_label || 'Average';
-    },
-    getQueryAlerts(graphData) {
-      if (!graphData.queries) return [];
-      return graphData.queries.map(query => query.alert_path).filter(Boolean);
-    },
-    setAlerts(metricId, alertData) {
-      this.$set(this.alertData, metricId, alertData);
+    setAlerts(alertPath, alertAttributes) {
+      if (alertAttributes) {
+        this.$set(this.allAlerts, alertPath, alertAttributes);
+      } else {
+        this.$delete(this.allAlerts, alertPath);
+      }
     },
   },
 };

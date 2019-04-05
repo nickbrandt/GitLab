@@ -8460,6 +8460,9 @@ msgstr ""
 msgid "PrometheusAlerts|Operator"
 msgstr ""
 
+msgid "PrometheusAlerts|Select query"
+msgstr ""
+
 msgid "PrometheusAlerts|Threshold"
 msgstr ""
 

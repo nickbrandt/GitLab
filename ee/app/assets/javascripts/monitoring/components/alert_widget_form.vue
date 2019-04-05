@@ -1,7 +1,10 @@
 <script>
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
+import _ from 'underscore';
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
+import { alertsValidator, queriesValidator } from '../validators';
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 
 Vue.use(Translate);
 
@@ -24,39 +27,58 @@ const OPERATORS = {
 };
 
 export default {
+  components: {
+    GlDropdown,
+    GlDropdownItem,
+  },
   props: {
     disabled: {
       type: Boolean,
       required: true,
     },
-    alert: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    alertData: {
+    alertsToManage: {
       type: Object,
       required: false,
       default: () => ({}),
+      validator: alertsValidator,
+    },
+    relevantQueries: {
+      type: Array,
+      required: true,
+      validator: queriesValidator,
     },
   },
   data() {
     return {
       operators: OPERATORS,
-      operator: this.alertData.operator,
-      threshold: this.alertData.threshold,
+      operator: null,
+      threshold: null,
+      prometheusMetricId: null,
+      selectedAlert: {},
     };
   },
   computed: {
+    currentQuery() {
+      return this.relevantQueries.find(query => query.metricId === this.prometheusMetricId) || {};
+    },
+    formDisabled() {
+      // We need a prometheusMetricId to determine whether we're
+      // creating/updating/deleting
+      return this.disabled || !this.prometheusMetricId;
+    },
+    queryDropdownLabel() {
+      return this.currentQuery.label || s__('PrometheusAlerts|Select query');
+    },
     haveValuesChanged() {
       return (
         this.operator &&
         this.threshold === Number(this.threshold) &&
-        (this.operator !== this.alertData.operator || this.threshold !== this.alertData.threshold)
+        (this.operator !== this.selectedAlert.operator ||
+          this.threshold !== this.selectedAlert.threshold)
       );
     },
     submitAction() {
-      if (!this.alert) return 'create';
+      if (_.isEmpty(this.selectedAlert)) return 'create';
       if (this.haveValuesChanged) return 'update';
       return 'delete';
     },
@@ -71,11 +93,30 @@ export default {
     },
   },
   watch: {
-    alertData() {
+    alertsToManage() {
       this.resetAlertData();
+    },
+    submitAction() {
+      this.$emit('setAction', this.submitAction);
     },
   },
   methods: {
+    selectQuery(queryId) {
+      const existingAlertPath = _.findKey(this.alertsToManage, alert => alert.metricId === queryId);
+      const existingAlert = this.alertsToManage[existingAlertPath];
+
+      if (existingAlert) {
+        this.selectedAlert = existingAlert;
+        this.operator = existingAlert.operator;
+        this.threshold = existingAlert.threshold;
+      } else {
+        this.selectedAlert = {};
+        this.operator = null;
+        this.threshold = null;
+      }
+
+      this.prometheusMetricId = queryId;
+    },
     handleCancel() {
       this.resetAlertData();
       this.$emit('cancel');
@@ -83,14 +124,17 @@ export default {
     handleSubmit() {
       this.$refs.submitButton.blur();
       this.$emit(this.submitAction, {
-        alert: this.alert,
+        alert: this.selectedAlert.alert_path,
         operator: this.operator,
         threshold: this.threshold,
+        prometheus_metric_id: this.prometheusMetricId,
       });
     },
     resetAlertData() {
-      this.operator = this.alertData.operator;
-      this.threshold = this.alertData.threshold;
+      this.operator = null;
+      this.threshold = null;
+      this.prometheusMetricId = null;
+      this.selectedAlert = {};
     },
   },
 };
@@ -98,10 +142,19 @@ export default {
 
 <template>
   <div class="alert-form">
+    <gl-dropdown :text="queryDropdownLabel" class="form-group" toggle-class="dropdown-menu-toggle">
+      <gl-dropdown-item
+        v-for="query in relevantQueries"
+        :key="query.metricId"
+        @click="selectQuery(query.metricId)"
+      >
+        {{ `${query.label} (${query.unit})` }}
+      </gl-dropdown-item>
+    </gl-dropdown>
     <div :aria-label="s__('PrometheusAlerts|Operator')" class="form-group btn-group" role="group">
       <button
         :class="{ active: operator === operators.greaterThan }"
-        :disabled="disabled"
+        :disabled="formDisabled"
         type="button"
         class="btn btn-default"
         @click="operator = operators.greaterThan"
@@ -110,7 +163,7 @@ export default {
       </button>
       <button
         :class="{ active: operator === operators.equalTo }"
-        :disabled="disabled"
+        :disabled="formDisabled"
         type="button"
         class="btn btn-default"
         @click="operator = operators.equalTo"
@@ -119,7 +172,7 @@ export default {
       </button>
       <button
         :class="{ active: operator === operators.lessThan }"
-        :disabled="disabled"
+        :disabled="formDisabled"
         type="button"
         class="btn btn-default"
         @click="operator = operators.lessThan"
@@ -129,12 +182,17 @@ export default {
     </div>
     <div class="form-group">
       <label>{{ s__('PrometheusAlerts|Threshold') }}</label>
-      <input v-model.number="threshold" :disabled="disabled" type="number" class="form-control" />
+      <input
+        v-model.number="threshold"
+        :disabled="formDisabled"
+        type="number"
+        class="form-control"
+      />
     </div>
     <div class="action-group">
       <button
         ref="cancelButton"
-        :disabled="disabled"
+        :disabled="formDisabled"
         type="button"
         class="btn btn-default"
         @click="handleCancel"

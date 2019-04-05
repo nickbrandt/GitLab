@@ -105,9 +105,11 @@ A few fields are required:
 
 - **Name**: Chart title
 - **Type**: Type of metric. Metrics of the same type will be shown together.
-- **Query**: Valid [PromQL query](https://prometheus.io/docs/prometheus/latest/querying/basics/). Note, no validation is performed at this time. If the query is not valid, the dashboard will display an error.
+- **Query**: Valid [PromQL query](https://prometheus.io/docs/prometheus/latest/querying/basics/).
 - **Y-axis label**: Y axis title to display on the dashboard.
 - **Unit label**: Query units, for example `req / sec`. Shown next to the value.
+
+Multiple metrics can be displayed on the same chart if the fields **Name**, **Type**, and **Y-axis label** match between metrics. For example, a metric with **Name** `Requests Rate`, **Type** `Business`, and **Y-axis label** `rec / sec` would display on the same chart as a second metric with the same values. A **Legend label** is suggested if this feature used.
 
 #### Query Variables
 
