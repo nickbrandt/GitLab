@@ -14,9 +14,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
     let tokenKeys;
 
     beforeEach(() => {
-      IssuableFilteredSearchTokenKeys.init({
-        multipleAssignees: true,
-      });
+      IssuableFilteredSearchTokenKeys.enableMultipleAssignees();
       tokenKeys = IssuableFilteredSearchTokenKeys.get();
     });
 
