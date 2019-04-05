@@ -260,6 +260,9 @@ msgstr ""
 msgid "%{user_name} profile page"
 msgstr ""
 
+msgid "(No changes)"
+msgstr ""
+
 msgid "(external source)"
 msgstr ""
 
@@ -8759,6 +8762,9 @@ msgstr ""
 msgid "Remove this label? This will affect all projects within the group. Are you sure?"
 msgstr ""
 
+msgid "Removed"
+msgstr ""
+
 msgid "Removed group can not be restored!"
 msgstr ""
 
@@ -8817,6 +8823,18 @@ msgid "Reports|Execution time"
 msgstr ""
 
 msgid "Reports|Failure"
+msgstr ""
+
+msgid "Reports|Metrics reports are loading"
+msgstr ""
+
+msgid "Reports|Metrics reports changed on %{numberOfChanges} %{pointsString}"
+msgstr ""
+
+msgid "Reports|Metrics reports did not change"
+msgstr ""
+
+msgid "Reports|Metrics reports failed loading results"
 msgstr ""
 
 msgid "Reports|Severity"
@@ -13215,6 +13233,11 @@ msgstr ""
 
 msgid "personal access token"
 msgstr ""
+
+msgid "point"
+msgid_plural "points"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "private"
 msgstr ""

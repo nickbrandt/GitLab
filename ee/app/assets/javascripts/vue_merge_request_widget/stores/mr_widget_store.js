@@ -26,6 +26,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.initCodeclimate(data);
     this.initPerformanceReport(data);
     this.licenseManagement = data.license_management;
+    this.metricsReportsPath = data.metrics_reports_path;
   }
 
   setData(data, isRebased) {
