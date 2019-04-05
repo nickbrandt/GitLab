@@ -133,4 +133,19 @@ describe MergeRequests::ByApproversFinder do
       )
     end
   end
+
+  context 'filter by approvers' do
+    let(:mrs_by_ids) { merge_requests(ids: [first_user.id]) }
+    let(:mrs_by_usernames) { merge_requests(names: [first_user.username]) }
+
+    it 'can be ordered by popularity' do
+      expect(mrs_by_ids.sort_by_attribute("popularity")).to eq([merge_request_with_two_approvers, merge_request_with_approver])
+      expect(mrs_by_usernames.sort_by_attribute("popularity")).to eq([merge_request_with_two_approvers, merge_request_with_approver])
+    end
+
+    it 'can be ordered by priority' do
+      expect(mrs_by_usernames.sort_by_attribute("priority")).to eq([merge_request_with_two_approvers, merge_request_with_approver])
+      expect(mrs_by_ids.sort_by_attribute("priority")).to eq([merge_request_with_two_approvers, merge_request_with_approver])
+    end
+  end
 end
