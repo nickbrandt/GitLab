@@ -7255,6 +7255,9 @@ msgstr ""
 msgid "Not now"
 msgstr ""
 
+msgid "Not ready yet. Try again later."
+msgstr ""
+
 msgid "Not started"
 msgstr ""
 
@@ -13247,6 +13250,9 @@ msgid "private"
 msgstr ""
 
 msgid "private key does not match certificate."
+msgstr ""
+
+msgid "processing"
 msgstr ""
 
 msgid "project"
