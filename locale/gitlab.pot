@@ -7240,6 +7240,9 @@ msgstr ""
 msgid "Not now"
 msgstr ""
 
+msgid "Not ready yet. Try again later."
+msgstr ""
+
 msgid "Not started"
 msgstr ""
 
@@ -8533,9 +8536,6 @@ msgid "Protected"
 msgstr ""
 
 msgid "Protected Environments"
-msgstr ""
-
-msgid "Not ready yet. Try again later."
 msgstr ""
 
 msgid "ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?"
