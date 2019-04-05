@@ -1,32 +1,43 @@
 import Vue from 'vue';
 
 import roadmapShellComponent from 'ee/roadmap/components/roadmap_shell.vue';
+import createStore from 'ee/roadmap/store';
 import eventHub from 'ee/roadmap/event_hub';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { mockEpic, mockTimeframeInitialDate, mockGroupId } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = (
-  { epics = [mockEpic], timeframe = mockTimeframeMonths, currentGroupId = mockGroupId },
+  {
+    epics = [mockEpic],
+    timeframe = mockTimeframeMonths,
+    currentGroupId = mockGroupId,
+    defaultInnerHeight = 0,
+  },
   el,
 ) => {
   const Component = Vue.extend(roadmapShellComponent);
 
-  return mountComponent(
-    Component,
-    {
+  const store = createStore();
+  store.dispatch('setInitialData', {
+    defaultInnerHeight,
+  });
+
+  return mountComponentWithStore(Component, {
+    el,
+    store,
+    props: {
       presetType: PRESET_TYPES.MONTHS,
       epics,
       timeframe,
       currentGroupId,
     },
-    el,
-  );
+  });
 };
 
 describe('RoadmapShellComponent', () => {

@@ -399,9 +399,11 @@ export const getEpicsPathForPreset = ({
     end.setDate(end.getDate() + 6);
   }
 
+  epicsPath += epicsPath.indexOf('?') === -1 ? '?' : '&';
+
   const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
   const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-  epicsPath += `?state=${epicsState}&start_date=${startDate}&end_date=${endDate}`;
+  epicsPath += `state=${epicsState}&start_date=${startDate}&end_date=${endDate}`;
 
   if (filterQueryString) {
     epicsPath += `&${filterQueryString}`;

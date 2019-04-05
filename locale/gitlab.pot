@@ -5346,6 +5346,9 @@ msgstr ""
 msgid "GroupRoadmap|The roadmap shows the progress of your epics along a timeline"
 msgstr ""
 
+msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of the %{linkStart}child epics%{linkEnd}."
+msgstr ""
+
 msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from %{startDate} to %{endDate}."
 msgstr ""
 

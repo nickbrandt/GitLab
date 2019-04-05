@@ -46,6 +46,7 @@ export default {
       'epicsFetchForTimeframeInProgress',
       'epicsFetchResultEmpty',
       'epicsFetchFailure',
+      'isChildEpics',
     ]),
     timeframeStart() {
       return this.timeframe[0];
@@ -171,6 +172,7 @@ export default {
       :has-filters-applied="hasFiltersApplied"
       :new-epic-endpoint="newEpicEndpoint"
       :empty-state-illustration-path="emptyStateIllustrationPath"
+      :is-child-epics="isChildEpics"
     />
   </div>
 </template>

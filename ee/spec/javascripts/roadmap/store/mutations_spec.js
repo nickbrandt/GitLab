@@ -22,6 +22,7 @@ describe('Roadmap Store Mutations', () => {
         currentGroupId: mockGroupId,
         sortedBy: mockSortedBy,
         initialEpicsPath: epicsPath,
+        defaultInnerHeight: 600,
         extendedTimeframe: [],
         filterQueryString: '',
         epicsState: 'all',
