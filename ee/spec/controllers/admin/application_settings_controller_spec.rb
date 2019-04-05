@@ -34,7 +34,8 @@ describe Admin::ApplicationSettingsController do
           slack_app_id: 'slack_app_id',
           slack_app_secret: 'slack_app_secret',
           slack_app_verification_token: 'slack_app_verification_token',
-          allow_group_owners_to_manage_ldap: false
+          allow_group_owners_to_manage_ldap: false,
+          geo_node_allowed_ips: '0.0.0.0/0, ::/0'
       }
 
       put :update, params: { application_setting: settings }
@@ -48,7 +49,7 @@ describe Admin::ApplicationSettingsController do
     end
 
     shared_examples 'settings for licensed features' do
-      it 'does not update settings when licesed feature is not available' do
+      it 'does not update settings when licensed feature is not available' do
         stub_licensed_features(feature => false)
         attribute_names = settings.keys.map(&:to_s)
 

@@ -394,6 +394,32 @@ describe "Git HTTP requests (Geo)", :geo do
         end
       end
     end
+
+    context 'IP allowed settings' do
+      subject do
+        make_request
+        response
+      end
+
+      def make_request
+        get "/#{repository_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
+      end
+
+      let(:repository_path) { project.full_path }
+
+      it 'returns unauthorized error' do
+        stub_application_setting(geo_node_allowed_ips: '192.34.34.34')
+
+        is_expected.to have_gitlab_http_status(:unauthorized)
+        expect(subject.parsed_body).to eq('Request from this IP is not allowed')
+      end
+
+      it 'returns success response' do
+        stub_application_setting(geo_node_allowed_ips: '127.0.0.1')
+
+        is_expected.to have_gitlab_http_status(:success)
+      end
+    end
   end
 
   def valid_geo_env

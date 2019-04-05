@@ -76,6 +76,10 @@ module EE
                 presence: true,
                 if: -> (setting) { setting.external_auth_client_cert.present? }
 
+      validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
+
+      validate :check_geo_node_allowed_ips
+
       validates_with X509CertificateCredentialsValidator,
                      certificate: :external_auth_client_cert,
                      pkey: :external_auth_client_key,
@@ -119,7 +123,8 @@ module EE
           snowplow_cookie_domain: nil,
           snowplow_enabled: false,
           snowplow_site_id: nil,
-          custom_project_templates_group_id: nil
+          custom_project_templates_group_id: nil,
+          geo_node_allowed_ips: '0.0.0.0/0, ::/0'
         )
       end
     end
@@ -289,6 +294,12 @@ module EE
 
     def email_additional_text_column_exists?
       ::Gitlab::Database.cached_column_exists?(:application_settings, :email_additional_text)
+    end
+
+    def check_geo_node_allowed_ips
+      ::Gitlab::CIDR.new(geo_node_allowed_ips)
+    rescue ::Gitlab::CIDR::ValidationError => e
+      errors.add(:geo_node_allowed_ips, e.message)
     end
   end
 end

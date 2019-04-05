@@ -6449,6 +6449,9 @@ msgstr ""
 msgid "List available repositories"
 msgstr ""
 
+msgid "List of IPs and CIDRs of allowed secondary nodes. Comma-separated, e.g. \"1.1.1.1, 2.2.2.0/24\""
+msgstr ""
+
 msgid "List view"
 msgstr ""
 
@@ -10525,6 +10528,9 @@ msgid "The Issue Tracker is the place to add things that need to be improved or 
 msgstr ""
 
 msgid "The X509 Certificate to use when mutual TLS is required to communicate with the external authorization service. If left blank, the server certificate is still validated when accessing over HTTPS."
+msgstr ""
+
+msgid "The amount of seconds after which a request to get a secondary node status will time out."
 msgstr ""
 
 msgid "The branch for this project has no active pipeline configuration."
