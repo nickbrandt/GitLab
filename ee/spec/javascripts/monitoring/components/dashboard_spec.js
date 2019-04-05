@@ -41,6 +41,7 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: true,
             alertsEndpoint: '/endpoint',
+            showTimeWindowDropdown: false,
           },
         });
       });
@@ -62,6 +63,7 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: false,
             alertsEndpoint: '/endpoint',
+            showTimeWindowDropdown: false,
           },
         });
       });
