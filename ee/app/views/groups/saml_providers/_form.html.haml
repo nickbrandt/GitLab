@@ -13,37 +13,35 @@
         .form-text.d-inline.ml-3.align-text-bottom= s_('GroupSAML|Enable SAML authentication for this group')
     - if Feature.enabled?(:enforced_sso, group)
       .form-group.row
-        = f.label :enforced_sso, _("Enforced SSO"), class: 'col-form-label col-sm-2'
-        .col-sm-10
+        = f.label :enforced_sso, s_('GroupSAML|Enforced SSO'), class: 'col-form-label col-sm-2'
+        .col-sm-10.pt-1
           .form-check
             = f.check_box :enforced_sso, class: 'form-check-input'
             = f.label :enforced_sso, class: 'form-check-label' do
-              = _("Enforce SSO-only authentication for this group")
+              = s_('GroupSAML|Enforce SSO-only authentication for this group')
     - if Feature.enabled?(:group_managed_accounts, group)
       .form-group.row
-        = f.label :enforced_group_managed_accounts, _("Group managed accounts"), class: 'col-form-label col-sm-2'
-        .col-sm-10
+        = f.label :enforced_group_managed_accounts, s_('GroupSAML|Group managed accounts'), class: 'col-form-label col-sm-2'
+        .col-sm-10.pt-1
           .form-check
             = f.check_box :enforced_group_managed_accounts, class: 'form-check-input'
             = f.label :enforced_group_managed_accounts, class: 'form-check-label' do
-              = _("Enforce users to have dedicated group managed accounts for this group")
-    .form-group.row
-      = f.label :sso_url, class: 'col-form-label col-sm-2' do
-        = _("Identity provider single sign on URL")
-      .col-sm-10
-        = f.text_field :sso_url, placeholder: 'e.g. https://example.com/adfs/ls', class: 'form-control qa-identity-provider-sso-field'
-        .form-text.text-muted
-          = _('Members will be forwarded here when signing in to your group. Get this from your identity provider, where it can also be called "SSO Service Location", "SAML Token Issuance Endpoint", or "SAML 2.0/W-Federation URL".')
+              = s_('GroupSAML|Enforce users to have dedicated group managed accounts for this group')
+    .well-segment.borderless.mb-3.col-12.col-lg-9.p-0
+      = f.label :sso_url, class: 'label-bold' do
+        = s_('GroupSAML|Identity provider single sign on URL')
+      = f.text_field :sso_url, placeholder: 'e.g. https://example.com/adfs/ls', class: 'form-control qa-identity-provider-sso-field'
+      .form-text.text-muted
+        = s_('GroupSAML|Members will be forwarded here when signing in to your group. Get this from your identity provider, where it can also be called "SSO Service Location", "SAML Token Issuance Endpoint", or "SAML 2.0/W-Federation URL".')
 
-    .form-group.row
-      = f.label :certificate_fingerprint, class: 'col-form-label col-sm-2' do
-        = _("Certificate fingerprint")
-      .col-sm-10
-        = f.text_field :certificate_fingerprint, placeholder: 'e.g. 0a:1b:2c:3d:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff', class: 'form-control qa-certificate-fingerprint-field'
-        .form-text.text-muted
-          = _('SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called "Thumbprint".')
+    .well-segment.borderless.mb-3.col-12.col-lg-9.p-0
+      = f.label :certificate_fingerprint, class: 'label-bold' do
+        = s_('GroupSAML|Certificate fingerprint')
+      = f.text_field :certificate_fingerprint, placeholder: 'e.g. 0a:1b:2c:3d:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff', class: 'form-control qa-certificate-fingerprint-field'
+      .form-text.text-muted
+        = s_('GroupSAML|SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called "Thumbprint".')
 
-    .form-actions
+    .mt-3
       = f.submit _("Save changes"), class: 'btn btn-success qa-save-changes-button'
       #js-saml-test-button.has-tooltip.pull-right
         = render 'test_button', saml_provider: @saml_provider
