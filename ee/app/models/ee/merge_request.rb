@@ -36,7 +36,7 @@ module EE
 
     class_methods do
       def select_from_union(relations)
-        from_union(relations, remove_duplicates: true)
+        where(id: from_union(relations))
       end
     end
 
