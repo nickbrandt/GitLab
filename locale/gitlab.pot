@@ -1245,6 +1245,9 @@ msgstr ""
 msgid "Are you sure you want to reset registration token?"
 msgstr ""
 
+msgid "Are you sure you want to reset the SCIM token? SCIM provisioning will stop working until the new token is updated."
+msgstr ""
+
 msgid "Are you sure you want to reset the health check token?"
 msgstr ""
 
@@ -1918,9 +1921,6 @@ msgid "Certificate"
 msgstr ""
 
 msgid "Certificate (PEM)"
-msgstr ""
-
-msgid "Certificate fingerprint"
 msgstr ""
 
 msgid "Change Weight"
@@ -3880,15 +3880,6 @@ msgstr ""
 msgid "Ends at (UTC)"
 msgstr ""
 
-msgid "Enforce SSO-only authentication for this group"
-msgstr ""
-
-msgid "Enforce users to have dedicated group managed accounts for this group"
-msgstr ""
-
-msgid "Enforced SSO"
-msgstr ""
-
 msgid "Enter at least three characters to search"
 msgstr ""
 
@@ -5331,9 +5322,6 @@ msgstr ""
 msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
-msgid "Group managed accounts"
-msgstr ""
-
 msgid "Group name"
 msgstr ""
 
@@ -5373,10 +5361,64 @@ msgstr ""
 msgid "GroupRoadmap|Until %{dateWord}"
 msgstr ""
 
+msgid "GroupSAML|Certificate fingerprint"
+msgstr ""
+
 msgid "GroupSAML|Enable SAML authentication for this group"
 msgstr ""
 
+msgid "GroupSAML|Enforce SSO-only authentication for this group"
+msgstr ""
+
+msgid "GroupSAML|Enforce users to have dedicated group managed accounts for this group"
+msgstr ""
+
+msgid "GroupSAML|Enforced SSO"
+msgstr ""
+
+msgid "GroupSAML|Generate a SCIM token"
+msgstr ""
+
+msgid "GroupSAML|Generate a SCIM token to set up your System for Cross-Domain Identity Management."
+msgstr ""
+
+msgid "GroupSAML|Group managed accounts"
+msgstr ""
+
+msgid "GroupSAML|Identity provider single sign on URL"
+msgstr ""
+
+msgid "GroupSAML|Make sure you save this token — you won't be able to access it again."
+msgstr ""
+
+msgid "GroupSAML|Manage your group’s membership while adding another level of security with SAML."
+msgstr ""
+
+msgid "GroupSAML|Members will be forwarded here when signing in to your group. Get this from your identity provider, where it can also be called \"SSO Service Location\", \"SAML Token Issuance Endpoint\", or \"SAML 2.0/W-Federation URL\"."
+msgstr ""
+
+msgid "GroupSAML|SAML Single Sign On"
+msgstr ""
+
+msgid "GroupSAML|SAML Single Sign On Settings"
+msgstr ""
+
+msgid "GroupSAML|SCIM API endpoint URL"
+msgstr ""
+
+msgid "GroupSAML|SCIM Token"
+msgstr ""
+
+msgid "GroupSAML|SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called \"Thumbprint\"."
+msgstr ""
+
+msgid "GroupSAML|The SCIM token is now hidden. To see the value of the token again, you need to "
+msgstr ""
+
 msgid "GroupSAML|Toggle SAML authentication"
+msgstr ""
+
+msgid "GroupSAML|Your SCIM token"
 msgstr ""
 
 msgid "GroupSettings|Auto DevOps pipeline was updated for the group"
@@ -5640,9 +5682,6 @@ msgid "Identifier"
 msgstr ""
 
 msgid "Identities"
-msgstr ""
-
-msgid "Identity provider single sign on URL"
 msgstr ""
 
 msgid "If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like \"1 hour\". Values without specification represent seconds."
@@ -6524,9 +6563,6 @@ msgstr ""
 msgid "Manage two-factor authentication"
 msgstr ""
 
-msgid "Manage your group’s membership while adding another level of security with SAML."
-msgstr ""
-
 msgid "Manifest"
 msgstr ""
 
@@ -6615,9 +6651,6 @@ msgid "Members can be added by project <i>Maintainers</i> or <i>Owners</i>"
 msgstr ""
 
 msgid "Members of <strong>%{project_name}</strong>"
-msgstr ""
-
-msgid "Members will be forwarded here when signing in to your group. Get this from your identity provider, where it can also be called \"SSO Service Location\", \"SAML Token Issuance Endpoint\", or \"SAML 2.0/W-Federation URL\"."
 msgstr ""
 
 msgid "Merge Request"
@@ -9167,16 +9200,7 @@ msgstr ""
 msgid "SAML SSO for %{group_name}"
 msgstr ""
 
-msgid "SAML Single Sign On"
-msgstr ""
-
-msgid "SAML Single Sign On Settings"
-msgstr ""
-
 msgid "SAML for %{group_name}"
-msgstr ""
-
-msgid "SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called \"Thumbprint\"."
 msgstr ""
 
 msgid "SSH Keys"
@@ -12466,6 +12490,9 @@ msgstr ""
 msgid "Your name"
 msgstr ""
 
+msgid "Your new SCIM token"
+msgstr ""
+
 msgid "Your project limit is %{limit} projects! Please contact your administrator to increase it"
 msgstr ""
 
@@ -13335,6 +13362,9 @@ msgid "reply"
 msgid_plural "replies"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "reset it."
+msgstr ""
 
 msgid "score"
 msgstr ""
