@@ -68,16 +68,5 @@ module EE
 
       namespace_shared_runner_usage_progress_bar(percent)
     end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def namespaces_options_with_developer_maintainer_access(options = {})
-      selected = options.delete(:selected) || :current_user
-      options[:groups] = current_user.manageable_groups(include_groups_with_developer_maintainer_access: true)
-                                     .eager_load(:route)
-                                     .order('routes.path')
-
-      namespaces_options(selected, options)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end

@@ -38,26 +38,4 @@ describe Admin::GroupsController do
       end
     end
   end
-
-  context 'PUT update' do
-    context 'no license' do
-      it 'does not update the project_creation_level successfully' do
-        stub_licensed_features(project_creation_level: false)
-
-        expect do
-          post :update, params: { id: group.to_param, group: { project_creation_level: ::EE::Gitlab::Access::NO_ONE_PROJECT_ACCESS } }
-        end.not_to change { group.reload.project_creation_level }
-      end
-    end
-
-    context 'licensed' do
-      it 'updates the project_creation_level successfully' do
-        stub_licensed_features(project_creation_level: true)
-
-        expect do
-          post :update, params: { id: group.to_param, group: { project_creation_level: ::EE::Gitlab::Access::NO_ONE_PROJECT_ACCESS } }
-        end.to change { group.reload.project_creation_level }.to(::EE::Gitlab::Access::NO_ONE_PROJECT_ACCESS)
-      end
-    end
-  end
 end
