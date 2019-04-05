@@ -32,6 +32,14 @@ describe Projects::UpdateRepositoryStorageService do
         end
       end
 
+      context 'when the project is already on the target storage' do
+        it 'bails out and does nothing' do
+          expect do
+            subject.execute(project.repository_storage)
+          end.to raise_error(described_class::RepositoryAlreadyMoved)
+        end
+      end
+
       context 'when the move fails' do
         it 'unmarks the repository as read-only without updating the repository storage' do
           expect_any_instance_of(Gitlab::Git::Repository).to receive(:fetch_repository_as_mirror)
@@ -87,6 +95,14 @@ describe Projects::UpdateRepositoryStorageService do
           expect(project.repository_storage).to eq('test_second_storage')
           expect(gitlab_shell.exists?('default', old_path)).to be(false)
           expect(gitlab_shell.exists?('default', old_wiki_path)).to be(false)
+        end
+      end
+
+      context 'when the project is already on the target storage' do
+        it 'bails out and does nothing' do
+          expect do
+            subject.execute(project.repository_storage)
+          end.to raise_error(described_class::RepositoryAlreadyMoved)
         end
       end
 

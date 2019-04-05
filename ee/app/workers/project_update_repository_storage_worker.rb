@@ -7,5 +7,7 @@ class ProjectUpdateRepositoryStorageWorker
     project = Project.find(project_id)
 
     ::Projects::UpdateRepositoryStorageService.new(project).execute(new_repository_storage_key)
+  rescue ::Projects::UpdateRepositoryStorageService::RepositoryAlreadyMoved
+    Rails.logger.info "#{self.class}: repository already moved: #{project}"
   end
 end
