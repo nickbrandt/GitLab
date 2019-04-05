@@ -3305,6 +3305,9 @@ msgstr ""
 msgid "DashboardProjects|Personal"
 msgstr ""
 
+msgid "Dashboards"
+msgstr ""
+
 msgid "Data is still calculating..."
 msgstr ""
 
