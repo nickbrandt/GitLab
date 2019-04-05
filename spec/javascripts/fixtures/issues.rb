@@ -106,7 +106,7 @@ describe API::Issues, '(JavaScript fixtures)', type: :request do
             description: issue_description
 
     project.add_reporter(user)
-    related_mr = create_referencing_mr(user, project, issue)
+    create_referencing_mr(user, project, issue)
 
     create(:merge_request,
            :simple,

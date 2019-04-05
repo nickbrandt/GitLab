@@ -30,14 +30,14 @@ export default {
   computed: {
     ...mapState(['isFetchingMergeRequests', 'mergeRequests', 'totalCount']),
     closingMergeRequestsText() {
-      if (this.closingMergeRequestsCount === 0) {
+      if (!this.hasClosingMergeRequest) {
         return '';
       }
 
       const mrText = n__(
         'When this merge request is accepted',
         'When these merge requests are accepted',
-        this.closingMergeRequestsCount,
+        this.totalCount,
       );
 
       return sprintf(s__('%{mrText}, this issue will be closed automatically.'), { mrText });
@@ -48,7 +48,7 @@ export default {
     this.fetchMergeRequests();
   },
   created() {
-    this.closingMergeRequestsCount = parseIssuableData().closingMergeRequestsCount;
+    this.hasClosingMergeRequest = parseIssuableData().hasClosingMergeRequest;
   },
   methods: {
     ...mapActions(['setInitialState', 'fetchMergeRequests']),
@@ -64,14 +64,14 @@ export default {
 </script>
 
 <template>
-  <div v-if="totalCount">
+  <div v-if="isFetchingMergeRequests || (!isFetchingMergeRequests && totalCount)">
     <div id="merge-requests" class="card-slim mt-3">
       <div class="card-header">
         <div class="card-title mt-0 mb-0 h5 merge-requests-title">
           <span class="mr-1">
             {{ __('Related merge requests') }}
           </span>
-          <div class="d-inline-flex lh-100 align-middle">
+          <div v-if="totalCount" class="d-inline-flex lh-100 align-middle">
             <div class="mr-count-badge">
               <div class="mr-count-badge-count">
                 <svg class="s16 mr-1 text-secondary">
@@ -100,6 +100,7 @@ export default {
               :assignees="getAssignees(mr)"
               :created-at="mr.created_at"
               :closed-at="mr.closed_at"
+              :merged-at="mr.merged_at"
               :path="mr.web_url"
               :state="mr.state"
               :is-merge-request="true"
@@ -110,7 +111,10 @@ export default {
         </ul>
       </div>
     </div>
-    <div class="issue-closed-by-widget second-block">
+    <div
+      v-if="hasClosingMergeRequest && !isFetchingMergeRequests"
+      class="issue-closed-by-widget second-block"
+    >
       {{ closingMergeRequestsText }}
     </div>
   </div>

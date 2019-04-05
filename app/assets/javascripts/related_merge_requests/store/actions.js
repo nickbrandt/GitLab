@@ -1,8 +1,8 @@
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
+import { normalizeHeaders } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
-import { normalizeHeaders } from '../../lib/utils/common_utils';
 
 const REQUEST_PAGE_COUNT = 100;
 
@@ -23,7 +23,7 @@ export const fetchMergeRequests = ({ state, dispatch }) => {
     .get(`${state.apiEndpoint}?per_page=${REQUEST_PAGE_COUNT}`)
     .then(res => {
       const { headers, data } = res;
-      const total = parseInt(normalizeHeaders(headers)['X-TOTAL'], 10) || 0;
+      const total = Number(normalizeHeaders(headers)['X-TOTAL']) || 0;
 
       dispatch('receiveDataSuccess', { data, total });
     })

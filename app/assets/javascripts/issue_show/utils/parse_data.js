@@ -6,6 +6,8 @@ export const parseIssuableData = () => {
 
     return JSON.parse(sanitize(initialDataEl.textContent).replace(/&quot;/g, '"'));
   } catch (e) {
+    console.error(e); // eslint-disable-line no-console
+
     return {};
   }
 };

@@ -59,6 +59,11 @@ const mixins = {
       required: false,
       default: '',
     },
+    mergedAt: {
+      type: String,
+      required: false,
+      default: '',
+    },
     milestone: {
       type: Object,
       required: false,
@@ -156,11 +161,38 @@ const mixins = {
     createdAtTimestamp() {
       return this.createdAt ? formatDate(new Date(this.createdAt)) : '';
     },
+    mergedAtTimestamp() {
+      return this.mergedAt ? formatDate(new Date(this.mergedAt)) : '';
+    },
+    mergedAtInWords() {
+      return this.mergedAt ? this.timeFormated(this.mergedAt) : '';
+    },
     closedAtInWords() {
       return this.closedAt ? this.timeFormated(this.closedAt) : '';
     },
     closedAtTimestamp() {
       return this.closedAt ? formatDate(new Date(this.closedAt)) : '';
+    },
+    stateText() {
+      if (this.isMerged) {
+        return __('Merged');
+      }
+
+      return this.isOpen ? __('Opened') : __('Closed');
+    },
+    stateTimeInWords() {
+      if (this.isMerged) {
+        return this.mergedAtInWords;
+      }
+
+      return this.isOpen ? this.createdAtInWords : this.closedAtInWords;
+    },
+    stateTimestamp() {
+      if (this.isMerged) {
+        return this.mergedAtTimestamp;
+      }
+
+      return this.isOpen ? this.createdAtTimestamp : this.closedAtTimestamp;
     },
     pipelineStatusTooltip() {
       return this.hasPipeline
