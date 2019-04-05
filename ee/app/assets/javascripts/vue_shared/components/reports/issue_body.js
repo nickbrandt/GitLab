@@ -8,6 +8,7 @@ import LicenseIssueBody from 'ee/vue_shared/license_management/components/licens
 import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
 import SastContainerIssueBody from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
 import DastIssueBody from 'ee/vue_shared/security_reports/components/dast_issue_body.vue';
+import MetricsReportsIssueBody from 'ee/vue_shared/metrics_reports/components/metrics_reports_issue_body.vue';
 
 export const components = {
   ...componentsCE,
@@ -17,6 +18,7 @@ export const components = {
   SastContainerIssueBody,
   SastIssueBody,
   DastIssueBody,
+  MetricsReportsIssueBody,
 };
 
 export const componentNames = {
@@ -27,4 +29,5 @@ export const componentNames = {
   SastContainerIssueBody: SastContainerIssueBody.name,
   SastIssueBody: SastIssueBody.name,
   DastIssueBody: DastIssueBody.name,
+  MetricsReportsIssueBody: MetricsReportsIssueBody.name,
 };
