@@ -4,11 +4,6 @@
     = form.label :url, s_('Geo|URL'), class: 'font-weight-bold'
     = form.text_field :url, class: 'form-control'
 
-  .form-group.col-sm-6.js-alternate-url{ class: ('hidden' unless geo_node.secondary?) }
-    = form.label :alternate_url, s_('Geo|Alternate URL'), class: 'font-weight-bold'
-    = form.text_field :alternate_url, class: 'form-control'
-    .form-text.text-muted= s_('Geo|To support OAuth logins to this node at a different domain than URL')
-
   .form-group.col-sm-6.js-internal-url{ class: ('hidden' unless geo_node.primary?) }
     = form.label :internal_url, s_('Geo|Internal URL'), class: 'font-weight-bold'
     = form.text_field :internal_url, class: 'form-control'

@@ -19,7 +19,6 @@ class GeoNode < ApplicationRecord
                  primary: false
 
   validates :url, presence: true, uniqueness: { case_sensitive: false }, url: true
-  validates :alternate_url, url: true, allow_blank: true, allow_nil: true
   validates :internal_url, url: true, allow_blank: true, allow_nil: true
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
@@ -132,16 +131,6 @@ class GeoNode < ApplicationRecord
     @uri = nil
   end
 
-  def alternate_url
-    read_with_ending_slash(:alternate_url)
-  end
-
-  def alternate_url=(value)
-    write_with_ending_slash(:alternate_url, value)
-
-    @alternate_uri = nil
-  end
-
   def internal_url
     read_with_ending_slash(:internal_url).presence || read_with_ending_slash(:url)
   end
@@ -154,10 +143,6 @@ class GeoNode < ApplicationRecord
 
   def uri
     @uri ||= URI.parse(url) if url.present?
-  end
-
-  def alternate_uri
-    @alternate_uri ||= URI.parse(alternate_url) if alternate_url.present?
   end
 
   def internal_uri
@@ -181,12 +166,6 @@ class GeoNode < ApplicationRecord
 
   def oauth_callback_url
     Gitlab::Routing.url_helpers.oauth_geo_callback_url(url_helper_args)
-  end
-
-  def alternate_oauth_callback_url
-    return unless alternate_url.present?
-
-    Gitlab::Routing.url_helpers.oauth_geo_callback_url(alternate_url_helper_args)
   end
 
   def oauth_logout_url(state)
@@ -279,10 +258,6 @@ class GeoNode < ApplicationRecord
     url_helper_options(uri)
   end
 
-  def alternate_url_helper_args
-    url_helper_options(alternate_uri)
-  end
-
   def url_helper_options(given_uri)
     { protocol: given_uri.scheme, host: given_uri.host, port: given_uri.port, script_name: given_uri.path }
   end
@@ -310,7 +285,7 @@ class GeoNode < ApplicationRecord
   def update_oauth_application!
     self.build_oauth_application if oauth_application.nil?
     self.oauth_application.name = "Geo node: #{self.url}"
-    self.oauth_application.redirect_uri = [oauth_callback_url, alternate_oauth_callback_url].compact.join("\n")
+    self.oauth_application.redirect_uri = oauth_callback_url
   end
 
   def expire_cache!

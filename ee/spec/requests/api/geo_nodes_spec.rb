@@ -212,7 +212,6 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       params = {
         enabled: false,
         url: 'https://updated.example.com/',
-        alternate_url: 'https://alternate.example.com/',
         internal_url: 'https://internal-com.com/',
         files_max_capacity: 33,
         repos_max_capacity: 44,
