@@ -318,6 +318,36 @@ module Elasticsearch
           res
         end
 
+        def delete_index_for_commits_and_blobs
+          client_for_indexing.delete_by_query(
+            index: self.class.index_name,
+            routing: es_parent,
+            body: {
+              query: {
+                bool: {
+                  filter: [
+                    {
+                      terms: {
+                        type: %w{commit blob}
+                      }
+                    },
+                    {
+                      has_parent: {
+                        parent_type: 'project',
+                        query: {
+                          term: {
+                            id: project_id
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          )
+        end
+
         def search(query, type: :all, page: 1, per: 20, options: {})
           options[:repository_id] = repository_id if options[:repository_id].nil?
           self.class.search(query, type: type, page: page, per: per, options: options)

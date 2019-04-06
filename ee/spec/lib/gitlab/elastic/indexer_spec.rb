@@ -79,20 +79,6 @@ describe Gitlab::Elastic::Indexer do
           expect_index_status(to_sha)
         end
       end
-
-      context 'when last_commit no longer exists' do
-        before do
-          project.create_index_status!(last_commit: '51749675fc22nononononononono343bd54a3c95')
-        end
-
-        it 'use nil as from_sha' do
-          expect_popen.and_return(popen_success)
-
-          indexer.run(to_sha)
-
-          expect_index_status(to_sha)
-        end
-      end
     end
 
     it 'updates the index status when the indexing is a success' do
@@ -174,8 +160,12 @@ describe Gitlab::Elastic::Indexer do
     let!(:initial_commit) { project.repository.commit('master').sha }
     let(:ee_application_setting) { nil }
 
+    before do
+      stub_ee_application_setting(elasticsearch_indexing: true)
+    end
+
     def change_repository_and_index(project, &blk)
-      yield blk
+      yield blk if blk
 
       current_commit = project.repository.commit('master').sha
 
@@ -194,25 +184,29 @@ describe Gitlab::Elastic::Indexer do
       end
     end
 
-    context 'when IndexStatus#last_commit is no longer in repository', :pending do
+    context 'when IndexStatus#last_commit is no longer in repository' do
       before do
+        ElasticIndexerWorker.new.perform("index", "Project", project.id, project.es_id)
+      end
+
+      it 'reindexes from scratch if IndexStatus#last_commit is no longer in repository' do
+        sha_for_reset = nil
+
         change_repository_and_index(project) do
-          project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
+          sha_for_reset = project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
           project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
         end
 
         expect(indexed_file_paths_for('12')).to include('12')
         expect(indexed_file_paths_for('23')).to include('23')
 
-        project.index_status.update(last_commit: 'ABCDABCDABCD')
-      end
+        project.index_status.update(last_commit: '____________')
 
-      it 'reindexes from scratch if IndexStatus#last_commit is no longer in repository' do
         change_repository_and_index(project) do
-          project.repository.write_ref('master', initial_commit)
+          project.repository.write_ref('master', sha_for_reset)
         end
 
-        expect(indexed_file_paths_for('12')).not_to include('12')
+        expect(indexed_file_paths_for('12')).to include('12')
         expect(indexed_file_paths_for('23')).not_to include('23')
       end
     end
@@ -221,11 +215,9 @@ describe Gitlab::Elastic::Indexer do
       before do
         change_repository_and_index(project) do
           project.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
-          project.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
         end
 
         expect(indexed_file_paths_for('12')).to include('12')
-        expect(indexed_file_paths_for('23')).to include('23')
       end
 
       it 'reverses already indexed commits' do
@@ -234,7 +226,6 @@ describe Gitlab::Elastic::Indexer do
         end
 
         expect(indexed_file_paths_for('12')).not_to include('12')
-        expect(indexed_file_paths_for('23')).not_to include('23')
       end
     end
   end

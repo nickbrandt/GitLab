@@ -16,7 +16,7 @@ describe ElasticBatchProjectIndexerWorker do
       end
 
       it 'only indexes the enabled project' do
-        projects.each { |project| expect_index(project, false).and_call_original }
+        projects.each { |project| expect_index(project).and_call_original }
 
         expect(Gitlab::Elastic::Indexer).to receive(:new).with(projects.first).and_return(double(run: true))
         expect(Gitlab::Elastic::Indexer).not_to receive(:new).with(projects.last)
@@ -26,14 +26,14 @@ describe ElasticBatchProjectIndexerWorker do
     end
 
     it 'runs the indexer for projects in the batch range' do
-      projects.each { |project| expect_index(project, false) }
+      projects.each { |project| expect_index(project) }
 
       worker.perform(projects.first.id, projects.last.id)
     end
 
     it 'skips projects not in the batch range' do
-      expect_index(projects.first, false).never
-      expect_index(projects.last, false)
+      expect_index(projects.first).never
+      expect_index(projects.last)
 
       worker.perform(projects.last.id, projects.last.id)
     end
@@ -41,7 +41,7 @@ describe ElasticBatchProjectIndexerWorker do
     it 'clears the "locked" state from redis when the project finishes indexing' do
       Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, projects.first.id) }
 
-      expect_index(projects.first, false).and_call_original
+      expect_index(projects.first).and_call_original
       expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
         expect(indexer).to receive(:run)
       end
@@ -50,40 +50,27 @@ describe ElasticBatchProjectIndexerWorker do
         .to change { project_locked?(projects.first) }.from(true).to(false)
     end
 
-    context 'update_index = false' do
-      it 'indexes all projects it receives even if already indexed' do
-        projects.first.index_status.update!(last_commit: 'foo')
+    it 'reindexes projects that were already indexed' do
+      expect_index(projects.first)
+      expect_index(projects.last)
 
-        expect_index(projects.first, false).and_call_original
-        expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
-          expect(indexer).to receive(:run)
-        end
-
-        worker.perform(projects.first.id, projects.first.id)
-      end
+      worker.perform(projects.first.id, projects.last.id)
     end
 
-    context 'with update_index' do
-      it 'reindexes projects that were already indexed' do
-        expect_index(projects.first, true)
-        expect_index(projects.last, true)
+    it 'indexes all projects it receives even if already indexed' do
+      projects.first.index_status.update!(last_commit: 'foo')
 
-        worker.perform(projects.first.id, projects.last.id, true)
+      expect_index(projects.first).and_call_original
+      expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
+        expect(indexer).to receive(:run)
       end
 
-      it 'starts indexing at the last indexed commit' do
-        projects.first.index_status.update!(last_commit: 'foo')
-
-        expect_index(projects.first, true).and_call_original
-        expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
-
-        worker.perform(projects.first.id, projects.first.id, true)
-      end
+      worker.perform(projects.first.id, projects.first.id)
     end
   end
 
-  def expect_index(project, update_index)
-    expect(worker).to receive(:run_indexer).with(project, update_index)
+  def expect_index(project)
+    expect(worker).to receive(:run_indexer).with(project)
   end
 
   def project_locked?(project)
