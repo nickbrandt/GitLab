@@ -20,8 +20,7 @@ module Geo
     def execute
       return Geo::Fdw::Project.none unless valid_shard?
 
-      current_node
-        .projects
+      projects
         .recently_updated
         .within_shards(shard_name)
         .limit(batch_size)
@@ -31,6 +30,12 @@ module Geo
     private
 
     attr_reader :current_node, :shard_name, :batch_size
+
+    def projects
+      return Geo::Fdw::Project.all if current_node.selective_sync_by_shards?
+
+      current_node.projects
+    end
 
     def valid_shard?
       return true unless current_node.selective_sync_by_shards?
