@@ -379,85 +379,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
-  shared_examples 'finds all the things' do |method_prefix|
-    describe '#find_unsynced_projects' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_unsynced_projects".to_sym).and_call_original
-
-        subject.find_unsynced_projects(batch_size: 10)
-      end
-
-      it 'returns projects without an entry on the tracking database' do
-        project_not_synced = create(:project)
-        create(:geo_project_registry, :synced, :repository_dirty, project: project_1_in_synced_group)
-
-        projects = subject.find_unsynced_projects(batch_size: 10)
-
-        expect(projects).to match_ids(project_not_synced)
-      end
-
-      context 'with selective sync' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'delegates to #legacy_find_unsynced_projects' do
-          expect(subject).to receive(:legacy_find_unsynced_projects).and_call_original
-
-          subject.find_unsynced_projects(batch_size: 10)
-        end
-
-        it 'returns untracked projects in the synced group' do
-          create(:geo_project_registry, :sync_failed, project: project_1_in_synced_group)
-
-          projects = subject.find_unsynced_projects(batch_size: 10)
-
-          expect(projects).to match_ids(project_2_in_synced_group)
-        end
-      end
-    end
-
-    describe '#find_projects_updated_recently' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_projects_updated_recently".to_sym).and_call_original
-
-        subject.find_projects_updated_recently(batch_size: 10)
-      end
-
-      it 'returns projects with a dirty entry on the tracking database' do
-        create(:geo_project_registry, :synced, :repository_dirty, project: project_1_in_synced_group)
-        create(:geo_project_registry, :synced, :wiki_dirty, project: project_2_in_synced_group)
-
-        projects = subject.find_projects_updated_recently(batch_size: 10)
-
-        expect(projects).to match_ids([project_1_in_synced_group, project_2_in_synced_group])
-      end
-
-      context 'with selective sync' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'delegates to #legacy_find_projects_updated_recently' do
-          expect(subject).to receive(:legacy_find_projects_updated_recently).and_call_original
-
-          subject.find_projects_updated_recently(batch_size: 10)
-        end
-
-        it 'returns dirty projects in the synced group' do
-          create(:project, group: synced_group)
-          create(:geo_project_registry, :synced, :repository_dirty, project: project_1_in_synced_group)
-          create(:geo_project_registry, :synced, :wiki_dirty, project: project_2_in_synced_group)
-          create(:geo_project_registry, :synced, project: project_3_in_synced_group)
-
-          projects = subject.find_projects_updated_recently(batch_size: 10)
-
-          expect(projects).to match_ids(project_1_in_synced_group, project_2_in_synced_group)
-        end
-      end
-    end
-  end
-
   shared_examples 'delegates to the proper finder' do |legacy_finder_klass, finder_klass, method, args|
     where(:selective_sync, :fdw_enabled, :fdw_for_selective_sync, :finder) do
       false | false | false | legacy_finder_klass
@@ -500,7 +421,6 @@ describe Geo::ProjectRegistryFinder, :geo do
       end
 
       include_examples 'counts all the things', 'fdw'
-      include_examples 'finds all the things', 'fdw'
     end
 
     context 'with use_fdw_queries_for_selective_sync enabled' do
@@ -509,7 +429,6 @@ describe Geo::ProjectRegistryFinder, :geo do
       end
 
       include_examples 'counts all the things', 'fdw'
-      include_examples 'finds all the things', 'fdw'
     end
   end
 
@@ -519,7 +438,20 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
 
     include_examples 'counts all the things', 'legacy'
-    include_examples 'finds all the things', 'legacy'
+  end
+
+  describe '#find_unsynced_projects', :delete do
+    include_examples 'delegates to the proper finder',
+      Geo::LegacyProjectUnsyncedFinder,
+      Geo::ProjectUnsyncedFinder,
+      :find_unsynced_projects, [shard_name: 'default', batch_size: 100]
+  end
+
+  describe '#find_projects_updated_recently', :delete do
+    include_examples 'delegates to the proper finder',
+      Geo::LegacyProjectUpdatedRecentlyFinder,
+      Geo::ProjectUpdatedRecentlyFinder,
+      :find_projects_updated_recently, [shard_name: 'default', batch_size: 100]
   end
 
   describe '#find_failed_project_registries', :delete do

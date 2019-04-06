@@ -1,0 +1,5 @@
+---
+title: 'Geo: Add selective sync support for the FDW queries to find unsynced projects'
+merge_request: 10522
+author:
+type: changed

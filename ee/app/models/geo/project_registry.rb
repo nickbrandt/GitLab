@@ -35,6 +35,10 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(project_id: ids)
   end
 
+  def self.pluck_project_key
+    where(nil).pluck(:project_id)
+  end
+
   def self.failed
     repository_sync_failed = arel_table[:repository_retry_count].gt(0)
     wiki_sync_failed = arel_table[:wiki_retry_count].gt(0)
