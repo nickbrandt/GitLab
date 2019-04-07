@@ -1,6 +1,6 @@
-# Getting Started with Subscriptions
+# Subscriptions
 
-Thank you for purchasing a subscription for GitLab. This page will help get you started with your subscription, whether you have subscribed to GitLab.com or self-managed GitLab. For more information on the types of subscriptions, please see [Subscribe to GitLab](../README.md#subscribe-to-gitlab) on the GitLab Documentation landing page.
+Thank you for purchasing a subscription for GitLab. This page will help get you started with your new subscription or manage an existing one, whether you have subscribed to GitLab.com or self-managed GitLab. For more information on the types of subscriptions, please see [Subscribe to GitLab](../README.md#subscribe-to-gitlab) on the GitLab Documentation landing page.
 
 ## Set up GitLab
 
@@ -75,6 +75,5 @@ These issues are the best avenue for getting updates on specific product plans a
 
 ### Contacting Support
 
-GitLab offers 24x5 support. We will make a best effort to resolve any issues to your satisfaction as quickly as possible. [Learn more about GitLab Support](https://about.gitlab.com/support/).
-
-Contact us through the [Support Portal](https://support.gitlab.com) or in the case the portal is unavailable, email us directly at [support@gitlab.com](mailto:support@gitlab.com).
+Learn more about the tiers of [GitLab Support](https://about.gitlab.com/support/) or contact us now through the
+[Support Portal](https://support.gitlab.com), which is avaialble to all GitLab subscribers.
