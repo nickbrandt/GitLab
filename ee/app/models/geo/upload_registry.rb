@@ -14,4 +14,18 @@ class Geo::UploadRegistry < Geo::FileRegistry
 
     sti_column.in(sti_names)
   end
+
+  def self.with_search(query)
+    return all if query.nil?
+
+    where(file_id: Geo::Fdw::Upload.search(query))
+  end
+
+  def file
+    upload&.path || s_('Removed %{type} with id %{id}') % { type: file_type, id: file_id }
+  end
+
+  def project
+    return upload.model if upload&.model.is_a?(Project)
+  end
 end

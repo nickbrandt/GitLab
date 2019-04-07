@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-class Admin::Geo::NodesController < Admin::ApplicationController
-  before_action :check_license, except: :index
+class Admin::Geo::NodesController < Admin::Geo::ApplicationController
+  before_action :check_license!, except: :index
   before_action :load_node, only: [:edit, :update]
-
-  helper EE::GeoHelper
 
   # rubocop: disable CodeReuse/ActiveRecord
   def index
@@ -12,7 +10,7 @@ class Admin::Geo::NodesController < Admin::ApplicationController
     @node = GeoNode.new
 
     unless Gitlab::Geo.license_allows?
-      flash.now[:alert] = _('You need a different license to enable Geo replication.')
+      flash.now[:alert] = _('You need a different license to use Geo replication.')
     end
 
     unless Gitlab::Database.postgresql_minimum_supported_version?
@@ -60,13 +58,6 @@ class Admin::Geo::NodesController < Admin::ApplicationController
       :minimum_reverification_interval,
       selective_sync_shards: []
     )
-  end
-
-  def check_license
-    unless Gitlab::Geo.license_allows?
-      flash[:alert] = 'You need a different license to enable Geo replication'
-      redirect_to admin_license_path
-    end
   end
 
   def load_node

@@ -87,7 +87,7 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
 
       it 'counts LFS objects that has been synced' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
         create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
         create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
 
@@ -120,7 +120,7 @@ describe Geo::LfsObjectRegistryFinder, :geo do
         end
 
         it 'counts LFS objects that has been synced' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
 
@@ -156,17 +156,17 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
 
       it 'counts LFS objects that sync has failed' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
         create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
 
         expect(subject.count_failed).to eq 2
       end
 
       it 'ignores remote LFS objects' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, success: false)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, success: false)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_remote_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
 
         expect(subject.count_failed).to eq 2
       end
@@ -189,17 +189,17 @@ describe Geo::LfsObjectRegistryFinder, :geo do
         end
 
         it 'counts LFS objects that sync has failed' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
 
           expect(subject.count_failed).to eq 1
         end
 
         it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, success: false)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
           lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
@@ -238,7 +238,7 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
 
       it 'excludes LFS objects that are not synced' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: false, missing_on_primary: true)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id, missing_on_primary: true)
 
         expect(subject.count_synced_missing_on_primary).to eq 0
       end
@@ -292,8 +292,8 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
 
       it 'returns LFS objects without an entry on the tracking database' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: true)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
 
         lfs_objects = subject.find_unsynced(batch_size: 10)
 
@@ -301,8 +301,8 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
 
       it 'excludes LFS objects without an entry on the tracking database' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, success: true)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, success: false)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
 
         lfs_objects = subject.find_unsynced(batch_size: 10, except_file_ids: [lfs_object_2.id])
 

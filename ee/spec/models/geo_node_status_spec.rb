@@ -131,7 +131,7 @@ describe GeoNodeStatus, :geo, :delete do
 
       create(:geo_file_registry, :avatar, file_id: uploads[0])
       create(:geo_file_registry, :avatar, file_id: uploads[1])
-      create(:geo_file_registry, :avatar, file_id: uploads[2], success: false)
+      create(:geo_file_registry, :avatar, :failed, file_id: uploads[2])
 
       expect(subject.attachments_synced_count).to eq(2)
     end
@@ -176,7 +176,7 @@ describe GeoNodeStatus, :geo, :delete do
 
       create(:geo_file_registry, :avatar, file_id: uploads[0], missing_on_primary: true)
       create(:geo_file_registry, :avatar, file_id: uploads[1])
-      create(:geo_file_registry, :avatar, file_id: uploads[2], success: false)
+      create(:geo_file_registry, :avatar, :failed, file_id: uploads[2])
 
       expect(subject.attachments_synced_missing_on_primary_count).to eq(1)
     end
@@ -185,13 +185,13 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#attachments_failed_count', :delete do
     it 'counts failed avatars, attachment, personal snippets and files' do
       # These two should be ignored
-      create(:geo_file_registry, :lfs, :with_file, success: false)
+      create(:geo_file_registry, :lfs, :with_file, :failed)
       create(:geo_file_registry, :with_file)
 
-      create(:geo_file_registry, :with_file, file_type: :personal_file, success: false)
-      create(:geo_file_registry, :with_file, file_type: :attachment, success: false)
-      create(:geo_file_registry, :avatar, :with_file, success: false)
-      create(:geo_file_registry, :with_file, success: false)
+      create(:geo_file_registry, :with_file, :failed, file_type: :personal_file)
+      create(:geo_file_registry, :with_file, :failed, file_type: :attachment)
+      create(:geo_file_registry, :avatar, :with_file, :failed)
+      create(:geo_file_registry, :with_file, :failed)
 
       expect(subject.attachments_failed_count).to eq(4)
     end
@@ -248,12 +248,12 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#lfs_objects_synced_count', :delete do
     it 'counts synced LFS objects' do
       # These four should be ignored
-      create(:geo_file_registry, success: false)
+      create(:geo_file_registry, :failed)
       create(:geo_file_registry, :avatar)
       create(:geo_file_registry, file_type: :attachment)
-      create(:geo_file_registry, :lfs, :with_file, success: false)
+      create(:geo_file_registry, :lfs, :with_file, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file, success: true)
+      create(:geo_file_registry, :lfs, :with_file)
 
       expect(subject.lfs_objects_synced_count).to eq(1)
     end
@@ -264,12 +264,12 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#lfs_objects_synced_missing_on_primary_count', :delete do
     it 'counts LFS objects marked as synced due to file missing on the primary' do
       # These four should be ignored
-      create(:geo_file_registry, success: false)
+      create(:geo_file_registry, :failed)
       create(:geo_file_registry, :avatar, missing_on_primary: true)
       create(:geo_file_registry, file_type: :attachment, missing_on_primary: true)
-      create(:geo_file_registry, :lfs, :with_file, success: false)
+      create(:geo_file_registry, :lfs, :with_file, :failed)
 
-      create(:geo_file_registry, :lfs, :with_file, success: true, missing_on_primary: true)
+      create(:geo_file_registry, :lfs, :with_file, missing_on_primary: true)
 
       expect(subject.lfs_objects_synced_missing_on_primary_count).to eq(1)
     end
@@ -280,12 +280,12 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#lfs_objects_failed_count', :delete do
     it 'counts failed LFS objects' do
       # These four should be ignored
-      create(:geo_file_registry, success: false)
-      create(:geo_file_registry, :avatar, success: false)
-      create(:geo_file_registry, file_type: :attachment, success: false)
+      create(:geo_file_registry, :failed)
+      create(:geo_file_registry, :avatar, :failed)
+      create(:geo_file_registry, :failed, file_type: :attachment)
       create(:geo_file_registry, :lfs, :with_file)
 
-      create(:geo_file_registry, :lfs, :with_file, success: false)
+      create(:geo_file_registry, :lfs, :with_file, :failed)
 
       expect(subject.lfs_objects_failed_count).to eq(1)
     end
@@ -308,14 +308,14 @@ describe GeoNodeStatus, :geo, :delete do
     end
 
     it 'returns the right percentage with no group restrictions' do
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id, success: true)
+      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(25)
     end
 
     it 'returns the right percentage with group restrictions' do
       secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id, success: true)
+      create(:geo_file_registry, :lfs, file_id: lfs_object_project.lfs_object_id)
 
       expect(subject.lfs_objects_synced_in_percentage).to be_within(0.0001).of(50)
     end
@@ -326,7 +326,7 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#job_artifacts_synced_count', :delete do
     it 'counts synced job artifacts' do
       # These should be ignored
-      create(:geo_file_registry, success: true)
+      create(:geo_file_registry)
       create(:geo_job_artifact_registry, :with_artifact, success: false)
 
       create(:geo_job_artifact_registry, :with_artifact, success: true)
@@ -340,7 +340,7 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#job_artifacts_synced_missing_on_primary_count', :delete do
     it 'counts job artifacts marked as synced due to file missing on the primary' do
       # These should be ignored
-      create(:geo_file_registry, success: true, missing_on_primary: true)
+      create(:geo_file_registry, missing_on_primary: true)
       create(:geo_job_artifact_registry, :with_artifact, success: true)
 
       create(:geo_job_artifact_registry, :with_artifact, success: true, missing_on_primary: true)
@@ -354,9 +354,9 @@ describe GeoNodeStatus, :geo, :delete do
   describe '#job_artifacts_failed_count', :delete do
     it 'counts failed job artifacts' do
       # These should be ignored
-      create(:geo_file_registry, success: false)
-      create(:geo_file_registry, :avatar, success: false)
-      create(:geo_file_registry, file_type: :attachment, success: false)
+      create(:geo_file_registry, :failed)
+      create(:geo_file_registry, :avatar, :failed)
+      create(:geo_file_registry, :attachment, :failed)
       create(:geo_job_artifact_registry, :with_artifact, success: true)
 
       create(:geo_job_artifact_registry, :with_artifact, success: false)

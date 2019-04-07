@@ -8,7 +8,7 @@ describe Admin::Geo::NodesController, :postgresql do
     end
 
     it 'displays a flash message' do
-      expect(controller).to set_flash[:alert].to('You need a different license to enable Geo replication')
+      expect(controller).to set_flash[:alert].to('You need a different license to use Geo replication.')
     end
   end
 
@@ -55,7 +55,7 @@ describe Admin::Geo::NodesController, :postgresql do
         allow(Gitlab::Geo).to receive(:license_allows?).and_return(false)
       end
 
-      it_behaves_like 'with flash message', :alert, 'You need a different license to enable Geo replication'
+      it_behaves_like 'with flash message', :alert, 'You need a different license to use Geo replication'
 
       it 'does not redirects to the license page' do
         go
