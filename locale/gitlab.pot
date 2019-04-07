@@ -195,6 +195,9 @@ msgstr ""
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
+msgid "%{mrText}, this issue will be closed automatically."
+msgstr ""
+
 msgid "%{name}'s avatar"
 msgstr ""
 
@@ -7767,6 +7770,9 @@ msgstr ""
 msgid "Pipeline triggers"
 msgstr ""
 
+msgid "Pipeline: %{status}"
+msgstr ""
+
 msgid "PipelineCharts|Failed:"
 msgstr ""
 
@@ -9976,6 +9982,9 @@ msgstr ""
 msgid "Something went wrong while fetching group member contributions"
 msgstr ""
 
+msgid "Something went wrong while fetching related merge requests."
+msgstr ""
+
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
 msgstr ""
 
@@ -12135,6 +12144,11 @@ msgstr ""
 
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
 msgstr ""
+
+msgid "When this merge request is accepted"
+msgid_plural "When these merge requests are accepted"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "When:"
 msgstr ""
