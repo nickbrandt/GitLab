@@ -111,7 +111,7 @@ They are:
   - Script execution shell.
 - Not supported:
   - For definitions where the ["Expansion place"](#gitlab-ciyml-file) is GitLab.
-  - In the `only` and `except` [variables expressions](README.md#variables-expressions).
+  - In the `only` and `except` [variables expressions](README.md#environment-variables-expressions).
 
 ## Variables with an environment scope
 
