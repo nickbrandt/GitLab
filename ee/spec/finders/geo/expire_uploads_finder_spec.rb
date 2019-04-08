@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Geo::ExpireUploadsFinder, :geo do
+  include EE::GeoHelpers
+
   let(:project) { create(:project) }
 
   # Disable transactions via :delete method because a foreign table
@@ -11,23 +13,14 @@ describe Geo::ExpireUploadsFinder, :geo do
     end
 
     describe '#find_project_uploads' do
-      let(:project) { build_stubbed(:project) }
-
-      it 'delegates to #fdw_find_project_uploads' do
-        expect(subject).to receive(:fdw_find_project_uploads).with(project)
-
-        subject.find_project_uploads(project)
-      end
-    end
-
-    describe '#fdw_find_project_uploads' do
       context 'filtering per project uploads' do
         it 'returns only objects associated with the project' do
           other_upload = create(:upload, :issuable_upload)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: upload.id)
           create(:geo_file_registry, file_id: other_upload.id)
-          uploads = subject.fdw_find_project_uploads(project)
+
+          uploads = subject.find_project_uploads(project)
 
           expect(uploads.count).to eq(1)
           expect(uploads.first.id).to eq(upload.id)
@@ -39,7 +32,8 @@ describe Geo::ExpireUploadsFinder, :geo do
           create(:upload, :issuable_upload, model: project)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: upload.id, success: false)
-          uploads = subject.fdw_find_project_uploads(project)
+
+          uploads = subject.find_project_uploads(project)
 
           expect(uploads.count).to eq(1)
           expect(uploads.first.id).to eq(upload.id)
@@ -48,23 +42,14 @@ describe Geo::ExpireUploadsFinder, :geo do
     end
 
     describe '#find_file_registries_uploads' do
-      let(:project) { build_stubbed(:project) }
-
-      it 'delegates to #fdw_find_file_registries_uploads' do
-        expect(subject).to receive(:fdw_find_file_registries_uploads).with(project)
-
-        subject.find_file_registries_uploads(project)
-      end
-    end
-
-    describe '#fdw_find_file_registries_uploads' do
       context 'filtering per project uploads' do
         it 'returns only objects associated with the project' do
           other_upload = create(:upload, :issuable_upload)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: other_upload.id)
           file_registry = create(:geo_file_registry, file_id: upload.id)
-          files = subject.fdw_find_file_registries_uploads(project)
+
+          files = subject.find_file_registries_uploads(project)
 
           expect(files.count).to eq(1)
           expect(files.first.id).to eq(file_registry.id)
@@ -75,27 +60,18 @@ describe Geo::ExpireUploadsFinder, :geo do
 
   context 'Legacy' do
     before do
-      allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
+      stub_fdw_disabled
     end
 
     describe '#find_project_uploads' do
-      let(:project) { build_stubbed(:project) }
-
-      it 'delegates to #legacy_find_project_uploads' do
-        expect(subject).to receive(:legacy_find_project_uploads).with(project)
-
-        subject.find_project_uploads(project)
-      end
-    end
-
-    describe '#legacy_find_project_uploads' do
       context 'filtering per project uploads' do
         it 'returns only objects associated with the project' do
           other_upload = create(:upload, :issuable_upload)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: upload.id)
           create(:geo_file_registry, file_id: other_upload.id)
-          uploads = subject.legacy_find_project_uploads(project)
+
+          uploads = subject.find_project_uploads(project)
 
           expect(uploads.count).to eq(1)
           expect(uploads.first.id).to eq(upload.id)
@@ -107,7 +83,8 @@ describe Geo::ExpireUploadsFinder, :geo do
           create(:upload, :issuable_upload, model: project)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: upload.id, success: false)
-          uploads = subject.legacy_find_project_uploads(project)
+
+          uploads = subject.find_project_uploads(project)
 
           expect(uploads.count).to eq(1)
           expect(uploads.first.id).to eq(upload.id)
@@ -116,23 +93,14 @@ describe Geo::ExpireUploadsFinder, :geo do
     end
 
     describe '#find_file_registries_uploads' do
-      let(:project) { build_stubbed(:project) }
-
-      it 'delegates to #legacy_find_file_registries_uploads' do
-        expect(subject).to receive(:legacy_find_file_registries_uploads).with(project)
-
-        subject.find_file_registries_uploads(project)
-      end
-    end
-
-    describe '#legacy_find_file_registries_uploads' do
       context 'filtering per project uploads' do
         it 'returns only objects associated with the project' do
           other_upload = create(:upload, :issuable_upload)
           upload = create(:upload, :issuable_upload, model: project)
           create(:geo_file_registry, file_id: other_upload.id)
           file_registry = create(:geo_file_registry, file_id: upload.id)
-          files = subject.legacy_find_file_registries_uploads(project)
+
+          files = subject.find_file_registries_uploads(project)
 
           expect(files.count).to eq(1)
           expect(files.first.id).to eq(file_registry.id)

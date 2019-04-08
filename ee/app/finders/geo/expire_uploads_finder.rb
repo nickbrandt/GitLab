@@ -18,6 +18,8 @@ module Geo
       end
     end
 
+    private
+
     #
     # FDW accessors
     #
