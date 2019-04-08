@@ -1,4 +1,4 @@
-# Extra Sidekiq processes
+# Extra Sidekiq processes **[STARTER ONLY]**
 
 GitLab Enterprise Edition allows one to start an extra set of Sidekiq processes
 besides the default one. These processes can be used to consume a dedicated set
@@ -43,14 +43,14 @@ sidekiq_cluster['queue_groups'] = [
 Keep in mind, all changes must be followed by reconfiguring your GitLab
 application via `sudo gitlab-ctl reconfigure`.
 
-#### Monitoring
+### Monitoring
 
 Once the Sidekiq processes are added, you can visit the "Background Jobs"
 section under the admin area in GitLab (`/admin/background_jobs`).
 
 ![Extra sidekiq processes](img/sidekiq-cluster.png)
 
-#### All queues with exceptions
+### All queues with exceptions
 
 To have the additional sidekiq processes work on every queue EXCEPT the ones
 you list:
@@ -64,7 +64,7 @@ you list:
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 
-#### Limiting concurrency
+### Limiting concurrency
 
 1. Edit `/etc/gitlab/gitlab.rb` and add:
 
@@ -76,7 +76,7 @@ you list:
 
 Keep in mind, this normally would not exceed the number of CPU cores available.
 
-#### Modifying the check interval
+### Modifying the check interval
 
 To modify the check interval for the additional Sidekiq processes:
 
@@ -133,7 +133,7 @@ you'd use the following:
 /opt/gitlab/embedded/service/gitlab-rails/bin/sidekiq-cluster process_commit,post_receive gitlab_shell
 ```
 
-#### Monitoring
+### Monitoring
 
 The `sidekiq-cluster` command will not terminate once it has started the desired
 amount of Sidekiq processes. Instead, the process will continue running and
@@ -155,7 +155,7 @@ process to terminate, then terminate itself. This removes the need for
 Instead you should make sure your supervisor restarts the `sidekiq-cluster`
 process whenever necessary.
 
-#### PID files
+### PID files
 
 The `sidekiq-cluster` command can store its PID in a file. By default no PID
 file is written, but this can be changed by passing the `--pidfile` option to
@@ -168,13 +168,13 @@ file is written, but this can be changed by passing the `--pidfile` option to
 Keep in mind that the PID file will contain the PID of the `sidekiq-cluster`
 command and not the PID(s) of the started Sidekiq processes.
 
-#### Environment
+### Environment
 
 The Rails environment can be set by passing the `--environment` flag to the
 `sidekiq-cluster` command, or by setting `RAILS_ENV` to a non-empty value. The
 default value is "development".
 
-#### All queues with exceptions
+### All queues with exceptions
 
 You're able to run all queues in `sidekiq_queues.yml` file on a single or
 multiple processes with exceptions using the `--negate` flag.
@@ -192,7 +192,7 @@ For multiple processes of all queues (except "process_commit" and "post_receive"
 sidekiq-cluster process_commit,post_receive process_commit,post_receive --negate
 ```
 
-#### Limiting concurrency
+### Limiting concurrency
 
 By default, `sidekiq-cluster` will spin up extra Sidekiq processes that use
 one thread per queue up to a maximum of 50. If you wish to change the cap, use
