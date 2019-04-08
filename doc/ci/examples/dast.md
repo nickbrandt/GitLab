@@ -32,11 +32,18 @@ Once you set up the Runner, add a new job to `.gitlab-ci.yml` using [the CI/CD t
 ```yaml
 include:
   template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_WEBSITE: https://example.com
 ```
 
 The above example will create a `dast` job in your CI/CD pipeline which will run
-the tests on the URL defined in the `DAST_WEBSITE` variable (change it to use your
-own) and scan it for possible vulnerabilities.
+the tests on the specified URL and scan it for possible vulnerabilities.
+
+There are two ways to define the URL to be scanned by DAST:
+
+- The `DAST_WEBSITE` [variable](../../ci/yaml/README.md#variables).
+- In an `environment_url.txt` file at the root of your project.
 
 It's also possible to authenticate the user before performing DAST checks:
 
