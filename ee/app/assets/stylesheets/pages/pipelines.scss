@@ -151,7 +151,7 @@
       }
 
       &.left-connector {
-        @include flat-connector-before(88px)
+        @include flat-connector-before(88px);
       }
 
       &::after {

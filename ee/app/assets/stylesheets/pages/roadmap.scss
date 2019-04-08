@@ -5,21 +5,9 @@ $timeline-cell-width: 180px;
 $border-style: 1px solid $border-gray-normal;
 $roadmap-gradient-dark-gray: rgba(0, 0, 0, 0.15);
 $roadmap-gradient-gray: rgba(255, 255, 255, 0.001);
-$scroll-top-gradient: linear-gradient(
-  to bottom,
-  $roadmap-gradient-dark-gray 0%,
-  $roadmap-gradient-gray 100%
-);
-$scroll-bottom-gradient: linear-gradient(
-  to bottom,
-  $roadmap-gradient-gray 0%,
-  $roadmap-gradient-dark-gray 100%
-);
-$column-right-gradient: linear-gradient(
-  to right,
-  $roadmap-gradient-dark-gray 0%,
-  $roadmap-gradient-gray 100%
-);
+$scroll-top-gradient: linear-gradient(to bottom, $roadmap-gradient-dark-gray 0%, $roadmap-gradient-gray 100%);
+$scroll-bottom-gradient: linear-gradient(to bottom, $roadmap-gradient-gray 0%, $roadmap-gradient-dark-gray 100%);
+$column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%, $roadmap-gradient-gray 100%);
 
 @keyframes colorTransitionDetailsCell {
   from {
@@ -145,7 +133,7 @@ $column-right-gradient: linear-gradient(
 .roadmap-timeline-section .timeline-header-blank::after,
 .epics-list-section .epic-details-cell::after,
 .skeleton-loader::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   right: -$grid-size;
@@ -229,7 +217,7 @@ $column-right-gradient: linear-gradient(
       }
 
       .today-bar::before {
-        content: "";
+        content: '';
         position: absolute;
         top: -2px;
         left: -3px;
@@ -243,7 +231,7 @@ $column-right-gradient: linear-gradient(
 
   &.scroll-top-shadow .timeline-header-blank::before {
     @include roadmap-scroll-mixin;
-    content: "";
+    content: '';
     position: absolute;
     left: 0;
     bottom: -$grid-size;
@@ -360,21 +348,11 @@ $column-right-gradient: linear-gradient(
         }
 
         &.start-date-undefined {
-          background: linear-gradient(
-            to right,
-            $roadmap-gradient-gray 0%,
-            $blue-200 50%,
-            $blue-500 100%
-          );
+          background: linear-gradient(to right, $roadmap-gradient-gray 0%, $blue-200 50%, $blue-500 100%);
         }
 
         &.end-date-undefined {
-          background: linear-gradient(
-            to right,
-            $blue-500 0%,
-            $blue-200 50%,
-            $roadmap-gradient-gray 100%
-          );
+          background: linear-gradient(to right, $blue-500 0%, $blue-200 50%, $roadmap-gradient-gray 100%);
         }
       }
 
