@@ -446,6 +446,12 @@ msgstr ""
 msgid "A member of GitLab's abuse team will review your report as soon as possible."
 msgstr ""
 
+msgid "A merge commit is created for every merge, and merging is allowed as long as there are no conflicts."
+msgstr ""
+
+msgid "A merge commit is created for every merge, but merging is only allowed if fast-forward merge is possible. This way you could make sure that if this merge request would build, after merging to target branch it would also build."
+msgstr ""
+
 msgid "A new branch will be created in your fork and a new merge request will be started."
 msgstr ""
 
@@ -1434,6 +1440,9 @@ msgstr ""
 msgid "Automatically marked as default internal user"
 msgstr ""
 
+msgid "Automatically resolve merge request diff discussions when they become outdated"
+msgstr ""
+
 msgid "Automatically resolved"
 msgstr ""
 
@@ -1819,6 +1828,12 @@ msgid "Business"
 msgstr ""
 
 msgid "Business metrics (Custom)"
+msgstr ""
+
+msgid "Buy EE"
+msgstr ""
+
+msgid "Buy GitLab Enterprise Edition"
 msgstr ""
 
 msgid "By %{user_name}"
@@ -2945,7 +2960,16 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
+msgid "Contact an owner of group %{namespace_name} to upgrade the plan."
+msgstr ""
+
+msgid "Contact owner %{link_start}%{owner_name}%{link_end} to upgrade the plan."
+msgstr ""
+
 msgid "Contact sales to upgrade"
+msgstr ""
+
+msgid "Contact your Administrator to upgrade your license."
 msgstr ""
 
 msgid "Container Registry"
@@ -3575,6 +3599,9 @@ msgid "Descending"
 msgstr ""
 
 msgid "Description"
+msgstr ""
+
+msgid "Description parsed with %{link_start}GitLab Flavored Markdown%{link_end}"
 msgstr ""
 
 msgid "Description templates allow you to define context-specific templates for issue and merge request description fields for your project."
@@ -4448,6 +4475,9 @@ msgid "Failed to upload object map file"
 msgstr ""
 
 msgid "Failure"
+msgstr ""
+
+msgid "Fast-forward merge"
 msgstr ""
 
 msgid "Fast-forward merge without a merge commit"
@@ -5882,6 +5912,9 @@ msgstr ""
 msgid "Improve Issue boards with GitLab Enterprise Edition."
 msgstr ""
 
+msgid "Improve Merge Requests and customer support with GitLab Enterprise Edition."
+msgstr ""
+
 msgid "Improve issues management with Issue weight and GitLab Enterprise Edition."
 msgstr ""
 
@@ -6740,13 +6773,22 @@ msgstr ""
 msgid "Merge Request"
 msgstr ""
 
+msgid "Merge Request Approvals"
+msgstr ""
+
 msgid "Merge Requests"
 msgstr ""
 
 msgid "Merge Requests created"
 msgstr ""
 
+msgid "Merge commit"
+msgstr ""
+
 msgid "Merge commit message"
+msgstr ""
+
+msgid "Merge commit with semi-linear history"
 msgstr ""
 
 msgid "Merge events"
@@ -6758,6 +6800,9 @@ msgstr ""
 msgid "Merge in progress"
 msgstr ""
 
+msgid "Merge method"
+msgstr ""
+
 msgid "Merge pipelines will try to validate the post-merge result prior to merging"
 msgstr ""
 
@@ -6765,6 +6810,9 @@ msgid "Merge request"
 msgstr ""
 
 msgid "Merge request approvals"
+msgstr ""
+
+msgid "Merge request approvals allow you to set the number of necessary approvals and predefine a list of approvers that will need to approve every merge request in a project."
 msgstr ""
 
 msgid "Merge requests"
@@ -7321,6 +7369,9 @@ msgstr ""
 msgid "No matching results"
 msgstr ""
 
+msgid "No merge commits are created and all merges are fast-forwarded, which means that merging is only allowed if the branch could be fast-forwarded. When fast-forward merge is not possible, the user is given the option to rebase."
+msgstr ""
+
 msgid "No merge requests for the selected time period."
 msgstr ""
 
@@ -7540,6 +7591,12 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "Only admins"
+msgstr ""
+
+msgid "Only allow merge requests to be merged if all discussions are resolved"
+msgstr ""
+
+msgid "Only allow merge requests to be merged if the pipeline succeeds"
 msgstr ""
 
 msgid "Only mirror protected branches"
@@ -9839,6 +9896,9 @@ msgstr ""
 msgid "Show latest version"
 msgstr ""
 
+msgid "Show link to create/view merge request when pushing from the command line"
+msgstr ""
+
 msgid "Show parent pages"
 msgstr ""
 
@@ -10238,6 +10298,9 @@ msgid "StarredProjectsEmptyState|You don't have starred projects yet."
 msgstr ""
 
 msgid "Stars"
+msgstr ""
+
+msgid "Start GitLab Ultimate trial"
 msgstr ""
 
 msgid "Start Web Terminal"
@@ -11707,6 +11770,9 @@ msgstr ""
 msgid "Upgrade plan to unlock Canary Deployments feature"
 msgstr ""
 
+msgid "Upgrade your plan"
+msgstr ""
+
 msgid "Upgrade your plan to activate Advanced Global Search."
 msgstr ""
 
@@ -11720,6 +11786,9 @@ msgid "Upgrade your plan to activate Issue weight."
 msgstr ""
 
 msgid "Upgrade your plan to improve Issue boards."
+msgstr ""
+
+msgid "Upgrade your plan to improve Merge Requests."
 msgstr ""
 
 msgid "Upload <code>GoogleCodeProjectHosting.json</code> here:"
@@ -12158,6 +12227,9 @@ msgid "When a runner is locked, it cannot be assigned to other projects"
 msgstr ""
 
 msgid "When enabled, users cannot use GitLab until the terms have been accepted."
+msgstr ""
+
+msgid "When fast-forward merge is not possible, the user is given the option to rebase."
 msgstr ""
 
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."

@@ -3,9 +3,8 @@
 .form-check.builds-feature
   = form.check_box :merge_pipelines_enabled, class: 'form-check-input'
   = form.label :merge_pipelines_enabled, class: 'form-check-label' do
-    %strong
+    %p.mb-0
       = _('Merge pipelines will try to validate the post-merge result prior to merging')
-    %br
-    %span.descr
+    .text-secondary.mb-3
       = _('Pipelines need to be configured to enable this feature.')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_when_pipeline_succeeds', anchor: 'only-allow-merge-requests-to-be-merged-if-the-pipeline-succeeds'), target: '_blank'
