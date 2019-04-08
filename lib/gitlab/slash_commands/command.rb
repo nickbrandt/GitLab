@@ -3,8 +3,6 @@
 module Gitlab
   module SlashCommands
     class Command < BaseCommand
-      prepend EE::Gitlab::SlashCommands::Command # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def self.commands
         [
           Gitlab::SlashCommands::IssueShow,

@@ -1,0 +1,5 @@
+---
+title: Remove slack slash commands double up
+merge_request: 10555
+author:
+type: fixed
