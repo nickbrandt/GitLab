@@ -182,16 +182,6 @@ describe Group do
     end
   end
 
-  describe 'project_creation_level' do
-    it 'outputs the default one if it is nil' do
-      stub_application_setting(default_project_creation: ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
-
-      group = create(:group, project_creation_level: nil)
-
-      expect(group.project_creation_level).to eq(Gitlab::CurrentSettings.default_project_creation)
-    end
-  end
-
   describe '#file_template_project' do
     it { expect(group.private_methods).to include(:file_template_project) }
 

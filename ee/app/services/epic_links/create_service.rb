@@ -61,11 +61,7 @@ module EpicLinks
     end
 
     def level_depth_exceeded?(epic)
-      depth_level(epic) + parent_ancestors_count >= 5
-    end
-
-    def depth_level(epic)
-      epic.descendants.count + 1 # level including epic -> therefore +1
+      epic.hierarchy.max_descendants_depth + parent_ancestors_count >= 5
     end
 
     def parent_ancestors_count

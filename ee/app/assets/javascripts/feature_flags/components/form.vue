@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlBadge } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -10,6 +10,7 @@ import { internalKeyID } from '../store/modules/helpers';
 export default {
   components: {
     GlButton,
+    GlBadge,
     ToggleButton,
     Icon,
     EnvironmentsDropdown,
@@ -71,6 +72,13 @@ export default {
       // eslint-disable-next-line no-underscore-dangle
       return this.formScopes.filter(scope => !scope._destroy);
     },
+
+    canUpdateFlag() {
+      return !this.permissionsFlag || (this.scopes || []).every(scope => scope.can_update);
+    },
+    permissionsFlag() {
+      return gon && gon.features && gon.features.featureFlagPermissions;
+    },
   },
   methods: {
     isAllEnvironment(name) {
@@ -108,11 +116,18 @@ export default {
      * @param {Boolean} value the toggle value
      */
     onChangeNewScopeStatus(value) {
-      this.formScopes.push({
+      const newScope = {
         active: value,
         environment_scope: this.newScope,
         id: _.uniqueId(internalKeyID),
-      });
+      };
+
+      if (this.permissionsFlag) {
+        newScope.can_update = true;
+        newScope.protected = false;
+      }
+
+      this.formScopes.push(newScope);
 
       this.newScope = '';
     },
@@ -160,6 +175,10 @@ export default {
         scopes: this.formScopes,
       });
     },
+
+    canUpdateScope(scope) {
+      return !this.permissionsFlag || scope.can_update;
+    },
   },
 };
 </script>
@@ -169,7 +188,12 @@ export default {
       <div class="row">
         <div class="form-group col-md-4">
           <label for="feature-flag-name" class="label-bold">{{ s__('FeatureFlags|Name') }}</label>
-          <input id="feature-flag-name" v-model="formName" class="form-control" />
+          <input
+            id="feature-flag-name"
+            v-model="formName"
+            :disabled="!canUpdateFlag"
+            class="form-control"
+          />
         </div>
       </div>
 
@@ -181,6 +205,7 @@ export default {
           <textarea
             id="feature-flag-description"
             v-model="formDescription"
+            :disabled="!canUpdateFlag"
             class="form-control"
             rows="4"
           ></textarea>
@@ -212,7 +237,9 @@ export default {
                 <div class="table-mobile-header" role="rowheader">
                   {{ s__('FeatureFlags|Environment Spec') }}
                 </div>
-                <div class="table-mobile-content js-feature-flag-status">
+                <div
+                  class="table-mobile-content js-feature-flag-status d-flex align-items-center justify-content-start"
+                >
                   <p v-if="isAllEnvironment(scope.environment_scope)" class="js-scope-all pl-3">
                     {{ $options.allEnvironments }}
                   </p>
@@ -222,10 +249,15 @@ export default {
                     class="col-md-6"
                     :value="scope.environment_scope"
                     :endpoint="environmentsEndpoint"
+                    :disabled="!canUpdateScope(scope)"
                     @selectEnvironment="env => updateScope(env, scope, index)"
                     @createClicked="env => updateScope(env, scope, index)"
                     @clearInput="updateScope('', scope, index)"
                   />
+
+                  <gl-badge v-if="permissionsFlag && scope.protected" variant="success">{{
+                    s__('FeatureFlags|Protected')
+                  }}</gl-badge>
                 </div>
               </div>
 
@@ -236,6 +268,7 @@ export default {
                 <div class="table-mobile-content js-feature-flag-status">
                   <toggle-button
                     :value="scope.active"
+                    :disabled-input="!canUpdateScope(scope)"
                     @change="status => onUpdateScopeStatus(scope, status)"
                   />
                 </div>
@@ -247,7 +280,7 @@ export default {
                 </div>
                 <div class="table-mobile-content js-feature-flag-delete">
                   <gl-button
-                    v-if="!isAllEnvironment(scope.environment_scope)"
+                    v-if="!isAllEnvironment(scope.environment_scope) && canUpdateScope(scope)"
                     class="js-delete-scope btn-transparent"
                     @click="removeScope(scope)"
                   >

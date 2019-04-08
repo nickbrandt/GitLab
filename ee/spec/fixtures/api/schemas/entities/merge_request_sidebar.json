@@ -1,0 +1,13 @@
+{
+  "allOf": [
+    { "$ref": "../../../../../../spec/fixtures/api/schemas/entities/merge_request_sidebar.json" },
+    {
+      "properties": {
+        "scoped_labels_available": { "type": "boolean" }
+      },
+      "required": [
+        "scoped_labels_available"
+      ]
+    }
+  ]
+}

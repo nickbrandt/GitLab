@@ -4,6 +4,7 @@ describe "Admin uploads license" do
   set(:admin) { create(:admin) }
 
   before do
+    stub_feature_flags(licenses_app: false)
     sign_in(admin)
   end
 

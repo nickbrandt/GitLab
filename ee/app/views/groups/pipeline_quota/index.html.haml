@@ -10,9 +10,10 @@
     %strong= @group.name
     group
 
-  .col-sm-6
-    %p.text-right
-      = link_to 'Buy additional minutes', 'https://customers.gitlab.com/subscriptions', target: '_blank', class: 'btn btn-inverted btn-success right text-right'
+  - if @group.paid_plan?
+    .col-sm-6
+      %p.text-right
+        = link_to 'Buy additional minutes', 'https://customers.gitlab.com/subscriptions', target: '_blank', class: 'btn btn-inverted btn-success right text-right'
 
 = render "namespaces/pipelines_quota/list",
   locals: { namespace: @group, projects: @projects }

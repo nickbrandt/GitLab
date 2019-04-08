@@ -2186,7 +2186,7 @@ describe Project do
   end
 
   describe '#create_import_state' do
-    it 'it is called after save' do
+    it 'is called after save' do
       project = create(:project)
 
       expect(project).to receive(:create_import_state)

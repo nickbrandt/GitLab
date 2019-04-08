@@ -20,6 +20,10 @@ module EE
         render_api_error!(e.to_s, 401)
       end
 
+      def check_gitlab_geo_request_ip!
+        unauthorized! unless ::Gitlab::Geo.allowed_ip?(request.ip)
+      end
+
       override :current_user
       def current_user
         strong_memoize(:current_user) do

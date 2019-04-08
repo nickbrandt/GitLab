@@ -75,7 +75,7 @@ describe Dashboard::Operations::ProjectsService do
         License::ULTIMATE_PLAN  | false | true  | true
         License::ULTIMATE_PLAN  | true  | false | false
         License::ULTIMATE_PLAN  | true  | true  | false
-        License::PREMIUM_PLAN   | false | false | false
+        License::PREMIUM_PLAN   | false | false | true
         nil                     | false | false | false
       end
 
@@ -97,7 +97,7 @@ describe Dashboard::Operations::ProjectsService do
 
       where(:check_namespace_plan, :plan, :available) do
         true  | :gold   | true
-        true  | :silver | false
+        true  | :silver | true
         true  | nil     | false
         false | :gold   | true
         false | :silver | true

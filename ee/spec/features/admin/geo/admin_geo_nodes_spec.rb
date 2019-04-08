@@ -114,16 +114,18 @@ describe 'admin Geo Nodes', :js do
   end
 
   describe 'update an existing Geo Node' do
-    before do
+    it 'updates an existing Geo Node' do
+      geo_node.update(primary: true)
+
       visit admin_geo_nodes_path
       wait_for_requests
+
       page.within(find('.geo-node-actions', match: :first)) do
         page.click_link('Edit')
       end
-    end
 
-    it 'updates an existing Geo Node' do
       fill_in 'URL', with: 'http://newsite.com'
+      fill_in 'Internal URL', with: 'http://internal-url.com'
       check 'This is a primary node'
       click_button 'Save changes'
 
@@ -133,20 +135,12 @@ describe 'admin Geo Nodes', :js do
       page.within(find('.geo-node-item', match: :first)) do
         expect(page).to have_content('http://newsite.com')
         expect(page).to have_content('Primary')
-      end
-    end
 
-    it "allows the admin to update a secondary node's alternate URL" do
-      fill_in 'Alternate URL', with: 'http://someloadbalancer.com'
-      click_button 'Save changes'
-
-      expect(current_path).to eq admin_geo_nodes_path
-      wait_for_requests
-
-      page.within(find('.geo-node-item', match: :first)) do
         click_button 'Other information'
 
-        expect(page).to have_content('http://someloadbalancer.com')
+        page.within(find('.other-section')) do
+          expect(page).to have_content('http://internal-url.com')
+        end
       end
     end
   end

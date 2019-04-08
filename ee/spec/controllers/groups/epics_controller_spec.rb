@@ -148,6 +148,21 @@ describe Groups::EpicsController do
           expect(item['web_url']).to eq(group_epic_path(group, epic))
         end
 
+        context 'with parent_id filter' do
+          let(:parent_epic) { create(:epic, group: group) }
+
+          it 'returns child epics of the given parent' do
+            child_epics = create_list(:epic, 2, group: group, parent: parent_epic)
+            # descendant epic that should not be included
+            create(:epic, group: group, parent: child_epics.first)
+
+            get :index, params: { group_id: group, parent_id: parent_epic.id }, format: :json
+
+            expect(json_response.size).to eq(2)
+            expect(json_response.map { |e| e['id'] }).to match_array(child_epics.map(&:id))
+          end
+        end
+
         context 'using label_name filter' do
           let(:label) { create(:label) }
           let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }

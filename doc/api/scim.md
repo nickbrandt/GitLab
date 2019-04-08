@@ -49,6 +49,8 @@ Example response:
       "id": "0b1d561c-21ff-4092-beab-8154b17f82f2",
       "active": true,
       "name.formatted": "Test User",
+      "userName": "username",
+      "meta": { "resourceType":"User" },
       "emails": [
         {
           "type": "work",
@@ -90,6 +92,8 @@ Example response:
   "id": "0b1d561c-21ff-4092-beab-8154b17f82f2",
   "active": true,
   "name.formatted": "Test User",
+  "userName": "username",
+  "meta": { "resourceType":"User" },
   "emails": [
     {
       "type": "work",
@@ -100,16 +104,63 @@ Example response:
 }
 ```
 
+## Create a SAML user
+
+```text
+POST /api/scim/v2/groups/:group_path/Users/
+```
+
+Parameters:
+
+| Attribute      | Type    | Required | Description            |
+|:---------------|:----------|:----|:--------------------------|
+| `externalId` | string      | yes | External UID of the user. |
+| `userName`   | string      | yes | Username of the user. |
+| `emails`     | JSON string | yes | Work email. |
+| `name`       | JSON string | yes | Name of the user. |
+| `meta`       | string      | no  | Resource type (`User'). |
+
+Example request:
+
+```sh
+curl --verbose --request POST 'https://example.gitlab.com/api/scim/v2/groups/test_group/Users' --data '{"externalId":"test_uid","active":null,"userName":"username","emails":[{"primary":true,"type":"work","value":"name@example.com"}],"name":{"formatted":"Test User","familyName":"User","givenName":"Test"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User"],"meta":{"resourceType":"User"}}' --header "Authorization: Bearer <your_scim_token>" --header "Content-Type: application/scim+json"
+```
+
+Example response:
+
+```json
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "id": "0b1d561c-21ff-4092-beab-8154b17f82f2",
+  "active": true,
+  "name.formatted": "Test User",
+  "userName": "username",
+  "meta": { "resourceType":"User" },
+  "emails": [
+    {
+      "type": "work",
+      "value": "name@example.com",
+      "primary": true
+    }
+  ]
+}
+```
+
+Returns a `201` status code if successful.
+
 ## Update a single SAML user
 
 Fields that can be updated are:
 
 | SCIM/IdP field | GitLab field |
 |:----------|:--------|
-| id  | extern_uid |
+| id/externalId  | extern_uid |
 | name.formatted  | name |
 | emails\[type eq "work"\].value  | email |
 | active | Identity removal if `active = false` |
+| userName | username |
 
 ```text
 PATCH /api/scim/v2/groups/:group_path/Users/:id

@@ -12,7 +12,10 @@ describe('ApproversSelect', () => {
       };
 
       $approverSelect = {
-        select2: jasmine.createSpy(),
+        select2: jasmine.createSpy().and.callFake(function() {
+          return this;
+        }),
+        trigger: jasmine.createSpy(),
       };
 
       $loadWrapper = {
@@ -26,8 +29,9 @@ describe('ApproversSelect', () => {
       expect($input.val).toHaveBeenCalledWith('');
     });
 
-    it('should empty the select2 value', () => {
+    it('should empty the select2 value and trigger a change event', () => {
       expect($approverSelect.select2).toHaveBeenCalledWith('val', '');
+      expect($approverSelect.trigger).toHaveBeenCalledWith('change');
     });
 
     it('should hide loadWrapper', () => {

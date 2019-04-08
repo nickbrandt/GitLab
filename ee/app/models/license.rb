@@ -28,7 +28,6 @@ class License < ApplicationRecord
     multiple_issue_assignees
     multiple_project_issue_boards
     push_rules
-    project_creation_level
     protected_refs_for_users
     related_issues
     repository_mirrors
@@ -52,6 +51,7 @@ class License < ApplicationRecord
     geo
     github_project_service_integration
     jira_dev_panel_integration
+    scoped_labels
     ldap_group_sync_filter
     multiple_clusters
     multiple_group_issue_boards
@@ -76,6 +76,7 @@ class License < ApplicationRecord
     issues_analytics
     merge_pipelines
     design_management
+    operations_dashboard
   ]
   EEP_FEATURES.freeze
 
@@ -92,7 +93,6 @@ class License < ApplicationRecord
     pod_logs
     pseudonymizer
     prometheus_alerts
-    operations_dashboard
     tracing
     insights
     web_ide_terminal

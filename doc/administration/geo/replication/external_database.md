@@ -39,7 +39,7 @@ Given you have a primary node set up on AWS EC2 that uses RDS.
 You can now just create a read-only replica in a different region and the
 replication process will be managed by AWS. Make sure you've set Network ACL, Subnet, and
 Security Group according to your needs, so the secondary application node can access the database.
-Skip to the [Configure secondary application node](#configure-secondary-application-node) section below.
+Skip to the [Configure secondary application node](#configure-secondary-application-nodes-to-use-the-external-read-replica) section below.
 
 #### Manually configure the primary database for replication
 

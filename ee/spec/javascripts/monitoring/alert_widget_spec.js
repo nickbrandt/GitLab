@@ -6,16 +6,33 @@ import mountComponent from 'spec/helpers/vue_mount_component_helper';
 describe('AlertWidget', () => {
   let AlertWidgetComponent;
   let vm;
+
+  const metricId = '5';
+  const alertPath = 'my/alert.json';
+  const relevantQueries = [{ metricId, label: 'alert-label', alert_path: alertPath }];
+
   const props = {
     alertsEndpoint: '',
-    customMetricId: 5,
-    label: 'alert-label',
-    currentAlerts: ['my/alert.json'],
+    relevantQueries,
+    alertsToManage: {},
   };
 
-  const mockSetAlerts = (_, data) => {
-    /* eslint-disable-next-line no-underscore-dangle */
-    Vue.set(vm._props, 'alertData', data);
+  const propsWithAlert = {
+    ...props,
+    relevantQueries,
+  };
+
+  const propsWithAlertData = {
+    ...props,
+    relevantQueries,
+    alertsToManage: {
+      [alertPath]: { operator: '>', threshold: 42, alert_path: alertPath, metricId },
+    },
+  };
+
+  const mockSetAlerts = (path, data) => {
+    const alerts = data ? { [path]: data } : {};
+    Vue.set(vm, 'alertsToManage', alerts);
   };
 
   beforeAll(() => {
@@ -38,7 +55,7 @@ describe('AlertWidget', () => {
         resolveReadAlert = cb;
       }),
     );
-    vm = mountComponent(AlertWidgetComponent, props, '#alert-widget');
+    vm = mountComponent(AlertWidgetComponent, propsWithAlert, '#alert-widget');
 
     // expect loading spinner to exist during fetch
     expect(vm.isLoading).toBeTruthy();
@@ -58,7 +75,7 @@ describe('AlertWidget', () => {
 
   it('displays an error message when fetch fails', done => {
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(Promise.reject());
-    vm = mountComponent(AlertWidgetComponent, props, '#alert-widget');
+    vm = mountComponent(AlertWidgetComponent, propsWithAlert, '#alert-widget');
 
     setTimeout(() =>
       vm.$nextTick(() => {
@@ -70,28 +87,48 @@ describe('AlertWidget', () => {
     );
   });
 
-  it('displays an alert summary when fetch succeeds', done => {
+  it('displays an alert summary when there is a single alert', () => {
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(
       Promise.resolve({ operator: '>', threshold: 42 }),
     );
-    const propsWithAlertData = {
-      ...props,
-      alertData: { 'my/alert.json': { operator: '>', threshold: 42 } },
-    };
     vm = mountComponent(AlertWidgetComponent, propsWithAlertData, '#alert-widget');
 
-    setTimeout(() =>
-      vm.$nextTick(() => {
-        expect(vm.isLoading).toEqual(false);
-        expect(vm.alertSummary).toBe('alert-label > 42');
-        expect(vm.$el.querySelector('.alert-current-setting')).toBeVisible();
-        done();
-      }),
+    expect(vm.alertSummary).toBe('alert-label > 42');
+    expect(vm.$el.querySelector('.alert-current-setting')).toBeVisible();
+  });
+
+  it('displays a combined alert summary when there are multiple alerts', () => {
+    spyOn(AlertsService.prototype, 'readAlert').and.returnValue(
+      Promise.resolve({ operator: '>', threshold: 42 }),
     );
+    const propsWithManyAlerts = {
+      ...props,
+      relevantQueries: relevantQueries.concat([
+        { metricId: '6', alert_path: 'my/alert2.json', label: 'alert-label2' },
+      ]),
+      alertsToManage: {
+        'my/alert.json': {
+          operator: '>',
+          threshold: 42,
+          alert_path: alertPath,
+          metricId,
+        },
+        'my/alert2.json': {
+          operator: '=',
+          threshold: 900,
+          alert_path: 'my/alert2.json',
+          metricId: '6',
+        },
+      },
+    };
+    vm = mountComponent(AlertWidgetComponent, propsWithManyAlerts, '#alert-widget');
+
+    expect(vm.alertSummary).toBe('alert-label > 42, alert-label2 = 900');
+    expect(vm.$el.querySelector('.alert-current-setting')).toBeVisible();
   });
 
   it('opens and closes a dropdown menu by clicking close button', done => {
-    vm = mountComponent(AlertWidgetComponent, { ...props, currentAlerts: [] });
+    vm = mountComponent(AlertWidgetComponent, props);
 
     expect(vm.isOpen).toEqual(false);
     expect(vm.$el.querySelector('.alert-dropdown-menu')).toBeHidden();
@@ -100,20 +137,18 @@ describe('AlertWidget', () => {
 
     Vue.nextTick(() => {
       expect(vm.isOpen).toEqual(true);
-      expect(vm.$el).toHaveClass('show');
 
       vm.$el.querySelector('.dropdown-menu-close').click();
 
       Vue.nextTick(() => {
         expect(vm.isOpen).toEqual(false);
-        expect(vm.$el).not.toHaveClass('show');
         done();
       });
     });
   });
 
   it('opens and closes a dropdown menu by clicking outside the menu', done => {
-    vm = mountComponent(AlertWidgetComponent, { ...props, currentAlerts: [] });
+    vm = mountComponent(AlertWidgetComponent, props);
 
     expect(vm.isOpen).toEqual(false);
     expect(vm.$el.querySelector('.alert-dropdown-menu')).toBeHidden();
@@ -122,13 +157,11 @@ describe('AlertWidget', () => {
 
     Vue.nextTick(() => {
       expect(vm.isOpen).toEqual(true);
-      expect(vm.$el).toHaveClass('show');
 
       document.body.click();
 
       Vue.nextTick(() => {
         expect(vm.isOpen).toEqual(false);
-        expect(vm.$el).not.toHaveClass('show');
         done();
       });
     });
@@ -138,17 +171,14 @@ describe('AlertWidget', () => {
     const alertParams = {
       operator: '<',
       threshold: 4,
-      prometheus_metric_id: 5,
+      prometheus_metric_id: '5',
     };
 
     spyOn(AlertsService.prototype, 'createAlert').and.returnValue(
-      Promise.resolve({
-        alert_path: 'foo/bar',
-        ...alertParams,
-      }),
+      Promise.resolve({ alert_path: 'foo/bar', ...alertParams }),
     );
 
-    vm = mountComponent(AlertWidgetComponent, { ...props, currentAlerts: [] });
+    vm = mountComponent(AlertWidgetComponent, props);
     vm.$on('setAlerts', mockSetAlerts);
 
     vm.$refs.widgetForm.$emit('create', alertParams);
@@ -156,54 +186,40 @@ describe('AlertWidget', () => {
     expect(AlertsService.prototype.createAlert).toHaveBeenCalledWith(alertParams);
     Vue.nextTick(() => {
       expect(vm.isLoading).toEqual(false);
-      expect(vm.alertSummary).toBe('alert-label < 4');
       done();
     });
   });
 
   it('updates an alert with an appropriate handler', done => {
-    const alertPath = 'my/test/alert.json';
-    const alertParams = {
-      operator: '<',
-      threshold: 4,
-    };
+    const alertParams = { operator: '<', threshold: 4, alert_path: alertPath };
+    const newAlertParams = { operator: '=', threshold: 12 };
 
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(Promise.resolve(alertParams));
-    spyOn(AlertsService.prototype, 'updateAlert').and.returnValue(Promise.resolve());
+    spyOn(AlertsService.prototype, 'updateAlert').and.returnValue(Promise.resolve({}));
 
-    vm = mountComponent(AlertWidgetComponent, { ...props, currentAlerts: [alertPath] });
+    vm = mountComponent(AlertWidgetComponent, propsWithAlertData);
     vm.$on('setAlerts', mockSetAlerts);
 
     vm.$refs.widgetForm.$emit('update', {
-      ...alertParams,
       alert: alertPath,
-      operator: '=',
-      threshold: 12,
+      ...newAlertParams,
+      prometheus_metric_id: '5',
     });
 
-    expect(AlertsService.prototype.updateAlert).toHaveBeenCalledWith(alertPath, {
-      ...alertParams,
-      operator: '=',
-      threshold: 12,
-    });
+    expect(AlertsService.prototype.updateAlert).toHaveBeenCalledWith(alertPath, newAlertParams);
     Vue.nextTick(() => {
       expect(vm.isLoading).toEqual(false);
-      expect(vm.alertSummary).toBe('alert-label = 12');
       done();
     });
   });
 
   it('deletes an alert with an appropriate handler', done => {
-    const alertPath = 'my/test/alert.json';
-    const alertParams = {
-      operator: '<',
-      threshold: 4,
-    };
+    const alertParams = { alert_path: alertPath, operator: '>', threshold: 42 };
 
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(Promise.resolve(alertParams));
-    spyOn(AlertsService.prototype, 'deleteAlert').and.returnValue(Promise.resolve());
+    spyOn(AlertsService.prototype, 'deleteAlert').and.returnValue(Promise.resolve({}));
 
-    vm = mountComponent(AlertWidgetComponent, { ...props, currentAlerts: [alertPath] });
+    vm = mountComponent(AlertWidgetComponent, propsWithAlert);
     vm.$on('setAlerts', mockSetAlerts);
 
     vm.$refs.widgetForm.$emit('delete', { alert: alertPath });

@@ -13,6 +13,13 @@ FactoryBot.define do
     trait(:favicon) { file_type :favicon }
     trait(:import_export) { file_type :import_export }
 
+    factory :geo_upload_registry, class: Geo::UploadRegistry
+
+    trait :failed do
+      success false
+      retry_count 1
+    end
+
     trait :with_file do
       after(:build, :stub) do |registry, _|
         file =

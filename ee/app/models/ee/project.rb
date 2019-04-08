@@ -87,7 +87,7 @@ module EE
       end
 
       scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
-
+      scope :within_shards, -> (shard_names) { where(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
@@ -323,7 +323,7 @@ module EE
     end
 
     def visible_regular_approval_rules
-      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self)
+      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self, default_enabled: true)
 
       strong_memoize(:visible_regular_approval_rules) do
         regular_rules = approval_rules.regular.order(:id)

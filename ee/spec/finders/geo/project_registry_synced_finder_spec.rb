@@ -37,7 +37,7 @@ describe Geo::ProjectRegistrySyncedFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns synced registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to match_array([registry_synced, registry_wiki_dirty])
         end
@@ -63,7 +63,7 @@ describe Geo::ProjectRegistrySyncedFinder, :geo do
 
       context 'with selective sync by namespace' do
         it 'returns synced registries where projects belongs to the namespaces' do
-          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1, nested_group_1])
+          node.update!(selective_sync_type: 'namespaces', namespaces: [group_1])
 
           expect(subject.execute).to match_array([registry_synced, registry_repository_dirty])
         end

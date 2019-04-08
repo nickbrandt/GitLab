@@ -18,4 +18,8 @@ RSpec.configure do |config|
   config.around(:each, :geo_tracking_db) do |example|
     example.run if Gitlab::Geo.geo_database_configured?
   end
+
+  config.around(:each, :geo_fdw) do |example|
+    example.run if Gitlab::Geo::Fdw.enabled?
+  end
 end

@@ -12,13 +12,13 @@ describe ProtectedEnvironments::DestroyService, '#execute' do
   context 'when the Protected Environment is deleted' do
     it { is_expected.to be_truthy }
 
-    it 'should delete the requested ProtectedEnvironment' do
+    it 'deletes the requested ProtectedEnvironment' do
       expect do
         subject
       end.to change { ProtectedEnvironment.count }.from(1).to(0)
     end
 
-    it 'should delete the related DeployAccessLevel' do
+    it 'deletes the related DeployAccessLevel' do
       expect do
         subject
       end.to change { ProtectedEnvironment::DeployAccessLevel.count }.from(1).to(0)

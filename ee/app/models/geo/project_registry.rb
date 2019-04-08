@@ -31,6 +31,14 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   scope :wiki_checksum_mismatch, -> { where(wiki_checksum_mismatch: true) }
   scope :with_routes, -> { includes(project: :route).includes(project: { namespace: :route }) }
 
+  def self.project_id_in(ids)
+    where(project_id: ids)
+  end
+
+  def self.pluck_project_key
+    where(nil).pluck(:project_id)
+  end
+
   def self.failed
     repository_sync_failed = arel_table[:repository_retry_count].gt(0)
     wiki_sync_failed = arel_table[:wiki_retry_count].gt(0)
@@ -139,6 +147,30 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     else
       repository_checksum_mismatch.or(wiki_checksum_mismatch)
     end
+  end
+
+  def self.registries_pending_verification
+    repositories_pending_verification.or(wikis_pending_verification)
+  end
+
+  def self.repositories_pending_verification
+    repository_exists_on_primary =
+      Arel::Nodes::SqlLiteral.new("project_registry.repository_missing_on_primary IS NOT TRUE")
+
+    arel_table[:repository_verification_checksum_sha].eq(nil)
+      .and(arel_table[:last_repository_verification_failure].eq(nil))
+      .and(arel_table[:resync_repository].eq(false))
+      .and(repository_exists_on_primary)
+  end
+
+  def self.wikis_pending_verification
+    wiki_exists_on_primary =
+      Arel::Nodes::SqlLiteral.new("project_registry.wiki_missing_on_primary IS NOT TRUE")
+
+    arel_table[:wiki_verification_checksum_sha].eq(nil)
+      .and(arel_table[:last_wiki_verification_failure].eq(nil))
+      .and(arel_table[:resync_wiki].eq(false))
+      .and(wiki_exists_on_primary)
   end
 
   def self.flag_repositories_for_resync!

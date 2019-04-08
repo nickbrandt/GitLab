@@ -374,19 +374,19 @@ describe GroupsController do
       expect(controller).to set_flash[:notice]
     end
 
-    it 'updates the project_creation_level successfully' do
-      post :update, params: { id: group.to_param, group: { project_creation_level: ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS } }
-
-      expect(response).to have_gitlab_http_status(302)
-      expect(group.reload.project_creation_level).to eq(::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
-    end
-
     it 'does not update the path on error' do
       allow_any_instance_of(Group).to receive(:move_dir).and_raise(Gitlab::UpdatePathError)
       post :update, params: { id: group.to_param, group: { path: 'new_path' } }
 
       expect(assigns(:group).errors).not_to be_empty
       expect(assigns(:group).path).not_to eq('new_path')
+    end
+
+    it 'updates the project_creation_level successfully' do
+      post :update, params: { id: group.to_param, group: { project_creation_level: ::Gitlab::Access::MAINTAINER_PROJECT_ACCESS } }
+
+      expect(response).to have_gitlab_http_status(302)
+      expect(group.reload.project_creation_level).to eq(::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)
     end
   end
 
@@ -605,11 +605,11 @@ describe GroupsController do
           }
       end
 
-      it 'should return a notice' do
+      it 'returns a notice' do
         expect(flash[:notice]).to eq("Group '#{group.name}' was successfully transferred.")
       end
 
-      it 'should redirect to the new path' do
+      it 'redirects to the new path' do
         expect(response).to redirect_to("/#{new_parent_group.path}/#{group.path}")
       end
     end
@@ -626,11 +626,11 @@ describe GroupsController do
           }
       end
 
-      it 'should return a notice' do
+      it 'returns a notice' do
         expect(flash[:notice]).to eq("Group '#{group.name}' was successfully transferred.")
       end
 
-      it 'should redirect to the new path' do
+      it 'redirects to the new path' do
         expect(response).to redirect_to("/#{group.path}")
       end
     end
@@ -650,11 +650,11 @@ describe GroupsController do
           }
       end
 
-      it 'should return an alert' do
+      it 'returns an alert' do
         expect(flash[:alert]).to eq "Transfer failed: namespace directory cannot be moved"
       end
 
-      it 'should redirect to the current path' do
+      it 'redirects to the current path' do
         expect(response).to redirect_to(edit_group_path(group))
       end
     end
@@ -672,7 +672,7 @@ describe GroupsController do
           }
       end
 
-      it 'should be denied' do
+      it 'is denied' do
         expect(response).to have_gitlab_http_status(404)
       end
     end

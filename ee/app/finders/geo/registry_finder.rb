@@ -55,5 +55,9 @@ module Geo
       joined_relation.where(registry: { registry_present: [nil, false] })
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def quote_value(value)
+      ::Gitlab::SQL::Glob.q(value)
+    end
   end
 end

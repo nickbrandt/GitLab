@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Gitlab::GitAccess do
+  include EE::GeoHelpers
+
   set(:user) { create(:user) }
 
   let(:actor) { user }
@@ -249,11 +251,43 @@ describe Gitlab::GitAccess do
     end
   end
 
-  describe 'Geo system permissions' do
+  describe 'Geo' do
     let(:actor) { :geo }
 
-    it { expect { pull_changes }.not_to raise_error }
-    it { expect { push_changes }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
+    context 'git pull' do
+      it { expect { pull_changes }.not_to raise_error }
+
+      context 'for a secondary' do
+        let(:current_replication_lag) { nil }
+
+        before do
+          stub_licensed_features(geo: true)
+          stub_current_geo_node(create(:geo_node))
+
+          allow_any_instance_of(Gitlab::Geo::HealthCheck).to receive(:db_replication_lag_seconds).and_return(current_replication_lag)
+        end
+
+        context 'that has no DB replication lag' do
+          let(:current_replication_lag) { 0 }
+
+          it 'does not return a replication lag message in the console messages' do
+            expect(pull_changes.console_messages).to be_empty
+          end
+        end
+
+        context 'that has DB replication lag > 0' do
+          let(:current_replication_lag) { 7 }
+
+          it 'returns a replication lag message in the console messages' do
+            expect(pull_changes.console_messages).to eq(['Current replication lag: 7 seconds'])
+          end
+        end
+      end
+    end
+
+    context 'git push' do
+      it { expect { push_changes }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
+    end
   end
 
   private

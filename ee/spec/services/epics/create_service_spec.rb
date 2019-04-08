@@ -19,5 +19,9 @@ describe Epics::CreateService do
       expect(epic.description).to eq('epic description')
       expect(NewEpicWorker).to have_received(:perform_async).with(epic.id, user.id)
     end
+
+    it_behaves_like 'new issuable with scoped labels' do
+      let(:parent) { group }
+    end
   end
 end

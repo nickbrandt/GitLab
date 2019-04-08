@@ -43,11 +43,13 @@ describe('NodeDetailsSectionOther', () => {
 
         const items = vmNodePrimary.nodeDetailItems;
 
-        expect(items.length).toBe(2);
+        expect(items.length).toBe(3);
         expect(items[0].itemTitle).toBe('Replication slots');
         expect(items[0].itemValue).toBe(mockNodeDetails.replicationSlots);
         expect(items[1].itemTitle).toBe('Replication slot WAL');
         expect(items[1].itemValue).toBe(numberToHumanSize(mockNodeDetails.replicationSlotWAL));
+        expect(items[2].itemTitle).toBe('Internal URL');
+        expect(items[2].itemValue).toBe(mockNode.internalUrl);
 
         vmNodePrimary.$destroy();
       });
@@ -55,7 +57,7 @@ describe('NodeDetailsSectionOther', () => {
       it('returns array containing items to show under secondary node when prop `nodeTypePrimary` is false', () => {
         const items = vm.nodeDetailItems;
 
-        expect(items.length).toBe(2);
+        expect(items.length).toBe(1);
         expect(items[0].itemTitle).toBe('Storage config');
       });
     });

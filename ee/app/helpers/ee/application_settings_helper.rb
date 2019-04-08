@@ -66,6 +66,7 @@ module EE
         :elasticsearch_namespace_ids,
         :elasticsearch_project_ids,
         :geo_status_timeout,
+        :geo_node_allowed_ips,
         :help_text,
         :pseudonymizer_enabled,
         :repository_size_limit,

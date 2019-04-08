@@ -13,15 +13,17 @@
         = form_errors(@application_setting)
 
         %fieldset
-          %p
-            These settings will only take effect if Geo is enabled and require a restart to take effect.
           .form-group
             = f.label :geo_status_timeout, 'Connection timeout', class: 'label-bold'
             = f.number_field :geo_status_timeout, class: 'form-control'
             .form-text.text-muted
-              The amount of seconds after which a request to get a secondary node
-              status will time out.
+              = _('The amount of seconds after which a request to get a secondary node status will time out.')
+          .form-group
+            = f.label :geo_node_allowed_ips, 'Allowed Geo IP', class: 'label-bold'
+            = f.text_field :geo_node_allowed_ips, class: 'form-control'
+            .form-text.text-muted
+              = _('List of IPs and CIDRs of allowed secondary nodes. Comma-separated, e.g. "1.1.1.1, 2.2.2.0/24"')
 
-        = f.submit 'Save changes', class: "btn btn-success"
+        = f.submit _('Save changes'), class: "btn btn-success"
 - else
   = render 'shared/empty_states/geo'

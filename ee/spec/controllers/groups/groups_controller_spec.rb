@@ -150,7 +150,7 @@ describe GroupsController do
         end
 
         context 'with group view set as default' do
-          it 'should render the expected template' do
+          it 'renders the expected template' do
             expect(subject).to render_template('groups/show')
           end
         end
@@ -159,7 +159,7 @@ describe GroupsController do
           let(:user) { create(:user, group_view: :security_dashboard) }
 
           context 'in HTML format' do
-            it 'should redirect to the security dashboard' do
+            it 'redirects to the security dashboard' do
               expect(subject).to redirect_to(group_security_dashboard_url(group))
             end
           end
@@ -167,7 +167,7 @@ describe GroupsController do
           context 'in Atom format' do
             let(:format) { :atom }
 
-            it 'should not redirect to the security dashboard' do
+            it 'does not redirect to the security dashboard' do
               expect(subject).to render_template('groups/show')
             end
           end
@@ -177,7 +177,7 @@ describe GroupsController do
               stub_feature_flags(group_overview_security_dashboard: false)
             end
 
-            it 'should render the expected template' do
+            it 'renders the expected template' do
               expect(subject).to render_template('groups/show')
             end
           end
@@ -223,7 +223,7 @@ describe GroupsController do
         context 'with group view set to security dashboard' do
           let(:user) { create(:user, group_view: :security_dashboard) }
 
-          it 'should not redirect to the security dashboard' do
+          it 'does not redirect to the security dashboard' do
             expect(subject).not_to redirect_to(group_security_dashboard_url(group))
           end
 
@@ -232,7 +232,7 @@ describe GroupsController do
               stub_feature_flags(group_overview_security_dashboard: false)
             end
 
-            it 'should render the expected template' do
+            it 'renders the expected template' do
               expect(subject).to render_template('groups/show')
             end
           end

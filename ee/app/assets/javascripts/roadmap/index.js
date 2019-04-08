@@ -63,6 +63,8 @@ export default () => {
       return {
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
         hasFiltersApplied: parseBoolean(dataset.hasFiltersApplied),
+        defaultInnerHeight: Number(dataset.innerHeight),
+        isChildEpics: parseBoolean(dataset.childEpics),
         currentGroupId: parseInt(dataset.groupId, 0),
         newEpicEndpoint: dataset.newEpicEndpoint,
         epicsState: dataset.epicsState,
@@ -83,6 +85,8 @@ export default () => {
         basePath: this.basePath,
         filterQueryString: this.filterQueryString,
         initialEpicsPath: this.initialEpicsPath,
+        defaultInnerHeight: this.defaultInnerHeight,
+        isChildEpics: this.isChildEpics,
       });
     },
     methods: {

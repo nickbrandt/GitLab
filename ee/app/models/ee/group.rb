@@ -153,10 +153,6 @@ module EE
       ensure_saml_discovery_token!
     end
 
-    def project_creation_level
-      super || ::Gitlab::CurrentSettings.default_project_creation
-    end
-
     override :multiple_issue_boards_available?
     def multiple_issue_boards_available?
       feature_available?(:multiple_group_issue_boards)

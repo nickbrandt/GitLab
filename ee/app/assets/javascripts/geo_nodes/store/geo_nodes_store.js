@@ -48,7 +48,7 @@ export default class GeoNodesStore {
       primary,
       current,
       enabled,
-      alternateUrl: rawNode.alternate_url || '',
+      internalUrl: rawNode.internal_url || '',
       nodeActionActive: false,
       basePath: rawNode._links.self,
       repairPath: rawNode._links.repair,

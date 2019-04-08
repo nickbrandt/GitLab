@@ -40,7 +40,9 @@ module EpicsHelper
       labels_path: group_labels_path(group, format: :json, only_group_labels: true, include_ancestor_groups: true),
       toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
       labels_web_url: group_labels_path(group),
-      epics_web_url: group_epics_path(group)
+      epics_web_url: group_epics_path(group),
+      scoped_labels: group.feature_available?(:scoped_labels),
+      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
     }
 
     epic_meta[:todo_delete_path] = dashboard_todo_path(todo) if todo.present?

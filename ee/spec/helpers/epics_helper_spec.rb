@@ -39,7 +39,7 @@ describe EpicsHelper do
         start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
         due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
         due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
-        labels_web_url epics_web_url lock_version
+        labels_web_url epics_web_url lock_version scoped_labels scoped_labels_documentation_link
       ])
       expect(meta_data['author']).to eq({
         'name' => user.name,
@@ -111,7 +111,7 @@ describe EpicsHelper do
           start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
           due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
           due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
-          labels_web_url epics_web_url lock_version
+          labels_web_url epics_web_url lock_version scoped_labels scoped_labels_documentation_link
         ])
         expect(meta_data['start_date']).to eq('2000-01-01')
         expect(meta_data['start_date_sourcing_milestone_title']).to eq(milestone1.title)
@@ -126,7 +126,7 @@ describe EpicsHelper do
   end
 
   describe '#epic_endpoint_query_params' do
-    it 'it includes epic specific options in JSON format' do
+    it 'includes Epic specific options in JSON format' do
       opts = epic_endpoint_query_params({})
 
       expected = "{\"only_group_labels\":true,\"include_ancestor_groups\":true,\"include_descendant_groups\":true}"

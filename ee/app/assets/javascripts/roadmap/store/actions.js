@@ -10,6 +10,9 @@ import * as types from './mutation_types';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 
+export const setWindowResizeInProgress = ({ commit }, inProgress) =>
+  commit(types.SET_WINDOW_RESIZE_IN_PROGRESS, inProgress);
+
 export const requestEpics = ({ commit }) => commit(types.REQUEST_EPICS);
 export const requestEpicsForTimeframe = ({ commit }) => commit(types.REQUEST_EPICS_FOR_TIMEFRAME);
 export const receiveEpicsSuccess = (

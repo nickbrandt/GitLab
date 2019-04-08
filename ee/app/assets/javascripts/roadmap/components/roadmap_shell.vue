@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlSkeletonLoading } from '@gitlab/ui';
 
 import { isInViewport } from '~/lib/utils/common_utils';
@@ -41,6 +42,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['defaultInnerHeight']),
     containerStyles() {
       return {
         width: `${this.shellWidth}px`,
@@ -73,7 +75,7 @@ export default {
       // before setting shellWidth
       // see https://vuejs.org/v2/api/#Vue-nextTick
       if (this.$el.parentElement) {
-        this.shellHeight = window.innerHeight - this.$el.offsetTop;
+        this.shellHeight = (this.defaultInnerHeight || window.innerHeight) - this.$el.offsetTop;
         this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
         this.shellWidth = this.getShellWidth(this.noScroll);
 

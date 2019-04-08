@@ -8,7 +8,7 @@ describe Admin::Geo::NodesController, :postgresql do
     end
 
     it 'displays a flash message' do
-      expect(controller).to set_flash[:alert].to('You need a different license to enable Geo replication')
+      expect(controller).to set_flash[:alert].to('You need a different license to use Geo replication.')
     end
   end
 
@@ -55,7 +55,7 @@ describe Admin::Geo::NodesController, :postgresql do
         allow(Gitlab::Geo).to receive(:license_allows?).and_return(false)
       end
 
-      it_behaves_like 'with flash message', :alert, 'You need a different license to enable Geo replication'
+      it_behaves_like 'with flash message', :alert, 'You need a different license to use Geo replication'
 
       it 'does not redirects to the license page' do
         go
@@ -110,7 +110,13 @@ describe Admin::Geo::NodesController, :postgresql do
   end
 
   describe '#update' do
-    let(:geo_node_attributes) { { url: 'http://example.com', alternate_url: 'http://anotherexample.com', selective_sync_shards: %w[foo bar] } }
+    let(:geo_node_attributes) do
+      {
+        url: 'http://example.com',
+        internal_url: 'http://internal-url.com',
+        selective_sync_shards: %w[foo bar]
+      }
+    end
 
     let(:geo_node) { create(:geo_node) }
 
@@ -137,7 +143,7 @@ describe Admin::Geo::NodesController, :postgresql do
 
         geo_node.reload
         expect(geo_node.url.chomp('/')).to eq(geo_node_attributes[:url])
-        expect(geo_node.alternate_url.chomp('/')).to eq(geo_node_attributes[:alternate_url])
+        expect(geo_node.internal_url.chomp('/')).to eq(geo_node_attributes[:internal_url])
         expect(geo_node.selective_sync_shards).to eq(%w[foo bar])
       end
 

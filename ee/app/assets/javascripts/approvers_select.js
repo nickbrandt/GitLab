@@ -186,7 +186,7 @@ export default class ApproversSelect {
 
   static saveApproversComplete($input, $approverSelect, $loadWrapper) {
     $input.val('');
-    $approverSelect.select2('val', '');
+    $approverSelect.select2('val', '').trigger('change');
     $loadWrapper.addClass('hidden');
   }
 

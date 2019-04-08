@@ -3,11 +3,21 @@
 class OperationsController < ApplicationController
   before_action :authorize_read_operations_dashboard!
 
+  before_action :dashboard_feature_flag, only: [:environments]
+
   respond_to :json, only: [:list]
 
   POLLING_INTERVAL = 120_000
 
   def index
+  end
+
+  def environments
+    render :index
+  end
+
+  def dashboard_feature_flag
+    push_frontend_feature_flag(:environments_dashboard)
   end
 
   def list

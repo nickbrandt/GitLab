@@ -231,7 +231,7 @@ describe EE::DeploymentPlatform do
         stub_licensed_features(multiple_clusters: true)
       end
 
-      it 'should return the appropriate cluster' do
+      it 'returns the appropriate cluster' do
         expect(project.deployment_platform(environment: environment_1)).to eq(cluster_1.platform_kubernetes)
         expect(project.deployment_platform(environment: environment_2)).to eq(cluster_2.platform_kubernetes)
       end

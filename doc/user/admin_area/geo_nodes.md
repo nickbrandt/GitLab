@@ -27,7 +27,6 @@ Secondaries have a number of additional settings available:
 | Selective synchronization | Enable Geo [selective sync](../../administration/geo/replication/configuration.md#selective-synchronization) for this secondary. |
 | Repository sync capacity  | Number of concurrent requests this secondary will make to the primary when backfilling repositories. |
 | File sync capacity        | Number of concurrent requests this secondary will make to the primary when backfilling files. |
-| Alternate URL             | Allows users to log in to the secondary at an alternate URL (required for OAuth) |
 
 ## Geo backfill
 
@@ -47,12 +46,12 @@ you can increase the values to complete backfill in a shorter time. If it's
 under heavy load and backfill is reducing its availability for normal requests,
 you can decrease them.
 
-## Multiple secondaries behind a load balancer
+## Using a different URL for synchronization
 
-Secondaries are authenticated via OAuth with the primary. For security, the
-primary does not allow redirecting back to an arbitrary URL. If you want to
-allow users to log in to secondaries at a common name/load balancer URL, then
-this URL must be specified as the "Alternate URL" on every secondary behind it.
+The **primary** node's Internal URL is used by **secondary** nodes to contact it
+(to sync repositories, for example). The name Internal URL distinguishes it from
+[External URL](https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab)
+which is used by users. Internal URL does not need to be a private address.
 
-Additionally, the load balancer should use sticky sessions, since users must
-authenticate each first request to each secondary.
+Internal URL defaults to External URL, but you can customize it under
+**Admin area > Geo Nodes**.

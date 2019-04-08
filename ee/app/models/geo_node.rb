@@ -18,9 +18,8 @@ class GeoNode < ApplicationRecord
   default_values url: ->(record) { record.class.current_node_url },
                  primary: false
 
-  validates :url, presence: true, uniqueness: { case_sensitive: false }
-  validate :url_is_http
-  validate :alternate_url_is_http
+  validates :url, presence: true, uniqueness: { case_sensitive: false }, url: true
+  validates :internal_url, url: true, allow_blank: true, allow_nil: true
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
   validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
@@ -132,22 +131,22 @@ class GeoNode < ApplicationRecord
     @uri = nil
   end
 
-  def alternate_url
-    read_with_ending_slash(:alternate_url)
+  def internal_url
+    read_with_ending_slash(:internal_url).presence || read_with_ending_slash(:url)
   end
 
-  def alternate_url=(value)
-    write_with_ending_slash(:alternate_url, value)
-
-    @alternate_uri = nil
+  def internal_url=(value)
+    value = add_ending_slash(value) != url ? value : nil
+    write_with_ending_slash(:internal_url, value)
+    @internal_uri = nil
   end
 
   def uri
     @uri ||= URI.parse(url) if url.present?
   end
 
-  def alternate_uri
-    @alternate_uri ||= URI.parse(alternate_url) if alternate_url.present?
+  def internal_uri
+    @internal_uri ||= URI.parse(internal_url) if internal_url.present?
   end
 
   def geo_transfers_url(file_type, file_id)
@@ -167,12 +166,6 @@ class GeoNode < ApplicationRecord
 
   def oauth_callback_url
     Gitlab::Routing.url_helpers.oauth_geo_callback_url(url_helper_args)
-  end
-
-  def alternate_oauth_callback_url
-    return unless alternate_url.present?
-
-    Gitlab::Routing.url_helpers.oauth_geo_callback_url(alternate_url_helper_args)
   end
 
   def oauth_logout_url(state)
@@ -206,9 +199,9 @@ class GeoNode < ApplicationRecord
 
     if selective_sync_by_namespaces?
       query = Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
-      Project.where(namespace_id: query.select(:id))
+      Project.in_namespace(query.select(:id))
     elsif selective_sync_by_shards?
-      Project.where(repository_storage: selective_sync_shards)
+      Project.within_shards(selective_sync_shards)
     else
       Project.none
     end
@@ -249,7 +242,7 @@ class GeoNode < ApplicationRecord
   end
 
   def api_url(suffix)
-    Gitlab::Utils.append_path(uri.to_s, "api/#{API::API.version}/#{suffix}")
+    Gitlab::Utils.append_path(internal_uri.to_s, "api/#{API::API.version}/#{suffix}")
   end
 
   def ensure_access_keys!
@@ -263,10 +256,6 @@ class GeoNode < ApplicationRecord
 
   def url_helper_args
     url_helper_options(uri)
-  end
-
-  def alternate_url_helper_args
-    url_helper_options(alternate_uri)
   end
 
   def url_helper_options(given_uri)
@@ -289,24 +278,6 @@ class GeoNode < ApplicationRecord
     end
   end
 
-  def url_is_http
-    url_is_http_for(:url, uri)
-  end
-
-  def alternate_url_is_http
-    url_is_http_for(:alternate_url, alternate_uri)
-  end
-
-  def url_is_http_for(attribute, uri_value)
-    return unless uri_value
-
-    unless %w[http https].include?(uri_value.scheme)
-      errors.add(attribute, 'scheme must be http or https')
-    end
-  rescue URI::InvalidURIError
-    errors.add(attribute, 'is not a valid URI')
-  end
-
   def update_clone_url
     self.clone_url_prefix = Gitlab.config.gitlab_shell.ssh_path_prefix
   end
@@ -314,7 +285,7 @@ class GeoNode < ApplicationRecord
   def update_oauth_application!
     self.build_oauth_application if oauth_application.nil?
     self.oauth_application.name = "Geo node: #{self.url}"
-    self.oauth_application.redirect_uri = [oauth_callback_url, alternate_oauth_callback_url].compact.join("\n")
+    self.oauth_application.redirect_uri = oauth_callback_url
   end
 
   def expire_cache!

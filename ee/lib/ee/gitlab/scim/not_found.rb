@@ -4,9 +4,7 @@ module EE
   module Gitlab
     module Scim
       class NotFound < EE::Gitlab::Scim::Error
-        def status
-          404
-        end
+        STATUS = 404
       end
     end
   end

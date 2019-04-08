@@ -190,44 +190,52 @@ describe EpicLinks::CreateService, :postgresql do
           end
         end
 
-        context 'when adding an epic would would exceed level 5 in hierarchy' do
-          context 'when adding to already deep structure' do
-            before do
-              epic1 = create(:epic, group: group)
-              epic2 = create(:epic, group: group, parent: epic1)
-              epic3 = create(:epic, group: group, parent: epic2)
-              epic4 = create(:epic, group: group, parent: epic3)
+        context 'when adding to an Epic that is already at maximum depth' do
+          before do
+            epic1 = create(:epic, group: group)
+            epic2 = create(:epic, group: group, parent: epic1)
+            epic3 = create(:epic, group: group, parent: epic2)
+            epic4 = create(:epic, group: group, parent: epic3)
 
-              epic.update(parent: epic4)
-            end
-
-            subject { add_epic([valid_reference]) }
-
-            it 'returns an error' do
-              expect(subject).to eq(message: 'Epic hierarchy level too deep', status: :error, http_status: 409)
-            end
-
-            it 'no relationship is created' do
-              expect { subject }.not_to change { epic.children.count }
-            end
+            epic.update(parent: epic4)
           end
 
-          context 'when adding an epic already having some epics as children' do
+          subject { add_epic([valid_reference]) }
+
+          it 'returns an error' do
+            expect(subject).to eq(message: 'Epic hierarchy level too deep', status: :error, http_status: 409)
+          end
+
+          it 'no relationship is created' do
+            expect { subject }.not_to change { epic.children.count }
+          end
+        end
+
+        context 'when adding an Epic that has existing children' do
+          subject { add_epic([valid_reference]) }
+
+          context 'when total depth after adding would exceed limit' do
             before do
               epic1 = create(:epic, group: group)
 
               epic.update(parent: epic1) # epic is on level 2
 
-              # epic_to_add has 3 children (level 4 inlcuding epic_to_add)
+              # epic_to_add has 3 children (level 4 including epic_to_add)
               # that would mean level 6 after relating epic_to_add on epic
               epic2 = create(:epic, group: group, parent: epic_to_add)
               epic3 = create(:epic, group: group, parent: epic2)
               create(:epic, group: group, parent: epic3)
             end
 
-            subject { add_epic([valid_reference]) }
-
             include_examples 'returns not found error'
+          end
+
+          context 'when Epic to add has more than 5 children' do
+            before do
+              create_list(:epic, 8, group: group, parent: epic_to_add)
+            end
+
+            include_examples 'returns success'
           end
         end
 

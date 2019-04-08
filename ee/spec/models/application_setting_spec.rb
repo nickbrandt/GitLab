@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe ApplicationSetting do
+  using RSpec::Parameterized::TableSyntax
+
   subject(:setting) { described_class.create_from_defaults }
 
   describe 'validations' do
@@ -77,6 +79,27 @@ describe ApplicationSetting do
           setting.validate
 
           expect(setting.errors).not_to include(*tls_attributes)
+        end
+      end
+    end
+
+    context 'when validating allowed_ips' do
+      where(:allowed_ips, :is_valid) do
+        "192.1.1.1"                   | true
+        "192.1.1.0/24"                | true
+        "192.1.1.0/24, 192.1.20.23"   | true
+        "192.1.1.0/24, 192.23.0.0/16" | true
+        "192.1.1.0/34"                | false
+        "192.1.1.257"                 | false
+        "192.1.1.257, 192.1.1.1"      | false
+        "300.1.1.0/34"                | false
+      end
+
+      with_them do
+        it do
+          setting.update_column(:geo_node_allowed_ips, allowed_ips)
+
+          expect(setting.reload.valid?).to eq(is_valid)
         end
       end
     end

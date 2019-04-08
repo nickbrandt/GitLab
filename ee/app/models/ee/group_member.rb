@@ -16,5 +16,11 @@ module EE
 
       scope :non_owners, -> { where("members.access_level < ?", ::Gitlab::Access::OWNER) }
     end
+
+    class_methods do
+      def member_of_group?(group, user)
+        exists?(group: group, user: user)
+      end
+    end
   end
 end

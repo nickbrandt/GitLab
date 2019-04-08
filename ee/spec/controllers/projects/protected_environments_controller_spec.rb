@@ -31,19 +31,19 @@ describe Projects::ProtectedEnvironmentsController do
       end
 
       context 'with valid params' do
-        it 'should create a new ProtectedEnvironment' do
+        it 'creates a new ProtectedEnvironment' do
           expect do
             subject
           end.to change(ProtectedEnvironment, :count).by(1)
         end
 
-        it 'should set a flash' do
+        it 'sets a flash' do
           subject
 
           expect(controller).to set_flash[:notice].to(/environment has been protected/)
         end
 
-        it 'should redirect to CI/CD settings' do
+        it 'redirects to CI/CD settings' do
           subject
 
           expect(response).to redirect_to project_settings_ci_cd_path(project, anchor: 'js-protected-environments-settings')
@@ -57,13 +57,13 @@ describe Projects::ProtectedEnvironmentsController do
                          deploy_access_levels_attributes: [{ access_level: maintainer_access }])
         end
 
-        it 'should not create a new ProtectedEnvironment' do
+        it 'does not create a new ProtectedEnvironment' do
           expect do
             subject
           end.not_to change(ProtectedEnvironment, :count)
         end
 
-        it 'should redirect to CI/CD settings' do
+        it 'redirects to CI/CD settings' do
           subject
 
           expect(response).to redirect_to project_settings_ci_cd_path(project, anchor: 'js-protected-environments-settings')
@@ -76,7 +76,7 @@ describe Projects::ProtectedEnvironmentsController do
         project.add_developer(current_user)
       end
 
-      it 'should render 404' do
+      it 'renders 404' do
         subject
 
         expect(response).to have_gitlab_http_status(404)
@@ -114,15 +114,15 @@ describe Projects::ProtectedEnvironmentsController do
         subject
       end
 
-      it 'should find the requested protected environment' do
+      it 'finds the requested protected environment' do
         expect(assigns(:protected_environment)).to eq(protected_environment)
       end
 
-      it 'should update the protected environment' do
+      it 'updates the protected environment' do
         expect(protected_environment.deploy_access_levels.count).to eq(2)
       end
 
-      it 'should be success' do
+      it 'is successful' do
         expect(response).to have_gitlab_http_status(200)
       end
     end
@@ -134,7 +134,7 @@ describe Projects::ProtectedEnvironmentsController do
         subject
       end
 
-      it 'should not be success' do
+      it 'is not successful' do
         expect(response).to have_gitlab_http_status(404)
       end
     end
@@ -157,19 +157,19 @@ describe Projects::ProtectedEnvironmentsController do
         project.add_maintainer(current_user)
       end
 
-      it 'should find the requested protected environment' do
+      it 'finds the requested protected environment' do
         subject
 
         expect(assigns(:protected_environment)).to eq(protected_environment)
       end
 
-      it 'should delete the requested protected environment' do
+      it 'deletes the requested protected environment' do
         expect do
           subject
         end.to change { ProtectedEnvironment.count }.from(1).to(0)
       end
 
-      it 'should redirect to CI/CD settings' do
+      it 'redirects to CI/CD settings' do
         subject
 
         expect(response).to redirect_to project_settings_ci_cd_path(project, anchor: 'js-protected-environments-settings')
@@ -181,7 +181,7 @@ describe Projects::ProtectedEnvironmentsController do
         project.add_developer(current_user)
       end
 
-      it 'should not be success' do
+      it 'is not successful' do
         subject
 
         expect(response).to have_gitlab_http_status(404)

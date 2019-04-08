@@ -86,8 +86,8 @@ To display the Deploy Boards for a specific [environment] you should:
    Kubernetes.
 
    NOTE: **Note:**
-   The Kubernetes label of `app` is deprecated and will not be used for deploy
-   boards in the future.
+   The Kubernetes label of `app` is deprecated and may be removed in next major
+   release, GitLab 12.0.
 
     ![Deploy Boards Kubernetes Label](img/deploy_boards_kubernetes_label.png)
 

@@ -33,6 +33,8 @@ export default {
       'labelsPath',
       'labelsWebUrl',
       'epicsWebUrl',
+      'scopedLabels',
+      'scopedLabelsDocumentationLink',
     ]),
     epicContext() {
       return {
@@ -111,6 +113,8 @@ export default {
     :labels-web-url="labelsWebUrl"
     :label-filter-base-path="epicsWebUrl"
     :show-create="true"
+    :enable-scoped-labels="scopedLabels"
+    :scoped-labels-documentation-link="scopedLabelsDocumentationLink"
     ability-name="epic"
     @onLabelClick="handleLabelClick"
     @onDropdownClose="handleDropdownClose"

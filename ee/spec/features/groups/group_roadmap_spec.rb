@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe 'group epic roadmap', :js do
   include FilteredSearchHelpers
+  include MobileHelpers
 
   let(:user) { create(:user) }
   let(:group) { create(:group) }
@@ -71,6 +72,18 @@ describe 'group epic roadmap', :js do
       it 'renders all group epics within roadmap' do
         page.within('.roadmap-container .epics-list-section') do
           expect(page).to have_selector('.epics-list-item .epic-title', count: 3)
+        end
+      end
+
+      it 'resizing browser window causes Roadmap to re-render' do
+        page.within('.group-epics-roadmap .roadmap-container') do
+          initial_style = find('.roadmap-shell')[:style]
+
+          page.current_window.resize_to(2500, 1000)
+          wait_for_requests
+
+          expect(find('.roadmap-shell')[:style]).not_to eq(initial_style)
+          restore_window_size
         end
       end
     end

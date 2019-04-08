@@ -19,6 +19,6 @@ describe ::EE::Gitlab::Scim::Error do
   end
 
   it 'contains the status' do
-    expect(subject[:status]).to eq(409)
+    expect(subject[:status]).to eq(412)
   end
 end

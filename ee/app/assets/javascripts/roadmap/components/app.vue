@@ -42,10 +42,12 @@ export default {
       'epics',
       'timeframe',
       'extendedTimeframe',
+      'windowResizeInProgress',
       'epicsFetchInProgress',
       'epicsFetchForTimeframeInProgress',
       'epicsFetchResultEmpty',
       'epicsFetchFailure',
+      'isChildEpics',
     ]),
     timeframeStart() {
       return this.timeframe[0];
@@ -55,7 +57,12 @@ export default {
       return this.timeframe[last];
     },
     showRoadmap() {
-      return !this.epicsFetchFailure && !this.epicsFetchInProgress && !this.epicsFetchResultEmpty;
+      return (
+        !this.windowResizeInProgress &&
+        !this.epicsFetchFailure &&
+        !this.epicsFetchInProgress &&
+        !this.epicsFetchResultEmpty
+      );
     },
   },
   watch: {
@@ -79,7 +86,13 @@ export default {
     window.removeEventListener('resize', this.handleResizeThrottled, false);
   },
   methods: {
-    ...mapActions(['fetchEpics', 'fetchEpicsForTimeframe', 'extendTimeframe', 'refreshEpicDates']),
+    ...mapActions([
+      'setWindowResizeInProgress',
+      'fetchEpics',
+      'fetchEpicsForTimeframe',
+      'extendTimeframe',
+      'refreshEpicDates',
+    ]),
     /**
      * Roadmap view works with absolute sizing and positioning
      * of following child components of RoadmapShell;
@@ -91,14 +104,15 @@ export default {
      * And hence when window is resized, any size attributes passed
      * down to child components are no longer valid, so best approach
      * to refresh entire app is to re-render it on resize, hence
-     * we toggle `isLoading` variable which is bound to `RoadmapShell`.
+     * we toggle `windowResizeInProgress` variable which is bound
+     * to `RoadmapShell`.
      */
     handleResize() {
-      this.isLoading = true;
+      this.setWindowResizeInProgress(true);
       // We need to debounce the toggle to make sure loading animation
       // shows up while app is being rerendered.
       _.debounce(() => {
-        this.isLoading = false;
+        this.setWindowResizeInProgress(false);
       }, 200)();
     },
     /**
@@ -171,6 +185,7 @@ export default {
       :has-filters-applied="hasFiltersApplied"
       :new-epic-endpoint="newEpicEndpoint"
       :empty-state-illustration-path="emptyStateIllustrationPath"
+      :is-child-epics="isChildEpics"
     />
   </div>
 </template>

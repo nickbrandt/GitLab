@@ -10,15 +10,15 @@ class ElasticBatchProjectIndexerWorker
   # necessary
   sidekiq_options retry: 10
 
-  def perform(start, finish, update_index = false)
+  def perform(start, finish)
     projects = build_relation(start, finish)
 
-    projects.find_each { |project| run_indexer(project, update_index) }
+    projects.find_each { |project| run_indexer(project) }
   end
 
   private
 
-  def run_indexer(project, update_index)
+  def run_indexer(project)
     return unless project.use_elasticsearch?
 
     # Ensure we remove the hold on the project, no matter what, so ElasticCommitIndexerWorker can do its thing

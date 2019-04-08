@@ -19,7 +19,7 @@ namespace :gitlab do
       print "Enqueuing project repositories in batches of #{batch_size}"
 
       project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.perform_async(start, finish, ENV['UPDATE_INDEX'])
+        ElasticBatchProjectIndexerWorker.perform_async(start, finish)
         print "."
       end
 
@@ -41,7 +41,7 @@ namespace :gitlab do
 
       Sidekiq::Logging.logger = Logger.new(STDOUT)
       project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.new.perform(start, finish, ENV['UPDATE_INDEX'])
+        ElasticBatchProjectIndexerWorker.new.perform(start, finish)
       end
     end
 

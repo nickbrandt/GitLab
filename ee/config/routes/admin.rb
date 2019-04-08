@@ -40,6 +40,8 @@ namespace :admin do
         post :resync_all
       end
     end
+
+    resources :uploads, only: [:index, :destroy]
   end
 
   get '/dashboard/stats', to: 'dashboard#stats'

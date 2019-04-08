@@ -53,3 +53,10 @@
 .add-issuable-form-actions {
   margin-top: $gl-padding;
 }
+
+.limit-container-width {
+  .epic-page-container .issuable-details,
+  .emoji-list-container {
+    @include fixed-width-container;
+  }
+}

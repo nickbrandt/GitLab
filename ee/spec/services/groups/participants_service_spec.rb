@@ -19,7 +19,7 @@ describe Groups::ParticipantsService do
   end
 
   describe '#execute' do
-    it 'should add the owner to the list' do
+    it 'adds the owner to the list' do
       expect(described_class.new(group, user).execute(epic).first).to eq(user_to_autocompletable(user))
     end
   end
@@ -36,7 +36,7 @@ describe Groups::ParticipantsService do
       create(:note, author: user, project: nil, noteable: epic, note: @users.map { |u| u.to_reference }.join(' '))
     end
 
-    it 'should return all participants' do
+    it 'returns all participants' do
       service = described_class.new(group, user)
       service.instance_variable_set(:@noteable, epic)
       result = service.participants_in_noteable
@@ -53,7 +53,7 @@ describe Groups::ParticipantsService do
     let(:subgroup) { create(:group_with_members, parent: group) }
     let(:subproject) { create(:project, group: subgroup) }
 
-    it 'should return all members in parent groups, sub-groups, and sub-projects' do
+    it 'returns all members in parent groups, sub-groups, and sub-projects' do
       parent_group.add_developer(create(:user))
       subgroup.add_developer(create(:user))
       subproject.add_developer(create(:user))
@@ -74,12 +74,12 @@ describe Groups::ParticipantsService do
     describe 'avatar_url' do
       let(:groups) { described_class.new(group, user).groups }
 
-      it 'should return an url for the avatar' do
+      it 'returns a URL for the avatar' do
         expect(groups.size).to eq 1
         expect(groups.first[:avatar_url]).to eq("/uploads/-/system/group/avatar/#{group.id}/dk.png")
       end
 
-      it 'should return an url for the avatar with relative url' do
+      it 'returns a relative URL for the avatar' do
         stub_config_setting(relative_url_root: '/gitlab')
         stub_config_setting(url: Settings.send(:build_gitlab_url))
 

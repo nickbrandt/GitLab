@@ -1,0 +1,6 @@
+---
+title: Geo - Add selective sync support for the FDW queries to find registries to
+  verify
+merge_request: 10438
+author:
+type: changed

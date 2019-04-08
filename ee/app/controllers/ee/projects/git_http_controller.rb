@@ -47,15 +47,16 @@ module EE
       override :authenticate_user
       def authenticate_user
         return super unless geo_request?
-        return render_bad_geo_auth('Bad token') unless decoded_authorization
-        return render_bad_geo_auth('Unauthorized scope') unless jwt_scope_valid?
+        return render_bad_geo_response('Request from this IP is not allowed') unless ip_allowed?
+        return render_bad_geo_jwt('Bad token') unless decoded_authorization
+        return render_bad_geo_jwt('Unauthorized scope') unless jwt_scope_valid?
 
         # grant access
         @authentication_result = ::Gitlab::Auth::Result.new(nil, project, :geo, [:download_code, :push_code]) # rubocop:disable Gitlab/ModuleWithInstanceVariables
       rescue ::Gitlab::Geo::InvalidDecryptionKeyError
-        render_bad_geo_auth("Invalid decryption key")
+        render_bad_geo_jwt("Invalid decryption key")
       rescue ::Gitlab::Geo::InvalidSignatureTimeError
-        render_bad_geo_auth("Invalid signature time ")
+        render_bad_geo_jwt("Invalid signature time ")
       end
 
       def jwt_scope_valid?
@@ -72,8 +73,16 @@ module EE
         end
       end
 
-      def render_bad_geo_auth(message)
-        render plain: "Geo JWT authentication failed: #{message}", status: :unauthorized
+      def render_bad_geo_jwt(message)
+        render_bad_geo_response("Geo JWT authentication failed: #{message}")
+      end
+
+      def render_bad_geo_response(message)
+        render plain: message, status: :unauthorized
+      end
+
+      def ip_allowed?
+        ::Gitlab::Geo.allowed_ip?(request.ip)
       end
     end
   end

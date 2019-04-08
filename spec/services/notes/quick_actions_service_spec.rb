@@ -171,7 +171,7 @@ describe Notes::QuickActionsService do
     end
   end
 
-  context 'Issue assignees' do
+  context 'CE restriction for issue assignees' do
     describe '/assign' do
       let(:project) { create(:project) }
       let(:maintainer) { create(:user).tap { |u| project.add_maintainer(u) } }
@@ -185,6 +185,7 @@ describe Notes::QuickActionsService do
       end
 
       before do
+        stub_licensed_features(multiple_issue_assignees: false)
         project.add_maintainer(maintainer)
         project.add_maintainer(assignee)
       end
@@ -193,7 +194,7 @@ describe Notes::QuickActionsService do
         _, update_params = service.execute(note)
         service.apply_updates(update_params, note)
 
-        expect(note.noteable.assignees.count).to eq(2)
+        expect(note.noteable.assignees.count).to eq(1)
       end
     end
   end

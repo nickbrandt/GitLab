@@ -140,7 +140,7 @@ describe Gitlab::Database::LoadBalancing::ConnectionProxy do
         .and_return(session)
     end
 
-    it 'it uses but does not stick to the primary when sticking is disabled' do
+    it 'uses but does not stick to the primary when sticking is disabled' do
       expect(proxy.load_balancer).to receive(:read_write).and_yield(connection)
       expect(connection).to receive(:foo).with('foo')
       expect(session).not_to receive(:write!)

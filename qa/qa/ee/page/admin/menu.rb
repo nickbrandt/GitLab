@@ -9,8 +9,11 @@ module QA
             page.module_eval do
               view 'app/views/layouts/nav/sidebar/_admin.html.haml' do
                 element :link_license_menu
-                element :link_geo_menu
                 element :admin_settings_template_item
+              end
+
+              view 'ee/app/views/layouts/nav/ee/admin/_geo_sidebar.html.haml' do
+                element :link_geo_menu
               end
             end
           end

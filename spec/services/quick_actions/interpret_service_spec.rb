@@ -344,23 +344,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    shared_examples 'weight command' do
-      it 'populates weight: 5 if content contains /weight 5' do
-        _, updates = service.execute(content, issuable)
-
-        expect(updates).to eq(weight: 5)
-      end
-    end
-
-    shared_examples 'clear weight command' do
-      it 'populates weight: nil if content contains /clear_weight' do
-        issuable.update(weight: 5)
-        _, updates = service.execute(content, issuable)
-
-        expect(updates).to eq(weight: nil)
-      end
-    end
-
     shared_examples 'duplicate command' do
       it 'fetches issue and populates canonical_issue_id if content contains /duplicate issue_reference' do
         issue_duplicate # populate the issue
@@ -504,29 +487,6 @@ describe QuickActions::InterpretService do
           let(:issuable) { build(:merge_request, source_project: project) }
         end
       end
-
-      context 'not approved merge request can not be merged' do
-        before do
-          merge_request.target_project.update(approvals_before_merge: 1)
-        end
-
-        it_behaves_like 'empty command' do
-          let(:content) { "/merge" }
-          let(:issuable) { build(:merge_request, source_project: project) }
-        end
-      end
-
-      context 'approved merge request can be merged' do
-        before do
-          merge_request.update(approvals_before_merge: 1)
-          merge_request.approvals.create(user: developer)
-        end
-
-        it_behaves_like 'empty command' do
-          let(:content) { "/merge" }
-          let(:issuable) { build(:merge_request, source_project: project) }
-        end
-      end
     end
 
     it_behaves_like 'title command' do
@@ -612,7 +572,7 @@ describe QuickActions::InterpretService do
 
       context 'Issue' do
         it 'populates assignee_ids: [] if content contains /unassign' do
-          issue.update(assignee_ids: [developer.id])
+          issue.update!(assignee_ids: [developer.id])
           _, updates = service.execute(content, issue)
 
           expect(updates).to eq(assignee_ids: [])
@@ -621,7 +581,7 @@ describe QuickActions::InterpretService do
 
       context 'Merge Request' do
         it 'populates assignee_ids: [] if content contains /unassign' do
-          merge_request.update(assignee_ids: [developer.id])
+          merge_request.update!(assignee_ids: [developer.id])
           _, updates = service.execute(content, merge_request)
 
           expect(updates).to eq(assignee_ids: [])
@@ -907,40 +867,6 @@ describe QuickActions::InterpretService do
     it_behaves_like 'unlock command' do
       let(:content) { '/unlock' }
       let(:issuable) { merge_request }
-    end
-
-    context 'issuable weights licensed' do
-      before do
-        stub_licensed_features(issue_weights: true)
-      end
-
-      it_behaves_like 'weight command' do
-        let(:content) { '/weight 5'}
-        let(:issuable) { issue }
-      end
-
-      it_behaves_like 'clear weight command' do
-        let(:content) { '/clear_weight' }
-        let(:issuable) { issue }
-      end
-    end
-
-    context 'issuable weights unlicensed' do
-      before do
-        stub_licensed_features(issue_weights: false)
-      end
-
-      it 'does not recognise /weight X' do
-        _, updates = service.execute('/weight 5', issue)
-
-        expect(updates).to be_empty
-      end
-
-      it 'does not recognise /clear_weight' do
-        _, updates = service.execute('/clear_weight', issue)
-
-        expect(updates).to be_empty
-      end
     end
 
     context '/todo' do
@@ -1650,17 +1576,6 @@ describe QuickActions::InterpretService do
         service.execute(content, issue)
 
         expect(service.commands_executed_count).to eq(3)
-      end
-    end
-
-    # EE-specific tests
-
-    describe 'weight command' do
-      let(:content) { '/weight 4' }
-
-      it 'includes the number' do
-        _, explanations = service.explain(content, issue)
-        expect(explanations).to eq(['Sets weight to 4.'])
       end
     end
   end

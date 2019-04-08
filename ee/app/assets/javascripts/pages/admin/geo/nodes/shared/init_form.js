@@ -5,8 +5,10 @@ import Api from '~/api';
 
 const onPrimaryCheckboxChange = function onPrimaryCheckboxChange(e, $namespaces, $reverification) {
   const $namespacesSelect = $('.select2', $namespaces);
+  const $internalUrl = $('.js-internal-url');
 
   $namespacesSelect.select2('data', null);
+  $internalUrl.toggleClass('hidden', !e.currentTarget.checked);
   $namespaces.toggleClass('hidden', e.currentTarget.checked);
   $reverification.toggleClass('hidden', !e.currentTarget.checked);
 };

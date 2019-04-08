@@ -58,6 +58,15 @@ export default {
           });
         }
 
+        if (this.node.internalUrl) {
+          primaryNodeDetailItems.push({
+            itemTitle: s__('GeoNodes|Internal URL'),
+            itemValue: this.node.internalUrl,
+            itemValueType: VALUE_TYPE.PLAIN,
+            cssClass: 'node-detail-value-bold',
+          });
+        }
+
         return primaryNodeDetailItems;
       }
 
@@ -68,12 +77,6 @@ export default {
           itemValue: this.storageShardsStatus,
           itemValueType: VALUE_TYPE.PLAIN,
           cssClass: this.storageShardsCssClass,
-        },
-        {
-          itemTitle: s__('GeoNodes|Alternate URL'),
-          itemValue: this.node.alternateUrl,
-          itemValueType: VALUE_TYPE.PLAIN,
-          cssClass: 'node-detail-value-bold',
         },
       ];
     },
@@ -90,14 +93,6 @@ export default {
       return !this.nodeDetails.storageShardsMatch
         ? `${cssClass} node-detail-value-error`
         : cssClass;
-    },
-    sectionItemsContainerClasses() {
-      const { nodeTypePrimary, showSectionItems } = this;
-      return {
-        'col-md-6 prepend-left-15': nodeTypePrimary,
-        'row col-md-12 prepend-left-10': !nodeTypePrimary,
-        'd-flex': showSectionItems && !nodeTypePrimary,
-      };
     },
   },
   methods: {
@@ -118,13 +113,11 @@ export default {
     </div>
     <div
       v-show="showSectionItems"
-      :class="sectionItemsContainerClasses"
-      class="prepend-top-10 section-items-container"
+      class="col-md-6 prepend-left-15 prepend-top-10 section-items-container"
     >
       <geo-node-detail-item
         v-for="(nodeDetailItem, index) in nodeDetailItems"
         :key="index"
-        :class="{ 'prepend-top-15 prepend-left-10': nodeTypePrimary, 'col-sm-3': !nodeTypePrimary }"
         :css-class="nodeDetailItem.cssClass"
         :item-title="nodeDetailItem.itemTitle"
         :item-value="nodeDetailItem.itemValue"

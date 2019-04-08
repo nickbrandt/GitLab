@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190328210840) do
+ActiveRecord::Schema.define(version: 20190404231137) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -179,7 +179,6 @@ ActiveRecord::Schema.define(version: 20190328210840) do
     t.integer "gitaly_timeout_medium", default: 30, null: false
     t.integer "gitaly_timeout_fast", default: 10, null: false
     t.boolean "mirror_available", default: true, null: false
-    t.integer "default_project_creation", default: 2, null: false
     t.boolean "password_authentication_enabled_for_web"
     t.boolean "password_authentication_enabled_for_git", default: true, null: false
     t.string "auto_devops_domain"
@@ -218,6 +217,8 @@ ActiveRecord::Schema.define(version: 20190328210840) do
     t.integer "local_markdown_version", default: 0, null: false
     t.integer "first_day_of_week", default: 0, null: false
     t.boolean "elasticsearch_limit_indexing", default: false, null: false
+    t.integer "default_project_creation", default: 2, null: false
+    t.string "geo_node_allowed_ips", default: "0.0.0.0/0, ::/0"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
@@ -1042,14 +1043,19 @@ ActiveRecord::Schema.define(version: 20190328210840) do
     t.integer "issue_id", null: false
     t.string "filename", null: false
     t.index ["issue_id", "filename"], name: "index_design_management_designs_on_issue_id_and_filename", unique: true, using: :btree
-    t.index ["issue_id"], name: "index_design_management_designs_on_issue_id", unique: true, using: :btree
     t.index ["project_id"], name: "index_design_management_designs_on_project_id", using: :btree
   end
 
+  create_table "design_management_designs_versions", id: false, force: :cascade do |t|
+    t.bigint "design_id", null: false
+    t.bigint "version_id", null: false
+    t.index ["design_id", "version_id"], name: "design_management_designs_versions_uniqueness", unique: true, using: :btree
+    t.index ["design_id"], name: "index_design_management_designs_versions_on_design_id", using: :btree
+    t.index ["version_id"], name: "index_design_management_designs_versions_on_version_id", using: :btree
+  end
+
   create_table "design_management_versions", id: :bigserial, force: :cascade do |t|
-    t.bigint "design_management_design_id", null: false
     t.binary "sha", null: false
-    t.index ["design_management_design_id"], name: "index_design_management_versions_on_design_management_design_id", using: :btree
     t.index ["sha"], name: "index_design_management_versions_on_sha", unique: true, using: :btree
   end
 
@@ -1356,7 +1362,7 @@ ActiveRecord::Schema.define(version: 20190328210840) do
     t.text "selective_sync_shards"
     t.integer "verification_max_capacity", default: 100, null: false
     t.integer "minimum_reverification_interval", default: 7, null: false
-    t.string "alternate_url"
+    t.string "internal_url"
     t.index ["access_key"], name: "index_geo_nodes_on_access_key", using: :btree
     t.index ["primary"], name: "index_geo_nodes_on_primary", using: :btree
     t.index ["url"], name: "index_geo_nodes_on_url", unique: true, using: :btree
@@ -3475,7 +3481,8 @@ ActiveRecord::Schema.define(version: 20190328210840) do
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
-  add_foreign_key "design_management_versions", "design_management_designs", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "elasticsearch_indexed_namespaces", "namespaces", on_delete: :cascade

@@ -64,6 +64,9 @@ describe 'EE Clusters', :js do
             click_link 'Add existing cluster'
             fill_in 'cluster_name', with: 'staging-cluster'
             fill_in 'cluster_environment_scope', with: '*'
+            fill_in 'cluster_platform_kubernetes_attributes_api_url', with: 'https://0.0.0.0'
+            fill_in 'cluster_platform_kubernetes_attributes_token', with: 'token'
+
             click_button 'Add Kubernetes cluster'
           end
 

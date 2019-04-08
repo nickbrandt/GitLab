@@ -26,6 +26,8 @@ module API
         requires :id, type: Integer, desc: 'The DB ID of the file'
       end
       get 'transfers/:type/:id' do
+        check_gitlab_geo_request_ip!
+
         service = ::Geo::FileUploadService.new(params, headers['Authorization'])
         response = service.execute
 
@@ -44,6 +46,7 @@ module API
       # Example request:
       #   POST /geo/status
       post 'status' do
+        check_gitlab_geo_request_ip!
         authenticate_by_gitlab_geo_node_token!
 
         db_status = GeoNode.find(params[:geo_node_id]).find_or_build_status

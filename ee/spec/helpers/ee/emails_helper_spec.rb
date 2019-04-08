@@ -12,7 +12,7 @@ describe EE::EmailsHelper do
     end
 
     with_them do
-      it 'should return the expected title' do
+      it 'returns the expected title' do
         title = helper.action_title(path)
         expect(title).to eq(result)
       end

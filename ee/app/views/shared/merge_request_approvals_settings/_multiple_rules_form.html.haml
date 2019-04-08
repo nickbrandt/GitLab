@@ -1,6 +1,6 @@
 .form-group
   = form.label :approver_ids, class: 'label-bold' do
-    = _("Approvers")
+    = _("Add approvers")
   #js-mr-approvals-settings{ data: { 'project_id': @project.id,
     'project_path': api_v4_projects_path(id: @project.id),
     'settings_path': api_v4_projects_approval_settings_path(id: @project.id),
