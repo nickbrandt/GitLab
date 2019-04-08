@@ -12,7 +12,20 @@
         "labels"
       ],
       "properties": {
-        "group": { "type": ["object", null] },
+        "group": {
+          "type": ["object", "null"],
+          "required": [
+            "id",
+            "web_url",
+            "name"
+          ],
+          "properties": {
+            "id": { "type": "integer" },
+            "web_url": { "type": "string" },
+            "name": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
         "name": { "type": "string" },
         "weight": { "type": ["integer", "null"] },
         "assignee": {
