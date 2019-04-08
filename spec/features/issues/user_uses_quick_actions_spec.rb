@@ -58,6 +58,7 @@ describe 'Issues > User uses quick actions', :js do
 
     it_behaves_like 'confidential quick action'
     it_behaves_like 'remove_due_date quick action'
+    it_behaves_like 'duplicate quick action'
 
     describe 'adding a due date from note' do
       let(:issue) { create(:issue, project: project) }
