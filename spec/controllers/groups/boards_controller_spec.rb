@@ -55,7 +55,7 @@ describe Groups::BoardsController do
 
     context 'when format is JSON' do
       it 'return an array with one group board' do
-        create(:board, group: group, milestone: create(:milestone, group: group))
+        create(:board, group: group)
 
         expect(Boards::Visits::LatestService).not_to receive(:new)
 
