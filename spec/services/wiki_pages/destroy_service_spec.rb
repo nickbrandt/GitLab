@@ -8,12 +8,13 @@ describe WikiPages::DestroyService do
   subject(:service) { described_class.new(project, user) }
 
   before do
-    project.add_maintainer(user)
+    project.add_developer(user)
   end
 
   describe '#execute' do
     it 'executes webhooks' do
-      expect(service).to receive(:execute_hooks).once.with(instance_of(WikiPage), 'delete')
+      expect(service).to receive(:execute_hooks).once
+        .with(instance_of(WikiPage), 'delete')
 
       service.execute(page)
     end
