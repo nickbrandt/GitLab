@@ -37,7 +37,7 @@ describe API::Issues, :mailer do
         expect(response).to match_response_schema('public_api/v4/issues', dir: 'ee')
       end
 
-      describe "filtering by weight" do
+      context "filtering by weight" do
         let!(:issue1) { create(:issue, author: user2, project: project, weight: 1, created_at: 3.days.ago) }
         let!(:issue2) { create(:issue, author: user2, project: project, weight: 5, created_at: 2.days.ago) }
         let!(:issue3) { create(:issue, author: user2, project: project, weight: 3, created_at: 1.day.ago) }
@@ -59,6 +59,54 @@ describe API::Issues, :mailer do
 
           expect_paginated_array_response([issue3.id, issue2.id, issue1.id])
         end
+      end
+
+      context 'filtering by assignee_username' do
+        let(:another_assignee) { create(:assignee) }
+        let!(:issue1) { create(:issue, author: user2, project: project, weight: 1, created_at: 3.days.ago) }
+        let!(:issue2) { create(:issue, author: user2, project: project, weight: 5, created_at: 2.days.ago) }
+        let!(:issue3) { create(:issue, author: user2, assignees: [assignee, another_assignee], project: project, weight: 3, created_at: 1.day.ago) }
+
+        it 'returns issues with multiple assignees' do
+          get api("/issues", user), params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+
+          expect_paginated_array_response(issue3.id)
+        end
+      end
+    end
+  end
+
+  describe 'GET /groups/:id/issues' do
+    let!(:group)            { create(:group) }
+    let!(:group_project)    { create(:project, :public, creator_id: user.id, namespace: group) }
+
+    context 'filtering by assignee_username' do
+      let(:another_assignee) { create(:assignee) }
+      let!(:issue1) { create(:issue, author: user2, project: group_project, weight: 1, created_at: 3.days.ago) }
+      let!(:issue2) { create(:issue, author: user2, project: group_project, weight: 5, created_at: 2.days.ago) }
+      let!(:issue3) { create(:issue, author: user2, assignees: [assignee, another_assignee], project: group_project, weight: 3, created_at: 1.day.ago) }
+
+      it 'returns issues with multiple assignees' do
+        get api("/groups/#{group.id}/issues", user),
+             params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+
+        expect_paginated_array_response(issue3.id)
+      end
+    end
+  end
+
+  describe "GET /projects/:id/issues" do
+    context 'filtering by assignee_username' do
+      let(:another_assignee) { create(:assignee) }
+      let!(:issue1) { create(:issue, author: user2, project: project, weight: 1, created_at: 3.days.ago) }
+      let!(:issue2) { create(:issue, author: user2, project: project, weight: 5, created_at: 2.days.ago) }
+      let!(:issue3) { create(:issue, author: user2, assignees: [assignee, another_assignee], project: project, weight: 3, created_at: 1.day.ago) }
+
+      it 'returns issues with multiple assignees' do
+        get api("/projects/#{project.id}/issues", user),
+             params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+
+        expect_paginated_array_response(issue3.id)
       end
     end
   end
