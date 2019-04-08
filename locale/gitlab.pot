@@ -16,6 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+msgid " Please sign in."
+msgstr ""
+
 msgid " Status"
 msgstr ""
 
@@ -507,6 +510,9 @@ msgid "Accepted MR"
 msgstr ""
 
 msgid "Access Tokens"
+msgstr ""
+
+msgid "Access denied for your LDAP account."
 msgstr ""
 
 msgid "Access denied! Please verify you can add deploy keys to this repository."
@@ -1371,10 +1377,16 @@ msgstr ""
 msgid "Authentication Log"
 msgstr ""
 
+msgid "Authentication failed: %{error_message}"
+msgstr ""
+
 msgid "Authentication log"
 msgstr ""
 
 msgid "Authentication method"
+msgstr ""
+
+msgid "Authentication method updated"
 msgstr ""
 
 msgid "Authentication via U2F device failed."
@@ -1396,6 +1408,9 @@ msgid "Authorize"
 msgstr ""
 
 msgid "Authorize %{link_to_client} to use your account?"
+msgstr ""
+
+msgid "Authorized %{new_chat_name}"
 msgstr ""
 
 msgid "Authorized At"
@@ -1942,6 +1957,12 @@ msgid "Cancel this job"
 msgstr ""
 
 msgid "Cannot be merged automatically"
+msgstr ""
+
+msgid "Cannot create the abuse report. The user has been deleted."
+msgstr ""
+
+msgid "Cannot create the abuse report. This user has been blocked."
 msgstr ""
 
 msgid "Cannot modify managed Kubernetes cluster"
@@ -3125,10 +3146,16 @@ msgstr ""
 msgid "Copy token to clipboard"
 msgstr ""
 
+msgid "Could not authorize chat nickname. Try again!"
+msgstr ""
+
 msgid "Could not connect to FogBugz, check your URL"
 msgstr ""
 
 msgid "Could not create Wiki Repository at this time. Please try again later."
+msgstr ""
+
+msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
 msgid "Could not remove the trigger."
@@ -3138,6 +3165,9 @@ msgid "Could not retrieve the pipeline status. For troubleshooting steps, read t
 msgstr ""
 
 msgid "Could not revoke impersonation token %{token_name}."
+msgstr ""
+
+msgid "Could not revoke personal access token %{personal_access_token_name}."
 msgstr ""
 
 msgid "Coverage"
@@ -3150,6 +3180,9 @@ msgid "Create New Directory"
 msgstr ""
 
 msgid "Create New Domain"
+msgstr ""
+
+msgid "Create a GitLab account first, and then connect it to your %{label} account."
 msgstr ""
 
 msgid "Create a new branch"
@@ -3440,6 +3473,9 @@ msgstr ""
 msgid "Deleted"
 msgstr ""
 
+msgid "Deleted chat nickname: %{chat_name}!"
+msgstr ""
+
 msgid "Deleting the license failed."
 msgstr ""
 
@@ -3447,6 +3483,9 @@ msgid "Deleting the license failed. The license was not found."
 msgstr ""
 
 msgid "Deleting the license failed. You are not permitted to perform this action."
+msgstr ""
+
+msgid "Denied authorization of chat nickname %{user_name}."
 msgstr ""
 
 msgid "Deny"
@@ -4463,6 +4502,12 @@ msgid "Failed to reset key. Please try again."
 msgstr ""
 
 msgid "Failed to save new settings"
+msgstr ""
+
+msgid "Failed to save preferences (%{error_message})."
+msgstr ""
+
+msgid "Failed to save preferences."
 msgstr ""
 
 msgid "Failed to signing using smartcard authentication"
@@ -7764,6 +7809,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Password authentication is unavailable."
+msgstr ""
+
 msgid "Past due"
 msgstr ""
 
@@ -8043,10 +8091,16 @@ msgstr ""
 msgid "Please choose a group URL with no special characters."
 msgstr ""
 
+msgid "Please complete your profile with email address"
+msgstr ""
+
 msgid "Please convert them to %{link_to_git}, and go through the %{link_to_import_flow} again."
 msgstr ""
 
 msgid "Please convert them to Git on Google Code, and go through the %{link_to_import_flow} again."
+msgstr ""
+
+msgid "Please create a password for your new account."
 msgstr ""
 
 msgid "Please create a username with only alphanumeric characters."
@@ -8107,6 +8161,9 @@ msgid "Please wait while we import the repository for you. Refresh at will."
 msgstr ""
 
 msgid "Preferences"
+msgstr ""
+
+msgid "Preferences saved."
 msgstr ""
 
 msgid "Preferences|Navigation theme"
@@ -8314,6 +8371,9 @@ msgid "Profiles|Tell us about yourself in fewer than 250 characters"
 msgstr ""
 
 msgid "Profiles|The maximum file size allowed is 200KB."
+msgstr ""
+
+msgid "Profiles|There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
 msgstr ""
 
 msgid "Profiles|This doesn't look like a public SSH key, are you sure you want to add it?"
@@ -9284,6 +9344,9 @@ msgstr ""
 msgid "Revoked impersonation token %{token_name}!"
 msgstr ""
 
+msgid "Revoked personal access token %{personal_access_token_name}!"
+msgstr ""
+
 msgid "Roadmap"
 msgstr ""
 
@@ -9958,6 +10021,12 @@ msgstr ""
 msgid "Sign-up restrictions"
 msgstr ""
 
+msgid "Signing in using %{label} has been disabled"
+msgstr ""
+
+msgid "Signing in using your %{label} account without a pre-existing GitLab account is not allowed."
+msgstr ""
+
 msgid "Similar issues"
 msgstr ""
 
@@ -10507,6 +10576,9 @@ msgstr ""
 msgid "Successfully confirmed"
 msgstr ""
 
+msgid "Successfully deleted U2F device."
+msgstr ""
+
 msgid "Successfully removed email."
 msgstr ""
 
@@ -10684,6 +10756,9 @@ msgstr ""
 msgid "Test failed."
 msgstr ""
 
+msgid "Thank you for your report. A GitLab administrator will look into it shortly."
+msgstr ""
+
 msgid "Thanks! Don't show me this again"
 msgstr ""
 
@@ -10768,6 +10843,12 @@ msgid "The group settings for %{group_links} require you to enable Two-Factor Au
 msgstr ""
 
 msgid "The import will time out after %{timeout}. For repositories that take longer, use a clone/push combination."
+msgstr ""
+
+msgid "The invitation could not be accepted."
+msgstr ""
+
+msgid "The invitation could not be declined."
 msgstr ""
 
 msgid "The invitation has already been accepted."
@@ -12417,6 +12498,9 @@ msgstr ""
 msgid "Write milestone description..."
 msgstr ""
 
+msgid "Wrong extern UID provided. Make sure Auth0 is configured correctly."
+msgstr ""
+
 msgid "Yes"
 msgstr ""
 
@@ -12547,6 +12631,15 @@ msgid "You don't have any authorized applications"
 msgstr ""
 
 msgid "You don't have any deployments right now."
+msgstr ""
+
+msgid "You have been granted %{member_human_access} access to %{label}."
+msgstr ""
+
+msgid "You have been unsubscribed from this thread."
+msgstr ""
+
+msgid "You have declined the invitation to join %{label}."
 msgstr ""
 
 msgid "You have no permissions"
@@ -12718,6 +12811,12 @@ msgid "Your name"
 msgstr ""
 
 msgid "Your new SCIM token"
+msgstr ""
+
+msgid "Your new personal access token has been created."
+msgstr ""
+
+msgid "Your password reset token has expired."
 msgstr ""
 
 msgid "Your project limit is %{limit} projects! Please contact your administrator to increase it"
