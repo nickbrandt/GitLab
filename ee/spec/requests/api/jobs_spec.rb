@@ -11,60 +11,123 @@ describe API::Jobs do
                                ref: project.default_branch)
   end
 
-  let!(:job) { create(:ci_build, :success, pipeline: pipeline) }
+  let(:developer) { create(:user) }
 
-  let(:user) { create(:user) }
-  let(:api_user) { user }
-  let(:reporter) { create(:project_member, :reporter, project: project).user }
-  let(:cross_project_pipeline_enabled) { true }
+  let(:download_headers) do
+    { 'Content-Transfer-Encoding' => 'binary',
+      'Content-Disposition' =>
+    %Q(attachment; filename="#{job.artifacts_file.filename}"; filename*=UTF-8''#{job.artifacts_file.filename}) }
+  end
 
   before do
-    stub_licensed_features(cross_project_pipelines: cross_project_pipeline_enabled)
-    project.add_developer(user)
+    project.add_developer(developer)
   end
 
   describe 'GET /projects/:id/jobs/:job_id/artifacts' do
-    shared_examples 'downloads artifact' do
-      let(:download_headers) do
-        { 'Content-Transfer-Encoding' => 'binary',
-          'Content-Disposition' => 'attachment; filename="ci_build_artifacts.zip"; filename*=UTF-8\'\'ci_build_artifacts.zip' }
-      end
+    let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
 
-      it 'returns specific job artifacts' do
-        expect(response).to have_gitlab_http_status(200)
-        expect(response.headers.to_h).to include(download_headers)
-        expect(response.body).to match_file(job.artifacts_file.file.file)
-      end
-    end
-
-    context 'authorized by job_token' do
-      let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
-
-      before do
+    context 'when using job_token to authenticate' do
+      subject do
         get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), params: { job_token: job.token }
       end
 
-      context 'user is developer' do
-        let(:api_user) { user }
+      context 'when cross-project pipelines are enabled' do
+        before do
+          stub_licensed_features(cross_project_pipelines: true)
+        end
 
-        it_behaves_like 'downloads artifact'
-      end
+        context 'user is developer' do
+          let(:api_user) { developer }
 
-      context 'when anonymous user is accessing private artifacts' do
-        let(:api_user) { nil }
+          it 'returns specific job artifacts' do
+            subject
 
-        it 'hides artifacts and rejects request' do
-          expect(project).to be_private
-          expect(response).to have_gitlab_http_status(404)
+            expect(response).to have_gitlab_http_status(200)
+            expect(response.headers.to_h).to include(download_headers)
+            expect(response.body).to match_file(job.artifacts_file.file.file)
+          end
+        end
+
+        context 'when anonymous user is accessing private artifacts' do
+          let(:api_user) { nil }
+
+          it 'hides artifacts and rejects request' do
+            subject
+
+            expect(project).to be_private
+            expect(response).to have_gitlab_http_status(404)
+          end
         end
       end
 
-      context 'feature is disabled for EES' do
-        let(:api_user) { user }
-        let(:cross_project_pipeline_enabled) { false }
+      context 'when cross-project pipeline are disabled' do
+        let(:api_user) { developer }
 
         it 'disallows access to the artifacts' do
+          subject
+
           expect(response).to have_gitlab_http_status(404)
+        end
+      end
+    end
+  end
+
+  describe 'GET /projects/:id/artifacts/:ref_name/download?job=name' do
+    let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+
+    context 'when using job_token to authenticate' do
+      subject do
+        get api("/projects/#{project.id}/jobs/artifacts/#{pipeline.ref}/download"), params: { job: job.name, job_token: job.token }
+      end
+
+      context 'when cross-project pipelines are enabled' do
+        before do
+          stub_licensed_features(cross_project_pipelines: true)
+        end
+
+        context 'when user is developer' do
+          let(:api_user) { developer }
+
+          before do
+            job.success
+          end
+
+          context 'when artifacts are stored locally' do
+            it 'returns specific job artifacts' do
+              subject
+
+              expect(response).to have_gitlab_http_status(200)
+              expect(response.headers.to_h).to include(download_headers)
+              expect(response.body).to match_file(job.artifacts_file.file.file)
+            end
+          end
+
+          context 'when artifacts are stored remotely' do
+            let(:job) { create(:ci_build, pipeline: pipeline, user: api_user) }
+
+            before do
+              stub_artifacts_object_storage
+              job.job_artifacts << create(:ci_job_artifact, :archive, :remote_store)
+            end
+
+            subject { get api("/projects/#{project.id}/jobs/#{job.id}/artifacts", api_user) }
+
+            it 'returns location redirect' do
+              subject
+
+              expect(response).to have_gitlab_http_status(:found)
+            end
+          end
+        end
+
+        context 'when user is admin, but not member' do
+          let(:api_user) { create(:admin) }
+
+          it 'does not allow to see that artfiact is present' do
+            subject
+
+            expect(response).to have_gitlab_http_status(404)
+          end
         end
       end
     end
