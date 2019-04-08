@@ -26,8 +26,17 @@ describe Gitlab::Ci::Parsers::Security::Sast do
         expect(report.scanners.length).to eq(3)
       end
 
-      it "generates expected location fingerprint" do
-        expect(report.occurrences.first.location_fingerprint).to eq('d869ba3f0b3347eb2749135a437dc07c8ae0f420')
+      it 'generates expected location' do
+        location = report.occurrences.first.location
+
+        expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::Sast)
+        expect(location).to have_attributes(
+          file_path: 'python/hardcoded/hardcoded-tmp.py',
+          start_line: 1,
+          end_line: 1,
+          class_name: nil,
+          method_name: nil
+        )
       end
 
       it "generates expected metadata_version" do

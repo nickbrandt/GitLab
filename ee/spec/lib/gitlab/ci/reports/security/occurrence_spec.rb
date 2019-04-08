@@ -9,13 +9,14 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
     let(:primary_identifier) { create(:ci_reports_security_identifier) }
     let(:other_identifier) { create(:ci_reports_security_identifier) }
     let(:scanner) { create(:ci_reports_security_scanner) }
+    let(:location) { create(:ci_reports_security_locations_sast) }
 
     let(:params) do
       {
         compare_key: 'this_is_supposed_to_be_a_unique_value',
         confidence: :medium,
         identifiers: [primary_identifier, other_identifier],
-        location_fingerprint: '4e5b6966dd100170b4b1ad599c7058cce91b57b4',
+        location: location,
         metadata_version: 'sast:1.0',
         name: 'Cipher with no integrity',
         raw_metadata: 'I am a stringified json object',
@@ -35,7 +36,7 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
           confidence: :medium,
           project_fingerprint: '9a73f32d58d87d94e3dc61c4c1a94803f6014258',
           identifiers: [primary_identifier, other_identifier],
-          location_fingerprint: '4e5b6966dd100170b4b1ad599c7058cce91b57b4',
+          location: location,
           metadata_version: 'sast:1.0',
           name: 'Cipher with no integrity',
           raw_metadata: 'I am a stringified json object',
@@ -47,7 +48,7 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
       end
     end
 
-    %i[compare_key identifiers location_fingerprint metadata_version name raw_metadata report_type scanner uuid].each do |attribute|
+    %i[compare_key identifiers location metadata_version name raw_metadata report_type scanner uuid].each do |attribute|
       context "when attribute #{attribute} is missing" do
         before do
           params.delete(attribute)
@@ -70,7 +71,7 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
         compare_key: occurrence.compare_key,
         confidence: occurrence.confidence,
         identifiers: occurrence.identifiers,
-        location_fingerprint: occurrence.location_fingerprint,
+        location: occurrence.location,
         metadata_version: occurrence.metadata_version,
         name: occurrence.name,
         project_fingerprint: occurrence.project_fingerprint,
@@ -101,22 +102,19 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
 
     let(:identifier) { create(:ci_reports_security_identifier) }
     let(:other_identifier) { create(:ci_reports_security_identifier, external_type: 'other_identifier') }
+    let(:location) { create(:ci_reports_security_locations_sast) }
+    let(:other_location) { create(:ci_reports_security_locations_sast, file_path: 'other/file.rb') }
 
-    report_type = 'sast'
-    fingerprint = '4e5b6966dd100170b4b1ad599c7058cce91b57b4'
-    other_report_type = 'dependency_scanning'
-    other_fingerprint = '368d8604fb8c0g455d129274f5773aa2f31d4f7q'
-
-    where(:report_type_1, :location_fingerprint_1, :identifier_1, :report_type_2, :location_fingerprint_2, :identifier_2, :equal, :case_name) do
-      report_type | fingerprint | -> { identifier } | report_type       | fingerprint       | -> { identifier }       | true  | 'when report_type, location_fingerprint and primary identifier are equal'
-      report_type | fingerprint | -> { identifier } | other_report_type | fingerprint       | -> { identifier }       | false | 'when report_type is different'
-      report_type | fingerprint | -> { identifier } | report_type       | other_fingerprint | -> { identifier }       | false | 'when location_fingerprint is different'
-      report_type | fingerprint | -> { identifier } | report_type       | fingerprint       | -> { other_identifier } | false | 'when primary identifier is different'
+    where(:report_type_1, :location_1, :identifier_1, :report_type_2, :location_2, :identifier_2, :equal, :case_name) do
+      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { location }       | -> { identifier }       | true  | 'when report_type, location and primary identifier are equal'
+      'sast' | -> { location } | -> { identifier } | 'dependency_scanning' | -> { location }       | -> { identifier }       | false | 'when report_type is different'
+      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { other_location } | -> { identifier }       | false | 'when location is different'
+      'sast' | -> { location } | -> { identifier } | 'sast'                | -> { location }       | -> { other_identifier } | false | 'when primary identifier is different'
     end
 
     with_them do
-      let(:occurrence_1) { create(:ci_reports_security_occurrence, report_type: report_type_1, location_fingerprint: location_fingerprint_1, identifiers: [identifier_1.call]) }
-      let(:occurrence_2) { create(:ci_reports_security_occurrence, report_type: report_type_2, location_fingerprint: location_fingerprint_2, identifiers: [identifier_2.call]) }
+      let(:occurrence_1) { create(:ci_reports_security_occurrence, report_type: report_type_1, location: location_1.call, identifiers: [identifier_1.call]) }
+      let(:occurrence_2) { create(:ci_reports_security_occurrence, report_type: report_type_2, location: location_2.call, identifiers: [identifier_2.call]) }
 
       it "returns #{params[:equal]}" do
         expect(occurrence_1 == occurrence_2).to eq(equal)

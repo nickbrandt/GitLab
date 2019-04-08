@@ -8,7 +8,7 @@ module Gitlab
           attr_reader :compare_key
           attr_reader :confidence
           attr_reader :identifiers
-          attr_reader :location_fingerprint
+          attr_reader :location
           attr_reader :metadata_version
           attr_reader :name
           attr_reader :project_fingerprint
@@ -18,11 +18,11 @@ module Gitlab
           attr_reader :severity
           attr_reader :uuid
 
-          def initialize(compare_key:, identifiers:, location_fingerprint:, metadata_version:, name:, raw_metadata:, report_type:, scanner:, uuid:, confidence: nil, severity: nil) # rubocop:disable Metrics/ParameterLists
+          def initialize(compare_key:, identifiers:, location:, metadata_version:, name:, raw_metadata:, report_type:, scanner:, uuid:, confidence: nil, severity: nil) # rubocop:disable Metrics/ParameterLists
             @compare_key = compare_key
             @confidence = confidence
             @identifiers = identifiers
-            @location_fingerprint = location_fingerprint
+            @location = location
             @metadata_version = metadata_version
             @name = name
             @raw_metadata = raw_metadata
@@ -39,7 +39,7 @@ module Gitlab
               compare_key
               confidence
               identifiers
-              location_fingerprint
+              location
               metadata_version
               name
               project_fingerprint
@@ -59,7 +59,7 @@ module Gitlab
 
           def ==(other)
             other.report_type == report_type &&
-              other.location_fingerprint == location_fingerprint &&
+              other.location == location &&
               other.primary_identifier == primary_identifier
           end
 

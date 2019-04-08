@@ -31,10 +31,16 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
       expect(report.scanners.length).to eq(1)
     end
 
-    it "generates expected location fingerprint" do
-      expected = Digest::SHA1.hexdigest('debian:9:glibc')
+    it 'generates expected location' do
+      location = report.occurrences.first.location
 
-      expect(report.occurrences.first.location_fingerprint).to eq(expected)
+      expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::ContainerScanning)
+      expect(location).to have_attributes(
+        image: 'registry.gitlab.com/groulot/container-scanning-test/master:5f21de6956aee99ddb68ae49498662d9872f50ff',
+        operating_system: 'debian:9',
+        package_name: 'glibc',
+        package_version: '2.24-11+deb9u3'
+      )
     end
 
     it "generates expected metadata_version" do

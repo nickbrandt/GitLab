@@ -45,8 +45,12 @@ module Gitlab
             end
           end
 
-          def generate_location_fingerprint(location)
-            Digest::SHA1.hexdigest("#{location['path']}:#{location['method']}:#{location['param']}")
+          def create_location(location_data)
+            ::Gitlab::Ci::Reports::Security::Locations::Dast.new(
+              hostname: location_data['hostname'],
+              method_name: location_data['method'],
+              param: location_data['param'],
+              path: location_data['path'])
           end
         end
       end
