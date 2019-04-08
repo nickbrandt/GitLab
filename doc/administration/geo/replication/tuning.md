@@ -12,8 +12,6 @@ Increasing these values will increase the number of jobs that are scheduled.
 However, this may not lead to more downloads in parallel unless the number of
 available Sidekiq threads is also increased. For example, if repository sync
 capacity is increased from 25 to 50, you may also want to increase the number
-of Sidekiq threads from 25 to 50. See the [Sidekiq concurrency
-documentation][sidekiq-concurrency]
+of Sidekiq threads from 25 to 50. See the
+[Sidekiq concurrency documentation](../../operations/extra_sidekiq_processes.html#number-of-threads)
 for more details.
-
-[sidekiq-concurrency]: ../../operations/extra_sidekiq_processes.html#concurrency
