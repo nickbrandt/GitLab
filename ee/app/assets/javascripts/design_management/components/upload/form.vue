@@ -1,10 +1,9 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import UploadButton from './button.vue';
 
 export default {
   components: {
-    GlButton,
-    GlLoadingIcon,
+    UploadButton,
   },
   props: {
     isSaving: {
@@ -17,11 +16,8 @@ export default {
     },
   },
   methods: {
-    openFileUpload() {
-      this.$refs.fileUpload.click();
-    },
-    onFileUploadChange() {
-      this.$emit('upload', this.$refs.fileUpload.files);
+    onFileUploadChange(files) {
+      this.$emit('upload', files);
     },
   },
 };
@@ -30,24 +26,11 @@ export default {
 <template>
   <header class="row-content-block border-top-0 p-2 d-flex">
     <div>
-      <gl-button
+      <upload-button
         v-if="canUploadDesign"
-        :disabled="isSaving"
-        variant="primary"
-        class="btn-inverted"
-        @click="openFileUpload"
-      >
-        {{ s__('DesignManagement|Upload designs') }}
-        <gl-loading-icon v-if="isSaving" inline class="ml-1" />
-      </gl-button>
-      <input
-        ref="fileUpload"
-        type="file"
-        name="design_file"
-        accept="image/*"
-        class="hide"
-        multiple
-        @change="onFileUploadChange"
+        :is-saving="isSaving"
+        :is-inverted="true"
+        @upload="onFileUploadChange"
       />
     </div>
   </header>

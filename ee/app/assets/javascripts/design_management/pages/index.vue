@@ -4,6 +4,7 @@ import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
+import EmptyState from '../components/empty_state.vue';
 import allDesignsQuery from '../queries/allDesigns.graphql';
 import uploadDesignQuery from '../queries/uploadDesign.graphql';
 import appDataQuery from '../queries/appData.graphql';
@@ -14,6 +15,7 @@ export default {
     GlLoadingIcon,
     DesignList,
     UploadForm,
+    EmptyState,
   },
   apollo: {
     appData: {
@@ -44,7 +46,9 @@ export default {
   data() {
     return {
       designs: [],
-      permissions: {},
+      permissions: {
+        createDesign: false,
+      },
       error: false,
       isSaving: false,
       projectPath: '',
@@ -53,10 +57,16 @@ export default {
   },
   computed: {
     isLoading() {
-      return this.$apollo.queries.designs.loading && this.$apollo.queries.permissions.loading;
+      return this.$apollo.queries.designs.loading || this.$apollo.queries.permissions.loading;
     },
     canCreateDesign() {
       return this.permissions.createDesign;
+    },
+    showUploadForm() {
+      return this.canCreateDesign && this.hasDesigns;
+    },
+    hasDesigns() {
+      return this.designs.length > 0;
     },
   },
   methods: {
@@ -110,7 +120,7 @@ export default {
 <template>
   <div>
     <upload-form
-      v-if="canCreateDesign"
+      v-if="showUploadForm"
       :can-upload-design="canCreateDesign"
       :is-saving="isSaving"
       @upload="onUploadDesign"
@@ -120,8 +130,13 @@ export default {
       <div v-else-if="error" class="alert alert-danger">
         {{ __('An error occurred while loading designs. Please try again.') }}
       </div>
-      <design-list v-else-if="designs.length" :designs="designs" />
-      <div v-else>{{ __('No designs found.') }}</div>
+      <design-list v-else-if="hasDesigns" :designs="designs" />
+      <empty-state
+        v-else
+        :can-upload-design="canCreateDesign"
+        :is-saving="isSaving"
+        @upload="onUploadDesign"
+      />
     </div>
     <router-view />
   </div>
