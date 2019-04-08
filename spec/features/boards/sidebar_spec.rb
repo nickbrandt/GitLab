@@ -120,12 +120,6 @@ describe 'Issue Boards', :js do
       card_two = find('.board:nth-child(2)').find('.board-card:nth-child(2)')
       click_card(card_two)
 
-      def close_dropdown_menu_if_visible
-        find('.dropdown-menu-toggle', visible: :all).tap do |toggle|
-          toggle.click if toggle.visible?
-        end
-      end
-
       page.within('.assignee') do
         click_link 'Edit'
 
