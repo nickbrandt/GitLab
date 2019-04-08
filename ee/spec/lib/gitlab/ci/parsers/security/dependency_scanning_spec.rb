@@ -12,10 +12,10 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
     let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type) }
     let(:parser) { described_class.new }
 
-    where(:report_format, :occurrence_count, :identifier_count, :scanner_count, :fingerprint, :version) do
-      :dependency_scanning             | 4 | 7 | 2 | '2773f8cc955346ab1f756b94aa310db8e17c0944' | '1.3'
-      :dependency_scanning_deprecated  | 4 | 7 | 2 | '2773f8cc955346ab1f756b94aa310db8e17c0944' | '1.3'
-      :dependency_scanning_remediation | 2 | 3 | 1 | '228998b5db51d86d3b091939e2f5873ada0a14a1' | '2.0'
+    where(:report_format, :occurrence_count, :identifier_count, :scanner_count, :file_path, :package_name, :package_version, :version) do
+      :dependency_scanning             | 4 | 7 | 2 | 'app/pom.xml' | 'io.netty/netty' | '3.9.1.Final' | '1.3'
+      :dependency_scanning_deprecated  | 4 | 7 | 2 | 'app/pom.xml' | 'io.netty/netty' | '3.9.1.Final' | '1.3'
+      :dependency_scanning_remediation | 2 | 3 | 1 | 'yarn.lock'   | 'debug'          | '1.0.5'       | '2.0'
     end
 
     with_them do
@@ -33,8 +33,15 @@ describe Gitlab::Ci::Parsers::Security::DependencyScanning do
         expect(report.scanners.length).to eq(scanner_count)
       end
 
-      it "generates expected location fingerprint" do
-        expect(report.occurrences.first.location_fingerprint).to eq(fingerprint)
+      it 'generates expected location' do
+        location = report.occurrences.first.location
+
+        expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::DependencyScanning)
+        expect(location).to have_attributes(
+          file_path: file_path,
+          package_name: package_name,
+          package_version: package_version
+        )
       end
 
       it "generates expected metadata_version" do

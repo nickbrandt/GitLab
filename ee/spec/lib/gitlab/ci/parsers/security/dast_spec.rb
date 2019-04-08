@@ -23,12 +23,16 @@ describe Gitlab::Ci::Parsers::Security::Dast do
       expect(report.scanners.length).to eq(1)
     end
 
-    it 'generates expected location fingerprint' do
-      expected1 = Digest::SHA1.hexdigest(':GET:X-Content-Type-Options')
-      expected2 = Digest::SHA1.hexdigest('/:GET:X-Content-Type-Options')
+    it 'generates expected location' do
+      location = report.occurrences.first.location
 
-      expect(report.occurrences.first.location_fingerprint).to eq(expected1)
-      expect(report.occurrences.last.location_fingerprint).to eq(expected2)
+      expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::Dast)
+      expect(location).to have_attributes(
+        hostname: 'http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io',
+        method_name: 'GET',
+        param: 'X-Content-Type-Options',
+        path: ''
+      )
     end
 
     describe 'occurrence properties' do

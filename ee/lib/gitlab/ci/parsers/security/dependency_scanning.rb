@@ -11,8 +11,11 @@ module Gitlab
 
           private
 
-          def generate_location_fingerprint(location)
-            Digest::SHA1.hexdigest("#{location['file']}:#{location.dig('dependency', 'package', 'name')}")
+          def create_location(location_data)
+            ::Gitlab::Ci::Reports::Security::Locations::DependencyScanning.new(
+              file_path: location_data['file'],
+              package_name: location_data.dig('dependency', 'package', 'name'),
+              package_version: location_data.dig('dependency', 'version'))
           end
         end
       end

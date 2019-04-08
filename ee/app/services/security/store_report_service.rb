@@ -50,11 +50,11 @@ module Security
       find_params = {
         scanner: scanners_objects[occurrence.scanner.key],
         primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
-        location_fingerprint: occurrence.location_fingerprint
+        location_fingerprint: occurrence.location.fingerprint
       }
 
       create_params = occurrence.to_hash
-        .except(:compare_key, :identifiers, :scanner) # rubocop: disable CodeReuse/ActiveRecord
+        .except(:compare_key, :identifiers, :location, :scanner) # rubocop: disable CodeReuse/ActiveRecord
 
       begin
         project.vulnerabilities

@@ -5,7 +5,7 @@ FactoryBot.define do
     compare_key 'this_is_supposed_to_be_a_unique_value'
     confidence :medium
     identifiers { Array.new(1) { FactoryBot.build(:ci_reports_security_identifier) } }
-    location_fingerprint '4e5b6966dd100170b4b1ad599c7058cce91b57b4'
+    location factory: :ci_reports_security_locations_sast
     metadata_version 'sast:1.0'
     name 'Cipher with no integrity'
     report_type :sast

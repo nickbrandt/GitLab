@@ -50,7 +50,7 @@ module Gitlab
                 report_type: report.type,
                 name: data['message'],
                 compare_key: data['cve'],
-                location_fingerprint: generate_location_fingerprint(data['location']),
+                location: create_location(data['location']),
                 severity: parse_level(data['severity']),
                 confidence: parse_level(data['confidence']),
                 scanner: scanner,
@@ -96,7 +96,7 @@ module Gitlab
             input.blank? ? 'undefined' : input.downcase
           end
 
-          def generate_location_fingerprint(location)
+          def create_location(location_data)
             raise NotImplementedError
           end
         end
