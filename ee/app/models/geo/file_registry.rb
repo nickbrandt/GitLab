@@ -8,6 +8,7 @@ class Geo::FileRegistry < Geo::BaseRegistry
   scope :failed, -> { where(success: false).where.not(retry_count: nil) }
   scope :never, -> { where(success: false, retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
+  scope :with_file_type, ->(type) { where(file_type: type) }
 
   self.inheritance_column = 'file_type'
 
