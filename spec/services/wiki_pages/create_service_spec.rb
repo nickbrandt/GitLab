@@ -15,7 +15,7 @@ describe WikiPages::CreateService do
   subject(:service) { described_class.new(project, user, opts) }
 
   before do
-    project.add_maintainer(user)
+    project.add_developer(user)
   end
 
   describe '#execute' do
@@ -23,11 +23,14 @@ describe WikiPages::CreateService do
       page = service.execute
 
       expect(page).to be_valid
-      expect(page).to have_attributes(title: opts[:title], content: opts[:content], format: opts[:format].to_sym)
+      expect(page.title).to eq(opts[:title])
+      expect(page.content).to eq(opts[:content])
+      expect(page.format).to eq(opts[:format].to_sym)
     end
 
     it 'executes webhooks' do
-      expect(service).to receive(:execute_hooks).once.with(instance_of(WikiPage), 'create')
+      expect(service).to receive(:execute_hooks).once
+        .with(instance_of(WikiPage), 'create')
 
       service.execute
     end
