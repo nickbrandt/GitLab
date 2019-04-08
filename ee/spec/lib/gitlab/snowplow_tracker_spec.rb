@@ -8,7 +8,7 @@ describe Gitlab::SnowplowTracker do
     Timecop.freeze(timestamp) { example.run }
   end
 
-  subject { described_class.track_event('category', 'action', property: 'what', value: 'doit') }
+  subject { described_class.track_event('epics', 'action', property: 'what', value: 'doit') }
 
   context '.track_event' do
     context 'when Snowplow tracker is disabled' do
@@ -20,10 +20,13 @@ describe Gitlab::SnowplowTracker do
     end
 
     context 'when Snowplow tracker is enabled' do
-      it 'tracks the event' do
+      before do
         stub_application_setting(snowplow_enabled: true)
         stub_application_setting(snowplow_site_id: 'awesome gitlab')
         stub_application_setting(snowplow_collector_uri: 'url.com')
+      end
+
+      it 'tracks the event' do
         tracker = double
 
         expect(::SnowplowTracker::Tracker).to receive(:new)
@@ -33,7 +36,7 @@ describe Gitlab::SnowplowTracker do
             'cf', 'awesome gitlab'
           ).and_return(tracker)
         expect(tracker).to receive(:track_struct_event)
-          .with('category', 'action', nil, 'what', 'doit', nil, timestamp.to_i)
+          .with('epics', 'action', nil, 'what', 'doit', nil, timestamp.to_i)
 
         subject
       end
