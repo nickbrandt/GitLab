@@ -5,28 +5,33 @@ module EE
     module BranchPushService
       extend ::Gitlab::Utils::Override
 
-      protected
-
-      override :execute_related_hooks
-      def execute_related_hooks
-        if should_index_commits?
-          ::ElasticCommitIndexerWorker.perform_async(project.id, params[:oldrev], params[:newrev])
-        end
+      override :execute
+      def execute
+        enqueue_elasticsearch_indexing
 
         super
       end
 
       private
 
-      def should_index_commits?
-        default_branch? &&
-          project.use_elasticsearch? &&
-          ::Gitlab::Redis::SharedState.with { |redis| !redis.sismember(:elastic_projects_indexing, project.id) }
+      def enqueue_elasticsearch_indexing
+        return unless should_index_commits?
+
+        ::ElasticCommitIndexerWorker.perform_async(
+          project.id,
+          params[:oldrev],
+          params[:newrev]
+        )
       end
 
-      override :pipeline_options
-      def pipeline_options
-        { mirror_update: project.mirror? && project.repository.up_to_date_with_upstream?(branch_name) }
+      def should_index_commits?
+        return false unless default_branch?
+        return false unless project.use_elasticsearch?
+
+        # Check that we're not already indexing this project
+        ::Gitlab::Redis::SharedState.with do |redis|
+          !redis.sismember(:elastic_projects_indexing, project.id)
+        end
       end
     end
   end

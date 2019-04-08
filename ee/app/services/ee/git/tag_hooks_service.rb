@@ -2,7 +2,7 @@
 
 module EE
   module Git
-    module TagPushService
+    module TagHooksService
       extend ::Gitlab::Utils::Override
 
       private

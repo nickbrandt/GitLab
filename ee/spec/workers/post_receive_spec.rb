@@ -22,8 +22,14 @@ describe PostReceive do
         allow_any_instance_of(Gitlab::DataBuilder::Repository).to receive(:update).and_return(fake_hook_data)
         # silence hooks so we can isolate
         allow_any_instance_of(Key).to receive(:post_create_hook).and_return(true)
-        allow_any_instance_of(Git::TagPushService).to receive(:execute).and_return(true)
-        allow_any_instance_of(Git::BranchPushService).to receive(:execute).and_return(true)
+
+        expect_next_instance_of(Git::TagPushService) do |service|
+          expect(service).to receive(:execute).and_return(true)
+        end
+
+        expect_next_instance_of(Git::BranchPushService) do |service|
+          expect(service).to receive(:execute).and_return(true)
+        end
       end
 
       it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
