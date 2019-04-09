@@ -45,7 +45,7 @@ describe Members::DestroyService do
 
     it 'invalidates cached counts for assigned issues and merge requests', :aggregate_failures do
       create(:issue, project: group_project, assignees: [member_user])
-      create(:merge_request, source_project: group_project, assignee: member_user)
+      create(:merge_request, source_project: group_project, assignees: [member_user])
       create(:todo, :pending, project: group_project, user: member_user)
       create(:todo, :done, project: group_project, user: member_user)
 

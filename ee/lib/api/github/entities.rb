@@ -135,7 +135,9 @@ module API
 
       class PullRequest < Grape::Entity
         expose :title
-        expose :assignee, using: User
+        expose :assignee, using: User do |merge_request|
+          merge_request.assignee
+        end
         expose :author, as: :user, using: User
         expose :created_at
         expose :description, as: :body

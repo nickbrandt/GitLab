@@ -54,6 +54,11 @@ module EE
       super
     end
 
+    def allows_multiple_assignees?
+      project.multiple_mr_assignees_enabled? &&
+        project.feature_available?(:multiple_merge_request_assignees)
+    end
+
     def supports_weight?
       false
     end

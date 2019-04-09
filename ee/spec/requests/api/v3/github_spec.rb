@@ -215,11 +215,12 @@ describe API::V3::Github do
 
   describe 'repo pulls' do
     let(:assignee) { create(:user) }
+    let(:assignee2) { create(:user) }
     let!(:merge_request) do
-      create(:merge_request, source_project: project, target_project: project, author: user, assignee: assignee)
+      create(:merge_request, source_project: project, target_project: project, author: user, assignees: [assignee])
     end
     let!(:merge_request_2) do
-      create(:merge_request, source_project: project2, target_project: project2, author: user, assignee: assignee)
+      create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
     end
 
     describe 'GET /-/jira/pulls' do

@@ -1338,9 +1338,6 @@ msgstr ""
 msgid "Assigned Merge Requests"
 msgstr ""
 
-msgid "Assigned to :name"
-msgstr ""
-
 msgid "Assigned to me"
 msgstr ""
 
@@ -7354,9 +7351,6 @@ msgstr ""
 msgid "No activities found"
 msgstr ""
 
-msgid "No assignee"
-msgstr ""
-
 msgid "No branches found"
 msgstr ""
 
@@ -7466,9 +7460,6 @@ msgid "Nodes"
 msgstr ""
 
 msgid "None"
-msgstr ""
-
-msgid "Not allowed to merge"
 msgstr ""
 
 msgid "Not available"
@@ -9690,9 +9681,6 @@ msgid "Select a timezone"
 msgstr ""
 
 msgid "Select an existing Kubernetes cluster or create a new one"
-msgstr ""
-
-msgid "Select assignee"
 msgstr ""
 
 msgid "Select branch/tag"
@@ -12844,9 +12832,6 @@ msgid "allowed to fail"
 msgstr ""
 
 msgid "among other things"
-msgstr ""
-
-msgid "assign yourself"
 msgstr ""
 
 msgid "at"

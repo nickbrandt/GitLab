@@ -2,16 +2,12 @@
 
 module EE
   module FormHelper
-    def issue_assignees_dropdown_options
-      options = super
+    def issue_supports_multiple_assignees?
+      current_board_parent.feature_available?(:multiple_issue_assignees)
+    end
 
-      if current_board_parent.feature_available?(:multiple_issue_assignees)
-        options[:title] = 'Select assignee(s)'
-        options[:data][:'dropdown-header'] = 'Assignee(s)'
-        options[:data].delete(:'max-select')
-      end
-
-      options
+    def merge_request_supports_multiple_assignees?
+      @merge_request&.allows_multiple_assignees?
     end
   end
 end

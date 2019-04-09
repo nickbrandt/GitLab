@@ -17,7 +17,7 @@ describe Projects::MergeRequests::DraftsController do
 
   before do
     sign_in(user)
-    stub_licensed_features(batch_comments: true)
+    stub_licensed_features(batch_comments: true, multiple_merge_request_assignees: true)
     stub_commonmark_sourcepos_disabled
   end
 
@@ -237,15 +237,17 @@ describe Projects::MergeRequests::DraftsController do
     end
 
     it 'publishes a draft note with quick actions and applies them' do
-      create(:draft_note, merge_request: merge_request, author: user, note: "/assign #{user.to_reference}")
+      project.add_developer(user2)
+      create(:draft_note, merge_request: merge_request, author: user,
+                          note: "/assign #{user.to_reference} #{user2.to_reference}")
 
-      expect(merge_request.assignee_id).to be_nil
+      expect(merge_request.assignees).to be_empty
 
       expect { post :publish, params: params }.to change { Note.count }.by(1)
         .and change { DraftNote.count }.by(-1)
 
       expect(response).to have_gitlab_http_status(200)
-      expect(merge_request.reload.assignee_id).to eq(user.id)
+      expect(merge_request.reload.assignee_ids).to match_array([user.id, user2.id])
       expect(Note.last.system?).to be true
     end
 
