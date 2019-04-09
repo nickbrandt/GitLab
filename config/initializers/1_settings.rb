@@ -295,6 +295,19 @@ Settings.packages['storage_path'] = Settings.absolute(Settings.packages['storage
 Settings.packages['object_store'] = ObjectStoreSettings.parse(Settings.packages['object_store'])
 
 #
+# Dependency Proxy
+#
+Settings['dependency_proxy'] ||= Settingslogic.new({})
+Settings.dependency_proxy['enabled']      = true if Settings.dependency_proxy['enabled'].nil?
+Settings.dependency_proxy['storage_path'] = Settings.absolute(Settings.dependency_proxy['storage_path'] || File.join(Settings.shared['path'], "dependency_proxy"))
+Settings.dependency_proxy['object_store'] = ObjectStoreSettings.parse(Settings.dependency_proxy['object_store'])
+# For first iteration dependency proxy uses Rails server to download blobs.
+# To ensure acceptable performance we only allow feature to be used with
+# multithreaded web-server Puma. This will be removed once download logic is moved
+# to GitLab workhorse
+Settings.dependency_proxy['enabled'] = false unless defined?(::Puma)
+
+#
 # Mattermost
 #
 Settings['mattermost'] ||= Settingslogic.new({})
