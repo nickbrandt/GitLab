@@ -55,14 +55,17 @@ class GeoNode < ApplicationRecord
                  encode: true
 
   class << self
+    # Set in gitlab.rb as external_url
     def current_node_url
       RequestStore.fetch('geo_node:current_node_url') do
-        cfg = Gitlab.config.gitlab
+        Gitlab.config.gitlab.url
+      end
+    end
 
-        uri = URI.parse("#{cfg.protocol}://#{cfg.host}:#{cfg.port}#{cfg.relative_url_root}")
-        uri.path += '/' unless uri.path.end_with?('/')
-
-        uri.to_s
+    # Set in gitlab.rb as geo_node_name
+    def current_node_name
+      RequestStore.fetch('geo_node:current_node_name') do
+        Gitlab.config.geo.node_name
       end
     end
 
