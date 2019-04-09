@@ -44,44 +44,10 @@
       "type": "date"
     },
     "assignee": {
-      "type": "object",
-      "required": [
-        "id",
-        "login",
-        "url"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "login": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+      "$ref": "user.json"
     },
     "author": {
-      "type": "object",
-      "required": [
-        "id",
-        "login",
-        "url"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "login": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+      "$ref": "user.json"
     },
     "head": {
       "type": "object",
