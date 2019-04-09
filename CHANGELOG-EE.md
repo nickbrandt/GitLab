@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.7 (2019-04-09)
+
+### Security (1 change)
+
+- Expose only basic group attributes in boards API.
+
+
 ## 11.9.6 (2019-04-04)
 
 ### Fixed (3 changes)
