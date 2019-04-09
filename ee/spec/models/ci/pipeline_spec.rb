@@ -508,4 +508,36 @@ describe Ci::Pipeline do
       end
     end
   end
+
+  describe '#latest_merge_request_pipeline?' do
+    subject { pipeline.latest_merge_request_pipeline? }
+
+    let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
+    let(:pipeline) { merge_request.all_pipelines.first }
+    let(:args) { {} }
+
+    it { is_expected.to be_truthy }
+
+    context 'when pipeline is not merge request pipeline' do
+      let(:pipeline) { build(:ci_pipeline) }
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when source sha is outdated' do
+      before do
+        pipeline.source_sha = merge_request.diff_base_sha
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when target sha is outdated' do
+      before do
+        pipeline.target_sha = 'old-sha'
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
 end
