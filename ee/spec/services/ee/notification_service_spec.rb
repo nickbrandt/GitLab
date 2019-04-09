@@ -2,46 +2,8 @@ require 'spec_helper'
 
 describe EE::NotificationService, :mailer do
   include NotificationHelpers
-  include ExternalAuthorizationServiceHelpers
+
   let(:subject) { NotificationService.new }
-
-  context 'with external authentication service' do
-    let(:issue) { create(:issue) }
-    let(:project) { issue.project }
-    let(:note) { create(:note, noteable: issue, project: project) }
-    let(:member) { create(:user) }
-
-    before do
-      project.add_maintainer(member)
-      member.global_notification_setting.update!(level: :watch)
-    end
-
-    it 'sends email when the service is not enabled' do
-      expect(Notify).to receive(:new_issue_email).with(member.id, issue.id, nil).and_call_original
-
-      subject.new_issue(issue, member)
-    end
-
-    context 'when the service is enabled' do
-      before do
-        enable_external_authorization_service_check
-      end
-
-      it 'does not send an email' do
-        expect(Notify).not_to receive(:new_issue_email)
-
-        subject.new_issue(issue, member)
-      end
-
-      it 'still delivers email to admins' do
-        member.update!(admin: true)
-
-        expect(Notify).to receive(:new_issue_email).with(member.id, issue.id, nil).and_call_original
-
-        subject.new_issue(issue, member)
-      end
-    end
-  end
 
   context 'service desk issues' do
     before do

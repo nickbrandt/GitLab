@@ -30,15 +30,6 @@ module EE
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
 
-      with_scope :subject
-      condition(:classification_label_authorized, score: 32) do
-        EE::Gitlab::ExternalAuthorization.access_allowed?(
-          @user,
-          @subject.external_authorization_classification_label,
-          @subject.full_path
-        )
-      end
-
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -190,25 +181,6 @@ module EE
       rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.enable :change_commit_committer_check
 
       rule { owner | reporter }.enable :build_read_project
-
-      rule { ~can?(:read_cross_project) & ~classification_label_authorized }.policy do
-        # Preventing access here still allows the projects to be listed. Listing
-        # projects doesn't check the `:read_project` ability. But instead counts
-        # on the `project_authorizations` table.
-        #
-        # All other actions should explicitly check read project, which would
-        # trigger the `classification_label_authorized` condition.
-        #
-        # `:read_project_for_iids` is not prevented by this condition, as it is
-        # used for cross-project reference checks.
-        prevent :guest_access
-        prevent :public_access
-        prevent :public_user_access
-        prevent :reporter_access
-        prevent :developer_access
-        prevent :maintainer_access
-        prevent :owner_access
-      end
 
       rule { archived }.policy do
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|

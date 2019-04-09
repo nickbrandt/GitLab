@@ -10,8 +10,8 @@ module EE
           attrs += EE::ApplicationSettingsHelper.repository_mirror_attributes
         end
 
-        if License.feature_available?(:external_authorization_service)
-          attrs += EE::ApplicationSettingsHelper.external_authorization_service_attributes
+        if License.feature_available?(:project_creation_level)
+          attrs << :default_project_creation
         end
 
         if License.feature_available?(:custom_project_templates)
