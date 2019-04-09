@@ -66,7 +66,6 @@ class License < ApplicationRecord
     variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
-    external_authorization_service
     ci_cd_projects
     protected_environments
     custom_project_templates
@@ -179,7 +178,6 @@ class License < ApplicationRecord
     multiple_ldap_servers
     object_storage
     repository_size_limit
-    external_authorization_service
     custom_project_templates
   ].freeze
 

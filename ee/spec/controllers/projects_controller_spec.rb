@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe ProjectsController do
-  include ExternalAuthorizationServiceHelpers
-
   let(:project) { create(:project) }
   let(:user) { create(:user) }
 
@@ -277,30 +275,6 @@ describe ProjectsController do
             end.not_to change(project, param)
           end
         end
-      end
-    end
-
-    it_behaves_like 'unauthorized when external service denies access' do
-      subject do
-        put :update,
-            params: {
-              namespace_id: project.namespace,
-              id: project,
-              project: { description: 'Hello world' }
-            }
-        project.reload
-      end
-
-      it 'updates when the service allows access' do
-        external_service_allow_access(user, project)
-
-        expect { subject }.to change(project, :description)
-      end
-
-      it 'does not update when the service rejects access' do
-        external_service_deny_access(user, project)
-
-        expect { subject }.not_to change(project, :description)
       end
     end
   end

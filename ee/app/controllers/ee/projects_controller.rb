@@ -37,7 +37,6 @@ module EE
         repository_size_limit
         reset_approvals_on_push
         service_desk_enabled
-        external_authorization_classification_label
         ci_cd_only
         use_custom_template
         packages_enabled

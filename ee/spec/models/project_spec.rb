@@ -4,7 +4,6 @@ require 'spec_helper'
 
 describe Project do
   include ProjectForksHelper
-  include ExternalAuthorizationServiceHelpers
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
@@ -1239,43 +1238,6 @@ describe Project do
 
       expect(projects).to include(project1)
       expect(projects).not_to include(project2)
-    end
-  end
-
-  describe '#external_authorization_classification_label' do
-    it 'falls back to the default when none is configured' do
-      enable_external_authorization_service_check
-
-      expect(build(:project).external_authorization_classification_label)
-        .to eq('default_label')
-    end
-
-    it 'returns `nil` if the feature is disabled' do
-      stub_licensed_features(external_authorization_service: false)
-
-      project = build(:project,
-                      external_authorization_classification_label: 'hello')
-
-      expect(project.external_authorization_classification_label)
-        .to eq(nil)
-    end
-
-    it 'returns the classification label if it was configured on the project' do
-      enable_external_authorization_service_check
-
-      project = build(:project,
-                      external_authorization_classification_label: 'hello')
-
-      expect(project.external_authorization_classification_label)
-        .to eq('hello')
-    end
-
-    it 'does not break when not stubbing the license check' do
-      enable_external_authorization_service_check
-      enable_namespace_license_check!
-      project = build(:project)
-
-      expect { project.external_authorization_classification_label }.not_to raise_error
     end
   end
 

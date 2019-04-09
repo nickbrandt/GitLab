@@ -16,12 +16,6 @@ module EE
               attrs = attrs.except(*::EE::ApplicationSettingsHelper.repository_mirror_attributes)
             end
 
-            unless ::License.feature_available?(:external_authorization_service)
-              attrs = attrs.except(
-                *::EE::ApplicationSettingsHelper.external_authorization_service_attributes
-              )
-            end
-
             unless ::License.feature_available?(:email_additional_text)
               attrs = attrs.except(:email_additional_text)
             end
