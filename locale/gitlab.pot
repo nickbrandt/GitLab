@@ -3667,6 +3667,12 @@ msgstr ""
 msgid "DesignManagement|Go to previous design"
 msgstr ""
 
+msgid "DesignManagement|The one place for your designs"
+msgstr ""
+
+msgid "DesignManagement|Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
+msgstr ""
+
 msgid "DesignManagement|Upload designs"
 msgstr ""
 
@@ -7370,9 +7376,6 @@ msgid "No contributions were found"
 msgstr ""
 
 msgid "No credit card required."
-msgstr ""
-
-msgid "No designs found."
 msgstr ""
 
 msgid "No details available"

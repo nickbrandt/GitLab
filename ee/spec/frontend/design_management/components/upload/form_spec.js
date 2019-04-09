@@ -13,14 +13,12 @@ describe('Design management upload form component', () => {
     });
   }
 
-  it('renders upload design button', () => {
-    createComponent();
-
-    expect(vm.element).toMatchSnapshot();
+  afterEach(() => {
+    vm.destroy();
   });
 
-  it('renders loading icon', () => {
-    createComponent(true);
+  it('renders upload design button', () => {
+    createComponent();
 
     expect(vm.element).toMatchSnapshot();
   });
@@ -35,23 +33,9 @@ describe('Design management upload form component', () => {
     it('emits upload event', () => {
       createComponent();
 
-      jest.spyOn(vm.find({ ref: 'fileUpload' }).element, 'files', 'get').mockReturnValue('test');
-
-      vm.vm.onFileUploadChange();
+      vm.vm.onFileUploadChange('test');
 
       expect(vm.emitted().upload[0]).toEqual(['test']);
-    });
-  });
-
-  describe('openFileUpload', () => {
-    it('triggers click on input', () => {
-      createComponent();
-
-      const clickSpy = jest.spyOn(vm.find({ ref: 'fileUpload' }).element, 'click');
-
-      vm.vm.openFileUpload();
-
-      expect(clickSpy).toHaveBeenCalled();
     });
   });
 });
