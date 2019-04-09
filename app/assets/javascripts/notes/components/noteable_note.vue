@@ -4,6 +4,7 @@ import { mapGetters, mapActions } from 'vuex';
 import { escape } from 'underscore';
 import { truncateSha } from '~/lib/utils/text_utility';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
+import draftMixin from 'ee_else_ce/notes/mixins/draft';
 import { s__, sprintf } from '../../locale';
 import Flash from '../../flash';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -23,7 +24,7 @@ export default {
     noteBody,
     TimelineEntryItem,
   },
-  mixins: [noteable, resolvable],
+  mixins: [noteable, resolvable, draftMixin],
   props: {
     note: {
       type: Object,
@@ -72,9 +73,6 @@ export default {
         target: this.isTarget,
         'is-editable': this.note.current_user.can_edit,
       };
-    },
-    canResolve() {
-      return this.note.resolvable && !!this.getUserData.id;
     },
     canReportAsAbuse() {
       return !!this.note.report_abuse_path && this.author.id !== this.getUserData.id;
@@ -164,7 +162,7 @@ export default {
         callback: () => this.updateSuccess(),
       });
 
-      if (this.note.isDraft) return;
+      if (this.isDraft) return;
 
       const data = {
         endpoint: this.note.path,
@@ -252,9 +250,7 @@ export default {
           :can-award-emoji="note.current_user.can_award_emoji"
           :can-delete="note.current_user.can_edit"
           :can-report-as-abuse="canReportAsAbuse"
-          :can-resolve="
-            note.current_user.can_resolve || (note.isDraft && note.discussion_id !== null)
-          "
+          :can-resolve="canResolve"
           :report-abuse-path="note.report_abuse_path"
           :resolvable="note.resolvable || note.isDraft"
           :is-resolved="note.resolved || note.resolve_discussion"
