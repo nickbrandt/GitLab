@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe 'Issue Boards', :js do
   include BoardHelpers
+  include FilteredSearchHelpers
 
   let(:user)         { create(:user) }
   let(:user2)        { create(:user) }
@@ -22,7 +23,6 @@ describe 'Issue Boards', :js do
   end
 
   before do
-    stub_licensed_features(multiple_issue_assignees: false)
     project.add_maintainer(user)
 
     sign_in(user)
@@ -130,6 +130,7 @@ describe 'Issue Boards', :js do
           click_link 'Unassigned'
         end
 
+        close_dropdown_menu_if_visible
         wait_for_requests
 
         expect(page).to have_content('No assignee')
