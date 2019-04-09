@@ -12,14 +12,7 @@
 module Gitlab
   module Geo
     class Fdw
-      class FileRegistryQueryBuilder < SimpleDelegator
-        attr_reader :query
-
-        def initialize(query = nil)
-          @query = query || base_query
-          super(query)
-        end
-
+      class FileRegistryQueryBuilder < BaseQueryBuilder
         # rubocop:disable CodeReuse/ActiveRecord
         def for_model(model)
           reflect(
@@ -39,12 +32,8 @@ module Gitlab
 
         private
 
-        def base_query
-          ::Geo::FileRegistry
-        end
-
-        def reflect(query)
-          self.class.new(query)
+        def base
+          ::Geo::FileRegistry.select(file_registry_table[Arel.star])
         end
 
         def file_registry_table
