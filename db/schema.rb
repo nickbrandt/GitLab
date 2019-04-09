@@ -991,6 +991,25 @@ ActiveRecord::Schema.define(version: 20190404231137) do
     t.float "percentage_service_desk_issues", default: 0.0, null: false
   end
 
+  create_table "dependency_proxy_blobs", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.bigint "size"
+    t.integer "file_store"
+    t.string "file_name", null: false
+    t.text "file", null: false
+    t.index ["group_id", "file_name"], name: "index_dependency_proxy_blobs_on_group_id_and_file_name", using: :btree
+  end
+
+  create_table "dependency_proxy_group_settings", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.index ["group_id"], name: "index_dependency_proxy_group_settings_on_group_id", using: :btree
+  end
+
   create_table "deploy_keys_projects", force: :cascade do |t|
     t.integer "deploy_key_id", null: false
     t.integer "project_id", null: false
@@ -3479,6 +3498,8 @@ ActiveRecord::Schema.define(version: 20190404231137) do
   add_foreign_key "clusters_kubernetes_namespaces", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "projects", on_delete: :nullify
   add_foreign_key "container_repositories", "projects"
+  add_foreign_key "dependency_proxy_blobs", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "dependency_proxy_group_settings", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
