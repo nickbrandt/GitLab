@@ -27,7 +27,8 @@ module QA
         Runtime::Env.personal_access_token = @original_personal_access_token
       end
 
-      context 'using group cn method' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/95
+      context 'using group cn method', :quarantine do
         let(:ldap_users) do
           [
               {
@@ -77,7 +78,8 @@ module QA
         end
       end
 
-      context 'user filter method' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/95
+      context 'user filter method', :quarantine do
         let(:ldap_users) do
           [
               {
