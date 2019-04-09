@@ -25,6 +25,9 @@ module EE
       has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :hooks, dependent: :destroy, class_name: 'GroupHook' # rubocop:disable Cop/ActiveRecordDependent
 
+      has_one :dependency_proxy_setting, class_name: 'DependencyProxy::GroupSetting'
+      has_many :dependency_proxy_blobs, class_name: 'DependencyProxy::Blob'
+
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
       has_many :audit_events, -> { where(entity_type: ::Group.name) }, foreign_key: 'entity_id'
