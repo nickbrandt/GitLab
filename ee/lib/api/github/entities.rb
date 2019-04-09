@@ -115,8 +115,14 @@ module API
       class User < Grape::Entity
         expose :id
         expose :username, as: :login
-        expose :url do |user|
-          Gitlab::Routing.url_helpers.user_url(user)
+        expose :user_url, as: :url
+        expose :user_url, as: :html_url
+        expose :avatar_url
+
+        private
+
+        def user_url
+          Gitlab::Routing.url_helpers.user_url(object)
         end
       end
 

@@ -1,0 +1,5 @@
+---
+title: Add missing endpoint for user information to GitHub API
+merge_request: 10482
+author:
+type: fixed
