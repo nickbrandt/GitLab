@@ -15,7 +15,7 @@ describe 'User views issue designs', :js do
   end
 
   it 'opens design detail' do
-    first('.js-design-list-item').click
+    find('.js-design-list-item', match: :first).click
 
     page.within(find('.js-design-header')) do
       expect(page).to have_content('test.jpg')
