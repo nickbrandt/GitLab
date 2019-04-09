@@ -86,27 +86,6 @@ describe 'Merge request > User selects branches for new MR', :js do
     expect(target_items.count).to be > 1
   end
 
-  context 'when approvals are enabled for the target project' do
-    before do
-      project.update(approvals_before_merge: 1)
-
-      visit project_new_merge_request_path(project, merge_request: { target_branch: 'master', source_branch: 'feature_conflict' })
-    end
-
-    it 'shows approval settings' do
-      expect(page).to have_content('Approvers')
-    end
-
-    context 'saving the MR' do
-      it 'shows the saved MR' do
-        fill_in 'merge_request_title', with: 'Test'
-        click_button 'Submit merge request'
-
-        expect(page).to have_link('Close merge request')
-      end
-    end
-  end
-
   context 'when target project cannot be viewed by the current user' do
     it 'does not leak the private project name & namespace' do
       private_project = create(:project, :private, :repository)
