@@ -17,7 +17,7 @@ to learn how to protect your organization.
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your source code for known
 vulnerabilities using Static Application Security Testing (SAST).
 
-You can take advantage of SAST by either [including the CI job](#configuration) in
+You can take advantage of SAST by either [including the CI job](#configuring-sast) in
 your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
@@ -90,7 +90,7 @@ This can be done in two ways:
 
 NOTE: **Note:**
 The CI/CD SAST template is supported on GitLab 11.9 and later versions.
-For earlier versions, use the [manual job definition](#manual-job-definition).
+For earlier versions, use the [manual job definition](#manual-job-definition-for-gitlab-115-and-later).
 
 A CI/CD [SAST template](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml)
 with the default SAST job definition is provided as a part of your GitLab
