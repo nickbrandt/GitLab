@@ -95,7 +95,8 @@ describe Ci::RetryBuildService do
     end
 
     it 'has correct number of known attributes' do
-      known_accessors = CLONE_ACCESSORS + REJECT_ACCESSORS + IGNORE_ACCESSORS
+      processed_accessors = CLONE_ACCESSORS + REJECT_ACCESSORS
+      known_accessors = processed_accessors + IGNORE_ACCESSORS
 
       # :tag_list is a special case, this accessor does not exist
       # in reflected associations, comes from `act_as_taggable` and
@@ -108,7 +109,8 @@ describe Ci::RetryBuildService do
 
       current_accessors.uniq!
 
-      expect(known_accessors).to contain_exactly(*current_accessors)
+      expect(current_accessors).to include(*processed_accessors)
+      expect(known_accessors).to include(*current_accessors)
     end
   end
 
