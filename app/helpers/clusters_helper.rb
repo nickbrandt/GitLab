@@ -20,6 +20,11 @@ module ClustersHelper
 
     !cluster.provider.legacy_abac?
   end
+
+  # EE overrides this
+  def show_cluster_health_graphs?(cluster)
+    false
+  end
 end
 
 ClustersHelper.prepend(EE::ClustersHelper)
