@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.6.0
+
+- Add new endpoint to add support to proxy websocket requests to build's services !370
+
 v8.5.1
 
 - Remove duplicate X-Request-Id response header !384
