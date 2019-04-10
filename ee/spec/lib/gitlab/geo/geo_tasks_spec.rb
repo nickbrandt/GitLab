@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Gitlab::Geo::GeoTasks do
   describe '.set_primary_geo_node' do
     before do
+      allow(GeoNode).to receive(:current_node_name).and_return('https://primary.geo.example.com')
       allow(GeoNode).to receive(:current_node_url).and_return('https://primary.geo.example.com')
     end
 

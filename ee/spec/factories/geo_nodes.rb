@@ -9,6 +9,7 @@ FactoryBot.define do
 
       uri.to_s
     end
+    name { url }
 
     primary false
 

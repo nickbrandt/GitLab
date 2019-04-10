@@ -116,9 +116,10 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
 
         expect(Gitlab::Metrics.registry.get(:geo_db_replication_lag_seconds).values.count).to eq(2)
         expect(Gitlab::Metrics.registry.get(:geo_repositories).values.count).to eq(3)
-        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: secondary.url })).to eq(10)
-        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: another_secondary.url })).to eq(10)
-        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ url: primary.url })).to eq(10)
+
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ name: secondary.name, url: secondary.name })).to eq(10)
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ name: another_secondary.name, url: another_secondary.name })).to eq(10)
+        expect(Gitlab::Metrics.registry.get(:geo_repositories).get({ name: primary.name, url: primary.name })).to eq(10)
       end
 
       it 'updates the GeoNodeStatus entry' do
@@ -202,7 +203,7 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       end
 
       def metric_value(metric_name)
-        Gitlab::Metrics.registry.get(metric_name)&.get({ url: secondary.url })
+        Gitlab::Metrics.registry.get(metric_name)&.get({ name: secondary.name, url: secondary.name })
       end
     end
   end

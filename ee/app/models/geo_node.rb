@@ -71,9 +71,9 @@ class GeoNode < ApplicationRecord
     end
 
     def current_node
-      return unless column_names.include?('url')
+      return unless column_names.include?('name')
 
-      GeoNode.find_by(url: current_node_url)
+      GeoNode.find_by(name: current_node_name)
     end
 
     def primary_node
@@ -111,7 +111,7 @@ class GeoNode < ApplicationRecord
   end
 
   def current?
-    self.class.current_node_url == url
+    self.class.current_node_name == name
   end
 
   def secondary?
@@ -279,7 +279,7 @@ class GeoNode < ApplicationRecord
 
   # Prevent locking yourself out
   def check_not_adding_primary_as_secondary
-    if url == self.class.current_node_url
+    if name == self.class.current_node_name
       errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
     end
   end

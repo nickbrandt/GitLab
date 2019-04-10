@@ -323,13 +323,13 @@ describe GeoNode, :geo, type: :model do
 
   describe '#current?' do
     it 'returns true when node is the current node' do
-      node = described_class.new(url: described_class.current_node_url)
+      node = described_class.new(name: described_class.current_node_name)
 
       expect(node.current?).to be_truthy
     end
 
     it 'returns false when node is not the current node' do
-      node = described_class.new(url: 'http://another.node.com:8080/foo')
+      node = described_class.new(name: 'some other node')
 
       expect(node.current?).to be_falsy
     end
