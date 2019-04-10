@@ -38,7 +38,8 @@ module QA
         end
       end
 
-      context 'instance level' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/51
+      context 'instance level', :quarantine do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_credentials)
