@@ -15,6 +15,7 @@ class GeoNode < ApplicationRecord
   has_many :namespaces, through: :geo_node_namespace_links
   has_one :status, class_name: 'GeoNodeStatus'
 
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :url, presence: true, uniqueness: { case_sensitive: false }, addressable_url: true
   validates :internal_url, addressable_url: true, allow_blank: true, allow_nil: true
 

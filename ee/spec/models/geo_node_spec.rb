@@ -23,12 +23,17 @@ describe GeoNode, :geo, type: :model do
   end
 
   context 'validations' do
+    subject { build(:geo_node) }
+
     it { is_expected.to validate_inclusion_of(:selective_sync_type).in_array([nil, *GeoNode::SELECTIVE_SYNC_TYPES]) }
     it { is_expected.to validate_numericality_of(:repos_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:files_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:verification_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
+    it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:url) }
+    it { is_expected.to validate_uniqueness_of(:url).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
 
     context 'when validating primary node' do
       it 'cannot be disabled' do
