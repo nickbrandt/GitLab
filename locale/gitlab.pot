@@ -7559,9 +7559,6 @@ msgstr ""
 msgid "Metrics|No deployed environments"
 msgstr ""
 
-msgid "Metrics|Not enough data to display"
-msgstr ""
-
 msgid "Metrics|PromQL query is valid"
 msgstr ""
 
@@ -9361,6 +9358,57 @@ msgid "ProjectSettings|Users can only push commits to this repository that were 
 msgstr ""
 
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
+msgstr ""
+
+msgid "ProjectTemplates|.NET Core"
+msgstr ""
+
+msgid "ProjectTemplates|Android"
+msgstr ""
+
+msgid "ProjectTemplates|Go Micro"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/GitBook"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Hexo"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Hugo"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Jekyll"
+msgstr ""
+
+msgid "ProjectTemplates|Netlify/Plain HTML"
+msgstr ""
+
+msgid "ProjectTemplates|NodeJS Express"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/GitBook"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Hexo"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Hugo"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Jekyll"
+msgstr ""
+
+msgid "ProjectTemplates|Pages/Plain HTML"
+msgstr ""
+
+msgid "ProjectTemplates|Ruby on Rails"
+msgstr ""
+
+msgid "ProjectTemplates|Spring"
+msgstr ""
+
+msgid "ProjectTemplates|iOS (Swift)"
 msgstr ""
 
 msgid "Projects"
