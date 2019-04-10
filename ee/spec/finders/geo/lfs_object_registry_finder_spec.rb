@@ -9,13 +9,17 @@ describe Geo::LfsObjectRegistryFinder, :geo do
   # different connection.
   let(:secondary) { create(:geo_node) }
   let(:synced_group) { create(:group) }
+  let(:nested_group_1) { create(:group, parent: synced_group) }
   let(:synced_project) { create(:project, group: synced_group) }
+  let(:synced_project_in_nested_group) { create(:project, group: nested_group_1) }
   let(:unsynced_project) { create(:project) }
+  let(:project_broken_storage) { create(:project, :broken_storage) }
 
-  let(:lfs_object_1) { create(:lfs_object) }
-  let(:lfs_object_2) { create(:lfs_object) }
-  let(:lfs_object_3) { create(:lfs_object) }
-  let(:lfs_object_4) { create(:lfs_object) }
+  let!(:lfs_object_1) { create(:lfs_object) }
+  let!(:lfs_object_2) { create(:lfs_object) }
+  let!(:lfs_object_3) { create(:lfs_object) }
+  let!(:lfs_object_4) { create(:lfs_object) }
+  let!(:lfs_object_5) { create(:lfs_object) }
   let(:lfs_object_remote_1) { create(:lfs_object, :object_storage) }
   let(:lfs_object_remote_2) { create(:lfs_object, :object_storage) }
 
@@ -29,30 +33,27 @@ describe Geo::LfsObjectRegistryFinder, :geo do
   shared_examples 'counts all the things' do
     describe '#count_syncable' do
       before do
-        lfs_object_1
-        lfs_object_2
-        lfs_object_3
-        lfs_object_4
+        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
+        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
       end
 
       it 'counts LFS objects' do
-        expect(subject.count_syncable).to eq 4
+        expect(subject.count_syncable).to eq 5
       end
 
       it 'ignores remote LFS objects' do
         lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
-        expect(subject.count_syncable).to eq 3
+        expect(subject.count_syncable).to eq 4
       end
 
-      context 'with selective sync' do
+      context 'with selective sync by namespace' do
         before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
-
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
         end
 
@@ -62,6 +63,22 @@ describe Geo::LfsObjectRegistryFinder, :geo do
 
         it 'ignores remote LFS objects' do
           lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts LFS objects' do
+          expect(subject.count_syncable).to eq 2
+        end
+
+        it 'ignores remote LFS objects' do
+          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_syncable).to eq 1
         end
@@ -297,7 +314,7 @@ describe Geo::LfsObjectRegistryFinder, :geo do
 
         lfs_objects = subject.find_unsynced(batch_size: 10)
 
-        expect(lfs_objects).to match_ids(lfs_object_2, lfs_object_4)
+        expect(lfs_objects).to match_ids(lfs_object_2, lfs_object_4, lfs_object_5)
       end
 
       it 'excludes LFS objects without an entry on the tracking database' do
@@ -306,7 +323,7 @@ describe Geo::LfsObjectRegistryFinder, :geo do
 
         lfs_objects = subject.find_unsynced(batch_size: 10, except_file_ids: [lfs_object_2.id])
 
-        expect(lfs_objects).to match_ids(lfs_object_4)
+        expect(lfs_objects).to match_ids(lfs_object_4, lfs_object_5)
       end
     end
 

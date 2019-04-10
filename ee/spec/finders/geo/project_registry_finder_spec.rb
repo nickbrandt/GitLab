@@ -11,9 +11,10 @@ describe Geo::ProjectRegistryFinder, :geo do
   # different connection.
   let(:secondary) { create(:geo_node) }
   let(:synced_group) { create(:group) }
+  let(:nested_group_1) { create(:group, parent: synced_group) }
   let(:project) { create(:project) }
   let(:project_1_in_synced_group) { create(:project, group: synced_group) }
-  let(:project_2_in_synced_group) { create(:project, group: synced_group) }
+  let(:project_2_in_synced_group) { create(:project, group: nested_group_1) }
   let(:project_3_in_synced_group) { create(:project, group: synced_group) }
   let(:project_4_broken_storage) { create(:project, :broken_storage) }
 
