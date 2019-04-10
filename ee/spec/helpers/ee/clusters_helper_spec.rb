@@ -29,4 +29,37 @@ describe ClustersHelper do
       it { is_expected.to be_falsey }
     end
   end
+
+  describe '#show_cluster_health_graphs?' do
+    let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+    let(:cluster_presenter) { cluster.present }
+
+    before do
+      stub_licensed_features(cluster_health: true)
+    end
+
+    context 'with project level cluster' do
+      it 'returns true' do
+        expect(helper.show_cluster_health_graphs?(cluster_presenter)).to eq(true)
+      end
+    end
+
+    context 'with group level cluster' do
+      let(:cluster) { create(:cluster, :group, :provided_by_gcp) }
+
+      it 'returns false' do
+        expect(helper.show_cluster_health_graphs?(cluster_presenter)).to eq(false)
+      end
+    end
+
+    context 'without cluster_health license' do
+      before do
+        stub_licensed_features(cluster_health: false)
+      end
+
+      it 'returns false' do
+        expect(helper.show_cluster_health_graphs?(cluster_presenter)).to eq(false)
+      end
+    end
+  end
 end

@@ -1,0 +1,5 @@
+---
+title: Correct path to cluster health partial
+merge_request: 10638
+author:
+type: fixed
