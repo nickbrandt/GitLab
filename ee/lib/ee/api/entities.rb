@@ -123,7 +123,7 @@ module EE
         prepended do
           # Default filtering configuration
           expose :name
-          expose :group
+          expose :group, using: ::API::Entities::BasicGroupDetails
 
           with_options if: ->(board, _) { board.parent.feature_available?(:scoped_issue_board) } do
             expose :milestone do |board|

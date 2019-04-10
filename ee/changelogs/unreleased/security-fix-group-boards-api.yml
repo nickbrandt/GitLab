@@ -1,0 +1,5 @@
+---
+title: Expose only basic group attributes in boards API.
+merge_request:
+author:
+type: security
