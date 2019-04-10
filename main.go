@@ -25,7 +25,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"gitlab.com/gitlab-org/labkit/correlation"
 	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -152,12 +151,7 @@ func main() {
 		}
 	}
 
-	up := wrapRaven(
-		correlation.InjectCorrelationID(
-			upstream.NewUpstream(cfg),
-			correlation.WithSetResponseHeader(),
-		),
-	)
+	up := wrapRaven(upstream.NewUpstream(cfg))
 
 	logger.Fatal(http.Serve(listener, up))
 }

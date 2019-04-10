@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sebest/xff"
+	"gitlab.com/gitlab-org/labkit/correlation"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -44,7 +44,8 @@ func NewUpstream(cfg config.Config) http.Handler {
 	up.RoundTripper = roundtripper.NewBackendRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
 	up.configureURLPrefix()
 	up.configureRoutes()
-	return &up
+
+	return correlation.InjectCorrelationID(&up)
 }
 
 func (u *upstream) configureURLPrefix() {
@@ -56,12 +57,7 @@ func (u *upstream) configureURLPrefix() {
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
-	// Unix domain sockets have a remote addr of @. This will make the
-	// xff package lookup the X-Forwarded-For address if available.
-	if r.RemoteAddr == "@" {
-		r.RemoteAddr = "127.0.0.1:0"
-	}
-	r.RemoteAddr = xff.GetRemoteAddr(r)
+	helper.FixRemoteAddr(r)
 
 	w := helper.NewStatsCollectingResponseWriter(ow)
 	defer w.RequestFinished(r)

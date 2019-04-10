@@ -14,6 +14,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/sebest/xff"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
@@ -155,6 +157,15 @@ func DisableResponseBuffering(w http.ResponseWriter) {
 
 func AllowResponseBuffering(w http.ResponseWriter) {
 	w.Header().Del(NginxResponseBufferHeader)
+}
+
+func FixRemoteAddr(r *http.Request) {
+	// Unix domain sockets have a remote addr of @. This will make the
+	// xff package lookup the X-Forwarded-For address if available.
+	if r.RemoteAddr == "@" {
+		r.RemoteAddr = "127.0.0.1:0"
+	}
+	r.RemoteAddr = xff.GetRemoteAddr(r)
 }
 
 func SetForwardedFor(newHeaders *http.Header, originalRequest *http.Request) {

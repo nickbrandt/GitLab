@@ -449,6 +449,26 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 	}
 }
 
+func TestCorrelationIdHeader(t *testing.T) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-Request-Id", "12345678")
+		w.WriteHeader(200)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/api/v3/projects/123/repository/not/special",
+	} {
+		resp, _ := httpGet(t, ws.URL+resource, nil)
+
+		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		requestIds := resp.Header["X-Request-Id"]
+		assert.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
+	}
+}
+
 func setupStaticFile(fpath, content string) error {
 	cwd, err := os.Getwd()
 	if err != nil {
