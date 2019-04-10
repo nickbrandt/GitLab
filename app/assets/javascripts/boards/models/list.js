@@ -4,7 +4,7 @@
 import { __ } from '~/locale';
 import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
-import { urlParamsToObject } from '~/lib/utils/common_utils';
+import { isEE, urlParamsToObject } from '~/lib/utils/common_utils';
 import boardsStore from '../stores/boards_store';
 import ListMilestone from './milestone';
 
@@ -79,7 +79,7 @@ class List {
       entityType = 'label_id';
     } else if (this.assignee) {
       entityType = 'assignee_id';
-    } else if (this.milestone) {
+    } else if (isEE && this.milestone) {
       entityType = 'milestone_id';
     }
 
@@ -198,7 +198,7 @@ class List {
         issue.addAssignee(this.assignee);
       }
 
-      if (this.milestone) {
+      if (isEE && this.milestone) {
         if (listFrom && listFrom.type === 'milestone') {
           issue.removeMilestone(listFrom.milestone);
         }
