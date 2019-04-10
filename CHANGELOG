@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.5.1
+
+- Remove duplicate X-Request-Id response header !384
+
 v8.5.0
 
 - Replace terminal terminology to channel !382
