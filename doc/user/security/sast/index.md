@@ -45,9 +45,11 @@ The results are sorted by the priority of the vulnerability:
 
 ## Requirements
 
-To run a SAST job, you need GitLab Runner with a
-[docker-in-docker executor](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode).
-If you're using the shared Runners on GitLab.com, this is enabled by default.
+To run a SAST job, you need GitLab Runner with the
+[`docker`](https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode) or
+[`kubernetes`](https://docs.gitlab.com/runner/install/kubernetes.html#running-privileged-containers-for-the-runners)
+executor running in privileged mode. If you're using the shared Runners on GitLab.com,
+this is enabled by default.
 
 ## Supported languages and frameworks
 
@@ -110,7 +112,7 @@ your project's source code for possible vulnerabilities.
 
 The report will be saved as a
 [SAST report artifact](../../../ci/yaml/README.md#artifactsreportssast-ultimate)
-that you can later download and analyze. Due to implementation limitations we
+that you can later download and analyze. Due to implementation limitations, we
 always take the latest SAST artifact available. Behind the scenes, the
 [GitLab SAST Docker image](https://gitlab.com/gitlab-org/security-products/sast)
 is used to detect the languages/frameworks and in turn runs the matching scan tools.
@@ -119,9 +121,8 @@ is used to detect the languages/frameworks and in turn runs the matching scan to
 
 The SAST settings can be changed through environment variables by using the
 [`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
-
-Because the template is [evaluated before](../../../ci/yaml/README.md#include)
-the pipeline configuration, the last mention of the variable will take precedence.
+These variables are documented in the
+[SAST tool documentation](https://gitlab.com/gitlab-org/security-products/sast#settings).
 
 In the following example, we include the SAST template and at the same time we
 set the `SAST_GOSEC_LEVEL` variable to `2`:
@@ -134,7 +135,8 @@ variables:
   SAST_GOSEC_LEVEL: 2
 ```
 
-[**> Find all the supported variables that you can use, in the SAST analyzer's project page.**](https://gitlab.com/gitlab-org/security-products/sast#settings)
+Because the template is [evaluated before](../../../ci/yaml/README.md#include)
+the pipeline configuration, the last mention of the variable will take precedence.
 
 #### Overriding the SAST template
 
