@@ -65,7 +65,7 @@ describe 'Protected Environments' do
       end
     end
 
-    it 'allows updating access to a protected environment', :js do
+    it 'allows updating access to a protected environment', :js, :quarantine do
       within('.protected-environments-list tr', text: 'production') do
         set_allowed_to_deploy('Developers + Maintainers')
       end
