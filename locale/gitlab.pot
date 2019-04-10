@@ -3928,9 +3928,6 @@ msgstr ""
 msgid "Embed"
 msgstr ""
 
-msgid "Emojis|Something went wrong while loading emojis."
-msgstr ""
-
 msgid "Empty file"
 msgstr ""
 
