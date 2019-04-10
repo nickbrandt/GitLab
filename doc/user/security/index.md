@@ -20,4 +20,4 @@ The following documentation relates to the DevOps **Secure** stage:
 | [Group Security Dashboard](../group/security_dashboard/index.md) **[ULTIMATE]**                 | View vulnerabilities in all the projects in a group and its subgroups. |
 | [License Management](../project/merge_requests/license_management.md) **[ULTIMATE]**            | Search your project's dependencies for their licenses.                 |
 | [Project Security Dashboard](../project/security_dashboard.md) **[ULTIMATE]**                   | View the latest security reports for your project.                     |
-| [Static Application Security Testing (SAST)](../project/merge_requests/sast.md) **[ULTIMATE]**  | Analyze source code for known vulnerabilities.                         |
+| [Static Application Security Testing (SAST)](sast/index.md) **[ULTIMATE]**                      | Analyze source code for known vulnerabilities.                         |
