@@ -121,4 +121,7 @@ module StubConfiguration
   end
 end
 
+require_relative '../../../ee/spec/support/helpers/ee/stub_configuration' if
+  Dir.exist?("#{__dir__}/../../../ee")
+
 StubConfiguration.prepend(EE::StubConfiguration)
