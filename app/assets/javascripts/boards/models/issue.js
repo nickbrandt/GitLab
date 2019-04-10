@@ -5,6 +5,7 @@
 
 import Vue from 'vue';
 import '~/vue_shared/models/label';
+import { isEE } from '~/lib/utils/common_utils';
 import IssueProject from './project';
 import boardsStore from '../stores/boards_store';
 
@@ -90,13 +91,13 @@ class ListIssue {
 
   addMilestone(milestone) {
     const miletoneId = this.milestone ? this.milestone.id : null;
-    if (milestone.id !== miletoneId) {
+    if (isEE && milestone.id !== miletoneId) {
       this.milestone = new ListMilestone(milestone);
     }
   }
 
   removeMilestone(removeMilestone) {
-    if (removeMilestone && removeMilestone.id === this.milestone.id) {
+    if (isEE && removeMilestone && removeMilestone.id === this.milestone.id) {
       this.milestone = {};
     }
   }
