@@ -2,6 +2,7 @@
   "type": "object",
   "required" : [
     "id",
+    "name",
     "url",
     "primary",
     "enabled",
@@ -14,6 +15,7 @@
   ],
   "properties" : {
     "id": { "type": "integer" },
+    "name": { "type": ["string", "null"] },
     "url": { "type": ["string", "null"] },
     "primary": { "type": "boolean" },
     "internal_url": { "type": ["string", "null"] },
