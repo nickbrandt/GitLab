@@ -47,8 +47,21 @@ module EE
       super
     end
 
+    override :mergeable_ci_state?
+    def mergeable_ci_state?
+      return false unless validate_merge_request_pipelines
+
+      super
+    end
+
     def supports_weight?
       false
+    end
+
+    def validate_merge_request_pipelines
+      return true unless project.merge_pipelines_enabled?
+
+      actual_head_pipeline&.latest_merge_request_pipeline?
     end
 
     def validate_approvals_before_merge

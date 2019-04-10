@@ -1,12 +1,13 @@
 import { shallowMount } from '@vue/test-utils';
 import Index from 'ee/design_management/pages/index.vue';
+import UploadForm from 'ee/design_management/components/upload/form.vue';
 import uploadDesignQuery from 'ee/design_management/queries/uploadDesign.graphql';
 
 describe('Design management index page', () => {
   let mutate;
   let vm;
 
-  function createComponent(loading = false) {
+  function createComponent(loading = false, designs = []) {
     mutate = jest.fn(() => Promise.resolve());
     const $apollo = {
       queries: {
@@ -26,11 +27,16 @@ describe('Design management index page', () => {
     });
 
     vm.setData({
+      designs,
       permissions: {
         createDesign: true,
       },
     });
   }
+
+  afterEach(() => {
+    vm.destroy();
+  });
 
   describe('designs', () => {
     it('renders loading icon', () => {
@@ -54,11 +60,23 @@ describe('Design management index page', () => {
     });
 
     it('renders designs list', () => {
-      createComponent();
-
-      vm.setData({ designs: ['design'] });
+      createComponent(false, ['design']);
 
       expect(vm.element).toMatchSnapshot();
+    });
+  });
+
+  describe('upload form', () => {
+    it('hides upload form', () => {
+      createComponent();
+
+      expect(vm.find(UploadForm).exists()).toBe(false);
+    });
+
+    it('renders upload form', () => {
+      createComponent(false, ['design']);
+
+      expect(vm.find(UploadForm).exists()).toBe(true);
     });
   });
 
