@@ -190,6 +190,9 @@ func (u *upstream) configureRoutes() {
 		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 
+		// Proxy Job Services
+		wsRoute(projectPattern+`-/jobs/[0-9]+/proxy.ws\z`, channel.Handler(api)),
+
 		// Long poll and limit capacity given to jobs/request and builds/register.json
 		route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),
 		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),

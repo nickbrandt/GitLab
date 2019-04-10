@@ -20,8 +20,9 @@ import (
 )
 
 var (
-	envTerminalPath = fmt.Sprintf("%s/environments/1/terminal.ws", testProject)
-	jobTerminalPath = fmt.Sprintf("%s/-/jobs/1/terminal.ws", testProject)
+	envTerminalPath     = fmt.Sprintf("%s/environments/1/terminal.ws", testProject)
+	jobTerminalPath     = fmt.Sprintf("%s/-/jobs/1/terminal.ws", testProject)
+	servicesProxyWSPath = fmt.Sprintf("%s/-/jobs/1/proxy.ws", testProject)
 )
 
 type connWithReq struct {
@@ -36,6 +37,7 @@ func TestChannelHappyPath(t *testing.T) {
 	}{
 		{"environments", envTerminalPath},
 		{"jobs", jobTerminalPath},
+		{"services", servicesProxyWSPath},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -74,15 +76,16 @@ func TestChannelHappyPath(t *testing.T) {
 
 func TestChannelHappyPathWithTerminalResponse(t *testing.T) {
 	tests := []struct {
-		name         string
-		terminalPath string
+		name        string
+		channelPath string
 	}{
 		{"environments", envTerminalPath},
 		{"jobs", jobTerminalPath},
+		{"services", servicesProxyWSPath},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			serverConns, clientURL, close := wireupTerminal(test.terminalPath, nil, "channel.k8s.io")
+			serverConns, clientURL, close := wireupTerminal(test.channelPath, nil, "channel.k8s.io")
 			defer close()
 
 			client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
