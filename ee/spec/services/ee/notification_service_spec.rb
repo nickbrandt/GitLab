@@ -2,46 +2,8 @@ require 'spec_helper'
 
 describe EE::NotificationService, :mailer do
   include NotificationHelpers
-  include ExternalAuthorizationServiceHelpers
+
   let(:subject) { NotificationService.new }
-
-  context 'with external authentication service' do
-    let(:issue) { create(:issue) }
-    let(:project) { issue.project }
-    let(:note) { create(:note, noteable: issue, project: project) }
-    let(:member) { create(:user) }
-
-    before do
-      project.add_maintainer(member)
-      member.global_notification_setting.update!(level: :watch)
-    end
-
-    it 'sends email when the service is not enabled' do
-      expect(Notify).to receive(:new_issue_email).with(member.id, issue.id, nil).and_call_original
-
-      subject.new_issue(issue, member)
-    end
-
-    context 'when the service is enabled' do
-      before do
-        enable_external_authorization_service_check
-      end
-
-      it 'does not send an email' do
-        expect(Notify).not_to receive(:new_issue_email)
-
-        subject.new_issue(issue, member)
-      end
-
-      it 'still delivers email to admins' do
-        member.update!(admin: true)
-
-        expect(Notify).to receive(:new_issue_email).with(member.id, issue.id, nil).and_call_original
-
-        subject.new_issue(issue, member)
-      end
-    end
-  end
 
   context 'service desk issues' do
     before do
@@ -124,8 +86,9 @@ describe EE::NotificationService, :mailer do
   context 'new review' do
     let(:project) { create(:project, :repository) }
     let(:user) { create(:user) }
+    let(:user2) { create(:user) }
     let(:reviewer) { create(:user) }
-    let(:merge_request) { create(:merge_request, source_project: project, assignee: user, author: create(:user)) }
+    let(:merge_request) { create(:merge_request, source_project: project, assignees: [user, user2], author: create(:user)) }
     let(:review) { create(:review, merge_request: merge_request, project: project, author: reviewer) }
     let(:note) { create(:diff_note_on_merge_request, project: project, noteable: merge_request, author: reviewer, review: review) }
 
@@ -133,7 +96,7 @@ describe EE::NotificationService, :mailer do
       build_team(review.project, merge_request)
       project.add_maintainer(merge_request.author)
       project.add_maintainer(reviewer)
-      project.add_maintainer(merge_request.assignee)
+      merge_request.assignees.each { |assignee| project.add_maintainer(assignee) }
 
       create(:diff_note_on_merge_request,
              project: project,
@@ -146,7 +109,9 @@ describe EE::NotificationService, :mailer do
     it 'sends emails' do
       expect(Notify).not_to receive(:new_review_email).with(review.author.id, review.id)
       expect(Notify).not_to receive(:new_review_email).with(@unsubscriber.id, review.id)
-      expect(Notify).to receive(:new_review_email).with(merge_request.assignee.id, review.id).and_call_original
+      merge_request.assignee_ids.each do |assignee_id|
+        expect(Notify).to receive(:new_review_email).with(assignee_id, review.id).and_call_original
+      end
       expect(Notify).to receive(:new_review_email).with(merge_request.author.id, review.id).and_call_original
       expect(Notify).to receive(:new_review_email).with(@u_watcher.id, review.id).and_call_original
       expect(Notify).to receive(:new_review_email).with(@u_mentioned.id, review.id).and_call_original
@@ -513,10 +478,11 @@ describe EE::NotificationService, :mailer do
   context 'Merge Requests' do
     let(:notification) { NotificationService.new }
     let(:assignee) { create(:user) }
+    let(:assignee2) { create(:user) }
     let(:group) { create(:group) }
     let(:project) { create(:project, :public, :repository, namespace: group) }
     let(:another_project) { create(:project, :public, namespace: group) }
-    let(:merge_request) { create :merge_request, source_project: project, assignee: create(:user), description: 'cc @participant' }
+    let(:merge_request) { create :merge_request, source_project: project, assignees: [assignee, assignee2], description: 'cc @participant' }
 
     around do |example|
       perform_enqueued_jobs do
@@ -528,7 +494,7 @@ describe EE::NotificationService, :mailer do
       stub_feature_flags(approval_rules: false)
 
       project.add_maintainer(merge_request.author)
-      project.add_maintainer(merge_request.assignee)
+      merge_request.assignees.each { |assignee| project.add_maintainer(assignee) }
       build_team(merge_request.target_project)
       add_users_with_subscription(merge_request.target_project, merge_request)
       update_custom_notification(:new_merge_request, @u_guest_custom, resource: project)
@@ -537,6 +503,12 @@ describe EE::NotificationService, :mailer do
     end
 
     describe '#new_merge_request' do
+      it 'emails all assignees' do
+        notification.new_merge_request(merge_request, assignee)
+
+        merge_request.assignees.each { |assignee| should_email(assignee) }
+      end
+
       context 'when the target project has approvers set' do
         let(:project_approvers) { create_list(:user, 3) }
 

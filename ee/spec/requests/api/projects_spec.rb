@@ -1,14 +1,11 @@
 require 'spec_helper'
 
 describe API::Projects do
-  include ExternalAuthorizationServiceHelpers
-
   let(:user) { create(:user) }
   let(:project) { create(:project, namespace: user.namespace) }
 
   describe 'GET /projects' do
     it 'does not break on license checks' do
-      stub_licensed_features(external_authorization_service: true)
       enable_namespace_license_check!
 
       create(:project, :private, namespace: user.namespace)
@@ -90,20 +87,6 @@ describe API::Projects do
 
   describe 'PUT /projects/:id' do
     let(:project) { create(:project, namespace: user.namespace) }
-
-    context 'when updating external classification' do
-      before do
-        enable_external_authorization_service_check
-      end
-
-      it 'updates the classification label' do
-        put(api("/projects/#{project.id}", user), params: { external_authorization_classification_label: 'new label' })
-
-        expect(response).to have_gitlab_http_status(200)
-
-        expect(project.reload.external_authorization_classification_label).to eq('new label')
-      end
-    end
 
     context 'when updating repository storage' do
       let(:unknown_storage) { 'new-storage' }
@@ -307,67 +290,21 @@ describe API::Projects do
   end
 
   describe 'GET /projects/:id' do
-    context 'with external authorization' do
-      let(:project) do
-        create(:project,
-               namespace: user.namespace,
-               external_authorization_classification_label: 'the-label')
+    describe 'packages_enabled attribute' do
+      it 'exposed when the feature is available' do
+        stub_licensed_features(packages: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'packages_enabled'
       end
 
-      context 'when the user has access to the project' do
-        before do
-          external_service_allow_access(user, project)
-        end
+      it 'not exposed when the feature is available' do
+        stub_licensed_features(packages: false)
 
-        it 'includes the label in the response' do
-          get api("/projects/#{project.id}", user)
+        get api("/projects/#{project.id}", user)
 
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response['external_authorization_classification_label']).to eq('the-label')
-        end
-      end
-
-      context 'when the external service denies access' do
-        before do
-          external_service_deny_access(user, project)
-        end
-
-        it 'returns a 404' do
-          get api("/projects/#{project.id}", user)
-
-          expect(response).to have_gitlab_http_status(404)
-        end
-      end
-
-      context 'it does not return the label when the feature is not available' do
-        before do
-          stub_licensed_features(external_authorization_service: false)
-        end
-
-        it 'does not include the label in the response' do
-          get api("/projects/#{project.id}", user)
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(json_response['external_authorization_classification_label']).to be_nil
-        end
-      end
-
-      describe 'packages_enabled attribute' do
-        it 'exposed when the feature is available' do
-          stub_licensed_features(packages: true)
-
-          get api("/projects/#{project.id}", user)
-
-          expect(json_response).to have_key 'packages_enabled'
-        end
-
-        it 'not exposed when the feature is available' do
-          stub_licensed_features(packages: false)
-
-          get api("/projects/#{project.id}", user)
-
-          expect(json_response).not_to have_key 'packages_enabled'
-        end
+        expect(json_response).not_to have_key 'packages_enabled'
       end
     end
   end

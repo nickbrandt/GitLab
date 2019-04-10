@@ -118,6 +118,13 @@ module API
 
           present paginate(projects), with: ::API::Github::Entities::Repository
         end
+
+        get ':username' do
+          forbidden! unless can?(current_user, :read_users_list)
+          user = UsersFinder.new(current_user, { username: params[:username] }).execute.first
+          not_found! unless user
+          present user, with: ::API::Github::Entities::User
+        end
       end
 
       # Jira dev panel integration weirdly requests for "/-/jira/pulls" instead

@@ -3,33 +3,19 @@ require "spec_helper"
 describe "User creates a merge request", :js do
   include ProjectForksHelper
 
-  let(:approver) { create(:user) }
-  let(:project) do
-    create(:project,
-      :repository,
-      approvals_before_merge: 1,
-      merge_requests_template: template_text)
-  end
-  let(:template_text) { "This merge request should contain the following." }
   let(:title) { "Some feature" }
+  let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
-  let(:user2) { create(:user) }
 
   before do
     stub_feature_flags(approval_rules: false)
 
     project.add_maintainer(user)
-    project.add_maintainer(user2)
-    project.add_maintainer(approver)
     sign_in(user)
-
-    project.approvers.create(user_id: approver.id)
-
-    visit(project_new_merge_request_path(project))
   end
 
   it "creates a merge request" do
-    allow_any_instance_of(Gitlab::AuthorityAnalyzer).to receive(:calculate).and_return([user2])
+    visit(project_new_merge_request_path(project))
 
     find(".js-source-branch").click
     click_link("fix")
@@ -39,37 +25,11 @@ describe "User creates a merge request", :js do
 
     click_button("Compare branches")
 
-    expect(find_field("merge_request_description").value).to eq(template_text)
-
-    # Approvers
-    page.within("ul .unsaved-approvers") do
-      expect(page).to have_content(approver.name)
-    end
-
-    page.within(".suggested-approvers") do
-      expect(page).to have_content(user2.name)
-    end
-
-    click_link(user2.name)
-
-    page.within("ul.approver-list") do
-      expect(page).to have_content(user2.name)
-    end
-    # End of approvers
-
     fill_in("Title", with: title)
     click_button("Submit merge request")
 
     page.within(".merge-request") do
       expect(page).to have_content(title)
-    end
-
-    page.within(".js-issuable-actions") do
-      click_link("Edit", match: :first)
-    end
-
-    page.within("ul.approver-list") do
-      expect(page).to have_content(user2.name)
     end
   end
 
@@ -108,15 +68,15 @@ describe "User creates a merge request", :js do
         fill_in("Title", with: title)
       end
 
-      click_button("Assignee")
-
       expect(find(".js-assignee-search")["data-project-id"]).to eq(project.id.to_s)
+      find('.js-assignee-search').click
 
       page.within(".dropdown-menu-user") do
         expect(page).to have_content("Unassigned")
                    .and have_content(user.name)
                    .and have_content(project.users.first.name)
       end
+      find('.js-assignee-search').click
 
       click_button("Submit merge request")
 

@@ -66,6 +66,12 @@ suitable to your workflow:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
+CAUTION: **Caution:**
+There was a [regression affecting this feature in 11.8](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9648). We recommend upgrading _at least_ to version 11.8.2. to avoid any issues.
+
+NOTE: **Note:**
+In 11.8 this feature does not work in [private groups](https://gitlab.com/gitlab-org/gitlab-ee/issues/10356).
+
 For GitLab Premium, [multiple approver rules](#multiple-approval-rules-premium) can be configured. To configure the merge
 request approval rules:
 

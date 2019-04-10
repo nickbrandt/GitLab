@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Issue do
-  using RSpec::Parameterized::TableSyntax
   include ExternalAuthorizationServiceHelpers
+
+  using RSpec::Parameterized::TableSyntax
 
   describe 'validations' do
     subject { build(:issue) }
@@ -128,50 +129,6 @@ describe Issue do
       end
 
       it { is_expected.to eq(expected) }
-    end
-  end
-
-  context 'when an external authentication service' do
-    before do
-      enable_external_authorization_service_check
-    end
-
-    describe '#publicly_visible?' do
-      it 'is `false` when an external authorization service is enabled' do
-        issue = build(:issue, project: build(:project, :public))
-
-        expect(issue).not_to be_publicly_visible
-      end
-    end
-
-    describe '#readable_by?' do
-      it 'checks the external service to determine if an issue is readable by a user' do
-        project = build(:project, :public,
-                        external_authorization_classification_label: 'a-label')
-        issue = build(:issue, project: project)
-        user = build(:user)
-
-        expect(EE::Gitlab::ExternalAuthorization).to receive(:access_allowed?).with(user, 'a-label') { false }
-        expect(issue.readable_by?(user)).to be_falsy
-      end
-
-      it 'does not check the external webservice for admins' do
-        issue = build(:issue)
-        user = build(:admin)
-
-        expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
-
-        issue.readable_by?(user)
-      end
-
-      it 'does not check the external webservice for auditors' do
-        issue = build(:issue)
-        user = build(:auditor)
-
-        expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
-
-        issue.readable_by?(user)
-      end
     end
   end
 
@@ -377,6 +334,23 @@ describe Issue do
         new_issue.save!
 
         expect(new_issue.relative_position).to be(100)
+      end
+    end
+  end
+
+  context 'when an external authentication service' do
+    before do
+      enable_external_authorization_service_check
+    end
+
+    describe '#visible_to_user?' do
+      it 'does not check the external webservice for auditors' do
+        issue = build(:issue)
+        user = build(:auditor)
+
+        expect(::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
+
+        issue.visible_to_user?(user)
       end
     end
   end

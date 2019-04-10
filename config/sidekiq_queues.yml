@@ -89,7 +89,8 @@
   - [project_daily_statistics, 1]
   - [import_issues_csv, 2]
   - [chat_notification, 2]
-  - [migrate_external_diffs, 1] 
+  - [migrate_external_diffs, 1]
+  - [update_project_statistics, 1]
 
   # EE-specific queues
   - [ldap_group_sync, 2]

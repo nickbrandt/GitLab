@@ -121,6 +121,46 @@ describe API::V3::Github do
       let(:path) { "#{project.namespace.path}/#{project.path}" }
     end
 
+    describe 'GET /users/:username' do
+      let!(:user1) { create(:user, username: 'jane') }
+
+      before do
+        stub_licensed_features(jira_dev_panel_integration: true)
+      end
+
+      context 'user exists' do
+        it 'responds with the expected user' do
+          jira_get v3_api('/users/jane', user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('entities/github/user', dir: 'ee')
+        end
+      end
+
+      context 'user does not exist' do
+        it 'responds with the expected status' do
+          jira_get v3_api('/users/unknown_user_name', user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'no rights to request user lists' do
+        let(:unauthorized_user) { create(:user) }
+
+        before do
+          expect(Ability).to receive(:allowed?).with(unauthorized_user, :read_users_list, :global).and_return(false)
+          expect(Ability).to receive(:allowed?).at_least(:once).and_call_original
+        end
+
+        it 'responds with forbidden' do
+          jira_get v3_api('/users/jane', unauthorized_user)
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+
     describe 'GET events' do
       let(:group) { create(:group) }
       let(:project) { create(:project, :empty_repo, group: group) }
@@ -175,11 +215,12 @@ describe API::V3::Github do
 
   describe 'repo pulls' do
     let(:assignee) { create(:user) }
+    let(:assignee2) { create(:user) }
     let!(:merge_request) do
-      create(:merge_request, source_project: project, target_project: project, author: user, assignee: assignee)
+      create(:merge_request, source_project: project, target_project: project, author: user, assignees: [assignee])
     end
     let!(:merge_request_2) do
-      create(:merge_request, source_project: project2, target_project: project2, author: user, assignee: assignee)
+      create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
     end
 
     describe 'GET /-/jira/pulls' do

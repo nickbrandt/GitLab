@@ -1,20 +1,13 @@
 require 'spec_helper'
 
 describe EnvironmentEntity do
-  include KubernetesHelpers
-
-  let(:user) { create(:user) }
-  let(:environment) { create(:environment) }
-
+  let(:request) { double('request') }
   let(:entity) do
-    described_class.new(environment, request: double(current_user: user))
+    described_class.new(environment, request: spy('request'))
   end
 
+  let(:environment) { create(:environment) }
   subject { entity.as_json }
-
-  before do
-    environment.project.add_maintainer(user)
-  end
 
   it 'exposes latest deployment' do
     expect(subject).to include(:last_deployment)
@@ -45,29 +38,6 @@ describe EnvironmentEntity do
 
     it 'exposes metrics path' do
       expect(subject).to include(:metrics_path)
-    end
-  end
-
-  context 'with deployment service ready' do
-    before do
-      stub_licensed_features(deploy_board: true)
-      allow(environment).to receive(:has_terminals?).and_return(true)
-      allow(environment).to receive(:rollout_status).and_return(kube_deployment_rollout_status)
-    end
-
-    it 'exposes rollout_status' do
-      expect(subject).to include(:rollout_status)
-    end
-  end
-
-  context 'when license does not has the GitLab_DeployBoard add-on' do
-    before do
-      stub_licensed_features(deploy_board: false)
-      allow(environment).to receive(:has_terminals?).and_return(true)
-    end
-
-    it 'does not expose rollout_status' do
-      expect(subject[:rollout_status_path]).to be_blank
     end
   end
 

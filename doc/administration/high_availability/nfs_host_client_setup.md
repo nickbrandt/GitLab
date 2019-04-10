@@ -107,7 +107,7 @@ point and have all the required locations as subdirectories to use the NFS mount
 git-data.
 
 ```text
-git_data_dirs({"default" => "/nfs/home/var/opt/gitlab-data/git-data"})
+git_data_dirs({"default" => {"path" => "/nfs/home/var/opt/gitlab-data/git-data"}})
 user['home'] = '/nfs/home/var/opt/gitlab-data/home'
 gitlab_rails['uploads_directory'] = '/nfs/home/var/opt/gitlab-data/uploads'
 gitlab_rails['shared_path'] = '/nfs/home/var/opt/gitlab-data/shared'

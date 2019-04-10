@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe MergeRequestPolicy do
-  include ExternalAuthorizationServiceHelpers
   include ProjectForksHelper
 
   let(:guest) { create(:user) }
@@ -109,23 +108,6 @@ describe MergeRequestPolicy do
         expect(policy_for(fork_guest)).to be_disallowed(:update_approvers)
         expect(policy_for(fork_maintainer)).to be_disallowed(:update_approvers)
       end
-    end
-  end
-
-  context 'with external authorization enabled' do
-    let(:user) { create(:user) }
-    let(:project) { create(:project, :public) }
-    let(:merge_request) { create(:merge_request, source_project: project) }
-    let(:policies) { described_class.new(user, merge_request) }
-
-    before do
-      enable_external_authorization_service_check
-    end
-
-    it 'can read the issue iid without accessing the external service' do
-      expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
-
-      expect(policies).to be_allowed(:read_merge_request_iid)
     end
   end
 end

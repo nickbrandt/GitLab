@@ -13,7 +13,7 @@ describe 'User paginates issue designs', :js do
 
     wait_for_requests
 
-    first('.js-design-list-item').click
+    find('.js-design-list-item', match: :first).click
   end
 
   it 'paginates to next design' do

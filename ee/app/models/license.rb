@@ -26,6 +26,7 @@ class License < ApplicationRecord
     merge_request_approvers
     multiple_ldap_servers
     multiple_issue_assignees
+    multiple_merge_request_assignees
     multiple_project_issue_boards
     push_rules
     protected_refs_for_users
@@ -65,7 +66,6 @@ class License < ApplicationRecord
     variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
-    external_authorization_service
     ci_cd_projects
     protected_environments
     custom_project_templates
@@ -178,7 +178,6 @@ class License < ApplicationRecord
     multiple_ldap_servers
     object_storage
     repository_size_limit
-    external_authorization_service
     custom_project_templates
   ].freeze
 

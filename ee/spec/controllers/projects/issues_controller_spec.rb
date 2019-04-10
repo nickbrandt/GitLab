@@ -1,22 +1,9 @@
 require 'spec_helper'
 
 describe Projects::IssuesController do
-  include Rails.application.routes.url_helpers
-
   let(:namespace) { create(:group, :public) }
   let(:project)   { create(:project_empty_repo, :public, namespace: namespace) }
   let(:user) { create(:user) }
-
-  describe 'GET #index' do
-    before do
-      sign_in user
-      project.add_developer(user)
-    end
-
-    it_behaves_like 'unauthorized when external service denies access' do
-      subject { get :index, params: { namespace_id: project.namespace, project_id: project } }
-    end
-  end
 
   describe 'POST export_csv' do
     let(:viewer)            { user }

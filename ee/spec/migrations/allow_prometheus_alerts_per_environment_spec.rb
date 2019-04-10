@@ -38,9 +38,10 @@ describe AllowPrometheusAlertsPerEnvironment, :migration do
     let(:b_prd) { environment(id: 14, name: 'b_prd', project: b) }
     let(:b_stg) { environment(id: 15, name: 'b_stg', project: b) }
     let(:c_prd) { environment(id: 16, name: 'c_prd', project: c) }
-    let(:metric_a) { metric(id: 21, project: a) }
-    let(:metric_b) { metric(id: 22, project: b) }
-    let(:metric_c) { metric(id: 23, project: c) }
+    # Start with a big ID since db/migrate/20180831164910_import_common_metrics.rb inserts at least 21 metrics...
+    let(:metric_a) { metric(id: 997, project: a) }
+    let(:metric_b) { metric(id: 998, project: b) }
+    let(:metric_c) { metric(id: 999, project: c) }
 
     let(:alert_a_prd) { alert(id: 31, metric: metric_a, environment: a_prd) }
     let(:alert_a_stg) { alert(id: 32, metric: metric_a, environment: a_stg) }

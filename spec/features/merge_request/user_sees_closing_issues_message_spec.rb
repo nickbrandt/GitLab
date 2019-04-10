@@ -73,18 +73,4 @@ describe 'Merge request > User sees closing issues message', :js do
       expect(page).to have_content("Mentions #{issue_2.to_reference}")
     end
   end
-
-  context 'approvals are enabled while closing issues', :js do
-    before do
-      project.add_developer(user)
-    end
-
-    let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
-    let(:merge_request_description) { "Description\n\nclosing #{issue_1.to_reference}, #{issue_2.to_reference}" }
-
-    it 'displays closing issue message exactly one time' do
-      wait_for_requests
-      expect(page).to have_content("Closes #{issue_1.to_reference} and #{issue_2.to_reference}", count: 1)
-    end
-  end
 end

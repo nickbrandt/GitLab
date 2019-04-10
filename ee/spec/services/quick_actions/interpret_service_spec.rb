@@ -11,7 +11,8 @@ describe QuickActions::InterpretService do
   let(:service) { described_class.new(project, current_user) }
 
   before do
-    stub_licensed_features(multiple_issue_assignees: true)
+    stub_licensed_features(multiple_issue_assignees: true,
+                           multiple_merge_request_assignees: true)
 
     project.add_developer(current_user)
   end
@@ -36,6 +37,42 @@ describe QuickActions::InterpretService do
             _, updates = service.execute("/unassign @#{user.username}\n/assign @#{user2.username} @#{user3.username}", issue)
 
             expect(updates[:assignee_ids]).to match_array([user2.id, user3.id])
+          end
+        end
+      end
+
+      context 'Merge Request' do
+        let(:merge_request) { create(:merge_request, source_project: project) }
+
+        it 'fetches assignees and populates them if content contains /assign' do
+          merge_request.update(assignee_ids: [user.id])
+
+          _, updates = service.execute("/assign @#{user2.username}", merge_request)
+
+          expect(updates[:assignee_ids]).to match_array([user.id, user2.id])
+        end
+
+        context 'assign command with multiple assignees' do
+          it 'fetches assignee and populates assignee_ids if content contains /assign' do
+            merge_request.update(assignee_ids: [user.id])
+
+            _, updates = service.execute("/assign @#{user.username}\n/assign @#{user2.username} @#{user3.username}", issue)
+
+            expect(updates[:assignee_ids]).to match_array([user.id, user2.id, user3.id])
+          end
+
+          context 'unlicensed' do
+            before do
+              stub_licensed_features(multiple_merge_request_assignees: false)
+            end
+
+            it 'does not recognize /assign with multiple user references' do
+              merge_request.update(assignee_ids: [user.id])
+
+              _, updates = service.execute("/assign @#{user2.username} @#{user3.username}", merge_request)
+
+              expect(updates[:assignee_ids]).to match_array([user2.id])
+            end
           end
         end
       end
@@ -69,6 +106,42 @@ describe QuickActions::InterpretService do
           expect(updates[:assignee_ids]).to be_empty
         end
       end
+
+      context 'Merge Request' do
+        let(:merge_request) { create(:merge_request, source_project: project) }
+
+        it 'unassigns user if content contains /unassign @user' do
+          merge_request.update(assignee_ids: [user.id, user2.id])
+
+          _, updates = service.execute("/unassign @#{user2.username}", merge_request)
+
+          expect(updates[:assignee_ids]).to match_array([user.id])
+        end
+
+        context 'unassign command with multiple assignees' do
+          it 'unassigns both users if content contains /unassign @user @user1' do
+            merge_request.update(assignee_ids: [user.id, user2.id, user3.id])
+
+            _, updates = service.execute("/unassign @#{user.username} @#{user2.username}", merge_request)
+
+            expect(updates[:assignee_ids]).to match_array([user3.id])
+          end
+
+          context 'unlicensed' do
+            before do
+              stub_licensed_features(multiple_merge_request_assignees: false)
+            end
+
+            it 'does not recognize /unassign @user' do
+              merge_request.update(assignee_ids: [user.id, user2.id, user3.id])
+
+              _, updates = service.execute("/unassign @#{user.username}", merge_request)
+
+              expect(updates[:assignee_ids]).to be_empty
+            end
+          end
+        end
+      end
     end
 
     context 'reassign command' do
@@ -77,10 +150,22 @@ describe QuickActions::InterpretService do
       context 'Merge Request' do
         let(:merge_request) { create(:merge_request, source_project: project) }
 
-        it 'does not recognize /reassign @user' do
-          _, updates = service.execute(content, merge_request)
+        context 'unlicensed' do
+          before do
+            stub_licensed_features(multiple_merge_request_assignees: false)
+          end
 
-          expect(updates).to be_empty
+          it 'does not recognize /reassign @user' do
+            _, updates = service.execute(content, merge_request)
+
+            expect(updates).to be_empty
+          end
+        end
+
+        it 'reassigns user if content contains /reassign @user' do
+          _, updates = service.execute("/reassign @#{current_user.username}", merge_request)
+
+          expect(updates[:assignee_ids]).to match_array([current_user.id])
         end
       end
 

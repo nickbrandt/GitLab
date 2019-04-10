@@ -45,6 +45,7 @@ module EE
         prevent :create_epic
         prevent :admin_epic
         prevent :update_epic
+        prevent :destroy_epic
       end
 
       rule { auditor }.enable :read_group
