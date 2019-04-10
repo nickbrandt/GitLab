@@ -20,6 +20,7 @@ describe ApplicationRecord do
     end
 
     it 'returns false when ActiveRecord::RecordNotUnique is raised' do
+      expect(model).to receive(:save).once
       expect(klass.safe_ensure_unique { model.save }).to be_falsey
     end
 
