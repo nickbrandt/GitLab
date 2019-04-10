@@ -94,15 +94,13 @@ module Geo
 
     private
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def all
       if selective_sync?
-        LfsObject.joins(:projects).where(projects: { id: current_node.projects })
+        LfsObject.project_id_in(current_node.projects)
       else
         LfsObject.all
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def find_synced
       if use_legacy_queries?
