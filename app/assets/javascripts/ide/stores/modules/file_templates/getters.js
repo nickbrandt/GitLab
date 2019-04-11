@@ -17,6 +17,10 @@ export const templateTypes = () => [
     name: 'Dockerfile',
     key: 'dockerfiles',
   },
+  {
+    name: '.gitlab/insights.yml',
+    key: 'gitlab_insights_ymls'
+  },
 ];
 
 export const showFileTemplatesBar = (_, getters, rootState) => name =>
