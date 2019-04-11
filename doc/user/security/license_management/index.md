@@ -102,9 +102,9 @@ always take the latest License Management artifact available. Behind the scenes,
 [GitLab License Management Docker image](https://gitlab.com/gitlab-org/security-products/license-management)
 is used to detect the languages/frameworks and in turn analyzes the licenses.
 
-#### Installing custom project dependencies
+#### Installing custom dependencies
 
-> Introduced in GitLab Ultimate 11.4.
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.4.
 
 The `license_management` image already embeds many auto-detection scripts, languages,
 and packages. Nevertheless, it's almost impossible to cover all cases for all projects.
@@ -130,7 +130,7 @@ variables:
 In this example, `my-custom-install-script.sh` is a shell script at the root
 directory of your project.
 
-#### Overriding the License Management template
+#### Overriding the template
 
 If you want to override the job definition (for example, change properties like
 `variables` or `dependencies`), you need to declare a `license_management` job
@@ -145,7 +145,7 @@ license_management:
     CI_DEBUG_TRACE: "true"
 ```
 
-#### Configuring License Management for maven projects
+#### Configuring Maven projects
 
 The License Management tool provides a `MAVEN_CLI_OPTS` environment variable which can hold
 the command line arguments to pass to the `mvn install` command which is executed under the hood.
@@ -160,7 +160,6 @@ license_management:
     MAVEN_CLI_OPTS: --debug
 ```
 
-NOTE: **Note:**
 `mvn install` runs through all of the [build life cycle](http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
 stages prior to `install`, including `test`. Running unit tests is not directly
 necessary for the license scanning purposes and consumes time, so it's skipped
