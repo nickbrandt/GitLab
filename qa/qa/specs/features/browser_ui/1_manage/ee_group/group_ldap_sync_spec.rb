@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/95
+  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls, :quarantine do
     describe 'LDAP Group sync' do
       include Support::Api
 
@@ -27,8 +28,7 @@ module QA
         Runtime::Env.personal_access_token = @original_personal_access_token
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/95
-      context 'using group cn method', :quarantine do
+      context 'using group cn method' do
         let(:ldap_users) do
           [
               {
@@ -78,8 +78,7 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/95
-      context 'user filter method', :quarantine do
+      context 'user filter method' do
         let(:ldap_users) do
           [
               {
