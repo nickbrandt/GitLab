@@ -5,6 +5,10 @@ describe MergeRequestPresenter do
   let!(:project) { create(:project, :repository) }
   let!(:user) { project.creator }
 
+  before do
+    stub_config_setting(relative_url_root: '/gitlab')
+  end
+
   describe '#approvals_path' do
     subject { described_class.new(resource, current_user: user).approvals_path }
 
@@ -17,7 +21,7 @@ describe MergeRequestPresenter do
     subject { described_class.new(resource, current_user: user).api_approvals_path }
 
     it 'returns path' do
-      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approvals")
+      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approvals"))
     end
   end
 
@@ -25,7 +29,7 @@ describe MergeRequestPresenter do
     subject { described_class.new(resource, current_user: user).api_approval_settings_path }
 
     it 'returns path' do
-      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approval_settings")
+      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approval_settings"))
     end
   end
 
@@ -33,7 +37,7 @@ describe MergeRequestPresenter do
     subject { described_class.new(resource, current_user: user).api_approve_path }
 
     it 'returns path' do
-      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approve")
+      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approve"))
     end
   end
 
@@ -41,7 +45,7 @@ describe MergeRequestPresenter do
     subject { described_class.new(resource, current_user: user).api_unapprove_path }
 
     it 'returns path' do
-      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/unapprove")
+      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/unapprove"))
     end
   end
 

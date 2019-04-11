@@ -13,25 +13,25 @@ module EE
 
     def api_approvals_path
       if approval_feature_available?
-        api_v4_projects_merge_requests_approvals_path(id: project.id, merge_request_iid: merge_request.iid)
+        expose_url(api_v4_projects_merge_requests_approvals_path(id: project.id, merge_request_iid: merge_request.iid))
       end
     end
 
     def api_approval_settings_path
       if approval_feature_available?
-        api_v4_projects_merge_requests_approval_settings_path(id: project.id, merge_request_iid: merge_request.iid)
+        expose_url(api_v4_projects_merge_requests_approval_settings_path(id: project.id, merge_request_iid: merge_request.iid))
       end
     end
 
     def api_approve_path
       if approval_feature_available?
-        api_v4_projects_merge_requests_approve_path(id: project.id, merge_request_iid: merge_request.iid)
+        expose_url(api_v4_projects_merge_requests_approve_path(id: project.id, merge_request_iid: merge_request.iid))
       end
     end
 
     def api_unapprove_path
       if approval_feature_available?
-        api_v4_projects_merge_requests_unapprove_path(id: project.id, merge_request_iid: merge_request.iid)
+        expose_url(api_v4_projects_merge_requests_unapprove_path(id: project.id, merge_request_iid: merge_request.iid))
       end
     end
 
