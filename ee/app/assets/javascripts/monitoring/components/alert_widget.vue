@@ -201,7 +201,7 @@ export default {
       <icon :size="16" name="arrow-down" aria-hidden="true" class="chevron" />
     </button>
     <div ref="dropdownMenu" :class="{ show: isOpen }" class="dropdown-menu alert-dropdown-menu">
-      <div class="dropdown-title">
+      <div class="dropdown-title m0">
         <span>{{ dropdownTitle }}</span>
         <button
           class="dropdown-title-button dropdown-menu-close"
