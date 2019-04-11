@@ -66,9 +66,7 @@ With GitLab Enterprise Edition, you can also:
 - Leverage continuous delivery method with [Canary Deployments](project/canary_deployments.md).
 - Scan your code for vulnerabilities and [display them in merge requests](project/merge_requests/sast.md).
 
-You can also [integrate](project/integrations/project_services.md) GitLab with
-numerous third-party applications, such as Mattermost, Microsoft Teams, Trello,
-Slack, Bamboo CI, JIRA, and a lot more.
+You can also [integrate](project/integrations/project_services.md) GitLab with numerous third-party applications, such as Mattermost, Microsoft Teams, HipChat, Trello, Slack, Bamboo CI, JIRA, and a lot more.
 
 ## Projects
 
