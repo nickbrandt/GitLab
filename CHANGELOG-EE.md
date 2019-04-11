@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.8 (2019-04-11)
+
+### Fixed (1 change)
+
+- Fix sorting by priority with filtering by approvers. !10446
+
+
 ## 11.9.7 (2019-04-09)
 
 ### Security (1 change)
