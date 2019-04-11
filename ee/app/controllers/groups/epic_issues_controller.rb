@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Groups::EpicIssuesController < Groups::EpicsController
+class Groups::EpicIssuesController < Groups::ApplicationController
   include EpicRelations
 
   before_action :authorize_issue_link_association!, only: [:destroy, :update]

@@ -38,16 +38,31 @@ describe Groups::EpicLinksController, :postgresql do
     context 'when epics are enabled' do
       before do
         stub_licensed_features(epics: true)
-        group.add_developer(user)
-
-        subject
       end
 
-      it 'returns the correct JSON response' do
-        list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
+      context 'when user has access to epic' do
+        before do
+          group.add_developer(user)
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response).to eq(list_service_response.as_json)
+          subject
+        end
+
+        it 'returns the correct JSON response' do
+          list_service_response = EpicLinks::ListService.new(parent_epic, user).execute
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to eq(list_service_response.as_json)
+        end
+      end
+
+      context 'when user does not have access to epic' do
+        it 'returns 404 status' do
+          group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(404)
+        end
       end
     end
   end
