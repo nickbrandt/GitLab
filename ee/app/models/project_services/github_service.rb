@@ -10,7 +10,7 @@ class GithubService < Service
   delegate :api_url, :owner, :repository_name, to: :remote_project
 
   validates :token, presence: true, if: :activated?
-  validates :repository_url, url: true, allow_blank: true
+  validates :repository_url, addressable_url: true, allow_blank: true
 
   default_value_for :pipeline_events, true
 

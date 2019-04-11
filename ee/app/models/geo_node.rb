@@ -18,8 +18,8 @@ class GeoNode < ApplicationRecord
   default_values url: ->(record) { record.class.current_node_url },
                  primary: false
 
-  validates :url, presence: true, uniqueness: { case_sensitive: false }, url: true
-  validates :internal_url, url: true, allow_blank: true, allow_nil: true
+  validates :url, presence: true, uniqueness: { case_sensitive: false }, addressable_url: true
+  validates :internal_url, addressable_url: true, allow_blank: true, allow_nil: true
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
   validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
