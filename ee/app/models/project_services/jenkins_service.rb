@@ -5,7 +5,7 @@ class JenkinsService < CiService
 
   before_update :reset_password
 
-  validates :jenkins_url, presence: true, url: true, if: :activated?
+  validates :jenkins_url, presence: true, addressable_url: true, if: :activated?
   validates :project_name, presence: true, if: :activated?
   validates :username, presence: true, if: ->(service) { service.activated? && service.password_touched? && service.password.present? }
 
