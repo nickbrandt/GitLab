@@ -159,12 +159,7 @@ module EE
       def deepest_relationship_level
         return unless supports_nested_objects?
 
-        hierarchy = ::Gitlab::ObjectHierarchy.new(self.where.not(parent_id: nil))
-        deepest_level = hierarchy.max_descendants_depth || 0
-
-        # For performance reasons, epics without a parent_id are being ignored in the query.
-        # So we add 1 to the result to take into account the first parent.
-        deepest_level + 1
+        ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
 
       def update_start_and_due_dates(epics)
