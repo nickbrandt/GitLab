@@ -6,13 +6,6 @@
   background-color: $gray-light;
   min-height: 20px;
 
-  .fa-spinner {
-    margin: 0 auto;
-    width: 20px;
-    display: block;
-    font-size: 20px;
-  }
-
   > div {
     display: flex;
     justify-content: space-between;
@@ -24,36 +17,20 @@
       flex-wrap: wrap;
       justify-content: center;
       margin: 20px 0 20px 5px;
-
-      > span {
-        text-align: center;
-      }
-
-      .percentage {
-        color: $gl-text-color;
-      }
-
-      .text {
-        color: $gl-text-color-secondary;
-      }
     }
 
     .deploy-board-instances {
       order: 2;
       margin-left: 20px;
       width: 100%;
+    }
 
-      .text {
-        color: $gl-text-color-secondary;
-        font-size: 12px;
-      }
+    .deploy-board-instances-text {
+      font-size: 12px;
+    }
 
-      .deploy-board-instances-container {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        margin-top: -8px;
-      }
+    .deploy-board-instances-container {
+      margin-top: -8px;
     }
 
     .deploy-board-actions {
@@ -78,12 +55,12 @@
       flex-wrap: wrap;
       margin: auto auto 15px 0;
 
-      .title {
-        order: 1;
-        display: flex;
-        font-size: 17px;
-        line-height: 40px;
-      }
+    }
+
+    .deploy-board-empty-state-title {
+      order: 1;
+      font-size: 17px;
+      line-height: 40px;
     }
   }
 }
@@ -114,11 +91,7 @@
     border-color: $green-400;
   }
 
-  &-failed {
-    background-color: $red-200;
-    border-color: $red-500;
-  }
-
+  &-failed,
   &-unknown {
     background-color: $red-200;
     border-color: $red-500;
@@ -156,19 +129,6 @@
   }
 }
 
-.cluster-health-graphs {
-  .prometheus-state {
-    .state-svg img {
-      max-height: 120px;
-    }
-
-    .state-description,
-    .state-button {
-      display: none;
-    }
-  }
-}
-
 .alert-dropdown-button {
   margin-left: $btn-side-margin;
 
@@ -194,10 +154,6 @@
   right: 0;
   left: auto;
   z-index: $zindex-popover + 5; // must be higher than graph flag popover
-
-  .dropdown-title {
-    margin: 0;
-  }
 }
 
 .alert-error-message {
@@ -225,10 +181,6 @@
       flex: 1 auto;
       box-shadow: none;
     }
-  }
-
-  .action-group .btn + .btn {
-    margin-left: $gl-padding-8;
   }
 }
 

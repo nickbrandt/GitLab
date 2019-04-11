@@ -74,7 +74,9 @@ describe('Deploy Board', () => {
     it('should render the empty state', () => {
       expect(component.$el.querySelector('.deploy-board-empty-state-svg svg')).toBeDefined();
       expect(
-        component.$el.querySelector('.deploy-board-empty-state-text .title').textContent,
+        component.$el.querySelector(
+          '.deploy-board-empty-state-text .deploy-board-empty-state-title',
+        ).textContent,
       ).toContain('Kubernetes deployment not found');
     });
   });

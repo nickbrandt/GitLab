@@ -84,18 +84,18 @@ export default {
     <div v-if="canRenderDeployBoard">
       <section class="deploy-board-information">
         <span v-tooltip :title="instanceIsCompletedText">
-          <span class="percentage">{{ deployBoardData.completion }}%</span>
-          <span class="text">Complete</span>
+          <span class="percentage text-center text-plain">{{ deployBoardData.completion }}%</span>
+          <span class="text text-center text-secondary">Complete</span>
         </span>
       </section>
 
       <section class="deploy-board-instances">
-        <p class="text">
+        <p class="deploy-board-instances-text text-secondary">
           <span>{{ instanceTitle }}</span>
           <span class="total-instances">({{ instanceCount }})</span>
         </p>
 
-        <div class="deploy-board-instances-container">
+        <div class="deploy-board-instances-container d-flex flex-wrap flex-row">
           <template v-for="(instance, i) in deployBoardData.instances">
             <instance-component
               :key="i"
@@ -139,7 +139,7 @@ export default {
       <section class="deploy-board-empty-state-svg" v-html="deployBoardSvg"></section>
 
       <section class="deploy-board-empty-state-text">
-        <span class="title">Kubernetes deployment not found</span>
+        <span class="deploy-board-empty-state-title d-flex">Kubernetes deployment not found</span>
         <span>
           To see deployment progress for your environments, make sure your deployments are in
           Kubernetes namespace <code>{{ projectName }}</code> and labeled with

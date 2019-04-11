@@ -194,7 +194,7 @@ export default {
         ref="cancelButton"
         :disabled="formDisabled"
         type="button"
-        class="btn btn-default"
+        class="btn btn-default prepend-left-8"
         @click="handleCancel"
       >
         {{ __('Cancel') }}
@@ -204,7 +204,7 @@ export default {
         :class="submitButtonClass"
         :disabled="isSubmitDisabled"
         type="button"
-        class="btn btn-inverted"
+        class="btn btn-inverted prepend-left-8"
         @click="handleSubmit"
       >
         {{ submitActionText }}
