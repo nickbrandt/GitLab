@@ -1887,17 +1887,18 @@ describe Project do
 
   describe "#design_management_enabled?" do
     let(:project) { build(:project) }
-    where(:feature_enabled, :license_enabled, :expected) do
-      false | false | false
-      false | true  | false
-      true  | false | false
-      true  | true  | true
+    where(:feature_enabled, :license_enabled, :graphql, :expected) do
+      false | false | false | false
+      false | true  | false | false
+      true  | false | false | false
+      false | false | true  | false
+      true  | true  | true  | true
     end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management: feature_enabled)
+        stub_feature_flags(design_management: feature_enabled, graphql: graphql)
       end
 
       it "knows if design management is available" do
