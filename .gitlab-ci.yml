@@ -713,14 +713,14 @@ rspec-pg-ee:
 
 rspec-mysql-ee:
   <<: *rspec-ee-mysql
+  <<: *only-schedules-master
   parallel: 10
 
 rspec-pg geo: *rspec-metadata-pg-geo-9-6
 rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
 
-
 .rspec-quarantine-ee: &rspec-quarantine-ee
-  retry: 0
+  <<: *only-schedules-master
   script:
     - export CACHE_CLASSES=true
     - scripts/gitaly-test-spawn
