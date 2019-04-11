@@ -12103,6 +12103,9 @@ msgstr ""
 msgid "Usage statistics"
 msgstr ""
 
+msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"
+msgstr ""
+
 msgid "Use <code>%{native_redirect_uri}</code> for local tests"
 msgstr ""
 
@@ -12269,6 +12272,9 @@ msgid "Users were successfully added."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
+msgstr ""
+
+msgid "Using %{code_start}::%{code_end} denotes a %{link_start}scoped label set%{link_end}"
 msgstr ""
 
 msgid "Validate"
