@@ -13,14 +13,7 @@
 module Gitlab
   module Geo
     class Fdw
-      class ProjectRegistryQueryBuilder < SimpleDelegator
-        attr_reader :query
-
-        def initialize(query = nil)
-          @query = query || base_query
-          super(query)
-        end
-
+      class ProjectRegistryQueryBuilder < BaseQueryBuilder
         # rubocop:disable CodeReuse/ActiveRecord
         def registries_pending_verification
           reflect(
@@ -54,12 +47,8 @@ module Gitlab
 
         private
 
-        def base_query
+        def base
           ::Geo::ProjectRegistry.select(project_registries_table[Arel.star])
-        end
-
-        def reflect(query)
-          self.class.new(query)
         end
 
         def project_registries_table
