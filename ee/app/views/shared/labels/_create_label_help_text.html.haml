@@ -1,15 +1,16 @@
-- docs_link = help_page_path('user/project/labels.md', anchor: 'scoped-labels')
+- if @label.subject.feature_available?(:scoped_labels)
+  - docs_link = help_page_path('user/project/labels.md', anchor: 'scoped-labels')
 
-.col-sm-10.offset-sm-2.form-text.text-muted.js-has-scoped-labels.hidden
-  Using
-  %code ::
-  denotes a
-  %a{ href: docs_link, target: '_blank', rel: 'noopener noreferrer' } scoped label set
-.col-sm-10.offset-sm-2.form-text.text-muted.js-use-scoped-labels
-  Use
-  %code ::
-  to create a
-  %a{ href: docs_link, target: '_blank', rel: 'noopener noreferrer' } scoped label set
-  (eg.
-  %code priority::1
-  )
+  .col-sm-10.offset-sm-2.form-text.text-muted.js-has-scoped-labels.hidden
+    Using
+    %code ::
+    denotes a
+    %a{ href: docs_link, target: '_blank', rel: 'noopener noreferrer' } scoped label set
+  .col-sm-10.offset-sm-2.form-text.text-muted.js-use-scoped-labels
+    Use
+    %code ::
+    to create a
+    %a{ href: docs_link, target: '_blank', rel: 'noopener noreferrer' } scoped label set
+    (eg.
+    %code priority::1
+    )
