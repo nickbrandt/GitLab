@@ -71,7 +71,7 @@ This can be done in two ways:
 
 NOTE: **Note:**
 The CI/CD Container Scanning template is supported on GitLab 11.9 and later versions.
-For earlier versions, use the [manual job definition](#manual-job-definition).
+For earlier versions, use the [manual job definition](#manual-job-definition-for-gitlab-115-and-later).
 
 A CI/CD [Container Scanning template](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml)
 with the default Container Scanning job definition is provided as a part of your GitLab

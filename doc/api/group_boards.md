@@ -31,32 +31,7 @@ Example response:
     "group": {
       "id": 5,
       "name": "Documentcloud",
-      "path": "documentcloud",
-      "owner_id": null,
-      "created_at": "2018-05-07T06:52:45.788Z",
-      "updated_at": "2018-07-03T06:48:17.005Z",
-      "description": "Consequatur aut a aperiam ut.",
-      "avatar": {
-        "url": null
-      },
-      "membership_lock": false,
-      "share_with_group_lock": false,
-      "visibility_level": 20,
-      "request_access_enabled": false,
-      "ldap_sync_status": "ready",
-      "ldap_sync_error": null,
-      "ldap_sync_last_update_at": null,
-      "ldap_sync_last_successful_update_at": null,
-      "ldap_sync_last_sync_at": null,
-      "lfs_enabled": null,
-      "parent_id": null,
-      "shared_runners_minutes_limit": null,
-      "repository_size_limit": null,
-      "require_two_factor_authentication": false,
-      "two_factor_grace_period": 48,
-      "plan_id": null,
-      "project_creation_level": 2,
-      "runners_token": "rgeeL-nv4wa9YdRvuMid"
+      "web_url": "http://example.com/groups/documentcloud"
     },
     "milestone":   {
       "id": 12
@@ -121,32 +96,7 @@ Example response:
     "group": {
       "id": 5,
       "name": "Documentcloud",
-      "path": "documentcloud",
-      "owner_id": null,
-      "created_at": "2018-05-07T06:52:45.788Z",
-      "updated_at": "2018-07-03T06:48:17.005Z",
-      "description": "Consequatur aut a aperiam ut.",
-      "avatar": {
-        "url": null
-      },
-      "membership_lock": false,
-      "share_with_group_lock": false,
-      "visibility_level": 20,
-      "request_access_enabled": false,
-      "ldap_sync_status": "ready",
-      "ldap_sync_error": null,
-      "ldap_sync_last_update_at": null,
-      "ldap_sync_last_successful_update_at": null,
-      "ldap_sync_last_sync_at": null,
-      "lfs_enabled": null,
-      "parent_id": null,
-      "shared_runners_minutes_limit": null,
-      "repository_size_limit": null,
-      "require_two_factor_authentication": false,
-      "two_factor_grace_period": 48,
-      "plan_id": null,
-      "project_creation_level": 2,
-      "runners_token": "rgeeL-nv4wa9YdRvuMid"
+      "web_url": "http://example.com/groups/documentcloud"
     },
     "milestone":   {
       "id": 12
@@ -210,32 +160,7 @@ Example response:
     "group": {
       "id": 5,
       "name": "Documentcloud",
-      "path": "documentcloud",
-      "owner_id": null,
-      "created_at": "2018-05-07T06:52:45.788Z",
-      "updated_at": "2018-07-03T06:48:17.005Z",
-      "description": "Consequatur aut a aperiam ut.",
-      "avatar": {
-        "url": null
-      },
-      "membership_lock": false,
-      "share_with_group_lock": false,
-      "visibility_level": 20,
-      "request_access_enabled": false,
-      "ldap_sync_status": "ready",
-      "ldap_sync_error": null,
-      "ldap_sync_last_update_at": null,
-      "ldap_sync_last_successful_update_at": null,
-      "ldap_sync_last_sync_at": null,
-      "lfs_enabled": null,
-      "parent_id": null,
-      "shared_runners_minutes_limit": null,
-      "repository_size_limit": null,
-      "require_two_factor_authentication": false,
-      "two_factor_grace_period": 48,
-      "plan_id": null,
-      "project_creation_level": 2,
-      "runners_token": "rgeeL-nv4wa9YdRvuMid"
+      "web_url": "http://example.com/groups/documentcloud"
     },
     "milestone":   {
       "id": 12
@@ -309,32 +234,7 @@ Example response:
     "group": {
       "id": 5,
       "name": "Documentcloud",
-      "path": "documentcloud",
-      "owner_id": null,
-      "created_at": "2018-05-07T06:52:45.788Z",
-      "updated_at": "2018-07-03T06:48:17.005Z",
-      "description": "Consequatur aut a aperiam ut.",
-      "avatar": {
-        "url": null
-      },
-      "membership_lock": false,
-      "share_with_group_lock": false,
-      "visibility_level": 20,
-      "request_access_enabled": false,
-      "ldap_sync_status": "ready",
-      "ldap_sync_error": null,
-      "ldap_sync_last_update_at": null,
-      "ldap_sync_last_successful_update_at": null,
-      "ldap_sync_last_sync_at": null,
-      "lfs_enabled": null,
-      "parent_id": null,
-      "shared_runners_minutes_limit": null,
-      "repository_size_limit": null,
-      "require_two_factor_authentication": false,
-      "two_factor_grace_period": 48,
-      "plan_id": null,
-      "project_creation_level": 2,
-      "runners_token": "rgeeL-nv3wa6YdRvuMid"
+      "web_url": "http://example.com/groups/documentcloud"
     },
     "milestone": {
       "id": 44,
