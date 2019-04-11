@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
-# vim: ft=ruby
+# frozen_string_literal: true
+
 require 'rubygems'
 require 'bundler/setup'
 require 'optparse'
+
+def rails_path(relname)
+  Pathname.new(__FILE__).dirname.join('../..').join(relname).realpath
+end
 
 class GeoLogCursorOptionParser
   def self.parse(argv)
@@ -22,7 +27,7 @@ class GeoLogCursorOptionParser
     end
     op.on('-v', '--version') do
       # Load only necessary libraries for faster startup
-      require "#{File.dirname(__FILE__)}/../lib/gitlab/geo/log_cursor/daemon"
+      require rails_path('ee/lib/gitlab/geo/log_cursor/daemon.rb')
 
       puts Gitlab::Geo::LogCursor::Daemon::VERSION
       exit
@@ -39,7 +44,7 @@ if $0 == __FILE__
   options = GeoLogCursorOptionParser.parse(ARGV)
 
   # We load rails environment / initializers only here to get faster command line startup when `--help` and `--version`
-  require "#{File.dirname(__FILE__)}/../config/environment"
+  require rails_path('config/environment.rb')
 
   Gitlab::Geo::LogCursor::Daemon.new(options).run!
 end
