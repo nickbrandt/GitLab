@@ -1,0 +1,5 @@
+---
+title: Hide scoped labels help text without corresponding license
+merge_request: 10737
+author:
+type: fixed
