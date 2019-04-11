@@ -37,7 +37,6 @@ Click on the service links to see further configuration instructions and details
 | Flowdock | Flowdock is a collaboration web app for technical teams |
 | [GitHub](github.md) | Sends pipeline notifications to GitHub |
 | [Hangouts Chat](hangouts_chat.md) | Receive events notifications in Google Hangouts Chat |
-| [HipChat](hipchat.md) | Private group chat and IM |
 | [Irker (IRC gateway)](irker.md) | Send IRC messages, on update, to a list of recipients through an Irker gateway |
 | [JIRA](jira.md) | JIRA issue tracker |
 | [Jenkins](../../../integration/jenkins.md) | An extendable open source continuous integration server |
