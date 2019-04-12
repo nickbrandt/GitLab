@@ -34,11 +34,11 @@ import actions, {
   fetchDependencyScanningReports,
   openModal,
   setModalData,
-  requestDismissIssue,
-  receiveDismissIssue,
-  receiveDismissIssueError,
-  dismissIssue,
-  revertDismissIssue,
+  requestDismissVulnerability,
+  receiveDismissVulnerability,
+  receiveDismissVulnerabilityError,
+  dismissVulnerability,
+  revertDismissVulnerability,
   requestCreateIssue,
   receiveCreateIssue,
   receiveCreateIssueError,
@@ -1063,15 +1063,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('requestDismissIssue', () => {
+  describe('requestDismissVulnerability', () => {
     it('commits request dismiss issue', done => {
       testAction(
-        requestDismissIssue,
+        requestDismissVulnerability,
         null,
         mockedState,
         [
           {
-            type: types.REQUEST_DISMISS_ISSUE,
+            type: types.REQUEST_DISMISS_VULNERABILITY,
           },
         ],
         [],
@@ -1080,15 +1080,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('receiveDismissIssue', () => {
+  describe('receiveDismissVulnerability', () => {
     it('commits receive dismiss issue', done => {
       testAction(
-        receiveDismissIssue,
+        receiveDismissVulnerability,
         null,
         mockedState,
         [
           {
-            type: types.RECEIVE_DISMISS_ISSUE_SUCCESS,
+            type: types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS,
           },
         ],
         [],
@@ -1097,15 +1097,15 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('receiveDismissIssueError', () => {
+  describe('receiveDismissVulnerabilityError', () => {
     it('commits receive dismiss issue error with payload', done => {
       testAction(
-        receiveDismissIssueError,
+        receiveDismissVulnerabilityError,
         'error',
         mockedState,
         [
           {
-            type: types.RECEIVE_DISMISS_ISSUE_ERROR,
+            type: types.RECEIVE_DISMISS_VULNERABILITY_ERROR,
             payload: 'error',
           },
         ],
@@ -1115,29 +1115,32 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('dismissIssue', () => {
+  describe('dismissVulnerability', () => {
     describe('with success', () => {
       let dismissalFeedback;
       beforeEach(() => {
         dismissalFeedback = {
           foo: 'bar',
         };
-        mock.onPost('dismiss_issue_path').reply(200, dismissalFeedback);
-        mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_issue_path';
+        mock.onPost('dismiss_vulnerability_path').reply(200, dismissalFeedback);
+        mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_vulnerability_path';
       });
 
-      it('with success should dispatch `receiveDismissIssue`', done => {
+      it('with success should dispatch `receiveDismissVulnerability`', done => {
         testAction(
-          dismissIssue,
+          dismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
             },
           ],
           done,
@@ -1153,16 +1156,19 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          dismissIssue,
+          dismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateSastIssue',
@@ -1182,16 +1188,19 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          dismissIssue,
+          dismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateDependencyScanningIssue',
@@ -1211,16 +1220,19 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          dismissIssue,
+          dismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateContainerScanningIssue',
@@ -1240,16 +1252,19 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          dismissIssue,
+          dismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateDastIssue',
@@ -1261,21 +1276,21 @@ describe('security reports actions', () => {
       });
     });
 
-    it('with error should dispatch `receiveDismissIssueError`', done => {
-      mock.onPost('dismiss_issue_path').reply(500, {});
-      mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_issue_path';
+    it('with error should dispatch `receiveDismissVulnerabilityError`', done => {
+      mock.onPost('dismiss_vulnerability_path').reply(500, {});
+      mockedState.vulnerabilityFeedbackPath = 'dismiss_vulnerability_path';
 
       testAction(
-        dismissIssue,
+        dismissVulnerability,
         null,
         mockedState,
         [],
         [
           {
-            type: 'requestDismissIssue',
+            type: 'requestDismissVulnerability',
           },
           {
-            type: 'receiveDismissIssueError',
+            type: 'receiveDismissVulnerabilityError',
             payload: 'There was an error dismissing the vulnerability. Please try again.',
           },
         ],
@@ -1284,27 +1299,28 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('revertDismissIssue', () => {
+  describe('revertDismissVulnerability', () => {
     describe('with success', () => {
       beforeEach(() => {
-        mock.onDelete('dismiss_issue_path/123').reply(200, {});
+        mock.onDelete('dismiss_vulnerability_path/123').reply(200, {});
         mockedState.modal.vulnerability.dismissalFeedback = {
-          destroy_vulnerability_feedback_dismissal_path: 'dismiss_issue_path/123',
+          id: 123,
+          destroy_vulnerability_feedback_dismissal_path: 'dismiss_vulnerability_path/123',
         };
       });
 
-      it('should dispatch `receiveDismissIssue`', done => {
+      it('should dispatch `receiveDismissVulnerability`', done => {
         testAction(
-          revertDismissIssue,
+          revertDismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'receiveDismissVulnerability',
             },
           ],
           done,
@@ -1320,16 +1336,16 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          revertDismissIssue,
+          revertDismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateSastIssue',
@@ -1349,16 +1365,16 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          revertDismissIssue,
+          revertDismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateDependencyScanningIssue',
@@ -1378,16 +1394,16 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          revertDismissIssue,
+          revertDismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateContainerScanningIssue',
@@ -1407,16 +1423,16 @@ describe('security reports actions', () => {
         };
 
         testAction(
-          revertDismissIssue,
+          revertDismissVulnerability,
           null,
           mockedState,
           [],
           [
             {
-              type: 'requestDismissIssue',
+              type: 'requestDismissVulnerability',
             },
             {
-              type: 'receiveDismissIssue',
+              type: 'receiveDismissVulnerability',
             },
             {
               type: 'updateDastIssue',
@@ -1428,23 +1444,22 @@ describe('security reports actions', () => {
       });
     });
 
-    it('with error should dispatch `receiveDismissIssueError`', done => {
-      mockedState.modal.vulnerability.dismissalFeedback = {
-        destroy_vulnerability_feedback_dismissal_path: 'dismiss_issue_path',
-      };
-      mock.onDelete('dismiss_issue_path/123').reply(500, {});
+    it('with error should dispatch `receiveDismissVulnerabilityError`', done => {
+      mock.onDelete('dismiss_vulnerability_path/123').reply(500, {});
+      mockedState.modal.vulnerability.dismissalFeedback = { id: 123 };
+      mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_vulnerability_path';
 
       testAction(
-        revertDismissIssue,
+        revertDismissVulnerability,
         null,
         mockedState,
         [],
         [
           {
-            type: 'requestDismissIssue',
+            type: 'requestDismissVulnerability',
           },
           {
-            type: 'receiveDismissIssueError',
+            type: 'receiveDismissVulnerabilityError',
             payload: 'There was an error reverting the dismissal. Please try again.',
           },
         ],
@@ -1510,7 +1525,7 @@ describe('security reports actions', () => {
       spyOnDependency(actions, 'visitUrl');
     });
 
-    it('with success should dispatch `receiveCreateIssue`', done => {
+    it('with success should dispatch `receiveDismissVulnerability`', done => {
       mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
       mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
 

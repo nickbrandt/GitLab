@@ -46,17 +46,33 @@ export default {
       }
       return __('Dismissed');
     },
+    commentDetails() {
+      return this.feedback.comment_details;
+    },
   },
 };
 </script>
 
 <template>
-  <event-item
-    :author="feedback.author"
-    :created-at="feedback.created_at"
-    icon-name="cancel"
-    icon-style="ci-status-icon-pending"
-  >
-    <div v-html="eventText"></div>
-  </event-item>
+  <div>
+    <event-item
+      :author="feedback.author"
+      :created-at="feedback.created_at"
+      icon-name="cancel"
+      icon-style="ci-status-icon-pending"
+    >
+      <div v-html="eventText"></div>
+    </event-item>
+    <template v-if="commentDetails">
+      <hr class="my-3" />
+      <event-item
+        :author="commentDetails.comment_author"
+        :created-at="commentDetails.comment_timestamp"
+        icon-name="comment"
+        icon-style="ci-status-icon-pending"
+      >
+        {{ commentDetails.comment }}
+      </event-item>
+    </template>
+  </div>
 </template>

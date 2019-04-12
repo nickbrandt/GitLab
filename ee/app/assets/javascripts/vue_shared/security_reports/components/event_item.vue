@@ -33,7 +33,7 @@ export default {
 </script>
 
 <template>
-  <div class="card-body d-flex align-items-center">
+  <div class="d-flex align-items-center">
     <div class="circle-icon-container" :class="iconStyle">
       <icon :size="16" :name="iconName" />
     </div>

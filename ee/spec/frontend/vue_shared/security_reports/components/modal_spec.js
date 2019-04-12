@@ -31,19 +31,6 @@ describe('Security Reports modal', () => {
         expect(vm.$el.textContent.trim()).toContain('@jsmith');
         expect(vm.$el.textContent.trim()).toContain('#123');
       });
-
-      it('renders button to undo dismiss', () => {
-        expect(vm.$el.querySelector('.js-dismiss-btn').textContent.trim()).toEqual('Undo dismiss');
-      });
-
-      it('emits revertDismissIssue when undo dismiss button is clicked', () => {
-        jest.spyOn(vm, '$emit');
-
-        const button = vm.$el.querySelector('.js-dismiss-btn');
-        button.click();
-
-        expect(vm.$emit).toHaveBeenCalledWith('revertDismissIssue');
-      });
     });
 
     describe('with not dismissed issue', () => {
@@ -55,62 +42,8 @@ describe('Security Reports modal', () => {
         vm = mountComponent(Component, props);
       });
 
-      it('renders button to dismiss issue', () => {
-        expect(vm.$el.querySelector('.js-dismiss-btn').textContent.trim()).toEqual(
-          'Dismiss vulnerability',
-        );
-      });
-
-      it('does not render create issue button', () => {
-        expect(vm.$el.querySelector('.js-create-issue-btn')).toBe(null);
-      });
-
-      it('renders the dismiss button', () => {
-        expect(vm.$el.querySelector('.js-dismiss-btn')).not.toBe(null);
-      });
-
       it('renders the footer', () => {
         expect(vm.$el.classList.contains('modal-hide-footer')).toEqual(false);
-      });
-
-      it('emits dismissIssue when dismiss issue button is clicked', () => {
-        jest.spyOn(vm, '$emit');
-
-        const button = vm.$el.querySelector('.js-dismiss-btn');
-        button.click();
-
-        expect(vm.$emit).toHaveBeenCalledWith('dismissIssue');
-      });
-    });
-
-    describe('with create issue', () => {
-      beforeEach(() => {
-        const props = {
-          modal: createState().modal,
-          canCreateIssue: true,
-        };
-        vm = mountComponent(Component, props);
-      });
-
-      it('does not render dismiss button', () => {
-        expect(vm.$el.querySelector('.js-dismiss-btn')).toBe(null);
-      });
-
-      it('renders create issue button', () => {
-        expect(vm.$el.querySelector('.js-action-button')).not.toBe(null);
-      });
-
-      it('renders the footer', () => {
-        expect(vm.$el.classList.contains('modal-hide-footer')).toEqual(false);
-      });
-
-      it('emits createIssue when create issue button is clicked', () => {
-        jest.spyOn(vm, '$emit');
-
-        const button = vm.$el.querySelector('.js-action-button');
-        button.click();
-
-        expect(vm.$emit).toHaveBeenCalledWith('createNewIssue');
       });
     });
 
@@ -142,11 +75,6 @@ describe('Security Reports modal', () => {
         modal: createState().modal,
       };
       vm = mountComponent(Component, props);
-    });
-
-    it('does not render action buttons', () => {
-      expect(vm.$el.querySelector('.js-dismiss-btn')).toBe(null);
-      expect(vm.$el.querySelector('.js-create-issue-btn')).toBe(null);
     });
 
     it('does not display the footer', () => {

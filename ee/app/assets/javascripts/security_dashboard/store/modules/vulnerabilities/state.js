@@ -39,6 +39,7 @@ export default () => ({
     isCreatingNewIssue: false,
     isCreatingMergeRequest: false,
     isDismissingVulnerability: false,
+    isCommentingOnDismissal: false,
   },
   isCreatingIssue: false,
   isCreatingMergeRequest: false,

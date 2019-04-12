@@ -1,28 +1,30 @@
 <script>
-import { s__ } from '~/locale';
+import { __ } from '~/locale';
 import Modal from '~/vue_shared/components/gl_modal.vue';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 
 import DismissalNote from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
+import DismissalCommentBox from 'ee/vue_shared/security_reports/components/dismissal_comment_box.vue';
+import DismissalCommentModalFooter from 'ee/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
+import ModalFooter from 'ee/vue_shared/security_reports/components/modal_footer.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
-import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
 
 export default {
   components: {
     DismissalNote,
+    DismissalCommentBox,
+    DismissalCommentModalFooter,
     EventItem,
     ExpandButton,
     IssueNote,
-    LoadingButton,
     MergeRequestNote,
     Modal,
+    ModalFooter,
     SolutionCard,
-    SplitButton,
     VulnerabilityDetails,
   },
   props: {
@@ -51,37 +53,11 @@ export default {
       default: false,
     },
   },
+  data: () => ({
+    localDismissalComment: '',
+    dismissalCommentErrorMessage: '',
+  }),
   computed: {
-    actionButtons() {
-      const buttons = [];
-      const issueButton = {
-        name: s__('ciReport|Create issue'),
-        tagline: s__('ciReport|Investigate this vulnerability by creating an issue'),
-        isLoading: this.modal.isCreatingNewIssue,
-        action: 'createNewIssue',
-      };
-      const MRButton = {
-        name: s__('ciReport|Create merge request'),
-        tagline: s__('ciReport|Implement this solution by creating a merge request'),
-        isLoading: this.modal.isCreatingMergeRequest,
-        action: 'createMergeRequest',
-      };
-
-      if (!this.vulnerability.hasMergeRequest && this.canCreateMergeRequest && this.remediation) {
-        buttons.push(MRButton);
-      }
-
-      if (!this.vulnerability.hasIssue && this.canCreateIssue) {
-        buttons.push(issueButton);
-      }
-
-      return buttons;
-    },
-    revertTitle() {
-      return this.vulnerability.isDismissed
-        ? s__('ciReport|Undo dismiss')
-        : s__('ciReport|Dismiss vulnerability');
-    },
     hasDismissedBy() {
       return (
         this.vulnerability &&
@@ -137,14 +113,45 @@ export default {
 
       return result;
     },
+    dismissalFeedbackObject() {
+      if (this.dismissalFeedback) {
+        return this.dismissalFeedback;
+      }
+
+      // If we don't have access to the feedback object, we can preempt the data with properties taken from the `gon` variable
+
+      const {
+        current_user_avatar_url,
+        current_user_fullname,
+        current_user_id,
+        current_username,
+      } = gon;
+
+      const currentDate = new Date();
+
+      return {
+        created_at: currentDate.toString(),
+        project_id: this.project ? this.project.id : null,
+        author: {
+          id: current_user_id,
+          name: current_user_fullname,
+          username: current_username,
+          state: 'active',
+          avatar_url: current_user_avatar_url,
+        },
+      };
+    },
   },
   methods: {
-    handleDismissClick() {
-      if (this.vulnerability.isDismissed) {
-        this.$emit('revertDismissIssue');
+    dismissVulnerabilityWithComment() {
+      if (this.localDismissalComment.length) {
+        this.$emit('dismissVulnerability', this.localDismissalComment);
       } else {
-        this.$emit('dismissIssue');
+        this.dismissalCommentErrorMessage = __('Please add a comment in the text area above');
       }
+    },
+    clearDismissalError() {
+      this.dismissalCommentErrorMessage = '';
     },
   },
 };
@@ -164,15 +171,28 @@ export default {
 
       <ul v-if="issueFeedback || mergeRequestFeedback" class="notes card my-4">
         <li v-if="issueFeedback" class="note">
-          <issue-note :feedback="issueFeedback" :project="project" />
+          <div class="card-body">
+            <issue-note :feedback="issueFeedback" :project="project" />
+          </div>
         </li>
         <li v-if="mergeRequestFeedback" class="note">
-          <merge-request-note :feedback="mergeRequestFeedback" :project="project" />
+          <div class="card-body">
+            <merge-request-note :feedback="mergeRequestFeedback" :project="project" />
+          </div>
         </li>
       </ul>
 
-      <div class="card my-4">
-        <dismissal-note v-if="dismissalFeedback" :feedback="dismissalFeedback" :project="project" />
+      <div v-if="dismissalFeedback || modal.isCommentingOnDismissal" class="card my-4">
+        <div class="card-body">
+          <dismissal-note :feedback="dismissalFeedbackObject" :project="project" />
+          <dismissal-comment-box
+            v-if="modal.isCommentingOnDismissal"
+            v-model="localDismissalComment"
+            :error-message="dismissalCommentErrorMessage"
+            @submit="dismissVulnerabilityWithComment"
+            @clearError="clearDismissalError"
+          />
+        </div>
       </div>
 
       <div class="prepend-top-20 append-bottom-10">
@@ -190,38 +210,25 @@ export default {
       <div v-if="modal.error" class="alert alert-danger">{{ modal.error }}</div>
     </slot>
     <div slot="footer">
-      <template v-if="shouldRenderFooterSection">
-        <button type="button" class="btn btn-default" data-dismiss="modal">
-          {{ __('Cancel') }}
-        </button>
-
-        <loading-button
-          v-if="canDismissVulnerability"
-          :loading="modal.isDismissingIssue"
-          :disabled="modal.isDismissingIssue"
-          :label="revertTitle"
-          container-class="js-dismiss-btn btn btn-close"
-          @click="handleDismissClick"
-        />
-
-        <split-button
-          v-if="actionButtons.length > 1"
-          :buttons="actionButtons"
-          class="js-split-button"
-          @createMergeRequest="$emit('createMergeRequest')"
-          @createNewIssue="$emit('createNewIssue')"
-        />
-
-        <loading-button
-          v-else-if="actionButtons.length > 0"
-          :loading="actionButtons[0].isLoading"
-          :disabled="actionButtons[0].isLoading"
-          :label="actionButtons[0].name"
-          container-class="btn btn-success btn-inverted"
-          class="js-action-button"
-          @click="$emit(actionButtons[0].action)"
-        />
-      </template>
+      <dismissal-comment-modal-footer
+        v-if="modal.isCommentingOnDismissal"
+        @dismissVulnerability="dismissVulnerabilityWithComment"
+        @cancel="$emit('closeDismissalCommentBox')"
+      />
+      <modal-footer
+        v-else-if="shouldRenderFooterSection"
+        :modal="modal"
+        :vulnerability="vulnerability"
+        :can-create-issue="Boolean(!vulnerability.hasIssue && canCreateIssue)"
+        :can-create-merge-request="Boolean(!vulnerability.hasMergeRequest && remediation)"
+        :can-dismiss-vulnerability="canDismissVulnerability"
+        :is-dismissed="vulnerability.isDismissed"
+        @createMergeRequest="$emit('createMergeRequest')"
+        @createNewIssue="$emit('createNewIssue')"
+        @dismissVulnerability="$emit('dismissVulnerability')"
+        @openDismissalCommentBox="$emit('openDismissalCommentBox')"
+        @revertDismissVulnerability="$emit('revertDismissVulnerability')"
+      />
     </div>
   </modal>
 </template>

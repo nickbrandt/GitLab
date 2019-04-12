@@ -9127,6 +9127,9 @@ msgstr ""
 msgid "Please accept the Terms of Service before continuing."
 msgstr ""
 
+msgid "Please add a comment in the text area above"
+msgstr ""
+
 msgid "Please add a list to your board first"
 msgstr ""
 
@@ -14794,9 +14797,6 @@ msgstr ""
 msgid "ciReport|Description"
 msgstr ""
 
-msgid "ciReport|Dismiss vulnerability"
-msgstr ""
-
 msgid "ciReport|Download and apply the patch to fix this vulnerability."
 msgstr ""
 
@@ -14913,9 +14913,6 @@ msgid "ciReport|There was an error loading dependency scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
-msgstr ""
-
-msgid "ciReport|Undo dismiss"
 msgstr ""
 
 msgid "ciReport|Upgrade %{name} from %{version} to %{fixed}."
@@ -15617,6 +15614,21 @@ msgid "view it on GitLab"
 msgstr ""
 
 msgid "view the blob"
+msgstr ""
+
+msgid "vulnerability|Add a comment or reason for dismissal"
+msgstr ""
+
+msgid "vulnerability|Add comment & dismiss"
+msgstr ""
+
+msgid "vulnerability|Dismiss vulnerability"
+msgstr ""
+
+msgid "vulnerability|Undo dismiss"
+msgstr ""
+
+msgid "vulnerability|dismissed"
 msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."

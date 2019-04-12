@@ -130,6 +130,7 @@ export default {
     );
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
+    Vue.set(state.modal, 'isCommentingOnDismissal', false);
 
     if (vulnerability.instances && vulnerability.instances.length) {
       Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
@@ -216,5 +217,11 @@ export default {
       'error',
       s__('security Reports|There was an error creating the merge request'),
     );
+  },
+  [types.OPEN_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isCommentingOnDismissal', true);
+  },
+  [types.CLOSE_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isCommentingOnDismissal', false);
   },
 };
