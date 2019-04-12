@@ -1217,6 +1217,9 @@ msgstr ""
 msgid "An error occurred whilst fetching the latest pipeline."
 msgstr ""
 
+msgid "An error occurred whilst getting files for - %{branchId}"
+msgstr ""
+
 msgid "An error occurred whilst loading all the files."
 msgstr ""
 
@@ -1936,6 +1939,9 @@ msgid "Branch is already taken"
 msgstr ""
 
 msgid "Branch name"
+msgstr ""
+
+msgid "Branch not loaded - %{branchId}"
 msgstr ""
 
 msgid "BranchSwitcherPlaceholder|Search branches"
@@ -3609,6 +3615,9 @@ msgid "Create a merge request."
 msgstr ""
 
 msgid "Create a new branch"
+msgstr ""
+
+msgid "Create a new file as there are no files yet. Afterwards, you'll be able to commit your changes."
 msgstr ""
 
 msgid "Create a new issue"
@@ -7631,6 +7640,9 @@ msgstr ""
 msgid "MRDiff|Show full file"
 msgstr ""
 
+msgid "Make and review changes in the browser with the Web IDE"
+msgstr ""
+
 msgid "Make everyone on your team more productive regardless of their location. GitLab Geo creates read-only mirrors of your GitLab instance so you can reduce the time it takes to clone and fetch large repos."
 msgstr ""
 
@@ -8459,6 +8471,9 @@ msgid "No file chosen"
 msgstr ""
 
 msgid "No file selected"
+msgstr ""
+
+msgid "No files"
 msgstr ""
 
 msgid "No files found."
@@ -11202,6 +11217,9 @@ msgid "Select Archive Format"
 msgstr ""
 
 msgid "Select Page"
+msgstr ""
+
+msgid "Select a file from the left sidebar to begin editing. Afterwards, you'll be able to commit your changes."
 msgstr ""
 
 msgid "Select a group to invite"
