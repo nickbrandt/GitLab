@@ -17,6 +17,10 @@ describe API::Geo do
     Gitlab::Geo::TransferRequest.new(transfer.request_data.merge(file_id: 100000)).headers
   end
 
+  before do
+    stub_current_geo_node(primary_node)
+  end
+
   shared_examples 'with terms enforced' do
     before do
       enforce_terms

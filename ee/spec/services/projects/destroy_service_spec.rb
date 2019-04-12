@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Projects::DestroyService do
+  include EE::GeoHelpers
+
   let!(:user) { create(:user) }
   let!(:project) { create(:project, :repository, namespace: user.namespace) }
   let!(:project_id) { project.id }
@@ -32,6 +34,10 @@ describe Projects::DestroyService do
   context 'when running on a primary node' do
     set(:primary) { create(:geo_node, :primary) }
     set(:secondary) { create(:geo_node) }
+
+    before do
+      stub_current_geo_node(primary)
+    end
 
     it 'logs an event to the Geo event log' do
       # Run Sidekiq immediately to check that renamed repository will be removed

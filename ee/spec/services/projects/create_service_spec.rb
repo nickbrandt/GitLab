@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Projects::CreateService, '#execute' do
+  include EE::GeoHelpers
+
   let(:user) { create :user }
   let(:opts) do
     {
@@ -196,6 +198,10 @@ describe Projects::CreateService, '#execute' do
   context 'when running on a primary node' do
     set(:primary) { create(:geo_node, :primary) }
     set(:secondary) { create(:geo_node) }
+
+    before do
+      stub_current_geo_node(primary)
+    end
 
     it 'logs an event to the Geo event log' do
       expect { create_project(user, opts) }.to change(Geo::RepositoryCreatedEvent, :count).by(1)

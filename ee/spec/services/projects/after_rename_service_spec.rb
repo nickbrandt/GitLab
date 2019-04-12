@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Projects::AfterRenameService do
+  include EE::GeoHelpers
+
   describe '#execute' do
     context 'when running on a primary node' do
       set(:primary) { create(:geo_node, :primary) }
@@ -11,6 +13,10 @@ describe Projects::AfterRenameService do
       let!(:path_before_rename) { project.path }
       let!(:full_path_before_rename) { project.full_path }
       let(:path_after_rename) { "#{project.path}-renamed" }
+
+      before do
+        stub_current_geo_node(primary)
+      end
 
       it 'logs the Geo::RepositoryRenamedEvent for project backed by hashed storage' do
         expect { service_execute }.to change(Geo::RepositoryRenamedEvent, :count)

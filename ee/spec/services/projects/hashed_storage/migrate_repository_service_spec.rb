@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Projects::HashedStorage::MigrateRepositoryService do
+  include EE::GeoHelpers
+
   let(:project) { create(:project, :empty_repo, :wiki_repo, :legacy_storage) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
   let(:hashed_storage) { Storage::HashedProject.new(project) }
@@ -12,6 +14,7 @@ describe Projects::HashedStorage::MigrateRepositoryService do
 
     before do
       TestEnv.clean_test_path
+      stub_current_geo_node(primary)
     end
 
     it 'creates a Geo::HashedStorageMigratedEvent on success' do

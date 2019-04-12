@@ -25,5 +25,9 @@ module EE
         allow(object).to receive_message_chain(:current_application_settings, setting) { value }
       end
     end
+
+    def stub_geo_setting(messages)
+      allow(::Gitlab.config.geo).to receive_messages(to_settings(messages))
+    end
   end
 end

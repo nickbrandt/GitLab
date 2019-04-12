@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Projects::TransferService do
+  include EE::GeoHelpers
+
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, namespace: user.namespace) }
@@ -16,6 +18,8 @@ describe Projects::TransferService do
     set(:secondary) { create(:geo_node) }
 
     it 'logs an event to the Geo event log' do
+      stub_current_geo_node(primary)
+
       expect { subject.execute(group) }.to change(Geo::RepositoryRenamedEvent, :count).by(1)
     end
   end

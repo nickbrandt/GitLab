@@ -11,6 +11,7 @@ describe 'geo rake tasks', :geo do
   describe 'set_primary_node task' do
     before do
       stub_config_setting(url: 'https://example.com:1234/relative_part')
+      stub_geo_setting(node_name: 'Region 1 node')
     end
 
     it 'creates a GeoNode' do
@@ -22,6 +23,7 @@ describe 'geo rake tasks', :geo do
 
       node = GeoNode.first
 
+      expect(node.name).to eq('Region 1 node')
       expect(node.uri.scheme).to eq('https')
       expect(node.url).to eq('https://example.com:1234/relative_part/')
       expect(node.primary).to be_truthy

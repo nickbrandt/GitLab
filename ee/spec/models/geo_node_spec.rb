@@ -102,7 +102,8 @@ describe GeoNode, :geo, type: :model do
 
   context 'prevent locking yourself out' do
     it 'does not accept adding a non primary node with same details as current_node' do
-      node = build(:geo_node, :primary, primary: false)
+      stub_geo_setting(node_name: 'foo')
+      node = build(:geo_node, :primary, primary: false, name: 'foo')
 
       expect(node).not_to be_valid
       expect(node.errors.full_messages.count).to eq(1)

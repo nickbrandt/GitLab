@@ -170,7 +170,8 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
     end
 
     it 'returns 200 for the primary node' do
-      expect(GeoNodeStatus).to receive(:fast_current_node_status).and_return(secondary_status)
+      set_current_geo_node!(primary)
+      create(:geo_node_status, :healthy, geo_node: primary)
 
       post api("/geo_nodes/#{primary.id}/repair", admin)
 

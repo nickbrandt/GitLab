@@ -82,7 +82,7 @@ describe Oauth::GeoAuthController, :geo do
           it "redirects to primary node's oauth endpoint" do
             get :callback, params: { state: login_state }
 
-            expect(response).to redirect_to('/')
+            expect(response).to redirect_to(secondary_node.uri.path)
           end
         end
 
