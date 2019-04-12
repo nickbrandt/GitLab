@@ -1,5 +1,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import { IMAGE_DIFF_POSITION_TYPE } from '~/diffs/constants';
 import { sprintf, __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import resolvedStatusMixin from '../mixins/resolved_status';
@@ -43,6 +44,10 @@ export default {
       });
     },
     linePosition() {
+      if (this.draft.position && this.draft.position.position_type === IMAGE_DIFF_POSITION_TYPE) {
+        return `${this.draft.position.x}x ${this.draft.position.y}y`;
+      }
+
       const position = this.discussion ? this.discussion.position : this.draft.position;
 
       return position.new_line || position.old_line;
@@ -78,7 +83,7 @@ export default {
   >
     <span class="review-preview-item-header">
       <icon class="append-right-8 flex-shrink-0" :name="iconName" />
-      <span class="bold">
+      <span class="bold text-nowrap">
         <span class="review-preview-item-header-text block-truncated"> {{ titleText }} </span>
         <template v-if="showLinePosition">
           :{{ linePosition }}

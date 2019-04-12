@@ -81,3 +81,10 @@ button[disabled] {
     }
   }
 }
+
+.frame,
+.diff-discussions {
+  .badge.is-draft {
+    background-color: $orange-600;
+  }
+}
