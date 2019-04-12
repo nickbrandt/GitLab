@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Prepended onto ::QA::Runtime::Env
 module QA
   module EE
