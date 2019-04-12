@@ -143,7 +143,7 @@ describe EpicPolicy do
       end
 
       it 'does not call external authorization service' do
-        expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
+        expect(::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
 
         subject
       end

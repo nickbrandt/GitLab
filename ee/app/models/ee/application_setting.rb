@@ -60,43 +60,9 @@ module EE
                 presence: true,
                 if: :snowplow_enabled
 
-      validates :external_authorization_service_default_label,
-                presence: true,
-                if: :external_authorization_service_enabled?
-
-      validates :external_authorization_service_url,
-                url: true, allow_blank: true,
-                if: :external_authorization_service_enabled?
-
-      validates :external_authorization_service_timeout,
-                numericality: { greater_than: 0, less_than_or_equal_to: 10 },
-                if: :external_authorization_service_enabled?
-
-      validates :external_auth_client_key,
-                presence: true,
-                if: -> (setting) { setting.external_auth_client_cert.present? }
-
       validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
 
       validate :check_geo_node_allowed_ips
-
-      validates_with X509CertificateCredentialsValidator,
-                     certificate: :external_auth_client_cert,
-                     pkey: :external_auth_client_key,
-                     pass: :external_auth_client_key_pass,
-                     if: -> (setting) { setting.external_auth_client_cert.present? }
-
-      attr_encrypted :external_auth_client_key,
-                     mode: :per_attribute_iv,
-                     key: Settings.attr_encrypted_db_key_base_truncated,
-                     algorithm: 'aes-256-gcm',
-                     encode: true
-
-      attr_encrypted :external_auth_client_key_pass,
-                     mode: :per_attribute_iv,
-                     key: Settings.attr_encrypted_db_key_base_truncated,
-                     algorithm: 'aes-256-gcm',
-                     encode: true
     end
 
     class_methods do
@@ -237,12 +203,6 @@ module EE
     def email_additional_text_character_limit
       EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT
     end
-
-    def external_authorization_service_enabled
-      License.feature_available?(:external_authorization_service) && super
-    end
-    alias_method :external_authorization_service_enabled?,
-                 :external_authorization_service_enabled
 
     def custom_project_templates_enabled?
       License.feature_available?(:custom_project_templates)

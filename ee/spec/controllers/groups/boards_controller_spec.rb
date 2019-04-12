@@ -43,10 +43,6 @@ describe Groups::BoardsController do
       end
     end
 
-    it_behaves_like 'disabled when using an external authorization service' do
-      subject { list_boards }
-    end
-
     it_behaves_like 'redirects to last visited board' do
       let(:parent) { group }
     end
