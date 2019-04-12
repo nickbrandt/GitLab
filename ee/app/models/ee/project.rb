@@ -576,7 +576,9 @@ module EE
       # Checking both feature availability on the license, as well as the feature
       # flag, because we don't want to enable design_management by default on
       # on prem installs yet.
-      feature_available?(:design_management) && ::Feature.enabled?(:design_management, self)
+      # GraphQL is also required for using Design Management
+      feature_available?(:design_management) && ::Feature.enabled?(:design_management, self) &&
+        ::Gitlab::Graphql.enabled?
     end
 
     private
