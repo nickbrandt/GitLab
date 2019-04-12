@@ -4,7 +4,6 @@ module EE
   module Projects
     module CreateService
       extend ::Gitlab::Utils::Override
-      include ValidatesClassificationLabel
 
       override :execute
       def execute
@@ -25,7 +24,6 @@ module EE
             project.mirror_user_id = mirror_user_id
           end
 
-          validate_classification_label(project, :external_authorization_classification_label)
           validate_namespace_used_with_template(project, group_with_project_templates_id)
         end
 

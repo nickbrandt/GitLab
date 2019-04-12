@@ -477,13 +477,6 @@ module EE
         ::Gitlab::CurrentSettings.mirror_available
     end
 
-    def external_authorization_classification_label
-      return unless License.feature_available?(:external_authorization_service)
-
-      super || ::Gitlab::CurrentSettings.current_application_settings
-                 .external_authorization_service_default_label
-    end
-
     override :licensed_features
     def licensed_features
       return super unless License.current

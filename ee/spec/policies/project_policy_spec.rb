@@ -190,35 +190,9 @@ describe ProjectPolicy do
   end
 
   context 'reading a project' do
-    it 'allows access when a user has read access to the repo' do
-      expect(described_class.new(owner, project)).to be_allowed(:read_project)
-      expect(described_class.new(developer, project)).to be_allowed(:read_project)
-      expect(described_class.new(admin, project)).to be_allowed(:read_project)
-    end
-
-    it 'never checks the external service' do
-      expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
-
-      expect(described_class.new(owner, project)).to be_allowed(:read_project)
-    end
-
     context 'with an external authorization service' do
       before do
         enable_external_authorization_service_check
-      end
-
-      it 'allows access when the external service allows it' do
-        external_service_allow_access(owner, project)
-        external_service_allow_access(developer, project)
-
-        expect(described_class.new(owner, project)).to be_allowed(:read_project)
-        expect(described_class.new(developer, project)).to be_allowed(:read_project)
-      end
-
-      it 'does not check the external service for admins and allows access' do
-        expect(EE::Gitlab::ExternalAuthorization).not_to receive(:access_allowed?)
-
-        expect(described_class.new(admin, project)).to be_allowed(:read_project)
       end
 
       it 'allows auditors' do
@@ -226,24 +200,6 @@ describe ProjectPolicy do
         auditor = create(:user, :auditor)
 
         expect(described_class.new(auditor, project)).to be_allowed(:read_project)
-      end
-
-      it 'prevents all but seeing a public project in a list when access is denied' do
-        [developer, owner, build(:user), nil].each do |user|
-          external_service_deny_access(user, project)
-          policy = described_class.new(user, project)
-
-          expect(policy).not_to be_allowed(:read_project)
-          expect(policy).not_to be_allowed(:owner_access)
-          expect(policy).not_to be_allowed(:change_namespace)
-        end
-      end
-
-      it 'passes the full path to external authorization for logging purposes' do
-        expect(EE::Gitlab::ExternalAuthorization)
-          .to receive(:access_allowed?).with(owner, 'default_label', project.full_path).and_call_original
-
-        described_class.new(owner, project).allowed?(:read_project)
       end
     end
   end
