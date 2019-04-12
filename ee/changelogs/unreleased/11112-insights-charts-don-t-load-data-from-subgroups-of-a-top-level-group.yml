@@ -1,0 +1,5 @@
+---
+title: Include subgroups when finding Insights issuables
+merge_request: 10801
+author:
+type: fixed
