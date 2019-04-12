@@ -74,7 +74,8 @@ module EE
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
 
       enum bot_type: {
-        support_bot: 1
+        support_bot: 1,
+        alert_bot: 2
       }
     end
 
@@ -87,6 +88,15 @@ module EE
         unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
           u.bio = 'The GitLab support bot used for Service Desk'
           u.name = 'GitLab Support Bot'
+        end
+      end
+
+      def alert_bot
+        email_pattern = "alert%s@#{Settings.gitlab.host}"
+
+        unique_internal(where(bot_type: :alert_bot), 'alert-bot', email_pattern) do |u|
+          u.bio = 'The GitLab alert bot'
+          u.name = 'GitLab Alert Bot'
         end
       end
 
