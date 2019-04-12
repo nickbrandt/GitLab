@@ -16,7 +16,7 @@ export default {
 
 <template>
   <tr class="notes_holder js-temp-notes-holder">
-    <td class="notes_content" colspan="3">
+    <td class="notes-content" colspan="3">
       <div class="content"><draft-note :draft="draft" /></div>
     </td>
   </tr>
