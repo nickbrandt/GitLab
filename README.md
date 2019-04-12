@@ -11,7 +11,7 @@ The canonical source of GitLab Community Edition is [hosted on GitLab.com](https
 
 The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ee).
 
-# ![logo](https://about.gitlab.com/images/gitlab_logo.png) GitLab
+# ![logo](https://about.gitlab.com/images/logo.png) GitLab
 
 ## Free trial
 
