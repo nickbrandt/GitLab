@@ -28,7 +28,7 @@ describe IncidentManagement::CreateIssueService do
         expect(subject).to include(status: :success)
 
         issue = subject[:issue]
-        expect(issue.author).to eq(User.ghost)
+        expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include('Summary')
         expect(issue.description).to include(alert_title)

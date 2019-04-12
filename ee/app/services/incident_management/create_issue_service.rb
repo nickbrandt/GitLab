@@ -24,9 +24,7 @@ module IncidentManagement
 
     def issue_author
       strong_memoize(:issue_author) do
-        # This is a temporary solution before we've implemented User.alert_bot
-        # https://gitlab.com/gitlab-org/gitlab-ee/issues/10159
-        User.ghost
+        User.alert_bot
       end
     end
 
