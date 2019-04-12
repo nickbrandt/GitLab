@@ -1,12 +1,12 @@
 # Configuring NFS for GitLab HA
 
-Setting up NFS for a GitLab HA setup allows all applications nodes in a cluster 
+Setting up NFS for a GitLab HA setup allows all applications nodes in a cluster
 to share the same files and maintain data consistency. Application nodes in an HA
 setup act as clients while the NFS server plays host.
 
 > Note: The instructions provided in this documentation allow for setting a quick
-proof of concept but will leave NFS as potential single point of failure and 
-therefore not recommended for use in production. Explore options such as [Pacemaker 
+proof of concept but will leave NFS as potential single point of failure and
+therefore not recommended for use in production. Explore options such as [Pacemaker
 and Corosync](http://clusterlabs.org/) for highly available NFS in production.
 
 Below are instructions for setting up an application node(client) in an HA cluster
@@ -40,7 +40,7 @@ In this setup we will share the home directory on the host with the client. Edit
 /home <client-ip-address>(rw,sync,no_root_squash,no_subtree_check) <client-2-ip-address>(rw,sync,no_root_squash,no_subtree_check) <client-3-ip-address>(rw,sync,no_root_squash,no_subtree_check)
 ```
 
-Restart the NFS server after making changes to the `exports` file for the changes 
+Restart the NFS server after making changes to the `exports` file for the changes
 to take effect.
 
 ```sh
@@ -57,7 +57,7 @@ inside your HA environment to the NFS server configured above.
 
 ### Step 1 - Install NFS Common on Client
 
-The nfs-common provides NFS functionality without installing server components which 
+The nfs-common provides NFS functionality without installing server components which
 we don't need running on the application nodes.
 
 ```sh
@@ -67,7 +67,7 @@ apt-get install nfs-common
 
 ### Step 2 - Create Mount Points on Client
 
-Create a directroy on the client that we can mount the shared directory from the host. 
+Create a directroy on the client that we can mount the shared directory from the host.
 Please note that if your mount point directory contains any files they will be hidden
 once the remote shares are mounted. An empty/new directory on the client is recommended
 for this purpose.
@@ -86,7 +86,7 @@ df -h
 
 ### Step 3 - Set up Automatic Mounts on Boot
 
-Edit `/etc/fstab` on client as below to mount the remote shares automatically at boot. 
+Edit `/etc/fstab` on client as below to mount the remote shares automatically at boot.
 Note that GitLab requires advisory file locking, which is only supported natively in
 NFS version 4. NFSv3 also supports locking as long as Linux Kernel 2.6.5+ is used.
 We recommend using version 4 and do not specifically test NFSv3.
@@ -108,7 +108,6 @@ git-data.
 
 ```text
 git_data_dirs({"default" => {"path" => "/nfs/home/var/opt/gitlab-data/git-data"}})
-user['home'] = '/nfs/home/var/opt/gitlab-data/home'
 gitlab_rails['uploads_directory'] = '/nfs/home/var/opt/gitlab-data/uploads'
 gitlab_rails['shared_path'] = '/nfs/home/var/opt/gitlab-data/shared'
 gitlab_ci['builds_directory'] = '/nfs/home/var/opt/gitlab-data/builds'
@@ -118,17 +117,17 @@ Save the changes in `gitlab.rb` and run `gitlab-ctl reconfigure`.
 
 ## NFS in a Firewalled Environment
 
-If the traffic between your NFS server and NFS client(s) is subject to port filtering 
-by a firewall, then you will need to reconfigure that firewall to allow NFS communication.  
+If the traffic between your NFS server and NFS client(s) is subject to port filtering
+by a firewall, then you will need to reconfigure that firewall to allow NFS communication.
 
-[This guide from TDLP](http://tldp.org/HOWTO/NFS-HOWTO/security.html#FIREWALLS) 
-covers the basics of using NFS in a firewalled environment. Additionally, we encourage you to 
-search for and review the specific documentation for your OS/distro and your firewall software. 
+[This guide from TDLP](http://tldp.org/HOWTO/NFS-HOWTO/security.html#FIREWALLS)
+covers the basics of using NFS in a firewalled environment. Additionally, we encourage you to
+search for and review the specific documentation for your OS/distro and your firewall software.
 
-Example for Ubuntu:  
+Example for Ubuntu:
 
-Check that NFS traffic from the client is allowed by the firewall on the host by running 
-the command: `sudo ufw status`. If it's being blocked, then you can allow traffic from a specific 
+Check that NFS traffic from the client is allowed by the firewall on the host by running
+the command: `sudo ufw status`. If it's being blocked, then you can allow traffic from a specific
 client with the command below.
 
 ```sh
