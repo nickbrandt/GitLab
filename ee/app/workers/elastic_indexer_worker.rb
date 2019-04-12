@@ -14,14 +14,7 @@ class ElasticIndexerWorker
 
     case operation.to_s
     when /index|update/
-      record = klass.find(record_id)
-      record.__elasticsearch__.client = client
-
-      import(operation, record, klass)
-
-      initial_index_project(record) if klass == Project && operation.to_s.match?(/index/)
-
-      update_issue_notes(record, options["changed_fields"]) if klass == Issue
+      index(operation, klass.find(record_id), options)
     when /delete/
       if klass.nested?
         client.delete(
@@ -43,6 +36,16 @@ class ElasticIndexerWorker
     #
     # We can ignore these.
     true
+  end
+
+  def index(operation, record, options = {})
+    record.__elasticsearch__.client = client
+
+    import(operation, record, record.class)
+
+    initial_index_project(record) if record.class == Project && operation.to_s.match?(/index/)
+
+    update_issue_notes(record, options["changed_fields"]) if record.class == Issue
   end
 
   private

@@ -53,6 +53,7 @@
 - elastic_namespace_indexer
 - elastic_commit_indexer
 - elastic_indexer
+- elastic_full_index
 - export_csv
 - ldap_group_sync
 - new_epic

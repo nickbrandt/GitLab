@@ -133,4 +133,35 @@ describe ElasticIndexerWorker, :elastic do
     ## All database objects + data from repository. The absolute value does not matter
     expect(Elasticsearch::Model.search('*').total_count).to be > 40
   end
+
+  it 'indexes changes during indexing gap' do
+    project = nil
+    note = nil
+
+    Sidekiq::Testing.inline! do
+      project = create :project, :repository
+      note = create :note, project: project, note: 'note_1'
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    options = { project_ids: [project.id] }
+
+    Sidekiq::Testing.disable! do
+      note.update_columns(note: 'note_2')
+      create :note, project: project, note: 'note_3'
+    end
+
+    expect(Note.elastic_search('note_1', options: options).present?).to eq(true)
+    expect(Note.elastic_search('note_2', options: options).present?).to eq(false)
+    expect(Note.elastic_search('note_3', options: options).present?).to eq(false)
+
+    Sidekiq::Testing.inline! do
+      subject.perform("index", "Project", project.id, project.es_id)
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    expect(Note.elastic_search('note_1', options: options).present?).to eq(false)
+    expect(Note.elastic_search('note_2', options: options).present?).to eq(true)
+    expect(Note.elastic_search('note_3', options: options).present?).to eq(true)
+  end
 end
