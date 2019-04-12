@@ -53,13 +53,13 @@ describe('GeoNodeActionsComponent', () => {
         let mockNode = Object.assign({}, mockNodes[1]);
         let vmX = createComponent(mockNode);
 
-        expect(vmX.nodeToggleLabel).toBe('Disable');
+        expect(vmX.nodeToggleLabel).toBe('Pause replication');
         vmX.$destroy();
 
         mockNode = Object.assign({}, mockNodes[1], { enabled: false });
         vmX = createComponent(mockNode);
 
-        expect(vmX.nodeToggleLabel).toBe('Enable');
+        expect(vmX.nodeToggleLabel).toBe('Resume replication');
         vmX.$destroy();
       });
     });
@@ -74,7 +74,7 @@ describe('GeoNodeActionsComponent', () => {
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
           actionType: NODE_ACTIONS.TOGGLE,
           node: vm.node,
-          modalMessage: 'Disabling a node stops the sync process. Are you sure?',
+          modalMessage: 'Pausing replication stops the sync process.',
           modalActionLabel: vm.nodeToggleLabel,
         });
       });
