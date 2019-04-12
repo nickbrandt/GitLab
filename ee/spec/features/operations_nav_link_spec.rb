@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Operations dropdown navbar EE' do
@@ -14,11 +16,11 @@ describe 'Operations dropdown navbar EE' do
     visit project_issues_path(project)
   end
 
-  it 'should have a `Operations` link' do
+  it 'has an `Operations` link' do
     expect(page).to have_link('Operations', href: operations_path)
   end
 
-  it 'should have a `Environments` link' do
+  it 'has an `Environments` link' do
     expect(page).to have_link('Environments', href: operations_environments_path)
   end
 end

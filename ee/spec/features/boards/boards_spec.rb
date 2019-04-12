@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'issue boards', :js do
@@ -149,11 +151,11 @@ describe 'issue boards', :js do
       wait_for_requests
     end
 
-    it 'should not have remove button' do
+    it 'does not have remove button' do
       expect(page).to have_selector('.js-visual-token .remove-token', count: 0)
     end
 
-    it 'should not be able to be backspaced' do
+    it 'is not able to be backspaced' do
       find('.input-token .filtered-search').native.send_key(:backspace)
       expect(page).to have_selector('.js-visual-token', count: 1)
     end

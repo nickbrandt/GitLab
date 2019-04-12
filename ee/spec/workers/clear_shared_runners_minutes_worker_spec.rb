@@ -83,7 +83,7 @@ describe ClearSharedRunnersMinutesWorker do
         context 'when some extra minutes are used' do
           let(:minutes_used) { 105 }
 
-          it 'it discounts the extra minutes used' do
+          it 'discounts the extra minutes used' do
             subject
 
             expect(namespace.reload.extra_shared_runners_minutes_limit).to eq(5)

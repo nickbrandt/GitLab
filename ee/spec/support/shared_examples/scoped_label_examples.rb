@@ -80,7 +80,7 @@ shared_examples_for 'existing issuable with scoped labels' do
         expect(issuable.reload.labels).to match_array([label3])
       end
 
-      it 'it preserves multiple exclusive scoped labels when only removing labels' do
+      it 'preserves multiple exclusive scoped labels when only removing labels' do
         create(:label_link, label: label1, target: issuable)
         create(:label_link, label: label2, target: issuable)
         create(:label_link, label: label3, target: issuable)
