@@ -51,4 +51,4 @@ class ProjectCacheWorker
   end
 end
 
-ProjectCacheWorker.prepend(EE::Workers::ProjectCacheWorker)
+ProjectCacheWorker.prepend(EE::ProjectCacheWorker)
