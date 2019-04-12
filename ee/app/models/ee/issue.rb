@@ -24,7 +24,7 @@ module EE
 
     # override
     def check_for_spam?
-      author.support_bot? || super
+      author.bot? || super
     end
 
     # override
@@ -48,7 +48,7 @@ module EE
       # Making the support bot subscribed to every issue is not as bad as it
       # seems, though, since it isn't permitted to :receive_notifications,
       # and doesn't actually show up in the participants list.
-      user.support_bot? || super
+      user.bot? || super
     end
 
     # override

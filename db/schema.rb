@@ -3243,8 +3243,10 @@ ActiveRecord::Schema.define(version: 20190404231137) do
     t.string "commit_email"
     t.integer "group_view"
     t.integer "managing_group_id"
+    t.integer "bot_type", limit: 2
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id", using: :btree
     t.index ["admin"], name: "index_users_on_admin", using: :btree
+    t.index ["bot_type"], name: "index_users_on_bot_type", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
     t.index ["created_at"], name: "index_users_on_created_at", using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
@@ -3258,6 +3260,7 @@ ActiveRecord::Schema.define(version: 20190404231137) do
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
     t.index ["state"], name: "index_users_on_state", using: :btree
+    t.index ["state"], name: "index_users_on_state_and_internal", where: "((ghost <> true) AND (bot_type IS NULL))", using: :btree
     t.index ["state"], name: "index_users_on_state_and_internal_attrs", where: "((ghost <> true) AND (support_bot <> true))", using: :btree
     t.index ["support_bot"], name: "index_users_on_support_bot", using: :btree
     t.index ["username"], name: "index_users_on_username", using: :btree

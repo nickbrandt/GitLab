@@ -519,4 +519,31 @@ describe User do
       end
     end
   end
+
+  describe 'internal methods' do
+    let!(:user) { create(:user) }
+    let!(:ghost) { described_class.ghost }
+    let!(:support_bot) { described_class.support_bot }
+    let!(:non_internal) { [user] }
+    let!(:internal) { [ghost, support_bot] }
+
+    it 'returns non internal users' do
+      expect(described_class.internal).to eq(internal)
+      expect(internal.all?(&:internal?)).to eq(true)
+    end
+
+    it 'returns internal users' do
+      expect(described_class.non_internal).to eq(non_internal)
+      expect(non_internal.all?(&:internal?)).to eq(false)
+    end
+
+    describe '#bot?' do
+      it 'marks bot users' do
+        expect(user.bot?).to eq(false)
+        expect(ghost.bot?).to eq(false)
+
+        expect(support_bot.bot?).to eq(true)
+      end
+    end
+  end
 end

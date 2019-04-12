@@ -17,6 +17,8 @@ module EE
     prepended do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
 
+      ignore_column :support_bot
+
       # We aren't using the `auditor?` method for the `if` condition here
       # because `auditor?` returns `false` when the `auditor` column is `true`
       # and the auditor add-on absent. We want to run this validation
@@ -70,21 +72,32 @@ module EE
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
       scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
+
+      enum bot_type: {
+        support_bot: 1
+      }
     end
 
     class_methods do
+      extend ::Gitlab::Utils::Override
+
       def support_bot
         email_pattern = "support%s@#{Settings.gitlab.host}"
 
-        unique_internal(where(support_bot: true), 'support-bot', email_pattern) do |u|
+        unique_internal(where(bot_type: :support_bot), 'support-bot', email_pattern) do |u|
           u.bio = 'The GitLab support bot used for Service Desk'
           u.name = 'GitLab Support Bot'
         end
       end
 
-      # override
-      def internal_attributes
-        super + [:support_bot]
+      override :internal
+      def internal
+        super.or(where.not(bot_type: nil))
+      end
+
+      override :non_internal
+      def non_internal
+        super.where(bot_type: nil)
       end
 
       def non_ldap
@@ -224,6 +237,14 @@ module EE
       super
     end
 
+    def internal?
+      super || bot?
+    end
+
+    def bot?
+      has_bot_type? ? bot_type.present? : old_support_bot
+    end
+
     protected
 
     override :password_required?
@@ -234,6 +255,14 @@ module EE
     end
 
     private
+
+    def has_bot_type?
+      has_attribute?(:bot_type)
+    end
+
+    def old_support_bot
+      read_attribute(:support_bot)
+    end
 
     def namespace_union(select = :id)
       ::Gitlab::SQL::Union.new([

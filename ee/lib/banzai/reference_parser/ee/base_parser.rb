@@ -9,7 +9,7 @@ module Banzai
         # the policies framework, but CE currently
         # manually checks for team membership and the like.
         def nodes_user_can_reference(user, nodes)
-          return [] if user.support_bot?
+          return [] if user.bot?
 
           super
         end
