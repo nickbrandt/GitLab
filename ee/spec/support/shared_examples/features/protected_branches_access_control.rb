@@ -177,9 +177,9 @@ shared_examples "protected branches > access control > EE" do
     it 'unprotect/delete can be performed by a maintainer' do
       visit project_protected_branches_path(project)
 
-      expect do
-        accept_alert { click_on 'Unprotect' }
-      end.to change(ProtectedBranch, :count).to(0)
+      expect(page).to have_selector('.qa-protected-branch')
+      accept_alert { click_on 'Unprotect' }
+      expect(page).not_to have_selector('.qa-protected-branch')
     end
 
     context 'with unprotect access levels' do
