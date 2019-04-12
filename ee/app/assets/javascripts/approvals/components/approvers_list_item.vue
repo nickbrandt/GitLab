@@ -37,16 +37,14 @@ export default {
 
 <template>
   <transition name="fade">
-    <li class="settings-flex-row">
-      <div class="px-3 d-flex align-items-center">
-        <hidden-groups-item v-if="isHiddenGroups" />
-        <template v-else>
-          <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
-        </template>
-        <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
-          <icon name="remove" :aria-label="__('Remove')" />
-        </gl-button>
-      </div>
+    <li class="d-flex align-items-center px-3">
+      <hidden-groups-item v-if="isHiddenGroups" />
+      <template v-else>
+        <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
+      </template>
+      <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
+        <icon name="remove" :aria-label="__('Remove')" />
+      </gl-button>
     </li>
   </transition>
 </template>
