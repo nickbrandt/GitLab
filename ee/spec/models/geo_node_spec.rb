@@ -32,7 +32,6 @@ describe GeoNode, :geo, type: :model do
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:url) }
-    it { is_expected.to validate_uniqueness_of(:url).case_insensitive }
     it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
 
     context 'when validating primary node' do
@@ -63,6 +62,13 @@ describe GeoNode, :geo, type: :model do
         let(:url) { 'nothttp://foo' }
 
         it { is_expected.not_to be_valid }
+      end
+
+      context 'when an existing GeoNode has the same url but different name' do
+        let!(:existing) { new_node }
+        let(:url) { new_node.url }
+
+        it { is_expected.to be_valid }
       end
     end
 

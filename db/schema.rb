@@ -1389,7 +1389,6 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.index ["access_key"], name: "index_geo_nodes_on_access_key", using: :btree
     t.index ["name"], name: "index_geo_nodes_on_name", unique: true, using: :btree
     t.index ["primary"], name: "index_geo_nodes_on_primary", using: :btree
-    t.index ["url"], name: "index_geo_nodes_on_url", unique: true, using: :btree
   end
 
   create_table "geo_repositories_changed_events", force: :cascade do |t|
