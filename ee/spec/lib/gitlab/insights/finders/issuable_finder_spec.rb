@@ -123,7 +123,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
   context 'for a group' do
     let(:entity) { create(:group) }
-    let(:project) { create(:project, :public, group: entity) }
+    let(:project) { create(:project, :public, group: create(:group, parent: entity)) }
     let(:label_type) { :group_label }
     let(:label_entity_association_key) { :group }
 
