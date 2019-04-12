@@ -8563,6 +8563,9 @@ msgstr ""
 msgid "Other information"
 msgstr ""
 
+msgid "Other merge requests block this MR"
+msgstr ""
+
 msgid "Outbound requests"
 msgstr ""
 
@@ -12361,6 +12364,9 @@ msgstr ""
 msgid "This application will be able to:"
 msgstr ""
 
+msgid "This block is self-referential"
+msgstr ""
+
 msgid "This board's scope is reduced"
 msgstr ""
 
@@ -14311,7 +14317,13 @@ msgstr ""
 msgid "cannot be enabled unless all domains have TLS certificates"
 msgstr ""
 
+msgid "cannot block others"
+msgstr ""
+
 msgid "cannot include leading slash or directory traversal."
+msgstr ""
+
+msgid "cannot itself be blocked"
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"

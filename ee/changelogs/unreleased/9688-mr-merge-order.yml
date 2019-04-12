@@ -1,0 +1,5 @@
+---
+title: Allow merge requests to block other MRs from being merged
+merge_request: 11600
+author:
+type: added
