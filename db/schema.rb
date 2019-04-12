@@ -218,6 +218,15 @@ ActiveRecord::Schema.define(version: 20190404231137) do
     t.integer "first_day_of_week", default: 0, null: false
     t.boolean "elasticsearch_limit_indexing", default: false, null: false
     t.integer "default_project_creation", default: 2, null: false
+    t.boolean "external_authorization_service_enabled", default: false, null: false
+    t.string "external_authorization_service_url"
+    t.string "external_authorization_service_default_label"
+    t.float "external_authorization_service_timeout", default: 0.5
+    t.text "external_auth_client_cert"
+    t.text "encrypted_external_auth_client_key"
+    t.string "encrypted_external_auth_client_key_iv"
+    t.string "encrypted_external_auth_client_key_pass"
+    t.string "encrypted_external_auth_client_key_pass_iv"
     t.string "geo_node_allowed_ips", default: "0.0.0.0/0, ::/0"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
@@ -2509,6 +2518,7 @@ ActiveRecord::Schema.define(version: 20190404231137) do
     t.string "bfg_object_map"
     t.boolean "merge_requests_require_code_owner_approval"
     t.boolean "detected_repository_languages"
+    t.string "external_authorization_classification_label"
     t.boolean "merge_requests_disable_committers_approval"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))", using: :btree
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
