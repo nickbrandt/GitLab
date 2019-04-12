@@ -9,7 +9,7 @@ module ApprovalRules
       filter_eligible_groups!
 
       if rule.update(params)
-        rule.reload
+        rule.reset
         success
       else
         error(rule.errors.messages)

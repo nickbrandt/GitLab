@@ -18,7 +18,7 @@ module EE
         return unless can?(current_user, :update_epic, epic_issue.epic.group)
 
         epic_issue.update(issue_id: new_entity.id)
-        original_entity.reload
+        original_entity.reset
       end
     end
   end

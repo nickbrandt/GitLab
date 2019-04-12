@@ -25,7 +25,7 @@ class ProjectFeatureUsage < ApplicationRecord
       touch(self.class.jira_dvcs_integration_field(cloud: cloud))
     end
   rescue ActiveRecord::RecordNotUnique
-    reload
+    reset
     retry
   end
 end
