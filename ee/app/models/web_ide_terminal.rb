@@ -28,14 +28,20 @@ class WebIdeTerminal
     terminal_project_job_path(project, build, format: :ws)
   end
 
+  def proxy_websocket_path
+    proxy_project_job_path(project, build, format: :ws)
+  end
+
   private
 
-  def web_ide_terminal_route_generator(action)
-    url_for(action: action,
-            controller: 'projects/web_ide_terminals',
-            namespace_id: project.namespace.to_param,
-            project_id: project.to_param,
-            id: build.id,
-            only_path: true)
+  def web_ide_terminal_route_generator(action, options = {})
+    options.reverse_merge!(action: action,
+                           controller: 'projects/web_ide_terminals',
+                           namespace_id: project.namespace.to_param,
+                           project_id: project.to_param,
+                           id: build.id,
+                           only_path: true)
+
+    url_for(options)
   end
 end

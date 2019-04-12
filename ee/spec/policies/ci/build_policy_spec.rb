@@ -34,7 +34,7 @@ describe Ci::BuildPolicy do
   end
 
   describe 'manage a web ide terminal' do
-    let(:build_permissions) { %i[read_web_ide_terminal create_build_terminal update_web_ide_terminal] }
+    let(:build_permissions) { %i[read_web_ide_terminal create_build_terminal update_web_ide_terminal create_build_service_proxy] }
     set(:maintainer) { create(:user) }
     let(:owner) { create(:owner) }
     let(:admin) { create(:admin) }
@@ -79,7 +79,7 @@ describe Ci::BuildPolicy do
         context 'when build is not from a webide pipeline' do
           let(:pipeline) { create(:ci_empty_pipeline, project: project, source: :chat) }
 
-          it { expect_disallowed(:read_web_ide_terminal, :update_web_ide_terminal) }
+          it { expect_disallowed(:read_web_ide_terminal, :update_web_ide_terminal, :create_build_service_proxy) }
         end
 
         context 'when build has no runner terminal' do
@@ -88,7 +88,15 @@ describe Ci::BuildPolicy do
           end
 
           it { expect_allowed(:read_web_ide_terminal, :update_web_ide_terminal) }
-          it { expect_disallowed(:create_build_terminal) }
+          it { expect_disallowed(:create_build_terminal, :create_build_service_proxy) }
+        end
+
+        context 'feature flag "build_service_proxy" is disabled' do
+          before do
+            stub_feature_flags(build_service_proxy: false)
+          end
+
+          it { expect_disallowed(:create_build_service_proxy) }
         end
       end
 

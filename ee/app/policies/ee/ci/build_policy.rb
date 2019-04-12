@@ -26,6 +26,11 @@ module EE
 
         rule { can?(:update_web_ide_terminal) & terminal }.policy do
           enable :create_build_terminal
+          enable :create_build_service_proxy
+        end
+
+        rule { ~can?(:build_service_proxy_enabled) }.policy do
+          prevent :create_build_service_proxy
         end
 
         private
