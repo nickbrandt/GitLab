@@ -56,7 +56,6 @@ describe API::ProtectedBranches do
         expect(json_response['name']).to eq(branch_name)
         expect(json_response['push_access_levels'][0]['access_level']).to eq(::Gitlab::Access::MAINTAINER)
         expect(json_response['merge_access_levels'][0]['access_level']).to eq(::Gitlab::Access::MAINTAINER)
-        expect(json_response['unprotect_access_levels']).to eq([])
       end
 
       context 'when protected branch does not exist' do
@@ -65,34 +64,6 @@ describe API::ProtectedBranches do
         it_behaves_like '404 response' do
           let(:request) { get api(route, user) }
           let(:message) { '404 Not found' }
-        end
-      end
-
-      context 'with per user/group access levels' do
-        let(:push_user) { create(:user) }
-        let(:merge_group) { create(:group) }
-        let(:unprotect_group) { create(:group) }
-
-        before do
-          project.add_developer(push_user)
-          project.project_group_links.create(group: merge_group)
-          project.project_group_links.create(group: unprotect_group)
-          protected_branch.push_access_levels.create!(user: push_user)
-          protected_branch.merge_access_levels.create!(group: merge_group)
-          protected_branch.unprotect_access_levels.create!(group: unprotect_group)
-        end
-
-        it 'returns access level details' do
-          get api(route, user)
-
-          push_user_ids = json_response['push_access_levels'].map {|level| level['user_id']}
-          merge_group_ids = json_response['merge_access_levels'].map {|level| level['group_id']}
-          unprotect_group_ids = json_response['unprotect_access_levels'].map {|level| level['group_id']}
-
-          expect(response).to have_gitlab_http_status(200)
-          expect(push_user_ids).to include(push_user.id)
-          expect(merge_group_ids).to include(merge_group.id)
-          expect(unprotect_group_ids).to include(unprotect_group.id)
         end
       end
     end
@@ -149,7 +120,6 @@ describe API::ProtectedBranches do
         expect(json_response['name']).to eq(branch_name)
         expect(json_response['push_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
         expect(json_response['merge_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
-        expect(json_response['unprotect_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
       end
 
       it 'protects a single branch and developers can push' do
@@ -197,16 +167,6 @@ describe API::ProtectedBranches do
         expect(json_response['merge_access_levels'][0]['access_level']).to eq(Gitlab::Access::NO_ACCESS)
       end
 
-      it 'protects a single branch and only admins can unprotect' do
-        post post_endpoint, params: { name: branch_name, unprotect_access_level: Gitlab::Access::ADMIN }
-
-        expect(response).to have_gitlab_http_status(201)
-        expect(json_response['name']).to eq(branch_name)
-        expect(json_response['push_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
-        expect(json_response['merge_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
-        expect(json_response['unprotect_access_levels'][0]['access_level']).to eq(Gitlab::Access::ADMIN)
-      end
-
       it 'protects a single branch and no one can push or merge' do
         post post_endpoint, params: { name: branch_name, push_access_level: 0, merge_access_level: 0 }
 
@@ -214,100 +174,6 @@ describe API::ProtectedBranches do
         expect(json_response['name']).to eq(branch_name)
         expect(json_response['push_access_levels'][0]['access_level']).to eq(Gitlab::Access::NO_ACCESS)
         expect(json_response['merge_access_levels'][0]['access_level']).to eq(Gitlab::Access::NO_ACCESS)
-      end
-
-      context 'with granular access' do
-        let(:invited_group) do
-          create(:project_group_link, project: project).group
-        end
-
-        let(:project_member) do
-          create(:project_member, project: project).user
-        end
-
-        it 'can protect a branch while allowing an individual user to push' do
-          push_user = project_member
-
-          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ user_id: push_user.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['push_access_levels'][0]['user_id']).to eq(push_user.id)
-        end
-
-        it 'can protect a branch while allowing an individual user to merge' do
-          merge_user = project_member
-
-          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ user_id: merge_user.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['merge_access_levels'][0]['user_id']).to eq(merge_user.id)
-        end
-
-        it 'can protect a branch while allowing an individual user to unprotect' do
-          unprotect_user = project_member
-
-          post post_endpoint, params: { name: branch_name, allowed_to_unprotect: [{ user_id: unprotect_user.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['unprotect_access_levels'][0]['user_id']).to eq(unprotect_user.id)
-        end
-
-        it 'can protect a branch while allowing a group to push' do
-          push_group = invited_group
-
-          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ group_id: push_group.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['push_access_levels'][0]['group_id']).to eq(push_group.id)
-        end
-
-        it 'can protect a branch while allowing a group to merge' do
-          merge_group = invited_group
-
-          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['merge_access_levels'][0]['group_id']).to eq(merge_group.id)
-        end
-
-        it 'can protect a branch while allowing a group to unprotect' do
-          unprotect_group = invited_group
-
-          post post_endpoint, params: { name: branch_name, allowed_to_unprotect: [{ group_id: unprotect_group.id }] }
-
-          expect_protection_to_be_successful
-          expect(json_response['unprotect_access_levels'][0]['group_id']).to eq(unprotect_group.id)
-        end
-
-        it "fails if users don't all have access to the project" do
-          push_user = create(:user)
-
-          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ user_id: push_user.id }] }
-
-          expect(response).to have_gitlab_http_status(422)
-          expect(json_response['message'][0]).to match(/is not a member of the project/)
-        end
-
-        it "fails if groups aren't all invited to the project" do
-          merge_group = create(:group)
-
-          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }] }
-
-          expect(response).to have_gitlab_http_status(422)
-          expect(json_response['message'][0]).to match(/does not have access to the project/)
-        end
-
-        it 'avoids creating default access levels unless necessary' do
-          push_user = project_member
-
-          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ user_id: push_user.id }] }
-
-          expect(response).to have_gitlab_http_status(201)
-          expect(json_response['push_access_levels'].count).to eq(1)
-          expect(json_response['merge_access_levels'].count).to eq(1)
-          expect(json_response['push_access_levels'][0]['user_id']).to eq(push_user.id)
-          expect(json_response['push_access_levels'][0]['access_level']).to eq(Gitlab::Access::MAINTAINER)
-        end
       end
 
       it 'returns a 409 error if the same branch is protected twice' do
