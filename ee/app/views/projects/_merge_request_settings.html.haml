@@ -2,6 +2,10 @@
 
 = render_ce 'projects/merge_request_merge_method_settings', project: @project, form: form
 
+= render_ce 'projects/merge_request_merge_options_settings', project: @project, form: form
+
+= render_ce 'projects/merge_request_merge_checks_settings', project: @project, form: form
+
 - if @project.feature_available?(:issuable_default_templates)
   .form-group
     = form.label :merge_requests_template, class: 'label-bold' do
@@ -11,6 +15,3 @@
     .text-secondary
       - link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: help_page_path('user/markdown') }
       = _('Description parsed with %{link_start}GitLab Flavored Markdown%{link_end}').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
-
-
-= render_ce 'projects/merge_request_merge_settings', form: form
