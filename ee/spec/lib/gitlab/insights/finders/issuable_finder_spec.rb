@@ -121,9 +121,8 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     end
   end
 
-  context 'for a group' do
+  shared_examples_for 'group tests' do
     let(:entity) { create(:group) }
-    let(:project) { create(:project, :public, group: entity) }
     let(:label_type) { :group_label }
     let(:label_entity_association_key) { :group }
 
@@ -149,6 +148,18 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           ]
         end
       end
+    end
+  end
+
+  context 'for a group' do
+    include_examples 'group tests' do
+      let(:project) { create(:project, :public, group: entity) }
+    end
+  end
+
+  context 'for a group with subgroups', :nested_groups do
+    include_examples 'group tests' do
+      let(:project) { create(:project, :public, group: create(:group, parent: entity)) }
     end
   end
 

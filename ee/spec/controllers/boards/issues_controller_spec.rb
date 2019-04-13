@@ -89,26 +89,6 @@ describe Boards::IssuesController do
       end
     end
 
-    context 'with external authorization' do
-      before do
-        sign_in(user)
-        enable_external_authorization_service_check
-      end
-
-      it 'returns a 403 for group boards' do
-        get :index, params: { board_id: board }
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-
-      it 'is successful for project boards' do
-        project_board = create(:board, project: project_1)
-        list_issues(user: user, board: project_board)
-
-        expect(response).to have_gitlab_http_status(200)
-      end
-    end
-
     def list_issues(user:, board:, list: nil)
       sign_in(user)
 

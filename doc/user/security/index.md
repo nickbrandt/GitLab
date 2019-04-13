@@ -14,10 +14,10 @@ The following documentation relates to the DevOps **Secure** stage:
 
 | Secure topics                                                                                   | Description                                                            |
 |:------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
-| [Container Scanning](container_scanning/index.md) **[ULTIMATE]**            | Use Clair to scan docker images for known vulnerabilities.             |
-| [Dependency Scanning](../project/merge_requests/dependency_scanning.md) **[ULTIMATE]**          | Analyze your dependencies for known vulnerabilities.                   |
-| [Dynamic Application Security Testing (DAST)](../project/merge_requests/dast.md) **[ULTIMATE]** | Analyze running web applications for known vulnerabilities.            |
+| [Container Scanning](container_scanning/index.md) **[ULTIMATE]**                                | Use Clair to scan docker images for known vulnerabilities.             |
+| [Dependency Scanning](dependency_scanning/index.md) **[ULTIMATE]**                              | Analyze your dependencies for known vulnerabilities.                   |
+| [Dynamic Application Security Testing (DAST)](dast/index.md) **[ULTIMATE]**                     | Analyze running web applications for known vulnerabilities.            |
 | [Group Security Dashboard](../group/security_dashboard/index.md) **[ULTIMATE]**                 | View vulnerabilities in all the projects in a group and its subgroups. |
-| [License Management](../project/merge_requests/license_management.md) **[ULTIMATE]**            | Search your project's dependencies for their licenses.                 |
+| [License Management](license_management/index.md) **[ULTIMATE]**                               | Search your project's dependencies for their licenses.                 |
 | [Project Security Dashboard](../project/security_dashboard.md) **[ULTIMATE]**                   | View the latest security reports for your project.                     |
 | [Static Application Security Testing (SAST)](sast/index.md) **[ULTIMATE]**                      | Analyze source code for known vulnerabilities.                         |
