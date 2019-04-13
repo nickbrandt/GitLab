@@ -99,8 +99,7 @@ module EE
     end
 
     def show_gold_trial_suitable_env?
-      (::Gitlab.com? || Rails.env.development?) &&
-        !::Gitlab::Database.read_only?
+      ::Gitlab.com? && !::Gitlab::Database.read_only?
     end
 
     def has_no_trial_or_gold_plan?(user)
