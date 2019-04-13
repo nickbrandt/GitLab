@@ -408,7 +408,7 @@ data before running `pg_basebackup`.
     ```sh
     gitlab-ctl replicate-geo-database \
        --slot-name=<secondary_node_name> \
-       --host=<secondary_node_ip>
+       --host=<primary_node_ip>
     ```
 
     When prompted, enter the _plaintext_ password you set up for the `gitlab_replicator`
