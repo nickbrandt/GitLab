@@ -193,3 +193,14 @@ Alternatively, the job name could be `sast:container`
 and the artifact name could be `gl-sast-container-report.json`.
 These names have been deprecated with GitLab 11.0
 and may be removed in the next major release, GitLab 12.0.
+
+## Security Dashboard
+
+The Security Dashboard is a good place to get an overview of all the security
+vulnerabilities in your groups and projects. Read more about the
+[Security Dashboard](../security_dashboard/index.md).
+
+## Interacting with the vulnerabilities
+
+Once a vulnerability is found, you can interact with it. Read more on how to
+[interact with the vulnerabilities](../index.md#interacting-with-the-vulnerabilities).
