@@ -23,37 +23,39 @@ export const fetchConfigData = ({ dispatch }, endpoint) => {
     });
 };
 
-export const requestChartData = ({ commit }) => commit(types.REQUEST_CHART);
-export const receiveChartDataSuccess = ({ commit }, data) =>
-  commit(types.RECEIVE_CHART_SUCCESS, data);
-export const receiveChartDataError = ({ commit }) => commit(types.RECEIVE_CHART_ERROR);
+export const receiveChartDataSuccess = ({ commit }, { chart, data }) =>
+  commit(types.RECEIVE_CHART_SUCCESS, { chart, data });
+export const receiveChartDataError = ({ commit }, { chart, error }) =>
+  commit(types.RECEIVE_CHART_ERROR, { chart, error });
 
-export const fetchChartData = ({ dispatch, state }, endpoint) => {
-  const { activeChart } = state;
-  dispatch('requestChartData');
-
-  return axios
+export const fetchChartData = ({ dispatch }, { endpoint, chart }) =>
+  axios
     .post(endpoint, {
-      query: activeChart.query,
-      chart_type: activeChart.type,
+      query: chart.query,
+      chart_type: chart.type,
     })
-    .then(({ data }) => dispatch('receiveChartDataSuccess', data))
+    .then(({ data }) => dispatch('receiveChartDataSuccess', { chart, data }))
     .catch(error => {
-      const message = `${__('There was an error gathering the chart data')}: ${
-        error.response.data.message
-      }`;
+      let message = `${__('There was an error gathering the chart data')}`;
+
+      if (error.response.data && error.response.data.message) {
+        message += `: ${error.response.data.message}`;
+      }
       createFlash(message);
-      dispatch('receiveChartDataError');
+      dispatch('receiveChartDataError', { chart, error: message });
     });
-};
 
 export const setActiveTab = ({ commit, state }, key) => {
   const { configData } = state;
 
-  const chart = configData[key];
+  const page = configData[key];
 
   commit(types.SET_ACTIVE_TAB, key);
-  commit(types.SET_ACTIVE_CHART, chart);
+  commit(types.SET_ACTIVE_PAGE, page);
 };
+
+export const setChartData = ({ commit }, store) => commit(types.SET_CHART_DATA, store);
+export const setPageLoading = ({ commit }, pageLoading) =>
+  commit(types.SET_PAGE_LOADING, pageLoading);
 
 export default () => {};

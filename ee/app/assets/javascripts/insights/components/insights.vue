@@ -1,18 +1,16 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlLoadingIcon } from '@gitlab/ui';
-import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
-import StackedBar from './chart_js/stacked_bar.vue';
-import Bar from './chart_js/bar.vue';
-import LineChart from './chart_js/line.vue';
+import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import InsightsPage from './insights_page.vue';
+import InsightsConfigWarning from './insights_config_warning.vue';
 
 export default {
   components: {
     GlLoadingIcon,
-    NavigationTabs,
-    StackedBar,
-    Bar,
-    LineChart,
+    InsightsPage,
+    InsightsConfigWarning,
+    GlDropdown,
+    GlDropdownItem,
   },
   props: {
     endpoint: {
@@ -25,15 +23,8 @@ export default {
     },
   },
   computed: {
-    ...mapState('insights', [
-      'configData',
-      'configLoading',
-      'activeTab',
-      'activeChart',
-      'chartData',
-      'chartLoading',
-    ]),
-    navigationTabs() {
+    ...mapState('insights', ['configData', 'configLoading', 'activeTab', 'activePage']),
+    pages() {
       const { configData, activeTab } = this;
 
       if (!configData) {
@@ -50,50 +41,52 @@ export default {
         isActive: this.activeTab === key,
       }));
     },
-    chartType() {
-      switch (this.activeChart.type) {
-        case 'line':
-          // Apparently Line clashes with another component
-          return 'line-chart';
-        default:
-          return this.activeChart.type;
-      }
-    },
-    drawChart() {
-      return this.chartData && this.activeChart && !this.chartLoading;
-    },
-  },
-  watch: {
-    activeChart() {
-      this.fetchChartData(this.queryEndpoint);
+    configPresent() {
+      return !this.configLoading && this.configData != null;
     },
   },
   mounted() {
     this.fetchConfigData(this.endpoint);
   },
   methods: {
-    ...mapActions('insights', ['fetchConfigData', 'fetchChartData', 'setActiveTab']),
-    onChangeTab(scope) {
-      this.setActiveTab(scope);
+    ...mapActions('insights', ['fetchConfigData', 'setActiveTab']),
+    onChangePage(page) {
+      this.setActiveTab(page);
     },
   },
 };
 </script>
 <template>
-  <div class="insights-container">
+  <div class="insights-container prepend-top-default">
     <div v-if="configLoading" class="insights-config-loading text-center">
-      <gl-loading-icon :inline="true" :size="4" />
+      <gl-loading-icon :inline="true" size="lg" />
     </div>
-    <div v-else class="insights-wrapper">
-      <div class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-        <navigation-tabs :tabs="navigationTabs" @onChangeTab="onChangeTab" />
-      </div>
-      <div class="insights-chart">
-        <div v-if="chartLoading" class="insights-chart-loading text-center">
-          <gl-loading-icon :inline="true" :size="4" />
-        </div>
-        <component :is="chartType" v-if="drawChart" :info="activeChart" :data="chartData" />
-      </div>
+    <div v-else-if="configPresent" class="insights-wrapper">
+      <gl-dropdown
+        class="js-insights-dropdown col-8 col-md-9 gl-pr-0"
+        menu-class="w-100 mw-100"
+        toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
+        :text="__('Select Page')"
+      >
+        <gl-dropdown-item
+          v-for="page in pages"
+          :key="page.scope"
+          class="w-100"
+          @click="onChangePage(page.scope)"
+          >{{ page.name }}</gl-dropdown-item
+        >
+      </gl-dropdown>
+      <insights-page :query-endpoint="queryEndpoint" :page-config="activePage" />
     </div>
+    <insights-config-warning
+      v-else
+      :title="__('Invalid Insights config file detected')"
+      :summary="
+        __(
+          'Please check the configuration file to ensure that it is available and the YAML is valid',
+        )
+      "
+      image="illustrations/monitoring/getting_started.svg"
+    />
   </div>
 </template>

@@ -47,109 +47,40 @@ describe('Insights component', () => {
 
   describe('when config loaded', () => {
     const title = 'Bugs Per Team';
+    const page = {
+      title,
+    };
 
     beforeEach(() => {
       vm.$store.state.insights.configLoading = false;
+      vm.$store.state.insights.activePage = page;
       vm.$store.state.insights.configData = {
-        bugsPerTeam: {
-          title,
-        },
+        bugsPerTeam: page,
       };
     });
 
     it('has the correct nav tabs', done => {
       vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.nav-links')).not.toBe(null);
-        expect(vm.$el.querySelector('.nav-links li a').innerText.trim()).toBe(title);
-        done();
-      });
-    });
-  });
-
-  describe('when activeChart changes', () => {
-    it('loads chart data', done => {
-      vm.$store.state.insights.activeChart = { key: 'chart' };
-
-      vm.$nextTick(() => {
-        expect(store.dispatch).toHaveBeenCalledWith(
-          'insights/fetchChartData',
-          `${gl.TEST_HOST}/query`,
+        expect(vm.$el.querySelector('.js-insights-dropdown')).not.toBe(null);
+        expect(vm.$el.querySelector('.js-insights-dropdown .dropdown-item').innerText.trim()).toBe(
+          title,
         );
         done();
       });
     });
   });
 
-  describe('when loading chart', () => {
+  describe('empty config', () => {
     beforeEach(() => {
       vm.$store.state.insights.configLoading = false;
-      vm.$store.state.insights.chartLoading = true;
+      vm.$store.state.insights.configData = null;
     });
 
-    it('hides the config loading state', done => {
+    it('it displays a warning', done => {
       vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-config-loading')).toBe(null);
-        done();
-      });
-    });
-
-    it('renders chart loading state', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-wrapper')).not.toBe(null);
-        expect(vm.$el.querySelector('.insights-chart .insights-chart-loading')).not.toBe(null);
-        done();
-      });
-    });
-
-    it('chart is not shown', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-wrapper')).not.toBe(null);
-        expect(vm.$el.querySelector('.insights-chart .chart-canvas-wrapper')).toBe(null);
-        done();
-      });
-    });
-  });
-
-  describe('when chart loaded', () => {
-    const chart = {
-      title: 'Bugs Per Team',
-      type: 'stacked-bar',
-      query: {
-        name: 'filter_issues_by_label_category',
-        filter_label: 'bug',
-        category_labels: ['Plan', 'Create', 'Manage'],
-      },
-    };
-
-    beforeEach(() => {
-      vm.$store.state.insights.activeChart = chart;
-      vm.$store.state.insights.chartData = {};
-      vm.$store.state.insights.configLoading = false;
-      vm.$store.state.insights.chartLoading = false;
-    });
-
-    it('renders chart', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-wrapper')).not.toBe(null);
-        expect(vm.$el.querySelector('.insights-chart .chart-canvas-wrapper')).not.toBe(null);
-        done();
-      });
-    });
-
-    it('hides chart loading state', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-wrapper')).not.toBe(null);
-        expect(vm.$el.querySelector('.insights-chart .insights-chart-loading')).toBe(null);
-        done();
-      });
-    });
-
-    it('renders the correct type of chart', done => {
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.insights-wrapper')).not.toBe(null);
-        expect(
-          vm.$el.querySelector('.insights-chart .chart-canvas-wrapper canvas.stacked-bar'),
-        ).not.toBe(null);
+        expect(vm.$el.querySelector('.js-empty-state').innerText.trim()).toContain(
+          'Invalid Insights config file detected',
+        );
         done();
       });
     });

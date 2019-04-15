@@ -14,24 +14,36 @@ export default {
     state.configLoading = false;
   },
 
-  [types.REQUEST_CHART](state) {
-    state.chartData = null;
-    state.chartLoading = true;
+  [types.RECEIVE_CHART_SUCCESS](state, { chart, data }) {
+    const { type } = chart;
+
+    state.chartData[chart.title] = {
+      type,
+      data,
+      loaded: true,
+    };
   },
-  [types.RECEIVE_CHART_SUCCESS](state, data) {
-    state.chartData = data;
-    state.chartLoading = false;
-    state.redraw = true;
-  },
-  [types.RECEIVE_CHART_ERROR](state) {
-    state.chartData = null;
-    state.chartLoading = false;
+  [types.RECEIVE_CHART_ERROR](state, { chart, error }) {
+    const { type } = chart;
+
+    state.chartData[chart.title] = {
+      type,
+      data: null,
+      loaded: false,
+      error,
+    };
   },
 
   [types.SET_ACTIVE_TAB](state, tab) {
     state.activeTab = tab;
   },
-  [types.SET_ACTIVE_CHART](state, chartData) {
-    state.activeChart = chartData;
+  [types.SET_ACTIVE_PAGE](state, pageData) {
+    state.activePage = pageData;
+  },
+  [types.SET_CHART_DATA](state, chartData) {
+    state.chartData = chartData;
+  },
+  [types.SET_PAGE_LOADING](state, pageLoading) {
+    state.pageLoading = pageLoading;
   },
 };
