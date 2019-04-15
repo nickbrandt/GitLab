@@ -61,6 +61,9 @@ export const draftForLine = (state, getters) => (diffFileSha, line, side = null)
   return {};
 };
 
+export const draftsForFile = state => diffFileSha =>
+  state.drafts.filter(draft => draft.file_hash === diffFileSha);
+
 export const isPublishingDraft = state => draftId =>
   state.currentlyPublishingDrafts.indexOf(draftId) !== -1;
 

@@ -87,6 +87,16 @@ describe('Batch comments draft preview item component', () => {
 
       expect(vm.$el.querySelector('.bold').textContent).toContain(':2');
     });
+
+    it('renders image position', () => {
+      createComponent(false, {
+        file_path: 'index.js',
+        file_hash: 'abc',
+        position: { position_type: 'image', x: 10, y: 20 },
+      });
+
+      expect(vm.$el.querySelector('.bold').textContent).toContain('10x 20y');
+    });
   });
 
   describe('for discussion', () => {
