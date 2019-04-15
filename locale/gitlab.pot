@@ -6052,6 +6052,9 @@ msgstr ""
 msgid "Introducing Your Conversational Development Index"
 msgstr ""
 
+msgid "Invalid Insights config file detected"
+msgstr ""
+
 msgid "Invalid Login or password"
 msgstr ""
 
@@ -8049,6 +8052,15 @@ msgstr ""
 msgid "Please accept the Terms of Service before continuing."
 msgstr ""
 
+msgid "Please check the configuration file for this chart"
+msgstr ""
+
+msgid "Please check the configuration file to ensure that a collection of charts has been declared."
+msgstr ""
+
+msgid "Please check the configuration file to ensure that it is available and the YAML is valid"
+msgstr ""
+
 msgid "Please choose a group URL with no special characters."
 msgstr ""
 
@@ -9611,6 +9623,9 @@ msgstr ""
 msgid "Select Archive Format"
 msgstr ""
 
+msgid "Select Page"
+msgstr ""
+
 msgid "Select a group to invite"
 msgstr ""
 
@@ -10914,6 +10929,9 @@ msgstr ""
 msgid "There are no archived projects yet"
 msgstr ""
 
+msgid "There are no charts configured for this page"
+msgstr ""
+
 msgid "There are no closed issues"
 msgstr ""
 
@@ -11014,6 +11032,9 @@ msgid "This board's scope is reduced"
 msgstr ""
 
 msgid "This branch has changed since you started editing. Would you like to create a new branch?"
+msgstr ""
+
+msgid "This chart could not be displayed"
 msgstr ""
 
 msgid "This commit is part of merge request %{link_to_merge_request}. Comments created here will be created in the context of that merge request."

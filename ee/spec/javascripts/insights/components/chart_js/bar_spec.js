@@ -11,7 +11,7 @@ describe('Insights bar chart component', () => {
   beforeEach(() => {
     mountComponent = data => {
       const props = data || {
-        info: chartInfo,
+        chartTitle: chartInfo.title,
         data: chartData,
       };
       return mountComponentWithStore(Component, { props });

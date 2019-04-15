@@ -6,6 +6,9 @@ module InsightsActions
   included do
     before_action :check_insights_available!
     before_action :validate_params, only: [:query]
+
+    rescue_from Gitlab::Insights::Validators::ParamsValidator::ParamsValidatorError,
+      Gitlab::Insights::Finders::IssuableFinder::IssuableFinderError, with: :render_insights_chart_error
   end
 
   def show
@@ -68,5 +71,9 @@ module InsightsActions
 
   def config_data
     insights_entity.insights_config
+  end
+
+  def render_insights_chart_error(exception)
+    render json: { message: exception.message }, status: :unprocessable_entity
   end
 end
