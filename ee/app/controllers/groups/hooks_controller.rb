@@ -37,7 +37,7 @@ class Groups::HooksController < Groups::ApplicationController
 
       set_hook_execution_notice(result)
     else
-      flash[:alert] = 'Hook execution failed. Ensure the group has a project with commits.'
+      flash[:alert] = _('Hook execution failed. Ensure the group has a project with commits.')
     end
 
     redirect_back_or_default(default: { action: 'index' })

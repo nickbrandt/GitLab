@@ -8,9 +8,9 @@ module EE
         user
 
         if ClearNamespaceSharedRunnersMinutesService.new(@user.namespace).execute
-          redirect_to [:admin, @user], notice: 'User pipeline minutes were successfully reset.'
+          redirect_to [:admin, @user], notice: _('User pipeline minutes were successfully reset.')
         else
-          flash.now[:error] = 'There was an error resetting user pipeline minutes.'
+          flash.now[:error] = _('There was an error resetting user pipeline minutes.')
           render "edit"
         end
       end

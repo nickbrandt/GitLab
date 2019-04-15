@@ -8,9 +8,9 @@ module EE
         group
 
         if ClearNamespaceSharedRunnersMinutesService.new(@group).execute
-          redirect_to [:admin, @group], notice: 'Group pipeline minutes were successfully reset.'
+          redirect_to [:admin, @group], notice: _('Group pipeline minutes were successfully reset.')
         else
-          flash.now[:error] = 'There was an error resetting group pipeline minutes.'
+          flash.now[:error] = _('There was an error resetting group pipeline minutes.')
           render "edit"
         end
       end

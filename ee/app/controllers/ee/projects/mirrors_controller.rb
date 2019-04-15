@@ -13,11 +13,11 @@ module EE
         if result[:status] == :success
           flash[:notice] =
             if project.mirror?
-              "Mirroring settings were successfully updated. The project is being updated."
+              _('Mirroring settings were successfully updated. The project is being updated.')
             elsif project.previous_changes.key?('mirror')
-              "Mirroring was successfully disabled."
+              _('Mirroring was successfully disabled.')
             else
-              "Mirroring settings were successfully updated."
+              _('Mirroring settings were successfully updated.')
             end
         else
           flash[:alert] = project.errors.full_messages.join(', ').html_safe
@@ -39,10 +39,10 @@ module EE
       def update_now
         if params[:sync_remote]
           project.update_remote_mirrors
-          flash[:notice] = "The remote repository is being updated..."
+          flash[:notice] = _('The remote repository is being updated...')
         else
           project.import_state.force_import_job!
-          flash[:notice] = "The repository is being updated..."
+          flash[:notice] = _('The repository is being updated...')
         end
 
         redirect_to_repository_settings(project, anchor: 'js-push-remote-settings')

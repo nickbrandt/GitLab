@@ -4717,6 +4717,12 @@ msgstr ""
 msgid "Feature Flags"
 msgstr ""
 
+msgid "Feature flag was not removed."
+msgstr ""
+
+msgid "Feature flag was successfully removed."
+msgstr ""
+
 msgid "FeatureFlags|* (All Environments)"
 msgstr ""
 
@@ -5661,6 +5667,9 @@ msgstr ""
 msgid "Group overview content"
 msgstr ""
 
+msgid "Group pipeline minutes were successfully reset."
+msgstr ""
+
 msgid "Group was successfully updated."
 msgstr ""
 
@@ -5946,6 +5955,9 @@ msgid "Highest role:"
 msgstr ""
 
 msgid "History"
+msgstr ""
+
+msgid "Hook execution failed. Ensure the group has a project with commits."
 msgstr ""
 
 msgid "Hook was successfully created."
@@ -6589,6 +6601,9 @@ msgstr ""
 msgid "LDAP settings"
 msgstr ""
 
+msgid "LDAP sync in progress. This could take a few minutes. Refresh the page to see the changes."
+msgstr ""
+
 msgid "LFS"
 msgstr ""
 
@@ -7205,6 +7220,12 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
+msgid "Metric was successfully added."
+msgstr ""
+
+msgid "Metric was successfully updated."
+msgstr ""
+
 msgid "Metrics"
 msgstr ""
 
@@ -7383,6 +7404,12 @@ msgid "Mirroring repositories"
 msgstr ""
 
 msgid "Mirroring settings were successfully updated."
+msgstr ""
+
+msgid "Mirroring settings were successfully updated. The project is being updated."
+msgstr ""
+
+msgid "Mirroring was successfully disabled."
 msgstr ""
 
 msgid "MissingSSHKeyWarningLink|add an SSH key"
@@ -7724,6 +7751,12 @@ msgid "No start date"
 msgstr ""
 
 msgid "No, directly import the existing email addresses and usernames."
+msgstr ""
+
+msgid "Node was successfully created."
+msgstr ""
+
+msgid "Node was successfully updated."
 msgstr ""
 
 msgid "Nodes"
@@ -8404,6 +8437,9 @@ msgid "Please enter a number greater than %{number} (from the project settings)"
 msgstr ""
 
 msgid "Please enter a valid number"
+msgstr ""
+
+msgid "Please enter or upload a license."
 msgstr ""
 
 msgid "Please fill in a descriptive name for your group."
@@ -9201,7 +9237,13 @@ msgstr ""
 msgid "Push"
 msgstr ""
 
+msgid "Push Rule updated successfully."
+msgstr ""
+
 msgid "Push Rules"
+msgstr ""
+
+msgid "Push Rules updated successfully."
 msgstr ""
 
 msgid "Push an existing Git repository"
@@ -11244,6 +11286,15 @@ msgstr ""
 msgid "The issue stage shows the time it takes from creating an issue to assigning the issue to a milestone, or add the issue to a list on your Issue Board. Begin creating issues to see data for this stage."
 msgstr ""
 
+msgid "The license was removed. GitLab has fallen back on the previous license."
+msgstr ""
+
+msgid "The license was removed. GitLab now no longer has a valid license."
+msgstr ""
+
+msgid "The license was successfully uploaded and is now active. You can see the details below."
+msgstr ""
+
 msgid "The maximum file size allowed is %{size}."
 msgstr ""
 
@@ -11314,6 +11365,9 @@ msgid "The repository for this project does not exist."
 msgstr ""
 
 msgid "The repository for this project is empty"
+msgstr ""
+
+msgid "The repository is being updated..."
 msgstr ""
 
 msgid "The repository must be accessible over <code>http://</code>, <code>https://</code> or <code>git://</code>."
@@ -11437,6 +11491,12 @@ msgid "There was an error loading users activity calendar."
 msgstr ""
 
 msgid "There was an error removing the e-mail."
+msgstr ""
+
+msgid "There was an error resetting group pipeline minutes."
+msgstr ""
+
+msgid "There was an error resetting user pipeline minutes."
 msgstr ""
 
 msgid "There was an error saving your changes."
@@ -12410,6 +12470,9 @@ msgid "User key was successfully removed."
 msgstr ""
 
 msgid "User map"
+msgstr ""
+
+msgid "User pipeline minutes were successfully reset."
 msgstr ""
 
 msgid "User settings"
