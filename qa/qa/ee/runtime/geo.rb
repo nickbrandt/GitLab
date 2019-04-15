@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # EE-only singleton
 module QA
   module EE

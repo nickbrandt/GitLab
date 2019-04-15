@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ::QA::EE::Runtime::Geo do
   describe '.max_db_replication_time' do
     subject { described_class.max_db_replication_time }
