@@ -158,7 +158,7 @@ receivers:
 
 ### Taking action on an alert **[ULTIMATE]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.9.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.10.
 
 Alerts can be used to trigger actions, like open an issue automatically. To configure the actions:
 
@@ -171,25 +171,6 @@ Alerts can be used to trigger actions, like open an issue automatically. To conf
 Once enabled, an issue will be opened automatically when an alert is triggered. To further customize the issue, you can add labels, mentions, or any other supported [quick action](../quick_actions.md) in the selected issue template.
 
 If the metric exceeds the threshold of the alert for over 5 minutes, an email will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
-
-**Note:**
-If you are running a self-managed instance, the new interface shown on
-this page will not be available unless the feature flag
-`incident_management` is enabled, which can be done from the Rails console by
-instance administrators.
-
-Use these commands to start the Rails console:
-
-```sh
-# Omnibus GitLab
-gitlab-rails console
-
-# Installation from source
-cd /home/git/gitlab
-sudo -u git -H bin/rails console RAILS_ENV=production
-```
-
-Then run `Feature.enable(:incident_management)` to enable the feature flag.
 
 ## Determining the performance impact of a merge
 

@@ -19,16 +19,8 @@ module Projects
 
         private
 
-        def has_incident_management_license?
-          project.feature_available?(:incident_management)
-        end
-
-        def incident_management_feature_enabled?
-          Feature.enabled?(:incident_management)
-        end
-
         def incident_management_available?
-          has_incident_management_license? && incident_management_feature_enabled?
+          project.feature_available?(:incident_management)
         end
 
         def incident_management_setting
