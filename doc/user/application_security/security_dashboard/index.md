@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # GitLab Security Dashboard **[ULTIMATE]**
 
 The Security Dashboard is a good place to get an overview of all the security

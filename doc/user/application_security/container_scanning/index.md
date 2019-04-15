@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # Container Scanning **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3672)
@@ -14,7 +10,7 @@ images (or more precisely the containers) for known vulnerabilities by using
 [Clair](https://github.com/coreos/clair) and [clair-scanner](https://github.com/arminc/clair-scanner),
 two open source tools for Vulnerability Static Analysis for containers.
 
-You can take advantage of Container Scanning by either [including the CI job](../../../ci/examples/container_scanning.md) in
+You can take advantage of Container Scanning by either [including the CI job](#including-the-provided-template) in
 your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto Container Scanning](../../../topics/autodevops/index.md#auto-container-scanning)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).

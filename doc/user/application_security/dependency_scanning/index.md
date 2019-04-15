@@ -8,8 +8,8 @@ in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.7.
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your dependencies for known
 vulnerabilities using Dependency Scanning.
 
-You can take advantage of Dependency Scanning by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
-your existing `.gitlab-ci.yml` file or by implicitly using
+You can take advantage of Dependency Scanning by either [including the CI job](#including-the-provided-template)
+in your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 

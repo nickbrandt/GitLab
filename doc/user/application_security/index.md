@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # GitLab Secure **[ULTIMATE]**
 
 Check your application for security vulnerabilities that may lead to unauthorized access,

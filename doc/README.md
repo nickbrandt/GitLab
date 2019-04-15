@@ -351,15 +351,15 @@ high-level view on projects and groups, and start remediation processes when nee
 
 The following documentation relates to the DevOps **Secure** stage:
 
-| Monitor Topics                                                                                    | Description                                                            |
-|:--------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
-| [Container Scanning](user/project/merge_requests/container_scanning.md) **[ULTIMATE]**            | Use Clair to scan docker images for known vulnerabilities.             |
-| [Dependency Scanning](user/project/merge_requests/dependency_scanning.md) **[ULTIMATE]**          | Analyze your dependencies for known vulnerabilities.                   |
-| [Dynamic Application Security Testing (DAST)](user/project/merge_requests/dast.md) **[ULTIMATE]** | Analyze running web applications for known vulnerabilities.            |
-| [Group Security Dashboard](user/group/security_dashboard/index.md) **[ULTIMATE]**                 | View vulnerabilities in all the projects in a group and its subgroups. |
-| [License Management](user/project/merge_requests/license_management.md) **[ULTIMATE]**            | Search your project's dependencies for their licenses.                 |
-| [Project Security Dashboard](user/project/security_dashboard.md) **[ULTIMATE]**                   | View the latest security reports for your project.                     |
-| [Static Application Security Testing (SAST)](user/project/merge_requests/sast.md) **[ULTIMATE]**  | Analyze source code for known vulnerabilities.                         |
+| Secure Topics                                                                                         | Description                                                            |
+|:------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
+| [Container Scanning](user/application_security/container_scanning/index.md) **[ULTIMATE]**            | Use Clair to scan docker images for known vulnerabilities.             |
+| [Dependency Scanning](user/application_security/dependency_scanning/index.md) **[ULTIMATE]**          | Analyze your dependencies for known vulnerabilities.                   |
+| [Dynamic Application Security Testing (DAST)](user/application_security/dast/index.md) **[ULTIMATE]** | Analyze running web applications for known vulnerabilities.            |
+| [Group Security Dashboard](user/application_security/security_dashboard/index.md) **[ULTIMATE]**      | View vulnerabilities in all the projects in a group and its subgroups. |
+| [License Management](user/application_security/license_management/index.md) **[ULTIMATE]**            | Search your project's dependencies for their licenses.                 |
+| [Project Security Dashboard](user/application_security/security_dashboard/index.md) **[ULTIMATE]**    | View the latest security reports for your project.                     |
+| [Static Application Security Testing (SAST)](user/application_security/sast/index.md) **[ULTIMATE]**  | Analyze source code for known vulnerabilities.                         |
 
 ## Subscribe to GitLab
 
