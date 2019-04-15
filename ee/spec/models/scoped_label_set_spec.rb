@@ -84,5 +84,11 @@ describe ScopedLabelSet do
 
       expect(set.last_id_by_order([kv_label1.id, kv_label3.id, kv_label2.id])).to eq(kv_label3.id)
     end
+
+    it 'returns last label present in the set ordered by custom order if there is single item' do
+      set = described_class.new('key', [kv_label1, kv_label3])
+
+      expect(set.last_id_by_order([kv_label3.id])).to eq(kv_label3.id)
+    end
   end
 end

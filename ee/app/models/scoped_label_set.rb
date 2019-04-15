@@ -28,7 +28,7 @@ class ScopedLabelSet
     by_index = label_ids_order.map.with_index { |id, idx| [id.to_i, idx] }.to_h
 
     label_ids.max do |id1, id2|
-      by_index[id1].to_i <=> by_index[id2].to_i
+      by_index.fetch(id1, -1) <=> by_index.fetch(id2, -1)
     end
   end
 
