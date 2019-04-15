@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # Static Application Security Testing (SAST) **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3775)

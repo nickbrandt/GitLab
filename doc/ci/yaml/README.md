@@ -1457,7 +1457,7 @@ dashboards.
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
-The `dependency_scanning` report collects [Dependency Scanning vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/dependency_scanning.html)
+The `dependency_scanning` report collects [Dependency Scanning vulnerabilities](../../user/application_security/dependency_scanning/index.md)
 as artifacts.
 
 The collected Dependency Scanning report will be uploaded to GitLab as an artifact and will
@@ -1468,7 +1468,7 @@ dashboards.
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
-The `container_scanning` report collects [Container Scanning vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/container_scanning.html)
+The `container_scanning` report collects [Container Scanning vulnerabilities](../../user/application_security/container_scanning/index.md)
 as artifacts.
 
 The collected Container Scanning report will be uploaded to GitLab as an artifact and will
@@ -1479,7 +1479,7 @@ dashboards.
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
-The `dast` report collects [DAST vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html)
+The `dast` report collects [DAST vulnerabilities](../../user/application_security/dast/index.md)
 as artifacts.
 
 The collected DAST report will be uploaded to GitLab as an artifact and will

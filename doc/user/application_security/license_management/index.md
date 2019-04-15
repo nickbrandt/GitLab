@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # License Management **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5483)

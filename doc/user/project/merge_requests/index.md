@@ -37,11 +37,11 @@ With **[GitLab Enterprise Edition][ee]**, you can also:
 - View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md) **[PREMIUM]**
 - Request [approvals](merge_request_approvals.md) from your managers **[STARTER]**
 - Analyze the impact of your changes with [Code Quality reports](code_quality.md) **[STARTER]**
-- Manage the licenses of your dependencies with [License Management](#license-management-ultimate) **[ULTIMATE]**
-- Analyze your source code for vulnerabilities with [Static Application Security Testing](sast.md) **[ULTIMATE]**
-- Analyze your running web applications for vulnerabilities with [Dynamic Application Security Testing](dast.md) **[ULTIMATE]**
-- Analyze your dependencies for vulnerabilities with [Dependency Scanning](dependency_scanning.md) **[ULTIMATE]**
-- Analyze your Docker images for vulnerabilities with [Container Scanning](container_scanning.md) **[ULTIMATE]**
+- Manage the licenses of your dependencies with [License Management](../../application_security/license_management/index.md) **[ULTIMATE]**
+- Analyze your source code for vulnerabilities with [Static Application Security Testing](../../application_security/sast/index.md) **[ULTIMATE]**
+- Analyze your running web applications for vulnerabilities with [Dynamic Application Security Testing](../../application_security/dast/index.md) **[ULTIMATE]**
+- Analyze your dependencies for vulnerabilities with [Dependency Scanning](../../application_security/dependency_scanning/index.md) **[ULTIMATE]**
+- Analyze your Docker images for vulnerabilities with [Container Scanning](../../application_security/container_scanning/index.md) **[ULTIMATE]**
 - Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing-premium) **[PREMIUM]**
 
 ## Use cases
@@ -369,83 +369,11 @@ GitLab runs the [Sitespeed.io container][sitespeed-container] and displays the d
 
 [Read more about Browser Performance Testing.](browser_performance_testing.md)
 
-## License Management **[ULTIMATE]**
-
-> Introduced in [GitLab Ultimate][products] 11.0.
-
-If you are using [GitLab CI/CD][ci], you can search your dependencies for their
-licenses using License Management.
-Going a step further, GitLab can show the licenses report right in the
-merge request widget area.
-
-[Read more about License Management reports.](license_management.md)
-
 ## Security reports **[ULTIMATE]**
 
-GitLab can scan and report any vulnerabilities found in your project. The
-following security reports are available:
+GitLab can scan and report any vulnerabilities found in your project.
 
-- [Static Application Security Testing reports](sast.md) - Analyze your source
-  code for known vulnerabilities using Static Application Security Testing (SAST)
-  and see the security report right in your merge requests.
-- [Dynamic Application Security Testing reports](dast.md) - Analyze your running
-  web application(s) for known vulnerabilities using Dynamic Application Security
-  Testing (DAST) and see the security report right in your merge requests.
-- [Dependency Scanning reports](dependency_scanning.md) - Analyze your
-  dependencies for known vulnerabilities using Dependency Scanning and see the
-  security report right in your merge requests.
-- [Container Scanning reports](container_scanning.md) - Analyze your Docker
-  images for known vulnerabilities and see the security report right in your
-  merge requests.
-
-### Interacting with security reports **[ULTIMATE]**
-
-> Introduced in [GitLab Ultimate][products] 10.8.
-
-CAUTION: **Warning:**
-This feature is currently [Alpha](https://about.gitlab.com/handbook/product/#alpha-beta-ga) and while you can start using it, it may receive important changes in the future.
-
-Each security vulnerability in the report is actionable. Clicking on an entry,
-a detailed information will pop up with two different possible options:
-
-- **Dismiss vulnerability** - Dismissing a vulnerability will place a <s>strikethrough</s> styling on it.
-- **Create issue** - The new issue will have the title and description
-  pre-populated with the information from the vulnerability report and is created as [confidential](../issues/confidential_issues.md) by default.
-- **Solution** - For some vulnerabilities ([Dependency Scanning](dependency_scanning.md) and [Container Scanning](container_scanning.md))
-  a solution is provided for how to fix the vulnerability.
-
-![Interacting with security reports](img/interactive_reports.png)
-
-You can also revert your dismissal or see the linked issue after the action has
-been taken.
-
-### Solutions for Dependency Scanning **[ULTIMATE]**
-
-> Introduced in [GitLab Ultimate][products] 11.7.
-
-CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the moment only Node.JS projects managed with yarn are supported.
-
-Some Vulnerabilities can be fixed by applying a patch that is automatically generated by GitLab. To apply the fix:
-
-1. Download and review the patch file `remediation.patch`.
-2. Ensure your local project has the same commit checked out that was used to generate the patch.
-3. Run `git apply remediation.patch`.
-4. Verify and commit the changes to your branch.
-
-![Solutions for dependency scanning](img/vulnerability_solution.png)
-
-### Create a merge request from a vulnerability **[ULTIMATE]**
-
-> Introduced in [GitLab Ultimate][products] 11.9.
-
-CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the moment only Node.JS projects managed with yarn are supported.
-
-Any vulnerability that has a [solution](#solutions-for-dependency-scanning-ultimate) can have a merge request created to automatically solve the issue.
-
-If this action is available there will be a "Create merge request" button in the vulnerability modal.
-Clicking on this button will create a merge request to apply the solution onto the source branch.
-
-![Create merge request from vulnerability](img/create-issue-with-list-hover.png)
+[Read more about security reports.](../../application_security/index.md)
 
 ## Live preview with Review Apps
 

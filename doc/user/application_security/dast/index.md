@@ -1,7 +1,3 @@
----
-is_hidden: true
----
-
 # Dynamic Application Security Testing (DAST) **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4348)
