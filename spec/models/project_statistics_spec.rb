@@ -124,7 +124,7 @@ describe ProjectStatistics do
   end
 
   describe '.increment_statistic' do
-    shared_examples 'a statistic that increases storage_size' do
+    shared_examples 'a statistic that also increases storage_size' do
       it 'increases the statistic by that amount' do
         expect { described_class.increment_statistic(project.id, stat, 13) }
           .to change { statistics.reload.send(stat) || 0 }
@@ -153,7 +153,7 @@ describe ProjectStatistics do
     context 'when the amount is 0' do
       it 'does not execute a query' do
         project
-        expect { described_class.increment_statistic(project.id, :build_artifacts_size, 0) }
+        expect { described_class.increment_statistic(project.id, stat, 0) }
           .not_to exceed_query_limit(0)
       end
     end
