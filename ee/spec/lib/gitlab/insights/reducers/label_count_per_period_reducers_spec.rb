@@ -10,7 +10,7 @@ RSpec.describe Gitlab::Insights::Reducers::LabelCountPerPeriodReducer do
   end
 
   def reduce(issuable_relation, period, labels)
-    described_class.reduce(issuable_relation, period: period, labels: labels)
+    described_class.reduce(issuable_relation, period: period, period_limit: 5, labels: labels)
   end
 
   let(:opts) do
@@ -20,7 +20,7 @@ RSpec.describe Gitlab::Insights::Reducers::LabelCountPerPeriodReducer do
       filter_labels: [label_bug.title],
       collection_labels: [label_manage.title, label_plan.title],
       group_by: 'month',
-      period_limit: 3
+      period_limit: 5
     }
   end
   let(:issuable_relation) { find_issuables(project, opts) }
@@ -35,13 +35,23 @@ RSpec.describe Gitlab::Insights::Reducers::LabelCountPerPeriodReducer do
         Gitlab::Insights::UNCATEGORIZED => 1
       },
       'February 2019' => {
-        label_manage.title => 1,
+        label_manage.title => 0,
         label_plan.title => 0,
         Gitlab::Insights::UNCATEGORIZED => 0
       },
       'March 2019' => {
+        label_manage.title => 1,
+        label_plan.title => 0,
+        Gitlab::Insights::UNCATEGORIZED => 0
+      },
+      'April 2019' => {
         label_manage.title => 0,
         label_plan.title => 1,
+        Gitlab::Insights::UNCATEGORIZED => 0
+      },
+      'May 2019' => {
+        label_manage.title => 0,
+        label_plan.title => 0,
         Gitlab::Insights::UNCATEGORIZED => 0
       }
     }

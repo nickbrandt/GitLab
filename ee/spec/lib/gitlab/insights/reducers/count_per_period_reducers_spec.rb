@@ -9,8 +9,8 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
     Gitlab::Insights::Finders::IssuableFinder.new(project, nil, opts).find
   end
 
-  def reduce(issuable_relation, period, period_field = :created_at)
-    described_class.reduce(issuable_relation, period: period, period_field: period_field)
+  def reduce(issuable_relation, period, period_limit = 5, period_field = :created_at)
+    described_class.reduce(issuable_relation, period: period, period_limit: period_limit, period_field: period_field)
   end
 
   let(:opts) do
@@ -19,7 +19,7 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
       issuable_type: 'issue',
       filter_labels: [label_bug.title],
       group_by: 'month',
-      period_limit: 3
+      period_limit: 5
     }
   end
   let(:issuable_relation) { find_issuables(project, opts) }
@@ -29,8 +29,10 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
   let(:expected) do
     {
       'January 2019' => 1,
-      'February 2019' => 1,
-      'March 2019' => 1
+      'February 2019' => 0,
+      'March 2019' => 1,
+      'April 2019' => 1,
+      'May 2019' => 0
     }
   end
 
@@ -39,7 +41,11 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
   end
 
   it 'raises an error for an unknown :period_field option' do
-    expect { reduce(issuable_relation, 'month', :foo) }.to raise_error(described_class::InvalidPeriodFieldError, "Invalid value for `period_field`: `foo`. Allowed values are #{described_class::VALID_PERIOD_FIELD}!")
+    expect { reduce(issuable_relation, 'month', 5, :foo) }.to raise_error(described_class::InvalidPeriodFieldError, "Invalid value for `period_field`: `foo`. Allowed values are #{described_class::VALID_PERIOD_FIELD}!")
+  end
+
+  it 'raises an error for an unknown :period_limit option' do
+    expect { reduce(issuable_relation, 'month', -1) }.to raise_error(described_class::InvalidPeriodLimitError, "Invalid value for `period_limit`: `-1`. Value must be greater than 0!")
   end
 
   it 'returns issuables with only the needed fields' do

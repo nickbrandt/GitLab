@@ -39,23 +39,29 @@ module InsightsActions
   end
 
   def insights_json
-    issuables = find_issuables(params[:query])
-    insights = reduce(issuables, params[:chart_type], params[:query])
+    issuables_finder = finder(params[:query])
+    issuables = issuables_finder.find
+    insights = reduce(
+      issuables: issuables,
+      chart_type: params[:chart_type],
+      period: params[:query][:group_by],
+      period_limit: issuables_finder.period_limit,
+      labels: params[:query][:collection_labels])
     serializer(params[:chart_type]).present(insights)
   end
 
-  def find_issuables(query)
-    Gitlab::Insights::Finders::IssuableFinder
-      .new(insights_entity, current_user, query).find
-  end
-
-  def reduce(issuables, chart_type, query)
+  def reduce(issuables:, chart_type:, period:, period_limit:, labels: nil)
     case chart_type
     when 'stacked-bar', 'line'
-      Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: query[:group_by], labels: query[:collection_labels])
+      Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: period, period_limit: period_limit, labels: labels)
     when 'bar'
-      Gitlab::Insights::Reducers::CountPerPeriodReducer.reduce(issuables, period: query[:group_by])
+      Gitlab::Insights::Reducers::CountPerPeriodReducer.reduce(issuables, period: period, period_limit: period_limit)
     end
+  end
+
+  def finder(query)
+    Gitlab::Insights::Finders::IssuableFinder
+      .new(insights_entity, current_user, query)
   end
 
   def serializer(chart_type)

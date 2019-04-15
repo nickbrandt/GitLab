@@ -36,6 +36,19 @@ module Gitlab
           relation
         end
 
+        def period_limit
+          @period_limit ||=
+            if opts.key?(:period_limit)
+              begin
+                Integer(opts[:period_limit])
+              rescue ArgumentError
+                raise InvalidPeriodLimitError, "Invalid `:period_limit` option: `#{opts[:period_limit]}`. Expected an integer!"
+              end
+            else
+              PERIODS.dig(period, :default)
+            end
+        end
+
         private
 
         attr_reader :entity, :current_user, :opts
@@ -84,19 +97,6 @@ module Gitlab
               end
 
               period
-            end
-        end
-
-        def period_limit
-          @period_limit ||=
-            if opts.key?(:period_limit)
-              begin
-                Integer(opts[:period_limit])
-              rescue ArgumentError
-                raise InvalidPeriodLimitError, "Invalid `:period_limit` option: `#{opts[:period_limit]}`. Expected an integer!"
-              end
-            else
-              PERIODS.dig(period, :default)
             end
         end
       end
