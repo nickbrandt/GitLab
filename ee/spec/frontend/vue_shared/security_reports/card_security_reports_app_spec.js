@@ -16,51 +16,52 @@ jest.mock(
   () => jest.genMockFromModule('ee/vue_shared/security_reports/store/actions').default,
 );
 
+const createTestProps = (createdDate = new Date()) => ({
+  hasPipelineData: true,
+  emptyStateIllustrationPath: `${TEST_HOST}/img`,
+  securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
+  commit: {
+    id: '1234adf',
+    path: `${TEST_HOST}/commit`,
+  },
+  branch: {
+    id: 'master',
+    path: `${TEST_HOST}/branch`,
+  },
+  pipeline: {
+    id: '55',
+    created: createdDate.toISOString(),
+    path: `${TEST_HOST}/pipeline`,
+  },
+  triggeredBy: {
+    path: `${TEST_HOST}/user`,
+    avatarPath: `${TEST_HOST}/img`,
+    name: 'TestUser',
+  },
+  headBlobPath: 'path',
+  baseBlobPath: 'path',
+  sastHeadPath: `${TEST_HOST}/sast_head`,
+  dependencyScanningHeadPath: `${TEST_HOST}/dss_head`,
+  dastHeadPath: `${TEST_HOST}/dast_head`,
+  sastContainerHeadPath: `${TEST_HOST}/sast_container_head`,
+  sastHelpPath: 'path',
+  dependencyScanningHelpPath: 'path',
+  vulnerabilityFeedbackPath: `${TEST_HOST}/vulnerability_feedback_path`,
+  vulnerabilityFeedbackHelpPath: 'path',
+  dastHelpPath: 'path',
+  sastContainerHelpPath: 'path',
+  pipelineId: 123,
+  canCreateFeedback: true,
+  canCreateIssue: true,
+});
+
 describe('Card security reports app', () => {
   const Component = Vue.extend(component);
 
   let vm;
-  const runDate = new Date();
-  runDate.setDate(runDate.getDate() - 7);
-
-  const props = {
-    hasPipelineData: true,
-    emptyStateIllustrationPath: `${TEST_HOST}/img`,
-    securityDashboardHelpPath: `${TEST_HOST}/help_dashboard`,
-    commit: {
-      id: '1234adf',
-      path: `${TEST_HOST}/commit`,
-    },
-    branch: {
-      id: 'master',
-      path: `${TEST_HOST}/branch`,
-    },
-    pipeline: {
-      id: '55',
-      created: runDate.toISOString(),
-      path: `${TEST_HOST}/pipeline`,
-    },
-    triggeredBy: {
-      path: `${TEST_HOST}/user`,
-      avatarPath: `${TEST_HOST}/img`,
-      name: 'TestUser',
-    },
-    headBlobPath: 'path',
-    baseBlobPath: 'path',
-    sastHeadPath: `${TEST_HOST}/sast_head`,
-    dependencyScanningHeadPath: `${TEST_HOST}/dss_head`,
-    dastHeadPath: `${TEST_HOST}/dast_head`,
-    sastContainerHeadPath: `${TEST_HOST}/sast_container_head`,
-    sastHelpPath: 'path',
-    dependencyScanningHelpPath: 'path',
-    vulnerabilityFeedbackPath: `${TEST_HOST}/vulnerability_feedback_path`,
-    vulnerabilityFeedbackHelpPath: 'path',
-    dastHelpPath: 'path',
-    sastContainerHelpPath: 'path',
-    pipelineId: 123,
-    canCreateFeedback: true,
-    canCreateIssue: true,
-  };
+  const createdDate = new Date();
+  createdDate.setDate(createdDate.getDate() - 7);
+  const props = createTestProps(createdDate);
 
   beforeEach(() => {
     vm = mountComponentWithStore(Component, {
