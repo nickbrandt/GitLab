@@ -43,7 +43,7 @@ module EE
           @metric = project.prometheus_metrics.create(metrics_params) # rubocop:disable Gitlab/ModuleWithInstanceVariables
           if @metric.persisted? # rubocop:disable Gitlab/ModuleWithInstanceVariables
             redirect_to edit_project_service_path(project, ::PrometheusService),
-                        notice: 'Metric was successfully added.'
+                        notice: _('Metric was successfully added.')
           else
             render 'new'
           end
@@ -55,7 +55,7 @@ module EE
 
           if @metric.persisted? # rubocop:disable Gitlab/ModuleWithInstanceVariables
             redirect_to edit_project_service_path(project, ::PrometheusService),
-                        notice: 'Metric was successfully updated.'
+                        notice: _('Metric was successfully updated.')
           else
             render 'edit'
           end

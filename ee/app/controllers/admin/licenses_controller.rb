@@ -24,7 +24,7 @@ class Admin::LicensesController < Admin::ApplicationController
 
   def create
     unless params[:license][:data].present? || params[:license][:data_file].present?
-      flash[:alert] = 'Please enter or upload a license.'
+      flash[:alert] = _('Please enter or upload a license.')
 
       @license = License.new
       redirect_to new_admin_license_path
@@ -35,7 +35,7 @@ class Admin::LicensesController < Admin::ApplicationController
 
     respond_with(@license, location: admin_license_path) do
       if @license.save
-        flash[:notice] = "The license was successfully uploaded and is now active. You can see the details below."
+        flash[:notice] = _('The license was successfully uploaded and is now active. You can see the details below.')
       end
     end
   end
@@ -44,9 +44,9 @@ class Admin::LicensesController < Admin::ApplicationController
     license.destroy
 
     if License.current
-      flash[:notice] = "The license was removed. GitLab has fallen back on the previous license."
+      flash[:notice] = _('The license was removed. GitLab has fallen back on the previous license.')
     else
-      flash[:alert] = "The license was removed. GitLab now no longer has a valid license."
+      flash[:alert] = _('The license was removed. GitLab now no longer has a valid license.')
     end
 
     redirect_to admin_license_path, status: :found

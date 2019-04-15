@@ -16,8 +16,8 @@ module EE
       private
 
       def show_ldap_sync_flash
-        flash[:notice] = 'LDAP sync in progress. This could take a few minutes. '\
-                         'Refresh the page to see the changes.'
+        flash[:notice] = _('LDAP sync in progress. This could take a few minutes. '\
+                         'Refresh the page to see the changes.')
       end
     end
   end

@@ -80,12 +80,12 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
     if result[:status] == :success
       respond_to do |format|
-        format.html { redirect_to_index(notice: 'Feature flag was successfully removed.') }
+        format.html { redirect_to_index(notice: _('Feature flag was successfully removed.')) }
         format.json { render_success_json(feature_flag) }
       end
     else
       respond_to do |format|
-        format.html { redirect_to_index(alert: 'Feature flag was not removed.') }
+        format.html { redirect_to_index(alert: _('Feature flag was not removed.')) }
         format.json { render_error_json(result[:message]) }
       end
     end

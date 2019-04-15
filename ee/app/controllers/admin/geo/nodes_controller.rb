@@ -23,7 +23,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
     @node = ::Geo::NodeCreateService.new(geo_node_params).execute
 
     if @node.persisted?
-      redirect_to admin_geo_nodes_path, notice: 'Node was successfully created.'
+      redirect_to admin_geo_nodes_path, notice: _('Node was successfully created.')
     else
       @nodes = GeoNode.all
 
@@ -37,7 +37,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
 
   def update
     if ::Geo::NodeUpdateService.new(@node, geo_node_params).execute
-      redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
+      redirect_to admin_geo_nodes_path, notice: _('Node was successfully updated.')
     else
       render :edit
     end
