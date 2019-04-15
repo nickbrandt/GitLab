@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ExpirePipelineCacheWorker do
+describe Ci::ExpirePipelineCacheService do
   let(:pipeline) { create(:ci_empty_pipeline) }
 
   subject { described_class.new }
@@ -17,7 +17,7 @@ describe ExpirePipelineCacheWorker do
         allow_any_instance_of(Gitlab::EtagCaching::Store).to receive(:touch)
         expect_any_instance_of(Gitlab::EtagCaching::Store).to receive(:touch).with(dependent_pipeline_path)
 
-        subject.perform(pipeline.id)
+        subject.execute(pipeline)
       end
     end
 
@@ -31,7 +31,7 @@ describe ExpirePipelineCacheWorker do
         allow_any_instance_of(Gitlab::EtagCaching::Store).to receive(:touch)
         expect_any_instance_of(Gitlab::EtagCaching::Store).to receive(:touch).with(dependent_pipeline_path)
 
-        subject.perform(pipeline.id)
+        subject.execute(pipeline)
       end
     end
   end
