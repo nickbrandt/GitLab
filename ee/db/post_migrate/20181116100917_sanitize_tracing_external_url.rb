@@ -15,7 +15,7 @@ class SanitizeTracingExternalUrl < ActiveRecord::Migration[4.2]
     self.table_name = 'project_tracing_settings'
 
     def sanitize_external_url
-      self.external_url = ActionController::Base.helpers.sanitize(self.external_url, tags: [])
+      self.external_url = Rails::Html::FullSanitizer.new.sanitize(self.external_url)
     end
   end
 

@@ -13,7 +13,7 @@ describe SanitizeTracingExternalUrl, :migration do
 
     let(:valid_url) { "https://replaceme.com/" }
     let(:invalid_url) { "https://replaceme.com/'><script>alert(document.cookie)</script>" }
-    let(:cleaned_url) { "https://replaceme.com/'>" }
+    let(:cleaned_url) { "https://replaceme.com/'&gt;" }
 
     before do
       namespaces.create(id: 1, name: 'gitlab-org', path: 'gitlab-org')

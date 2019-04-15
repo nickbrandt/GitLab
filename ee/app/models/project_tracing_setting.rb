@@ -10,6 +10,6 @@ class ProjectTracingSetting < ApplicationRecord
   private
 
   def sanitize_external_url
-    self.external_url = ActionController::Base.helpers.sanitize(self.external_url, tags: [])
+    self.external_url = Rails::Html::FullSanitizer.new.sanitize(self.external_url)
   end
 end

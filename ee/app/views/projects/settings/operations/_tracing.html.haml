@@ -9,7 +9,7 @@
       = _("Jaeger tracing")
     %p
       - if has_jaeger_url
-        - tracing_link = link_to sanitize(@project.tracing_external_url, tags: []), target: "_blank", rel: 'noopener noreferrer' do
+        - tracing_link = link_to sanitize(@project.tracing_external_url, scrubber: Rails::Html::TextOnlyScrubber.new), target: "_blank", rel: 'noopener noreferrer' do
           %span
             = _('Tracing')
             = sprite_icon('external-link', size: 16, css_class: 'ml-1 vertical-align-middle')
