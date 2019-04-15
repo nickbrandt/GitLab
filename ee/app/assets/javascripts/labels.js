@@ -1,5 +1,6 @@
 import Labels from '~/labels';
 import $ from 'jquery';
+import { isScopedLabel } from '~/lib/utils/common_utils';
 
 class LabelsEE extends Labels {
   addBinding() {
@@ -11,12 +12,12 @@ class LabelsEE extends Labels {
     const title = $(this).val();
 
     const $parentEl = $('.label-form');
-    const hasKeyValue = $parentEl.find('.js-has-scoped-labels');
-    const useKeyValue = $parentEl.find('.js-use-scoped-labels');
+    const hasScoped = $parentEl.find('.js-has-scoped-labels');
+    const useScoped = $parentEl.find('.js-use-scoped-labels');
 
-    const isKeyVal = title.indexOf('::') === -1;
-    hasKeyValue.toggleClass('hidden', isKeyVal);
-    useKeyValue.toggleClass('hidden', !isKeyVal);
+    const isScoped = isScopedLabel({ title });
+    hasScoped.toggleClass('hidden', isScoped);
+    useScoped.toggleClass('hidden', !isScoped);
   }
 }
 
