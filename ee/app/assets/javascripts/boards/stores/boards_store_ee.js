@@ -22,17 +22,31 @@ class BoardsStoreEE {
     this.store.create = () => {
       baseCreate();
       if (this.$boardApp) {
+        const {
+          dataset: {
+            boardMilestoneId,
+            boardMilestoneTitle,
+            boardAssigneeUsername,
+            labels,
+            boardWeight,
+            weightFeatureAvailable,
+            scopedLabels,
+            scopedLabelsDocumentationLink,
+          },
+        } = this.$boardApp;
         this.store.boardConfig = {
-          milestoneId: parseInt(this.$boardApp.dataset.boardMilestoneId, 10),
-          milestoneTitle: this.$boardApp.dataset.boardMilestoneTitle || '',
-          assigneeUsername: this.$boardApp.dataset.boardAssigneeUsername,
-          labels: JSON.parse(this.$boardApp.dataset.labels || []),
-          weight: parseInt(this.$boardApp.dataset.boardWeight, 10),
+          milestoneId: parseInt(boardMilestoneId, 10),
+          milestoneTitle: boardMilestoneTitle || '',
+          assigneeUsername: boardAssigneeUsername,
+          labels: JSON.parse(labels || []),
+          weight: parseInt(boardWeight, 10),
         };
         this.store.cantEdit = [];
-        this.store.weightFeatureAvailable = parseBoolean(
-          this.$boardApp.dataset.weightFeatureAvailable,
-        );
+        this.store.weightFeatureAvailable = parseBoolean(weightFeatureAvailable);
+        this.store.scopedLabels = {
+          enabled: parseBoolean(scopedLabels),
+          helpLink: scopedLabelsDocumentationLink,
+        };
         this.initBoardFilters();
       }
     };

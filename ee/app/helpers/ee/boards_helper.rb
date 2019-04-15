@@ -32,7 +32,7 @@ module EE
         focus_mode_available: parent.feature_available?(:issue_board_focus_mode),
         weight_feature_available: parent.feature_available?(:issue_weights).to_s,
         show_promotion: show_feature_promotion,
-        scoped_labels: parent.feature_available?(:scoped_labels),
+        scoped_labels: parent.feature_available?(:scoped_labels)&.to_s,
         scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
       }
 
