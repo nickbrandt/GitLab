@@ -15,5 +15,3 @@ class ExpirePipelineCacheWorker
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
-
-ExpirePipelineCacheWorker.prepend(EE::ExpirePipelineCacheWorker)
