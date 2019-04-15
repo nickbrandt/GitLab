@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 class Packages::PackageFile < ApplicationRecord
+  include UpdateProjectStatistics
+
+  delegate :project, :project_id, to: :package
+  update_project_statistics stat: :packages_size
+
   belongs_to :package
 
   validates :package, presence: true
