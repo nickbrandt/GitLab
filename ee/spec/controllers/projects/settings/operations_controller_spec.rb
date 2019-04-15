@@ -392,16 +392,6 @@ describe Projects::Settings::OperationsController do
       it_behaves_like 'user without write access', :internal, :maintainer
     end
 
-    context 'with incident_management feature flag disabled' do
-      before do
-        stub_feature_flags(incident_management: false)
-      end
-
-      it_behaves_like 'user without write access', :public, :maintainer
-      it_behaves_like 'user without write access', :private, :maintainer
-      it_behaves_like 'user without write access', :internal, :maintainer
-    end
-
     private
 
     def update_project(project, tracing_params: nil, incident_management_params: nil)
