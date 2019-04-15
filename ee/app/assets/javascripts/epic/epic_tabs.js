@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import initRoadmap from 'ee/roadmap/index';
+import initRoadmap from 'ee/roadmap/roadmap_bundle';
 
 export default class EpicTabs {
   constructor() {

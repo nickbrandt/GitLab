@@ -152,8 +152,10 @@ export default {
 
       // Check if container height is less than total height of all Epic
       // items combined (AKA list is scrollable).
-      const isListVertScrollable =
-        this.$el.parentElement.offsetHeight < EPIC_ITEM_HEIGHT * (this.epics.length + 1);
+      const offsetHeight = this.$el.parentElement
+        ? this.$el.parentElement.offsetHeight
+        : this.$el.offsetHeight;
+      const isListVertScrollable = offsetHeight < EPIC_ITEM_HEIGHT * (this.epics.length + 1);
 
       // Toggle empty row.
       this.showEmptyRow = !isListVertScrollable;

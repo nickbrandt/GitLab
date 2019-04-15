@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import appComponent from 'ee/roadmap/components/app.vue';
+import appComponent from 'ee/roadmap/components/roadmap_app.vue';
 import createStore from 'ee/roadmap/store';
 import eventHub from 'ee/roadmap/event_hub';
 
