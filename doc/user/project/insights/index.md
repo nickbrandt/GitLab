@@ -11,7 +11,7 @@ Configure the Insights that matter for your projects to explore data such as
 triage hygiene, issues created/closed per a given period, average time for merge
 requests to be merged and much more.
 
-![Insights example stacked bar chart](img/insights_example_stacked_bar_chart.png)
+![Insights example stacked bar chart](img/project_insights.png)
 
 NOTE: **Note:**
 This feature is [also available at the group level](../../group/insights/index.md).
@@ -48,9 +48,28 @@ You may also consult the [group permissions table](../../permissions.md#group-me
 ## Writing your `.gitlab/insights.yml`
 
 The `.gitlab/insights.yml` file defines the structure and order of the Insights
-charts that will be displayed in the Insights page of your project or group.
+charts that will be displayed in each Insights page of your project or group.
 
-Each chart have a unique key, and a definition hash composed of key-value pairs.
+Each page has a unique key and a collection of charts to fetch and display.
+
+For example, here's a single definition for Insights that will display one page with one chart:
+
+```yaml
+bugsCharts:
+  title: 'Charts for Bugs'
+  charts:
+    - title: Monthly Bugs Created (bar)
+      type: bar
+      query:
+        issuable_type: issue
+        issuable_state: opened
+        filter_labels:
+          - bug
+        group_by: month
+        period_limit: 24
+```
+
+Each chart definition is made up of a hash composed of key-value pairs.
 
 For example, here's single chart definition:
 
@@ -237,43 +256,43 @@ you defined.
 ## Complete example
 
 ```yaml
-monthlyBugsCreated:
-  title: Monthly Bugs Created (bar)
-  type: bar
-  query:
-    issuable_type: issue
-    issuable_state: opened
-    filter_labels:
-      - bug
-    group_by: month
-    period_limit: 24
-weeklyBugsBySeverity:
-  title: Weekly Bugs By Severity (stacked bar)
-  type: stacked-bar
-  query:
-    issuable_type: issue
-    issuable_state: opened
-    filter_labels:
-      - bug
-    collection_labels:
-      - S1
-      - S2
-      - S3
-      - S4
-    group_by: week
-    period_limit: 104
-monthlyBugsByTeamLine:
-  title: Monthly Bugs By Team (line)
-  type: line
-  query:
-    issuable_type: merge_request
-    issuable_state: opened
-    filter_labels:
-      - bug
-    collection_labels:
-      - Manage
-      - Plan
-      - Create
-    group_by: month
-    period_limit: 24
+bugsCharts:
+  title: 'Charts for Bugs'
+  charts:
+    - title: Monthly Bugs Created (bar)
+      type: bar
+      query:
+        issuable_type: issue
+        issuable_state: opened
+        filter_labels:
+          - bug
+        group_by: month
+        period_limit: 24
+    - title: Weekly Bugs By Severity (stacked bar)
+      type: stacked-bar
+      query:
+        issuable_type: issue
+        issuable_state: opened
+        filter_labels:
+          - bug
+        collection_labels:
+          - S1
+          - S2
+          - S3
+          - S4
+        group_by: week
+        period_limit: 104
+    - title: Monthly Bugs By Team (line)
+      type: line
+      query:
+        issuable_type: merge_request
+        issuable_state: opened
+        filter_labels:
+          - bug
+        collection_labels:
+          - Manage
+          - Plan
+          - Create
+        group_by: month
+        period_limit: 24
 ```

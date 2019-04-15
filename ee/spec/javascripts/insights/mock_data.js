@@ -25,3 +25,14 @@ export const chartData = {
     },
   ],
 };
+
+export const pageInfo = {
+  title: 'Title',
+  charts: [chartInfo],
+};
+
+export const pageInfoNoCharts = {
+  page: {
+    title: 'Page No Charts',
+  },
+};

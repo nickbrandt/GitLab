@@ -2,7 +2,6 @@ import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as actions from 'ee/insights/stores/modules/insights/actions';
-import store from 'ee/insights/stores/';
 
 describe('Insights store actions', () => {
   const key = 'bugsPerTeam';
@@ -15,10 +14,14 @@ describe('Insights store actions', () => {
       category_labels: ['Plan', 'Create', 'Manage'],
     },
   };
+  const page = {
+    title: 'Bugs Charts',
+    charts: [chart],
+  };
   const configData = {};
 
   beforeEach(() => {
-    configData[key] = chart;
+    configData[key] = page;
   });
 
   describe('requestConfig', () => {
@@ -31,9 +34,9 @@ describe('Insights store actions', () => {
     it('commits RECEIVE_CONFIG_SUCCESS', done => {
       testAction(
         actions.receiveConfigSuccess,
-        [{ chart: 'chart' }],
+        [configData],
         null,
-        [{ type: 'RECEIVE_CONFIG_SUCCESS', payload: [{ chart: 'chart' }] }],
+        [{ type: 'RECEIVE_CONFIG_SUCCESS', payload: [configData] }],
         [],
         done,
       );
@@ -97,19 +100,20 @@ describe('Insights store actions', () => {
     });
   });
 
-  describe('requestChartData', () => {
-    it('commits REQUEST_CHART', done => {
-      testAction(actions.requestChartData, null, null, [{ type: 'REQUEST_CHART' }], [], done);
-    });
-  });
-
   describe('receiveChartDataSuccess', () => {
+    const chartData = { type: 'bar', data: {} };
+
     it('commits RECEIVE_CHART_SUCCESS', done => {
       testAction(
         actions.receiveChartDataSuccess,
-        { type: 'bar', data: {} },
+        { chart, data: chartData },
         null,
-        [{ type: 'RECEIVE_CHART_SUCCESS', payload: { type: 'bar', data: {} } }],
+        [
+          {
+            type: 'RECEIVE_CHART_SUCCESS',
+            payload: { chart, data: chartData },
+          },
+        ],
         [],
         done,
       );
@@ -117,12 +121,19 @@ describe('Insights store actions', () => {
   });
 
   describe('receiveChartDataError', () => {
+    const error = 'myError';
+
     it('commits RECEIVE_CHART_ERROR', done => {
       testAction(
         actions.receiveChartDataError,
+        { chart, error },
         null,
-        null,
-        [{ type: 'RECEIVE_CHART_ERROR' }],
+        [
+          {
+            type: 'RECEIVE_CHART_ERROR',
+            payload: { chart, error },
+          },
+        ],
         [],
         done,
       );
@@ -132,7 +143,8 @@ describe('Insights store actions', () => {
   describe('fetchChartData', () => {
     let mock;
     let dispatch;
-    let state;
+    const payload = { endpoint: `${gl.TEST_HOST}/query`, chart };
+
     const chartData = {
       labels: ['January'],
       datasets: [
@@ -152,64 +164,110 @@ describe('Insights store actions', () => {
     };
 
     beforeEach(() => {
-      store.state.insights.activeChart = chart;
-
-      state = store.state.insights;
       dispatch = jasmine.createSpy('dispatch');
       mock = new MockAdapter(axios);
-
-      mock
-        .onPost(`${gl.TEST_HOST}/query`, {
-          query: chart.query,
-          chart_type: chart.type,
-        })
-        .reply(200, chartData);
     });
 
     afterEach(() => {
       mock.restore();
     });
 
-    it('calls requestChartData', done => {
-      const context = {
-        dispatch,
-        state,
-      };
+    describe('successful request', () => {
+      beforeEach(() => {
+        mock
+          .onPost(`${gl.TEST_HOST}/query`, {
+            query: chart.query,
+            chart_type: chart.type,
+          })
+          .reply(200, chartData);
+      });
 
-      actions
-        .fetchChartData(context, `${gl.TEST_HOST}/query`)
-        .then(() => {
-          expect(dispatch.calls.argsFor(0)).toEqual(['requestChartData']);
-        })
-        .then(done)
-        .catch(done.fail);
+      it('calls receiveChartDataSuccess with chart data', done => {
+        const context = {
+          dispatch,
+        };
+
+        actions
+          .fetchChartData(context, payload)
+          .then(() => {
+            expect(dispatch.calls.argsFor(0)).toEqual([
+              'receiveChartDataSuccess',
+              { chart, data: chartData },
+            ]);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
     });
 
-    it('calls receiveChartDataSuccess with chart data', done => {
-      const context = {
-        dispatch,
-        state,
-      };
+    describe('failed request', () => {
+      beforeEach(() => {
+        mock
+          .onPost(`${gl.TEST_HOST}/query`, {
+            query: chart.query,
+            chart_type: chart.type,
+          })
+          .reply(500);
+      });
 
-      actions
-        .fetchChartData(context, `${gl.TEST_HOST}/query`)
-        .then(() => {
-          expect(dispatch.calls.argsFor(1)).toEqual(['receiveChartDataSuccess', chartData]);
-        })
-        .then(done)
-        .catch(done.fail);
+      it('calls receiveChartDataError with error message', done => {
+        const context = {
+          dispatch,
+        };
+
+        actions
+          .fetchChartData(context, payload)
+          .then(() => {
+            expect(dispatch.calls.argsFor(0)).toEqual([
+              'receiveChartDataError',
+              { chart, error: 'There was an error gathering the chart data' },
+            ]);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
     });
   });
 
   describe('setActiveTab', () => {
-    it('commits SET_ACTIVE_TAB and SET_ACTIVE_CHART', done => {
+    it('commits SET_ACTIVE_TAB and SET_ACTIVE_PAGE', done => {
       const state = { configData };
 
       testAction(
         actions.setActiveTab,
         key,
         state,
-        [{ type: 'SET_ACTIVE_TAB', payload: key }, { type: 'SET_ACTIVE_CHART', payload: chart }],
+        [{ type: 'SET_ACTIVE_TAB', payload: key }, { type: 'SET_ACTIVE_PAGE', payload: page }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setChartData', () => {
+    it('commits SET_CHART_DATA', done => {
+      const chartData = { a: { data: 'data' } };
+
+      testAction(
+        actions.setChartData,
+        chartData,
+        null,
+        [{ type: 'SET_CHART_DATA', payload: chartData }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setPageLoading', () => {
+    it('commits SET_PAGE_LOADING', done => {
+      const pageLoading = false;
+
+      testAction(
+        actions.setPageLoading,
+        pageLoading,
+        null,
+        [{ type: 'SET_PAGE_LOADING', payload: false }],
         [],
         done,
       );
