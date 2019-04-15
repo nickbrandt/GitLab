@@ -77,9 +77,9 @@ module VisibleApprovable
   end
 
   def reset_approval_cache!
-    approvals.reload
-    approved_by_users.reload
-    approval_rules.reload
+    approvals.reset
+    approved_by_users.reset
+    approval_rules.reset
 
     clear_memoization(:approvers_left)
     clear_memoization(:all_approvers_including_groups)

@@ -16,8 +16,8 @@ module CleanupApprovers
     # If the target already has `approvers` and/or `approver_groups` loaded then we need to
     # force a reload in order to not return stale information after the destroys above
     if reload
-      target.approvers.reload
-      target.approver_groups.reload
+      target.approvers.reset
+      target.approver_groups.reset
     end
 
     target
