@@ -17,8 +17,8 @@ module Gitlab
       #     }
       #   }
       class LabelCountPerPeriodReducer < CountPerPeriodReducer
-        def initialize(issuables, labels:, period:, period_field: :created_at)
-          super(issuables, period: period, period_field: period_field)
+        def initialize(issuables, labels:, period:, period_limit:, period_field: :created_at)
+          super(issuables, period: period, period_limit: period_limit, period_field: period_field)
           @labels = labels
         end
 
