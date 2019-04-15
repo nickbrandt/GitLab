@@ -348,6 +348,22 @@ describe "Git HTTP requests (Geo)", :geo do
       end
     end
 
+    context 'repository does not exist' do
+      subject do
+        make_request
+        response
+      end
+
+      def make_request
+        full_path = project.full_path
+        project.destroy
+
+        get "/#{full_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
+      end
+
+      it { is_expected.to have_gitlab_http_status(:not_found) }
+    end
+
     context 'invalid scope' do
       subject do
         make_request
