@@ -8,9 +8,9 @@ module EE
         include ::Gitlab::QuickActions::Dsl
 
         included do
-          desc 'Change assignee(s)'
+          desc _('Change assignee(s)')
           explanation do
-            'Change assignee(s).'
+            _('Change assignee(s).')
           end
           params '@user1 @user2'
           types Issue, MergeRequest
@@ -23,9 +23,9 @@ module EE
             @updates[:assignee_ids] = extract_users(reassign_param).map(&:id)
           end
 
-          desc 'Set weight'
+          desc _('Set weight')
           explanation do |weight|
-            "Sets weight to #{weight}." if weight
+            _("Sets weight to %{weight}.") % { weight: weight } if weight
           end
           params "0, 1, 2, …"
           types Issue, MergeRequest
@@ -40,8 +40,8 @@ module EE
             @updates[:weight] = weight if weight
           end
 
-          desc 'Clear weight'
-          explanation 'Clears weight.'
+          desc _('Clear weight')
+          explanation _('Clears weight.')
           types Issue, MergeRequest
           condition do
             quick_action_target.persisted? &&
