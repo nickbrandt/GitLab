@@ -32,7 +32,7 @@ module EE
     private
 
     def registry
-      @registry ||= DependencyProxy::Registry.new
+      @registry ||= DependencyProxy::Registry
     end
   end
 end

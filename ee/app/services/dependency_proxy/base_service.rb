@@ -5,7 +5,7 @@ module DependencyProxy
     private
 
     def registry
-      DependencyProxy::Registry.new
+      DependencyProxy::Registry
     end
 
     def auth_headers
