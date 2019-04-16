@@ -4,6 +4,8 @@ module Epics
   class CreateService < Epics::BaseService
     def execute
       @epic = group.epics.new(whitelisted_epic_params)
+      @epic.move_to_start if @epic.parent
+
       create(@epic)
     end
 
@@ -18,7 +20,7 @@ module Epics
     end
 
     def whitelisted_epic_params
-      params.slice(:title, :description, :start_date, :end_date, :milestone, :label_ids)
+      params.slice(:title, :description, :start_date, :end_date, :milestone, :label_ids, :parent_id)
     end
   end
 end
