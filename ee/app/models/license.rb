@@ -77,6 +77,7 @@ class License < ApplicationRecord
     merge_pipelines
     design_management
     operations_dashboard
+    dependency_proxy
   ]
   EEP_FEATURES.freeze
 

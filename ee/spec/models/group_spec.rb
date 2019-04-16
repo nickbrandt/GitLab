@@ -8,6 +8,8 @@ describe Group do
   describe 'associations' do
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to belong_to(:file_template_project) }
+    it { is_expected.to have_many(:dependency_proxy_blobs) }
+    it { is_expected.to have_one(:dependency_proxy_setting) }
   end
 
   describe 'scopes' do
