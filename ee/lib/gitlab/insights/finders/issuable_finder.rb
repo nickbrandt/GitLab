@@ -89,7 +89,7 @@ module Gitlab
 
         def period
           @period ||=
-            begin
+            if opts.key?(:group_by)
               period = opts[:group_by].to_s.pluralize.to_sym
 
               unless PERIODS.key?(period)
@@ -97,6 +97,8 @@ module Gitlab
               end
 
               period
+            else
+              :days
             end
         end
       end

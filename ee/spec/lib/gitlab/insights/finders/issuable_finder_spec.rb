@@ -20,7 +20,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     end
 
     it 'raises an error for an invalid :issuable_type option' do
-      expect { find(nil, issuable_type: 'foo') }.to raise_error(described_class::InvalidIssuableTypeError, "Invalid `:issuable_type` option: `foo`. Allowed values are #{described_class::FINDERS.keys}!")
+      expect { find(build(:project), issuable_type: 'foo') }.to raise_error(described_class::InvalidIssuableTypeError, "Invalid `:issuable_type` option: `foo`. Allowed values are #{described_class::FINDERS.keys}!")
     end
 
     it 'raises an error for an invalid entity object' do
@@ -28,11 +28,15 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     end
 
     it 'raises an error for an invalid :group_by option' do
-      expect { find(nil, issuable_type: 'issue', group_by: 'foo') }.to raise_error(described_class::InvalidGroupByError, "Invalid `:group_by` option: `foo`. Allowed values are #{described_class::PERIODS.keys}!")
+      expect { find(build(:project), issuable_type: 'issue', group_by: 'foo') }.to raise_error(described_class::InvalidGroupByError, "Invalid `:group_by` option: `foo`. Allowed values are #{described_class::PERIODS.keys}!")
+    end
+
+    it 'defaults to the "days" period if no :group_by is given' do
+      expect(described_class.new(build(:project), nil, issuable_type: 'issue').__send__(:period)).to eq(:days)
     end
 
     it 'raises an error for an invalid :period_limit option' do
-      expect { find(build(:user), issuable_type: 'issue', group_by: 'months', period_limit: 'many') }.to raise_error(described_class::InvalidPeriodLimitError, "Invalid `:period_limit` option: `many`. Expected an integer!")
+      expect { find(build(:project), issuable_type: 'issue', group_by: 'months', period_limit: 'many') }.to raise_error(described_class::InvalidPeriodLimitError, "Invalid `:period_limit` option: `many`. Expected an integer!")
     end
 
     shared_examples_for "insights issuable finder" do
