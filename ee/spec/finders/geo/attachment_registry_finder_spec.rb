@@ -13,6 +13,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
   let(:synced_subgroup) { create(:group, parent: synced_group) }
   let(:unsynced_group) { create(:group) }
   let(:synced_project) { create(:project, group: synced_group) }
+  let(:synced_project_in_nested_group) { create(:project, group: synced_subgroup) }
   let(:unsynced_project) { create(:project, :broken_storage, group: unsynced_group) }
 
   let(:upload_1) { create(:upload, model: synced_group) }
@@ -24,7 +25,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
   let(:upload_7) { create(:upload, model: synced_subgroup) }
   let(:upload_8) { create(:upload, :object_storage, model: unsynced_project) }
   let(:upload_9) { create(:upload, :object_storage, model: unsynced_group) }
-  let(:lfs_object) { create(:lfs_object) }
   let(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
 
   subject { described_class.new(current_node: secondary) }
@@ -34,41 +34,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
   end
 
   shared_examples 'counts all the things' do
-    describe '#count_syncable' do
-      before do
-        upload_1
-        upload_2
-        upload_3
-        upload_4
-      end
-
-      it 'counts attachments' do
-        expect(subject.count_syncable).to eq 4
-      end
-
-      it 'ignores remote attachments' do
-        upload_1.update!(store: ObjectStorage::Store::REMOTE)
-
-        expect(subject.count_syncable).to eq 3
-      end
-
-      context 'with selective sync' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'counts attachments' do
-          expect(subject.count_syncable).to eq 2
-        end
-
-        it 'ignores remote attachments' do
-          upload_1.update!(store: ObjectStorage::Store::REMOTE)
-
-          expect(subject.count_syncable).to eq 1
-        end
-      end
-    end
-
     describe '#count_synced' do
       it 'delegates to #legacy_find_synced' do
         allow(subject).to receive(:aggregate_pushdown_supported?).and_return(false)
@@ -408,4 +373,96 @@ describe Geo::AttachmentRegistryFinder, :geo do
   end
 
   it_behaves_like 'a file registry finder'
+
+  shared_examples 'counts all the things with selective sync coverage' do
+    describe '#count_syncable' do
+      let!(:upload_1) { create(:upload, model: synced_group) }
+      let!(:upload_2) { create(:upload, model: unsynced_group) }
+      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
+      let!(:upload_4) { create(:upload, model: unsynced_project) }
+      let!(:upload_5) { create(:upload, :personal_snippet_upload) }
+
+      it 'counts attachments' do
+        expect(subject.count_syncable).to eq 5
+      end
+
+      it 'ignores remote attachments' do
+        upload_1.update!(store: ObjectStorage::Store::REMOTE)
+
+        expect(subject.count_syncable).to eq 4
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts attachments' do
+          expect(subject.count_syncable).to eq 3
+        end
+
+        it 'ignores remote attachments' do
+          upload_1.update!(store: ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 2
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts attachments' do
+          expect(subject.count_syncable).to eq 3
+        end
+
+        it 'ignores remote attachments' do
+          upload_4.update!(store: ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 2
+        end
+      end
+    end
+  end
+
+  context 'FDW', :geo_fdw do
+    context 'with a PostgreSQL version that does not support aggregate pushdown' do
+      before do
+        allow(Gitlab::Database).to receive(:version).and_return(9.6)
+      end
+
+      include_examples 'counts all the things with selective sync coverage'
+    end
+
+    context 'with a PostgreSQL version that supports aggregate pushdown' do
+      before do
+        allow(Gitlab::Database).to receive(:version).and_return(10.0)
+      end
+
+      context 'with use_fdw_queries_for_selective_sync disabled' do
+        before do
+          stub_feature_flags(use_fdw_queries_for_selective_sync: false)
+        end
+
+        include_examples 'counts all the things with selective sync coverage'
+      end
+
+      context 'with use_fdw_queries_for_selective_sync enabled' do
+        before do
+          stub_feature_flags(use_fdw_queries_for_selective_sync: true)
+        end
+
+        include_examples 'counts all the things with selective sync coverage'
+      end
+    end
+  end
+
+  context 'Legacy' do
+    before do
+      stub_fdw_disabled
+    end
+
+    include_examples 'counts all the things with selective sync coverage'
+  end
 end
