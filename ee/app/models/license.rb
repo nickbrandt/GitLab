@@ -78,6 +78,7 @@ class License < ApplicationRecord
     design_management
     operations_dashboard
     dependency_proxy
+    metrics_reports
   ]
   EEP_FEATURES.freeze
 

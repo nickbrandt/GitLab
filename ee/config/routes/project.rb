@@ -34,6 +34,12 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :merge_requests, only: [], constraints: { id: /\d+/ } do
+        member do
+          get :metrics_reports
+        end
+      end
+
       resource :insights, only: [:show] do
         collection do
           post :query
