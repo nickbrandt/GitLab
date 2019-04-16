@@ -527,6 +527,27 @@ describe MergeRequest do
     end
   end
 
+  describe '#has_metrics_reports?' do
+    subject { merge_request.has_metrics_reports? }
+    let(:project) { create(:project, :repository) }
+
+    before do
+      stub_licensed_features(metrics_reports: true)
+    end
+
+    context 'when head pipeline has metrics reports' do
+      let(:merge_request) { create(:ee_merge_request, :with_metrics_reports, source_project: project) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when head pipeline does not have license management reports' do
+      let(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
   describe '#compare_license_management_reports' do
     subject { merge_request.compare_license_management_reports }
 
@@ -596,6 +617,79 @@ describe MergeRequest do
       it 'returns status and error message' do
         expect(subject[:status]).to eq(:error)
         expect(subject[:status_reason]).to eq('This merge request does not have license management reports')
+      end
+    end
+  end
+
+  describe '#compare_metrics_reports' do
+    subject { merge_request.compare_metrics_reports }
+
+    let(:project) { create(:project, :repository) }
+    let(:merge_request) { create(:merge_request, source_project: project) }
+
+    let!(:base_pipeline) do
+      create(:ee_ci_pipeline,
+             :with_metrics_report,
+             project: project,
+             ref: merge_request.target_branch,
+             sha: merge_request.diff_base_sha)
+    end
+
+    before do
+      merge_request.update!(head_pipeline_id: head_pipeline.id)
+    end
+
+    context 'when head pipeline has metrics reports' do
+      let!(:head_pipeline) do
+        create(:ee_ci_pipeline,
+               :with_metrics_report,
+               project: project,
+               ref: merge_request.source_branch,
+               sha: merge_request.diff_head_sha)
+      end
+
+      context 'when reactive cache worker is parsing asynchronously' do
+        it 'returns status' do
+          expect(subject[:status]).to eq(:parsing)
+        end
+      end
+
+      context 'when reactive cache worker is inline' do
+        before do
+          synchronous_reactive_cache(merge_request)
+        end
+
+        it 'returns status and data' do
+          expect_any_instance_of(Ci::CompareMetricsReportsService)
+            .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
+
+          subject
+        end
+
+        context 'when cached results is not latest' do
+          before do
+            allow_any_instance_of(Ci::CompareMetricsReportsService)
+              .to receive(:latest?).and_return(false)
+          end
+
+          it 'raises and InvalidateReactiveCache error' do
+            expect { subject }.to raise_error(ReactiveCaching::InvalidateReactiveCache)
+          end
+        end
+      end
+    end
+
+    context 'when head pipeline does not have metrics reports' do
+      let!(:head_pipeline) do
+        create(:ci_pipeline,
+               project: project,
+               ref: merge_request.source_branch,
+               sha: merge_request.diff_head_sha)
+      end
+
+      it 'returns status and error message' do
+        expect(subject[:status]).to eq(:error)
+        expect(subject[:status_reason]).to eq('This merge request does not have metrics reports')
       end
     end
   end

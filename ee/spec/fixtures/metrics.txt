@@ -1,0 +1,2 @@
+first_metric 12.47
+second_metric hello

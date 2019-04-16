@@ -119,40 +119,6 @@ describe Ci::Build do
     end
   end
 
-  describe '.with_security_reports' do
-    subject { described_class.with_security_reports }
-
-    context 'when build has a security report' do
-      let!(:build) { create(:ee_ci_build, :success, :sast) }
-
-      it 'selects the build' do
-        is_expected.to eq([build])
-      end
-    end
-
-    context 'when build does not have security reports' do
-      let!(:build) { create(:ci_build, :success, :trace_artifact) }
-
-      it 'does not select the build' do
-        is_expected.to be_empty
-      end
-    end
-
-    context 'when there are multiple builds with security reports' do
-      let!(:builds) { create_list(:ee_ci_build, 5, :success, :sast) }
-
-      it 'does not execute a query for selecting job artifacts one by one' do
-        recorded = ActiveRecord::QueryRecorder.new do
-          subject.each do |build|
-            build.job_artifacts.map { |a| a.file.exists? }
-          end
-        end
-
-        expect(recorded.count).to eq(2)
-      end
-    end
-  end
-
   describe '#collect_security_reports!' do
     let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
 
@@ -321,6 +287,40 @@ describe Ci::Build do
           subject
 
           expect(license_management_report.licenses.count).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe '#collect_metrics_reports!' do
+    subject { job.collect_metrics_reports!(metrics_report) }
+
+    let(:metrics_report) { Gitlab::Ci::Reports::Metrics::Report.new }
+
+    context 'when there is a metrics report' do
+      before do
+        create(:ee_ci_job_artifact, :metrics, job: job, project: job.project)
+      end
+
+      context 'when license has metrics_reports' do
+        before do
+          stub_licensed_features(metrics_reports: true)
+        end
+
+        it 'parses blobs and add the results to the report' do
+          expect { subject }.to change { metrics_report.metrics.count }.from(0).to(2)
+        end
+      end
+
+      context 'when license does not have metrics_reports' do
+        before do
+          stub_licensed_features(license_management: false)
+        end
+
+        it 'does not parse metrics report' do
+          subject
+
+          expect(metrics_report.metrics.count).to eq(0)
         end
       end
     end
