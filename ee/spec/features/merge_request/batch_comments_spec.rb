@@ -167,6 +167,8 @@ describe 'Merge request > Batch comments', :js do
           expect(page).to have_content('1/1 discussion resolved')
           expect(page).to have_selector('.line-resolve-btn.is-active')
         end
+
+        expect_empty_local_draft
       end
     end
 
@@ -210,6 +212,8 @@ describe 'Merge request > Batch comments', :js do
           expect(page).to have_content('0/1 discussion resolved')
           expect(page).to have_selector('.line-resolve-btn.is-disabled')
         end
+
+        expect_empty_local_draft
       end
     end
   end
@@ -262,4 +266,11 @@ def write_reply_to_discussion(button_text: 'Start a review', text: 'Line is wron
   end
 
   wait_for_requests
+end
+
+def expect_empty_local_draft
+  page.within('.discussion-reply-holder') do
+    click_button('Reply...')
+    expect(find('#note_note').value).to eq('')
+  end
 end
