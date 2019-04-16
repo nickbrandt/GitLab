@@ -57,6 +57,28 @@ describe 'Update Epic', :js do
         expect(find('.issuable-details .description')).to have_content('New epic description')
       end
 
+      it 'updates the epic and keep the description saved across reload' do
+        fill_in 'issue-description', with: 'New epic description'
+
+        page.within('.detail-page-description') do
+          click_button('Preview')
+          expect(find('.md-preview-holder')).to have_content('New epic description')
+        end
+
+        visit group_epic_path(group, epic)
+
+        # Deal with the beforeunload browser popup
+        page.driver.browser.switch_to.alert.accept
+
+        wait_for_requests
+        find('.btn-edit').click
+
+        page.within('.detail-page-description') do
+          click_button('Preview')
+          expect(find('.md-preview-holder')).to have_content('New epic description')
+        end
+      end
+
       it 'creates a todo only for mentioned users' do
         mentioned = create(:user)
 
