@@ -5,6 +5,7 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
   include GitlabRoutingHelper
 
   expose :id
+  expose :created_at
   expose :project_id
   expose :author, using: UserEntity
   expose :pipeline, if: -> (feedback, _) { feedback.pipeline.present? } do

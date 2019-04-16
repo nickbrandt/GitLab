@@ -10,7 +10,7 @@ describe Vulnerabilities::FeedbackEntity do
   describe '#as_json' do
     subject { entity.as_json }
 
-    it { is_expected.to include(:project_id, :author, :category, :feedback_type) }
+    it { is_expected.to include(:created_at, :project_id, :author, :category, :feedback_type) }
   end
 
   context 'when issue is present' do
