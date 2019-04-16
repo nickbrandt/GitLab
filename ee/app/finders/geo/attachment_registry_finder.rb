@@ -2,12 +2,18 @@
 
 module Geo
   class AttachmentRegistryFinder < FileRegistryFinder
-    def syncable
-      all.geo_syncable
-    end
-
     def count_syncable
       syncable.count
+    end
+
+    def syncable
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.syncable
+      elsif selective_sync?
+        legacy_finder.syncable
+      else
+        Upload.geo_syncable
+      end
     end
 
     def count_synced
@@ -94,15 +100,11 @@ module Geo
 
     private
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    def all
-      if selective_sync?
-        Upload.where(group_uploads.or(project_uploads).or(other_uploads))
-      else
-        Upload.all
-      end
+    # rubocop:disable CodeReuse/Finder
+    def legacy_finder
+      @legacy_finder ||= Geo::LegacyAttachmentRegistryFinder.new(current_node: current_node)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/Finder
 
     # rubocop: disable CodeReuse/ActiveRecord
     def group_uploads
@@ -273,7 +275,7 @@ module Geo
       registry_file_ids = Geo::FileRegistry.attachments.pluck(:file_id) - except_file_ids
 
       legacy_inner_join_registry_ids(
-        all.with_files_stored_remotely,
+        legacy_finder.attachments.with_files_stored_remotely,
         registry_file_ids,
         Upload
       )
