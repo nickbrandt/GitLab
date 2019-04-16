@@ -175,7 +175,7 @@ keys must be manually replicated to the **secondary** node.
    (`/admin/geo/nodes`) in your browser.
 1. Add the **secondary** node by providing its full URL. **Do NOT** check the
    **This is a primary node** checkbox.
-1. Optionally, choose which namespaces should be replicated by the
+1. Optionally, choose which groups or storage shards should be replicated by the
    **secondary** node. Leave blank to replicate all. Read more in
    [selective synchronization](#selective-synchronization).
 1. Click the **Add node** button.
@@ -278,23 +278,22 @@ Currently, this is what is synced:
 
 Geo supports selective synchronization, which allows admins to choose
 which projects should be synchronized by **secondary** nodes.
-
-It is important to note that selective synchronization does not:
-
-1. Restrict permissions from **secondary** nodes.
-1. Hide project metadata from **secondary** nodes.
-   - Since Geo currently relies on PostgreSQL replication, all project metadata
-     gets replicated to **secondary** nodes, but repositories that have not been
-     selected will be empty.
-1. Reduce the number of events generated for the Geo event log.
-   - The **primary** node generates events as long as any **secondary** nodes are present.
-     Selective synchronization restrictions are implemented on the **secondary** nodes,
-     not the **primary** node.
-
 A subset of projects can be chosen, either by group or by storage shard. The
 former is ideal for replicating data belonging to a subset of users, while the
 latter is more suited to progressively rolling out Geo to a large GitLab
 instance.
+
+It is important to note that selective synchronization:
+
+1. Does not restrict permissions from **secondary** nodes.
+1. Does not hide project metadata from **secondary** nodes.
+   - Since Geo currently relies on PostgreSQL replication, all project metadata
+     gets replicated to **secondary** nodes, but repositories that have not been
+     selected will be empty.
+1. Does not reduce the number of events generated for the Geo event log.
+   - The **primary** node generates events as long as any **secondary** nodes are present.
+     Selective synchronization restrictions are implemented on the **secondary** nodes,
+     not the **primary** node.
 
 ## Upgrading Geo
 
