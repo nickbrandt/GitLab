@@ -5,7 +5,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import Vue from 'vue';
 import Cookies from 'js-cookie';
-import BoardsStoreEE from 'ee/boards/stores/boards_store_ee';
+import BoardsStoreEE from 'ee_else_ce/boards/stores/boards_store_ee';
 import { getUrlParamsArray, parseBoolean } from '~/lib/utils/common_utils';
 
 const boardsStore = {
@@ -37,13 +37,6 @@ const boardsStore = {
     this.detail = {
       issue: {},
     };
-  },
-  createNewListDropdownData() {
-    this.state.currentBoard = {
-      labels: [],
-    };
-    this.state.currentPage = '';
-    this.state.reload = false;
   },
   showPage(page) {
     this.state.reload = false;
