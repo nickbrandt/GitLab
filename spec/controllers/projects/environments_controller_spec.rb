@@ -479,32 +479,8 @@ describe Projects::EnvironmentsController do
         get :metrics_dashboard, params: environment_params(format: :json)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response).to include('dashboard', 'order', 'panel_groups')
-        expect(json_response['panel_groups']).to all( include('group', 'priority', 'panels') )
-      end
-    end
-  end
-
-  describe 'metrics_dashboard' do
-    context 'when prometheus endpoint is disabled' do
-      before do
-        stub_feature_flags(environment_metrics_use_prometheus_endpoint: false)
-      end
-
-      it 'responds with status code 403' do
-        get :metrics_dashboard, params: environment_params(format: :json)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-      end
-    end
-
-    context 'when prometheus endpoint is enabled' do
-      it 'returns a json representation of the environment dashboard' do
-        get :metrics_dashboard, params: environment_params(format: :json)
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response).to include('dashboard', 'order', 'panel_groups')
-        expect(json_response['panel_groups']).to all( include('group', 'priority', 'panels') )
+        expect(json_response.keys).to contain_exactly('dashboard', 'status')
+        expect(json_response['dashboard']).to be_an_instance_of(Hash)
       end
     end
   end

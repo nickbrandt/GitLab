@@ -9,8 +9,7 @@ describe Gitlab::MetricsDashboard::Processor do
 
   describe 'process' do
     let(:process_params) { [dashboard_yml, project, environment] }
-    let(:dashboard_json) { described_class.new(*process_params).process }
-    let(:dashboard) { JSON.parse(dashboard_json, symbolize_names: true) }
+    let(:dashboard) { described_class.new(*process_params).process }
 
     context 'when dashboard config corresponds to common metrics' do
       let!(:common_metric) { create(:prometheus_metric, :common, identifier: 'metric_a1') }
