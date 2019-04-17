@@ -1,0 +1,5 @@
+---
+title: Fix merge request operation failure (e.g. assigning user) when project approvers required increases
+merge_request: 10766
+author:
+type: fixed

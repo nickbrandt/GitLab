@@ -720,27 +720,27 @@ describe MergeRequest do
     end
   end
 
-  describe "#approvals_required" do
-    let(:merge_request) { build(:merge_request) }
-
-    before do
-      merge_request.target_project.update(approvals_before_merge: 3)
+  describe '#approvals_required' do
+    where(:license_value, :db_value, :project_db_value, :expected) do
+      true  | 5   | 6   | 6
+      true  | 6   | 5   | 6
+      true  | nil | 5   | 5
+      false | 5   | 6   | 0
+      false | nil | 5   | 0
     end
 
-    context "when the MR has approvals_before_merge set" do
+    with_them do
+      let(:merge_request) { build(:merge_request, approvals_before_merge: db_value) }
+
+      subject { merge_request.approvals_required }
+
       before do
-        merge_request.update(approvals_before_merge: 1)
+        stub_licensed_features(merge_request_approvers: license_value)
+
+        merge_request.target_project.approvals_before_merge = project_db_value
       end
 
-      it "uses the approvals_before_merge from the MR" do
-        expect(merge_request.approvals_required).to eq(1)
-      end
-    end
-
-    context "when the MR doesn't have approvals_before_merge set" do
-      it "takes approvals_before_merge from the target project" do
-        expect(merge_request.approvals_required).to eq(3)
-      end
+      it { is_expected.to eq(expected) }
     end
   end
 
