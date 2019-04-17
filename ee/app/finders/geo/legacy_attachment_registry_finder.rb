@@ -6,6 +6,7 @@ module Geo
       attachments.geo_syncable
     end
 
+    # rubocop:disable CodeReuse/ActiveRecord
     def attachments
       if selective_sync?
         Upload.where(group_uploads.or(project_uploads).or(other_uploads))
@@ -13,10 +14,11 @@ module Geo
         Upload.all
       end
     end
+    # rubocop:enable CodeReuse/ActiveRecord
 
     private
 
-    # rubocop: disable CodeReuse/ActiveRecord
+    # rubocop:disable CodeReuse/ActiveRecord
     def group_uploads
       namespace_ids =
         if current_node.selective_sync_by_namespaces?
@@ -35,7 +37,7 @@ module Geo
 
       upload_table[:model_type].eq('Namespace').and(namespace_ids_in_sql)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/ActiveRecord
 
     def project_uploads
       project_ids = current_node.projects.select(:id)
