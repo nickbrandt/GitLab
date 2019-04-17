@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module DependencyProxyHelpers
     def stub_registry_auth(image, token)
