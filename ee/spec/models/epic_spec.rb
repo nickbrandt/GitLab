@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Epic do
-  let(:group) { create(:group) }
+  set(:group) { create(:group) }
   let(:project) { create(:project, group: group) }
 
   describe 'associations' do
@@ -16,7 +16,7 @@ describe Epic do
   end
 
   describe 'validations' do
-    subject { create(:epic) }
+    subject { build(:epic) }
 
     it { is_expected.to validate_presence_of(:group) }
     it { is_expected.to validate_presence_of(:author) }
@@ -86,33 +86,29 @@ describe Epic do
     end
   end
 
-  describe '#ancestors', :nested_groups do
-    set(:group) { create(:group) }
-    set(:epic1) { create(:epic, group: group) }
-    set(:epic2) { create(:epic, group: group, parent: epic1) }
-    set(:epic3) { create(:epic, group: group, parent: epic2) }
-
-    it 'returns all ancestors for an epic' do
-      expect(epic3.ancestors).to eq [epic2, epic1]
-    end
-
-    it 'returns an empty array if an epic does not have any parent' do
-      expect(epic1.ancestors).to be_empty
-    end
-  end
-
-  describe '#descendants', :nested_groups do
-    let(:group) { create(:group) }
+  context 'hierarchy' do
     let(:epic1) { create(:epic, group: group) }
     let(:epic2) { create(:epic, group: group, parent: epic1) }
     let(:epic3) { create(:epic, group: group, parent: epic2) }
 
-    it 'returns all ancestors for an epic' do
-      expect(epic1.descendants).to match_array([epic2, epic3])
+    describe '#ancestors', :nested_groups do
+      it 'returns all ancestors for an epic' do
+        expect(epic3.ancestors).to eq [epic2, epic1]
+      end
+
+      it 'returns an empty array if an epic does not have any parent' do
+        expect(epic1.ancestors).to be_empty
+      end
     end
 
-    it 'returns an empty array if an epic does not have any descendants' do
-      expect(epic3.descendants).to be_empty
+    describe '#descendants', :nested_groups do
+      it 'returns all ancestors for an epic' do
+        expect(epic1.descendants).to match_array([epic2, epic3])
+      end
+
+      it 'returns an empty array if an epic does not have any descendants' do
+        expect(epic3.descendants).to be_empty
+      end
     end
   end
 
@@ -465,6 +461,12 @@ describe Epic do
   end
 
   describe '.deepest_relationship_level', :postgresql do
+    context 'when there are no epics' do
+      it 'returns nil' do
+        expect(described_class.deepest_relationship_level).to be_nil
+      end
+    end
+
     it 'returns the deepest relationship level between epics' do
       group_1 = create(:group)
       group_2 = create(:group)
@@ -605,7 +607,6 @@ describe Epic do
   end
 
   context 'mentioning other objects' do
-    let(:group) { create(:group) }
     let(:epic) { create(:epic, group: group) }
 
     let(:project) { create(:project, :repository, :public) }
