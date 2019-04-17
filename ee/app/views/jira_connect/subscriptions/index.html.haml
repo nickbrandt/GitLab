@@ -1,13 +1,13 @@
 %h1
   GitLab for Jira Configuration
 
-%form#add-subscription-form{ style: 'margin-bottom: 20px;' }
+%form#add-subscription-form.subscription-form{ action: jira_connect_subscriptions_path }
   .ak-field-group
     %label
       Namespace
-    %input#namespace-input.ak-field-text{ type: 'text', required: true }
 
-  .ak-field-group
+  .ak-field-group.field-group-input
+    %input#namespace-input.ak-field-text{ type: 'text', required: true }
     %button.ak-button.ak-button__appearance-primary{ type: 'submit' }
       Link namespace to Jira
 
@@ -24,46 +24,5 @@
         %td= subscription.created_at
         %td= link_to 'Remove', jira_connect_subscription_path(subscription), class: 'remove-subscription'
 
-:javascript
-  window.onload = function() {
-    $('#add-subscription-form').submit(function(e) {
-      e.preventDefault();
-
-      AP.context.getToken(function(token) {
-        $.post('/-/jira_connect/subscriptions', {
-          jwt: token,
-          namespace_path: $('#namespace-input').val(),
-          format: 'json',
-        })
-          .done(function(response) {
-            AP.navigator.reload();
-          })
-          .fail(function(xhr) {
-            alert(xhr.responseJSON.error);
-          });
-      });
-    });
-
-    $('.remove-subscription').click(function(e) {
-      e.preventDefault();
-
-      var href = $(this).attr('href');
-
-      AP.context.getToken(function(token) {
-        $.ajax({
-          url: href,
-          method: 'DELETE',
-          data: {
-            jwt: token,
-            format: 'json',
-          },
-        })
-          .done(function(response) {
-            AP.navigator.reload();
-          })
-          .fail(function(xhr) {
-            alert(xhr.responseJSON.error);
-          });
-      });
-    });
-  };
+= page_specific_javascript_tag('jira_connect.js')
+= stylesheet_link_tag 'pages/jira_connect'
