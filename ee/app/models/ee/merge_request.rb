@@ -22,7 +22,6 @@ module EE
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
       has_many :draft_notes
 
-      validate :validate_approvals_before_merge, unless: :importing?
       validate :validate_approval_rule_source
 
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
@@ -67,19 +66,6 @@ module EE
       return true unless project.merge_pipelines_enabled?
 
       actual_head_pipeline&.latest_merge_request_pipeline?
-    end
-
-    def validate_approvals_before_merge
-      return true unless approvals_before_merge
-      return true unless target_project
-
-      # Ensure per-merge-request approvals override is valid
-      if approvals_before_merge >= target_project.approvals_before_merge
-        true
-      else
-        errors.add :validate_approvals_before_merge,
-                   'Number of approvals must be at least that of approvals on the target project'
-      end
     end
 
     def validate_approval_rule_source
