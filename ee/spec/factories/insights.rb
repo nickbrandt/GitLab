@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :insights_issuables, class: Hash do
+  factory :insights_issues_by_team, class: Hash do
     initialize_with do
       {
         Manage: 1,
@@ -12,7 +12,17 @@ FactoryBot.define do
     end
   end
 
-  factory :insights_issuables_per_month, class: Hash do
+  factory :insights_merge_requests_per_month, class: Hash do
+    initialize_with do
+      {
+        'January 2019' => 1,
+        'February 2019' => 2,
+        'March 2019' => 3
+      }
+    end
+  end
+
+  factory :insights_issues_by_team_per_month, class: Hash do
     initialize_with do
       {
         'January 2019' => {
