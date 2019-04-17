@@ -10,7 +10,7 @@ module Geo
       if use_legacy_queries_for_selective_sync?
         legacy_finder.syncable
       elsif selective_sync?
-        legacy_finder.syncable
+        fdw_all.geo_syncable
       else
         Upload.geo_syncable
       end
@@ -106,13 +106,27 @@ module Geo
     end
     # rubocop:enable CodeReuse/Finder
 
+    def fdw_geo_node
+      @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
-    def group_uploads
+    def fdw_all
+      if selective_sync?
+        Geo::Fdw::Upload.where(fdw_group_uploads.or(fdw_project_uploads).or(fdw_other_uploads))
+      else
+        Geo::Fdw::Upload.all
+      end
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def fdw_group_uploads
       namespace_ids =
         if current_node.selective_sync_by_namespaces?
-          Gitlab::ObjectHierarchy.new(current_node.namespaces).base_and_descendants.select(:id)
+          Gitlab::ObjectHierarchy.new(fdw_geo_node.namespaces).base_and_descendants.select(:id)
         elsif current_node.selective_sync_by_shards?
-          leaf_groups = Namespace.where(id: current_node.projects.select(:namespace_id))
+          leaf_groups = Geo::Fdw::Namespace.where(id: fdw_geo_node.projects.select(:namespace_id))
           Gitlab::ObjectHierarchy.new(leaf_groups).base_and_ancestors.select(:id)
         else
           Namespace.none
@@ -121,29 +135,29 @@ module Geo
       # This query was intentionally converted to a raw one to get it work in Rails 5.0.
       # In Rails 5.0 and 5.1 there's a bug: https://github.com/rails/arel/issues/531
       # Please convert it back when on rails 5.2 as it works again as expected since 5.2.
-      namespace_ids_in_sql = Arel::Nodes::SqlLiteral.new("uploads.model_id IN (#{namespace_ids.to_sql})")
+      namespace_ids_in_sql = Arel::Nodes::SqlLiteral.new("#{fdw_upload_table.name}.#{fdw_upload_table[:model_id].name} IN (#{namespace_ids.to_sql})")
 
-      upload_table[:model_type].eq('Namespace').and(namespace_ids_in_sql)
+      fdw_upload_table[:model_type].eq('Namespace').and(namespace_ids_in_sql)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def project_uploads
-      project_ids = current_node.projects.select(:id)
+    def fdw_project_uploads
+      project_ids = fdw_geo_node.projects.select(:id)
 
       # This query was intentionally converted to a raw one to get it work in Rails 5.0.
       # In Rails 5.0 and 5.1 there's a bug: https://github.com/rails/arel/issues/531
       # Please convert it back when on rails 5.2 as it works again as expected since 5.2.
-      project_ids_in_sql = Arel::Nodes::SqlLiteral.new("uploads.model_id IN (#{project_ids.to_sql})")
+      project_ids_in_sql = Arel::Nodes::SqlLiteral.new("#{fdw_upload_table.name}.#{fdw_upload_table[:model_id].name} IN (#{project_ids.to_sql})")
 
-      upload_table[:model_type].eq('Project').and(project_ids_in_sql)
+      fdw_upload_table[:model_type].eq('Project').and(project_ids_in_sql)
     end
 
-    def other_uploads
-      upload_table[:model_type].not_in(%w[Namespace Project])
+    def fdw_other_uploads
+      fdw_upload_table[:model_type].not_in(%w[Namespace Project])
     end
 
-    def upload_table
-      Upload.arel_table
+    def fdw_upload_table
+      Geo::Fdw::Upload.arel_table
     end
 
     def find_synced
@@ -173,10 +187,6 @@ module Geo
     def find_synced_missing_on_primary_registries
       find_synced_registries.missing_on_primary
     end
-
-    #
-    # FDW accessors
-    #
 
     def fdw_find_synced
       fdw_find_syncable.merge(Geo::FileRegistry.synced)
@@ -211,16 +221,6 @@ module Geo
       fdw_find_synced.merge(Geo::FileRegistry.missing_on_primary)
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_all
-      if selective_sync?
-        Geo::Fdw::Upload.where(group_uploads.or(project_uploads).or(other_uploads))
-      else
-        Geo::Fdw::Upload.all
-      end
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
     def fdw_table
       Geo::Fdw::Upload.table_name
     end
@@ -233,10 +233,6 @@ module Geo
         .where.not(id: except_file_ids)
     end
     # rubocop: enable CodeReuse/ActiveRecord
-
-    #
-    # Legacy accessors (non FDW)
-    #
 
     # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_synced
