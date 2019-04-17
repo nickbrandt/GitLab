@@ -5,29 +5,13 @@ require 'rails_helper'
 describe 'Merge request > User sets approval rules', :js do
   include ProjectForksHelper
 
-  let(:approver) { create(:user) }
-  let(:author) { create(:user) }
-  let(:project) { create(:project, :public, :repository) }
+  include_context 'project with approval rules'
 
   def page_rule_names
     page.all('.js-approval-rules table .js-name')
   end
 
-  before do
-    stub_licensed_features(multiple_approval_rules: true)
-
-    [approver, author].each do |member|
-      project.add_maintainer(member)
-    end
-  end
-
   context "with project approval rules" do
-    let!(:regular_rules) do
-      Array.new(3) do |i|
-        create(:approval_project_rule, project: project, users: [approver], name: "Regular Rule #{i}")
-      end
-    end
-
     context "from a fork" do
       let(:forked_project) { fork_project(project, nil, repository: true) }
 
