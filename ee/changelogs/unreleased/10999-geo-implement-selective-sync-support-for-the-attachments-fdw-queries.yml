@@ -1,0 +1,6 @@
+---
+title: 'Geo: Implement selective sync support for the FDW queries to count the number
+  of attachments to sync'
+merge_request: 11107
+author:
+type: changed
