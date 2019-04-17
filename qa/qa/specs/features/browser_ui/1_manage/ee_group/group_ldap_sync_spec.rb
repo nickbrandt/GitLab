@@ -19,7 +19,9 @@ module QA
           menu.sign_out if menu.has_personal_area?
         end
 
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+
         Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
         Page::Main::Menu.perform(&:sign_out)
       end
