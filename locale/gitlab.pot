@@ -3326,6 +3326,9 @@ msgstr ""
 msgid "Create a GitLab account first, and then connect it to your %{label} account."
 msgstr ""
 
+msgid "Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies."
+msgstr ""
+
 msgid "Create a merge request."
 msgstr ""
 
@@ -3660,6 +3663,12 @@ msgid "Denied authorization of chat nickname %{user_name}."
 msgstr ""
 
 msgid "Deny"
+msgstr ""
+
+msgid "Dependency Proxy"
+msgstr ""
+
+msgid "DependencyProxy|Toggle Dependency Proxy"
 msgstr ""
 
 msgid "Deploy"
