@@ -164,16 +164,10 @@ class Projects::EnvironmentsController < Projects::ApplicationController
       format.json do
         result = Gitlab::MetricsDashboard::Service.new(@project, @current_user, environment: environment).get_dashboard
 
-        if result[:status] == :success
-          status_code = :ok
-          details = { dashboard: result[:dashboard] }
-        else
-          status_code = result[:http_status] || :bad_request
-          details = { message: result[:message] }
-        end
+        ok_status = :ok if result[:status] == :success
+        status = ok_status || result[:http_status] || :bad_request
 
-        render status: status_code,
-               json: { status: result[:status] }.merge(details)
+        render status: status, json: result
       end
     end
   end
