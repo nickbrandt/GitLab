@@ -158,11 +158,11 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 
   def metrics_dashboard
-    render_403 && return unless Feature.enabled?(:environment_metrics_use_prometheus_endpoint, project)
+    render_403 && return unless Feature.enabled?(:environment_metrics_use_prometheus_endpoint, @project)
 
     respond_to do |format|
       format.json do
-        dashboard = MetricsDashboardService.new(@project).get_dashboard
+        dashboard = Gitlab::MetricsDashboard::Service.new(@project, environment).get_dashboard
 
         render json: dashboard, status: :ok
       end
