@@ -91,7 +91,7 @@ describe 'Issue Boards', :js do
 
         wait_for_requests
 
-        expect(page).to have_content('No assignee')
+        expect(find('.qa-assign-yourself')).to have_content('None')
       end
 
       expect(card_two).not_to have_selector('.avatar')
@@ -101,7 +101,7 @@ describe 'Issue Boards', :js do
       click_card(card2)
 
       page.within(find('.assignee')) do
-        expect(page).to have_content('No assignee')
+        expect(find('.qa-assign-yourself')).to have_content('None')
 
         click_button 'assign yourself'
 
