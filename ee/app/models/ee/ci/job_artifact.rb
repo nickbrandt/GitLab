@@ -13,6 +13,7 @@ module EE
 
       SECURITY_REPORT_FILE_TYPES = %w[sast dependency_scanning container_scanning dast].freeze
       LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
+      METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
       scope :geo_syncable, -> { with_files_stored_locally.not_expired }
@@ -24,6 +25,10 @@ module EE
 
       scope :license_management_reports, -> do
         with_file_types(LICENSE_MANAGEMENT_REPORT_FILE_TYPES)
+      end
+
+      scope :metrics_reports, -> do
+        with_file_types(METRICS_REPORT_FILE_TYPES)
       end
     end
 
