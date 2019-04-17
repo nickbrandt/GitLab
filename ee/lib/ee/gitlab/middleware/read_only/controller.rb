@@ -12,7 +12,8 @@ module EE
           }.freeze
 
           WHITELISTED_GEO_ROUTES_TRACKING_DB = {
-            'admin/geo/projects' => %w{destroy resync recheck force_redownload resync_all recheck_all}
+            'admin/geo/projects' => %w{destroy resync recheck force_redownload resync_all recheck_all},
+            'admin/geo/uploads' => %w{destroy}
           }.freeze
 
           private

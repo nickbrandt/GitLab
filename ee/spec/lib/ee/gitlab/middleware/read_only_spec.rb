@@ -64,6 +64,8 @@ describe Gitlab::Middleware::ReadOnly do
       it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/resync_all'
 
       it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/1/force_redownload'
+
+      it_behaves_like 'whitelisted request', :delete, '/admin/geo/uploads/1'
     end
   end
 end
