@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Insights::Serializers::Chartjs::LineSerializer do
-  let(:input) { build(:insights_issuables_per_month) }
+  let(:input) { build(:insights_issues_by_team_per_month) }
 
   subject { described_class.present(input) }
 
