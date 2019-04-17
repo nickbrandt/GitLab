@@ -84,7 +84,7 @@ module Geo
     def find_retryable_failed_registries(batch_size:, except_file_ids: [])
       find_failed_registries
         .retry_due
-        .where.not(file_id: except_file_ids)
+        .file_id_not_in(except_file_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -93,7 +93,7 @@ module Geo
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
       find_synced_missing_on_primary_registries
         .retry_due
-        .where.not(file_id: except_file_ids)
+        .file_id_not_in(except_file_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -196,67 +196,50 @@ module Geo
       fdw_find_syncable.merge(Geo::FileRegistry.failed)
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_syncable
-      fdw_all.joins("INNER JOIN file_registry ON file_registry.file_id = #{fdw_table}.id")
+      fdw_all
+        .inner_join_file_registry
         .geo_syncable
         .merge(Geo::FileRegistry.attachments)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_unsynced(except_file_ids:)
-      upload_types = Geo::FileService::DEFAULT_OBJECT_TYPES.map { |val| "'#{val}'" }.join(',')
-
-      fdw_all.joins("LEFT OUTER JOIN file_registry
-                                          ON file_registry.file_id = #{fdw_table}.id
-                                         AND file_registry.file_type IN (#{upload_types})")
+      fdw_all
+        .missing_file_registry
         .geo_syncable
-        .where(file_registry: { id: nil })
-        .where.not(id: except_file_ids)
+        .id_not_in(except_file_ids)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def fdw_find_synced_missing_on_primary
       fdw_find_synced.merge(Geo::FileRegistry.missing_on_primary)
     end
 
-    def fdw_table
-      Geo::Fdw::Upload.table_name
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_migrated_local(except_file_ids:)
-      fdw_all.joins("INNER JOIN file_registry ON file_registry.file_id = #{fdw_table}.id")
+      fdw_all
+        .inner_join_file_registry
         .with_files_stored_remotely
         .merge(Geo::FileRegistry.attachments)
-        .where.not(id: except_file_ids)
+        .id_not_in(except_file_ids)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_synced
       legacy_inner_join_registry_ids(
         syncable,
-        find_synced_registries.pluck(:file_id),
+        find_synced_registries.pluck_file_key,
         Upload
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_failed
       legacy_inner_join_registry_ids(
         syncable,
-        find_failed_registries.pluck(:file_id),
+        find_failed_registries.pluck_file_key,
         Upload
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_unsynced(except_file_ids:)
-      registry_file_ids = Geo::FileRegistry.attachments.pluck(:file_id) | except_file_ids
+      registry_file_ids = Geo::FileRegistry.attachments.pluck_file_key | except_file_ids
 
       legacy_left_outer_join_registry_ids(
         syncable,
@@ -264,11 +247,9 @@ module Geo
         Upload
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_migrated_local(except_file_ids:)
-      registry_file_ids = Geo::FileRegistry.attachments.pluck(:file_id) - except_file_ids
+      registry_file_ids = Geo::FileRegistry.attachments.pluck_file_key - except_file_ids
 
       legacy_inner_join_registry_ids(
         legacy_finder.attachments.with_files_stored_remotely,
@@ -276,16 +257,13 @@ module Geo
         Upload
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_synced_missing_on_primary
       legacy_inner_join_registry_ids(
         syncable,
-        find_synced_missing_on_primary_registries.pluck(:file_id),
+        find_synced_missing_on_primary_registries.pluck_file_key,
         Upload
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
