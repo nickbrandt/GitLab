@@ -84,6 +84,10 @@ module EE
         end
       end
 
+      expose :metrics_reports_path, if: -> (mr, _) { mr.has_metrics_reports? } do |merge_request|
+        metrics_reports_project_merge_request_path(merge_request.project, merge_request, format: :json)
+      end
+
       expose :sast_container, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:container_scanning) } do
         expose :head_path do |merge_request|
           head_pipeline_downloadable_path_for_report_type(:container_scanning)

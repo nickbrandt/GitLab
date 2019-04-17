@@ -20,7 +20,7 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
       filter_labels: [label_bug.title],
       collection_labels: [label_manage.title, label_plan.title],
       group_by: 'month',
-      period_limit: 2
+      period_limit: 5
     }
   end
   let(:issuable_relation) { find_issuables(project, opts) }

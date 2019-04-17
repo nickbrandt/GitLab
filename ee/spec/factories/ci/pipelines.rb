@@ -30,5 +30,21 @@ FactoryBot.define do
         pipeline.builds << build(:ee_ci_build, :corrupted_license_management_report, pipeline: pipeline, project: pipeline.project)
       end
     end
+
+    trait :with_metrics_report do
+      status :success
+
+      after(:build) do |pipeline, evaluator|
+        pipeline.builds << build(:ee_ci_build, :metrics, pipeline: pipeline, project: pipeline.project)
+      end
+    end
+
+    trait :with_metrics_alternate_report do
+      status :success
+
+      after(:build) do |pipeline, evaluator|
+        pipeline.builds << build(:ee_ci_build, :metrics_alternate, pipeline: pipeline, project: pipeline.project)
+      end
+    end
   end
 end

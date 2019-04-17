@@ -3,8 +3,8 @@ import Chart from 'chart.js';
 
 export default {
   props: {
-    info: {
-      type: Object,
+    chartTitle: {
+      type: String,
       required: true,
     },
     data: {
@@ -25,7 +25,7 @@ export default {
       return {
         title: {
           display: true,
-          text: this.info.title,
+          text: this.chartTitle,
         },
       };
     },

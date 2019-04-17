@@ -4,6 +4,15 @@ import * as types from 'ee/insights/stores/modules/insights/mutation_types';
 
 describe('Insights mutations', () => {
   let state;
+  const chart = {
+    title: 'Bugs Per Team',
+    type: 'stacked-bar',
+    query: {
+      name: 'filter_issues_by_label_category',
+      filter_label: 'bug',
+      category_labels: ['Plan', 'Create', 'Manage'],
+    },
+  };
 
   beforeEach(() => {
     state = createState();
@@ -57,17 +66,21 @@ describe('Insights mutations', () => {
     });
   });
 
-  describe(types.REQUEST_CHART, () => {
-    it('sets chartLoading state when starting request', () => {
-      mutations[types.REQUEST_CHART](state);
+  describe(types.SET_ACTIVE_TAB, () => {
+    it('sets activeTab state', () => {
+      mutations[types.SET_ACTIVE_TAB](state, 'key');
 
-      expect(state.chartLoading).toBe(true);
+      expect(state.activeTab).toBe('key');
     });
+  });
 
-    it('resets chartData state when starting request', () => {
-      mutations[types.REQUEST_CHART](state);
+  describe(types.SET_ACTIVE_PAGE, () => {
+    const pageData = { key: 'page' };
 
-      expect(state.chartData).toBe(null);
+    it('sets activePage state', () => {
+      mutations[types.SET_ACTIVE_PAGE](state, pageData);
+
+      expect(state.activePage).toBe(pageData);
     });
   });
 
@@ -90,52 +103,84 @@ describe('Insights mutations', () => {
       ],
     };
 
-    it('sets chartLoading state to false on success', () => {
-      mutations[types.RECEIVE_CHART_SUCCESS](state, data);
+    it('sets charts loaded state to true on success', () => {
+      mutations[types.RECEIVE_CHART_SUCCESS](state, { chart, data });
 
-      expect(state.chartLoading).toBe(false);
+      const { chartData } = state;
+
+      expect(chartData[chart.title].loaded).toBe(true);
     });
 
-    it('sets chartData state to incoming data on success', () => {
-      mutations[types.RECEIVE_CHART_SUCCESS](state, data);
+    it('sets charts data to incoming data on success', () => {
+      mutations[types.RECEIVE_CHART_SUCCESS](state, { chart, data });
 
-      expect(state.chartData).toBe(data);
+      const { chartData } = state;
+
+      expect(chartData[chart.title].data).toBe(data);
+    });
+
+    it('sets charts type to incoming type on success', () => {
+      mutations[types.RECEIVE_CHART_SUCCESS](state, { chart, data });
+
+      const { chartData } = state;
+
+      expect(chartData[chart.title].type).toBe(chart.type);
     });
   });
 
   describe(types.RECEIVE_CHART_ERROR, () => {
-    it('sets chartLoading state to false on error', () => {
-      mutations[types.RECEIVE_CHART_ERROR](state);
+    const error = 'myError';
 
-      expect(state.chartLoading).toBe(false);
+    it('sets charts loaded state to false on error', () => {
+      mutations[types.RECEIVE_CHART_ERROR](state, { chart, error });
+
+      const { chartData } = state;
+
+      expect(chartData[chart.title].loaded).toBe(false);
     });
 
-    it('sets chartData state to null on error', () => {
-      mutations[types.RECEIVE_CHART_ERROR](state);
+    it('sets charts data state to null on error', () => {
+      mutations[types.RECEIVE_CHART_ERROR](state, { chart, error });
 
-      expect(state.chartData).toBe(null);
+      const { chartData } = state;
+
+      expect(chartData[chart.title].data).toBe(null);
+    });
+
+    it('sets charts type to incoming type on error', () => {
+      mutations[types.RECEIVE_CHART_ERROR](state, { chart, error });
+
+      const { chartData } = state;
+
+      expect(chartData[chart.title].type).toBe(chart.type);
+    });
+
+    it('sets charts error state to error message on error', () => {
+      mutations[types.RECEIVE_CHART_ERROR](state, { chart, error });
+
+      const { chartData } = state;
+
+      expect(chartData[chart.title].error).toBe(error);
     });
   });
 
-  describe(types.SET_ACTIVE_TAB, () => {
-    it('sets activeTab state', () => {
-      mutations[types.SET_ACTIVE_TAB](state, 'key');
+  describe(types.SET_CHART_DATA, () => {
+    const chartData = { a: { data: 'data' } };
 
-      expect(state.activeTab).toBe('key');
+    it('sets chartData state', () => {
+      mutations[types.SET_CHART_DATA](state, chartData);
+
+      expect(state.chartData).toBe(chartData);
     });
   });
 
-  describe(types.SET_ACTIVE_CHART, () => {
-    let chartData;
+  describe(types.SET_PAGE_LOADING, () => {
+    const pageLoading = true;
 
-    beforeEach(() => {
-      chartData = { key: 'chart' };
-    });
+    it('sets pageLoading state', () => {
+      mutations[types.SET_PAGE_LOADING](state, pageLoading);
 
-    it('sets activeChart state', () => {
-      mutations[types.SET_ACTIVE_CHART](state, chartData);
-
-      expect(state.activeChart).toBe(chartData);
+      expect(state.pageLoading).toBe(pageLoading);
     });
   });
 });
