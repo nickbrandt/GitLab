@@ -82,34 +82,13 @@ describe API::MergeRequestApprovals do
           project.update_attribute(:disable_overriding_approvers_per_merge_request, false)
         end
 
-        it 'allows you to override approvals required' do
+        it 'allows you to set approvals_before_merge' do
           expect do
             post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
           end.to change { merge_request.reload.approvals_before_merge }.from(nil).to(5)
 
           expect(response).to have_gitlab_http_status(201)
           expect(json_response['approvals_required']).to eq(5)
-        end
-
-        context 'when project approvals are zero' do
-          before do
-            project.update!(approvals_before_merge: 0)
-          end
-
-          it 'does not include an error in the response' do
-            expect do
-              post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 0 }
-            end.to change {merge_request.reload.approvals_before_merge}.from(nil).to(0)
-            expect(json_response['message']).to eq(nil)
-          end
-        end
-
-        it 'does not allow approvals required under what the project requires' do
-          expect do
-            post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 1 }
-          end.not_to change { merge_request.reload.approvals_before_merge }
-
-          expect(response).to have_gitlab_http_status(400)
         end
       end
 
@@ -118,7 +97,7 @@ describe API::MergeRequestApprovals do
           project.update_attribute(:disable_overriding_approvers_per_merge_request, true)
         end
 
-        it 'does not allow you to override approvals required' do
+        it 'does not allow you to set approvals_before_merge' do
           expect do
             post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
           end.not_to change { merge_request.reload.approvals_before_merge }
@@ -544,32 +523,19 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
   end
 
   describe 'POST :id/merge_requests/:merge_request_iid/approvals' do
-    shared_examples_for 'user allowed to override approvals required' do
+    shared_examples_for 'user allowed to override approvals_before_merge' do
       context 'when disable_overriding_approvers_per_merge_request is false on the project' do
         before do
           project.update(disable_overriding_approvers_per_merge_request: false)
         end
 
-        it 'allows you to override approvals required' do
+        it 'allows you to set approvals required' do
           expect do
             post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
           end.to change { merge_request.reload.approvals_before_merge }.from(nil).to(5)
 
           expect(response).to have_gitlab_http_status(201)
           expect(json_response['approvals_required']).to eq(5)
-        end
-
-        context 'when project approvals are zero' do
-          before do
-            project.update!(approvals_before_merge: 0)
-          end
-
-          it 'does not include an error in the response' do
-            expect do
-              post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 0 }
-            end.to change {merge_request.reload.approvals_before_merge}.from(nil).to(0)
-            expect(json_response['message']).to eq(nil)
-          end
         end
       end
 
@@ -578,7 +544,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
           project.update(disable_overriding_approvers_per_merge_request: true)
         end
 
-        it 'does not allow you to override approvals required' do
+        it 'does not allow you to set approvals_before_merge' do
           expect do
             post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
           end.not_to change { merge_request.reload.approvals_before_merge }
@@ -599,14 +565,14 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
     end
 
     context 'as a project admin' do
-      it_behaves_like 'user allowed to override approvals required' do
+      it_behaves_like 'user allowed to override approvals_before_merge' do
         let(:current_user) { user }
         let(:expected_approver_group_size) { 0 }
       end
     end
 
     context 'as a global admin' do
-      it_behaves_like 'user allowed to override approvals required' do
+      it_behaves_like 'user allowed to override approvals_before_merge' do
         let(:current_user) { admin }
         let(:expected_approver_group_size) { 1 }
       end

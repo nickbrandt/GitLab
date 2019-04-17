@@ -46,7 +46,7 @@ module Approvable
   end
 
   def approvals_required
-    approvals_before_merge || target_project.approvals_before_merge
+    [approvals_before_merge.to_i, target_project.approvals_before_merge.to_i].max
   end
 
   def approvals_before_merge
