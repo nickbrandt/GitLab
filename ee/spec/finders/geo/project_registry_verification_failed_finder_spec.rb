@@ -2,10 +2,8 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectRegistryVerificationFailedFinder, :geo do
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe '#execute', :delete do
+describe Geo::ProjectRegistryVerificationFailedFinder, :geo, :geo_fdw do
+  describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
     let(:group_2) { create(:group) }
@@ -21,10 +19,6 @@ describe Geo::ProjectRegistryVerificationFailedFinder, :geo do
     let!(:registry_wiki_verification_failed_broken_shard) { create(:geo_project_registry, :repository_verified, :wiki_verification_failed, project: project_4) }
     let!(:registry_repository_verification_failed_broken_shard) { create(:geo_project_registry, :repository_verification_failed, :wiki_verified, project: project_5) }
     let!(:registry_verified) { create(:geo_project_registry, :repository_verified, :wiki_verified) }
-
-    before do
-      skip('FDW is not configured') unless Gitlab::Geo::Fdw.enabled?
-    end
 
     context 'with repository type' do
       subject { described_class.new(current_node: node, type: :repository) }

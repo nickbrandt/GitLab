@@ -1,8 +1,6 @@
 require 'spec_helper'
 
-# Disable transactions via :delete method because a foreign table
-# can't see changes inside a transaction of a different connection.
-describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cache do
+describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -15,15 +13,11 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
     stub_current_geo_node(secondary)
   end
 
-  shared_examples '#perform' do |skip_tests|
+  shared_examples '#perform' do
     let!(:restricted_group) { create(:group) }
 
     let!(:unsynced_project_in_restricted_group) { create(:project, group: restricted_group) }
     let!(:unsynced_project) { create(:project) }
-
-    before do
-      skip('FDW is not configured') if skip_tests
-    end
 
     before do
       stub_exclusive_lease(renew: true)
@@ -291,9 +285,8 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
     end
   end
 
-  describe 'when PostgreSQL FDW is available', :geo do
-    # Skip if FDW isn't activated on this database
-    it_behaves_like '#perform', Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
+  describe 'when PostgreSQL FDW is available', :geo, :geo_fdw do
+    it_behaves_like '#perform'
   end
 
   describe 'when PostgreSQL FDW is not enabled', :geo do
@@ -301,6 +294,6 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
       allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
     end
 
-    it_behaves_like '#perform', false
+    it_behaves_like '#perform'
   end
 end

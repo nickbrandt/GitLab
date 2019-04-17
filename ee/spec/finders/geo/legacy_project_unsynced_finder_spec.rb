@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Geo::LegacyProjectUnsyncedFinder, :geo do
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
   describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }

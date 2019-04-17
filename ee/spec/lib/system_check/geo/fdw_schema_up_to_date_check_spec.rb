@@ -36,7 +36,7 @@ describe SystemCheck::Geo::FdwSchemaUpToDateCheck, :geo do
     end
   end
 
-  context 'with functional FDW environment', :geo_tracking_db do
+  context 'with functional FDW environment', :geo_fdw do
     it 'returns true' do
       expect(subject.check?).to be_truthy
     end

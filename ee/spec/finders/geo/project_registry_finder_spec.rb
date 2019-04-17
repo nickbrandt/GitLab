@@ -409,13 +409,7 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  context 'FDW', :delete do
-    before do
-      skip('FDW is not configured') if Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
-    end
-
+  context 'FDW', :geo_fdw do
     context 'with use_fdw_queries_for_selective_sync disabled' do
       before do
         stub_feature_flags(use_fdw_queries_for_selective_sync: false)
@@ -441,42 +435,42 @@ describe Geo::ProjectRegistryFinder, :geo do
     include_examples 'counts all the things', 'legacy'
   end
 
-  describe '#find_unsynced_projects', :delete do
+  describe '#find_unsynced_projects', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectUnsyncedFinder,
       Geo::ProjectUnsyncedFinder,
       :find_unsynced_projects, [shard_name: 'default', batch_size: 100]
   end
 
-  describe '#find_projects_updated_recently', :delete do
+  describe '#find_projects_updated_recently', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectUpdatedRecentlyFinder,
       Geo::ProjectUpdatedRecentlyFinder,
       :find_projects_updated_recently, [shard_name: 'default', batch_size: 100]
   end
 
-  describe '#find_failed_project_registries', :delete do
+  describe '#find_failed_project_registries', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectRegistrySyncFailedFinder,
       Geo::ProjectRegistrySyncFailedFinder,
       :find_failed_project_registries, ['repository']
   end
 
-  describe '#find_registries_to_verify', :delete do
+  describe '#find_registries_to_verify', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectRegistryPendingVerificationFinder,
       Geo::ProjectRegistryPendingVerificationFinder,
       :find_registries_to_verify, [shard_name: 'default', batch_size: 100]
   end
 
-  describe '#find_verification_failed_project_registries', :delete do
+  describe '#find_verification_failed_project_registries', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectRegistryVerificationFailedFinder,
       Geo::ProjectRegistryVerificationFailedFinder,
       :find_verification_failed_project_registries, ['repository']
   end
 
-  describe '#find_checksum_mismatch_project_registries', :delete do
+  describe '#find_checksum_mismatch_project_registries', :geo_fdw do
     include_examples 'delegates to the proper finder',
       Geo::LegacyProjectRegistryMismatchFinder,
       Geo::ProjectRegistryMismatchFinder,

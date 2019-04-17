@@ -8,13 +8,7 @@ RSpec.describe Geo::Fdw::GeoNode, :geo, type: :model do
     it { is_expected.to have_many(:namespaces).class_name('Geo::Fdw::Namespace').through(:geo_node_namespace_links) }
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe '#projects', :delete do
-    before do
-      skip('FDW is not configured') unless Gitlab::Geo::Fdw.enabled?
-    end
-
+  describe '#projects', :geo_fdw do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
     let(:group_2) { create(:group) }
@@ -50,11 +44,7 @@ RSpec.describe Geo::Fdw::GeoNode, :geo, type: :model do
 
   # Disable transactions via :delete method because a foreign table
   # can't see changes inside a transaction of a different connection.
-  describe '#project_registries', :delete do
-    before do
-      skip('FDW is not configured') unless Gitlab::Geo::Fdw.enabled?
-    end
-
+  describe '#project_registries', :geo_fdw do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
     let(:group_2) { create(:group) }

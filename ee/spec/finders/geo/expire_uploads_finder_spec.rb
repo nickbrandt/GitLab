@@ -5,13 +5,7 @@ describe Geo::ExpireUploadsFinder, :geo do
 
   let(:project) { create(:project) }
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  context 'FDW', :delete do
-    before do
-      skip('FDW is not configured') if Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
-    end
-
+  context 'FDW', :geo_fdw do
     describe '#find_project_uploads' do
       context 'filtering per project uploads' do
         it 'returns only objects associated with the project' do
