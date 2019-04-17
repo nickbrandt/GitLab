@@ -1,67 +1,99 @@
 require 'spec_helper'
 
 describe MergeRequestPresenter do
-  let(:resource) { create :merge_request, source_project: project }
-  let!(:project) { create(:project, :repository) }
-  let!(:user) { project.creator }
+  using RSpec::Parameterized::TableSyntax
+
+  let(:merge_request) { create(:merge_request, source_project: project) }
+  let(:project) { create(:project, :repository) }
+  let(:user) { project.creator }
+  let(:approval_feature_available) { true }
 
   before do
     stub_config_setting(relative_url_root: '/gitlab')
+    stub_licensed_features(merge_request_approvers: approval_feature_available)
+  end
+
+  shared_examples 'is nil when needed' do
+    where(:approval_feature_available, :with_iid) do
+      false | false
+      false | true
+      true  | false
+    end
+
+    with_them do
+      before do
+        merge_request.iid = nil unless with_iid
+      end
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#approvals_path' do
-    subject { described_class.new(resource, current_user: user).approvals_path }
+    subject { described_class.new(merge_request, current_user: user).approvals_path }
 
-    it 'returns path' do
-      is_expected.to eq("/#{resource.project.full_path}/merge_requests/#{resource.iid}/approvals")
-    end
+    it_behaves_like 'is nil when needed'
+
+    it { is_expected.to eq(expose_url("/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}/approvals")) }
   end
 
   describe '#api_approvals_path' do
-    subject { described_class.new(resource, current_user: user).api_approvals_path }
+    subject { described_class.new(merge_request, current_user: user).api_approvals_path }
 
-    it 'returns path' do
-      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approvals"))
-    end
+    it_behaves_like 'is nil when needed'
+
+    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approvals")) }
   end
 
   describe '#api_approval_settings_path' do
-    subject { described_class.new(resource, current_user: user).api_approval_settings_path }
+    subject { described_class.new(merge_request, current_user: user).api_approval_settings_path }
 
-    it 'returns path' do
-      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approval_settings"))
+    it_behaves_like 'is nil when needed'
+
+    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approval_settings")) }
+  end
+
+  describe '#api_project_approval_settings_path' do
+    subject { described_class.new(merge_request, current_user: user).api_project_approval_settings_path }
+
+    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/approval_settings")) }
+
+    context "when approvals not available" do
+      let(:approval_feature_available) { false }
+
+      it { is_expected.to be_nil }
     end
   end
 
   describe '#api_approve_path' do
-    subject { described_class.new(resource, current_user: user).api_approve_path }
+    subject { described_class.new(merge_request, current_user: user).api_approve_path }
 
-    it 'returns path' do
-      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approve"))
-    end
+    it_behaves_like 'is nil when needed'
+
+    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approve")) }
   end
 
   describe '#api_unapprove_path' do
-    subject { described_class.new(resource, current_user: user).api_unapprove_path }
+    subject { described_class.new(merge_request, current_user: user).api_unapprove_path }
 
-    it 'returns path' do
-      is_expected.to eq(expose_url("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/unapprove"))
-    end
+    it_behaves_like 'is nil when needed'
+
+    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
   end
 
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
-    let!(:approver) { create(:approver, target: resource) }
+    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
+    let!(:approver) { create(:approver, target: merge_request) }
 
     before do
       stub_feature_flags(approval_rules: false)
-      resource.approvals.create!(user: approver.user)
+      merge_request.approvals.create!(user: approver.user)
     end
 
-    subject { described_class.new(resource, current_user: user).approvers_left }
+    subject { described_class.new(merge_request, current_user: user).approvers_left }
 
     it { is_expected.to match_array(public_approver_group.users) }
 
@@ -81,15 +113,15 @@ describe MergeRequestPresenter do
   describe '#approvers_left with approval_rule enabled' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
-    let!(:approver) { create(:approver, target: resource) }
+    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
+    let!(:approver) { create(:approver, target: merge_request) }
 
     before do
-      resource.approvals.create!(user: approver.user)
+      merge_request.approvals.create!(user: approver.user)
     end
 
-    subject { described_class.new(resource, current_user: user).approvers_left }
+    subject { described_class.new(merge_request, current_user: user).approvers_left }
 
     it 'contains all approvers' do
       approvers = public_approver_group.users + private_approver_group.users - [user]
@@ -101,10 +133,10 @@ describe MergeRequestPresenter do
   describe '#overall_approver_groups' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
+    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
 
-    subject { described_class.new(resource, current_user: user).overall_approver_groups }
+    subject { described_class.new(merge_request, current_user: user).overall_approver_groups }
 
     it { is_expected.to match_array([public_approver_group]) }
 
@@ -120,11 +152,11 @@ describe MergeRequestPresenter do
   describe '#all_approvers_including_groups' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
-    let!(:approver) { create(:approver, target: resource) }
+    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
+    let!(:approver) { create(:approver, target: merge_request) }
 
-    subject { described_class.new(resource, current_user: user).all_approvers_including_groups }
+    subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
 
     before do
       stub_feature_flags(approval_rules: false)
@@ -148,11 +180,11 @@ describe MergeRequestPresenter do
   describe '#all_approvers_including_groups with approval_rule enabled' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
-    let!(:approver) { create(:approver, target: resource) }
+    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
+    let!(:approver) { create(:approver, target: merge_request) }
 
-    subject { described_class.new(resource, current_user: user).all_approvers_including_groups }
+    subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
 
     it do
       approvers = [public_approver_group.users, private_approver_group.users, approver.user].flatten - [user]
