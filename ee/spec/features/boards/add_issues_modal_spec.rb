@@ -23,7 +23,7 @@ describe 'Issue Boards add issue modal', :js do
   it 'shows weight filter' do
     click_button('Add issues')
     wait_for_requests
-    find('.add-issues-search .filtered-search').click
+    find('.add-issues-modal .filtered-search').click
 
     expect(page.find('.filter-dropdown')).to have_content 'weight'
   end
