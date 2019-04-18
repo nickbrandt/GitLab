@@ -4,7 +4,7 @@ import { GlTooltipDirective } from '@gitlab/ui';
 import { sprintf, __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
-import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
+import issueCardInner from 'ee_else_ce/boards/mixins/issue_card_inner';
 import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import eventHub from '../eventhub';
 import IssueDueDate from './issue_due_date.vue';
@@ -19,13 +19,14 @@ export default {
     UserAvatarLink,
     TooltipOnTruncate,
     IssueDueDate,
-    IssueCardWeight,
     IssueTimeEstimate,
+    IssueCardWeight: () => import('ee_component/boards/components/issue_card_weight.vue'),
     IssueCardInnerScopedLabel,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [issueCardInner],
   props: {
     issue: {
       type: Object,
@@ -134,14 +135,6 @@ export default {
       if (!this.updateFilters) return;
       const labelTitle = encodeURIComponent(label.title);
       const filter = `label_name[]=${labelTitle}`;
-
-      this.applyFilter(filter);
-    },
-    filterByWeight(weight) {
-      if (!this.updateFilters) return;
-
-      const issueWeight = encodeURIComponent(weight);
-      const filter = `weight=${issueWeight}`;
 
       this.applyFilter(filter);
     },

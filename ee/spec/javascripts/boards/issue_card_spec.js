@@ -1,15 +1,14 @@
 /* global ListLabel */
-/* global ListIssue */
 
 import Vue from 'vue';
 import _ from 'underscore';
 
 import '~/vue_shared/models/label';
 import '~/vue_shared/models/assignee';
-import '~/boards/models/issue';
 import '~/boards/models/list';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import { listObj } from 'spec/boards/mock_data';
+import ListIssueEE from 'ee/boards/models/issue';
 
 describe('Issue card component', () => {
   const label1 = new ListLabel({
@@ -27,7 +26,7 @@ describe('Issue card component', () => {
     setFixtures('<div class="test-container"></div>');
 
     list = listObj;
-    issue = new ListIssue({
+    issue = new ListIssueEE({
       title: 'Testing',
       id: 1,
       iid: 1,
@@ -36,6 +35,7 @@ describe('Issue card component', () => {
       assignees: [],
       reference_path: '#1',
       real_path: '/test/1',
+      weight: 1,
     });
 
     component = new Vue({
@@ -110,6 +110,12 @@ describe('Issue card component', () => {
           done();
         })
         .catch(done.fail);
+    });
+  });
+
+  describe('weights', () => {
+    it('shows weight component', () => {
+      expect(component.$el.querySelector('.board-card-weight')).not.toBeNull();
     });
   });
 });
