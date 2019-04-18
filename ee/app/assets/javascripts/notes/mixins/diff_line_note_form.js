@@ -3,6 +3,7 @@ import { TEXT_DIFF_POSITION_TYPE, IMAGE_DIFF_POSITION_TYPE } from '~/diffs/const
 import { getDraftReplyFormData, getDraftFormData } from 'ee/batch_comments/utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
+import { clearDraft } from '~/lib/utils/autosave';
 
 export default {
   computed: {
@@ -78,7 +79,13 @@ export default {
         fileHash: this.diffFileHash,
       });
       this.$nextTick(() => {
-        this.resetAutoSave();
+        if (this.autosaveKey) {
+          clearDraft(this.autosaveKey);
+        } else {
+          // TODO: remove the following after replacing the autosave mixin
+          // https://gitlab.com/gitlab-org/gitlab-ce/issues/60587
+          this.resetAutoSave();
+        }
       });
     },
     showDraft(replyId) {
