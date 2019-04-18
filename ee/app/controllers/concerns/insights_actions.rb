@@ -65,7 +65,7 @@ module InsightsActions
     case chart_type_param
     when 'stacked-bar', 'line'
       Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: period_param, period_limit: period_limit, labels: collection_labels_param)
-    when 'bar'
+    when 'bar', 'pie'
       if period_param
         Gitlab::Insights::Reducers::CountPerPeriodReducer.reduce(issuables, period: period_param, period_limit: period_limit)
       else
@@ -84,7 +84,7 @@ module InsightsActions
     case chart_type_param
     when 'stacked-bar'
       Gitlab::Insights::Serializers::Chartjs::MultiSeriesSerializer
-    when 'bar'
+    when 'bar', 'pie'
       if period_param
         Gitlab::Insights::Serializers::Chartjs::BarTimeSeriesSerializer
       else

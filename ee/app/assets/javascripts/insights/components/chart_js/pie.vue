@@ -7,10 +7,10 @@ export default {
   computed: {
     config() {
       return {
-        type: 'bar',
+        type: 'pie',
         data: this.data,
         options: {
-          ...chartOptions.barChartOptions(),
+          ...chartOptions.pieChartOptions(),
           ...this.title(),
           ...this.commonOptions(),
         },
@@ -21,6 +21,6 @@ export default {
 </script>
 <template>
   <div class="chart-canvas-wrapper">
-    <canvas ref="insightsChart" class="bar" height="300"></canvas>
+    <canvas ref="insightsChart" class="pie" height="180"></canvas>
   </div>
 </template>
