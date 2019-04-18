@@ -1,0 +1,5 @@
+---
+title: Fix approval rules when used with relative url root
+merge_request: 10819
+author:
+type: fixed

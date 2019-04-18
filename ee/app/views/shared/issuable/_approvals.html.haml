@@ -12,7 +12,7 @@
     Approvers
   .col-sm-10
     - if Feature.enabled?(:approval_rules, @target_project, default_enabled: true)
-      = render 'shared/issuable/approvals_multiple_rule', issuable: issuable
+      = render 'shared/issuable/approvals_multiple_rule', issuable: issuable, presenter: presenter
     - else
       = render 'shared/issuable/approvals_single_rule', issuable: issuable, presenter: presenter, form: form
     - if can_update_approvers
