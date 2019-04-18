@@ -1,0 +1,6 @@
+- show_label_epics_link = defined?(@group) && @group&.feature_available?(:epics)
+
+- if show_label_epics_link
+  &middot;
+  %li.label-link-item.inline
+    = link_to 'Epics', group_epics_path(@group, label_name:[label.name])
