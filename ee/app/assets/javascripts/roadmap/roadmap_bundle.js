@@ -12,7 +12,7 @@ import { getTimeframeForPreset, getEpicsPathForPreset } from './utils/roadmap_ut
 
 import createStore from './store';
 
-import roadmapApp from './components/app.vue';
+import roadmapApp from './components/roadmap_app.vue';
 
 Vue.use(Translate);
 
