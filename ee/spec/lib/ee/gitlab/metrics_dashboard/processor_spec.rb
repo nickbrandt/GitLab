@@ -12,11 +12,14 @@ describe Gitlab::MetricsDashboard::Processor do
     let(:dashboard) { described_class.new(*process_params).process }
 
     context 'when the dashboard references persisted metrics with alerts' do
-      let!(:alert) { create( :prometheus_alert, project: project, prometheus_metric: persisted_metric ) }
+      let!(:alert) { create(:prometheus_alert, project: project, prometheus_metric: persisted_metric) }
 
       shared_examples_for 'has saved alerts' do
         it 'includes an alert path' do
           target_metric = all_metrics.find { |metric| metric[:metric_id] == persisted_metric.id }
+
+          p PrometheusAlert.all
+          p target_metric
 
           expect(target_metric).to be_a Hash
           expect(target_metric).to include(:alert_path)
