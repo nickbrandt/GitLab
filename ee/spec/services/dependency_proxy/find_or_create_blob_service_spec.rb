@@ -39,7 +39,7 @@ describe DependencyProxy::FindOrCreateBlobService do
 
   context 'no such blob exists remotely' do
     before do
-      stub_blob_download_not_found(image, blob_sha)
+      stub_blob_download(image, blob_sha, 404)
     end
 
     it { is_expected.to be nil }

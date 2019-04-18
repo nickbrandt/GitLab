@@ -4,30 +4,58 @@ require 'spec_helper'
 
 describe Groups::DependencyProxyForContainersController do
   let(:group) { create(:group) }
+  let(:token_response) { { code: 200, body: 'abcd1234' } }
 
   before do
     allow(Gitlab.config.dependency_proxy)
       .to receive(:enabled).and_return(true)
 
     allow_any_instance_of(DependencyProxy::RequestTokenService)
-      .to receive(:execute).and_return('abcd1234')
+      .to receive(:execute).and_return(token_response)
   end
 
   describe 'GET #manifest' do
     let(:manifest) { { foo: 'bar' }.to_json }
+    let(:pull_response) { { code: 200, body: manifest } }
 
     before do
       allow_any_instance_of(DependencyProxy::PullManifestService)
-        .to receive(:execute).and_return(manifest)
+        .to receive(:execute).and_return(pull_response)
     end
 
-    it 'returns 200 with manifest file' do
-      enable_dependency_proxy
+    context 'feature enabled' do
+      before do
+        enable_dependency_proxy
+      end
 
-      get_manifest
+      context 'remote token request fails' do
+        let(:token_response) { { code: 503, body: 'Service Unavailable' } }
 
-      expect(response).to have_gitlab_http_status(200)
-      expect(response.body).to eq(manifest)
+        it 'proxies status from the remote token request' do
+          get_manifest
+
+          expect(response).to have_gitlab_http_status(503)
+          expect(response.body).to eq('Service Unavailable')
+        end
+      end
+
+      context 'remote manifest request fails' do
+        let(:pull_response) { { code: 400, body: '' } }
+
+        it 'proxies status from the remote manifest request' do
+          get_manifest
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(response.body).to be_empty
+        end
+      end
+
+      it 'returns 200 with manifest file' do
+        get_manifest
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.body).to eq(manifest)
+      end
     end
 
     it 'returns 404 when feature is disabled' do

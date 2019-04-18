@@ -10,7 +10,10 @@ module DependencyProxy
 
     def execute
       response = Gitlab::HTTP.get(manifest_url, headers: auth_headers)
-      response.body
+
+      to_response(response.code, response.body)
+    rescue Net::OpenTimeout, Net::ReadTimeout => exception
+      to_response(599, exception.message)
     end
 
     private

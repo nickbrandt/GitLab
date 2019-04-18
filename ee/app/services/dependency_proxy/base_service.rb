@@ -13,5 +13,12 @@ module DependencyProxy
         Authorization: "Bearer #{@token}"
       }
     end
+
+    def to_response(code, body)
+      {
+        code: code,
+        body: body
+      }
+    end
   end
 end

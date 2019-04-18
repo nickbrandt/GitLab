@@ -4,11 +4,12 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   include SendFileUpload
 
   before_action :ensure_feature_enabled!
+  before_action :ensure_token_granted!
 
   def manifest
-    output = DependencyProxy::PullManifestService.new(image, tag, token).execute
+    response = DependencyProxy::PullManifestService.new(image, tag, token).execute
 
-    render json: output
+    render status: response[:code], json: response[:body]
   end
 
   def blob
@@ -29,16 +30,22 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   end
 
   def token
-    @token ||= request_token
-  end
-
-  def request_token
-    DependencyProxy::RequestTokenService.new(image).execute
+    @token
   end
 
   def ensure_feature_enabled!
     render_404 unless Gitlab.config.dependency_proxy.enabled &&
         group.feature_available?(:dependency_proxy) &&
         group.dependency_proxy_setting&.enabled
+  end
+
+  def ensure_token_granted!
+    response = DependencyProxy::RequestTokenService.new(image).execute
+
+    if response[:code] == 200 and response[:body].present?
+      @token = response[:body]
+    else
+      render status: response[:code], json: response[:body]
+    end
   end
 end
