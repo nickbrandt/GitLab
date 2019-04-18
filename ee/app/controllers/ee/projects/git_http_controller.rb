@@ -60,11 +60,11 @@ module EE
       end
 
       def jwt_scope_valid?
-        decoded_authorization[:scope] == repository.full_path
+        decoded_authorization[:scope] == repository_full_path
       end
 
-      def repository
-        wiki? ? project.wiki.repository : project.repository
+      def repository_full_path
+        File.join(params[:namespace_id], project_path)
       end
 
       def decoded_authorization

@@ -1,0 +1,5 @@
+---
+title: Fix JWT token check when repository does not exist
+merge_request: 11033
+author:
+type: fixed
