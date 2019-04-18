@@ -82,6 +82,21 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  describe '.for_pipelines_with_sha' do
+    let(:project) { create(:project) }
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+    before do
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    end
+
+    subject(:occurrences) { described_class.for_pipelines_with_sha([pipeline]) }
+
+    it 'sets the sha' do
+      expect(occurrences.first.sha).to eq(pipeline.sha)
+    end
+  end
+
   describe '.count_by_day_and_severity' do
     let(:project) { create(:project) }
     let(:date_1) { Time.zone.parse('2018-11-11') }

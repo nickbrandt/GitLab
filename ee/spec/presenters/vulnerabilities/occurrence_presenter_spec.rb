@@ -1,0 +1,50 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe Vulnerabilities::OccurrencePresenter do
+  let(:presenter) { described_class.new(occurrence) }
+  let(:occurrence) { build_stubbed(:vulnerabilities_occurrence) }
+
+  describe '#blob_path' do
+    subject { presenter.blob_path }
+
+    context 'without a sha' do
+      it { is_expected.to be_blank }
+    end
+
+    context 'with a sha' do
+      before do
+        allow_any_instance_of(Vulnerabilities::Occurrence).to receive(:sha)
+          .and_return('abc')
+      end
+
+      context 'without start_line or end_line' do
+        before do
+          allow(presenter).to receive(:location)
+            .and_return({ 'file' => 'a.txt' })
+        end
+
+        it { is_expected.to end_with('a.txt') }
+      end
+
+      context 'with start_line only' do
+        before do
+          allow(presenter).to receive(:location)
+            .and_return({ 'file' => 'a.txt', 'start_line' => 1 })
+        end
+
+        it { is_expected.to end_with('#L1') }
+      end
+
+      context 'with start_line and end_line' do
+        before do
+          allow(presenter).to receive(:location)
+            .and_return({ 'file' => 'a.txt', 'start_line' => 1, 'end_line' => 2 })
+        end
+
+        it { is_expected.to end_with('#L1-2') }
+      end
+    end
+  end
+end
