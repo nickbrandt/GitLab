@@ -53,6 +53,7 @@ describe Vulnerabilities::OccurrenceEntity do
       expect(subject).to include(:scanner, :project, :identifiers)
       expect(subject).to include(:dismissal_feedback, :issue_feedback)
       expect(subject).to include(:description, :links, :location, :remediations, :solution)
+      expect(subject).to include(:blob_path)
     end
 
     context 'when not allowed to admin vulnerability feedback' do

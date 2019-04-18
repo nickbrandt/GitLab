@@ -4,6 +4,7 @@ module Vulnerabilities
   class Occurrence < ApplicationRecord
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
+    include Presentable
 
     self.table_name = "vulnerability_occurrences"
 
@@ -81,6 +82,12 @@ module Vulnerabilities
 
     scope :all_preloaded, -> do
       preload(:scanner, :identifiers, project: [:namespace, :project_feature])
+    end
+
+    def self.for_pipelines_with_sha(pipelines)
+      for_pipelines(pipelines)
+        .joins(:pipelines)
+        .select("vulnerability_occurrences.*, ci_pipelines.sha")
     end
 
     def self.for_pipelines(pipelines)

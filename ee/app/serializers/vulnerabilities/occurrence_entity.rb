@@ -23,6 +23,10 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
     expose :solution
   end
 
+  expose :blob_path do |occurrence|
+    occurrence.present.blob_path
+  end
+
   alias_method :occurrence, :object
 
   private

@@ -4,7 +4,7 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   HISTORY_RANGE = 3.months
 
   def index
-    vulnerabilities = found_vulnerabilities.ordered.page(params[:page])
+    vulnerabilities = found_vulnerabilities(:with_sha).ordered.page(params[:page])
 
     respond_to do |format|
       format.json do

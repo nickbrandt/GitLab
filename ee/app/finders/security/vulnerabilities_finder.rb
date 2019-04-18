@@ -54,7 +54,13 @@ module Security
     end
 
     def init_collection(scope)
-      scope == :all ? group.all_vulnerabilities : group.latest_vulnerabilities
+      if scope == :all
+        group.all_vulnerabilities
+      elsif scope == :with_sha
+        group.latest_vulnerabilities_with_sha
+      else
+        group.latest_vulnerabilities
+      end
     end
   end
 end
