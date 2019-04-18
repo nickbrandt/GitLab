@@ -21,6 +21,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
       has_many :draft_notes
+      has_one :merge_train
 
       validate :validate_approval_rule_source
 
@@ -51,6 +52,18 @@ module EE
       return false unless validate_merge_request_pipelines
 
       super
+    end
+
+    def get_on_train!(user)
+      create_merge_train!(user: user)
+    end
+
+    def get_off_train!
+      merge_train.destroy!
+    end
+
+    def on_train?
+      merge_train.present?
     end
 
     def allows_multiple_assignees?

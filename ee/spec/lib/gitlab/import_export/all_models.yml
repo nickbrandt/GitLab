@@ -14,6 +14,7 @@ merge_requests:
 - approver_groups
 - approved_by_users
 - draft_notes
+- merge_train
 ci_pipelines:
 - source_pipeline
 - source_bridge
@@ -81,6 +82,7 @@ project:
 - webide_pipelines
 - reviews
 - incident_management_setting
+- merge_trains
 prometheus_metrics:
 - project
 - prometheus_alerts
@@ -103,3 +105,6 @@ reviews:
 - notes
 incident_management_setting:
 - project
+merge_trains:
+- project
+- merge_request
