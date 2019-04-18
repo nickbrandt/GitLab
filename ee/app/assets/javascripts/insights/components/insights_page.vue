@@ -7,18 +7,20 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import InsightsChartError from './insights_chart_error.vue';
 import InsightsConfigWarning from './insights_config_warning.vue';
 
-import StackedBar from './chart_js/stacked_bar.vue';
 import Bar from './chart_js/bar.vue';
 import LineChart from './chart_js/line.vue';
+import Pie from './chart_js/pie.vue';
+import StackedBar from './chart_js/stacked_bar.vue';
 
 export default {
   components: {
     GlLoadingIcon,
     InsightsChartError,
     InsightsConfigWarning,
-    StackedBar,
     Bar,
     LineChart,
+    Pie,
+    StackedBar,
   },
   props: {
     queryEndpoint: {

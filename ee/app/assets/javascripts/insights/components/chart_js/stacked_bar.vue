@@ -3,9 +3,6 @@ import BaseChart from './insights_chart.vue';
 import * as chartOptions from '~/lib/utils/chart_utils';
 
 export default {
-  components: {
-    BaseChart,
-  },
   extends: BaseChart,
   computed: {
     config() {

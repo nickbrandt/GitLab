@@ -131,6 +131,7 @@ Supported values are:
 | ----- | ------- |
 | `bar` | ![Insights example bar chart](img/insights_example_bar_chart.png) |
 | `bar` (time series, i.e. when `group_by` is used) | ![Insights example bar time series chart](img/insights_example_bar_time_series_chart.png) |
+| `pie` | ![Insights example pie chart](img/insights_example_pie_chart.png) |
 | `line` | ![Insights example stacked bar chart](img/insights_example_line_chart.png) |
 | `stacked-bar` | ![Insights example stacked bar chart](img/insights_example_stacked_bar_chart.png) |
 

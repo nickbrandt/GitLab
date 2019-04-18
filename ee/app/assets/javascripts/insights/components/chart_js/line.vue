@@ -2,9 +2,6 @@
 import BaseChart from './insights_chart.vue';
 
 export default {
-  components: {
-    BaseChart,
-  },
   extends: BaseChart,
   computed: {
     config() {
