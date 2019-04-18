@@ -1,0 +1,5 @@
+---
+title: 'Geo: Fix broken button to delete orphaned upload registries through Admin'
+merge_request: 11156
+author:
+type: fixed
