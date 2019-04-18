@@ -2,31 +2,41 @@
 
 module DependencyProxy
   class DownloadBlobService < DependencyProxy::BaseService
-    DownloadError = Class.new(StandardError)
+    class DownloadError < StandardError
+      attr_reader :http_status
 
-    def initialize(image, blob_sha, token, file_path)
+      def initialize(message, http_status)
+        @http_status = http_status
+
+        super(message)
+      end
+    end
+
+    def initialize(image, blob_sha, token)
       @image = image
       @blob_sha = blob_sha
       @token = token
-      @file_path = file_path
+      @temp_file = Tempfile.new
     end
 
     def execute
-      File.open(@file_path, "wb") do |file|
+      File.open(@temp_file.path, "wb") do |file|
         Gitlab::HTTP.get(blob_url, headers: auth_headers, stream_body: true) do |fragment|
           if [301, 302, 307].include?(fragment.code)
             # do nothing
           elsif fragment.code == 200
             file.write(fragment)
           else
-            raise DownloadError, "Non-success status code while downloading a blob. #{fragment.code}"
+            raise DownloadError.new('Non-success response code on downloading blob fragment', fragment.code)
           end
         end
       end
 
-      true
-    rescue DownloadError
-      false
+      success(file: @temp_file)
+    rescue DownloadError => exception
+      error(exception.message, exception.http_status)
+    rescue Timeout::Error => exception
+      error(exception.message, 599)
     end
 
     private

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DependencyProxy
-  class BaseService
+  class BaseService < ::BaseService
     private
 
     def registry
@@ -11,13 +11,6 @@ module DependencyProxy
     def auth_headers
       {
         Authorization: "Bearer #{@token}"
-      }
-    end
-
-    def to_response(code, body)
-      {
-        code: code,
-        body: body
       }
     end
   end

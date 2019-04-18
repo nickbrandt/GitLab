@@ -14,8 +14,8 @@ describe DependencyProxy::RequestTokenService do
       stub_registry_auth(image, token)
     end
 
-    it { expect(subject[:code]).to eq(200) }
-    it { expect(subject[:body]).to eq(token) }
+    it { expect(subject[:status]).to eq(:success) }
+    it { expect(subject[:token]).to eq(token) }
   end
 
   context 'remote request is not found' do
@@ -23,8 +23,9 @@ describe DependencyProxy::RequestTokenService do
       stub_registry_auth(image, token, 404)
     end
 
-    it { expect(subject[:code]).to eq(404) }
-    it { expect(subject[:body]).to eq('Expected 200 response code for an access token') }
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(404) }
+    it { expect(subject[:message]).to eq('Expected 200 response code for an access token') }
   end
 
   context 'failed to parse response body' do
@@ -32,8 +33,9 @@ describe DependencyProxy::RequestTokenService do
       stub_registry_auth(image, token, 200, 'dasd1321: wow')
     end
 
-    it { expect(subject[:code]).to eq(500) }
-    it { expect(subject[:body]).to eq('Failed to parse a response body for an access token') }
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(500) }
+    it { expect(subject[:message]).to eq('Failed to parse a response body for an access token') }
   end
 
   context 'net timeout exception' do
@@ -43,7 +45,8 @@ describe DependencyProxy::RequestTokenService do
       stub_request(:any, auth_link).to_timeout
     end
 
-    it { expect(subject[:code]).to eq(599) }
-    it { expect(subject[:body]).to eq('execution expired') }
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(599) }
+    it { expect(subject[:message]).to eq('execution expired') }
   end
 end

@@ -23,8 +23,9 @@ describe DependencyProxy::FindOrCreateBlobService do
     end
 
     it 'downloads blob from remote registry if there is no cached one' do
-      is_expected.to be_a(DependencyProxy::Blob)
-      is_expected.to be_persisted
+      expect(subject[:status]).to eq(:success)
+      expect(subject[:blob]).to be_a(DependencyProxy::Blob)
+      expect(subject[:blob]).to be_persisted
     end
   end
 
@@ -32,8 +33,9 @@ describe DependencyProxy::FindOrCreateBlobService do
     let(:blob_sha) { blob.file_name.sub('.gz', '') }
 
     it 'uses cached blob instead of downloading one' do
-      is_expected.to be_a(DependencyProxy::Blob)
-      is_expected.to eq(blob)
+      expect(subject[:status]).to eq(:success)
+      expect(subject[:blob]).to be_a(DependencyProxy::Blob)
+      expect(subject[:blob]).to eq(blob)
     end
   end
 
@@ -42,6 +44,10 @@ describe DependencyProxy::FindOrCreateBlobService do
       stub_blob_download(image, blob_sha, 404)
     end
 
-    it { is_expected.to be nil }
+    it 'returns error message and http status' do
+      expect(subject[:status]).to eq(:error)
+      expect(subject[:message]).to eq('Failed to download the blob')
+      expect(subject[:http_status]).to eq(404)
+    end
   end
 end

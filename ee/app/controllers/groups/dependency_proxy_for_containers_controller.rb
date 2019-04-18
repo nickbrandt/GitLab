@@ -6,17 +6,27 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   before_action :ensure_feature_enabled!
   before_action :ensure_token_granted!
 
-  def manifest
-    response = DependencyProxy::PullManifestService.new(image, tag, token).execute
+  attr_reader :token
 
-    render status: response[:code], json: response[:body]
+  def manifest
+    result = DependencyProxy::PullManifestService.new(image, tag, token).execute
+
+    if result[:status] == :success
+      render json: result[:manifest]
+    else
+      render status: result[:http_status], json: result[:message]
+    end
   end
 
   def blob
-    blob = DependencyProxy::FindOrCreateBlobService
+    result = DependencyProxy::FindOrCreateBlobService
       .new(group, image, token, params[:sha]).execute
 
-    send_upload(blob.file)
+    if result[:status] == :success
+      send_upload(result[:blob].file)
+    else
+      head result[:http_status]
+    end
   end
 
   private
@@ -29,10 +39,6 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
     params[:tag]
   end
 
-  def token
-    @token
-  end
-
   def ensure_feature_enabled!
     render_404 unless Gitlab.config.dependency_proxy.enabled &&
         group.feature_available?(:dependency_proxy) &&
@@ -40,12 +46,12 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   end
 
   def ensure_token_granted!
-    response = DependencyProxy::RequestTokenService.new(image).execute
+    result = DependencyProxy::RequestTokenService.new(image).execute
 
-    if response[:code] == 200 and response[:body].present?
-      @token = response[:body]
+    if result[:status] == :success
+      @token = result[:token]
     else
-      render status: response[:code], json: response[:body]
+      render status: result[:http_status], json: result[:message]
     end
   end
 end

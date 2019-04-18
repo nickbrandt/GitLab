@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Groups::DependencyProxyForContainersController do
   let(:group) { create(:group) }
-  let(:token_response) { { code: 200, body: 'abcd1234' } }
+  let(:token_response) { { status: :success, token: 'abcd1234' } }
 
   before do
     allow(Gitlab.config.dependency_proxy)
@@ -16,7 +16,7 @@ describe Groups::DependencyProxyForContainersController do
 
   describe 'GET #manifest' do
     let(:manifest) { { foo: 'bar' }.to_json }
-    let(:pull_response) { { code: 200, body: manifest } }
+    let(:pull_response) { { status: :success, manifest: manifest } }
 
     before do
       allow_any_instance_of(DependencyProxy::PullManifestService)
@@ -29,7 +29,13 @@ describe Groups::DependencyProxyForContainersController do
       end
 
       context 'remote token request fails' do
-        let(:token_response) { { code: 503, body: 'Service Unavailable' } }
+        let(:token_response) do
+          {
+            status: :error,
+            http_status: 503,
+            message: 'Service Unavailable'
+          }
+        end
 
         it 'proxies status from the remote token request' do
           get_manifest
@@ -40,7 +46,13 @@ describe Groups::DependencyProxyForContainersController do
       end
 
       context 'remote manifest request fails' do
-        let(:pull_response) { { code: 400, body: '' } }
+        let(:pull_response) do
+          {
+            status: :error,
+            http_status: 400,
+            message: ''
+          }
+        end
 
         it 'proxies status from the remote manifest request' do
           get_manifest
@@ -72,15 +84,33 @@ describe Groups::DependencyProxyForContainersController do
   describe 'GET #blob' do
     let(:blob) { create(:dependency_proxy_blob) }
     let(:blob_sha) { blob.file_name.sub('.gz', '') }
+    let(:blob_response) { { status: :success, blob: blob } }
 
     before do
       allow_any_instance_of(DependencyProxy::FindOrCreateBlobService)
-        .to receive(:execute).and_return(blob)
+        .to receive(:execute).and_return(blob_response)
     end
 
     context 'feature enabled' do
       before do
         enable_dependency_proxy
+      end
+
+      context 'remote blob request fails' do
+        let(:blob_response) do
+          {
+            status: :error,
+            http_status: 400,
+            message: ''
+          }
+        end
+
+        it 'proxies status from the remote blob request' do
+          get_blob
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(response.body).to be_empty
+        end
       end
 
       it 'sends a file' do

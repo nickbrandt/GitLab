@@ -9,15 +9,15 @@ module DependencyProxy
     def execute
       response = Gitlab::HTTP.get(auth_url)
 
-      if response.code == 200
-        to_response(200, JSON.parse(response.body)['token'])
+      if response.success?
+        success(token: JSON.parse(response.body)['token'])
       else
-        to_response(response.code, 'Expected 200 response code for an access token')
+        error('Expected 200 response code for an access token', response.code)
       end
-    rescue Net::OpenTimeout, Net::ReadTimeout => exception
-      to_response(599, exception.message)
+    rescue Timeout::Error => exception
+      error(exception.message, 599)
     rescue JSON::ParserError
-      to_response(500, 'Failed to parse a response body for an access token')
+      error('Failed to parse a response body for an access token', 500)
     end
 
     private

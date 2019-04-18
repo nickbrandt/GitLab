@@ -7,15 +7,38 @@ describe DependencyProxy::DownloadBlobService do
   let(:image) { 'alpine' }
   let(:token) { Digest::SHA256.hexdigest('123') }
   let(:blob_sha) { Digest::SHA256.hexdigest('ruby:2.3.9') }
-  let(:file) { Tempfile.new }
 
-  subject { described_class.new(image, blob_sha, token, file.path) }
+  subject { described_class.new(image, blob_sha, token).execute }
 
-  before do
-    stub_blob_download(image, blob_sha)
+  context 'remote request is successful' do
+    before do
+      stub_blob_download(image, blob_sha)
+    end
+
+    it { expect(subject[:status]).to eq(:success) }
+    it { expect(subject[:file]).to be_a(Tempfile) }
+    it { expect(subject[:file].size).to eq(6) }
   end
 
-  it 'downloads blob and writes it into the file' do
-    expect { subject.execute }.to change { file.size }.from(0).to(6)
+  context 'remote request is not found' do
+    before do
+      stub_blob_download(image, blob_sha, 404)
+    end
+
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(404) }
+    it { expect(subject[:message]).to eq('Non-success response code on downloading blob fragment') }
+  end
+
+  context 'net timeout exception' do
+    before do
+      blob_url = DependencyProxy::Registry.blob_url(image, blob_sha)
+
+      stub_request(:get, blob_url).to_timeout
+    end
+
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(599) }
+    it { expect(subject[:message]).to eq('execution expired') }
   end
 end

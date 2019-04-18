@@ -16,8 +16,8 @@ describe DependencyProxy::PullManifestService do
       stub_manifest_download(image, tag)
     end
 
-    it { expect(subject[:code]).to eq(200) }
-    it { expect(subject[:body]).to eq(manifest) }
+    it { expect(subject[:status]).to eq(:success) }
+    it { expect(subject[:manifest]).to eq(manifest) }
   end
 
   context 'remote request is not found' do
@@ -25,8 +25,9 @@ describe DependencyProxy::PullManifestService do
       stub_manifest_download(image, tag, 404, 'Not found')
     end
 
-    it { expect(subject[:code]).to eq(404) }
-    it { expect(subject[:body]).to eq('Not found') }
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(404) }
+    it { expect(subject[:message]).to eq('Not found') }
   end
 
   context 'net timeout exception' do
@@ -36,7 +37,8 @@ describe DependencyProxy::PullManifestService do
       stub_request(:get, manifest_link).to_timeout
     end
 
-    it { expect(subject[:code]).to eq(599) }
-    it { expect(subject[:body]).to eq('execution expired') }
+    it { expect(subject[:status]).to eq(:error) }
+    it { expect(subject[:http_status]).to eq(599) }
+    it { expect(subject[:message]).to eq('execution expired') }
   end
 end

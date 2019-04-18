@@ -14,19 +14,32 @@ module DependencyProxy
       blob = @group.dependency_proxy_blobs.find_or_build(file_name)
 
       unless blob.persisted?
-        temp_file = Tempfile.new
+        result = DependencyProxy::DownloadBlobService
+          .new(@image, @blob_sha, @token).execute
 
-        success = DependencyProxy::DownloadBlobService
-          .new(@image, @blob_sha, @token, temp_file.path).execute
+        if result[:status] == :error
+          log_failure(result)
 
-        return unless success
+          return error('Failed to download the blob', result[:http_status])
+        end
 
-        blob.file = temp_file
-        blob.size = temp_file.size
+        blob.file = result[:file]
+        blob.size = result[:file].size
         blob.save!
       end
 
-      blob
+      success(blob: blob)
+    end
+
+    private
+
+    def log_failure(result)
+      log_error(
+        "Dependency proxy: Failed to download the blob." \
+        "Blob sha: #{@blob_sha}." \
+        "Error message: #{result[:message][0, 100]}" \
+        "HTTP status: #{result[:http_status]}"
+      )
     end
   end
 end
