@@ -22,6 +22,7 @@ describe('actions', () => {
   afterEach(() => {
     clearState(store);
     mockAxios.restore();
+    actions.clearProjectsEtagPoll();
   });
 
   describe('addProjectsToDashboard', () => {
@@ -109,7 +110,7 @@ describe('actions', () => {
         [],
         [
           {
-            type: 'fetchProjects',
+            type: 'forceProjectsRequest',
           },
         ],
         done,
@@ -189,10 +190,6 @@ describe('actions', () => {
   });
 
   describe('fetchProjects', () => {
-    afterEach(() => {
-      actions.clearProjectsEtagPoll();
-    });
-
     it('calls project list endpoint', done => {
       store.state.projectEndpoints.list = mockListEndpoint;
       mockAxios.onGet(mockListEndpoint).replyOnce(200);
@@ -312,7 +309,7 @@ describe('actions', () => {
         null,
         null,
         [],
-        [{ type: 'fetchProjects' }],
+        [{ type: 'forceProjectsRequest' }],
         done,
       );
     });

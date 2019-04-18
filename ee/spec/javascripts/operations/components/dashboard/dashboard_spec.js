@@ -1,49 +1,59 @@
-import Vue from 'vue';
-import store from 'ee/operations/store/index';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
+import { mount, createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+import Project from 'ee/operations/components/dashboard/project.vue';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
-import DashboardProject from 'ee/operations/components/dashboard/project.vue';
+import store from 'ee/operations/store';
+import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 import { trimText } from 'spec/helpers/vue_component_helper';
-import { getChildInstances, clearState } from '../../helpers';
 import { mockProjectData, mockText } from '../../mock_data';
 
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
 describe('dashboard component', () => {
-  const DashboardComponent = Vue.extend(Dashboard);
-  const DashboardProjectComponent = Vue.extend(DashboardProject);
-  const mount = () =>
-    new DashboardComponent({
+  const mockAddEndpoint = 'mock-addPath';
+  const mockListEndpoint = 'mock-listPath';
+  const DashboardComponent = localVue.extend(Dashboard);
+  let wrapper;
+  let mockAxios;
+
+  const mountComponent = () =>
+    mount(DashboardComponent, {
+      sync: false,
       store,
+      localVue,
       propsData: {
-        addPath: 'mock-addPath',
-        listPath: 'mock-listPath',
+        addPath: mockAddEndpoint,
+        listPath: mockListEndpoint,
         emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
         emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
       },
-      methods: {
-        fetchProjects: () => {},
-      },
-    }).$mount();
-  let vm;
+    });
 
   beforeEach(() => {
-    vm = mount();
+    mockAxios = new MockAdapter(axios);
+    mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: mockProjectData(1) });
+    wrapper = mountComponent();
   });
 
   afterEach(() => {
-    vm.$destroy();
-    clearState(store);
+    wrapper.destroy();
+    mockAxios.restore();
   });
 
   it('renders dashboard title', () => {
-    expect(vm.$el.querySelector('.js-dashboard-title').innerText.trim()).toBe(
-      mockText.DASHBOARD_TITLE,
-    );
+    const dashboardTitle = wrapper.element.querySelector('.js-dashboard-title');
+
+    expect(dashboardTitle.innerText.trim()).toEqual(mockText.DASHBOARD_TITLE);
   });
 
   describe('add projects button', () => {
     let button;
 
     beforeEach(() => {
-      button = vm.$el.querySelector('.js-add-projects-button');
+      button = wrapper.element.querySelector('.js-add-projects-button');
     });
 
     it('renders add projects text', () => {
@@ -53,7 +63,31 @@ describe('dashboard component', () => {
     it('renders the projects modal', () => {
       button.click();
 
-      expect(vm.$el.querySelector('.add-projects-modal')).toBeDefined();
+      expect(wrapper.element.querySelector('.add-projects-modal')).toBeDefined();
+    });
+
+    describe('when a project is added', () => {
+      it('immediately requests the project list again', done => {
+        mockAxios.reset();
+        mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: mockProjectData(2) });
+        mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [1], invalid: [] });
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            wrapper.vm.projectClicked({ id: 1 });
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            wrapper.vm.onOk();
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            expect(store.state.projects.length).toEqual(2);
+            expect(wrapper.element.querySelectorAll('.js-dashboard-project').length).toEqual(2);
+            done();
+          })
+          .catch(done.fail);
+      });
     });
   });
 
@@ -64,53 +98,77 @@ describe('dashboard component', () => {
 
       beforeEach(() => {
         store.state.projects = projects;
-        vm = mount();
+        wrapper = mountComponent();
       });
 
       it('includes a dashboard project component for each project', () => {
-        expect(getChildInstances(vm, DashboardProjectComponent).length).toBe(projectCount);
+        const projectComponents = wrapper.element.querySelectorAll('.js-dashboard-project');
+
+        expect(projectComponents.length).toBe(projectCount);
       });
 
       it('passes each project to the dashboard project component', () => {
         const [oneProject] = projects;
-        const [projectComponent] = getChildInstances(vm, DashboardProjectComponent);
+        const projectComponent = wrapper.find(Project);
 
-        expect(projectComponent.project).toEqual(oneProject);
+        expect(projectComponent.props().project).toEqual(oneProject);
+      });
+
+      describe('when a project is removed', () => {
+        it('immediately requests the project list again', done => {
+          mockAxios.reset();
+          mockAxios.onDelete(projects[0].remove_path).reply(200);
+          mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
+
+          wrapper.find('.js-remove-button').vm.$emit('click');
+
+          timeoutPromise()
+            .then(() => {
+              expect(store.state.projects.length).toEqual(0);
+              expect(wrapper.element.querySelectorAll('.js-dashboard-project').length).toEqual(0);
+              done();
+            })
+            .catch(done.fail);
+        });
       });
     });
 
     describe('empty state', () => {
       beforeEach(() => {
         store.state.projects = [];
-        vm = mount();
+        mockAxios.reset();
+        mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
+        wrapper = mountComponent();
       });
 
       it('renders empty state svg after requesting projects with no results', () => {
-        const svgSrc = vm.$el.querySelector('.js-empty-state-svg').src;
+        const svgSrc = wrapper.element.querySelector('.js-empty-state-svg').src;
 
         expect(svgSrc).toMatch(mockText.EMPTY_SVG_SOURCE);
       });
 
       it('renders title', () => {
-        expect(vm.$el.querySelector('.js-title').innerText.trim()).toBe(mockText.EMPTY_TITLE);
+        expect(wrapper.element.querySelector('.js-title').innerText.trim()).toBe(
+          mockText.EMPTY_TITLE,
+        );
       });
 
       it('renders sub-title', () => {
-        expect(trimText(vm.$el.querySelector('.js-sub-title').innerText)).toBe(
+        expect(trimText(wrapper.element.querySelector('.js-sub-title').innerText)).toBe(
           mockText.EMPTY_SUBTITLE,
         );
       });
 
       it('renders link to documentation', () => {
-        const link = vm.$el.querySelector('.js-documentation-link');
+        const link = wrapper.element.querySelector('.js-documentation-link');
 
         expect(link.innerText.trim()).toBe('More information');
       });
 
       it('links to documentation', () => {
-        const link = vm.$el.querySelector('.js-documentation-link');
+        const link = wrapper.element.querySelector('.js-documentation-link');
 
-        expect(link.href).toMatch(vm.emptyDashboardHelpPath);
+        expect(link.href).toMatch(wrapper.props().emptyDashboardHelpPath);
       });
     });
   });
