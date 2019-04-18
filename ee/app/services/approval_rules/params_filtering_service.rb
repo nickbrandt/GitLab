@@ -15,7 +15,7 @@ module ApprovalRules
     def initialize(target, user, params)
       @target = target
       @current_user = user
-      @params = params.with_indifferent_access
+      @params = params.to_h.with_indifferent_access
 
       batch_load_visible_user_and_group_ids
     end
