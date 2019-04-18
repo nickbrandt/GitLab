@@ -6846,6 +6846,9 @@ msgstr ""
 msgid "Lead"
 msgstr ""
 
+msgid "Learn how to %{link_start}contribute to the built-in templates%{link_end}"
+msgstr ""
+
 msgid "Learn how to %{no_packages_link_start}publish and share your packages%{no_packages_link_end} with GitLab."
 msgstr ""
 
