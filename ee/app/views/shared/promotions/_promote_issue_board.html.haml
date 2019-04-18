@@ -20,5 +20,5 @@
         = link_to _('Issue board focus mode'), help_page_path('user/project/issue_board.html', anchor:'focus-mode-starter'), target: '_blank'
   = render 'shared/promotions/promotion_link_project'
   .top-space
-    %button.btn.btn-default.btn-block#hide-btn{ :href => "#", "@click.stop" => "clearPromotionState" }
+    %button.d-block.mb-3.btn.btn-default.btn-block#hide-btn{ :href => "#", "@click.stop" => "clearPromotionState" }
       = _("Thanks! Don't show me this again")
