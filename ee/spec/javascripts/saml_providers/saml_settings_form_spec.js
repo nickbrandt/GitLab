@@ -35,7 +35,7 @@ describe('SamlSettingsForm', () => {
     });
 
     it('keeps Test button disabled when SAML disabled for the group', () => {
-      samlSettingsForm.enabled = false;
+      samlSettingsForm.samlProviderEnabled = false;
       samlSettingsForm.testButton.setAttribute('disabled', true);
 
       samlSettingsForm.updateView();
