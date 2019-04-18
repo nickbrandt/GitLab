@@ -172,5 +172,22 @@ module EE
 
       create_note(NoteSummary.new(noteable, nil, author, body, action: 'epic_date_changed'))
     end
+
+    def change_epics_relation(epic, child_epic, user, type)
+      note_body = if type == 'relate_epic'
+                    "added epic %{target_epic_ref} as %{direction} epic"
+                  else
+                    "removed %{direction} epic %{target_epic_ref}"
+                  end
+
+      change_epics_relation_act(epic, user, type, note_body,
+                                { direction: 'child', target_epic_ref: child_epic.to_reference(epic.group) })
+      change_epics_relation_act(child_epic, user, type, note_body,
+                                { direction: 'parent', target_epic_ref: epic.to_reference(child_epic.group) })
+    end
+
+    def change_epics_relation_act(subject_epic, user, action, text, text_params)
+      create_note(NoteSummary.new(subject_epic, nil, user, text % text_params, action: action))
+    end
   end
 end

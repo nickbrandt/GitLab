@@ -10,7 +10,7 @@ module IssuableLinks
     end
 
     def execute
-      return error('No Issue Link found', 404) unless permission_to_remove_relation?
+      return error(not_found_message, 404) unless permission_to_remove_relation?
 
       remove_relation
       create_notes
@@ -22,6 +22,10 @@ module IssuableLinks
 
     def remove_relation
       link.destroy!
+    end
+
+    def not_found_message
+      'No Issue Link found'
     end
   end
 end

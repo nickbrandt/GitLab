@@ -257,4 +257,70 @@ describe SystemNoteService do
       end
     end
   end
+
+  describe '.relate_epic' do
+    let(:child_epic) { create(:epic, parent: epic, group: group) }
+    let(:noteable) { child_epic }
+
+    subject { described_class.change_epics_relation(epic, child_epic, author, 'relate_epic') }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'relate_epic' }
+    end
+
+    context 'when epic is added as child to a parent epic' do
+      it 'sets the note text' do
+        expect { subject }.to change { Note.system.count }.from(0).to(2)
+        expect(Note.first.note).to eq("added epic &#{child_epic.iid} as child epic")
+        expect(Note.last.note).to eq("added epic &#{epic.iid} as parent epic")
+      end
+    end
+
+    context 'when added epic is from a subgroup' do
+      let(:subgroup) {create(:group, parent: group)}
+
+      before do
+        child_epic.update!({ group: subgroup })
+      end
+
+      it 'sets the note text' do
+        expect { subject }.to change { Note.system.count }.from(0).to(2)
+        expect(Note.first.note).to eq("added epic #{group.path}/#{subgroup.path}&#{child_epic.iid} as child epic")
+        expect(Note.last.note).to eq("added epic #{group.path}&#{epic.iid} as parent epic")
+      end
+    end
+  end
+
+  describe '.unrelate_epic' do
+    let(:child_epic) { create(:epic, parent: epic, group: group) }
+    let(:noteable) { child_epic }
+
+    subject { described_class.change_epics_relation(epic, child_epic, author, 'unrelate_epic') }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'unrelate_epic' }
+    end
+
+    context 'when child epic is removed from a parent epic' do
+      it 'sets the note text' do
+        expect { subject }.to change { Note.system.count }.from(0).to(2)
+        expect(Note.first.note).to eq("removed child epic &#{child_epic.iid}")
+        expect(Note.last.note).to eq("removed parent epic &#{epic.iid}")
+      end
+    end
+
+    context 'when removed epic is from a subgroup' do
+      let(:subgroup) {create(:group, parent: group)}
+
+      before do
+        child_epic.update!({ group: subgroup })
+      end
+
+      it 'sets the note text' do
+        expect { subject }.to change { Note.system.count }.from(0).to(2)
+        expect(Note.first.note).to eq("removed child epic #{group.path}/#{subgroup.path}&#{child_epic.iid}")
+        expect(Note.last.note).to eq("removed parent epic #{group.path}&#{epic.iid}")
+      end
+    end
+  end
 end
