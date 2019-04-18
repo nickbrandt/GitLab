@@ -1,0 +1,5 @@
+---
+title: Fix add/remove pipeline dashboard issue
+merge_request: 11029
+author:
+type: fixed
