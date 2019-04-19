@@ -44,6 +44,7 @@
 
 - pipeline_default:store_security_reports
 - pipeline_default:ci_create_cross_project_pipeline
+- pipeline_default:ci_pipeline_bridge
 
 - incident_management:incident_management_process_alert
 
