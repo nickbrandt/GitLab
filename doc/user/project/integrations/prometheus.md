@@ -156,9 +156,9 @@ receivers:
   ...
 ```
 
-### Taking action on an alert **[ULTIMATE]**
+### Taking action on incidents **[ULTIMATE]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.11.
 
 Alerts can be used to trigger actions, like open an issue automatically. To configure the actions:
 
