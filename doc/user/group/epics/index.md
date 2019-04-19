@@ -73,6 +73,16 @@ These are dynamic dates in that if milestones are re-assigned to the issues, if 
 milestone dates change, or if issues are added or removed from the epic, then
 the re-calculation will happen immediately to set a new dynamic date.
 
+## Roadmap in epics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7327) in [GitLab Ultimate](https://about.gitlab.com/pricing) 11.10.
+
+If your epic contains one or more [child epics](#multi-level-child-epics) which
+have a [start or due date](#start-date-and-due-date), then you can see a
+[roadmap](../roadmap/index.md) view of the child epics under the parent epic itself.
+
+![Child epics roadmap](img/child_epics_roadmap.png)
+
 ## Reordering issues and child epics
 
 Drag and drop to reorder issues and child epics. New issues and child epics added to an epic appear at the top of the list.
