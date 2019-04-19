@@ -1,0 +1,5 @@
+---
+title: Allow multiple secondary nodes behind a load balancer
+merge_request: 10755
+author:
+type: added
