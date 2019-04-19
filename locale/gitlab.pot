@@ -5526,6 +5526,12 @@ msgstr ""
 msgid "Geo|The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set"
 msgstr ""
 
+msgid "Geo|The database is currently %{db_lag} behind the primary node."
+msgstr ""
+
+msgid "Geo|The node is currently %{minutes_behind} behind the primary node."
+msgstr ""
+
 msgid "Geo|This is a primary node"
 msgstr ""
 

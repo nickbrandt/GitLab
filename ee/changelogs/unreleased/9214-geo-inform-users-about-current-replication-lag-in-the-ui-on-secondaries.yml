@@ -1,0 +1,5 @@
+---
+title: 'Geo: Inform users about current replication lag in the UI on secondaries'
+merge_request: 10807
+author:
+type: added

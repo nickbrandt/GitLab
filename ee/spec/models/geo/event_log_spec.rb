@@ -15,6 +15,27 @@ RSpec.describe Geo::EventLog, type: :model do
     it { is_expected.to belong_to(:job_artifact_deleted_event).class_name('Geo::JobArtifactDeletedEvent').with_foreign_key('job_artifact_deleted_event_id') }
   end
 
+  describe '.next_unprocessed_event' do
+    it 'returns next unprocessed event' do
+      processed_event = create(:geo_event_log)
+      unprocessed_event = create(:geo_event_log)
+      create(:geo_event_log_state, event_id: processed_event.id)
+
+      expect(described_class.next_unprocessed_event).to eq unprocessed_event
+    end
+
+    it 'returns the oldest event when there are no processed events yet' do
+      oldest_event = create(:geo_event_log)
+      create(:geo_event_log)
+
+      expect(described_class.next_unprocessed_event).to eq oldest_event
+    end
+
+    it 'returns nil when there are no events yet' do
+      expect(described_class.next_unprocessed_event).to be_nil
+    end
+  end
+
   describe '.event_classes' do
     it 'returns all event class reflections' do
       reflections = described_class.reflections.map { |_k, v| v.class_name.constantize }
