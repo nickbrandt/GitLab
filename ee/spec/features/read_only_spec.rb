@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'Geo read-only message' do
+describe 'Geo read-only message', :geo do
   include ::EE::GeoHelpers
 
   set(:user) { create(:user) }
