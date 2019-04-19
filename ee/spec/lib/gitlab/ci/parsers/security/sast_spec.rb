@@ -6,7 +6,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
   describe '#parse!' do
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha) }
     let(:parser) { described_class.new }
 
     where(report_format: %i(sast sast_deprecated))

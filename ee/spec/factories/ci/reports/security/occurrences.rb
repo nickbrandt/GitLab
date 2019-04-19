@@ -34,6 +34,10 @@ FactoryBot.define do
 
     skip_create
 
+    trait :dynamic do
+      location { FactoryBot.build(:ci_reports_security_locations_sast, :dynamic) }
+    end
+
     initialize_with do
       ::Gitlab::Ci::Reports::Security::Occurrence.new(attributes)
     end

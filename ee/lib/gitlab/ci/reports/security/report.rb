@@ -6,13 +6,16 @@ module Gitlab
       module Security
         class Report
           attr_reader :type
+          attr_reader :commit_sha
           attr_reader :occurrences
           attr_reader :scanners
           attr_reader :identifiers
+
           attr_accessor :error
 
-          def initialize(type)
+          def initialize(type, commit_sha)
             @type = type
+            @commit_sha = commit_sha
             @occurrences = []
             @scanners = {}
             @identifiers = {}

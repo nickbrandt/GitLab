@@ -28,7 +28,7 @@ describe Security::StoreReportsService, '#execute' do
     end
 
     context 'when StoreReportService returns an error for a report' do
-      let(:reports) { Gitlab::Ci::Reports::Security::Reports.new }
+      let(:reports) { Gitlab::Ci::Reports::Security::Reports.new(pipeline.sha) }
       let(:sast_report) { reports.get_report('sast') }
       let(:dast_report) { reports.get_report('dast') }
       let(:success) { { status: :success } }
