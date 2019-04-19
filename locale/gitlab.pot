@@ -683,6 +683,9 @@ msgstr ""
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
 msgstr ""
 
+msgid "Additional minutes"
+msgstr ""
+
 msgid "Additional text"
 msgstr ""
 
@@ -690,9 +693,6 @@ msgid "Adds"
 msgstr ""
 
 msgid "Adds a todo."
-msgstr ""
-
-msgid "Aditional minutes"
 msgstr ""
 
 msgid "Admin Area"
