@@ -70,17 +70,20 @@ describe Namespace do
 
     subject { namespace.paid_plan? }
 
-    where(:plan_code, :expected_result) do
-      described_class::FREE_PLAN          | false
-      described_class::EARLY_ADOPTER_PLAN | false
-      described_class::BRONZE_PLAN        | true
-      described_class::SILVER_PLAN        | true
-      described_class::GOLD_PLAN          | true
+    where(:plan_code, :trial, :expected_result) do
+      described_class::FREE_PLAN          | false | false
+      described_class::EARLY_ADOPTER_PLAN | false | false
+      described_class::BRONZE_PLAN        | false | true
+      described_class::SILVER_PLAN        | false | true
+      described_class::GOLD_PLAN          | false | true
+      described_class::BRONZE_PLAN        | true  | false
+      described_class::SILVER_PLAN        | true  | false
+      described_class::GOLD_PLAN          | true  | false
     end
 
     with_them do
       before do
-        namespace.update!(gitlab_subscription_attributes: { hosted_plan: Plan.find_by_name(plan_code) })
+        namespace.update!(gitlab_subscription_attributes: { trial: trial, hosted_plan: Plan.find_by_name(plan_code) })
       end
 
       it do
