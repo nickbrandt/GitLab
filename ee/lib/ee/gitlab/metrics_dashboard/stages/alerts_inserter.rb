@@ -8,10 +8,10 @@ module EE
       module Stages
         class AlertsInserter < ::Gitlab::MetricsDashboard::Stages::BaseStage
           def transform!
-            alerts = metrics_with_alerts
+            return if metrics_with_alerts.empty?
 
             for_metrics do |metric|
-              next unless alerts.include?(metric[:metric_id])
+              next unless metrics_with_alerts.include?(metric[:metric_id])
 
               metric[:alert_path] = alert_path(metric[:metric_id], project, environment)
             end
@@ -20,11 +20,13 @@ module EE
           private
 
           def metrics_with_alerts
+            return @metrics_with_alerts if @metrics_with_alerts
+
             alerts = ::Projects::Prometheus::AlertsFinder
                        .new(project: project, environment: environment)
                        .execute
 
-            Set.new(alerts.map(&:prometheus_metric_id))
+            @metrics_with_alerts = Set.new(alerts.map(&:prometheus_metric_id))
           end
 
           def alert_path(metric_id, project, environment)

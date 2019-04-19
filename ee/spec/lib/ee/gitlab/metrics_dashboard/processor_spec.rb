@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::MetricsDashboard::Processor do
   let(:project) { build(:project) }
-  let(:environment) { alert.environment }
+  let(:environment) { create(:environment, project: project) }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics_dashboard/sample_dashboard.yml') }
 
   describe 'stages' do
@@ -12,7 +12,7 @@ describe Gitlab::MetricsDashboard::Processor do
     let(:process_params) { [dashboard_yml, project, environment] }
     let(:stages) { described_class.new(*process_params).stages }
 
-    it 'should include the alerts processing stage' do
+    it 'includes the alerts processing stage' do
       expect(stages.length).to eq(4)
     end
   end
@@ -22,7 +22,14 @@ describe Gitlab::MetricsDashboard::Processor do
     let(:dashboard) { described_class.new(*process_params).process }
 
     context 'when the dashboard references persisted metrics with alerts' do
-      let!(:alert) { create(:prometheus_alert, project: project, prometheus_metric: persisted_metric) }
+      let!(:alert) do
+        create(
+          :prometheus_alert,
+          environment: environment,
+          project: project,
+          prometheus_metric: persisted_metric
+        )
+      end
 
       shared_examples_for 'has saved alerts' do
         it 'includes an alert path' do
@@ -48,6 +55,17 @@ describe Gitlab::MetricsDashboard::Processor do
         let!(:persisted_metric) { create(:prometheus_metric, project: project, group: :business) }
 
         it_behaves_like 'has saved alerts'
+      end
+    end
+
+    context 'when there are no alerts' do
+      let!(:persisted_metric) { create(:prometheus_metric, :common, identifier: 'metric_a1') }
+
+      it 'does not insert an alert_path' do
+        target_metric = all_metrics.find { |metric| metric[:metric_id] == persisted_metric.id }
+
+        expect(target_metric).to be_a Hash
+        expect(target_metric).not_to include(:alert_path)
       end
     end
   end
