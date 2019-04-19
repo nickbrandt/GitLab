@@ -14,7 +14,7 @@ describe DeleteBranchService do
 
       result = service.execute(branch_name)
 
-      expect(result[:status]).to eq :success
+      expect(result.status).to eq :success
       expect(branch_exists?(branch_name)).to be false
     end
   end
@@ -34,8 +34,8 @@ describe DeleteBranchService do
 
         result = service.execute('feature')
 
-        expect(result[:status]).to eq :error
-        expect(result[:message]).to eq 'You dont have push access to repo'
+        expect(result.status).to eq :error
+        expect(result.message).to eq 'You dont have push access to repo'
         expect(branch_exists?('feature')).to be true
       end
     end
