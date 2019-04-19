@@ -7,6 +7,16 @@ describe Gitlab::MetricsDashboard::Processor do
   let(:environment) { alert.environment }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics_dashboard/sample_dashboard.yml') }
 
+  describe 'stages' do
+    let(:environment) { build(:environment) }
+    let(:process_params) { [dashboard_yml, project, environment] }
+    let(:stages) { described_class.new(*process_params).stages }
+
+    it 'should include the alerts processing stage' do
+      expect(stages.length).to eq(4)
+    end
+  end
+
   describe 'process' do
     let(:process_params) { [dashboard_yml, project, environment] }
     let(:dashboard) { described_class.new(*process_params).process }
@@ -17,9 +27,6 @@ describe Gitlab::MetricsDashboard::Processor do
       shared_examples_for 'has saved alerts' do
         it 'includes an alert path' do
           target_metric = all_metrics.find { |metric| metric[:metric_id] == persisted_metric.id }
-
-          p PrometheusAlert.all
-          p target_metric
 
           expect(target_metric).to be_a Hash
           expect(target_metric).to include(:alert_path)
