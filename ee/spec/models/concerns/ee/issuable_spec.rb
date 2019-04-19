@@ -19,4 +19,22 @@ describe EE::Issuable do
       expect(relation.labels_hash[issue_id]).to include('Feature', 'Second Label')
     end
   end
+
+  describe '#milestone_available?' do
+    context 'with Epic' do
+      let(:epic) { create(:epic) }
+
+      it 'returns true' do
+        expect(epic.milestone_available?).to be_truthy
+      end
+    end
+
+    context 'no Epic' do
+      let(:issue) { create(:issue) }
+
+      it 'returns false' do
+        expect(issue.milestone_available?).to be_falsy
+      end
+    end
+  end
 end

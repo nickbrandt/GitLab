@@ -3,6 +3,7 @@
 module EE
   module Issuable
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     class_methods do
       def labels_hash
@@ -15,6 +16,13 @@ module EE
 
         issue_labels
       end
+    end
+
+    override :milestone_available?
+    def milestone_available?
+      return true if is_a?(Epic)
+
+      super
     end
 
     def supports_epic?
