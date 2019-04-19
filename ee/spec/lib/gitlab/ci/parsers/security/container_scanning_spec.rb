@@ -17,7 +17,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
     let(:project) { artifact.project }
     let(:pipeline) { artifact.job.pipeline }
     let(:artifact) { create(:ee_ci_job_artifact, :container_scanning) }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha) }
 
     before do
       artifact.each_blob do |blob|

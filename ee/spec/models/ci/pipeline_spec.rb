@@ -204,6 +204,11 @@ describe Ci::Pipeline do
         create(:ee_ci_job_artifact, :container_scanning, job: build_cs_1, project: project)
       end
 
+      it 'assigns pipeline commit_sha to the reports' do
+        expect(subject.commit_sha).to eq(pipeline.sha)
+        expect(subject.reports.values.map(&:commit_sha).uniq).to contain_exactly(pipeline.sha)
+      end
+
       it 'returns security reports with collected data grouped as expected' do
         expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning', 'container_scanning')
         expect(subject.get_report('sast').occurrences.size).to eq(66)

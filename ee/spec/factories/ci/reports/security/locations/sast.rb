@@ -13,5 +13,11 @@ FactoryBot.define do
     initialize_with do
       ::Gitlab::Ci::Reports::Security::Locations::Sast.new(attributes)
     end
+
+    trait :dynamic do
+      sequence(:file_path, 'a') { |n| "path/#{n}" }
+      start_line { Random.rand(20) }
+      end_line { start_line + Random.rand(5) }
+    end
   end
 end

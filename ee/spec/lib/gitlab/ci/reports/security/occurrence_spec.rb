@@ -61,6 +61,15 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
     end
   end
 
+  describe "delegation" do
+    subject { create(:ci_reports_security_occurrence) }
+    %i[file_path start_line end_line].each do |attribute|
+      it "delegates attribute #{attribute} to location" do
+        expect(subject.public_send(attribute)).to eq(subject.location.public_send(attribute))
+      end
+    end
+  end
+
   describe '#to_hash' do
     let(:occurrence) { create(:ci_reports_security_occurrence) }
 
@@ -97,7 +106,29 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
     end
   end
 
-  describe '#==' do
+  describe '#update_location' do
+    let(:old_location) { create(:ci_reports_security_locations_sast, file_path: 'old_file.rb') }
+    let(:new_location) { create(:ci_reports_security_locations_sast, file_path: 'new_file.rb') }
+
+    let(:occurrence) { create(:ci_reports_security_occurrence, location: old_location) }
+
+    subject { occurrence.update_location(new_location) }
+
+    it 'assigns the new location and returns it' do
+      subject
+
+      expect(occurrence.location).to eq(new_location)
+      is_expected.to eq(new_location)
+    end
+
+    it 'assigns the old location' do
+      subject
+
+      expect(occurrence.old_location).to eq(old_location)
+    end
+  end
+
+  describe '#== and eql?' do
     using RSpec::Parameterized::TableSyntax
 
     let(:identifier) { create(:ci_reports_security_identifier) }
@@ -116,8 +147,12 @@ describe Gitlab::Ci::Reports::Security::Occurrence do
       let(:occurrence_1) { create(:ci_reports_security_occurrence, report_type: report_type_1, location: location_1.call, identifiers: [identifier_1.call]) }
       let(:occurrence_2) { create(:ci_reports_security_occurrence, report_type: report_type_2, location: location_2.call, identifiers: [identifier_2.call]) }
 
-      it "returns #{params[:equal]}" do
+      it "returns #{params[:equal]} for ==" do
         expect(occurrence_1 == occurrence_2).to eq(equal)
+      end
+
+      it "returns #{params[:equal]} for eq?" do
+        expect(occurrence_1.eql?(occurrence_2)).to eq(equal)
       end
     end
   end

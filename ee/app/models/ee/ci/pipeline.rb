@@ -146,7 +146,7 @@ module EE
       end
 
       def security_reports
-        ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
+        ::Gitlab::Ci::Reports::Security::Reports.new(sha).tap do |security_reports|
           builds.latest.with_reports(::Ci::JobArtifact.security_reports).each do |build|
             build.collect_security_reports!(security_reports)
           end

@@ -120,7 +120,7 @@ describe Ci::Build do
   end
 
   describe '#collect_security_reports!' do
-    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new(pipeline.sha) }
 
     subject { job.collect_security_reports!(security_reports) }
 

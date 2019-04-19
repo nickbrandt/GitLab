@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Ci::Reports::Security::Report do
   let(:pipeline) { create(:ci_pipeline) }
-  let(:report) { described_class.new('sast') }
+  let(:report) { described_class.new('sast', pipeline.sha) }
 
   it { expect(report.type).to eq('sast') }
 
