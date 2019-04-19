@@ -24,7 +24,7 @@ module EE
                        .new(project: project, environment: environment)
                        .execute
 
-            Set.new(alerts.map(&:id))
+            Set.new(alerts.map(&:prometheus_metric_id))
           end
 
           def alert_path(metric_id, project, environment)
