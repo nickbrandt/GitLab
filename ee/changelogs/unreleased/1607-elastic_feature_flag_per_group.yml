@@ -1,5 +1,0 @@
----
-title: Allow per-project and per-group enabling of Elasticsearch indexing
-merge_request: 9861
-author:
-type: added

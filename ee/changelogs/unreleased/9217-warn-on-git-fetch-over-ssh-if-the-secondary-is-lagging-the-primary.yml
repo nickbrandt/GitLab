@@ -1,5 +1,0 @@
----
-title: 'Geo: Display secondary replication lag on console (if lag > 0 seconds)'
-merge_request: 10471
-author:
-type: added

@@ -1,5 +1,0 @@
----
-title: Fix authors of merge commits being excluded from approving an MR
-merge_request: 10359
-author:
-type: fixed

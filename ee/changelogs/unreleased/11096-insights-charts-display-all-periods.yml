@@ -1,5 +1,0 @@
----
-title: Ensure Insights charts show all periods even if there are no data
-merge_request: 10733
-author:
-type: fixed

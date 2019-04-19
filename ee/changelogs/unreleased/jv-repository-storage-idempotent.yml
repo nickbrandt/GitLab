@@ -1,5 +1,0 @@
----
-title: Make UpdateRepositoryStorageService idempotent
-merge_request: 10457
-author:
-type: fixed
