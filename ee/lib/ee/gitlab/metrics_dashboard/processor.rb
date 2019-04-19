@@ -4,8 +4,8 @@ module EE
   module Gitlab
     module MetricsDashboard
       module Processor
-        def stages
-          @stages ||= super + [Stages::AlertsInserter]
+        def sequence
+          super + [Stages::AlertsInserter]
         end
       end
     end
