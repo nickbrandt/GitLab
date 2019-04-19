@@ -1,6 +1,6 @@
 # Roadmap **[ULTIMATE]**
 
-> Introduced in [GitLab Ultimate][ee] 10.5.
+> Introduced in [GitLab Ultimate](https://about.gitlab.com/pricing) 10.5.
 
 An Epic within a group containing **Start date** and/or **Due date**
 can be visualized in a form of a timeline (e.g. a Gantt chart). The Epics Roadmap page
@@ -20,6 +20,8 @@ Epics in the view can be sorted by:
 - **Due date**
 
 Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [epics list view](../epics/index.md).
+
+Roadmaps can also be [visualized inside an epic](../epics/index.md#roadmap-in-epics).
 
 ## Timeline duration
 
@@ -60,5 +62,3 @@ and due date. If an epic doesn't have a due date, the timeline bar fades
 away towards the future. Similarly, if an epic doesn't have a start date, the
 timeline bar becomes more visible as it approaches the epic's due date on the
 timeline.
-
-[ee]: https://about.gitlab.com/pricing
