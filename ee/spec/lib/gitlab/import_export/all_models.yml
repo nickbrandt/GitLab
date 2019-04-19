@@ -20,6 +20,7 @@ ci_pipelines:
 - sourced_pipelines
 - triggered_by_pipeline
 - triggered_pipelines
+- bridged_jobs
 - job_artifacts
 - vulnerabilities_occurrence_pipelines
 - vulnerabilities

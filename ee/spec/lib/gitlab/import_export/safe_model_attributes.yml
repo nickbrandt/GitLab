@@ -6,3 +6,5 @@ ProjectTracingSetting:
 - external_url
 Note:
 - review_id
+CommitStatus:
+- bridged_pipeline_id

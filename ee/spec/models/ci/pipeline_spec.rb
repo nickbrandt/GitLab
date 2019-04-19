@@ -14,6 +14,7 @@ describe Ci::Pipeline do
   it { is_expected.to have_many(:sourced_pipelines) }
   it { is_expected.to have_one(:triggered_by_pipeline) }
   it { is_expected.to have_many(:triggered_pipelines) }
+  it { is_expected.to have_many(:bridged_jobs) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
   it { is_expected.to have_many(:vulnerabilities).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
   it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
