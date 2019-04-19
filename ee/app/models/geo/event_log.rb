@@ -70,6 +70,13 @@ module Geo
       order(id: :desc).first
     end
 
+    def self.next_unprocessed_event
+      last_processed = Geo::EventLogState.last_processed
+      return first unless last_processed
+
+      where('id > ?', last_processed.event_id).first
+    end
+
     def self.event_classes
       EVENT_CLASSES.map(&:constantize)
     end

@@ -3,6 +3,10 @@
 module EE
   module ApplicationHelper
     extend ::Gitlab::Utils::Override
+    DB_LAG_SHOW_THRESHOLD = 60 # seconds
+    LOG_CURSOR_CHECK_TIME = ::Gitlab::Geo::LogCursor::Daemon::SECONDARY_CHECK_INTERVAL
+    EVENT_PROCESSING_TIME = 60.seconds
+    EVENT_LAG_SHOW_THRESHOLD = DB_LAG_SHOW_THRESHOLD.seconds + LOG_CURSOR_CHECK_TIME + EVENT_PROCESSING_TIME
 
     override :read_only_message
     def read_only_message
@@ -11,8 +15,25 @@ module EE
       if @limited_actions_message
         s_('Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.').html_safe
       else
-        (s_('Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.') %
+        message = (s_('Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.') %
           { primary_node: link_to('primary node', ::Gitlab::Geo.primary_node&.url || '#') }).html_safe
+
+        return "#{message} #{lag_message}".html_safe if lag_message
+
+        message
+      end
+    end
+
+    def lag_message
+      if db_lag > DB_LAG_SHOW_THRESHOLD
+        return (s_('Geo|The database is currently %{db_lag} behind the primary node.') %
+          { db_lag: time_ago_in_words(db_lag.seconds.ago) }).html_safe
+      end
+
+      if unprocessed_too_old?
+        minutes_behind = time_ago_in_words(next_unprocessed_event.created_at)
+        return (s_('Geo|The node is currently %{minutes_behind} behind the primary node.') %
+          { minutes_behind: minutes_behind }).html_safe
       end
     end
 
@@ -100,6 +121,24 @@ module EE
 
     def appearance
       ::Appearance.current
+    end
+
+    def db_lag
+      @db_lag ||= Rails.cache.fetch('geo:db_lag', expires_in: 20.seconds) do
+        ::Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
+      end
+    end
+
+    def next_unprocessed_event
+      @next_unprocessed_event ||= Geo::EventLog.next_unprocessed_event
+    end
+
+    def unprocessed_too_old?
+      Rails.cache.fetch('geo:unprocessed_too_old', expires_in: 20.seconds) do
+        break false unless next_unprocessed_event
+
+        next_unprocessed_event.created_at < EVENT_LAG_SHOW_THRESHOLD.ago
+      end
     end
   end
 end
