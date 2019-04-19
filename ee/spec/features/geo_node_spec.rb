@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'GEO Nodes' do
+describe 'GEO Nodes', :geo do
   include ::EE::GeoHelpers
 
   set(:user) { create(:user) }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'Geo clone instructions', :js do
+describe 'Geo clone instructions', :geo, :js do
   include Devise::Test::IntegrationHelpers
   include ::EE::GeoHelpers
 

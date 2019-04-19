@@ -5,7 +5,7 @@ require 'spec_helper'
 describe ApplicationHelper do
   include EE::GeoHelpers
 
-  describe '#read_only_message' do
+  describe '#read_only_message', :geo do
     context 'when not in a Geo secondary' do
       it 'returns a fallback message if database is readonly' do
         expect(Gitlab::Database).to receive(:read_only?) { true }
