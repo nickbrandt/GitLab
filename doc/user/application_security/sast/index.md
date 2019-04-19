@@ -54,7 +54,7 @@ The following table shows which languages, package managers and frameworks are s
 | Language (package managers) / framework                                     | Scan tool                                                                              | Introduced in GitLab Version |
 |-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------|------------------------------|
 | .NET                                                                        | [Security Code Scan](https://security-code-scan.github.io)                             | 11.0                         |
-| Any                                                                         | [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog) and [Diffence](https://github.com/techjacker/diffence) | 11.9 |
+| Any                                                                         | [Gitleaks](https://github.com/zricethezav/gitleaks) and [TruffleHog](https://github.com/dxa4481/truffleHog) | 11.9 |
 | C/C++                                                                       | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     | 10.7                         |
 | Elixir (Phoenix)                                                            | [Sobelow](https://github.com/nccgroup/sobelow)                                         | 11.10                        |
 | Go                                                                          | [Gosec](https://github.com/securego/gosec)                                             | 10.7                         |
