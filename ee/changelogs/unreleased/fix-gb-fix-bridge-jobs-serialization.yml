@@ -1,5 +1,0 @@
----
-title: Fix pipeline bridge serialization error
-merge_request: 10565
-author:
-type: fixed

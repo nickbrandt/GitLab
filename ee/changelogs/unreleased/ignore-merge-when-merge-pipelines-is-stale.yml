@@ -1,5 +1,0 @@
----
-title: Prevent merge if the merge request pipeline is stale
-merge_request: 9643
-author:
-type: added

@@ -1,5 +1,0 @@
----
-title: Fix sorting by priority with filtering by approvers
-merge_request: 10446
-author:
-type: fixed

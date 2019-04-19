@@ -1,5 +1,119 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.10.0 (2019-04-22)
+
+### Security (3 changes)
+
+- Check label_ids parent when updating issue board.
+- Geo - Improve security while redirecting user back to the secondary after a logout & re-login via the primary.
+- Expose only basic group attributes in boards API.
+
+### Fixed (25 changes)
+
+- User Statistics in Admin Dashboard now a button. !8807
+- Fix misalignment of dropdowns in edit board modal of issue boards. !9909
+- Geo: Support archive recovery or streaming replication types in health check. !9935
+- Geo: Only display Geo-specific clone instructions button on a Geo Secondary node. !10007
+- Resolve Deletion of vulnerability-associated issuables prevents security report from loading. !10016
+- Elasticsearch API: Fix project_id showing as 0 for all blobs. A reindex will be required. !10020
+- Make editing the filters in the Group Security Dashboard easier. !10138
+- Geo - Reset the verification checksum after deployment refs are created. !10160
+- Search snippets via elasticsearch. !10325
+- Fixed bug preventing users from adding child epics with multiple children. !10331
+- Fix merge requests being added to Jira Development Panel. !10342
+- Fix authors of merge commits being excluded from approving an MR. !10359
+- Fix ChatOps Slack responder for gitlab.com. !10416
+- Fix sorting by priority with filtering by approvers. !10446
+- Make UpdateRepositoryStorageService idempotent. !10457
+- Fix broken links to protected environments on the CI/CD settings page. !10470
+- Notify owner that group is invalid when LDAP "Sync now" fails. !10509
+- Fix user agent string for Hosted Jira. !10545
+- Fix query used to calculate number of users over license. !10556
+- Fix pipeline bridge serialization error. !10565
+- Correct path to cluster health partial. !10638
+- Ensure Insights charts show all periods even if there are no data. !10733
+- Hide scoped labels help text without corresponding license. !10737
+- Fix merge request operation failure (e.g. assigning user) when project approvers required increases. !10766
+- Include subgroups when finding Insights issuables. !10801
+
+### Changed (27 changes)
+
+- Move project search bar into modal dialog on Operations Dashboard page. !9260
+- Geo - Add selective sync support for the FDW queries to count synced registries. !9445
+- Geo - Add selective sync support for the FDW queries to count failed registries. !9527
+- Convert enable group authentication checkbox to toggle button. !9816
+- Geo: Limit max backoff time by 1 hour, instead of 7 days. !9893
+- Documented Guide to using Geo in HA with RDS cross-region replicas. !9985
+- Dynamically resize security group dashboard vuln graph. !10028
+- Add self approval of merge requests setting to merge requests approvals API. !10050
+- elasticsearch: Switch from LZ4 to DEFLATE compression. !10072
+- Geo - Store the invalid checksum when we have a mismatch. !10101
+- Add requested resources to cluster health metrics. !10135
+- Allow self-approvals in fallback approval rules. !10218
+- Geo - Add selective sync support for FDW queries to find verified registries. !10255
+- Add file line number to vuln modal. !10265
+- Geo - Add selective sync support for FDW queries to find registries where verification has failed. !10266
+- Enforce Geo JWT tokens scope for repository sync. !10303
+- Display link to review note in text email, similar to HTML email. !10401
+- Geo - Add selective sync support for the FDW queries to find mismatch registries. !10434
+- Geo - Add selective sync support for queries to find registries retrying verification. !10436
+- Geo - Add selective sync support for the FDW queries to find registries to verify. !10438
+- Improve DAST location fingerprints. !10487
+- Change order in dast location fingerprint. !10487
+- Geo: Add selective sync support for the FDW queries to find unsynced projects. !10522
+- Enrich container scanning with more data on the frontend. !10526
+- [Geo] Don't mark sync as successful if repo does not exist because of some problems. !10578
+- Move operations dashboard from Ultimate to Premium. !10586
+- Support multiple chart per page for Insights.
+
+### Performance (3 changes)
+
+- Avoid a Gitaly N+1 when loading commits for Elasticsearch search results. !9760
+- Geo: Optimize repository and wiki verification counts. !9939
+- Avoid N+1 when loading Code search results with Elasticsearch enabled. !10394
+
+### Added (31 changes, 1 of them is from the community)
+
+- Add approval and unapproval webhooks. !8742
+- Adding pipelines to the operations dashboard. !9197
+- Add operations dashboard usage counts to usage data. !9291
+- Automatically deprovision and update users from a configured identity via SCIM. !9388
+- Add SCIM Token section to SAML SSO Settings. !9619
+- Use merge request MERGE ref for attached merge request pipelines. !9622
+- Geo: Support syncing over non-publicly accessible URLs. !9634
+- Prevent merge if the merge request pipeline is stale. !9643
+- Block possibility to change email for users with group managed account. !9712
+- Geo admin panel for upload verification. !9720
+- Geo: Create separate models for different registries. !9755
+- Add ability to purchase extra CI minutes. !9815
+- Update Web IDE config to accept ports. !9818
+- Allow per-project and per-group enabling of Elasticsearch indexing. !9861
+- Geo: Help admins diagnose configuration problems. !9988
+- Added MAVEN_CLI_OPTS env var support to License Management CI job. !10012
+- Show DAST vulnerabilities in the Group Security Dashboard. !10271
+- Show DAST in Group Security Dashboard Back-End. !10277
+- Removing pipeline dashboard feature flag. !10302
+- Update user name upon LDAP sync. !10316 (@icode1)
+- Collect usage of pod logs feature. !10370
+- Added metrics reports widget to merge request page. !10380
+- IP whitelisting for Geo-enabling functionality in the primary. !10383
+- Persist in the URL the page and day range of vulnerabilities viewed in the Group Security Dashboard. !10402
+- Add 'Metrics' job artifact report type. !10452
+- Create a user via SCIM. !10456
+- Geo: Display secondary replication lag on console (if lag > 0 seconds). !10471
+- Add Roadmap to Epic page. !10488
+- Expose merge request pipeline parameters for MR widget. !10502
+- Allow instance admins to link all projects to Jira DVCS. !10541
+- Added mutually exclusive key value labels.
+
+### Other (4 changes)
+
+- Simplify admin instance licenses page. !9785
+- Extract EE specific files and externalize strings in admin application settings. !9930
+- Add specs for coerced labels parameter in Epics API. !9932
+- Improve project service desk settings. !10381
+
+
 ## 11.9.6 (2019-04-04)
 
 ### Fixed (3 changes)

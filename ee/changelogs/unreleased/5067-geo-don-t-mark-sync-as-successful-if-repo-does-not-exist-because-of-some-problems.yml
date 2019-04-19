@@ -1,6 +1,0 @@
----
-title: "[Geo] Don't mark sync as successful if repo does not exist because of some
-  problems"
-merge_request: 10578
-author:
-type: changed
