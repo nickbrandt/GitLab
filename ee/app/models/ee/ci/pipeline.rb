@@ -88,11 +88,19 @@ module EE
         }.freeze
 
         state_machine :status do
-          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
             next unless pipeline.has_reports?(::Ci::JobArtifact.security_reports) && pipeline.default_branch?
 
             pipeline.run_after_commit do
               StoreSecurityReportsWorker.perform_async(pipeline.id)
+            end
+          end
+
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+            next unless pipeline.bridged_jobs.any?
+
+            pipeline.run_after_commit do
+              ::Ci::PipelineBridgeWorker.perform_async(pipeline.id)
             end
           end
 

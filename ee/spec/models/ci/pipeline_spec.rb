@@ -440,6 +440,19 @@ describe Ci::Pipeline do
         end
       end
     end
+
+    context 'when pipeline has bridged jobs' do
+      before do
+        pipeline.bridged_jobs << create(:ci_bridge)
+      end
+
+      context "when transitioning to success" do
+        it 'schedules the pipeline bridge worker' do
+          expect(::Ci::PipelineBridgeWorker).to receive(:perform_async).with(pipeline.id)
+          pipeline.succeed!
+        end
+      end
+    end
   end
 
   describe '#ci_yaml_file_path' do
