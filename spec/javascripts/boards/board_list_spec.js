@@ -1,64 +1,13 @@
-/* global List */
-/* global ListIssue */
-
 import Vue from 'vue';
-import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import Sortable from 'sortablejs';
-import BoardList from '~/boards/components/board_list.vue';
 import eventHub from '~/boards/eventhub';
-import '~/boards/models/issue';
-import '~/boards/models/list';
-import boardsStore from '~/boards/stores/boards_store';
-import { listObj, boardsMockInterceptor, mockBoardService } from './mock_data';
-
-window.Sortable = Sortable;
+import createComponent from './board_list_common_spec';
 
 describe('Board list component', () => {
   let mock;
   let component;
 
   beforeEach(done => {
-    const el = document.createElement('div');
-
-    document.body.appendChild(el);
-    mock = new MockAdapter(axios);
-    mock.onAny().reply(boardsMockInterceptor);
-    gl.boardService = mockBoardService();
-    boardsStore.create();
-
-    const BoardListComp = Vue.extend(BoardList);
-    const list = new List(listObj);
-    const issue = new ListIssue({
-      title: 'Testing',
-      id: 1,
-      iid: 1,
-      confidential: false,
-      labels: [],
-      assignees: [],
-      project: {
-        path: '/test',
-      },
-    });
-    list.issuesSize = 1;
-    list.issues.push(issue);
-
-    component = new BoardListComp({
-      el,
-      propsData: {
-        disabled: false,
-        list,
-        issues: list.issues,
-        loading: false,
-        groupId: 1,
-        issueLinkBase: '/test/:project_path/issues',
-        rootPath: '/',
-      },
-    }).$mount();
-
-    Vue.nextTick(() => {
-      done();
-    });
+    ({ mock, component } = createComponent({ done }));
   });
 
   afterEach(() => {
@@ -81,12 +30,6 @@ describe('Board list component', () => {
 
   it('renders issues', () => {
     expect(component.$el.querySelectorAll('.board-card').length).toBe(1);
-  });
-
-  it('renders link properly in issue', () => {
-    expect(
-      component.$el.querySelector('.board-card .board-card-title a').getAttribute('href'),
-    ).not.toContain(':project_path');
   });
 
   it('sets data attribute with issue id', () => {
