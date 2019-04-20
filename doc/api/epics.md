@@ -60,6 +60,7 @@ Example response:
   "group_id": 7,
   "title": "Accusamus iste et ullam ratione voluptatem omnis debitis dolor est.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
+  "state": "opened",
   "author": {
     "id": 10,
     "name": "Lu Mayer",
@@ -112,6 +113,7 @@ Example response:
   "group_id": 7,
   "title": "Ea cupiditate dolores ut vero consequatur quasi veniam voluptatem et non.",
   "description": "Molestias dolorem eos vitae expedita impedit necessitatibus quo voluptatum.",
+  "state": "opened",
   "author":{
     "id": 7,
     "name": "Pamella Huel",
@@ -174,6 +176,7 @@ Example response:
   "group_id": 7,
   "title": "Epic",
   "description": "Epic description",
+  "state": "opened",
   "author": {
     "name" : "Alexandra Bashirian",
     "avatar_url" : null,
@@ -238,6 +241,7 @@ Example response:
   "group_id": 7,
   "title": "New Title",
   "description": "Epic description",
+  "state": "opened",
   "author": {
     "name" : "Alexandra Bashirian",
     "avatar_url" : null,
@@ -277,7 +281,7 @@ DELETE /groups/:id/epics/:epic_iid
 | `epic_iid`          | integer/string   | yes        | The internal ID  of the epic.  |
 
 ```bash
-curl --header DELETE "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5?title=New%20Title
+curl --header DELETE "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5
 ```
 
 ## Create a todo
