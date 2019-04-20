@@ -308,6 +308,46 @@ describe API::Epics do
       it_behaves_like 'can admin epics'
     end
 
+    context 'filtering before a specific date' do
+      let!(:epic) { create(:epic, group: group, created_at: Date.new(2000, 1, 1), updated_at: Date.new(2000, 1, 1)) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'returns epics created before a specific date' do
+        get api(url, user), params: { created_before: '2000-01-02T00:00:00.060Z' }
+
+        expect_paginated_array_response(epic.id)
+      end
+
+      it 'returns epics updated before a specific date' do
+        get api(url, user), params: { updated_before: '2000-01-02T00:00:00.060Z' }
+
+        expect_paginated_array_response(epic.id)
+      end
+    end
+
+    context 'filtering after a specific date' do
+      let!(:epic) { create(:epic, group: group, created_at: 1.week.from_now, updated_at: 1.week.from_now) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'returns epics created after a specific date' do
+        get api(url, user), params: { created_after: epic.created_at }
+
+        expect_paginated_array_response(epic.id)
+      end
+
+      it 'returns epics updated after a specific date' do
+        get api(url, user), params: { updated_after: epic.updated_at }
+
+        expect_paginated_array_response(epic.id)
+      end
+    end
+
     context 'with pagination params' do
       let(:page) { 1 }
       let(:per_page) { 2 }

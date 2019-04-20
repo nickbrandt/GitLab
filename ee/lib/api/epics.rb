@@ -30,6 +30,10 @@ module API
                          desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
         optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
+        optional :created_after, type: DateTime, desc: 'Return epics created after the specified time'
+        optional :created_before, type: DateTime, desc: 'Return epics created before the specified time'
+        optional :updated_after, type: DateTime, desc: 'Return epics updated after the specified time'
+        optional :updated_before, type: DateTime, desc: 'Return epics updated before the specified time'
         use :pagination
       end
       get ':id/(-/)epics' do
