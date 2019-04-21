@@ -42,7 +42,7 @@ describe DependencyProxy::RequestTokenService do
     before do
       auth_link = DependencyProxy::Registry.auth_url(image)
 
-      stub_request(:any, auth_link).to_timeout
+      stub_full_request(auth_link, method: :any).to_timeout
     end
 
     it { expect(subject[:status]).to eq(:error) }
