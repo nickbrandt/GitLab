@@ -41,8 +41,13 @@ module QA
       # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/51
       context 'instance level', :quarantine do
         before do
+          # Log out if already logged in
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
-          Page::Main::Login.perform(&:sign_in_using_credentials)
+          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
           Page::Main::Menu.perform(&:click_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
