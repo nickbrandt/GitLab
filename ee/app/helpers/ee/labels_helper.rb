@@ -43,6 +43,12 @@ module EE
       })
     end
 
+    def issuable_types
+      return super unless @group&.feature_available?(:epics)
+
+      super + ['epics']
+    end
+
     module_function :scoped_label_wrapper, :scoped_labels_doc_link, :label_tooltip_title
   end
 end
