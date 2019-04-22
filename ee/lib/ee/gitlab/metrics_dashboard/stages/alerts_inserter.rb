@@ -25,8 +25,9 @@ module EE
             alerts = ::Projects::Prometheus::AlertsFinder
                        .new(project: project, environment: environment)
                        .execute
+                       .pluck(:prometheus_metric_id)
 
-            @metrics_with_alerts = Set.new(alerts.map(&:prometheus_metric_id))
+            @metrics_with_alerts = Set.new(alerts)
           end
 
           def alert_path(metric_id, project, environment)
