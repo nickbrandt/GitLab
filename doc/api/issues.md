@@ -3,7 +3,7 @@
 Every API call to issues must be authenticated.
 
 If a user is not a member of a project and the project is private, a `GET`
-request on that project will result to a `404` status code.
+request on that project will result in a `404` status code.
 
 ## Issues pagination
 

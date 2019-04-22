@@ -70,6 +70,7 @@ The following API resources are available in the project context:
 | [Search](search.md)                                                 | `/projects/:id/search` (also available for groups and standalone)                                                                                                                                     |
 | [Services](services.md)                                             | `/projects/:id/services`                                                                                                                                                                              |
 | [Tags](tags.md)                                                     | `/projects/:id/repository/tags`                                                                                                                                                                       |
+| [Vulnerabilities](vulnerabilities.md) **[ULTIMATE]**                | `/projects/:id/vulnerabilities` (also available for groups)                                                                                                                                           |
 | [Wikis](wikis.md)                                                   | `/projects/:id/wikis`                                                                                                                                                                                 |
 
 ### Group resources
