@@ -608,10 +608,10 @@ describe ApprovalState do
               expect(subject.can_approve?(user)).to be_truthy
             end
 
-            it 'allows the user to approve the MR if not within the approvers list' do
+            it 'does not allow the user to approve the MR if not within the approvers list' do
               allow(subject).to receive(:approvers).and_return([])
 
-              expect(subject.can_approve?(user)).to be_truthy
+              expect(subject.can_approve?(user)).to be_falsey
             end
           end
         end

@@ -1,0 +1,5 @@
+---
+title: Fix preventing approval of merge requests by an author
+merge_request: 11263
+author:
+type: fixed

@@ -140,8 +140,8 @@ class ApprovalState
     return false if approvals.where(user: user).any?
     # At this point, follow self-approval rules. Otherwise authors must
     # have been in the list of unactioned_approvers to have been approved.
-    return committers_can_approve? if merge_request.committers.include?(user)
-    return authors_can_approve? if merge_request.author == user
+    return false if !authors_can_approve? && merge_request.author == user
+    return false if !committers_can_approve? && merge_request.committers.include?(user)
 
     true
   end
