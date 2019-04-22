@@ -14,9 +14,14 @@ module QA
 
         # Create an admin personal access token and use it for the remaining API calls
         @original_personal_access_token = Runtime::Env.personal_access_token
-        Page::Main::Menu.perform(&:sign_out)
 
+        Page::Main::Menu.perform do |menu|
+          menu.sign_out if menu.has_personal_area?
+        end
+
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+
         Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
         Page::Main::Menu.perform(&:sign_out)
       end
