@@ -205,3 +205,7 @@ Once you wrote your comment, you can either:
 ## Award emoji
 
 - You can [award an emoji](../../award_emojis.md) to that epic or its comments.
+
+## Notifications            
+
+- [Receive notifications](../../../workflow/notifications.md) for epic events.
