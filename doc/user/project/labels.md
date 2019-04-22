@@ -17,22 +17,25 @@ In GitLab, you can create project and group labels:
 
 Scoped labels allow teams to use the simple and familiar feature of labels to
 annotate their issues, merge requests, and epics to achieve custom fields and
-custom workflow states, by leveraging a special label title syntax to create those scopes.
+custom workflow states by leveraging a special label title syntax.
 
-A scoped label is a specific kind of label defined only by a special colon syntax
-in the label’s title, namely `key::value`.
+A scoped label is a kind of label defined only by a special double-colon syntax
+in the label’s title, using the format `key::value`. For example:
 
 ![A sample scoped label](img/key_value_labels.png)
 
-A scoped label with a same key but with different value cannot be applied together
-to an issue, epic or a merge request. For example, if an issue has `priority::3`
-already and you apply `priority::2` to it, `priority::3` automatically gets removed
-from the issue.
+Two scoped labels with the same key but a different value cannot simultaneeously
+apply to an issue, epic, or merge request. For example, if an issue already has `priority::3`
+and you apply `priority::2` to it, `priority::3` is automatically removed from the issue.
+
+An issue, epic, or merge request cannot have two scoped labels with the same key.
+For example, if an issue is already labeled `priority::3` and you apply the label `priority::2` to it,
+`priority::3` is automatically removed.
 
 ### Workflows with scoped labels **[PREMIUM]**
 
 Suppose you wanted a custom field in issues to track the platform operating system
-that your features target, and each issue should only target one platform. You
+that your features target, where each issue should only target one platform. You
 would then create labels `platform::iOS`, `platform::Android`, `platform::Linux`,
 etc., as necessary. Applying any one of these labels on a given issue would
 automatically remove any other existing label that starts with `platform::`.
@@ -44,8 +47,8 @@ applied, and a developer wanted to advance the issue to `workflow::review`, they
 would simply apply that label, and the `workflow::development` label would
 automatically be removed. This behavior already exists when you move issues
 across label lists in an [issue board](issue_board.md#creating-workflows), but
-now team members who may not be working in an issue board directly, would still
-nonetheless be able to advance workflow states consistently in issues themselves.
+now, team members who may not be working in an issue board directly would still
+be able to advance workflow states consistently in issues themselves.
 
 ## Creating labels
 
