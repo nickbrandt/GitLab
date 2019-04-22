@@ -204,10 +204,9 @@ class GeoNode < ApplicationRecord
     return Project.all unless selective_sync?
 
     if selective_sync_by_namespaces?
-      query = Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
-      Project.in_namespace(query.select(:id))
+      projects_for_selected_namespaces
     elsif selective_sync_by_shards?
-      Project.within_shards(selective_sync_shards)
+      projects_for_selected_shards
     else
       Project.none
     end
@@ -315,5 +314,13 @@ class GeoNode < ApplicationRecord
     return value if value.end_with?('/')
 
     "#{value}/"
+  end
+
+  def projects_for_selected_namespaces
+    Project.where(Project.arel_table.name => { namespace_id: selected_namespaces_and_descendants.select(:id) })
+  end
+
+  def projects_for_selected_shards
+    Project.within_shards(selective_sync_shards)
   end
 end

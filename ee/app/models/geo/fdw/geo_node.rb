@@ -71,37 +71,6 @@ module Geo
         Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
           .within_shards(selective_sync_shards)
       end
-
-      def selected_namespaces_and_descendants
-        relation = selected_namespaces_and_descendants_cte.apply_to(Geo::Fdw::Namespace.all)
-        relation.extend(Gitlab::Database::ReadOnlyRelation)
-        relation
-      end
-
-      def selected_namespaces_and_descendants_cte
-        cte = Gitlab::SQL::RecursiveCTE.new(:base_and_descendants)
-
-        cte << geo_node_namespace_links
-          .select(fdw_geo_node_namespace_links_table[:namespace_id].as('id'))
-          .except(:order)
-
-        # Recursively get all the descendants of the base set.
-        cte << Geo::Fdw::Namespace
-          .select(fdw_namespaces_table[:id])
-          .from([fdw_namespaces_table, cte.table])
-          .where(fdw_namespaces_table[:parent_id].eq(cte.table[:id]))
-          .except(:order)
-
-        cte
-      end
-
-      def fdw_namespaces_table
-        Geo::Fdw::Namespace.arel_table
-      end
-
-      def fdw_geo_node_namespace_links_table
-        Geo::Fdw::GeoNodeNamespaceLink.arel_table
-      end
     end
   end
 end
