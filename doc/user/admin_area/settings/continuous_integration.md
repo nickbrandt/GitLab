@@ -92,6 +92,37 @@ the group.
 
 ![Group pipelines quota](img/group_pipelines_quota.png)
 
+
+## Extra Shared Runners pipeline minutes quota
+
+NOTE: **Note:**
+Only available on GitLab.com.
+
+If you have a Group with a [paid plan](https://about.gitlab.com/pricing/#gitlab-com) on GitLab.com,
+then you can purchase additional CI minutes so your pipelines will not be blocked after you have
+used all your CI minutes from your main quota.
+
+In order to purchase additional minutes, you should follow these steps:
+
+1. Go to **Group > Settings > Pipelines quota**. Once you are on that page, click on **Buy additional minutes**.
+
+    ![Buy additional minutes](img/buy_btn.png)
+
+1. Locate the subscription card that is linked to your group on GitLab.com,
+click on **Buy more CI minutes**, and complete the details about the transaction.
+
+    ![Buy additional minutes](img/buy_minutes_card.png)
+
+1. Once we have processed your payment, the extra CI minutes
+will be synced to your Group and you can visualize it from  the
+**Group > Settings > Pipelines quota** page:
+
+    ![Additional minutes](img/additional_minutes.png)
+
+NOTE: **Important note**: If you have some minutes used over your default quota, these minutes will
+be deducted from your Additional Minutes quota immediately after your purchase of additional
+minutes.
+
 ## Archive jobs **[CORE ONLY]**
 
 Archiving jobs is useful for reducing the CI/CD footprint on the system by
