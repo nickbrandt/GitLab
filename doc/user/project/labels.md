@@ -28,6 +28,10 @@ Two scoped labels with the same key but a different value cannot simultaneeously
 apply to an issue, epic, or merge request. For example, if an issue already has `priority::3`
 and you apply `priority::2` to it, `priority::3` is automatically removed from the issue.
 
+An issue, epic, or merge request cannot have two scoped labels with the same key.
+For example, if an issue is already labeled `priority::3` and you apply the label `priority::2` to it,
+`priority::3` is automatically removed.
+
 ### Workflows with scoped labels **[PREMIUM]**
 
 Suppose you wanted a custom field in issues to track the platform operating system
