@@ -4,7 +4,7 @@ module EE
   module Gitlab
     module MetricsDashboard
       module Processor
-       extend ::Gitlab::Utils::Override
+        extend ::Gitlab::Utils::Override
 
         EE_SEQUENCE = [
           Stages::AlertsInserter
