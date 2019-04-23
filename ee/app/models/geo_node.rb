@@ -194,6 +194,12 @@ class GeoNode < ApplicationRecord
     end
   end
 
+  def lfs_objects
+    return LfsObject.all unless selective_sync?
+
+    LfsObject.project_id_in(projects)
+  end
+
   def projects
     return Project.all unless selective_sync?
 

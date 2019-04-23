@@ -4,7 +4,7 @@ require 'spec_helper'
 
 # Disable transactions via :delete method because a foreign table
 # can't see changes inside a transaction of a different connection.
-describe Gitlab::Geo::Fdw::FileRegistryQueryBuilder, :geo, :delete do
+describe Gitlab::Geo::Fdw::UploadRegistryQueryBuilder, :geo, :delete do
   let(:project) { create(:project) }
   let(:upload_1) { create(:upload, :issuable_upload, model: project) }
   let(:upload_2) { create(:upload, :issuable_upload, model: project) }

@@ -14,6 +14,19 @@ module Geo
       has_many :geo_node_namespace_links, class_name: 'Geo::Fdw::GeoNodeNamespaceLink'
       has_many :namespaces, class_name: 'Geo::Fdw::Namespace', through: :geo_node_namespace_links
 
+      def lfs_objects
+        return Geo::Fdw::LfsObject.all unless selective_sync?
+
+        Geo::Fdw::LfsObject.project_id_in(projects)
+      end
+
+      def lfs_object_registries
+        return Geo::FileRegistry.lfs_objects unless selective_sync?
+
+        Gitlab::Geo::Fdw::LfsObjectRegistryQueryBuilder.new
+          .for_lfs_objects(lfs_objects)
+      end
+
       def projects
         return Geo::Fdw::Project.all unless selective_sync?
 

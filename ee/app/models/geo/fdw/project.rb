@@ -7,6 +7,9 @@ module Geo
 
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
+      has_many :lfs_objects_projects, class_name: 'Geo::Fdw::LfsObjectsProject'
+      has_many :lfs_objects, class_name: 'Geo::Fdw::LfsObject', through: :lfs_objects_projects
+
       class << self
         def missing_project_registry
           left_outer_join_project_registry

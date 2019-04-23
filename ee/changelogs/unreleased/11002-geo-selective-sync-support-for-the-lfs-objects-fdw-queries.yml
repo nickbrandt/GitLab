@@ -1,0 +1,5 @@
+---
+title: Geo - Implement selective sync support for the LFS objects FDW queries
+merge_request: 10757
+author:
+type: changed

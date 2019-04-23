@@ -2,9 +2,11 @@
 
 module Geo
   class ExpireUploadsFinder
+    UPLOAD_TYPE = 'file'
+
     def find_project_uploads(project)
       if Gitlab::Geo::Fdw.enabled?
-        Geo::Fdw::Upload.for_model_with_type(project, 'file')
+        Geo::Fdw::Upload.for_model_with_type(project, UPLOAD_TYPE)
       else
         legacy_find_project_uploads(project)
       end
@@ -12,9 +14,9 @@ module Geo
 
     def find_file_registries_uploads(project)
       if Gitlab::Geo::Fdw.enabled?
-        Gitlab::Geo::Fdw::FileRegistryQueryBuilder.new
+        Gitlab::Geo::Fdw::UploadRegistryQueryBuilder.new
           .for_model(project)
-          .with_type('file')
+          .with_type(UPLOAD_TYPE)
       else
         legacy_find_file_registries_uploads(project)
       end
@@ -28,13 +30,12 @@ module Geo
       return Geo::FileRegistry.none if upload_ids.empty?
 
       values_sql = upload_ids.map { |id| "(#{id})" }.join(',')
-      upload_type = 'file'
 
       Geo::FileRegistry.joins(<<~SQL)
         JOIN (VALUES #{values_sql})
           AS uploads (id)
           ON uploads.id = file_registry.file_id
-         AND file_registry.file_type='#{upload_type}'
+         AND file_registry.file_type='#{UPLOAD_TYPE}'
       SQL
     end
     # rubocop:enable CodeReuse/ActiveRecord

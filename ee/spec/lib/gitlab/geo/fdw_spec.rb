@@ -44,6 +44,49 @@ describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
+  describe '.enabled?' do
+    it 'returns true when foreign server does not exist' do
+      drop_foreign_server
+
+      expect(described_class.disabled?).to eq true
+    end
+
+    it 'returns true when foreign server exists but foreign schema does not exist' do
+      drop_foreign_schema
+
+      expect(described_class.disabled?).to eq true
+    end
+
+    it 'returns true when foreign server and schema exists but foreign tables are empty' do
+      drop_foreign_schema
+      create_foreign_schema
+
+      expect(described_class.disabled?).to eq true
+    end
+
+    it 'returns true when fdw is disabled in `config/database_geo.yml`' do
+      allow(Rails.configuration).to receive(:geo_database).and_return('fdw' => false)
+
+      expect(described_class.disabled?).to eq true
+    end
+
+    it 'returns false when fdw is set in `config/database_geo.yml`' do
+      allow(Rails.configuration).to receive(:geo_database).and_return('fdw' => true)
+
+      expect(described_class.disabled?).to eq false
+    end
+
+    it 'returns false when fdw is nil in `config/database_geo.yml`' do
+      allow(Rails.configuration).to receive(:geo_database).and_return('fdw' => nil)
+
+      expect(described_class.disabled?).to eq false
+    end
+
+    it 'returns false with a functional fdw environment' do
+      expect(described_class.disabled?).to eq false
+    end
+  end
+
   describe '.enabled_for_selective_sync?' do
     context 'when the feature flag is enabled' do
       before do
