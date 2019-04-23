@@ -16,22 +16,6 @@ describe Label do
       it 'returns true for scoped labels' do
         expect(build(:label, title: 'key::some name').scoped_label?).to be_truthy
       end
-
-      it 'returns false for scoped labels without subject' do
-        label = described_class.new(title: 'key::some name')
-
-        expect(label.scoped_label?).to be_falsey
-      end
-    end
-
-    context 'with scoped_labels not available' do
-      before do
-        stub_licensed_features(scoped_labels: false)
-      end
-
-      it 'returns false for scoped labels' do
-        expect(build(:label, title: 'key::some name').scoped_label?).to be_falsey
-      end
     end
   end
 
