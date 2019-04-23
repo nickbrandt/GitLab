@@ -30,7 +30,7 @@ module EE
       end
 
       def stick_build_if_status_changed
-        return unless status_changed?
+        return unless saved_change_to_status?
         return unless running?
 
         ::Gitlab::Database::LoadBalancing::Sticking.stick(:build, id)

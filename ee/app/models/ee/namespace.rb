@@ -80,7 +80,7 @@ module EE
     end
 
     def old_path_with_namespace_for(project)
-      project.full_path.sub(/\A#{Regexp.escape(full_path)}/, full_path_was)
+      project.full_path.sub(/\A#{Regexp.escape(full_path)}/, full_path_before_last_save)
     end
 
     # This makes the feature disabled by default, in contrary to how
