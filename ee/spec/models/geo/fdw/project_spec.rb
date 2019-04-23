@@ -3,6 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe Geo::Fdw::Project, :geo, type: :model do
+  context 'relationships' do
+    it { is_expected.to have_many(:lfs_objects_projects).class_name('Geo::Fdw::LfsObjectsProject') }
+    it { is_expected.to have_many(:lfs_objects).class_name('Geo::Fdw::LfsObject').through(:lfs_objects_projects) }
+  end
+
   describe '.search' do
     set(:test_project) { create(:project, description: 'kitten mittens') }
     set(:project) { described_class.find(test_project.id) }

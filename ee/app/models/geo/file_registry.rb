@@ -3,11 +3,11 @@
 class Geo::FileRegistry < Geo::BaseRegistry
   include Geo::Syncable
 
-  scope :lfs_objects, -> { where(file_type: :lfs) }
   scope :attachments, -> { where(file_type: Geo::FileService::DEFAULT_OBJECT_TYPES) }
   scope :failed, -> { where(success: false).where.not(retry_count: nil) }
-  scope :never, -> { where(success: false, retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
+  scope :lfs_objects, -> { where(file_type: :lfs) }
+  scope :never, -> { where(success: false, retry_count: nil) }
   scope :with_file_type, ->(type) { where(file_type: type) }
 
   self.inheritance_column = 'file_type'
@@ -18,6 +18,18 @@ class Geo::FileRegistry < Geo::BaseRegistry
     elsif Geo::FileService::DEFAULT_OBJECT_TYPES.include?(file_type.to_sym)
       Geo::UploadRegistry
     end
+  end
+
+  def self.file_id_in(ids)
+    where(file_id: ids)
+  end
+
+  def self.file_id_not_in(ids)
+    where.not(file_id: ids)
+  end
+
+  def self.pluck_file_key
+    where(nil).pluck(:file_id)
   end
 
   def self.with_status(status)

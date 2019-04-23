@@ -5,14 +5,14 @@
 #
 # Basic usage:
 #
-#     Gitlab::Geo::Fdw::FileRegistryQueryBuilder
+#     Gitlab::Geo::Fdw::UploadRegistryQueryBuilder
 #       .new
 #       .for_project_with_type(project, 'file')
 #
 module Gitlab
   module Geo
     class Fdw
-      class FileRegistryQueryBuilder < BaseQueryBuilder
+      class UploadRegistryQueryBuilder < BaseQueryBuilder
         # rubocop:disable CodeReuse/ActiveRecord
         def for_model(model)
           reflect(

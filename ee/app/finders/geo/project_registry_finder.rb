@@ -86,14 +86,6 @@ module Geo
 
     private
 
-    def fdw_disabled?
-      !Gitlab::Geo::Fdw.enabled?
-    end
-
-    def use_legacy_queries_for_selective_sync?
-      fdw_disabled? || selective_sync? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
-    end
-
     def finder_klass_for_unsynced_projects
       if use_legacy_queries_for_selective_sync?
         Geo::LegacyProjectUnsyncedFinder

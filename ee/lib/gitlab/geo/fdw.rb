@@ -19,6 +19,10 @@ module Gitlab
           value.nil? ? true : value
         end
 
+        def disabled?
+          !enabled?
+        end
+
         def enabled_for_selective_sync?
           enabled? && Feature.enabled?(:use_fdw_queries_for_selective_sync)
         end

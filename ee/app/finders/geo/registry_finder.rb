@@ -23,7 +23,11 @@ module Geo
     def use_legacy_queries?
       # Selective project replication adds a wrinkle to FDW
       # queries, so we fallback to the legacy version for now.
-      !Gitlab::Geo::Fdw.enabled? || selective_sync?
+      Gitlab::Geo::Fdw.disabled? || selective_sync?
+    end
+
+    def use_legacy_queries_for_selective_sync?
+      use_legacy_queries? && !Gitlab::Geo::Fdw.enabled_for_selective_sync?
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

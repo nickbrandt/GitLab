@@ -7,31 +7,29 @@ module Geo
     end
 
     def count_synced
-      if aggregate_pushdown_supported?
-        find_synced.count
-      else
-        legacy_find_synced.count
-      end
+      lfs_objects_synced.count
     end
 
     def count_failed
-      if aggregate_pushdown_supported?
-        find_failed.count
-      else
-        legacy_find_failed.count
-      end
+      lfs_objects_failed.count
     end
 
     def count_synced_missing_on_primary
-      if aggregate_pushdown_supported? && !use_legacy_queries?
-        fdw_find_synced_missing_on_primary.count
-      else
-        legacy_find_synced_missing_on_primary.count
-      end
+      lfs_objects_synced_missing_on_primary.count
     end
 
     def count_registry
-      Geo::FileRegistry.lfs_objects.count
+      registries_for_lfs_objects.count
+    end
+
+    def syncable
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.syncable
+      elsif selective_sync?
+        fdw_geo_node.lfs_objects.syncable
+      else
+        LfsObject.syncable
+      end
     end
 
     # Find limited amount of non replicated lfs objects.
@@ -44,206 +42,111 @@ module Geo
     #
     # @param [Integer] batch_size used to limit the results returned
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
-    # rubocop: disable CodeReuse/ActiveRecord
+    # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
       relation =
-        if use_legacy_queries?
-          legacy_find_unsynced(except_file_ids: except_file_ids)
+        if use_legacy_queries_for_selective_sync?
+          legacy_finder.lfs_objects_unsynced(except_file_ids: except_file_ids)
         else
-          fdw_find_unsynced(except_file_ids: except_file_ids)
+          lfs_objects_unsynced(except_file_ids: except_file_ids)
         end
 
       relation.limit(batch_size)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
+    # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
       relation =
-        if use_legacy_queries?
-          legacy_find_migrated_local(except_file_ids: except_file_ids)
+        if use_legacy_queries_for_selective_sync?
+          legacy_finder.lfs_objects_migrated_local(except_file_ids: except_file_ids)
         else
-          fdw_find_migrated_local(except_file_ids: except_file_ids)
+          lfs_objects_migrated_local(except_file_ids: except_file_ids)
         end
 
       relation.limit(batch_size)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/ActiveRecord
 
-    def syncable
-      all.geo_syncable
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
+    # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_file_ids: [])
-      find_failed_registries
-        .retry_due
-        .where.not(file_id: except_file_ids)
+      registries_for_lfs_objects
+        .merge(Geo::FileRegistry.failed)
+        .merge(Geo::FileRegistry.retry_due)
+        .file_id_not_in(except_file_ids)
         .limit(batch_size)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
+    # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
-      find_synced_missing_on_primary_registries
+      registries_for_lfs_objects
+        .synced
+        .missing_on_primary
         .retry_due
-        .where.not(file_id: except_file_ids)
+        .file_id_not_in(except_file_ids)
         .limit(batch_size)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
+    # rubocop:enable CodeReuse/ActiveRecord
 
     private
 
-    def all
-      if selective_sync?
-        LfsObject.project_id_in(current_node.projects)
+    # rubocop:disable CodeReuse/Finder
+    def legacy_finder
+      @legacy_finder ||= Geo::LegacyLfsObjectRegistryFinder.new(current_node: current_node)
+    end
+    # rubocop:enable CodeReuse/Finder
+
+    def fdw_geo_node
+      @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
+    end
+
+    def registries_for_lfs_objects
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.registries_for_lfs_objects
       else
-        LfsObject.all
+        fdw_geo_node.lfs_object_registries
       end
     end
 
-    def find_synced
-      if use_legacy_queries?
-        legacy_find_synced
+    def lfs_objects_synced
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.lfs_objects_synced
       else
-        fdw_find_synced
+        fdw_geo_node.lfs_objects.synced
       end
     end
 
-    def find_failed
-      if use_legacy_queries?
-        legacy_find_failed
+    def lfs_objects_failed
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.lfs_objects_failed
       else
-        fdw_find_failed
+        fdw_geo_node.lfs_objects.failed
       end
     end
 
-    def find_synced_registries
-      Geo::FileRegistry.lfs_objects.synced
+    def lfs_objects_unsynced(except_file_ids:)
+      fdw_geo_node
+        .lfs_objects
+        .syncable
+        .missing_file_registry
+        .id_not_in(except_file_ids)
     end
 
-    def find_failed_registries
-      Geo::FileRegistry.lfs_objects.failed
-    end
-
-    def find_synced_missing_on_primary_registries
-      find_synced_registries.missing_on_primary
-    end
-
-    #
-    # FDW accessors
-    #
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find
-      fdw_all.joins("INNER JOIN file_registry ON file_registry.file_id = #{fdw_table}.id")
-        .geo_syncable
-        .merge(Geo::FileRegistry.lfs_objects)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find_unsynced(except_file_ids:)
-      fdw_all.joins("LEFT OUTER JOIN file_registry
-                                          ON file_registry.file_id = #{fdw_table}.id
-                                         AND file_registry.file_type = 'lfs'")
-        .geo_syncable
-        .where(file_registry: { id: nil })
-        .where.not(id: except_file_ids)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find_migrated_local(except_file_ids:)
-      fdw_all.joins("INNER JOIN file_registry ON file_registry.file_id = #{fdw_table}.id")
+    def lfs_objects_migrated_local(except_file_ids:)
+      fdw_geo_node
+        .lfs_objects
+        .inner_join_file_registry
         .with_files_stored_remotely
-        .where.not(id: except_file_ids)
-        .merge(Geo::FileRegistry.lfs_objects)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    def fdw_find_synced
-      fdw_find.merge(Geo::FileRegistry.synced)
+        .id_not_in(except_file_ids)
     end
 
-    def fdw_find_synced_missing_on_primary
-      fdw_find.merge(Geo::FileRegistry.synced.missing_on_primary)
-    end
-
-    def fdw_find_failed
-      fdw_find.merge(Geo::FileRegistry.failed)
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_all
-      if selective_sync?
-        Geo::Fdw::LfsObject.joins(:project).where(projects: { id: current_node.projects })
+    def lfs_objects_synced_missing_on_primary
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.lfs_objects_synced_missing_on_primary
       else
-        Geo::Fdw::LfsObject.all
+        fdw_geo_node.lfs_objects.synced.missing_on_primary
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    def fdw_table
-      Geo::Fdw::LfsObject.table_name
-    end
-
-    #
-    # Legacy accessors (non FDW)
-    #
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_synced
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_registries.pluck(:file_id),
-        LfsObject
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_failed
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_failed_registries.pluck(:file_id),
-        LfsObject
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_unsynced(except_file_ids:)
-      registry_file_ids = Geo::FileRegistry.lfs_objects.pluck(:file_id) | except_file_ids
-
-      legacy_left_outer_join_registry_ids(
-        syncable,
-        registry_file_ids,
-        LfsObject
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_migrated_local(except_file_ids:)
-      registry_file_ids = Geo::FileRegistry.lfs_objects.pluck(:file_id) - except_file_ids
-
-      legacy_inner_join_registry_ids(
-        all.with_files_stored_remotely,
-        registry_file_ids,
-        LfsObject
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_missing_on_primary_registries.pluck(:file_id),
-        LfsObject
-      )
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
