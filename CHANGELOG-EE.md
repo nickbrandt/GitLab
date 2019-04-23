@@ -1,5 +1,20 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.10.1 (2019-04-23)
+
+### Fixed (4 changes)
+
+- Fix approval rules when used with relative url root. !10819
+- Fix add/remove pipeline dashboard issue. !11029
+- Fix JWT token check when repository does not exist. !11033
+- Fix preventing approval of merge requests by an author. !11263
+
+### Changed (2 changes)
+
+- Improve SAML settings with validation, design, and help text. !10450
+- Use a single color for the Insights time series bar charts. !11076
+
+
 ## 11.10.0 (2019-04-22)
 
 ### Security (3 changes)
