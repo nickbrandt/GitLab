@@ -114,6 +114,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Improve project service desk settings. !10381
 
 
+## 11.9.9 (2019-04-23)
+
+### Fixed (1 change)
+
+- Fix approval rules when used with relative url root. !10819
+
+
 ## 11.9.8 (2019-04-11)
 
 ### Fixed (1 change)
