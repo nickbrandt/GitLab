@@ -8,6 +8,12 @@ milestones.
 
 ![epics list view](img/epics_list_view.png)
 
+## Use cases
+
+- Suppose your team is working on a large feature that involves multiple discussions throughout different issues created in distinct projects within a [Group](../index.md). With Epics, you can track all the related activities that together contribute to that single feature.
+- Track when the work for the group of issues is targeted to begin, and when it is targeted to end.
+- Discuss and collaborate on feature ideas and scope at a high-level.
+
 ## Creating an epic
 
 A paginated list of epics is available in each group from where you can create
