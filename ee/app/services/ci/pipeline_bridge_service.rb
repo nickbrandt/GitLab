@@ -4,7 +4,20 @@ module Ci
   class PipelineBridgeService < ::BaseService
     def execute(pipeline)
       pipeline.bridged_jobs.each do |bridged_job|
-        bridged_job.update(status: pipeline.status)
+        process_bridged_job(pipeline.status, bridged_job)
+      end
+    end
+
+    def process_bridged_job(status, job)
+      case status
+      when 'success'
+        job.success!
+      when 'failed'
+        job.drop!
+      when 'canceled'
+        job.cancel!
+      when 'skipped'
+        job.skip!
       end
     end
   end
