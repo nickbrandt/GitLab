@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe GitlabSubscription do
+  around do |example|
+    Timecop.freeze do
+      example.run
+    end
+  end
+
   describe 'default values' do
     it do
       expect(subject.start_date).to eq(Date.today)
