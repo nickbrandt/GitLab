@@ -15,4 +15,4 @@
           - if epic.labels.any?
             &nbsp;
             - epic.labels.each do |label|
-              = render_label(label, tooltip: true, link: group_epics_path(@group, label_name:[label.name]), css: 'label-link')
+              = render_label(label.present(issuable_subject: @group), tooltip: true, link: group_epics_path(@group, label_name:[label.name]), css: 'label-link')
