@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Geo::ProjectRegistryStatusFinder, :geo do
+describe Geo::ProjectRegistryStatusFinder, :geo, :geo_tracking_db do
   include ::EE::GeoHelpers
 
   set(:secondary) { create(:geo_node) }
@@ -21,7 +21,6 @@ describe Geo::ProjectRegistryStatusFinder, :geo do
   subject { described_class.new(current_node: secondary) }
 
   before do
-    skip('FDW is not configured') if Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
     stub_current_geo_node(secondary)
   end
 

@@ -13,11 +13,7 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo do
     allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:renew).and_return(true)
   end
 
-  shared_examples '#perform' do |skip_tests|
-    before do
-      skip('FDW is not configured') if skip_tests
-    end
-
+  shared_examples '#perform' do
     it 'does not run when node is disabled' do
       secondary.enabled = false
       secondary.save
@@ -173,11 +169,8 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo do
     end
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe 'when PostgreSQL FDW is available', :geo, :delete do
-    # Skip if FDW isn't activated on this database
-    it_behaves_like '#perform', Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
+  describe 'when PostgreSQL FDW is available', :geo, :geo_fdw do
+    it_behaves_like '#perform'
   end
 
   describe 'when PostgreSQL FDW is not enabled', :geo do
@@ -185,6 +178,6 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo do
       allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
     end
 
-    it_behaves_like '#perform', false
+    it_behaves_like '#perform'
   end
 end

@@ -2,10 +2,8 @@
 
 require 'spec_helper'
 
-describe Geo::ProjectUnsyncedFinder, :geo do
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe '#execute', :delete do
+describe Geo::ProjectUnsyncedFinder, :geo, :geo_fdw do
+  describe '#execute' do
     let(:node) { create(:geo_node) }
     let(:group_1) { create(:group) }
     let(:group_2) { create(:group) }
@@ -16,8 +14,6 @@ describe Geo::ProjectUnsyncedFinder, :geo do
     let!(:project_4) { create(:project, group: group_1) }
 
     before do
-      skip('FDW is not configured') unless Gitlab::Geo::Fdw.enabled?
-
       project_4.update_column(:repository_storage, 'foo')
     end
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Geo::UploadRegistry, :geo, :delete do
+describe Geo::UploadRegistry, :geo, :geo_fdw do
   let!(:lfs_registry) { create(:geo_file_registry, :lfs) }
   let!(:attachment_registry) { create(:geo_file_registry, :attachment, :with_file) }
   let!(:avatar_registry) { create(:geo_file_registry, :avatar) }
@@ -28,7 +28,7 @@ describe Geo::UploadRegistry, :geo, :delete do
     expect(described_class.find(attachment_registry.id).upload).to be_an_instance_of(Upload)
   end
 
-  describe '.with_search', :geo_fdw do
+  describe '.with_search' do
     it 'searches registries on path' do
       upload = create(:upload, path: 'uploads/-/system/project/avatar/my-awesome-avatar.png')
       upload_registry = create(:geo_upload_registry, file_id: upload.id, file_type: :avatar)

@@ -1,10 +1,9 @@
 require 'spec_helper'
 
-# Disable transactions via :delete method because a foreign table
-# can't see changes inside a transaction of a different connection.
-describe Geo::FilesExpireService, :geo, :delete do
+describe Geo::FilesExpireService, :geo, :geo_fdw do
   let(:project) { create(:project, :legacy_storage) }
   let!(:old_full_path) { project.full_path }
+
   subject { described_class.new(project, old_full_path) }
 
   describe '#execute' do

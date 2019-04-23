@@ -18,13 +18,7 @@ shared_examples_for 'a file registry finder' do
     end
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  context 'FDW', :delete do
-    before do
-      skip('FDW is not configured') if Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
-    end
-
+  context 'FDW', :geo_fdw do
     include_examples 'counts all the things'
 
     include_examples 'finds all the things' do

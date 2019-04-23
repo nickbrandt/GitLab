@@ -20,6 +20,12 @@ RSpec.configure do |config|
   end
 
   config.around(:each, :geo_fdw) do |example|
-    example.run if Gitlab::Geo::Fdw.enabled?
+    if Gitlab::Geo::Fdw.enabled? && Gitlab::Geo.geo_database_configured?
+      # Disable transactions via :delete method because a foreign table
+      # can't see changes inside a transaction of a different connection.
+      example.metadata[:delete] = true
+
+      example.run
+    end
   end
 end

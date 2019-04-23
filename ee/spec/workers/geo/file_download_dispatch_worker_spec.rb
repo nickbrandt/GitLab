@@ -14,13 +14,7 @@ describe Geo::FileDownloadDispatchWorker, :geo do
     WebMock.stub_request(:get, /primary-geo-node/).to_return(status: 200, body: "", headers: {})
   end
 
-  subject { described_class.new }
-
-  shared_examples '#perform' do |skip_tests|
-    before do
-      skip('FDW is not configured') if skip_tests
-    end
-
+  shared_examples '#perform' do
     it 'does not schedule anything when tracking database is not configured' do
       create(:lfs_object, :with_file)
 
@@ -399,18 +393,15 @@ describe Geo::FileDownloadDispatchWorker, :geo do
     end
   end
 
-  # Disable transactions via :delete method because a foreign table
-  # can't see changes inside a transaction of a different connection.
-  describe 'when PostgreSQL FDW is available', :geo, :delete do
-    # Skip if FDW isn't activated on this database
-    it_behaves_like '#perform', Gitlab::Database.postgresql? && !Gitlab::Geo::Fdw.enabled?
+  describe 'when PostgreSQL FDW is available', :geo_fdw do
+    it_behaves_like '#perform'
   end
 
-  describe 'when PostgreSQL FDW is not enabled', :geo do
+  describe 'when PostgreSQL FDW is not enabled' do
     before do
       allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
     end
 
-    it_behaves_like '#perform', false
+    it_behaves_like '#perform'
   end
 end

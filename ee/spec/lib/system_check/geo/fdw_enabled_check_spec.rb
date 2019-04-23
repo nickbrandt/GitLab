@@ -27,7 +27,7 @@ describe SystemCheck::Geo::FdwEnabledCheck, :geo do
   end
 
   describe '#check?' do
-    context 'with functional FDW environment', :geo_tracking_db do
+    context 'with functional FDW environment', :geo_fdw do
       it 'returns true' do
         expect(subject.check?).to be_truthy
       end
