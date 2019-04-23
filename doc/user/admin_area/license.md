@@ -72,12 +72,8 @@ expired license(s).
 
 ## License history
 
-It's possible to upload more than one license, but only the last one will be
-taken into account.
-
-You can see your previous licenses' history at the bottom of the License page.
-
-![License history](img/license_history.png)
+It's possible to upload and view more than one license,
+but only the latest license will be used as the active license.
 
 [free trial]: https://about.gitlab.com/free-trial/
 [pricing]: https://about.gitlab.com/pricing/
