@@ -26,6 +26,7 @@ class EpicsFinder < IssuableFinder
 
     items = init_collection
     items = by_created_at(items)
+    items = by_updated_at(items)
     items = by_search(items)
     items = by_author(items)
     items = by_timeframe(items)
