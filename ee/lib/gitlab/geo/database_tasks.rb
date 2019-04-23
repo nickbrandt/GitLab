@@ -128,7 +128,7 @@ module Gitlab
           Gitlab::Geo::DatabaseTasks.with_geo_db do
             should_reconnect = ActiveRecord::Base.connection_pool.active_connection?
             ActiveRecord::Schema.verbose = false
-            ActiveRecord::Tasks::DatabaseTasks.load_schema_for ActiveRecord::Base.configurations['test'], :ruby, ENV['SCHEMA']
+            ActiveRecord::Tasks::DatabaseTasks.load_schema ActiveRecord::Base.configurations['test'], :ruby, ENV['SCHEMA']
           ensure
             if should_reconnect
               ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[ActiveRecord::Tasks::DatabaseTasks.env])
