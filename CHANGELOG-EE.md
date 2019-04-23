@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.11 (2019-04-23)
+
+### Security (1 change)
+
+- Respect group membership lock when importing a member from another group.
+
+
 ## 11.5.10 (2019-01-30)
 
 - No changes.
