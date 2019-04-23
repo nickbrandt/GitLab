@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 20190314201959) do
   create_table "event_log_states", primary_key: "event_id", id: :bigint, force: :cascade do |t|
   end
 
-  create_table "file_registry", force: :cascade do |t|
+  create_table "file_registry", id: :serial, force: :cascade do |t|
     t.string "file_type", null: false
     t.integer "file_id", null: false
     t.bigint "bytes"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20190314201959) do
     t.index ["success"], name: "index_file_registry_on_success", using: :btree
   end
 
-  create_table "job_artifact_registry", force: :cascade do |t|
+  create_table "job_artifact_registry", id: :serial, force: :cascade do |t|
     t.datetime_with_timezone "created_at"
     t.datetime_with_timezone "retry_at"
     t.bigint "bytes"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 20190314201959) do
     t.index ["success"], name: "index_job_artifact_registry_on_success", using: :btree
   end
 
-  create_table "project_registry", force: :cascade do |t|
+  create_table "project_registry", id: :serial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.datetime "last_repository_synced_at"
     t.datetime "last_repository_successful_sync_at"

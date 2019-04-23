@@ -124,7 +124,7 @@ module Gitlab
           def format(vulnerability, definitions)
             definitions.each do |keys, value|
               if vulnerability.values_at(*Array(keys)).all?(&:present?)
-                return value % vulnerability.with_indifferent_access
+                return value % vulnerability.symbolize_keys
               end
             end
 
