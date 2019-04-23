@@ -43,10 +43,6 @@ module EE
       end
 
       def metrics_reports
-        unless ::Feature.enabled?(:metrics_reports, project)
-          return render json: '', status: :bad_request
-        end
-
         reports_response(merge_request.compare_metrics_reports)
       end
 

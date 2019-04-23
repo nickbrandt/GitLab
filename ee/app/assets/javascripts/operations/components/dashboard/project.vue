@@ -97,7 +97,7 @@ export default {
 };
 </script>
 <template>
-  <div class="dashboard-card card border-0">
+  <div class="js-dashboard-project dashboard-card card border-0">
     <project-header
       :project="project"
       :has-pipeline-failed="hasPipelineFailed"
@@ -117,7 +117,7 @@ export default {
           />
         </div>
 
-        <div class="col-10 col-sm-6 pr-0 pl-5 align-self-center align-middle ci-table">
+        <div class="col-10 col-sm-7 pr-0 pl-5 align-self-center align-middle ci-table">
           <commit
             :tag="commitRef.tag"
             :commit-ref="commitRef"
@@ -129,7 +129,7 @@ export default {
           />
         </div>
 
-        <div class="col-sm-5 pl-0 text-right align-self-center d-none d-sm-block">
+        <div class="col-sm-4 pl-0 text-right align-self-center d-none d-sm-block">
           <time-ago
             v-if="shouldShowTimeAgo"
             :time="finishedTime"

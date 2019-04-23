@@ -8,7 +8,8 @@ module InsightsActions
     before_action :validate_params, only: [:query]
 
     rescue_from Gitlab::Insights::Validators::ParamsValidator::ParamsValidatorError,
-      Gitlab::Insights::Finders::IssuableFinder::IssuableFinderError, with: :render_insights_chart_error
+      Gitlab::Insights::Finders::IssuableFinder::IssuableFinderError,
+      Gitlab::Insights::Reducers::BaseReducer::BaseReducerError, with: :render_insights_chart_error
   end
 
   def show
@@ -38,38 +39,57 @@ module InsightsActions
     Gitlab::Insights::Validators::ParamsValidator.new(params).validate!
   end
 
-  def insights_json
-    issuables_finder = finder(params[:query])
-    issuables = issuables_finder.find
-    insights = reduce(
-      issuables: issuables,
-      chart_type: params[:chart_type],
-      period: params[:query][:group_by],
-      period_limit: issuables_finder.period_limit,
-      labels: params[:query][:collection_labels])
-    serializer(params[:chart_type]).present(insights)
+  def chart_type_param
+    @chart_type_param ||= params[:chart_type]
   end
 
-  def reduce(issuables:, chart_type:, period:, period_limit:, labels: nil)
-    case chart_type
+  def query_param
+    @query_param ||= params[:query]
+  end
+
+  def period_param
+    @period_param ||= query_param[:group_by]
+  end
+
+  def collection_labels_param
+    @collection_labels_param ||= query_param[:collection_labels]
+  end
+
+  def insights_json
+    issuables = finder.find
+    insights = reduce(issuables: issuables, period_limit: finder.period_limit)
+    serializer.present(insights)
+  end
+
+  def reduce(issuables:, period_limit: nil)
+    case chart_type_param
     when 'stacked-bar', 'line'
-      Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: period, period_limit: period_limit, labels: labels)
+      Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: period_param, period_limit: period_limit, labels: collection_labels_param)
     when 'bar'
-      Gitlab::Insights::Reducers::CountPerPeriodReducer.reduce(issuables, period: period, period_limit: period_limit)
+      if period_param
+        Gitlab::Insights::Reducers::CountPerPeriodReducer.reduce(issuables, period: period_param, period_limit: period_limit)
+      else
+        Gitlab::Insights::Reducers::CountPerLabelReducer.reduce(issuables, labels: collection_labels_param)
+      end
     end
   end
 
-  def finder(query)
-    Gitlab::Insights::Finders::IssuableFinder
-      .new(insights_entity, current_user, query)
+  def finder
+    @finder ||=
+      Gitlab::Insights::Finders::IssuableFinder
+        .new(insights_entity, current_user, query_param)
   end
 
-  def serializer(chart_type)
-    case chart_type
+  def serializer
+    case chart_type_param
     when 'stacked-bar'
       Gitlab::Insights::Serializers::Chartjs::MultiSeriesSerializer
     when 'bar'
-      Gitlab::Insights::Serializers::Chartjs::BarSerializer
+      if period_param
+        Gitlab::Insights::Serializers::Chartjs::BarTimeSeriesSerializer
+      else
+        Gitlab::Insights::Serializers::Chartjs::BarSerializer
+      end
     when 'line'
       Gitlab::Insights::Serializers::Chartjs::LineSerializer
     end

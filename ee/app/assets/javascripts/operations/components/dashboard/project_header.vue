@@ -61,14 +61,14 @@ export default {
       </gl-link>
     </div>
     <div class="dropdown js-more-actions">
-      <gl-button
+      <button
         v-gl-tooltip
         class="js-more-actions-toggle d-flex align-items-center bg-transparent border-0 p-0 ml-2"
         data-toggle="dropdown"
         :title="__('More actions')"
       >
         <icon name="ellipsis_v" class="text-secondary" />
-      </gl-button>
+      </button>
       <ul class="dropdown-menu dropdown-menu-right">
         <li>
           <gl-button class="btn btn-transparent js-remove-button" @click="onRemove">

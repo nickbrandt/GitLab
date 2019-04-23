@@ -1,23 +1,12 @@
-import Vue from 'vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import Dashboard from './components/dashboard.vue';
+import initCeBundle from '~/monitoring/monitoring_bundle';
 
 export default () => {
   const el = document.getElementById('prometheus-graphs');
 
   if (el && el.dataset) {
-    // eslint-disable-next-line no-new
-    new Vue({
-      el,
-      render(createElement) {
-        return createElement(Dashboard, {
-          props: {
-            ...el.dataset,
-            hasMetrics: parseBoolean(el.dataset.hasMetrics),
-            prometheusAlertsAvailable: parseBoolean(el.dataset.prometheusAlertsAvailable),
-          },
-        });
-      },
+    initCeBundle({
+      prometheusAlertsAvailable: parseBoolean(el.dataset.prometheusAlertsAvailable),
     });
   }
 };

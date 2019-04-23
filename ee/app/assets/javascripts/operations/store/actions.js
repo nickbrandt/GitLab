@@ -76,7 +76,7 @@ export const receiveAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
   }
 
   if (added.length) {
-    dispatch('fetchProjects');
+    dispatch('forceProjectsRequest');
   }
 };
 
@@ -135,7 +135,7 @@ export const removeProject = ({ dispatch }, removePath) => {
     .catch(() => dispatch('receiveRemoveProjectError'));
 };
 
-export const receiveRemoveProjectSuccess = ({ dispatch }) => dispatch('fetchProjects');
+export const receiveRemoveProjectSuccess = ({ dispatch }) => dispatch('forceProjectsRequest');
 
 export const receiveRemoveProjectError = () => {
   createFlash(__('Something went wrong, unable to remove project'));

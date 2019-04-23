@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Insights::Serializers::Chartjs::MultiSeriesSerializer do
   it 'returns the correct format' do
-    input = build(:insights_issuables_per_month)
+    input = build(:insights_issues_by_team_per_month)
     expected = {
       labels: ['January 2019', 'February 2019', 'March 2019'],
       datasets: [

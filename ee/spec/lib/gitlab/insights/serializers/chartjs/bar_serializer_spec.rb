@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Insights::Serializers::Chartjs::BarSerializer do
   it 'returns the correct format' do
-    input = build(:insights_issuables)
+    input = build(:insights_issues_by_team)
     expected = {
       labels: %w[Manage Plan Create undefined],
       datasets: [
