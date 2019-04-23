@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.8.8 (2019-04-23)
+
+### Fixed (1 change)
+
+- Renders inline downstream & upstream pipelines. !9627
+
+### Changed (1 change)
+
+- Add Kerberos URL back to clone panel. !9840
+
+
 ## 11.8.7 (2019-04-09)
 
 ### Security (1 change)
