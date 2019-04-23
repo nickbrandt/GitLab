@@ -1,4 +1,4 @@
-# SAML SSO for GitLab.com Groups
+# SAML SSO for GitLab.com Groups **[SILVER ONLY]**
 
 > Introduced in [GitLab.com Silver](https://about.gitlab.com/pricing/) 11.0.
 
