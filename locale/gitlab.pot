@@ -1997,6 +1997,9 @@ msgstr ""
 msgid "Clone with %{http_label}"
 msgstr ""
 
+msgid "Clone with KRB5"
+msgstr ""
+
 msgid "Clone with SSH"
 msgstr ""
 
@@ -2810,6 +2813,9 @@ msgid "Copy %{protocol} clone URL"
 msgstr ""
 
 msgid "Copy ID to clipboard"
+msgstr ""
+
+msgid "Copy KRB5 clone URL"
 msgstr ""
 
 msgid "Copy SSH clone URL"
