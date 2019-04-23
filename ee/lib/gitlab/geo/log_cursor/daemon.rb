@@ -4,11 +4,9 @@ module Gitlab
   module Geo
     module LogCursor
       class Daemon
-        include Utils::StrongMemoize
-
         VERSION = '0.2.0'.freeze
         BATCH_SIZE = 250
-        SECONDARY_CHECK_INTERVAL = 1.minute
+        SECONDARY_CHECK_INTERVAL = 60
 
         attr_reader :options
 
@@ -130,9 +128,7 @@ module Gitlab
         end
 
         def logger
-          strong_memoize(:logger) do
-            Gitlab::Geo::LogCursor::Logger.new(self.class, log_level)
-          end
+          @logger ||= Gitlab::Geo::LogCursor::Logger.new(self.class, log_level)
         end
 
         def log_level
