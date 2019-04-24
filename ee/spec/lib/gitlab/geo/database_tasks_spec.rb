@@ -104,15 +104,15 @@ describe Gitlab::Geo::DatabaseTasks do
 
   describe described_class::Test do
     describe '.load' do
-      it 'calls ActiveRecord::Tasks::DatabaseTasks.load_schema_for' do
-        expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:load_schema_for)
+      it 'calls ActiveRecord::Tasks::DatabaseTasks.load_schema' do
+        expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:load_schema)
 
         subject.load
       end
     end
 
     describe '.purge' do
-      it 'calls ActiveRecord::Tasks::DatabaseTasks.load_schema_for' do
+      it 'calls ActiveRecord::Tasks::DatabaseTasks.purge' do
         expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:purge)
 
         subject.purge
