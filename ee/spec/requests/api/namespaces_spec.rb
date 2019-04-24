@@ -266,7 +266,7 @@ describe API::Namespaces do
 
     context 'when authenticated as an admin' do
       context 'when namespace is not found' do
-        it 'returns a 404 error' do
+        it 'returns a 404 error', :quarantine do
           do_put(1111, admin, params)
 
           expect(response).to have_gitlab_http_status(404)
