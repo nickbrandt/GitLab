@@ -1,4 +1,4 @@
-# GitLab Slack application
+# GitLab Slack application **[FREE ONLY]**
 
 NOTE: **Note:**
 The GitLab Slack application is only configurable for GitLab.com. It will **not**
@@ -12,7 +12,7 @@ GitLab 10.2.
 Slack provides a native application which you can enable via your project's
 integrations on GitLab.com.
 
-## Slack App Directory 
+## Slack App Directory
 
 The simplest way to enable the GitLab Slack application for your workspace is to
 install the [GitLab application](https://slack-platform.slack.com/apps/A676ADMV5-gitlab) from
