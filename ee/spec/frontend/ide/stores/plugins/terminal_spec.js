@@ -1,9 +1,9 @@
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { SET_BRANCH_WORKING_REFERENCE } from '~/ide/stores/mutation_types';
-import { TEST_HOST } from 'spec/test_constants';
+import { TEST_HOST } from 'helpers/test_constants';
 import terminalModule from 'ee/ide/stores/modules/terminal';
-import extendStore from 'ee/ide/stores/extend';
+import createTerminalPlugin from 'ee/ide/stores/plugins/terminal';
 
 const TEST_DATASET = {
   eeWebTerminalSvgPath: `${TEST_HOST}/web/terminal/svg`,
@@ -27,10 +27,12 @@ describe('ee/ide/stores/extend', () => {
       },
     });
 
-    spyOn(store, 'registerModule');
-    spyOn(store, 'dispatch');
+    jest.spyOn(store, 'registerModule').mockImplementation();
+    jest.spyOn(store, 'dispatch').mockImplementation();
 
-    store = extendStore(store, el);
+    const plugin = createTerminalPlugin(el);
+
+    plugin(store);
   });
 
   it('registers terminal module', () => {
@@ -47,7 +49,7 @@ describe('ee/ide/stores/extend', () => {
   });
 
   it(`dispatches terminal/init on ${SET_BRANCH_WORKING_REFERENCE}`, () => {
-    store.dispatch.calls.reset();
+    store.dispatch.mockReset();
 
     store.commit(SET_BRANCH_WORKING_REFERENCE);
 
