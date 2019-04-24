@@ -179,6 +179,17 @@ namespace :gitlab do
       puts "Done".color(:green)
     end
 
+    desc "GitLab | Elasticsearch | Display which projects are not indexed"
+    task projects_not_indexed: :environment do
+      not_indexed = Project.where.not(id: IndexStatus.select(:project_id).distinct)
+
+      if not_indexed.count.zero?
+        puts 'All projects are currently indexed'.color(:green)
+      else
+        display_unindexed(not_indexed)
+      end
+    end
+
     def batch_size
       ENV.fetch('BATCH', 300).to_i
     end
@@ -207,6 +218,20 @@ namespace :gitlab do
       end
 
       projects
+    end
+
+    def display_unindexed(projects)
+      arr = if projects.count < 500 || ENV['SHOW_ALL']
+              projects
+            else
+              projects[1..500]
+            end
+
+      arr.each do |p|
+        puts "Project '#{p.full_path}' (ID: #{p.id}) isn't indexed.".color(:red)
+      end
+
+      puts "#{arr.count} out of #{projects.count} non-indexed projects shown."
     end
   end
 end
