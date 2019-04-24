@@ -40,7 +40,7 @@ shared_examples_for 'new issuable with scoped labels' do
         stub_licensed_features(scoped_labels: false)
       end
 
-      it 'adds only last selected exclusive scoped label' do
+      it 'adds all scoped labels' do
         label1 = create_label('label1')
         label2 = create_label('key::label1')
         label3 = create_label('key::label2')

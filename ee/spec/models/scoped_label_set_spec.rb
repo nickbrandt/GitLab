@@ -71,7 +71,7 @@ describe ScopedLabelSet do
       expect(set.contains_any?([kv_label2.id])).to eq(true)
     end
 
-    it 'returns true if any of label ids is in set' do
+    it 'returns false if certain label ids is not in set' do
       set = described_class.new('key', [kv_label1])
 
       expect(set.contains_any?([kv_label2.id])).to eq(false)
