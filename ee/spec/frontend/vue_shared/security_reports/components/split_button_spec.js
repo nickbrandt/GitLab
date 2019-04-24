@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/split_button.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('Split Button', () => {
   const Component = Vue.extend(component);
@@ -46,7 +46,7 @@ describe('Split Button', () => {
     });
 
     it('emits the correct event when the button is pressed', () => {
-      spyOn(vm, '$emit');
+      jest.spyOn(vm, '$emit');
 
       vm.$el.querySelector('.btn').click();
 

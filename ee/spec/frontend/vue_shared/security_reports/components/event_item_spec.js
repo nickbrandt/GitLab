@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/event_item.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import mountComponent from 'helpers/vue_mount_component_helper';
 
 describe('Event Item', () => {
   const Component = Vue.extend(component);
