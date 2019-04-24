@@ -467,6 +467,9 @@ msgstr ""
 msgid "A deleted user"
 msgstr ""
 
+msgid "A fork is a copy of a project.<br />Forking a repository allows you to make changes without affecting the original project."
+msgstr ""
+
 msgid "A member of GitLab's abuse team will review your report as soon as possible."
 msgstr ""
 
@@ -5106,6 +5109,15 @@ msgstr ""
 msgid "For public projects, anyone can view pipelines and access job details (output logs and artifacts)"
 msgstr ""
 
+msgid "Fork"
+msgstr ""
+
+msgid "Fork Error!"
+msgstr ""
+
+msgid "Fork project"
+msgstr ""
+
 msgid "ForkedFromProjectPath|Forked from"
 msgstr ""
 
@@ -5113,6 +5125,9 @@ msgid "ForkedFromProjectPath|Forked from %{project_name} (deleted)"
 msgstr ""
 
 msgid "Forking in progress"
+msgstr ""
+
+msgid "Forking repository"
 msgstr ""
 
 msgid "Forks"
@@ -5689,6 +5704,9 @@ msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
 msgid "Go to project"
+msgstr ""
+
+msgid "Go to your fork"
 msgstr ""
 
 msgid "Google Code import"
@@ -7652,6 +7670,9 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+msgid "Name has already been taken"
+msgstr ""
+
 msgid "Name new label"
 msgstr ""
 
@@ -7814,6 +7835,9 @@ msgid "No Tag"
 msgstr ""
 
 msgid "No activities found"
+msgstr ""
+
+msgid "No available namespaces to fork the project."
 msgstr ""
 
 msgid "No branches found"
@@ -10208,6 +10232,9 @@ msgstr ""
 msgid "Search for projects, issues, etc."
 msgstr ""
 
+msgid "Search forks"
+msgstr ""
+
 msgid "Search groups"
 msgstr ""
 
@@ -12565,6 +12592,9 @@ msgstr ""
 msgid "Try all GitLab has to offer for 30 days."
 msgstr ""
 
+msgid "Try to fork again"
+msgstr ""
+
 msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
 msgstr ""
 
@@ -13572,6 +13602,9 @@ msgstr ""
 msgid "You must have maintainer access to force delete a lock"
 msgstr ""
 
+msgid "You must have permission to create a project in a namespace before forking."
+msgstr ""
+
 msgid "You need a different license to enable FileLocks feature"
 msgstr ""
 
@@ -13594,6 +13627,9 @@ msgid "You need to upload a GitLab project export archive (ending in .gz)."
 msgstr ""
 
 msgid "You need to upload a Google Takeout archive."
+msgstr ""
+
+msgid "You tried to fork %{link_to_the_project} but it failed for the following reason:"
 msgstr ""
 
 msgid "You will lose all changes you've made to this file. This action cannot be undone."
@@ -14692,6 +14728,9 @@ msgid "show less"
 msgstr ""
 
 msgid "sign in"
+msgstr ""
+
+msgid "sort:"
 msgstr ""
 
 msgid "source"
