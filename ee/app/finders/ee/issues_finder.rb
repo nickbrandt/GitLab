@@ -50,7 +50,7 @@ module EE
 
     override :by_assignee
     def by_assignee(items)
-      if License.feature_available?(:multiple_issue_assignees) && assignees.any?
+      if assignees.any?
         assignees.each do |assignee|
           items = items.assigned_to(assignee)
         end
