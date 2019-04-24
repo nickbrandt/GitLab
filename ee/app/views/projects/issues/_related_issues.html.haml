@@ -1,0 +1,9 @@
+- if can?(current_user, :read_issue_link, @project)
+  .js-related-issues-root{ data: { endpoint: project_issue_links_path(@project, @issue),
+    can_add_related_issues: "#{can?(current_user, :admin_issue_link, @issue)}",
+    help_path: help_page_path('user/project/issues/related_issues') } }
+    .related-issues-block
+      .card-slim
+        .card-header.panel-empty-heading.border-bottom-0
+          %h3.card-title.mt-0.mb-0.h5
+            Related issues
