@@ -1,25 +1,10 @@
-import * as mutationTypes from '~/ide/stores/mutation_types';
-import terminalModule from './modules/terminal';
+import terminal from './plugins/terminal';
 
-function getPathsFromData(el) {
-  return {
-    webTerminalSvgPath: el.dataset.eeWebTerminalSvgPath,
-    webTerminalHelpPath: el.dataset.eeWebTerminalHelpPath,
-    webTerminalConfigHelpPath: el.dataset.eeWebTerminalConfigHelpPath,
-    webTerminalRunnersHelpPath: el.dataset.eeWebTerminalRunnersHelpPath,
-  };
-}
+const plugins = [terminal];
 
 export default (store, el) => {
-  store.registerModule('terminal', terminalModule());
-
-  store.dispatch('terminal/setPaths', getPathsFromData(el));
-
-  store.subscribe(({ type }) => {
-    if (type === mutationTypes.SET_BRANCH_WORKING_REFERENCE) {
-      store.dispatch('terminal/init');
-    }
-  });
+  // plugins is actually an array of plugin factories, so we have to create first then call
+  plugins.forEach(plugin => plugin(el)(store));
 
   return store;
 };
