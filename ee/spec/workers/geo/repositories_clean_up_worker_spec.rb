@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositoriesCleanUpWorker do
+describe Geo::RepositoriesCleanUpWorker, :geo do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

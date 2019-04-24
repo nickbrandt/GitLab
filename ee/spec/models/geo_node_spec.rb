@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GeoNode, type: :model do
+describe GeoNode, :geo, type: :model  do
   using RSpec::Parameterized::TableSyntax
   include ::EE::GeoHelpers
 
