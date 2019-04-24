@@ -19,5 +19,10 @@ module EE
     def issuable
       epic || super
     end
+
+    override :banzai_render_context
+    def banzai_render_context(field)
+      epic ? super.merge(label_url_method: :group_epics_url) : super
+    end
   end
 end

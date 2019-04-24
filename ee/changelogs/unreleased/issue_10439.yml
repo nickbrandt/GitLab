@@ -1,0 +1,5 @@
+---
+title: 'Resolve: Epic labels in system notes point to the epic itself'
+merge_request: 11234
+author:
+type: fixed
