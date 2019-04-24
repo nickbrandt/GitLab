@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import GfmAutoComplete from '~/gfm_auto_complete';
+import GfmAutoComplete from 'ee_else_ce/gfm_auto_complete';
 import { GlLoadingIcon } from '@gitlab/ui';
 import issueToken from './issue_token.vue';
 import { autoCompleteTextMap, inputPlaceholderTextMap } from '../constants';

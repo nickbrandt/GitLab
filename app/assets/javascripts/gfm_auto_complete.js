@@ -1,9 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
 
-// EE-specific
-import setupAutoCompleteEpics from 'ee/gfm_auto_complete_ee';
-
 import glRegexp from './lib/utils/regexp';
 import AjaxCache from './lib/utils/ajax_cache';
 
@@ -56,9 +53,6 @@ class GfmAutoComplete {
     if (this.enableMap.mergeRequests) this.setupMergeRequests($input);
     if (this.enableMap.labels) this.setupLabels($input);
     if (this.enableMap.snippets) this.setupSnippets($input);
-
-    // EE-specific
-    if (this.enableMap.epics) setupAutoCompleteEpics($input, this.getDefaultCallbacks());
 
     // We don't instantiate the quick actions autocomplete for note and issue/MR edit forms
     $input.filter('[data-supports-quick-actions="true"]').atwho({
