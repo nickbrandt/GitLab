@@ -63,10 +63,10 @@ be created on first sign in.
 
 ## Group Sync
 
-If your LDAP supports the `memberof` property, GitLab will add the user to any
-new groups they might be added to when the user logs in. That way they don't need
-to wait for the hourly sync to be granted access to the groups that they are in
-in LDAP.
+If your LDAP supports the `memberof` property, when the user signs in for the
+first time GitLab will trigger a sync for groups the user should be a member of.
+That way they don't need to wait for the hourly sync to be granted
+access to their groups and projects.
 
 In GitLab Premium, we can also add a GitLab group to sync with one or multiple LDAP groups or we can
 also add a filter. The filter must comply with the syntax defined in [RFC 2254](https://tools.ietf.org/search/rfc2254).
