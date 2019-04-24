@@ -10,7 +10,7 @@ Currently SAML on GitLab.com can be used to automatically add users to a group, 
 User synchronization for GitLab.com is partially supported using [SCIM](scim_setup.md).
 
 NOTE: **Note:**
-SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
+SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers without using SCIM. If a group is not using SCIM, group Owners will still need to manage user accounts, such as removing users when necessary.
 
 ## Configuring your Identity Provider
 
@@ -21,6 +21,9 @@ SAML SSO for groups is used only as a convenient way to add users and does not s
 1. Once the identity provider is set up, move on to [configuring GitLab](#configuring-gitlab).
 
 ![Issuer and callback for configuring SAML identity provider with GitLab.com](img/group_saml_configuration_information.png)
+
+NOTE: **Note:**
+Partial SSO enforcement was introduced in [11.8](https://gitlab.com/gitlab-org/gitlab-ee/issues/5291). With this option enabled, users must use your group's GitLab single sign on URL to be added to the group or be added via SCIM. Users can no longer be added manually. After a user has been added to the group, GitLab does not continue to enforce the use of SSO, but we'll [add a persistent check](https://gitlab.com/gitlab-org/gitlab-ee/issues/9255) in a later version.
 
 ### NameID
 
