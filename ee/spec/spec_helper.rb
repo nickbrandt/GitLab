@@ -6,6 +6,12 @@ Dir[Rails.root.join("ee/spec/support/**/*.rb")].each { |f| require f }
 RSpec.configure do |config|
   config.include EE::LicenseHelpers
 
+  config.define_derived_metadata(file_path: %r{ee/spec/}) do |metadata|
+    location = metadata[:location]
+
+    metadata[:geo] = metadata.fetch(:geo, true) if location =~ %r{[/_]geo[/_]}
+  end
+
   config.before(:all) do
     License.destroy_all # rubocop: disable DestroyAll
     TestLicense.init
