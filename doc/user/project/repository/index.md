@@ -97,7 +97,7 @@ Some things to note about precedence:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/2508) in GitLab 9.1
 
-[Jupyter][jupyter] Notebook (previously IPython Notebook) files are used for
+[Jupyter](https://jupyter.org) Notebook (previously IPython Notebook) files are used for
 interactive computing in many fields and contain a complete record of the
 user's sessions and include code, narrative text, equations and rich output.
 
@@ -222,7 +222,8 @@ Find it under your project's **Repository > Compare**.
 
 ## Locked files **[PREMIUM]**
 
-[Lock your files](../file_lock.md) to prevent any conflicting changes.
+Use [File Locking](../file_lock.md) to lock your files to prevent
+any conflicting changes.
 
 ## Repository's API
 
@@ -236,4 +237,21 @@ Projects that contain a `.xcodeproj` or `.xcworkspace` directory can now be clon
 in Xcode using the new **Open in Xcode** button, located next to the Git URL
 used for cloning your project. The button is only shown on macOS.
 
-[jupyter]: https://jupyter.org
+## Download Source Code
+
+> Support for directory download was [introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/24704) in GitLab 11.11.
+
+The source code stored in a repository can be downloaded from the UI.
+By clicking the download icon, a dropdown will open with links to download the following:
+
+![Download source code](img/download_source_code.png)
+
+- **Source code:**
+  allows users to download the source code on branch they're currently
+  viewing. Available extensions: `zip`, `tar`, `tar.gz`, and `tar.bz2`.
+- **Directory:**
+  only shows up when viewing a sub-directory. This allows users to download
+  the specific directory they're currently viewing. Also available in `zip`,
+  `tar`, `tar.gz`, and `tar.bz2`.
+- **Artifacts:**
+  allows users to download the artifacts of the latest CI build.
