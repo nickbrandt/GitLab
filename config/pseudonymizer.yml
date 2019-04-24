@@ -379,7 +379,6 @@ tables:
     - issues_template
     - mirror
     - mirror_user_id
-    - ci_id
     - shared_runners_enabled
     - build_coverage_regex
     - build_allow_git_fetch

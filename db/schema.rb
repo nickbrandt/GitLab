@@ -2502,7 +2502,6 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.datetime "mirror_last_successful_update_at"
     t.integer "mirror_user_id"
     t.text "import_error"
-    t.integer "ci_id"
     t.boolean "shared_runners_enabled", default: true, null: false
     t.string "runners_token"
     t.string "build_coverage_regex"
@@ -2552,7 +2551,6 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.boolean "detected_repository_languages"
     t.boolean "merge_requests_disable_committers_approval"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))", using: :btree
-    t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
     t.index ["description"], name: "index_projects_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
