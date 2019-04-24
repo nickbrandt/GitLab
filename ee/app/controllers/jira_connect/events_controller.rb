@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class JiraConnect::EventsController < JiraConnect::ApplicationController
-  skip_before_action :verify_authenticity_token
   skip_before_action :verify_atlassian_jwt!, only: :installed
+  before_action :verify_qsh_claim!, only: :uninstalled
 
   def installed
-    if JiraConnectInstallation.create(install_params)
+    installation = JiraConnectInstallation.new(install_params)
+
+    if installation.save
       head :ok
     else
       head :unprocessable_entity

@@ -4,6 +4,7 @@ class JiraConnect::ApplicationController < ApplicationController
   include Gitlab::Utils::StrongMemoize
 
   skip_before_action :authenticate_user!
+  skip_before_action :verify_authenticity_token
   before_action :check_feature_flag_enabled!
   before_action :verify_atlassian_jwt!
 
@@ -21,14 +22,20 @@ class JiraConnect::ApplicationController < ApplicationController
     @current_jira_installation = installation_from_jwt
   end
 
+  def verify_qsh_claim!
+    payload, _ = decode_auth_token!
+
+    # Make sure `qsh` claim matches the current request
+    render_403 unless payload['qsh'] == Atlassian::Jwt.create_query_string_hash(request.method, request.url, jira_connect_base_url)
+  rescue
+    render_403
+  end
+
   def atlassian_jwt_valid?
     return false unless installation_from_jwt
 
     # Verify JWT signature with our stored `shared_secret`
-    payload, _ = Atlassian::Jwt.decode(auth_token, installation_from_jwt.shared_secret)
-
-    # Make sure `qsh` claim matches the current request
-    payload['qsh'] == Atlassian::Jwt.create_query_string_hash(request.method, request.url, jira_connect_base_url)
+    decode_auth_token!
   rescue JWT::DecodeError
     false
   end
@@ -41,6 +48,10 @@ class JiraConnect::ApplicationController < ApplicationController
       payload, _ = Atlassian::Jwt.decode(auth_token, nil, false)
       JiraConnectInstallation.find_by_client_key(payload['iss'])
     end
+  end
+
+  def decode_auth_token!
+    Atlassian::Jwt.decode(auth_token, installation_from_jwt.shared_secret)
   end
 
   def auth_token

@@ -6,6 +6,9 @@ class JiraConnectInstallation < ApplicationRecord
                  algorithm: 'aes-256-gcm',
                  key:       Settings.attr_encrypted_db_key_base_32
 
-  validates :client_key, :shared_secret, presence: true
+  has_many :subscriptions, class_name: 'JiraConnectSubscription'
+
+  validates :client_key, presence: true, uniqueness: true
+  validates :shared_secret, presence: true
   validates :base_url, presence: true, public_url: true
 end

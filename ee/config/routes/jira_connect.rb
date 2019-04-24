@@ -11,5 +11,5 @@ namespace :jira_connect do
     post 'uninstalled'
   end
 
-  get 'configuration' => 'configuration#show'
+  resources :subscriptions, only: [:index, :create, :destroy]
 end

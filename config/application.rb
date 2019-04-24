@@ -181,6 +181,8 @@ module Gitlab
     ## EE-specific assets config START
     %w[images javascripts stylesheets].each do |path|
       config.assets.paths << "#{config.root}/ee/app/assets/#{path}"
+      config.assets.precompile << "jira_connect.js"
+      config.assets.precompile << "pages/jira_connect.css"
     end
 
     config.assets.paths << "#{config.root}/vendor/assets/javascripts/"

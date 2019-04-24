@@ -26,7 +26,7 @@ describe JiraConnect::AppDescriptorController do
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to include(
-          'baseUrl' => 'http://test.host/-/jira_connect',
+          'baseUrl' => 'https://test.host/-/jira_connect',
           'lifecycle' => {
             'installed' => '/events/installed',
             'uninstalled' => '/events/uninstalled'
