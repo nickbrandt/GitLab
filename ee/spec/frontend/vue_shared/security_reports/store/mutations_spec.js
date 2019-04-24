@@ -22,6 +22,11 @@ import {
   parsedDastNewIssues,
   parsedDast,
 } from '../mock_data';
+import { visitUrl } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility', () => ({
+  visitUrl: jest.fn().mockName('visitUrlMock'),
+}));
 
 describe('security reports mutations', () => {
   let stateCopy;
@@ -511,7 +516,6 @@ describe('security reports mutations', () => {
   describe('RECEIVE_CREATE_MERGE_REQUEST_SUCCESS', () => {
     it('should fire the visitUrl function on the merge request URL', () => {
       const payload = { merge_request_path: 'fakepath.html' };
-      const visitUrl = spyOnDependency(mutations, 'visitUrl');
       mutations[types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](stateCopy, payload);
 
       expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_path);
