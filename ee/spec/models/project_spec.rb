@@ -376,11 +376,10 @@ describe Project do
   end
 
   describe '#feature_available?' do
-    let(:namespace) { create(:namespace) }
+    let(:namespace) { build(:namespace) }
     let(:plan_license) { nil }
-    let!(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: plan_license) }
-    let(:project) { create(:project, namespace: namespace) }
-    let(:user) { create(:user) }
+    let(:project) { build(:project, namespace: namespace) }
+    let(:user) { build(:user) }
 
     subject { project.feature_available?(feature, user) }
 
@@ -402,7 +401,11 @@ describe Project do
 
               context 'allowed by Plan License AND Global License' do
                 let(:allowed_on_global_license) { true }
-                let(:plan_license) { create(:gold_plan) }
+                let(:plan_license) { build(:gold_plan) }
+
+                before do
+                  allow(namespace).to receive(:plans) { [plan_license] }
+                end
 
                 it 'returns true' do
                   is_expected.to eq(true)
@@ -419,7 +422,7 @@ describe Project do
 
               context 'not allowed by Plan License but project and namespace are public' do
                 let(:allowed_on_global_license) { true }
-                let(:plan_license) { create(:bronze_plan) }
+                let(:plan_license) { build(:bronze_plan) }
 
                 it 'returns true' do
                   allow(namespace).to receive(:public?) { true }
@@ -432,7 +435,7 @@ describe Project do
               unless License.plan_includes_feature?(License::STARTER_PLAN, feature_sym)
                 context 'not allowed by Plan License' do
                   let(:allowed_on_global_license) { true }
-                  let(:plan_license) { create(:bronze_plan) }
+                  let(:plan_license) { build(:bronze_plan) }
 
                   it 'returns false' do
                     is_expected.to eq(false)
@@ -442,7 +445,7 @@ describe Project do
 
               context 'not allowed by Global License' do
                 let(:allowed_on_global_license) { false }
-                let(:plan_license) { create(:gold_plan) }
+                let(:plan_license) { build(:gold_plan) }
 
                 it 'returns false' do
                   is_expected.to eq(false)
