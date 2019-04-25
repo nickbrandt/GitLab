@@ -24,6 +24,31 @@ export default {
     },
   },
   methods: {
+    handleKeySubmit() {
+      if (this.showBatchCommentsActions) {
+        this.handleAddToReview();
+      } else {
+        this.handleUpdate();
+      }
+    },
+    handleUpdate(shouldResolve) {
+      const beforeSubmitDiscussionState = this.discussionResolved;
+      this.isSubmitting = true;
+
+      this.$emit(
+        'handleFormUpdate',
+        this.updatedNoteBody,
+        this.$refs.editNoteForm,
+        () => {
+          this.isSubmitting = false;
+
+          if (this.shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState)) {
+            this.resolveHandler(beforeSubmitDiscussionState);
+          }
+        },
+        this.discussionResolved ? !this.isUnresolving : this.isResolving,
+      );
+    },
     shouldBeResolved(resolveStatus) {
       if (this.withBatchComments) {
         return (
