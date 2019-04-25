@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -81,7 +82,7 @@ export default {
     title: {
       type: String,
       required: false,
-      default: 'Related issues',
+      default: __('Related issues'),
     },
     issuableType: {
       type: String,
