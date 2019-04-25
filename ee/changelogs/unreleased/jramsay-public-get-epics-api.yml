@@ -1,0 +1,5 @@
+---
+title: Fix unauthenticated GET of public Epics API
+merge_request: 11485
+author:
+type: fixed

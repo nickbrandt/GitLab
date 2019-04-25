@@ -23,12 +23,6 @@ describe API::Epics do
           stub_licensed_features(epics: true)
         end
 
-        it 'returns 401 unauthorized error for non authenticated user' do
-          get api(url), params: params
-
-          expect(response).to have_gitlab_http_status(401)
-        end
-
         it 'returns 404 not found error for a user without permissions to see the group' do
           project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
           group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
@@ -130,19 +124,19 @@ describe API::Epics do
       end
 
       it 'returns epics authored by the given author id' do
-        get api(url, user), params: { author_id: user2.id }
+        get api(url), params: { author_id: user2.id }
 
         expect_paginated_array_response([epic2.id])
       end
 
       it 'returns epics matching given search string for title' do
-        get api(url, user), params: { search: epic2.title }
+        get api(url), params: { search: epic2.title }
 
         expect_paginated_array_response([epic2.id])
       end
 
       it 'returns epics matching given search string for description' do
-        get api(url, user), params: { search: epic2.description }
+        get api(url), params: { search: epic2.description }
 
         expect_paginated_array_response([epic2.id])
       end
@@ -154,7 +148,7 @@ describe API::Epics do
       end
 
       it 'returns all epics when state set to all' do
-        get api(url, user), params: { state: :all }
+        get api(url), params: { state: :all }
 
         expect_paginated_array_response([epic2.id, epic.id])
       end
@@ -163,7 +157,7 @@ describe API::Epics do
         epic.create_award_emoji('thumbsup', user)
         epic2.create_award_emoji('thumbsdown', user)
 
-        get api(url, user)
+        get api(url)
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -174,37 +168,37 @@ describe API::Epics do
       end
 
       it 'sorts by created_at descending by default' do
-        get api(url, user)
+        get api(url)
 
         expect_paginated_array_response([epic2.id, epic.id])
       end
 
       it 'sorts ascending when requested' do
-        get api(url, user), params: { sort: :asc }
+        get api(url), params: { sort: :asc }
 
         expect_paginated_array_response([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at descending when requested' do
-        get api(url, user), params: { order_by: :updated_at }
+        get api(url), params: { order_by: :updated_at }
 
         expect_paginated_array_response([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at ascending when requested' do
-        get api(url, user), params: { order_by: :updated_at, sort: :asc }
+        get api(url), params: { order_by: :updated_at, sort: :asc }
 
         expect_paginated_array_response([epic2.id, epic.id])
       end
 
       it 'returns an array of labeled epics' do
-        get api(url, user), params: { labels: label.title }
+        get api(url), params: { labels: label.title }
 
         expect_paginated_array_response([epic2.id])
       end
 
       it 'returns an array of labeled epics with labels param as array' do
-        get api(url, user), params: { labels: [label.title] }
+        get api(url), params: { labels: [label.title] }
 
         expect_paginated_array_response([epic2.id])
       end
@@ -216,7 +210,7 @@ describe API::Epics do
         create(:label_link, label: label_b, target: epic2)
         create(:label_link, label: label_c, target: epic2)
 
-        get api(url, user), params: { labels: "#{label.title},#{label_b.title},#{label_c.title}" }
+        get api(url), params: { labels: "#{label.title},#{label_b.title},#{label_c.title}" }
 
         expect_paginated_array_response([epic2.id])
         expect(json_response.first['labels']).to match_array([label.title, label_b.title, label_c.title])
@@ -229,26 +223,26 @@ describe API::Epics do
         create(:label_link, label: label_b, target: epic2)
         create(:label_link, label: label_c, target: epic2)
 
-        get api(url, user), params: { labels: [label.title, label_b.title, label_c.title] }
+        get api(url), params: { labels: [label.title, label_b.title, label_c.title] }
 
         expect_paginated_array_response([epic2.id])
         expect(json_response.first['labels']).to match_array([label.title, label_b.title, label_c.title])
       end
 
       it 'returns an empty array if no epic matches labels' do
-        get api(url, user), params: { labels: 'foo,bar' }
+        get api(url), params: { labels: 'foo,bar' }
 
         expect_paginated_array_response([])
       end
 
       it 'returns an empty array if no epic matches labels with labels param as array' do
-        get api(url, user), params: { labels: %w(foo bar) }
+        get api(url), params: { labels: %w(foo bar) }
 
         expect_paginated_array_response([])
       end
 
       it 'returns an array of labeled epics matching given state' do
-        get api(url, user), params: { labels: label.title, state: :opened }
+        get api(url), params: { labels: label.title, state: :opened }
 
         expect_paginated_array_response(epic2.id)
         expect(json_response.first['labels']).to eq([label.title])
@@ -256,7 +250,7 @@ describe API::Epics do
       end
 
       it 'returns an array of labeled epics matching given state with labels param as array' do
-        get api(url, user), params: { labels: [label.title], state: :opened }
+        get api(url), params: { labels: [label.title], state: :opened }
 
         expect_paginated_array_response(epic2.id)
         expect(json_response.first['labels']).to eq([label.title])
@@ -264,43 +258,43 @@ describe API::Epics do
       end
 
       it 'returns an empty array if no epic matches labels and state filters' do
-        get api(url, user), params: { labels: label.title, state: :closed }
+        get api(url), params: { labels: label.title, state: :closed }
 
         expect_paginated_array_response([])
       end
 
       it 'returns an array of epics with any label' do
-        get api(url, user), params: { labels: IssuesFinder::FILTER_ANY }
+        get api(url), params: { labels: IssuesFinder::FILTER_ANY }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with any label with labels param as array' do
-        get api(url, user), params: { labels: [IssuesFinder::FILTER_ANY] }
+        get api(url), params: { labels: [IssuesFinder::FILTER_ANY] }
 
         expect_paginated_array_response(epic2.id)
       end
 
       it 'returns an array of epics with no label' do
-        get api(url, user), params: { labels: IssuesFinder::FILTER_NONE }
+        get api(url), params: { labels: IssuesFinder::FILTER_NONE }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label with labels param as array' do
-        get api(url, user), params: { labels: [IssuesFinder::FILTER_NONE] }
+        get api(url), params: { labels: [IssuesFinder::FILTER_NONE] }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label when using the legacy No+Label filter' do
-        get api(url, user), params: { labels: 'No Label' }
+        get api(url), params: { labels: 'No Label' }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns an array of epics with no label when using the legacy No+Label filter with labels param as array' do
-        get api(url, user), params: { labels: ['No Label'] }
+        get api(url), params: { labels: ['No Label'] }
 
         expect_paginated_array_response(epic.id)
       end
@@ -316,13 +310,13 @@ describe API::Epics do
       end
 
       it 'returns epics created before a specific date' do
-        get api(url, user), params: { created_before: '2000-01-02T00:00:00.060Z' }
+        get api(url), params: { created_before: '2000-01-02T00:00:00.060Z' }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns epics updated before a specific date' do
-        get api(url, user), params: { updated_before: '2000-01-02T00:00:00.060Z' }
+        get api(url), params: { updated_before: '2000-01-02T00:00:00.060Z' }
 
         expect_paginated_array_response(epic.id)
       end
@@ -336,13 +330,13 @@ describe API::Epics do
       end
 
       it 'returns epics created after a specific date' do
-        get api(url, user), params: { created_after: epic.created_at }
+        get api(url), params: { created_after: epic.created_at }
 
         expect_paginated_array_response(epic.id)
       end
 
       it 'returns epics updated after a specific date' do
-        get api(url, user), params: { updated_after: epic.updated_at }
+        get api(url), params: { updated_after: epic.updated_at }
 
         expect_paginated_array_response(epic.id)
       end
@@ -361,7 +355,7 @@ describe API::Epics do
 
       shared_examples 'paginated API endpoint' do
         it 'returns the correct page' do
-          get api(url, user), params: { page: page, per_page: per_page }
+          get api(url), params: { page: page, per_page: per_page }
 
           expect(response.headers['X-Page']).to eq(page.to_s)
           expect_paginated_array_response(expected)
@@ -395,13 +389,13 @@ describe API::Epics do
       end
 
       it 'returns 200 status' do
-        get api(url, user)
+        get api(url)
 
         expect(response).to have_gitlab_http_status(200)
       end
 
       it 'matches the response schema' do
-        get api(url, user)
+        get api(url)
 
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
       end
