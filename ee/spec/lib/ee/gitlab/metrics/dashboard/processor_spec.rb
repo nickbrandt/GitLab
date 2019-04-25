@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-describe Gitlab::MetricsDashboard::Processor do
+describe Gitlab::Metrics::Dashboard::Processor do
   let(:project) { build(:project) }
   let(:environment) { create(:environment, project: project) }
-  let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics_dashboard/sample_dashboard.yml') }
+  let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
 
   describe 'sequence' do
     let(:environment) { build(:environment) }
