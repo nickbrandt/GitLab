@@ -8,7 +8,7 @@ module EE
       module Dashboard
         module Stages
           class AlertsInserter < ::Gitlab::Metrics::Dashboard::Stages::BaseStage
-            def transform!(dashboard)
+            def transform!
               return if metrics_with_alerts.empty?
 
               for_metrics(dashboard) do |metric|

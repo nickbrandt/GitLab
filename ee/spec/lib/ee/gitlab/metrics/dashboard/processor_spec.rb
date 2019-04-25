@@ -6,11 +6,11 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:project) { build(:project) }
   let(:environment) { create(:environment, project: project) }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
+  let(:params) { [project, environment, dashboard_yml] }
 
   describe 'sequence' do
     let(:environment) { build(:environment) }
-    let(:process_params) { [project, environment] }
-    let(:sequence) { described_class.new(*process_params).sequence }
+    let(:sequence) { described_class.new(*params).sequence }
 
     it 'includes the alerts processing stage' do
       expect(sequence.length).to eq(4)
@@ -18,8 +18,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
   end
 
   describe 'process' do
-    let(:process_params) { [project, environment] }
-    let(:dashboard) { described_class.new(*process_params).process(dashboard_yml) }
+    let(:dashboard) { described_class.new(*params).process }
 
     context 'when the dashboard references persisted metrics with alerts' do
       let!(:alert) do
