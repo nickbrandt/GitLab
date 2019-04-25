@@ -33,6 +33,7 @@ describe GeoNode, :geo, type: :model do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:url) }
     it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
+    it { is_expected.to validate_length_of(:name).is_at_most(255) }
 
     context 'when validating primary node' do
       it 'cannot be disabled' do
