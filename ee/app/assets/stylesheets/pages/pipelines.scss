@@ -1,5 +1,4 @@
 .linked-pipeline-mini-list {
-  display: inline-block;
 
   &.is-downstream {
     margin-left: -4px;
@@ -92,10 +91,6 @@
       }
     }
   }
-}
-
-.has-linked-pipelines.stage-column-list {
-  display: inline-block;
 }
 
 .upstream-pipeline {

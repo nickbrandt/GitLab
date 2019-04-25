@@ -86,7 +86,7 @@ export default {
       'is-upstream': isUpstream,
       'is-downstream': isDownstream,
     }"
-    class="linked-pipeline-mini-list"
+    class="linked-pipeline-mini-list inline"
   >
     <icon v-if="isDownstream" class="arrow-icon" name="long-arrow" />
 

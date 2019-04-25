@@ -132,7 +132,7 @@ export default {
       <ul
         v-if="!isLoading"
         :class="{
-          'has-linked-pipelines': hasTriggered || hasTriggeredBy,
+          'inline': hasTriggered || hasTriggeredBy,
         }"
         class="stage-column-list align-top"
       >
