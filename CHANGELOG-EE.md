@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.10.2 (2019-04-25)
+
+### Security (1 change)
+
+- Handle race condition when creating an MR approval.
+
+
 ## 11.10.1 (2019-04-23)
 
 ### Fixed (4 changes)
