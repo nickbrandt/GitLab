@@ -5,7 +5,7 @@ module API
     include PaginationParams
 
     before do
-      authenticate!
+      authenticate_non_get!
       authorize_epics_feature!
     end
 
