@@ -7,7 +7,7 @@ module Groups
 
     def show
       @blobs_count = group.dependency_proxy_blobs.count
-      @blobs_total_size = group.dependency_proxy_blobs.size_sum
+      @blobs_total_size = group.dependency_proxy_blobs.total_size
     end
 
     def update
