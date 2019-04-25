@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('ee', 'db', 'migrate', '20181017131623_add_missing_geo_even_log_indexes.rb')
 
-describe AddMissingGeoEvenLogIndexes, :migration do
+describe AddMissingGeoEvenLogIndexes, :migration, geo: false do
   let(:namespace) { table(:namespaces).create(path: 'ns', name: 'Namespace') }
   let(:project) { table(:projects).create(namespace_id: namespace.id, path: 'pj') }
   let(:geo_event_log) { table(:geo_event_log) }
