@@ -292,6 +292,7 @@ ActiveRecord::Schema.define(version: 20190408163745) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["merge_request_id"], name: "index_approvals_on_merge_request_id", using: :btree
+    t.index ["user_id", "merge_request_id"], name: "index_approvals_on_user_id_and_merge_request_id", unique: true, using: :btree
   end
 
   create_table "approver_groups", id: :serial, force: :cascade do |t|
