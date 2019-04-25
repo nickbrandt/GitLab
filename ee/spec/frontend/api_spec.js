@@ -4,7 +4,7 @@ import Api from 'ee/api';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';
-  const dummyUrlRoot = 'http://host.invalid';
+  const dummyUrlRoot = '/gitlab';
   const dummyGon = {
     api_version: dummyApiVersion,
     relative_url_root: dummyUrlRoot,
