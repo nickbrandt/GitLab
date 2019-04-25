@@ -11,7 +11,7 @@ module EE
 
       belongs_to :review, inverse_of: :notes
 
-      scope :searchable, -> { where(system: false) }
+      scope :searchable, -> { where(system: false).includes(:noteable) }
     end
 
     # Original method in Elastic::ApplicationSearch
