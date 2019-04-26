@@ -1,6 +1,6 @@
-import state from 'ee/operations/store/state';
-import mutations from 'ee/operations/store/mutations';
-import * as types from 'ee/operations/store/mutation_types';
+import state from 'ee/vue_shared/dashboards/store/state';
+import mutations from 'ee/vue_shared/dashboards/store/mutations';
+import * as types from 'ee/vue_shared/dashboards/store/mutation_types';
 import { mockProjectData } from '../mock_data';
 
 describe('mutations', () => {

@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import ProjectPipeline from 'ee/vue_shared/dashboards/components/project_pipeline.vue';
-import mockPipelineData from '../mock_data';
+import { mockPipelineData } from '../mock_data';
 
 const localVue = createLocalVue();
 

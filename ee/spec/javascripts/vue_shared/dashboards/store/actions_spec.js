@@ -1,10 +1,10 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import store from 'ee/operations/store/index';
-import * as types from 'ee/operations/store/mutation_types';
-import defaultActions, * as actions from 'ee/operations/store/actions';
+import createStore from 'ee/vue_shared/dashboards/store/index';
+import * as types from 'ee/vue_shared/dashboards/store/mutation_types';
+import defaultActions, * as actions from 'ee/vue_shared/dashboards/store/actions';
 import testAction from 'spec/helpers/vuex_action_helper';
-import { clearState } from '../helpers';
+import clearState from '../helpers';
 import { mockText, mockProjectData } from '../mock_data';
 
 describe('actions', () => {
@@ -13,9 +13,11 @@ describe('actions', () => {
   const mockResponse = { data: 'mock-data' };
   const mockProjects = mockProjectData(1);
   const [mockOneProject] = mockProjects;
+  let store;
   let mockAxios;
 
   beforeEach(() => {
+    store = createStore();
     mockAxios = new MockAdapter(axios);
   });
 
@@ -118,7 +120,7 @@ describe('actions', () => {
     });
 
     const errorMessage =
-      'The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.';
+      'This dashboard is available for public projects, and private projects in groups with a Gold plan.';
     const selectProjects = count => {
       for (let i = 0; i < count; i += 1) {
         store.dispatch('toggleSelectedProject', {
@@ -303,7 +305,7 @@ describe('actions', () => {
   });
 
   describe('receiveRemoveProjectSuccess', () => {
-    it('fetches operations dashboard projects', done => {
+    it('fetches dashboard projects', done => {
       testAction(
         actions.receiveRemoveProjectSuccess,
         null,
