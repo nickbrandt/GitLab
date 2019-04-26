@@ -35,6 +35,7 @@ describe Ci::ProcessBuildService, '#execute' do
 
       context 'when user does not have access to the environment' do
         it 'fails the build' do
+          allow(Deployments::FinishedWorker).to receive(:perform_async)
           subject
 
           expect(ci_build.failed?).to be_truthy
