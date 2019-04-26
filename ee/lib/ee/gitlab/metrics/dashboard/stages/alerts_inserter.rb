@@ -8,6 +8,8 @@ module EE
       module Dashboard
         module Stages
           class AlertsInserter < ::Gitlab::Metrics::Dashboard::Stages::BaseStage
+            include ::Gitlab::Utils::StrongMemoize
+
             def transform!
               return if metrics_with_alerts.empty?
 
@@ -21,13 +23,13 @@ module EE
             private
 
             def metrics_with_alerts
-              return @metrics_with_alerts if @metrics_with_alerts
+              strong_memoize(:metrics_with_alerts) do
+                alerts = ::Projects::Prometheus::AlertsFinder
+                  .new(project: project, environment: environment)
+                  .execute
 
-              alerts = ::Projects::Prometheus::AlertsFinder
-                         .new(project: project, environment: environment)
-                         .execute
-
-              @metrics_with_alerts = Set.new(alerts.map(&:prometheus_metric_id))
+                Set.new(alerts.map(&:prometheus_metric_id))
+              end
             end
 
             def alert_path(metric_id, project, environment)
