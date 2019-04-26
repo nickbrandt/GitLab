@@ -32,9 +32,11 @@ see the details and the URL(s) affected.
 [Dynamic Application Security Testing (DAST)](https://en.wikipedia.org/wiki/Dynamic_Application_Security_Testing)
 is using the popular open source tool [OWASP ZAProxy](https://github.com/zaproxy/zaproxy)
 to perform an analysis on your running web application.
-Since it is based on [ZAP Baseline](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan),
-DAST will perform passive scanning only; it will not actively attack your application.
 
+By default, DAST executes [ZAP Baseline Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Baseline-Scan) and will perform passive scanning only. It will not actively attack your application.
+
+However, DAST can be [configured](#full-scan)
+to also perform a so-called "active scan". That is, attack your application and produce a more extensive security report.
 It can be very useful combined with [Review Apps](../../../ci/review_apps/index.md).
 
 ## Use cases
@@ -98,6 +100,8 @@ There are two ways to define the URL to be scanned by DAST:
 - Set the `DAST_WEBSITE` [variable](../../../ci/yaml/README.md#variables).
 - Add it in an `environment_url.txt` file at the root of your project.
 
+#### Authenticated scan
+
 It's also possible to authenticate the user before performing the DAST checks:
 
 ```yaml
@@ -111,12 +115,26 @@ variables:
   DAST_PASSWORD: john-doe-password
   DAST_USERNAME_FIELD: session[user] # the name of username field at the sign-in HTML form
   DAST_PASSWORD_FIELD: session[password] # the name of password field at the sign-in HTML form
+  DAST_AUTH_EXCLUDE_URLS: http://example.com/sign-out,http://example.com/sign-out-2 # optional, URLs to skip during the authenticated scan; comma-separated, no spaces in between
 ```
 
 The report will be saved as a
 [DAST report artifact](../../../ci/yaml/README.md#artifactsreportsdast-ultimate)
 that you can later download and analyze.
 Due to implementation limitations, we always take the latest DAST artifact available.
+
+#### Full scan
+
+DAST can be configured to perform [ZAP Full Scan](https://github.com/zaproxy/zaproxy/wiki/ZAP-Full-Scan), which
+includes both passive and active scanning against the same target website:
+
+```yaml
+include:
+  template: DAST.gitlab-ci.yml
+
+variables:
+  DAST_FULL_SCAN_ENABLED: "true"
+```
 
 #### Customizing the DAST settings
 
