@@ -1,0 +1,108 @@
+{
+  "id": 27,
+  "name": "production",
+  "state": "available",
+  "external_url": "http://root-minimal-ruby-app.35.188.122.130.xip.io",
+  "environment_type": null,
+  "name_without_type": "production",
+  "last_deployment": {
+    "id": 227,
+    "iid": 50,
+    "sha": "63492726c2264a0277141d6a6573c3d22ecd7de3",
+    "ref": {
+      "name": "master",
+      "ref_path": "/root/minimal-ruby-app/tree/master",
+      "tag": false
+    },
+    "created_at": "2019-02-20T16:09:12.213Z",
+    "tag": false,
+    "last?": true,
+    "user": {
+      "id": 1,
+      "name": "Administrator",
+      "username": "root",
+      "state": "active",
+      "avatar_url": "https://secure.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon",
+      "web_url": "https://22878.qa-tunnel.gitlab.info/root",
+      "status_tooltip_html": null,
+      "path": "/root"
+    },
+    "commit": {
+      "id": "63492726c2264a0277141d6a6573c3d22ecd7de3",
+      "short_id": "63492726",
+      "created_at": "2017-09-07T13:45:32.000Z",
+      "parent_ids": ["3fc05cdfcdc813ffe7d82af7bac9df5663f3bc17"],
+      "title": "Improve code quality",
+      "message": "Improve code quality",
+      "author_name": "Alessio Caiazza",
+      "author_email": "acaiazza@gitlab.com",
+      "authored_date": "2017-09-07T13:45:32.000Z",
+      "committer_name": "Alessio Caiazza",
+      "committer_email": "acaiazza@gitlab.com",
+      "committed_date": "2017-09-07T13:45:32.000Z",
+      "author": null,
+      "author_gravatar_url": "https://secure.gravatar.com/avatar/9c90b0ce0129300552700dc0fcd871fc?s=80\u0026d=identicon",
+      "commit_url": "https://22878.qa-tunnel.gitlab.info/root/minimal-ruby-app/commit/63492726c2264a0277141d6a6573c3d22ecd7de3",
+      "commit_path": "/root/minimal-ruby-app/commit/63492726c2264a0277141d6a6573c3d22ecd7de3"
+    },
+    "deployable": {
+      "id": 1097,
+      "name": "production",
+      "started": "2019-02-20T16:15:09.799Z",
+      "archived": false,
+      "build_path": "/root/minimal-ruby-app/-/jobs/1097",
+      "retry_path": "/root/minimal-ruby-app/-/jobs/1097/retry",
+      "playable": false,
+      "scheduled": false,
+      "created_at": "2019-02-20T16:09:12.194Z",
+      "updated_at": "2019-02-20T16:15:40.122Z",
+      "status": {
+        "icon": "status_success",
+        "text": "passed",
+        "label": "passed",
+        "group": "success",
+        "tooltip": "passed",
+        "has_details": true,
+        "details_path": "/root/minimal-ruby-app/-/jobs/1097",
+        "illustration": {
+          "image": "/assets/illustrations/skipped-job_empty-8b877955fbf175e42ae65b6cb95346e15282c6fc5b682756c329af3a0055225e.svg",
+          "size": "svg-430",
+          "title": "This job does not have a trace."
+        },
+        "favicon": "/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png",
+        "action": {
+          "icon": "retry",
+          "title": "Retry",
+          "path": "/root/minimal-ruby-app/-/jobs/1097/retry",
+          "method": "post",
+          "button_title": "Retry this job"
+        }
+      }
+    },
+    "manual_actions": [],
+    "scheduled_actions": []
+  },
+  "has_stop_action": false,
+  "environment_path": "/root/minimal-ruby-app/environments/27",
+  "stop_path": "/root/minimal-ruby-app/environments/27/stop",
+  "cluster_type": "project_type",
+  "terminal_path": "/root/minimal-ruby-app/environments/27/terminal",
+  "folder_path": "/root/minimal-ruby-app/environments/folders/production",
+  "created_at": "2019-02-19T09:12:37.400Z",
+  "updated_at": "2019-02-19T09:32:30.109Z",
+  "can_stop": true,
+  "rollout_status": {
+    "status": "loading"
+  },
+  "logs_path": "/root/minimal-ruby-app/environments/27/logs",
+  "alert_count": 1,
+  "alert_path": "/root/minimal-ruby-app/environments/27/metrics",
+  "last_alert": {
+    "id": 1,
+    "title": "my metric",
+    "query": "avg(metric)",
+    "threshold": 1.0,
+    "operator": "\u003e",
+    "alert_path": "/root/minimal-ruby-app/prometheus/alerts/21.json?environment_id=27"
+  }
+}
