@@ -10,7 +10,7 @@ module Geo
 
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('uploads')
 
-      scope :geo_syncable, -> { with_files_stored_locally }
+      scope :syncable, -> { with_files_stored_locally }
 
       class << self
         def for_model_with_type(model, type)
