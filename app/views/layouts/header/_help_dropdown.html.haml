@@ -9,3 +9,6 @@
     = render 'shared/user_dropdown_contributing_link'
   - if instance_review_permitted?
     = render 'shared/user_dropdown_instance_review'
+  - if Gitlab.com?
+    %li.js-canary-link
+      = link_to _("Switch to GitLab Next"), "https://next.gitlab.com/"
