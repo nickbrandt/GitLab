@@ -20,9 +20,7 @@ Geo provides local, read-only instances of your GitLab instances, reducing the t
 For a video introduction to Geo, see [Introduction to GitLab Geo - GitLab Features](https://www.youtube.com/watch?v=-HDLxSjEh6w).
 
 CAUTION: **Caution:**
-Geo undergoes significant changes from release to release. Upgrades **are** supported and [documented](#updating-geo), but you should ensure that you're using the right version of the documentation for your installation.
-
-To make sure you're using the right version of the documentation, navigate to [the source version of this page on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/doc/administration/geo/replication/index.md) and choose the appropriate release from the **Switch branch/tag** dropdown. For example, [`v11.2.3-ee`](https://gitlab.com/gitlab-org/gitlab-ee/blob/v11.2.3-ee/doc/administration/geo/replication/index.md).
+Geo undergoes significant changes from release to release. Upgrades **are** supported and [documented](#updating-geo), but you should ensure that you're using the right [version of the documentation](https://docs.gitlab.com/archives/) for your installation.
 
 ## Use cases
 
