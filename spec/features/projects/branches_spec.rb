@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe 'Branches' do
-  include EE::ProtectedBranchHelpers
-
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository) }
   let(:repository) { project.repository }
