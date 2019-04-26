@@ -1,5 +1,4 @@
 .linked-pipeline-mini-list {
-
   &.is-downstream {
     margin-left: -4px;
     margin-right: 4px;
@@ -170,7 +169,6 @@
 }
 
 .stage-column.has-upstream {
-
   .left-connector {
     @include flat-connector-before(60px);
   }
