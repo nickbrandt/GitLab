@@ -4093,6 +4093,9 @@ msgstr ""
 msgid "Dependencies|Version"
 msgstr ""
 
+msgid "Dependency List"
+msgstr ""
+
 msgid "Dependency Proxy"
 msgstr ""
 
