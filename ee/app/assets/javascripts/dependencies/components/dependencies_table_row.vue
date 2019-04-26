@@ -1,0 +1,61 @@
+<script>
+import { GlSkeletonLoading } from '@gitlab/ui';
+import { PACKAGE_TYPES } from '../store/constants';
+
+export default {
+  name: 'DependenciesTableRow',
+  components: {
+    GlSkeletonLoading,
+  },
+  props: {
+    dependency: {
+      type: Object,
+      required: true,
+    },
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  computed: {
+    packager() {
+      const { type } = this.dependency;
+      return PACKAGE_TYPES[type] || type;
+    },
+  },
+};
+</script>
+
+<template>
+  <!-- TODO: properly handle skeleton in case we're loading -->
+  <div class="gl-responsive-table-row vulnerabilities-row p-2">
+    <gl-skeleton-loading
+      v-if="isLoading"
+      :lines="1"
+      class="d-flex flex-column justify-content-center"
+    />
+    <template v-else>
+      <div class="table-section section-20 section-wrap">
+        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Component') }}</div>
+        <div class="table-mobile-content">{{ dependency.name }}</div>
+      </div>
+
+      <div class="table-section section-15">
+        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Version') }}</div>
+        <div class="table-mobile-content">{{ dependency.version }}</div>
+      </div>
+
+      <div class="table-section section-20 section-wrap">
+        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Packager') }}</div>
+        <div class="table-mobile-content">{{ packager }}</div>
+      </div>
+
+      <div class="table-section flex-grow-1 section-wrap">
+        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Location') }}</div>
+        <div class="table-mobile-content">
+          <a :href="dependency.location.blob_path">{{ dependency.location.blob_path }}</a>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
