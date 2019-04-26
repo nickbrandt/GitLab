@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.9.10 (2019-04-26)
+
+### Security (1 change)
+
+- Handle race condition when creating an MR approval.
+
+### Fixed (1 change, 1 of them is from the community)
+
+- Fix the group's epic page. The Paste issue link placeholder shown as 'undefinedundefinedundefined' in Chinese environment. And the error message showed nothing. !11312 (wdmcheng)
+
+
 ## 11.9.9 (2019-04-23)
 
 ### Fixed (1 change)
