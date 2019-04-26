@@ -2396,6 +2396,10 @@ ActiveRecord::Schema.define(version: 20190423124640) do
     t.text "issue_template_key"
   end
 
+  create_table "project_metrics_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
+    t.string "external_dashboard_url", null: false
+  end
+
   create_table "project_mirror_data", id: :serial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "retry_count", default: 0, null: false
@@ -3661,6 +3665,7 @@ ActiveRecord::Schema.define(version: 20190423124640) do
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
   add_foreign_key "project_incident_management_settings", "projects", on_delete: :cascade
+  add_foreign_key "project_metrics_settings", "projects", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
