@@ -67,20 +67,6 @@ describe API::Vulnerabilities do
           expect(json_response.first['name']).to eq 'DoS by CPU exhaustion when using malicious SSL packets'
         end
       end
-
-      it 'returns all project vulnerabilities' do
-        get api("/projects/#{project.id}/vulnerabilities", user)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to include_pagination_headers
-        expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
-
-        expect(response.headers['X-Total']).to eq('37')
-        expect(response.headers['X-Total-Pages']).to eql('2')
-
-        expect(json_response.count).to eq 20
-        expect(json_response.first['name']).to eq 'DoS by CPU exhaustion when using malicious SSL packets'
-      end
     end
 
     context 'with authorized user without read permissions' do

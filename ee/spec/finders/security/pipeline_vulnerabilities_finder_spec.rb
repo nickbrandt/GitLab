@@ -35,7 +35,7 @@ describe Security::PipelineVulnerabilitiesFinder do
       context 'when dependency_scanning' do
         let(:params) { { report_type: %w[dependency_scanning] } }
 
-        it 'includes only depscan' do
+        it 'includes only dependency_scanning' do
           expect(subject.count).to eq 4
         end
       end
@@ -43,7 +43,7 @@ describe Security::PipelineVulnerabilitiesFinder do
       context 'when dast' do
         let(:params) { { report_type: %w[dast] } }
 
-        it 'includes only depscan' do
+        it 'includes only dast' do
           expect(subject.count).to eq 2
         end
       end
@@ -51,7 +51,7 @@ describe Security::PipelineVulnerabilitiesFinder do
       context 'when container_scanning' do
         let(:params) { { report_type: %w[container_scanning] } }
 
-        it 'includes only depscan' do
+        it 'includes only container_scanning' do
           expect(subject.count).to eq 8
         end
       end
@@ -72,6 +72,14 @@ describe Security::PipelineVulnerabilitiesFinder do
         it 'did not find anything' do
           is_expected.to be_empty
         end
+      end
+    end
+
+    context 'without params' do
+      subject { described_class.new(pipeline: pipeline).execute }
+
+      it 'returns all report_types' do
+        expect(subject.count).to eq 47
       end
     end
   end

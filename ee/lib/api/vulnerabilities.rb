@@ -29,17 +29,19 @@ module API
     end
 
     params do
-      requires :id, type: String, desc: "The ID of a project"
+      requires :id, type: String, desc: 'The ID of a project'
     end
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      desc "Get a list of project vulnerabilities" do
+      desc 'Get a list of project vulnerabilities' do
         success ::Vulnerabilities::OccurrenceEntity
       end
+
       params do
-        optional :report_type, type: String, desc: 'the type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
+        optional :report_type, type: String, desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
         use :pagination
       end
+
       get ':id/vulnerabilities' do
         project = Project.find(params[:id])
 
