@@ -55,7 +55,7 @@ export default {
       <ci-status
         v-else
         :status="pipelineStatus"
-        cssClasses="position-top-0"
+        css-classes="position-top-0"
         class="js-linked-pipeline-status"
       />
 
