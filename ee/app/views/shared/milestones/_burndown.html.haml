@@ -9,9 +9,9 @@
     %h3
       Burndown chart
       .btn-group.js-burndown-data-selector
-        %button.btn.btn-sm.active{ data: { show: 'count' } }
+        %button.btn.btn-sm.btn-primary{ data: { show: 'count' } }
           Issues
-        %button.btn.btn-sm{ data: { show: 'weight' } }
+        %button.btn.btn-sm.btn-primary.btn-inverted{ data: { show: 'weight' } }
           Issue weight
   .burndown-chart{ data: { start_date: burndown.start_date.strftime("%Y-%m-%d"), due_date: burndown.due_date.strftime("%Y-%m-%d"), chart_data: burndown.to_json } }
 
