@@ -29,7 +29,7 @@ describe 'admin Geo Projects', :js, :geo do
       end
     end
 
-    describe 'searching for a geo project' do
+    describe 'searching for a geo project', :geo_fdw do
       it 'filters out projects with the search term' do
         fill_in :name, with: synced_registry.project.name
         find('#project-filter-form-field').native.send_keys(:enter)
@@ -66,7 +66,7 @@ describe 'admin Geo Projects', :js, :geo do
       end
     end
 
-    describe 'searching for a geo project' do
+    describe 'searching for a geo project', :geo_fdw do
       it 'finds the project with the same name' do
         fill_in :name, with: sync_pending_registry.project.name
         find('#project-filter-form-field').native.send_keys(:enter)
