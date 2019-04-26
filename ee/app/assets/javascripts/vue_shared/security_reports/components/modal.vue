@@ -4,16 +4,22 @@ import Modal from '~/vue_shared/components/gl_modal.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 
+import DismissalNote from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
+import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
+import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
 
 export default {
   components: {
+    DismissalNote,
     EventItem,
     ExpandButton,
+    IssueNote,
     LoadingButton,
+    MergeRequestNote,
     Modal,
     SolutionCard,
     SplitButton,
@@ -80,7 +86,7 @@ export default {
       );
     },
     project() {
-      return this.modal.data.project || {};
+      return this.modal.data.project;
     },
     solution() {
       return this.vulnerability && this.vulnerability.solution;
@@ -102,14 +108,20 @@ export default {
         (this.canCreateFeedbackPermission || this.canCreateIssuePermission)
       );
     },
+    vulnerability() {
+      return this.modal.vulnerability;
+    },
     issueFeedback() {
       return this.vulnerability && this.vulnerability.issue_feedback;
     },
     mergeRequestFeedback() {
       return this.vulnerability && this.vulnerability.merge_request_feedback;
     },
-    vulnerability() {
-      return this.modal.vulnerability;
+    dismissalFeedback() {
+      return (
+        this.vulnerability &&
+        (this.vulnerability.dismissal_feedback || this.vulnerability.dismissalFeedback)
+      );
     },
     valuedFields() {
       const { data } = this.modal;
@@ -148,43 +160,21 @@ export default {
       <solution-card v-if="renderSolutionCard" :solution="solution" :remediation="remediation" />
       <hr v-else />
 
-      <ul v-if="vulnerability.hasIssue || vulnerability.hasMergeRequest" class="notes card">
-        <li v-if="vulnerability.hasIssue" class="note">
-          <event-item
-            type="issue"
-            :project-name="project.value"
-            :project-link="project.url"
-            :author-name="issueFeedback.author.name"
-            :author-username="issueFeedback.author.username"
-            :action-link-text="`#${issueFeedback.issue_iid}`"
-            :action-link-url="issueFeedback.issue_url"
-          />
+      <ul v-if="issueFeedback || mergeRequestFeedback" class="notes card my-4">
+        <li v-if="issueFeedback" class="note">
+          <issue-note :feedback="issueFeedback" :project="project" />
         </li>
-        <li v-if="vulnerability.hasMergeRequest" class="note">
-          <event-item
-            type="mergeRequest"
-            :project-name="project.value"
-            :project-link="project.url"
-            :author-name="mergeRequestFeedback.author.name"
-            :author-username="mergeRequestFeedback.author.username"
-            :action-link-text="`!${mergeRequestFeedback.merge_request_iid}`"
-            :action-link-url="mergeRequestFeedback.merge_request_path"
-          />
+        <li v-if="mergeRequestFeedback" class="note">
+          <merge-request-note :feedback="mergeRequestFeedback" :project="project" />
         </li>
       </ul>
 
+      <div class="card my-4">
+        <dismissal-note v-if="dismissalFeedback" :feedback="dismissalFeedback" :project="project" />
+      </div>
+
       <div class="prepend-top-20 append-bottom-10">
         <div class="col-sm-12 text-secondary">
-          <template v-if="hasDismissedBy">
-            {{ s__('ciReport|Dismissed by') }}
-            <a :href="vulnerability.dismissalFeedback.author.web_url" class="pipeline-id">
-              @{{ vulnerability.dismissalFeedback.author.username }}
-            </a>
-            {{ s__('ciReport|on pipeline') }}
-            <a :href="vulnerability.dismissalFeedback.pipeline.path" class="pipeline-id"
-              >#{{ vulnerability.dismissalFeedback.pipeline.id }}</a
-            >.
-          </template>
           <a
             v-if="vulnerabilityFeedbackHelpPath"
             :href="vulnerabilityFeedbackHelpPath"
