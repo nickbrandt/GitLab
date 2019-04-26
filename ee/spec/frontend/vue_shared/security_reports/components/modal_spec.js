@@ -20,13 +20,14 @@ describe('Security Reports modal', () => {
         };
         props.modal.vulnerability.isDismissed = true;
         props.modal.vulnerability.dismissalFeedback = {
-          author: { username: 'jsmith' },
-          pipeline: { id: '123' },
+          author: { username: 'jsmith', name: 'John Smith' },
+          pipeline: { id: '123', path: '#' },
         };
         vm = mountComponent(Component, props);
       });
 
       it('renders dismissal author and associated pipeline', () => {
+        expect(vm.$el.textContent.trim()).toContain('John Smith');
         expect(vm.$el.textContent.trim()).toContain('@jsmith');
         expect(vm.$el.textContent.trim()).toContain('#123');
       });
