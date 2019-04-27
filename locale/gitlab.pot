@@ -189,6 +189,9 @@ msgstr ""
 msgid "%{label_for_message} unavailable"
 msgstr ""
 
+msgid "%{lets_encrypt_link_start}Let's Encrypt%{lets_encrypt_link_end} is a free, automated, and open certificate authority (CA), that give digital certificates in order to enable HTTPS (SSL/TLS) for websites."
+msgstr ""
+
 msgid "%{level_name} is not allowed in a %{group_level_name} group."
 msgstr ""
 
@@ -309,6 +312,9 @@ msgid "- Runner is paused and will not receive any new jobs"
 msgstr ""
 
 msgid "- show less"
+msgstr ""
+
+msgid "0 for unlimited"
 msgstr ""
 
 msgid "1 %{type} addition"
@@ -459,6 +465,9 @@ msgid "A Hugo site that uses Netlify for CI/CD instead of GitLab, but still with
 msgstr ""
 
 msgid "A Jekyll site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
+msgstr ""
+
+msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
 msgid "A default branch cannot be chosen for an empty project."
@@ -3083,6 +3092,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Let's Encrypt"
+msgstr ""
+
 msgid "Configure Tracing"
 msgstr ""
 
@@ -4001,6 +4013,9 @@ msgid "Documentation for popular identity providers"
 msgstr ""
 
 msgid "Domain"
+msgstr ""
+
+msgid "Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled"
 msgstr ""
 
 msgid "Don't show again"
@@ -6170,6 +6185,9 @@ msgstr ""
 msgid "I accept the|Terms of Service and Privacy Policy"
 msgstr ""
 
+msgid "I have read and agree to the Let's Encrypt Terms of Service"
+msgstr ""
+
 msgid "ID"
 msgstr ""
 
@@ -6976,6 +6994,9 @@ msgid "Leave project"
 msgstr ""
 
 msgid "Leave the \"File type\" and \"Delivery method\" options on their default values."
+msgstr ""
+
+msgid "Let's Encrypt does not accept emails on example.com"
 msgstr ""
 
 msgid "License"
@@ -9972,6 +9993,9 @@ msgid "Require all users to accept Terms of Service and Privacy Policy when they
 msgstr ""
 
 msgid "Require approval from code owners"
+msgstr ""
+
+msgid "Require users to prove ownership of custom domains"
 msgstr ""
 
 msgid "Requires approval from %{names}."
