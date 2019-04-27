@@ -50,6 +50,11 @@ describe 'User activates GitHub Service' do
       let(:project) { create(:project, ci_pipelines: [pipeline])}
 
       it 'tests service before save' do
+        stub_request(:post, "https://api.github.com/repos/h5bp/html5-boilerplate/statuses/#{pipeline.sha}").to_return(
+          body: { context: {} }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
         click_button 'Test settings and save changes'
         wait_for_requests
 
