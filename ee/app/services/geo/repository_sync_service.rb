@@ -7,6 +7,7 @@ module Geo
     private
 
     def sync_repository
+      start_registry!
       fetch_repository
       update_root_ref
       mark_sync_as_successful

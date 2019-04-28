@@ -48,10 +48,6 @@ module Geo
       log_info("Trying to fetch #{type}")
       clean_up_temporary_repository
 
-      log_info("Marking #{type} sync as started")
-
-      registry.start_sync!(type)
-
       if redownload?
         redownload_repository
         @new_repository = true
@@ -159,6 +155,11 @@ module Geo
         sync_repository: type.repository?,
         sync_wiki: type.wiki?
       )
+    end
+
+    def start_registry!
+      log_info("Marking #{type} sync as started")
+      registry.start_sync!(type)
     end
 
     def fail_registry!(message, error, attrs = {})
