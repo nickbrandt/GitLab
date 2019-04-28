@@ -10,6 +10,7 @@ module EESpecificCheck
     'scripts/**/*',
     'vendor/assets/javascripts/jasmine-jquery.js',
     '.gitlab-ci.yml',
+    '.gitlab/ci/rails.gitlab-ci.yml',
     'db/schema.rb',
     'locale/gitlab.pot'
   ].freeze
