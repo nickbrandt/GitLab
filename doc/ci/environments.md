@@ -237,7 +237,7 @@ For more information, see [Where variables can be used](variables/where_variable
 GitLab Runner exposes various [environment variables](variables/README.md) when a job runs, so
 you can use them as environment names.
 
-In the following example, a job will deploy to all branches except `master`:
+In the following example, the job will deploy to all branches except `master`:
 
 ```yaml
 deploy_review:
