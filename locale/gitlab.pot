@@ -4804,6 +4804,9 @@ msgstr ""
 msgid "Failed to check related branches."
 msgstr ""
 
+msgid "Failed to connect to the prometheus server"
+msgstr ""
+
 msgid "Failed to create repository via gitlab-shell"
 msgstr ""
 
