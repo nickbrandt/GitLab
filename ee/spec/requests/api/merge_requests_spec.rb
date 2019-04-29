@@ -170,6 +170,29 @@ describe API::MergeRequests do
     end
   end
 
+  describe "PUT /projects/:id/merge_requests/:merge_request_iid/merge" do
+    it 'returns 405 if merge request was not approved' do
+      project.add_developer(create(:user))
+      project.update(approvals_before_merge: 1)
+
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+
+      expect(response).to have_gitlab_http_status(406)
+      expect(json_response['message']).to eq('Branch cannot be merged')
+    end
+
+    it 'returns 200 if merge request was approved' do
+      approver = create(:user)
+      project.add_developer(approver)
+      project.update(approvals_before_merge: 1)
+      merge_request.approvals.create(user: approver)
+
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+  end
+
   context 'when authenticated' do
     def expect_response_contain_exactly(*items)
       expect(response).to have_gitlab_http_status(200)
