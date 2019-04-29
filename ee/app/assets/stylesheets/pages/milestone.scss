@@ -59,18 +59,6 @@
     margin-left: 20px;
     margin-bottom: 2px;
   }
-
-  .btn {
-    @include btn-outline($white-light, $blue-500, $blue-500, $blue-500, $white-light, $blue-600, $blue-600, $blue-700);
-
-    font-size: 12px;
-
-    &.active {
-      background-color: $blue-500;
-      border-color: $blue-600;
-      color: $white-light;
-    }
-  }
 }
 
 .burndown-chart {

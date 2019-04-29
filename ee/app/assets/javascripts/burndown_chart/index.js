@@ -32,9 +32,9 @@ export default () => {
       if (currentView !== show) {
         currentView = show;
         $this
-          .addClass('active')
+          .removeClass('btn-inverted')
           .siblings()
-          .removeClass('active');
+          .addClass('btn-inverted');
         switch (show) {
           case 'count':
             chart.setData(openIssuesCount, { label: 'Open issues', animate: true });
