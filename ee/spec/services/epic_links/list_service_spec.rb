@@ -18,7 +18,7 @@ describe EpicLinks::ListService, :postgresql do
         state: epic.state,
         reference: epic.to_reference(group),
         path: "/groups/#{epic.group.full_path}/-/epics/#{epic.iid}",
-        relation_path: "/groups/#{epic.group.full_path}/-/epics/#{parent_epic.iid}/links/#{epic.id}"
+        relation_path: "/groups/#{parent_epic.group.full_path}/-/epics/#{parent_epic.iid}/links/#{epic.id}"
       }
     end
   end
