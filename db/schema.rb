@@ -2253,6 +2253,20 @@ ActiveRecord::Schema.define(version: 20190603124955) do
     t.index ["project_id"], name: "index_packages_packages_on_project_id", using: :btree
   end
 
+  create_table "pages_domain_acme_orders", force: :cascade do |t|
+    t.integer "pages_domain_id", null: false
+    t.datetime_with_timezone "expires_at", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "url", null: false
+    t.string "challenge_token", null: false
+    t.text "challenge_file_content", null: false
+    t.text "encrypted_private_key", null: false
+    t.text "encrypted_private_key_iv", null: false
+    t.index ["challenge_token"], name: "index_pages_domain_acme_orders_on_challenge_token", using: :btree
+    t.index ["pages_domain_id"], name: "index_pages_domain_acme_orders_on_pages_domain_id", using: :btree
+  end
+
   create_table "pages_domains", id: :serial, force: :cascade do |t|
     t.integer "project_id"
     t.text "certificate"
@@ -3698,6 +3712,7 @@ ActiveRecord::Schema.define(version: 20190603124955) do
   add_foreign_key "packages_maven_metadata", "packages_packages", column: "package_id", name: "fk_be88aed360", on_delete: :cascade
   add_foreign_key "packages_package_files", "packages_packages", column: "package_id", name: "fk_86f0f182f8", on_delete: :cascade
   add_foreign_key "packages_packages", "projects", on_delete: :cascade
+  add_foreign_key "pages_domain_acme_orders", "pages_domains", on_delete: :cascade
   add_foreign_key "pages_domains", "projects", name: "fk_ea2f6dfc6f", on_delete: :cascade
   add_foreign_key "path_locks", "projects", name: "fk_5265c98f24", on_delete: :cascade
   add_foreign_key "path_locks", "users"
