@@ -7,31 +7,19 @@ module Geo
     end
 
     def count_synced
-      if aggregate_pushdown_supported?
-        find_synced.count
-      else
-        legacy_find_synced.count
-      end
+      job_artifacts_synced.count
     end
 
     def count_failed
-      if aggregate_pushdown_supported?
-        find_failed.count
-      else
-        legacy_find_failed.count
-      end
+      job_artifacts_failed.count
     end
 
     def count_synced_missing_on_primary
-      if aggregate_pushdown_supported?
-        find_synced_missing_on_primary.count
-      else
-        legacy_find_synced_missing_on_primary.count
-      end
+      job_artifacts_synced_missing_on_primary.count
     end
 
     def count_registry
-      Geo::JobArtifactRegistry.count
+      registries_for_job_artifacts.count
     end
 
     def syncable
@@ -82,7 +70,8 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_artifact_ids: [])
-      find_failed_registries
+      Geo::JobArtifactRegistry
+        .failed
         .retry_due
         .artifact_id_not_in(except_artifact_ids)
         .limit(batch_size)
@@ -91,7 +80,9 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_artifact_ids: [])
-      find_synced_missing_on_primary_registries
+      Geo::JobArtifactRegistry
+        .synced
+        .missing_on_primary
         .retry_due
         .artifact_id_not_in(except_artifact_ids)
         .limit(batch_size)
@@ -118,46 +109,38 @@ module Geo
       end
     end
 
-    def find_synced
-      if use_legacy_queries?
-        legacy_find_synced
+    def registries_for_job_artifacts
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.registries_for_job_artifacts
       else
-        fdw_find.merge(find_synced_registries)
+        job_artifacts
+          .inner_join_job_artifact_registry
+          .syncable
       end
     end
 
-    def find_synced_missing_on_primary
-      if use_legacy_queries?
-        legacy_find_synced_missing_on_primary
+    def job_artifacts_synced
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.job_artifacts_synced
       else
-        fdw_find.merge(find_synced_missing_on_primary_registries)
+        registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced)
       end
     end
 
-    def find_failed
-      if use_legacy_queries?
-        legacy_find_failed
+    def job_artifacts_failed
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.job_artifacts_failed
       else
-        fdw_find.merge(find_failed_registries)
+        registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.failed)
       end
     end
 
-    def find_synced_registries
-      Geo::JobArtifactRegistry.synced
-    end
-
-    def find_synced_missing_on_primary_registries
-      find_synced_registries.missing_on_primary
-    end
-
-    def find_failed_registries
-      Geo::JobArtifactRegistry.failed
-    end
-
-    def fdw_find
-      job_artifacts
-        .inner_join_job_artifact_registry
-        .syncable
+    def job_artifacts_synced_missing_on_primary
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.job_artifacts_synced_missing_on_primary
+      else
+        registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced.missing_on_primary)
+      end
     end
 
     def fdw_find_unsynced(except_artifact_ids:)
@@ -173,22 +156,6 @@ module Geo
         .with_files_stored_remotely
         .id_not_in(except_artifact_ids)
         .merge(Geo::JobArtifactRegistry.all)
-    end
-
-    def legacy_find_synced
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_registries.pluck_artifact_key,
-        Ci::JobArtifact
-      )
-    end
-
-    def legacy_find_failed
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_failed_registries.pluck_artifact_key,
-        Ci::JobArtifact
-      )
     end
 
     def legacy_find_unsynced(except_artifact_ids:)
@@ -207,14 +174,6 @@ module Geo
       legacy_inner_join_registry_ids(
         legacy_finder.job_artifacts.with_files_stored_remotely,
         registry_artifact_ids,
-        Ci::JobArtifact
-      )
-    end
-
-    def legacy_find_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_missing_on_primary_registries.pluck_artifact_key,
         Ci::JobArtifact
       )
     end

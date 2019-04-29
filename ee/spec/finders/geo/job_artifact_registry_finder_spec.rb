@@ -11,6 +11,7 @@ describe Geo::JobArtifactRegistryFinder, :geo do
   let(:synced_group) { create(:group) }
   let(:synced_project) { create(:project, group: synced_group) }
   let(:unsynced_project) { create(:project) }
+  let(:project_broken_storage) { create(:project, :broken_storage) }
 
   let(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
   let(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
@@ -26,32 +27,51 @@ describe Geo::JobArtifactRegistryFinder, :geo do
     stub_artifacts_object_storage
   end
 
+  it 'responds to file registry finder methods' do
+    file_registry_finder_methods = %i{
+      syncable
+      count_syncable
+      count_synced
+      count_failed
+      count_synced_missing_on_primary
+      count_registry
+      find_unsynced
+      find_migrated_local
+      find_retryable_failed_registries
+      find_retryable_synced_missing_on_primary_registries
+    }
+
+    file_registry_finder_methods.each do |method|
+      expect(subject).to respond_to(method)
+    end
+  end
+
   shared_examples 'counts all the things' do
     describe '#count_syncable' do
-      before do
-        job_artifact_1
-        job_artifact_2
-        job_artifact_3
-        job_artifact_4
-      end
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_3) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_4) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_5) { create(:ci_job_artifact, project: project_broken_storage) }
+      let!(:job_artifact_6) { create(:ci_job_artifact, project: project_broken_storage) }
 
       it 'counts job artifacts' do
-        expect(subject.count_syncable).to eq 4
+        expect(subject.count_syncable).to eq 6
       end
 
       it 'ignores remote job artifacts' do
         job_artifact_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
-        expect(subject.count_syncable).to eq 3
+        expect(subject.count_syncable).to eq 5
       end
 
       it 'ignores expired job artifacts' do
         job_artifact_1.update_column(:expire_at, Date.yesterday)
 
-        expect(subject.count_syncable).to eq 3
+        expect(subject.count_syncable).to eq 5
       end
 
-      context 'with selective sync' do
+      context 'with selective sync by namespace' do
         before do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
         end
@@ -72,82 +92,109 @@ describe Geo::JobArtifactRegistryFinder, :geo do
           expect(subject.count_syncable).to eq 1
         end
       end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts job artifacts' do
+          expect(subject.count_syncable).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 1
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_5.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_syncable).to eq 1
+        end
+      end
     end
 
     describe '#count_synced' do
-      it 'delegates to #legacy_find_synced' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(false)
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_3) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_4) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_5) { create(:ci_job_artifact, project: project_broken_storage) }
+      let!(:job_artifact_6) { create(:ci_job_artifact, project: project_broken_storage) }
 
-        expect(subject).to receive(:legacy_find_synced).and_call_original
-
-        subject.count_synced
-      end
-
-      it 'delegates to #find_synced for PostgreSQL 10' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(true)
-
-        expect(subject).to receive(:find_synced).and_call_original
-
-        subject.count_synced
-      end
-
-      it 'counts job artifacts that have been synced' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
-
-        expect(subject.count_synced).to eq 2
-      end
-
-      it 'ignores remote job artifacts' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
-
-        expect(subject.count_synced).to eq 2
-      end
-
-      it 'ignores expired job artifacts' do
-        job_artifact_1.update_column(:expire_at, Date.yesterday)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
-
-        expect(subject.count_synced).to eq 2
-      end
-
-      context 'with selective sync' do
+      context 'without selective sync' do
         before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'delegates to #legacy_find_synced' do
-          expect(subject).to receive(:legacy_find_synced).and_call_original
-
-          subject.count_synced
-        end
-
-        it 'counts job artifacts that has been synced' do
           create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
+        end
+
+        it 'counts job artifacts that have been synced' do
+          expect(subject.count_synced).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_2.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_synced).to eq 1
         end
 
-        it 'ignores remote job artifacts' do
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
+        it 'ignores expired job artifacts' do
+          job_artifact_2.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_synced).to eq 1
+        end
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
+        end
+
+        it 'counts job artifacts that has been synced' do
+          expect(subject.count_synced).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_synced).to eq 1
         end
 
         it 'ignores expired job artifacts' do
           job_artifact_1.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_synced).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
           create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id)
+        end
+
+        it 'counts job artifacts that has been synced' do
+          expect(subject.count_synced).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_synced).to eq 1
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_5.update_column(:expire_at, Date.yesterday)
 
           expect(subject.count_synced).to eq 1
         end
@@ -155,85 +202,88 @@ describe Geo::JobArtifactRegistryFinder, :geo do
     end
 
     describe '#count_failed' do
-      it 'delegates to #legacy_find_failed' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(false)
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_3) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_4) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_5) { create(:ci_job_artifact, project: project_broken_storage) }
+      let!(:job_artifact_6) { create(:ci_job_artifact, project: project_broken_storage) }
 
-        expect(subject).to receive(:legacy_find_failed).and_call_original
-
-        subject.count_failed
-      end
-
-      it 'delegates to #find_failed' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(true)
-
-        expect(subject).to receive(:find_failed).and_call_original
-
-        subject.count_failed
-      end
-
-      it 'counts job artifacts that sync has failed' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
-
-        expect(subject.count_failed).to eq 2
-      end
-
-      it 'ignores remote job artifacts' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
-
-        expect(subject.count_failed).to eq 2
-      end
-
-      it 'ignores expired job artifacts' do
-        job_artifact_1.update_column(:expire_at, Date.yesterday)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, success: false)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
-
-        expect(subject.count_failed).to eq 2
-      end
-
-      context 'with selective sync' do
+      context 'without selective sync' do
         before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'delegates to #legacy_find_failed' do
-          expect(subject).to receive(:legacy_find_failed).and_call_original
-
-          subject.count_failed
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, success: false)
         end
 
         it 'counts job artifacts that sync has failed' do
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id)
-
-          expect(subject.count_failed).to eq 1
-        end
-
-        it 'does not count job artifacts of unsynced projects' do
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, success: false)
-
-          expect(subject.count_failed).to eq 0
+          expect(subject.count_failed).to eq 3
         end
 
         it 'ignores remote job artifacts' do
           job_artifact_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_failed).to eq 2
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_1.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_failed).to eq 2
+        end
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
           create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, success: false)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, success: false)
+        end
+
+        it 'counts job artifacts that sync has failed' do
+          expect(subject.count_failed).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
         end
 
         it 'ignores expired job artifacts' do
           job_artifact_1.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_failed).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
           create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, success: false)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, success: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id, success: false)
+        end
+
+        it 'counts job artifacts that sync has failed' do
+          expect(subject.count_failed).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_failed).to eq 1
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_5.update_column(:expire_at, Date.yesterday)
 
           expect(subject.count_failed).to eq 1
         end
@@ -241,83 +291,135 @@ describe Geo::JobArtifactRegistryFinder, :geo do
     end
 
     describe '#count_synced_missing_on_primary' do
-      it 'delegates to #legacy_find_synced_missing_on_primary' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(false)
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_3) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_4) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_5) { create(:ci_job_artifact, project: project_broken_storage) }
+      let!(:job_artifact_6) { create(:ci_job_artifact, project: project_broken_storage) }
 
-        expect(subject).to receive(:legacy_find_synced_missing_on_primary).and_call_original
-
-        subject.count_synced_missing_on_primary
-      end
-
-      it 'delegates to #find_synced_missing_on_primary for PostgreSQL 10' do
-        allow(subject).to receive(:aggregate_pushdown_supported?).and_return(true)
-
-        expect(subject).to receive(:find_synced_missing_on_primary).and_call_original
-
-        subject.count_synced_missing_on_primary
-      end
-
-      it 'counts job artifacts that have been synced and are missing on the primary' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 1
-      end
-
-      it 'excludes job artifacts that are not missing on the primary' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
-      it 'excludes job artifacts that are not synced' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
-      it 'ignores remote job artifacts' do
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
-      it 'ignores expired job artifacts' do
-        job_artifact_1.update_column(:expire_at, Date.yesterday)
-        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
-      context 'with selective sync' do
+      context 'without selective sync' do
         before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'delegates to #legacy_find_synced_missing_on_primary' do
-          expect(subject).to receive(:legacy_find_synced_missing_on_primary).and_call_original
-
-          subject.count_synced_missing_on_primary
-        end
-
-        it 'counts job artifacts that has been synced' do
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false, missing_on_primary: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
           create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_4.id, missing_on_primary: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id)
+        end
 
+        it 'counts job artifacts that have been synced and are missing on the primary' do
           expect(subject.count_synced_missing_on_primary).to eq 2
         end
 
         it 'ignores remote job artifacts' do
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id, missing_on_primary: true)
+          job_artifact_3.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
-          expect(subject.count_synced_missing_on_primary).to eq 0
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_3.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_4.id, missing_on_primary: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id)
+        end
+
+        it 'counts job artifacts that have been synced and are missing on the primary' do
+          expect(subject.count_synced_missing_on_primary).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_synced_missing_on_primary).to eq 1
         end
 
         it 'ignores expired job artifacts' do
           job_artifact_1.update_column(:expire_at, Date.yesterday)
-          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
 
-          expect(subject.count_synced_missing_on_primary).to eq 0
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_2.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_4.id, missing_on_primary: false)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_5.id, missing_on_primary: true)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id, missing_on_primary: true)
+        end
+
+        it 'counts job artifacts that have been synced and are missing on the primary' do
+          expect(subject.count_synced_missing_on_primary).to eq 2
+        end
+
+        it 'ignores remote job artifacts' do
+          job_artifact_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+
+        it 'ignores expired job artifacts' do
+          job_artifact_5.update_column(:expire_at, Date.yesterday)
+
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+      end
+    end
+
+    describe '#count_registry' do
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_3) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_4) { create(:ci_job_artifact, project: unsynced_project) }
+      let!(:job_artifact_5) { create(:ci_job_artifact, project: project_broken_storage) }
+      let!(:job_artifact_6) { create(:ci_job_artifact, project: project_broken_storage) }
+
+      before do
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: false)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, missing_on_primary: true)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_4.id)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_6.id)
+      end
+
+      it 'counts file registries for job artifacts' do
+        expect(subject.count_registry).to eq 4
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts file registries for job artifacts' do
+          expect(subject.count_registry).to eq 2
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts file registries for job artifacts' do
+          expect(subject.count_registry).to eq 1
         end
       end
     end
@@ -325,12 +427,6 @@ describe Geo::JobArtifactRegistryFinder, :geo do
 
   shared_examples 'finds all the things' do
     describe '#find_unsynced' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_unsynced".to_sym).and_call_original
-
-        subject.find_unsynced(batch_size: 10)
-      end
-
       it 'returns job artifacts without an entry on the tracking database' do
         create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id, success: true)
         create(:geo_job_artifact_registry, artifact_id: job_artifact_3.id, success: false)
@@ -367,12 +463,6 @@ describe Geo::JobArtifactRegistryFinder, :geo do
     end
 
     describe '#find_migrated_local' do
-      it 'delegates to the correct method' do
-        expect(subject).to receive("#{method_prefix}_find_migrated_local".to_sym).and_call_original
-
-        subject.find_migrated_local(batch_size: 10)
-      end
-
       it 'returns job artifacts remotely and successfully synced locally' do
         job_artifact = create(:ci_job_artifact, :remote_store, project: synced_project)
         create(:geo_job_artifact_registry, artifact_id: job_artifact.id)
@@ -418,5 +508,34 @@ describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  it_behaves_like 'a file registry finder'
+  # Disable transactions via :delete method because a foreign table
+  # can't see changes inside a transaction of a different connection.
+  context 'FDW', :geo_fdw, :delete do
+    context 'with use_fdw_queries_for_selective_sync disabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: false)
+      end
+
+      include_examples 'counts all the things'
+      include_examples 'finds all the things'
+    end
+
+    context 'with use_fdw_queries_for_selective_sync enabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: true)
+      end
+
+      include_examples 'counts all the things'
+      include_examples 'finds all the things'
+    end
+  end
+
+  context 'Legacy' do
+    before do
+      stub_fdw_disabled
+    end
+
+    include_examples 'counts all the things'
+    include_examples 'finds all the things'
+  end
 end
