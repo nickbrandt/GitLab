@@ -3,7 +3,7 @@
 module Geo
   class LegacyJobArtifactRegistryFinder < RegistryFinder
     def syncable
-      job_artifacts.geo_syncable
+      job_artifacts.syncable
     end
 
     def job_artifacts

@@ -38,9 +38,9 @@ module Geo
       if use_legacy_queries_for_selective_sync?
         legacy_finder.syncable
       elsif selective_sync?
-        job_artifacts.geo_syncable
+        job_artifacts.syncable
       else
-        Ci::JobArtifact.geo_syncable
+        Ci::JobArtifact.syncable
       end
     end
 
@@ -157,13 +157,13 @@ module Geo
     def fdw_find
       job_artifacts
         .inner_join_job_artifact_registry
-        .geo_syncable
+        .syncable
     end
 
     def fdw_find_unsynced(except_artifact_ids:)
       job_artifacts
         .missing_job_artifact_registry
-        .geo_syncable
+        .syncable
         .id_not_in(except_artifact_ids)
     end
 
