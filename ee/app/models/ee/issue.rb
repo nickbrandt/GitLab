@@ -18,6 +18,7 @@ module EE
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
+      has_many :designs, class_name: "DesignManagement::Design", inverse_of: :issue
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end
@@ -89,6 +90,10 @@ module EE
 
     def board_group
       @group ||= project.group
+    end
+
+    def design_collection
+      @design_collection ||= ::DesignManagement::DesignCollection.new(self)
     end
 
     class_methods do
