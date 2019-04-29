@@ -14,6 +14,7 @@ module Geo
 
         scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
         scope :geo_syncable, -> { with_files_stored_locally.not_expired }
+        scope :project_id_in, ->(ids) { joins(:project).merge(Geo::Fdw::Project.id_in(ids)) }
       end
     end
   end
