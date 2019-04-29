@@ -4,16 +4,6 @@ module API
   class Vulnerabilities < Grape::API
     include PaginationParams
 
-    # HACK: RequestProxy needed because `request.current_user` not set for Grape::API
-    class RequestProxy < SimpleDelegator
-      attr_reader :current_user
-
-      def initialize(req, current_user)
-        @current_user = current_user
-        super(req)
-      end
-    end
-
     helpers do
       def vulnerability_occurrences_by(params)
         pipeline = params[:project].latest_pipeline_with_security_reports
@@ -53,7 +43,7 @@ module API
 
         present paginate(vulnerability_occurrences),
           with: ::Vulnerabilities::OccurrenceEntity,
-          request: RequestProxy.new(request, current_user)
+          request: GrapeRequestProxy.new(request, current_user)
       end
     end
   end
