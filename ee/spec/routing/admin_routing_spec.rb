@@ -49,4 +49,14 @@ describe 'EE-specific admin routing' do
       expect(patch("/admin/geo/nodes/#{geo_node.id}")).to route_to('admin/geo/nodes#update', id: geo_node.to_param)
     end
   end
+
+  describe Admin::EmailsController, 'routing' do
+    it 'routes to #show' do
+      expect(get('/admin/email')).to route_to('admin/emails#show')
+    end
+
+    it 'routes to #create' do
+      expect(post('/admin/email')).to route_to('admin/emails#create')
+    end
+  end
 end

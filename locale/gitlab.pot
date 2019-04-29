@@ -135,9 +135,6 @@ msgstr ""
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
 msgstr ""
 
-msgid "%{count} %{alerts}"
-msgstr ""
-
 msgid "%{count} approval required from %{name}"
 msgid_plural "%{count} approvals required from %{name}"
 msgstr[0] ""
@@ -190,6 +187,9 @@ msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
 msgid "%{label_for_message} unavailable"
+msgstr ""
+
+msgid "%{lets_encrypt_link_start}Let's Encrypt%{lets_encrypt_link_end} is a free, automated, and open certificate authority (CA), that give digital certificates in order to enable HTTPS (SSL/TLS) for websites."
 msgstr ""
 
 msgid "%{level_name} is not allowed in a %{group_level_name} group."
@@ -263,6 +263,9 @@ msgstr[1] ""
 msgid "%{text} is available"
 msgstr ""
 
+msgid "%{title} %{operator} %{threshold}"
+msgstr ""
+
 msgid "%{title} changes"
 msgstr ""
 
@@ -309,6 +312,9 @@ msgid "- Runner is paused and will not receive any new jobs"
 msgstr ""
 
 msgid "- show less"
+msgstr ""
+
+msgid "0 for unlimited"
 msgstr ""
 
 msgid "1 %{type} addition"
@@ -459,6 +465,9 @@ msgid "A Hugo site that uses Netlify for CI/CD instead of GitLab, but still with
 msgstr ""
 
 msgid "A Jekyll site that uses Netlify for CI/CD instead of GitLab, but still with all the other great GitLab features."
+msgstr ""
+
+msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
 msgid "A default branch cannot be chosen for an empty project."
@@ -2415,6 +2424,9 @@ msgstr ""
 msgid "Close milestone"
 msgstr ""
 
+msgid "Close sidebar"
+msgstr ""
+
 msgid "Closed"
 msgstr ""
 
@@ -3080,6 +3092,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Let's Encrypt"
+msgstr ""
+
 msgid "Configure Tracing"
 msgstr ""
 
@@ -3438,6 +3453,18 @@ msgid "Created At"
 msgstr ""
 
 msgid "Created by me"
+msgstr ""
+
+msgid "Created issue %{issueLink}"
+msgstr ""
+
+msgid "Created issue %{issueLink} at %{projectLink}"
+msgstr ""
+
+msgid "Created merge request %{mergeRequestLink}"
+msgstr ""
+
+msgid "Created merge request %{mergeRequestLink} at %{projectLink}"
 msgstr ""
 
 msgid "Created on"
@@ -3967,6 +3994,18 @@ msgstr ""
 msgid "Dismiss trial promotion"
 msgstr ""
 
+msgid "Dismissed"
+msgstr ""
+
+msgid "Dismissed at %{projectLink}"
+msgstr ""
+
+msgid "Dismissed on pipeline %{pipelineLink}"
+msgstr ""
+
+msgid "Dismissed on pipeline %{pipelineLink} at %{projectLink}"
+msgstr ""
+
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
 msgstr ""
 
@@ -3974,6 +4013,9 @@ msgid "Documentation for popular identity providers"
 msgstr ""
 
 msgid "Domain"
+msgstr ""
+
+msgid "Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled"
 msgstr ""
 
 msgid "Don't show again"
@@ -4261,6 +4303,9 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
+msgid "EnviornmentDashboard|You are looking at the last updated environment"
+msgstr ""
+
 msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. Additionally, they will be masked by default so they are hidden in job logs, though they must match certain regexp requirements to do so. You can use environment variables for passwords, secret keys, or whatever you want."
 msgstr ""
 
@@ -4273,7 +4318,31 @@ msgstr ""
 msgid "Environments"
 msgstr ""
 
+msgid "Environments Dashboard"
+msgstr ""
+
 msgid "Environments allow you to track deployments of your application %{link_to_read_more}."
+msgstr ""
+
+msgid "EnvironmentsDashboard|Add a project to the dashboard"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Add projects"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Environments Dashboard"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Job: %{job}"
+msgstr ""
+
+msgid "EnvironmentsDashboard|More actions"
+msgstr ""
+
+msgid "EnvironmentsDashboard|Remove"
+msgstr ""
+
+msgid "EnvironmentsDashboard|The environments dashboard provides a summary of each project's environments' status, including pipeline and alert statuses."
 msgstr ""
 
 msgid "Environments|An error occurred while fetching the environments."
@@ -6116,6 +6185,9 @@ msgstr ""
 msgid "I accept the|Terms of Service and Privacy Policy"
 msgstr ""
 
+msgid "I have read and agree to the Let's Encrypt Terms of Service"
+msgstr ""
+
 msgid "ID"
 msgstr ""
 
@@ -6922,6 +6994,9 @@ msgid "Leave project"
 msgstr ""
 
 msgid "Leave the \"File type\" and \"Delivery method\" options on their default values."
+msgstr ""
+
+msgid "Let's Encrypt does not accept emails on example.com"
 msgstr ""
 
 msgid "License"
@@ -7822,6 +7897,9 @@ msgstr ""
 msgid "Newly registered users will by default be external"
 msgstr ""
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -8143,6 +8221,9 @@ msgid "Only project members can comment."
 msgstr ""
 
 msgid "Only project members will be imported. Group members will be skipped."
+msgstr ""
+
+msgid "Only these extensions are supported: %{extension_list}"
 msgstr ""
 
 msgid "Oops, are you sure?"
@@ -9662,6 +9743,9 @@ msgstr ""
 msgid "Related Merged Requests"
 msgstr ""
 
+msgid "Related issues"
+msgstr ""
+
 msgid "Related merge requests"
 msgstr ""
 
@@ -9860,12 +9944,6 @@ msgstr ""
 msgid "Reports|Vulnerability"
 msgstr ""
 
-msgid "Reports|issue"
-msgstr ""
-
-msgid "Reports|merge request"
-msgstr ""
-
 msgid "Reports|no changed test results"
 msgstr ""
 
@@ -9918,6 +9996,9 @@ msgid "Require all users to accept Terms of Service and Privacy Policy when they
 msgstr ""
 
 msgid "Require approval from code owners"
+msgstr ""
+
+msgid "Require users to prove ownership of custom domains"
 msgstr ""
 
 msgid "Requires approval from %{names}."
@@ -11353,6 +11434,9 @@ msgstr ""
 msgid "Switch branch/tag"
 msgstr ""
 
+msgid "Switch to GitLab Next"
+msgstr ""
+
 msgid "Sync information"
 msgstr ""
 
@@ -11953,6 +12037,9 @@ msgid "This directory"
 msgstr ""
 
 msgid "This domain is not verified. You will need to verify ownership before access is enabled."
+msgstr ""
+
+msgid "This environment has no deployments yet."
 msgstr ""
 
 msgid "This field is required."
@@ -13066,6 +13153,9 @@ msgstr ""
 msgid "View details: %{details_url}"
 msgstr ""
 
+msgid "View documentation"
+msgstr ""
+
 msgid "View eligible approvers"
 msgstr ""
 
@@ -13803,9 +13893,6 @@ msgstr ""
 msgid "among other things"
 msgstr ""
 
-msgid "at"
-msgstr ""
-
 msgid "attach a new file"
 msgstr ""
 
@@ -13953,9 +14040,6 @@ msgstr ""
 msgid "ciReport|Create merge request"
 msgstr ""
 
-msgid "ciReport|Created %{eventType}"
-msgstr ""
-
 msgid "ciReport|DAST"
 msgstr ""
 
@@ -13972,9 +14056,6 @@ msgid "ciReport|Description"
 msgstr ""
 
 msgid "ciReport|Dismiss vulnerability"
-msgstr ""
-
-msgid "ciReport|Dismissed by"
 msgstr ""
 
 msgid "ciReport|Download and apply the patch to fix this vulnerability."
@@ -14113,9 +14194,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "ciReport|View full report"
-msgstr ""
-
-msgid "ciReport|on pipeline"
 msgstr ""
 
 msgid "commented on %{link_to_project}"

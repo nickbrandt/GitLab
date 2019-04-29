@@ -82,14 +82,21 @@ Add the following information:
 
 ![new group info](img/create_new_group_info.png)
 
-1. The **Group name** will populate the path automatically. Optionally, you can
-   change it. This is the name that will me displayed in the group views.
-1. Set the **Group URL** which will be the **namespace** under which your projects
-   will be hosted (path can contain only letters, digits, underscores, dashes
-   and dots; it cannot start with dashes or end in dot).
-1. Optionally, you can add a description so that others can briefly understand
+1. The **Group name** will populate the URL automatically. Optionally, you can change it.
+   This is the name that is displayed in the group views.
+   The name can contain only:
+     - Alphanumeric characters.
+     - Underscores.
+     - Dashes and dots.
+     - Spaces.
+1. The **Group URL**, which will be the namespace under which your projects will be hosted.
+   The URL can contain only:
+     - Alphanumeric characters.
+     - Underscores.
+     - Dashes and dots. It cannot start with dashes or end in dot.
+1. Optionally, you can add a brief description to tell others
    what this group is about.
-1. Optionally, choose an avatar for your project.
+1. Optionally, choose an avatar for your group.
 1. Choose the [visibility level](../../public_access/public_access.md).
 
 ## Add users to a group

@@ -28,6 +28,10 @@ describe Issue do
     end
   end
 
+  describe "relations" do
+    it { is_expected.to have_many(:designs) }
+  end
+
   it_behaves_like 'an editable mentionable with EE-specific mentions' do
     subject { create(:issue, project: create(:project, :repository)) }
 
@@ -352,6 +356,16 @@ describe Issue do
 
         issue.visible_to_user?(user)
       end
+    end
+  end
+
+  describe "#design_collection" do
+    it "returns a design collection" do
+      issue = build(:issue)
+      collection = issue.design_collection
+
+      expect(collection).to be_a(DesignManagement::DesignCollection)
+      expect(collection.issue).to eq(issue)
     end
   end
 end

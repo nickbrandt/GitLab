@@ -103,7 +103,6 @@ flaky-examples-check:
     - /[\d-]+-stable(-ee)?/
     - /^security-/
     - /\bce\-to\-ee\b/
-    - /(^docs[\/-].*|.*-docs$)/
 
 ee-files-location-check:
   <<: *ee-specific-check

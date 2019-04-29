@@ -6,42 +6,30 @@ module Geo
       syncable.count
     end
 
+    def count_synced
+      attachments_synced.count
+    end
+
+    def count_failed
+      attachments_failed.count
+    end
+
+    def count_synced_missing_on_primary
+      attachments_synced_missing_on_primary.count
+    end
+
+    def count_registry
+      registries_for_attachments.count
+    end
+
     def syncable
       if use_legacy_queries_for_selective_sync?
         legacy_finder.syncable
       elsif selective_sync?
-        fdw_all.geo_syncable
+        attachments.syncable
       else
-        Upload.geo_syncable
+        Upload.syncable
       end
-    end
-
-    def count_synced
-      if aggregate_pushdown_supported?
-        find_synced.count
-      else
-        legacy_find_synced.count
-      end
-    end
-
-    def count_failed
-      if aggregate_pushdown_supported?
-        find_failed.count
-      else
-        legacy_find_failed.count
-      end
-    end
-
-    def count_synced_missing_on_primary
-      if aggregate_pushdown_supported? && !use_legacy_queries?
-        fdw_find_synced_missing_on_primary.count
-      else
-        legacy_find_synced_missing_on_primary.count
-      end
-    end
-
-    def count_registry
-      Geo::FileRegistry.attachments.count
     end
 
     # Find limited amount of non replicated attachments.
@@ -82,7 +70,9 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_file_ids: [])
-      find_failed_registries
+      Geo::FileRegistry
+        .attachments
+        .failed
         .retry_due
         .file_id_not_in(except_file_ids)
         .limit(batch_size)
@@ -91,7 +81,10 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_file_ids: [])
-      find_synced_missing_on_primary_registries
+      Geo::FileRegistry
+        .attachments
+        .synced
+        .missing_on_primary
         .retry_due
         .file_id_not_in(except_file_ids)
         .limit(batch_size)
@@ -110,10 +103,51 @@ module Geo
       @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
     end
 
+    def registries_for_attachments
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.registries_for_attachments
+      else
+        attachments
+          .inner_join_file_registry
+          .merge(Geo::FileRegistry.attachments)
+      end
+    end
+
+    def attachments_synced
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.attachments_synced
+      else
+        registries_for_attachments
+          .syncable
+          .merge(Geo::FileRegistry.synced)
+      end
+    end
+
+    def attachments_failed
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.attachments_failed
+      else
+        registries_for_attachments
+          .syncable
+          .merge(Geo::FileRegistry.failed)
+      end
+    end
+
+    def attachments_synced_missing_on_primary
+      if use_legacy_queries_for_selective_sync?
+        legacy_finder.attachments_synced_missing_on_primary
+      else
+        registries_for_attachments
+          .syncable
+          .merge(Geo::FileRegistry.synced)
+          .merge(Geo::FileRegistry.missing_on_primary)
+      end
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_all
+    def attachments
       if selective_sync?
-        Geo::Fdw::Upload.where(fdw_group_uploads.or(fdw_project_uploads).or(fdw_other_uploads))
+        Geo::Fdw::Upload.where(group_uploads.or(project_uploads).or(other_uploads))
       else
         Geo::Fdw::Upload.all
       end
@@ -121,7 +155,7 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_group_uploads
+    def group_uploads
       namespace_ids =
         if current_node.selective_sync_by_namespaces?
           Gitlab::ObjectHierarchy.new(fdw_geo_node.namespaces).base_and_descendants.select(:id)
@@ -141,7 +175,7 @@ module Geo
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def fdw_project_uploads
+    def project_uploads
       project_ids = fdw_geo_node.projects.select(:id)
 
       # This query was intentionally converted to a raw one to get it work in Rails 5.0.
@@ -152,7 +186,7 @@ module Geo
       fdw_upload_table[:model_type].eq('Project').and(project_ids_in_sql)
     end
 
-    def fdw_other_uploads
+    def other_uploads
       fdw_upload_table[:model_type].not_in(%w[Namespace Project])
     end
 
@@ -160,82 +194,19 @@ module Geo
       Geo::Fdw::Upload.arel_table
     end
 
-    def find_synced
-      if use_legacy_queries?
-        legacy_find_synced
-      else
-        fdw_find_synced
-      end
-    end
-
-    def find_failed
-      if use_legacy_queries?
-        legacy_find_failed
-      else
-        fdw_find_failed
-      end
-    end
-
-    def find_synced_registries
-      Geo::FileRegistry.attachments.synced
-    end
-
-    def find_failed_registries
-      Geo::FileRegistry.attachments.failed
-    end
-
-    def find_synced_missing_on_primary_registries
-      find_synced_registries.missing_on_primary
-    end
-
-    def fdw_find_synced
-      fdw_find_syncable.merge(Geo::FileRegistry.synced)
-    end
-
-    def fdw_find_failed
-      fdw_find_syncable.merge(Geo::FileRegistry.failed)
-    end
-
-    def fdw_find_syncable
-      fdw_all
-        .inner_join_file_registry
-        .geo_syncable
-        .merge(Geo::FileRegistry.attachments)
-    end
-
     def fdw_find_unsynced(except_file_ids:)
-      fdw_all
+      attachments
         .missing_file_registry
-        .geo_syncable
+        .syncable
         .id_not_in(except_file_ids)
     end
 
-    def fdw_find_synced_missing_on_primary
-      fdw_find_synced.merge(Geo::FileRegistry.missing_on_primary)
-    end
-
     def fdw_find_migrated_local(except_file_ids:)
-      fdw_all
+      attachments
         .inner_join_file_registry
         .with_files_stored_remotely
         .merge(Geo::FileRegistry.attachments)
         .id_not_in(except_file_ids)
-    end
-
-    def legacy_find_synced
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_registries.pluck_file_key,
-        Upload
-      )
-    end
-
-    def legacy_find_failed
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_failed_registries.pluck_file_key,
-        Upload
-      )
     end
 
     def legacy_find_unsynced(except_file_ids:)
@@ -254,14 +225,6 @@ module Geo
       legacy_inner_join_registry_ids(
         legacy_finder.attachments.with_files_stored_remotely,
         registry_file_ids,
-        Upload
-      )
-    end
-
-    def legacy_find_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        find_synced_missing_on_primary_registries.pluck_file_key,
         Upload
       )
     end

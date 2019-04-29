@@ -1,63 +1,32 @@
 <script>
-import { s__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
   name: 'EventItem',
   components: {
     Icon,
+    TimeAgoTooltip,
   },
   props: {
-    type: {
-      type: String,
+    author: {
+      type: Object,
       required: true,
     },
-    authorName: {
-      type: String,
-      required: true,
-    },
-    authorUsername: {
-      type: String,
-      required: true,
-    },
-    projectName: {
+    createdAt: {
       type: String,
       required: false,
       default: '',
     },
-    projectLink: {
+    iconName: {
       type: String,
       required: false,
-      default: '',
+      default: 'plus',
     },
-    actionLinkText: {
+    iconStyle: {
       type: String,
-      required: true,
-    },
-    actionLinkUrl: {
-      type: String,
-      required: true,
-    },
-  },
-  typeMap: {
-    issue: {
-      name: s__('Reports|issue'),
-      icon: 'issue-created',
-    },
-    mergeRequest: {
-      name: s__('Reports|merge request'),
-      icon: 'merge-request',
-    },
-  },
-  computed: {
-    typeData() {
-      return this.$options.typeMap[this.type] || {};
-    },
-    iconName() {
-      return this.typeData.icon || 'plus';
-    },
-    createdText() {
-      return sprintf(s__('ciReport|Created %{eventType}'), { eventType: this.typeData.name });
+      required: false,
+      default: 'ci-status-icon-success',
     },
   },
 };
@@ -65,24 +34,29 @@ export default {
 
 <template>
   <div class="card-body d-flex align-items-center">
-    <div class="circle-icon-container ci-status-icon-success">
+    <div class="circle-icon-container" :class="iconStyle">
       <icon :size="16" :name="iconName" />
     </div>
     <div class="ml-3">
-      <div>
-        <strong class="js-author-name">{{ authorName }}</strong>
-        <em class="js-username">@{{ authorUsername }}</em>
-      </div>
-      <div>
-        <span v-if="typeData.name" class="js-created">{{ createdText }}</span>
-        <a class="js-action-link" :title="actionLinkText" :href="actionLinkUrl">
-          {{ actionLinkText }}
+      <div class="note-header-info pb-0">
+        <a
+          :href="author.path"
+          :data-user-id="author.id"
+          :data-username="author.username"
+          class="js-author"
+        >
+          <strong class="note-header-author-name">{{ author.name }}</strong>
+          <span v-if="author.status_tooltip_html" v-html="author.status_tooltip_html"></span>
+          <span class="note-headline-light">@{{ author.username }}</span>
         </a>
-        <template v-if="projectName">
-          <span>{{ __('at') }} </span>
-          <a class="js-project-name" :title="projectName" :href="projectLink">{{ projectName }}</a>
-        </template>
+        <span class="note-headline-light note-headline-meta">
+          <template v-if="createdAt">
+            <span class="system-note-separator">·</span>
+            <time-ago-tooltip :time="createdAt" tooltip-placement="bottom" />
+          </template>
+        </span>
       </div>
+      <slot></slot>
     </div>
   </div>
 </template>

@@ -127,7 +127,8 @@ export default {
       state.modal.vulnerability,
       'hasMergeRequest',
       Boolean(
-        vulnerability.merge_request_feedback && vulnerability.merge_request.merge_request_iid,
+        vulnerability.merge_request_feedback &&
+          vulnerability.merge_request_feedback.merge_request_iid,
       ),
     );
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));

@@ -80,12 +80,7 @@
           - deleted_message = s_('ForkedFromProjectPath|Forked from %{project_name} (deleted)')
           = deleted_message % { project_name: fork_source_name(@project) }
 
-    - if @project.mirror?
-      - import_url = @project.safe_import_url
-      %p
-        Mirrored from #{link_to import_url, import_url}.
-        %br
-        = render "shared/mirror_status"
+    = render_if_exists "projects/home_mirror"
 
   - if @project.badges.present?
     .project-badges.mb-2

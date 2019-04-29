@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Environment Header has a failed pipeline matches the snapshot 1`] = `
+<div
+  class="card-header border-0 py-2 d-flex align-items-center dashboard-card-header-failed"
+>
+  <div
+    class="flex-grow-1 block-truncated"
+  >
+    <gllink-stub
+      class="js-environment-link cgray"
+      data-original-title="staging"
+      href="/enivronment/1"
+      title=""
+    >
+      <span
+        class="js-environment-name bold"
+      >
+         staging
+      </span>
+    </gllink-stub>
+     
+    <!---->
+  </div>
+   
+  <reviewapplink-stub
+    cssclass="btn btn-default btn-sm"
+    link="http://example.com"
+  />
+</div>
+`;
+
+exports[`Environment Header has errors matches the snapshot 1`] = `
+<div
+  class="card-header border-0 py-2 d-flex align-items-center dashboard-card-header-warning"
+>
+  <div
+    class="flex-grow-1 block-truncated"
+  >
+    <gllink-stub
+      class="js-environment-link cgray"
+      data-original-title="staging"
+      href="/enivronment/1"
+      title=""
+    >
+      <span
+        class="js-environment-name bold"
+      >
+         staging
+      </span>
+    </gllink-stub>
+     
+    <!---->
+  </div>
+   
+  <reviewapplink-stub
+    cssclass="btn btn-default btn-sm"
+    link="http://example.com"
+  />
+</div>
+`;
+
+exports[`Environment Header renders name and link to app matches the snapshot 1`] = `
+<div
+  class="card-header border-0 py-2 d-flex align-items-center bg-light"
+>
+  <div
+    class="flex-grow-1 block-truncated"
+  >
+    <gllink-stub
+      class="js-environment-link cgray"
+      data-original-title="staging"
+      href="/enivronment/1"
+      title=""
+    >
+      <span
+        class="js-environment-name bold"
+      >
+         staging
+      </span>
+    </gllink-stub>
+     
+    <!---->
+  </div>
+   
+  <reviewapplink-stub
+    cssclass="btn btn-default btn-sm"
+    link="http://example.com"
+  />
+</div>
+`;
+
+exports[`Environment Header with children matches the snapshot 1`] = `
+<div
+  class="card-header border-0 py-2 d-flex align-items-center bg-light"
+>
+  <div
+    class="flex-grow-1 block-truncated"
+  >
+    <gllink-stub
+      class="js-environment-link cgray"
+      data-original-title="review/testing"
+      href="/enivronment/1"
+      title=""
+    >
+      <span
+        class="js-environment-name bold"
+      >
+         review/testing
+      </span>
+    </gllink-stub>
+     
+    <glbadge-stub
+      class="dashboard-card-icon"
+      pill="true"
+    >
+      5
+    </glbadge-stub>
+  </div>
+   
+  <icon-stub
+    cssclasses="dashboard-card-icon"
+    data-original-title="You are looking at the last updated environment"
+    name="information"
+    size="16"
+    title=""
+  />
+</div>
+`;

@@ -1,7 +1,13 @@
 <script>
 import _ from 'underscore';
 import { mapState, mapActions } from 'vuex';
-import { GlDashboardSkeleton, GlModal, GlModalDirective, GlButton } from '@gitlab/ui';
+import {
+  GlLoadingIcon,
+  GlModal,
+  GlModalDirective,
+  GlButton,
+  GlDashboardSkeleton,
+} from '@gitlab/ui';
 import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import DashboardProject from './project.vue';
 
@@ -10,6 +16,7 @@ export default {
     DashboardProject,
     GlModal,
     GlDashboardSkeleton,
+    GlLoadingIcon,
     GlButton,
     ProjectSelector,
   },

@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dashboard should match the snapshot 1`] = `
+<div
+  class="operations-dashboard"
+>
+  <div>
+    <!---->
+  </div>
+   
+  <div
+    class="page-title-holder flex-fill d-flex align-items-center"
+  >
+    <h1
+      class="js-dashboard-title page-title text-nowrap flex-fill"
+    >
+      
+      Environments Dashboard
+    
+    </h1>
+     
+    <button
+      class="btn js-add-projects-button btn btn-success btn-secondary"
+      type="button"
+    >
+      
+      Add projects
+    
+    </button>
+  </div>
+   
+  <div
+    class="prepend-top-default"
+  >
+    <div
+      class="row prepend-top-20 text-center"
+    >
+      <div
+        class="col-12 d-flex justify-content-center svg-content"
+      >
+        <img
+          class="js-empty-state-svg col-12 prepend-top-20"
+          src="/assets/illustrations/operations-dashboard_empty.svg"
+        />
+      </div>
+       
+      <h4
+        class="js-title col-12 prepend-top-20"
+      >
+        
+        Add a project to the dashboard
+      
+      </h4>
+       
+      <div
+        class="col-12 d-flex justify-content-center"
+      >
+        <span
+          class="js-sub-title mw-460 text-tertiary text-left"
+        >
+          
+          The environments dashboard provides a summary of each project's environments' status, including pipeline and alert statuses.
+        
+        </span>
+      </div>
+       
+      <div
+        class="col-12"
+      >
+        <a
+          class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
+          href="/help/user/operations_dashboard/index.html"
+        >
+          
+          View documentation
+        
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+`;

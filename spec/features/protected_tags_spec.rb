@@ -1,31 +1,13 @@
 require 'spec_helper'
 
 describe 'Protected Tags', :js do
+  include ProtectedTagHelpers
+
   let(:user) { create(:user, :admin) }
   let(:project) { create(:project, :repository) }
 
   before do
     sign_in(user)
-  end
-
-  def set_allowed_to(operation, option = 'Maintainers', form: '.new-protected-tag')
-    within form do
-      find(".js-allowed-to-#{operation}").click
-      wait_for_requests
-
-      within('.dropdown-content') do
-        Array(option).each { |opt| click_on(opt) }
-      end
-
-      find(".js-allowed-to-#{operation}").click # needed to submit form in some cases
-    end
-  end
-
-  def set_protected_tag_name(tag_name)
-    find(".js-protected-tag-select").click
-    find(".dropdown-input-field").set(tag_name)
-    click_on("Create wildcard #{tag_name}")
-    find('.protected-tags-dropdown .dropdown-menu', visible: false)
   end
 
   describe "explicit protected tags" do
@@ -111,44 +93,10 @@ describe 'Protected Tags', :js do
   end
 
   describe "access control" do
-    describe 'with ref permissions for users enabled' do
-      before do
-        stub_licensed_features(protected_refs_for_users: true)
-      end
-
-      include_examples "protected tags > access control > EE"
+    before do
+      stub_licensed_features(protected_refs_for_users: false)
     end
 
-    describe 'with ref permissions for users disabled' do
-      before do
-        stub_licensed_features(protected_refs_for_users: false)
-      end
-
-      include_examples "protected tags > access control > CE"
-
-      describe 'with existing access levels' do
-        let(:protected_tag) { create(:protected_tag, project: project) }
-
-        it 'shows users that can push to the branch' do
-          protected_tag.create_access_levels.new(user: create(:user, name: 'Jane'))
-            .save!(validate: false)
-
-          visit project_settings_repository_path(project)
-
-          expect(page).to have_content("The following user can also create tags: "\
-                                       "Jane")
-        end
-
-        it 'shows groups that can create to the branch' do
-          protected_tag.create_access_levels.new(group: create(:group, name: 'Team Awesome'))
-            .save!(validate: false)
-
-          visit project_settings_repository_path(project)
-
-          expect(page).to have_content("Members of this group can also create tags: "\
-                                       "Team Awesome")
-        end
-      end
-    end
+    include_examples "protected tags > access control > CE"
   end
 end

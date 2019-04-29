@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190408163745) do
+ActiveRecord::Schema.define(version: 20190426180107) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -218,6 +218,8 @@ ActiveRecord::Schema.define(version: 20190408163745) do
     t.integer "first_day_of_week", default: 0, null: false
     t.boolean "elasticsearch_limit_indexing", default: false, null: false
     t.integer "default_project_creation", default: 2, null: false
+    t.string "lets_encrypt_notification_email"
+    t.boolean "lets_encrypt_terms_of_service_accepted", default: false, null: false
     t.string "geo_node_allowed_ips", default: "0.0.0.0/0, ::/0"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
@@ -2397,6 +2399,10 @@ ActiveRecord::Schema.define(version: 20190408163745) do
     t.text "issue_template_key"
   end
 
+  create_table "project_metrics_settings", primary_key: "project_id", id: :integer, default: nil, force: :cascade do |t|
+    t.string "external_dashboard_url", null: false
+  end
+
   create_table "project_mirror_data", id: :serial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "retry_count", default: 0, null: false
@@ -2556,6 +2562,7 @@ ActiveRecord::Schema.define(version: 20190408163745) do
     t.index ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
     t.index ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
     t.index ["mirror_last_successful_update_at"], name: "index_projects_on_mirror_last_successful_update_at", using: :btree
+    t.index ["mirror_user_id"], name: "index_projects_on_mirror_user_id", using: :btree
     t.index ["name"], name: "index_projects_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree
     t.index ["path"], name: "index_projects_on_path", using: :btree
@@ -2889,6 +2896,7 @@ ActiveRecord::Schema.define(version: 20190408163745) do
     t.boolean "commit_events", default: true, null: false
     t.boolean "job_events", default: false, null: false
     t.boolean "confidential_note_events", default: true
+    t.boolean "deployment_events", default: false, null: false
     t.index ["project_id"], name: "index_services_on_project_id", using: :btree
     t.index ["template"], name: "index_services_on_template", using: :btree
     t.index ["type"], name: "index_services_on_type", using: :btree
@@ -3661,6 +3669,7 @@ ActiveRecord::Schema.define(version: 20190408163745) do
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
   add_foreign_key "project_incident_management_settings", "projects", on_delete: :cascade
+  add_foreign_key "project_metrics_settings", "projects", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict

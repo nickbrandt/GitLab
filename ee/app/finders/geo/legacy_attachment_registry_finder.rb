@@ -3,7 +3,7 @@
 module Geo
   class LegacyAttachmentRegistryFinder < RegistryFinder
     def syncable
-      attachments.geo_syncable
+      attachments.syncable
     end
 
     # rubocop:disable CodeReuse/ActiveRecord
@@ -15,6 +15,41 @@ module Geo
       end
     end
     # rubocop:enable CodeReuse/ActiveRecord
+
+    def attachments_synced
+      legacy_inner_join_registry_ids(
+        syncable,
+        Geo::FileRegistry.attachments.synced.pluck_file_key,
+        Upload
+      )
+    end
+
+    def attachments_failed
+      legacy_inner_join_registry_ids(
+        syncable,
+        Geo::FileRegistry.attachments.failed.pluck_file_key,
+        Upload
+      )
+    end
+
+    def attachments_synced_missing_on_primary
+      legacy_inner_join_registry_ids(
+        syncable,
+        Geo::FileRegistry.attachments.synced.missing_on_primary.pluck_file_key,
+        Upload
+      )
+    end
+
+    def registries_for_attachments
+      return Geo::FileRegistry.attachments unless selective_sync?
+
+      legacy_inner_join_registry_ids(
+        Geo::FileRegistry.attachments,
+        attachments.pluck_primary_key,
+        Geo::FileRegistry,
+        foreign_key: :file_id
+      )
+    end
 
     private
 

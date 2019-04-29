@@ -62,4 +62,25 @@ describe ClustersHelper do
       end
     end
   end
+
+  describe '#cluster_health_data' do
+    let(:project) { cluster.project }
+    let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
+    let(:cluster_presenter) { cluster.present }
+
+    it 'returns graph configuration' do
+      expect(cluster_health_data(cluster_presenter)).to eq(
+        'clusters-path': project_clusters_path(project),
+        'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
+        'empty-getting-started-svg-path': image_path('illustrations/monitoring/getting_started.svg'),
+        'empty-loading-svg-path': image_path('illustrations/monitoring/loading.svg'),
+        'empty-no-data-svg-path': image_path('illustrations/monitoring/no_data.svg'),
+        'empty-unable-to-connect-svg-path': image_path('illustrations/monitoring/unable_to_connect.svg'),
+        'metrics-endpoint': metrics_project_cluster_path(project, cluster, format: :json),
+        'settings-path': '',
+        'project-path': '',
+        'tags-path': ''
+      )
+    end
+  end
 end
