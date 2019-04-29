@@ -22,10 +22,7 @@ describe API::Vulnerabilities do
     context 'with an authorized user with proper permissions' do
       before do
         project.add_developer(user)
-        stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true)
-
-        allow(Ability).to receive(:allowed?).and_call_original
-        allow(Ability).to receive(:allowed?).with(user, :read_project_security_dashboard, project).and_return(true)
+        stub_licensed_features(security_dashboard: true, sast: true, dependency_scanning: true, container_scanning: true)
       end
 
       it 'returns all vulnerabilities' do
@@ -72,9 +69,7 @@ describe API::Vulnerabilities do
     context 'with authorized user without read permissions' do
       before do
         project.add_reporter(user)
-
-        allow(Ability).to receive(:allowed?).and_call_original
-        allow(Ability).to receive(:allowed?).with(user, :read_project_security_dashboard, project).and_return(false)
+        stub_licensed_features(security_dashboard: false, sast: true, dependency_scanning: true, container_scanning: true)
       end
 
       it 'responds with 404 Not Found' do
