@@ -1,5 +1,5 @@
 - if EE::Gitlab::ServiceDesk.enabled?(project: @project) || (show_promotions? && show_callout?('promote_service_desk_dismissed'))
-  - expanded = Rails.env.test?
+  - expanded = expanded_by_default?
   %section.settings.js-service-desk-setting-wrapper.no-animate#js-service-desk{ class: ('expanded' if expanded) }
     .settings-header
       %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only= _('Service Desk')
