@@ -7,6 +7,7 @@ module Geo
 
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
+      has_many :job_artifacts, class_name: 'Geo::Fdw::Ci::JobArtifact'
       has_many :lfs_objects_projects, class_name: 'Geo::Fdw::LfsObjectsProject'
       has_many :lfs_objects, class_name: 'Geo::Fdw::LfsObject', through: :lfs_objects_projects
 
