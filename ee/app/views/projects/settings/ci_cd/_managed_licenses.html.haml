@@ -1,5 +1,5 @@
 - return unless @project.feature_available?(:license_management)
-- expanded = Rails.env.test?
+- expanded = expanded_by_default?
 
 %section.settings.no-animate#js-license-management{ class: ('expanded' if expanded) }
   .settings-header

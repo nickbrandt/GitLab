@@ -1,5 +1,5 @@
 - if @project.feature_available?(:issuable_default_templates)
-  - expanded = Rails.env.test?
+  - expanded = expanded_by_default?
   %section.settings.issues-feature.no-animate#js-issue-settings{ class: [('expanded' if expanded), ('hidden' if @project.project_feature.send(:issues_access_level) == 0)] }
     .settings-header
       %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only= _('Default issue template')

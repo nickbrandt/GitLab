@@ -1,4 +1,4 @@
-- expanded = Rails.env.test?
+- expanded = expanded_by_default?
 - can_admin_project = can?(current_user, :admin_project, @project)
 
 - if protected_environments_enabled?(@project)
