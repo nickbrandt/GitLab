@@ -13,7 +13,7 @@ import mockData, {
   headIssues,
   basePerformance,
   headPerformance,
-} from 'spec/vue_mr_widget/mock_data';
+} from 'ee_spec/vue_mr_widget/mock_data';
 
 import {
   sastIssues,
