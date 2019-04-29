@@ -6434,6 +6434,9 @@ msgstr ""
 msgid "Inform users without uploaded SSH keys that they can't push over SSH until one is added"
 msgstr ""
 
+msgid "Information about additional Pages templates and how to install them can be found in our %{pages_getting_started_guide}."
+msgstr ""
+
 msgid "Inline"
 msgstr ""
 
@@ -8353,6 +8356,9 @@ msgid "Pages Domain"
 msgstr ""
 
 msgid "Pages Domains"
+msgstr ""
+
+msgid "Pages getting started guide"
 msgstr ""
 
 msgid "Pagination|Last »"
