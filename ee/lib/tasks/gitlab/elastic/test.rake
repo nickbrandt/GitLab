@@ -1,5 +1,5 @@
 namespace :gitlab do
-  namespace :elastic do
+  namespace :concerns do
     namespace :test do
       desc 'GitLab | Elasticsearch | Test | Measure space taken by ES indices'
       task index_size: :environment do

@@ -1,5 +1,5 @@
 namespace :gitlab do
-  namespace :elastic do
+  namespace :concerns do
     desc "GitLab | Elasticsearch | Index eveything at once"
     task :index do
       # UPDATE_INDEX=true can cause some projects not to be indexed properly if someone were to push a commit to the
