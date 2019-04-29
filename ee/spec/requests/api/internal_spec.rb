@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-# Explicitly require `GlRepository` since if it was autoloaded by a previous spec
-# but not really loaded, the `Gitlab::GlRepository` module is not prepended with it's EE counterpart
-require_dependency 'lib/gitlab/gl_repository'
-
 describe API::Internal do
   describe "POST /internal/allowed" do
     context "for design repositories" do
