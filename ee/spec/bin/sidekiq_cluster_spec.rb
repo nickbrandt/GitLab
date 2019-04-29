@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe 'bin/sidekiq-cluster' do
+describe 'ee/bin/sidekiq-cluster' do
   it 'runs successfully', :aggregate_failures do
-    cmd = %w[bin/sidekiq-cluster --dryrun --negate cronjob]
+    cmd = %w[ee/bin/sidekiq-cluster --dryrun --negate cronjob]
 
     output, status = Gitlab::Popen.popen(cmd, Rails.root.to_s)
 
