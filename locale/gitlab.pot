@@ -7999,6 +7999,9 @@ msgstr ""
 msgid "No other labels with such name or description"
 msgstr ""
 
+msgid "No parent group"
+msgstr ""
+
 msgid "No preview for this file type"
 msgstr ""
 
@@ -11971,6 +11974,9 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
+msgstr ""
+
+msgid "There was an error while fetching cycle analytics data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
