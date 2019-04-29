@@ -7,18 +7,23 @@ describe Security::PipelineVulnerabilitiesFinder do
     set(:project) { create(:project, :repository) }
     set(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
-    let(:build_cs) { create(:ci_build, :success, name: 'cs_job', pipeline: pipeline, project: project) }
+    set(:build_cs) { create(:ci_build, :success, name: 'cs_job', pipeline: pipeline, project: project) }
     set(:build_dast) { create(:ci_build, :success, name: 'dast_job', pipeline: pipeline, project: project) }
     set(:build_ds) { create(:ci_build, :success, name: 'ds_job', pipeline: pipeline, project: project) }
     set(:build_sast) { create(:ci_build, :success, name: 'sast_job', pipeline: pipeline, project: project) }
 
+    set(:artifact_cs) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs, project: project) }
+    set(:artifact_dast) { create(:ee_ci_job_artifact, :dast, job: build_dast, project: project) }
+    set(:artifact_ds) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project) }
+    set(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast, project: project) }
+
+    let(:cs_count) { read_fixture(artifact_cs)['unapproved'].count }
+    let(:dast_count) { read_fixture(artifact_dast).dig('site', 'alerts').first['instances'].count }
+    let(:ds_count) { read_fixture(artifact_ds)['vulnerabilities'].count }
+    let(:sast_count) { read_fixture(artifact_sast)['vulnerabilities'].count }
+
     before do
       stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true, dast: true)
-
-      create(:ee_ci_job_artifact, :container_scanning, job: build_cs, project: project)
-      create(:ee_ci_job_artifact, :dast, job: build_dast, project: project)
-      create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project)
-      create(:ee_ci_job_artifact, :sast, job: build_sast, project: project)
     end
 
     subject { described_class.new(pipeline: pipeline, params: params).execute }
@@ -28,7 +33,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[sast] } }
 
         it 'includes only sast' do
-          expect(subject.count).to eq 33
+          expect(subject.count).to eq sast_count
         end
       end
 
@@ -36,7 +41,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[dependency_scanning] } }
 
         it 'includes only dependency_scanning' do
-          expect(subject.count).to eq 4
+          expect(subject.count).to eq ds_count
         end
       end
 
@@ -44,7 +49,8 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[dast] } }
 
         it 'includes only dast' do
-          expect(subject.count).to eq 2
+          # binding.pry
+          expect(subject.count).to eq dast_count
         end
       end
 
@@ -52,7 +58,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[container_scanning] } }
 
         it 'includes only container_scanning' do
-          expect(subject.count).to eq 8
+          expect(subject.count).to eq cs_count
         end
       end
     end
@@ -62,7 +68,7 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning] } }
 
         it 'filters by all params' do
-          expect(subject.count).to eq 47
+          expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
         end
       end
 
@@ -79,8 +85,12 @@ describe Security::PipelineVulnerabilitiesFinder do
       subject { described_class.new(pipeline: pipeline).execute }
 
       it 'returns all report_types' do
-        expect(subject.count).to eq 47
+        expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
       end
+    end
+
+    def read_fixture(fixture)
+      JSON.parse(File.read(fixture.file.path))
     end
   end
 end
