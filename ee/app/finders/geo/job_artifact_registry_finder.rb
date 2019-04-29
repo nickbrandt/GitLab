@@ -84,7 +84,7 @@ module Geo
     def find_retryable_failed_registries(batch_size:, except_artifact_ids: [])
       find_failed_registries
         .retry_due
-        .where.not(artifact_id: except_artifact_ids)
+        .artifact_id_not_in(except_artifact_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -93,7 +93,7 @@ module Geo
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_artifact_ids: [])
       find_synced_missing_on_primary_registries
         .retry_due
-        .where.not(artifact_id: except_artifact_ids)
+        .artifact_id_not_in(except_artifact_ids)
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -154,67 +154,45 @@ module Geo
       Geo::JobArtifactRegistry.failed
     end
 
-    #
-    # FDW accessors
-    #
-
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find
-      job_artifacts.joins("INNER JOIN job_artifact_registry ON job_artifact_registry.artifact_id = #{fdw_table}.id")
+      job_artifacts
+        .inner_join_job_artifact_registry
         .geo_syncable
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_unsynced(except_artifact_ids:)
-      job_artifacts.joins("LEFT OUTER JOIN job_artifact_registry
-                               ON job_artifact_registry.artifact_id = #{fdw_table}.id")
+      job_artifacts
+        .missing_job_artifact_registry
         .geo_syncable
-        .where(job_artifact_registry: { artifact_id: nil })
-        .where.not(id: except_artifact_ids)
+        .id_not_in(except_artifact_ids)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_migrated_local(except_artifact_ids:)
-      job_artifacts.joins("INNER JOIN job_artifact_registry ON job_artifact_registry.artifact_id = #{fdw_table}.id")
+      job_artifacts
+        .inner_join_job_artifact_registry
         .with_files_stored_remotely
-        .where.not(id: except_artifact_ids)
+        .id_not_in(except_artifact_ids)
         .merge(Geo::JobArtifactRegistry.all)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    def fdw_table
-      Geo::Fdw::Ci::JobArtifact.table_name
-    end
-
-    #
-    # Legacy accessors (non FDW)
-    #
-
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_synced
       legacy_inner_join_registry_ids(
         syncable,
-        find_synced_registries.pluck(:artifact_id),
+        find_synced_registries.pluck_artifact_key,
         Ci::JobArtifact
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_failed
       legacy_inner_join_registry_ids(
         syncable,
-        find_failed_registries.pluck(:artifact_id),
+        find_failed_registries.pluck_artifact_key,
         Ci::JobArtifact
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_unsynced(except_artifact_ids:)
-      registry_artifact_ids = Geo::JobArtifactRegistry.pluck(:artifact_id) | except_artifact_ids
+      registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key | except_artifact_ids
 
       legacy_left_outer_join_registry_ids(
         syncable,
@@ -222,11 +200,9 @@ module Geo
         Ci::JobArtifact
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_migrated_local(except_artifact_ids:)
-      registry_artifact_ids = Geo::JobArtifactRegistry.pluck(:artifact_id) - except_artifact_ids
+      registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key - except_artifact_ids
 
       legacy_inner_join_registry_ids(
         legacy_finder.job_artifacts.with_files_stored_remotely,
@@ -234,16 +210,13 @@ module Geo
         Ci::JobArtifact
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def legacy_find_synced_missing_on_primary
       legacy_inner_join_registry_ids(
         syncable,
-        find_synced_missing_on_primary_registries.pluck(:artifact_id),
+        find_synced_missing_on_primary_registries.pluck_artifact_key,
         Ci::JobArtifact
       )
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
