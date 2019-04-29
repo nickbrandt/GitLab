@@ -39,11 +39,7 @@
             - presented_labels_sorted_by_title(issue.labels, issue.project).each do |label|
               = link_to_label(label, css_class: 'label-link')
 
-          - if issue.weight
-            %span.issuable-weight.d-none.d-sm-inline-block.has-tooltip{ data: { container: 'body' }, title: _('Weight') }
-              &nbsp;
-              = sprite_icon('weight', size: 16, css_class: 'issue-weight-icon')
-              = issue.weight
+          = render_if_exists "projects/issues/issue_weight", issue: issue
 
       .issuable-meta
         %ul.controls
