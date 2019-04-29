@@ -31,7 +31,7 @@ sast:
         CURRENT_ENV=$(printenv)
 
         for VAR_NAME; do
-          echo $CURRENT_ENV | grep $VAR_NAME > /dev/null && echo "--env $VAR_NAME "
+          echo $CURRENT_ENV | grep "${VAR_NAME}=" > /dev/null && echo "--env $VAR_NAME "
         done
       }
     - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
@@ -75,7 +75,7 @@ dependency_scanning:
         CURRENT_ENV=$(printenv)
 
         for VAR_NAME; do
-          echo $CURRENT_ENV | grep $VAR_NAME > /dev/null && echo "--env $VAR_NAME "
+          echo $CURRENT_ENV | grep "${VAR_NAME}=" > /dev/null && echo "--env $VAR_NAME "
         done
       }
     - |
