@@ -55,8 +55,8 @@
       { "type": "null" },
       { "$ref": "../vulnerability_feedback.json" }
     ]},
-    "description": { "type": "string" },
-    "solution": { "type": "string" },
+    "description": { "type": ["string", "null"] },
+    "solution": { "type": ["string", "null"] },
     "location" : {
       "class" : { "type": "string" },
       "method" : { "type": "string" },
