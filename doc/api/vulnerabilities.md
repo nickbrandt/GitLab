@@ -20,13 +20,13 @@ List all of a project's vulnerabilities.
 GET /projects/:id/vulnerabilities
 GET /projects/:id/vulnerabilities?report_type=sast
 GET /projects/:id/vulnerabilities?report_type=container_scanning
-GET /projects/:id/vulnerabilities?report_type[]=sast&report_type[]=dast
+GET /projects/:id/vulnerabilities?report_type=sast,dast
 ```
 
 | Attribute           | Type             | Required   | Description                                                                                                                                         |
 | ------------------- | ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `id`                | integer/string   | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user.                                    |
-| `report_type`       | string           | no         | Returns vulnerabilities belonging to specified report type. Valid values: `sast`, `dast`, `dependency_scanning`, or `container_scanning`.           |
+| `report_type`       | Array[string]    | no         | Returns vulnerabilities belonging to specified report type. Valid values: `sast`, `dast`, `dependency_scanning`, or `container_scanning`.           |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/vulnerabilities

@@ -28,7 +28,7 @@ module API
       end
 
       params do
-        optional :report_type, type: String, desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
+        optional :report_type, type: Array[String], desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
         use :pagination
       end
 
