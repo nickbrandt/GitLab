@@ -16,7 +16,7 @@ module Gitlab
         }.with_indifferent_access.freeze
         PERIODS = {
           days: { default: 30 },
-          weeks: { default: 4 },
+          weeks: { default: 12 },
           months: { default: 12 }
         }.with_indifferent_access.freeze
 

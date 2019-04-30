@@ -112,8 +112,17 @@ module LicenseHelper
 
   def license_app_data
     { data: { current_active_user_count: current_active_user_count,
-              licenses_path: api_v4_licenses_path, delete_license_path: api_v4_license_path(id: ':id'),
+              licenses_path: api_licenses_url,
+              delete_license_path: api_license_url(id: ':id'),
               new_license_path: new_admin_license_path, download_license_path: download_admin_license_path } }
+  end
+
+  def api_licenses_url
+    expose_url(api_v4_licenses_path)
+  end
+
+  def api_license_url(args)
+    expose_url(api_v4_license_path(args))
   end
 
   extend self
