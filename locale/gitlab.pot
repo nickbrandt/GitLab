@@ -8793,6 +8793,9 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
+msgid "Preview Markdown"
+msgstr ""
+
 msgid "Preview changes"
 msgstr ""
 
@@ -12719,6 +12722,9 @@ msgid "Unable to connect to server: %{error}"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
+msgstr ""
+
+msgid "Unable to regenerate public ssh key."
 msgstr ""
 
 msgid "Unable to schedule a pipeline to run immediately"
