@@ -8280,6 +8280,12 @@ msgstr ""
 msgid "Opens in a new window"
 msgstr ""
 
+msgid "Operation failed. Check pod logs for %{pod_name} for more details."
+msgstr ""
+
+msgid "Operation timed out. Check pod logs for %{pod_name} for more details."
+msgstr ""
+
 msgid "Operations"
 msgstr ""
 
