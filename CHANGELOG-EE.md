@@ -308,6 +308,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Adds documentation for autoremediation. !10054
 
 
+## 11.8.10 (2019-04-30)
+
+- No changes.
+
 ## 11.8.3 (2019-03-19)
 
 - No changes.
