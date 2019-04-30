@@ -391,11 +391,15 @@ rspec-pg geo:
   <<: *rspec-metadata-pg-geo-9-6
   except:
     - /(^geo[\/-].*|.*-geo$)/
+    - /(^docs[\/-].*|.*-docs$)/
+    - /(^qa[\/-].*|.*-qa$)/
 
 rspec-pg-10 geo:
   <<: *rspec-metadata-pg-geo-10-2
   except:
     - /(^geo[\/-].*|.*-geo$)/
+    - /(^docs[\/-].*|.*-docs$)/
+    - /(^qa[\/-].*|.*-qa$)/
 
 quick-rspec-pg geo:
   <<: *rspec-metadata-pg-geo-9-6
