@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'admin Geo Nodes', :js do
+describe 'admin Geo Nodes', :js, :geo do
   let!(:geo_node) { create(:geo_node) }
 
   before do

@@ -258,7 +258,6 @@ Settings.pages.admin['certificate'] ||= ''
 #
 # Geo
 #
-Settings.gitlab['geo_status_timeout'] ||= 10
 
 #
 # External merge request diffs

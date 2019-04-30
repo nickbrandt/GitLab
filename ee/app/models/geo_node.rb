@@ -15,9 +15,6 @@ class GeoNode < ApplicationRecord
   has_many :namespaces, through: :geo_node_namespace_links
   has_one :status, class_name: 'GeoNodeStatus'
 
-  default_values url: ->(record) { record.class.current_node_url },
-                 primary: false
-
   validates :url, presence: true, uniqueness: { case_sensitive: false }, addressable_url: true
   validates :internal_url, addressable_url: true, allow_blank: true, allow_nil: true
 
@@ -288,6 +285,8 @@ class GeoNode < ApplicationRecord
   end
 
   def update_oauth_application!
+    return unless uri
+
     self.build_oauth_application if oauth_application.nil?
     self.oauth_application.name = "Geo node: #{self.url}"
     self.oauth_application.redirect_uri = oauth_callback_url

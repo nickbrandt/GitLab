@@ -2,10 +2,11 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Oauth::Session do
+describe Gitlab::Geo::Oauth::Session, :geo do
   include EE::GeoHelpers
 
-  let!(:primary_node) { create(:geo_node, :primary) }
+  # This spec doesn't work with a relative_url_root https://gitlab.com/gitlab-org/gitlab-ee/issues/11261
+  let!(:primary_node) { create(:geo_node, :primary, url: 'http://primary') }
   let(:secondary_node) { create(:geo_node) }
   let(:oauth_application) { secondary_node.oauth_application }
   let(:access_token) { create(:doorkeeper_access_token, application: oauth_application) }
