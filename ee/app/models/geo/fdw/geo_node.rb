@@ -71,6 +71,14 @@ module Geo
         Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
           .within_shards(selective_sync_shards)
       end
+
+      def uploads_model
+        Geo::Fdw::Upload
+      end
+
+      def uploads_table
+        Geo::Fdw::Upload.arel_table
+      end
     end
   end
 end
