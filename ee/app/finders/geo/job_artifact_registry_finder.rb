@@ -26,7 +26,7 @@ module Geo
       if use_legacy_queries_for_selective_sync?
         legacy_finder.syncable
       elsif selective_sync?
-        job_artifacts.syncable
+        fdw_geo_node.job_artifacts.syncable
       else
         Ci::JobArtifact.syncable
       end
@@ -101,19 +101,12 @@ module Geo
       @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
     end
 
-    def job_artifacts
-      if selective_sync?
-        Geo::Fdw::Ci::JobArtifact.project_id_in(fdw_geo_node.projects)
-      else
-        Geo::Fdw::Ci::JobArtifact.all
-      end
-    end
-
     def registries_for_job_artifacts
       if use_legacy_queries_for_selective_sync?
         legacy_finder.registries_for_job_artifacts
       else
-        job_artifacts
+        fdw_geo_node
+          .job_artifacts
           .inner_join_job_artifact_registry
           .syncable
       end
@@ -144,18 +137,19 @@ module Geo
     end
 
     def fdw_find_unsynced(except_artifact_ids:)
-      job_artifacts
-        .missing_job_artifact_registry
+      fdw_geo_node
+        .job_artifacts
         .syncable
+        .missing_job_artifact_registry
         .id_not_in(except_artifact_ids)
     end
 
     def fdw_find_migrated_local(except_artifact_ids:)
-      job_artifacts
+      fdw_geo_node
+        .job_artifacts
         .inner_join_job_artifact_registry
         .with_files_stored_remotely
         .id_not_in(except_artifact_ids)
-        .merge(Geo::JobArtifactRegistry.all)
     end
 
     def legacy_find_unsynced(except_artifact_ids:)
@@ -172,7 +166,7 @@ module Geo
       registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key - except_artifact_ids
 
       legacy_inner_join_registry_ids(
-        legacy_finder.job_artifacts.with_files_stored_remotely,
+        current_node.job_artifacts.with_files_stored_remotely,
         registry_artifact_ids,
         Ci::JobArtifact
       )

@@ -14,6 +14,12 @@ module Geo
       has_many :geo_node_namespace_links, class_name: 'Geo::Fdw::GeoNodeNamespaceLink'
       has_many :namespaces, class_name: 'Geo::Fdw::Namespace', through: :geo_node_namespace_links
 
+      def job_artifacts
+        Geo::Fdw::Ci::JobArtifact.all unless selective_sync?
+
+        Geo::Fdw::Ci::JobArtifact.project_id_in(projects)
+      end
+
       def lfs_objects
         return Geo::Fdw::LfsObject.all unless selective_sync?
 

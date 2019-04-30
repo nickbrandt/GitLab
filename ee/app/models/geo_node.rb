@@ -194,6 +194,12 @@ class GeoNode < ApplicationRecord
     end
   end
 
+  def job_artifacts
+    Ci::JobArtifact.all unless selective_sync?
+
+    Ci::JobArtifact.project_id_in(projects)
+  end
+
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
