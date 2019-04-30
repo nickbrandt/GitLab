@@ -49,64 +49,100 @@ describe Geo::AttachmentRegistryFinder, :geo do
 
   shared_examples 'finds all the things' do
     describe '#find_unsynced' do
-      it 'returns uploads without an entry on the tracking database' do
+      let!(:upload_1) { create(:upload, model: synced_group) }
+      let!(:upload_2) { create(:upload, model: unsynced_group) }
+      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project) }
+      let!(:upload_4) { create(:upload, model: unsynced_project) }
+      let!(:upload_5) { create(:upload, model: synced_project) }
+      let!(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
+
+      it 'returns attachments without an entry on the tracking database' do
         create(:geo_file_registry, :avatar, file_id: upload_1.id)
 
-        uploads = subject.find_unsynced(batch_size: 10)
+        attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_2.id])
 
-        expect(uploads).to match_ids(upload_2, upload_3, upload_4)
+        expect(attachments).to match_ids(upload_3, upload_4, upload_5)
       end
 
-      it 'excludes uploads in the except_file_ids option' do
-        uploads = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_2.id])
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
 
-        expect(uploads).to match_ids(upload_1, upload_3, upload_4)
+        it 'returns attachments without an entry on the tracking database' do
+          create(:geo_file_registry, :avatar, file_id: upload_1.id)
+
+          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_5.id])
+
+          expect(attachments).to match_ids(upload_3)
+        end
       end
 
-      it 'excludes remote uploads' do
-        upload_1.update!(store: ObjectStorage::Store::REMOTE)
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
 
-        uploads = subject.find_unsynced(batch_size: 10)
+        it 'returns attachments without an entry on the tracking database' do
+          create(:geo_file_registry, :avatar, file_id: upload_2.id)
 
-        expect(uploads).to match_ids(upload_2, upload_3, upload_4)
+          attachments = subject.find_unsynced(batch_size: 10)
+
+          expect(attachments).to match_ids(upload_4)
+        end
       end
     end
 
     describe '#find_migrated_local' do
-      it 'returns uploads stored remotely and successfully synced locally' do
-        upload = create(:upload, :object_storage, model: synced_group)
-        create(:geo_file_registry, :avatar, file_id: upload.id)
+      let!(:upload_1) { create(:upload, model: synced_group) }
+      let!(:upload_2) { create(:upload, model: unsynced_group) }
+      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project) }
+      let!(:upload_4) { create(:upload, model: unsynced_project) }
+      let!(:upload_5) { create(:upload, model: synced_project) }
+      let!(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
+      let!(:upload_remote_2) { create(:upload, :object_storage, model: unsynced_project) }
 
-        uploads = subject.find_migrated_local(batch_size: 100)
-
-        expect(uploads).to match_ids(upload)
+      before do
+        create(:geo_file_registry, :avatar, file_id: upload_remote_1.id)
+        create(:geo_file_registry, :avatar, file_id: upload_remote_2.id)
       end
 
-      it 'excludes uploads stored remotely, but not synced yet' do
+      it 'returns attachments stored remotely and successfully synced locally' do
+        attachments = subject.find_migrated_local(batch_size: 100, except_file_ids: [upload_remote_2.id])
+
+        expect(attachments).to match_ids(upload_remote_1)
+      end
+
+      it 'excludes attachments stored remotely, but not synced yet' do
         create(:upload, :object_storage, model: synced_group)
 
-        uploads = subject.find_migrated_local(batch_size: 100)
+        attachments = subject.find_migrated_local(batch_size: 100)
 
-        expect(uploads).to be_empty
+        expect(attachments).to match_ids(upload_remote_1, upload_remote_2)
       end
 
-      it 'excludes synced uploads that are stored locally' do
-        create(:geo_file_registry, :avatar, file_id: upload_5.id)
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
 
-        uploads = subject.find_migrated_local(batch_size: 100)
+        it 'returns attachments stored remotely and successfully synced locally' do
+          attachments = subject.find_migrated_local(batch_size: 10)
 
-        expect(uploads).to be_empty
+          expect(attachments).to match_ids(upload_remote_1)
+        end
       end
 
-      it 'excludes except_file_ids' do
-        upload_a = create(:upload, :object_storage, model: synced_group)
-        upload_b = create(:upload, :object_storage, model: unsynced_group)
-        create(:geo_file_registry, :avatar, file_id: upload_a.id)
-        create(:geo_file_registry, :avatar, file_id: upload_b.id)
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
 
-        uploads = subject.find_migrated_local(batch_size: 10, except_file_ids: [upload_a.id])
+        it 'returns attachments stored remotely and successfully synced locally' do
+          attachments = subject.find_migrated_local(batch_size: 10)
 
-        expect(uploads).to match_ids(upload_b)
+          expect(attachments).to match_ids(upload_remote_2)
+        end
       end
     end
   end
