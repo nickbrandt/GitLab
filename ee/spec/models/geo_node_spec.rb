@@ -671,4 +671,16 @@ describe GeoNode, :geo, type: :model do
       is_expected.to be_falsy
     end
   end
+
+  describe '#name=' do
+    context 'before validation' do
+      it 'strips leading and trailing whitespace' do
+        node = build(:geo_node)
+        node.name = " foo\n\n "
+        node.valid?
+
+        expect(node.name).to eq('foo')
+      end
+    end
+  end
 end

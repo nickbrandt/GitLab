@@ -3,6 +3,7 @@
 class GeoNode < ApplicationRecord
   include Presentable
   include Geo::SelectiveSync
+  include StripAttribute
 
   SELECTIVE_SYNC_TYPES = %w[namespaces shards].freeze
 
@@ -54,6 +55,8 @@ class GeoNode < ApplicationRecord
                  algorithm: 'aes-256-gcm',
                  mode: :per_attribute_iv,
                  encode: true
+
+  strip_attributes :name
 
   class << self
     # Set in gitlab.rb as external_url
