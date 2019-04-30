@@ -1659,6 +1659,9 @@ msgstr ""
 msgid "Badges|e.g. %{exampleUrl}"
 msgstr ""
 
+msgid "Balsamiq file could not be loaded."
+msgstr ""
+
 msgid "BambooService|A continuous integration and build server"
 msgstr ""
 
@@ -2086,6 +2089,9 @@ msgid "Cannot refer to a group milestone by an internal id!"
 msgstr ""
 
 msgid "Cannot render the image. Maximum character count (%{charLimit}) has been exceeded."
+msgstr ""
+
+msgid "Cannot show preview. For previews on sketch files, they must have the file format introduced by Sketch version 43 and above."
 msgstr ""
 
 msgid "Cannot skip two factor authentication setup"
@@ -3311,6 +3317,9 @@ msgstr ""
 msgid "Copy secret to clipboard"
 msgstr ""
 
+msgid "Copy source to clipboard"
+msgstr ""
+
 msgid "Copy to clipboard"
 msgstr ""
 
@@ -4012,6 +4021,9 @@ msgstr ""
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
 msgstr ""
 
+msgid "Dockerfile"
+msgstr ""
+
 msgid "Documentation for popular identity providers"
 msgstr ""
 
@@ -4543,6 +4555,9 @@ msgstr ""
 msgid "Error loading branches."
 msgstr ""
 
+msgid "Error loading file viewer."
+msgstr ""
+
 msgid "Error loading last commit."
 msgstr ""
 
@@ -4559,6 +4574,9 @@ msgid "Error loading template types."
 msgstr ""
 
 msgid "Error loading template."
+msgstr ""
+
+msgid "Error loading viewer"
 msgstr ""
 
 msgid "Error occurred when toggling the notification subscription"
@@ -4592,6 +4610,9 @@ msgid "Error updating todo status."
 msgstr ""
 
 msgid "Error uploading file"
+msgstr ""
+
+msgid "Error uploading file: %{stripped}"
 msgstr ""
 
 msgid "Error while loading the merge request. Please try again."
@@ -8742,6 +8763,9 @@ msgstr ""
 msgid "Please provide a name"
 msgstr ""
 
+msgid "Please select a file"
+msgstr ""
+
 msgid "Please select a group."
 msgstr ""
 
@@ -11458,6 +11482,9 @@ msgstr ""
 msgid "Switch to GitLab Next"
 msgstr ""
 
+msgid "Switch to the source to copy it to the clipboard"
+msgstr ""
+
 msgid "Sync information"
 msgstr ""
 
@@ -13307,6 +13334,9 @@ msgid "Vulnerability|Report Type"
 msgstr ""
 
 msgid "Vulnerability|Severity"
+msgstr ""
+
+msgid "Wait for the source to load to copy it to the clipboard"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
