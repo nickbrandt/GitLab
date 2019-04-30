@@ -94,6 +94,14 @@ Parameters:
       "avatar_url": null,
       "web_url" : "https://gitlab.example.com/admin"
     },
+    "assignees": [{
+      "name": "Miss Monserrate Beier",
+      "username": "axel.block",
+      "id": 12,
+      "state": "active",
+      "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+      "web_url": "https://gitlab.example.com/axel.block"
+    }],
     "source_project_id": 2,
     "target_project_id": 3,
     "labels": [
@@ -230,6 +238,14 @@ Parameters:
       "avatar_url": null,
       "web_url" : "https://gitlab.example.com/admin"
     },
+    "assignees": [{
+      "name": "Miss Monserrate Beier",
+      "username": "axel.block",
+      "id": 12,
+      "state": "active",
+      "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+      "web_url": "https://gitlab.example.com/axel.block"
+    }],
     "source_project_id": 2,
     "target_project_id": 3,
     "labels": [
@@ -356,6 +372,14 @@ Parameters:
       "avatar_url": null,
       "web_url" : "https://gitlab.example.com/admin"
     },
+    "assignees": [{
+      "name": "Miss Monserrate Beier",
+      "username": "axel.block",
+      "id": 12,
+      "state": "active",
+      "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+      "web_url": "https://gitlab.example.com/axel.block"
+    }],
     "source_project_id": 2,
     "target_project_id": 3,
     "labels": [
@@ -451,6 +475,14 @@ Parameters:
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -636,6 +668,14 @@ Parameters:
     "avatar_url": "http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=40&d=identicon",
     "web_url" : "https://gitlab.example.com/root"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 4,
   "target_project_id": 4,
   "labels": [ ],
@@ -725,6 +765,7 @@ POST /projects/:id/merge_requests
 | `target_branch`            | string  | yes      | The target branch                                                               |
 | `title`                    | string  | yes      | Title of MR                                                                     |
 | `assignee_id`              | integer | no       | Assignee user ID                                                                |
+| `assignee_ids`             | Array[integer] | no  | The ID of the user(s) to assign the MR to. Set to `0` or provide an empty value to unassign all assignees.  |
 | `description`              | string  | no       | Description of MR                                                               |
 | `target_project_id`        | integer | no       | The target project (numeric id)                                                 |
 | `labels`                   | string  | no       | Labels for MR as a comma-separated list                                         |
@@ -860,6 +901,7 @@ PUT /projects/:id/merge_requests/:merge_request_iid
 | `target_branch`            | string  | no       | The target branch                                                               |
 | `title`                    | string  | no       | Title of MR                                                                     |
 | `assignee_id`              | integer | no       | The ID of the user to assign the merge request to. Set to `0` or provide an empty value to unassign all assignees.  |
+| `assignee_ids`             | Array[integer] | no  | The ID of the user(s) to assign the MR to. Set to `0` or provide an empty value to unassign all assignees.  |
 | `milestone_id`             | integer | no       | The global ID of a milestone to assign the merge request to. Set to `0` or provide an empty value to unassign a milestone.|
 | `labels`                   | string  | no       | Comma-separated label names for a merge request. Set to an empty string to unassign all labels.                    |
 | `description`              | string  | no       | Description of MR                                                               |
@@ -902,6 +944,14 @@ Must include at least one non-required attribute from above.
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -1048,6 +1098,14 @@ Parameters:
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -1199,6 +1257,14 @@ Parameters:
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -1456,6 +1522,14 @@ Example response:
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -1578,6 +1652,14 @@ Example response:
     "avatar_url": null,
     "web_url" : "https://gitlab.example.com/admin"
   },
+  "assignees": [{
+    "name": "Miss Monserrate Beier",
+    "username": "axel.block",
+    "id": 12,
+    "state": "active",
+    "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/axel.block"
+  }],
   "source_project_id": 2,
   "target_project_id": 3,
   "labels": [
@@ -1720,6 +1802,14 @@ Example response:
       "avatar_url": "http://www.gravatar.com/avatar/733005fcd7e6df12d2d8580171ccb966?s=80&d=identicon",
       "web_url": "https://gitlab.example.com/barrett.krajcik"
     },
+    "assignees": [{
+      "name": "Miss Monserrate Beier",
+      "username": "axel.block",
+      "id": 12,
+      "state": "active",
+      "avatar_url": "http://www.gravatar.com/avatar/46f6f7dc858ada7be1853f7fb96e81da?s=80&d=identicon",
+      "web_url": "https://gitlab.example.com/axel.block"
+    }],
     "source_project_id": 3,
     "target_project_id": 3,
     "labels": [],
