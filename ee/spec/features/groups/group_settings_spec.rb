@@ -188,7 +188,7 @@ describe 'Edit group settings' do
 
     context 'is enabled' do
       before do
-        stub_licensed_features(custom_project_templates: true)
+        stub_licensed_features(group_project_templates: true)
         visit edit_group_path(selected_group)
       end
 
@@ -207,9 +207,54 @@ describe 'Edit group settings' do
       end
     end
 
+    context 'namespace plan is checked' do
+      before do
+        create(:gitlab_subscription, namespace: group, hosted_plan: plan)
+        stub_licensed_features(group_project_templates: true)
+        allow(Gitlab::CurrentSettings.current_application_settings)
+          .to receive(:should_check_namespace_plan?) { true }
+
+        visit edit_group_path(selected_group)
+      end
+
+      context 'namespace is on the proper plan' do
+        let(:plan) { create(:gold_plan) }
+
+        context 'when the group is a top parent group' do
+          let(:selected_group) { group }
+          let(:nested_group) { subgroup }
+
+          it_behaves_like 'shows custom project templates settings'
+        end
+
+        context 'when the group is a subgroup' do
+          let(:selected_group) { subgroup }
+          let(:nested_group) { subgroup_1 }
+
+          it_behaves_like 'shows custom project templates settings'
+        end
+      end
+
+      context 'is disabled for namespace' do
+        let(:plan) { create(:bronze_plan) }
+
+        context 'when the group is the top parent group' do
+          let(:selected_group) { group }
+
+          it_behaves_like 'does not show custom project templates settings'
+        end
+
+        context 'when the group is a subgroup' do
+          let(:selected_group) { subgroup }
+
+          it_behaves_like 'does not show custom project templates settings'
+        end
+      end
+    end
+
     context 'is disabled' do
       before do
-        stub_licensed_features(custom_project_templates: false)
+        stub_licensed_features(group_project_templates: false)
         visit edit_group_path(selected_group)
       end
 

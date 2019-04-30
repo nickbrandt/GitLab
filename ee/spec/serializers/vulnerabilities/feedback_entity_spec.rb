@@ -13,6 +13,26 @@ describe Vulnerabilities::FeedbackEntity do
     it { is_expected.to include(:created_at, :project_id, :author, :category, :feedback_type) }
   end
 
+  context 'when comment is not present' do
+    subject { entity.as_json }
+
+    it { is_expected.not_to include(:comment_details) }
+  end
+
+  context 'when comment is present' do
+    let(:feedback) { build(:vulnerability_feedback, :comment) }
+    let(:entity) { described_class.represent(feedback) }
+
+    subject { entity.as_json }
+
+    it 'exposes comment information' do
+      expect(subject).to include(:comment_details)
+      expect(subject[:comment_details]).to include(:comment)
+      expect(subject[:comment_details]).to include(:comment_timestamp)
+      expect(subject[:comment_details]).to include(:comment_author)
+    end
+  end
+
   context 'when issue is present' do
     let(:feedback) { build(:vulnerability_feedback, :issue ) }
     let(:entity) { described_class.represent(feedback) }

@@ -3316,7 +3316,11 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.integer "issue_id"
     t.string "project_fingerprint", limit: 40, null: false
     t.integer "merge_request_id"
+    t.integer "comment_author_id"
+    t.text "comment"
+    t.datetime_with_timezone "comment_timestamp"
     t.index ["author_id"], name: "index_vulnerability_feedback_on_author_id", using: :btree
+    t.index ["comment_author_id"], name: "index_vulnerability_feedback_on_comment_author_id", using: :btree
     t.index ["issue_id"], name: "index_vulnerability_feedback_on_issue_id", using: :btree
     t.index ["merge_request_id"], name: "index_vulnerability_feedback_on_merge_request_id", using: :btree
     t.index ["pipeline_id"], name: "index_vulnerability_feedback_on_pipeline_id", using: :btree
@@ -3755,6 +3759,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
   add_foreign_key "vulnerability_feedback", "merge_requests", name: "fk_563ff1912e", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "users", column: "author_id", on_delete: :cascade
+  add_foreign_key "vulnerability_feedback", "users", column: "comment_author_id", name: "fk_94f7c8a81e", on_delete: :nullify
   add_foreign_key "vulnerability_identifiers", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_identifiers", column: "identifier_id", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade

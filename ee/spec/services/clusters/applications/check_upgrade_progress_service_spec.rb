@@ -34,7 +34,7 @@ describe Clusters::Applications::CheckUpgradeProgressService do
       end
 
       context 'when timed out' do
-        let(:application) { create(:clusters_applications_prometheus, :timeouted, :updating) }
+        let(:application) { create(:clusters_applications_prometheus, :timed_out, :updating) }
 
         it_behaves_like 'a terminated upgrade'
 

@@ -4,7 +4,7 @@ import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
 import mountComponent, { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { codequalityParsedIssues } from 'spec/vue_mr_widget/mock_data';
+import { codequalityParsedIssues } from 'ee_spec/vue_mr_widget/mock_data';
 import {
   sastParsedIssues,
   dockerReportParsed,

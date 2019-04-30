@@ -27,7 +27,7 @@ module EE
       ].tap do |params_ee|
         params_ee << { insight_attributes: :project_id } if current_group&.insights_available?
         params_ee << :file_template_project_id if current_group&.feature_available?(:custom_file_templates_for_namespace)
-        params_ee << :custom_project_templates_group_id if License.feature_available?(:custom_project_templates)
+        params_ee << :custom_project_templates_group_id if current_group&.group_project_template_available?
       end
     end
 

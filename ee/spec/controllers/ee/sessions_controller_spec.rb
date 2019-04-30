@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SessionsController do
+describe SessionsController, :geo do
   include DeviseHelpers
   include EE::GeoHelpers
 

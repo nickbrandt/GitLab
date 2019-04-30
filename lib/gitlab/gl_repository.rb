@@ -41,5 +41,3 @@ module Gitlab
     end
   end
 end
-
-::Gitlab::GlRepository.prepend(::EE::Gitlab::GlRepository)

@@ -1,0 +1,5 @@
+---
+title: Ensure custom group template feature is available only for groups on gold and silver
+merge_request: 10678
+author:
+type: fixed

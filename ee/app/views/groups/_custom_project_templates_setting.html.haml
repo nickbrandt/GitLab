@@ -1,5 +1,5 @@
-- return unless ::Gitlab::CurrentSettings.custom_project_templates_enabled?
-- expanded = Rails.env.test?
+- return unless @group.group_project_template_available?
+- expanded = expanded_by_default?
 
 %section.settings.no-animate.qa-custom-project-templates{ class: ('expanded' if expanded) }
   .settings-header

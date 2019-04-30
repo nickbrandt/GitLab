@@ -273,17 +273,17 @@ confidently and securely with GitLab’s built-in Continuous Delivery and Deploy
 
 The following documentation relates to the DevOps **Release** stage:
 
-| Release Topics                                                                                                  | Description                                                                                                                           |
-|:----------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
-| [Auto Deploy](topics/autodevops/index.md#auto-deploy)                                                           | Configure GitLab for the deployment of your application.                                                                              |
-| [Canary Deployments](user/project/canary_deployments.md) **[PREMIUM]**                                          | Employ a popular CI strategy where a small portion of the fleet is updated to the new version first.                                  |
-| [Deploy Boards](user/project/deploy_boards.md) **[PREMIUM]**                                                    | View the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment. |
-| [Environments and deployments](ci/environments.md)                                                              | With environments, you can control the continuous deployment of your software within GitLab.                                          |
+| Release Topics                                                                                                                      | Description                                                                                                                           |
+|:------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
+| [Auto Deploy](topics/autodevops/index.md#auto-deploy)                                                                               | Configure GitLab for the deployment of your application.                                                                              |
+| [Canary Deployments](user/project/canary_deployments.md) **[PREMIUM]**                                                              | Employ a popular CI strategy where a small portion of the fleet is updated to the new version first.                                  |
+| [Deploy Boards](user/project/deploy_boards.md) **[PREMIUM]**                                                                        | View the current health and status of each CI environment running on Kubernetes, displaying the status of the pods in the deployment. |
+| [Environments and deployments](ci/environments.md)                                                                                  | With environments, you can control the continuous deployment of your software within GitLab.                                          |
 | [Environment-specific variables](ci/variables/README.md#limiting-environment-scopes-of-environment-variables-premium) **[PREMIUM]** | Limit scope of variables to specific environments.                                                                                    |
-| [GitLab CI/CD](ci/README.md)                                                                                    | Explore the features and capabilities of Continuous Deployment and Delivery with GitLab.                                              |
-| [GitLab Pages](user/project/pages/index.md)                                                                     | Build, test, and deploy a static site directly from GitLab.                                                                           |
-| [Protected Runners](ci/runners/README.md#protected-runners)                                                     | Select Runners to only pick jobs for protected branches and tags.                                                                     |
-| [Scheduled Pipelines](user/project/pipelines/schedules.md)                                                      | Execute pipelines on a schedule.                                                                                                      |
+| [GitLab CI/CD](ci/README.md)                                                                                                        | Explore the features and capabilities of Continuous Deployment and Delivery with GitLab.                                              |
+| [GitLab Pages](user/project/pages/index.md)                                                                                         | Build, test, and deploy a static site directly from GitLab.                                                                           |
+| [Protected Runners](ci/runners/README.md#protected-runners)                                                                         | Select Runners to only pick jobs for protected branches and tags.                                                                     |
+| [Scheduled Pipelines](user/project/pipelines/schedules.md)                                                                          | Execute pipelines on a schedule.                                                                                                      |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">
@@ -308,7 +308,7 @@ The following documentation relates to the DevOps **Configure** stage:
 | [Installing Applications](user/project/clusters/index.md#installing-applications)                                                  | Deploy Helm, Ingress, and Prometheus on Kubernetes.                       |
 | [Mattermost slash commands](user/project/integrations/mattermost_slash_commands.md)                                                | Enable and use slash commands from within Mattermost.                     |
 | [Multiple Kubernetes Clusters](user/project/clusters/index.md#multiple-kubernetes-clusters-premium) **[PREMIUM]**                  | Associate more than one Kubernetes clusters to your project.              |
-| [Protected variables](ci/variables/README.md#protected-environment-variables)                                                                  | Restrict variables to protected branches and tags.                        |
+| [Protected variables](ci/variables/README.md#protected-environment-variables)                                                      | Restrict variables to protected branches and tags.                        |
 | [Serverless](user/project/clusters/serverless/index.md)                                                                            | Run serverless workloads on Kubernetes.                                   |
 | [Slack slash commands](user/project/integrations/slack_slash_commands.md)                                                          | Enable and use slash commands from within Slack.                          |
 
@@ -453,7 +453,7 @@ We have the following documentation to rapidly uplift your GitLab knowledge:
 
 | Topic                                                                                                                  | Description                                                    |
 |:-----------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------|
-| [GitLab Basics](gitlab-basics/README.md)                                                                               | Start working on the command line and with GitLab.             |
+| [GitLab basics guides](gitlab-basics/README.md)                                                                        | Start working on the command line and with GitLab.             |
 | [GitLab Workflow](workflow/README.md) and [overview](https://about.gitlab.com/2016/10/25/gitlab-workflow-an-overview/) | Enhance your workflow with the best of GitLab Workflow.        |
 | [Get started with GitLab CI/CD](ci/quick_start/README.md)                                                              | Quickly implement GitLab CI/CD.                                |
 | [Auto DevOps](topics/autodevops/index.md)                                                                              | Learn more about GitLab's Auto DevOps.                         |

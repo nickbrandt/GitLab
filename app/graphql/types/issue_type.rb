@@ -43,5 +43,3 @@ module Types
     field :updated_at, Types::TimeType, null: false
   end
 end
-
-Types::IssueType.prepend(::EE::Types::IssueType)

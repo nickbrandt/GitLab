@@ -38,6 +38,14 @@ module EE
       scope :with_plan, -> { where.not(plan_id: nil) }
       scope :with_shared_runners_minutes_limit, -> { where("namespaces.shared_runners_minutes_limit > 0") }
       scope :with_extra_shared_runners_minutes_limit, -> { where("namespaces.extra_shared_runners_minutes_limit > 0") }
+      scope :with_feature_available_in_plan, -> (feature) do
+        plans = plans_with_feature(feature)
+        matcher = Plan.where(name: plans)
+          .joins(:hosted_subscriptions)
+          .where("gitlab_subscriptions.namespace_id = namespaces.id")
+          .select('1')
+        where("EXISTS (?)", matcher)
+      end
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         :extra_shared_runners_minutes, to: :namespace_statistics, allow_nil: true

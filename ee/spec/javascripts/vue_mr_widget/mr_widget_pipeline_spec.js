@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import pipelineComponent from '~/vue_merge_request_widget/components/mr_widget_pipeline.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import mockData from 'spec/vue_mr_widget/mock_data';
+import mockData from 'ee_spec/vue_mr_widget/mock_data';
 import mockLinkedPipelines from 'ee_spec/pipelines/graph/linked_pipelines_mock_data';
 
 describe('MRWidgetPipeline', () => {

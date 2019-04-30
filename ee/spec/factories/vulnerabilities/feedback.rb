@@ -20,6 +20,12 @@ FactoryBot.define do
       feedback_type 'dismissal'
     end
 
+    trait :comment do
+      comment 'a dismissal comment'
+      comment_timestamp { Time.zone.now }
+      comment_author { author }
+    end
+
     trait :issue do
       feedback_type 'issue'
       issue { create(:issue, project: project) }

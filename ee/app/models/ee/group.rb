@@ -166,6 +166,11 @@ module EE
       feature_available?(:multiple_group_issue_boards)
     end
 
+    def group_project_template_available?
+      feature_available?(:group_project_templates) ||
+        (custom_project_templates_group_id? && Time.zone.now <= GroupsWithTemplatesFinder::CUT_OFF_DATE)
+    end
+
     def actual_size_limit
       return ::Gitlab::CurrentSettings.repository_size_limit if repository_size_limit.nil?
 
