@@ -285,6 +285,8 @@ module EE
     end
 
     def paid_plan?
+      return false if trial?
+
       !(free_plan? || early_adopter_plan?)
     end
 

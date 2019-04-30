@@ -93,7 +93,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
             opts.merge!(group_by: 'week')
           end
 
-          it 'returns issuable created after 4 weeks ago' do
+          it 'returns issuable created after 12 weeks ago' do
             expect(subject.to_a).to eq([issuable2, issuable3, issuable4])
           end
         end
@@ -219,8 +219,8 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       context 'with group_by: "week"' do
         let(:opts) { base_opts.merge!(group_by: 'week') }
 
-        it 'returns 4' do
-          expect(subject).to eq(4)
+        it 'returns 12' do
+          expect(subject).to eq(12)
         end
       end
 

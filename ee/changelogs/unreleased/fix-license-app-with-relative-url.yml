@@ -1,0 +1,5 @@
+---
+title: Fix error retrieving licenses when relative URL in use
+merge_request: 11717
+author: Hiroyuki Sato
+type: fixed
