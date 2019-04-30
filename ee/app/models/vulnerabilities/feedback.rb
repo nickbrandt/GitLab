@@ -5,10 +5,12 @@ module Vulnerabilities
     self.table_name = 'vulnerability_feedback'
 
     belongs_to :project
-    belongs_to :author, class_name: "User"
+    belongs_to :author, class_name: 'User'
     belongs_to :issue
     belongs_to :merge_request
     belongs_to :pipeline, class_name: 'Ci::Pipeline', foreign_key: :pipeline_id
+
+    belongs_to :comment_author, class_name: 'User'
 
     attr_accessor :vulnerability_data
 
@@ -17,6 +19,7 @@ module Vulnerabilities
 
     validates :project, presence: true
     validates :author, presence: true
+    validates :comment_timestamp, :comment_author, presence: true, if: :comment?
     validates :issue, presence: true, if: :issue?
     validates :merge_request, presence: true, if: :merge_request?
     validates :vulnerability_data, presence: true, unless: :dismissal?
@@ -24,10 +27,10 @@ module Vulnerabilities
     validates :category, presence: true
     validates :project_fingerprint, presence: true, uniqueness: { scope: [:project_id, :category, :feedback_type] }
 
-    scope :with_associations, -> { includes(:pipeline, :issue, :merge_request, :author) }
+    scope :with_associations, -> { includes(:pipeline, :issue, :merge_request, :author, :comment_author) }
 
     scope :all_preloaded, -> do
-      preload(:author, :project, :issue, :merge_request, :pipeline)
+      preload(:author, :comment_author, :project, :issue, :merge_request, :pipeline)
     end
 
     def self.find_or_init_for(feedback_params)
