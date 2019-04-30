@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190620112608) do
+ActiveRecord::Schema.define(version: 20190625184066) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,8 +94,6 @@ ActiveRecord::Schema.define(version: 20190620112608) do
     t.boolean "akismet_enabled", default: false
     t.string "akismet_api_key"
     t.integer "metrics_sample_interval", default: 15
-    t.boolean "sentry_enabled", default: false
-    t.string "sentry_dsn"
     t.boolean "email_author_in_body", default: false
     t.integer "default_group_visibility"
     t.boolean "repository_checks_enabled", default: false
@@ -147,8 +145,6 @@ ActiveRecord::Schema.define(version: 20190620112608) do
     t.decimal "polling_interval_multiplier", default: "1.0", null: false
     t.boolean "elasticsearch_experimental_indexer"
     t.integer "cached_markdown_version"
-    t.boolean "clientside_sentry_enabled", default: false, null: false
-    t.string "clientside_sentry_dsn"
     t.boolean "check_namespace_plan", default: false, null: false
     t.integer "mirror_max_delay", default: 300, null: false
     t.integer "mirror_max_capacity", default: 100, null: false
