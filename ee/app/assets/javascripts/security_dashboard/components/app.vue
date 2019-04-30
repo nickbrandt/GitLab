@@ -108,6 +108,7 @@ export default {
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
       'undoDismiss',
+      'downloadPatch',
     ]),
     ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
     ...mapActions('filters', ['lockFilter']),
@@ -141,6 +142,7 @@ export default {
       @dismissVulnerability="dismissVulnerability({ vulnerability, comment: $event })"
       @openDismissalCommentBox="openDismissalCommentBox()"
       @revertDismissVulnerability="undoDismiss({ vulnerability })"
+      @downloadPatch="downloadPatch({ vulnerability })"
     />
   </div>
 </template>

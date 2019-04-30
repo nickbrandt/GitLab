@@ -256,6 +256,7 @@ export default {
       'createMergeRequest',
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
+      'downloadPatch',
     ]),
   },
 };
@@ -361,6 +362,7 @@ export default {
         @dismissVulnerability="dismissVulnerability"
         @openDismissalCommentBox="openDismissalCommentBox()"
         @revertDismissVulnerability="revertDismissVulnerability"
+        @downloadPatch="downloadPatch"
       />
     </div>
   </report-section>

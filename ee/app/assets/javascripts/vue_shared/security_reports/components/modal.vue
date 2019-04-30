@@ -58,6 +58,17 @@ export default {
     dismissalCommentErrorMessage: '',
   }),
   computed: {
+    canDownloadPatch() {
+      const remediationDiff = this.remediation && this.remediation.diff;
+      return Boolean(
+        remediationDiff &&
+          remediationDiff.length > 0 &&
+          (!this.vulnerability.hasMergeRequest && this.remediation),
+      );
+    },
+    hasRemediation() {
+      return Boolean(this.remediation);
+    },
     hasDismissedBy() {
       return (
         this.vulnerability &&
@@ -76,9 +87,6 @@ export default {
       return (
         this.vulnerability && this.vulnerability.remediations && this.vulnerability.remediations[0]
       );
-    },
-    renderSolutionCard() {
-      return this.solution || this.remediation;
     },
     /**
      * The slot for the footer should be rendered if any of the conditions is true.
@@ -170,8 +178,14 @@ export default {
     <slot>
       <vulnerability-details :details="valuedFields" class="js-vulnerability-details" />
 
-      <solution-card v-if="renderSolutionCard" :solution="solution" :remediation="remediation" />
-      <hr v-else />
+      <solution-card
+        :solution="solution"
+        :remediation="remediation"
+        :has-mr="vulnerability.hasMergeRequest"
+        :has-remediation="hasRemediation"
+        :has-download="canDownloadPatch"
+        :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+      />
 
       <ul v-if="issueFeedback || mergeRequestFeedback" class="notes card my-4">
         <li v-if="issueFeedback" class="note">
@@ -199,18 +213,6 @@ export default {
         </div>
       </div>
 
-      <div class="prepend-top-20 append-bottom-10">
-        <div class="col-sm-12 text-secondary">
-          <a
-            v-if="vulnerabilityFeedbackHelpPath"
-            :href="vulnerabilityFeedbackHelpPath"
-            class="js-link-vulnerabilityFeedbackHelpPath"
-          >
-            {{ s__('ciReport|Learn more about interacting with security reports (Alpha).') }}
-          </a>
-        </div>
-      </div>
-
       <div v-if="modal.error" class="alert alert-danger">{{ modal.error }}</div>
     </slot>
     <div slot="footer">
@@ -225,6 +227,7 @@ export default {
         :vulnerability="vulnerability"
         :can-create-issue="Boolean(!vulnerability.hasIssue && canCreateIssue)"
         :can-create-merge-request="Boolean(!vulnerability.hasMergeRequest && remediation)"
+        :can-download-patch="canDownloadPatch"
         :can-dismiss-vulnerability="canDismissVulnerability"
         :is-dismissed="vulnerability.isDismissed"
         @createMergeRequest="$emit('createMergeRequest')"
@@ -232,6 +235,7 @@ export default {
         @dismissVulnerability="$emit('dismissVulnerability')"
         @openDismissalCommentBox="$emit('openDismissalCommentBox')"
         @revertDismissVulnerability="$emit('revertDismissVulnerability')"
+        @downloadPatch="$emit('downloadPatch')"
       />
     </div>
   </modal>

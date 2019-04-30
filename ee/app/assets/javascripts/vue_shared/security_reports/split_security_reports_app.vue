@@ -236,6 +236,7 @@ export default {
       'createMergeRequest',
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
+      'downloadPatch',
     ]),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {
@@ -325,6 +326,7 @@ export default {
       @dismissVulnerability="dismissVulnerability"
       @openDismissalCommentBox="openDismissalCommentBox()"
       @revertDismissVulnerability="revertDismissVulnerability"
+      @downloadPatch="downloadPatch"
     />
   </div>
 </template>

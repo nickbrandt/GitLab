@@ -15962,6 +15962,9 @@ msgstr ""
 msgid "ciReport|All severities"
 msgstr ""
 
+msgid "ciReport|Automatically apply the patch in a new branch"
+msgstr ""
+
 msgid "ciReport|Class"
 msgstr ""
 
@@ -15980,10 +15983,10 @@ msgstr ""
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
-msgid "ciReport|Create issue"
+msgid "ciReport|Create a merge request to implement this solution, or download and apply the patch manually."
 msgstr ""
 
-msgid "ciReport|Create merge request"
+msgid "ciReport|Create issue"
 msgstr ""
 
 msgid "ciReport|DAST"
@@ -16001,10 +16004,10 @@ msgstr ""
 msgid "ciReport|Description"
 msgstr ""
 
-msgid "ciReport|Download and apply the patch to fix this vulnerability."
+msgid "ciReport|Download patch to resolve"
 msgstr ""
 
-msgid "ciReport|Download patch"
+msgid "ciReport|Download the patch to apply it manually"
 msgstr ""
 
 msgid "ciReport|Dynamic Application Security Testing (DAST) detects known vulnerabilities in your web application."
@@ -16025,16 +16028,13 @@ msgstr ""
 msgid "ciReport|Image"
 msgstr ""
 
-msgid "ciReport|Implement this solution by creating a merge request"
-msgstr ""
-
 msgid "ciReport|Instances"
 msgstr ""
 
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
-msgid "ciReport|Learn more about interacting with security reports (Alpha)."
+msgid "ciReport|Learn more about interacting with security reports"
 msgstr ""
 
 msgid "ciReport|License management detected %d license for the source branch only"
@@ -16075,6 +16075,9 @@ msgid "ciReport|No changes to performance metrics"
 msgstr ""
 
 msgid "ciReport|Performance metrics"
+msgstr ""
+
+msgid "ciReport|Resolve with merge request"
 msgstr ""
 
 msgid "ciReport|SAST"
