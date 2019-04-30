@@ -58,6 +58,24 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(Milestone.find_by_description('test milestone').issues.count).to eq(2)
       end
 
+      context 'when importing a project with cached_markdown_version and note_html' do
+        let!(:issue) { Issue.find_by(description: 'Aliquam enim illo et possimus.') }
+        let(:note1) { issue.notes.select {|n| n.note.match(/Quo reprehenderit aliquam qui dicta impedit cupiditate eligendi/)}.first }
+        let(:note2) { issue.notes.select {|n| n.note.match(/Est reprehenderit quas aut aspernatur autem recusandae voluptatem/)}.first }
+
+        it 'does not import the note_html' do
+          expect(note1.note_html).to match(/Quo reprehenderit aliquam qui dicta impedit cupiditate eligendi/)
+        end
+
+        it 'does not set the old cached_markdown_version' do
+          expect(note2.cached_markdown_version).not_to eq(121212)
+        end
+
+        it 'does not import the note_html' do
+          expect(note2.note_html).to match(/Est reprehenderit quas aut aspernatur autem recusandae voluptatem/)
+        end
+      end
+
       it 'creates a valid pipeline note' do
         expect(Ci::Pipeline.find_by_sha('sha-notes').notes).not_to be_empty
       end
