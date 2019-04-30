@@ -11943,6 +11943,9 @@ msgstr ""
 msgid "There is already a repository with that name on disk"
 msgstr ""
 
+msgid "There was a problem communicating with your device."
+msgstr ""
+
 msgid "There was an error adding a todo."
 msgstr ""
 
@@ -12049,6 +12052,12 @@ msgid "This date is after the due date, so this epic won't appear in the roadmap
 msgstr ""
 
 msgid "This date is before the start date, so this epic won't appear in the roadmap."
+msgstr ""
+
+msgid "This device has already been registered with us."
+msgstr ""
+
+msgid "This device has not been registered with us."
 msgstr ""
 
 msgid "This diff is collapsed."
@@ -12722,6 +12731,9 @@ msgid "Two-factor authentication"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "U2F only works with HTTPS-enabled websites. Contact your administrator for more details."
 msgstr ""
 
 msgid "URL"
