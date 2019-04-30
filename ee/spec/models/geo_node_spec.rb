@@ -28,6 +28,7 @@ describe GeoNode, :geo, type: :model do
     it { is_expected.to validate_numericality_of(:files_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:verification_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
+    it { is_expected.to validate_presence_of(:url) }
 
     context 'when validating primary node' do
       it 'cannot be disabled' do
@@ -85,8 +86,6 @@ describe GeoNode, :geo, type: :model do
 
   context 'default values' do
     where(:attribute, :value) do
-      :url                | Gitlab::Routing.url_helpers.root_url
-      :primary            | false
       :repos_max_capacity | 25
       :files_max_capacity | 10
     end
@@ -332,7 +331,7 @@ describe GeoNode, :geo, type: :model do
   end
 
   describe '#uri' do
-    context 'when all fields are filled' do
+    context 'when url is set' do
       it 'returns an URI object' do
         expect(new_node.uri).to be_a URI
       end
@@ -344,9 +343,9 @@ describe GeoNode, :geo, type: :model do
       end
     end
 
-    context 'when required fields are not filled' do
-      it 'returns an URI object' do
-        expect(empty_node.uri).to be_a URI
+    context 'when url is not yet set' do
+      it 'returns nil' do
+        expect(empty_node.uri).to be_nil
       end
     end
   end
@@ -359,14 +358,6 @@ describe GeoNode, :geo, type: :model do
     it 'includes schema home port and relative_url with a terminating /' do
       expected_url = 'https://localhost:3000/gitlab/'
       expect(new_node.url).to eq(expected_url)
-    end
-
-    it 'defaults to existing HTTPS and relative URL with a terminating / if present' do
-      stub_config_setting(port: 443)
-      stub_config_setting(protocol: 'https')
-      stub_config_setting(relative_url_root: '/gitlab')
-
-      expect(empty_node.url).to eq('https://localhost/gitlab/')
     end
   end
 

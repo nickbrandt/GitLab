@@ -10,6 +10,8 @@ FactoryBot.define do
       uri.to_s
     end
 
+    primary false
+
     trait :primary do
       primary true
       minimum_reverification_interval 7

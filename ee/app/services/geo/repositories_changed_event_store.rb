@@ -15,12 +15,5 @@ module Geo
     def build_event
       Geo::RepositoriesChangedEvent.new(geo_node: geo_node)
     end
-
-    def log_params
-      {
-        geo_node_id: geo_node.id,
-        geo_node_url: geo_node.url
-      }
-    end
   end
 end
