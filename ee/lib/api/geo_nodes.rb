@@ -143,7 +143,8 @@ module API
         end
         params do
           optional :enabled, type: Boolean, desc: 'Flag indicating if the Geo node is enabled'
-          optional :url, type: String, desc: 'The URL to connect to the Geo node'
+          optional :name, type: String, desc: 'The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url`'
+          optional :url, type: String, desc: 'The user-facing URL of the Geo node'
           optional :internal_url, type: String, desc: 'The URL defined on the primary node that secondary nodes should use to contact it. Defaults to url'
           optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node'
           optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node'

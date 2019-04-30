@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Namespace do
+  include EE::GeoHelpers
+
   let!(:namespace) { create(:namespace) }
   let!(:free_plan) { create(:free_plan) }
   let!(:bronze_plan) { create(:bronze_plan) }
@@ -148,6 +150,8 @@ describe Namespace do
         allow(gitlab_shell).to receive(:mv_namespace)
           .with(project_legacy.repository_storage, full_path_was, new_path)
           .and_return(true)
+
+        stub_current_geo_node(primary)
       end
 
       it 'logs the Geo::RepositoryRenamedEvent for each project inside namespace' do

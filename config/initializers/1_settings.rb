@@ -268,6 +268,9 @@ Settings.pages.admin['certificate'] ||= ''
 #
 # Geo
 #
+Settings['geo'] ||= Settingslogic.new({})
+# For backwards compatibility, default to gitlab_url and if so, ensure it ends with "/"
+Settings.geo['node_name'] = Settings.geo['node_name'].presence || Settings.gitlab['url'].chomp('/').concat('/')
 
 #
 # External merge request diffs

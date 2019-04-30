@@ -27,7 +27,7 @@ describe SessionsController, :geo do
           redirect_params = CGI.parse(redirect_uri.query)
 
           expect(response).to have_gitlab_http_status(302)
-          expect(response).to redirect_to %r(\A#{primary_node.url}oauth/geo/auth)
+          expect(response).to redirect_to %r(\A#{Gitlab.config.gitlab.url}/oauth/geo/auth)
           expect(redirect_params['state'].first).to end_with(':')
         end
       end

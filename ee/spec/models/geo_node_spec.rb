@@ -23,12 +23,17 @@ describe GeoNode, :geo, type: :model do
   end
 
   context 'validations' do
+    subject { build(:geo_node) }
+
     it { is_expected.to validate_inclusion_of(:selective_sync_type).in_array([nil, *GeoNode::SELECTIVE_SYNC_TYPES]) }
     it { is_expected.to validate_numericality_of(:repos_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:files_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:verification_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
+    it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:url) }
+    it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
+    it { is_expected.to validate_length_of(:name).is_at_most(255) }
 
     context 'when validating primary node' do
       it 'cannot be disabled' do
@@ -58,6 +63,13 @@ describe GeoNode, :geo, type: :model do
         let(:url) { 'nothttp://foo' }
 
         it { is_expected.not_to be_valid }
+      end
+
+      context 'when an existing GeoNode has the same url but different name' do
+        let!(:existing) { new_node }
+        let(:url) { new_node.url }
+
+        it { is_expected.to be_valid }
       end
     end
 
@@ -97,7 +109,8 @@ describe GeoNode, :geo, type: :model do
 
   context 'prevent locking yourself out' do
     it 'does not accept adding a non primary node with same details as current_node' do
-      node = build(:geo_node, :primary, primary: false)
+      stub_geo_setting(node_name: 'foo')
+      node = build(:geo_node, :primary, primary: false, name: 'foo')
 
       expect(node).not_to be_valid
       expect(node.errors.full_messages.count).to eq(1)
@@ -318,13 +331,13 @@ describe GeoNode, :geo, type: :model do
 
   describe '#current?' do
     it 'returns true when node is the current node' do
-      node = described_class.new(url: described_class.current_node_url)
+      node = described_class.new(name: described_class.current_node_name)
 
       expect(node.current?).to be_truthy
     end
 
     it 'returns false when node is not the current node' do
-      node = described_class.new(url: 'http://another.node.com:8080/foo')
+      node = described_class.new(name: 'some other node')
 
       expect(node.current?).to be_falsy
     end
@@ -656,6 +669,18 @@ describe GeoNode, :geo, type: :model do
       )
 
       is_expected.to be_falsy
+    end
+  end
+
+  describe '#name=' do
+    context 'before validation' do
+      it 'strips leading and trailing whitespace' do
+        node = build(:geo_node)
+        node.name = " foo\n\n "
+        node.valid?
+
+        expect(node.name).to eq('foo')
+      end
     end
   end
 end

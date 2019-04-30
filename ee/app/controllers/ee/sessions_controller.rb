@@ -14,7 +14,7 @@ module EE
       return super if signed_in?
 
       if ::Gitlab::Geo.secondary_with_primary?
-        redirect_to oauth_geo_auth_url(host: ::Gitlab::Geo.current_node.url, state: geo_login_state.encode)
+        redirect_to oauth_geo_auth_url(host: GeoNode.current_node_url, state: geo_login_state.encode)
       else
         super
       end

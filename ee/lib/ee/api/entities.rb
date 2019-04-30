@@ -456,6 +456,7 @@ module EE
         include ::API::Helpers::RelatedResourcesHelpers
 
         expose :id
+        expose :name
         expose :url
         expose :internal_url
         expose :primary?, as: :primary

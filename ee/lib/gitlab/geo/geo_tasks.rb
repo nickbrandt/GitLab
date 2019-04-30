@@ -6,8 +6,8 @@ module Gitlab
       extend self
 
       def set_primary_geo_node
-        node = GeoNode.new(primary: true, url: GeoNode.current_node_url)
-        $stdout.puts "Saving primary Geo node with URL #{node.url} ..."
+        node = GeoNode.new(primary: true, name: GeoNode.current_node_name, url: GeoNode.current_node_url)
+        $stdout.puts "Saving primary Geo node with name #{node.name} and URL #{node.url} ..."
         node.save
 
         if node.persisted?

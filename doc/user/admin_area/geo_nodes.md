@@ -12,7 +12,8 @@ All Geo nodes have the following settings:
 | Setting | Description |
 | --------| ----------- |
 | Primary | This marks a Geo Node as **primary** node. There can be only one **primary** node; make sure that you first add the **primary** node and then all the others. |
-| URL     | The instance's full URL, in the same way it is configured in  `/etc/gitlab/gitlab.rb` (Omnibus GitLab installations) or `gitlab.yml` (source based installations). |
+| Name    | The unique identifier for the Geo node. Must match the setting `gitlab_rails[geo_node_name]` in `/etc/gitlab/gitlab.rb`. The setting defaults to `external_url` with a trailing slash. |
+| URL     | The instance's user-facing URL. |
 
 The node you're reading from is indicated with a green `Current node` label, and
 the **primary** node is given a blue `Primary` label. Remember that you can only make
@@ -55,3 +56,15 @@ which is used by users. Internal URL does not need to be a private address.
 
 Internal URL defaults to External URL, but you can customize it under
 **Admin area > Geo Nodes**.
+
+## Multiple secondary nodes behind a load balancer
+
+In GitLab 11.11, **secondary** nodes can use identical external URLs as long as
+a unique `name` is set for each Geo node. The `gitlab.rb` setting
+`gitlab_rails[geo_node_name]` must:
+
+- Be set for each GitLab instance that runs `unicorn`, `sidekiq`, or `geo_logcursor`.
+- Match a Geo node name.
+
+The load balancer must use sticky sessions in order to avoid authentication
+failures and cross site request errors.

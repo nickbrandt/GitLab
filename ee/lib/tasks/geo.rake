@@ -217,7 +217,8 @@ namespace :geo do
     end
 
     puts
-    puts GeoNode.current_node_url
+    puts "Name: #{GeoNode.current_node_name}"
+    puts "URL: #{GeoNode.current_node_url}"
     puts '-----------------------------------------------------'.color(:yellow)
 
     unless Gitlab::Database.postgresql_minimum_supported_version?

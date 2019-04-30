@@ -77,6 +77,7 @@ describe 'admin Geo Nodes', :js, :geo do
 
     it 'creates a new Geo Node' do
       check 'This is a primary node'
+      fill_in 'geo_node_name', with: 'a node name'
       fill_in 'geo_node_url', with: 'https://test.gitlab.com'
       click_button 'Add Node'
 

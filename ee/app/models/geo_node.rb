@@ -3,6 +3,7 @@
 class GeoNode < ApplicationRecord
   include Presentable
   include Geo::SelectiveSync
+  include StripAttribute
 
   SELECTIVE_SYNC_TYPES = %w[namespaces shards].freeze
 
@@ -15,7 +16,8 @@ class GeoNode < ApplicationRecord
   has_many :namespaces, through: :geo_node_namespace_links
   has_one :status, class_name: 'GeoNodeStatus'
 
-  validates :url, presence: true, uniqueness: { case_sensitive: false }, addressable_url: true
+  validates :name, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
+  validates :url, presence: true, addressable_url: true
   validates :internal_url, addressable_url: true, allow_blank: true, allow_nil: true
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
@@ -54,22 +56,27 @@ class GeoNode < ApplicationRecord
                  mode: :per_attribute_iv,
                  encode: true
 
+  strip_attributes :name
+
   class << self
+    # Set in gitlab.rb as external_url
     def current_node_url
       RequestStore.fetch('geo_node:current_node_url') do
-        cfg = Gitlab.config.gitlab
+        Gitlab.config.gitlab.url
+      end
+    end
 
-        uri = URI.parse("#{cfg.protocol}://#{cfg.host}:#{cfg.port}#{cfg.relative_url_root}")
-        uri.path += '/' unless uri.path.end_with?('/')
-
-        uri.to_s
+    # Set in gitlab.rb as geo_node_name
+    def current_node_name
+      RequestStore.fetch('geo_node:current_node_name') do
+        Gitlab.config.geo.node_name
       end
     end
 
     def current_node
-      return unless column_names.include?('url')
+      return unless column_names.include?('name')
 
-      GeoNode.find_by(url: current_node_url)
+      GeoNode.find_by(name: current_node_name)
     end
 
     def primary_node
@@ -107,7 +114,7 @@ class GeoNode < ApplicationRecord
   end
 
   def current?
-    self.class.current_node_url == url
+    self.class.current_node_name == name
   end
 
   def secondary?
@@ -275,7 +282,7 @@ class GeoNode < ApplicationRecord
 
   # Prevent locking yourself out
   def check_not_adding_primary_as_secondary
-    if url == self.class.current_node_url
+    if name == self.class.current_node_name
       errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
     end
   end

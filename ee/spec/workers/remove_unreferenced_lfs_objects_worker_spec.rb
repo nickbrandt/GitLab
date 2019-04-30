@@ -1,12 +1,15 @@
 require 'spec_helper'
 
 describe RemoveUnreferencedLfsObjectsWorker do
+  include EE::GeoHelpers
+
   describe '#perform' do
     context 'when running in a Geo primary node' do
       set(:primary) { create(:geo_node, :primary) }
       set(:secondary) { create(:geo_node) }
 
       it 'logs an event to the Geo event log for every unreferenced LFS objects' do
+        stub_current_geo_node(primary)
         unreferenced_lfs_object_1 = create(:lfs_object, :with_file)
         unreferenced_lfs_object_2 = create(:lfs_object, :with_file)
         referenced_lfs_object = create(:lfs_object)

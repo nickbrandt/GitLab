@@ -1,11 +1,17 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::JwtRequestDecoder do
+  include EE::GeoHelpers
+
   let!(:primary_node) { FactoryBot.create(:geo_node, :primary) }
   let(:data) { { input: 123 } }
   let(:request) { Gitlab::Geo::TransferRequest.new(data) }
 
   subject { described_class.new(request.headers['Authorization']) }
+
+  before do
+    stub_current_geo_node(primary_node)
+  end
 
   describe '#decode' do
     it 'decodes correct data' do

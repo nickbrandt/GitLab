@@ -70,7 +70,16 @@ module Geo
     end
 
     def metric_labels(node)
-      { url: node.url }
+      labels = { name: node.name }
+
+      # Installations that existed before 11.11 were using the `url` label. This
+      # line preserves continuity of metrics.
+      #
+      # This can be removed in 12.0+ since there will have been at least one
+      # release worth of data labeled with `name`.
+      labels[:url] = node.name
+
+      labels
     end
 
     def prometheus_enabled?

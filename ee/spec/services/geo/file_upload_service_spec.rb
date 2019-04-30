@@ -1,10 +1,16 @@
 require 'spec_helper'
 
 describe Geo::FileUploadService do
+  include EE::GeoHelpers
+
   set(:node) { create(:geo_node, :primary) }
 
   let(:transfer_request) { Gitlab::Geo::TransferRequest.new(request_data) }
   let(:req_header) { transfer_request.headers['Authorization'] }
+
+  before do
+    stub_current_geo_node(node)
+  end
 
   shared_examples 'no authorization header' do
     it 'returns nil' do

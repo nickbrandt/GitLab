@@ -47,6 +47,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
 
   def geo_node_params
     params.require(:geo_node).permit(
+      :name,
       :url,
       :internal_url,
       :primary,

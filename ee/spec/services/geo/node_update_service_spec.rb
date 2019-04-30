@@ -1,11 +1,17 @@
 require 'spec_helper'
 
 describe Geo::NodeUpdateService do
+  include EE::GeoHelpers
+
   set(:primary) { create(:geo_node, :primary) }
 
   let(:geo_node) { create(:geo_node) }
   let(:groups) { create_list(:group, 2) }
   let(:namespace_ids) { groups.map(&:id).join(',') }
+
+  before do
+    stub_current_geo_node(primary)
+  end
 
   describe '#execute' do
     it 'updates the node' do

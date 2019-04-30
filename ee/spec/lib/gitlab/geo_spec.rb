@@ -18,6 +18,8 @@ describe Gitlab::Geo, :geo, :request_store do
 
   describe '.current_node' do
     it 'returns a GeoNode instance' do
+      expect(GeoNode).to receive(:current_node).and_return(primary_node)
+
       expect(described_class.current_node).to eq(primary_node)
     end
 
@@ -42,6 +44,10 @@ describe Gitlab::Geo, :geo, :request_store do
 
   describe '.primary?' do
     context 'when current node is a primary node' do
+      before do
+        stub_current_geo_node(primary_node)
+      end
+
       it 'returns true' do
         expect(described_class.primary?).to be_truthy
       end

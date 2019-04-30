@@ -1,17 +1,22 @@
 require 'spec_helper'
 
 describe Projects::HashedStorage::MigrateAttachmentsService do
+  include EE::GeoHelpers
+
   let(:project) { create(:project, storage_version: 1) }
   let(:legacy_storage) { Storage::LegacyProject.new(project) }
   let(:hashed_storage) { Storage::HashedProject.new(project) }
   let(:old_attachments_path) { legacy_storage.disk_path }
   let(:new_attachments_path) { hashed_storage.disk_path }
   let(:service) { described_class.new(project, old_attachments_path) }
+  set(:primary) { create(:geo_node, :primary) }
+  set(:secondary) { create(:geo_node) }
+
+  before do
+    stub_current_geo_node(primary)
+  end
 
   describe '#execute' do
-    set(:primary) { create(:geo_node, :primary) }
-    set(:secondary) { create(:geo_node) }
-
     context 'on success' do
       before do
         TestEnv.clean_test_path
