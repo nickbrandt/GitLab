@@ -14,6 +14,6 @@ class LinkedEpicEntity < Grape::Entity
   end
 
   expose :relation_path do |epic|
-    group_epic_link_path(epic.group, request.issuable.iid, epic.id)
+    group_epic_link_path(request.issuable.group, request.issuable.iid, epic.id)
   end
 end
