@@ -10,12 +10,12 @@ describe API::Vulnerabilities do
     create(:ci_empty_pipeline, status: :created, project: project)
   end
 
-  let(:build_sast) { create(:ci_build, :success, name: 'sast_job', pipeline: pipeline, project: project) }
   let(:build_ds) { create(:ci_build, :success, name: 'ds_job', pipeline: pipeline, project: project) }
+  let(:build_sast) { create(:ci_build, :success, name: 'sast_job', pipeline: pipeline, project: project) }
 
   before do
-    create(:ee_ci_job_artifact, :sast, job: build_sast, project: project)
     create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project)
+    create(:ee_ci_job_artifact, :sast, job: build_sast, project: project)
   end
 
   describe "GET /projects/:id/vulnerabilities" do
