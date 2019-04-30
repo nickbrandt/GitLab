@@ -69,6 +69,7 @@ class License < ApplicationRecord
     ci_cd_projects
     protected_environments
     custom_project_templates
+    group_project_templates
     packages
     code_owner_approval_required
     feature_flags
