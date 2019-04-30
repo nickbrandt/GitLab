@@ -4888,6 +4888,9 @@ msgstr ""
 msgid "Failed to update issues, please try again."
 msgstr ""
 
+msgid "Failed to update tag!"
+msgstr ""
+
 msgid "Failed to update."
 msgstr ""
 
@@ -9550,6 +9553,9 @@ msgid "Protected"
 msgstr ""
 
 msgid "Protected Environments"
+msgstr ""
+
+msgid "Protected Tag"
 msgstr ""
 
 msgid "ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?"
