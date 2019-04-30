@@ -172,11 +172,11 @@ module EE
     end
 
     def available_subgroups_with_custom_project_templates(group_id = nil)
-      groups = group_id ? ::Group.find(group_id).self_and_ancestors : ::Group.all
+      groups = GroupsWithTemplatesFinder.new(group_id).execute
 
       GroupsFinder.new(self, min_access_level: ::Gitlab::Access::MAINTAINER)
                   .execute
-                  .where(id: groups.with_project_templates.select(:custom_project_templates_group_id))
+                  .where(id: groups.select(:custom_project_templates_group_id))
                   .includes(:projects)
                   .reorder(nil)
                   .distinct

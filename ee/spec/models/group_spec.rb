@@ -289,78 +289,135 @@ describe Group do
   end
 
   describe 'Vulnerabilities::Occurrence collection methods' do
-    let(:project) { create(:project, namespace: group) }
-    let(:external_project) { create(:project) }
-    let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
-
-    let!(:old_vuln) { create_vulnerability(project) }
-    let!(:new_vuln) { create_vulnerability(project) }
-    let!(:external_vuln) { create_vulnerability(external_project) }
-    let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
-
-    def create_vulnerability(project, pipeline = nil)
-      pipeline ||= create(:ci_pipeline, :success, project: project)
-      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
-    end
-
     describe '#latest_vulnerabilities' do
-      subject { group.latest_vulnerabilities }
+      let(:project) { create(:project, namespace: group) }
+      let(:external_project) { create(:project) }
+      let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
 
-      it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
-        is_expected.to contain_exactly(new_vuln)
+      let!(:old_vuln) { create_vulnerability(project) }
+      let!(:new_vuln) { create_vulnerability(project) }
+      let!(:external_vuln) { create_vulnerability(external_project) }
+      let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+
+      def create_vulnerability(project, pipeline = nil)
+        pipeline ||= create(:ci_pipeline, :success, project: project)
+        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
       end
 
-      context 'with vulnerabilities from other branches' do
-        let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-        let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+      describe '#latest_vulnerabilities' do
+        subject { group.latest_vulnerabilities }
 
-        # TODO: This should actually fail and we must scope vulns
-        # per branch as soon as we store them for other branches
-        # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-        it 'includes vulnerabilities from all branches' do
-          is_expected.to contain_exactly(branch_vuln)
+        it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
+          is_expected.to contain_exactly(new_vuln)
+        end
+
+        context 'with vulnerabilities from other branches' do
+          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+          # TODO: This should actually fail and we must scope vulns
+          # per branch as soon as we store them for other branches
+          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+          it 'includes vulnerabilities from all branches' do
+            is_expected.to contain_exactly(branch_vuln)
+          end
+        end
+      end
+
+      describe '#latest_vulnerabilities_with_sha' do
+        subject { group.latest_vulnerabilities_with_sha }
+
+        it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
+          is_expected.to contain_exactly(new_vuln)
+        end
+
+        it { is_expected.to all(respond_to(:sha)) }
+
+        context 'with vulnerabilities from other branches' do
+          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+          # TODO: This should actually fail and we must scope vulns
+          # per branch as soon as we store them for other branches
+          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+          it 'includes vulnerabilities from all branches' do
+            is_expected.to contain_exactly(branch_vuln)
+          end
+        end
+      end
+
+      describe '#all_vulnerabilities' do
+        subject { group.all_vulnerabilities }
+
+        it 'returns vulns for all successful pipelines of projects belonging to the group' do
+          is_expected.to contain_exactly(old_vuln, new_vuln)
+        end
+
+        context 'with vulnerabilities from other branches' do
+          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+          # TODO: This should actually fail and we must scope vulns
+          # per branch as soon as we store them for other branches
+          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
+          it 'includes vulnerabilities from all branches' do
+            is_expected.to contain_exactly(old_vuln, new_vuln, branch_vuln)
+          end
         end
       end
     end
+  end
 
-    describe '#latest_vulnerabilities_with_sha' do
-      subject { group.latest_vulnerabilities_with_sha }
+  describe '#group_project_template_available?' do
+    subject { group.group_project_template_available? }
 
-      it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
-        is_expected.to contain_exactly(new_vuln)
+    context 'licensed' do
+      before do
+        stub_licensed_features(group_project_templates: true)
       end
 
-      it { is_expected.to all(respond_to(:sha)) }
+      it 'returns true for licensed instance' do
+        is_expected.to be true
+      end
 
-      context 'with vulnerabilities from other branches' do
-        let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-        let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+      context 'when in need of checking plan' do
+        before do
+          allow(Gitlab::CurrentSettings.current_application_settings)
+            .to receive(:should_check_namespace_plan?) { true }
+        end
 
-        # TODO: This should actually fail and we must scope vulns
-        # per branch as soon as we store them for other branches
-        # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-        it 'includes vulnerabilities from all branches' do
-          is_expected.to contain_exactly(branch_vuln)
+        it 'returns true for groups in proper plan' do
+          create(:gitlab_subscription, namespace: group, hosted_plan: create(:gold_plan))
+
+          is_expected.to be true
+        end
+
+        it 'returns true for groups with group template already set within grace period' do
+          group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
+          group.reload
+
+          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE - 1.day) do
+            is_expected.to be true
+          end
+        end
+
+        it 'returns false for groups with group template already set after grace period' do
+          group.update!(custom_project_templates_group_id: create(:group, parent: group).id)
+          group.reload
+
+          Timecop.freeze(GroupsWithTemplatesFinder::CUT_OFF_DATE + 1.day) do
+            is_expected.to be false
+          end
         end
       end
-    end
 
-    describe '#all_vulnerabilities' do
-      subject { group.all_vulnerabilities }
+      context 'unlicensed' do
+        before do
+          stub_licensed_features(group_project_templates: false)
+        end
 
-      it 'returns vulns for all successful pipelines of projects belonging to the group' do
-        is_expected.to contain_exactly(old_vuln, new_vuln)
-      end
-
-      context 'with vulnerabilities from other branches' do
-        let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-        let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
-
-        # TODO: This should actually fail and we must scope vulns
-        # per branch as soon as we store them for other branches
-        # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-        it 'includes vulnerabilities from all branches' do
-          is_expected.to contain_exactly(old_vuln, new_vuln, branch_vuln)
+        it 'returns false unlicensed instance' do
+          is_expected.to be false
         end
       end
     end
