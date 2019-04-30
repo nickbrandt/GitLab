@@ -387,8 +387,27 @@ rspec-mysql-ee:
   <<: *only-schedules-master
   parallel: 10
 
-rspec-pg geo: *rspec-metadata-pg-geo-9-6
-rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
+rspec-pg geo:
+  <<: *rspec-metadata-pg-geo-9-6
+  except:
+    - /(^geo[\/-].*|.*-geo$)/
+
+rspec-pg-10 geo:
+  <<: *rspec-metadata-pg-geo-10-2
+  except:
+    - /(^geo[\/-].*|.*-geo$)/
+
+quick-rspec-pg geo:
+  <<: *rspec-metadata-pg-geo-9-6
+  stage: quick-test
+  only:
+    - /(^geo[\/-].*|.*-geo$)/
+
+quick-rspec-pg-10 geo:
+  <<: *rspec-metadata-pg-geo-10-2
+  stage: quick-test
+  only:
+    - /(^geo[\/-].*|.*-geo$)/
 
 .rspec-quarantine-ee: &rspec-quarantine-ee
   <<: *only-schedules-master
