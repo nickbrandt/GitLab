@@ -36,5 +36,12 @@ module EE
       count = project.mirror == true ? 1 : 0
       count + @project.remote_mirrors.to_a.count { |mirror| mirror.enabled }
     end
+
+    def mirror_lfs_sync_message
+      docs_link_url = help_page_path('workflow/lfs/manage_large_binaries_with_git_lfs')
+      docs_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: docs_link_url }
+
+      _('Git LFS objects will be synced in pull mirrors if LFS is %{docs_link_start}enabled for the project%{docs_link_end}. They will <strong>not</strong> be synced in push mirrors.').html_safe % { docs_link_start: docs_link_start, docs_link_end: '</a>'.html_safe }
+    end
   end
 end
