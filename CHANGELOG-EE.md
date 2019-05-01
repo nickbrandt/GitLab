@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.10.4 (2019-05-01)
+
+### Fixed (1 change, 1 of them is from the community)
+
+- Fix error retrieving licenses when relative URL in use. !11717 (Hiroyuki Sato)
+
+### Changed (1 change)
+
+- [Insights] Change the default weeks period limit to 12. !11498
+
+
 ## 11.10.3 (2019-04-30)
 
 - No changes.
