@@ -7631,7 +7631,19 @@ msgstr ""
 msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
 msgstr ""
 
+msgid "Metrics|e.g. HTTP requests"
+msgstr ""
+
+msgid "Metrics|e.g. Requests/second"
+msgstr ""
+
 msgid "Metrics|e.g. Throughput"
+msgstr ""
+
+msgid "Metrics|e.g. rate(http_requests_total[5m])"
+msgstr ""
+
+msgid "Metrics|e.g. req/sec"
 msgstr ""
 
 msgid "Migrated %{success_count}/%{total_count} files."
