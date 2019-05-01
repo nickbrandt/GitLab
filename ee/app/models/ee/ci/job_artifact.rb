@@ -16,7 +16,8 @@ module EE
       METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-      scope :geo_syncable, -> { with_files_stored_locally.not_expired }
+      scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
+      scope :syncable, -> { with_files_stored_locally.not_expired }
       scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
 
       scope :security_reports, -> do
