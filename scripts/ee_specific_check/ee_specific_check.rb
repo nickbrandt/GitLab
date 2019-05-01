@@ -37,7 +37,7 @@ module EESpecificCheck
     'doc/administration/raketasks/**/*',
     'doc/administration/raketasks/uploads/**/*',
     'doc/administration/troubleshooting/**/*',
-    'doc/analytics/**/*',
+    # 'doc/analytics/**/*',
     'doc/api/*.md',
     'doc/api/graphql/**/*',
     'doc/api/releases/**/*',
