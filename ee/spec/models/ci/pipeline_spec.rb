@@ -14,7 +14,7 @@ describe Ci::Pipeline do
   it { is_expected.to have_many(:sourced_pipelines) }
   it { is_expected.to have_one(:triggered_by_pipeline) }
   it { is_expected.to have_many(:triggered_pipelines) }
-  it { is_expected.to have_many(:bridged_jobs) }
+  it { is_expected.to have_many(:downstream_bridges) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
   it { is_expected.to have_many(:vulnerabilities).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
   it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
@@ -443,12 +443,13 @@ describe Ci::Pipeline do
 
     context 'when pipeline has bridged jobs' do
       before do
-        pipeline.bridged_jobs << create(:ci_bridge)
+        pipeline.downstream_bridges << create(:ci_bridge)
       end
 
       context "when transitioning to success" do
         it 'schedules the pipeline bridge worker' do
-          expect(::Ci::PipelineBridgeWorker).to receive(:perform_async).with(pipeline.id)
+          expect(::Ci::PipelineBridgeStatusWorker).to receive(:perform_async).with(pipeline.id)
+
           pipeline.succeed!
         end
       end

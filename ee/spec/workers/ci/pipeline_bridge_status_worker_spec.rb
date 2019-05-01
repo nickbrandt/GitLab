@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::PipelineBridgeWorker do
+describe Ci::PipelineBridgeStatusWorker do
   describe '#perform' do
     subject { described_class.new.perform(pipeline_id) }
 
@@ -13,7 +13,7 @@ describe Ci::PipelineBridgeWorker do
       it 'calls the service' do
         service = double('bridge status service')
 
-        expect(Ci::PipelineBridgeService)
+        expect(Ci::PipelineBridgeStatusService)
           .to receive(:new)
           .with(pipeline.project, pipeline.user)
           .and_return(service)
@@ -28,7 +28,7 @@ describe Ci::PipelineBridgeWorker do
       let(:pipeline_id) { 1234 }
 
       it 'does not call the service' do
-        expect(Ci::PipelineBridgeService)
+        expect(Ci::PipelineBridgeStatusService)
           .not_to receive(:new)
 
         subject

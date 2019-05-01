@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ci::PipelineBridgeService do
+describe Ci::PipelineBridgeStatusService do
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   let(:pipeline) { create(:ci_pipeline, :success, project: project) }
@@ -14,7 +14,7 @@ describe Ci::PipelineBridgeService do
       let(:bridge) { create(:ci_bridge, status: :pending) }
 
       before do
-        pipeline.bridged_jobs << bridge
+        pipeline.downstream_bridges << bridge
       end
 
       it 'updates the bridge status with the pipeline status' do

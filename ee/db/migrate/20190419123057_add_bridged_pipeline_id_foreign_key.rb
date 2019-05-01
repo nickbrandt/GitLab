@@ -12,12 +12,12 @@ class AddBridgedPipelineIdForeignKey < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
-    add_concurrent_index :ci_builds, :bridged_pipeline_id, where: 'bridged_pipeline_id IS NOT NULL'
-    add_concurrent_foreign_key :ci_builds, :ci_pipelines, column: :bridged_pipeline_id
+    add_concurrent_index :ci_builds, :upstream_pipeline_id, where: 'upstream_pipeline_id IS NOT NULL'
+    add_concurrent_foreign_key :ci_builds, :ci_pipelines, column: :upstream_pipeline_id
   end
 
   def down
-    remove_foreign_key :ci_builds, column: :bridged_pipeline_id
-    remove_concurrent_index :ci_builds, :bridged_pipeline_id
+    remove_foreign_key :ci_builds, column: :upstream_pipeline_id
+    remove_concurrent_index :ci_builds, :upstream_pipeline_id
   end
 end

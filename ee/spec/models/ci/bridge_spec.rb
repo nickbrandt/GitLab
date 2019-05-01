@@ -14,8 +14,8 @@ describe Ci::Bridge do
     { trigger: { project: 'my/project', branch: 'master' } }
   end
 
-  it 'belongs to a source pipeline' do
-    expect(bridge).to belong_to(:source_pipeline)
+  it 'belongs to an upstream pipeline' do
+    expect(bridge).to belong_to(:upstream_pipeline)
   end
 
   it 'has many sourced pipelines' do

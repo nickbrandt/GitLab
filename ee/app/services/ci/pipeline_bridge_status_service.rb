@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Ci
-  class PipelineBridgeService < ::BaseService
+  class PipelineBridgeStatusService < ::BaseService
     def execute(pipeline)
-      pipeline.bridged_jobs.each do |bridged_job|
+      pipeline.downstream_bridges.each do |bridged_job|
         process_bridged_job(pipeline.status, bridged_job)
       end
     end

@@ -7,4 +7,4 @@ ProjectTracingSetting:
 Note:
 - review_id
 CommitStatus:
-- bridged_pipeline_id
+- upstream_pipeline_id
