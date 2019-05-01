@@ -19,6 +19,7 @@ module Projects
       end
 
       update_branches
+      update_lfs_objects
 
       success
     rescue Gitlab::Shell::Error, Gitlab::Git::BaseError, UpdateError => e
@@ -92,6 +93,12 @@ module Projects
       end
 
       fetch_result
+    end
+
+    def update_lfs_objects
+      result = Projects::LfsPointers::LfsImportService.new(project).execute
+
+      raise UpdateError, result[:message] if result[:status] == :error
     end
 
     def handle_diverged_branch(upstream, local, branch_name, errors)

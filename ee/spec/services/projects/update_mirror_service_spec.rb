@@ -201,6 +201,45 @@ describe Projects::UpdateMirrorService do
       end
     end
 
+    context 'updating Lfs objects' do
+      before do
+        stub_fetch_mirror(project)
+      end
+
+      context 'when Lfs is disabled in the project' do
+        it 'does not update Lfs objects' do
+          allow(project).to receive(:lfs_enabled?).and_return(false)
+          expect(Projects::LfsPointers::LfsObjectDownloadListService).not_to receive(:new)
+
+          service.execute
+        end
+      end
+
+      context 'when Lfs is enabled in the project' do
+        before do
+          allow(project).to receive(:lfs_enabled?).and_return(true)
+        end
+
+        it 'updates Lfs objects' do
+          expect(Projects::LfsPointers::LfsImportService).to receive(:new).and_call_original
+          expect_any_instance_of(Projects::LfsPointers::LfsObjectDownloadListService).to receive(:execute).and_return({})
+
+          service.execute
+        end
+
+        context 'when Lfs import fails' do
+          it 'the mirror operation fails' do
+            expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
+
+            result = subject.execute
+
+            expect(result[:status]).to eq :error
+            expect(result[:message]).to eq 'error message'
+          end
+        end
+      end
+    end
+
     it "fails when the mirror user doesn't have access" do
       stub_fetch_mirror(project)
 
