@@ -8274,6 +8274,9 @@ msgstr ""
 msgid "Only project members will be imported. Group members will be skipped."
 msgstr ""
 
+msgid "Only these extensions are supported: %{extension_list}"
+msgstr ""
+
 msgid "Oops, are you sure?"
 msgstr ""
 
