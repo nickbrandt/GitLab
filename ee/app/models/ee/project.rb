@@ -107,6 +107,7 @@ module EE
       delegate :log_jira_dvcs_integration_usage, :jira_dvcs_server_last_sync_at, :jira_dvcs_cloud_last_sync_at, to: :feature_usage
 
       delegate :merge_pipelines_enabled, :merge_pipelines_enabled=, :merge_pipelines_enabled?, to: :ci_cd_settings
+      delegate :merge_trains_enabled, :merge_trains_enabled=, :merge_trains_enabled?, to: :ci_cd_settings
 
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
@@ -522,10 +523,6 @@ module EE
 
     def protected_environments_feature_available?
       feature_available?(:protected_environments)
-    end
-
-    def merge_pipelines_enabled?
-      feature_available?(:merge_pipelines) && super
     end
 
     # Because we use default_value_for we need to be sure

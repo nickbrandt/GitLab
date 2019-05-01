@@ -127,6 +127,10 @@ module EE
         merge_request.target_project.merge_pipelines_enabled?
       end
 
+      expose :merge_trains_enabled?, as: :merge_trains_enabled do |merge_request|
+        merge_request.target_project.merge_trains_enabled?
+      end
+
       expose :can_push_to_source_branch do |merge_request|
         presenter(merge_request).can_push_to_source_branch?
       end

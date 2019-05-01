@@ -76,6 +76,7 @@ class License < ApplicationRecord
     batch_comments
     issues_analytics
     merge_pipelines
+    merge_trains
     design_management
     operations_dashboard
     dependency_proxy

@@ -190,4 +190,8 @@ describe MergeRequestWidgetEntity do
 
     expect(subject.as_json).to include(:pipeline_id)
   end
+
+  it 'has merge trains flag' do
+    expect(subject.as_json).to include(:merge_trains_enabled)
+  end
 end

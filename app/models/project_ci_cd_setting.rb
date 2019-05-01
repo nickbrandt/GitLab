@@ -16,3 +16,5 @@ class ProjectCiCdSetting < ApplicationRecord
     super
   end
 end
+
+ProjectCiCdSetting.prepend(EE::ProjectCiCdSetting)
