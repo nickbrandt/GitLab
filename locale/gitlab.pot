@@ -3299,6 +3299,9 @@ msgstr ""
 msgid "ConvDev Index"
 msgstr ""
 
+msgid "Copied"
+msgstr ""
+
 msgid "Copy %{http_label} clone URL"
 msgstr ""
 
