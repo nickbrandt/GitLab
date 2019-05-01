@@ -26,19 +26,17 @@ describe API::Vulnerabilities do
       end
 
       it 'returns all vulnerabilities' do
-        get api("/projects/#{project.id}/vulnerabilities", user)
+        get api("/projects/#{project.id}/vulnerabilities?per_page=40", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
         expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
 
         expect(response.headers['X-Total']).to eq('37')
-        expect(response.headers['X-Total-Pages']).to eql('2')
+        expect(response.headers['X-Total-Pages']).to eql('1')
 
-        expect(json_response.count).to eq 20
+        expect(json_response.count).to eq 37
         expect(json_response.map { |v| v['report_type'] }.uniq).to match_array %w[dependency_scanning sast]
-
-        expect(json_response.first['name']).to eq 'DoS by CPU exhaustion when using malicious SSL packets'
       end
 
       describe 'filtering' do
