@@ -102,7 +102,7 @@ describe Epic do
     end
 
     describe '#descendants', :nested_groups do
-      it 'returns all ancestors for an epic' do
+      it 'returns all descendants for an epic' do
         expect(epic1.descendants).to match_array([epic2, epic3])
       end
 
