@@ -10,7 +10,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
 
   describe 'sequence' do
     let(:environment) { build(:environment) }
-    let(:sequence) { described_class.new(*params).sequence }
+    let(:sequence) { described_class.new(*params).__send__(:sequence, insert_project_metrics: true) }
 
     it 'includes the alerts processing stage' do
       expect(sequence.length).to eq(4)
@@ -18,7 +18,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
   end
 
   describe 'process' do
-    let(:dashboard) { described_class.new(*params).process }
+    let(:dashboard) { described_class.new(*params).process(insert_project_metrics: true) }
 
     context 'when the dashboard references persisted metrics with alerts' do
       let!(:alert) do

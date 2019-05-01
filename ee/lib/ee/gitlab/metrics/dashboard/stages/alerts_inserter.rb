@@ -13,7 +13,7 @@ module EE
             def transform!
               return if metrics_with_alerts.empty?
 
-              for_metrics(dashboard) do |metric|
+              for_metrics do |metric|
                 next unless metrics_with_alerts.include?(metric[:metric_id])
 
                 metric[:alert_path] = alert_path(metric[:metric_id], project, environment)
