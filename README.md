@@ -177,6 +177,8 @@ removing EXIF data (which may contain sensitive information) from uploaded
 images. If you installed GitLab:
 
 -   Using the Omnibus package, you're all set.
+    *NOTE* that if you are using CentOS Minimal, you may need to install `perl`
+    package: `yum install perl`
 -   From source, make sure `exiftool` is installed:
 
     ```sh
