@@ -87,6 +87,12 @@ plan - in the included table:
 | Subscription start date | The date your subscription started. If this is for a Free plan, this is the date you transitioned off your group's paid plan. | 
 | Subscription end date | The date your current subscription will end. This does not apply to Free plans. | 
 
+### Subscription changes and your data
+
+When your subscription or trial expires, GitLab does not delete your data, however, depending on the tier and feature, it may become inaccessible. If you renew or upgrade, your data will again be accessible.
+
+For self-managed customers, there is a two-week grace period when your features will continue to work as-is, after which the entire instance will become read only. However, if you remove the license, you will immediately revert to Core features.
+
 ## Need help?
 
 [GitLab's Documentation](https://docs.gitlab.com/) offers a wide range of topics covering the use and administration of GitLab.
