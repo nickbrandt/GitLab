@@ -203,7 +203,7 @@ module EESpecificCheck
     'doc/user/project/integrations/*.md',
     'doc/user/project/integrations/prometheus_library/**/*',
     'doc/user/project/integrations/samples/**/*',
-    'doc/user/project/issues/**/*',
+    # 'doc/user/project/issues/**/*',
     'doc/user/project/members/**/*',
     'doc/user/project/merge_requests/**/*',
     'doc/user/project/milestones/**/*',
