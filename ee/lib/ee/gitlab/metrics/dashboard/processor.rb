@@ -12,7 +12,7 @@ module EE
           ].freeze
 
           override :sequence
-          def sequence
+          def sequence(_insert_project_metrics)
             super + EE_SEQUENCE
           end
         end
