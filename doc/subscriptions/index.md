@@ -89,7 +89,9 @@ plan - in the included table:
 
 ### Subscription changes and your data
 
-When your subscription or trial expires, GitLab does not delete your data, however, depending on the tier and feature, it may become inaccessible. If you renew or upgrade, your data will again be accessible.
+When your subscription or trial expires, GitLab does not delete your data, however, depending on the tier and feature, it may become inaccessible. Please note that some features may not behave as expected if a graceful fallback is not currently implemented, such as [environment specific variables not being passed](https://gitlab.com/gitlab-org/gitlab-ce/issues/52825).
+
+If you renew or upgrade, your data will again be accessible.
 
 For self-managed customers, there is a two-week grace period when your features will continue to work as-is, after which the entire instance will become read only. However, if you remove the license, you will immediately revert to Core features.
 
