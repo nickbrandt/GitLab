@@ -44,5 +44,9 @@ namespace :admin do
     resources :uploads, only: [:index, :destroy]
   end
 
+  namespace :elasticsearch do
+    post :enqueue_index
+  end
+
   get '/dashboard/stats', to: 'dashboard#stats'
 end
