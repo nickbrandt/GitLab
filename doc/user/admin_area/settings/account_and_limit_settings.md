@@ -36,11 +36,9 @@ These settings can be found within:
   - **Admin Area > Settings > General**.
   - The path `/admin/application_settings`.
 
-The very first push of a new project cannot be checked for size as of now, so
-the first push will allow you to upload more than the limit dictates, but every
-subsequent push will be denied. LFS objects, however, can be checked on first
-push and **will** be rejected if the sum of their sizes exceeds the maximum
-allowed repository size.
+The first push of a new project, including LFS objects, will be checked for size
+and **will** be rejected if the sum of their sizes exceeds the maximum allowed 
+repository size.
 
 For more manually purging the files, read the docs on
 [reducing the repository size using Git][repo-size].
