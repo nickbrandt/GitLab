@@ -1,0 +1,5 @@
+---
+title: 'Geo: Remove counts over geo_event_log table'
+merge_request: 12146
+author:
+type: fixed
