@@ -84,7 +84,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Wiki](wiki/index.md): document your GitLab project in an integrated Wiki.
 - [Snippets](../snippets.md): store, share and collaborate on code snippets.
 - [Cycle Analytics](cycle_analytics.md): review your development lifecycle.
-- [Security Dashboard](security_dashboard.md): Security Dashboard.
+- [Security Dashboard](security_dashboard.md): Security Dashboard. **[ULTIMATE]**
 - [Syntax highlighting](highlighting.md): an alternative to customize
   your code blocks, overriding GitLab's default choice of language.
 - [Badges](badges.md): badges for the project overview.
@@ -130,7 +130,7 @@ Read through the documentation on [project settings](settings/index.md).
 - [Export a project from GitLab](settings/import_export.md#exporting-a-project-and-its-data)
 - [Importing and exporting projects between GitLab instances](settings/import_export.md)
 
-## CI/CD for external repositories
+## CI/CD for external repositories **[PREMIUM]**
 
 Instead of importing a repository directly to GitLab, you can connect your repository
 as a CI/CD project.
