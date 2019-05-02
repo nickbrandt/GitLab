@@ -97,7 +97,7 @@ module Operations
     end
 
     def update_default_scope
-      default_scope.update(active: self.active) if self.active_changed?
+      default_scope.update(active: self.active) if saved_change_to_active?
     end
   end
 end

@@ -373,7 +373,7 @@ module EE
 
     def import_url_updated?
       # check if import_url has been updated and it's not just the first assignment
-      import_url_changed? && changes['import_url'].first
+      saved_change_to_import_url? && saved_changes['import_url'].first
     end
 
     def remove_mirror_repository_reference

@@ -10,7 +10,7 @@ module EE
       def execute(milestone)
         super
 
-        if dates_changed?(milestone)
+        if saved_change_to_dates?(milestone)
           ::Epic.update_start_and_due_dates(
             ::Epic.joins(:issues).where(issues: { milestone_id: milestone.id })
           )
@@ -22,9 +22,8 @@ module EE
 
       private
 
-      def dates_changed?(milestone)
-        changes = milestone.previous_changes
-        changes.include?(:start_date) || changes.include?(:due_date)
+      def saved_change_to_dates?(milestone)
+        milestone.saved_change_to_start_date? || milestone.saved_change_to_due_date?
       end
     end
   end
