@@ -57,6 +57,6 @@ describe SystemCheck::Geo::GeoDatabaseConfiguredCheck do
   end
 
   def stub_tables_existence(state)
-    expect(ActiveRecord::Migrator).to receive(:needs_migration?).and_return(!state)
+    expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:needs_migration?).and_return(!state)
   end
 end

@@ -68,6 +68,10 @@ describe GroupPolicy do
           end
         end
 
+        before do
+          group.root_ancestor.reload
+        end
+
         it 'prevents access without a SAML session' do
           is_expected.not_to be_allowed(:read_group)
         end

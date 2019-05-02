@@ -122,8 +122,8 @@ describe ApprovalMergeRequestRule do
     end
 
     it 'retries when a record was created between the find and the create' do
-      expect(described_class).to receive(:where).and_raise(ActiveRecord::RecordNotUnique)
-      allow(described_class).to receive(:where).and_call_original
+      expect(described_class).to receive(:code_owner).and_raise(ActiveRecord::RecordNotUnique)
+      allow(described_class).to receive(:code_owner).and_call_original
 
       expect(described_class.find_or_create_code_owner_rule(merge_request, '*.js')).not_to be_nil
     end

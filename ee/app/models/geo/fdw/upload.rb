@@ -8,6 +8,7 @@ module Geo
 
       STORE_COLUMN = :store
 
+      self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('uploads')
 
       scope :syncable, -> { with_files_stored_locally }
