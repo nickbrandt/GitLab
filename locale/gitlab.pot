@@ -8185,6 +8185,9 @@ msgstr ""
 msgid "Notes|Show history only"
 msgstr ""
 
+msgid "Nothing to preview."
+msgstr ""
+
 msgid "Notification events"
 msgstr ""
 
@@ -8878,6 +8881,9 @@ msgid "Preferences|Navigation theme"
 msgstr ""
 
 msgid "Preferences|This feature is experimental and translations are not complete yet"
+msgstr ""
+
+msgid "Press %{key}-C to copy"
 msgstr ""
 
 msgid "Press Enter or click to search"
@@ -11650,6 +11656,9 @@ msgstr ""
 msgid "System metrics (Kubernetes)"
 msgstr ""
 
+msgid "Table of Contents"
+msgstr ""
+
 msgid "Tag"
 msgstr ""
 
@@ -13792,6 +13801,12 @@ msgid "You can %{linkStart}view the blob%{linkEnd} instead."
 msgstr ""
 
 msgid "You can also create a project from the command line."
+msgstr ""
+
+msgid "You can also press &#8984;-Enter"
+msgstr ""
+
+msgid "You can also press Ctrl-Enter"
 msgstr ""
 
 msgid "You can also star a label to make it a priority label."
