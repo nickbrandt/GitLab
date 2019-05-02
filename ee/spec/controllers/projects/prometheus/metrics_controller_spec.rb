@@ -12,6 +12,20 @@ describe Projects::Prometheus::MetricsController do
 
     project.add_maintainer(user)
     sign_in(user)
+
+    stub_licensed_features(custom_prometheus_metrics: true)
+  end
+
+  shared_context 'not found' do
+    before do
+      stub_licensed_features(custom_prometheus_metrics: false)
+    end
+
+    it 'renders 404' do
+      subject
+
+      expect(response).to have_gitlab_http_status(:not_found)
+    end
   end
 
   describe 'POST #validate_query' do
@@ -40,9 +54,21 @@ describe Projects::Prometheus::MetricsController do
         expect(response).to have_gitlab_http_status(202)
       end
     end
+
+    context 'without premium license' do
+      subject { post :validate_query, params: project_params(format: :json, query: query) }
+
+      it_behaves_like 'not found'
+    end
   end
 
   describe 'GET #index' do
+    context 'without premium license' do
+      subject { get :index, params: project_params(format: :json) }
+
+      it_behaves_like 'not found'
+    end
+
     context 'with custom metric present' do
       let!(:prometheus_metric) { create(:prometheus_metric, project: project) }
 
@@ -65,6 +91,14 @@ describe Projects::Prometheus::MetricsController do
   end
 
   describe 'POST #create' do
+    context 'without premium license' do
+      let(:metric) { { prometheus_metric: { title: 'title' } } }
+
+      subject { post :create, params: project_params(metric) }
+
+      it_behaves_like 'not found'
+    end
+
     context 'metric is valid' do
       let(:valid_metric) { { prometheus_metric: { title: 'title', query: 'query', group: 'business', y_label: 'label', unit: 'u', legend: 'legend' } } }
 
@@ -90,6 +124,14 @@ describe Projects::Prometheus::MetricsController do
   end
 
   describe 'DELETE #destroy' do
+    context 'without premium license' do
+      let(:metric) { create(:prometheus_metric, project: project) }
+
+      subject { delete :destroy, params: project_params(id: metric.id) }
+
+      it_behaves_like 'not found'
+    end
+
     context 'format html' do
       let!(:metric) { create(:prometheus_metric, project: project) }
 
