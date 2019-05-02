@@ -149,6 +149,7 @@ export default {
           :stage-connector-class="stageConnectorClass(index, stage)"
           :is-first-column="isFirstColumn(index)"
           :has-triggered-by="hasTriggeredBy"
+          :action="stage.status.action"
           @refreshPipelineGraph="refreshPipelineGraph"
         />
       </ul>
