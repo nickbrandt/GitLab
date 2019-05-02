@@ -190,7 +190,7 @@ module EESpecificCheck
     'doc/user/operations_dashboard/**/*',
     'doc/user/profile/*.md',
     'doc/user/profile/account/**/*',
-    'doc/user/project/*.md',
+    # 'doc/user/project/*.md',
     'doc/user/project/builds/**/*',
     'doc/user/project/clusters/*.md',
     'doc/user/project/clusters/eks_and_gitlab/**/*',
