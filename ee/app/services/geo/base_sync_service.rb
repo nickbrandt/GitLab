@@ -157,12 +157,12 @@ module Geo
       )
     end
 
-    def start_registry!
+    def start_registry_sync!
       log_info("Marking #{type} sync as started")
       registry.start_sync!(type)
     end
 
-    def fail_registry!(message, error, attrs = {})
+    def fail_registry_sync!(message, error, attrs = {})
       log_error(message, error)
 
       registry.fail_sync!(type, message, error, attrs)

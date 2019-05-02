@@ -424,7 +424,7 @@ describe Geo::RepositorySyncService do
           )
 
           expect(project.repository).to receive(:expire_exists_cache).twice.and_call_original
-          expect(subject).not_to receive(:fail_registry!)
+          expect(subject).not_to receive(:fail_registry_sync!)
 
           subject.execute
         end

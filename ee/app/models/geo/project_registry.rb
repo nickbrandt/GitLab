@@ -254,12 +254,12 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   def fail_sync!(type, message, error, attrs = {})
     ensure_valid_type!(type)
 
-    new_count = retry_count(type) + 1
+    new_retry_count = retry_count(type) + 1
 
     attrs["resync_#{type}"] = true
     attrs["last_#{type}_sync_failure"] = "#{message}: #{error.message}"
-    attrs["#{type}_retry_count"] = new_count
-    attrs["#{type}_retry_at"] = next_retry_time(new_count)
+    attrs["#{type}_retry_count"] = new_retry_count
+    attrs["#{type}_retry_at"] = next_retry_time(new_retry_count)
 
     update!(attrs)
   end
