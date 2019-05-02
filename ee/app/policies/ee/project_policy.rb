@@ -3,6 +3,7 @@
 module EE
   module ProjectPolicy
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     READONLY_FEATURES_WHEN_ARCHIVED = %i[
       board
@@ -198,6 +199,10 @@ module EE
         ::Feature.enabled?(:build_service_proxy, @subject)
       end
 
+      condition(:needs_new_sso_session) do
+        ::Gitlab::Auth::GroupSaml::SsoEnforcer.group_access_restricted?(subject.group)
+      end
+
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
 
       # Design abilities could also be prevented in the issue policy.
@@ -209,6 +214,13 @@ module EE
       end
 
       rule { build_service_proxy_enabled }.enable :build_service_proxy_enabled
+    end
+
+    override :lookup_access_level!
+    def lookup_access_level!
+      return ::GroupMember::NO_ACCESS if needs_new_sso_session?
+
+      super
     end
   end
 end
