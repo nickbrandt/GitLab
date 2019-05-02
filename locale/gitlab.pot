@@ -2249,6 +2249,9 @@ msgstr ""
 msgid "Choose a role permission"
 msgstr ""
 
+msgid "Choose a template"
+msgstr ""
+
 msgid "Choose a template..."
 msgstr ""
 
@@ -3197,6 +3200,9 @@ msgid "Connect your external repositories, and CI/CD pipelines will run for new 
 msgstr ""
 
 msgid "Connecting..."
+msgstr ""
+
+msgid "Connection failure"
 msgstr ""
 
 msgid "Contact an owner of group %{namespace_name} to upgrade the plan."
