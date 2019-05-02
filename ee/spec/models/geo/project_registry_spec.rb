@@ -334,61 +334,12 @@ describe Geo::ProjectRegistry do
         expect(subject.last_repository_synced_at).to be_like_time(Time.now)
       end
 
-      it 'ensures repository_retry_at is capped at one hour' do
-        subject.update(repository_retry_count: 31)
-
-        subject.start_sync!(type)
-
-        expect(subject).to have_attributes(
-          repository_retry_at: be_within(100.seconds).of(1.hour.from_now),
-          repository_retry_count: 32
-        )
-      end
-
-      shared_examples_for 'sets repository_retry_at to a future time' do
-        it 'sets repository_retry_at to a future time' do
-          subject.start_sync!(type)
-
-          expect(subject.repository_retry_at > Time.now).to be(true)
-        end
-      end
-
       context 'when repository_retry_count is nil' do
         it 'sets repository_retry_count to 0' do
           expect do
             subject.start_sync!(type)
           end.to change { subject.repository_retry_count }.from(nil).to(0)
         end
-
-        it_behaves_like 'sets repository_retry_at to a future time'
-      end
-
-      context 'when repository_retry_count is 0' do
-        before do
-          subject.update!(repository_retry_count: 0)
-        end
-
-        it 'increments repository_retry_count' do
-          expect do
-            subject.start_sync!(type)
-          end.to change { subject.repository_retry_count }.by(1)
-        end
-
-        it_behaves_like 'sets repository_retry_at to a future time'
-      end
-
-      context 'when repository_retry_count is 1' do
-        before do
-          subject.update!(repository_retry_count: 1)
-        end
-
-        it 'increments repository_retry_count' do
-          expect do
-            subject.start_sync!(type)
-          end.to change { subject.repository_retry_count }.by(1)
-        end
-
-        it_behaves_like 'sets repository_retry_at to a future time'
       end
     end
 
@@ -401,61 +352,12 @@ describe Geo::ProjectRegistry do
         expect(subject.last_wiki_synced_at).to be_like_time(Time.now)
       end
 
-      it 'ensures wiki_retry_at is capped at one hour' do
-        subject.update(wiki_retry_count: 31)
-
-        subject.start_sync!(type)
-
-        expect(subject).to have_attributes(
-          wiki_retry_at: be_within(100.seconds).of(1.hour.from_now),
-          wiki_retry_count: 32
-        )
-      end
-
-      shared_examples_for 'sets wiki_retry_at to a future time' do
-        it 'sets wiki_retry_at to a future time' do
-          subject.start_sync!(type)
-
-          expect(subject.wiki_retry_at > Time.now).to be(true)
-        end
-      end
-
       context 'when wiki_retry_count is nil' do
         it 'sets wiki_retry_count to 0' do
           expect do
             subject.start_sync!(type)
           end.to change { subject.wiki_retry_count }.from(nil).to(0)
         end
-
-        it_behaves_like 'sets wiki_retry_at to a future time'
-      end
-
-      context 'when wiki_retry_count is 0' do
-        before do
-          subject.update!(wiki_retry_count: 0)
-        end
-
-        it 'increments wiki_retry_count' do
-          expect do
-            subject.start_sync!(type)
-          end.to change { subject.wiki_retry_count }.by(1)
-        end
-
-        it_behaves_like 'sets wiki_retry_at to a future time'
-      end
-
-      context 'when wiki_retry_count is 1' do
-        before do
-          subject.update!(wiki_retry_count: 1)
-        end
-
-        it 'increments wiki_retry_count' do
-          expect do
-            subject.start_sync!(type)
-          end.to change { subject.wiki_retry_count }.by(1)
-        end
-
-        it_behaves_like 'sets wiki_retry_at to a future time'
       end
     end
   end
@@ -664,6 +566,25 @@ describe Geo::ProjectRegistry do
                         last_repository_sync_failure: 'foo')
       end
 
+      it 'sets repository_retry_at to a future time' do
+        subject.update(repository_retry_count: 0)
+
+        subject.fail_sync!(type, message, error)
+
+        expect(subject.repository_retry_at > Time.now).to be(true)
+      end
+
+      it 'ensures repository_retry_at is capped at one hour' do
+        subject.update(repository_retry_count: 31)
+
+        subject.fail_sync!(type, message, error)
+
+        expect(subject).to have_attributes(
+          repository_retry_at: be_within(100.seconds).of(1.hour.from_now),
+          repository_retry_count: 32
+        )
+      end
+
       it 'sets resync_repository to true' do
         subject.fail_sync!(type, message, error)
 
@@ -693,6 +614,30 @@ describe Geo::ProjectRegistry do
 
         expect(subject.reload.force_to_redownload_repository).to be true
       end
+
+      context 'when repository_retry_count is 0' do
+        before do
+          subject.update!(repository_retry_count: 0)
+        end
+
+        it 'increments repository_retry_count' do
+          expect do
+            subject.fail_sync!(type, message, error)
+          end.to change { subject.repository_retry_count }.by(1)
+        end
+      end
+
+      context 'when repository_retry_count is 1' do
+        before do
+          subject.update!(repository_retry_count: 1)
+        end
+
+        it 'increments repository_retry_count' do
+          expect do
+            subject.fail_sync!(type, message, error)
+          end.to change { subject.repository_retry_count }.by(1)
+        end
+      end
     end
 
     context 'for a wiki' do
@@ -704,6 +649,25 @@ describe Geo::ProjectRegistry do
         subject.start_sync!(type)
         subject.update!(resync_wiki: false,
                         last_wiki_sync_failure: 'foo')
+      end
+
+      it 'sets wiki_retry_at to a future time' do
+        subject.update(wiki_retry_count: 0)
+
+        subject.fail_sync!(type, message, error)
+
+        expect(subject.wiki_retry_at > Time.now).to be(true)
+      end
+
+      it 'ensures wiki_retry_at is capped at one hour' do
+        subject.update(wiki_retry_count: 31)
+
+        subject.fail_sync!(type, message, error)
+
+        expect(subject).to have_attributes(
+          wiki_retry_at: be_within(100.seconds).of(1.hour.from_now),
+          wiki_retry_count: 32
+        )
       end
 
       it 'sets resync_wiki to true' do
@@ -734,6 +698,30 @@ describe Geo::ProjectRegistry do
         subject.fail_sync!(type, message, error, { force_to_redownload_wiki: true })
 
         expect(subject.reload.force_to_redownload_wiki).to be true
+      end
+
+      context 'when wiki_retry_count is 0' do
+        before do
+          subject.update!(wiki_retry_count: 0)
+        end
+
+        it 'increments wiki_retry_count' do
+          expect do
+            subject.fail_sync!(type, message, error)
+          end.to change { subject.wiki_retry_count }.by(1)
+        end
+      end
+
+      context 'when wiki_retry_count is 1' do
+        before do
+          subject.update!(wiki_retry_count: 1)
+        end
+
+        it 'increments wiki_retry_count' do
+          expect do
+            subject.fail_sync!(type, message, error)
+          end.to change { subject.wiki_retry_count }.by(1)
+        end
       end
     end
   end

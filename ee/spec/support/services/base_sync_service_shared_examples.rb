@@ -49,6 +49,15 @@ shared_examples 'cleans temporary repositories' do
 end
 
 shared_examples 'geo base sync fetch' do
+  describe '#sync_repository' do
+    it 'tells registry that sync will start now' do
+      registry = subject.send(:registry)
+      expect(registry).to receive(:start_sync!)
+
+      subject.send(:sync_repository)
+    end
+  end
+
   describe '#fetch_repository' do
     let(:fetch_repository) { subject.send(:fetch_repository) }
 
@@ -58,13 +67,6 @@ shared_examples 'geo base sync fetch' do
 
     it 'cleans up temporary repository' do
       is_expected.to receive(:clean_up_temporary_repository)
-
-      fetch_repository
-    end
-
-    it 'tells registry that sync will start now' do
-      registry = subject.send(:registry)
-      expect(registry).to receive(:start_sync!)
 
       fetch_repository
     end
