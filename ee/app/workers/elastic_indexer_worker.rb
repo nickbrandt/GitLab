@@ -62,13 +62,7 @@ class ElasticIndexerWorker
   end
 
   def initial_index_project(project)
-    {
-      Issue        => project.issues,
-      MergeRequest => project.merge_requests,
-      Snippet      => project.snippets,
-      Note         => project.notes.searchable,
-      Milestone    => project.milestones
-    }.each do |klass, objects|
+    project.each_indexed_association do |klass, objects|
       objects.find_each { |object| import(:index, object, klass) }
     end
 
