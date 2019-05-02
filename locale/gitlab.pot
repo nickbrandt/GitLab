@@ -9829,7 +9829,10 @@ msgstr ""
 msgid "ProtectedEnvironment|Allowed to deploy"
 msgstr ""
 
-msgid "ProtectedEnvironment|Choose who is allowed to deploy"
+msgid "ProtectedEnvironment|Choose users"
+msgstr ""
+
+msgid "ProtectedEnvironment|Choose who is allowed to deploy and manage Feature Flag settings"
 msgstr ""
 
 msgid "ProtectedEnvironment|Environment"
