@@ -1,14 +1,17 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
+import _ from 'underscore';
 import createFlash from '~/flash';
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import EmptyState from '../components/empty_state.vue';
 import allDesignsQuery from '../queries/allDesigns.graphql';
-import uploadDesignQuery from '../queries/uploadDesign.graphql';
-import appDataQuery from '../queries/appData.graphql';
+import uploadDesignMutation from '../queries/uploadDesign.graphql';
 import permissionsQuery from '../queries/permissions.graphql';
+import allDesignsMixin from '../mixins/all_designs';
+
+const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
 export default {
   components: {
@@ -17,21 +20,8 @@ export default {
     UploadForm,
     EmptyState,
   },
+  mixins: [allDesignsMixin],
   apollo: {
-    appData: {
-      query: appDataQuery,
-      manual: true,
-      result({ data: { projectPath, issueIid } }) {
-        this.projectPath = projectPath;
-        this.issueIid = issueIid;
-      },
-    },
-    designs: {
-      query: allDesignsQuery,
-      error() {
-        this.error = true;
-      },
-    },
     permissions: {
       query: permissionsQuery,
       variables() {
@@ -45,14 +35,10 @@ export default {
   },
   data() {
     return {
-      designs: [],
       permissions: {
         createDesign: false,
       },
-      error: false,
       isSaving: false,
-      projectPath: '',
-      issueIid: null,
     };
   },
   computed: {
@@ -73,33 +59,81 @@ export default {
     onUploadDesign(files) {
       if (!this.canCreateDesign) return null;
 
+      if (files.length >= MAXIMUM_FILE_UPLOAD_LIMIT) {
+        createFlash(
+          sprintf(
+            s__(
+              'DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again.',
+            ),
+            {
+              upload_limit: MAXIMUM_FILE_UPLOAD_LIMIT,
+            },
+          ),
+        );
+
+        return null;
+      }
+
       const optimisticResponse = Array.from(files).map(file => ({
         __typename: 'Design',
-        id: -1,
+        id: -_.uniqueId(),
         image: '',
-        name: file.name,
-        commentsCount: 0,
-        updatedAt: new Date().toString(),
+        filename: file.name,
       }));
 
       this.isSaving = true;
 
       return this.$apollo
         .mutate({
-          mutation: uploadDesignQuery,
+          mutation: uploadDesignMutation,
           variables: {
             files,
+            projectPath: this.projectPath,
+            iid: this.issueIid,
           },
-          // update: (store, { data: { uploadDesign } }) => {
-          //   const data = store.readQuery({ query: allDesignsQuery });
-          //   console.log(data, uploadDesign);
+          update: (store, { data: { designManagementUpload } }) => {
+            const data = store.readQuery({
+              query: allDesignsQuery,
+              variables: { fullPath: this.projectPath, iid: this.issueIid },
+            });
+            const newDesigns = data.project.issue.designs.designs.edges.reduce((acc, design) => {
+              if (!acc.find(d => d.filename === design.node.filename)) {
+                acc.push(design.node);
+              }
 
-          //   data.designs.unshift(...uploadDesign);
-          //   store.writeQuery({ query: allDesignsQuery, data });
-          // },
+              return acc;
+            }, designManagementUpload.designs);
+            const newQueryData = {
+              project: {
+                __typename: 'Project',
+                issue: {
+                  __typename: 'Issue',
+                  designs: {
+                    __typename: 'DesignCollection',
+                    designs: {
+                      __typename: 'DesignConnection',
+                      edges: newDesigns.map(design => ({
+                        __typename: 'DesignEdge',
+                        node: design,
+                      })),
+                    },
+                  },
+                },
+              },
+            };
+
+            store.writeQuery({
+              query: allDesignsQuery,
+              variables: { fullPath: this.projectPath, iid: this.issueIid },
+              data: newQueryData,
+            });
+          },
           optimisticResponse: {
             __typename: 'Mutation',
-            uploadDesign: optimisticResponse,
+            designManagementUpload: {
+              __typename: 'DesignManagementUploadPayload',
+              designs: optimisticResponse,
+            },
           },
         })
         .then(() => {

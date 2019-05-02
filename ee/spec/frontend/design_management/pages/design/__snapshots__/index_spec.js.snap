@@ -7,7 +7,6 @@ exports[`Design management design index page renders design index 1`] = `
   <toolbar-stub
     id="1"
     name="test.jpg"
-    updatedat=""
     updatedby="[object Object]"
   />
    
@@ -26,7 +25,6 @@ exports[`Design management design index page sets loading state 1`] = `
     id="1"
     isloading="true"
     name=""
-    updatedat=""
     updatedby="[object Object]"
   />
    

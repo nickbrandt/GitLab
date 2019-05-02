@@ -95,19 +95,23 @@ describe('Design management index page', () => {
             mutation: uploadDesignQuery,
             variables: {
               files: [{ name: 'test' }],
+              projectPath: '',
+              iid: null,
             },
+            update: expect.anything(),
             optimisticResponse: {
               __typename: 'Mutation',
-              uploadDesign: [
-                {
-                  __typename: 'Design',
-                  id: -1,
-                  image: '',
-                  name: 'test',
-                  commentsCount: 0,
-                  updatedAt: expect.any(String),
-                },
-              ],
+              designManagementUpload: {
+                __typename: 'DesignManagementUploadPayload',
+                designs: [
+                  {
+                    __typename: 'Design',
+                    id: expect.anything(),
+                    image: '',
+                    filename: 'test',
+                  },
+                ],
+              },
             },
           });
         });
