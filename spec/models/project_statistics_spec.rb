@@ -124,7 +124,7 @@ describe ProjectStatistics do
   end
 
   describe '.increment_statistic' do
-    shared_examples 'a statistic that also increases storage_size' do
+    shared_examples 'a statistic that increases storage_size' do
       it 'increases the statistic by that amount' do
         expect { described_class.increment_statistic(project.id, stat, 13) }
           .to change { statistics.reload.send(stat) || 0 }
