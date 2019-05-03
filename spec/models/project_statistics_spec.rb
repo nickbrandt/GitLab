@@ -153,7 +153,7 @@ describe ProjectStatistics do
     context 'when the amount is 0' do
       it 'does not execute a query' do
         project
-        expect { described_class.increment_statistic(project.id, stat, 0) }
+        expect { described_class.increment_statistic(project.id, :build_artifacts_size, 0) }
           .not_to exceed_query_limit(0)
       end
     end
