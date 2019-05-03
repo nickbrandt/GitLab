@@ -159,10 +159,6 @@ class GeoNodeStatus < ApplicationRecord
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
-    self.projects_count = projects_finder.count_projects
-    self.lfs_objects_count = lfs_objects_finder.count_syncable
-    self.job_artifacts_count = job_artifacts_finder.count_syncable
-    self.attachments_count = attachments_finder.count_syncable
     self.last_successful_status_check_at = Time.now
     self.storage_shards = StorageShard.all
     self.storage_configuration_digest = StorageShard.build_digest
@@ -191,6 +187,11 @@ class GeoNodeStatus < ApplicationRecord
 
   def load_primary_data
     if Gitlab::Geo.primary?
+      self.projects_count = geo_node.projects.count
+      self.lfs_objects_count = LfsObject.syncable.count
+      self.job_artifacts_count = Ci::JobArtifact.syncable.count
+      self.attachments_count = Upload.syncable.count
+
       self.replication_slots_count = geo_node.replication_slots_count
       self.replication_slots_used_count = geo_node.replication_slots_used_count
       self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
@@ -207,23 +208,27 @@ class GeoNodeStatus < ApplicationRecord
     end
   end
 
-  def load_secondary_data
+  def load_secondary_data # rubocop:disable Metrics/AbcSize
     if Gitlab::Geo.secondary?
       self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
       self.cursor_last_event_id = current_cursor_last_event_id
       self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
+      self.projects_count = projects_finder.count_projects
       self.repositories_synced_count = projects_finder.count_synced_repositories
       self.repositories_failed_count = projects_finder.count_failed_repositories
       self.wikis_synced_count = projects_finder.count_synced_wikis
       self.wikis_failed_count = projects_finder.count_failed_wikis
+      self.lfs_objects_count = lfs_objects_finder.count_syncable
       self.lfs_objects_synced_count = lfs_objects_finder.count_synced
       self.lfs_objects_failed_count = lfs_objects_finder.count_failed
       self.lfs_objects_registry_count = lfs_objects_finder.count_registry
       self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
+      self.job_artifacts_count = job_artifacts_finder.count_syncable
       self.job_artifacts_synced_count = job_artifacts_finder.count_synced
       self.job_artifacts_failed_count = job_artifacts_finder.count_failed
       self.job_artifacts_registry_count = job_artifacts_finder.count_registry
       self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
+      self.attachments_count = attachments_finder.count_syncable
       self.attachments_synced_count = attachments_finder.count_synced
       self.attachments_failed_count = attachments_finder.count_failed
       self.attachments_registry_count = attachments_finder.count_registry

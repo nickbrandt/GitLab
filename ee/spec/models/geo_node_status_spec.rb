@@ -988,4 +988,62 @@ describe GeoNodeStatus, :geo, :geo_fdw do
       end
     end
   end
+
+  describe '#load_data_from_current_node' do
+    context 'on the primary' do
+      before do
+        stub_current_geo_node(primary)
+      end
+
+      it 'does not call ProjectRegistryFinder#count_projects' do
+        expect_any_instance_of(Geo::ProjectRegistryFinder).not_to receive(:count_projects)
+
+        subject
+      end
+
+      it 'does not call LfsObjectRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:count_syncable)
+
+        subject
+      end
+
+      it 'does not call AttachmentRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).not_to receive(:count_syncable)
+
+        subject
+      end
+
+      it 'does not call JobArtifactRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).not_to receive(:count_syncable)
+
+        subject
+      end
+    end
+
+    context 'on the secondary' do
+      it 'calls ProjectRegistryFinder#count_projects' do
+        expect_any_instance_of(Geo::ProjectRegistryFinder).to receive(:count_projects)
+
+        subject
+      end
+
+      it 'calls LfsObjectRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+
+        subject
+      end
+
+      it 'calls AttachmentRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+
+        subject
+      end
+
+      it 'calls JobArtifactRegistryFinder#count_syncable' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).to receive(:count_syncable)
+
+        subject
+      end
+    end
+  end
 end
