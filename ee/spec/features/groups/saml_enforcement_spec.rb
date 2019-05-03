@@ -11,14 +11,16 @@ describe 'SAML access enforcement' do
   before do
     group.add_guest(user)
     sign_in(user)
+
+    stub_licensed_features(group_saml: true)
   end
 
   context 'without SAML session' do
-    it 'prevents access to group resources' do
+    it 'prevents access to group resources via SSO redirect' do
       visit group_path(group)
 
-      expect(page).not_to have_content(group.name)
-      expect(page).to have_content('Page Not Found')
+      expect(page).to have_content("SAML SSO Sign in to \"#{group.name}\"")
+      expect(current_url).to match(/groups\/#{group.to_param}\/-\/saml\/sso\?token=/)
     end
   end
 
@@ -32,6 +34,7 @@ describe 'SAML access enforcement' do
       visit group_path(group)
 
       expect(page).not_to have_content('Page Not Found')
+      expect(page).not_to have_content('SAML SSO Sign')
       expect(page).to have_content(group.name)
       expect(current_path).to eq(group_path(group))
     end
