@@ -3173,6 +3173,9 @@ msgstr ""
 msgid "ContainerRegistry|You can also use a %{deploy_token} for read-only access to the registry images."
 msgstr ""
 
+msgid "Contains %{count} blobs of images (%{size})"
+msgstr ""
+
 msgid "Contents of .gitlab-ci.yml"
 msgstr ""
 
@@ -3666,6 +3669,12 @@ msgid "Deny"
 msgstr ""
 
 msgid "Dependency Proxy"
+msgstr ""
+
+msgid "Dependency proxy"
+msgstr ""
+
+msgid "Dependency proxy URL"
 msgstr ""
 
 msgid "DependencyProxy|Toggle Dependency Proxy"
