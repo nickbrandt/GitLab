@@ -4,9 +4,19 @@ exports[`dashboard should match the snapshot 1`] = `
 <div
   class="operations-dashboard"
 >
-  <div>
-    <!---->
-  </div>
+  <glmodal-stub
+    modalid="add-projects-modal"
+    ok-disabled="true"
+    ok-title="Add projects"
+    ok-variant="success"
+    title="Add projects"
+    titletag="h4"
+  >
+    <projectselector-stub
+      projectsearchresults=""
+      selectedprojects=""
+    />
+  </glmodal-stub>
    
   <div
     class="page-title-holder flex-fill d-flex align-items-center"
@@ -19,14 +29,14 @@ exports[`dashboard should match the snapshot 1`] = `
     
     </h1>
      
-    <button
-      class="btn js-add-projects-button btn btn-success btn-secondary"
-      type="button"
+    <glbutton-stub
+      class="js-add-projects-button btn btn-success"
+      role="button"
     >
       
       Add projects
     
-    </button>
+    </glbutton-stub>
   </div>
    
   <div

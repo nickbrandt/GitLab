@@ -1,5 +1,6 @@
 <script>
 import _ from 'underscore';
+import { mapState, mapActions } from 'vuex';
 import {
   GlLoadingIcon,
   GlModal,
@@ -59,19 +60,17 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      projects: [],
-      projectTokens: '',
-      isLoadingProjects: false,
-      selectedProjects: [],
-      projectSearchResults: [],
-      searchCount: 0,
-      searchQuery: '',
-      messages: {},
-    };
-  },
   computed: {
+    ...mapState([
+      'projects',
+      'projectTokens',
+      'isLoadingProjects',
+      'selectedProjects',
+      'projectSearchResults',
+      'searchCount',
+      'searchQuery',
+      'messages',
+    ]),
     isSearchingProjects() {
       return this.searchCount > 0;
     },
@@ -87,13 +86,15 @@ export default {
     this.fetchProjects();
   },
   methods: {
-    fetchSearchResults() {},
-    addProjectsToDashboard() {},
-    fetchProjects() {},
-    setProjectEndpoints() {},
-    clearSearchResults() {},
-    toggleSelectedProject() {},
-    setSearchQuery() {},
+    ...mapActions([
+      'fetchSearchResults',
+      'addProjectsToDashboard',
+      'fetchProjects',
+      'setProjectEndpoints',
+      'clearSearchResults',
+      'toggleSelectedProject',
+      'setSearchQuery',
+    ]),
     addProjects() {
       this.addProjectsToDashboard();
     },

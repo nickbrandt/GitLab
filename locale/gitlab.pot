@@ -3705,6 +3705,15 @@ msgstr ""
 msgid "Dashboards"
 msgstr ""
 
+msgid "Dashboard|%{firstProject} and %{secondProject}"
+msgstr ""
+
+msgid "Dashboard|%{firstProject}, %{rest}, and %{secondProject}"
+msgstr ""
+
+msgid "Dashboard|Unable to add %{invalidProjects}. This dashboard is available for public projects, and private projects in groups with a Gold plan."
+msgstr ""
+
 msgid "Data is still calculating..."
 msgstr ""
 
@@ -8542,9 +8551,6 @@ msgstr ""
 msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
-msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan."
-msgstr ""
-
 msgid "Optional"
 msgstr ""
 
@@ -11309,7 +11315,7 @@ msgstr ""
 msgid "Something went wrong, unable to add %{project} to dashboard"
 msgstr ""
 
-msgid "Something went wrong, unable to get operations projects"
+msgid "Something went wrong, unable to get projects"
 msgstr ""
 
 msgid "Something went wrong, unable to remove project"

@@ -48,24 +48,32 @@ export const receiveAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
   const { added, invalid } = data;
 
   if (invalid.length) {
-    const projectNames = state.selectedProjects.reduce((accumulator, project) => {
-      if (invalid.includes(project.id)) {
-        accumulator.push(project.name);
-      }
-      return accumulator;
-    }, []);
+    const [firstProject, secondProject, ...rest] = state.selectedProjects
+      .filter(project => invalid.includes(project.id))
+      .map(project => project.name);
+    const translationValues = {
+      firstProject,
+      secondProject,
+      rest: rest.join(', '),
+    };
     let invalidProjects;
-    if (projectNames.length > 2) {
-      invalidProjects = `${projectNames.slice(0, -1).join(', ')}, and ${projectNames.pop()}`;
-    } else if (projectNames.length > 1) {
-      invalidProjects = projectNames.join(' and ');
+    if (rest.length > 0) {
+      invalidProjects = sprintf(
+        s__('Dashboard|%{firstProject}, %{rest}, and %{secondProject}'),
+        translationValues,
+      );
+    } else if (secondProject) {
+      invalidProjects = sprintf(
+        s__('Dashboard|%{firstProject} and %{secondProject}'),
+        translationValues,
+      );
     } else {
-      [invalidProjects] = projectNames;
+      invalidProjects = firstProject;
     }
     createFlash(
       sprintf(
         s__(
-          'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.',
+          'Dashboard|Unable to add %{invalidProjects}. This dashboard is available for public projects, and private projects in groups with a Gold plan.',
         ),
         {
           invalidProjects,
@@ -124,7 +132,7 @@ export const receiveProjectsSuccess = ({ commit }, data) => {
 
 export const receiveProjectsError = ({ commit }) => {
   commit(types.RECEIVE_PROJECTS_ERROR);
-  createFlash(__('Something went wrong, unable to get operations projects'));
+  createFlash(__('Something went wrong, unable to get projects'));
 };
 
 export const removeProject = ({ dispatch }, removePath) => {
