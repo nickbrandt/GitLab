@@ -24,14 +24,13 @@ export const forceProjectsRequest = () => {
   if (eTagPoll) eTagPoll.makeRequest();
 };
 
-export const addProjectsToDashboard = ({ state, dispatch }) => {
+export const addProjectsToDashboard = ({ state, dispatch }) =>
   axios
     .post(state.projectEndpoints.add, {
       project_ids: state.selectedProjects.map(p => p.id),
     })
     .then(response => dispatch('receiveAddProjectsToDashboardSuccess', response.data))
     .catch(() => dispatch('receiveAddProjectsToDashboardError'));
-};
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
   if (!_.findWhere(state.selectedProjects, { id: project.id })) {
