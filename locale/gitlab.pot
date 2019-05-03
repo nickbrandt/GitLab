@@ -5084,6 +5084,9 @@ msgstr ""
 msgid "Failed to reset key. Please try again."
 msgstr ""
 
+msgid "Failed to save comment!"
+msgstr ""
+
 msgid "Failed to save merge conflicts resolutions. Please try again!"
 msgstr ""
 
