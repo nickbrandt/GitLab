@@ -30,7 +30,7 @@ describe('Design management design index page', () => {
 
     vm.setData({
       design: {
-        name: 'test.jpg',
+        filename: 'test.jpg',
         image: 'test.jpg',
         updatedAt: '01-01-2019',
         updatedBy: {

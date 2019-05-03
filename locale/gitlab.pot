@@ -4031,6 +4031,9 @@ msgstr ""
 msgid "DesignManagement|Go to previous design"
 msgstr ""
 
+msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
+msgstr ""
+
 msgid "DesignManagement|The one place for your designs"
 msgstr ""
 

@@ -1,0 +1,4 @@
+fragment DesignListItem on Design {
+  id
+  filename
+}

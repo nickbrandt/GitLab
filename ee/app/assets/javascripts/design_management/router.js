@@ -39,7 +39,7 @@ const router = new VueRouter({
             from,
             next,
           ) {
-            if (id !== -1) next();
+            if (id > 0) next();
           },
           props: ({ params: { id } }) => ({ id: parseInt(id, 10) }),
         },

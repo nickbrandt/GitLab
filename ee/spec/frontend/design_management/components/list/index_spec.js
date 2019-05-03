@@ -3,7 +3,7 @@ import List from 'ee/design_management/components/list/index.vue';
 
 const createMockDesign = id => ({
   id,
-  name: 'test',
+  filename: 'test',
   image: 'test',
   commentsCount: 2,
   updatedAt: '01-01-2019',
