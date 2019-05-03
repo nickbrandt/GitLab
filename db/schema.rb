@@ -2460,7 +2460,6 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.bigint "repository_size", default: 0, null: false
     t.bigint "lfs_objects_size", default: 0, null: false
     t.bigint "build_artifacts_size", default: 0, null: false
-    t.bigint "packages_size"
     t.bigint "shared_runners_seconds", default: 0, null: false
     t.datetime "shared_runners_seconds_last_reset"
     t.bigint "packages_size"
