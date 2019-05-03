@@ -1,4 +1,5 @@
 <script>
+import settingPanelMixings from 'ee_else_ce/pages/projects/shared/permissions/mixins/settings_panel';
 import projectFeatureSetting from './project_feature_setting.vue';
 import projectFeatureToggle from '../../../../../vue_shared/components/toggle_button.vue';
 import projectSettingRow from './project_setting_row.vue';
@@ -11,7 +12,7 @@ export default {
     projectFeatureToggle,
     projectSettingRow,
   },
-
+  mixins: [settingPanelMixings],
   props: {
     currentSettings: {
       type: Object,
@@ -33,11 +34,6 @@ export default {
       default: false,
     },
     registryAvailable: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    packagesAvailable: {
       type: Boolean,
       required: false,
       default: false,
@@ -72,11 +68,6 @@ export default {
       required: false,
       default: '',
     },
-    packagesHelpPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
   },
 
   data() {
@@ -92,7 +83,6 @@ export default {
       pagesAccessLevel: 20,
       containerRegistryEnabled: true,
       lfsEnabled: true,
-      packagesEnabled: true,
       requestAccessEnabled: true,
       highlightChangesClass: false,
     };
@@ -168,14 +158,20 @@ export default {
         if (value === 0) {
           this.containerRegistryEnabled = false;
           this.lfsEnabled = false;
-          this.packagesEnabled = false;
+
+          if (this.isEE) {
+            this.packagesEnabled = false;
+          }
         }
       } else if (oldValue === 0) {
         this.mergeRequestsAccessLevel = value;
         this.buildsAccessLevel = value;
         this.containerRegistryEnabled = true;
         this.lfsEnabled = true;
-        this.packagesEnabled = true;
+
+        if (this.isEE) {
+          this.packagesEnabled = true;
+        }
       }
     },
 
@@ -318,7 +314,7 @@ export default {
           />
         </project-setting-row>
         <project-setting-row
-          v-if="packagesAvailable"
+          v-if="packagesAvailable && isEE"
           :help-path="packagesHelpPath"
           label="Packages"
           help-text="Every project can have its own space to store its packages"
