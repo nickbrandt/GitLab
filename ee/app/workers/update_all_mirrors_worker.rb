@@ -7,10 +7,25 @@ class UpdateAllMirrorsWorker
   LEASE_TIMEOUT = 5.minutes
   SCHEDULE_WAIT_TIMEOUT = 4.minutes
   LEASE_KEY = 'update_all_mirrors'.freeze
+  RESCHEDULE_WAIT = 10.seconds
 
   def perform
-    with_lease do
+    scheduling_ran = with_lease do
       schedule_mirrors!
+    end
+
+    # If we didn't get the lease, exit early
+    return unless scheduling_ran
+
+    if Feature.enabled?(:update_all_mirrors_worker_rescheduling)
+      # Wait to give some jobs a chance to complete
+      Kernel.sleep(RESCHEDULE_WAIT)
+
+      # If there's capacity left now (some jobs completed),
+      # reschedule this job to enqueue more work.
+      #
+      # This is in addition to the regular (cron-like) scheduling of this job.
+      reschedule_if_capacity_left
     end
   end
 
@@ -46,10 +61,18 @@ class UpdateAllMirrorsWorker
 
   private
 
+  def reschedule_if_capacity_left
+    return unless Gitlab::Mirror.reschedule_immediately?
+
+    UpdateAllMirrorsWorker.perform_async
+  end
+
   def with_lease
     if lease_uuid = try_obtain_lease
       yield
     end
+
+    lease_uuid
   ensure
     cancel_lease(lease_uuid) if lease_uuid
   end
