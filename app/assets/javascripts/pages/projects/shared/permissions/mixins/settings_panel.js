@@ -1,1 +1,7 @@
-export default {};
+export default {
+  data() {
+    return {
+      packagesAvailable: false,
+    }
+  },
+};
