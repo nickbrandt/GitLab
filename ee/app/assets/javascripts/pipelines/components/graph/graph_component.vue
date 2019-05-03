@@ -140,10 +140,10 @@ export default {
           v-for="(stage, index) in graph"
           :key="stage.name"
           :class="{
-            'has-upstream prepend-left-60': index === 0 && hasTriggeredBy,
+            'has-upstream prepend-left-64': index === 0 && hasTriggeredBy,
             'has-downstream': index === graph.length - 1 && hasTriggered,
             'has-only-one-job': hasOnlyOneJob(stage),
-            'append-right-44': !(index === graph.length - 1),
+            'append-right-46': !(index === graph.length - 1),
           }"
           :title="capitalizeStageName(stage.name)"
           :groups="stage.groups"
