@@ -9,12 +9,9 @@ class UpdateAllMirrorsWorker
   LEASE_KEY = 'update_all_mirrors'.freeze
 
   def perform
-    lease_uuid = try_obtain_lease
-    return unless lease_uuid
-
-    schedule_mirrors!
-
-    cancel_lease(lease_uuid)
+    with_lease do
+      schedule_mirrors!
+    end
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -48,6 +45,14 @@ class UpdateAllMirrorsWorker
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def with_lease
+    if lease_uuid = try_obtain_lease
+      yield
+    end
+  ensure
+    cancel_lease(lease_uuid) if lease_uuid
+  end
 
   def try_obtain_lease
     ::Gitlab::ExclusiveLease.new(LEASE_KEY, timeout: LEASE_TIMEOUT).try_obtain
