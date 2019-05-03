@@ -223,6 +223,12 @@ msgstr ""
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
+msgid "%{name} contained %{resultsString}"
+msgstr ""
+
+msgid "%{name} found %{resultsString}"
+msgstr ""
+
 msgid "%{name}'s avatar"
 msgstr ""
 
