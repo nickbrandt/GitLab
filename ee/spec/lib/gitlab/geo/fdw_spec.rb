@@ -2,6 +2,12 @@ require 'spec_helper'
 
 describe Gitlab::Geo::Fdw, :geo do
   describe '.enabled?' do
+    it 'returns false when Geo secondary database is not configured' do
+      allow(Gitlab::Geo).to receive(:geo_database_configured?).and_return(false)
+
+      expect(described_class.enabled?).to eq false
+    end
+
     it 'returns false when foreign server does not exist' do
       drop_foreign_server
 
@@ -44,7 +50,7 @@ describe Gitlab::Geo::Fdw, :geo do
     end
   end
 
-  describe '.enabled?' do
+  describe '.disabled?' do
     it 'returns true when foreign server does not exist' do
       drop_foreign_server
 
@@ -66,6 +72,12 @@ describe Gitlab::Geo::Fdw, :geo do
 
     it 'returns true when fdw is disabled in `config/database_geo.yml`' do
       allow(Rails.configuration).to receive(:geo_database).and_return('fdw' => false)
+
+      expect(described_class.disabled?).to eq true
+    end
+
+    it 'returns true when Geo secondary database is not configured' do
+      allow(Gitlab::Geo).to receive(:geo_database_configured?).and_return(false)
 
       expect(described_class.disabled?).to eq true
     end
