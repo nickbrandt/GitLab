@@ -10,7 +10,7 @@ module Gitlab
         # fetches up to BATCH_SIZE next events and keep track of batches
         # rubocop: disable CodeReuse/ActiveRecord
         def fetch_in_batches(batch_size: BATCH_SIZE)
-          last_id = last_processed_id
+          last_id = last_processed_id || last_event_log_id
 
           ::Geo::EventLog.where('id > ?', last_id).find_in_batches(batch_size: batch_size) do |batch|
             yield(batch, last_id)
@@ -31,18 +31,19 @@ module Gitlab
           event_state.update!(event_id: event_id)
         end
 
-        # @return [Integer] id of last replicated event
+        # @return [Integer] id of last replicated event or nil if it does not exist
         def last_processed_id
-          last = ::Geo::EventLogState.last_processed&.id
-          return last if last
+          ::Geo::EventLogState.last_processed&.id
+        end
 
-          if ::Geo::EventLog.any?
-            event_id = ::Geo::EventLog.last.id
-            save_processed(event_id)
-            event_id
-          else
-            -1
-          end
+        # @return [Integer] id of the event we need to start processing from
+        def last_event_log_id
+          last_id = ::Geo::EventLog.last&.id
+
+          return 0 unless last_id
+
+          save_processed(last_id)
+          last_id
         end
       end
     end
