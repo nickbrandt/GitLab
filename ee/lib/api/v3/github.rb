@@ -9,7 +9,7 @@ module API
   module V3
     class Github < Grape::API
       JIRA_DEV_PANEL_FEATURE = :jira_dev_panel_integration.freeze
-      NO_SLASH_URL_PART_REGEX = %r{[^/]+}
+      NO_SLASH_URL_PART_REGEX = %r{[^/]+}.freeze
       NAMESPACE_ENDPOINT_REQUIREMENTS = { namespace: NO_SLASH_URL_PART_REGEX }.freeze
       PROJECT_ENDPOINT_REQUIREMENTS = NAMESPACE_ENDPOINT_REQUIREMENTS.merge(project: NO_SLASH_URL_PART_REGEX).freeze
 
