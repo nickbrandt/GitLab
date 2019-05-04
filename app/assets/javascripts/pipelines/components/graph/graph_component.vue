@@ -21,8 +21,8 @@ export default {
           v-for="(stage, index) in graph"
           :key="stage.name"
           :class="{
-            'append-right-44': !(index === graph.length - 1),
-          }"          
+            'append-right-48': !(index === graph.length - 1),
+          }"
           :title="capitalizeStageName(stage.name)"
           :groups="stage.groups"
           :stage-connector-class="stageConnectorClass(index, stage)"
