@@ -89,7 +89,6 @@ describe API::Vulnerabilities do
 
           expect(response.headers['X-Total']).to eq occurrence_count
 
-          expect(json_response.first['name']).to eq 'Probable insecure usage of temp file/directory.'
           expect(json_response.first['vulnerability_feedback_dismissal_path']).to be_present
         end
 
