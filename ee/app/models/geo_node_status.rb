@@ -14,6 +14,7 @@ class GeoNodeStatus < ApplicationRecord
   attr_accessor :repository_verification_enabled
 
   # Prometheus metrics, no need to store them in the database
+  # :event_log_count is deprecated and will be removed in 12.0
   attr_accessor :event_log_count, :event_log_max_id,
                 :repository_created_max_id, :repository_updated_max_id,
                 :repository_deleted_max_id, :repository_renamed_max_id, :repositories_changed_max_id,
@@ -70,7 +71,6 @@ class GeoNodeStatus < ApplicationRecord
     cursor_last_event_timestamp: 'Time of the event log processed by the secondary',
     last_successful_status_check_timestamp: 'Time when Geo node status was updated internally',
     status_message: 'Summary of health status',
-    event_log_count: 'Number of entries in the Geo event log',
     event_log_max_id: 'Highest ID present in the Geo event log',
     repository_created_max_id: 'Highest ID present in repositories created',
     repository_updated_max_id: 'Highest ID present in repositories updated',
@@ -166,7 +166,6 @@ class GeoNodeStatus < ApplicationRecord
     self.version = Gitlab::VERSION
     self.revision = Gitlab.revision
 
-    self.event_log_count = Geo::EventLog.count
     # Geo::PruneEventLogWorker might remove old events, so log maximum id
     self.event_log_max_id = Geo::EventLog.maximum(:id)
     self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
