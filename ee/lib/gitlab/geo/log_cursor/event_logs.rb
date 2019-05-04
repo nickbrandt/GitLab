@@ -37,11 +37,11 @@ module Gitlab
           return last if last
 
           if ::Geo::EventLog.any?
-            event_id = ::Geo::EventLog.last.id
-            save_processed(event_id)
-            event_id
+            last_event_id = ::Geo::EventLog.last.id
+            save_processed(last_event_id)
+            last_event_id
           else
-            -1
+            0
           end
         end
       end
