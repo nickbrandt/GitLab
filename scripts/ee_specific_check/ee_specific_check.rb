@@ -27,7 +27,7 @@ module EESpecificCheck
     # 'doc/administration/geo/disaster_recovery/**/*',
     # 'doc/administration/geo/replication/**/*',
     'doc/administration/gitaly/**/*',
-    'doc/administration/high_availability/**/*',
+    # 'doc/administration/high_availability/**/*',
     'doc/administration/integration/**/*',
     # 'doc/administration/monitoring/**/*',
     # 'doc/administration/monitoring/performance/**/*',
