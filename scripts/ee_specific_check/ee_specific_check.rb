@@ -32,7 +32,7 @@ module EESpecificCheck
     # 'doc/administration/monitoring/**/*',
     # 'doc/administration/monitoring/performance/**/*',
     # 'doc/administration/monitoring/prometheus/**/*',
-    'doc/administration/operations/**/*',
+    # 'doc/administration/operations/**/*',
     'doc/administration/pages/**/*',
     'doc/administration/raketasks/**/*',
     'doc/administration/raketasks/uploads/**/*',
