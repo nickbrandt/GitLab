@@ -24,7 +24,7 @@ If no configuration was set, a [default configuration file](
 https://gitlab.com/gitlab-org/gitlab-ee/blob/master/ee/fixtures/insights/ee/fixtures/insights/default.yml)
 will be used.
 
-See the [Project's Insights documentation](../../project/insights/index.md) for
+See the [Project's Insights documentation](https://docs.gitlab.com/ee/user/project/insights/index.html) for
 more details about the `.gitlab/insights.yml` configuration file.
 
 ## Permissions
