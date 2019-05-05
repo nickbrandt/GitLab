@@ -88,8 +88,6 @@ From the project issue/merge request list pages and the group issue/merge reques
 - From [project issue boards](../issue_board.md), you can filter by both group milestones and project milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **[STARTER]**
 - From [group issue boards](../issue_board.md#group-issue-boards-premium) you can filter by only group milestones in the [issue board configuration](../issue_board.md#configurable-issue-boards-starter). **[STARTER]**
 
-
-
 ### Special milestone filters
 
 When filtering by milestone, in addition to choosing a specific project milestone or group milestone, you can choose a special milestone filter.
@@ -103,17 +101,17 @@ When filtering by milestone, in addition to choosing a specific project mileston
 
 Not all features in the project milestone view are available in the group milestone view. This table summarizes the differences:
 
-| Feature | Project milestone view | Group milestone view |
-|---|:---:|:---:|
-| Title an description | ✓ | ✓ |
-| Issues assigned to milestone | ✓ |  |
-| Merge requests assigned to milestone | ✓ |  |
-| Participants and labels used | ✓ |  |
-| Percentage complete | ✓ | ✓ |
-| Start date and due date | ✓ | ✓ |
-| Total issue time spent | ✓ | ✓ |
-| Total issue weight | ✓ |  |
-| Burndown chart | ✓ | ✓ |
+| Feature                              | Project milestone view | Group milestone view |
+|--------------------------------------|:----------------------:|:--------------------:|
+| Title an description                 | ✓                      | ✓                    |
+| Issues assigned to milestone         | ✓                      |                      |
+| Merge requests assigned to milestone | ✓                      |                      |
+| Participants and labels used         | ✓                      |                      |
+| Percentage complete                  | ✓                      | ✓                    |
+| Start date and due date              | ✓                      | ✓                    |
+| Total issue time spent               | ✓                      | ✓                    |
+| Total issue weight                   | ✓                      |                      |
+| Burndown chart **[STARTER}**         | ✓                      | ✓                    |
 
 The milestone view shows the title and description.
 
