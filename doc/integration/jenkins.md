@@ -63,7 +63,7 @@ copied earlier in the 'API Token' field.
 For more information, see GitLab Plugin documentation about 
 [Jenkins-to-GitLab authentication](https://github.com/jenkinsci/gitlab-plugin#jenkins-to-gitlab-authentication)
 
-![Jenkins GitLab plugin configuration](jenkins_gitlab_plugin_config.png)
+![Jenkins GitLab plugin configuration](img/jenkins_gitlab_plugin_config.png)
 
 ## Configure a Jenkins project
 
@@ -93,7 +93,7 @@ from the URL bar of your browser while viewing the Jenkins project.
 Optionally, enter a username and password if your Jenkins server requires
 authentication.
 
-![GitLab service settings](jenkins_gitlab_service_settings.png)
+![GitLab service settings](img/jenkins_gitlab_service_settings.png)
 
 ## Plugin functional overview
 
