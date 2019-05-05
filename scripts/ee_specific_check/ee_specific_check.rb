@@ -20,9 +20,9 @@ module EESpecificCheck
     ##
     'doc/*.md',
     'doc/administration/*.md',
-    'doc/administration/auth/**/*',
-    'doc/administration/auth/how_to_configure_ldap_gitlab_ce/**/*',
-    'doc/administration/auth/how_to_configure_ldap_gitlab_ee/**/*',
+    # 'doc/administration/auth/**/*',
+    # 'doc/administration/auth/how_to_configure_ldap_gitlab_ce/**/*',
+    # 'doc/administration/auth/how_to_configure_ldap_gitlab_ee/**/*',
     'doc/administration/geo/**/*',
     'doc/administration/geo/disaster_recovery/**/*',
     'doc/administration/geo/replication/**/*',
