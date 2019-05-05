@@ -98,9 +98,9 @@ environments including [Horizontal](./README.md#horizontal),
 
 ### Provide your own PostgreSQL instance **[CORE ONLY]**
 
-If you want to use your own deployed PostgreSQL instance(s), 
+If you want to use your own deployed PostgreSQL instance(s),
 see [Provide your own PostgreSQL instance](#provide-your-own-postgresql-instance-core-only)
-for more details. However, you can use the GitLab Omnibus package to easily 
+for more details. However, you can use the GitLab Omnibus package to easily
 deploy the bundled PostgreSQL. 
 
 ### High Availability with GitLab Omnibus **[PREMIUM ONLY]**

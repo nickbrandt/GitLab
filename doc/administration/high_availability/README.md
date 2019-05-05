@@ -69,8 +69,8 @@ larger one.
 
 #### Installation Instructions
 
-Complete the following installation steps in order. A link at the end of each 
-section will bring you back to the Scalable Architecture Examples section so 
+Complete the following installation steps in order. A link at the end of each
+section will bring you back to the Scalable Architecture Examples section so
 you can continue with the next step.
 
 1. [PostgreSQL](./database.md#postgresql-in-a-scaled-environment)
@@ -135,7 +135,7 @@ the contention.
 - 2 or more GitLab application nodes (Unicorn, Workhorse, Sidekiq, PGBouncer)
 - 1 NFS/Gitaly server
 
-![Horizontal architecture diagram](../img/high_availability/horizontal.png)
+![Horizontal architecture diagram](https://docs.gitlab.com/ee/administration/img/high_availability/horizontal.png)
 
 ### Hybrid
 
@@ -151,7 +151,7 @@ contention due to certain workloads.
 - 2 or more Web nodes (Unicorn, Workhorse, PGBouncer)
 - 1 or more NFS/Gitaly servers
 
-![Hybrid architecture diagram](../img/high_availability/hybrid.png)
+![Hybrid architecture diagram](https://docs.gitlab.com/ee/administration/img/high_availability/hybrid.png)
 
 ### Fully Distributed
 
@@ -170,7 +170,7 @@ with the added complexity of many more nodes to configure, manage and monitor.
 - 2 or more Web nodes (All other web requests)
 - 2 or more NFS/Gitaly servers
 
-![Fully Distributed architecture diagram](../img/high_availability/fully-distributed.png)
+![Fully Distributed architecture diagram](https://docs.gitlab.com/ee/administration/img/high_availability/fully-distributed.png)
 
 The following pages outline the steps necessary to configure each component
 separately:
