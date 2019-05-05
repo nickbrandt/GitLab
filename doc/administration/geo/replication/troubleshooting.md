@@ -1,4 +1,4 @@
-# Geo Troubleshooting
+# Geo Troubleshooting **[PREMIUM ONLY]**
 
 NOTE: **Note:**
 This list is an attempt to document all the moving parts that can go wrong.

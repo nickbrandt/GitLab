@@ -1,4 +1,4 @@
-# Geo configuration (source)
+# Geo configuration (source) **[PREMIUM ONLY]**
 
 NOTE: **Note:**
 This documentation applies to GitLab source installations. In GitLab 11.5, this documentation was deprecated and will be removed in a future release.
