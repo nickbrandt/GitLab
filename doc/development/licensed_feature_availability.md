@@ -1,4 +1,4 @@
-# Licensed feature availability
+# Licensed feature availability **[STARTER]**
 
 As of GitLab 9.4, we've been supporting a simplified version of licensed 
 feature availability checks via `ee/app/models/license.rb`, both for 
@@ -7,8 +7,8 @@ on-premise or GitLab.com plans and features.
 ## Restricting features scoped by namespaces or projects
 
 GitLab.com plans are persisted on user groups and namespaces, therefore, if you're adding a
-feature such as [Related issues](../user/project/issues/related_issues.md) or 
-[Service desk](../user/project/service_desk.md), 
+feature such as [Related issues](https://docs.gitlab.com/ee/user/project/issues/related_issues.html) or 
+[Service desk](https://docs.gitlab.com/ee/user/project/service_desk.html), 
 it should be restricted on namespace scope.
 
 1. Add the feature symbol on `EES_FEATURES`, `EEP_FEATURES` or `EEU_FEATURES` constants in 
@@ -22,8 +22,8 @@ project.feature_available?(:feature_symbol)
 
 ## Restricting global features (instance)
 
-However, for features such as [Geo](../gitlab-geo/README.md) and 
-[Load balancing](../administration/database_load_balancing.md), which cannot be restricted 
+However, for features such as [Geo](https://docs.gitlab.com/ee/administration/geo/replication/index.html) and 
+[Load balancing](https://docs.gitlab.com/ee/administration/database_load_balancing.html), which cannot be restricted 
 to only a subset of projects or namespaces, the check will be made directly in 
 the instance license.
 
