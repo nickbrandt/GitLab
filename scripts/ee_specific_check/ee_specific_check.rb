@@ -174,7 +174,7 @@ module EESpecificCheck
     'doc/user/application_security/license_management/**/*',
     'doc/user/application_security/sast/**/*',
     'doc/user/application_security/security_dashboard/**/*',
-    'doc/user/discussions/**/*',
+    # 'doc/user/discussions/**/*',
     'doc/user/gitlab_com/**/*',
     # 'doc/user/group/*.md',
     # 'doc/user/group/clusters/**/*',
