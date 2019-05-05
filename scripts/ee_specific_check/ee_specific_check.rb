@@ -206,7 +206,7 @@ module EESpecificCheck
     'doc/user/project/issues/**/*',
     'doc/user/project/members/**/*',
     'doc/user/project/merge_requests/**/*',
-    'doc/user/project/milestones/**/*',
+    # 'doc/user/project/milestones/**/*',
     'doc/user/project/operations/**/*',
     'doc/user/project/packages/**/*',
     'doc/user/project/pages/**/*',
