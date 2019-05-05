@@ -109,7 +109,7 @@ module EESpecificCheck
     'doc/getting-started/**/*',
     'doc/git_hooks/**/*',
     'doc/gitlab-basics/**/*',
-    'doc/gitlab-geo/**/*',
+    # 'doc/gitlab-geo/**/*',
     'doc/hooks/**/*',
     'doc/incoming_email/**/*',
     'doc/install/*.md',
