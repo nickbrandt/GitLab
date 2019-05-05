@@ -161,7 +161,7 @@ module EESpecificCheck
     'doc/university/training/end-user/**/*',
     'doc/university/training/gitlab_flow/**/*',
     'doc/university/training/topics/**/*',
-    'doc/update/**/*',
+    # 'doc/update/**/*',
     'doc/user/*.md',
     'doc/user/account/**/*',
     'doc/user/admin_area/*.md',
