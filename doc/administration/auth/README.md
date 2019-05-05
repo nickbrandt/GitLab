@@ -16,4 +16,4 @@ providers.
 - [SAML](../../integration/saml.md) Configure GitLab as a SAML 2.0 Service Provider
 - [Okta](okta.md) Configure GitLab to sign in using Okta
 - [Authentiq](authentiq.md): Enable the Authentiq OmniAuth provider for passwordless authentication
-- [Smartcard](smartcard.md) Smartcard authentication
+- [Smartcard](smartcard.md) Smartcard authentication **[PREMIUM ONLY]**
