@@ -263,9 +263,9 @@ Auditor users are given read-only access to all projects, groups, and other
 resources on the GitLab instance.
 
 An Auditor user should be able to access all projects and groups of a GitLab instance
-with the permissions described on the documentation on [auditor users permissions](../administration/auditor_users.md#permissions-and-restrictions-of-an-auditor-user).
+with the permissions described on the documentation on [auditor users permissions](https://docs.gitlab.com/ee/administration/auditor_users.html#permissions-and-restrictions-of-an-auditor-user).
 
-[Read more about Auditor users.](../administration/auditor_users.md)
+[Read more about Auditor users.](https://docs.gitlab.com/ee/administration/auditor_users.html)
 
 ## Project features
 
@@ -350,7 +350,7 @@ for details about the pipelines security model.
 ## LDAP users permissions
 
 Since GitLab 8.15, LDAP user permissions can now be manually overridden by an admin user.
-Read through the documentation on [LDAP users permissions](../administration/auth/how_to_configure_ldap_gitlab_ee/index.md) to learn more.
+Read through the documentation on [LDAP users permissions](https://docs.gitlab.com/ee/administration/auth/how_to_configure_ldap_gitlab_ee/index.html) to learn more.
 
 [^1]: On public and internal projects, all users are able to perform this action
 [^2]: Guest users can only view the confidential issues they created themselves
