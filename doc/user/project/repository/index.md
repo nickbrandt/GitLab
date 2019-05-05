@@ -222,8 +222,8 @@ Find it under your project's **Repository > Compare**.
 
 ## Locked files **[PREMIUM]**
 
-Use [File Locking](../file_lock.md) to lock your files to prevent
-any conflicting changes.
+Use [File Locking](https://docs.gitlab.com/ee/user/project/file_lock.html) to
+lock your files to prevent any conflicting changes.
 
 ## Repository's API
 
