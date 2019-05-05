@@ -5,7 +5,7 @@ The ability to contribute conversationally is offered throughout GitLab.
 You can leave a comment in the following places:
 
 - issues
-- epics
+- epics **[ULTIMATE]**
 - merge requests
 - snippets
 - commits
