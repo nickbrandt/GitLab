@@ -74,7 +74,7 @@ When you create a project in GitLab, you'll have access to a large number of
      timeout (defines the maximum amount of time in minutes that a job is able run), custom path for `.gitlab-ci.yml`, test coverage parsing, pipeline's visibility, and much more
   - [Kubernetes cluster integration](clusters/index.md): Connecting your GitLab project
     with a Kubernetes cluster
-  - [Feature Flags](operations/feature_flags.md): Feature flags allow you to ship a project in
+  - [Feature Flags](https://docs.gitlab.com/ee/user/project/operations/feature_flags.html): Feature flags allow you to ship a project in
     different flavors by dynamically toggling certain functionality **[PREMIUM]**
 - [GitLab Pages](pages/index.md): Build, test, and deploy your static
   website with GitLab Pages
@@ -91,10 +91,10 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Releases](releases/index.md): a way to track deliverables in your project as snapshot in time of
   the source, build output, and other metadata or artifacts
   associated with a released version of your code.
-- [Maven packages](packages/maven_repository.md): your private Maven repository in GitLab. **[PREMIUM]**
-- [NPM packages](packages/npm_registry.md): your private NPM package registry in GitLab. **[PREMIUM]**
+- [Maven packages](https://docs.gitlab.com/ee/user/project/packages/maven_repository.html): your private Maven repository in GitLab. **[PREMIUM]**
+- [NPM packages](https://docs.gitlab.com/ee/user/project/packages/npm_registry.html): your private NPM package registry in GitLab. **[PREMIUM]**
 - [Code owners](code_owners.md): specify code owners for certain files **[STARTER]**
-- [License Management](merge_requests/license_management.md): approve and blacklist licenses for projects. **[ULTIMATE]**
+- [License Management](https://docs.gitlab.com/ee/user/application_security/license_management/index.html): approve and blacklist licenses for projects. **[ULTIMATE]**
 
 ### Project integrations
 
@@ -135,7 +135,7 @@ Read through the documentation on [project settings](settings/index.md).
 Instead of importing a repository directly to GitLab, you can connect your repository
 as a CI/CD project.
 
-Read through the documentation on [CI/CD for external repositories](../../ci/ci_cd_for_external_repos/index.md).
+Read through the documentation on [CI/CD for external repositories](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/index.html).
 
 ## Project members
 
