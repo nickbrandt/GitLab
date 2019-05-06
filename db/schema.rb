@@ -563,6 +563,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.boolean "masked", default: false, null: false
+    t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["group_id", "key"], name: "index_ci_group_variables_on_group_id_and_key", unique: true, using: :btree
   end
 
@@ -602,6 +603,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.integer "pipeline_schedule_id", null: false
     t.datetime_with_timezone "created_at"
     t.datetime_with_timezone "updated_at"
+    t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["pipeline_schedule_id", "key"], name: "index_ci_pipeline_schedule_variables_on_schedule_id_and_key", unique: true, using: :btree
   end
 
@@ -628,6 +630,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.string "encrypted_value_salt"
     t.string "encrypted_value_iv"
     t.integer "pipeline_id", null: false
+    t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["pipeline_id", "key"], name: "index_ci_pipeline_variables_on_pipeline_id_and_key", unique: true, using: :btree
   end
 
@@ -775,6 +778,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.boolean "protected", default: false, null: false
     t.string "environment_scope", default: "*", null: false
     t.boolean "masked", default: false, null: false
+    t.integer "variable_type", limit: 2, default: 1, null: false
     t.index ["project_id", "key", "environment_scope"], name: "index_ci_variables_on_project_id_and_key_and_environment_scope", unique: true, using: :btree
   end
 
