@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module EE
-  module Projects
+  module Clusters
     module ClustersController
-      extend ActiveSupport::Concern
-
       def metrics
         return render_404 unless prometheus_adapter&.can_query?
 
