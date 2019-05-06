@@ -21,6 +21,18 @@ describe Epic do
     it { is_expected.to validate_presence_of(:group) }
     it { is_expected.to validate_presence_of(:author) }
     it { is_expected.to validate_presence_of(:title) }
+
+    it 'is valid with a valid parent' do
+      epic = build(:epic, group: group, parent: create(:epic, group: group))
+
+      expect(epic).to be_valid
+    end
+
+    it 'is not valid with invalid parent' do
+      epic = build(:epic, group: group, parent: create(:epic))
+
+      expect(epic).not_to be_valid
+    end
   end
 
   describe 'modules' do
@@ -83,6 +95,110 @@ describe Epic do
 
     it 'orders by relative_position ASC' do
       expect(epics(:relative_position)).to eq([epic2, epic3, epic1, epic4])
+    end
+  end
+
+  describe '#valid_parent?' do
+    context 'basic checks' do
+      let(:epic) { build(:epic, group: group) }
+
+      it 'returns true without parent' do
+        expect(epic.valid_parent?).to be_truthy
+      end
+
+      it 'returns true with a valid parent' do
+        epic.parent = create(:epic, group: group)
+
+        expect(epic.valid_parent?).to be_truthy
+      end
+
+      it 'returns false with a parent from different group' do
+        epic.parent = create(:epic)
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+
+      it 'returns false when level is too deep' do
+        epic1 = create(:epic, group: group)
+        epic2 = create(:epic, group: group, parent: epic1)
+        epic3 = create(:epic, group: group, parent: epic2)
+        epic4 = create(:epic, group: group, parent: epic3)
+        epic5 = create(:epic, group: group, parent: epic4)
+        epic6 = create(:epic, group: group, parent: epic5)
+        epic.parent = epic6
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+    end
+
+    context 'when adding an Epic that has existing children' do
+      let(:parent_epic) { create(:epic, group: group) }
+      let(:epic) { build(:epic, group: group) }
+      let(:child_epic1) { create(:epic, group: group, parent: epic)}
+
+      it 'returns true when total depth after adding will not exceed limit' do
+        epic.parent = parent_epic
+
+        expect(epic.valid_parent?).to be_truthy
+      end
+
+      it 'returns false when total depth after adding would exceed limit' do
+        child_epic2 = create(:epic, group: group, parent: child_epic1)
+        child_epic3 = create(:epic, group: group, parent: child_epic2)
+        child_epic4 = create(:epic, group: group, parent: child_epic3)
+        create(:epic, group: group, parent: child_epic4)
+
+        epic.parent = parent_epic
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+    end
+
+    context 'when parent has ancestors and epic has children' do
+      let(:root_epic) { create(:epic, group: group) }
+      let(:parent_epic) { create(:epic, group: group, parent: root_epic) }
+      let(:epic) { build(:epic, group: group) }
+      let(:child_epic1) { create(:epic, group: group, parent: epic)}
+
+      it 'returns true when total depth after adding will not exceed limit' do
+        epic.parent = parent_epic
+
+        expect(epic.valid_parent?).to be_truthy
+      end
+
+      it 'returns false when total depth after adding would exceed limit' do
+        root_epic.update(parent: create(:epic, group: group))
+        create(:epic, group: group, parent: child_epic1)
+
+        epic.parent = parent_epic
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+    end
+
+    context 'when hierarchy is cyclic' do
+      let(:epic) { create(:epic, group: group) }
+
+      it 'returns false when parent is same as the epic' do
+        epic.parent = epic
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+
+      it 'returns false when child epic is parent of the given parent' do
+        epic1 = create(:epic, group: group, parent: epic)
+        epic.parent = epic1
+
+        expect(epic.valid_parent?).to be_falsey
+      end
+
+      it 'returns false when child epic is an ancestor of the given parent' do
+        epic1 = create(:epic, group: group, parent: epic)
+        epic2 = create(:epic, group: group, parent: epic1)
+        epic.parent = epic2
+
+        expect(epic.valid_parent?).to be_falsey
+      end
     end
   end
 

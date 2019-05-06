@@ -406,13 +406,15 @@ describe API::Epics do
 
   describe 'POST /groups/:id/epics' do
     let(:url) { "/groups/#{group.path}/epics" }
+    let(:parent_epic) { create(:epic, group: group) }
     let(:params) do
       {
         title: 'new epic',
         description: 'epic description',
         labels: 'label1',
         due_date_fixed: '2018-07-17',
-        due_date_is_fixed: true
+        due_date_is_fixed: true,
+        parent_id: parent_epic.id
       }
     end
 
@@ -455,6 +457,8 @@ describe API::Epics do
           expect(epic.due_date_fixed).to eq(Date.new(2018, 7, 17))
           expect(epic.due_date_is_fixed).to eq(true)
           expect(epic.labels.first.title).to eq('label1')
+          expect(epic.parent).to eq(parent_epic)
+          expect(epic.relative_position).not_to be_nil
         end
 
         context 'when deprecated start_date and end_date params are present' do
