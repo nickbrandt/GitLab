@@ -3,7 +3,9 @@ require 'spec_helper'
 describe GitlabSubscription do
   describe 'default values' do
     it do
-      expect(subject.start_date).to eq(Date.today)
+      Timecop.freeze(Date.today + 30) do
+        expect(subject.start_date).to eq(Date.today)
+      end
     end
   end
 
