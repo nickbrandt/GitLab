@@ -1,0 +1,5 @@
+---
+title: Allow merge requests to be merged even when it does not have up-to-date pipeline when merge request pipeline is enabled
+merge_request: 12309
+author:
+type: changed
