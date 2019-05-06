@@ -5791,13 +5791,13 @@ msgstr ""
 msgid "Geo|Synchronization failed - %{error}"
 msgstr ""
 
+msgid "Geo|The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set"
+msgstr ""
+
 msgid "Geo|The database is currently %{db_lag} behind the primary node."
 msgstr ""
 
 msgid "Geo|The node is currently %{minutes_behind} behind the primary node."
-msgstr ""
-
-msgid "Geo|The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set"
 msgstr ""
 
 msgid "Geo|This is a primary node"
@@ -6314,9 +6314,6 @@ msgid "Help page"
 msgstr ""
 
 msgid "Help page text and support page url."
-msgstr ""
-
-msgid "Here is the public SSH key that needs to be added to the remote server. For more information, please refer to the documentation."
 msgstr ""
 
 msgid "Hide archived projects"
