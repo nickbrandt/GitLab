@@ -1,0 +1,6 @@
+- return unless user_onboarding_enabled?
+
+%li
+  %a{ href: explore_onboarding_index_path }
+    = _("Learn GitLab")
+    %span.badge.badge-success= s_("Badge|New")
