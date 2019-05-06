@@ -3,21 +3,21 @@
 module Ci
   class PipelineBridgeStatusService < ::BaseService
     def execute(pipeline)
-      pipeline.downstream_bridges.each do |bridged_job|
-        process_bridged_job(pipeline.status, bridged_job)
+      pipeline.downstream_bridges.each do |bridge|
+        process_bridge(pipeline.status, bridge)
       end
     end
 
-    def process_bridged_job(status, job)
+    def process_bridge(status, bridge)
       case status
       when 'success'
-        job.success!
+        bridge.success!
       when 'failed'
-        job.drop!
+        bridge.drop!
       when 'canceled'
-        job.cancel!
+        bridge.cancel!
       when 'skipped'
-        job.skip!
+        bridge.skip!
       end
     end
   end

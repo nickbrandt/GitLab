@@ -23,9 +23,33 @@ describe Ci::Bridge do
   end
 
   describe 'state machine transitions' do
-    context 'when it changes status from created to pending' do
+    context 'when bridge points towards downstream' do
+      it 'does not subscribe to upstream project' do
+        expect(::Ci::SubscribeBridgeService).not_to receive(:new)
+
+        bridge.enqueue!
+      end
+
       it 'schedules downstream pipeline creation' do
         expect(bridge).to receive(:schedule_downstream_pipeline!)
+
+        bridge.enqueue!
+      end
+    end
+
+    context 'when bridge points towards upstream' do
+      before do
+        bridge.options = { needs: { project: 'my/project' } }
+      end
+
+      it 'subscribes to the upstream project' do
+        expect(::Ci::SubscribeBridgeService).to receive_message_chain(:new, :execute)
+
+        bridge.enqueue!
+      end
+
+      it 'does not schedule downstream pipeline creation' do
+        expect(bridge).not_to receive(:schedule_downstream_pipeline!)
 
         bridge.enqueue!
       end
