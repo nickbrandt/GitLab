@@ -935,7 +935,7 @@ GEM
     sys-filesystem (1.1.6)
       ffi
     sysexits (1.2.0)
-    temple (0.8.0)
+    temple (0.8.1)
     test-prof (0.2.5)
     text (1.3.1)
     thin (1.7.2)
@@ -945,7 +945,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     thrift (0.11.0.0)
-    tilt (2.0.8)
+    tilt (2.0.9)
     timecop (0.8.1)
     timfel-krb5-auth (0.8.3)
     toml (0.2.0)
@@ -1121,7 +1121,7 @@ DEPENDENCIES
   graphql (~> 1.8.0)
   grpc (~> 1.19.0)
   gssapi
-  haml_lint (~> 0.28.0)
+  haml_lint (~> 0.30.0)
   hamlit (~> 2.8.8)
   hangouts-chat (~> 0.0.5)
   hashie-forbidden_attributes
