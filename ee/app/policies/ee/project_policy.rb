@@ -80,6 +80,8 @@ module EE
         prevent :read_project
       end
 
+      rule { alert_bot }.enable :reporter_access
+
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in

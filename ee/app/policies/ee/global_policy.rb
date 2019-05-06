@@ -14,6 +14,8 @@ module EE
         enable :read_licenses
         enable :destroy_licenses
       end
+
+      rule { support_bot }.prevent :use_quick_actions
     end
   end
 end

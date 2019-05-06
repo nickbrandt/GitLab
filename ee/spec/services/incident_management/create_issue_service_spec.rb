@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe IncidentManagement::CreateIssueService do
-  set(:project) { create(:project, :repository, create_templates: :issue) }
+  let(:project) { create(:project, :repository) }
   let(:service) { described_class.new(project, nil, alert_payload) }
   let(:alert_title) { 'TITLE' }
   let(:alert_payload) do
@@ -17,7 +17,8 @@ describe IncidentManagement::CreateIssueService do
   subject { service.execute }
 
   context 'when create_issue enabled' do
-    let(:user) { create(:user) }
+    let(:issue) { subject[:issue] }
+    let(:summary_separator) { "---\n\n" }
 
     before do
       setting.update!(create_issue: true)
@@ -27,26 +28,68 @@ describe IncidentManagement::CreateIssueService do
       it 'creates an issue with alert summary only' do
         expect(subject).to include(status: :success)
 
-        issue = subject[:issue]
         expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include('Summary')
         expect(issue.description).to include(alert_title)
-        expect(issue.description).not_to include("---\n\n")
+        expect(issue.description).not_to include(summary_separator)
       end
     end
 
     context 'with issue_template_content' do
       before do
+        create_issue_template('bug', issue_template_content)
         setting.update!(issue_template_key: 'bug')
       end
 
-      it 'creates an issue appending issue template' do
-        expect(subject).to include(status: :success)
+      context 'plain content' do
+        let(:issue_template_content) { 'some content' }
 
-        issue = subject[:issue]
-        expect(issue.description).to include("---\n\n")
-        expect(issue.description).to include(setting.issue_template_content)
+        it 'creates an issue appending issue template' do
+          expect(subject).to include(status: :success)
+
+          expect(issue.description).to include('Summary')
+          expect(issue.description).to include(alert_title)
+          expect(issue.description).to include(summary_separator)
+          expect(issue.description).to include(issue_template_content)
+        end
+      end
+
+      context 'quick actions' do
+        let(:user) { create(:user) }
+        let(:plain_text) { 'some content' }
+
+        let(:issue_template_content) do
+          <<~CONTENT
+            #{plain_text}
+            /due tomorrow
+            /assign @#{user.username}
+          CONTENT
+        end
+
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'creates an issue interpreting quick actions' do
+          expect(subject).to include(status: :success)
+
+          expect(issue.description).to include(plain_text)
+          expect(issue.due_date).to be_present
+          expect(issue.assignees).to eq([user])
+        end
+      end
+
+      private
+
+      def create_issue_template(name, content)
+        project.repository.create_file(
+          project.creator,
+          ".gitlab/issue_templates/#{name}.md",
+          content,
+          message: 'message',
+          branch_name: 'master'
+        )
       end
     end
 
