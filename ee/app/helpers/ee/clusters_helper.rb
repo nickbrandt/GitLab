@@ -15,7 +15,7 @@ module EE
 
     def cluster_health_data(cluster)
       {
-        'clusters-path': clusterable.clusters_path,
+        'clusters-path': clusterable.index_path,
         'metrics-endpoint': clusterable.metrics_cluster_path(cluster, format: :json),
         'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
         'empty-getting-started-svg-path': image_path('illustrations/monitoring/getting_started.svg'),
