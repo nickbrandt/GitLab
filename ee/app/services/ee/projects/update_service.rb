@@ -34,6 +34,7 @@ module EE
 
           sync_wiki_on_enable if !wiki_was_enabled && project.wiki_enabled?
           project.import_state.force_import_job! if params[:mirror].present? && project.mirror?
+          project.remove_import_data if project.previous_changes.include?('mirror') && !project.mirror?
 
           sync_approval_rules
         end
