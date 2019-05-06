@@ -116,7 +116,7 @@ describe('Approvals ApproversSelect', () => {
 
     waitForEvent($input, 'select2-loaded')
       .then(() => {
-        expect(Api.groups).toHaveBeenCalledWith(term, { skip_groups: [] });
+        expect(Api.groups).toHaveBeenCalledWith(term, { skip_groups: [], all_available: true });
         expect(Api.approverUsers).toHaveBeenCalledWith(term, {
           skip_users: [],
           project_id: TEST_PROJECT_ID,
@@ -141,7 +141,11 @@ describe('Approvals ApproversSelect', () => {
 
     waitForEvent($input, 'select2-loaded')
       .then(() => {
-        expect(Api.groups).toHaveBeenCalledWith('', { skip_groups: skipGroupIds });
+        expect(Api.groups).toHaveBeenCalledWith('', {
+          skip_groups: skipGroupIds,
+          all_available: true,
+        });
+
         expect(Api.approverUsers).toHaveBeenCalledWith('', {
           skip_users: skipUserIds,
           project_id: TEST_PROJECT_ID,
