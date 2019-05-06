@@ -12,6 +12,9 @@
   %td.mirror-action-buttons
     .btn-group.mirror-actions-group.pull-right{ role: 'group' }
       - if @project.mirror?
+        - ssh_public_key = @project.import_data.ssh_public_key
+        - if ssh_public_key
+          = clipboard_button(text: ssh_public_key, class: 'btn btn-default qa-copy-ssh-public-key', title: _('Copy SSH public key'))
         - if import_state.mirror_update_due? || import_state.updating_mirror?
           %button.btn.disabled{ type: 'button', data: { container: 'body', toggle: 'tooltip' }, title: _('Updating') }= icon("refresh spin")
         - else

@@ -277,6 +277,13 @@ describe Projects::UpdateService, '#execute' do
     expect(result).to eq({ status: :error, message: "Name can contain only letters, digits, emojis, '_', '.', dash, space. It must start with letter, digit, emoji or '_'." })
   end
 
+  it 'calls remove_import_data if mirror was disabled in previous change' do
+    update_project(project, user, { mirror: false })
+
+    expect(project.import_data).to be_nil
+    expect(project).not_to be_mirror
+  end
+
   def update_project(project, user, opts)
     Projects::UpdateService.new(project, user, opts).execute
   end
