@@ -503,4 +503,10 @@ describe ProjectPolicy do
              projects: [clusterable])
     end
   end
+
+  context 'alert bot' do
+    let(:current_user) { User.alert_bot }
+
+    it { is_expected.to be_allowed(:reporter_access) }
+  end
 end
