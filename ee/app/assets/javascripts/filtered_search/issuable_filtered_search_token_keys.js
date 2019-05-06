@@ -43,6 +43,10 @@ class IssuesFilteredSearchTokenKeysEE extends FilteredSearchTokenKeys {
    */
   enableMultipleAssignees() {
     const assigneeTokenKey = this.tokenKeys.find(tk => tk.key === 'assignee');
+
+    // Add the original as an alternative token key
+    this.tokenKeysWithAlternative.push({ ...assigneeTokenKey });
+
     assigneeTokenKey.type = 'array';
     assigneeTokenKey.param = 'username[]';
   }
