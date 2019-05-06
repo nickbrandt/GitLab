@@ -37,7 +37,7 @@ module Gitlab
         return false if available_spots < capacity_threshold
 
         # Only reschedule if we are able to completely fill up the available spots.
-        mirrors_ready_to_sync_count(available_spots + 1) >= available_spots
+        mirrors_ready_to_sync_count(available_spots) >= available_spots
       end
 
       def mirrors_ready_to_sync_count(up_to = nil)
