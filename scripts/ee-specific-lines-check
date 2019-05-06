@@ -24,7 +24,7 @@ offenses = updated_numstat.select do |file, updated_delta|
 
   more_lines &&
     allow_prepend_line &&
-    !WHITELIST.any? { |pattern| Dir.glob(pattern).include?(file) }
+    !WHITELIST.any? { |pattern| Dir.glob(pattern, File::FNM_DOTMATCH).include?(file) }
 end
 
 if offenses.empty?
