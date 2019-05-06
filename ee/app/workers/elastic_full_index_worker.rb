@@ -13,7 +13,7 @@ class ElasticFullIndexWorker
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?
 
     Project.id_in(start_id..end_id).find_each do |project|
-      ElasticIndexerWorker.new.index(:index, project)
+      Elastic::IndexRecordService.new.execute(project, true)
     end
   end
 end
