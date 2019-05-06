@@ -51,7 +51,7 @@ describe Namespace do
 
       expect(namespace.use_elasticsearch?).to eq(false)
 
-      ::Gitlab::CurrentSettings.update!(elasticsearch_namespace_ids: namespace.id.to_s)
+      create :elasticsearch_indexed_namespace, namespace: namespace
 
       expect(namespace.use_elasticsearch?).to eq(true)
     end

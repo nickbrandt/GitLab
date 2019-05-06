@@ -33,6 +33,46 @@ describe API::Settings, 'EE Settings' do
       expect(json_response['snowplow_site_id']).to eq('site_id')
       expect(json_response['file_template_project_id']).to eq(project.id)
     end
+
+    context 'elasticsearch settings' do
+      it 'limits namespaces and projects properly' do
+        namespace_ids = create_list(:namespace, 2).map(&:id)
+        project_ids = create_list(:project, 2).map(&:id)
+
+        put api('/application/settings', admin),
+            params: {
+              elasticsearch_limit_indexing: true,
+              elasticsearch_project_ids: project_ids.join(','),
+              elasticsearch_namespace_ids: namespace_ids.join(',')
+            }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['elasticsearch_limit_indexing']).to eq(true)
+        expect(json_response['elasticsearch_project_ids']).to eq(project_ids)
+        expect(json_response['elasticsearch_namespace_ids']).to eq(namespace_ids)
+        expect(ElasticsearchIndexedNamespace.count).to eq(2)
+        expect(ElasticsearchIndexedProject.count).to eq(2)
+      end
+
+      it 'removes namespaces and projects properly' do
+        stub_ee_application_setting(elasticsearch_limit_indexing: true)
+        create(:elasticsearch_indexed_namespace).namespace.id
+        create(:elasticsearch_indexed_project).project.id
+
+        put api('/application/settings', admin),
+            params: {
+              elasticsearch_namespace_ids: []
+            }.to_json,
+            headers: {
+              'CONTENT_TYPE' => 'application/json'
+            }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['elasticsearch_namespace_ids']).to eq([])
+        expect(ElasticsearchIndexedNamespace.count).to eq(0)
+        expect(ElasticsearchIndexedProject.count).to eq(1)
+      end
+    end
   end
 
   shared_examples 'settings for licensed features' do
