@@ -69,8 +69,8 @@ GET /groups?statistics=true
       "storage_size" : 212,
       "repository_size" : 33,
       "lfs_objects_size" : 123,
-      "job_artifacts_size" : 57
-
+      "job_artifacts_size" : 57,
+      "packages_size": 0
     }
   }
 ]
