@@ -1720,6 +1720,9 @@ msgstr ""
 msgid "Badges|e.g. %{exampleUrl}"
 msgstr ""
 
+msgid "Badge|New"
+msgstr ""
+
 msgid "Balsamiq file could not be loaded."
 msgstr ""
 
@@ -1844,6 +1847,9 @@ msgid "Blocked"
 msgstr ""
 
 msgid "Blog"
+msgstr ""
+
+msgid "Blue helpers indicate an action to be taken."
 msgstr ""
 
 msgid "Boards"
@@ -4172,6 +4178,9 @@ msgstr ""
 msgid "Don't show again"
 msgstr ""
 
+msgid "Don't worry, you can access this tour by clicking on the help icon in the top right corner and choose <strong>Learn GitLab</strong>."
+msgstr ""
+
 msgid "Done"
 msgstr ""
 
@@ -6301,6 +6310,9 @@ msgstr ""
 msgid "HealthCheck|Unhealthy"
 msgstr ""
 
+msgid "Hello there"
+msgstr ""
+
 msgid "Help"
 msgstr ""
 
@@ -7133,6 +7145,9 @@ msgid "Latest pipeline for this branch"
 msgstr ""
 
 msgid "Lead"
+msgstr ""
+
+msgid "Learn GitLab"
 msgstr ""
 
 msgid "Learn how to %{link_start}contribute to the built-in templates%{link_end}"
@@ -8421,6 +8436,12 @@ msgid "October"
 msgstr ""
 
 msgid "OfSearchInADropdown|Filter"
+msgstr ""
+
+msgid "Ok let's go"
+msgstr ""
+
+msgid "Onboarding"
 msgstr ""
 
 msgid "Once imported, repositories can be mirrored over SSH. Read more %{ssh_link}"
@@ -11195,6 +11216,9 @@ msgstr ""
 msgid "Size limit per repository (MB)"
 msgstr ""
 
+msgid "Skip this for now"
+msgstr ""
+
 msgid "Slack application"
 msgstr ""
 
@@ -13673,6 +13697,9 @@ msgstr ""
 msgid "We couldn't find any results matching"
 msgstr ""
 
+msgid "We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You willl be guided by two types of helpers, best recognized by their color."
+msgstr ""
+
 msgid "We detected potential spam in the %{humanized_resource_name}. Please solve the reCAPTCHA to proceed."
 msgstr ""
 
@@ -13712,6 +13739,9 @@ msgstr ""
 msgid "Weight %{weight}"
 msgstr ""
 
+msgid "Welcome to the Guided GitLab Tour"
+msgstr ""
+
 msgid "Welcome to your Issue Board!"
 msgstr ""
 
@@ -13730,6 +13760,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "When:"
+msgstr ""
+
+msgid "White helpers give contextual information."
 msgstr ""
 
 msgid "Who can see this group?"
