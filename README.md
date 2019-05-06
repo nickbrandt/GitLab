@@ -194,17 +194,24 @@ images. If you installed GitLab:
 GitLab-Workhorse supports remote error tracking with
 [Sentry](https://sentry.io). To enable this feature set the
 GITLAB_WORKHORSE_SENTRY_DSN environment variable.
+You can also set the GITLAB_WORKHORSE_SENTRY_ENVIRONMENT environment variable to
+use the Sentry environment functionality to separate staging, production and
+development.
 
 Omnibus (`/etc/gitlab/gitlab.rb`):
 
 ```
-gitlab_workhorse['env'] = {'GITLAB_WORKHORSE_SENTRY_DSN' => 'https://foobar'}
+gitlab_workhorse['env'] = {
+    'GITLAB_WORKHORSE_SENTRY_DSN' => 'https://foobar'
+    'GITLAB_WORKHORSE_SENTRY_ENVIRONMENT' => 'production'
+}
 ```
 
 Source installations (`/etc/default/gitlab`):
 
 ```
 export GITLAB_WORKHORSE_SENTRY_DSN='https://foobar'
+export GITLAB_WORKHORSE_SENTRY_ENVIRONMENT='production'
 ```
 
 ## Tests
