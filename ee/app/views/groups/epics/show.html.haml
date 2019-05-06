@@ -11,7 +11,7 @@
 
 - page_card_attributes @epic.card_attributes
 
-#epic-app-root{ data: epic_show_app_data(@epic, author_icon: avatar_icon_for_user(@epic.author), initial: issuable_initial_data(@epic)) }
+#epic-app-root{ data: epic_show_app_data(@epic) }
 
 .content-block.content-block-small.emoji-list-container.js-noteable-awards
   = render 'award_emoji/awards_block', awardable: @epic, inline: true
