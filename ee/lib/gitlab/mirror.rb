@@ -41,7 +41,7 @@ module Gitlab
       end
 
       def mirrors_ready_to_sync_count(up_to = nil)
-        Project.mirrors_to_sync(Time.now).limit(up_to).count
+        Project.mirrors_to_sync(Time.now, limit: up_to).count
       end
 
       def available_capacity

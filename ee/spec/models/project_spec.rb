@@ -191,6 +191,17 @@ describe Project do
 
         expect(described_class.mirrors_to_sync(timestamp)).to be_empty
       end
+
+      context 'when a limit is applied' do
+        before do
+          another_project = create(:project)
+          create(:import_state, :mirror, :finished, project: another_project)
+        end
+
+        it 'returns project if next_execution_timestamp is not in the future' do
+          expect(described_class.mirrors_to_sync(timestamp, limit: 1)).to match_array(project)
+        end
+      end
     end
 
     context 'when project is failed' do
