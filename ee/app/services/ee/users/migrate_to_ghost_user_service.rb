@@ -21,6 +21,7 @@ module EE
 
       def migrate_vulnerabilities_feedback
         user.vulnerability_feedback.update_all(author_id: ghost_user.id)
+        user.commented_vulnerability_feedback.update_all(comment_author_id: ghost_user.id)
       end
 
       def migrate_reviews
