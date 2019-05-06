@@ -118,7 +118,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when level is too deep' do
+      it 'returns false when level is too deep', :nested_groups do
         epic1 = create(:epic, group: group)
         epic2 = create(:epic, group: group, parent: epic1)
         epic3 = create(:epic, group: group, parent: epic2)
@@ -142,7 +142,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_truthy
       end
 
-      it 'returns false when total depth after adding would exceed limit' do
+      it 'returns false when total depth after adding would exceed limit', :nested_groups do
         child_epic2 = create(:epic, group: group, parent: child_epic1)
         child_epic3 = create(:epic, group: group, parent: child_epic2)
         child_epic4 = create(:epic, group: group, parent: child_epic3)
@@ -166,7 +166,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_truthy
       end
 
-      it 'returns false when total depth after adding would exceed limit' do
+      it 'returns false when total depth after adding would exceed limit', :nested_groups do
         root_epic.update(parent: create(:epic, group: group))
         create(:epic, group: group, parent: child_epic1)
 
@@ -185,14 +185,14 @@ describe Epic do
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when child epic is parent of the given parent' do
+      it 'returns false when child epic is parent of the given parent', :nested_groups do
         epic1 = create(:epic, group: group, parent: epic)
         epic.parent = epic1
 
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when child epic is an ancestor of the given parent' do
+      it 'returns false when child epic is an ancestor of the given parent', :nested_groups do
         epic1 = create(:epic, group: group, parent: epic)
         epic2 = create(:epic, group: group, parent: epic1)
         epic.parent = epic2
