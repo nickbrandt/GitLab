@@ -493,6 +493,66 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_prometheus_alerts' do
+    context 'with prometheus_alerts available' do
+      before do
+        stub_licensed_features(prometheus_alerts: true)
+      end
+
+      context 'with admin' do
+        let(:current_user) { admin }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with reporter' do
+        let(:current_user) { reporter }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with guest' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+    end
+
+    context 'without prometheus_alerts available' do
+      before do
+        stub_licensed_features(prometheus_alerts: false)
+      end
+
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+  end
+
   it_behaves_like 'ee clusterable policies' do
     let(:clusterable) { create(:project, :repository) }
 
