@@ -511,6 +511,7 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.integer "failure_reason"
     t.datetime_with_timezone "scheduled_at"
     t.string "token_encrypted"
+    t.integer "upstream_pipeline_id"
     t.index ["artifacts_expire_at"], name: "index_ci_builds_on_artifacts_expire_at", where: "(artifacts_file <> ''::text)", using: :btree
     t.index ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree
     t.index ["commit_id", "artifacts_expire_at", "id"], name: "index_ci_builds_on_commit_id_and_artifacts_expireatandidpartial", where: "(((type)::text = 'Ci::Build'::text) AND ((retried = false) OR (retried IS NULL)) AND ((name)::text = ANY (ARRAY[('sast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('sast:container'::character varying)::text, ('container_scanning'::character varying)::text, ('dast'::character varying)::text])))", using: :btree
@@ -530,6 +531,7 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.index ["token"], name: "index_ci_builds_on_token", unique: true, using: :btree
     t.index ["token_encrypted"], name: "index_ci_builds_on_token_encrypted", unique: true, where: "(token_encrypted IS NOT NULL)", using: :btree
     t.index ["updated_at"], name: "index_ci_builds_on_updated_at", using: :btree
+    t.index ["upstream_pipeline_id"], name: "index_ci_builds_on_upstream_pipeline_id", where: "(upstream_pipeline_id IS NOT NULL)", using: :btree
     t.index ["user_id"], name: "index_ci_builds_on_user_id", using: :btree
   end
 
@@ -3489,6 +3491,7 @@ ActiveRecord::Schema.define(version: 20190506135400) do
   add_foreign_key "ci_build_trace_sections", "projects", on_delete: :cascade
   add_foreign_key "ci_builds", "ci_pipelines", column: "auto_canceled_by_id", name: "fk_a2141b1522", on_delete: :nullify
   add_foreign_key "ci_builds", "ci_pipelines", column: "commit_id", name: "fk_d3130c9a7f", on_delete: :cascade
+  add_foreign_key "ci_builds", "ci_pipelines", column: "upstream_pipeline_id", name: "fk_87f4cefcda", on_delete: :cascade
   add_foreign_key "ci_builds", "ci_stages", column: "stage_id", name: "fk_3a9eaa254d", on_delete: :cascade
   add_foreign_key "ci_builds", "projects", name: "fk_befce0568a", on_delete: :cascade
   add_foreign_key "ci_builds_metadata", "ci_builds", column: "build_id", on_delete: :cascade
