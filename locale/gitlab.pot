@@ -9829,19 +9829,10 @@ msgstr ""
 msgid "ProtectedEnvironment|Allowed to deploy"
 msgstr ""
 
-msgid "ProtectedEnvironment|Choose users"
-msgstr ""
-
-msgid "ProtectedEnvironment|Choose who is allowed to deploy and manage Feature Flag settings"
-msgstr ""
-
 msgid "ProtectedEnvironment|Environment"
 msgstr ""
 
 msgid "ProtectedEnvironment|Protect"
-msgstr ""
-
-msgid "ProtectedEnvironment|Protect Environments in order to restrict who can execute deployments."
 msgstr ""
 
 msgid "ProtectedEnvironment|Protect an environment"
@@ -9850,7 +9841,16 @@ msgstr ""
 msgid "ProtectedEnvironment|Protected Environment (%{protected_environments_count})"
 msgstr ""
 
+msgid "ProtectedEnvironment|Protecting an environment restricts the users who can execute deployments."
+msgstr ""
+
 msgid "ProtectedEnvironment|Select an environment"
+msgstr ""
+
+msgid "ProtectedEnvironment|Select users"
+msgstr ""
+
+msgid "ProtectedEnvironment|Select users to deploy and manage Feature Flag settings"
 msgstr ""
 
 msgid "ProtectedEnvironment|There are currently no protected environments, protect an environment with the form above."
