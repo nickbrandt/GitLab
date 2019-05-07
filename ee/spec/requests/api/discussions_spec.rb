@@ -21,7 +21,7 @@ describe API::Discussions do
       stub_licensed_features(epics: true)
     end
 
-    it_behaves_like 'discussions API', 'groups', 'epics', 'id' do
+    it_behaves_like 'discussions API', 'groups', 'epics', 'id', can_reply_to_invididual_notes: true do
       let(:parent)   { group }
       let(:noteable) { epic }
       let(:note)     { epic_note }
