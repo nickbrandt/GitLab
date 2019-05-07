@@ -7821,7 +7821,7 @@ msgstr ""
 msgid "MergeRequest|Error loading full diff. Please try again."
 msgstr ""
 
-msgid "MergeRequest|Filter files"
+msgid "MergeRequest|Filter files or search with %{modifier_key}+p"
 msgstr ""
 
 msgid "MergeRequest|No files found"
@@ -8038,6 +8038,9 @@ msgid "Mirroring settings were successfully updated. The project is being update
 msgstr ""
 
 msgid "Mirroring was successfully disabled."
+msgstr ""
+
+msgid "Missing commit signatures endpoint!"
 msgstr ""
 
 msgid "MissingSSHKeyWarningLink|add an SSH key"
@@ -10879,6 +10882,9 @@ msgid "Search branches and tags"
 msgstr ""
 
 msgid "Search files"
+msgstr ""
+
+msgid "Search for a group"
 msgstr ""
 
 msgid "Search for projects, issues, etc."
