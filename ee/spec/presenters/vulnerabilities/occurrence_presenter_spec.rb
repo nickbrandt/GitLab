@@ -46,6 +46,15 @@ describe Vulnerabilities::OccurrencePresenter do
         it { is_expected.to end_with('#L1-2') }
       end
 
+      context 'without file' do
+        before do
+          allow(presenter).to receive(:location)
+            .and_return({ 'foo' => 123 })
+        end
+
+        it { is_expected.to be_blank }
+      end
+
       context 'without location' do
         before do
           allow(presenter).to receive(:location)
