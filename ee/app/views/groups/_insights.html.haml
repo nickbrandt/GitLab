@@ -16,6 +16,7 @@
         .form-group
           - insight = @group.insight || @group.build_insight
           = form.fields_for :insight_attributes, insight do |insight_form|
+            = insight_form.hidden_field :id
             = insight_form.label :project_id, class: 'label-light' do
               .form-text.text-muted
                 = _('Select a repository')

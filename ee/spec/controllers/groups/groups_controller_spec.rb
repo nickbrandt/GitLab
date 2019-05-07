@@ -45,14 +45,26 @@ describe GroupsController do
             end.to change { group.reload.file_template_project_id }.to(project.id)
           end
 
-          it 'updates insight project_id successfully' do
-            project = create(:project, group: group)
+          context 'with insights feature' do
+            let(:project) { create(:project, group: group) }
 
-            stub_licensed_features(insights: true)
+            before do
+              stub_licensed_features(insights: true)
+            end
 
-            post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
+            it 'updates insight project_id successfully' do
+              post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
 
-            expect(group.reload.insight.project).to eq(project)
+              expect(group.reload.insight.project).to eq(project)
+            end
+
+            it 'removes insight successfully' do
+              insight = group.create_insight(project: project)
+
+              post :update, params: { id: group.to_param, group: { insight_attributes: { id: insight.id, project_id: '' } } }
+
+              expect(group.reload.insight).to be_nil
+            end
           end
         end
       end
