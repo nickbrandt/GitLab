@@ -306,6 +306,9 @@ msgstr ""
 msgid "(No changes)"
 msgstr ""
 
+msgid "(check progress)"
+msgstr ""
+
 msgid "(external source)"
 msgstr ""
 
@@ -4319,6 +4322,9 @@ msgstr ""
 msgid "Elasticsearch"
 msgstr ""
 
+msgid "Elasticsearch indexing started"
+msgstr ""
+
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
 
@@ -6670,6 +6676,9 @@ msgid "Incompatible Project"
 msgstr ""
 
 msgid "Incompatible options set!"
+msgstr ""
+
+msgid "Indexing"
 msgstr ""
 
 msgid "Indicates whether this runner can pick jobs without tags"
@@ -11631,6 +11640,9 @@ msgid "Stars"
 msgstr ""
 
 msgid "Start GitLab Ultimate trial"
+msgstr ""
+
+msgid "Start Indexing"
 msgstr ""
 
 msgid "Start Web Terminal"
