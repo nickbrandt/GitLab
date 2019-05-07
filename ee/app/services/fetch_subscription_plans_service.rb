@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class FetchSubscriptionPlansService
-  URL = 'https://customers.gitlab.com/gitlab_plans'.freeze
+  URL = "#{EE::SUBSCRIPTIONS_URL}/gitlab_plans".freeze
 
   def initialize(plan:)
     @plan = plan
