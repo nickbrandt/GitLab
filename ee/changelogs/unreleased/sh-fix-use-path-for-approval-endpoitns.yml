@@ -1,0 +1,5 @@
+---
+title: Use path instead of a URL for accessing approval settings
+merge_request: 12414
+author:
+type: fixed
