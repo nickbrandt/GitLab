@@ -5099,6 +5099,9 @@ msgstr ""
 msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
+msgid "Failed to update branch!"
+msgstr ""
+
 msgid "Failed to update issues, please try again."
 msgstr ""
 
@@ -9920,6 +9923,9 @@ msgid "Prompt users to upload SSH keys"
 msgstr ""
 
 msgid "Protected"
+msgstr ""
+
+msgid "Protected Branch"
 msgstr ""
 
 msgid "Protected Environments"
