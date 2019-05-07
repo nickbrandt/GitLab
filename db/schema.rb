@@ -3181,6 +3181,9 @@ ActiveRecord::Schema.define(version: 20190506135400) do
     t.string "merge_requests_sort"
     t.string "roadmaps_sort"
     t.integer "first_day_of_week"
+    t.string "timezone"
+    t.boolean "time_display_relative"
+    t.boolean "time_format_in_24h"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
