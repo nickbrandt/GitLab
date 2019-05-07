@@ -11,7 +11,6 @@ export default () => ({
   errorLoadingVulnerabilitiesHistory: false,
   vulnerabilitiesHistory: {},
   vulnerabilitiesHistoryDayRange: 90,
-  vulnerabilitiesHistoryShowSplitLine: false,
   vulnerabilitiesHistoryMaxDayInterval: 7,
   pageInfo: {},
   vulnerabilitiesCountEndpoint: null,
