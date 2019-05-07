@@ -1,0 +1,5 @@
+---
+title: Fix placement of LDAP icon in members list
+merge_request: 12304
+author:
+type: fixed
