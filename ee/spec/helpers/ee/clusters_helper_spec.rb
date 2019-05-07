@@ -76,7 +76,7 @@ describe ClustersHelper do
 
       it do
         is_expected.to match(
-          'clusters-path': clusterable_presenter.clusters_path,
+          'clusters-path': clusterable_presenter.index_path,
           'metrics-endpoint': clusterable_presenter.metrics_cluster_path(cluster, format: :json),
           'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
           'empty-getting-started-svg-path': match_asset_path('/assets/illustrations/monitoring/getting_started.svg'),
