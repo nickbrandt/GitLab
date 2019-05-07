@@ -78,6 +78,14 @@ module Geo
           .within_shards(selective_sync_shards)
       end
 
+      def project_model
+        Geo::Fdw::Project
+      end
+
+      def projects_table
+        Geo::Fdw::Project.arel_table
+      end
+
       def uploads_model
         Geo::Fdw::Upload
       end

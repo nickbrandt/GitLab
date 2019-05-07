@@ -11,6 +11,30 @@ module Geo::SelectiveSync
     end
   end
 
+  def projects_outside_selected_namespaces
+    return project_model.none unless selective_sync_by_namespaces?
+
+    cte_query = selected_namespaces_and_descendants_cte
+    cte_table = cte_query.table
+
+    join_statement =
+      projects_table
+        .join(cte_table, Arel::Nodes::OuterJoin)
+        .on(projects_table[:namespace_id].eq(cte_table[:id]))
+
+    project_model
+      .joins(join_statement.join_sources)
+      .where(cte_table[:id].eq(nil))
+      .with
+      .recursive(cte_query.to_arel)
+  end
+
+  def projects_outside_selected_shards
+    return project_model.none unless selective_sync_by_shards?
+
+    project_model.outside_shards(selective_sync_shards)
+  end
+
   def selective_sync?
     selective_sync_type.present?
   end
@@ -133,6 +157,16 @@ module Geo::SelectiveSync
   # two places, they act differently - the first doesn't use FDW, the second does.
   def namespaces_table
     namespaces.arel_table
+  end
+
+  def project_model
+    raise NotImplementedError,
+      "#{self.class} does not implement #{__method__}"
+  end
+
+  def projects_table
+    raise NotImplementedError,
+      "#{self.class} does not implement #{__method__}"
   end
 
   def uploads_model
