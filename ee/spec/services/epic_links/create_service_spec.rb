@@ -159,13 +159,15 @@ describe EpicLinks::CreateService, :postgresql do
 
             new_epics = [create(:epic, group: group), create(:epic, group: group)]
 
-            # threshold is 6 because
+            # threshold is 8 because
             # 1. we need to check hierarchy for each child epic (3 queries)
             # 2. we have to update the  record (2 including releasing savepoint)
             # 3. we have to update start and due dates for all updated epics
+            # 4. we temporarily increased this from 6 due to
+            #    https://gitlab.com/gitlab-org/gitlab-ee/issues/11539
             expect do
               ActiveRecord::QueryRecorder.new { add_epic(new_epics.map { |epic| epic.to_reference(full: true) }) }
-            end.not_to exceed_query_limit(control).with_threshold(6)
+            end.not_to exceed_query_limit(control).with_threshold(8)
           end
         end
 
