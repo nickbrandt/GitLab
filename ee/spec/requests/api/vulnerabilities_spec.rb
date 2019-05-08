@@ -14,21 +14,21 @@ describe API::Vulnerabilities do
   let(:ds_report) { pipeline.security_reports.reports["dependency_scanning"] }
   let(:sast_report) { pipeline.security_reports.reports["sast"] }
 
-  before do
-    stub_licensed_features(security_dashboard: true, sast: true, dependency_scanning: true, container_scanning: true)
-
-    create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project)
-    create(:ee_ci_job_artifact, :sast, job: build_sast, project: project)
-
-    create(
-      :vulnerability_feedback,
-      :dismissal,
-      :sast,
+  let(:dismissal) do
+    create(:vulnerability_feedback, :dismissal, :sast,
       project: project,
       pipeline: pipeline,
       project_fingerprint: sast_report.occurrences.first.project_fingerprint,
       vulnerability_data: sast_report.occurrences.first.raw_metadata
     )
+  end
+
+  before do
+    stub_licensed_features(security_dashboard: true, sast: true, dependency_scanning: true, container_scanning: true)
+
+    create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds, project: project)
+    create(:ee_ci_job_artifact, :sast, job: build_sast, project: project)
+    dismissal
   end
 
   describe "GET /projects/:id/vulnerabilities" do
@@ -89,7 +89,7 @@ describe API::Vulnerabilities do
 
           expect(response.headers['X-Total']).to eq occurrence_count
 
-          expect(json_response.first['vulnerability_feedback_dismissal_path']).to be_present
+          expect(json_response.first.dig('dismissal_feedback', 'id')).to eq(dismissal.id)
         end
 
         it 'returns vulnerabilities with low severity' do

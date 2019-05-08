@@ -113,11 +113,19 @@ module EE
       end
 
       expose :vulnerability_feedback_path do |merge_request|
-        project_vulnerability_feedback_index_path(merge_request.project)
+        presenter(merge_request).vulnerability_feedback_path
       end
 
-      expose :can_create_feedback do |merge_request|
-        can?(current_user, :admin_vulnerability_feedback, merge_request)
+      expose :create_vulnerability_feedback_issue_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_issue_path
+      end
+
+      expose :create_vulnerability_feedback_merge_request_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_merge_request_path
+      end
+
+      expose :create_vulnerability_feedback_dismissal_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_dismissal_path
       end
 
       expose :rebase_commit_sha

@@ -35,12 +35,17 @@ export default {
       required: false,
       default: '',
     },
-    canCreateIssuePermission: {
+    canCreateIssue: {
       type: Boolean,
       required: false,
       default: false,
     },
-    canCreateFeedbackPermission: {
+    canCreateMergeRequest: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    canDismissVulnerability: {
       type: Boolean,
       required: false,
       default: false,
@@ -62,11 +67,11 @@ export default {
         action: 'createMergeRequest',
       };
 
-      if (!this.vulnerability.hasMergeRequest && this.remediation) {
+      if (!this.vulnerability.hasMergeRequest && this.canCreateMergeRequest && this.remediation) {
         buttons.push(MRButton);
       }
 
-      if (!this.vulnerability.hasIssue && this.canCreateIssuePermission) {
+      if (!this.vulnerability.hasIssue && this.canCreateIssue) {
         buttons.push(issueButton);
       }
 
@@ -103,10 +108,7 @@ export default {
      * The slot for the footer should be rendered if any of the conditions is true.
      */
     shouldRenderFooterSection() {
-      return (
-        !this.modal.isResolved &&
-        (this.canCreateFeedbackPermission || this.canCreateIssuePermission)
-      );
+      return !this.modal.isResolved && (this.canCreateIssue || this.canDismissVulnerability);
     },
     vulnerability() {
       return this.modal.vulnerability;
@@ -194,7 +196,7 @@ export default {
         </button>
 
         <loading-button
-          v-if="canCreateFeedbackPermission"
+          v-if="canDismissVulnerability"
           :loading="modal.isDismissingIssue"
           :disabled="modal.isDismissingIssue"
           :label="revertTitle"
