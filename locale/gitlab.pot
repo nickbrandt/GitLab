@@ -4391,6 +4391,12 @@ msgstr ""
 msgid "EmailError|Your account has been blocked. If you believe this is in error, contact a staff member."
 msgstr ""
 
+msgid "EmailToken|reset it"
+msgstr ""
+
+msgid "EmailToken|resetting..."
+msgstr ""
+
 msgid "Emails"
 msgstr ""
 
@@ -5079,6 +5085,9 @@ msgid "Failed to load emoji list."
 msgstr ""
 
 msgid "Failed to load errors from Sentry. Error message: %{errorMessage}"
+msgstr ""
+
+msgid "Failed to load related branches"
 msgstr ""
 
 msgid "Failed to promote label due to internal error. Please contact administrators."
@@ -6864,6 +6873,9 @@ msgid "Issue events"
 msgstr ""
 
 msgid "Issue template (optional)"
+msgstr ""
+
+msgid "Issue update failed"
 msgstr ""
 
 msgid "IssueBoards|Board"
@@ -13320,6 +13332,9 @@ msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
 msgstr ""
 
 msgid "Unable to update this epic at this time."
+msgstr ""
+
+msgid "Unable to update this issue at this time."
 msgstr ""
 
 msgid "Unarchive project"
