@@ -21,12 +21,19 @@ GET /projects/:id/vulnerabilities
 GET /projects/:id/vulnerabilities?report_type=sast
 GET /projects/:id/vulnerabilities?report_type=container_scanning
 GET /projects/:id/vulnerabilities?report_type=sast,dast
+GET /projects/:id/vulnerabilities?scope=all
+GET /projects/:id/vulnerabilities?scope=dismissed
+GET /projects/:id/vulnerabilities?severity=high
+GET /projects/:id/vulnerabilities?confidence=unknown,experimental
 ```
 
-| Attribute           | Type             | Required   | Description                                                                                                                                         |
-| ------------------- | ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                | integer/string   | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user.                                    |
-| `report_type`       | Array[string]    | no         | Returns vulnerabilities belonging to specified report type. Valid values: `sast`, `dast`, `dependency_scanning`, or `container_scanning`.           |
+| Attribute           | Type             | Required   | Description                                                                                                                                                                 |
+| ------------------- | ---------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`                | integer/string   | yes        | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user.                                                            |
+| `report_type`       | Array[string]    | no         | Returns vulnerabilities belonging to specified report type. Valid values: `sast`, `dast`, `dependency_scanning`, or `container_scanning`.                                   |
+| `scope`             | string           | no         | Returns vulnerabilities for the given scope: `all` or `dismissed`. Defaults to `dismissed`                                                                                  |
+| `severity`          | Array[string]    | no         | Returns vulnerabilities belonging to specified severity level: `undefined`, `info`, `unknown`, `low`, `medium`, `high`, or `critical`. Defaults to all'                     |
+| `confidence`        | Array[string]    | no         | Returns vulnerabilities belonging to specified confidence level: `undefined`, `ignore`, `unknown`, `experimental`, `low`, `medium`, `high`, or `confirmed`. Defaults to all |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/4/vulnerabilities
@@ -61,9 +68,9 @@ Example response:
       }
     ],
     "project_fingerprint": "fa6f5b6c5d240b834ac5e901dc69f9484cef89ec",
-    "vulnerability_feedback_issue_path": "/tests/yarn-remediation-test/vulnerability_feedback",
-    "vulnerability_feedback_merge_request_path": "/tests/yarn-remediation-test/vulnerability_feedback",
-    "vulnerability_feedback_dismissal_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_issue_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_merge_request_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_dismissal_path": "/tests/yarn-remediation-test/vulnerability_feedback",
     "project": {
       "id": 31,
       "name": "yarn-remediation-test",

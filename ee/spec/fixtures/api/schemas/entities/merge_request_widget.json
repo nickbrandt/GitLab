@@ -21,7 +21,9 @@
           "base_path": { "type": "string" }
         },
         "vulnerability_feedback_path": { "type": "string" },
-        "can_create_feedback": { "type": "boolean" }
+        "create_vulnerability_feedback_issue_path": { "type": ["string", "null"] },
+        "create_vulnerability_feedback_merge_request_path": { "type": ["string", "null"] },
+        "create_vulnerability_feedback_dismissal_path": { "type": ["string", "null"] }
       }
     }
   ]

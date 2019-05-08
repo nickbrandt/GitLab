@@ -193,23 +193,7 @@ describe ApplicationSetting do
       end
 
       context 'namespaces' do
-        let(:namespaces) { create_list(:namespace, 3) }
-
-        it 'creates ElasticsearchIndexedNamespace objects when given elasticsearch_namespace_ids' do
-          expect do
-            setting.update!(elasticsearch_namespace_ids: namespaces.map(&:id).join(','))
-          end.to change { ElasticsearchIndexedNamespace.count }.by(3)
-        end
-
-        it 'deletes ElasticsearchIndexedNamespace objects not in elasticsearch_namespace_ids' do
-          create :elasticsearch_indexed_namespace, namespace: namespaces.last
-
-          expect do
-            setting.update!(elasticsearch_namespace_ids: namespaces.first(2).map(&:id).join(','))
-          end.to change { ElasticsearchIndexedNamespace.count }.from(1).to(2)
-
-          expect(ElasticsearchIndexedNamespace.where(namespace_id: namespaces.last.id)).not_to exist
-        end
+        let(:namespaces) { create_list(:namespace, 2) }
 
         it 'tells you if a namespace is allowed to be indexed' do
           create :elasticsearch_indexed_namespace, namespace: namespaces.last
@@ -220,23 +204,7 @@ describe ApplicationSetting do
       end
 
       context 'projects' do
-        let(:projects) { create_list(:project, 3) }
-
-        it 'creates ElasticsearchIndexedProject objects when given elasticsearch_project_ids' do
-          expect do
-            setting.update!(elasticsearch_project_ids: projects.map(&:id).join(','))
-          end.to change { ElasticsearchIndexedProject.count }.by(3)
-        end
-
-        it 'deletes ElasticsearchIndexedProject objects not in elasticsearch_project_ids' do
-          create :elasticsearch_indexed_project, project: projects.last
-
-          expect do
-            setting.update!(elasticsearch_project_ids: projects.first(2).map(&:id).join(','))
-          end.to change { ElasticsearchIndexedProject.count }.from(1).to(2)
-
-          expect(ElasticsearchIndexedProject.where(project_id: projects.last.id)).not_to exist
-        end
+        let(:projects) { create_list(:project, 2) }
 
         it 'tells you if a project is allowed to be indexed' do
           create :elasticsearch_indexed_project, project: projects.last
@@ -250,10 +218,8 @@ describe ApplicationSetting do
         project1 = create(:project)
         projects = create_list(:project, 3)
 
-        setting.update!(
-          elasticsearch_project_ids: projects.map(&:id).join(','),
-          elasticsearch_namespace_ids: project1.namespace.id.to_s
-        )
+        create :elasticsearch_indexed_namespace, namespace: project1.namespace
+        projects.each { |project| create :elasticsearch_indexed_project, project: project }
 
         expect(setting.elasticsearch_limited_projects).to match_array(projects << project1)
       end

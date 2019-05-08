@@ -80,6 +80,8 @@ module EE
         prevent :read_project
       end
 
+      rule { alert_bot }.enable :reporter_access
+
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in
@@ -107,7 +109,8 @@ module EE
 
       rule { can?(:developer_access) }.policy do
         enable :admin_board
-        enable :admin_vulnerability_feedback
+        enable :create_vulnerability_feedback
+        enable :destroy_vulnerability_feedback
         enable :create_package
         enable :read_feature_flag
         enable :create_feature_flag

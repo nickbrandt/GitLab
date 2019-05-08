@@ -10,12 +10,13 @@ export default {
   },
   props: {
     id: {
-      type: Number,
+      type: [Number, String],
       required: true,
     },
     commentsCount: {
       type: Number,
-      required: true,
+      required: false,
+      default: 0,
     },
     image: {
       type: String,
@@ -27,7 +28,8 @@ export default {
     },
     updatedAt: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   computed: {
@@ -49,7 +51,7 @@ export default {
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">
         <span class="bold str-truncated-100">{{ name }}</span>
-        <span class="str-truncated-100">
+        <span v-if="updatedAt" class="str-truncated-100">
           {{ __('Updated') }} <timeago :time="updatedAt" tooltip-placement="bottom" />
         </span>
       </div>

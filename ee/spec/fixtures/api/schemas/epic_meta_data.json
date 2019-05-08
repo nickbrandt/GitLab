@@ -1,0 +1,199 @@
+{
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["epic_id", "created", "author", "ancestors", "todo_exists", "todo_path", "lock_version",
+    "state", "namespace", "labels_path", "toggle_subscription_path", "labels_web_url", "epics_web_url",
+    "scoped_labels", "scoped_labels_documentation_link", "start_date", "start_date_is_fixed", "start_date_fixed",
+    "start_date_from_milestones", "start_date_sourcing_milestone_title", "start_date_sourcing_milestone_dates",
+    "due_date", "due_date_is_fixed", "due_date_fixed",
+    "due_date_from_milestones", "due_date_sourcing_milestone_title", "due_date_sourcing_milestone_dates"],
+  "properties": {
+    "epic_id": {
+      "type": "integer"
+    },
+    "created": {
+      "type": "string"
+    },
+    "author": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "name",
+        "url",
+        "username",
+        "src"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string"
+        }
+      }
+    },
+    "ancestors": {
+      "items": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "human_readable_end_date": {
+          "type": "string"
+        },
+        "human_readable_timestamp": {
+          "type": "string"
+        }
+      },
+      "type": "array"
+    },
+    "todo_exists": {
+      "type": "boolean"
+    },
+    "todo_path": {
+      "type": "string"
+    },
+    "lock_version": {
+      "type": [
+        "integer",
+        null
+      ]
+    },
+    "state": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "labels_path": {
+      "type": "string"
+    },
+    "toggle_subscription_path": {
+      "type": "string"
+    },
+    "labels_web_url": {
+      "type": "string"
+    },
+    "epics_web_url": {
+      "type": "string"
+    },
+    "scoped_labels": {
+      "type": "boolean"
+    },
+    "scoped_labels_documentation_link": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "start_date_is_fixed": {
+      "type": "boolean"
+    },
+    "start_date_fixed": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "start_date_from_milestones": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "start_date_sourcing_milestone_title": {
+      "type": "string"
+    },
+    "start_date_sourcing_milestone_dates": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "start_date",
+        "due_date"
+      ],
+      "properties": {
+        "start_date": {
+          "type": [
+            "string",
+            null
+          ]
+        },
+        "due_date": {
+          "type": [
+            "string",
+            null
+          ]
+        }
+      }
+    },
+    "due_date": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "due_date_is_fixed": {
+      "type": "boolean"
+    },
+    "due_date_fixed": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "due_date_from_milestones": {
+      "type": [
+        "string",
+        null
+      ]
+    },
+    "due_date_sourcing_milestone_title": {
+      "type": "string"
+    },
+    "due_date_sourcing_milestone_dates": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "start_date",
+        "due_date"
+      ],
+      "properties": {
+        "start_date": {
+          "type": [
+            "string",
+            null
+          ]
+        },
+        "due_date": {
+          "type": [
+            "string",
+            null
+          ]
+        }
+      }
+    }
+  }
+}

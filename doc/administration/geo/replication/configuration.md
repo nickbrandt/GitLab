@@ -1,4 +1,4 @@
-# Geo configuration (GitLab Omnibus)
+# Geo configuration (GitLab Omnibus) **[PREMIUM ONLY]**
 
 NOTE: **Note:**
 This is the documentation for the Omnibus GitLab packages. For installations

@@ -12,21 +12,24 @@
 
 module Security
   class PipelineVulnerabilitiesFinder
+    include Gitlab::Utils::StrongMemoize
+
     attr_accessor :params
     attr_reader :pipeline
 
-    def initialize(pipeline:, params: default_params)
+    def initialize(pipeline:, params: {})
       @pipeline = pipeline
       @params = params
     end
 
     def execute
       pipeline_reports.each_with_object([]) do |(type, report), occurrences|
-        next unless requested_type?(report.type)
+        next unless requested_type?(type)
 
-        occurrences.concat(
-          normalize_report_occurrences(report.occurrences)
-        )
+        normalized_occurrences = normalize_report_occurrences(report.occurrences)
+        filtered_occurrences = filter(normalized_occurrences)
+
+        occurrences.concat(filtered_occurrences)
       end
     end
 
@@ -53,12 +56,47 @@ module Security
       end
     end
 
-    def requested_type?(type)
-      Array(params[:report_type]).include?(type)
+    def filter(occurrences)
+      occurrences.select do |occurrence|
+        next if !include_dismissed? && dismissal_feedback?(occurrence)
+        next unless confidence_levels.include?(occurrence.confidence)
+        next unless severity_levels.include?(occurrence.severity)
+
+        occurrence
+      end
     end
 
-    def default_params
-      { report_type: Vulnerabilities::Occurrence.report_types.keys }
+    def requested_type?(type)
+      report_types.include?(type)
+    end
+
+    def include_dismissed?
+      params[:scope] == 'all'
+    end
+
+    def dismissal_feedback?(occurrence)
+      dismissal_feedback_by_fingerprint[occurrence.project_fingerprint]
+    end
+
+    def dismissal_feedback_by_fingerprint
+      strong_memoize(:dismissal_feedback_by_fingerprint) do
+        pipeline.project.vulnerability_feedback
+          .with_associations
+          .where(feedback_type: 'dismissal') # rubocop:disable CodeReuse/ActiveRecord
+          .group_by(&:project_fingerprint)
+      end
+    end
+
+    def confidence_levels
+      Array(params.fetch(:confidence, Vulnerabilities::Occurrence.confidences.keys))
+    end
+
+    def report_types
+      Array(params.fetch(:report_type, Vulnerabilities::Occurrence.report_types.keys))
+    end
+
+    def severity_levels
+      Array(params.fetch(:severity, Vulnerabilities::Occurrence.severities.keys))
     end
   end
 end

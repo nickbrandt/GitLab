@@ -9,6 +9,7 @@ module EE
       super + %w[
         groups/security/dashboard#show
         groups/insights#show
+        groups/dependency_proxies#show
       ]
     end
 

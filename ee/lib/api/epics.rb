@@ -66,6 +66,7 @@ module API
         optional :end_date, as: :due_date_fixed, type: String, desc: 'The due date of an epic'
         optional :due_date_is_fixed, type: Boolean, desc: 'Indicates due date should be sourced from due_date_fixed field not the issue milestones'
         optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
+        optional :parent_id, type: Integer, desc: 'The id of a parent epic'
       end
       post ':id/(-/)epics' do
         authorize_can_create!

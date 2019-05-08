@@ -1,103 +1,16 @@
 # frozen_string_literal: true
 
 module EpicsHelper
-  include EntityDateHelper
-
-  # rubocop: disable Metrics/AbcSize
-  def epic_show_app_data(epic, opts)
-    group = epic.group
-    todo = epic_pending_todo(epic)
-
-    epic_meta = {
-      epic_id: epic.id,
-      created: epic.created_at,
-      author: epic_author(epic, opts),
-      ancestors: epic_ancestors(epic.ancestors.inc_group),
-      todo_exists: todo.present?,
-      todo_path: group_todos_path(group),
-      start_date: epic.start_date,
-      start_date_is_fixed: epic.start_date_is_fixed?,
-      start_date_fixed: epic.start_date_fixed,
-      start_date_from_milestones: epic.start_date_from_milestones,
-      start_date_sourcing_milestone_title: epic.start_date_sourcing_milestone&.title,
-      start_date_sourcing_milestone_dates: {
-        start_date: epic.start_date_sourcing_milestone&.start_date,
-        due_date: epic.start_date_sourcing_milestone&.due_date
-      },
-      due_date: epic.due_date,
-      due_date_is_fixed: epic.due_date_is_fixed?,
-      due_date_fixed: epic.due_date_fixed,
-      due_date_from_milestones: epic.due_date_from_milestones,
-      due_date_sourcing_milestone_title: epic.due_date_sourcing_milestone&.title,
-      due_date_sourcing_milestone_dates: {
-        start_date: epic.due_date_sourcing_milestone&.start_date,
-        due_date: epic.due_date_sourcing_milestone&.due_date
-      },
-      lock_version: epic.lock_version,
-      end_date: epic.end_date,
-      state: epic.state,
-      namespace: group.path,
-      labels_path: group_labels_path(group, format: :json, only_group_labels: true, include_ancestor_groups: true),
-      toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
-      labels_web_url: group_labels_path(group),
-      epics_web_url: group_epics_path(group),
-      scoped_labels: group.feature_available?(:scoped_labels),
-      scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
-    }
-
-    epic_meta[:todo_delete_path] = dashboard_todo_path(todo) if todo.present?
-
-    participants = UserSerializer.new.represent(epic.participants)
-    initial = opts[:initial].merge(labels: epic.labels,
-                                   participants: participants,
-                                   subscribed: epic.subscribed?(current_user))
-
-    # TODO: Remove from `namespace` to epics_web_url
-    # from below as it is already included in `epic_meta`
-    {
-      initial: initial.to_json,
-      meta: epic_meta.to_json,
-      namespace: group.path,
-      labels_path: group_labels_path(group, format: :json, only_group_labels: true, include_ancestor_groups: true),
-      toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
-      labels_web_url: group_labels_path(group),
-      epics_web_url: group_epics_path(group)
-    }
-  end
-  # rubocop: enable Metrics/AbcSize
-
-  def epic_pending_todo(epic)
-    current_user.pending_todo_for(epic) if current_user
-  end
-
-  def epic_author(epic, opts)
-    {
-      name: epic.author.name,
-      url: user_path(epic.author),
-      username: "@#{epic.author.username}",
-      src: opts[:author_icon]
-    }
-  end
-
-  def epic_ancestors(epics)
-    epics.map do |epic|
-      {
-        id: epic.id,
-        title: epic.title,
-        url: epic_path(epic),
-        state: epic.state,
-        human_readable_end_date: epic.end_date&.to_s(:medium),
-        human_readable_timestamp: remaining_days_in_words(epic.end_date, epic.start_date)
-      }
-    end
+  def epic_show_app_data(epic)
+    EpicPresenter.new(epic, current_user: current_user).show_data(author_icon: avatar_icon_for_user(epic.author), base_data: issuable_initial_data(epic))
   end
 
   def epic_endpoint_query_params(opts)
     opts[:data] ||= {}
     opts[:data][:endpoint_query_params] = {
-        only_group_labels: true,
-        include_ancestor_groups: true,
-        include_descendant_groups: true
+      only_group_labels: true,
+      include_ancestor_groups: true,
+      include_descendant_groups: true
     }.to_json
 
     opts

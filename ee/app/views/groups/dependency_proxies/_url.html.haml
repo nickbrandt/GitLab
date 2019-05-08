@@ -1,0 +1,7 @@
+%h5.prepend-top-20= _('Dependency proxy URL')
+
+%div
+  = text_field_tag :url, "#{group_url(@group)}/dependency_proxy/containers", class: 'js-dependency-proxy-url form-control', readonly: true
+
+.help-block.prepend-top-5
+  = s_('Contains %{count} blobs of images (%{size})') % { count: @blobs_count, size: number_to_human_size(@blobs_total_size) }

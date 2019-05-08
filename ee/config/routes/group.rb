@@ -106,6 +106,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       path
     end
     get 'boards(/*extra_params)', as: :legacy_ee_group_boards_redirect, to: legacy_ee_group_boards_redirect
+
+    resource :dependency_proxy, only: [:show, :update]
   end
 
   scope(path: 'groups/*group_id') do
@@ -113,4 +115,12 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
                                           :notification_setting, :audit_events,
                                           :pipeline_quota, :hooks, :boards)
   end
+end
+
+# Dependency proxy for containers
+# Because docker adds v2 prefix to URI this need to be outside of usual group routes
+scope constraints: { format: nil } do
+  get 'v2', to: proc { [200, {}, ['']] }
+  get 'v2/*group_id/dependency_proxy/containers/:image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest'
+  get 'v2/*group_id/dependency_proxy/containers/:image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob'
 end

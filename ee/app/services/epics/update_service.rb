@@ -16,7 +16,7 @@ module Epics
 
       update_task_event(epic) || update(epic)
 
-      if have_epic_dates_changed?(epic)
+      if saved_change_to_epic_dates?(epic)
         epic.update_start_and_due_dates
         epic.reset
       end
@@ -43,8 +43,8 @@ module Epics
 
     private
 
-    def have_epic_dates_changed?(epic)
-      (epic.previous_changes.keys.map(&:to_sym) & EPIC_DATE_FIELDS).present?
+    def saved_change_to_epic_dates?(epic)
+      (epic.saved_changes.keys.map(&:to_sym) & EPIC_DATE_FIELDS).present?
     end
   end
 end

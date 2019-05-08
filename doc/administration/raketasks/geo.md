@@ -1,4 +1,4 @@
-# Geo Rake Tasks
+# Geo Rake Tasks **[PREMIUM ONLY]**
 
 ## Git housekeeping
 

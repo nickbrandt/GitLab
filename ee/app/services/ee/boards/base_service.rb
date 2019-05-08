@@ -5,6 +5,8 @@ module EE
     module BaseService
       # rubocop: disable CodeReuse/ActiveRecord
       def set_assignee
+        return unless params.key?(:assignee_id)
+
         assignee = ::User.find_by(id: params.delete(:assignee_id))
         params.merge!(assignee: assignee)
       end
@@ -12,9 +14,9 @@ module EE
 
       # rubocop: disable CodeReuse/ActiveRecord
       def set_milestone
-        milestone_id = params[:milestone_id]
+        return unless params.key?(:milestone_id)
 
-        return unless milestone_id
+        milestone_id = params[:milestone_id]
 
         return if [::Milestone::None.id,
                    ::Milestone::Upcoming.id,
@@ -35,10 +37,10 @@ module EE
       # rubocop: enable CodeReuse/ActiveRecord
 
       def set_labels
-        if params[:label_ids]
-          params[:label_ids] = labels_service.filter_labels_ids_in_param(:label_ids)
-        elsif params[:labels]
-          params[:label_ids] = labels_service.find_or_create_by_titles.map(&:id)
+        if params.key?(:label_ids)
+          params[:label_ids] = (labels_service.filter_labels_ids_in_param(:label_ids) || [])
+        elsif params.key?(:labels)
+          params[:label_ids] = (labels_service.find_or_create_by_titles.map(&:id) || [])
         end
       end
 

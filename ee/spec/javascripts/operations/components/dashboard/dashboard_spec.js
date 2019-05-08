@@ -4,7 +4,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
-import store from 'ee/operations/store';
+import createStore from 'ee/vue_shared/dashboards/store';
 import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
 import { trimText } from 'spec/helpers/vue_component_helper';
 import { mockProjectData, mockText } from '../../mock_data';
@@ -16,6 +16,7 @@ describe('dashboard component', () => {
   const mockAddEndpoint = 'mock-addPath';
   const mockListEndpoint = 'mock-listPath';
   const DashboardComponent = localVue.extend(Dashboard);
+  const store = createStore();
   let wrapper;
   let mockAxios;
 
@@ -83,7 +84,7 @@ describe('dashboard component', () => {
           .then(timeoutPromise)
           .then(() => {
             expect(store.state.projects.length).toEqual(2);
-            expect(wrapper.element.querySelectorAll('.js-dashboard-project').length).toEqual(2);
+            expect(wrapper.findAll(Project).length).toEqual(2);
             done();
           })
           .catch(done.fail);
@@ -102,7 +103,7 @@ describe('dashboard component', () => {
       });
 
       it('includes a dashboard project component for each project', () => {
-        const projectComponents = wrapper.element.querySelectorAll('.js-dashboard-project');
+        const projectComponents = wrapper.findAll(Project);
 
         expect(projectComponents.length).toBe(projectCount);
       });
@@ -125,11 +126,83 @@ describe('dashboard component', () => {
           timeoutPromise()
             .then(() => {
               expect(store.state.projects.length).toEqual(0);
-              expect(wrapper.element.querySelectorAll('.js-dashboard-project').length).toEqual(0);
+              expect(wrapper.findAll(Project).length).toEqual(0);
               done();
             })
             .catch(done.fail);
         });
+      });
+    });
+
+    describe('add projects modal', () => {
+      beforeEach(() => {
+        store.state.projectSearchResults = mockProjectData(2);
+        store.state.selectedProjects = mockProjectData(1);
+      });
+
+      it('clears state when adding a valid project', done => {
+        mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [1], invalid: [] });
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            wrapper.vm.onOk();
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            expect(store.state.projectSearchResults.length).toEqual(0);
+            expect(store.state.selectedProjects.length).toEqual(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('clears state when adding an invalid project', done => {
+        mockAxios.onPost(mockAddEndpoint).replyOnce(200, { added: [], invalid: [1] });
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            wrapper.vm.onOk();
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            expect(store.state.projectSearchResults.length).toEqual(0);
+            expect(store.state.selectedProjects.length).toEqual(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('clears state when canceled', done => {
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            wrapper.vm.onCancel();
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            expect(store.state.projectSearchResults.length).toEqual(0);
+            expect(store.state.selectedProjects.length).toEqual(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('clears state on error', done => {
+        mockAxios.onPost(mockAddEndpoint).replyOnce(500, {});
+        wrapper.vm
+          .$nextTick()
+          .then(() => {
+            expect(store.state.projectSearchResults.length).not.toEqual(0);
+            expect(store.state.selectedProjects.length).not.toEqual(0);
+            wrapper.vm.onOk();
+          })
+          .then(timeoutPromise)
+          .then(() => {
+            expect(store.state.projectSearchResults.length).toEqual(0);
+            expect(store.state.selectedProjects.length).toEqual(0);
+            done();
+          })
+          .catch(done.fail);
       });
     });
 

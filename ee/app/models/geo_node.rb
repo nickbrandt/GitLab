@@ -198,6 +198,12 @@ class GeoNode < ApplicationRecord
     end
   end
 
+  def job_artifacts
+    Ci::JobArtifact.all unless selective_sync?
+
+    Ci::JobArtifact.project_id_in(projects)
+  end
+
   def lfs_objects
     return LfsObject.all unless selective_sync?
 
@@ -328,6 +334,14 @@ class GeoNode < ApplicationRecord
 
   def projects_for_selected_shards
     Project.within_shards(selective_sync_shards)
+  end
+
+  def project_model
+    Project
+  end
+
+  def projects_table
+    Project.arel_table
   end
 
   def uploads_model

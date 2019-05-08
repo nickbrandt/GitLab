@@ -124,6 +124,10 @@ describe 'Merge request > Batch comments', :js do
 
       it 'adds draft comments to both sides' do
         write_parallel_comment('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_10_9')
+
+        # make sure line 9 is in the view
+        execute_script("window.scrollBy(0, -200)")
+
         write_parallel_comment('2f6fcd96b88b36ce98c38da085c795a27d92a3dd_9_9', button_text: 'Add to review', text: 'Another wrong line')
 
         expect(find('.new .draft-note-component')).to have_content('Line is wrong')

@@ -37,7 +37,7 @@
         - commit_text =  _('%{commit_author_link} authored %{commit_timeago}') % { commit_author_link: commit_author_link, commit_timeago: commit_timeago }
         #{ commit_text.html_safe }
       - if show_project_name
-        %span.project_namespace
+        %span.project-namespace
           = project.full_name
 
       - if commit.description?
@@ -56,7 +56,7 @@
       .js-commit-pipeline-status{ data: { endpoint: pipelines_project_commit_path(project, commit.id, ref: ref) } }
 
       .commit-sha-group.d-none.d-sm-flex
-        .label.label-monospace
+        .label.label-monospace.monospace
           = commit.short_id
         = clipboard_button(text: commit.id, title: _("Copy commit SHA to clipboard"), class: "btn btn-default", container: "body")
         = link_to_browse_code(project, commit)

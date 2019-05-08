@@ -18,6 +18,13 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
 
   private
 
+  override :link_identity
+  def link_identity(identity_linker)
+    super.tap do
+      store_active_saml_session unless identity_linker.failed?
+    end
+  end
+
   override :redirect_identity_linked
   def redirect_identity_linked
     flash[:notice] = "SAML for #{@unauthenticated_group.name} was added to your connected accounts"
@@ -44,6 +51,17 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     flash[:notice] = "Signed in with SAML for #{@unauthenticated_group.name}"
 
     super
+  end
+
+  override :sign_in
+  def sign_in(resource_or_scope, *args)
+    store_active_saml_session
+
+    super
+  end
+
+  def store_active_saml_session
+    Gitlab::Auth::GroupSaml::SsoEnforcer.new(@saml_provider).update_session
   end
 
   def redirect_unverified_saml_initiation

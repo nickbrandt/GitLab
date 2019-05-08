@@ -14,12 +14,14 @@ and we use [Bootstrap's Utility Classes](https://getbootstrap.com/docs/4.3/utili
 
 New utility classes should be added to [`utilities.scss`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/app/assets/stylesheets/utilities.scss). Existing classes include:
 
-**Background color**: `.bg-variant-shade` e.g. `.bg-warning-400`
-**Text color**: `.text-variant-shade` e.g. `.text-success-500`
+**Background color**: `.bg-variant-shade` e.g. `.bg-warning-400`  
+**Text color**: `.text-variant-shade` e.g. `.text-success-500` 
+
 - variant is one of 'primary', 'secondary', 'success', 'warning', 'error'
 - shade is on of the shades listed on [colors](https://design.gitlab.com/foundations/colors/)
 
 **Font size**: `.text-size` e.g. `.text-2`
+
 - **size** is number from 1-6 from our [Type scale](https://design.gitlab.com/foundations/typography)
 
 ### Naming

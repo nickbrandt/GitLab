@@ -148,6 +148,27 @@ describe EpicLinks::CreateService, :postgresql do
           it 'returns success status' do
             expect(subject).to eq(status: :success)
           end
+
+          it 'avoids un-necessary database queries' do
+            epic1 = create(:epic, group: group)
+
+            # Establish baseline
+            add_epic([valid_reference])
+
+            control = ActiveRecord::QueryRecorder.new { add_epic([epic1.to_reference(full: true)]) }
+
+            new_epics = [create(:epic, group: group), create(:epic, group: group)]
+
+            # threshold is 8 because
+            # 1. we need to check hierarchy for each child epic (3 queries)
+            # 2. we have to update the  record (2 including releasing savepoint)
+            # 3. we have to update start and due dates for all updated epics
+            # 4. we temporarily increased this from 6 due to
+            #    https://gitlab.com/gitlab-org/gitlab-ee/issues/11539
+            expect do
+              ActiveRecord::QueryRecorder.new { add_epic(new_epics.map { |epic| epic.to_reference(full: true) }) }
+            end.not_to exceed_query_limit(control).with_threshold(8)
+          end
         end
 
         context 'when at least one epic is still not assigned to the parent epic' do
@@ -187,55 +208,6 @@ describe EpicLinks::CreateService, :postgresql do
 
           it 'no relationship is created' do
             expect { subject }.not_to change { epic.children.count }
-          end
-        end
-
-        context 'when adding to an Epic that is already at maximum depth' do
-          before do
-            epic1 = create(:epic, group: group)
-            epic2 = create(:epic, group: group, parent: epic1)
-            epic3 = create(:epic, group: group, parent: epic2)
-            epic4 = create(:epic, group: group, parent: epic3)
-
-            epic.update(parent: epic4)
-          end
-
-          subject { add_epic([valid_reference]) }
-
-          it 'returns an error' do
-            expect(subject).to eq(message: 'Epic hierarchy level too deep', status: :error, http_status: 409)
-          end
-
-          it 'no relationship is created' do
-            expect { subject }.not_to change { epic.children.count }
-          end
-        end
-
-        context 'when adding an Epic that has existing children' do
-          subject { add_epic([valid_reference]) }
-
-          context 'when total depth after adding would exceed limit' do
-            before do
-              epic1 = create(:epic, group: group)
-
-              epic.update(parent: epic1) # epic is on level 2
-
-              # epic_to_add has 3 children (level 4 including epic_to_add)
-              # that would mean level 6 after relating epic_to_add on epic
-              epic2 = create(:epic, group: group, parent: epic_to_add)
-              epic3 = create(:epic, group: group, parent: epic2)
-              create(:epic, group: group, parent: epic3)
-            end
-
-            include_examples 'returns not found error'
-          end
-
-          context 'when Epic to add has more than 5 children' do
-            before do
-              create_list(:epic, 8, group: group, parent: epic_to_add)
-            end
-
-            include_examples 'returns success'
           end
         end
 

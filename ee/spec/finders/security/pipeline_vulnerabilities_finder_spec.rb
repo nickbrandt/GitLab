@@ -63,12 +63,104 @@ describe Security::PipelineVulnerabilitiesFinder do
       end
     end
 
+    context 'by scope' do
+      let(:ds_occurrence) { pipeline.security_reports.reports["dependency_scanning"].occurrences.first }
+      let(:sast_occurrence) { pipeline.security_reports.reports["sast"].occurrences.first }
+
+      let!(:feedback) do
+        [
+          create(
+            :vulnerability_feedback,
+            :dismissal,
+            :dependency_scanning,
+            project: project,
+            pipeline: pipeline,
+            project_fingerprint: ds_occurrence.project_fingerprint,
+            vulnerability_data: ds_occurrence.raw_metadata
+          ),
+          create(
+            :vulnerability_feedback,
+            :dismissal,
+            :sast,
+            project: project,
+            pipeline: pipeline,
+            project_fingerprint: sast_occurrence.project_fingerprint,
+            vulnerability_data: sast_occurrence.raw_metadata
+          )
+        ]
+      end
+
+      context 'when unscoped' do
+        subject { described_class.new(pipeline: pipeline).execute }
+
+        it 'returns non-dismissed vulnerabilities' do
+          expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count - feedback.count
+          expect(subject.map(&:project_fingerprint)).not_to include(*feedback.map(&:project_fingerprint))
+        end
+      end
+
+      context 'when `dismissed`' do
+        subject { described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning], scope: 'dismissed' } ).execute }
+
+        it 'returns non-dismissed vulnerabilities' do
+          expect(subject.count).to eq(ds_count - 1)
+          expect(subject.map(&:project_fingerprint)).not_to include(ds_occurrence.project_fingerprint)
+        end
+      end
+
+      context 'when `all`' do
+        let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning], scope: 'all' } }
+
+        it 'returns all vulnerabilities' do
+          expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
+        end
+      end
+    end
+
+    context 'by severity' do
+      context 'when unscoped' do
+        subject { described_class.new(pipeline: pipeline).execute }
+
+        it 'returns all vulnerability severity levels' do
+          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical]
+        end
+      end
+
+      context 'when `low`' do
+        subject { described_class.new(pipeline: pipeline, params: { severity: 'low' } ).execute }
+
+        it 'returns only low-severity vulnerabilities' do
+          expect(subject.map(&:severity).uniq).to match_array %w[low]
+        end
+      end
+    end
+
+    context 'by confidence' do
+      context 'when unscoped' do
+        subject { described_class.new(pipeline: pipeline).execute }
+
+        it 'returns all vulnerability confidence levels' do
+          expect(subject.map(&:confidence).uniq).to match_array %w[undefined low medium high]
+        end
+      end
+
+      context 'when `medium`' do
+        subject { described_class.new(pipeline: pipeline, params: { confidence: 'medium' } ).execute }
+
+        it 'returns only medium-confidence vulnerabilities' do
+          expect(subject.map(&:confidence).uniq).to match_array %w[medium]
+        end
+      end
+    end
+
     context 'by all filters' do
       context 'with found entity' do
-        let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning] } }
+        let(:params) { { report_type: %w[sast dast container_scanning dependency_scanning], scope: 'all' } }
 
         it 'filters by all params' do
           expect(subject.count).to eq cs_count + dast_count + ds_count + sast_count
+          expect(subject.map(&:confidence).uniq).to match_array %w[undefined low medium high]
+          expect(subject.map(&:severity).uniq).to match_array %w[undefined unknown low medium high critical]
         end
       end
 

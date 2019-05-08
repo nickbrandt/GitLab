@@ -47,7 +47,8 @@ describe('Split security reports app', () => {
           sastContainerHelpPath: 'path',
           pipelineId: 123,
           canCreateIssue: true,
-          canCreateFeedback: true,
+          canCreateMergeRequest: true,
+          canDismissVulnerability: true,
         },
       });
     });
@@ -90,7 +91,8 @@ describe('Split security reports app', () => {
           sastContainerHelpPath: 'path',
           pipelineId: 123,
           canCreateIssue: true,
-          canCreateFeedback: true,
+          canCreateMergeRequest: true,
+          canDismissVulnerability: true,
         },
       });
     });
@@ -171,7 +173,8 @@ describe('Split security reports app', () => {
           sastContainerHelpPath: 'path',
           pipelineId: 123,
           canCreateIssue: true,
-          canCreateFeedback: true,
+          canCreateMergeRequest: true,
+          canDismissVulnerability: true,
         },
       });
     });

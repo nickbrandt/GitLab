@@ -10,8 +10,42 @@ module Geo
 
         self.table_name = Gitlab::Geo::Fdw.foreign_table_name('ci_job_artifacts')
 
+        belongs_to :project, class_name: 'Geo::Fdw::Project', inverse_of: :job_artifacts
+
         scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-        scope :geo_syncable, -> { with_files_stored_locally.not_expired }
+        scope :project_id_in, ->(ids) { joins(:project).merge(Geo::Fdw::Project.id_in(ids)) }
+        scope :syncable, -> { with_files_stored_locally.not_expired }
+
+        class << self
+          def inner_join_job_artifact_registry
+            join_statement =
+              arel_table
+                .join(job_artifact_registry_table, Arel::Nodes::InnerJoin)
+                .on(arel_table[:id].eq(job_artifact_registry_table[:artifact_id]))
+
+            joins(join_statement.join_sources)
+          end
+
+          def missing_job_artifact_registry
+            left_outer_join_job_artifact_registry
+              .where(job_artifact_registry_table[:id].eq(nil))
+          end
+
+          private
+
+          def job_artifact_registry_table
+            Geo::JobArtifactRegistry.arel_table
+          end
+
+          def left_outer_join_job_artifact_registry
+            join_statement =
+              arel_table
+                .join(job_artifact_registry_table, Arel::Nodes::OuterJoin)
+                .on(arel_table[:id].eq(job_artifact_registry_table[:artifact_id]))
+
+            joins(join_statement.join_sources)
+          end
+        end
       end
     end
   end

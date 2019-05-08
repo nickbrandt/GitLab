@@ -50,10 +50,10 @@ export default {
     <toolbar
       :id="id"
       :is-loading="isLoading"
-      :name="design.name"
+      :name="design.filename"
       :updated-at="design.updatedAt"
       :updated-by="design.updatedBy"
     />
-    <design-image :is-loading="isLoading" :image="design.image" :name="design.name" />
+    <design-image :is-loading="isLoading" :image="design.image" :name="design.filename" />
   </div>
 </template>

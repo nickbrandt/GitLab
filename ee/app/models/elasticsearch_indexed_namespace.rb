@@ -1,19 +1,17 @@
 # frozen_string_literal: true
 
 class ElasticsearchIndexedNamespace < ApplicationRecord
+  include ElasticsearchIndexedContainer
   include EachBatch
 
-  self.primary_key = 'namespace_id'
-
-  after_commit :index, on: :create
-  after_commit :delete_from_index, on: :destroy
+  self.primary_key = :namespace_id
 
   belongs_to :namespace
 
   validates :namespace_id, presence: true, uniqueness: true
 
-  def self.namespace_ids
-    self.pluck(:namespace_id)
+  def self.target_attr_name
+    :namespace_id
   end
 
   private

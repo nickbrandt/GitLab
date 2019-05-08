@@ -60,6 +60,61 @@ describe ApplicationSettings::UpdateService do
           expect(setting.repository_size_limit).to be_nil
         end
       end
+
+      context 'elasticsearch' do
+        context 'limiting namespaces and projects' do
+          before do
+            setting.update!(elasticsearch_indexing: true)
+            setting.update!(elasticsearch_limit_indexing: true)
+          end
+
+          context 'namespaces' do
+            let(:namespaces) { create_list(:namespace, 3) }
+
+            it 'creates ElasticsearchIndexedNamespace objects when given elasticsearch_namespace_ids' do
+              opts = { elasticsearch_namespace_ids: namespaces.map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedNamespace.count }.by(3)
+            end
+
+            it 'deletes ElasticsearchIndexedNamespace objects not in elasticsearch_namespace_ids' do
+              create :elasticsearch_indexed_namespace, namespace: namespaces.last
+              opts = { elasticsearch_namespace_ids: namespaces.first(2).map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedNamespace.count }.from(1).to(2)
+
+              expect(ElasticsearchIndexedNamespace.where(namespace_id: namespaces.last.id)).not_to exist
+            end
+          end
+
+          context 'projects' do
+            let(:projects) { create_list(:project, 3) }
+
+            it 'creates ElasticsearchIndexedProject objects when given elasticsearch_project_ids' do
+              opts = { elasticsearch_project_ids: projects.map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedProject.count }.by(3)
+            end
+
+            it 'deletes ElasticsearchIndexedProject objects not in elasticsearch_project_ids' do
+              create :elasticsearch_indexed_project, project: projects.last
+              opts = { elasticsearch_project_ids: projects.first(2).map(&:id).join(',') }
+
+              expect do
+                described_class.new(setting, user, opts).execute
+              end.to change { ElasticsearchIndexedProject.count }.from(1).to(2)
+
+              expect(ElasticsearchIndexedProject.where(project_id: projects.last.id)).not_to exist
+            end
+          end
+        end
+      end
     end
   end
 end

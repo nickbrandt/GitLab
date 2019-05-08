@@ -251,6 +251,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :security
           get :licenses
         end
+
+        member do
+          resources :stages, only: [], param: :name do
+            post :play_manual
+          end
+        end
+
+        member do
+          resources :stages, only: [], param: :name do
+            post :play_manual
+          end
+        end
       end
 
       resources :pipeline_schedules, except: [:show] do

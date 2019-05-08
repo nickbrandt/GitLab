@@ -286,6 +286,10 @@ module ApplicationSettingsHelper
   def expanded_by_default?
     Rails.env.test?
   end
+
+  def instance_clusters_enabled?
+    can?(current_user, :read_cluster, Clusters::Instance.new)
+  end
 end
 
 ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper) # rubocop: disable Cop/InjectEnterpriseEditionModule

@@ -2,7 +2,14 @@ import { TEST_HOST } from 'spec/test_constants';
 
 const AVATAR_URL = `${TEST_HOST}/dummy.jpg`;
 
-export default function mockPipelineData(
+export const mockText = {
+  ADD_PROJECTS_ERROR: 'Something went wrong, unable to add projects to dashboard',
+  REMOVE_PROJECT_ERROR: 'Something went wrong, unable to remove project',
+  NO_SEARCH_RESULTS: 'Sorry, no projects matched your search',
+  RECEIVE_PROJECTS_ERROR: 'Something went wrong, unable to get projects',
+};
+
+export function mockPipelineData(
   status = 'success',
   id = 1,
   finishedTimeStamp = new Date(Date.now() - 86400000).toISOString(),
@@ -65,4 +72,40 @@ export default function mockPipelineData(
       name: 'test-project',
     },
   };
+}
+
+export function mockProjectData(
+  projectCount = 1,
+  currentPipelineStatus = 'success',
+  upstreamStatus = 'success',
+  alertCount = 0,
+) {
+  return Array(projectCount)
+    .fill(null)
+    .map((_, index) => ({
+      id: index,
+      description: '',
+      name: 'test-project',
+      name_with_namespace: 'Test / test-project',
+      path: 'test-project',
+      path_with_namespace: 'test/test-project',
+      created_at: '2019-02-01T15:40:27.522Z',
+      default_branch: 'master',
+      tag_list: [],
+      avatar_url: null,
+      web_url: 'https://mock-web_url/',
+      namespace: {
+        id: 1,
+        name: 'test',
+        path: 'test',
+        kind: 'user',
+        full_path: 'user',
+        parent_id: null,
+      },
+      remove_path: '/-/operations?project_id=1',
+      last_pipeline: mockPipelineData(currentPipelineStatus),
+      upstream_pipeline: mockPipelineData(upstreamStatus),
+      downstream_pipelines: [],
+      alert_count: alertCount,
+    }));
 }

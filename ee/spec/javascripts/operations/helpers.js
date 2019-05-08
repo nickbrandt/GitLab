@@ -1,9 +1,3 @@
-import state from 'ee/operations/store/state';
-
-export function clearState(store) {
-  store.replaceState(state());
-}
-
 /**
  * @deprecated
  * DO NOT USE! This causes issues when `vue-test-utils` is used elsewhere.

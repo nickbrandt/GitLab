@@ -28,6 +28,8 @@ module EE
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
         has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
+        has_many :downstream_bridges, class_name: '::Ci::Bridge', foreign_key: :upstream_pipeline_id
+
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
@@ -86,11 +88,19 @@ module EE
         }.freeze
 
         state_machine :status do
-          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
             next unless pipeline.has_reports?(::Ci::JobArtifact.security_reports) && pipeline.default_branch?
 
             pipeline.run_after_commit do
               StoreSecurityReportsWorker.perform_async(pipeline.id)
+            end
+          end
+
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+            next unless pipeline.downstream_bridges.any?
+
+            pipeline.run_after_commit do
+              ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
             end
           end
 

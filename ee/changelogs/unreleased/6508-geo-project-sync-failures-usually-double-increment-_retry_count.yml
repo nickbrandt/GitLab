@@ -1,0 +1,5 @@
+---
+title: 'Geo: Fix: Project sync failures usually double-increment *_retry_count'
+merge_request: 11381
+author:
+type: fixed
