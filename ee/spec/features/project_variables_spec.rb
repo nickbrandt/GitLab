@@ -36,7 +36,7 @@ describe 'Project variables EE', :js do
 
       visit page_path
 
-      page.within('.js-ci-variable-list-section .js-row:nth-child(1)') do
+      page.within('.js-ci-variable-list-section .js-row:nth-child(2)') do
         expect(find('.js-ci-variable-input-key').value).to eq('somekey')
         expect(page).to have_content('review/*')
       end
