@@ -1,5 +1,4 @@
 <script>
-import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
@@ -50,13 +49,17 @@ export default {
     ...mapState('vulnerabilities', ['modal', 'pageInfo']),
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
-    canCreateIssuePermission() {
+    canCreateIssue() {
       const path = this.vulnerability.vulnerability_feedback_issue_path;
-      return _.isString(path) && !_.isEmpty(path);
+      return Boolean(path);
     },
-    canCreateFeedbackPermission() {
-      const path = this.vulnerability.vulnerability_feedback_dismissal_path;
-      return _.isString(path) && !_.isEmpty(path);
+    canCreateMergeRequest() {
+      const path = this.vulnerability.create_vulnerability_feedback_merge_request_path;
+      return Boolean(path);
+    },
+    canDismissVulnerability() {
+      const path = this.vulnerability.create_vulnerability_feedback_dismissal_path;
+      return Boolean(path);
     },
     vulnerability() {
       return this.modal.vulnerability;
@@ -104,8 +107,9 @@ export default {
     <issue-modal
       :modal="modal"
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-      :can-create-issue-permission="canCreateIssuePermission"
-      :can-create-feedback-permission="canCreateFeedbackPermission"
+      :can-create-issue="canCreateIssue"
+      :can-create-merge-request="canCreateMergeRequest"
+      :can-dismiss-vulnerability="canDismissVulnerability"
       @createNewIssue="createIssue({ vulnerability })"
       @dismissIssue="dismissVulnerability({ vulnerability })"
       @revertDismissIssue="undoDismiss({ vulnerability })"

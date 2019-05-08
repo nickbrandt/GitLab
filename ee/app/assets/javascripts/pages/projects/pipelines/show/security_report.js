@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import SecurityReportApp from 'ee/vue_shared/security_reports/split_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
-import { parseBoolean } from '~/lib/utils/common_utils';
 import { updateBadgeCount } from './utils';
 
 Vue.use(Translate);
@@ -22,12 +21,13 @@ export default () => {
       dependencyScanningHelpPath,
       vulnerabilityFeedbackPath,
       vulnerabilityFeedbackHelpPath,
+      createVulnerabilityFeedbackIssuePath,
+      createVulnerabilityFeedbackMergeRequestPath,
+      createVulnerabilityFeedbackDismissalPath,
       dastHeadPath,
       sastContainerHeadPath,
       dastHelpPath,
       sastContainerHelpPath,
-      canCreateIssue,
-      canCreateFeedback,
     } = datasetOptions;
     const pipelineId = parseInt(datasetOptions.pipelineId, 10);
 
@@ -52,13 +52,17 @@ export default () => {
             dependencyScanningHelpPath,
             vulnerabilityFeedbackPath,
             vulnerabilityFeedbackHelpPath,
+            createVulnerabilityFeedbackIssuePath,
+            createVulnerabilityFeedbackMergeRequestPath,
+            createVulnerabilityFeedbackDismissalPath,
             pipelineId,
             dastHeadPath,
             sastContainerHeadPath,
             dastHelpPath,
             sastContainerHelpPath,
-            canCreateFeedback: parseBoolean(canCreateFeedback),
-            canCreateIssue: parseBoolean(canCreateIssue),
+            canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
+            canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
+            canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
           },
           on: {
             updateBadgeCount: count => {

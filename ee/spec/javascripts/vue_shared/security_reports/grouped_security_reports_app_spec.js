@@ -60,7 +60,8 @@ describe('Grouped security reports app', () => {
         vulnerabilityFeedbackHelpPath: 'path',
         pipelineId: 123,
         canCreateIssue: true,
-        canCreateFeedback: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
       });
     });
 
@@ -116,7 +117,8 @@ describe('Grouped security reports app', () => {
         vulnerabilityFeedbackHelpPath: 'path',
         pipelineId: 123,
         canCreateIssue: true,
-        canCreateFeedback: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
       });
     });
 
@@ -170,7 +172,8 @@ describe('Grouped security reports app', () => {
         vulnerabilityFeedbackHelpPath: 'path',
         pipelineId: 123,
         canCreateIssue: true,
-        canCreateFeedback: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
       });
     });
 
@@ -242,8 +245,9 @@ describe('Grouped security reports app', () => {
     beforeEach(() => {
       vm = mountComponent(Component, {
         headBlobPath: 'path',
-        canCreateFeedback: false,
         canCreateIssue: false,
+        canCreateMergeRequest: false,
+        canDismissVulnerability: false,
         pipelinePath,
       });
     });

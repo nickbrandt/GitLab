@@ -68,9 +68,9 @@ Example response:
       }
     ],
     "project_fingerprint": "fa6f5b6c5d240b834ac5e901dc69f9484cef89ec",
-    "vulnerability_feedback_issue_path": "/tests/yarn-remediation-test/vulnerability_feedback",
-    "vulnerability_feedback_merge_request_path": "/tests/yarn-remediation-test/vulnerability_feedback",
-    "vulnerability_feedback_dismissal_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_issue_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_merge_request_path": "/tests/yarn-remediation-test/vulnerability_feedback",
+    "create_vulnerability_feedback_dismissal_path": "/tests/yarn-remediation-test/vulnerability_feedback",
     "project": {
       "id": 31,
       "name": "yarn-remediation-test",

@@ -181,8 +181,11 @@ describe MergeRequestWidgetEntity do
     end
   end
 
-  it 'has vulnerability feedbacks path' do
+  it 'has vulnerability feedback paths' do
     expect(subject.as_json).to include(:vulnerability_feedback_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_issue_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_merge_request_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_dismissal_path)
   end
 
   it 'has pipeline id' do
