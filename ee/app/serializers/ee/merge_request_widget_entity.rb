@@ -68,7 +68,7 @@ module EE
         end
 
         expose :managed_licenses_path do |merge_request|
-          api_v4_projects_managed_licenses_path(id: merge_request.target_project.id)
+          expose_path(api_v4_projects_managed_licenses_path(id: merge_request.target_project.id))
         end
 
         expose :can_manage_licenses do |merge_request|
