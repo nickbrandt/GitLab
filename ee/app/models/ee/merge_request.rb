@@ -23,6 +23,18 @@ module EE
       has_many :draft_notes
       has_one :merge_train
 
+      has_many :blocks_as_blocker,
+               class_name: 'MergeRequestBlock',
+               foreign_key: :blocking_merge_request_id
+
+      has_many :blocks_as_blockee,
+               class_name: 'MergeRequestBlock',
+               foreign_key: :blocked_merge_request_id
+
+      has_many :blocking_merge_requests, through: :blocks_as_blockee
+
+      has_many :blocked_merge_requests, through: :blocks_as_blocker
+
       validate :validate_approval_rule_source
 
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
@@ -38,13 +50,26 @@ module EE
       def select_from_union(relations)
         where(id: from_union(relations))
       end
+
+      # This is an ActiveRecord scope in CE
+      def with_api_entity_associations
+        super.preload(:blocking_merge_requests)
+      end
     end
 
     override :mergeable?
     def mergeable?(skip_ci_check: false)
       return false unless approved?
+      return false if merge_blocked_by_other_mrs?
 
       super
+    end
+
+    def merge_blocked_by_other_mrs?
+      strong_memoize(:merge_blocked_by_other_mrs) do
+        project.feature_available?(:blocking_merge_requests) &&
+          blocking_merge_requests.any? { |mr| !mr.merged? }
+      end
     end
 
     override :mergeable_ci_state?

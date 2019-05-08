@@ -1,5 +1,10 @@
 require 'spec_helper'
 
+# Store feature-specific specs in `ee/spec/models/merge_request instead of
+# making this file longer.
+#
+# For instance, `ee/spec/models/merge_request/blocking_spec.rb` tests the
+# "blocking MRs" feature.
 describe MergeRequest do
   using RSpec::Parameterized::TableSyntax
   include ReactiveCachingHelpers
