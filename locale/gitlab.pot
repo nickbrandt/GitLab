@@ -6934,6 +6934,9 @@ msgstr ""
 msgid "Invite"
 msgstr ""
 
+msgid "Invite \"%{trimmed}\" by email"
+msgstr ""
+
 msgid "Invite group"
 msgstr ""
 
@@ -10991,6 +10994,9 @@ msgstr ""
 msgid "Search for a group"
 msgstr ""
 
+msgid "Search for a user"
+msgstr ""
+
 msgid "Search for projects, issues, etc."
 msgstr ""
 
@@ -11687,6 +11693,9 @@ msgid "Something went wrong, unable to search projects"
 msgstr ""
 
 msgid "Something went wrong. Please try again."
+msgstr ""
+
+msgid "Something went wrong. Try again later."
 msgstr ""
 
 msgid "Sorry, no epics matched your search"
@@ -13910,6 +13919,21 @@ msgid "Users were successfully added."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
+msgstr ""
+
+msgid "UsersSelect|%{name} + %{length} more"
+msgstr ""
+
+msgid "UsersSelect|Any User"
+msgstr ""
+
+msgid "UsersSelect|Assignee"
+msgstr ""
+
+msgid "UsersSelect|No assignee - %{openingTag} assign yourself %{closingTag}"
+msgstr ""
+
+msgid "UsersSelect|Unassigned"
 msgstr ""
 
 msgid "Using %{code_start}::%{code_end} denotes a %{link_start}scoped label set%{link_end}"
