@@ -693,9 +693,6 @@ msgstr ""
 msgid "Add an SSH key"
 msgstr ""
 
-msgid "Add approver(s)"
-msgstr ""
-
 msgid "Add approvers"
 msgstr ""
 
@@ -748,9 +745,6 @@ msgid "Add todo"
 msgstr ""
 
 msgid "Add user(s) to the group:"
-msgstr ""
-
-msgid "Add users or groups who are allowed to approve every merge request"
 msgstr ""
 
 msgid "Add users to group"
@@ -1082,9 +1076,6 @@ msgstr ""
 msgid "An error occurred when updating the issue weight"
 msgstr ""
 
-msgid "An error occurred while adding approver"
-msgstr ""
-
 msgid "An error occurred while deleting the approvers group"
 msgstr ""
 
@@ -1191,9 +1182,6 @@ msgid "An error occurred while moving the issue."
 msgstr ""
 
 msgid "An error occurred while parsing recent searches"
-msgstr ""
-
-msgid "An error occurred while removing approver"
 msgstr ""
 
 msgid "An error occurred while removing epics."
@@ -1414,12 +1402,6 @@ msgstr ""
 msgid "Approvals"
 msgstr ""
 
-msgid "Approvals required"
-msgstr ""
-
-msgid "Approvers"
-msgstr ""
-
 msgid "Apr"
 msgstr ""
 
@@ -1481,18 +1463,6 @@ msgid "Are you sure you want to regenerate the public key? You will have to upda
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
-msgstr ""
-
-msgid "Are you sure you want to remove approver %{name}"
-msgstr ""
-
-msgid "Are you sure you want to remove approver %{name}?"
-msgstr ""
-
-msgid "Are you sure you want to remove group %{name}"
-msgstr ""
-
-msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
 msgid "Are you sure you want to remove the attachment?"
@@ -10760,9 +10730,6 @@ msgstr ""
 msgid "Remove all or specific label(s)"
 msgstr ""
 
-msgid "Remove approver"
-msgstr ""
-
 msgid "Remove approvers"
 msgstr ""
 
@@ -11697,9 +11664,6 @@ msgid "Set new password"
 msgstr ""
 
 msgid "Set notification email for abuse reports."
-msgstr ""
-
-msgid "Set number of approvers required before open merge requests can be merged"
 msgstr ""
 
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
@@ -13083,9 +13047,6 @@ msgstr ""
 msgid "There are no SSH keys with access to your account."
 msgstr ""
 
-msgid "There are no approvers"
-msgstr ""
-
 msgid "There are no archived projects yet"
 msgstr ""
 
@@ -13375,12 +13336,6 @@ msgid "This means you can not push code until you create an empty repository or 
 msgstr ""
 
 msgid "This merge request is locked."
-msgstr ""
-
-msgid "This merge request must be approved by members of these groups. You can override the project settings by setting your own list of approvers."
-msgstr ""
-
-msgid "This merge request must be approved by these users. You can override the project settings by setting your own list of approvers."
 msgstr ""
 
 msgid "This namespace has already been taken! Please choose another one."
@@ -15922,9 +15877,6 @@ msgstr ""
 msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage is %{emphasisStart} unchanged %{emphasisEnd} at %{memoryFrom}MB"
 msgstr ""
 
-msgid "mrWidget|Add approval"
-msgstr ""
-
 msgid "mrWidget|Allows commits from members who can merge to the target branch"
 msgstr ""
 
@@ -16018,13 +15970,7 @@ msgstr ""
 msgid "mrWidget|Merge locally"
 msgstr ""
 
-msgid "mrWidget|Merge request approved"
-msgstr ""
-
 msgid "mrWidget|Merge request approved."
-msgstr ""
-
-msgid "mrWidget|Merge request approved; you can approve additionally"
 msgstr ""
 
 msgid "mrWidget|Merged by"
@@ -16057,21 +16003,8 @@ msgstr ""
 msgid "mrWidget|Refreshing now"
 msgstr ""
 
-msgid "mrWidget|Remove your approval"
-msgstr ""
-
 msgid "mrWidget|Request to merge"
 msgstr ""
-
-msgid "mrWidget|Requires 1 more approval"
-msgid_plural "mrWidget|Requires %d more approvals"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "mrWidget|Requires 1 more approval by"
-msgid_plural "mrWidget|Requires %d more approvals by"
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "mrWidget|Resolve conflicts"
 msgstr ""

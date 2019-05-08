@@ -46,17 +46,15 @@ describe "User creates a merge request", :js do
     end
 
     # TODO: Fix https://gitlab.com/gitlab-org/gitlab-ee/issues/11527
-=begin
-    page.within(".suggested-approvers") do
-      expect(page).to have_content(user2.name)
-    end
-
-    click_link(user2.name)
-
-    page.within("ul.approver-list") do
-      expect(page).to have_content(user2.name)
-  end
-=end
+    # page.within(".suggested-approvers") do
+    #   expect(page).to have_content(user2.name)
+    # end
+    #
+    # click_link(user2.name)
+    #
+    # page.within("ul.approver-list") do
+    #   expect(page).to have_content(user2.name)
+    # end
 
     fill_in("Title", with: title)
     click_button("Submit merge request")
@@ -65,10 +63,8 @@ describe "User creates a merge request", :js do
       click_link("Edit", match: :first)
     end
 
-=begin
-    page.within("ul.approver-list") do
-      expect(page).to have_content(user2.name)
-    end
-=end
+    # page.within("ul.approver-list") do
+    #   expect(page).to have_content(user2.name)
+    # end
   end
 end

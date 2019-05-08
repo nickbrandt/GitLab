@@ -2,36 +2,12 @@ require 'rails_helper'
 
 describe 'Merge request > User sets approvers', :js do
   include ProjectForksHelper
+  include FeatureApprovalHelper
 
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
   let!(:config_selector) { '.js-approval-rules' }
   let!(:modal_selector) { '#mr-edit-approvals-create-modal' }
-
-  def open_modal
-    page.execute_script "document.querySelector('#{config_selector}').scrollIntoView()"
-    within(config_selector) do
-      click_on('Edit')
-    end
-  end
-
-  def open_approver_select
-    within(modal_selector) do
-      find('.select2-input').click
-    end
-    wait_for_requests
-  end
-
-  def close_approver_select
-    within(modal_selector) do
-      find('.select2-input').send_keys :escape
-    end
-  end
-
-  def remove_approver(name)
-    el = page.find("#{modal_selector} .content-list li", text: /#{name}/i)
-    el.find('button').click
-  end
 
   context 'when editing an MR with a different author' do
     let(:author) { create(:user) }
@@ -72,7 +48,6 @@ describe 'Merge request > User sets approvers', :js do
       open_approver_select
 
       expect(find('.select2-results')).to have_content(other_user.name)
-      # expect(find('.select2-results')).not_to have_content(user.name) # TODO
       expect(find('.select2-results')).not_to have_content(non_member.name)
     end
   end
@@ -111,7 +86,7 @@ describe 'Merge request > User sets approvers', :js do
         click_button 'Update approvers'
 
         click_on("Submit merge request")
-        wait_for_requests
+        wait_for_all_requests
 
         expect(page).to have_content("Requires approval.")
         expect(page).to have_selector("img[alt='#{other_user.name}']")
@@ -136,13 +111,12 @@ describe 'Merge request > User sets approvers', :js do
 
         click_button 'Update approvers'
         click_on("Submit merge request")
-        wait_for_requests
+        wait_for_all_requests
         click_on("View eligible approvers") if page.has_button?("View eligible approvers")
         wait_for_requests
 
         expect(page).not_to have_selector(".js-approvers img[alt='#{other_user.name}']")
         expect(page).to have_selector(".js-approvers img[alt='#{approver.name}']")
-        expect(page).to have_content("Requires approval.")
       end
     end
 
@@ -179,7 +153,7 @@ describe 'Merge request > User sets approvers', :js do
         click_button 'Update approvers'
 
         click_on("Save changes")
-        wait_for_requests
+        wait_for_all_requests
 
         expect(page).to have_content("Requires approval.")
         expect(page).to have_selector("img[alt='#{other_user.name}']")
@@ -205,7 +179,7 @@ describe 'Merge request > User sets approvers', :js do
 
         click_button 'Update approvers'
         click_on("Save changes")
-        wait_for_requests
+        wait_for_all_requests
 
         click_on("View eligible approvers")
         wait_for_requests
@@ -235,7 +209,7 @@ describe 'Merge request > User sets approvers', :js do
 
         click_button 'Update approvers'
         click_on('Save changes')
-        wait_for_requests
+        wait_for_all_requests
 
         # new MR setting on the show MR page
         expect(page).to have_content("Requires 3 more approvals")

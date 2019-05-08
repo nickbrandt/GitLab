@@ -170,7 +170,6 @@ describe MergeRequest do
     let(:code_owners) { [double(:code_owner)] }
 
     before do
-      stub_feature_flags(approval_rules: false)
       allow(subject).to receive(:code_owners).and_return(code_owners)
     end
 
@@ -533,36 +532,6 @@ describe MergeRequest do
       merge_request.approver_groups.create(group: group)
 
       expect(merge_request.approvers_left).to eq [user]
-    end
-  end
-
-  describe "#overall_approver_groups" do
-    it 'returns a merge request group approver' do
-      project = create :project
-      create :approver_group, target: project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      approver_group2 = create :approver_group, target: merge_request
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group2])
-    end
-
-    it 'returns a project group approver' do
-      project = create :project
-      approver_group1 = create :approver_group, target: project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group1])
-    end
-
-    it 'returns a merge request approver if there is no project group approver' do
-      project = create :project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      approver_group1 = create :approver_group, target: merge_request
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group1])
     end
   end
 

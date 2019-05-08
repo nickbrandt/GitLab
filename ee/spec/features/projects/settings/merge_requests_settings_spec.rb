@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe 'Project settings > [EE] Merge Requests', :js do
   include GitlabRoutingHelper
+  include FeatureApprovalHelper
 
   let(:user) { create(:user) }
   let(:project) { create(:project, approvals_before_merge: 1) }
@@ -10,45 +11,6 @@ describe 'Project settings > [EE] Merge Requests', :js do
   let(:non_member) { create(:user) }
   let!(:config_selector) { '.js-approval-rules' }
   let!(:modal_selector) { '#project-settings-approvals-create-modal' }
-
-  def open_modal
-    page.execute_script "document.querySelector('#{config_selector}').scrollIntoView()"
-    within(config_selector) do
-      click_on('Edit')
-    end
-  end
-
-  def open_approver_select
-    within(modal_selector) do
-      find('.select2-input').click
-    end
-    wait_for_requests
-  end
-
-  def close_approver_select
-    within(modal_selector) do
-      find('.select2-input').send_keys :escape
-    end
-  end
-
-  def remove_approver(name)
-    el = page.find("#{modal_selector} .content-list li", text: /#{name}/i)
-    el.find('button').click
-  end
-
-  def expect_avatar(container, users)
-    users = Array(users)
-
-    members = container.all('.js-members img.avatar').map do |member|
-      member['alt']
-    end
-
-    users.each do |user|
-      expect(members).to include(user.name)
-    end
-
-    expect(members.size).to eq(users.size)
-  end
 
   before do
     sign_in(user)

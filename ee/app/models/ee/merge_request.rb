@@ -107,7 +107,6 @@ module EE
     end
 
     def validate_approval_rule_source
-      return if ::Feature.disabled?(:approval_rules, project, default_enabled: true)
       return unless approval_rules.any?
 
       local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
@@ -126,16 +125,7 @@ module EE
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
 
-        if ::Feature.enabled?(:approval_rules, project, default_enabled: true)
-          approval_state.filtered_approvers(code_owner: false, unactioned: true)
-        else
-          approvers = [
-            *overall_approvers(exclude_code_owners: true),
-            *approvers_from_groups
-          ]
-
-          ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
-        end
+        approval_state.filtered_approvers(code_owner: false, unactioned: true)
       end
     end
 
