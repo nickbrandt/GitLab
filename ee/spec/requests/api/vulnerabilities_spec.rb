@@ -88,8 +88,6 @@ describe API::Vulnerabilities do
           expect(response).to have_gitlab_http_status(200)
 
           expect(response.headers['X-Total']).to eq occurrence_count
-
-          expect(json_response.first.dig('dismissal_feedback', 'id')).to eq(dismissal.id)
         end
 
         it 'returns vulnerabilities with low severity' do
