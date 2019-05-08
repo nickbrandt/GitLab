@@ -10320,6 +10320,9 @@ msgstr ""
 msgid "Require approval from code owners"
 msgstr ""
 
+msgid "Require user password to approve"
+msgstr ""
+
 msgid "Require users to prove ownership of custom domains"
 msgstr ""
 
@@ -14856,6 +14859,9 @@ msgid "mrWidget|An error occurred while retrieving approval data for this merge 
 msgstr ""
 
 msgid "mrWidget|An error occurred while submitting your approval."
+msgstr ""
+
+msgid "mrWidget|Approval password is invalid."
 msgstr ""
 
 msgid "mrWidget|Approve"

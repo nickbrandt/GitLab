@@ -2551,6 +2551,7 @@ ActiveRecord::Schema.define(version: 20190426180107) do
     t.boolean "merge_requests_require_code_owner_approval"
     t.boolean "detected_repository_languages"
     t.boolean "merge_requests_disable_committers_approval"
+    t.boolean "require_password_to_approve"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
