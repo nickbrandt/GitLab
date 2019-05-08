@@ -506,7 +506,7 @@ describe Project do
       let(:project) { build(:project, :mirror, import_url: import_url, import_data_attributes: { auth_method: auth_method } ) }
 
       it do
-        expect(project.repository).to receive(:fetch_upstream).with(expected)
+        expect(project.repository).to receive(:fetch_upstream).with(expected, forced: false)
 
         project.fetch_mirror
       end
