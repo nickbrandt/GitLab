@@ -14,7 +14,7 @@ requests to be merged and much more.
 ![Insights example stacked bar chart](img/project_insights.png)
 
 NOTE: **Note:**
-This feature is [also available at the group level](../../group/insights/index.md).
+This feature is [also available at the group level](https://docs.gitlab.com/ee/user/group/insights/index.html).
 
 ## Configure your Insights
 
@@ -26,7 +26,7 @@ for details about the content of this file.
 
 NOTE: **Note:**
 Once the configuration file is created, you can also
-[use it for your project's group](../../group/insights/index.md#configure-your-insights).
+[use it for your project's group](https://docs.gitlab.com/ee/user/group/insights/index.html#configure-your-insights).
 
 NOTE: **Note:**
 If the project doesn't have any configuration file, it'll try to use

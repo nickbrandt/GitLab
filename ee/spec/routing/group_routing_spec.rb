@@ -87,4 +87,20 @@ describe 'Group routing', "routing" do
       expect(get('/groups/gitlabhq/-/security/vulnerabilities/history')).to route_to('groups/security/vulnerabilities#history', group_id: 'gitlabhq')
     end
   end
+
+  describe 'dependency proxy for containers' do
+    before do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+    end
+
+    it 'routes to #manifest' do
+      expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/manifests/2.3.6'))
+        .to route_to('groups/dependency_proxy_for_containers#manifest', group_id: 'gitlabhq', image: 'ruby', tag: '2.3.6')
+    end
+
+    it 'routes to #blob' do
+      expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/blobs/abc12345'))
+        .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'ruby', sha: 'abc12345')
+    end
+  end
 end

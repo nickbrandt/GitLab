@@ -60,8 +60,9 @@ describe('Card security reports app', () => {
         dastHelpPath: 'path',
         sastContainerHelpPath: 'path',
         pipelineId: 123,
-        canCreateFeedback: true,
         canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
       },
     });
   });

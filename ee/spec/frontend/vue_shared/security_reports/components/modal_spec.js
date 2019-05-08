@@ -16,7 +16,7 @@ describe('Security Reports modal', () => {
       beforeEach(() => {
         const props = {
           modal: createState().modal,
-          canCreateFeedbackPermission: true,
+          canDismissVulnerability: true,
         };
         props.modal.vulnerability.isDismissed = true;
         props.modal.vulnerability.dismissalFeedback = {
@@ -50,7 +50,7 @@ describe('Security Reports modal', () => {
       beforeEach(() => {
         const props = {
           modal: createState().modal,
-          canCreateFeedbackPermission: true,
+          canDismissVulnerability: true,
         };
         vm = mountComponent(Component, props);
       });
@@ -87,7 +87,7 @@ describe('Security Reports modal', () => {
       beforeEach(() => {
         const props = {
           modal: createState().modal,
-          canCreateIssuePermission: true,
+          canCreateIssue: true,
         };
         vm = mountComponent(Component, props);
       });

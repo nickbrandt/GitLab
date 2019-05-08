@@ -273,7 +273,6 @@ describe API::Geo do
         last_event_date: Time.now.utc,
         cursor_last_event_id: 1,
         cursor_last_event_date: Time.now.utc,
-        event_log_count: 55,
         event_log_max_id: 555,
         repository_created_max_id: 43,
         repository_updated_max_id: 132,

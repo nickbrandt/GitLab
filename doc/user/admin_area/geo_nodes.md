@@ -1,7 +1,7 @@
 # Geo nodes admin area **[PREMIUM ONLY]**
 
 For more information about setting up GitLab Geo, read the
-[Geo documentation](../../gitlab-geo/README.md).
+[Geo documentation](https://docs.gitlab.com/ee/administration/geo/replication/index.html).
 
 When you're done, you can navigate to **Admin area > Geo** (`/admin/geo/nodes`).
 
@@ -25,7 +25,7 @@ changes on the **primary** node!
 
 | Setting                   | Description |
 |---------------------------|-------------|
-| Selective synchronization | Enable Geo [selective sync](../../administration/geo/replication/configuration.md#selective-synchronization) for this **secondary** node. |
+| Selective synchronization | Enable Geo [selective sync](https://docs.gitlab.com/ee/administration/geo/replication/configuration.html#selective-synchronization) for this **secondary** node. |
 | Repository sync capacity  | Number of concurrent requests this **secondary** node will make to the **primary** node when backfilling repositories. |
 | File sync capacity        | Number of concurrent requests this **secondary** node will make to the **primary** node when backfilling files. |
 

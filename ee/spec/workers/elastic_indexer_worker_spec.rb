@@ -30,31 +30,14 @@ describe ElasticIndexerWorker, :elastic do
     end
 
     with_them do
-      it 'indexes new records' do
-        object = nil
-        Sidekiq::Testing.disable! do
-          object = create(type)
+      it 'calls record indexing' do
+        object = create(type)
+
+        expect_next_instance_of(Elastic::IndexRecordService) do |service|
+          expect(service).to receive(:execute).with(object, true, {})
         end
 
-        expect do
-          subject.perform("index", name, object.id, object.es_id)
-          Gitlab::Elastic::Helper.refresh_index
-        end.to change { Elasticsearch::Model.search('*').records.size }.by(1)
-      end
-
-      it 'updates the index when object is changed' do
-        object = nil
-
-        Sidekiq::Testing.disable! do
-          object = create(type)
-          subject.perform("index", name, object.id, object.es_id)
-          object.update(attribute => "new")
-        end
-
-        expect do
-          subject.perform("update", name, object.id, object.es_id)
-          Gitlab::Elastic::Helper.refresh_index
-        end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
+        subject.perform("index", name, object.id, object.es_id)
       end
 
       it 'deletes from index when an object is deleted' do
@@ -105,32 +88,5 @@ describe ElasticIndexerWorker, :elastic do
     Gitlab::Elastic::Helper.refresh_index
 
     expect(Elasticsearch::Model.search('*').total_count).to be(0)
-  end
-
-  it 'indexes all nested objects for a Project' do
-    # To be able to access it outside the following block
-    project = nil
-
-    Sidekiq::Testing.disable! do
-      project = create :project, :repository
-      create :issue, project: project
-      create :milestone, project: project
-      create :note, project: project
-      create :merge_request, target_project: project, source_project: project
-      create :project_snippet, project: project
-    end
-
-    expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id).and_call_original
-
-    # Nothing should be in the index at this point
-    expect(Elasticsearch::Model.search('*').total_count).to be(0)
-
-    Sidekiq::Testing.inline! do
-      subject.perform("index", "Project", project.id, project.es_id)
-    end
-    Gitlab::Elastic::Helper.refresh_index
-
-    ## All database objects + data from repository. The absolute value does not matter
-    expect(Elasticsearch::Model.search('*').total_count).to be > 40
   end
 end

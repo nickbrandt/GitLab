@@ -1,0 +1,5 @@
+---
+title: 'Geo: Prevent RegistryFinder calls on the primary'
+merge_request: 12183
+author:
+type: fixed

@@ -289,7 +289,7 @@ describe Group do
   end
 
   describe 'Vulnerabilities::Occurrence collection methods' do
-    describe '#latest_vulnerabilities' do
+    describe 'vulnerabilities finder methods' do
       let(:project) { create(:project, namespace: group) }
       let(:external_project) { create(:project) }
       let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
@@ -298,6 +298,11 @@ describe Group do
       let!(:new_vuln) { create_vulnerability(project) }
       let!(:external_vuln) { create_vulnerability(external_project) }
       let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+
+      before do
+        pipeline_ran_against_new_sha = create(:ci_pipeline, :success, project: project, sha: '123')
+        new_vuln.pipelines << pipeline_ran_against_new_sha
+      end
 
       def create_vulnerability(project, pipeline = nil)
         pipeline ||= create(:ci_pipeline, :success, project: project)
@@ -350,7 +355,7 @@ describe Group do
         subject { group.all_vulnerabilities }
 
         it 'returns vulns for all successful pipelines of projects belonging to the group' do
-          is_expected.to contain_exactly(old_vuln, new_vuln)
+          is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln)
         end
 
         context 'with vulnerabilities from other branches' do
@@ -361,7 +366,7 @@ describe Group do
           # per branch as soon as we store them for other branches
           # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
           it 'includes vulnerabilities from all branches' do
-            is_expected.to contain_exactly(old_vuln, new_vuln, branch_vuln)
+            is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln, branch_vuln)
           end
         end
       end

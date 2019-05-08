@@ -4,7 +4,7 @@ import Commit from '~/vue_shared/components/commit.vue';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import Alerts from 'ee/vue_shared/dashboards/components/alerts.vue';
-import store from 'ee/operations/store';
+import store from 'ee/vue_shared/dashboards/store';
 import { mockOneProject } from '../../mock_data';
 
 const localVue = createLocalVue();

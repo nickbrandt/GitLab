@@ -216,12 +216,9 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   def start_sync!(type)
     ensure_valid_type!(type)
 
-    new_count = retry_count(type) + 1
-
     update!(
       "last_#{type}_synced_at" => Time.now,
-      "#{type}_retry_count" => new_count,
-      "#{type}_retry_at" => next_retry_time(new_count))
+      "#{type}_retry_count" => retry_count(type))
   end
 
   # Is called when synchronization finishes without any issue
@@ -257,9 +254,12 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   def fail_sync!(type, message, error, attrs = {})
     ensure_valid_type!(type)
 
+    new_retry_count = retry_count(type) + 1
+
     attrs["resync_#{type}"] = true
     attrs["last_#{type}_sync_failure"] = "#{message}: #{error.message}"
-    attrs["#{type}_retry_count"] = retry_count(type) + 1
+    attrs["#{type}_retry_count"] = new_retry_count
+    attrs["#{type}_retry_at"] = next_retry_time(new_retry_count)
 
     update!(attrs)
   end
@@ -463,7 +463,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   # @param [String] type must be one of the values in TYPES
   # @see REGISTRY_TYPES
   def retry_count(type)
-    public_send("#{type}_retry_count") || -1 # rubocop:disable GitlabSecurity/PublicSend
+    public_send("#{type}_retry_count") || 0 # rubocop:disable GitlabSecurity/PublicSend
   end
 
   # Mark repository as synced using atomic conditions

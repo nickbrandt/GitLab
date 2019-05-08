@@ -82,3 +82,11 @@
               AWS Secret Access Key.  Only required if not using role instance credentials
 
       = f.submit 'Save changes', class: "btn btn-success"
+
+    - if Feature.enabled?(:elasticsearch_web_indexing)
+      %br
+      %h4
+        = _('Indexing')
+
+      = form_with url: admin_elasticsearch_enqueue_index_path, html: { class: 'fieldset-form' }, data: { remote: false } do |f|
+        = f.submit _('Start Indexing'), class: "btn btn-success"

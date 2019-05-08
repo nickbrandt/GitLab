@@ -21,7 +21,7 @@ Requirements:
 1. Install [GitLab Hook plugin](https://wiki.jenkins.io/display/JENKINS/GitLab+Hook+Plugin)
 2. Set up jenkins project
 
-![screen](jenkins_project.png)
+![screen](img/jenkins_project.png)
 
 ## GitLab
 
@@ -38,7 +38,7 @@ project. For that case we will need a Deploy key. Read the documentation on
 
 Now navigate to GitLab services page and activate Jenkins
 
-![screen](jenkins_gitlab_service.png)
+![screen](img/jenkins_gitlab_service.png)
 
 Done! Now when you push to GitLab - it will create a build for Jenkins.
 And also you will be able to see merge request build status with a link to the Jenkins build.

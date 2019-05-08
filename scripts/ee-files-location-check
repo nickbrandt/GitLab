@@ -28,7 +28,7 @@ new_ee_specific_files_not_at_the_ee_top_level =
 status = 0
 
 new_ee_specific_files_not_at_the_ee_top_level.each do |file|
-  next if WHITELIST.any? { |pattern| Dir.glob(pattern).include?(file) }
+  next if WHITELIST.any? { |pattern| Dir.glob(pattern, File::FNM_DOTMATCH).include?(file) }
 
   puts
   puts "* 💥 #{file} is EE-specific and should be moved to ee/#{file}: 💥"

@@ -29,6 +29,16 @@ module API
 
       params do
         optional :report_type, type: Array[String], desc: 'The type of report vulnerability belongs to', default: ::Vulnerabilities::Occurrence.report_types.keys
+        optional :scope, type: String, desc: 'Return vulnerabilities for the given scope: `dismissed` or `all`', default: 'dismissed', values: %w[all dismissed]
+        optional :severity,
+                 type: Array[String],
+                 desc: 'Returns issues belonging to specified severity level: `undefined`, `info`, `unknown`, `low`, `medium`, `high`, or `critical`. Defaults to all',
+                 default: ::Vulnerabilities::Occurrence.severities.keys
+        optional :confidence,
+                 type: Array[String],
+                 desc: 'Returns vulnerabilities belonging to specified confidence level: `undefined`, `ignore`, `unknown`, `experimental`, `low`, `medium`, `high`, or `confirmed`. Defaults to all',
+                 default: ::Vulnerabilities::Occurrence.confidences.keys
+
         use :pagination
       end
 

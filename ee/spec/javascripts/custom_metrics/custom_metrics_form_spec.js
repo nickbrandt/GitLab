@@ -50,20 +50,5 @@ describe('CustomMetricsForm', () => {
       expect(wrapper.vm.saveButtonText).toEqual('Create metric');
       expect(wrapper.vm.titleText).toEqual('New metric');
     });
-
-    it('Shows a correct validation message for a valid custom query', () => {
-      mountComponent({ metricPersisted: false });
-      wrapper.vm.validCustomQuery = true;
-
-      expect(wrapper.vm.validQueryMsg).toEqual('PromQL query is valid');
-    });
-
-    it('Shows an incorrect validation message for an invalid custom query', () => {
-      mountComponent({ metricPersisted: false });
-      wrapper.vm.validCustomQuery = false;
-      wrapper.vm.errorMessage = 'parse error at char...';
-
-      expect(wrapper.vm.invalidQueryMsg).toEqual(wrapper.vm.errorMessage);
-    });
   });
 });

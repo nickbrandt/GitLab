@@ -13,6 +13,7 @@ It is recommended to run pgbouncer alongside the `gitlab-rails` service, or on i
 ## Operations
 
 ### Running Pgbouncer as part of an HA GitLab installation
+
 See our [HA documentation for PostgreSQL](database.md) for information on running pgbouncer as part of a HA setup
 
 ### Running Pgbouncer as part of a non-HA GitLab installation

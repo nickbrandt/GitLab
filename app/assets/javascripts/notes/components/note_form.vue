@@ -8,7 +8,7 @@ import issuableStateMixin from '../mixins/issuable_state';
 import resolvable from '../mixins/resolvable';
 import { __ } from '~/locale';
 import { getDraft, updateDraft } from '~/lib/utils/autosave';
-import noteFormMixin from 'ee/batch_comments/mixins/note_form';
+import noteFormMixin from 'ee_else_ce/notes/mixins/note_form';
 
 export default {
   name: 'NoteForm',
@@ -196,31 +196,6 @@ export default {
 
       return shouldResolve || shouldToggleState;
     },
-    handleKeySubmit() {
-      if (this.showBatchCommentsActions) {
-        this.handleAddToReview();
-      } else {
-        this.handleUpdate();
-      }
-    },
-    handleUpdate(shouldResolve) {
-      const beforeSubmitDiscussionState = this.discussionResolved;
-      this.isSubmitting = true;
-
-      this.$emit(
-        'handleFormUpdate',
-        this.updatedNoteBody,
-        this.$refs.editNoteForm,
-        () => {
-          this.isSubmitting = false;
-
-          if (this.shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState)) {
-            this.resolveHandler(beforeSubmitDiscussionState);
-          }
-        },
-        this.discussionResolved ? !this.isUnresolving : this.isResolving,
-      );
-    },
     editMyLastNote() {
       if (this.updatedNoteBody === '') {
         const lastNoteInDiscussion = this.getDiscussionLastNote(this.discussion);
@@ -290,48 +265,50 @@ export default {
         ></textarea>
       </markdown-field>
       <div class="note-form-actions clearfix">
-        <p v-if="showResolveDiscussionToggle">
-          <label>
-            <template v-if="discussionResolved">
-              <input
-                v-model="isUnresolving"
-                type="checkbox"
-                class="qa-unresolve-review-discussion"
-              />
-              {{ __('Unresolve discussion') }}
-            </template>
-            <template v-else>
-              <input v-model="isResolving" type="checkbox" class="qa-resolve-review-discussion" />
-              {{ __('Resolve discussion') }}
-            </template>
-          </label>
-        </p>
-        <div v-if="showBatchCommentsActions">
-          <button
-            :disabled="isDisabled"
-            type="button"
-            class="btn btn-success qa-start-review"
-            @click="handleAddToReview"
-          >
-            <template v-if="hasDrafts">{{ __('Add to review') }}</template>
-            <template v-else>{{ __('Start a review') }}</template>
-          </button>
-          <button
-            :disabled="isDisabled"
-            type="button"
-            class="btn qa-comment-now"
-            @click="handleUpdate()"
-          >
-            {{ __('Add comment now') }}
-          </button>
-          <button
-            class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
-            type="button"
-            @click="cancelHandler()"
-          >
-            {{ __('Cancel') }}
-          </button>
-        </div>
+        <template v-if="showBatchCommentsActions">
+          <p v-if="showResolveDiscussionToggle">
+            <label>
+              <template v-if="discussionResolved">
+                <input
+                  v-model="isUnresolving"
+                  type="checkbox"
+                  class="qa-unresolve-review-discussion"
+                />
+                {{ __('Unresolve discussion') }}
+              </template>
+              <template v-else>
+                <input v-model="isResolving" type="checkbox" class="qa-resolve-review-discussion" />
+                {{ __('Resolve discussion') }}
+              </template>
+            </label>
+          </p>
+          <div>
+            <button
+              :disabled="isDisabled"
+              type="button"
+              class="btn btn-success qa-start-review"
+              @click="handleAddToReview"
+            >
+              <template v-if="hasDrafts">{{ __('Add to review') }}</template>
+              <template v-else>{{ __('Start a review') }}</template>
+            </button>
+            <button
+              :disabled="isDisabled"
+              type="button"
+              class="btn qa-comment-now"
+              @click="handleUpdate()"
+            >
+              {{ __('Add comment now') }}
+            </button>
+            <button
+              class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
+              type="button"
+              @click="cancelHandler()"
+            >
+              {{ __('Cancel') }}
+            </button>
+          </div>
+        </template>
         <template v-else>
           <button
             :disabled="isDisabled"

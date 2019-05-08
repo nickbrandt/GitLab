@@ -17,7 +17,7 @@ module EE
           end
 
           def update_board
-            service = ::Boards::UpdateService.new(board_parent, current_user, declared_params)
+            service = ::Boards::UpdateService.new(board_parent, current_user, declared_params(include_missing: false))
             service.execute(board)
 
             if board.valid?

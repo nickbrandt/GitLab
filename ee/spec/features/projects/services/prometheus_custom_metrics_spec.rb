@@ -9,6 +9,8 @@ describe 'Prometheus custom metrics', :js do
     project.add_maintainer(user)
     sign_in(user)
 
+    stub_licensed_features(custom_prometheus_metrics: true)
+
     visit(project_settings_integrations_path(project))
 
     click_link('Prometheus')

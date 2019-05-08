@@ -122,6 +122,44 @@ describe EE::DeploymentPlatform do
       end
     end
 
+    context 'with instance clusters' do
+      let!(:default_cluster) do
+        create(:cluster, :provided_by_user, :instance, environment_scope: '*')
+      end
+
+      let!(:cluster) do
+        create(:cluster, :provided_by_user, :instance, environment_scope: 'review/*')
+      end
+
+      let(:environment) { 'review/name' }
+
+      subject { project.deployment_platform(environment: environment) }
+
+      context 'when environment scope is exactly matched' do
+        before do
+          cluster.update!(environment_scope: 'review/name')
+        end
+
+        it_behaves_like 'matching environment scope'
+      end
+
+      context 'when environment scope is matched by wildcard' do
+        before do
+          cluster.update!(environment_scope: 'review/*')
+        end
+
+        it_behaves_like 'matching environment scope'
+      end
+
+      context 'when environment scope does not match' do
+        before do
+          cluster.update!(environment_scope: 'review/*/special')
+        end
+
+        it_behaves_like 'not matching environment scope'
+      end
+    end
+
     context 'when environment is specified' do
       let!(:default_cluster) { create(:cluster, :provided_by_user, projects: [project], environment_scope: '*') }
       let!(:cluster) { create(:cluster, :provided_by_user, environment_scope: 'review/*', projects: [project]) }

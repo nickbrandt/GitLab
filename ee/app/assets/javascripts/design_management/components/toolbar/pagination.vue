@@ -2,35 +2,26 @@
 import { s__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import PaginationButton from './pagination_button.vue';
-import allDesignsQuery from '../../queries/allDesigns.graphql';
+import allDesignsMixin from '../../mixins/all_designs';
 
 export default {
-  apollo: {
-    designs: {
-      query: allDesignsQuery,
-    },
-  },
   components: {
     Icon,
     PaginationButton,
   },
+  mixins: [allDesignsMixin],
   props: {
     id: {
       type: Number,
       required: true,
     },
   },
-  data() {
-    return {
-      designs: [],
-    };
-  },
   computed: {
     designsCount() {
       return this.designs.length;
     },
     currentIndex() {
-      return this.designs.findIndex(design => design.id === this.id);
+      return this.designs.findIndex(design => parseInt(design.id, 10) === this.id);
     },
     paginationText() {
       return sprintf(s__('DesignManagement|%{current_design} of %{designs_count}'), {

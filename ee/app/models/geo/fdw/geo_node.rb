@@ -14,6 +14,12 @@ module Geo
       has_many :geo_node_namespace_links, class_name: 'Geo::Fdw::GeoNodeNamespaceLink'
       has_many :namespaces, class_name: 'Geo::Fdw::Namespace', through: :geo_node_namespace_links
 
+      def job_artifacts
+        Geo::Fdw::Ci::JobArtifact.all unless selective_sync?
+
+        Geo::Fdw::Ci::JobArtifact.project_id_in(projects)
+      end
+
       def lfs_objects
         return Geo::Fdw::LfsObject.all unless selective_sync?
 
@@ -70,6 +76,14 @@ module Geo
       def registries_for_selected_shards
         Gitlab::Geo::Fdw::ProjectRegistryQueryBuilder.new
           .within_shards(selective_sync_shards)
+      end
+
+      def project_model
+        Geo::Fdw::Project
+      end
+
+      def projects_table
+        Geo::Fdw::Project.arel_table
       end
 
       def uploads_model

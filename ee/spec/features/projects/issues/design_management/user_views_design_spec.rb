@@ -5,6 +5,8 @@ describe 'User views issue designs', :js do
   let(:issue) { create(:issue, project: project) }
 
   before do
+    create(:design, issue: issue, filename: 'world.png')
+
     stub_licensed_features(design_management: true)
 
     visit project_issue_path(project, issue)
@@ -18,8 +20,7 @@ describe 'User views issue designs', :js do
     find('.js-design-list-item', match: :first).click
 
     page.within(find('.js-design-header')) do
-      expect(page).to have_content('test.jpg')
-      expect(page).to have_content('Test Name')
+      expect(page).to have_content('world.png')
     end
 
     expect(page).to have_selector('.js-design-image')

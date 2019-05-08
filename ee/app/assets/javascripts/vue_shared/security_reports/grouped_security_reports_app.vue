@@ -104,6 +104,21 @@ export default {
       required: false,
       default: '',
     },
+    createVulnerabilityFeedbackIssuePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackMergeRequestPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackDismissalPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     pipelineId: {
       type: Number,
       required: false,
@@ -114,7 +129,11 @@ export default {
       required: false,
       default: undefined,
     },
-    canCreateFeedback: {
+    canDismissVulnerability: {
+      type: Boolean,
+      required: true,
+    },
+    canCreateMergeRequest: {
       type: Boolean,
       required: true,
     },
@@ -159,6 +178,11 @@ export default {
 
     this.setVulnerabilityFeedbackPath(this.vulnerabilityFeedbackPath);
     this.setVulnerabilityFeedbackHelpPath(this.vulnerabilityFeedbackHelpPath);
+    this.setCreateVulnerabilityFeedbackIssuePath(this.createVulnerabilityFeedbackIssuePath);
+    this.setCreateVulnerabilityFeedbackMergeRequestPath(
+      this.createVulnerabilityFeedbackMergeRequestPath,
+    );
+    this.setCreateVulnerabilityFeedbackDismissalPath(this.createVulnerabilityFeedbackDismissalPath);
     this.setPipelineId(this.pipelineId);
 
     this.setCanCreateIssuePermission(this.canCreateIssue);
@@ -220,6 +244,9 @@ export default {
       'fetchDependencyScanningReports',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
+      'setCreateVulnerabilityFeedbackIssuePath',
+      'setCreateVulnerabilityFeedbackMergeRequestPath',
+      'setCreateVulnerabilityFeedbackDismissalPath',
       'setPipelineId',
       'setCanCreateIssuePermission',
       'setCanCreateFeedbackPermission',
@@ -323,11 +350,12 @@ export default {
       <issue-modal
         :modal="modal"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-        :can-create-issue-permission="canCreateIssuePermission"
-        :can-create-feedback-permission="canCreateFeedbackPermission"
+        :can-create-issue="canCreateIssue"
+        :can-create-merge-request="canCreateMergeRequest"
+        :can-dismiss-vulnerability="canDismissVulnerability"
         @createNewIssue="createNewIssue"
-        @dismissIssue="dismissIssue"
         @createMergeRequest="createMergeRequest"
+        @dismissIssue="dismissIssue"
         @revertDismissIssue="revertDismissIssue"
       />
     </div>

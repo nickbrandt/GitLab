@@ -216,28 +216,8 @@ describe('vulnerabilities module mutations', () => {
       expect(state.vulnerabilitiesHistoryDayRange).toEqual(DAYS.THIRTY);
     });
 
-    it('should set the vulnerabilitiesHistoryShowSplitLine to true if 30 days or under', () => {
+    it('should set the vulnerabilitiesHistoryMaxDayInterval to 7 if days are 60 and under', () => {
       mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
-
-      expect(state.vulnerabilitiesHistoryShowSplitLine).toEqual(true);
-    });
-
-    it('should set the vulnerabilitiesHistoryShowSplitLine to false if 30 days or over', () => {
-      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.SIXTY);
-
-      expect(state.vulnerabilitiesHistoryShowSplitLine).toEqual(false);
-    });
-
-    it('should set the vulnerabilitiesHistoryMaxDayInterval to 1 if days are 30 and under', () => {
-      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, DAYS.THIRTY);
-
-      expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(1);
-    });
-
-    it('should set the vulnerabilitiesHistoryMaxDayInterval to 7 if between 30 and 60', () => {
-      const days = 45;
-
-      mutations[types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, days);
 
       expect(state.vulnerabilitiesHistoryMaxDayInterval).toEqual(7);
     });

@@ -62,6 +62,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :dependencies, only: [:index]
+
       namespace :settings do
         resource :operations, only: [:show, :update] do
           member do

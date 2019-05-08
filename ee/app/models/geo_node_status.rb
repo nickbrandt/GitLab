@@ -14,6 +14,7 @@ class GeoNodeStatus < ApplicationRecord
   attr_accessor :repository_verification_enabled
 
   # Prometheus metrics, no need to store them in the database
+  # :event_log_count is deprecated and will be removed in 12.0
   attr_accessor :event_log_count, :event_log_max_id,
                 :repository_created_max_id, :repository_updated_max_id,
                 :repository_deleted_max_id, :repository_renamed_max_id, :repositories_changed_max_id,
@@ -70,7 +71,6 @@ class GeoNodeStatus < ApplicationRecord
     cursor_last_event_timestamp: 'Time of the event log processed by the secondary',
     last_successful_status_check_timestamp: 'Time when Geo node status was updated internally',
     status_message: 'Summary of health status',
-    event_log_count: 'Number of entries in the Geo event log',
     event_log_max_id: 'Highest ID present in the Geo event log',
     repository_created_max_id: 'Highest ID present in repositories created',
     repository_updated_max_id: 'Highest ID present in repositories updated',
@@ -159,10 +159,6 @@ class GeoNodeStatus < ApplicationRecord
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
-    self.projects_count = projects_finder.count_projects
-    self.lfs_objects_count = lfs_objects_finder.count_syncable
-    self.job_artifacts_count = job_artifacts_finder.count_syncable
-    self.attachments_count = attachments_finder.count_syncable
     self.last_successful_status_check_at = Time.now
     self.storage_shards = StorageShard.all
     self.storage_configuration_digest = StorageShard.build_digest
@@ -170,7 +166,6 @@ class GeoNodeStatus < ApplicationRecord
     self.version = Gitlab::VERSION
     self.revision = Gitlab.revision
 
-    self.event_log_count = Geo::EventLog.count
     # Geo::PruneEventLogWorker might remove old events, so log maximum id
     self.event_log_max_id = Geo::EventLog.maximum(:id)
     self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
@@ -191,6 +186,11 @@ class GeoNodeStatus < ApplicationRecord
 
   def load_primary_data
     if Gitlab::Geo.primary?
+      self.projects_count = geo_node.projects.count
+      self.lfs_objects_count = LfsObject.syncable.count
+      self.job_artifacts_count = Ci::JobArtifact.syncable.count
+      self.attachments_count = Upload.syncable.count
+
       self.replication_slots_count = geo_node.replication_slots_count
       self.replication_slots_used_count = geo_node.replication_slots_used_count
       self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
@@ -207,23 +207,27 @@ class GeoNodeStatus < ApplicationRecord
     end
   end
 
-  def load_secondary_data
+  def load_secondary_data # rubocop:disable Metrics/AbcSize
     if Gitlab::Geo.secondary?
       self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
       self.cursor_last_event_id = current_cursor_last_event_id
       self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
+      self.projects_count = projects_finder.count_projects
       self.repositories_synced_count = projects_finder.count_synced_repositories
       self.repositories_failed_count = projects_finder.count_failed_repositories
       self.wikis_synced_count = projects_finder.count_synced_wikis
       self.wikis_failed_count = projects_finder.count_failed_wikis
+      self.lfs_objects_count = lfs_objects_finder.count_syncable
       self.lfs_objects_synced_count = lfs_objects_finder.count_synced
       self.lfs_objects_failed_count = lfs_objects_finder.count_failed
       self.lfs_objects_registry_count = lfs_objects_finder.count_registry
       self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
+      self.job_artifacts_count = job_artifacts_finder.count_syncable
       self.job_artifacts_synced_count = job_artifacts_finder.count_synced
       self.job_artifacts_failed_count = job_artifacts_finder.count_failed
       self.job_artifacts_registry_count = job_artifacts_finder.count_registry
       self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
+      self.attachments_count = attachments_finder.count_syncable
       self.attachments_synced_count = attachments_finder.count_synced
       self.attachments_failed_count = attachments_finder.count_failed
       self.attachments_registry_count = attachments_finder.count_registry

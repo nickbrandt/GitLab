@@ -113,6 +113,40 @@ Example response:
 }
 ```
 
+## Create and assign a child epic
+
+Creates a a new epic and associates it with provided parent epic. The response is LinkedEpic object.
+
+```
+POST /groups/:id/epics/:epic_iid/epics
+```
+
+| Attribute       | Type           | Required | Description                                                                                                        |
+| --------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `id`            | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user      |
+| `epic_iid`      | integer        | yes      | The internal ID of the (future parent) epic.                                                                                       |
+| `title` | integer        | yes      | The global ID of the child epic. Internal ID can't be used because they can conflict with epics from other groups. |
+
+```bash
+curl --header POST "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/1/epics/5/epics?title=Newpic
+```
+
+Example response:
+
+```json
+{
+  "id": 24,
+  "iid": 2,
+  "title": "child epic",
+  "group_id": 49,
+  "parent_id": 23,
+  "has_children": false,
+  "reference":  "&2",
+  "url": "http://localhost/groups/group16/-/epics/2",
+  "relation_url": "http://localhost/groups/group16/-/epics/1/links/24"
+}
+```
+
 ## Re-order a child epic
 
 ```

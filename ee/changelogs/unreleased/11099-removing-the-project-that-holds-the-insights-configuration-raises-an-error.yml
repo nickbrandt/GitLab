@@ -1,0 +1,5 @@
+---
+title: Fix removing and updating insights config, and foreign key constraints.
+merge_request: 11030
+author:
+type: fixed

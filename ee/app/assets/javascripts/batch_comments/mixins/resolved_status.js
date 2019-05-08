@@ -51,5 +51,17 @@ export default {
     componentClasses() {
       return this.resolveDiscussion ? 'is-resolving-discussion' : 'is-unresolving-discussion';
     },
+    resolveButtonTitle() {
+      if (this.isDraft || this.discussionId) return this.resolvedStatusMessage;
+
+      let title = 'Mark as resolved';
+
+      if (this.resolvedBy) {
+        title = `Resolved by ${this.resolvedBy.name}`;
+      }
+
+      return title;
+    },
   },
+  showStaysResolved: true,
 };

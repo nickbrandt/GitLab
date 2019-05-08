@@ -6,6 +6,7 @@ export default () => {
 
   if (el && el.dataset) {
     initCeBundle({
+      customMetricsAvailable: parseBoolean(el.dataset.customMetricsAvailable),
       prometheusAlertsAvailable: parseBoolean(el.dataset.prometheusAlertsAvailable),
     });
   }

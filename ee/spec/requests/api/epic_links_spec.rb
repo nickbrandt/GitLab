@@ -62,7 +62,7 @@ describe API::EpicLinks do
     end
   end
 
-  describe 'POST /groups/:id/epics/:epic_iid/epics' do
+  describe 'POST /groups/:id/epics/:epic_iid/epics/child_epic_id' do
     let(:child_epic) { create(:epic, group: group) }
     let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics/#{child_epic.id}" }
 
@@ -107,6 +107,42 @@ describe API::EpicLinks do
           subject
 
           expect(response).to have_gitlab_http_status(404)
+        end
+      end
+    end
+  end
+
+  describe 'POST /groups/:id/epics/:epic_iid/epics' do
+    let(:url) { "/groups/#{group.path}/-/epics/#{epic.iid}/epics" }
+
+    subject { post api(url, user), params: { title: 'child epic' } }
+
+    it_behaves_like 'user does not have access'
+
+    context 'when epics feature is enabled' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when user is guest' do
+        it 'returns 403' do
+          group.add_guest(user)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'when user is developer' do
+        it 'returns 201 status' do
+          group.add_developer(user)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(201)
+          expect(response).to match_response_schema('public_api/v4/linked_epic', dir: 'ee')
+          expect(epic.reload.children).to include(Epic.last)
         end
       end
     end

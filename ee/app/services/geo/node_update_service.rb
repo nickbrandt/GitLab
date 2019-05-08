@@ -5,12 +5,11 @@ module Geo
     attr_reader :geo_node, :old_namespace_ids, :old_shards, :params
 
     def initialize(geo_node, params)
-      @geo_node = geo_node
+      @geo_node          = geo_node
       @old_namespace_ids = geo_node.namespace_ids
-      @old_shards = geo_node.selective_sync_shards
+      @old_shards        = geo_node.selective_sync_shards
 
       @params = params.dup
-
       @params[:namespace_ids] = @params[:namespace_ids].to_s.split(',')
     end
 

@@ -7,6 +7,7 @@ module Geo
     private
 
     def sync_repository
+      start_registry_sync!
       fetch_repository
       update_root_ref
       mark_sync_as_successful
@@ -15,17 +16,17 @@ module Geo
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]
         if repository_presumably_exists_on_primary?
           log_info('Repository is not found, but it seems to exist on the primary')
-          fail_registry!('Repository is not found', e)
+          fail_registry_sync!('Repository is not found', e)
         else
           log_info('Repository is not found, marking it as successfully synced')
           mark_sync_as_successful(missing_on_primary: true)
         end
       else
-        fail_registry!('Error syncing repository', e)
+        fail_registry_sync!('Error syncing repository', e)
       end
     rescue Gitlab::Git::Repository::NoRepository => e
       log_info('Setting force_to_redownload flag')
-      fail_registry!('Invalid repository', e, force_to_redownload_repository: true)
+      fail_registry_sync!('Invalid repository', e, force_to_redownload_repository: true)
 
       log_info('Expiring caches')
       project.repository.after_create

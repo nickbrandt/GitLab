@@ -29,7 +29,7 @@ export default {
     updatedAt: {
       type: String,
       required: false,
-      default: '',
+      default: null,
     },
     updatedBy: {
       type: Object,
@@ -61,7 +61,7 @@ export default {
       <gl-loading-icon v-if="isLoading" size="md" class="mt-2 mb-2" />
       <template v-else>
         <h2 class="m-0">{{ name }}</h2>
-        <small class="text-secondary">{{ updatedText }}</small>
+        <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
       </template>
     </div>
     <pagination :id="id" class="ml-auto" />

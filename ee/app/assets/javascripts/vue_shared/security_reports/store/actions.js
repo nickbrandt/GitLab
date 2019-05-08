@@ -16,10 +16,20 @@ export const setVulnerabilityFeedbackPath = ({ commit }, path) =>
 export const setVulnerabilityFeedbackHelpPath = ({ commit }, path) =>
   commit(types.SET_VULNERABILITY_FEEDBACK_HELP_PATH, path);
 
+export const setCreateVulnerabilityFeedbackIssuePath = ({ commit }, path) =>
+  commit(types.SET_CREATE_VULNERABILITY_FEEDBACK_ISSUE_PATH, path);
+
+export const setCreateVulnerabilityFeedbackMergeRequestPath = ({ commit }, path) =>
+  commit(types.SET_CREATE_VULNERABILITY_FEEDBACK_MERGE_REQUEST_PATH, path);
+
+export const setCreateVulnerabilityFeedbackDismissalPath = ({ commit }, path) =>
+  commit(types.SET_CREATE_VULNERABILITY_FEEDBACK_DISMISSAL_PATH, path);
+
 export const setPipelineId = ({ commit }, id) => commit(types.SET_PIPELINE_ID, id);
 
 export const setCanCreateIssuePermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_ISSUE_PERMISSION, permission);
+
 export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
 
@@ -217,8 +227,8 @@ export const receiveDismissIssueError = ({ commit }, error) =>
 export const dismissIssue = ({ state, dispatch }) => {
   dispatch('requestDismissIssue');
 
-  return axios
-    .post(state.vulnerabilityFeedbackPath, {
+  axios
+    .post(state.createVulnerabilityFeedbackDismissalPath, {
       vulnerability_feedback: {
         feedback_type: 'dismissal',
         category: state.modal.vulnerability.category,
@@ -265,8 +275,10 @@ export const dismissIssue = ({ state, dispatch }) => {
 export const revertDismissIssue = ({ state, dispatch }) => {
   dispatch('requestDismissIssue');
 
-  return axios
-    .delete(`${state.vulnerabilityFeedbackPath}/${state.modal.vulnerability.dismissalFeedback.id}`)
+  axios
+    .delete(
+      state.modal.vulnerability.dismissalFeedback.destroy_vulnerability_feedback_dismissal_path,
+    )
     .then(() => {
       dispatch('receiveDismissIssue');
 
@@ -310,8 +322,8 @@ export const receiveCreateIssueError = ({ commit }, error) =>
 export const createNewIssue = ({ state, dispatch }) => {
   dispatch('requestCreateIssue');
 
-  return axios
-    .post(state.vulnerabilityFeedbackPath, {
+  axios
+    .post(state.createVulnerabilityFeedbackIssuePath, {
       vulnerability_feedback: {
         feedback_type: 'issue',
         category: state.modal.vulnerability.category,
@@ -342,7 +354,7 @@ export const createMergeRequest = ({ state, dispatch }) => {
   dispatch('requestCreateMergeRequest');
 
   axios
-    .post(state.vulnerabilityFeedbackPath, {
+    .post(state.createVulnerabilityFeedbackMergeRequestPath, {
       vulnerability_feedback: {
         feedback_type: 'merge_request',
         category,

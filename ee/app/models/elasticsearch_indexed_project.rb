@@ -1,19 +1,17 @@
 # frozen_string_literal: true
 
 class ElasticsearchIndexedProject < ApplicationRecord
+  include ElasticsearchIndexedContainer
   include EachBatch
 
-  self.primary_key = 'project_id'
-
-  after_commit :index, on: :create
-  after_commit :delete_from_index, on: :destroy
+  self.primary_key = :project_id
 
   belongs_to :project
 
   validates :project_id, presence: true, uniqueness: true
 
-  def self.project_ids
-    self.pluck(:project_id)
+  def self.target_attr_name
+    :project_id
   end
 
   private

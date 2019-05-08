@@ -115,11 +115,15 @@ export default {
       required: false,
       default: () => ({}),
     },
-    canCreateFeedback: {
+    canCreateIssue: {
       type: Boolean,
       required: true,
     },
-    canCreateIssue: {
+    canCreateMergeRequest: {
+      type: Boolean,
+      required: true,
+    },
+    canDismissVulnerability: {
       type: Boolean,
       required: true,
     },
@@ -173,8 +177,9 @@ export default {
         :dependency-scanning-help-path="dependencyScanningHelpPath"
         :vulnerability-feedback-path="vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-        :can-create-feedback="canCreateFeedback"
         :can-create-issue="canCreateIssue"
+        :can-create-merge-request="canCreateMergeRequest"
+        :can-dismiss-vulnerability="canDismissVulnerability"
         always-open
       />
     </div>

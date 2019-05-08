@@ -14,26 +14,29 @@ an issue (if there isn't one already) and leave a comment asking for it
 to be marked as `Accepting Merge Requests`. Please include screenshots or
 wireframes of the proposed feature if it will also change the UI.
 
-Merge requests should be submitted to the main project at
-[GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests).
+Merge requests should be submitted to the appropriate project at GitLab.com, for example
+[GitLab CE](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests),
+[GitLab EE](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests),
+[GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/merge_requests),
+[GitLab Omnibus](https://gitlab.com/gitlab-org/omnibus-gitlab/merge_requests), etc.
 
 If you are new to GitLab development (or web development in general), see the
 [I want to contribute!](index.md#i-want-to-contribute) section to get started with
 some potentially easy issues.
 
-To start with GitLab development download the [GitLab Development Kit](https://gitlab.com/gitlab-org/gitlab-development-kit)
-and see the [Development section](../../README.md) for some guidelines.
+To start developing GitLab, download the [GitLab Development Kit](https://gitlab.com/gitlab-org/gitlab-development-kit)
+and see the [Development section](../../README.md) for the required guidelines.
 
 ## Merge request guidelines
 
-If you can, please include tests when submitting a merge request with a fix or
-improvement. If you don't know how to fix the issue but can write a test
+If you find an issue, please submit a merge request with a fix or improvement, if
+you can, and include tests. If you don't know how to fix the issue but can write a test
 that exposes the issue, we will accept that as well. In general, bug fixes that
 include a regression test are merged quickly, while new features without proper
-tests will be slower to receive feedback. The workflow to make a merge
+tests might be slower to receive feedback. The workflow to make a merge
 request is as follows:
 
-1. [Fork](../../workflow/forking_workflow.html#creating-a-fork) the project into
+1. [Fork](../../workflow/forking_workflow.md#creating-a-fork) the project into
    your personal namespace (or group) on GitLab.com.
 1. Create a feature branch in your fork (don't work off `master`).
 1. Write [tests](../rake_tasks.md#run-tests) and code.
@@ -42,7 +45,8 @@ request is as follows:
    [documentation guidelines](../documentation/index.md).
 1. Follow the [commit messages guidelines](#commit-messages-guidelines).
 1. If you have multiple commits, combine them into a few logically organized
-   commits by [squashing them](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_squashing)
+   commits by [squashing them](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_squashing),
+   but do not change the commit history if you're working on shared branches though.
 1. Push the commit(s) to your working branch in your fork.
 1. Submit a merge request (MR) to the `master` branch in the main GitLab project.
    1. Your merge request needs at least 1 approval, but feel free to require more.
@@ -103,8 +107,8 @@ in mind.
 
 ### Keep it simple
 
-Please keep the amount of changes in a single MR **as small as possible**. If you
-want to contribute a large feature, think very carefully about what the
+*Live by smaller iterations.* Please keep the amount of changes in a single MR **as small as possible**.
+If you want to contribute a large feature, think very carefully about what the
 [minimum viable change](https://about.gitlab.com/handbook/product/#the-minimally-viable-change)
 is. Can you split the functionality into two smaller MRs? Can you submit only the
 backend/API code? Can you start with a very simple UI? Can you do just a part of the
@@ -169,8 +173,9 @@ the contribution acceptance criteria below:
 1. If the merge request adds any new libraries (gems, JavaScript libraries, etc.),
    they should conform to our [Licensing guidelines](../licensing.md). See those
    instructions for help if the "license-finder" test fails with a
-   `Dependencies that need approval` error.
-1. The merge request meets the [definition of done](#definition-of-done), below.
+   `Dependencies that need approval` error. Also, make the reviewer aware of the new
+   library and explain why you need it.
+1. The merge request meets GitLab's [definition of done](#definition-of-done), below.
 
 ## Definition of done
 
@@ -179,14 +184,14 @@ code. We use the following [definition of done](https://www.agilealliance.org/gl
 Your contribution is not *done* until you have made sure it meets all of these
 requirements.
 
-1. Clear Description explaining the relevancy of the contribution.
+1. Clear description explaining the relevancy of the contribution.
 1. Working and clean code that is commented where needed.
 1. [Unit, integration, and system tests](../testing_guide/index.md) that all pass
    on the CI server.
 1. Performance/scalability implications have been considered, addressed, and tested.
 1. [Documented](../documentation/index.md) in the `/doc` directory.
 1. [Changelog entry added](../changelog.md), if necessary.
-1. Reviewed by relevant UX/FE/BE teams and any concerns are addressed.
+1. Reviewed by relevant (UX/FE/BE/tech writing) reviewers and all concerns are addressed.
 1. Merged by a project maintainer.
 1. Added to the [release post](https://about.gitlab.com/handbook/marketing/blog/release-posts/),
    if relevant.

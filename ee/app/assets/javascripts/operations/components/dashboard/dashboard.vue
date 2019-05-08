@@ -83,11 +83,13 @@ export default {
     onModalShown() {
       this.$refs.projectSelector.focusSearchInput();
     },
-    onModalHidden() {
+    onCancel() {
       this.clearSearchResults();
     },
     onOk() {
-      this.addProjectsToDashboard();
+      this.addProjectsToDashboard()
+        .then(this.clearSearchResults)
+        .catch(this.clearSearchResults);
     },
     searched(query) {
       this.setSearchQuery(query);
@@ -109,7 +111,7 @@ export default {
       :ok-disabled="okDisabled"
       ok-variant="success"
       @shown="onModalShown"
-      @hidden="onModalHidden"
+      @cancel="onCancel"
       @ok="onOk"
     >
       <project-selector
