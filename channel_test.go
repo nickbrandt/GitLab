@@ -74,50 +74,6 @@ func TestChannelHappyPath(t *testing.T) {
 	}
 }
 
-func TestChannelHappyPathWithTerminalResponse(t *testing.T) {
-	tests := []struct {
-		name        string
-		channelPath string
-	}{
-		{"environments", envTerminalPath},
-		{"jobs", jobTerminalPath},
-		{"services", servicesProxyWSPath},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			serverConns, clientURL, close := wireupTerminal(test.channelPath, nil, "channel.k8s.io")
-			defer close()
-
-			client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			server := (<-serverConns).conn
-			defer server.Close()
-
-			message := "test message"
-
-			// channel.k8s.io: server writes to channel 1, STDOUT
-			if err := say(server, "\x01"+message); err != nil {
-				t.Fatal(err)
-			}
-			assertReadMessage(t, client, websocket.BinaryMessage, message)
-
-			if err := say(client, message); err != nil {
-				t.Fatal(err)
-			}
-
-			// channel.k8s.io: client writes get put on channel 0, STDIN
-			assertReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
-
-			// Closing the client should send an EOT signal to the server's STDIN
-			client.Close()
-			assertReadMessage(t, server, websocket.BinaryMessage, "\x00\x04")
-		})
-	}
-}
-
 func TestChannelBadTLS(t *testing.T) {
 	_, clientURL, close := wireupChannel(envTerminalPath, badCA, "channel.k8s.io")
 	defer close()
@@ -211,22 +167,6 @@ func wireupChannel(channelPath string, modifier func(*api.Response), subprotocol
 	}
 }
 
-func wireupTerminal(terminalPath string, modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
-	serverConns, remote := startWebsocketServer(subprotocols...)
-	authResponse := terminalOkBody(remote, nil, subprotocols...)
-	if modifier != nil {
-		modifier(authResponse)
-	}
-	upstream := testAuthServer(nil, 200, authResponse)
-	workhorse := startWorkhorseServer(upstream.URL)
-
-	return serverConns, websocketURL(workhorse.URL, terminalPath), func() {
-		workhorse.Close()
-		upstream.Close()
-		remote.Close()
-	}
-}
-
 func startWebsocketServer(subprotocols ...string) (chan connWithReq, *httptest.Server) {
 	upgrader := &websocket.Upgrader{Subprotocols: subprotocols}
 
@@ -259,25 +199,6 @@ func channelOkBody(remote *httptest.Server, header http.Header, subprotocols ...
 		data := bytes.NewBuffer(nil)
 		pem.Encode(data, &pem.Block{Type: "CERTIFICATE", Bytes: remote.TLS.Certificates[0].Certificate[0]})
 		out.Channel.CAPem = data.String()
-	}
-
-	return out
-}
-
-func terminalOkBody(remote *httptest.Server, header http.Header, subprotocols ...string) *api.Response {
-	out := &api.Response{
-		Terminal: &api.TerminalSettings{
-			Url:            websocketURL(remote.URL),
-			Header:         header,
-			Subprotocols:   subprotocols,
-			MaxSessionTime: 0,
-		},
-	}
-
-	if len(remote.TLS.Certificates) > 0 {
-		data := bytes.NewBuffer(nil)
-		pem.Encode(data, &pem.Block{Type: "CERTIFICATE", Bytes: remote.TLS.Certificates[0].Certificate[0]})
-		out.Terminal.CAPem = data.String()
 	}
 
 	return out
