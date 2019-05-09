@@ -22,14 +22,6 @@ var (
 
 func Handler(myAPI *api.API) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		// Used during the transition from Terminal to Channel
-		// Once we remove the TerminalSettings object we can remove
-		// this condition
-		// https://gitlab.com/gitlab-org/gitlab-workhorse/issues/214
-		if a.Terminal != nil {
-			a.Channel = a.Terminal.Channel()
-		}
-
 		if err := a.Channel.Validate(); err != nil {
 			helper.Fail500(w, r, err)
 			return

@@ -125,9 +125,6 @@ type Response struct {
 	Entry string `json:"entry"`
 	// Used to communicate channel session details
 	Channel *ChannelSettings
-	// Used to communicate terminal session details (Deprecated)
-	// Issue to remove this field https://gitlab.com/gitlab-org/gitlab-workhorse/issues/214
-	Terminal *TerminalSettings
 	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
 	GitalyServer gitaly.Server
 	// Repository object for making gRPC requests to Gitaly.
