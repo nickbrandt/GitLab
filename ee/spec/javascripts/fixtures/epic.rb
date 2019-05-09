@@ -39,15 +39,19 @@ describe 'Epics (JavaScript fixtures)' do
   end
 
   describe EpicPresenter, '(JavaScript fixtures)', type: :presenter do
+    let(:response) { @json_data.to_json }
+
     it 'epic/mock_meta.json' do |example|
       presenter = EpicPresenter.new(epic, current_user: user)
 
-      result = presenter.show_data(base_data: {}, author_icon: 'icon_path')
-      store_frontend_fixture(result.to_json, example.description)
+      @json_data = presenter.show_data(base_data: {}, author_icon: 'icon_path')
+      store_frontend_fixture(@json_data.to_json, example.description)
     end
   end
 
   describe IssuablesHelper, '(JavaScript fixtures)', type: :helper do
+    let(:response) { @json_data.to_json }
+
     before do
       allow(helper).to receive(:current_user).and_return(user)
       allow(helper).to receive(:can?).and_return(true)
@@ -56,8 +60,8 @@ describe 'Epics (JavaScript fixtures)' do
     it 'epic/mock_data.json' do |example|
       @group = epic.group
 
-      result = helper.issuable_initial_data(epic)
-      store_frontend_fixture(result.to_json, example.description)
+      @json_data = helper.issuable_initial_data(epic)
+      store_frontend_fixture(@json_data.to_json, example.description)
     end
   end
 end
