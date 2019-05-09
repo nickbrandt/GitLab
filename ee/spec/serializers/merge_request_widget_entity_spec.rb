@@ -10,6 +10,7 @@ describe MergeRequestWidgetEntity do
   let(:request) { double('request', current_user: user) }
 
   before do
+    stub_config_setting(relative_url_root: '/gitlab')
     project.add_developer(user)
   end
 
@@ -154,7 +155,7 @@ describe MergeRequestWidgetEntity do
     end
 
     describe '#managed_licenses_path' do
-      let(:managed_licenses_path) { api_v4_projects_managed_licenses_path(id: project.id) }
+      let(:managed_licenses_path) { expose_path(api_v4_projects_managed_licenses_path(id: project.id)) }
 
       before do
         create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
