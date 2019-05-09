@@ -121,6 +121,9 @@ end
 # Because docker adds v2 prefix to URI this need to be outside of usual group routes
 scope constraints: { format: nil } do
   get 'v2', to: proc { [200, {}, ['']] }
-  get 'v2/*group_id/dependency_proxy/containers/:image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest'
-  get 'v2/*group_id/dependency_proxy/containers/:image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob'
+
+  constraints image: Gitlab::PathRegex.container_image_regex do
+    get 'v2/*group_id/dependency_proxy/containers/*image/manifests/*tag' => 'groups/dependency_proxy_for_containers#manifest'
+    get 'v2/*group_id/dependency_proxy/containers/*image/blobs/:sha' => 'groups/dependency_proxy_for_containers#blob'
+  end
 end
