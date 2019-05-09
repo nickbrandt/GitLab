@@ -9244,6 +9244,9 @@ msgstr ""
 msgid "Private group(s)"
 msgstr ""
 
+msgid "Private profile"
+msgstr ""
+
 msgid "Private projects can be created in your personal namespace with:"
 msgstr ""
 
@@ -9281,6 +9284,9 @@ msgid "Profiles|Avatar cropper"
 msgstr ""
 
 msgid "Profiles|Avatar will be removed. Are you sure?"
+msgstr ""
+
+msgid "Profiles|Bio"
 msgstr ""
 
 msgid "Profiles|Change username"
@@ -9343,6 +9349,18 @@ msgstr ""
 msgid "Profiles|Enter your name, so people you know can recognize you"
 msgstr ""
 
+msgid "Profiles|Feed token was successfully reset"
+msgstr ""
+
+msgid "Profiles|Full name"
+msgstr ""
+
+msgid "Profiles|Include private contributions on my profile"
+msgstr ""
+
+msgid "Profiles|Incoming email token was successfully reset"
+msgstr ""
+
 msgid "Profiles|Increase your account's security by enabling Two-Factor Authentication (2FA)"
 msgstr ""
 
@@ -9355,6 +9373,9 @@ msgstr ""
 msgid "Profiles|Learn more"
 msgstr ""
 
+msgid "Profiles|Location"
+msgstr ""
+
 msgid "Profiles|Made a private contribution"
 msgstr ""
 
@@ -9364,6 +9385,9 @@ msgstr ""
 msgid "Profiles|No file chosen"
 msgstr ""
 
+msgid "Profiles|Organization"
+msgstr ""
+
 msgid "Profiles|Path"
 msgstr ""
 
@@ -9371,6 +9395,9 @@ msgid "Profiles|Position and size your new avatar"
 msgstr ""
 
 msgid "Profiles|Private contributions"
+msgstr ""
+
+msgid "Profiles|Profile was successfully updated"
 msgstr ""
 
 msgid "Profiles|Public Avatar"
@@ -9434,6 +9461,9 @@ msgid "Profiles|Upload new avatar"
 msgstr ""
 
 msgid "Profiles|Use a private email - %{email}"
+msgstr ""
+
+msgid "Profiles|User ID"
 msgstr ""
 
 msgid "Profiles|Username change failed - %{message}"
