@@ -20,7 +20,7 @@ describe Groups::SamlProvidersController, '(JavaScript fixtures)', type: :contro
     stub_licensed_features(group_saml: true)
   end
 
-  it 'groups/saml_providers/show.html' do |example|
+  it 'groups/saml_providers/show.html' do
     create(:saml_provider, group: group)
 
     get :show, params: { group_id: group }

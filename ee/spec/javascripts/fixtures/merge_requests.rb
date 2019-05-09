@@ -42,7 +42,7 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
     remove_repository(project)
   end
 
-  it 'merge_requests_ee/merge_request_edit.html' do |example|
+  it 'merge_requests_ee/merge_request_edit.html' do
     get :edit,
       params: {
         id: merge_request.id,

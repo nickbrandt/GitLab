@@ -41,7 +41,7 @@ describe 'Epics (JavaScript fixtures)' do
   describe EpicPresenter, '(JavaScript fixtures)', type: :presenter do
     let(:response) { @json_data.to_json }
 
-    it 'epic/mock_meta.json' do |example|
+    it 'epic/mock_meta.json' do
       presenter = EpicPresenter.new(epic, current_user: user)
 
       @json_data = presenter.show_data(base_data: {}, author_icon: 'icon_path')
@@ -56,7 +56,7 @@ describe 'Epics (JavaScript fixtures)' do
       allow(helper).to receive(:can?).and_return(true)
     end
 
-    it 'epic/mock_data.json' do |example|
+    it 'epic/mock_data.json' do
       @group = epic.group
 
       @json_data = helper.issuable_initial_data(epic)
