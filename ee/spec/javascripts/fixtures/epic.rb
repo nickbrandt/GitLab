@@ -45,7 +45,6 @@ describe 'Epics (JavaScript fixtures)' do
       presenter = EpicPresenter.new(epic, current_user: user)
 
       @json_data = presenter.show_data(base_data: {}, author_icon: 'icon_path')
-      store_frontend_fixture(@json_data.to_json, example.description)
     end
   end
 
@@ -61,7 +60,6 @@ describe 'Epics (JavaScript fixtures)' do
       @group = epic.group
 
       @json_data = helper.issuable_initial_data(epic)
-      store_frontend_fixture(@json_data.to_json, example.description)
     end
   end
 end
