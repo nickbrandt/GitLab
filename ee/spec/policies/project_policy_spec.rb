@@ -202,6 +202,66 @@ describe ProjectPolicy do
         expect(described_class.new(auditor, project)).to be_allowed(:read_project)
       end
     end
+
+    context 'with sso enforcement enabled' do
+      let(:current_user) { create(:user) }
+      let(:group) { create(:group, :private) }
+      let(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+      let!(:identity) { create(:group_saml_identity, user: current_user, saml_provider: saml_provider) }
+      let(:project) { create(:project, group: saml_provider.group) }
+
+      before do
+        group.add_guest(current_user)
+      end
+
+      context 'when the session has been set globally' do
+        around do |example|
+          Gitlab::Session.with_session({}) do
+            example.run
+          end
+        end
+
+        it 'prevents access without a SAML session' do
+          is_expected.not_to be_allowed(:read_project)
+        end
+
+        it 'allows access with a SAML session' do
+          Gitlab::Auth::GroupSaml::SsoEnforcer.new(saml_provider).update_session
+
+          is_expected.to be_allowed(:read_project)
+        end
+
+        context 'as an admin' do
+          let(:current_user) { admin }
+
+          it 'allows access' do
+            is_expected.to be_allowed(:read_project)
+          end
+        end
+
+        context 'as an owner' do
+          let(:current_user) { owner }
+
+          it 'prevents access without a SAML session' do
+            is_expected.not_to be_allowed(:read_project)
+          end
+        end
+
+        context 'in a personal namespace' do
+          let(:project) { create(:project, :public, namespace: owner.namespace) }
+
+          it 'allows access' do
+            is_expected.to be_allowed(:read_project)
+          end
+        end
+      end
+
+      context 'when there is no global session or sso state' do
+        it "allows access because we haven't yet restricted all use cases" do
+          is_expected.to be_allowed(:read_project)
+        end
+      end
+    end
   end
 
   describe 'read_vulnerability_feedback' do
