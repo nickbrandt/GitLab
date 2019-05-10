@@ -12,7 +12,7 @@ class Groups::EpicLinksController < Groups::ApplicationController
   end
 
   def destroy
-    result = ::Epics::UpdateService.new(group, current_user, { parent: nil }).execute(child_epic)
+    result = ::EpicLinks::DestroyService.new(child_epic, current_user).execute
 
     render json: { issuables: issuables }, status: result[:http_status]
   end

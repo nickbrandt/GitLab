@@ -19,6 +19,12 @@ module EpicLinks
       set_child_epic!(referenced_epic)
 
       affected_epics.each(&:update_start_and_due_dates)
+
+      yield
+    end
+
+    def create_notes(referenced_epic, params)
+      SystemNoteService.change_epics_relation(issuable, referenced_epic, current_user, 'relate_epic')
     end
 
     def set_child_epic!(child_epic)
