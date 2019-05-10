@@ -7241,6 +7241,9 @@ msgstr ""
 msgid "Labels|Promoting %{labelTitle} will make it available for all projects inside %{groupName}. Existing project labels with the same title will be merged. This action cannot be reversed."
 msgstr ""
 
+msgid "Labels|and %{count} more"
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
@@ -13386,6 +13389,9 @@ msgid "Unable to schedule a pipeline to run immediately"
 msgstr ""
 
 msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
+msgstr ""
+
+msgid "Unable to update label prioritization at this time"
 msgstr ""
 
 msgid "Unable to update this epic at this time."
