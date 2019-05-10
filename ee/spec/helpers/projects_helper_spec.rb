@@ -43,4 +43,24 @@ describe ProjectsHelper do
       end
     end
   end
+
+  describe '#can_import_members?' do
+    let(:project) { create(:project) }
+    let(:owner) { project.owner }
+
+    before do
+      helper.instance_variable_set(:@project, project)
+      allow(helper).to receive(:current_user) { owner }
+    end
+
+    it 'returns false if membership is locked' do
+      allow(helper).to receive(:membership_locked?) { true }
+      expect(helper.can_import_members?).to eq false
+    end
+
+    it 'returns true if membership is not locked' do
+      allow(helper).to receive(:membership_locked?) { false }
+      expect(helper.can_import_members?).to eq true
+    end
+  end
 end
