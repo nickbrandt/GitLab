@@ -45,7 +45,7 @@
         = link_to new_project_branch_path(@project), class: 'btn btn-success' do
           = s_('Branches|New branch')
 
-  = render 'projects/commits/mirror_status'
+  = render_if_exists 'projects/commits/mirror_status'
 
   - if can?(current_user, :admin_project, @project)
     - project_settings_link = link_to s_('Branches|project settings'), project_protected_branches_path(@project)
