@@ -23,9 +23,7 @@
         %code= liveness_url(token: Gitlab::CurrentSettings.health_check_access_token)
       %li
         %code= metrics_url(token: Gitlab::CurrentSettings.health_check_access_token)
-      - if Gitlab::Geo.secondary?
-        %li
-          %code= health_check_url(token: Gitlab::CurrentSettings.health_check_access_token, checks: :geo)
+      = render_if_exists 'admin/health_check/health_check_url'
   %hr
   .card
     .card-header
