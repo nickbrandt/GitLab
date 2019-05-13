@@ -21,7 +21,7 @@ This page gathers all the resources for the topic **Authentication** within GitL
 - [Enforce Two-factor Authentication (2FA)](../../security/two_factor_authentication.md#enforce-two-factor-authentication-2fa)
 - **Articles:**
   - [How to Configure LDAP with GitLab CE](../../administration/auth/how_to_configure_ldap_gitlab_ce/index.md)
-  - [How to Configure LDAP with GitLab EE](../../administration/auth/how_to_configure_ldap_gitlab_ee/index.md)
+  - [How to Configure LDAP with GitLab EE](https://docs.gitlab.com/ee/administration/auth/how_to_configure_ldap_gitlab_ee/index.html)
   - [Feature Highlight: LDAP Integration](https://about.gitlab.com/2014/07/10/feature-highlight-ldap-sync/)
   - [Debugging LDAP](https://about.gitlab.com/handbook/support/workflows/support-engineering/ldap/debugging_ldap.html)
 - **Integrations:**
@@ -30,8 +30,8 @@ This page gathers all the resources for the topic **Authentication** within GitL
   - [Atlassian Crowd OmniAuth Provider](../../administration/auth/crowd.md)
   - [CAS OmniAuth Provider](../../integration/cas.md)
   - [SAML OmniAuth Provider](../../integration/saml.md)
-  - [SAML for GitLab.com Groups](../../user/group/saml_sso/index.md)
-  - [SCIM user provisioning for GitLab.com Groups](../../user/group/saml_sso/scim_setup.md)
+  - [SAML for GitLab.com Groups](https://docs.gitlab.com/ee/user/group/saml_sso/index.html)
+  - [SCIM user provisioning for GitLab.com Groups](https://docs.gitlab.com/ee/user/group/saml_sso/scim_setup.html)
   - [Okta SSO provider](../../administration/auth/okta.md)
   - [Kerberos integration (GitLab EE)](https://docs.gitlab.com/ee/integration/kerberos.html)
 

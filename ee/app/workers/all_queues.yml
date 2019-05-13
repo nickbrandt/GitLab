@@ -44,6 +44,7 @@
 
 - pipeline_default:store_security_reports
 - pipeline_default:ci_create_cross_project_pipeline
+- pipeline_default:ci_pipeline_bridge_status
 
 - incident_management:incident_management_process_alert
 
@@ -53,6 +54,7 @@
 - elastic_namespace_indexer
 - elastic_commit_indexer
 - elastic_indexer
+- elastic_full_index
 - export_csv
 - ldap_group_sync
 - new_epic

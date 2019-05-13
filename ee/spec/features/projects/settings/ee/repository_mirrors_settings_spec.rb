@@ -66,5 +66,20 @@ describe 'Project settings > [EE] repository' do
         expect(mirror_url).to include('https://*****@github.com/')
       end
     end
+
+    context 'with an existing pull mirror', :js do
+      let(:mirrored_project) { create(:project, :repository, :mirror, namespace: user.namespace) }
+
+      it 'deletes the mirror' do
+        visit project_settings_repository_path(mirrored_project)
+
+        find('.js-delete-mirror').click
+        wait_for_requests
+        mirrored_project.reload
+
+        expect(mirrored_project.import_data).to be_nil
+        expect(mirrored_project).not_to be_mirror
+      end
+    end
   end
 end

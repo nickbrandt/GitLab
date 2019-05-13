@@ -49,5 +49,35 @@ describe Gitlab::Geo::Oauth::Session, :geo do
         expect { subject.authenticate(access_token.token) }.to raise_error(OAuth2::Error)
       end
     end
+
+    context 'primary is configured with relative URL' do
+      it 'includes primary relative URL path' do
+        primary_node.update(url: 'http:://localhost/relative-path/')
+
+        api_response = double(parsed: true)
+
+        expect_any_instance_of(OAuth2::AccessToken)
+          .to receive(:get).with(%r{^http:://localhost/relative-path/}).and_return(api_response)
+
+        subject.authenticate('any token')
+      end
+    end
+  end
+
+  describe '#get_token' do
+    context 'primary is configured with relative URL' do
+      it "makes the request to a primary's relative URL" do
+        response = ActiveSupport::JSON.encode({ access_token: 'fake-token' }.as_json)
+        primary_node.update(url: 'http://example.com/gitlab/')
+        api_url = "#{primary_node.internal_url}oauth/token"
+
+        stub_request(:post, api_url).to_return(
+          body: response,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+
+        expect(subject.get_token('any code')).to eq('fake-token')
+      end
+    end
   end
 end

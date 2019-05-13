@@ -21,7 +21,14 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.vulnerabilityFeedbackHelpPath = data.vulnerability_feedback_help_path;
     this.approvalsHelpPath = data.approvals_help_path;
     this.securityReportsPipelineId = data.pipeline_id;
-    this.canCreateFeedback = data.can_create_feedback || false;
+    this.createVulnerabilityFeedbackIssuePath = data.create_vulnerability_feedback_issue_path;
+    this.createVulnerabilityFeedbackMergeRequestPath =
+      data.create_vulnerability_feedback_merge_request_path;
+    this.createVulnerabilityFeedbackDismissalPath =
+      data.create_vulnerability_feedback_dismissal_path;
+    this.canCreateIssue = Boolean(this.createVulnerabilityFeedbackIssuePath);
+    this.canCreateMergeRequest = Boolean(this.createVulnerabilityFeedbackMergeRequestPath);
+    this.canDismissVulnerability = Boolean(this.createVulnerabilityFeedbackDismissalPath);
 
     this.initCodeclimate(data);
     this.initPerformanceReport(data);

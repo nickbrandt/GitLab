@@ -93,14 +93,28 @@ describe 'Group routing', "routing" do
       allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
     end
 
-    it 'routes to #manifest' do
-      expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/manifests/2.3.6'))
-        .to route_to('groups/dependency_proxy_for_containers#manifest', group_id: 'gitlabhq', image: 'ruby', tag: '2.3.6')
+    context 'image name without namespace' do
+      it 'routes to #manifest' do
+        expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/manifests/2.3.6'))
+          .to route_to('groups/dependency_proxy_for_containers#manifest', group_id: 'gitlabhq', image: 'ruby', tag: '2.3.6')
+      end
+
+      it 'routes to #blob' do
+        expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/blobs/abc12345'))
+          .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'ruby', sha: 'abc12345')
+      end
     end
 
-    it 'routes to #blob' do
-      expect(get('/v2/gitlabhq/dependency_proxy/containers/ruby/blobs/abc12345'))
-        .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'ruby', sha: 'abc12345')
+    context 'image name with namespace' do
+      it 'routes to #manifest' do
+        expect(get('/v2/gitlabhq/dependency_proxy/containers/foo/bar/manifests/2.3.6'))
+          .to route_to('groups/dependency_proxy_for_containers#manifest', group_id: 'gitlabhq', image: 'foo/bar', tag: '2.3.6')
+      end
+
+      it 'routes to #blob' do
+        expect(get('/v2/gitlabhq/dependency_proxy/containers/foo/bar/blobs/abc12345'))
+          .to route_to('groups/dependency_proxy_for_containers#blob', group_id: 'gitlabhq', image: 'foo/bar', sha: 'abc12345')
+      end
     end
   end
 end

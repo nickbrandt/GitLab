@@ -39,6 +39,7 @@ class License < ApplicationRecord
   EEP_FEATURES = EES_FEATURES + %i[
     admin_audit_log
     auditor_user
+    blocking_merge_requests
     board_assignee_lists
     board_milestone_lists
     cross_project_pipelines

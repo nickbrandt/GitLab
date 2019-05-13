@@ -202,6 +202,66 @@ describe ProjectPolicy do
         expect(described_class.new(auditor, project)).to be_allowed(:read_project)
       end
     end
+
+    context 'with sso enforcement enabled' do
+      let(:current_user) { create(:user) }
+      let(:group) { create(:group, :private) }
+      let(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+      let!(:identity) { create(:group_saml_identity, user: current_user, saml_provider: saml_provider) }
+      let(:project) { create(:project, group: saml_provider.group) }
+
+      before do
+        group.add_guest(current_user)
+      end
+
+      context 'when the session has been set globally' do
+        around do |example|
+          Gitlab::Session.with_session({}) do
+            example.run
+          end
+        end
+
+        it 'prevents access without a SAML session' do
+          is_expected.not_to be_allowed(:read_project)
+        end
+
+        it 'allows access with a SAML session' do
+          Gitlab::Auth::GroupSaml::SsoEnforcer.new(saml_provider).update_session
+
+          is_expected.to be_allowed(:read_project)
+        end
+
+        context 'as an admin' do
+          let(:current_user) { admin }
+
+          it 'allows access' do
+            is_expected.to be_allowed(:read_project)
+          end
+        end
+
+        context 'as an owner' do
+          let(:current_user) { owner }
+
+          it 'prevents access without a SAML session' do
+            is_expected.not_to be_allowed(:read_project)
+          end
+        end
+
+        context 'in a personal namespace' do
+          let(:project) { create(:project, :public, namespace: owner.namespace) }
+
+          it 'allows access' do
+            is_expected.to be_allowed(:read_project)
+          end
+        end
+      end
+
+      context 'when there is no global session or sso state' do
+        it "allows access because we haven't yet restricted all use cases" do
+          is_expected.to be_allowed(:read_project)
+        end
+      end
+    end
   end
 
   describe 'read_vulnerability_feedback' do
@@ -255,6 +315,65 @@ describe ProjectPolicy do
         let(:current_user) { nil }
 
         it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
+      end
+    end
+  end
+
+  describe 'vulnerability feedback permissions' do
+    subject { described_class.new(current_user, project) }
+
+    where(permission: %i[
+      create_vulnerability_feedback
+      destroy_vulnerability_feedback
+    ])
+
+    with_them do
+      context 'with admin' do
+        let(:current_user) { admin }
+
+        it { is_expected.to be_allowed(permission) }
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.to be_allowed(permission) }
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.to be_allowed(permission) }
+      end
+
+      context 'with developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.to be_allowed(permission) }
+      end
+
+      context 'with reporter' do
+        let(:current_user) { reporter }
+
+        it { is_expected.to be_disallowed(permission) }
+      end
+
+      context 'with guest' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_disallowed(permission) }
+      end
+
+      context 'with non member' do
+        let(:current_user) { create(:user) }
+
+        it { is_expected.to be_disallowed(permission) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(permission) }
       end
     end
   end
@@ -493,6 +612,66 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_prometheus_alerts' do
+    context 'with prometheus_alerts available' do
+      before do
+        stub_licensed_features(prometheus_alerts: true)
+      end
+
+      context 'with admin' do
+        let(:current_user) { admin }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.to be_allowed(:read_prometheus_alerts) }
+      end
+
+      context 'with developer' do
+        let(:current_user) { developer }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with reporter' do
+        let(:current_user) { reporter }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with guest' do
+        let(:current_user) { guest }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+
+      context 'with anonymous' do
+        let(:current_user) { nil }
+
+        it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+      end
+    end
+
+    context 'without prometheus_alerts available' do
+      before do
+        stub_licensed_features(prometheus_alerts: false)
+      end
+
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:read_prometheus_alerts) }
+    end
+  end
+
   it_behaves_like 'ee clusterable policies' do
     let(:clusterable) { create(:project, :repository) }
 
@@ -502,5 +681,11 @@ describe ProjectPolicy do
              :project,
              projects: [clusterable])
     end
+  end
+
+  context 'alert bot' do
+    let(:current_user) { User.alert_bot }
+
+    it { is_expected.to be_allowed(:reporter_access) }
   end
 end

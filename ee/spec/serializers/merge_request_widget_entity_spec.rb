@@ -10,6 +10,7 @@ describe MergeRequestWidgetEntity do
   let(:request) { double('request', current_user: user) }
 
   before do
+    stub_config_setting(relative_url_root: '/gitlab')
     project.add_developer(user)
   end
 
@@ -154,7 +155,7 @@ describe MergeRequestWidgetEntity do
     end
 
     describe '#managed_licenses_path' do
-      let(:managed_licenses_path) { api_v4_projects_managed_licenses_path(id: project.id) }
+      let(:managed_licenses_path) { expose_path(api_v4_projects_managed_licenses_path(id: project.id)) }
 
       before do
         create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
@@ -181,8 +182,11 @@ describe MergeRequestWidgetEntity do
     end
   end
 
-  it 'has vulnerability feedbacks path' do
+  it 'has vulnerability feedback paths' do
     expect(subject.as_json).to include(:vulnerability_feedback_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_issue_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_merge_request_path)
+    expect(subject.as_json).to include(:create_vulnerability_feedback_dismissal_path)
   end
 
   it 'has pipeline id' do

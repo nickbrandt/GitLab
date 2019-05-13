@@ -1,0 +1,5 @@
+---
+title: Destroy project remote pull mirrors instead of disabling
+merge_request: 10355
+author:
+type: security

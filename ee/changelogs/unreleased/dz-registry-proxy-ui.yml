@@ -1,0 +1,5 @@
+---
+title: Add UI to enable/disable a dependency proxy on a group level
+merge_request: 10386
+author:
+type: added

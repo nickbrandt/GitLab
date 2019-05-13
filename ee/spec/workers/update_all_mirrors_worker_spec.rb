@@ -23,6 +23,34 @@ describe UpdateAllMirrorsWorker do
 
       worker.perform
     end
+
+    context 'with update_all_mirrors_worker_rescheduling feature' do
+      before do
+        stub_feature_flags(update_all_mirrors_worker_rescheduling: true)
+      end
+
+      it 'sleeps a bit after scheduling mirrors' do
+        expect(Kernel).to receive(:sleep).with(described_class::RESCHEDULE_WAIT)
+
+        worker.perform
+      end
+
+      it 'reschedules the job if capacity is left' do
+        allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(true)
+
+        expect(described_class).to receive(:perform_async)
+
+        worker.perform
+      end
+
+      it 'does not reschedule the job if no capacity left' do
+        allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
+
+        expect(described_class).not_to receive(:perform_async)
+
+        worker.perform
+      end
+    end
   end
 
   describe '#schedule_mirrors!' do

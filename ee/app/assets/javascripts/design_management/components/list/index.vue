@@ -21,7 +21,7 @@ export default {
         :id="design.id"
         :comments-count="design.commentsCount"
         :image="design.image"
-        :name="design.name"
+        :name="design.filename"
         :updated-at="design.updatedAt"
       />
     </li>

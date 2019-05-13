@@ -1,10 +1,5 @@
 - can_override = local_assigns.fetch(:can_override, false)
-- visible = local_assigns.fetch(:visible, false)
 
 - if can_override
-  - if visible
-    %span.badge.badge-info.float-right.d-block.d-sm-none
-      LDAP
-  - else
-    %span.badge.badge-info.members-ldap.d-none.d-sm-block
-      LDAP
+  %span.badge.badge-info.members-ldap.d-sm-block.mr-md-4
+    LDAP

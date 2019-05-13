@@ -12,6 +12,8 @@ module EE
           return false if group.errors.present?
         end
 
+        remove_insight_if_insight_project_absent
+
         super.tap { |success| log_audit_event if success }
       end
 
@@ -58,6 +60,13 @@ module EE
           current_user: current_user,
           project_ids_relation: [params[:file_template_project_id]]
         ).execute.exists?
+      end
+
+      def remove_insight_if_insight_project_absent
+        if params.dig(:insight_attributes, :project_id) == ''
+          params[:insight_attributes][:_destroy] = true
+          params[:insight_attributes].delete(:project_id)
+        end
       end
 
       def log_audit_event

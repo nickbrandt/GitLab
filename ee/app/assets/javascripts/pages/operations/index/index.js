@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import store from 'ee/operations/store';
+import createStore from 'ee/vue_shared/dashboards/store';
 import DashboardComponent from 'ee/operations/components/dashboard/dashboard.vue';
 
 document.addEventListener(
@@ -7,7 +7,7 @@ document.addEventListener(
   () =>
     new Vue({
       el: '#js-operations',
-      store,
+      store: createStore(),
       components: {
         DashboardComponent,
       },

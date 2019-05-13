@@ -5,6 +5,8 @@ describe 'User views issue designs', :js do
   let(:issue) { create(:issue, project: project) }
 
   before do
+    create(:design, issue: issue, filename: 'world.png')
+
     stub_licensed_features(design_management: true)
 
     visit project_issue_path(project, issue)
@@ -15,6 +17,6 @@ describe 'User views issue designs', :js do
   end
 
   it 'fetches list of designs' do
-    expect(page).to have_selector('.js-design-list-item', count: 5)
+    expect(page).to have_selector('.js-design-list-item', count: 1)
   end
 end

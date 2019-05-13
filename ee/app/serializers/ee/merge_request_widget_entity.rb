@@ -68,7 +68,7 @@ module EE
         end
 
         expose :managed_licenses_path do |merge_request|
-          api_v4_projects_managed_licenses_path(id: merge_request.target_project.id)
+          expose_path(api_v4_projects_managed_licenses_path(id: merge_request.target_project.id))
         end
 
         expose :can_manage_licenses do |merge_request|
@@ -113,11 +113,19 @@ module EE
       end
 
       expose :vulnerability_feedback_path do |merge_request|
-        project_vulnerability_feedback_index_path(merge_request.project)
+        presenter(merge_request).vulnerability_feedback_path
       end
 
-      expose :can_create_feedback do |merge_request|
-        can?(current_user, :admin_vulnerability_feedback, merge_request)
+      expose :create_vulnerability_feedback_issue_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_issue_path
+      end
+
+      expose :create_vulnerability_feedback_merge_request_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_merge_request_path
+      end
+
+      expose :create_vulnerability_feedback_dismissal_path do |merge_request|
+        presenter(merge_request).create_vulnerability_feedback_dismissal_path
       end
 
       expose :rebase_commit_sha

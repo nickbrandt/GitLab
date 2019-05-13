@@ -11,6 +11,12 @@ describe EpicLinks::CreateService, :postgresql do
 
     let(:valid_reference) { epic_to_add.to_reference(full: true) }
 
+    shared_examples 'system notes created' do
+      it 'creates system notes' do
+        expect { subject }.to change { Note.system.count }.from(0).to(2)
+      end
+    end
+
     shared_examples 'returns success' do
       it 'creates a new relationship and updates epic' do
         expect { subject }.to change { epic.children.count }.by(1)
@@ -73,6 +79,7 @@ describe EpicLinks::CreateService, :postgresql do
           subject { add_epic([valid_reference]) }
 
           include_examples 'returns success'
+          include_examples 'system notes created'
         end
 
         context 'when an epic from a subgroup is given' do
@@ -85,6 +92,7 @@ describe EpicLinks::CreateService, :postgresql do
           subject { add_epic([valid_reference]) }
 
           include_examples 'returns success'
+          include_examples 'system notes created'
         end
 
         context 'when an epic from a another group is given' do
@@ -145,8 +153,28 @@ describe EpicLinks::CreateService, :postgresql do
             expect(epic.reload.children).to match_array([epic_to_add, another_epic])
           end
 
+          it 'creates system notes' do
+            expect { subject }.to change { Note.system.count }.from(0).to(4)
+          end
+
           it 'returns success status' do
             expect(subject).to eq(status: :success)
+          end
+
+          it 'avoids un-necessary database queries' do
+            control = ActiveRecord::QueryRecorder.new { add_epic([valid_reference]) }
+
+            new_epics = [create(:epic, group: group), create(:epic, group: group)]
+
+            # threshold is 8 because
+            # 1. we need to check hierarchy for each child epic (3 queries)
+            # 2. we have to update the  record (2 including releasing savepoint)
+            # 3. we have to update start and due dates for all updated epics
+            # 4. we temporarily increased this from 6 due to
+            #    https://gitlab.com/gitlab-org/gitlab-ee/issues/11539
+            expect do
+              ActiveRecord::QueryRecorder.new { add_epic(new_epics.map { |epic| epic.to_reference(full: true) }) }
+            end.not_to exceed_query_limit(control).with_threshold(8)
           end
         end
 
@@ -167,6 +195,10 @@ describe EpicLinks::CreateService, :postgresql do
             expect { subject }.to change { epic.children.count }.from(1).to(2)
 
             expect(epic.reload.children).to match_array([epic_to_add, another_epic])
+          end
+
+          it 'creates system notes' do
+            expect { subject }.to change { Note.system.count }.from(0).to(2)
           end
 
           it 'returns success status' do
@@ -236,6 +268,7 @@ describe EpicLinks::CreateService, :postgresql do
             end
 
             include_examples 'returns success'
+            include_examples 'system notes created'
           end
         end
 
@@ -249,6 +282,7 @@ describe EpicLinks::CreateService, :postgresql do
           subject { add_epic([valid_reference]) }
 
           include_examples 'returns success'
+          include_examples 'system notes created'
         end
       end
     end

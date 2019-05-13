@@ -85,7 +85,7 @@ You can see GitLab's keyboard shortcuts by using 'shift + ?'
 | <kbd>]</kbd> or <kbd>j</kbd> | Move to next file |
 | <kbd>[</kbd> or <kbd>k</kbd> | Move to previous file |
 
-## Epics
+## Epics **[ULTIMATE]**
 
 | Keyboard Shortcut | Description |
 | ----------------- | ----------- |

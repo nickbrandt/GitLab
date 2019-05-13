@@ -406,6 +406,27 @@ Upgrades will reset values back to the values built into the `runner`
 chart plus the values set by
 [`values.yaml`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/vendor/runner/values.yaml)
 
+### Uninstalling applications
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/60665) in
+> GitLab 11.11.
+
+The applications below can be uninstalled.
+
+| Application | GitLab version | Notes |
+| ----------- | -------------- | ----- |
+| Prometheus  | 11.11+         | All data will be deleted and cannot be restored. |
+
+To uninstall an application:
+
+1. Navigate to your project's **Operations > Kubernetes**.
+1. Select your cluster.
+1. Click the **Uninstall** button for the application.
+
+Support for uninstalling all applications will be progressively
+introduced (see [related
+epic](https://gitlab.com/groups/gitlab-org/-/epics/1201)).
+
 ### Troubleshooting applications
 
 Applications can fail with the following error:
@@ -527,7 +548,7 @@ differentiate the new cluster with the rest.
 
 When adding more than one Kubernetes cluster to your project, you need to differentiate
 them with an environment scope. The environment scope associates clusters with [environments](../../../ci/environments.md) similar to how the
-[environment-specific variables](../../../ci/variables/README.md#limiting-environment-scopes-of-environment-variables-premium) work.
+[environment-specific variables](https://docs.gitlab.com/ee/ci/variables/index.html#limiting-environment-scopes-of-environment-variables-premium) work.
 
 The default environment scope is `*`, which means all jobs, regardless of their
 environment, will use that cluster. Each scope can only be used by a single
@@ -670,7 +691,7 @@ displaying the status of the pods in the deployment. Developers and other
 teammates can view the progress and status of a rollout, pod by pod, in the
 workflow they already use without any need to access Kubernetes.
 
-[Read more about Deploy Boards](../deploy_boards.md)
+[Read more about Deploy Boards](https://docs.gitlab.com/ee/user/project/deploy_boards.html)
 
 ### Canary Deployments **[PREMIUM]**
 
@@ -678,7 +699,7 @@ Leverage [Kubernetes' Canary deployments](https://kubernetes.io/docs/concepts/cl
 and visualize your canary deployments right inside the Deploy Board, without
 the need to leave GitLab.
 
-[Read more about Canary Deployments](../canary_deployments.md)
+[Read more about Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html)
 
 ### Kubernetes monitoring
 

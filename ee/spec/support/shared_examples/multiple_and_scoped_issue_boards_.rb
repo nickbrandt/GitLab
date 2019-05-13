@@ -33,6 +33,32 @@ shared_examples_for 'multiple and scoped issue boards' do |route_definition|
         expect(board.weight).to eq(4)
         expect(board.labels.map(&:title)).to contain_exactly('foo', 'bar')
       end
+
+      it 'does not remove missing attributes from the board' do
+        expect { put api(url, user), params: { name: 'new name' } }
+          .to not_change { board.reload.assignee }
+          .and not_change { board.reload.milestone }
+          .and not_change { board.reload.weight }
+          .and not_change { board.reload.labels.map(&:title).sort }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
+      end
+
+      it 'allows removing optional attributes' do
+        put api(url, user), params: { name: 'new name', assignee_id: nil, milestone_id: nil, weight: nil, labels: nil }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/board', dir: "ee")
+
+        board.reload
+
+        expect(board.name).to eq('new name')
+        expect(board.assignee).to be_nil
+        expect(board.milestone).to be_nil
+        expect(board.weight).to be_nil
+        expect(board.labels).to be_empty
+      end
     end
 
     describe "DELETE #{route_definition}/:board_id" do

@@ -1,0 +1,5 @@
+---
+title: SSO enforcement requires active SAML session for web access to project resources
+merge_request: 12109
+author:
+type: changed

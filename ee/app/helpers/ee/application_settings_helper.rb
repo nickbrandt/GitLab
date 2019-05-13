@@ -54,11 +54,11 @@ module EE
     end
 
     def elasticsearch_namespace_ids
-      ElasticsearchIndexedNamespace.namespace_ids.join(',')
+      ElasticsearchIndexedNamespace.target_ids.join(',')
     end
 
     def elasticsearch_project_ids
-      ElasticsearchIndexedProject.project_ids.join(',')
+      ElasticsearchIndexedProject.target_ids.join(',')
     end
 
     def self.repository_mirror_attributes

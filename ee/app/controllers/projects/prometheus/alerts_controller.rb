@@ -12,7 +12,6 @@ module Projects
       prepend_before_action :repository, :project_without_auth, only: [:notify]
 
       before_action :authorize_read_prometheus_alerts!, except: [:notify]
-      before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
 
       def index

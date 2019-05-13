@@ -117,6 +117,10 @@ module EE
       show
     end
 
+    def user_onboarding_enabled?
+      ::Gitlab.com? && ::Feature.enabled?(:user_onboarding)
+    end
+
     private
 
     def appearance

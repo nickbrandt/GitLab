@@ -1,7 +1,7 @@
 # Using GitLab CI/CD with a GitHub repository **[PREMIUM]**
 
 GitLab CI/CD can be used with **GitHub.com** and **GitHub Enterprise** by
-creating a [CI/CD project](../../user/project/ci_cd_for_external_repo.md) to connect your GitHub repository to
+creating a [CI/CD project](https://docs.gitlab.com/ee/user/project/ci_cd_for_external_repo.html) to connect your GitHub repository to
 GitLab.
 
 NOTE: **Note:**
@@ -32,7 +32,7 @@ for more information.
 1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD](../quick_start/README.md).
 
 GitLab will import the project, enable [Pull Mirroring](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter), enable
-[GitHub project integration](../../user/project/integrations/github.md), and create a web hook
+[GitHub project integration](https://docs.gitlab.com/ee/user/project/integrations/github.html), and create a web hook
 on GitHub to notify GitLab of new commits.
 
 ## Connect with Personal Access Token
@@ -63,7 +63,7 @@ repositories:
 1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD](../quick_start/README.md).
 
 GitLab will import the project, enable [Pull Mirroring](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter), enable
-[GitHub project integration](../../user/project/integrations/github.md), and create a web hook
+[GitHub project integration](https://docs.gitlab.com/ee/user/project/integrations/github.html), and create a web hook
 on GitHub to notify GitLab of new commits.
 
 ## Connect manually
@@ -86,7 +86,7 @@ your repository.
 
     GitLab will automatically configure polling-based pull mirroring.
 
-1. Still in GitLab, enable the [GitHub project integration](../../user/project/integrations/github.md)
+1. Still in GitLab, enable the [GitHub project integration](https://docs.gitlab.com/ee/user/project/integrations/github.html)
    from **Settings > Integrations.**
 
     Check the **Active** checkbox to enable the integration, paste your
@@ -99,7 +99,7 @@ your repository.
    new commits.
 
     The web hook URL should be set to the GitLab API to
-    [trigger pull mirroring](../../api/projects.md#start-the-pull-mirroring-process-for-a-project-starter),
+    [trigger pull mirroring](https://docs.gitlab.com/ee/api/projects.html#start-the-pull-mirroring-process-for-a-project-starter),
     using the GitLab personal access token we just created.
 
     ```

@@ -22,5 +22,3 @@ class Projects::ClustersController < Clusters::ClustersController
     @repository ||= project.repository
   end
 end
-
-Projects::ClustersController.prepend(EE::Projects::ClustersController)

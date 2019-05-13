@@ -85,8 +85,8 @@ module Vulnerabilities
     end
 
     def self.for_pipelines_with_sha(pipelines)
-      for_pipelines(pipelines)
-        .joins(:pipelines)
+      joins(:pipelines)
+        .where(ci_pipelines: { id: pipelines })
         .select("vulnerability_occurrences.*, ci_pipelines.sha")
     end
 

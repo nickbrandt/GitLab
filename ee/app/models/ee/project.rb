@@ -61,6 +61,7 @@ module EE
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
+      has_many :merge_trains
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -88,6 +89,7 @@ module EE
 
       scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
       scope :within_shards, -> (shard_names) { where(repository_storage: Array(shard_names)) }
+      scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
@@ -362,6 +364,11 @@ module EE
     def merge_requests_require_code_owner_approval?
       super && code_owner_approval_required_available?
     end
+
+    def require_password_to_approve
+      super && password_authentication_enabled_for_web?
+    end
+    alias_method :require_password_to_approve?, :require_password_to_approve
 
     def find_path_lock(path, exact_match: false, downstream: false)
       path_lock_finder = strong_memoize(:path_lock_finder) do

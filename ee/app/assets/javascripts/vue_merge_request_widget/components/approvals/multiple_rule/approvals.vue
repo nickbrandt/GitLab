@@ -1,6 +1,6 @@
 <script>
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
-import createFlash from '~/flash';
+import createFlash, { hideFlash } from '~/flash';
 import { s__ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import eventHub from '~/vue_merge_request_widget/event_hub';
@@ -9,6 +9,7 @@ import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.v
 import ApprovalsSummary from './approvals_summary.vue';
 import ApprovalsSummaryOptional from './approvals_summary_optional.vue';
 import ApprovalsFooter from './approvals_footer.vue';
+import ApprovalsAuth from './approvals_auth.vue';
 import { FETCH_LOADING, FETCH_ERROR, APPROVE_ERROR, UNAPPROVE_ERROR } from '../messages';
 
 export default {
@@ -20,6 +21,7 @@ export default {
     ApprovalsSummary,
     ApprovalsSummaryOptional,
     ApprovalsFooter,
+    ApprovalsAuth,
     GlButton,
     GlLoadingIcon,
   },
@@ -39,6 +41,8 @@ export default {
       isApproving: false,
       isExpanded: false,
       isLoadingRules: false,
+      showApprovalAuth: false,
+      hasApprovalAuthError: false,
     };
   },
   computed: {
@@ -72,16 +76,20 @@ export default {
     showUnapprove() {
       return this.userHasApproved && !this.userCanApprove && this.mr.state !== 'merged';
     },
+    requirePasswordToApprove() {
+      return this.mr.approvals.require_password_to_approve;
+    },
+    approvalText() {
+      return this.isApproved && this.approvedBy.length > 0
+        ? s__('mrWidget|Approve additionally')
+        : s__('mrWidget|Approve');
+    },
     action() {
+      // Use the default approve action, only if we aren't using the auth component for it
       if (this.showApprove) {
         const inverted = this.isApproved;
-        const text =
-          this.isApproved && this.approvedBy.length > 0
-            ? s__('mrWidget|Approve additionally')
-            : s__('mrWidget|Approve');
-
         return {
-          text,
+          text: this.approvalText,
           inverted,
           variant: 'primary',
           action: () => this.approve(),
@@ -116,6 +124,13 @@ export default {
       .catch(() => createFlash(FETCH_ERROR));
   },
   methods: {
+    clearError() {
+      this.hasApprovalAuthError = false;
+      const flashEl = document.querySelector('.flash-alert');
+      if (flashEl) {
+        hideFlash(flashEl);
+      }
+    },
     refreshAll() {
       return Promise.all([this.refreshRules(), this.refreshApprovals()]).catch(() =>
         createFlash(FETCH_ERROR),
@@ -135,60 +150,94 @@ export default {
       });
     },
     approve() {
-      this.updateApproval(() => this.service.approveMergeRequest(), APPROVE_ERROR);
+      if (this.requirePasswordToApprove) {
+        this.showApprovalAuth = true;
+        return;
+      }
+      this.updateApproval(
+        () => this.service.approveMergeRequest(),
+        () => createFlash(APPROVE_ERROR),
+      );
     },
     unapprove() {
-      this.updateApproval(() => this.service.unapproveMergeRequest(), UNAPPROVE_ERROR);
+      this.updateApproval(
+        () => this.service.unapproveMergeRequest(),
+        () => createFlash(UNAPPROVE_ERROR),
+      );
     },
-    updateApproval(serviceFn, error) {
+    approveWithAuth(data) {
+      this.updateApproval(
+        () => this.service.approveMergeRequestWithAuth(data),
+        error => {
+          if (error && error.response && error.response.status === 401) {
+            this.hasApprovalAuthError = true;
+            return;
+          }
+          createFlash(APPROVE_ERROR);
+        },
+      );
+    },
+    updateApproval(serviceFn, errFn) {
       this.isApproving = true;
-
+      this.clearError();
       return serviceFn()
         .then(data => {
           this.mr.setApprovals(data);
           eventHub.$emit('MRWidgetUpdateRequested');
-          this.isApproving = false;
+          this.showApprovalAuth = false;
         })
-        .catch(() => {
-          createFlash(error);
+        .catch(errFn)
+        .then(() => {
           this.isApproving = false;
-        })
-        .then(() => this.refreshRules());
+          this.refreshRules();
+        });
+    },
+    onApprovalAuthCancel() {
+      this.showApprovalAuth = false;
+      this.clearError();
     },
   },
   FETCH_LOADING,
 };
 </script>
-
 <template>
   <mr-widget-container>
     <div class="js-mr-approvals d-flex align-items-start align-items-md-center">
       <mr-widget-icon name="approval" />
       <div v-if="fetchingApprovals">{{ $options.FETCH_LOADING }}</div>
       <template v-else>
-        <gl-button
-          v-if="action"
-          :variant="action.variant"
-          :class="{ 'btn-inverted': action.inverted }"
-          size="sm"
-          class="mr-3"
-          @click="action.action"
-        >
-          <gl-loading-icon v-if="isApproving" inline />
-          {{ action.text }}
-        </gl-button>
-        <approvals-summary-optional
-          v-if="isOptional"
-          :can-approve="hasAction"
-          :help-path="mr.approvalsHelpPath"
+        <approvals-auth
+          v-if="showApprovalAuth"
+          :is-approving="isApproving"
+          :has-error="hasApprovalAuthError"
+          @approve="approveWithAuth"
+          @cancel="onApprovalAuthCancel"
         />
-        <approvals-summary
-          v-else
-          :approved="isApproved"
-          :approvals-left="approvals.approvals_left"
-          :rules-left="approvals.approvalRuleNamesLeft"
-          :approvers="approvedBy"
-        />
+        <template v-else>
+          <gl-button
+            v-if="action"
+            :variant="action.variant"
+            :class="{ 'btn-inverted': action.inverted }"
+            size="sm"
+            class="mr-3"
+            @click="action.action"
+          >
+            <gl-loading-icon v-if="isApproving" inline />
+            {{ action.text }}
+          </gl-button>
+          <approvals-summary-optional
+            v-if="isOptional"
+            :can-approve="hasAction"
+            :help-path="mr.approvalsHelpPath"
+          />
+          <approvals-summary
+            v-else
+            :approved="isApproved"
+            :approvals-left="approvals.approvals_left"
+            :rules-left="approvals.approvalRuleNamesLeft"
+            :approvers="approvedBy"
+          />
+        </template>
       </template>
     </div>
     <approvals-footer

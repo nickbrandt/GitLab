@@ -54,6 +54,8 @@ describe RepositoryUpdateMirrorWorker do
     context 'reschedule mirrors' do
       before do
         allow_any_instance_of(Projects::UpdateMirrorService).to receive(:execute).and_return(status: :success)
+
+        stub_feature_flags(update_all_mirrors_worker_rescheduling: false)
       end
 
       context 'when we obtain the lease' do

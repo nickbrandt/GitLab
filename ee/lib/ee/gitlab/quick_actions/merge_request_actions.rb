@@ -12,7 +12,7 @@ module EE
           explanation 'Approve the current merge request.'
           types MergeRequest
           condition do
-            quick_action_target.persisted? && quick_action_target.can_approve?(current_user)
+            quick_action_target.persisted? && quick_action_target.can_approve?(current_user) && !quick_action_target.project.require_password_to_approve?
           end
           command :approve do
             if quick_action_target.can_approve?(current_user)

@@ -265,10 +265,16 @@ export default {
         :dependency-scanning-help-path="mr.dependencyScanningHelp"
         :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
+        :create-vulnerability-feedback-issue-path="mr.createVulnerabilityFeedbackIssuePath"
+        :create-vulnerability-feedback-merge-request-path="
+          mr.createVulnerabilityFeedbackMergeRequestPath
+        "
+        :create-vulnerability-feedback-dismissal-path="mr.createVulnerabilityFeedbackDismissalPath"
         :pipeline-path="mr.pipeline.path"
         :pipeline-id="mr.securityReportsPipelineId"
         :can-create-issue="mr.canCreateIssue"
-        :can-create-feedback="mr.canCreateFeedback"
+        :can-create-merge-request="mr.canCreateMergeRequest"
+        :can-dismiss-vulnerability="mr.canDismissVulnerability"
       />
       <mr-widget-licenses
         v-if="shouldRenderLicenseReport"

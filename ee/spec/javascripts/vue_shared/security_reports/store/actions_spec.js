@@ -1123,7 +1123,7 @@ describe('security reports actions', () => {
           foo: 'bar',
         };
         mock.onPost('dismiss_issue_path').reply(200, dismissalFeedback);
-        mockedState.vulnerabilityFeedbackPath = 'dismiss_issue_path';
+        mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_issue_path';
       });
 
       it('with success should dispatch `receiveDismissIssue`', done => {
@@ -1263,7 +1263,7 @@ describe('security reports actions', () => {
 
     it('with error should dispatch `receiveDismissIssueError`', done => {
       mock.onPost('dismiss_issue_path').reply(500, {});
-      mockedState.vulnerabilityFeedbackPath = 'dismiss_issue_path';
+      mockedState.createVulnerabilityFeedbackDismissalPath = 'dismiss_issue_path';
 
       testAction(
         dismissIssue,
@@ -1288,8 +1288,9 @@ describe('security reports actions', () => {
     describe('with success', () => {
       beforeEach(() => {
         mock.onDelete('dismiss_issue_path/123').reply(200, {});
-        mockedState.modal.vulnerability.dismissalFeedback = { id: 123 };
-        mockedState.vulnerabilityFeedbackPath = 'dismiss_issue_path';
+        mockedState.modal.vulnerability.dismissalFeedback = {
+          destroy_vulnerability_feedback_dismissal_path: 'dismiss_issue_path/123',
+        };
       });
 
       it('should dispatch `receiveDismissIssue`', done => {
@@ -1428,9 +1429,10 @@ describe('security reports actions', () => {
     });
 
     it('with error should dispatch `receiveDismissIssueError`', done => {
+      mockedState.modal.vulnerability.dismissalFeedback = {
+        destroy_vulnerability_feedback_dismissal_path: 'dismiss_issue_path',
+      };
       mock.onDelete('dismiss_issue_path/123').reply(500, {});
-      mockedState.modal.vulnerability.dismissalFeedback = { id: 123 };
-      mockedState.vulnerabilityFeedbackPath = 'dismiss_issue_path';
 
       testAction(
         revertDismissIssue,
@@ -1508,9 +1510,9 @@ describe('security reports actions', () => {
       spyOnDependency(actions, 'visitUrl');
     });
 
-    it('with success should dispatch `receiveDismissIssue`', done => {
+    it('with success should dispatch `receiveCreateIssue`', done => {
       mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
-      mockedState.vulnerabilityFeedbackPath = 'create_issue_path';
+      mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
 
       testAction(
         createNewIssue,
@@ -1613,8 +1615,8 @@ describe('security reports actions', () => {
 
     it('with success should dispatch `receiveCreateMergeRequestSuccess`', done => {
       const data = { merge_request_path: 'fakepath.html' };
+      mockedState.createVulnerabilityFeedbackMergeRequestPath = 'create_merge_request_path';
       mock.onPost('create_merge_request_path').reply(200, data);
-      mockedState.vulnerabilityFeedbackPath = 'create_merge_request_path';
 
       testAction(
         createMergeRequest,

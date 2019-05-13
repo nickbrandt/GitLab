@@ -128,6 +128,7 @@ export default {
     fetchGroups(term) {
       return Api.groups(term, {
         skip_groups: this.skipGroupIds,
+        all_available: true,
       });
     },
     fetchUsers(term) {

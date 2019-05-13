@@ -3,7 +3,9 @@
 module EpicLinks
   class CreateService < IssuableLinks::CreateService
     def execute
-      return error('Epic hierarchy level too deep', 409) if parent_ancestors_count >= 4
+      if issuable.max_hierarchy_depth_achieved?
+        return error('Epic hierarchy level too deep', 409)
+      end
 
       super
     end
@@ -17,6 +19,12 @@ module EpicLinks
       set_child_epic!(referenced_epic)
 
       affected_epics.each(&:update_start_and_due_dates)
+
+      yield
+    end
+
+    def create_notes(referenced_epic, params)
+      SystemNoteService.change_epics_relation(issuable, referenced_epic, current_user, 'relate_epic')
     end
 
     def set_child_epic!(child_epic)
@@ -36,12 +44,10 @@ module EpicLinks
     end
 
     def linkable_epic?(epic)
-      return false if epic == issuable
-      return false if previous_related_issuables.include?(epic)
-      return false if level_depth_exceeded?(epic)
-      return false if issuable.has_ancestor?(epic)
-
-      issuable_group_descendants.include?(epic.group)
+      epic.valid_parent?(
+        parent_epic: issuable,
+        parent_group_descendants: issuable_group_descendants
+      )
     end
 
     def references(extractor)
@@ -58,14 +64,6 @@ module EpicLinks
 
     def issuable_group_descendants
       @descendants ||= issuable.group.self_and_descendants
-    end
-
-    def level_depth_exceeded?(epic)
-      epic.hierarchy.max_descendants_depth + parent_ancestors_count >= 5
-    end
-
-    def parent_ancestors_count
-      @parent_ancestors_count ||= issuable.ancestors.count
     end
 
     def issuables_assigned_message
