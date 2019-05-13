@@ -319,6 +319,39 @@ describe API::MergeRequestApprovals do
         end
       end
 
+      context 'when project requires force auth for approval' do
+        before do
+          project.update(require_password_to_approve: true)
+          approver.update(password: 'password')
+        end
+
+        it 'returns a 401 with no password' do
+          approve
+          expect(response).to have_gitlab_http_status(401)
+        end
+
+        it 'does not approve the merge request with no password' do
+          approve
+          expect(merge_request.reload.approvals_left).to eq(2)
+        end
+
+        it 'returns a 401 with incorrect password' do
+          approve
+          expect(response).to have_gitlab_http_status(401)
+        end
+
+        it 'does not approve the merge request with incorrect password' do
+          approve
+          expect(merge_request.reload.approvals_left).to eq(2)
+        end
+
+        it 'approves the merge request with correct password' do
+          approve(approval_password: 'password')
+          expect(response).to have_gitlab_http_status(201)
+          expect(merge_request.reload.approvals_left).to eq(1)
+        end
+      end
+
       it 'only shows group approvers visible to the user' do
         private_group = create(:group, :private)
         merge_request.approver_groups.create(group: private_group)

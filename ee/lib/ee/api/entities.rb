@@ -387,6 +387,10 @@ module EE
 
         expose :approvals_left
 
+        expose :require_password_to_approve do |approval_state|
+          approval_state.project.require_password_to_approve?
+        end
+
         expose :approved_by, using: EE::API::Entities::Approvals do |approval_state|
           approval_state.merge_request.approvals
         end

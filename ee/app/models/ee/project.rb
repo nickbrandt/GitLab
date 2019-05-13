@@ -365,6 +365,11 @@ module EE
       super && code_owner_approval_required_available?
     end
 
+    def require_password_to_approve
+      super && password_authentication_enabled_for_web?
+    end
+    alias_method :require_password_to_approve?, :require_password_to_approve
+
     def find_path_lock(path, exact_match: false, downstream: false)
       path_lock_finder = strong_memoize(:path_lock_finder) do
         ::Gitlab::PathLocksFinder.new(self)

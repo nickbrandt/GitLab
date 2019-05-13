@@ -5,6 +5,8 @@ import Approvals from 'ee/vue_merge_request_widget/components/approvals/multiple
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary.vue';
 import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary_optional.vue';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_footer.vue';
+import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_auth.vue';
+
 import {
   FETCH_LOADING,
   FETCH_ERROR,
@@ -14,6 +16,7 @@ import {
 
 const localVue = createLocalVue();
 const TEST_HELP_PATH = 'help/path';
+const TEST_PASSWORD = 'password';
 const testApprovedBy = () => [1, 7, 10].map(id => ({ id }));
 const testApprovals = () => ({
   has_approval_rules: true,
@@ -24,6 +27,7 @@ const testApprovals = () => ({
   suggested_approvers: [],
   user_can_approve: true,
   user_has_approved: true,
+  require_password_to_approve: false,
 });
 const testApprovalRulesResponse = () => ({ rules: [{ id: 2 }] });
 
@@ -75,6 +79,7 @@ describe('EE MRWidget approvals', () => {
       fetchApprovalSettings: Promise.resolve(testApprovalRulesResponse()),
       approveMergeRequest: Promise.resolve(testApprovals()),
       unapproveMergeRequest: Promise.resolve(testApprovals()),
+      approveMergeRequestWithAuth: Promise.resolve(testApprovals()),
     });
     mr = {
       ...jasmine.createSpyObj('Store', ['setApprovals', 'setApprovalRules']),
@@ -280,6 +285,73 @@ describe('EE MRWidget approvals', () => {
 
           it('flashes error message', () => {
             expect(createFlash).toHaveBeenCalledWith(APPROVE_ERROR);
+          });
+        });
+      });
+
+      describe('when project requires password to approve', () => {
+        beforeEach(done => {
+          mr.approvals.require_password_to_approve = true;
+          createComponent();
+          waitForTick(done);
+        });
+
+        it('does not initially show approvals auth component', () => {
+          expect(wrapper.find(ApprovalsAuth).exists()).toBe(false);
+        });
+
+        describe('when approve is clicked', () => {
+          beforeEach(done => {
+            findAction().vm.$emit('click');
+            waitForTick(done);
+          });
+
+          it('shows approvals auth component', () => {
+            expect(wrapper.find(ApprovalsAuth).exists()).toBe(true);
+          });
+
+          describe('when emits approve', () => {
+            let authReject;
+
+            beforeEach(done => {
+              service.approveMergeRequestWithAuth.and.returnValue(
+                new Promise((resolve, reject) => {
+                  authReject = reject;
+                }),
+              );
+              wrapper.find(ApprovalsAuth).vm.$emit('approve', TEST_PASSWORD);
+              waitForTick(done);
+            });
+
+            it('calls service when emits approve', () => {
+              expect(service.approveMergeRequestWithAuth).toHaveBeenCalledWith(TEST_PASSWORD);
+            });
+
+            it('sets isLoading on auth', () => {
+              expect(wrapper.find(ApprovalsAuth).props('isApproving')).toBe(true);
+            });
+
+            it('sets hasError when auth fails', done => {
+              authReject({ response: { status: 401 } });
+
+              tick()
+                .then(() => {
+                  expect(wrapper.find(ApprovalsAuth).props('hasError')).toBe(true);
+                })
+                .then(done)
+                .catch(done.fail);
+            });
+
+            it('shows flash if general error', done => {
+              authReject('something really bad!');
+
+              tick()
+                .then(() => {
+                  expect(createFlash).toHaveBeenCalledWith(APPROVE_ERROR);
+                })
+                .then(done)
+                .catch(done.fail);
+            });
           });
         });
       });
