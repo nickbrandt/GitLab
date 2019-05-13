@@ -11,6 +11,9 @@ describe 'Group Dependency Proxy' do
   before do
     group.add_owner(owner)
     group.add_developer(developer)
+
+    enable_feature
+    stub_licensed_features(dependency_proxy: true)
   end
 
   describe 'feature settings', :js do
@@ -74,5 +77,33 @@ describe 'Group Dependency Proxy' do
         end
       end
     end
+
+    context 'when feature is not available because of license', js: false do
+      it 'renders 404 page' do
+        stub_licensed_features(dependency_proxy: false)
+
+        visit path
+
+        expect(page).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when feature is disabled globally', js: false do
+      it 'renders 404 page' do
+        disable_feature
+
+        visit path
+
+        expect(page).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  def enable_feature
+    allow(Gitlab.config.dependency_proxy).to receive(:enabled).and_return(true)
+  end
+
+  def disable_feature
+    allow(Gitlab.config.dependency_proxy).to receive(:enabled).and_return(false)
   end
 end
