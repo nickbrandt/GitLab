@@ -5,6 +5,8 @@ class GeoNodeStatus < ApplicationRecord
 
   belongs_to :geo_node
 
+  validate :validate_repositories_synced_count
+
   delegate :selective_sync_type, to: :geo_node
 
   after_initialize :initialize_feature_flags
@@ -142,6 +144,12 @@ class GeoNodeStatus < ApplicationRecord
 
   def initialize_feature_flags
     self.repository_verification_enabled = Gitlab::Geo.repository_verification_enabled?
+  end
+
+  def validate_repositories_synced_count
+    return if repositories_synced_count.to_i <= projects_count.to_i
+
+    errors.add(:repositories_synced_count, 'Repository sync count cannot be greater than the total repository count')
   end
 
   def update_cache!

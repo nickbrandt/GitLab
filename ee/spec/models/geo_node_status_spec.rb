@@ -18,6 +18,26 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     stub_current_geo_node(secondary)
   end
 
+  context 'validations' do
+    describe 'validate_repositories_synced_count' do
+      context 'where repositories_synced_count is <= projects_count' do
+        it 'succeeds' do
+          subject.projects_count = 2
+          subject.repositories_synced_count = 2
+          expect { subject.save! }.not_to raise_error
+        end
+      end
+
+      context 'where repositories_synced_count is > projects_count' do
+        it 'fails' do
+          subject.projects_count = 2
+          subject.repositories_synced_count = 3
+          expect { subject.save! }.to raise_error(/cannot be greater than the total repository count/)
+        end
+      end
+    end
+  end
+
   describe '#fast_current_node_status' do
     it 'reads the cache and spawns the worker' do
       expect(described_class).to receive(:spawn_worker).once
