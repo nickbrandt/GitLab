@@ -188,20 +188,6 @@ describe Groups::OmniauthCallbacksController do
         end
       end
 
-      context 'identity linked but sign in flow disabled' do
-        before do
-          create_linked_user
-          stub_feature_flags(group_saml_allows_sign_in_to_gitlab: false)
-        end
-
-        it 'prevents sign in' do
-          post provider, params: { group_id: group }
-
-          expect(flash[:notice]).to start_with('You must be signed in')
-          expect(response).to redirect_to('/users/sign_in')
-        end
-      end
-
       it_behaves_like "and identity already linked"
     end
   end
