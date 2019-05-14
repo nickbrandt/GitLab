@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class Groups::DependencyProxyForContainersController < Groups::ApplicationController
+  include DependencyProxyAccess
   include SendFileUpload
 
-  before_action :ensure_feature_enabled!
   before_action :ensure_token_granted!
+  before_action :ensure_feature_enabled!
 
   attr_reader :token
 
@@ -40,9 +41,7 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   end
 
   def ensure_feature_enabled!
-    render_404 unless Gitlab.config.dependency_proxy.enabled &&
-        group.feature_available?(:dependency_proxy) &&
-        group.dependency_proxy_setting&.enabled
+    render_404 unless group.dependency_proxy_setting&.enabled
   end
 
   def ensure_token_granted!
