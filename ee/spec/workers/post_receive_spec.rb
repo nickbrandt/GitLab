@@ -69,7 +69,7 @@ describe PostReceive do
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
 
-    it 'triggers wiki index update when ElasticSearch is enabled' do
+    it 'triggers wiki index update when ElasticSearch is enabled', :elastic do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
       expect_any_instance_of(ProjectWiki).to receive(:index_blobs)
@@ -77,7 +77,7 @@ describe PostReceive do
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
 
-    context 'when limited indexing is on' do
+    context 'when limited indexing is on', :elastic do
       before do
         stub_ee_application_setting(
           elasticsearch_search: true,

@@ -12,8 +12,14 @@ module Gitlab
 
       Error = Class.new(StandardError)
 
-      def self.experimental_indexer_present?
-        Gitlab::Utils.which(EXPERIMENTAL_INDEXER).present?
+      class << self
+        def experimental_indexer_present?
+          Gitlab::Utils.which(EXPERIMENTAL_INDEXER).present?
+        end
+
+        def experimental_indexer_version
+          Rails.root.join('GITLAB_ELASTICSEARCH_INDEXER_VERSION').read.chomp
+        end
       end
 
       attr_reader :project, :index_status
