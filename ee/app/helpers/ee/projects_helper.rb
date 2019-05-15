@@ -244,5 +244,10 @@ module EE
       @project_incident_management_setting ||= @project.incident_management_setting ||
         @project.build_incident_management_setting
     end
+
+    override :can_import_members?
+    def can_import_members?
+      super && !membership_locked?
+    end
   end
 end
