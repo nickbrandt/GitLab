@@ -1,0 +1,3 @@
+- if Gitlab::Geo.secondary?
+  %li
+    %code= health_check_url(token: Gitlab::CurrentSettings.health_check_access_token, checks: :geo)
