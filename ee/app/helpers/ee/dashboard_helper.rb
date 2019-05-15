@@ -24,5 +24,9 @@ module EE
     def user_default_dashboard?(user)
       controller_action_to_child_dashboards.any? {|dashboard| dashboard == user.dashboard }
     end
+
+    def has_start_trial?
+      !current_license && current_user.admin?
+    end
   end
 end
