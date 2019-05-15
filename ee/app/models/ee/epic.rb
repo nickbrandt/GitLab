@@ -283,6 +283,10 @@ module EE
       issues.any? || descendants.any?
     end
 
+    def child?(id)
+      children.where(id: id).exists?
+    end
+
     def hierarchy
       ::Gitlab::ObjectHierarchy.new(self.class.where(id: id))
     end
