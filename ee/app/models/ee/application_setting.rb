@@ -39,6 +39,14 @@ module EE
                 presence: true,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
+      validates :elasticsearch_shards,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
+      validates :elasticsearch_replicas,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
       validates :elasticsearch_url,
                 presence: { message: "can't be blank when indexing is enabled" },
                 if: ->(setting) { setting.elasticsearch_indexing? }
@@ -69,6 +77,8 @@ module EE
           allow_group_owners_to_manage_ldap: true,
           elasticsearch_aws: false,
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
+          elasticsearch_replicas: 1,
+          elasticsearch_shards: 5,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],

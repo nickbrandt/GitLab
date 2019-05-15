@@ -52,14 +52,23 @@ describe 'Admin updates EE-only settings' do
       visit integrations_admin_application_settings_path
     end
 
-    it 'Enable elastic search indexing' do
+    it 'changes elasticsearch settings' do
       page.within('.as-elasticsearch') do
         check 'Elasticsearch indexing'
+        check 'Search with Elasticsearch enabled'
+        fill_in 'Number of Elasticsearch shards', with: '120'
+        fill_in 'Number of Elasticsearch replicas', with: '2'
+
         click_button 'Save changes'
       end
 
-      expect(Gitlab::CurrentSettings.elasticsearch_indexing).to be_truthy
-      expect(page).to have_content "Application settings saved successfully"
+      aggregate_failures do
+        expect(Gitlab::CurrentSettings.elasticsearch_indexing).to be_truthy
+        expect(Gitlab::CurrentSettings.elasticsearch_search).to be_truthy
+        expect(Gitlab::CurrentSettings.elasticsearch_shards).to eq(120)
+        expect(Gitlab::CurrentSettings.elasticsearch_replicas).to eq(2)
+        expect(page).to have_content "Application settings saved successfully"
+      end
     end
 
     it 'Allows limiting projects and namespaces to index', :js do

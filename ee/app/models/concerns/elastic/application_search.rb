@@ -3,6 +3,21 @@ module Elastic
   module ApplicationSearch
     extend ActiveSupport::Concern
 
+    # Defer evaluation from class-definition time to index-creation time
+    class AsJSON
+      def initialize(&blk)
+        @blk = blk
+      end
+
+      def call
+        @blk.call
+      end
+
+      def as_json(*args, &blk)
+        call
+      end
+    end
+
     included do
       include Elasticsearch::Model
 
@@ -13,6 +28,8 @@ module Elastic
 
       settings \
         index: {
+          number_of_shards: AsJSON.new { Gitlab::CurrentSettings.elasticsearch_shards },
+          number_of_replicas: AsJSON.new { Gitlab::CurrentSettings.elasticsearch_replicas },
           codec: 'best_compression',
           analysis: {
             analyzer: {
