@@ -27,11 +27,8 @@
               - if Gitlab::CurrentSettings.sign_in_text.present?
                 = markdown_field(Gitlab::CurrentSettings.current_application_settings, :sign_in_text)
 
-              - if Gitlab::CurrentSettings.help_text.present?
-                %h3= _("Need help?")
-                %hr
-                %p.slead
-                  = markdown(Gitlab::CurrentSettings.help_text)
+              = render_if_exists 'layouts/devise_help_text'
+
             .col-sm-5.new-session-forms-container
               = yield
 

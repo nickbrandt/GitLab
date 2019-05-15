@@ -1,3 +1,5 @@
+- return unless Gitlab::CurrentSettings.snowplow_enabled?
+
 -# haml-lint:disable InlineJavaScript
 :javascript
   ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];

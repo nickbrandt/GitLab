@@ -1,0 +1,12 @@
+- if Gitlab::CurrentSettings.should_check_namespace_plan?
+  = nav_link(controller: :billings) do
+    = link_to profile_billings_path do
+      .nav-icon-container
+        = custom_icon('credit_card')
+      %span.nav-item-name
+        = _("Billing")
+    %ul.sidebar-sub-level-items.is-fly-out-only
+      = nav_link(controller: :billings, html_options: { class: "fly-out-top-item" } ) do
+        = link_to profile_billings_path do
+          %strong.fly-out-top-item-name
+            #{ _('Billing') }

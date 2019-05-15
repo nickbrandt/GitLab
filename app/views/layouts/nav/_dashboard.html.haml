@@ -95,7 +95,4 @@
       = link_to sherlock_transactions_path, class: 'admin-icon d-none d-lg-block d-xl-block', title: _('Sherlock Transactions'),
         data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
         = icon('tachometer fw')
-  - if Gitlab::Geo.secondary? && Gitlab::Geo.primary_node_configured?
-    %li
-      = link_to Gitlab::Geo.primary_node.url, title: 'Go to primary node', data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
-        = sprite_icon('location-dot', size: 18)
+  = render_if_exists 'layouts/nav/geo_primary_node_url'

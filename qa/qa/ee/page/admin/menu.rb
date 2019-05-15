@@ -8,12 +8,15 @@ module QA
           def self.prepended(page)
             page.module_eval do
               view 'app/views/layouts/nav/sidebar/_admin.html.haml' do
-                element :link_license_menu
                 element :admin_settings_template_item
               end
 
               view 'ee/app/views/layouts/nav/ee/admin/_geo_sidebar.html.haml' do
                 element :link_geo_menu
+              end
+
+              view 'ee/app/views/layouts/nav/sidebar/_licenses_link.html.haml' do
+                element :link_license_menu
               end
             end
           end
