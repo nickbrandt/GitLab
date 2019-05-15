@@ -237,29 +237,6 @@ describe ProjectsController do
         get :show, params: { namespace_id: public_project.namespace, id: public_project }
         expect(response).to render_template('_readme')
       end
-
-      context 'project repo over limit' do
-        before do
-          allow_any_instance_of(EE::Project)
-            .to receive(:above_size_limit?).and_return(true)
-
-          project.add_maintainer(user)
-        end
-
-        it 'shows the over size limit warning message for project members' do
-          allow(controller).to receive(:current_user).and_return(user)
-
-          get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
-
-          expect(response).to render_template('_above_size_limit_warning')
-        end
-
-        it 'does not show the message for non members' do
-          get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
-
-          expect(response).not_to render_template('_above_size_limit_warning')
-        end
-      end
     end
 
     context "when the url contains .atom" do

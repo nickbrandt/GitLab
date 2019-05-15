@@ -8,5 +8,4 @@
     = render 'shared/shared_runners_minutes_limit', project: project
     - unless project.empty_repo?
       = render 'shared/auto_devops_implicitly_enabled_banner', project: project
-    - if project.above_size_limit?
-      = render 'above_size_limit_warning'
+    = render_if_exists 'projects/above_size_limit_warning', project: project
