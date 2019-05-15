@@ -8495,6 +8495,9 @@ msgstr ""
 msgid "Notes|Show history only"
 msgstr ""
 
+msgid "Notes|This comment has changed since you started editing, please review the %{open_link}updated comment%{close_link} to ensure information is not lost"
+msgstr ""
+
 msgid "Nothing to preview."
 msgstr ""
 
@@ -12646,9 +12649,6 @@ msgstr ""
 msgid "This chart could not be displayed"
 msgstr ""
 
-msgid "This comment has changed since you started editing, please review the"
-msgstr ""
-
 msgid "This commit is part of merge request %{link_to_merge_request}. Comments created here will be created in the context of that merge request."
 msgstr ""
 
@@ -15574,9 +15574,6 @@ msgstr ""
 msgid "this document"
 msgstr ""
 
-msgid "to ensure information is not lost"
-msgstr ""
-
 msgid "to help your contributors communicate effectively!"
 msgstr ""
 
@@ -15584,9 +15581,6 @@ msgid "triggered"
 msgstr ""
 
 msgid "updated"
-msgstr ""
-
-msgid "updated comment"
 msgstr ""
 
 msgid "username"
