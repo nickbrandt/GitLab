@@ -8,17 +8,17 @@
 .row.prepend-top-default
   .col-lg-4.profile-settings-sidebar
     %h4.prepend-top-0
-      = s_("Profiles|Two-Factor Authentication")
+      = s_('Profiles|Two-Factor Authentication')
     %p
       = s_("Profiles|Increase your account's security by enabling Two-Factor Authentication (2FA)")
   .col-lg-8
     %p
       #{_('Status')}: #{current_user.two_factor_enabled? ? _('Enabled') : _('Disabled')}
     - if current_user.two_factor_enabled?
-      = link_to _("Manage two-factor authentication"), profile_two_factor_auth_path, class: 'btn btn-info'
+      = link_to _('Manage two-factor authentication'), profile_two_factor_auth_path, class: 'btn btn-info'
     - else
       .append-bottom-10
-        = link_to _("Enable two-factor authentication"), profile_two_factor_auth_path, class: 'btn btn-success'
+        = link_to _('Enable two-factor authentication'), profile_two_factor_auth_path, class: 'btn btn-success'
 
 %hr
 - if display_providers_on_profile?
