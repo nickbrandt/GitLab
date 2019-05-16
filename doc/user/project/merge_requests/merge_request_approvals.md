@@ -296,7 +296,7 @@ enabling [**Prevent approval of merge requests by their committers**](#prevent-a
 
 ## Require authentication when approving a merge request **[STARTER]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5981) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.11.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5981) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.0.
 
 You can force the approver to enter a password in order to authenticate who is approving the merge request by
 enabling **Require user password to approve**. This enables an Electronic Signature
