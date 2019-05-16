@@ -2254,6 +2254,9 @@ msgstr ""
 msgid "Changes the title to \"%{title_param}\"."
 msgstr ""
 
+msgid "Changes won't take place until the index is %{link_start}recreated%{link_end}."
+msgstr ""
+
 msgid "Charts"
 msgstr ""
 
@@ -4362,6 +4365,9 @@ msgid "Edit public deploy key"
 msgstr ""
 
 msgid "Elasticsearch"
+msgstr ""
+
+msgid "Elasticsearch indexing restrictions"
 msgstr ""
 
 msgid "Elasticsearch indexing started"
@@ -6492,6 +6498,12 @@ msgstr ""
 msgid "Housekeeping, export, path, transfer, remove, archive."
 msgstr ""
 
+msgid "How many replicas each Elasticsearch shard has."
+msgstr ""
+
+msgid "How many shards to split the Elasticsearch index over."
+msgstr ""
+
 msgid "However, you are already a member of this %{member_source}. Sign in using a different account to accept the invitation."
 msgstr ""
 
@@ -8568,6 +8580,12 @@ msgid "Nov"
 msgstr ""
 
 msgid "November"
+msgstr ""
+
+msgid "Number of Elasticsearch replicas"
+msgstr ""
+
+msgid "Number of Elasticsearch shards"
 msgstr ""
 
 msgid "OK"

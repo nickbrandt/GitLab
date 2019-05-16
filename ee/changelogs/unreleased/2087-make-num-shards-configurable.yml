@@ -1,0 +1,5 @@
+---
+title: Make the number of Elasticsearch shards and replicas configurable
+merge_request: 12713
+author:
+type: added
