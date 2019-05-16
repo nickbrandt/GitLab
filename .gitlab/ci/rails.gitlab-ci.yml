@@ -337,27 +337,26 @@ coverage:
   <<: *rspec-metadata-ee
   <<: *use-mysql-with-elasticsearch
 
-.rspec-geo-pg-9-6: &rspec-metadata-pg-geo-9-6
+.rspec-geo: &rspec-metadata-geo
   <<: *rspec-metadata
-  <<: *use-pg-9-6
   stage: test
   script:
-    - export NO_KNAPSACK=1
-    - export CACHE_CLASSES=true
+    - JOB_NAME=( $CI_JOB_NAME )
+    - TEST_TOOL=${JOB_NAME[0]}
+    - export KNAPSACK_TEST_FILE_PATTERN="ee/spec/**{,/*/**}/*_spec.rb" KNAPSACK_GENERATE_REPORT=true CACHE_CLASSES=true
+    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
+    - cp ${EE_KNAPSACK_RSPEC_SUITE_REPORT_PATH} ${KNAPSACK_REPORT_PATH}
     - source scripts/prepare_postgres_fdw.sh
     - scripts/gitaly-test-spawn
-    - bundle exec rspec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo ee/spec/
+    - knapsack rspec "-Ispec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo"
+
+.rspec-geo-pg-9-6: &rspec-metadata-pg-geo-9-6
+  <<: *rspec-metadata-geo
+  <<: *use-pg-9-6
 
 .rspec-geo-pg-10-2: &rspec-metadata-pg-geo-10-2
-  <<: *rspec-metadata
+  <<: *rspec-metadata-geo
   <<: *use-pg-10-2
-  stage: test
-  script:
-    - export NO_KNAPSACK=1
-    - export CACHE_CLASSES=true
-    - source scripts/prepare_postgres_fdw.sh
-    - scripts/gitaly-test-spawn
-    - bundle exec rspec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo ee/spec/
 
 .migration-paths-upgrade-ce-to-ee: &migration-paths-upgrade-ce-to-ee
   extends: .dedicated-no-docs-and-no-qa-pull-cache-job
@@ -388,27 +387,29 @@ rspec-mysql-ee:
   <<: *only-schedules-master
   parallel: 10
 
-rspec-pg geo:
+rspec-pg-ee geo:
   <<: *rspec-metadata-pg-geo-9-6
+  parallel: 3
   except:
     - /(^geo[\/-].*|.*-geo$)/
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-rspec-pg-10 geo:
+rspec-pg-10-ee geo:
   <<: *rspec-metadata-pg-geo-10-2
+  parallel: 3
   except:
     - /(^geo[\/-].*|.*-geo$)/
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-quick-rspec-pg geo:
+quick-rspec-pg-ee geo:
   <<: *rspec-metadata-pg-geo-9-6
   stage: quick-test
   only:
     - /(^geo[\/-].*|.*-geo$)/
 
-quick-rspec-pg-10 geo:
+quick-rspec-pg-10-ee geo:
   <<: *rspec-metadata-pg-geo-10-2
   stage: quick-test
   only:
