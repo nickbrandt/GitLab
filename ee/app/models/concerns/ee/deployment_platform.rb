@@ -30,7 +30,7 @@ module EE
     def find_instance_cluster_platform_kubernetes(environment: nil)
       return super unless environment && feature_available?(:multiple_clusters)
 
-      Clusters::Instance.new.clusters.enabled.on_environment(environment)
+      ::Clusters::Instance.new.clusters.enabled.on_environment(environment)
         .first&.platform_kubernetes
     end
   end
