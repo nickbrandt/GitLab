@@ -7,7 +7,7 @@ import component from 'ee/vue_shared/security_reports/card_security_reports_app.
 import createStore from 'ee/vue_shared/security_reports/store';
 import state from 'ee/vue_shared/security_reports/store/state';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 
 import { sastIssues, dast, dockerReport } from './mock_data';
 

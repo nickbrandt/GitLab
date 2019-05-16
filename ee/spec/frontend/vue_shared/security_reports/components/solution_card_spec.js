@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import mountComponent from 'helpers/vue_mount_component_helper';
-import { trimText } from 'helpers/vue_component_helper';
+import { trimText } from 'helpers/text_helper';
 
 describe('Solution Card', () => {
   const Component = Vue.extend(component);

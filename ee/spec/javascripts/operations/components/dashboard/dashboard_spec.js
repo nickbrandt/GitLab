@@ -6,7 +6,7 @@ import Project from 'ee/operations/components/dashboard/project.vue';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
 import createStore from 'ee/vue_shared/dashboards/store';
 import timeoutPromise from 'spec/helpers/set_timeout_promise_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { mockProjectData, mockText } from '../../mock_data';
 
 const localVue = createLocalVue();

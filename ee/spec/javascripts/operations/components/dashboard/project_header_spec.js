@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
-import { removeWhitespace } from 'spec/helpers/vue_component_helper';
+import { removeWhitespace } from 'spec/helpers/text_helper';
 import { mockOneProject, mockText } from '../../mock_data';
 
 const localVue = createLocalVue();
