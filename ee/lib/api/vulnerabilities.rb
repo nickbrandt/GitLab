@@ -43,12 +43,10 @@ module API
       end
 
       get ':id/vulnerabilities' do
-        project = Project.find(params[:id])
-
-        not_found!('Project') unless project && can?(current_user, :read_project_security_dashboard, project)
+        authorize! :read_project_security_dashboard, user_project
 
         vulnerability_occurrences = Kaminari.paginate_array(
-          vulnerability_occurrences_by(declared_params.merge(project: project))
+          vulnerability_occurrences_by(declared_params.merge(project: user_project))
         )
 
         present paginate(vulnerability_occurrences),
