@@ -11885,6 +11885,9 @@ msgstr ""
 msgid "Storage:"
 msgstr ""
 
+msgid "StorageSize|Unknown"
+msgstr ""
+
 msgid "Subgroups"
 msgstr ""
 
