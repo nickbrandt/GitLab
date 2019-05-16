@@ -234,6 +234,29 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
+  describe '.by_confidences' do
+    let!(:vulnerability_high) { create(:vulnerabilities_occurrence, confidence: :high) }
+    let!(:vulnerability_low) { create(:vulnerabilities_occurrence, confidence: :low) }
+
+    subject { described_class.by_confidences(param) }
+
+    context 'with one param' do
+      let(:param) { 4 }
+
+      it 'returns found record' do
+        is_expected.to contain_exactly(vulnerability_low)
+      end
+    end
+
+    context 'without found record' do
+      let(:param) { 7 }
+
+      it 'returns empty collection' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
   describe '.counted_by_severity' do
     let!(:high_vulnerabilities) { create_list(:vulnerabilities_occurrence, 3, severity: :high) }
     let!(:medium_vulnerabilities) { create_list(:vulnerabilities_occurrence, 2, severity: :medium) }

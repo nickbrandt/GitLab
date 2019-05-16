@@ -8,6 +8,7 @@
 #   group - object to filter vulnerabilities
 #   params:
 #     severity: Array<String>
+#     confidence: Array<String>
 #     project: Array<String>
 #     report_type: Array<String>
 
@@ -26,6 +27,7 @@ module Security
       collection = by_report_type(collection)
       collection = by_project(collection)
       collection = by_severity(collection)
+      collection = by_confidence(collection)
       collection
     end
 
@@ -51,6 +53,14 @@ module Security
       items.by_severities(
         Vulnerabilities::Occurrence::SEVERITY_LEVELS.values_at(
           *params[:severity]).compact)
+    end
+
+    def by_confidence(items)
+      return items unless params[:confidence].present?
+
+      items.by_confidences(
+        Vulnerabilities::Occurrence::CONFIDENCE_LEVELS.values_at(
+          *params[:confidence]).compact)
     end
 
     def init_collection(scope)

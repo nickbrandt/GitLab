@@ -18,7 +18,7 @@ describe('Filter component', () => {
     });
 
     it('should display all filters', () => {
-      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(3);
+      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(4);
     });
   });
 });
