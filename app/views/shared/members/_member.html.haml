@@ -53,7 +53,7 @@
           = time_ago_with_tooltip(member.created_at)
   - if show_roles
     - current_resource = @project || @group
-    .controls.member-controls.row
+    .controls.member-controls
       = render 'shared/members/ee/ldap_tag', can_override: member.can_override?
       - if show_controls && member.source == current_resource
 

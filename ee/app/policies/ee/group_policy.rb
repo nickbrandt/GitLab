@@ -26,6 +26,10 @@ module EE
         sso_enforcement_prevents_access?
       end
 
+      condition(:dependency_proxy_available) do
+        @subject.feature_available?(:dependency_proxy)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -37,6 +41,9 @@ module EE
 
       rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
+
+      rule { can?(:read_group) & dependency_proxy_available }
+        .enable :read_dependency_proxy
 
       rule { can?(:read_group) & epics_available }.enable :read_epic
 

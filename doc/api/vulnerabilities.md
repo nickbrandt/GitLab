@@ -5,6 +5,11 @@ Every API call to vulnerabilities must be authenticated.
 If a user is not a member of a project and the project is private, a `GET`
 request on that project will result in a `404` status code.
 
+CAUTION: **Caution:**
+This API is in an alpha stage and considered unstable.
+The response payload may be subject to change or breakage
+across GitLab releases.
+
 ## Vulnerabilities pagination
 
 By default, `GET` requests return 20 results at a time because the API results
