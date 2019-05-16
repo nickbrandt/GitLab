@@ -9,6 +9,27 @@ describe ProjectsController do
     sign_in(user)
   end
 
+  describe "GET show" do
+    let(:public_project) { create(:project, :public, :repository) }
+
+    render_views
+
+    it 'shows the over size limit warning message if above_size_limit' do
+      allow_any_instance_of(EE::Project).to receive(:above_size_limit?).and_return(true)
+      allow(controller).to receive(:current_user).and_return(user)
+
+      get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
+
+      expect(response.body).to match(/The size of this repository.+exceeds the limit/)
+    end
+
+    it 'does not show an over size warning if not above_size_limit' do
+      get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path }
+
+      expect(response.body).not_to match(/The size of this repository.+exceeds the limit/)
+    end
+  end
+
   describe 'POST create' do
     let!(:params) do
       {
