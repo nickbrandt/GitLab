@@ -5359,6 +5359,9 @@ msgstr ""
 msgid "Files"
 msgstr ""
 
+msgid "Files, directories, and submodules in the path %{path} for commit reference %{ref}"
+msgstr ""
+
 msgid "Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>"
 msgstr ""
 
