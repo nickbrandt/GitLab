@@ -1,4 +1,4 @@
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 
 export const SORT_FIELDS = {
   name: s__('Dependencies|Component name'),
@@ -22,6 +22,6 @@ export const REPORT_STATUS = {
   notSetUp: 'file_not_found',
 };
 
-export const FETCH_ERROR_MESSAGE = s__(
-  'Dependencies|Error fetching the Bill of Materials. Please check your network connection and try again.',
+export const FETCH_ERROR_MESSAGE = __(
+  'Error fetching the dependency list. Please check your network connection and try again.',
 );
