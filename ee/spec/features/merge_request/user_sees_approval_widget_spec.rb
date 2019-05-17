@@ -6,8 +6,6 @@ describe 'Merge request > User sees approval widget', :js do
   let(:merge_request) { create(:merge_request, source_project: project) }
 
   before do
-    stub_feature_flags(approval_rules: false)
-
     sign_in(user)
   end
 
@@ -22,17 +20,14 @@ describe 'Merge request > User sees approval widget', :js do
       visit project_merge_request_path(project, merge_request)
     end
 
-    it 'does not show checking ability text' do
+    # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+    xit 'does not show checking ability text' do
       expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
       expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
     end
   end
 
   context 'when rules are enabled' do
-    before do
-      stub_feature_flags(approval_rules: true)
-    end
-
     context 'merge request approvers enabled' do
       let(:project) { create(:project, :public, :repository, approvals_before_merge: 3) }
 

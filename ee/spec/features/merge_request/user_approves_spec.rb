@@ -1,13 +1,10 @@
 require 'rails_helper'
 
-describe 'Merge request > User approves', :js do
+# TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+xdescribe 'Merge request > User approves', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
   let(:merge_request) { create(:merge_request, source_project: project) }
-
-  before do
-    stub_feature_flags(approval_rules: false)
-  end
 
   context 'Approving by approvers from groups' do
     let(:other_user) { create(:user) }
@@ -65,7 +62,6 @@ describe 'Merge request > User approves', :js do
 
     context 'when CI is running but no approval given' do
       before do
-        stub_feature_flags(approval_rules: false) # TODO check in !9001 when feature enabled
         create :approver_group, group: group, target: merge_request
         pipeline = create(:ci_empty_pipeline, project: project, sha: merge_request.diff_head_sha, ref: merge_request.source_branch)
         merge_request.update(head_pipeline: pipeline)

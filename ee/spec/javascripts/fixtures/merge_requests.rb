@@ -22,8 +22,6 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
   end
 
   before do
-    stub_feature_flags(approval_rules: false)
-
     # Ensure some approver suggestions are displayed
     service = double(:service)
     expect(::Gitlab::AuthorityAnalyzer).to receive(:new).and_return(service)
@@ -32,8 +30,6 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
     # Ensure a project level group is present (but unsaved)
     approver_group = create(:approver_group, target: project)
     approver_group.group.add_owner(create(:owner))
-
-    stub_feature_flags(approval_rules: false)
 
     sign_in(admin)
   end
