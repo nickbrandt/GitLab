@@ -114,16 +114,18 @@ describe API::Vulnerabilities do
         stub_licensed_features(security_dashboard: false, sast: true, dependency_scanning: true, container_scanning: true)
       end
 
-      it 'responds with 404 Not Found' do
+      it 'responds with 403 Forbidden' do
         get api("/projects/#{project.id}/vulnerabilities", user)
 
-        expect(response).to have_gitlab_http_status(404)
+        expect(response).to have_gitlab_http_status(403)
       end
     end
 
-    context 'with unauthorized user' do
+    context 'with no project access' do
       it 'responds with 404 Not Found' do
-        get api("/projects/#{project.id}/vulnerabilities", user)
+        private_project = create(:project)
+
+        get api("/projects/#{private_project.id}/vulnerabilities", user)
 
         expect(response).to have_gitlab_http_status(404)
       end
