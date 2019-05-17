@@ -11,6 +11,10 @@ describe MergeRequestBlock do
   describe 'validations' do
     subject(:block) { create(:merge_request_block) }
 
+    let(:blocking_mr) { block.blocking_merge_request }
+    let(:blocked_mr) { block.blocked_merge_request }
+    let(:another_mr) { create(:merge_request) }
+
     it { is_expected.to validate_presence_of(:blocking_merge_request) }
     it { is_expected.to validate_presence_of(:blocked_merge_request) }
 
@@ -18,6 +22,24 @@ describe MergeRequestBlock do
       block.blocking_merge_request = block.blocked_merge_request
 
       expect(block).not_to be_valid
+    end
+
+    it 'allows an MR to block multiple MRs' do
+      another_block = described_class.new(
+        blocking_merge_request: blocking_mr,
+        blocked_merge_request: another_mr
+      )
+
+      expect(another_block).to be_valid
+    end
+
+    it 'allows an MR to be blocked by multiple MRs' do
+      another_block = described_class.new(
+        blocking_merge_request: another_mr,
+        blocked_merge_request: blocked_mr
+      )
+
+      expect(another_block).to be_valid
     end
 
     it 'forbids duplicate blocks' do

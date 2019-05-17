@@ -6,7 +6,7 @@ class MergeRequestBlock < ApplicationRecord
 
   validates_presence_of :blocking_merge_request
   validates_presence_of :blocked_merge_request
-  validates_uniqueness_of [:blocking_merge_request, :blocked_merge_request]
+  validates_uniqueness_of :blocked_merge_request, scope: :blocking_merge_request
 
   validate :check_block_constraints
 
