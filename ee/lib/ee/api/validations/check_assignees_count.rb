@@ -7,12 +7,11 @@ module EE
         extend ActiveSupport::Concern
         extend ::Gitlab::Utils::Override
 
-        prepended do
-          private
+        private
 
-          def param_allowed?(attr_name, params)
-            params[attr_name].size <= 1 || License.feature_available?(:multiple_issue_assignees)
-          end
+        override :param_allowed?
+        def param_allowed?(attr_name, params)
+          super || License.feature_available?(:multiple_issue_assignees)
         end
       end
     end
