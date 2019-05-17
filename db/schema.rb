@@ -2496,7 +2496,7 @@ ActiveRecord::Schema.define(version: 20190528173628) do
     t.bigint "build_artifacts_size", default: 0, null: false
     t.bigint "shared_runners_seconds", default: 0, null: false
     t.datetime "shared_runners_seconds_last_reset"
-    t.bigint "packages_size"
+    t.bigint "packages_size", default: 0, null: false
     t.bigint "wiki_size"
     t.index ["namespace_id"], name: "index_project_statistics_on_namespace_id", using: :btree
     t.index ["project_id"], name: "index_project_statistics_on_project_id", unique: true, using: :btree
