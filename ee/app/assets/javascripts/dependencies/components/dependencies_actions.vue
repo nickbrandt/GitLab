@@ -51,7 +51,7 @@ export default {
       <gl-button
         v-gl-tooltip
         :title="__('Sort direction')"
-        class="flex-grow-0"
+        class="flex-grow-0 js-sort-order"
         @click="toggleSortOrder"
       >
         <icon :name="sortOrderIcon" />
@@ -62,6 +62,7 @@ export default {
       :href="dependenciesDownloadEndpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
+      class="js-download"
     >
       <icon name="download" />
     </gl-button>

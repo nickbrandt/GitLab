@@ -15,10 +15,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    hasError: {
-      type: Boolean,
-      required: true,
-    },
   },
 };
 </script>

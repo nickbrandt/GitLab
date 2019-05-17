@@ -84,11 +84,7 @@ export default {
       <dependencies-actions />
     </div>
 
-    <dependencies-table
-      :dependencies="dependencies"
-      :is-loading="isLoading"
-      :has-error="errorLoading"
-    />
+    <dependencies-table :dependencies="dependencies" :is-loading="isLoading" />
 
     <pagination
       v-if="shouldShowPagination"

@@ -10,11 +10,13 @@ export default {
   props: {
     dependency: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     isLoading: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: true,
     },
   },
   computed: {
@@ -27,7 +29,7 @@ export default {
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row p-2">
+  <div class="gl-responsive-table-row p-2">
     <gl-skeleton-loading
       v-if="isLoading"
       :lines="1"
