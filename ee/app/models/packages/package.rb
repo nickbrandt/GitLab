@@ -13,12 +13,13 @@ class Packages::Package < ApplicationRecord
     presence: true,
     format: { with: Gitlab::Regex.package_name_regex }
 
-  validate :valid_npm_package_name, if: :npm?
-  validate :package_already_taken, if: :npm?
-
-  enum package_type: { maven: 1, npm: 2 }
+  enum package_type: { maven: 1, npm: 2, composer: 3 }
 
   scope :with_name, ->(name) { where(name: name) }
+  scope :preload_files, -> { preload(:package_files) }
+  scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
+  scope :find_composer_packages, -> { where(package_type: 3) }
+  scope :version_exists, ->(version) { where(version: version) }
 
   def self.for_projects(projects)
     return none unless projects.any?
@@ -31,7 +32,7 @@ class Packages::Package < ApplicationRecord
   end
 
   def self.by_name_and_file_name(name, file_name)
-    where(name: name)
+    with_name(name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
   end

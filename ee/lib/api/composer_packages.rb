@@ -2,7 +2,7 @@
 module API
   class ComposerPackages < Grape::API
     COMPOSER_ENDPOINT_REQUIREMENTS = {
-      package_name: API::NO_SLASH_URL_PART_REGEX
+        package_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
 
     before do
@@ -12,34 +12,65 @@ module API
 
     helpers ::API::Helpers::PackagesHelpers
 
-    helpers do
-      def find_project_by_package_name(name)
-        Project.find_by_full_path(name.sub('@', ''))
-      end
-    end
-
-    desc 'Composer registry endpoint at instance level' do
-      detail 'This feature was introduced in GitLab 11.8'
-    end
-    params do
-      requires :package_name, type: String, desc: 'Package name'
+    desc 'Composer packages endpoint at instance level' do
+      detail 'This feature was introduced in GitLab 11.10'
     end
     route_setting :authentication, job_token_allowed: true
-    get 'packages/composer/*package_name', requirements: COMPOSER_ENDPOINT_REQUIREMENTS do
-      package_name = params[:package_name]
+    get 'packages/composer/packages.json' do
+      packages = ::Packages::ComposerPackagesFinder.new(current_user).execute
+      presenter = ComposerPackagePresenter.new(packages)
+      sha = Digest::SHA1.hexdigest(presenter.versions.to_json)
 
-      # To avoid name collision we require project path and project package be the same.
-      # For packages that have different name from the project we should use
-      # the endpoint that includes project id
-      project = find_project_by_package_name(package_name)
+      presenter.packages_root(sha)
+    end
 
-      authorize!(:read_package, project)
-      forbidden! unless project.feature_available?(:packages)
+    desc 'Composer registry endpoint at instance level for include/all${sha}.json' do
+      detail 'This feature was introduced in GitLab 11.10'
+    end
+    params do
+      requires :sha, type: String, desc: 'Shasum of current packages.json'
+    end
+    route_setting :authentication, job_token_allowed: true
+    get 'packages/composer/include/all$*sha.json' do
+      packages = ::Packages::ComposerPackagesFinder.new(current_user).execute
+      presenter = ComposerPackagePresenter.new(packages)
+      json = presenter.versions
 
-      packages = project.packages.with_name(package_name)
+      presenter.same_sha?(params[:sha]) ? json : (status 404)
+    end
 
-      present ComposerPackagePresenter.new(project, package_name, packages),
-        with: EE::API::Entities::ComposerPackage
+    params do
+      requires :id, type: String, desc: 'The ID of a group'
+    end
+    resource :group, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      desc 'Composer packages endpoint at group level' do
+        detail 'This feature was introduced in GitLab 11.8'
+      end
+      route_setting :authentication, job_token_allowed: true
+      get ':id/-/packages/composer/packages.json' do
+        group = find_group(params[:id])
+        packages = ::Packages::ComposerPackagesFinder.new(current_user, group).execute
+        presenter = ComposerPackagePresenter.new(packages)
+        sha = Digest::SHA1.hexdigest(presenter.versions.to_json)
+
+        presenter.packages_root(sha)
+      end
+
+      desc 'Composer packages endpoint at group level for include/all${sha}.json' do
+        detail 'This feature was introduced in GitLab 11.8'
+      end
+      params do
+        requires :sha, type: String, desc: 'Shasum of current packages.json'
+      end
+      route_setting :authentication, job_token_allowed: true
+      get ':id/-/packages/composer/include/all$*sha.json', requirements: COMPOSER_ENDPOINT_REQUIREMENTS do
+        group = find_group(params[:id])
+        packages = ::Packages::ComposerPackagesFinder.new(current_user, group).execute
+        presenter = ComposerPackagePresenter.new(packages)
+        json = presenter.versions
+
+        presenter.same_sha?(params[:sha]) ? json : (status 404)
+      end
     end
 
     params do
@@ -50,8 +81,8 @@ module API
         authorize_packages_feature!
       end
 
-      desc 'Download the Composer tarball' do
-        detail 'This feature was introduced in GitLab 11.8'
+      desc 'Download the Composer archive, can be zip or tar' do
+        detail 'This feature was introduced in GitLab 11.10'
       end
       params do
         requires :package_name, type: String, desc: 'Package name'
@@ -60,18 +91,17 @@ module API
       route_setting :authentication, job_token_allowed: true
       get ':id/packages/composer/*package_name/-/*file_name', format: false do
         authorize_download_package!
-
         package = user_project.packages
-          .by_name_and_file_name(params[:package_name], params[:file_name])
+                      .by_name_and_file_name(params[:package_name], params[:file_name])
 
         package_file = ::Packages::PackageFileFinder
-          .new(package, params[:file_name]).execute!
+                           .new(package, params[:file_name]).execute!
 
         present_carrierwave_file!(package_file.file)
       end
 
-      desc 'Create Composer package' do
-        detail 'This feature was introduced in GitLab 11.8'
+      desc 'Upload and create Composer package' do
+        detail 'This feature was introduced in GitLab 11.10'
       end
       params do
         requires :package_name, type: String, desc: 'Package name'
@@ -80,8 +110,9 @@ module API
       put ':id/packages/composer/:package_name', requirements: COMPOSER_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 
-        ::Packages::CreateComposerPackageService
-          .new(user_project, current_user, params).execute
+        body = request.body.read.force_encoding(Encoding::UTF_8)
+
+        ::Packages::CreateComposerPackageService.new(user_project, current_user, body).execute
       end
     end
   end
