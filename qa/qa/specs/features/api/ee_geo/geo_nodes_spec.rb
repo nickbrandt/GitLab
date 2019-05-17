@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Geo', :orchestrated, :geo do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/99
+  context 'Geo', :orchestrated, :geo, :quarantine do
     describe 'Geo Nodes API' do
       before(:all) do
         get_personal_access_token
