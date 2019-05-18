@@ -37,10 +37,6 @@ module EESpecificCheck
     # 'doc/administration/raketasks/uploads/**/*',
     # 'doc/administration/troubleshooting/**/*',
     # 'doc/analytics/**/*',
-    'doc/api/*.md',
-    'doc/api/graphql/**/*',
-    'doc/api/releases/**/*',
-    'doc/api/templates/**/*',
     # 'doc/articles/*.md',
     # 'doc/articles/artifactory_and_gitlab/**/*',
     # 'doc/articles/how_to_configure_ldap_gitlab_ce/**/*',
@@ -228,7 +224,11 @@ module EESpecificCheck
     # 'doc/workflow/lfs/images/**/*',
     # 'doc/workflow/releases/**/*',
     # 'doc/workflow/time-tracking/**/*'
-    'doc/*.md'
+    # 'doc/*.md',
+    'doc/api/graphql/**/*',
+    'doc/api/releases/**/*',
+    'doc/api/templates/**/*',
+    'doc/api/*.md'
   ].freeze
 
   CompareBase = Struct.new(:ce_base, :ee_base, :ce_head, :ee_head)
