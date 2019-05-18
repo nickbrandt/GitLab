@@ -8,6 +8,8 @@ module EE
 
     def rollout_status(environment)
       result = with_reactive_cache do |data|
+        project = environment.project
+
         deployments = filter_by_project_environment(data[:deployments], project.full_path_slug, environment.slug)
         pods = filter_by_project_environment(data[:pods], project.full_path_slug, environment.slug) if data[:pods]&.any?
 
@@ -26,14 +28,18 @@ module EE
     def reactive_cache_updated
       super
 
-      ::Gitlab::EtagCaching::Store.new.tap do |store|
-        store.touch(
-          ::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+      if first_project
+        ::Gitlab::EtagCaching::Store.new.tap do |store|
+          store.touch(
+            ::Gitlab::Routing.url_helpers.project_environments_path(first_project, format: :json))
+        end
       end
     end
 
     def read_deployments
-      kubeclient.get_deployments(namespace: actual_namespace).as_json
+      return [] unless first_project
+
+      kubeclient.get_deployments(namespace: kubernetes_namespace_for(first_project)).as_json
     rescue KubeException => err
       raise err unless err.error_code == 404
 
@@ -41,11 +47,28 @@ module EE
     end
 
     def read_pod_logs(pod_name, container: nil)
-      kubeclient.get_pod_log(pod_name, actual_namespace, container: container, tail_lines: LOGS_LIMIT).as_json
+      return [] unless first_project
+
+      kubeclient.get_pod_log(pod_name, kubernetes_namespace_for(first_project), container: container, tail_lines: LOGS_LIMIT).as_json
     rescue ::Kubeclient::HttpError => err
       raise err unless err.error_code == 404
 
       []
+    end
+
+    private
+
+    ##
+    # TODO: KubernetesService is soon to be removed (https://gitlab.com/gitlab-org/gitlab-ce/issues/39217),
+    # after which we can retrieve the project from the cluster in all cases.
+    #
+    # This currently only works for project-level clusters, this is likely to be fixed as part of
+    # https://gitlab.com/gitlab-org/gitlab-ce/issues/61156, which will require logic to select
+    # a project from a cluster based on an environment.
+    def first_project
+      return project unless respond_to?(:cluster)
+
+      cluster.first_project if cluster.project_type?
     end
   end
 end
