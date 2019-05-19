@@ -181,7 +181,7 @@ module EE
       mirror? && !empty_repo?
     end
 
-    def fetch_mirror
+    def fetch_mirror(forced: false)
       return unless mirror?
 
       # Only send the password if it's needed
@@ -192,7 +192,7 @@ module EE
           username_only_import_url
         end
 
-      repository.fetch_upstream(url)
+      repository.fetch_upstream(url, forced: forced)
     end
 
     def can_override_approvers?
