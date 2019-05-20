@@ -9,8 +9,7 @@ export default Object.assign({}, mockData, {
     base_path: 'blob_path',
     head_path: 'blob_path',
   },
-  vulnerability_feedback_help_path:
-    '/help/user/project/merge_requests/index#interacting-with-security-reports-ultimate',
+  vulnerability_feedback_help_path: '/help/user/application_security/index',
 });
 
 // Codeclimate

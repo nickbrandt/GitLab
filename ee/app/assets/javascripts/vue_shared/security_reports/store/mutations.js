@@ -32,6 +32,18 @@ export default {
     state.vulnerabilityFeedbackHelpPath = path;
   },
 
+  [types.SET_CREATE_VULNERABILITY_FEEDBACK_ISSUE_PATH](state, path) {
+    state.createVulnerabilityFeedbackIssuePath = path;
+  },
+
+  [types.SET_CREATE_VULNERABILITY_FEEDBACK_MERGE_REQUEST_PATH](state, path) {
+    state.createVulnerabilityFeedbackMergeRequestPath = path;
+  },
+
+  [types.SET_CREATE_VULNERABILITY_FEEDBACK_DISMISSAL_PATH](state, path) {
+    state.createVulnerabilityFeedbackDismissalPath = path;
+  },
+
   [types.SET_PIPELINE_ID](state, id) {
     state.pipelineId = id;
   },

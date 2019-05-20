@@ -1,4 +1,4 @@
-# Elasticsearch knowledge
+# Elasticsearch knowledge **[STARTER ONLY]**
 
 This area is to maintain a compendium of useful information when working with elasticsearch.
 

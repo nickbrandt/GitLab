@@ -1,0 +1,4 @@
+- if Gitlab.config.dependency_proxy.enabled && @group.feature_available?(:dependency_proxy)
+  = nav_link(controller: 'groups/dependency_proxies') do
+    = link_to group_dependency_proxy_path(@group), title: _('Dependency Proxy') do
+      %span= _('Dependency Proxy')

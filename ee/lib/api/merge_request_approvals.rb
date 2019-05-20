@@ -117,6 +117,7 @@ module API
         end
         params do
           optional :sha, type: String, desc: 'When present, must have the HEAD SHA of the source branch'
+          optional :approval_password, type: String, desc: 'Current user\'s password if project is set to require explicit auth on approval'
         end
         post 'approve' do
           merge_request = find_project_merge_request(params[:merge_request_iid])
@@ -125,10 +126,13 @@ module API
 
           check_sha_param!(params, merge_request)
 
-          ::MergeRequests::ApprovalService
-            .new(user_project, current_user)
-            .execute(merge_request)
-
+          begin
+            ::MergeRequests::ApprovalService
+              .new(user_project, current_user, params)
+              .execute(merge_request)
+          rescue ::MergeRequests::ApprovalService::IncorrectApprovalPasswordError
+            unauthorized!
+          end
           present_approval(merge_request)
         end
 

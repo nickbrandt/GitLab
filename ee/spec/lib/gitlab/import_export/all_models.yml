@@ -14,6 +14,11 @@ merge_requests:
 - approver_groups
 - approved_by_users
 - draft_notes
+- merge_train
+- blocks_as_blocker
+- blocks_as_blockee
+- blocking_merge_requests
+- blocked_merge_requests
 ci_pipelines:
 - source_pipeline
 - source_bridge
@@ -21,6 +26,7 @@ ci_pipelines:
 - sourced_pipelines
 - triggered_by_pipeline
 - triggered_pipelines
+- downstream_bridges
 - job_artifacts
 - vulnerabilities_occurrence_pipelines
 - vulnerabilities
@@ -81,6 +87,7 @@ project:
 - webide_pipelines
 - reviews
 - incident_management_setting
+- merge_trains
 prometheus_metrics:
 - project
 - prometheus_alerts
@@ -103,3 +110,6 @@ reviews:
 - notes
 incident_management_setting:
 - project
+merge_trains:
+- project
+- merge_request

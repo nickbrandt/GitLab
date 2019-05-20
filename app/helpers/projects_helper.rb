@@ -241,8 +241,10 @@ module ProjectsHelper
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  # TODO: Remove this method when removing the feature flag
+  # https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/11209#note_162234863
   def show_projects?(projects, params)
-    !!(params[:personal] || params[:name] || any_projects?(projects))
+    Feature.enabled?(:project_list_filter_bar) || !!(params[:personal] || params[:name] || any_projects?(projects))
   end
 
   def push_to_create_project_command(user = current_user)
@@ -315,13 +317,18 @@ module ProjectsHelper
     ) % { default_label: default_label }
   end
 
+  def can_import_members?
+    Ability.allowed?(current_user, :admin_project_member, @project)
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
     nav_tabs = [:home]
 
-    if !project.empty_repo? && can?(current_user, :download_code, project)
-      nav_tabs << [:files, :commits, :network, :graphs, :forks, :releases]
+    unless project.empty_repo?
+      nav_tabs << [:files, :commits, :network, :graphs, :forks] if can?(current_user, :download_code, project)
+      nav_tabs << :releases if can?(current_user, :read_release, project)
     end
 
     if project.repo_exists? && can?(current_user, :read_merge_request, project)

@@ -23,11 +23,10 @@ describe 'User uploads new design', :js do
     it 'uploads design' do
       attach_file(:design_file, logo_fixture, make_visible: true)
 
-      expect(page).to have_selector('.js-design-list-item', count: 6)
+      expect(page).to have_selector('.js-design-list-item', count: 1)
 
       within first('#designs-tab .card') do
         expect(page).to have_content('dk.png')
-        expect(page).to have_content('Updated just now')
       end
     end
   end

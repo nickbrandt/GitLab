@@ -21,7 +21,6 @@ Your overall index score is an average of all your feature score percentages - t
 The page also provides helpful links to articles and GitLab docs, to help you
 improve your scores.
 
-
 Usage ping data is aggregated on GitLab's servers for analysis. Your usage
 information is **not sent** to any other GitLab instances. If you have just started using GitLab, it may take a few weeks for data to be
 collected before this feature is available.

@@ -178,9 +178,7 @@ module EE
         {
           empty_state_illustration_path: image_path('illustrations/security-dashboard_empty.svg'),
           security_dashboard_help_path: help_page_path("user/project/security_dashboard"),
-          has_pipeline_data: "false",
-          can_create_feedback: "false",
-          can_create_issue: "false"
+          has_pipeline_data: "false"
         }
       else
         {
@@ -191,11 +189,11 @@ module EE
           sast_container_head_path: pipeline.downloadable_path_for_report_type(:container_scanning),
           vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
           pipeline_id: pipeline.id,
-          vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
-          sast_help_path: help_page_path('user/project/merge_requests/sast'),
-          dependency_scanning_help_path: help_page_path('user/project/merge_requests/dependency_scanning'),
-          dast_help_path: help_page_path('user/project/merge_requests/dast'),
-          sast_container_help_path: help_page_path('user/project/merge_requests/container_scanning'),
+          vulnerability_feedback_help_path: help_page_path('user/application_security/index'),
+          sast_help_path: help_page_path('user/application_security/sast/index'),
+          dependency_scanning_help_path: help_page_path('user/application_security/dependency_scanning/index'),
+          dast_help_path: help_page_path('user/application_security/dast/index'),
+          sast_container_help_path: help_page_path('user/application_security/container_scanning/index'),
           user_path: user_url(pipeline.user),
           user_avatar_path: pipeline.user.avatar_url,
           user_name: pipeline.user.name,
@@ -206,9 +204,33 @@ module EE
           pipeline_path: pipeline_url(pipeline),
           pipeline_created: pipeline.created_at.to_s,
           has_pipeline_data: "true",
-          can_create_feedback: can?(current_user, :admin_vulnerability_feedback, project).to_s,
-          can_create_issue: can?(current_user, :create_issue, project).to_s
+          create_vulnerability_feedback_issue_path: create_vulnerability_feedback_issue_path(project),
+          create_vulnerability_feedback_merge_request_path: create_vulnerability_feedback_merge_request_path(project),
+          create_vulnerability_feedback_dismissal_path: create_vulnerability_feedback_dismissal_path(project)
         }
+      end
+    end
+
+    def can_create_feedback?(project, feedback_type)
+      feedback = Vulnerabilities::Feedback.new(project: project, feedback_type: feedback_type)
+      can?(current_user, :create_vulnerability_feedback, feedback)
+    end
+
+    def create_vulnerability_feedback_issue_path(project)
+      if can_create_feedback?(project, :issue)
+        project_vulnerability_feedback_index_path(project)
+      end
+    end
+
+    def create_vulnerability_feedback_merge_request_path(project)
+      if can_create_feedback?(project, :merge_request)
+        project_vulnerability_feedback_index_path(project)
+      end
+    end
+
+    def create_vulnerability_feedback_dismissal_path(project)
+      if can_create_feedback?(project, :dismissal)
+        project_vulnerability_feedback_index_path(project)
       end
     end
 
@@ -221,6 +243,11 @@ module EE
     def project_incident_management_setting
       @project_incident_management_setting ||= @project.incident_management_setting ||
         @project.build_incident_management_setting
+    end
+
+    override :can_import_members?
+    def can_import_members?
+      super && !membership_locked?
     end
   end
 end

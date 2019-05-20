@@ -235,3 +235,5 @@ class Clusters::ClustersController < Clusters::BaseController
     @cluster.applications.each(&:schedule_status_update)
   end
 end
+
+Clusters::ClustersController.prepend(EE::Clusters::ClustersController)

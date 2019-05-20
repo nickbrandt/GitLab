@@ -18,13 +18,14 @@
     pipeline_id: pipeline.id,
     source_branch: pipeline.ref,
     vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
-    vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
-    sast_help_path: help_page_path('user/project/merge_requests/sast'),
-    dependency_scanning_help_path: help_page_path('user/project/merge_requests/dependency_scanning'),
-    dast_help_path: help_page_path('user/project/merge_requests/dast'),
-    sast_container_help_path: help_page_path('user/project/merge_requests/container_scanning'),
-    can_create_feedback: can?(current_user, :admin_vulnerability_feedback, project).to_s,
-    can_create_issue: show_new_issue_link?(project).to_s } }
+    vulnerability_feedback_help_path: help_page_path('user/application_security/index'),
+    sast_help_path: help_page_path('user/application_security/sast/index'),
+    dependency_scanning_help_path: help_page_path('user/application_security/dependency_scanning/index'),
+    dast_help_path: help_page_path('user/application_security/dast/index'),
+    sast_container_help_path: help_page_path('user/application_security/container_scanning/index'),
+    create_vulnerability_feedback_issue_path: create_vulnerability_feedback_issue_path(project),
+    create_vulnerability_feedback_merge_request_path: create_vulnerability_feedback_merge_request_path(project),
+    create_vulnerability_feedback_dismissal_path: create_vulnerability_feedback_dismissal_path(project) } }
 
 - if pipeline.expose_license_management_data?
   #js-tab-licenses.tab-pane

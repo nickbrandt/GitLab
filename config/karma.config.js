@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const argumentsParser = require('commander');
 const webpackConfig = require('./webpack.config.js');
+const IS_EE = require('./helpers/is_ee_env');
 
 const ROOT_PATH = path.resolve(__dirname, '..');
 const SPECS_PATH = /^(?:\.[\\\/])?(ee[\\\/])?spec[\\\/]javascripts[\\\/]/;
@@ -90,6 +91,8 @@ if (specFilters.length) {
 module.exports = function(config) {
   process.env.TZ = 'Etc/UTC';
 
+  const fixturesPath = `${IS_EE ? 'ee/' : ''}spec/javascripts/fixtures`;
+
   const karmaConfig = {
     basePath: ROOT_PATH,
     browsers: ['ChromeHeadlessCustom'],
@@ -104,13 +107,15 @@ module.exports = function(config) {
           // chrome cannot run in sandboxed mode inside a docker container unless it is run with
           // escalated kernel privileges (e.g. docker run --cap-add=CAP_SYS_ADMIN)
           '--no-sandbox',
+          // https://bugs.chromium.org/p/chromedriver/issues/detail?id=2870
+          '--enable-features=NetworkService,NetworkServiceInProcess',
         ],
       },
     },
     frameworks: ['jasmine'],
     files: [
       { pattern: 'spec/javascripts/test_bundle.js', watched: false },
-      { pattern: `spec/javascripts/fixtures/**/*@(.json|.html|.png|.bmpr|.pdf)`, included: false },
+      { pattern: `${fixturesPath}/**/*@(.json|.html|.png|.bmpr|.pdf)`, included: false },
     ],
     preprocessors: {
       'spec/javascripts/**/*.js': ['webpack', 'sourcemap'],

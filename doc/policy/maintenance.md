@@ -82,4 +82,4 @@ Please see the table below for some examples:
 
 More information about the release procedures can be found in our
 [release documentation](https://gitlab.com/gitlab-org/release/docs). You may also want to read our
-[Responsible Disclosure Policy](https://about.gitlab.com/disclosure/).
+[Responsible Disclosure Policy](https://about.gitlab.com/security/disclosure/).

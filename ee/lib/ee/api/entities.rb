@@ -201,6 +201,26 @@ module EE
         expose :issue_link_id
       end
 
+      class LinkedEpic < Grape::Entity
+        expose :id
+        expose :iid
+        expose :title
+        expose :group_id
+        expose :parent_id
+        expose :has_children?, as: :has_children
+        expose :reference do |epic|
+          epic.to_reference(epic.parent.group)
+        end
+
+        expose :url do |epic|
+          ::Gitlab::Routing.url_helpers.group_epic_url(epic.group, epic)
+        end
+
+        expose :relation_url do |epic|
+          ::Gitlab::Routing.url_helpers.group_epic_link_url(epic.parent.group, epic.parent.iid, epic.id)
+        end
+      end
+
       class Epic < Grape::Entity
         can_admin_epic = ->(epic, opts) { Ability.allowed?(opts[:user], :admin_epic, epic) }
 
@@ -221,7 +241,7 @@ module EE
         expose :state
         expose :created_at
         expose :updated_at
-        expose :labels do |epic, options|
+        expose :labels do |epic|
           # Avoids an N+1 query since labels are preloaded
           epic.labels.map(&:title).sort
         end
@@ -366,6 +386,10 @@ module EE
         expose :approvals_required
 
         expose :approvals_left
+
+        expose :require_password_to_approve do |approval_state|
+          approval_state.project.require_password_to_approve?
+        end
 
         expose :approved_by, using: EE::API::Entities::Approvals do |approval_state|
           approval_state.merge_request.approvals

@@ -27,7 +27,9 @@ module EE
         :elasticsearch_aws_secret_access_key,
         :elasticsearch_experimental_indexer,
         :elasticsearch_indexing,
+        :elasticsearch_replicas,
         :elasticsearch_search,
+        :elasticsearch_shards,
         :elasticsearch_url,
         :elasticsearch_limit_indexing,
         :elasticsearch_namespace_ids,
@@ -54,11 +56,11 @@ module EE
     end
 
     def elasticsearch_namespace_ids
-      ElasticsearchIndexedNamespace.namespace_ids.join(',')
+      ElasticsearchIndexedNamespace.target_ids.join(',')
     end
 
     def elasticsearch_project_ids
-      ElasticsearchIndexedProject.project_ids.join(',')
+      ElasticsearchIndexedProject.target_ids.join(',')
     end
 
     def self.repository_mirror_attributes

@@ -103,8 +103,6 @@ module Gitlab
         none: "",
         qa: "~QA"
       }.freeze
-
-      # rubocop:disable Style/RegexpLiteral
       CATEGORIES = {
         %r{\Adoc/} => :none, # To reinstate roulette for documentation, set to `:docs`.
         %r{\A(CONTRIBUTING|LICENSE|MAINTENANCE|PHILOSOPHY|PROCESS|README)(\.md)?\z} => :none, # To reinstate roulette for documentation, set to `:docs`.
@@ -123,6 +121,8 @@ module Gitlab
           \.prettierrc |
           \.scss-lint.yml |
           \.stylelintrc |
+          \.haml-lint.yml |
+          \.haml-lint_todo.yml |
           babel\.config\.js |
           jest\.config\.js |
           karma\.config\.js |
@@ -151,7 +151,6 @@ module Gitlab
         %r{\.(md|txt)\z} => :none, # To reinstate roulette for documentation, set to `:docs`.
         %r{\.js\z} => :frontend
       }.freeze
-      # rubocop:enable Style/RegexpLiteral
     end
   end
 end

@@ -36,11 +36,11 @@ In order to isolate and only display relevant CPU and Memory metrics for a given
 
 Instead, the [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) or [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) name should begin with [CI_ENVIRONMENT_SLUG](../../../../ci/variables/README.md#predefined-environment-variables). It can be followed by a `-` and additional content if desired. For example, a deployment name of `review-homepage-5620p5` would match the `review/homepage` environment.
 
-## Displaying Canary metrics
+## Displaying Canary metrics **[PREMIUM]**
 
 > Introduced in [GitLab 10.2](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/15201).
 
-GitLab also gathers Kubernetes metrics for [canary deployments](../../canary_deployments.md), allowing easy comparison between the current deployed version and the canary.
+GitLab also gathers Kubernetes metrics for [canary deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html), allowing easy comparison between the current deployed version and the canary.
 
 These metrics expect the [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) or [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) name to begin with `$CI_ENVIRONMENT_SLUG-canary`, to isolate the canary metrics.
 

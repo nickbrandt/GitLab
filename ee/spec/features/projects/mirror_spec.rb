@@ -142,41 +142,17 @@ describe 'Project mirror', :js do
           select('Pull', from: 'Mirror direction')
           select 'SSH public key', from: 'Authentication method'
 
-          # Generates an SSH public key with an asynchronous PUT and displays it
-          wait_for_requests
-
-          expect(import_data.ssh_public_key).not_to be_nil
-          expect(page).to have_content(import_data.ssh_public_key)
-
           click_without_sidekiq 'Mirror repository'
         end
+        project.reload
 
-        # We didn't set any host keys
         expect(page).to have_content('Mirroring settings were successfully updated')
         expect(page).not_to have_content('Verified by')
-
-        project.reload
-        import_data.reload
+        expect(find('.qa-copy-ssh-public-key')['data-clipboard-text']).to eq(import_data.ssh_public_key)
         expect(project.mirror?).to be_truthy
         expect(project.username_only_import_url).to eq('ssh://user@example.com')
         expect(import_data.auth_method).to eq('ssh_public_key')
         expect(import_data.password).to be_blank
-
-        find('.js-delete-mirror').click
-        fill_in 'Git repository URL', with: 'ssh://user@example.com'
-        select('Pull', from: 'Mirror direction')
-
-        first_key = import_data.ssh_public_key
-        expect(page).to have_content(first_key)
-
-        # Check regenerating the public key works
-        click_without_sidekiq 'Regenerate key'
-        find('.js-regenerate-public-ssh-key-confirm-modal .js-confirm').click
-
-        wait_for_requests
-
-        expect(page).not_to have_content(first_key)
-        expect(page).to have_content(import_data.reload.ssh_public_key)
       end
     end
 
@@ -201,27 +177,6 @@ describe 'Project mirror', :js do
           click_on 'Input host keys manually'
 
           expect(page).to have_field('SSH host keys', with: key.key_text)
-        end
-      end
-
-      it 'preserves the existing SSH key after generating it once' do
-        stub_reactive_cache(cache, known_hosts: key.key_text)
-
-        visit project_settings_repository_path(project)
-
-        page.within('.project-mirror-settings') do
-          fill_in 'Git repository URL', with: 'ssh://example.com'
-          select('Pull', from: 'Mirror direction')
-          select 'SSH public key', from: 'Authentication method'
-          click_on 'Detect host keys'
-
-          wait_for_requests
-
-          expect(page).to have_content(key.fingerprint)
-
-          wait_for_requests
-
-          expect { click_on 'Mirror repository' }.not_to change { import_data.reload.ssh_public_key }
         end
       end
 

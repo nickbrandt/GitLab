@@ -15,7 +15,7 @@ module Projects
       end
 
       update_tags do
-        project.fetch_mirror
+        project.fetch_mirror(forced: true)
       end
 
       update_branches

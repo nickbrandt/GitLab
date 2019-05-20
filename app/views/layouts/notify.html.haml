@@ -32,10 +32,5 @@
 
           = email_action @target_url
 
-        -# EE-specific start
-        - if Gitlab::CurrentSettings.email_additional_text.present?
-          %br
-          %br
-            = Gitlab::Utils.nlbr(Gitlab::CurrentSettings.email_additional_text)
-        -# EE-specific end
+        = render_if_exists 'layouts/email_additional_text'
         = html_footer_message

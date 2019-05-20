@@ -800,33 +800,6 @@ describe Gitlab::GitAccess do
       end
     end
 
-    # Run permission checks for a group
-    def self.run_group_permission_checks(permissions_matrix)
-      permissions_matrix.each_pair do |role, matrix|
-        it "has the correct permissions for group #{role}s" do
-          project
-            .project_group_links
-            .create(group: group, group_access: Gitlab::Access.sym_options[role])
-
-          protected_branch.save
-
-          aggregate_failures do
-            matrix.each do |action, allowed|
-              check = -> { push_changes(changes[action]) }
-
-              if allowed
-                expect(&check).not_to raise_error,
-                  -> { "expected #{action} to be allowed" }
-              else
-                expect(&check).to raise_error(Gitlab::GitAccess::UnauthorizedError),
-                  -> { "expected #{action} to be disallowed" }
-              end
-            end
-          end
-        end
-      end
-    end
-
     permissions_matrix = {
       admin: {
         any: true,
@@ -933,92 +906,6 @@ describe Gitlab::GitAccess do
         let(:protected_branch) { create(:protected_branch, :developers_can_merge, :developers_can_push, name: protected_branch_name, project: project) }
 
         run_permission_checks(permissions_matrix.deep_merge(developer: { push_protected_branch: true, push_all: true, merge_into_protected_branch: true }))
-      end
-
-      context "user-specific access control" do
-        let(:user) { create(:user) }
-
-        context "when a specific user is allowed to push into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_user_to_push: user, name: protected_branch_name, project: project) }
-
-          run_permission_checks(permissions_matrix.deep_merge(developer: { push_protected_branch: true, push_all: true, merge_into_protected_branch: true },
-                                                              guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                              reporter: { push_protected_branch: false, merge_into_protected_branch: false }))
-        end
-
-        context "when a specific user is allowed to merge into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_user_to_merge: user, name: protected_branch_name, project: project) }
-
-          before do
-            create(:merge_request, source_project: project, source_branch: unprotected_branch, target_branch: 'feature', state: 'locked', in_progress_merge_commit_sha: merge_into_protected_branch)
-          end
-
-          run_permission_checks(permissions_matrix.deep_merge(admin: { push_protected_branch: false, push_all: false, merge_into_protected_branch: true },
-                                                              maintainer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: true },
-                                                              developer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: true },
-                                                              guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                              reporter: { push_protected_branch: false, merge_into_protected_branch: false }))
-        end
-
-        context "when a specific user is allowed to push & merge into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_user_to_push: user, authorize_user_to_merge: user, name: protected_branch_name, project: project) }
-
-          before do
-            create(:merge_request, source_project: project, source_branch: unprotected_branch, target_branch: 'feature', state: 'locked', in_progress_merge_commit_sha: merge_into_protected_branch)
-          end
-
-          run_permission_checks(permissions_matrix.deep_merge(developer: { push_protected_branch: true, push_all: true, merge_into_protected_branch: true },
-                                                              guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                              reporter: { push_protected_branch: false, merge_into_protected_branch: false }))
-        end
-      end
-
-      context "group-specific access control" do
-        let(:user) { create(:user) }
-        let(:group) { create(:group) }
-
-        before do
-          group.add_maintainer(user)
-        end
-
-        context "when a specific group is allowed to push into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_group_to_push: group, name: protected_branch_name, project: project) }
-
-          permissions = permissions_matrix.except(:admin).deep_merge(developer: { push_protected_branch: true, push_all: true, merge_into_protected_branch: true },
-                                                                     guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                                     reporter: { push_protected_branch: false, merge_into_protected_branch: false })
-
-          run_group_permission_checks(permissions)
-        end
-
-        context "when a specific group is allowed to merge into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_group_to_merge: group, name: protected_branch_name, project: project) }
-
-          before do
-            create(:merge_request, source_project: project, source_branch: unprotected_branch, target_branch: 'feature', state: 'locked', in_progress_merge_commit_sha: merge_into_protected_branch)
-          end
-
-          permissions = permissions_matrix.except(:admin).deep_merge(maintainer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: true },
-                                                                     developer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: true },
-                                                                     guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                                     reporter: { push_protected_branch: false, merge_into_protected_branch: false })
-
-          run_group_permission_checks(permissions)
-        end
-
-        context "when a specific group is allowed to push & merge into the #{protected_branch_type} protected branch" do
-          let(:protected_branch) { build(:protected_branch, authorize_group_to_push: group, authorize_group_to_merge: group, name: protected_branch_name, project: project) }
-
-          before do
-            create(:merge_request, source_project: project, source_branch: unprotected_branch, target_branch: 'feature', state: 'locked', in_progress_merge_commit_sha: merge_into_protected_branch)
-          end
-
-          permissions = permissions_matrix.except(:admin).deep_merge(developer: { push_protected_branch: true, push_all: true, merge_into_protected_branch: true },
-                                                                     guest: { push_protected_branch: false, merge_into_protected_branch: false },
-                                                                     reporter: { push_protected_branch: false, merge_into_protected_branch: false })
-
-          run_group_permission_checks(permissions)
-        end
       end
 
       context "when no one is allowed to push to the #{protected_branch_name} protected branch" do

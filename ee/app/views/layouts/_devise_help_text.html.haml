@@ -1,0 +1,5 @@
+- if Gitlab::CurrentSettings.help_text.present?
+  %h3= _("Need help?")
+  %hr
+  %p.slead
+    = markdown(Gitlab::CurrentSettings.help_text)

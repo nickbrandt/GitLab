@@ -1,15 +1,16 @@
 - import_data = @project.import_data || @project.build_import_data
 - is_one_user_option = default_mirror_users.count == 1
 - protocols = Gitlab::UrlSanitizer::ALLOWED_SCHEMES.join('|')
-- options = [[_('Push'), 'push']]
+- direction_options = [[_('Push'), 'push']]
 - has_existing_pull_mirror = @project.mirror.present?
+
 - if can?(current_user, :admin_mirror, @project)
-  - pull_addition_method = has_existing_pull_mirror ? options.method(:push) : options.method(:unshift)
+  - pull_addition_method = has_existing_pull_mirror ? direction_options.method(:push) : direction_options.method(:unshift)
   - pull_addition_method.call([_('Pull'), 'pull'])
 
 .form-group
   = label_tag :mirror_direction, _('Mirror direction'), class: 'label-light'
-  = select_tag :mirror_direction, options_for_select(options), class: 'form-control js-mirror-direction qa-mirror-direction', disabled: (options.count == 1) || has_existing_pull_mirror
+  = select_tag :mirror_direction, options_for_select(direction_options), class: 'form-control js-mirror-direction qa-mirror-direction', disabled: (direction_options.count == 1) || has_existing_pull_mirror
 
 .js-form-insertion-point
 
@@ -21,7 +22,7 @@
   = f.hidden_field :username_only_import_url, class: 'js-mirror-url-hidden', required: true, pattern: "(#{protocols}):\/\/.+"
   = f.hidden_field :only_mirror_protected_branches, class: 'js-mirror-protected-hidden'
 
-  = f.fields_for :import_data, import_data do |import_form|
+  = f.fields_for :import_data, import_data, include_id: false do |import_form|
     = render partial: 'projects/mirrors/ssh_host_keys', locals: { f: import_form }
     = render partial: 'projects/mirrors/authentication_method', locals: { f: import_form }
 

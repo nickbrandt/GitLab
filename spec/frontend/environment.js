@@ -24,8 +24,9 @@ class CustomEnvironment extends JSDOMEnvironment {
     });
 
     const { testEnvironmentOptions } = config;
+    const { IS_EE } = testEnvironmentOptions;
     this.global.gon = {
-      ee: testEnvironmentOptions.IS_EE,
+      ee: IS_EE,
     };
 
     this.rejectedPromises = [];
@@ -33,6 +34,20 @@ class CustomEnvironment extends JSDOMEnvironment {
     this.global.promiseRejectionHandler = error => {
       this.rejectedPromises.push(error);
     };
+
+    this.global.fixturesBasePath = `${process.cwd()}/${
+      IS_EE ? 'ee/' : ''
+    }spec/javascripts/fixtures`;
+
+    // Not yet supported by JSDOM: https://github.com/jsdom/jsdom/issues/317
+    this.global.document.createRange = () => ({
+      setStart: () => {},
+      setEnd: () => {},
+      commonAncestorContainer: {
+        nodeName: 'BODY',
+        ownerDocument: this.global.document,
+      },
+    });
   }
 
   async teardown() {

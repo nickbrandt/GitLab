@@ -56,12 +56,16 @@ describe('Card security reports app', () => {
         sastHelpPath: 'path',
         dependencyScanningHelpPath: 'path',
         vulnerabilityFeedbackPath: `${TEST_HOST}/vulnerability_feedback_path`,
+        createVulnerabilityFeedbackIssuePath: `${TEST_HOST}/vulnerability_feedback_path`,
+        createVulnerabilityFeedbackDismissalPath: `${TEST_HOST}/vulnerability_feedback_path`,
+        createVulnerabilityFeedbackMergeRequestPath: `${TEST_HOST}/vulnerability_feedback_path`,
         vulnerabilityFeedbackHelpPath: 'path',
         dastHelpPath: 'path',
         sastContainerHelpPath: 'path',
         pipelineId: 123,
-        canCreateFeedback: true,
         canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
       },
     });
   });

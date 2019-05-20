@@ -3,9 +3,11 @@ import Vue from 'vue';
 import router from './router';
 import App from './components/app.vue';
 import apolloProvider from './graphql';
+import allDesigns from './queries/allDesigns.graphql';
 
 export default () => {
   const el = document.getElementById('js-design-management');
+  const badge = document.querySelector('.js-designs-count');
   const { issueIid, projectPath } = el.dataset;
 
   $('.js-issue-tabs').on('shown.bs.tab', ({ target: { id } }) => {
@@ -22,6 +24,20 @@ export default () => {
       issueIid,
     },
   });
+
+  apolloProvider.clients.defaultClient
+    .watchQuery({
+      query: allDesigns,
+      variables: {
+        fullPath: projectPath,
+        iid: issueIid,
+      },
+    })
+    .subscribe(({ data }) => {
+      if (badge) {
+        badge.textContent = data.project.issue.designs.designs.length;
+      }
+    });
 
   return new Vue({
     el,

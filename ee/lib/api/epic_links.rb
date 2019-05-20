@@ -68,6 +68,26 @@ module API
         end
       end
 
+      desc 'Create and relate epic to a parent' do
+        success EE::API::Entities::Epic
+      end
+      params do
+        requires :title, type: String, desc: 'The title of a child epic'
+      end
+      post ':id/(-/)epics/:epic_iid/epics' do
+        authorize_can_admin!
+
+        create_params = { parent_id: epic.id, title: params[:title] }
+
+        child_epic = ::Epics::CreateService.new(user_group, current_user, create_params).execute
+
+        if child_epic.valid?
+          present child_epic, with: EE::API::Entities::LinkedEpic, user: current_user
+        else
+          render_validation_error!(epic)
+        end
+      end
+
       desc 'Remove epics relation'
       params do
         use :child_epic_id

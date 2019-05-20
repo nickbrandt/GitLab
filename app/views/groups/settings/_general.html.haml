@@ -17,7 +17,7 @@
         = f.label :description, _('Group description (optional)'), class: 'label-bold'
         = f.text_area :description, class: 'form-control', rows: 3, maxlength: 250
 
-  .row= render_if_exists 'shared/repository_size_limit_setting', form: f, type: :group
+  = render_if_exists 'shared/repository_size_limit_setting', form: f, type: :group
 
   .form-group.prepend-top-default.append-bottom-20
     .avatar-container.rect-avatar.s90

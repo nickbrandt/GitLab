@@ -336,6 +336,14 @@ class GeoNode < ApplicationRecord
     Project.within_shards(selective_sync_shards)
   end
 
+  def project_model
+    Project
+  end
+
+  def projects_table
+    Project.arel_table
+  end
+
   def uploads_model
     Upload
   end

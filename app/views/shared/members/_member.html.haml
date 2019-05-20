@@ -54,7 +54,7 @@
   - if show_roles
     - current_resource = @project || @group
     .controls.member-controls
-      = render 'shared/members/ee/ldap_tag', can_override: member.can_override?, visible: false
+      = render 'shared/members/ee/ldap_tag', can_override: member.can_override?
       - if show_controls && member.source == current_resource
 
         - if member.can_resend_invite?

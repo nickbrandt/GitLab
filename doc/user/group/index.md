@@ -304,7 +304,7 @@ level of members in the group.
 Member lock lets a group owner lock down any new project membership to all the
 projects within the group, allowing tighter control over project membership.
 
-For instance, if you want to lock the group for an [Audit Event](../../administration/audit_events.md),
+For instance, if you want to lock the group for an [Audit Event](https://docs.gitlab.com/ee/administration/audit_events.html),
 you enable Member lock to guarantee that membership of a project cannot be modified during that audit.
 
 To enable this feature:
@@ -323,7 +323,7 @@ request to add a new user to a project through API will not be possible.
 
 Group file templates allow you to share a set of templates for common file
 types with every project in a group. It is analogous to the
-[instance template repository](../admin_area/settings/instance_template_repository.md)
+[instance template repository](https://docs.gitlab.com/ee/user/admin_area/settings/instance_template_repository.html)
 feature, and the selected project should follow the same naming conventions as
 are documented on that page.
 
@@ -354,7 +354,7 @@ Define project templates at a group-level by setting a group as a template sourc
   access each project's settings, and remove any project from the same screen.
 - **Webhooks**: configure [webhooks](../project/integrations/webhooks.md) to your group.
 - **Kubernetes cluster integration**: connect your GitLab group with [Kubernetes clusters](clusters/index.md).
-- **Audit Events**: view [Audit Events](https://docs.gitlab.com/ee/administration/audit_events.html#audit-events)
+- **Audit Events**: view [Audit Events](https://docs.gitlab.com/ee/administration/audit_events.html)
   for the group. **[STARTER ONLY]**
 - **Pipelines quota**: keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group.
 
@@ -367,6 +367,10 @@ and issues) performed by your group members.
 ## Issues analytics **[PREMIUM]**
 
 With [GitLab Issues Analytics](issues_analytics/index.md), in groups, you can see a bar chart of the number of issues created each month.
+
+## Dependency Proxy **[PREMIUM]**
+
+Use GitLab as a [dependency proxy](dependency_proxy/index.md) for upstream Docker images.
 
 [ee]: https://about.gitlab.com/pricing/
 [ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534

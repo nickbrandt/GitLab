@@ -36,7 +36,6 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       last_event_date: event_date,
       cursor_last_event_id: 1,
       cursor_last_event_date: event_date,
-      event_log_count: 55,
       event_log_max_id: 555,
       repository_created_max_id: 43,
       repository_updated_max_id: 132,
@@ -60,7 +59,6 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       attachments_count: 30,
       last_event_id: 2,
       last_event_date: event_date,
-      event_log_count: 55,
       event_log_max_id: 555
     }
   end
@@ -176,7 +174,6 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
         expect(metric_value(:geo_cursor_last_event_id)).to eq(1)
         expect(metric_value(:geo_cursor_last_event_timestamp)).to eq(event_date.to_i)
         expect(metric_value(:geo_last_successful_status_check_timestamp)).to be_truthy
-        expect(metric_value(:geo_event_log)).to eq(55)
         expect(metric_value(:geo_event_log_max_id)).to eq(555)
         expect(metric_value(:geo_repository_created_max_id)).to eq(43)
         expect(metric_value(:geo_repository_updated_max_id)).to eq(132)

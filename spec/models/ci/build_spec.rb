@@ -2817,7 +2817,7 @@ describe Ci::Build do
 
     context 'when ref is merge request' do
       let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
-      let(:pipeline) { merge_request.merge_request_pipelines.first }
+      let(:pipeline) { merge_request.pipelines_for_merge_request.first }
       let(:build) { create(:ci_build, ref: merge_request.source_branch, tag: false, pipeline: pipeline, project: project) }
 
       context 'when ref is protected' do
@@ -2875,7 +2875,7 @@ describe Ci::Build do
 
     context 'when ref is merge request' do
       let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
-      let(:pipeline) { merge_request.merge_request_pipelines.first }
+      let(:pipeline) { merge_request.pipelines_for_merge_request.first }
       let(:build) { create(:ci_build, ref: merge_request.source_branch, tag: false, pipeline: pipeline, project: project) }
 
       context 'when ref is protected' do
@@ -2925,26 +2925,18 @@ describe Ci::Build do
 
     subject { build.any_unmet_prerequisites? }
 
+    before do
+      allow(build).to receive(:prerequisites).and_return(prerequisites)
+    end
+
     context 'build has prerequisites' do
-      before do
-        allow(build).to receive(:prerequisites).and_return([double])
-      end
+      let(:prerequisites) { [double] }
 
       it { is_expected.to be_truthy }
-
-      context 'and the ci_preparing_state feature is disabled' do
-        before do
-          stub_feature_flags(ci_preparing_state: false)
-        end
-
-        it { is_expected.to be_falsey }
-      end
     end
 
     context 'build does not have prerequisites' do
-      before do
-        allow(build).to receive(:prerequisites).and_return([])
-      end
+      let(:prerequisites) { [] }
 
       it { is_expected.to be_falsey }
     end

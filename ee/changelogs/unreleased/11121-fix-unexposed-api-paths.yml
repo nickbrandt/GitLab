@@ -1,0 +1,5 @@
+---
+title: Fix relative url root issues with license management
+merge_request: 12488
+author:
+type: fixed

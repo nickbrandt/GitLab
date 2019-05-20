@@ -1,4 +1,4 @@
-# Pseudonymizer
+# Pseudonymizer **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5532) in [GitLab Ultimate][ee] 11.1.
 

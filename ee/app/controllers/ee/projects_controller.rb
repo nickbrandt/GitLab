@@ -42,6 +42,7 @@ module EE
         packages_enabled
         merge_requests_author_approval
         merge_requests_disable_committers_approval
+        require_password_to_approve
         merge_requests_require_code_owner_approval
         group_with_project_templates_id
       ]

@@ -11,7 +11,7 @@ project itself, the highest permission level is used.
 On public and internal projects the Guest role is not enforced. All users will
 be able to create issues, leave comments, and clone or download the project code.
 
-When a member leaves the team all the assigned [Issues](project/issues/index.md) and [Merge Requests](project/merge_requests/index.md)
+When a member leaves a team's project, all the assigned [Issues](project/issues/index.md) and [Merge Requests](project/merge_requests/index.md)
 will be unassigned automatically.
 
 GitLab [administrators](../administration/index.md) receive all permissions.
@@ -173,8 +173,12 @@ read through the documentation on [permissions and access to confidential issues
 
 ### Releases permissions
 
-[Project Releases](project/releases/index.md) can be read by all project
-members (Reporters, Developers, Maintainers, Owners) **except Guests**.
+[Project Releases](project/releases/index.md) can be read by project
+members with Reporter, Developer, Maintainer, and Owner permissions.
+Guest users can access Release pages for downloading assets but
+are not allowed to download the source code nor see repository
+information such as tags and commits.
+
 Releases can be created, updated, or deleted via [Releases APIs](../api/releases/index.md)
 by project Developers, Maintainers, and Owners.
 
@@ -259,9 +263,9 @@ Auditor users are given read-only access to all projects, groups, and other
 resources on the GitLab instance.
 
 An Auditor user should be able to access all projects and groups of a GitLab instance
-with the permissions described on the documentation on [auditor users permissions](../administration/auditor_users.md#permissions-and-restrictions-of-an-auditor-user).
+with the permissions described on the documentation on [auditor users permissions](https://docs.gitlab.com/ee/administration/auditor_users.html#permissions-and-restrictions-of-an-auditor-user).
 
-[Read more about Auditor users.](../administration/auditor_users.md)
+[Read more about Auditor users.](https://docs.gitlab.com/ee/administration/auditor_users.html)
 
 ## Project features
 
@@ -346,7 +350,7 @@ for details about the pipelines security model.
 ## LDAP users permissions
 
 Since GitLab 8.15, LDAP user permissions can now be manually overridden by an admin user.
-Read through the documentation on [LDAP users permissions](../administration/auth/how_to_configure_ldap_gitlab_ee/index.md) to learn more.
+Read through the documentation on [LDAP users permissions](https://docs.gitlab.com/ee/administration/auth/how_to_configure_ldap_gitlab_ee/index.html) to learn more.
 
 [^1]: On public and internal projects, all users are able to perform this action
 [^2]: Guest users can only view the confidential issues they created themselves

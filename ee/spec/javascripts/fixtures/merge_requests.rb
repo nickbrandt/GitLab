@@ -42,7 +42,7 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
     remove_repository(project)
   end
 
-  it 'merge_requests_ee/merge_request_edit.html' do |example|
+  it 'merge_requests_ee/merge_request_edit.html' do
     get :edit,
       params: {
         id: merge_request.id,
@@ -53,6 +53,5 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
 
     expect(merge_request.all_approvers_including_groups.size).to eq(1)
     expect(response).to be_success
-    store_frontend_fixture(response, example.description)
   end
 end

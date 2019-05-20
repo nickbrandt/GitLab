@@ -31,6 +31,7 @@ import initPerformanceBar from './performance_bar';
 import initSearchAutocomplete from './search_autocomplete';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
+import { __ } from './locale';
 
 // EE-only scripts
 import 'ee/main';
@@ -139,10 +140,22 @@ function deferredInitialisation() {
 
   loadAwardsHandler();
 
-  // Toggle Canary Badge
+  /**
+   * Toggle Canary Badge
+   *
+   * For GitLab.com only, when the user is using canary
+   * we render a Next badge and hide the option to switch
+   * to canay
+   */
   if (Cookies.get('gitlab_canary') && Cookies.get('gitlab_canary') === 'true') {
-    document.querySelector('.js-canary-badge').classList.remove('hidden');
-    document.querySelector('.js-canary-link').classList.add('hidden');
+    const canaryBadge = document.querySelector('.js-canary-badge');
+    const canaryLink = document.querySelector('.js-canary-link');
+    if (canaryBadge) {
+      canaryBadge.classList.add('hidden');
+    }
+    if (canaryLink) {
+      canaryLink.classList.add('hidden');
+    }
   }
 }
 
@@ -210,9 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ref = xhrObj.status;
 
     if (ref === 401) {
-      Flash('You need to be logged in.');
+      Flash(__('You need to be logged in.'));
     } else if (ref === 404 || ref === 500) {
-      Flash('Something went wrong on our end.');
+      Flash(__('Something went wrong on our end.'));
     }
   });
 

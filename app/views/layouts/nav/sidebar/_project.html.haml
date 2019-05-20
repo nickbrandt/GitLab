@@ -270,11 +270,7 @@
                         %span= _("Got it!")
                         = sprite_icon('thumb-up')
 
-            - if project_nav_tab? :feature_flags
-              = nav_link(controller: :feature_flags) do
-                = link_to project_feature_flags_path(@project), title: _('Feature Flags'), class: 'shortcuts-feature-flags' do
-                  %span
-                    = _('Feature Flags')
+            = render_if_exists 'layouts/nav/sidebar/project_feature_flags_link'
 
       - if project_nav_tab? :container_registry
         = nav_link(controller: %w[projects/registry/repositories]) do
@@ -289,18 +285,7 @@
                 %strong.fly-out-top-item-name
                   = _('Registry')
 
-      - if project_nav_tab? :packages
-        = nav_link(controller: %w[projects/packages/packages]) do
-          = link_to project_packages_path(@project) do
-            .nav-icon-container
-              = sprite_icon('package')
-            %span.nav-item-name
-              = _('Packages')
-          %ul.sidebar-sub-level-items.is-fly-out-only
-            = nav_link(controller: %w[projects/packages/packages], html_options: { class: "fly-out-top-item" } ) do
-              = link_to project_packages_path(@project) do
-                %strong.fly-out-top-item-name
-                  = _('Packages')
+      = render_if_exists 'layouts/nav/sidebar/project_packages_link'
 
       - if project_nav_tab? :wiki
         - wiki_url = project_wiki_path(@project, :home)

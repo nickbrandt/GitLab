@@ -500,7 +500,7 @@ module Gitlab
       end
 
       # Return total diverging commits count
-      def diverging_commit_count(from, to, max_count:)
+      def diverging_commit_count(from, to, max_count: 0)
         wrapped_gitaly_errors do
           gitaly_commit_client.diverging_commit_count(from, to, max_count: max_count)
         end
@@ -919,6 +919,12 @@ module Gitlab
       def delete_config(*keys)
         wrapped_gitaly_errors do
           gitaly_repository_client.delete_config(keys)
+        end
+      end
+
+      def disconnect_alternates
+        wrapped_gitaly_errors do
+          gitaly_repository_client.disconnect_alternates
         end
       end
 

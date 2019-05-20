@@ -14,11 +14,6 @@ module EE
       EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT = 10_000
       INSTANCE_REVIEW_MIN_USERS = 100
 
-      attr_accessor :elasticsearch_namespace_ids, :elasticsearch_project_ids
-
-      after_save -> { update_elasticsearch_containers(ElasticsearchIndexedNamespace, :namespace_id, elasticsearch_namespace_ids) }, on: [:create, :update]
-      after_save -> { update_elasticsearch_containers(ElasticsearchIndexedProject, :project_id, elasticsearch_project_ids) }, on: [:create, :update]
-
       belongs_to :file_template_project, class_name: "Project"
 
       ignore_column :minimum_mirror_sync_time
@@ -43,6 +38,14 @@ module EE
       validates :repository_size_limit,
                 presence: true,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+      validates :elasticsearch_shards,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
+
+      validates :elasticsearch_replicas,
+                presence: true,
+                numericality: { only_integer: true, greater_than: 0 }
 
       validates :elasticsearch_url,
                 presence: { message: "can't be blank when indexing is enabled" },
@@ -74,6 +77,8 @@ module EE
           allow_group_owners_to_manage_ldap: true,
           elasticsearch_aws: false,
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
+          elasticsearch_replicas: 1,
+          elasticsearch_shards: 5,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
@@ -95,24 +100,12 @@ module EE
       end
     end
 
-    def update_elasticsearch_containers(klass, attribute, container_ids)
-      return unless elasticsearch_limit_indexing?
+    def elasticsearch_namespace_ids
+      ElasticsearchIndexedNamespace.target_ids
+    end
 
-      container_ids = container_ids&.split(",")
-      return unless container_ids.present?
-
-      # Destroy any containers that have been removed. This runs callbacks, etc
-      # #rubocop:disable Cop/DestroyAll
-      klass.where.not(attribute => container_ids).each_batch do |batch, _index|
-        batch.destroy_all
-      end
-      # #rubocop:enable Cop/DestroyAll
-
-      # Disregard any duplicates that are already present
-      container_ids -= klass.pluck(attribute)
-
-      # Add new containers
-      container_ids.each { |id| klass.create(attribute => id) }
+    def elasticsearch_project_ids
+      ElasticsearchIndexedProject.target_ids
     end
 
     def elasticsearch_indexes_project?(project)

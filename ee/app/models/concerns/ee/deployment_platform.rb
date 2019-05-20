@@ -25,5 +25,13 @@ module EE
         .ancestor_clusters_for_clusterable(self, hierarchy_order: :desc)
         .last&.platform_kubernetes
     end
+
+    override :find_instance_cluster_platform_kubernetes
+    def find_instance_cluster_platform_kubernetes(environment: nil)
+      return super unless environment && feature_available?(:multiple_clusters)
+
+      ::Clusters::Instance.new.clusters.enabled.on_environment(environment)
+        .first&.platform_kubernetes
+    end
   end
 end

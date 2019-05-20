@@ -72,12 +72,13 @@ POST /projects/:id/approvals
 
 **Parameters:**
 
-| Attribute                                        | Type    | Required | Description                                                |
-| ------------------------------------------------ | ------- | -------- | ---------------------------------------------------------- |
-| `id`                                             | integer | yes      | The ID of a project                                        |
-| `approvals_before_merge`                         | integer | no       | How many approvals are required before an MR can be merged |
-| `reset_approvals_on_push`                        | boolean | no       | Reset approvals on a new push                              |
-| `disable_overriding_approvers_per_merge_request` | boolean | no       | Allow/Disallow overriding approvers per MR                 |
+| Attribute                                        | Type    | Required | Description                                                   |
+| ------------------------------------------------ | ------- | -------- | ----------------------------------------------------------    |
+| `id`                                             | integer | yes      | The ID of a project                                           |
+| `approvals_before_merge`                         | integer | no       | How many approvals are required before an MR can be merged    |
+| `reset_approvals_on_push`                        | boolean | no       | Reset approvals on a new push                                 |
+| `disable_overriding_approvers_per_merge_request` | boolean | no       | Allow/Disallow overriding approvers per MR                    |
+| `merge_requests_author_approval`                 | boolean | no       | Allow/Disallow authors be able to self approve merge requests |
 
 ```json
 {
@@ -113,7 +114,8 @@ POST /projects/:id/approvals
   ],
   "approvals_before_merge": 2,
   "reset_approvals_on_push": true,
-  "disable_overriding_approvers_per_merge_request": false
+  "disable_overriding_approvers_per_merge_request": false,
+  "merge_requests_author_approval": false
 }
 ```
 
@@ -352,11 +354,12 @@ POST /projects/:id/merge_requests/:merge_request_iid/approve
 
 **Parameters:**
 
-| Attribute           | Type    | Required | Description         |
-|---------------------|---------|----------|---------------------|
-| `id`                | integer | yes      | The ID of a project |
-| `merge_request_iid` | integer | yes      | The IID of MR       |
-| `sha`               | string  | no       | The HEAD of the MR  |
+| Attribute           | Type    | Required | Description             |
+|---------------------|---------|----------|-------------------------|
+| `id`                | integer | yes      | The ID of a project     |
+| `merge_request_iid` | integer | yes      | The IID of MR           |
+| `sha`               | string  | no       | The HEAD of the MR      |
+| `approval_password` **[STARTER]** | string  | no      | Current user's password. Required if [**Require user password to approve**](../user/project/merge_requests/merge_request_approvals.md#require-authentication-when-approving-a-merge-request-starter) is enabled in the project settings. |
 
 The `sha` parameter works in the same way as
 when [accepting a merge request](merge_requests.md#accept-mr): if it is passed, then it must

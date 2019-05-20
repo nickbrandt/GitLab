@@ -14,7 +14,7 @@
 }
 
 .member {
-  &.is-overriden {
+  &.is-overridden {
     .btn-ldap-override {
       display: none !important;
     }
@@ -130,9 +130,6 @@
 
 .members-ldap {
   align-self: center;
-  height: 100%;
-  margin-right: 10px;
-  margin-left: -49px;
 }
 
 .alert-member-ldap {

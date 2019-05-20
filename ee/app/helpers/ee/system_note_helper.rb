@@ -16,7 +16,9 @@ module EE
       'issue_removed_from_epic' => 'epic',
       'issue_changed_epic' => 'epic',
       'epic_date_changed' => 'calendar',
-      'weight' => 'weight'
+      'weight' => 'weight',
+      'relate_epic' => 'epic',
+      'unrelate_epic' => 'epic'
     }.freeze
 
     override :system_note_icon_name

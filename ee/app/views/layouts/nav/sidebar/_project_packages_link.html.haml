@@ -1,0 +1,12 @@
+- if project_nav_tab? :packages
+  = nav_link(controller: %w[projects/packages/packages]) do
+    = link_to project_packages_path(@project) do
+      .nav-icon-container
+        = sprite_icon('package')
+      %span.nav-item-name
+        = _('Packages')
+    %ul.sidebar-sub-level-items.is-fly-out-only
+      = nav_link(controller: %w[projects/packages/packages], html_options: { class: "fly-out-top-item" } ) do
+        = link_to project_packages_path(@project) do
+          %strong.fly-out-top-item-name
+            = _('Packages')

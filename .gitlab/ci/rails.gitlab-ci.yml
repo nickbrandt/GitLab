@@ -87,7 +87,7 @@
 .rspec-metadata-pg-10: &rspec-metadata-pg-10
   <<: *rspec-metadata
   <<: *use-pg-10
-  image: "dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.5.3-golang-1.11-git-2.21-chrome-73.0-node-10.x-yarn-1.12-postgresql-10-graphicsmagick-1.3.29"
+  image: "dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.6.3-golang-1.11-git-2.21-chrome-73.0-node-10.x-yarn-1.12-postgresql-10-graphicsmagick-1.3.29"
 
 .rspec-metadata-mysql: &rspec-metadata-mysql
   <<: *rspec-metadata
@@ -109,7 +109,8 @@
     - git fetch https://gitlab.com/gitlab-org/gitlab-ee.git v9.3.0-ee
     - git checkout -f FETCH_HEAD
     - sed -i "s/gem 'oj', '~> 2.17.4'//" Gemfile
-    - bundle update google-protobuf grpc
+    - sed -i "s/gem 'bootsnap', '~> 1.0.0'/gem 'bootsnap'/" Gemfile
+    - bundle update google-protobuf grpc bootsnap
     - bundle install $BUNDLE_INSTALL_FLAGS
     - date
     - cp config/gitlab.yml.example config/gitlab.yml
@@ -184,7 +185,7 @@ static-analysis:
   script:
     - scripts/static-analysis
   cache:
-    key: "debian-stretch-ruby-2.5.3-node-10.x-and-rubocop"
+    key: "debian-stretch-ruby-2.6.3-node-10.x-and-rubocop"
     paths:
       - vendor/ruby
       - .yarn-cache/
@@ -336,27 +337,26 @@ coverage:
   <<: *rspec-metadata-ee
   <<: *use-mysql-with-elasticsearch
 
-.rspec-geo-pg-9-6: &rspec-metadata-pg-geo-9-6
+.rspec-geo: &rspec-metadata-geo
   <<: *rspec-metadata
-  <<: *use-pg-9-6
   stage: test
   script:
-    - export NO_KNAPSACK=1
-    - export CACHE_CLASSES=true
+    - JOB_NAME=( $CI_JOB_NAME )
+    - TEST_TOOL=${JOB_NAME[0]}
+    - export KNAPSACK_TEST_FILE_PATTERN="ee/spec/**{,/*/**}/*_spec.rb" KNAPSACK_GENERATE_REPORT=true CACHE_CLASSES=true
+    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
+    - cp ${EE_KNAPSACK_RSPEC_SUITE_REPORT_PATH} ${KNAPSACK_REPORT_PATH}
     - source scripts/prepare_postgres_fdw.sh
     - scripts/gitaly-test-spawn
-    - bundle exec rspec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo ee/spec/
+    - knapsack rspec "-Ispec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo"
+
+.rspec-geo-pg-9-6: &rspec-metadata-pg-geo-9-6
+  <<: *rspec-metadata-geo
+  <<: *use-pg-9-6
 
 .rspec-geo-pg-10-2: &rspec-metadata-pg-geo-10-2
-  <<: *rspec-metadata
+  <<: *rspec-metadata-geo
   <<: *use-pg-10-2
-  stage: test
-  script:
-    - export NO_KNAPSACK=1
-    - export CACHE_CLASSES=true
-    - source scripts/prepare_postgres_fdw.sh
-    - scripts/gitaly-test-spawn
-    - bundle exec rspec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo ee/spec/
 
 .migration-paths-upgrade-ce-to-ee: &migration-paths-upgrade-ce-to-ee
   extends: .dedicated-no-docs-and-no-qa-pull-cache-job
@@ -387,27 +387,29 @@ rspec-mysql-ee:
   <<: *only-schedules-master
   parallel: 10
 
-rspec-pg geo:
+rspec-pg-ee geo:
   <<: *rspec-metadata-pg-geo-9-6
+  parallel: 3
   except:
     - /(^geo[\/-].*|.*-geo$)/
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-rspec-pg-10 geo:
+rspec-pg-10-ee geo:
   <<: *rspec-metadata-pg-geo-10-2
+  parallel: 3
   except:
     - /(^geo[\/-].*|.*-geo$)/
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-quick-rspec-pg geo:
+quick-rspec-pg-ee geo:
   <<: *rspec-metadata-pg-geo-9-6
   stage: quick-test
   only:
     - /(^geo[\/-].*|.*-geo$)/
 
-quick-rspec-pg-10 geo:
+quick-rspec-pg-10-ee geo:
   <<: *rspec-metadata-pg-geo-10-2
   stage: quick-test
   only:

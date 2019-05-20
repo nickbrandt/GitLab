@@ -45,16 +45,63 @@ describe GroupsController do
             end.to change { group.reload.file_template_project_id }.to(project.id)
           end
 
-          it 'updates insight project_id successfully' do
-            project = create(:project, group: group)
+          context 'with insights feature' do
+            let(:project) { create(:project, group: group) }
 
-            stub_licensed_features(insights: true)
+            before do
+              stub_licensed_features(insights: true)
+            end
 
-            post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
+            it 'updates insight project_id successfully' do
+              post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
 
-            expect(group.reload.insight.project).to eq(project)
+              expect(group.reload.insight.project).to eq(project)
+            end
+
+            it 'removes insight successfully' do
+              insight = group.create_insight(project: project)
+
+              post :update, params: { id: group.to_param, group: { insight_attributes: { id: insight.id, project_id: '' } } }
+
+              expect(group.reload.insight).to be_nil
+            end
           end
         end
+      end
+    end
+  end
+
+  context 'with sso enforcement enabled' do
+    let(:group) { create(:group, :private) }
+    let!(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+    let(:identity) { create(:group_saml_identity, saml_provider: saml_provider) }
+    let(:guest_user) { identity.user }
+
+    before do
+      group.add_guest(guest_user)
+      sign_in(guest_user)
+    end
+
+    context 'without SAML session' do
+      it 'prevents access to group resources' do
+        get :show, params: { id: group }
+
+        expect(response).to have_gitlab_http_status(302)
+        expect(response.location).to match(/groups\/#{group.to_param}\/-\/saml\/sso\?token=/)
+      end
+    end
+
+    context 'with active SAML session' do
+      before do
+        Gitlab::Session.with_session(@request.session) do
+          Gitlab::Auth::GroupSaml::SsoEnforcer.new(saml_provider).update_session
+        end
+      end
+
+      it 'allows access to group resources' do
+        get :show, params: { id: group }
+
+        expect(response).to have_gitlab_http_status(200)
       end
     end
   end
@@ -132,7 +179,6 @@ describe GroupsController do
         end
       end
     end
-
     describe 'GET #details' do
       subject { get :details, params: { id: group.to_param } }
 

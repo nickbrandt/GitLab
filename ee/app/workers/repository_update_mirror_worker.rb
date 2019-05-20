@@ -35,8 +35,10 @@ class RepositoryUpdateMirrorWorker
     fail_mirror(project, ex.message)
     raise UpdateError, "#{ex.class}: #{ex.message}"
   ensure
-    if !lease.exists? && Gitlab::Mirror.reschedule_immediately? && lease.try_obtain
-      UpdateAllMirrorsWorker.perform_async
+    unless Feature.enabled?(:update_all_mirrors_worker_rescheduling)
+      if !lease.exists? && lease.try_obtain && Gitlab::Mirror.reschedule_immediately?
+        UpdateAllMirrorsWorker.perform_async
+      end
     end
   end
 

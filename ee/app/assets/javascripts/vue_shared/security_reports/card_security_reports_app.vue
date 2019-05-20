@@ -115,13 +115,32 @@ export default {
       required: false,
       default: () => ({}),
     },
-    canCreateFeedback: {
-      type: Boolean,
-      required: true,
-    },
     canCreateIssue: {
       type: Boolean,
       required: true,
+    },
+    canCreateMergeRequest: {
+      type: Boolean,
+      required: true,
+    },
+    canDismissVulnerability: {
+      type: Boolean,
+      required: true,
+    },
+    createVulnerabilityFeedbackIssuePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackMergeRequestPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackDismissalPath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   computed: {
@@ -173,8 +192,14 @@ export default {
         :dependency-scanning-help-path="dependencyScanningHelpPath"
         :vulnerability-feedback-path="vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-        :can-create-feedback="canCreateFeedback"
+        :create-vulnerability-feedback-issue-path="createVulnerabilityFeedbackIssuePath"
+        :create-vulnerability-feedback-merge-request-path="
+          createVulnerabilityFeedbackMergeRequestPath
+        "
+        :create-vulnerability-feedback-dismissal-path="createVulnerabilityFeedbackDismissalPath"
         :can-create-issue="canCreateIssue"
+        :can-create-merge-request="canCreateMergeRequest"
+        :can-dismiss-vulnerability="canDismissVulnerability"
         always-open
       />
     </div>

@@ -446,6 +446,28 @@ The disadvantage of this:
   port `render_if_exists` to CE.
 - If we have typos in the partial name, it would be silently ignored.
 
+
+##### Caveats
+
+The `render_if_exists` view path argument must be relative to `app/views/` and `ee/app/views`.
+Resolving an EE template path that is relative to the CE view path will not work.
+
+```haml
+- # app/views/projects/index.html.haml
+
+= render_if_exists 'button' # Will not render `ee/app/views/projects/_button` and will quietly fail
+= render_if_exists 'projects/button' # Will render `ee/app/views/projects/_button`
+```
+
+You should not explicitly set render options like `partial` or provide a `locals` hash.
+The first argument should be a path string and the second can be a hash replacing `locals`.
+
+```ruby
+render partial: 'projects/button', locals: { project: project }
+# becomes
+render_if_exists 'projects/button', project: project
+```
+
 #### Using `render_ce`
 
 For `render` and `render_if_exists`, they search for the EE partial first,
@@ -888,7 +910,7 @@ information on managing page-specific javascript within EE.
 ### script tag
 
 #### Child Component only used in EE
-To seperate Vue template differences we should [async import the components](https://vuejs.org/v2/guide/components-dynamic-async.html#Async-Components).
+To separate Vue template differences we should [async import the components](https://vuejs.org/v2/guide/components-dynamic-async.html#Async-Components).
 
 Doing this allows for us to load the correct component in EE whilst in CE
 we can load a empty component that renders nothing. This code **should**

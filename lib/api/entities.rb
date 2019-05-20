@@ -542,10 +542,15 @@ module API
     class IssueBasic < ProjectEntity
       expose :closed_at
       expose :closed_by, using: Entities::UserBasic
-      expose :labels do |issue|
-        # Avoids an N+1 query since labels are preloaded
-        issue.labels.map(&:title).sort
+
+      expose :labels do |issue, options|
+        if options[:with_labels_details]
+          ::API::Entities::LabelBasic.represent(issue.labels.sort_by(&:title))
+        else
+          issue.labels.map(&:title).sort
+        end
       end
+
       expose :milestone, using: Entities::Milestone
       expose :assignees, :author, using: Entities::UserBasic
 
@@ -572,6 +577,14 @@ module API
 
     class Issue < IssueBasic
       include ::API::Helpers::RelatedResourcesHelpers
+
+      expose(:has_tasks) do |issue, _|
+        !issue.task_list_items.empty?
+      end
+
+      expose :task_status, if: -> (issue, _) do
+        !issue.task_list_items.empty?
+      end
 
       expose :_links do
         expose :self do |issue|
@@ -878,7 +891,7 @@ module API
       expose :push_event_payload,
         as: :push_data,
         using: PushEventPayload,
-        if: -> (event, _) { event.push? }
+        if: -> (event, _) { event.push_action? }
 
       expose :author_username do |event, options|
         event.author&.username
@@ -1156,21 +1169,32 @@ module API
       end
     end
 
-    class Release < TagRelease
+    class Release < Grape::Entity
       expose :name
+      expose :tag, as: :tag_name, if: lambda { |_, _| can_download_code? }
+      expose :description
       expose :description_html do |entity|
         MarkupHelper.markdown_field(entity, :description)
       end
       expose :created_at
       expose :author, using: Entities::UserBasic, if: -> (release, _) { release.author.present? }
-      expose :commit, using: Entities::Commit
+      expose :commit, using: Entities::Commit, if: lambda { |_, _| can_download_code? }
 
       expose :assets do
-        expose :assets_count, as: :count
-        expose :sources, using: Entities::Releases::Source
+        expose :assets_count, as: :count do |release, _|
+          assets_to_exclude = can_download_code? ? [] : [:sources]
+          release.assets_count(except: assets_to_exclude)
+        end
+        expose :sources, using: Entities::Releases::Source, if: lambda { |_, _| can_download_code? }
         expose :links, using: Entities::Releases::Link do |release, options|
           release.links.sorted
         end
+      end
+
+      private
+
+      def can_download_code?
+        Ability.allowed?(options[:current_user], :download_code, object.project)
       end
     end
 
@@ -1277,7 +1301,7 @@ module API
     end
 
     class Variable < Grape::Entity
-      expose :key, :value
+      expose :variable_type, :key, :value
       expose :protected?, as: :protected, if: -> (entity, _) { entity.respond_to?(:protected?) }
     end
 

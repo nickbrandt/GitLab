@@ -109,48 +109,63 @@ describe('Approvals ApproversSelect', () => {
     search();
   });
 
-  it('searches with text and skips given ids', done => {
-    factory();
-
+  describe('with search term', () => {
     const term = 'lorem';
 
-    waitForEvent($input, 'select2-loaded')
-      .then(() => {
-        expect(Api.groups).toHaveBeenCalledWith(term, { skip_groups: [] });
-        expect(Api.approverUsers).toHaveBeenCalledWith(term, {
-          skip_users: [],
-          project_id: TEST_PROJECT_ID,
-        });
-      })
-      .then(done)
-      .catch(done.fail);
+    beforeEach(done => {
+      factory();
 
-    search(term);
+      waitForEvent($input, 'select2-loaded')
+        .then(done)
+        .catch(done.fail);
+
+      search(term);
+    });
+
+    it('fetches all available groups', () => {
+      expect(Api.groups).toHaveBeenCalledWith(term, { skip_groups: [], all_available: true });
+    });
+
+    it('fetches users', () => {
+      expect(Api.approverUsers).toHaveBeenCalledWith(term, {
+        skip_users: [],
+        project_id: TEST_PROJECT_ID,
+      });
+    });
   });
 
-  it('searches and skips given groups and users', done => {
+  describe('with empty seach term and skips', () => {
     const skipGroupIds = [7, 8];
     const skipUserIds = [9, 10];
 
-    factory({
-      propsData: {
-        skipGroupIds,
-        skipUserIds,
-      },
+    beforeEach(done => {
+      factory({
+        propsData: {
+          skipGroupIds,
+          skipUserIds,
+        },
+      });
+
+      waitForEvent($input, 'select2-loaded')
+        .then(done)
+        .catch(done.fail);
+
+      search();
     });
 
-    waitForEvent($input, 'select2-loaded')
-      .then(() => {
-        expect(Api.groups).toHaveBeenCalledWith('', { skip_groups: skipGroupIds });
-        expect(Api.approverUsers).toHaveBeenCalledWith('', {
-          skip_users: skipUserIds,
-          project_id: TEST_PROJECT_ID,
-        });
-      })
-      .then(done)
-      .catch(done.fail);
+    it('skips groups and does not fetch all available', () => {
+      expect(Api.groups).toHaveBeenCalledWith('', {
+        skip_groups: skipGroupIds,
+        all_available: false,
+      });
+    });
 
-    search();
+    it('skips users', () => {
+      expect(Api.approverUsers).toHaveBeenCalledWith('', {
+        skip_users: skipUserIds,
+        project_id: TEST_PROJECT_ID,
+      });
+    });
   });
 
   it('emits input when data changes', done => {

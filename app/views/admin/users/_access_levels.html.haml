@@ -22,12 +22,7 @@
       %p.light
         Regular users have access to their groups and projects
 
-      - if license_allows_auditor_user?
-        = f.radio_button :access_level, :auditor, disabled: editing_current_user
-        = label_tag :auditor, class: 'font-weight-bold' do
-          Auditor
-        %p.light
-          Auditors have read-only access to all groups, projects and users
+      = render_if_exists 'admin/users/auditor_access_level_radio', f: f, disabled: editing_current_user
 
       = f.radio_button :access_level, :admin, disabled: editing_current_user
       = label_tag :admin, class: 'font-weight-bold' do

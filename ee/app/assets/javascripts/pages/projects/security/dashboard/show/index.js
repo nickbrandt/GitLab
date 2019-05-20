@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     refId,
     refPath,
     pipelineId,
-    canCreateFeedback,
-    canCreateIssue,
+    createVulnerabilityFeedbackIssuePath,
+    createVulnerabilityFeedbackMergeRequestPath,
+    createVulnerabilityFeedbackDismissalPath,
     ...rest
   } = securityTab.dataset;
 
@@ -39,8 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         props: {
           pipelineId: parsedPipelineId,
           hasPipelineData: parseBoolean(hasPipelineData),
-          canCreateIssue: parseBoolean(canCreateIssue),
-          canCreateFeedback: parseBoolean(canCreateFeedback),
+          canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
+          canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
+          canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
+          createVulnerabilityFeedbackIssuePath,
+          createVulnerabilityFeedbackMergeRequestPath,
+          createVulnerabilityFeedbackDismissalPath,
           triggeredBy: {
             avatarPath: userAvatarPath,
             name: userName,

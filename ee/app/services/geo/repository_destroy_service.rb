@@ -19,7 +19,11 @@ module Geo
 
     def execute
       destroy_project
-      delete_project_registry_entries
+      destroy_registry_entries
+    rescue => e
+      log_error('Could not destroy repository', e, project_id: id, shard: repository_storage, disk_path: disk_path)
+      destroy_registry_entries
+      raise
     end
 
     private
@@ -29,7 +33,7 @@ module Geo
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def delete_project_registry_entries
+    def destroy_registry_entries
       ::Geo::ProjectRegistry.where(project_id: id).delete_all
 
       log_info("Project registry entry removed", project_id: id)

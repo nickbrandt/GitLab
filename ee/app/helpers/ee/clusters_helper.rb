@@ -9,17 +9,14 @@ module EE
       clusterable.feature_available?(:multiple_clusters)
     end
 
-    override :show_cluster_health_graphs?
-    def show_cluster_health_graphs?(cluster)
-      cluster.project_type? && cluster.project.feature_available?(:cluster_health)
+    def show_cluster_health_graphs?
+      clusterable.feature_available?(:cluster_health)
     end
 
     def cluster_health_data(cluster)
-      project = cluster.project
-
       {
-        'metrics-endpoint': metrics_project_cluster_path(project, cluster, format: :json),
-        'clusters-path': project_clusters_path(project),
+        'clusters-path': clusterable.index_path,
+        'metrics-endpoint': clusterable.metrics_cluster_path(cluster, format: :json),
         'documentation-path': help_page_path('administration/monitoring/prometheus/index.md'),
         'empty-getting-started-svg-path': image_path('illustrations/monitoring/getting_started.svg'),
         'empty-loading-svg-path': image_path('illustrations/monitoring/loading.svg'),

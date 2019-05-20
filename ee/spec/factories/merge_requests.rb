@@ -8,6 +8,16 @@ FactoryBot.modify do
       end
     end
 
+    trait :on_train do
+      transient do
+        train_creator { author }
+      end
+
+      after :create do |merge_request, evaluator|
+        merge_request.get_on_train!(evaluator.train_creator)
+      end
+    end
+
     transient do
       approval_groups []
       approval_users []

@@ -9,5 +9,9 @@ module EE
     def support_bot?
       false
     end
+
+    def alert_bot?
+      false
+    end
   end
 end
