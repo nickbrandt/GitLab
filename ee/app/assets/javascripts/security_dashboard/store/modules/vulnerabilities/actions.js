@@ -5,6 +5,8 @@ import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 
+const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
+
 export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_ENDPOINT, endpoint);
 };
@@ -133,14 +135,15 @@ export const receiveCreateIssueError = ({ commit }, { flashError }) => {
   }
 };
 
-export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError }) => {
+export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, comment }) => {
   dispatch('requestDismissVulnerability');
 
   axios
     .post(vulnerability.create_vulnerability_feedback_dismissal_path, {
       vulnerability_feedback: {
-        feedback_type: 'dismissal',
         category: vulnerability.report_type,
+        comment,
+        feedback_type: 'dismissal',
         project_fingerprint: vulnerability.project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
@@ -150,6 +153,7 @@ export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError }
     })
     .then(({ data }) => {
       const { id } = vulnerability;
+      dispatch('closeDismissalCommentBox');
       dispatch('receiveDismissVulnerabilitySuccess', { id, data });
     })
     .catch(() => {
@@ -163,6 +167,7 @@ export const requestDismissVulnerability = ({ commit }) => {
 
 export const receiveDismissVulnerabilitySuccess = ({ commit }, payload) => {
   commit(types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS, payload);
+  hideModal();
 };
 
 export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => {
@@ -198,6 +203,7 @@ export const requestUndoDismiss = ({ commit }) => {
 
 export const receiveUndoDismissSuccess = ({ commit }, payload) => {
   commit(types.RECEIVE_REVERT_DISMISSAL_SUCCESS, payload);
+  hideModal();
 };
 
 export const receiveUndoDismissError = ({ commit }, { flashError }) => {
@@ -298,6 +304,14 @@ export const receiveVulnerabilitiesHistorySuccess = ({ commit }, { data }) => {
 
 export const receiveVulnerabilitiesHistoryError = ({ commit }) => {
   commit(types.RECEIVE_VULNERABILITIES_HISTORY_ERROR);
+};
+
+export const openDismissalCommentBox = ({ commit }) => {
+  commit(types.OPEN_DISMISSAL_COMMENT_BOX);
+};
+
+export const closeDismissalCommentBox = ({ commit }) => {
+  commit(types.CLOSE_DISMISSAL_COMMENT_BOX);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

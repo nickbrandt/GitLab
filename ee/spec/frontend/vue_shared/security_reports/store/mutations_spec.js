@@ -452,26 +452,26 @@ describe('security reports mutations', () => {
     });
   });
 
-  describe('REQUEST_DISMISS_ISSUE', () => {
+  describe('REQUEST_DISMISS_VULNERABILITY', () => {
     it('sets isDismissingIssue prop to true and resets error', () => {
-      mutations[types.REQUEST_DISMISS_ISSUE](stateCopy);
+      mutations[types.REQUEST_DISMISS_VULNERABILITY](stateCopy);
 
       expect(stateCopy.modal.isDismissingIssue).toEqual(true);
       expect(stateCopy.modal.error).toBeNull();
     });
   });
 
-  describe('RECEIVE_DISMISS_ISSUE_SUCCESS', () => {
+  describe('RECEIVE_DISMISS_VULNERABILITY_SUCCESS', () => {
     it('sets isDismissingIssue prop to false', () => {
-      mutations[types.RECEIVE_DISMISS_ISSUE_SUCCESS](stateCopy);
+      mutations[types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](stateCopy);
 
       expect(stateCopy.modal.isDismissingIssue).toEqual(false);
     });
   });
 
-  describe('RECEIVE_DISMISS_ISSUE_ERROR', () => {
+  describe('RECEIVE_DISMISS_VULNERABILITY_ERROR', () => {
     it('sets isDismissingIssue prop to false and sets error', () => {
-      mutations[types.RECEIVE_DISMISS_ISSUE_ERROR](stateCopy, 'error');
+      mutations[types.RECEIVE_DISMISS_VULNERABILITY_ERROR](stateCopy, 'error');
 
       expect(stateCopy.modal.isDismissingIssue).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');

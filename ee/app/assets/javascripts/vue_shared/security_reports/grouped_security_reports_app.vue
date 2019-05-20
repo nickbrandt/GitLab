@@ -250,10 +250,12 @@ export default {
       'setPipelineId',
       'setCanCreateIssuePermission',
       'setCanCreateFeedbackPermission',
-      'dismissIssue',
-      'revertDismissIssue',
+      'dismissVulnerability',
+      'revertDismissVulnerability',
       'createNewIssue',
       'createMergeRequest',
+      'openDismissalCommentBox',
+      'closeDismissalCommentBox',
     ]),
   },
 };
@@ -353,10 +355,12 @@ export default {
         :can-create-issue="canCreateIssue"
         :can-create-merge-request="canCreateMergeRequest"
         :can-dismiss-vulnerability="canDismissVulnerability"
-        @createNewIssue="createNewIssue"
+        @closeDismissalCommentBox="closeDismissalCommentBox()"
         @createMergeRequest="createMergeRequest"
-        @dismissIssue="dismissIssue"
-        @revertDismissIssue="revertDismissIssue"
+        @createNewIssue="createNewIssue"
+        @dismissVulnerability="dismissVulnerability"
+        @openDismissalCommentBox="openDismissalCommentBox()"
+        @revertDismissVulnerability="revertDismissVulnerability"
       />
     </div>
   </report-section>

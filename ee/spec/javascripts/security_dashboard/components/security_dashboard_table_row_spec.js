@@ -105,7 +105,7 @@ describe('Security Dashboard Table Row', () => {
     });
 
     it('should render a `DISMISSED` tag', () => {
-      expect(vm.$el.textContent).toContain('DISMISSED');
+      expect(vm.$el.textContent).toContain('dismissed');
     });
   });
 

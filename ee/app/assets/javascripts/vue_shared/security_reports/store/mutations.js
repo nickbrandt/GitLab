@@ -305,13 +305,13 @@ export default {
     Vue.set(state.modal, 'error', null);
   },
 
-  [types.REQUEST_DISMISS_ISSUE](state) {
+  [types.REQUEST_DISMISS_VULNERABILITY](state) {
     Vue.set(state.modal, 'isDismissingIssue', true);
     // reset error in case previous state was error
     Vue.set(state.modal, 'error', null);
   },
 
-  [types.RECEIVE_DISMISS_ISSUE_SUCCESS](state) {
+  [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state) {
     Vue.set(state.modal, 'isDismissingIssue', false);
   },
 
@@ -387,7 +387,7 @@ export default {
     }
   },
 
-  [types.RECEIVE_DISMISS_ISSUE_ERROR](state, error) {
+  [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
     Vue.set(state.modal, 'error', error);
     Vue.set(state.modal, 'isDismissingIssue', false);
   },
@@ -420,5 +420,11 @@ export default {
     state.isCreatingMergeRequest = false;
     Vue.set(state.modal, 'isCreatingMergeRequest', false);
     Vue.set(state.modal, 'error', error);
+  },
+  [types.OPEN_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isCommentingOnDismissal', true);
+  },
+  [types.CLOSE_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isCommentingOnDismissal', false);
   },
 };
