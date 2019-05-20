@@ -80,32 +80,32 @@ export default class GeoNodesStore {
         failureCount: 0,
       },
       repositories: {
-        totalCount: rawNodeDetails.repositories_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.repositories_synced_count || 0,
         failureCount: rawNodeDetails.repositories_failed_count || 0,
       },
       wikis: {
-        totalCount: rawNodeDetails.wikis_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.wikis_synced_count || 0,
         failureCount: rawNodeDetails.wikis_failed_count || 0,
       },
       repositoriesChecksummed: {
-        totalCount: rawNodeDetails.repositories_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.repositories_checksummed_count || 0,
         failureCount: rawNodeDetails.repositories_checksum_failed_count || 0,
       },
       wikisChecksummed: {
-        totalCount: rawNodeDetails.wikis_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.wikis_checksummed_count || 0,
         failureCount: rawNodeDetails.wikis_checksum_failed_count || 0,
       },
       verifiedRepositories: {
-        totalCount: rawNodeDetails.repositories_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.repositories_verified_count || 0,
         failureCount: rawNodeDetails.repositories_verification_failed_count || 0,
       },
       verifiedWikis: {
-        totalCount: rawNodeDetails.wikis_count || 0,
+        totalCount: rawNodeDetails.projects_count || 0,
         successCount: rawNodeDetails.wikis_verified_count || 0,
         failureCount: rawNodeDetails.wikis_verification_failed_count || 0,
       },

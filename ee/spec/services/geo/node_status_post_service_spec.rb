@@ -73,7 +73,7 @@ describe Geo::NodeStatusPostService, :geo do
         geo_node_id: secondary.id,
         status_message: nil,
         db_replication_lag_seconds: 0,
-        repositories_count: 10
+        projects_count: 10
       }))
     end
 
@@ -88,7 +88,7 @@ describe Geo::NodeStatusPostService, :geo do
         geo_node_id: secondary.id,
         status_message: nil,
         db_replication_lag_seconds: 0,
-        repositories_count: 10
+        projects_count: 10
       }))
     end
   end

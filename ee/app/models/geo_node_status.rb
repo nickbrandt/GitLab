@@ -23,8 +23,6 @@ class GeoNodeStatus < ApplicationRecord
 
   sha_attribute :storage_configuration_digest
 
-  # It's needed for backward compatibility as we expose them via public API
-  alias_attribute :wikis_count, :projects_count
   alias_attribute :repositories_count, :projects_count
 
   # Be sure to keep this consistent with Prometheus naming conventions
