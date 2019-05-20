@@ -88,6 +88,7 @@ project:
 - reviews
 - incident_management_setting
 - merge_trains
+- designs
 prometheus_metrics:
 - project
 - prometheus_alerts

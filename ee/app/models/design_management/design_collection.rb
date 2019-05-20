@@ -20,7 +20,7 @@ module DesignManagement
     end
 
     def repository
-      @repository ||= ::DesignManagement::Repository.new(project)
+      project.design_repository
     end
   end
 end

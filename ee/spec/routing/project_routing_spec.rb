@@ -28,4 +28,12 @@ describe 'EE-specific project routing' do
       expect(get('/gitlab/gitlabhq/pipelines/12/security')).to route_to('projects/pipelines#security', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '12')
     end
   end
+
+  describe Projects::DesignsController, 'routing' do
+    it 'to #show' do
+      expect(get('/gitlab/gitlabhq/-/designs/1/master')).to route_to('projects/designs#show', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '1', ref: 'master')
+      expect(get('/gitlab/gitlabhq/-/designs/1/my/branch')).to route_to('projects/designs#show', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '1', ref: 'my/branch')
+      expect(get('/gitlab/gitlabhq/-/designs/1/f166f5c7afaed9e1236e4e5965585f235795db4c3f45e8a9f6ea9dde098c')).to route_to('projects/designs#show', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '1', ref: 'f166f5c7afaed9e1236e4e5965585f235795db4c3f45e8a9f6ea9dde098c')
+    end
+  end
 end
