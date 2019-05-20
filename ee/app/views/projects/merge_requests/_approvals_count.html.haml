@@ -2,5 +2,5 @@
   %li.d-none.d-sm-inline-block.has-tooltip{ title: _('Approvals'), class: ('text-success' if merge_request.approved?) }
     = sprite_icon('approval', size: 16, css_class: 'align-middle')
     = merge_request.approvals_given
-    &nbsp;of&nbsp;
+    %span of
     = merge_request.approvals_required
