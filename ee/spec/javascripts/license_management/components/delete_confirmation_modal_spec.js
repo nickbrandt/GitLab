@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import DeleteConfirmationModal from 'ee/vue_shared/license_management/components/delete_confirmation_modal.vue';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { approvedLicense } from 'ee_spec/license_management/mock_data';
 

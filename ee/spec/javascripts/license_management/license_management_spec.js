@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import LicenseManagement from 'ee/vue_shared/license_management/license_management.vue';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { approvedLicense, blacklistedLicense } from 'ee_spec/license_management/mock_data';
 
