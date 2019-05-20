@@ -6,6 +6,7 @@ describe 'Path Locks', :js do
   let(:tree_path) { project_tree_path(project, project.repository.root_ref) }
 
   before do
+    stub_feature_flags(vue_file_list: false)
     allow(project).to receive(:feature_available?).with(:file_locks) { true }
 
     project.add_maintainer(user)
