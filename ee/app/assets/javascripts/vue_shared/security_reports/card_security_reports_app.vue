@@ -127,6 +127,21 @@ export default {
       type: Boolean,
       required: true,
     },
+    createVulnerabilityFeedbackIssuePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackMergeRequestPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    createVulnerabilityFeedbackDismissalPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     headline() {
@@ -177,6 +192,11 @@ export default {
         :dependency-scanning-help-path="dependencyScanningHelpPath"
         :vulnerability-feedback-path="vulnerabilityFeedbackPath"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
+        :create-vulnerability-feedback-issue-path="createVulnerabilityFeedbackIssuePath"
+        :create-vulnerability-feedback-merge-request-path="
+          createVulnerabilityFeedbackMergeRequestPath
+        "
+        :create-vulnerability-feedback-dismissal-path="createVulnerabilityFeedbackDismissalPath"
         :can-create-issue="canCreateIssue"
         :can-create-merge-request="canCreateMergeRequest"
         :can-dismiss-vulnerability="canDismissVulnerability"
