@@ -247,6 +247,18 @@ msgstr ""
 msgid "%{service_title} settings saved, but not activated."
 msgstr ""
 
+msgid "%{size} GiB"
+msgstr ""
+
+msgid "%{size} KiB"
+msgstr ""
+
+msgid "%{size} MiB"
+msgstr ""
+
+msgid "%{size} bytes"
+msgstr ""
+
 msgid "%{spammable_titlecase} was submitted to Akismet successfully."
 msgstr ""
 
@@ -5554,6 +5566,9 @@ msgid "Found errors in your .gitlab-ci.yml:"
 msgstr ""
 
 msgid "Free Trial of GitLab.com Gold"
+msgstr ""
+
+msgid "Friday"
 msgstr ""
 
 msgid "From %{providerTitle}"
@@ -12942,6 +12957,9 @@ msgstr ""
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
 msgstr ""
 
+msgid "Thursday"
+msgstr ""
+
 msgid "Time before an issue gets scheduled"
 msgstr ""
 
@@ -13406,6 +13424,9 @@ msgid "Try to fork again"
 msgstr ""
 
 msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
+msgstr ""
+
+msgid "Tuesday"
 msgstr ""
 
 msgid "Turn on Service Desk"
@@ -14090,6 +14111,9 @@ msgid "Webhooks Help"
 msgstr ""
 
 msgid "Webhooks allow you to trigger a URL if, for example, new code is pushed or a new issue is created. You can configure webhooks to listen for specific events like pushes, issues or merge requests. Group webhooks will apply to all projects in a group, allowing you to standardize webhook functionality across your entire group."
+msgstr ""
+
+msgid "Wednesday"
 msgstr ""
 
 msgid "Weeks"
