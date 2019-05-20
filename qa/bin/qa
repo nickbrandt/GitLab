@@ -3,5 +3,5 @@
 require_relative '../qa'
 
 QA::Scenario
-  .const_get(ARGV.shift)
+  .const_get(ARGV.shift, false)
   .launch!(ARGV)
