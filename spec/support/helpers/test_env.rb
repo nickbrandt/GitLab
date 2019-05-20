@@ -135,7 +135,7 @@ module TestEnv
 
   def clean_gitlab_test_path
     Dir[TMP_TEST_PATH].each do |entry|
-      if File.basename(entry) =~ /\A(gitlab-(test|test_bare|test-fork|test-fork_bare))\z/
+      unless test_dirs.include?(File.basename(entry))
         FileUtils.rm_rf(entry)
       end
     end
