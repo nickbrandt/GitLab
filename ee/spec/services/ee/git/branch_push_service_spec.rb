@@ -31,7 +31,7 @@ describe Git::BranchPushService do
       end
     end
 
-    context 'ElasticSearch indexing' do
+    context 'ElasticSearch indexing', :elastic do
       before do
         stub_ee_application_setting(elasticsearch_indexing?: true)
       end
