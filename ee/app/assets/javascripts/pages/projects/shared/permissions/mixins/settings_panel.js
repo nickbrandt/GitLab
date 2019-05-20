@@ -1,3 +1,5 @@
+import { isEE } from '~/lib/utils/common_utils';
+
 export default {
   props: {
     packagesAvailable: {
@@ -9,6 +11,11 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+  },
+  computed: {
+    isEE() {
+      return isEE();
     },
   },
   data() {
