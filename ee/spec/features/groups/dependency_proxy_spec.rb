@@ -16,7 +16,7 @@ describe 'Group Dependency Proxy' do
     stub_licensed_features(dependency_proxy: true)
   end
 
-  describe 'feature settings', :js do
+  describe 'feature settings' do
     context 'when not logged in' do
       it 'does not show the feature settings' do
         visit path
@@ -27,74 +27,89 @@ describe 'Group Dependency Proxy' do
     end
 
     context 'when logged in as group owner' do
-      before do
-        sign_in(owner)
-        visit path
-      end
-
-      it 'toggle defaults to disabled' do
-        page.within('.js-dependency-proxy-toggle-area') do
-          expect(find('.js-project-feature-toggle-input', visible: false).value).to eq('false')
-        end
-      end
-
-      context 'when disabled' do
-        it 'does not show the proxy URL' do
-          expect(page).not_to have_css('.js-dependency-proxy-url')
-        end
-      end
-
-      context 'when enabled by owner' do
+      context 'feature is available', :js do
         before do
-          page.within('.edit_dependency_proxy_group_setting') do
-            find('.js-project-feature-toggle').click
-          end
-
-          click_button('Save changes')
-          wait_for_requests
+          sign_in(owner)
           visit path
         end
 
-        it 'shows the proxy URL' do
-          page.within('.edit_dependency_proxy_group_setting') do
-            expect(find('.js-dependency-proxy-url').value).to have_content('/dependency_proxy/containers')
+        it 'toggles defaults to disabled' do
+          page.within('.js-dependency-proxy-toggle-area') do
+            expect(find('.js-project-feature-toggle-input', visible: false).value).to eq('false')
           end
         end
 
-        context 'then when logged in as group developer' do
+        context 'when disabled' do
+          it 'does not show the proxy URL' do
+            expect(page).not_to have_css('.js-dependency-proxy-url')
+          end
+        end
+
+        context 'when enabled by owner' do
           before do
-            sign_in(developer)
+            page.within('.edit_dependency_proxy_group_setting') do
+              find('.js-project-feature-toggle').click
+            end
+
+            click_button('Save changes')
+            wait_for_requests
             visit path
           end
 
-          it 'does not show the feature toggle' do
-            expect(page).not_to have_css('.js-dependency-proxy-toggle-area')
+          it 'shows the proxy URL' do
+            page.within('.edit_dependency_proxy_group_setting') do
+              expect(find('.js-dependency-proxy-url').value).to have_content('/dependency_proxy/containers')
+            end
           end
 
-          it 'shows the proxy URL' do
-            expect(find('.js-dependency-proxy-url').value).to have_content('/dependency_proxy/containers')
+          context 'then when logged in as group developer' do
+            before do
+              sign_in(developer)
+              visit path
+            end
+
+            it 'does not show the feature toggle but shows the proxy URL' do
+              expect(page).not_to have_css('.js-dependency-proxy-toggle-area')
+              expect(find('.js-dependency-proxy-url').value).to have_content('/dependency_proxy/containers')
+            end
           end
         end
       end
-    end
 
-    context 'when feature is not available because of license', js: false do
-      it 'renders 404 page' do
-        stub_licensed_features(dependency_proxy: false)
+      context 'feature is not avaible' do
+        before do
+          sign_in(owner)
+        end
 
-        visit path
+        context 'group is private' do
+          let(:group) { create(:group, :private) }
 
-        expect(page).to have_gitlab_http_status(404)
-      end
-    end
+          it 'informs user that feature is only available for public groups' do
+            visit path
 
-    context 'when feature is disabled globally', js: false do
-      it 'renders 404 page' do
-        disable_feature
+            expect(page).to have_content('Dependency proxy feature is limited to public groups for now.')
+          end
+        end
 
-        visit path
+        context 'feature is not supported by the license' do
+          it 'renders 404 page' do
+            stub_licensed_features(dependency_proxy: false)
 
-        expect(page).to have_gitlab_http_status(404)
+            visit path
+
+            expect(page).to have_gitlab_http_status(404)
+          end
+        end
+
+        context 'feature is disabled globally' do
+          it 'renders 404 page' do
+            disable_feature
+
+            visit path
+
+            expect(page).to have_gitlab_http_status(404)
+          end
+        end
       end
     end
   end

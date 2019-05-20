@@ -3912,6 +3912,9 @@ msgstr ""
 msgid "Dependency proxy URL"
 msgstr ""
 
+msgid "Dependency proxy feature is limited to public groups for now."
+msgstr ""
+
 msgid "DependencyProxy|Toggle Dependency Proxy"
 msgstr ""
 
