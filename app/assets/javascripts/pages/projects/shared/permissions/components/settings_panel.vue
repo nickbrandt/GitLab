@@ -149,32 +149,6 @@ export default {
       }
     },
 
-    repositoryAccessLevel(value, oldValue) {
-      if (value < oldValue) {
-        // sub-features cannot have more premissive access level
-        this.mergeRequestsAccessLevel = Math.min(this.mergeRequestsAccessLevel, value);
-        this.buildsAccessLevel = Math.min(this.buildsAccessLevel, value);
-
-        if (value === 0) {
-          this.containerRegistryEnabled = false;
-          this.lfsEnabled = false;
-
-          if (this.isEE) {
-            this.packagesEnabled = false;
-          }
-        }
-      } else if (oldValue === 0) {
-        this.mergeRequestsAccessLevel = value;
-        this.buildsAccessLevel = value;
-        this.containerRegistryEnabled = true;
-        this.lfsEnabled = true;
-
-        if (this.isEE) {
-          this.packagesEnabled = true;
-        }
-      }
-    },
-
     issuesAccessLevel(value, oldValue) {
       if (value === 0) toggleHiddenClassBySelector('.issues-feature', true);
       else if (oldValue === 0) toggleHiddenClassBySelector('.issues-feature', false);
@@ -314,7 +288,7 @@ export default {
           />
         </project-setting-row>
         <project-setting-row
-          v-if="packagesAvailable && isEE"
+          v-if="packagesAvailable"
           :help-path="packagesHelpPath"
           label="Packages"
           help-text="Every project can have its own space to store its packages"
