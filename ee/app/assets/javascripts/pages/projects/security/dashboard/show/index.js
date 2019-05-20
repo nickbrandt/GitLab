@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
           canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
           canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
           canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
+          createVulnerabilityFeedbackIssuePath,
+          createVulnerabilityFeedbackMergeRequestPath,
+          createVulnerabilityFeedbackDismissalPath,
           triggeredBy: {
             avatarPath: userAvatarPath,
             name: userName,

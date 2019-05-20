@@ -70,6 +70,73 @@ describe Projects::UpdateMirrorService do
       end
     end
 
+    context 'when tags on mirror are modified' do
+      let(:mirror_project) { create(:project, :repository)}
+      let(:mirror_path) { File.join(TestEnv.repos_path, mirror_project.repository.relative_path) }
+      let(:mirror_rugged) { Rugged::Repository.new(mirror_path) }
+      let!(:mirror_modified_tag_sha) { modify_tag(mirror_project.repository, 'v1.0.0') }
+      let!(:mirror_modified_branch_sha) { modify_branch(mirror_project.repository, 'feature') }
+      let(:project) do
+        create(:project, :repository, :mirror, import_url: Project::UNKNOWN_IMPORT_URL, only_mirror_protected_branches: false)
+      end
+
+      before do
+        allow(project).to receive(:import_url).and_return(mirror_path)
+      end
+
+      context 'when mirror_overwrites_diverged_branches is true' do
+        before do
+          project.mirror_overwrites_diverged_branches = true
+        end
+
+        it 'updates the tag' do
+          result = service.execute
+
+          expect(result[:status]).to eq(:success)
+          expect(project.repository.find_tag('v1.0.0').dereferenced_target.id).to eq(mirror_modified_tag_sha)
+        end
+
+        it 'updates the modified branch' do
+          service.execute
+
+          expect(project.repository.find_branch('feature').dereferenced_target.id).to eq(mirror_modified_branch_sha)
+        end
+
+        it 'returns success' do
+          result = service.execute
+
+          expect(result[:status]).to eq(:success)
+        end
+      end
+
+      context 'when mirror_overwrites_diverged_branches is false' do
+        let(:error_message) { "Fetching remote upstream failed" }
+
+        before do
+          project.mirror_overwrites_diverged_branches = false
+        end
+
+        it 'updates the tag' do
+          result = service.execute
+
+          expect(result[:status]).to eq(:success)
+          expect(project.repository.find_tag('v1.0.0').dereferenced_target.id).to eq(mirror_modified_tag_sha)
+        end
+
+        it 'does not update the modified branch' do
+          service.execute
+
+          expect(project.repository.find_branch('feature').dereferenced_target.id).not_to eq(mirror_modified_branch_sha)
+        end
+
+        it 'returns success' do
+          result = service.execute
+
+          expect(result[:status]).to eq(:success)
+        end
+      end
+    end
+
     context "updating branches" do
       context 'when mirror only protected branches option is set' do
         let(:new_protected_branch_name) { 'new-branch' }
@@ -292,5 +359,23 @@ describe Projects::UpdateMirrorService do
 
     # New tag that point to a blob
     rugged.references.create('refs/tags/new-tag-on-blob', 'c74175afd117781cbc983664339a0f599b5bb34e')
+  end
+
+  def modify_tag(repository, tag_name)
+    rugged = rugged_repo(repository)
+    masterrev = repository.find_branch('master').dereferenced_target.id
+
+    # Modify tag
+    rugged.references.update("refs/tags/#{tag_name}", masterrev)
+    repository.find_tag(tag_name).dereferenced_target.id
+  end
+
+  def modify_branch(repository, branch_name)
+    rugged = rugged_repo(repository)
+    masterrev = repository.find_branch('master').dereferenced_target.id
+
+    # Modify branch
+    rugged.references.update("refs/heads/#{branch_name}", masterrev)
+    repository.find_branch(branch_name).dereferenced_target.id
   end
 end
