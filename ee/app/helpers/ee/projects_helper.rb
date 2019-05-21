@@ -137,10 +137,7 @@ module EE
       ::Gitlab::RepositorySizeError.new(@project).above_size_limit_message
     end
 
-    def project_can_be_shared?
-      !membership_locked? || @project.allowed_to_share_with_group?
-    end
-
+    override :membership_locked?
     def membership_locked?
       if @project.group && @project.group.membership_lock
         true
@@ -153,24 +150,6 @@ module EE
       allowed_subgroups = current_user.available_subgroups_with_custom_project_templates(group_id)
 
       ::Project.in_namespace(allowed_subgroups).count
-    end
-
-    def share_project_description
-      share_with_group   = @project.allowed_to_share_with_group?
-      share_with_members = !membership_locked?
-      project_name       = content_tag(:strong, @project.name)
-      member_message     = "You can invite a new member to #{project_name}"
-
-      description =
-        if share_with_group && share_with_members
-          "#{member_message} or invite another group."
-        elsif share_with_group
-          "You can invite another group to #{project_name}."
-        elsif share_with_members
-          "#{member_message}."
-        end
-
-      description.to_s.html_safe
     end
 
     def project_security_dashboard_config(project, pipeline)
