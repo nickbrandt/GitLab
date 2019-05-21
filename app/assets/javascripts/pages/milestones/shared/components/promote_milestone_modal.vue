@@ -31,26 +31,10 @@ export default {
       });
     },
     text() {
-      const milestonePromotion = sprintf(
-        s__(`Milestones|Promoting %{milestone} will make it available for all projects inside %{groupName}.
-          Existing project milestones with the same name will be merged. `),
-        {
-          milestone: this.milestoneTitle,
-          groupName: this.groupName,
-        },
-      );
-      const finalWarning = s__('Milestones|This action cannot be reversed.');
-
       return sprintf(
-        s__(
-          `Milestones|<p>%{milestonePromotion}</p>
-          %{finalWarning}`,
-        ),
-        {
-          milestonePromotion,
-          finalWarning,
-        },
-        false,
+        s__(`Milestones|Promoting %{milestoneTitle} will make it available for all projects inside %{groupName}.
+        Existing project milestones with the same title will be merged.`),
+        { milestoneTitle: this.milestoneTitle, groupName: this.groupName },
       );
     },
   },
@@ -87,6 +71,9 @@ export default {
     <template slot="title">
       {{ title }}
     </template>
-    <div v-html="text"></div>
+    <div>
+      <p>{{ text }}</p>
+      <p>{{ s__('Milestones|This action cannot be reversed.') }}</p>
+    </div>
   </gl-modal>
 </template>
