@@ -5102,6 +5102,12 @@ msgstr ""
 msgid "Failed to connect to the prometheus server"
 msgstr ""
 
+msgid "Failed to create Merge Request. Please try again."
+msgstr ""
+
+msgid "Failed to create a branch for this issue. Please try again."
+msgstr ""
+
 msgid "Failed to create repository via gitlab-shell"
 msgstr ""
 
@@ -5109,6 +5115,9 @@ msgid "Failed to create resources"
 msgstr ""
 
 msgid "Failed to deploy to"
+msgstr ""
+
+msgid "Failed to get ref."
 msgstr ""
 
 msgid "Failed to install."
