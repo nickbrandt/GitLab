@@ -295,6 +295,46 @@ describe 'Related issues', :js do
           expect(items[0].text).to eq(issue_project_b_a.title)
           expect(find('.js-related-issues-header-issue-count')).to have_content('1')
         end
+
+        it 'disallows duplicate entries' do
+          find('.js-issue-count-badge-add-button').click
+          find('.js-add-issuable-form-input').set 'duplicate duplicate duplicate'
+
+          items = all('.js-add-issuable-form-token-list-item')
+          expect(items.count).to eq(1)
+          expect(items[0].text).to eq('duplicate')
+
+          # Pending issues aren't counted towards the related issue count
+          expect(find('.js-related-issues-header-issue-count')).to have_content('0')
+        end
+
+        it 'allows us to remove pending issues' do
+          # Tests against https://gitlab.com/gitlab-org/gitlab-ee/issues/11625
+          find('.js-issue-count-badge-add-button').click
+          find('.js-add-issuable-form-input').set 'issue1 issue2 issue3 '
+
+          items = all('.js-add-issuable-form-token-list-item')
+          expect(items.count).to eq(3)
+          expect(items[0].text).to eq('issue1')
+          expect(items[1].text).to eq('issue2')
+          expect(items[2].text).to eq('issue3')
+
+          # Remove pending issues left to right to make sure none get stuck
+          items[0].find('.js-issue-token-remove-button').click
+          items = all('.js-add-issuable-form-token-list-item')
+          expect(items.count).to eq(2)
+          expect(items[0].text).to eq('issue2')
+          expect(items[1].text).to eq('issue3')
+
+          items[0].find('.js-issue-token-remove-button').click
+          items = all('.js-add-issuable-form-token-list-item')
+          expect(items.count).to eq(1)
+          expect(items[0].text).to eq('issue3')
+
+          items[0].find('.js-issue-token-remove-button').click
+          items = all('.js-add-issuable-form-token-list-item')
+          expect(items.count).to eq(0)
+        end
       end
 
       context 'with existing related issues' do

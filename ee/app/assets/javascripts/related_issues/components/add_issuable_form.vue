@@ -143,7 +143,7 @@ export default {
         -->
         <li
           v-for="(reference, index) in pendingReferences"
-          :key="`related-issues-token-${index}`"
+          :key="`related-issues-token-${reference}`"
           class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item"
         >
           <issue-token
