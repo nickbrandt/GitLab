@@ -22,10 +22,7 @@
         %span.badge.badge-success.prepend-left-5
           = s_('Branches|protected')
 
-      - if @project.mirror_ever_updated_successfully? && @repository.diverged_from_upstream?(branch.name)
-        %span.badge.badge-danger.prepend-left-5.has-tooltip{ data: { html: "true", title: branch_diverged_tooltip_message } }
-          = icon('exclamation-triangle')
-          = s_('Branches|diverged from upstream')
+      = render_if_exists 'projects/branches/diverged_from_upstream'
 
     .block-truncated
       - if commit
