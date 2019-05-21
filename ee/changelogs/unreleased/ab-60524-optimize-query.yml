@@ -1,0 +1,5 @@
+---
+title: Limit count to improve query performance
+merge_request: 12231
+author:
+type: performance

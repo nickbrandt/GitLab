@@ -1,0 +1,72 @@
+<script>
+// Nested `v-model`s in custom components are weird.
+// It's dangerous to go alone! take this
+// https://zaengle.com/blog/using-v-model-on-nested-vue-components
+
+import { s__ } from '~/locale';
+import { GlFormTextarea } from '@gitlab/ui';
+
+export default {
+  name: 'DismissalCommentBox',
+  components: {
+    GlFormTextarea,
+  },
+  props: {
+    value: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    errorMessage: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
+  data: () => ({
+    placeholder: s__('vulnerability|Add a comment or reason for dismissal'),
+  }),
+  computed: {
+    localComment: {
+      get() {
+        return this.value;
+      },
+      set(localComment) {
+        this.$emit('input', localComment);
+      },
+    },
+    textAreaState() {
+      if (this.errorMessage) {
+        return false;
+      }
+      return null;
+    },
+  },
+  mounted() {
+    this.$emit('input', '');
+    this.$emit('clearError');
+    this.$refs.dismissalComment.$el.focus();
+  },
+  methods: {
+    handleKeyPress(e) {
+      if (e.keyCode === 13 && e.metaKey) {
+        this.$emit('submit');
+      }
+    },
+  },
+};
+</script>
+
+<template>
+  <div>
+    <hr />
+    <gl-form-textarea
+      ref="dismissalComment"
+      v-model="localComment"
+      :state="textAreaState"
+      :placeholder="placeholder"
+      @keydown.native="handleKeyPress"
+    />
+    <span v-if="errorMessage" class="js-error invalid-feedback">{{ errorMessage }}</span>
+  </div>
+</template>

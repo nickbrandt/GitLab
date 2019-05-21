@@ -10,6 +10,7 @@ module EE
       prepended do
         before_action only: [:show] do
           push_frontend_feature_flag(:approval_rules, merge_request.project, default_enabled: true)
+          push_frontend_feature_flag(:visual_review_app, merge_request.project, default_enabled: false)
         end
 
         before_action :whitelist_query_limiting_ee_merge, only: [:merge]

@@ -34,6 +34,7 @@ class License < ApplicationRecord
     repository_mirrors
     repository_size_limit
     scoped_issue_board
+    visual_review_app
   ].freeze
 
   EEP_FEATURES = EES_FEATURES + %i[

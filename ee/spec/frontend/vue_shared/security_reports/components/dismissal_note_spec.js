@@ -19,10 +19,9 @@ describe('dismissal note', () => {
     value: 'Project one',
     url: '/path-to-the-project',
   };
+  let wrapper;
 
   describe('with no attached project or pipeline', () => {
-    let wrapper;
-
     beforeEach(() => {
       wrapper = shallowMount(component, {
         propsData: { feedback },
@@ -43,8 +42,6 @@ describe('dismissal note', () => {
   });
 
   describe('with an attached project', () => {
-    let wrapper;
-
     beforeEach(() => {
       wrapper = shallowMount(component, {
         propsData: { feedback, project },
@@ -57,8 +54,6 @@ describe('dismissal note', () => {
   });
 
   describe('with an attached pipeline', () => {
-    let wrapper;
-
     beforeEach(() => {
       wrapper = shallowMount(component, {
         propsData: { feedback: { ...feedback, pipeline } },
@@ -71,8 +66,6 @@ describe('dismissal note', () => {
   });
 
   describe('with an attached pipeline and project', () => {
-    let wrapper;
-
     beforeEach(() => {
       wrapper = shallowMount(component, {
         propsData: { feedback: { ...feedback, pipeline }, project },
@@ -85,7 +78,6 @@ describe('dismissal note', () => {
   });
 
   describe('with unsafe data', () => {
-    let wrapper;
     const unsafeProject = {
       ...project,
       value: 'Foo <script>alert("XSS")</script>',
@@ -108,6 +100,43 @@ describe('dismissal note', () => {
       expect(wrapper.vm.eventText).toContain(
         'Foo &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;',
       );
+    });
+  });
+
+  describe('with a comment', () => {
+    const commentDetails = {
+      comment: 'How many times have I said we need locking mechanisms on the vehicle doors!',
+      comment_timestamp: now.toString(),
+      comment_author: {
+        name: 'Muldoon',
+        username: 'RMuldoon62',
+      },
+    };
+    let commentItem;
+
+    beforeEach(() => {
+      wrapper = shallowMount(component, {
+        propsData: {
+          feedback: {
+            ...feedback,
+            comment_details: commentDetails,
+          },
+          project,
+        },
+      });
+      commentItem = wrapper.findAll(EventItem).at(1);
+    });
+
+    it('should render the comment', () => {
+      expect(commentItem.text()).toBe(commentDetails.comment);
+    });
+
+    it('should render the comment author', () => {
+      expect(commentItem.props().author).toBe(commentDetails.comment_author);
+    });
+
+    it('should render the comment timestamp', () => {
+      expect(commentItem.props().createdAt).toBe(commentDetails.comment_timestamp);
     });
   });
 });

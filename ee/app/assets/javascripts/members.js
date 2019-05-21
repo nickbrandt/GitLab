@@ -93,7 +93,7 @@ export default class MembersEE extends Members {
         },
       })
       .then(() => {
-        $memberListitem.toggleClass('is-overriden', override);
+        $memberListitem.toggleClass('is-overridden', override);
       });
   }
 }

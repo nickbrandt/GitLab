@@ -50,7 +50,7 @@ export default {
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
     canCreateIssue() {
-      const path = this.vulnerability.vulnerability_feedback_issue_path;
+      const path = this.vulnerability.create_vulnerability_feedback_issue_path;
       return Boolean(path);
     },
     canCreateMergeRequest() {
@@ -77,16 +77,18 @@ export default {
   },
   methods: {
     ...mapActions('vulnerabilities', [
+      'closeDismissalCommentBox',
       'createIssue',
+      'createMergeRequest',
       'dismissVulnerability',
       'fetchVulnerabilities',
       'fetchVulnerabilitiesCount',
       'fetchVulnerabilitiesHistory',
-      'undoDismiss',
-      'createMergeRequest',
+      'openDismissalCommentBox',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
+      'undoDismiss',
     ]),
     ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
   },
@@ -104,16 +106,19 @@ export default {
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
     />
+
     <issue-modal
       :modal="modal"
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue="canCreateIssue"
       :can-create-merge-request="canCreateMergeRequest"
       :can-dismiss-vulnerability="canDismissVulnerability"
-      @createNewIssue="createIssue({ vulnerability })"
-      @dismissIssue="dismissVulnerability({ vulnerability })"
-      @revertDismissIssue="undoDismiss({ vulnerability })"
+      @closeDismissalCommentBox="closeDismissalCommentBox()"
       @createMergeRequest="createMergeRequest({ vulnerability })"
+      @createNewIssue="createIssue({ vulnerability })"
+      @dismissVulnerability="dismissVulnerability({ vulnerability, comment: $event })"
+      @openDismissalCommentBox="openDismissalCommentBox()"
+      @revertDismissVulnerability="undoDismiss({ vulnerability })"
     />
   </div>
 </template>

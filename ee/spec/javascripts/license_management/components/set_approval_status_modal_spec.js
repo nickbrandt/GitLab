@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 import SetApprovalModal from 'ee/vue_shared/license_management/components/set_approval_status_modal.vue';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { licenseReport } from 'ee_spec/license_management/mock_data';
 

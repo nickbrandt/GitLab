@@ -613,4 +613,22 @@ describe('vulnerabilities module mutations', () => {
       expect(state.modal.error).toEqual('There was an error reverting the dismissal.');
     });
   });
+
+  describe('OPEN_DISMISSAL_COMMENT_BOX', () => {
+    it('should set isCommentingOnDismissal to true', () => {
+      const state = createState();
+      mutations[types.OPEN_DISMISSAL_COMMENT_BOX](state);
+
+      expect(state.modal.isCommentingOnDismissal).toBe(true);
+    });
+  });
+
+  describe('CLOSE_DISMISSAL_COMMENT_BOX', () => {
+    it('should set isCommentingOnDismissal to false', () => {
+      const state = createState();
+      mutations[types.CLOSE_DISMISSAL_COMMENT_BOX](state);
+
+      expect(state.modal.isCommentingOnDismissal).toBe(false);
+    });
+  });
 });

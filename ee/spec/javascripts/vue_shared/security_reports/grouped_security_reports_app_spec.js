@@ -4,7 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import component from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import {
   sastIssues,
   sastIssuesBase,

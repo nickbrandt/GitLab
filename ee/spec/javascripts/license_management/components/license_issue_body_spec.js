@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import LicenseIssueBody from 'ee/vue_shared/license_management/components/license_issue_body.vue';
-import { trimText } from 'spec/helpers/vue_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import createStore from 'ee/vue_shared/license_management/store';
 import { licenseReport } from 'ee_spec/license_management/mock_data';

@@ -1540,6 +1540,14 @@ msgstr ""
 msgid "Attach a file by drag &amp; drop or %{upload_link}"
 msgstr ""
 
+msgid "Attaching a file"
+msgid_plural "Attaching %d files"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Attaching the file failed."
+msgstr ""
+
 msgid "Audit Events"
 msgstr ""
 
@@ -5102,6 +5110,12 @@ msgstr ""
 msgid "Failed to connect to the prometheus server"
 msgstr ""
 
+msgid "Failed to create Merge Request. Please try again."
+msgstr ""
+
+msgid "Failed to create a branch for this issue. Please try again."
+msgstr ""
+
 msgid "Failed to create repository via gitlab-shell"
 msgstr ""
 
@@ -5109,6 +5123,9 @@ msgid "Failed to create resources"
 msgstr ""
 
 msgid "Failed to deploy to"
+msgstr ""
+
+msgid "Failed to get ref."
 msgstr ""
 
 msgid "Failed to install."
@@ -5357,6 +5374,9 @@ msgid "File upload error."
 msgstr ""
 
 msgid "Files"
+msgstr ""
+
+msgid "Files, directories, and submodules in the path %{path} for commit reference %{ref}"
 msgstr ""
 
 msgid "Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>"
@@ -7998,9 +8018,6 @@ msgstr ""
 msgid "Milestones| You’re about to permanently delete the milestone %{milestoneTitle}. This milestone is not currently used in any issues or merge requests."
 msgstr ""
 
-msgid "Milestones|<p>%{milestonePromotion}</p> %{finalWarning}"
-msgstr ""
-
 msgid "Milestones|Delete milestone"
 msgstr ""
 
@@ -8019,7 +8036,7 @@ msgstr ""
 msgid "Milestones|Promote Milestone"
 msgstr ""
 
-msgid "Milestones|Promoting %{milestone} will make it available for all projects inside %{groupName}. Existing project milestones with the same name will be merged. "
+msgid "Milestones|Promoting %{milestoneTitle} will make it available for all projects inside %{groupName}. Existing project milestones with the same title will be merged."
 msgstr ""
 
 msgid "Milestones|This action cannot be reversed."
@@ -9127,6 +9144,9 @@ msgstr ""
 msgid "Please accept the Terms of Service before continuing."
 msgstr ""
 
+msgid "Please add a comment in the text area above"
+msgstr ""
+
 msgid "Please add a list to your board first"
 msgstr ""
 
@@ -9743,6 +9763,12 @@ msgid "ProjectOverview|You must sign in to star a project"
 msgstr ""
 
 msgid "ProjectPage|Project ID: %{project_id}"
+msgstr ""
+
+msgid "ProjectSelect| or group"
+msgstr ""
+
+msgid "ProjectSelect|Search for project"
 msgstr ""
 
 msgid "ProjectSettings|Additional merge request capabilities that influence how and when merges will be performed"
@@ -10723,6 +10749,12 @@ msgid "Revoked impersonation token %{token_name}!"
 msgstr ""
 
 msgid "Revoked personal access token %{personal_access_token_name}!"
+msgstr ""
+
+msgid "RightSidebar|adding a"
+msgstr ""
+
+msgid "RightSidebar|deleting the"
 msgstr ""
 
 msgid "Roadmap"
@@ -12580,6 +12612,9 @@ msgstr ""
 msgid "There was a problem communicating with your device."
 msgstr ""
 
+msgid "There was an error %{message} todo."
+msgstr ""
+
 msgid "There was an error adding a todo."
 msgstr ""
 
@@ -13919,6 +13954,30 @@ msgstr ""
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
+msgid "VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:"
+msgstr ""
+
+msgid "VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} of every page of your application. "
+msgstr ""
+
+msgid "VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the review app and provide a personal access token following %{linkStart}personal access token%{linkEnd}."
+msgstr ""
+
+msgid "VisualReviewApp|%{stepStart}Step 4%{stepEnd}. You are now able to leave feedback from within the review app."
+msgstr ""
+
+msgid "VisualReviewApp|Adding the following script to your code makes it possible to directly leave feedback inside of the review app. Feedback given will get submitted automatically to this merge request’s discussion, including metadata."
+msgstr ""
+
+msgid "VisualReviewApp|Open review app"
+msgstr ""
+
+msgid "VisualReviewApp|Review"
+msgstr ""
+
+msgid "VisualReviewApp|Review and give feedback directly from within the review app"
+msgstr ""
+
 msgid "Vulnerability Chart"
 msgstr ""
 
@@ -14797,9 +14856,6 @@ msgstr ""
 msgid "ciReport|Description"
 msgstr ""
 
-msgid "ciReport|Dismiss vulnerability"
-msgstr ""
-
 msgid "ciReport|Download and apply the patch to fix this vulnerability."
 msgstr ""
 
@@ -14916,9 +14972,6 @@ msgid "ciReport|There was an error loading dependency scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
-msgstr ""
-
-msgid "ciReport|Undo dismiss"
 msgstr ""
 
 msgid "ciReport|Upgrade %{name} from %{version} to %{fixed}."
@@ -15620,6 +15673,21 @@ msgid "view it on GitLab"
 msgstr ""
 
 msgid "view the blob"
+msgstr ""
+
+msgid "vulnerability|Add a comment or reason for dismissal"
+msgstr ""
+
+msgid "vulnerability|Add comment & dismiss"
+msgstr ""
+
+msgid "vulnerability|Dismiss vulnerability"
+msgstr ""
+
+msgid "vulnerability|Undo dismiss"
+msgstr ""
+
+msgid "vulnerability|dismissed"
 msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."
