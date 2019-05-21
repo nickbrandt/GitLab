@@ -1,0 +1,61 @@
+# frozen_string_literal: true
+
+module EE
+  module Gitlab
+    module QuickActions
+      module EpicActions
+        extend ActiveSupport::Concern
+        include ::Gitlab::QuickActions::Dsl
+
+        included do
+          desc _('Add child epic to an epic')
+          explanation do |epic_param|
+            child_epic = extract_epic(epic_param)
+
+            _("Adds %{epic_ref} as child epic.") % { epic_ref: child_epic.to_reference(quick_action_target) } if child_epic
+          end
+          types Epic
+          condition { action_allowed? }
+          params '<&epic | group&epic | Epic URL>'
+          command :child_epic do |epic_param|
+            child_epic = extract_epic(epic_param)
+
+            if child_epic && !quick_action_target.child?(child_epic.id)
+              EpicLinks::CreateService.new(quick_action_target, current_user, { target_issuable: child_epic }).execute
+            end
+          end
+
+          desc _('Remove child epic from an epic')
+          explanation do |epic_param|
+            child_epic = extract_epic(epic_param)
+
+            _("Removes %{epic_ref} from child epics.") % { epic_ref: child_epic.to_reference(quick_action_target) } if child_epic
+          end
+          types Epic
+          condition { action_allowed? }
+          params '<&epic | group&epic | Epic URL>'
+          command :remove_child_epic do |epic_param|
+            child_epic = extract_epic(epic_param)
+
+            if child_epic && quick_action_target.child?(child_epic.id)
+              EpicLinks::DestroyService.new(child_epic, current_user).execute
+            end
+          end
+
+          private
+
+          def extract_epic(params)
+            return if params.nil?
+
+            extract_references(params, :epic).first
+          end
+
+          def action_allowed?
+            quick_action_target.group&.feature_available?(:epics) &&
+              current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
+          end
+        end
+      end
+    end
+  end
+end

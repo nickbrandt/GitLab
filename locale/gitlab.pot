@@ -663,6 +663,9 @@ msgstr ""
 msgid "Add bold text"
 msgstr ""
 
+msgid "Add child epic to an epic"
+msgstr ""
+
 msgid "Add comment now"
 msgstr ""
 
@@ -733,6 +736,9 @@ msgid "Additional text"
 msgstr ""
 
 msgid "Adds"
+msgstr ""
+
+msgid "Adds %{epic_ref} as child epic."
 msgstr ""
 
 msgid "Adds a todo."
@@ -10406,6 +10412,9 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove child epic from an epic"
+msgstr ""
+
 msgid "Remove due date"
 msgstr ""
 
@@ -10446,6 +10455,9 @@ msgid "Removed group can not be restored!"
 msgstr ""
 
 msgid "Removed projects cannot be restored!"
+msgstr ""
+
+msgid "Removes %{epic_ref} from child epics."
 msgstr ""
 
 msgid "Removes %{milestone_reference} milestone."

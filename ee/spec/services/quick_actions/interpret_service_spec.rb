@@ -17,6 +17,18 @@ describe QuickActions::InterpretService do
     project.add_developer(current_user)
   end
 
+  shared_examples 'quick action is unavailable' do |action|
+    it 'does not recognize action' do
+      expect(service.available_commands(target).map { |command| command[:name] }).not_to include(action)
+    end
+  end
+
+  shared_examples 'quick action is available' do |action|
+    it 'does recognize action' do
+      expect(service.available_commands(target).map { |command| command[:name] }).to include(action)
+    end
+  end
+
   describe '#execute' do
     let(:merge_request) { create(:merge_request, source_project: project) }
 
@@ -197,7 +209,7 @@ describe QuickActions::InterpretService do
     end
 
     context 'epic command' do
-      let(:epic) { create(:epic, group: group)}
+      let(:epic) { create(:epic, group: group) }
       let(:content) { "/epic #{epic.to_reference(project)}" }
 
       context 'when epics are enabled' do
@@ -286,8 +298,275 @@ describe QuickActions::InterpretService do
       end
     end
 
+    context 'child_epic command' do
+      let(:subgroup) { create(:group, parent: group) }
+      let(:another_group) { create(:group) }
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let(:epic) { create(:epic, group: group) }
+      let(:child_epic) { create(:epic, group: group) }
+      let(:content) { "/child_epic #{child_epic&.to_reference(epic)}" }
+
+      shared_examples 'epic relation is not added' do
+        it 'does not add child epic to epic' do
+          service.execute(content, epic)
+          child_epic.reload
+
+          expect(child_epic.parent).to be_nil
+        end
+      end
+
+      shared_examples 'epic relation is added' do
+        it 'adds child epic relation to the epic' do
+          service.execute(content, epic)
+          child_epic.reload
+
+          expect(child_epic.parent).to eq(epic)
+        end
+      end
+
+      context 'when epics are enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        context 'when a user does not have permissions to add epic relations' do
+          it_behaves_like 'epic relation is not added'
+          it_behaves_like 'quick action is unavailable', :child_epic do
+            let(:target) { epic }
+          end
+        end
+
+        context 'when a user has permissions to add epic relations' do
+          before do
+            group.add_developer(current_user)
+            another_group.add_developer(current_user)
+          end
+
+          it_behaves_like 'epic relation is added'
+
+          it_behaves_like 'quick action is available', :child_epic do
+            let(:target) { epic }
+          end
+
+          it_behaves_like 'quick action is unavailable', :child_epic do
+            let(:target) { issue }
+          end
+
+          it_behaves_like 'quick action is unavailable', :child_epic do
+            let(:target) { merge_request }
+          end
+
+          context 'when passed child epic is nil' do
+            let(:child_epic) { nil }
+
+            it 'does not add child epic to epic' do
+              expect { service.execute(content, epic) }.not_to change { epic.children.count }
+              expect { service.execute(content, epic) }.not_to raise_error
+            end
+
+            it 'does not raise error' do
+              expect { service.execute(content, epic) }.not_to raise_error
+            end
+          end
+
+          context 'when child_epic is already linked to an epic' do
+            let(:another_epic) { create(:epic, group: group) }
+
+            before do
+              child_epic.update!(parent: another_epic)
+            end
+
+            it_behaves_like 'epic relation is added'
+            it_behaves_like 'quick action is available', :child_epic do
+              let(:target) { epic }
+            end
+          end
+
+          context 'when child epic is in a subgroup of parent epic' do
+            let(:child_epic) { create(:epic, group: subgroup) }
+
+            it_behaves_like 'epic relation is added'
+            it_behaves_like 'quick action is available', :child_epic do
+              let(:target) { epic }
+            end
+          end
+
+          context 'when child epic is in a parent group of the parent epic' do
+            let(:child_epic) { create(:epic, group: group) }
+
+            before do
+              epic.update!(group: subgroup)
+            end
+
+            it_behaves_like 'epic relation is not added'
+            it_behaves_like 'quick action is available', :child_epic do
+              let(:target) { epic }
+            end
+          end
+
+          context 'when child epic is in a different group than parent epic' do
+            let(:child_epic) { create(:epic, group: another_group) }
+
+            it_behaves_like 'epic relation is not added'
+            it_behaves_like 'quick action is available', :child_epic do
+              let(:target) { epic }
+            end
+          end
+        end
+      end
+
+      context 'when epics are disabled' do
+        before do
+          group.add_developer(current_user)
+        end
+
+        it_behaves_like 'epic relation is not added'
+        it_behaves_like 'quick action is unavailable', :child_epic do
+          let(:target) { epic }
+        end
+      end
+    end
+
+    context 'remove_child_epic command' do
+      let(:subgroup) { create(:group, parent: group) }
+      let(:another_group) { create(:group) }
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let(:epic) { create(:epic, group: group) }
+      let!(:child_epic) { create(:epic, group: group, parent: epic) }
+      let(:content) { "/remove_child_epic #{child_epic.to_reference(epic)}" }
+
+      shared_examples 'epic relation is not removed' do
+        it 'does not remove child_epic from epic' do
+          expect(child_epic.parent).to eq(epic)
+
+          service.execute(content, target)
+          child_epic.reload
+
+          expect(child_epic.parent).to eq(epic)
+        end
+      end
+
+      shared_examples 'epic relation is removed' do
+        it 'does not remove child_epic from epic' do
+          expect(child_epic.parent).to eq(epic)
+
+          service.execute(content, epic)
+          child_epic.reload
+
+          expect(child_epic.parent).to be_nil
+        end
+      end
+
+      context 'when epics are enabled' do
+        before do
+          stub_licensed_features(epics: true)
+          epic.reload
+        end
+
+        context 'when a user does not have permissions to remove epic relations' do
+          it 'does not remove child_epic from epic' do
+            expect(child_epic.parent).to eq(epic)
+
+            service.execute(content, epic)
+            child_epic.reload
+
+            expect(child_epic.parent).to eq(epic)
+          end
+
+          it_behaves_like 'epic relation is not removed' do
+            let(:target) { epic }
+          end
+
+          it_behaves_like 'quick action is unavailable', :remove_child_epic do
+            let(:target) { epic }
+          end
+        end
+
+        context 'when a user has permissions to remove epic relations' do
+          before do
+            group.add_developer(current_user)
+            another_group.add_developer(current_user)
+          end
+
+          it_behaves_like 'quick action is available', :remove_child_epic do
+            let(:target) { epic }
+          end
+
+          it_behaves_like 'quick action is unavailable', :remove_child_epic do
+            let(:target) { issue }
+          end
+
+          it_behaves_like 'quick action is unavailable', :remove_child_epic do
+            let(:target) { merge_request }
+          end
+
+          it_behaves_like 'epic relation is removed'
+
+          context 'when trying to remove child epic from a different epic' do
+            let(:another_epic) { create(:epic, group: group) }
+
+            it_behaves_like 'epic relation is not removed' do
+              let(:target) { another_epic }
+            end
+          end
+
+          context 'when child epic is in a subgroup of parent epic' do
+            let(:child_epic) { create(:epic, group: subgroup, parent: epic) }
+
+            it_behaves_like 'epic relation is removed'
+            it_behaves_like 'quick action is available', :remove_child_epic do
+              let(:target) { epic }
+            end
+          end
+
+          context 'when child and paretn epics are in different groups' do
+            let(:child_epic) { create(:epic, group: group, parent: epic) }
+            context 'when child epic is in a parent group of the parent epic' do
+              before do
+                epic.update!(group: subgroup)
+              end
+
+              it_behaves_like 'epic relation is removed' do
+                let(:target) { epic }
+              end
+              it_behaves_like 'quick action is available', :remove_child_epic do
+                let(:target) { epic }
+              end
+            end
+
+            context 'when child epic is in a different group than parent epic' do
+              before do
+                epic.update!(group: another_group)
+              end
+
+              it_behaves_like 'epic relation is removed' do
+                let(:target) { epic }
+              end
+              it_behaves_like 'quick action is available', :remove_child_epic do
+                let(:target) { epic }
+              end
+            end
+          end
+        end
+      end
+
+      context 'when epics are disabled' do
+        before do
+          group.add_developer(current_user)
+        end
+
+        it_behaves_like 'epic relation is not removed' do
+          let(:target) { epic }
+        end
+
+        it_behaves_like 'quick action is unavailable', :remove_child_epic do
+          let(:target) { epic }
+        end
+      end
+    end
+
     context 'label command for epics' do
-      let(:epic) { create(:epic, group: group)}
+      let(:epic) { create(:epic, group: group) }
       let(:label) { create(:group_label, title: 'bug', group: group) }
       let(:project_label) { create(:label, title: 'project_label') }
       let(:content) { "/label ~#{label.title} ~#{project_label.title}" }
@@ -332,7 +611,7 @@ describe QuickActions::InterpretService do
     end
 
     context 'remove_epic command' do
-      let(:epic) { create(:epic, group: group)}
+      let(:epic) { create(:epic, group: group) }
       let(:content) { "/remove_epic #{epic.to_reference(project)}" }
 
       before do
@@ -409,7 +688,7 @@ describe QuickActions::InterpretService do
 
       it_behaves_like 'weight command' do
         let(:weight) { 5 }
-        let(:content) { "/weight #{weight}"}
+        let(:content) { "/weight #{weight}" }
         let(:issuable) { issue }
       end
 
@@ -516,6 +795,56 @@ describe QuickActions::InterpretService do
       it 'includes the number' do
         _, explanations = service.explain(content, issue)
         expect(explanations).to eq(['Sets weight to 4.'])
+      end
+    end
+
+    context 'epic commands' do
+      let(:epic) { create(:epic, group: group) }
+      let(:child_epic) { create(:epic, group: group) }
+
+      before do
+        stub_licensed_features(epics: true)
+        group.add_developer(current_user)
+      end
+
+      context 'child_epic command' do
+        context 'when correct epic reference' do
+          let(:content) { "/child_epic #{child_epic&.to_reference(epic)}" }
+
+          it 'returns message with epic reference' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq(["Adds #{child_epic.group.name}&#{child_epic.iid} as child epic."])
+          end
+        end
+
+        context 'when epic reference is wrong' do
+          let(:content) { "/child_epic qwe" }
+
+          it 'returns empty explain message' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq([])
+          end
+        end
+      end
+
+      context 'remove_child_epic command' do
+        context 'when correct epic reference' do
+          let(:content) { "/remove_child_epic #{child_epic&.to_reference(epic)}" }
+
+          it 'returns message with epic reference' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq(["Removes #{child_epic.group.name}&#{child_epic.iid} from child epics."])
+          end
+        end
+
+        context 'when epic reference is wrong' do
+          let(:content) { "/child_epic qwe" }
+
+          it 'returns empty explain message' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq([])
+          end
+        end
       end
     end
   end
