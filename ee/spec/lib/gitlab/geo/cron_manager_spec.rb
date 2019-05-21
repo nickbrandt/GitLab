@@ -29,6 +29,7 @@ describe Gitlab::Geo::CronManager, :geo do
 
     JOBS = %w[
       ldap_test
+      repository_check_worker
       geo_repository_verification_primary_batch_worker
       geo_repository_sync_worker
       geo_file_download_dispatch_worker
@@ -46,7 +47,7 @@ describe Gitlab::Geo::CronManager, :geo do
       JOBS.each { |name| job(name)&.destroy }
     end
 
-    let(:common_jobs) { [job('geo_metrics_update_worker')] }
+    let(:common_jobs) { [job('geo_metrics_update_worker'), job('repository_check_worker')] }
     let(:ldap_test_job) { job('ldap_test') }
     let(:primary_jobs) { [job('geo_repository_verification_primary_batch_worker')] }
 
