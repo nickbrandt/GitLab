@@ -1,0 +1,5 @@
+---
+title: 'Geo: Improve performance of selective sync worker'
+merge_request:
+author:
+type: performance

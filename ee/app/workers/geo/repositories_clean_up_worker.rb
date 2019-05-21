@@ -14,7 +14,7 @@ module Geo
     # rubocop:disable CodeReuse/ActiveRecord
     def perform(geo_node_id)
       try_obtain_lease do
-        node = GeoNode.find(geo_node_id)
+        node = Geo::Fdw::GeoNode.find(geo_node_id)
         break unless node.selective_sync?
 
         projects_to_clean_up(node).find_in_batches(batch_size: BATCH_SIZE) do |batch|
@@ -31,19 +31,19 @@ module Geo
     private
 
     def projects_to_clean_up(node)
-      if node.selective_sync_by_namespaces?
-        node.projects_outside_selected_namespaces
-      elsif node.selective_sync_by_shards?
-        node.projects_outside_selected_shards
-      else
-        Project.none
-      end
+      projects = if node.selective_sync_by_namespaces?
+                   node.projects_outside_selected_namespaces
+                 elsif node.selective_sync_by_shards?
+                   node.projects_outside_selected_shards
+                 else
+                   Geo::Fdw::Project.none
+                 end
+
+      projects.inner_join_project_registry
     end
 
     # rubocop:disable CodeReuse/ActiveRecord
     def clean_up_repositories(project)
-      return unless Geo::ProjectRegistry.exists?(project_id: project.id)
-
       job_id = ::Geo::RepositoryCleanupWorker.perform_async(project.id, project.name, project.disk_path, project.repository.storage)
 
       if job_id
