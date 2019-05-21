@@ -48,13 +48,9 @@
 
     = render partial: 'access_levels', locals: { f: f }
 
-    - if Gitlab::CurrentSettings.should_check_namespace_plan?
-      = f.fields_for :namespace do |namespace_form|
-        %fieldset
-          %legend Licensed Features
-          = render 'admin/namespace_plan', f: namespace_form
+    = render_if_exists 'admin/users/namespace_plan_fieldset', f: f
 
-    = render partial: 'limits', locals: { f: f }
+    = render_if_exists 'admin/users/limits', f: f
 
     %fieldset
       %legend Profile
@@ -81,11 +77,7 @@
           = f.label :website_url, 'Website', class: 'col-form-label'
         .col-sm-10= f.text_field :website_url, class: 'form-control'
 
-    %fieldset
-      %legend Admin notes
-      .form-group.row
-        = f.label :note, 'Note', class: 'col-form-label'
-        .col-sm-10= f.text_area :note, class: 'form-control'
+    = render_if_exists 'admin/users/admin_notes', f: f
 
     .form-actions
       - if @user.new_record?
