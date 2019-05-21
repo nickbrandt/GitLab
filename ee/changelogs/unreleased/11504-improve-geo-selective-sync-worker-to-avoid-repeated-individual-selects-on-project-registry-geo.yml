@@ -1,0 +1,5 @@
+---
+title: 'Geo: Improve performance of clean up worker for selective sync'
+merge_request:
+author:
+type: performance
