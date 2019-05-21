@@ -79,12 +79,13 @@ module EE
 
       scope :mirror, -> { where(mirror: true) }
 
-      scope :mirrors_to_sync, ->(freeze_at) do
+      scope :mirrors_to_sync, ->(freeze_at, limit: nil) do
         mirror
           .joins_import_state
           .where.not(import_state: { status: [:scheduled, :started] })
           .where("import_state.next_execution_timestamp <= ?", freeze_at)
           .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
+          .limit(limit)
       end
 
       scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
