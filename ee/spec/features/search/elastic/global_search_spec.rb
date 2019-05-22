@@ -119,5 +119,21 @@ describe 'Global elastic search' do
       expect(page).to have_selector('.commit-row-description')
       expect(page).to have_selector('.project-namespace')
     end
+
+    it 'shows proper page 2 results' do
+      visit dashboard_projects_path
+
+      fill_in "search", with: "add"
+      click_button "Go"
+
+      expected_message = "Add directory structure for tree_helper spec"
+
+      select_filter("Commits")
+      expect(page).not_to have_content(expected_message)
+
+      click_link 'Next'
+
+      expect(page).to have_content(expected_message)
+    end
   end
 end
