@@ -98,7 +98,11 @@ module Projects
     def update_lfs_objects
       result = Projects::LfsPointers::LfsImportService.new(project).execute
 
-      raise UpdateError, result[:message] if result[:status] == :error
+      if result[:status] == :error
+        log_error(result[:message])
+        # Uncomment once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+        # raise UpdateError, result[:message]
+      end
     end
 
     def handle_diverged_branch(upstream, local, branch_name, errors)
@@ -126,6 +130,22 @@ module Projects
 
     def skip_branch?(name)
       project.only_mirror_protected_branches && !ProtectedBranch.protected?(project, name)
+    end
+
+    def service_logger
+      @service_logger ||= Gitlab::UpdateMirrorServiceJsonLogger.build
+    end
+
+    def base_payload
+      {
+        user_id: current_user.id,
+        project_id: project.id,
+        import_url: project.safe_import_url
+      }
+    end
+
+    def log_error(error_message)
+      service_logger.error(base_payload.merge(error_message: error_message))
     end
   end
 end
