@@ -753,6 +753,9 @@ msgstr ""
 msgid "Admin Section"
 msgstr ""
 
+msgid "Admin notes"
+msgstr ""
+
 msgid "AdminArea| You are about to permanently delete the user %{username}. Issues, merge requests, and groups linked to them will be transferred to a system-wide \"Ghost-user\". To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
 msgstr ""
 
@@ -772,6 +775,9 @@ msgid "AdminArea|Stopping jobs failed"
 msgstr ""
 
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
+msgstr ""
+
+msgid "AdminNote|Note"
 msgstr ""
 
 msgid "AdminProjects| You’re about to permanently delete the project %{projectName}, its repository, and all related resources including issues, merge requests, etc..  Once you confirm and press %{strong_start}Delete project%{strong_end}, it cannot be undone or recovered."
@@ -7462,6 +7468,9 @@ msgid "LicenseManagement|URL"
 msgstr ""
 
 msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
+msgstr ""
+
+msgid "Licensed Features"
 msgstr ""
 
 msgid "Licensed to"
