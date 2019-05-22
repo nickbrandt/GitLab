@@ -1,7 +1,14 @@
 export default {
+  props: {
+    packagesAvailable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
   data() {
     return {
-      packagesAvailable: false,
+      packagesEnabled: false,
     };
   },
   watch: {
