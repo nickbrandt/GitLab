@@ -21,7 +21,7 @@ class CreateProjectMirrorDataEE < ActiveRecord::Migration[4.2]
             0 AS retry_count,
             CAST(NULL AS #{timestamp}) AS last_update_started_at,
             CAST(NULL AS #{timestamp}) AS last_update_scheduled_at,
-            NOW() AS next_execution_timestamp
+            CAST(NULL AS #{timestamp}) AS next_execution_timestamp
           FROM projects
           WHERE mirror IS TRUE
         );
