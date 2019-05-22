@@ -807,7 +807,7 @@ describe QuickActions::InterpretService do
         group.add_developer(current_user)
       end
 
-      context 'child_epic command' do
+      context 'child_epic command', :nested_groups do
         context 'when correct epic reference' do
           let(:content) { "/child_epic #{child_epic&.to_reference(epic)}" }
 
@@ -827,7 +827,7 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'remove_child_epic command' do
+      context 'remove_child_epic command', :nested_groups do
         context 'when correct epic reference' do
           let(:content) { "/remove_child_epic #{child_epic&.to_reference(epic)}" }
 
