@@ -1,9 +1,11 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlBadge, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import DependenciesActions from './dependencies_actions.vue';
 import DependenciesTable from './dependencies_table.vue';
+import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
+import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
 
 export default {
   name: 'DependenciesApp',
@@ -13,6 +15,8 @@ export default {
     GlBadge,
     GlEmptyState,
     GlLoadingIcon,
+    DependencyListIncompleteAlert,
+    DependencyListJobFailedAlert,
     Pagination,
   },
   props: {
@@ -22,6 +26,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(['jobNotSetUp', 'jobFailed', 'isIncomplete']),
     ...mapState([
       'initialized',
       'isLoading',
@@ -52,7 +57,7 @@ export default {
 
   <!-- TODO: add correct documentation link and SVG path -->
   <gl-empty-state
-    v-else-if="shouldRenderEmptyState"
+    v-else-if="jobNotSetUp"
     :title="__('View dependency information for your project')"
     :description="
       __('The dependency list details information about the components used within your project.')
@@ -62,6 +67,10 @@ export default {
   />
 
   <div v-else>
+    <dependency-list-incomplete-alert v-if="isIncomplete" />
+
+    <dependency-list-job-failed-alert v-if="jobFailed" :job-path="reportInfo.jobPath" />
+
     <div class="d-sm-flex justify-content-between align-items-baseline my-2">
       <h4 class="h5">
         {{ __('Dependencies') }}
