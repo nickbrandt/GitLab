@@ -1,5 +1,0 @@
----
-title: Fixes a CI failure in jest
-merge_request: 11586
-author:
-type: fixed

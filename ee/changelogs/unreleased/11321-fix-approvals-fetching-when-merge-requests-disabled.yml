@@ -1,5 +1,0 @@
----
-title: Fix approvals project settings section when merge requests disabled
-merge_request: 12070
-author:
-type: fixed

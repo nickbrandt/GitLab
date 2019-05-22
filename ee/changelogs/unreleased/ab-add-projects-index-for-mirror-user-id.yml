@@ -1,5 +1,0 @@
----
-title: Add index for mirror_user_id to projects table
-merge_request: 11422
-author:
-type: performance

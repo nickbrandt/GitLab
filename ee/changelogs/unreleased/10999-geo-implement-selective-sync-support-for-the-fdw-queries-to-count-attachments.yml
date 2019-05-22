@@ -1,5 +1,0 @@
----
-title: Geo - Implement selective sync support for the FDW queries to count attachments
-merge_request: 11518
-author:
-type: changed

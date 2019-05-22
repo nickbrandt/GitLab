@@ -1,5 +1,0 @@
----
-title: Geo - Add selective sync support for the job artifacts FDW queries
-merge_request: 11892
-author:
-type: changed

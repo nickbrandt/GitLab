@@ -1,5 +1,0 @@
----
-title: Alert users that protected environments affects feature flags
-merge_request: 12168
-author:
-type: added
