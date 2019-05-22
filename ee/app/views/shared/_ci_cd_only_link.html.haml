@@ -1,0 +1,7 @@
+- return if ci_cd_only
+
+- docs_link = help_page_path('/workflow/repository_mirroring.md', anchor: 'ssh-authentication')
+- link_start = "<a href='#{docs_link}' rel='noopener noreferrer' target='_blank'>".html_safe
+
+%li
+  = _('Once imported, repositories can be mirrored over SSH. Read more %{link_start}here%{link_end}.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
