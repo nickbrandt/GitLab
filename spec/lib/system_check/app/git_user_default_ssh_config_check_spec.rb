@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe SystemCheck::App::GitUserDefaultSSHConfigCheck do
-  include ::EE::GeoHelpers
-
   let(:username) { '_this_user_will_not_exist_unless_it_is_stubbed' }
   let(:base_dir) { Dir.mktmpdir }
   let(:home_dir) { File.join(base_dir, "/var/lib/#{username}") }
@@ -72,7 +70,6 @@ describe SystemCheck::App::GitUserDefaultSSHConfigCheck do
   end
 
   def stub_user
-    allow(File).to receive(:expand_path).and_call_original
     allow(File).to receive(:expand_path).with("~#{username}").and_return(home_dir)
   end
 
