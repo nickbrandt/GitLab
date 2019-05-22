@@ -24,8 +24,8 @@ describe PrometheusAlert do
   end
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project) }
-    it { is_expected.to belong_to(:environment) }
+    it { is_expected.to belong_to(:project).required }
+    it { is_expected.to belong_to(:environment).required }
   end
 
   describe 'project validations' do

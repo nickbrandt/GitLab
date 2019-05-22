@@ -7,7 +7,10 @@ describe Group do
 
   describe 'associations' do
     it { is_expected.to have_many(:audit_events).dependent(false) }
-    it { is_expected.to belong_to(:file_template_project) }
+    # shoulda-matchers attempts to set the association to nil to ensure
+    # the presence check works, but since this is a private method that
+    # method can't be called with a public_send.
+    it { is_expected.to belong_to(:file_template_project).class_name('Project').without_validating_presence }
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
   end
