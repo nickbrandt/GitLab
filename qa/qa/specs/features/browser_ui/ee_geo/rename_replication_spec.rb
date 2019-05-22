@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/99
-  context 'Geo', :orchestrated, :geo, :quarantine do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
       it 'user renames project' do
         # create the project and push code
