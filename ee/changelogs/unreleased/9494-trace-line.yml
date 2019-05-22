@@ -1,0 +1,5 @@
+---
+title: Remove extra border on tracing empty state page
+merge_request:
+author:
+type: fixed
