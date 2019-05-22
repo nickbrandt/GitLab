@@ -188,6 +188,27 @@ rspec system mysql:
   <<: *only-schedules-master
   parallel: 24
 
+.rspec-mysql-on-demand: &rspec-mysql-on-demand
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[run mysql\]/i
+      - $CI_COMMIT_REF_NAME =~ /mysql/
+
+rspec unit mysql on-demand:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-mysql-on-demand
+  parallel: 20
+
+rspec integration mysql on-demand:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-mysql-on-demand
+  parallel: 6
+
+rspec system mysql on-demand:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-mysql-on-demand
+  parallel: 24
+
 rspec-fast-spec-helper:
   <<: *rspec-metadata-pg
   script:
@@ -200,14 +221,15 @@ rspec-fast-spec-helper:
     - scripts/gitaly-test-spawn
     - bin/rspec --color --format documentation --tag quarantine -- spec/
 
-rspec-pg-quarantine:
+rspec quarantine pg:
   <<: *rspec-metadata-pg
   <<: *rspec-quarantine
   allow_failure: true
 
-rspec-mysql-quarantine:
+rspec quarantine mysql:
   <<: *rspec-metadata-mysql
   <<: *rspec-quarantine
+  <<: *only-schedules-master
   allow_failure: true
 
 static-analysis:
@@ -393,6 +415,21 @@ rspec system mysql ee:
   <<: *only-schedules-master
   parallel: 5
 
+rspec unit mysql ee on-demand:
+  <<: *rspec-metadata-mysql-ee
+  <<: *rspec-mysql-on-demand
+  parallel: 7
+
+rspec integration mysql ee on-demand:
+  <<: *rspec-metadata-mysql-ee
+  <<: *rspec-mysql-on-demand
+  parallel: 3
+
+rspec system mysql ee on-demand:
+  <<: *rspec-metadata-mysql-ee
+  <<: *rspec-mysql-on-demand
+  parallel: 5
+
 .rspec-metadata-pg-geo: &rspec-metadata-pg-geo
   <<: *rspec-metadata
   stage: test
@@ -406,7 +443,7 @@ rspec system mysql ee:
     - scripts/gitaly-test-spawn
     - knapsack rspec "-Ispec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo"
 
-rspec-pg-ee geo:
+rspec geo pg ee:
   <<: *rspec-metadata-pg-geo
   <<: *use-pg
   parallel: 3
@@ -415,7 +452,7 @@ rspec-pg-ee geo:
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-rspec-pg-10-ee geo:
+rspec geo pg-10 ee:
   <<: *rspec-metadata-pg-geo
   <<: *use-pg-10
   parallel: 3
@@ -424,14 +461,14 @@ rspec-pg-10-ee geo:
     - /(^docs[\/-].*|.*-docs$)/
     - /(^qa[\/-].*|.*-qa$)/
 
-quick-rspec-pg-ee geo:
+quick-rspec geo pg ee:
   <<: *rspec-metadata-pg-geo
   <<: *use-pg
   stage: quick-test
   only:
     - /(^geo[\/-].*|.*-geo$)/
 
-quick-rspec-pg-10-ee geo:
+quick-rspec geo pg-10 ee:
   <<: *rspec-metadata-pg-geo
   <<: *use-pg-10
   stage: quick-test
@@ -453,6 +490,7 @@ rspec quarantine pg ee:
 rspec quarantine mysql ee:
   <<: *rspec-quarantine-ee
   <<: *rspec-metadata-mysql
+  <<: *only-schedules-master
 
 .migration-paths-upgrade-ce-to-ee: &migration-paths-upgrade-ce-to-ee
   extends: .dedicated-no-docs-and-no-qa-pull-cache-job
