@@ -19,8 +19,10 @@ variables:
   EE_KNAPSACK_RSPEC_SUITE_REPORT_PATH: knapsack/${CI_PROJECT_NAME}/rspec_report-master-ee.json
 
 before_script:
+  - bundle --version
   - date
   - source scripts/utils.sh
+  - date
   - source scripts/prepare_build.sh
   - date
 

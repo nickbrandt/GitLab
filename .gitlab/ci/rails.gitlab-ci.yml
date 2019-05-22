@@ -6,13 +6,13 @@
 
 .use-pg-10: &use-pg-10
   services:
-    - name: postgres:10.7
+    - name: postgres:10.0
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
     - name: redis:alpine
 
 .use-mysql: &use-mysql
   services:
-    - mysql:5.7
+    - mysql:5.7.24
     - redis:alpine
 
 .only-schedules-master: &only-schedules-master
@@ -53,10 +53,8 @@
   script:
     - JOB_NAME=( $CI_JOB_NAME )
     - TEST_TOOL=${JOB_NAME[0]}
-    - TEST_LEVEL=${JOB_NAME[1]}
-    - DATABASE=${JOB_NAME[2]}
-    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_${TEST_LEVEL}_${DATABASE}_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
-    - export KNAPSACK_GENERATE_REPORT=true KNAPSACK_LOG_LEVEL=debug KNAPSACK_TEST_DIR=spec
+    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
+    - export KNAPSACK_GENERATE_REPORT=true
     - export SUITE_FLAKY_RSPEC_REPORT_PATH=${FLAKY_RSPEC_SUITE_REPORT_PATH}
     - export FLAKY_RSPEC_REPORT_PATH=rspec_flaky/all_${TEST_TOOL}_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
     - export NEW_FLAKY_RSPEC_REPORT_PATH=rspec_flaky/new_${TEST_TOOL}_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
@@ -66,10 +64,7 @@
     - '[[ -f $FLAKY_RSPEC_REPORT_PATH ]] || echo "{}" > ${FLAKY_RSPEC_REPORT_PATH}'
     - '[[ -f $NEW_FLAKY_RSPEC_REPORT_PATH ]] || echo "{}" > ${NEW_FLAKY_RSPEC_REPORT_PATH}'
     - scripts/gitaly-test-spawn
-    - date
-    - 'export KNAPSACK_TEST_FILE_PATTERN=$(ruby -r./lib/quality/test_level.rb -e "puts Quality::TestLevel.new.pattern(:${TEST_LEVEL})")'
-    - knapsack rspec "--color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag level:${TEST_LEVEL} --tag ~geo"
-    - date
+    - knapsack rspec "--color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag ~geo"
   artifacts:
     expire_in: 31d
     when: always
@@ -146,47 +141,19 @@ setup-test-env:
   except:
     - /(^docs[\/-].*|.*-docs$)/
 
-rspec unit pg:
+rspec-pg:
   <<: *rspec-metadata-pg
-  parallel: 20
+  parallel: 50
 
-rspec integration pg:
-  <<: *rspec-metadata-pg
-  parallel: 6
-
-rspec system pg:
-  <<: *rspec-metadata-pg
-  parallel: 24
-
-rspec unit pg-10:
+rspec-pg-10:
   <<: *rspec-metadata-pg-10
   <<: *only-schedules-master
-  parallel: 20
+  parallel: 50
 
-rspec integration pg-10:
-  <<: *rspec-metadata-pg-10
-  <<: *only-schedules-master
-  parallel: 6
-
-rspec system pg-10:
-  <<: *rspec-metadata-pg-10
-  <<: *only-schedules-master
-  parallel: 24
-
-rspec unit mysql:
+rspec-mysql:
   <<: *rspec-metadata-mysql
   <<: *only-schedules-master
-  parallel: 20
-
-rspec integration mysql:
-  <<: *rspec-metadata-mysql
-  <<: *only-schedules-master
-  parallel: 6
-
-rspec system mysql:
-  <<: *rspec-metadata-mysql
-  <<: *only-schedules-master
-  parallel: 24
+  parallel: 50
 
 rspec-fast-spec-helper:
   <<: *rspec-metadata-pg
@@ -198,7 +165,7 @@ rspec-fast-spec-helper:
   script:
     - export CACHE_CLASSES=true
     - scripts/gitaly-test-spawn
-    - bin/rspec --color --format documentation --tag quarantine -- spec/
+    - bin/rspec --color --format documentation --tag quarantine spec/
 
 rspec-pg-quarantine:
   <<: *rspec-metadata-pg
@@ -327,12 +294,22 @@ coverage:
     - /(^qa[\/-].*|.*-qa$)/
 
 ## EE-specific content
+
+.use-pg-9-6: &use-pg-9-6
+  services:
+    - postgres:9.6
+    - redis:alpine
+
+.use-pg-10-2: &use-pg-10-2
+  services:
+    - postgres:10.2
+    - redis:alpine
+
 .use-pg-with-elasticsearch: &use-pg-with-elasticsearch
   services:
-    - name: postgres:9.6
-      command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
-    - name: redis:alpine
-    - name: docker.elastic.co/elasticsearch/elasticsearch:5.6.12
+    - postgres:9.6
+    - redis:alpine
+    - docker.elastic.co/elasticsearch/elasticsearch:5.6.12
 
 .use-mysql-with-elasticsearch: &use-mysql-with-elasticsearch
   services:
@@ -346,54 +323,21 @@ coverage:
   script:
     - JOB_NAME=( $CI_JOB_NAME )
     - TEST_TOOL=${JOB_NAME[0]}
-    - TEST_LEVEL=${JOB_NAME[1]}
-    - DATABASE=${JOB_NAME[2]}
-    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_${TEST_LEVEL}_${DATABASE}_ee_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
-    - export KNAPSACK_GENERATE_REPORT=true KNAPSACK_LOG_LEVEL=debug KNAPSACK_TEST_DIR=spec
-    - export CACHE_CLASSES=true
+    - export KNAPSACK_TEST_FILE_PATTERN="ee/spec/**{,/*/**}/*_spec.rb" KNAPSACK_GENERATE_REPORT=true CACHE_CLASSES=true
+    - export KNAPSACK_REPORT_PATH=knapsack/${CI_PROJECT_NAME}/${TEST_TOOL}_node_${CI_NODE_INDEX}_${CI_NODE_TOTAL}_report.json
     - cp ${EE_KNAPSACK_RSPEC_SUITE_REPORT_PATH} ${KNAPSACK_REPORT_PATH}
     - scripts/gitaly-test-spawn
-    - date
-    - 'export KNAPSACK_TEST_FILE_PATTERN=$(ruby -r./lib/quality/test_level.rb -e "puts Quality::TestLevel.new(%(ee/)).pattern(:${TEST_LEVEL})")'
-    - knapsack rspec "--color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag level:${TEST_LEVEL} --tag ~geo"
-    - date
+    - knapsack rspec "-Ispec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag ~geo"
 
-.rspec-metadata-pg-ee: &rspec-metadata-pg-ee
+.rspec-ee-pg: &rspec-ee-pg
   <<: *rspec-metadata-ee
   <<: *use-pg-with-elasticsearch
 
-.rspec-metadata-mysql-ee: &rspec-metadata-mysql-ee
+.rspec-ee-mysql: &rspec-ee-mysql
   <<: *rspec-metadata-ee
   <<: *use-mysql-with-elasticsearch
 
-rspec unit pg ee:
-  <<: *rspec-metadata-pg-ee
-  parallel: 7
-
-rspec integration pg ee:
-  <<: *rspec-metadata-pg-ee
-  parallel: 3
-
-rspec system pg ee:
-  <<: *rspec-metadata-pg-ee
-  parallel: 5
-
-rspec unit mysql ee:
-  <<: *rspec-metadata-mysql-ee
-  <<: *only-schedules-master
-  parallel: 7
-
-rspec integration mysql ee:
-  <<: *rspec-metadata-mysql-ee
-  <<: *only-schedules-master
-  parallel: 3
-
-rspec system mysql ee:
-  <<: *rspec-metadata-mysql-ee
-  <<: *only-schedules-master
-  parallel: 5
-
-.rspec-metadata-pg-geo: &rspec-metadata-pg-geo
+.rspec-geo: &rspec-metadata-geo
   <<: *rspec-metadata
   stage: test
   script:
@@ -406,53 +350,13 @@ rspec system mysql ee:
     - scripts/gitaly-test-spawn
     - knapsack rspec "-Ispec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag geo"
 
-rspec-pg-ee geo:
-  <<: *rspec-metadata-pg-geo
-  <<: *use-pg
-  parallel: 3
-  except:
-    - /(^geo[\/-].*|.*-geo$)/
-    - /(^docs[\/-].*|.*-docs$)/
-    - /(^qa[\/-].*|.*-qa$)/
+.rspec-geo-pg-9-6: &rspec-metadata-pg-geo-9-6
+  <<: *rspec-metadata-geo
+  <<: *use-pg-9-6
 
-rspec-pg-10-ee geo:
-  <<: *rspec-metadata-pg-geo
-  <<: *use-pg-10
-  parallel: 3
-  except:
-    - /(^geo[\/-].*|.*-geo$)/
-    - /(^docs[\/-].*|.*-docs$)/
-    - /(^qa[\/-].*|.*-qa$)/
-
-quick-rspec-pg-ee geo:
-  <<: *rspec-metadata-pg-geo
-  <<: *use-pg
-  stage: quick-test
-  only:
-    - /(^geo[\/-].*|.*-geo$)/
-
-quick-rspec-pg-10-ee geo:
-  <<: *rspec-metadata-pg-geo
-  <<: *use-pg-10
-  stage: quick-test
-  only:
-    - /(^geo[\/-].*|.*-geo$)/
-
-.rspec-quarantine-ee: &rspec-quarantine-ee
-  <<: *only-schedules-master
-  allow_failure: true
-  script:
-    - export NO_KNAPSACK=1 CACHE_CLASSES=true
-    - scripts/gitaly-test-spawn
-    - bin/rspec --color --format documentation --format RspecJunitFormatter --out junit_rspec.xml --tag quarantine -- ee/spec/
-
-rspec quarantine pg ee:
-  <<: *rspec-quarantine-ee
-  <<: *rspec-metadata-pg
-
-rspec quarantine mysql ee:
-  <<: *rspec-quarantine-ee
-  <<: *rspec-metadata-mysql
+.rspec-geo-pg-10-2: &rspec-metadata-pg-geo-10-2
+  <<: *rspec-metadata-geo
+  <<: *use-pg-10-2
 
 .migration-paths-upgrade-ce-to-ee: &migration-paths-upgrade-ce-to-ee
   extends: .dedicated-no-docs-and-no-qa-pull-cache-job
@@ -473,6 +377,60 @@ rspec quarantine mysql ee:
     - bundle exec rake db:migrate
   dependencies:
     - setup-test-env
+
+rspec-pg-ee:
+  <<: *rspec-ee-pg
+  parallel: 10
+
+rspec-mysql-ee:
+  <<: *rspec-ee-mysql
+  <<: *only-schedules-master
+  parallel: 10
+
+rspec-pg-ee geo:
+  <<: *rspec-metadata-pg-geo-9-6
+  parallel: 3
+  except:
+    - /(^geo[\/-].*|.*-geo$)/
+    - /(^docs[\/-].*|.*-docs$)/
+    - /(^qa[\/-].*|.*-qa$)/
+
+rspec-pg-10-ee geo:
+  <<: *rspec-metadata-pg-geo-10-2
+  parallel: 3
+  except:
+    - /(^geo[\/-].*|.*-geo$)/
+    - /(^docs[\/-].*|.*-docs$)/
+    - /(^qa[\/-].*|.*-qa$)/
+
+quick-rspec-pg-ee geo:
+  <<: *rspec-metadata-pg-geo-9-6
+  stage: quick-test
+  only:
+    - /(^geo[\/-].*|.*-geo$)/
+
+quick-rspec-pg-10-ee geo:
+  <<: *rspec-metadata-pg-geo-10-2
+  stage: quick-test
+  only:
+    - /(^geo[\/-].*|.*-geo$)/
+
+.rspec-quarantine-ee: &rspec-quarantine-ee
+  <<: *only-schedules-master
+  script:
+    - export CACHE_CLASSES=true
+    - scripts/gitaly-test-spawn
+    - bin/rspec --color --format documentation --tag quarantine ee/spec/
+
+rspec-pg-quarantine-ee:
+  <<: *rspec-metadata-pg
+  <<: *rspec-quarantine-ee
+  allow_failure: true
+
+rspec-mysql-quarantine-ee:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-quarantine-ee
+  allow_failure: true
 
 migration:upgrade-pg-ce-to-ee:
   <<: *migration-paths-upgrade-ce-to-ee
