@@ -1653,6 +1653,9 @@ msgstr ""
 msgid "Automatically resolved"
 msgstr ""
 
+msgid "Automatically update this project's branches and tags from the upstream repository every hour."
+msgstr ""
+
 msgid "Autosave|Note"
 msgstr ""
 
@@ -8090,6 +8093,9 @@ msgstr ""
 msgid "Mirroring was successfully disabled."
 msgstr ""
 
+msgid "Mirroring will only be available if the feature is included in the plan of the selected group or user."
+msgstr ""
+
 msgid "Missing commit signatures endpoint!"
 msgstr ""
 
@@ -8650,7 +8656,7 @@ msgstr ""
 msgid "Onboarding"
 msgstr ""
 
-msgid "Once imported, repositories can be mirrored over SSH. Read more %{ssh_link}"
+msgid "Once imported, repositories can be mirrored over SSH. Read more %{link_start}here%{link_end}."
 msgstr ""
 
 msgid "Once removed, the fork relationship cannot be restored and you will no longer be able to send merge requests to the source."
