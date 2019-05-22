@@ -1,5 +1,0 @@
----
-title: Upgrade group security dashboard to use gitlab-ui line chart
-merge_request: 10479
-author:
-type: changed

@@ -1,5 +1,0 @@
----
-title: Fix error when reordering/deleting subgroup epics
-merge_request: 11837
-author:
-type: fixed

@@ -1,6 +1,0 @@
----
-title: Fix for not being able to remove the last namespace/project from elasticsearch
-  limited namespaces/projects
-merge_request: 11989
-author:
-type: fixed

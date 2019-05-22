@@ -1,5 +1,0 @@
----
-title: Fix some filter bar tokens not showing up when multiple assignees are enabled
-merge_request: 11939
-author:
-type: fixed
