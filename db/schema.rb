@@ -1617,6 +1617,19 @@ ActiveRecord::Schema.define(version: 20190611161641) do
     t.index ["issue_id"], name: "index_issue_metrics", using: :btree
   end
 
+  create_table "issue_tracker_data", force: :cascade do |t|
+    t.integer "service_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "encrypted_project_url"
+    t.string "encrypted_project_url_iv"
+    t.string "encrypted_issues_url"
+    t.string "encrypted_issues_url_iv"
+    t.string "encrypted_new_issue_url"
+    t.string "encrypted_new_issue_url_iv"
+    t.index ["service_id"], name: "index_issue_tracker_data_on_service_id", using: :btree
+  end
+
   create_table "issues", id: :serial, force: :cascade do |t|
     t.string "title"
     t.integer "author_id"
@@ -1678,6 +1691,22 @@ ActiveRecord::Schema.define(version: 20190611161641) do
     t.index ["jira_connect_installation_id", "namespace_id"], name: "idx_jira_connect_subscriptions_on_installation_id_namespace_id", unique: true, using: :btree
     t.index ["jira_connect_installation_id"], name: "idx_jira_connect_subscriptions_on_installation_id", using: :btree
     t.index ["namespace_id"], name: "index_jira_connect_subscriptions_on_namespace_id", using: :btree
+  end
+
+  create_table "jira_tracker_data", force: :cascade do |t|
+    t.integer "service_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "encrypted_url"
+    t.string "encrypted_url_iv"
+    t.string "encrypted_api_url"
+    t.string "encrypted_api_url_iv"
+    t.string "encrypted_username"
+    t.string "encrypted_username_iv"
+    t.string "encrypted_password"
+    t.string "encrypted_password_iv"
+    t.string "jira_issue_transition_id"
+    t.index ["service_id"], name: "index_jira_tracker_data_on_service_id", using: :btree
   end
 
   create_table "keys", id: :serial, force: :cascade do |t|
@@ -3661,6 +3690,7 @@ ActiveRecord::Schema.define(version: 20190611161641) do
   add_foreign_key "issue_links", "issues", column: "source_id", name: "fk_c900194ff2", on_delete: :cascade
   add_foreign_key "issue_links", "issues", column: "target_id", name: "fk_e71bb44f1f", on_delete: :cascade
   add_foreign_key "issue_metrics", "issues", on_delete: :cascade
+  add_foreign_key "issue_tracker_data", "services", on_delete: :cascade
   add_foreign_key "issues", "issues", column: "moved_to_id", name: "fk_a194299be1", on_delete: :nullify
   add_foreign_key "issues", "milestones", name: "fk_96b1dd429c", on_delete: :nullify
   add_foreign_key "issues", "projects", name: "fk_899c8f3231", on_delete: :cascade
@@ -3669,6 +3699,7 @@ ActiveRecord::Schema.define(version: 20190611161641) do
   add_foreign_key "issues", "users", column: "updated_by_id", name: "fk_ffed080f01", on_delete: :nullify
   add_foreign_key "jira_connect_subscriptions", "jira_connect_installations", on_delete: :cascade
   add_foreign_key "jira_connect_subscriptions", "namespaces", on_delete: :cascade
+  add_foreign_key "jira_tracker_data", "services", on_delete: :cascade
   add_foreign_key "label_links", "labels", name: "fk_d97dd08678", on_delete: :cascade
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
