@@ -5,6 +5,7 @@ module QA
     module Resource
       module Geo
         class Node < QA::Resource::Base
+          attr_accessor :name
           attr_accessor :address
 
           def fabricate!
@@ -14,8 +15,9 @@ module QA
             EE::Page::Admin::Geo::Nodes::Show.perform(&:new_node!)
 
             EE::Page::Admin::Geo::Nodes::New.perform do |page|
-              raise ArgumentError if @address.nil?
+              raise ArgumentError if @name.nil? || @address.nil?
 
+              page.set_node_name(@name)
               page.set_node_address(@address)
               page.add_node!
             end
