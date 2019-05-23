@@ -10,47 +10,24 @@ describe 'admin/groups/_form' do
     allow(view).to receive(:visibility_level) { group.visibility_level }
   end
 
-  describe 'when :shared_runner_minutes_on_root_namespace is disabled' do
-    before do
-      stub_feature_flags(shared_runner_minutes_on_root_namespace: false)
-    end
+  context 'when sub group is used', :nested_groups do
+    let(:root_ancestor) { create(:group) }
+    let(:group) { build(:group, parent: root_ancestor) }
 
-    context 'when sub group is used' do
-      let(:root_ancestor) { create(:group) }
-      let(:group) { build(:group, parent: root_ancestor) }
+    it 'does not render shared_runners_minutes_setting' do
+      render
 
-      it 'renders shared_runners_minutes_setting' do
-        render
-
-        expect(rendered).to render_template('namespaces/_shared_runners_minutes_setting')
-      end
+      expect(rendered).not_to render_template('namespaces/_shared_runners_minutes_setting')
     end
   end
 
-  describe 'when :shared_runner_minutes_on_root_namespace is enabled', :nested_groups do
-    before do
-      stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-    end
+  context 'when root group is used' do
+    let(:group) { build(:group) }
 
-    context 'when sub group is used' do
-      let(:root_ancestor) { create(:group) }
-      let(:group) { build(:group, parent: root_ancestor) }
+    it 'does not render shared_runners_minutes_setting' do
+      render
 
-      it 'does not render shared_runners_minutes_setting' do
-        render
-
-        expect(rendered).not_to render_template('namespaces/_shared_runners_minutes_setting')
-      end
-    end
-
-    context 'when root group is used' do
-      let(:group) { build(:group) }
-
-      it 'does not render shared_runners_minutes_setting' do
-        render
-
-        expect(rendered).to render_template('namespaces/_shared_runners_minutes_setting')
-      end
+      expect(rendered).to render_template('namespaces/_shared_runners_minutes_setting')
     end
   end
 end

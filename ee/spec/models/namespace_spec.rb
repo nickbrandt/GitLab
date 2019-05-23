@@ -99,10 +99,6 @@ describe Namespace do
     end
 
     describe '#validate_shared_runner_minutes_support' do
-      before do
-        stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-      end
-
       context 'when changing :shared_runners_minutes_limit' do
         before do
           namespace.shared_runners_minutes_limit = 100
@@ -431,24 +427,8 @@ describe Namespace do
         namespace.parent = build(:group)
       end
 
-      context 'when shared_runner_minutes_on_root_namespace is disabled' do
-        before do
-          stub_feature_flags(shared_runner_minutes_on_root_namespace: false)
-        end
-
-        it 'returns true' do
-          is_expected.to eq(true)
-        end
-      end
-
-      context 'when shared_runner_minutes_on_root_namespace is enabled', :nested_groups do
-        before do
-          stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-        end
-
-        it 'returns false' do
-          is_expected.to eq(false)
-        end
+      it 'returns false' do
+        is_expected.to eq(false)
       end
     end
 
@@ -482,7 +462,6 @@ describe Namespace do
 
         context 'when is subgroup', :nested_groups do
           before do
-            stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
             namespace.parent = build(:group)
           end
 
@@ -499,28 +478,12 @@ describe Namespace do
   describe '#shared_runners_enabled?' do
     subject { namespace.shared_runners_enabled? }
 
-    context 'subgroup with shared runners enabled project' do
+    context 'subgroup with shared runners enabled project', :nested_groups do
       let(:subgroup) { create(:group, parent: namespace) }
       let!(:subproject) { create(:project, namespace: subgroup, shared_runners_enabled: true) }
 
-      context 'when shared_runner_minutes_on_root_namespace is disabled' do
-        before do
-          stub_feature_flags(shared_runner_minutes_on_root_namespace: false)
-        end
-
-        it "returns false" do
-          is_expected.to eq(false)
-        end
-      end
-
-      context 'when shared_runner_minutes_on_root_namespace is enabled', :nested_groups do
-        before do
-          stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-        end
-
-        it "returns true" do
-          is_expected.to eq(true)
-        end
+      it "returns true" do
+        is_expected.to eq(true)
       end
     end
 

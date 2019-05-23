@@ -51,12 +51,7 @@ module EE
       # rubocop: disable CodeReuse/ActiveRecord
       def all_namespaces
         namespaces = ::Namespace.reorder(nil).where('namespaces.id = projects.namespace_id')
-
-        if ::Feature.enabled?(:shared_runner_minutes_on_root_namespace)
-          namespaces = ::Gitlab::ObjectHierarchy.new(namespaces).roots
-        end
-
-        namespaces
+        ::Gitlab::ObjectHierarchy.new(namespaces).roots
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
