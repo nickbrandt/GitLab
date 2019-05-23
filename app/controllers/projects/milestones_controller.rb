@@ -34,7 +34,7 @@ class Projects::MilestonesController < Projects::ApplicationController
         @milestones = @milestones.page(params[:page])
       end
       format.json do
-        render json: @milestones.to_json(methods: :name)
+        render json: @milestones.to_json(only: [:id, :title], methods: :name)
       end
     end
   end
