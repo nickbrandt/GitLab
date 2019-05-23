@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Groups::PipelineQuotaController < Groups::ApplicationController
+class Groups::UsageQuotasController < Groups::ApplicationController
   before_action :authorize_admin_group!
   before_action :validate_shared_runner_minutes_support!
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Groups > Pipeline Quota' do
+describe 'Groups > Usage Quotas' do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let!(:project) { create(:project, namespace: group, shared_runners_enabled: true) }
@@ -38,7 +38,7 @@ describe 'Groups > Pipeline Quota' do
     it 'is not linked within the group settings dropdown' do
       visit edit_group_path(group)
 
-      expect(page).not_to have_link('Pipelines quota')
+      expect(page).not_to have_link('Usage Quotas')
     end
 
     it 'shows correct group quota info' do
@@ -61,7 +61,7 @@ describe 'Groups > Pipeline Quota' do
     it 'is linked within the group settings tab' do
       visit edit_group_path(group)
 
-      expect(page).to have_link('Pipelines quota')
+      expect(page).to have_link('Usage Quotas')
     end
 
     it 'shows correct group quota info' do
@@ -82,7 +82,7 @@ describe 'Groups > Pipeline Quota' do
     it 'is linked within the group settings tab' do
       visit edit_group_path(group)
 
-      expect(page).to have_link('Pipelines quota')
+      expect(page).to have_link('Usage Quotas')
     end
 
     it 'shows correct group quota and projects info' do
@@ -125,6 +125,6 @@ describe 'Groups > Pipeline Quota' do
   end
 
   def visit_pipeline_quota_page
-    visit group_pipeline_quota_path(group)
+    visit group_usage_quotas_path(group)
   end
 end

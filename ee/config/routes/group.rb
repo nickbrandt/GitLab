@@ -36,7 +36,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :ldap_group_links, only: [:index, :create, :destroy]
     resources :audit_events, only: [:index]
-    resources :pipeline_quota, only: [:index]
+    resources :usage_quotas, only: [:index]
 
     resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ } do
       member do

@@ -8066,6 +8066,9 @@ msgstr ""
 msgid "Minimum capacity to be available before we schedule more mirrors preemptively."
 msgstr ""
 
+msgid "Minutes"
+msgstr ""
+
 msgid "Mirror a repository"
 msgstr ""
 
@@ -11423,6 +11426,9 @@ msgstr ""
 msgid "Shared projects"
 msgstr ""
 
+msgid "Shared runners help link"
+msgstr ""
+
 msgid "SharedRunnersMinutesSettings|By resetting the pipeline minutes for this namespace, the currently used minutes will be set to zero."
 msgstr ""
 
@@ -13679,6 +13685,36 @@ msgid "Usage ping is not enabled"
 msgstr ""
 
 msgid "Usage statistics"
+msgstr ""
+
+msgid "UsageQuota|Buy additional minutes"
+msgstr ""
+
+msgid "UsageQuota|Current period usage"
+msgstr ""
+
+msgid "UsageQuota|Pipelines"
+msgstr ""
+
+msgid "UsageQuota|This group has no projects which use shared runners"
+msgstr ""
+
+msgid "UsageQuota|Unlimited"
+msgstr ""
+
+msgid "UsageQuota|Usage"
+msgstr ""
+
+msgid "UsageQuota|Usage Quotas"
+msgstr ""
+
+msgid "UsageQuota|Usage of group resources across the projects in the %{strong_start}%{group_name}%{strong_end} group"
+msgstr ""
+
+msgid "UsageQuota|Usage quotas"
+msgstr ""
+
+msgid "UsageQuota|Usage since"
 msgstr ""
 
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"

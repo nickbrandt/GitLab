@@ -1,0 +1,21 @@
+- page_title s_("UsageQuota|Usage")
+
+%h3.page-title
+  = s_('UsageQuota|Usage quotas')
+
+.row
+  .col-sm-6
+    = s_('UsageQuota|Usage of group resources across the projects in the %{strong_start}%{group_name}%{strong_end} group').html_safe % { strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe, group_name: @group.name }
+
+.top-area.scrolling-tabs-container.inner-page-scroll-tabs
+  %ul.nav-links.scrolling-tabs.separator{ role: 'tablist' }
+    %li.nav-item
+      %a.nav-link.active#pipelines-quota{ href: 'pipelines-quota-tab', data: { toggle: 'tab' }, 'aria-controls': 'pipelines-quota-tab', 'aria-selected': true }
+        = s_('UsageQuota|Pipelines')
+  .nav-controls
+    = link_to s_('UsageQuota|Buy additional minutes'), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', class: 'btn btn-inverted btn-success float-right'
+
+.tab-content
+  .tab-pane.show.active#pipelines-quota-tab{ role: 'tabpanel' }
+    = render "namespaces/pipelines_quota/list",
+      locals: { namespace: @group, projects: @projects }

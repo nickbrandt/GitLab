@@ -7,18 +7,21 @@
       %strong
         - last_reset = namespace.shared_runners_seconds_last_reset
         - if last_reset
-          Usage since
+          = s_('UsageQuota|Usage since')
           = last_reset.strftime('%b %d, %Y')
         - else
-          Current period usage
+          = s_('UsageQuota|Current period usage')
       %div
         = namespace_shared_runner_limits_quota(namespace)
         minutes
+        = link_to icon('question-circle'), help_page_path('user/admin_area/settings/continuous_integration', anchor: 'shared-runners-build-minutes-quota'), target: '_blank', 'aria-label': _('Shared runners help link')
+
     .col-sm-6.right
       - if namespace.shared_runners_minutes_limit_enabled?
         #{namespace_shared_runner_limits_percent_used(namespace)}% used
       - else
-        Unlimited
+        = s_('UsageQuota|Unlimited')
+
       = namespace_shared_runner_limits_progress_bar(namespace)
 
   = render 'namespaces/pipelines_quota/extra_shared_runners_minutes_quota', namespace: namespace
@@ -26,8 +29,10 @@
 %table.table.pipeline-project-metrics
   %thead
     %tr
-      %th Project
-      %th Minutes
+      %th
+        = _('Project')
+      %th
+        = _('Minutes')
 
   %tbody
     - projects.each do |project|
@@ -41,6 +46,7 @@
     - if projects.blank?
       %tr
         %td{ colspan: 2 }
-          .nothing-here-block This group has no projects which use shared runners
+          .nothing-here-block
+            = s_('UsageQuota|This group has no projects which use shared runners')
 
 = paginate projects, theme: "gitlab"
