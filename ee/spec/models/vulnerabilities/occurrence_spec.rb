@@ -218,7 +218,7 @@ describe Vulnerabilities::Occurrence do
     subject { described_class.by_severities(param) }
 
     context 'with one param' do
-      let(:param) { 4 }
+      let(:param) { described_class.severities[:low] }
 
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_low)
@@ -226,7 +226,7 @@ describe Vulnerabilities::Occurrence do
     end
 
     context 'without found record' do
-      let(:param) { 7 }
+      let(:param) { described_class.severities[:unknown] }
 
       it 'returns empty collection' do
         is_expected.to be_empty
@@ -240,16 +240,16 @@ describe Vulnerabilities::Occurrence do
 
     subject { described_class.by_confidences(param) }
 
-    context 'with one param' do
-      let(:param) { 4 }
+    context 'with matching param' do
+      let(:param) { described_class.confidences[:low] }
 
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_low)
       end
     end
 
-    context 'without found record' do
-      let(:param) { 7 }
+    context 'with non-matching param' do
+      let(:param) { described_class.confidences[:unknown] }
 
       it 'returns empty collection' do
         is_expected.to be_empty
