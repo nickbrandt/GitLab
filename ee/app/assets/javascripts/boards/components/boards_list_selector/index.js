@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
@@ -80,8 +79,6 @@ export default Vue.extend({
         }
 
         this.store.new(list);
-
-        this.store.state.lists = _.sortBy(this.store.state.lists, 'position');
       }
     },
   },
