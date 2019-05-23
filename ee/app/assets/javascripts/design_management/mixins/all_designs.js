@@ -19,12 +19,7 @@ export default {
           iid: this.issueIid,
         };
       },
-      update: data =>
-        data.project.issue.designs.designs.edges.map(({ node }) => ({
-          ...node,
-          // TODO: Remove this once backend exposes raw images
-          image: 'http://via.placeholder.com/1000',
-        })),
+      update: data => data.project.issue.designs.designs.edges.map(({ node }) => node),
       error() {
         this.error = true;
       },
