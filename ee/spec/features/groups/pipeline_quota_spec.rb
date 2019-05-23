@@ -101,51 +101,26 @@ describe 'Groups > Pipeline Quota' do
     end
   end
 
-  context 'with shared_runner_minutes_on_root_namespace disabled' do
-    before do
-      stub_feature_flags(shared_runner_minutes_on_root_namespace: false)
-    end
+  context 'when accessing subgroup' do
+    let(:root_ancestor) { create(:group) }
+    let(:group) { create(:group, parent: root_ancestor) }
 
-    context 'when accessing group with subgroups' do
-      let(:group) { create(:group, :with_used_build_minutes_limit) }
-      let!(:subgroup) { create(:group, parent: group) }
-      let!(:subproject) { create(:project, namespace: subgroup, shared_runners_enabled: true) }
+    it 'does not show subproject' do
+      visit_pipeline_quota_page
 
-      it 'does not show project of subgroup' do
-        visit_pipeline_quota_page
-
-        expect(page).to have_content(project.full_name)
-        expect(page).not_to have_content(subproject.full_name)
-      end
+      expect(page).to have_http_status(:not_found)
     end
   end
 
-  context 'with shared_runner_minutes_on_root_namespace enabled', :nested_groups do
-    before do
-      stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-    end
+  context 'when accesing root group' do
+    let!(:subgroup) { create(:group, parent: group) }
+    let!(:subproject) { create(:project, namespace: subgroup, shared_runners_enabled: true) }
 
-    context 'when accessing subgroup' do
-      let(:root_ancestor) { create(:group) }
-      let(:group) { create(:group, parent: root_ancestor) }
+    it 'does show projects of subgroup' do
+      visit_pipeline_quota_page
 
-      it 'does not show subproject' do
-        visit_pipeline_quota_page
-
-        expect(page).to have_http_status(:not_found)
-      end
-    end
-
-    context 'when accesing root group' do
-      let!(:subgroup) { create(:group, parent: group) }
-      let!(:subproject) { create(:project, namespace: subgroup, shared_runners_enabled: true) }
-
-      it 'does show projects of subgroup' do
-        visit_pipeline_quota_page
-
-        expect(page).to have_content(project.full_name)
-        expect(page).to have_content(subproject.full_name)
-      end
+      expect(page).to have_content(project.full_name)
+      expect(page).to have_content(subproject.full_name)
     end
   end
 
