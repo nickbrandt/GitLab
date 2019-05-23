@@ -20,7 +20,6 @@ module EESpecificCheck
     ## for more information.
     ##
     'doc/api/custom_attributes.md',
-    'doc/api/services.md',
     'doc/api/system_hooks.md',
     'doc/api/access_requests.md',
     'doc/api/repositories.md',
@@ -28,7 +27,6 @@ module EESpecificCheck
     'doc/api/build_triggers.md',
     'doc/api/project_level_variables.md',
     'doc/api/markdown.md',
-    'doc/api/boards.md',
     'doc/api/graphql/index.md',
     'doc/api/pipelines.md',
     'doc/api/import.md',
@@ -54,12 +52,9 @@ module EESpecificCheck
     'doc/api/broadcast_messages.md',
     'doc/api/labels.md',
     'doc/api/pages_domains.md',
-    'doc/api/notes.md',
     'doc/api/builds.md',
     'doc/api/container_registry.md',
     'doc/api/todos.md',
-    'doc/api/resource_label_events.md',
-    'doc/api/discussions.md',
     'doc/api/protected_tags.md',
     'doc/api/releases/links.md',
     'doc/api/releases/index.md',
