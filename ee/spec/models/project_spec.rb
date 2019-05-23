@@ -613,7 +613,7 @@ describe Project do
     end
   end
 
-  describe '#shared_runners_limit_namespace' do
+  describe '#shared_runners_limit_namespace', :nested_groups do
     set(:root_ancestor) { create(:group) }
     set(:group) { create(:group, parent: root_ancestor) }
     let(:project) { create(:project, namespace: group) }
