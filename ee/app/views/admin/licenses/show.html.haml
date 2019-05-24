@@ -1,6 +1,6 @@
 - page_title "License"
 
-- if Feature.enabled?(:licenses_app, default_enabled: true)
+- if Feature.enabled?(:licenses_app)
   #instance-license-mount-element{ license_app_data }
 - else
   %h3.page-title
