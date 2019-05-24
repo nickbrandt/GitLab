@@ -26,6 +26,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           module: :projects,
           as: :project) do
 
+      # Begin of the /-/ scope.
+      # Use this scope for all new project routes.
       scope '-' do
         get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
 
@@ -92,19 +94,48 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         ## EE-specific
         resources :feature_flags
         ## EE-specific
-      end
 
-      resources :autocomplete_sources, only: [] do
-        collection do
-          get 'members'
-          get 'issues'
-          get 'merge_requests'
-          get 'labels'
-          get 'milestones'
-          get 'commands'
-          get 'snippets'
+        resources :autocomplete_sources, only: [] do
+          collection do
+            get 'members'
+            get 'issues'
+            get 'merge_requests'
+            get 'labels'
+            get 'milestones'
+            get 'commands'
+            get 'snippets'
+          end
+        end
+
+        resources :project_members, except: [:show, :new, :edit], constraints: { id: %r{[a-zA-Z./0-9_\-#%+]+} }, concerns: :access_requestable do
+          collection do
+            delete :leave
+
+            # Used for import team
+            # from another project
+            get :import
+            post :apply_import
+          end
+
+          member do
+            post :resend_invite
+          end
+        end
+
+        resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
+          member do
+            put :enable
+            put :disable
+          end
+        end
+
+        resources :deploy_tokens, constraints: { id: /\d+/ }, only: [] do
+          member do
+            put :revoke
+          end
         end
       end
+      # End of the /-/ scope.
 
       #
       # Templates
@@ -157,19 +188,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :notify, on: :collection
         end
         # EE-specific
-      end
-
-      resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
-        member do
-          put :enable
-          put :disable
-        end
-      end
-
-      resources :deploy_tokens, constraints: { id: /\d+/ }, only: [] do
-        member do
-          put :revoke
-        end
       end
 
       resources :releases, only: [:index]
@@ -489,21 +507,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
       end
 
-      resources :project_members, except: [:show, :new, :edit], constraints: { id: %r{[a-zA-Z./0-9_\-#%+]+} }, concerns: :access_requestable do
-        collection do
-          delete :leave
-
-          # Used for import team
-          # from another project
-          get :import
-          post :apply_import
-        end
-
-        member do
-          post :resend_invite
-        end
-      end
-
       resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
       resources :notes, only: [:create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ } do
@@ -611,7 +614,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           constraints: { project_id: Gitlab::PathRegex.project_route_regex },
           module: :projects,
           as: :project) do
-      Gitlab::Routing.redirect_legacy_paths(self, :settings, :branches, :tags, :network, :graphs)
+      Gitlab::Routing.redirect_legacy_paths(self, :settings, :branches, :tags,
+                                            :network, :graphs, :autocomplete_sources,
+                                            :project_members, :deploy_keys, :deploy_tokens)
     end
   end
 end
