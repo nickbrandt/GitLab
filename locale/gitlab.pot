@@ -1016,6 +1016,9 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
+msgid "An error occurding while fetching folder content."
+msgstr ""
+
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
@@ -7679,6 +7682,9 @@ msgstr ""
 msgid "Mark as resolved"
 msgstr ""
 
+msgid "Mark comment as resolved"
+msgstr ""
+
 msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
@@ -10714,6 +10720,9 @@ msgid "Resolved 1 discussion."
 msgstr ""
 
 msgid "Resolved all discussions."
+msgstr ""
+
+msgid "Resolved by %{name}"
 msgstr ""
 
 msgid "Resolved by %{resolvedByName}"
