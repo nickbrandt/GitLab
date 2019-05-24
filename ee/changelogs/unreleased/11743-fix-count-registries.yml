@@ -1,0 +1,6 @@
+---
+title: Geo - Does not apply selective sync restrictions while counting registries
+  on the tracking database
+merge_request: 13257
+author:
+type: performance

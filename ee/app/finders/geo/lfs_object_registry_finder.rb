@@ -19,7 +19,7 @@ module Geo
     end
 
     def count_registry
-      registries_for_lfs_objects.count
+      Geo::FileRegistry.lfs_objects.count
     end
 
     def syncable
