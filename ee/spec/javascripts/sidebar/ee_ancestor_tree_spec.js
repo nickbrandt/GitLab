@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { escape } from 'underscore';
 import ancestorsTree from 'ee/sidebar/components/ancestors_tree/ancestors_tree.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
@@ -55,6 +56,21 @@ describe('AncestorsTreeContainer', () => {
     vm.$nextTick()
       .then(() => {
         expect(vm.$el.querySelector('.fa-spinner')).toBeDefined();
+      })
+      .then(done)
+      .catch(done.fail);
+  });
+
+  it('escapes html in the tooltip', done => {
+    const title = '<script>alert(1);</script>';
+    const escapedTitle = escape(title);
+
+    vm.$props.ancestors = [{ id: 1, url: '', title, state: 'open' }];
+    vm.$nextTick()
+      .then(() => {
+        const tooltip = vm.$el.querySelector('.collapse-truncated-title');
+
+        expect(tooltip.innerText).toBe(escapedTitle);
       })
       .then(done)
       .catch(done.fail);
