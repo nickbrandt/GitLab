@@ -13,7 +13,7 @@ describe('Visual Review App Link', () => {
     propsData = {
       cssClass: 'button cool-button best-button',
       appMetadata: {
-        issueId: 1,
+        mergeRequestId: 1,
         sourceProjectId: 20,
         appUrl: 'http://gitlab.example.com',
       },
@@ -58,9 +58,9 @@ describe('Visual Review App Link', () => {
       );
     });
 
-    it('with expected discussion Id', () => {
+    it('with expected merge request id', () => {
       expect(wrapper.find(GlModal).text()).toEqual(
-        expect.stringContaining(`data-discussion-id='${propsData.appMetadata.issueId}'`),
+        expect.stringContaining(`data-merge-request-id='${propsData.appMetadata.mergeRequestId}'`),
       );
     });
 
