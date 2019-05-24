@@ -107,13 +107,13 @@ describe Geo::LfsObjectRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
         end
 
-        it 'counts file registries for LFS objects' do
+        it 'does not apply the selective sync restriction' do
           create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
           create(:geo_file_registry, :avatar)
 
-          expect(subject.count_registry).to eq 1
+          expect(subject.count_registry).to eq 3
         end
       end
 
@@ -130,13 +130,13 @@ describe Geo::LfsObjectRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
         end
 
-        it 'counts file registries for LFS objects' do
+        it 'does not apply the selective sync restriction' do
           create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
           create(:geo_file_registry, :avatar)
 
-          expect(subject.count_registry).to eq 2
+          expect(subject.count_registry).to eq 3
         end
       end
     end

@@ -19,7 +19,7 @@ module Geo
     end
 
     def count_registry
-      registries_for_job_artifacts.count
+      Geo::JobArtifactRegistry.count
     end
 
     def syncable
