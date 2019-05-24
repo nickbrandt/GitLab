@@ -382,8 +382,8 @@ describe Geo::JobArtifactRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
         end
 
-        it 'counts file registries for job artifacts' do
-          expect(subject.count_registry).to eq 2
+        it 'does not apply the selective sync restriction' do
+          expect(subject.count_registry).to eq 4
         end
       end
 
@@ -392,8 +392,8 @@ describe Geo::JobArtifactRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
         end
 
-        it 'counts file registries for job artifacts' do
-          expect(subject.count_registry).to eq 1
+        it 'does not apply the selective sync restriction' do
+          expect(subject.count_registry).to eq 4
         end
       end
     end
