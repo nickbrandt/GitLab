@@ -192,7 +192,7 @@ export default {
       }
     },
     cancel() {
-      boardsStore.state.currentPage = '';
+      boardsStore.showPage('');
     },
     resetFormState() {
       if (this.isNewForm) {
