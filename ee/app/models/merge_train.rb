@@ -30,6 +30,10 @@ class MergeTrain < ApplicationRecord
     self.class.all_in_train(merge_request).where('merge_trains.id > ?', id)
   end
 
+  def next
+    all_next.first
+  end
+
   def index
     self.class.all_in_train(merge_request).where('merge_trains.id < ?', id).count
   end

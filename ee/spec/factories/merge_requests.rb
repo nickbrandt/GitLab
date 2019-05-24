@@ -13,8 +13,14 @@ FactoryBot.modify do
         train_creator { author }
       end
 
+      auto_merge_enabled true
+      auto_merge_strategy AutoMergeService::STRATEGY_MERGE_TRAIN
+      merge_user { train_creator }
+
       after :create do |merge_request, evaluator|
-        merge_request.get_on_train!(evaluator.train_creator)
+        merge_request.create_merge_train(user: evaluator.train_creator,
+                                         target_project: merge_request.target_project,
+                                         target_branch: merge_request.target_branch)
       end
     end
 
