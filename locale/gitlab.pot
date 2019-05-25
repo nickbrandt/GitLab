@@ -14943,10 +14943,10 @@ msgstr ""
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
 msgstr ""
 
-msgid "You don't have any active chat names."
+msgid "You don't have any U2F devices registered yet."
 msgstr ""
 
-msgid "You don't have any U2F devices registered yet."
+msgid "You don't have any active chat names."
 msgstr ""
 
 msgid "You don't have any applications"
