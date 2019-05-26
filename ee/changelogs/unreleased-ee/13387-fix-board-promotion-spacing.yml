@@ -1,0 +1,5 @@
+---
+title: Fixed padding for promotion state in Boards
+merge_request: 13387
+author: Ben McCormick
+type: fixed
