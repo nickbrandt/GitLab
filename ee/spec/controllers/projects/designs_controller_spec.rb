@@ -12,7 +12,7 @@ describe Projects::DesignsController do
   end
 
   describe 'GET #show' do
-    it 'serves the file using workhorse' do
+    subject do
       get(:show,
         params: {
           namespace_id: project.namespace,
@@ -20,11 +20,22 @@ describe Projects::DesignsController do
           id: design.id,
           ref: 'HEAD'
       })
+    end
+
+    it 'serves the file using workhorse' do
+      subject
 
       expect(response).to have_gitlab_http_status(200)
       expect(response.header['Content-Disposition']).to eq('inline')
       expect(response.header[Gitlab::Workhorse::DETECT_HEADER]).to eq "true"
       expect(response.header[Gitlab::Workhorse::SEND_DATA_HEADER]).to start_with('git-blob:')
+    end
+
+    it_behaves_like 'a controller that can serve LFS files' do
+      let(:design) { create(:design, :with_lfs_file, issue: issue) }
+      let(:lfs_oid) { project.design_repository.blob_at('HEAD', design.full_path).lfs_oid }
+      let(:filename) { design.filename }
+      let(:filepath) { design.full_path }
     end
   end
 end

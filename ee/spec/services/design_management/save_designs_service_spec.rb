@@ -131,6 +131,17 @@ describe DesignManagement::SaveDesignsService do
         end
       end
 
+      context 'when LFS is enabled' do
+        before do
+          allow(project).to receive(:lfs_enabled?).and_return(true)
+          allow_any_instance_of(Lfs::FileTransformer).to receive(:lfs_file?).and_return(true)
+        end
+
+        it 'saves the design to LFS' do
+          expect { service.execute }.to change { LfsObject.count }.by(1)
+        end
+      end
+
       context 'when the user is not allowed to upload designs' do
         let(:user) { create(:user) }
 
