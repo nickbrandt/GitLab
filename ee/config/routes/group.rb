@@ -97,6 +97,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resource :scim_oauth, only: [:show, :create], controller: :scim_oauth
 
+    get :sign_up, to: 'sso#sign_up_form'
+    post :sign_up, to: 'sso#sign_up'
+
     resource :roadmap, only: [:show], controller: 'roadmap'
 
     legacy_ee_group_boards_redirect = redirect do |params, request|

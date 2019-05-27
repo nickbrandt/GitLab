@@ -11,6 +11,12 @@ class GroupSamlIdentityFinder
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  # rubocop: disable CodeReuse/ActiveRecord
+  def self.not_managed_identities(group:)
+    group.saml_provider.identities.joins(:user).merge(User.not_managed(group: group))
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
   def initialize(user:)
     @user = user
   end

@@ -151,21 +151,40 @@ describe Groups::OmniauthCallbacksController do
             expect(flash[:notice]).to eq 'Request to link SAML account must be authorized'
           end
         end
+
+        context 'with enforced_group_managed_accounts enabled' do
+          let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
+
+          it 'redirects to group sign up' do
+            post provider, params: { group_id: group }
+
+            expect(response).to redirect_to(group_sign_up_path(group))
+          end
+        end
       end
     end
 
     context "when not signed in" do
       context "and identity hasn't been linked" do
-        it "redirects to sign in page" do
-          post provider, params: { group_id: group }
+        let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
 
-          expect(response).to redirect_to(new_user_session_path)
+        context 'when sign_up_on_sso feature flag is disabled' do
+          before do
+            stub_feature_flags(sign_up_on_sso: false)
+          end
+
+          it "redirects to sign in page with flash notice" do
+            post provider, params: { group_id: group }
+
+            expect(response).to redirect_to(new_user_session_path)
+            expect(flash[:notice]).to start_with("Login to a GitLab account to link with your SAML identity")
+          end
         end
 
-        it "informs users that they need to sign in to the GitLab instance first" do
+        it 'redirects to group sign up page' do
           post provider, params: { group_id: group }
 
-          expect(flash[:notice]).to start_with("Login to a GitLab account to link with your SAML identity")
+          expect(response).to redirect_to(group_sign_up_path(group))
         end
       end
 
@@ -244,6 +263,8 @@ describe Groups::OmniauthCallbacksController do
     end
 
     context "with access to SAML settings for the group" do
+      let(:user) { create_linked_user }
+
       before do
         group.add_owner(user)
         sign_in(user)

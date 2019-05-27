@@ -1,0 +1,7 @@
+.avatar-container.s32.mr-2
+  = user_avatar_without_link(user: current_user, size: 32)
+%div
+  %div
+    %strong= current_user.name
+    %span= current_user.to_reference
+  %span.text-secondary= current_user.email

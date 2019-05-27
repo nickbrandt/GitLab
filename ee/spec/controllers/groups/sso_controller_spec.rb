@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Groups::SsoController do
   let(:user) { create(:user) }
-  let(:group) { create(:group, :private, name: 'our-group') }
+  let(:group) { create(:group, :private, name: 'our-group', saml_discovery_token: 'test-token') }
 
   before do
     stub_licensed_features(group_saml: true)
@@ -116,6 +116,116 @@ describe Groups::SsoController do
         get :saml, params: { group_id: 'not-a-group' }
 
         expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
+  describe 'GET sign_up_form' do
+    subject do
+      get :sign_up_form,
+          params: { group_id: group },
+          session: { "oauth_data" => oauth_data, "oauth_group_id" => oauth_group_id }
+    end
+
+    let(:oauth_data) { nil }
+    let(:oauth_group_id) { group.id }
+
+    context 'with SAML configured' do
+      let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
+
+      context 'and group managed accounts enforced' do
+        context 'and oauth data available' do
+          let(:oauth_data) { { "info" => { "name" => 'Test', "email" => 'email@email.com' } } }
+
+          it 'has status 200' do
+            expect(subject).to have_gitlab_http_status(200)
+          end
+
+          context 'and belongs to different group' do
+            let(:oauth_group_id) { group.id + 1 }
+
+            it 'renders 404' do
+              expect(subject).to have_gitlab_http_status(404)
+            end
+          end
+        end
+
+        it 'renders 404' do
+          expect(subject).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'and group managed accounts enforcing is disabled' do
+        before do
+          saml_provider.update(enforced_group_managed_accounts: false)
+        end
+
+        it 'renders 404' do
+          expect(subject).to have_gitlab_http_status(404)
+        end
+      end
+    end
+  end
+
+  describe 'POST sign_up' do
+    subject do
+      post :sign_up,
+           params: { group_id: group, new_user: new_user_data },
+           session: { "oauth_data" => oauth_data, "oauth_group_id" => group.id }
+    end
+
+    let(:new_user_data) { { username: "myusername" } }
+    let(:oauth_data) { { "info" => { "name" => 'Test', "email" => 'email@email.com' } } }
+
+    let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
+
+    let(:sign_up_service_spy) { spy('GroupSaml::SignUpService') }
+
+    before do
+      allow(GroupSaml::SignUpService)
+        .to receive(:new).with(kind_of(User), group, anything).and_return(sign_up_service_spy)
+    end
+
+    it 'calls for GroupSaml::SignUpService' do
+      subject
+
+      expect(sign_up_service_spy).to have_received(:execute)
+    end
+
+    context 'when service fails' do
+      before do
+        allow(sign_up_service_spy).to receive(:execute).and_return(false)
+      end
+
+      it 'renders the form' do
+        expect(subject).to render_template :sign_up_form
+      end
+    end
+
+    context 'when service succeeds' do
+      before do
+        allow(sign_up_service_spy).to receive(:execute).and_return(true)
+      end
+
+      it 'redirects to sign in' do
+        subject
+
+        expect(flash[:notice]).to eq "Sign up was successful! Please confirm your email to sign in."
+        expect(response).to redirect_to sso_group_saml_providers_url(group, token: group.saml_discovery_token)
+      end
+
+      context 'when user is already signed in' do
+        let(:user) { create :user }
+
+        before do
+          sign_in user
+        end
+
+        it 'signs user out' do
+          subject
+
+          expect(request.env['warden']).not_to be_authenticated
+        end
       end
     end
   end
