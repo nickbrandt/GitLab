@@ -337,7 +337,7 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def [](key)
-    public_send(key) # rubocop:disable GitlabSecurity/PublicSend
+    attribute(key)
   end
 
   private
