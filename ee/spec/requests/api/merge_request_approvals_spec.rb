@@ -407,7 +407,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
   set(:user2)         { create(:user) }
   set(:admin)         { create(:user, :admin) }
   set(:project)       { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
-  set(:merge_request) { create(:merge_request, :simple, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: Time.now) }
+  let(:merge_request) { create(:merge_request, :simple, author: user, assignees: [user], source_project: project, target_project: project, title: "Test", created_at: Time.now) }
 
   set(:approver) { create :user }
   set(:group) { create :group }
