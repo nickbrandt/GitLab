@@ -12,6 +12,9 @@ describe('Feature Flags', () => {
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
     featureFlagsHelpPagePath: '/help/feature-flags',
+    featureFlagsAnchoredHelpPagePath: '/help/feature-flags#unleash-clients',
+    unleashApiUrl: `${TEST_HOST}/api/unleash`,
+    unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
     canUserConfigure: true,
     newFeatureFlagPath: 'feature-flags/new',
   };
@@ -38,6 +41,9 @@ describe('Feature Flags', () => {
       errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
       featureFlagsHelpPagePath: '/help/feature-flags',
       canUserConfigure: false,
+      featureFlagsAnchoredHelpPagePath: '/help/feature-flags#unleash-clients',
+      unleashApiUrl: `${TEST_HOST}/api/unleash`,
+      unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
     };
 
     beforeEach(done => {
