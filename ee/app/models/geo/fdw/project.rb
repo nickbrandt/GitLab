@@ -2,40 +2,33 @@
 
 module Geo
   module Fdw
-    class Project < ::Geo::BaseFdw
+    class Project < ::Project
       include Gitlab::SQL::Pattern
-      include Routable
-
-      self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
       has_many :job_artifacts, class_name: 'Geo::Fdw::Ci::JobArtifact'
       has_many :lfs_objects_projects, class_name: 'Geo::Fdw::LfsObjectsProject'
       has_many :lfs_objects, class_name: 'Geo::Fdw::LfsObject', through: :lfs_objects_projects
-      belongs_to :namespace
 
-      scope :outside_shards, -> (shard_names) { where.not(repository_storage: Array(shard_names)) }
+      self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
-      alias_method :parent, :namespace
+      NOT_CONFIGURED_MSG     = 'Geo secondary database is not configured'.freeze
+      SecondaryNotConfigured = Class.new(StandardError)
 
-      delegate :disk_path, to: :storage
-
-      def hashed_storage?(feature)
-        raise ArgumentError, _("Invalid feature") unless ::Project::HASHED_STORAGE_FEATURES.include?(feature)
-
-        self.storage_version && self.storage_version >= ::Project::HASHED_STORAGE_FEATURES[feature]
+      if ::Gitlab::Geo.geo_database_configured?
+        establish_connection Rails.configuration.geo_database
       end
 
-      def repository
-        @repository ||= Repository.new(full_path, self, disk_path: disk_path)
-      end
+      def self.connection
+        unless ::Gitlab::Geo.geo_database_configured?
+          message = NOT_CONFIGURED_MSG
+          message = "#{message}\nIn the GDK root, try running `make geo-setup`" if Rails.env.development?
+          raise SecondaryNotConfigured.new(message)
+        end
 
-      def storage
-        @storage ||=
-          if hashed_storage?(:repository)
-            Storage::HashedProject.new(self)
-          else
-            Storage::LegacyProject.new(self)
-          end
+        # Don't call super because LoadBalancing::ActiveRecordProxy will intercept it
+        retrieve_connection
+      rescue ActiveRecord::NoDatabaseError
+        raise SecondaryNotConfigured.new(NOT_CONFIGURED_MSG)
       end
 
       class << self
