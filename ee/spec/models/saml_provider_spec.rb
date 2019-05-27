@@ -61,7 +61,7 @@ describe SamlProvider do
   end
 
   describe '#settings' do
-    let(:group) { create(:group, path: 'foo-group')}
+    let(:group) { create(:group, path: 'foo-group') }
     let(:settings) { subject.settings }
 
     subject(:saml_provider) { create(:saml_provider, group: group) }
@@ -103,6 +103,18 @@ describe SamlProvider do
         subject.enforced_sso = false
         expect(subject).not_to be_enforced_sso
       end
+
+      context 'and feature flag is disabled' do
+        before do
+          stub_feature_flags(enforced_sso: false)
+        end
+
+        it 'is false' do
+          subject.enforced_sso = true
+
+          expect(subject).not_to be_enforced_sso
+        end
+      end
     end
 
     context 'when provider is disabled' do
@@ -120,6 +132,10 @@ describe SamlProvider do
   end
 
   describe '#enforced_group_managed_accounts?' do
+    before do
+      stub_feature_flags(group_managed_accounts: true)
+    end
+
     context 'when enforced_sso is enabled' do
       before do
         subject.enabled = true
@@ -131,6 +147,18 @@ describe SamlProvider do
         expect(subject).to be_enforced_group_managed_accounts
         subject.enforced_group_managed_accounts = false
         expect(subject).not_to be_enforced_group_managed_accounts
+      end
+
+      context 'and feature flag is disabled' do
+        before do
+          stub_feature_flags(group_managed_accounts: false)
+        end
+
+        it 'is false' do
+          subject.enforced_group_managed_accounts = true
+
+          expect(subject).not_to be_enforced_group_managed_accounts
+        end
       end
     end
 

@@ -193,6 +193,9 @@ msgstr ""
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
+msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
+msgstr ""
+
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
@@ -2320,6 +2323,9 @@ msgid "Checking approval status"
 msgstr ""
 
 msgid "Checking branch availability..."
+msgstr ""
+
+msgid "Checking username availability..."
 msgstr ""
 
 msgid "Cherry-pick this commit"
@@ -5472,6 +5478,9 @@ msgstr ""
 msgid "Finish review"
 msgstr ""
 
+msgid "Finish setting up your dedicated account for <strong>%{group_name}</strong>."
+msgstr ""
+
 msgid "Finished"
 msgstr ""
 
@@ -5617,6 +5626,9 @@ msgid "From milestones:"
 msgstr ""
 
 msgid "From the Kubernetes cluster details view, install Runner from the applications list"
+msgstr ""
+
+msgid "Full name"
 msgstr ""
 
 msgid "GPG Key ID:"
@@ -8099,6 +8111,12 @@ msgstr ""
 msgid "Minimum capacity to be available before we schedule more mirrors preemptively."
 msgstr ""
 
+msgid "Minimum length is %{minimum_password_length} characters"
+msgstr ""
+
+msgid "Minimum length is %{minimum_password_length} characters."
+msgstr ""
+
 msgid "Minutes"
 msgstr ""
 
@@ -9264,6 +9282,12 @@ msgstr ""
 msgid "Please provide a name"
 msgstr ""
 
+msgid "Please provide a valid email address."
+msgstr ""
+
+msgid "Please retype the email address."
+msgstr ""
+
 msgid "Please select a file"
 msgstr ""
 
@@ -10377,6 +10401,9 @@ msgid "Regenerate key"
 msgstr ""
 
 msgid "Regex pattern"
+msgstr ""
+
+msgid "Register"
 msgstr ""
 
 msgid "Register / Sign In"
@@ -11555,6 +11582,12 @@ msgid "Sign in with smart card"
 msgstr ""
 
 msgid "Sign out"
+msgstr ""
+
+msgid "Sign out & Register"
+msgstr ""
+
+msgid "Sign up was successful! Please confirm your email to sign in."
 msgstr ""
 
 msgid "Sign-in restrictions"
@@ -13924,6 +13957,12 @@ msgstr ""
 msgid "UserProfile|Your projects can be available publicly, internally, or privately, at your choice."
 msgstr ""
 
+msgid "Username is already taken."
+msgstr ""
+
+msgid "Username is available."
+msgstr ""
+
 msgid "Users"
 msgstr ""
 
@@ -14680,6 +14719,9 @@ msgid "You won't be able to pull or push project code via SSH until you %{add_ss
 msgstr ""
 
 msgid "You won't be able to pull or push project code via SSH until you add an SSH key to your profile"
+msgstr ""
+
+msgid "You'll be signed out from your current account automatically."
 msgstr ""
 
 msgid "You'll need to use different branch names to get a valid comparison."

@@ -9,8 +9,7 @@ module EE::GroupMembersFinder
 
   # rubocop: disable CodeReuse/ActiveRecord
   def not_managed
-    group.group_members.non_owners.joins(:user)
-      .where("users.managing_group_id IS NULL OR users.managing_group_id != ?", group.id)
+    group.group_members.non_owners.joins(:user).merge(User.not_managed(group: group))
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
