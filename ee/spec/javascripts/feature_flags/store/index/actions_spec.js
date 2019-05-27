@@ -7,12 +7,18 @@ import {
   fetchFeatureFlags,
   setFeatureFlagsEndpoint,
   setFeatureFlagsOptions,
+  setInstanceIdEndpoint,
+  setInstanceId,
+  rotateInstanceId,
+  requestRotateInstanceId,
+  receiveRotateInstanceIdSuccess,
+  receiveRotateInstanceIdError,
 } from 'ee/feature_flags/store/modules/index/actions';
 import state from 'ee/feature_flags/store/modules/index/state';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
-import { getRequestData } from '../../mock_data';
+import { getRequestData, rotateData } from '../../mock_data';
 
 describe('Feature flags actions', () => {
   let mockedState;
@@ -41,6 +47,32 @@ describe('Feature flags actions', () => {
         { page: '1', scope: 'all' },
         mockedState,
         [{ type: types.SET_FEATURE_FLAGS_OPTIONS, payload: { page: '1', scope: 'all' } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setInstanceIdEndpoint', () => {
+    it('should commit SET_INSTANCE_ID_ENDPOINT mutation', done => {
+      testAction(
+        setInstanceIdEndpoint,
+        'instance_id.json',
+        mockedState,
+        [{ type: types.SET_INSTANCE_ID_ENDPOINT, payload: 'instance_id.json' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setInstanceId', () => {
+    it('should commit SET_INSTANCE_ID mutation', done => {
+      testAction(
+        setInstanceId,
+        'test_instance_id',
+        mockedState,
+        [{ type: types.SET_INSTANCE_ID, payload: 'test_instance_id' }],
         [],
         done,
       );
@@ -143,6 +175,108 @@ describe('Feature flags actions', () => {
         null,
         mockedState,
         [{ type: types.RECEIVE_FEATURE_FLAGS_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('rotateInstanceId', () => {
+    let mock;
+
+    beforeEach(() => {
+      mockedState.rotateEndpoint = `${TEST_HOST}/endpoint.json`;
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('success', () => {
+      it('dispatches requestRotateInstanceId and receiveRotateInstanceIdSuccess ', done => {
+        mock.onGet(`${TEST_HOST}/endpoint.json`).replyOnce(200, rotateData, {});
+
+        testAction(
+          rotateInstanceId,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestRotateInstanceId',
+            },
+            {
+              payload: { data: rotateData, headers: {} },
+              type: 'receiveRotateInstanceIdSuccess',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('error', () => {
+      it('dispatches requestRotateInstanceId and receiveRotateInstanceIdError ', done => {
+        mock.onGet(`${TEST_HOST}/endpoint.json`, {}).replyOnce(500, {});
+
+        testAction(
+          rotateInstanceId,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestRotateInstanceId',
+            },
+            {
+              type: 'receiveRotateInstanceIdError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('requestRotateInstanceId', () => {
+    it('should commit REQUEST_ROTATE_INSTANCE_ID mutation', done => {
+      testAction(
+        requestRotateInstanceId,
+        null,
+        mockedState,
+        [{ type: types.REQUEST_ROTATE_INSTANCE_ID }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveRotateInstanceIdSuccess', () => {
+    it('should commit RECEIVE_ROTATE_INSTANCE_ID_SUCCESS mutation', done => {
+      testAction(
+        receiveRotateInstanceIdSuccess,
+        { data: rotateData, headers: {} },
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_ROTATE_INSTANCE_ID_SUCCESS,
+            payload: { data: rotateData, headers: {} },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveRotateInstanceIdError', () => {
+    it('should commit RECEIVE_ROTATE_INSTANCE_ID_ERROR mutation', done => {
+      testAction(
+        receiveRotateInstanceIdError,
+        null,
+        mockedState,
+        [{ type: types.RECEIVE_ROTATE_INSTANCE_ID_ERROR }],
         [],
         done,
       );

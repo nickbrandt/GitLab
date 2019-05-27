@@ -80,3 +80,5 @@ export const getRequestData = {
     enabled: 0,
   },
 };
+
+export const rotateData = { token: 'oP6sCNRqtRHmpy1gw2-F' };
