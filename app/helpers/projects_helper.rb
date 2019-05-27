@@ -321,6 +321,10 @@ module ProjectsHelper
     Ability.allowed?(current_user, :admin_project_member, @project)
   end
 
+  def metrics_external_dashboard_url
+    @project.metrics_setting_external_dashboard_url
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
