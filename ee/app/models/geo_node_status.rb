@@ -309,49 +309,25 @@ class GeoNodeStatus < ApplicationRecord
     self.cursor_last_event_date = Time.at(value)
   end
 
-  def repositories_synced_in_percentage
-    calc_percentage(projects_count, repositories_synced_count)
+  def self.attr_in_percentage(attr_name, count, total)
+    define_method("#{attr_name}_in_percentage") do
+      return 0 if read_attribute(total)&.zero?
+
+      (read_attribute(count).to_f / read_attribute(total).to_f) * 100.0
+    end
   end
 
-  def wikis_synced_in_percentage
-    calc_percentage(projects_count, wikis_synced_count)
-  end
-
-  def repositories_checksummed_in_percentage
-    calc_percentage(projects_count, repositories_checksummed_count)
-  end
-
-  def wikis_checksummed_in_percentage
-    calc_percentage(projects_count, wikis_checksummed_count)
-  end
-
-  def repositories_verified_in_percentage
-    calc_percentage(projects_count, repositories_verified_count)
-  end
-
-  def wikis_verified_in_percentage
-    calc_percentage(projects_count, wikis_verified_count)
-  end
-
-  def repositories_checked_in_percentage
-    calc_percentage(projects_count, repositories_checked_count)
-  end
-
-  def lfs_objects_synced_in_percentage
-    calc_percentage(lfs_objects_count, lfs_objects_synced_count)
-  end
-
-  def job_artifacts_synced_in_percentage
-    calc_percentage(job_artifacts_count, job_artifacts_synced_count)
-  end
-
-  def attachments_synced_in_percentage
-    calc_percentage(attachments_count, attachments_synced_count)
-  end
-
-  def replication_slots_used_in_percentage
-    calc_percentage(replication_slots_count, replication_slots_used_count)
-  end
+  attr_in_percentage :repositories_synced,       :repositories_synced_count,       :repositories_count
+  attr_in_percentage :repositories_checksummed,  :repositories_checksummed_count,  :repositories_count
+  attr_in_percentage :repositories_verified,     :repositories_verified_count,     :repositories_count
+  attr_in_percentage :repositories_checked,      :repositories_checked_count,      :repositories_count
+  attr_in_percentage :wikis_synced,              :wikis_synced_count,              :wiki_count
+  attr_in_percentage :wikis_checksummed,         :wikis_checksummed_count,         :wiki_count
+  attr_in_percentage :wikis_verified,            :wikis_verified_count,            :wiki_count
+  attr_in_percentage :lfs_objects_synced,        :lfs_objects_synced_count,        :lfs_objects_count
+  attr_in_percentage :job_artifacts_synced,      :job_artifacts_synced_count,      :job_artifacts_count
+  attr_in_percentage :attachments_synced,        :attachments_synced_count,        :attachments_count
+  attr_in_percentage :replication_slots_used,    :replication_slots_used_count,    :replication_slots_count
 
   def storage_shards_match?
     return true if geo_node.primary?
@@ -420,11 +396,5 @@ class GeoNodeStatus < ApplicationRecord
 
   def repository_verification_finder
     @repository_verification_finder ||= Geo::RepositoryVerificationFinder.new
-  end
-
-  def calc_percentage(total, count)
-    return 0 if !total.present? || total.zero?
-
-    (count.to_f / total.to_f) * 100.0
   end
 end
