@@ -6147,6 +6147,9 @@ msgstr ""
 msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
+msgid "Go to parent"
+msgstr ""
+
 msgid "Go to project"
 msgstr ""
 
