@@ -720,6 +720,13 @@ module EE
       class ManagedLicense < Grape::Entity
         expose :id, :name, :approval_status
       end
+
+      class BoardSimple < Grape::Entity
+        expose :id
+        expose :name
+
+        expose :milestone, using: ::API::Entities::MilestoneSimple, if: ->(board, _) { board&.milestone_id }
+      end
     end
   end
 end

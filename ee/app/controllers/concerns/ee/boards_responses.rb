@@ -13,14 +13,9 @@ module EE
       authorize_action_for!(board, :read_milestone)
     end
 
-    override :serialize_as_json
-    def serialize_as_json(resource)
-      resource.as_json(
-        only: [:id, :name],
-        include: {
-          milestone: { only: [:id, :title] }
-        }
-      )
+    override :serializer
+    def serializer
+      BoardSerializer.new(serializer: 'ee-board')
     end
   end
 end

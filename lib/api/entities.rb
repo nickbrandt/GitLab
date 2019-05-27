@@ -542,6 +542,11 @@ module API
       end
     end
 
+    class MilestoneSimple < Grape::Entity
+      expose :id
+      expose :title
+    end
+
     class IssueBasic < ProjectEntity
       expose :closed_at
       expose :closed_by, using: Entities::UserBasic
@@ -1101,6 +1106,10 @@ module API
       expose :lists, using: Entities::List do |board|
         board.lists.destroyable
       end
+    end
+
+    class BoardSimple < Grape::Entity
+      expose :id
     end
 
     class Compare < Grape::Entity

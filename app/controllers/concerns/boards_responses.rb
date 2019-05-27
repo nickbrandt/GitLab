@@ -69,16 +69,20 @@ module BoardsResponses
   end
 
   def serialize_as_json(resource)
-    resource.as_json(only: [:id])
+    serializer.represent(resource)
   end
 
   def respond_with(resource)
     respond_to do |format|
       format.html
       format.json do
-        render json: serialize_as_json(resource)
+        render json: serialize_as_json(resource).as_json
       end
     end
+  end
+
+  def serializer
+    BoardSerializer.new
   end
 end
 
