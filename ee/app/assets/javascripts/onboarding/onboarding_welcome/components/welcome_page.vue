@@ -3,7 +3,7 @@ import { __ } from '~/locale';
 import { GlLink, GlPopover } from '@gitlab/ui';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import { redirectTo } from '~/lib/utils/url_utility';
-import { resetOnboardingLocalStorage, updateLocalStorage } from './../../utils';
+import onboardingUtils from './../../utils';
 
 export default {
   components: {
@@ -48,11 +48,12 @@ export default {
   },
   methods: {
     startTour() {
-      resetOnboardingLocalStorage();
+      onboardingUtils.resetOnboardingLocalStorage();
+      onboardingUtils.updateOnboardingDismissed(false);
       redirectTo(this.projectFullPath);
     },
     skipTour() {
-      updateLocalStorage({ dismissed: true });
+      onboardingUtils.updateOnboardingDismissed(true);
       redirectTo(this.skipUrl);
     },
   },
