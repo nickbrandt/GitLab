@@ -192,31 +192,6 @@ describe 'Admin updates settings' do
     end
   end
 
-  describe 'LDAP settings' do
-    context 'with LDAP enabled' do
-      it 'Change allow group owners to manage ldap' do
-        allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
-        visit admin_application_settings_path
-
-        page.within('.as-visibility-access') do
-          find('#application_setting_allow_group_owners_to_manage_ldap').set(false)
-          click_button 'Save'
-        end
-
-        expect(page).to have_content('Application settings saved successfully')
-        expect(find('#application_setting_allow_group_owners_to_manage_ldap')).not_to be_checked
-      end
-    end
-
-    context 'with LDAP disabled' do
-      it 'Does not show option to allow group owners to manage ldap' do
-        visit admin_application_settings_path
-
-        expect(page).not_to have_css('#application_setting_allow_group_owners_to_manage_ldap')
-      end
-    end
-  end
-
   context 'Integrations page' do
     before do
       visit integrations_admin_application_settings_path
