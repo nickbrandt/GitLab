@@ -539,21 +539,26 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :audit_events, only: [:index]
       ## EE-specific
 
-      namespace :settings do
-        get :members, to: redirect("%{namespace_id}/%{project_id}/project_members")
-        resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
-          post :reset_cache
-          put :reset_registration_token
-        end
-        resource :integrations, only: [:show]
+      scope '-' do
+        namespace :settings do
+          get :members, to: redirect("%{namespace_id}/%{project_id}/project_members")
 
-        resource :slack, only: [:destroy, :edit, :update] do
-          get :slack_auth
-        end
+          resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
+            post :reset_cache
+            put :reset_registration_token
+          end
 
-        resource :repository, only: [:show], controller: :repository do
-          post :create_deploy_token, path: 'deploy_token/create'
-          post :cleanup
+          resource :operations, only: [:show, :update]
+          resource :integrations, only: [:show]
+
+          resource :slack, only: [:destroy, :edit, :update] do
+            get :slack_auth
+          end
+
+          resource :repository, only: [:show], controller: :repository do
+            post :create_deploy_token, path: 'deploy_token/create'
+            post :cleanup
+          end
         end
       end
 
@@ -571,10 +576,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       ## EE-specific
       resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
       ## EE-specific
-
-      namespace :settings do
-        resource :operations, only: [:show, :update]
-      end
     end
 
     resources(:projects,
@@ -597,6 +598,20 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         get :refs
         put :new_issuable_address
       end
+    end
+  end
+
+  # Legacy routes.
+  # Introduced in 12.0.
+  # Should be removed after 12.1
+  scope(path: '*namespace_id',
+        as: :namespace,
+        namespace_id: Gitlab::PathRegex.full_namespace_route_regex) do
+    scope(path: ':project_id',
+          constraints: { project_id: Gitlab::PathRegex.project_route_regex },
+          module: :projects,
+          as: :project) do
+      Gitlab::Routing.redirect_legacy_paths(self, :settings, :branches, :tags, :network, :graphs)
     end
   end
 end

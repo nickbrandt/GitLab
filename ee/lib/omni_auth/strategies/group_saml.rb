@@ -61,11 +61,7 @@ module OmniAuth
       private
 
       def metadata_phase?
-        on_subpath?(:metadata) && metadata_enabled?
-      end
-
-      def metadata_enabled?
-        Feature.enabled?(:group_saml_metadata_available, group_lookup.group)
+        on_subpath?(:metadata)
       end
 
       def store_authn_request_id(authn_request)

@@ -24,7 +24,9 @@ class RelatedIssuesStore {
   }
 
   setPendingReferences(issues) {
-    this.state.pendingReferences = issues;
+    // Remove duplicates but retain order.
+    // If you don't do this, Vue will be confused by duplicates and refuse to delete them all.
+    this.state.pendingReferences = issues.filter((ref, idx) => issues.indexOf(ref) === idx);
   }
 
   removePendingRelatedIssue(indexToRemove) {

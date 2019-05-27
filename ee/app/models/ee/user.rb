@@ -57,6 +57,12 @@ module EE
 
       belongs_to :managing_group, class_name: 'Group', optional: true, inverse_of: :managed_users
 
+      scope :not_managed, ->(group: nil) {
+        scope = where(managing_group_id: nil)
+        scope = scope.or(where.not(managing_group_id: group.id)) if group
+        scope
+      }
+
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }

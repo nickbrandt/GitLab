@@ -36,7 +36,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resources :ldap_group_links, only: [:index, :create, :destroy]
     resources :audit_events, only: [:index]
-    resources :pipeline_quota, only: [:index]
+    resources :usage_quotas, only: [:index]
 
     resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ } do
       member do
@@ -96,6 +96,9 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     end
 
     resource :scim_oauth, only: [:show, :create], controller: :scim_oauth
+
+    get :sign_up, to: 'sso#sign_up_form'
+    post :sign_up, to: 'sso#sign_up'
 
     resource :roadmap, only: [:show], controller: 'roadmap'
 

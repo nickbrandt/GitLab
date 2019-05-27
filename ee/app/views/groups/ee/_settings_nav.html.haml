@@ -23,10 +23,10 @@
         Audit Events
 
 - if @group.shared_runners_enabled? && @group.shared_runners_minutes_limit_enabled?
-  = nav_link(path: 'pipeline_quota#index') do
-    = link_to group_pipeline_quota_path(@group), title: 'Pipelines quota' do
+  = nav_link(path: 'usage_quota#index') do
+    = link_to group_usage_quotas_path(@group), title: s_('UsageQuota|Usage Quotas') do
       %span
-        Pipelines quota
+        = s_('UsageQuota|Usage quotas')
 
 - if Gitlab::CurrentSettings.should_check_namespace_plan?
   = nav_link(path: 'billings#index') do

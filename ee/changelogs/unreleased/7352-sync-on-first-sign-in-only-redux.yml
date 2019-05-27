@@ -1,5 +1,0 @@
----
-title: Perform LDAP group sync on sign in only for new users
-merge_request:
-author:
-type: changed

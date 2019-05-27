@@ -193,6 +193,9 @@ msgstr ""
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
+msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
+msgstr ""
+
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
@@ -245,6 +248,18 @@ msgid "%{service_title} activated."
 msgstr ""
 
 msgid "%{service_title} settings saved, but not activated."
+msgstr ""
+
+msgid "%{size} GiB"
+msgstr ""
+
+msgid "%{size} KiB"
+msgstr ""
+
+msgid "%{size} MiB"
+msgstr ""
+
+msgid "%{size} bytes"
 msgstr ""
 
 msgid "%{spammable_titlecase} was submitted to Akismet successfully."
@@ -663,6 +678,9 @@ msgstr ""
 msgid "Add bold text"
 msgstr ""
 
+msgid "Add child epic to an epic"
+msgstr ""
+
 msgid "Add comment now"
 msgstr ""
 
@@ -735,6 +753,9 @@ msgstr ""
 msgid "Adds"
 msgstr ""
 
+msgid "Adds %{epic_ref} as child epic."
+msgstr ""
+
 msgid "Adds a todo."
 msgstr ""
 
@@ -745,6 +766,9 @@ msgid "Admin Overview"
 msgstr ""
 
 msgid "Admin Section"
+msgstr ""
+
+msgid "Admin notes"
 msgstr ""
 
 msgid "AdminArea| You are about to permanently delete the user %{username}. Issues, merge requests, and groups linked to them will be transferred to a system-wide \"Ghost-user\". To avoid data loss, consider using the %{strong_start}block user%{strong_end} feature instead. Once you %{strong_start}Delete user%{strong_end}, it cannot be undone or recovered."
@@ -766,6 +790,9 @@ msgid "AdminArea|Stopping jobs failed"
 msgstr ""
 
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
+msgstr ""
+
+msgid "AdminNote|Note"
 msgstr ""
 
 msgid "AdminProjects| You’re about to permanently delete the project %{projectName}, its repository, and all related resources including issues, merge requests, etc..  Once you confirm and press %{strong_start}Delete project%{strong_end}, it cannot be undone or recovered."
@@ -990,6 +1017,9 @@ msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"
 msgstr ""
 
 msgid "An error has occurred"
+msgstr ""
+
+msgid "An error occurding while fetching folder content."
 msgstr ""
 
 msgid "An error occurred adding a draft to the discussion."
@@ -1641,6 +1671,9 @@ msgstr ""
 msgid "Automatically resolved"
 msgstr ""
 
+msgid "Automatically update this project's branches and tags from the upstream repository every hour."
+msgstr ""
+
 msgid "Autosave|Note"
 msgstr ""
 
@@ -2290,6 +2323,9 @@ msgid "Checking approval status"
 msgstr ""
 
 msgid "Checking branch availability..."
+msgstr ""
+
+msgid "Checking username availability..."
 msgstr ""
 
 msgid "Cherry-pick this commit"
@@ -3033,6 +3069,9 @@ msgstr ""
 msgid "ClusterIntegration|The endpoint is in the process of being assigned. Please check your Kubernetes cluster or Quotas on Google Kubernetes Engine if it takes a long time."
 msgstr ""
 
+msgid "ClusterIntegration|There was a problem authenticating with your cluster. Please ensure your CA Certificate and Token are valid."
+msgstr ""
+
 msgid "ClusterIntegration|This account must have permissions to create a Kubernetes cluster in the %{link_to_container_project} specified below"
 msgstr ""
 
@@ -3085,6 +3124,9 @@ msgid "ClusterIntegration|You must have an RBAC-enabled cluster to install Knati
 msgstr ""
 
 msgid "ClusterIntegration|Your account must have %{link_to_kubernetes_engine}"
+msgstr ""
+
+msgid "ClusterIntegration|Your cluster API is unreachable. Please ensure your API URL is correct."
 msgstr ""
 
 msgid "ClusterIntegration|Zone"
@@ -3497,7 +3539,7 @@ msgstr ""
 msgid "Copy labels and milestone from %{source_issuable_reference}."
 msgstr ""
 
-msgid "Copy labels and milestone from other issue or merge request"
+msgid "Copy labels and milestone from other issue or merge request in this project"
 msgstr ""
 
 msgid "Copy link"
@@ -5436,6 +5478,9 @@ msgstr ""
 msgid "Finish review"
 msgstr ""
 
+msgid "Finish setting up your dedicated account for <strong>%{group_name}</strong>."
+msgstr ""
+
 msgid "Finished"
 msgstr ""
 
@@ -5550,6 +5595,9 @@ msgstr ""
 msgid "Free Trial of GitLab.com Gold"
 msgstr ""
 
+msgid "Friday"
+msgstr ""
+
 msgid "From %{providerTitle}"
 msgstr ""
 
@@ -5578,6 +5626,9 @@ msgid "From milestones:"
 msgstr ""
 
 msgid "From the Kubernetes cluster details view, install Runner from the applications list"
+msgstr ""
+
+msgid "Full name"
 msgstr ""
 
 msgid "GPG Key ID:"
@@ -6106,6 +6157,9 @@ msgid "Go to"
 msgstr ""
 
 msgid "Go to %{link_to_google_takeout}."
+msgstr ""
+
+msgid "Go to parent"
 msgstr ""
 
 msgid "Go to project"
@@ -6904,6 +6958,9 @@ msgstr ""
 msgid "Invite"
 msgstr ""
 
+msgid "Invite \"%{trimmed}\" by email"
+msgstr ""
+
 msgid "Invite group"
 msgstr ""
 
@@ -7264,6 +7321,9 @@ msgstr ""
 msgid "Labels|Promoting %{labelTitle} will make it available for all projects inside %{groupName}. Existing project labels with the same title will be merged. This action cannot be reversed."
 msgstr ""
 
+msgid "Labels|and %{count} more"
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
@@ -7455,6 +7515,9 @@ msgstr ""
 msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
+msgid "Licensed Features"
+msgstr ""
+
 msgid "Licensed to"
 msgstr ""
 
@@ -7641,6 +7704,9 @@ msgid "March"
 msgstr ""
 
 msgid "Mark as resolved"
+msgstr ""
+
+msgid "Mark comment as resolved"
 msgstr ""
 
 msgid "Mark this issue as a duplicate of another issue"
@@ -8045,6 +8111,15 @@ msgstr ""
 msgid "Minimum capacity to be available before we schedule more mirrors preemptively."
 msgstr ""
 
+msgid "Minimum length is %{minimum_password_length} characters"
+msgstr ""
+
+msgid "Minimum length is %{minimum_password_length} characters."
+msgstr ""
+
+msgid "Minutes"
+msgstr ""
+
 msgid "Mirror a repository"
 msgstr ""
 
@@ -8070,6 +8145,9 @@ msgid "Mirroring settings were successfully updated. The project is being update
 msgstr ""
 
 msgid "Mirroring was successfully disabled."
+msgstr ""
+
+msgid "Mirroring will only be available if the feature is included in the plan of the selected group or user."
 msgstr ""
 
 msgid "Missing commit signatures endpoint!"
@@ -8479,6 +8557,9 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
+msgid "Not implemented!"
+msgstr ""
+
 msgid "Not now"
 msgstr ""
 
@@ -8632,7 +8713,7 @@ msgstr ""
 msgid "Onboarding"
 msgstr ""
 
-msgid "Once imported, repositories can be mirrored over SSH. Read more %{ssh_link}"
+msgid "Once imported, repositories can be mirrored over SSH. Read more %{link_start}here%{link_end}."
 msgstr ""
 
 msgid "Once removed, the fork relationship cannot be restored and you will no longer be able to send merge requests to the source."
@@ -9202,6 +9283,12 @@ msgid "Please note that this application is not provided by GitLab and you shoul
 msgstr ""
 
 msgid "Please provide a name"
+msgstr ""
+
+msgid "Please provide a valid email address."
+msgstr ""
+
+msgid "Please retype the email address."
 msgstr ""
 
 msgid "Please select a file"
@@ -10319,6 +10406,9 @@ msgstr ""
 msgid "Regex pattern"
 msgstr ""
 
+msgid "Register"
+msgstr ""
+
 msgid "Register / Sign In"
 msgstr ""
 
@@ -10403,6 +10493,9 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove child epic from an epic"
+msgstr ""
+
 msgid "Remove due date"
 msgstr ""
 
@@ -10443,6 +10536,9 @@ msgid "Removed group can not be restored!"
 msgstr ""
 
 msgid "Removed projects cannot be restored!"
+msgstr ""
+
+msgid "Removes %{epic_ref} from child epics."
 msgstr ""
 
 msgid "Removes %{milestone_reference} milestone."
@@ -10666,6 +10762,9 @@ msgid "Resolved 1 discussion."
 msgstr ""
 
 msgid "Resolved all discussions."
+msgstr ""
+
+msgid "Resolved by %{name}"
 msgstr ""
 
 msgid "Resolved by %{resolvedByName}"
@@ -10941,6 +11040,9 @@ msgid "Search files"
 msgstr ""
 
 msgid "Search for a group"
+msgstr ""
+
+msgid "Search for a user"
 msgstr ""
 
 msgid "Search for projects, issues, etc."
@@ -11393,6 +11495,9 @@ msgstr ""
 msgid "Shared projects"
 msgstr ""
 
+msgid "Shared runners help link"
+msgstr ""
+
 msgid "SharedRunnersMinutesSettings|By resetting the pipeline minutes for this namespace, the currently used minutes will be set to zero."
 msgstr ""
 
@@ -11480,6 +11585,12 @@ msgid "Sign in with smart card"
 msgstr ""
 
 msgid "Sign out"
+msgstr ""
+
+msgid "Sign out & Register"
+msgstr ""
+
+msgid "Sign up was successful! Please confirm your email to sign in."
 msgstr ""
 
 msgid "Sign-in restrictions"
@@ -11636,6 +11747,9 @@ msgid "Something went wrong, unable to search projects"
 msgstr ""
 
 msgid "Something went wrong. Please try again."
+msgstr ""
+
+msgid "Something went wrong. Try again later."
 msgstr ""
 
 msgid "Sorry, no epics matched your search"
@@ -11830,6 +11944,9 @@ msgstr ""
 msgid "Star a label to make it a priority label. Order the prioritized labels to change their relative priority, by dragging."
 msgstr ""
 
+msgid "Star toggle failed. Try again later."
+msgstr ""
+
 msgid "StarProject|Star"
 msgstr ""
 
@@ -11984,6 +12101,9 @@ msgid "Subscribe to calendar"
 msgstr ""
 
 msgid "Subscribed"
+msgstr ""
+
+msgid "Subscription"
 msgstr ""
 
 msgid "SubscriptionTable|Billing"
@@ -12927,6 +13047,9 @@ msgstr ""
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
 msgstr ""
 
+msgid "Thursday"
+msgstr ""
+
 msgid "Time before an issue gets scheduled"
 msgstr ""
 
@@ -13393,6 +13516,9 @@ msgstr ""
 msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
 msgstr ""
 
+msgid "Tuesday"
+msgstr ""
+
 msgid "Turn on Service Desk"
 msgstr ""
 
@@ -13427,6 +13553,9 @@ msgid "Unable to schedule a pipeline to run immediately"
 msgstr ""
 
 msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
+msgstr ""
+
+msgid "Unable to update label prioritization at this time"
 msgstr ""
 
 msgid "Unable to update this epic at this time."
@@ -13642,6 +13771,36 @@ msgstr ""
 msgid "Usage statistics"
 msgstr ""
 
+msgid "UsageQuota|Buy additional minutes"
+msgstr ""
+
+msgid "UsageQuota|Current period usage"
+msgstr ""
+
+msgid "UsageQuota|Pipelines"
+msgstr ""
+
+msgid "UsageQuota|This group has no projects which use shared runners"
+msgstr ""
+
+msgid "UsageQuota|Unlimited"
+msgstr ""
+
+msgid "UsageQuota|Usage"
+msgstr ""
+
+msgid "UsageQuota|Usage Quotas"
+msgstr ""
+
+msgid "UsageQuota|Usage of group resources across the projects in the %{strong_start}%{group_name}%{strong_end} group"
+msgstr ""
+
+msgid "UsageQuota|Usage quotas"
+msgstr ""
+
+msgid "UsageQuota|Usage since"
+msgstr ""
+
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"
 msgstr ""
 
@@ -13801,6 +13960,12 @@ msgstr ""
 msgid "UserProfile|Your projects can be available publicly, internally, or privately, at your choice."
 msgstr ""
 
+msgid "Username is already taken."
+msgstr ""
+
+msgid "Username is available."
+msgstr ""
+
 msgid "Users"
 msgstr ""
 
@@ -13814,6 +13979,21 @@ msgid "Users were successfully added."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
+msgstr ""
+
+msgid "UsersSelect|%{name} + %{length} more"
+msgstr ""
+
+msgid "UsersSelect|Any User"
+msgstr ""
+
+msgid "UsersSelect|Assignee"
+msgstr ""
+
+msgid "UsersSelect|No assignee - %{openingTag} assign yourself %{closingTag}"
+msgstr ""
+
+msgid "UsersSelect|Unassigned"
 msgstr ""
 
 msgid "Using %{code_start}::%{code_end} denotes a %{link_start}scoped label set%{link_end}"
@@ -14072,6 +14252,9 @@ msgid "Webhooks Help"
 msgstr ""
 
 msgid "Webhooks allow you to trigger a URL if, for example, new code is pushed or a new issue is created. You can configure webhooks to listen for specific events like pushes, issues or merge requests. Group webhooks will apply to all projects in a group, allowing you to standardize webhook functionality across your entire group."
+msgstr ""
+
+msgid "Wednesday"
 msgstr ""
 
 msgid "Weeks"
@@ -14541,6 +14724,9 @@ msgstr ""
 msgid "You won't be able to pull or push project code via SSH until you add an SSH key to your profile"
 msgstr ""
 
+msgid "You'll be signed out from your current account automatically."
+msgstr ""
+
 msgid "You'll need to use different branch names to get a valid comparison."
 msgstr ""
 
@@ -14806,6 +14992,9 @@ msgid "ciReport|(is loading)"
 msgstr ""
 
 msgid "ciReport|(is loading, errors when loading results)"
+msgstr ""
+
+msgid "ciReport|All confidence levels"
 msgstr ""
 
 msgid "ciReport|All projects"

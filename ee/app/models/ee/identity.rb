@@ -16,6 +16,8 @@ module EE
           case_sensitive: false
         }
 
+      validate :validate_managing_group
+
       scope :with_secondary_extern_uid, ->(provider, secondary_extern_uid) do
         iwhere(secondary_extern_uid: normalize_uid(provider, secondary_extern_uid)).with_provider(provider)
       end
@@ -50,6 +52,14 @@ module EE
       def preload_saml_group
         preload(saml_provider: { group: :route })
       end
+    end
+
+    private
+
+    def validate_managing_group
+      return unless saml_provider&.enforced_group_managed_accounts?
+
+      errors.add(:base, 'Group requires separate account') if saml_provider.group != user.managing_group
     end
   end
 end

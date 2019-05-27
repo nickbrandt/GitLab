@@ -14,9 +14,7 @@ class GeoNodeStatus < ApplicationRecord
   attr_accessor :repository_verification_enabled
 
   # Prometheus metrics, no need to store them in the database
-  # :event_log_count is deprecated and will be removed in 12.0
-  attr_accessor :event_log_count, :event_log_max_id,
-                :repository_created_max_id, :repository_updated_max_id,
+  attr_accessor :event_log_max_id, :repository_created_max_id, :repository_updated_max_id,
                 :repository_deleted_max_id, :repository_renamed_max_id, :repositories_changed_max_id,
                 :lfs_object_deleted_max_id, :job_artifact_deleted_max_id,
                 :lfs_objects_registry_count, :job_artifacts_registry_count, :attachments_registry_count,

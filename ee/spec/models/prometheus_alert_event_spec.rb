@@ -7,7 +7,7 @@ describe PrometheusAlertEvent do
   let(:alert) { subject.prometheus_alert }
 
   describe 'associations' do
-    it { is_expected.to belong_to(:prometheus_alert) }
+    it { is_expected.to belong_to(:prometheus_alert).required }
   end
 
   describe 'validations' do

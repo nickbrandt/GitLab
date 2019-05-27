@@ -10,8 +10,8 @@ describe Security::VulnerabilitiesFinder do
     set(:pipeline1) { create(:ci_pipeline, :success, project: project1) }
     set(:pipeline2) { create(:ci_pipeline, :success, project: project2) }
 
-    set(:vulnerability1) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :high, pipelines: [pipeline1], project: project1) }
-    set(:vulnerability2) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning, severity: :medium, pipelines: [pipeline2], project: project2) }
+    set(:vulnerability1) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :high, confidence: :high, pipelines: [pipeline1], project: project1) }
+    set(:vulnerability2) { create(:vulnerabilities_occurrence, report_type: :dependency_scanning, severity: :medium, confidence: :low, pipelines: [pipeline2], project: project2) }
     set(:vulnerability3) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :low, pipelines: [pipeline2], project: project2) }
     set(:vulnerability4) { create(:vulnerabilities_occurrence, report_type: :dast, severity: :medium, pipelines: [pipeline1], project: project1) }
 
@@ -49,6 +49,24 @@ describe Security::VulnerabilitiesFinder do
 
         it 'includes only medium' do
           is_expected.to contain_exactly(vulnerability2, vulnerability4)
+        end
+      end
+    end
+
+    context 'by confidence' do
+      context 'when high' do
+        let(:params) { { confidence: %w[high] } }
+
+        it 'includes only high confidence vulnerabilities' do
+          is_expected.to contain_exactly(vulnerability1)
+        end
+      end
+
+      context 'when low' do
+        let(:params) { { confidence: %w[low] } }
+
+        it 'includes only low confidence vulnerabilities' do
+          is_expected.to contain_exactly(vulnerability2)
         end
       end
     end

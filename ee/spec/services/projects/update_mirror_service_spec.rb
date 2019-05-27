@@ -295,13 +295,33 @@ describe Projects::UpdateMirrorService do
         end
 
         context 'when Lfs import fails' do
-          it 'the mirror operation fails' do
-            expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
+          let(:error_message) { 'error_message' }
 
+          before do
+            expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: error_message)
+          end
+
+          # Uncomment once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+          # it 'fails mirror operation' do
+          #   expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
+
+          #   result = subject.execute
+
+          #   expect(result[:status]).to eq :error
+          #   expect(result[:message]).to eq 'error message'
+          # end
+
+          # Remove once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+          it 'does not fail mirror operation' do
             result = subject.execute
 
-            expect(result[:status]).to eq :error
-            expect(result[:message]).to eq 'error message'
+            expect(result[:status]).to eq :success
+          end
+
+          it 'logs the error' do
+            expect_any_instance_of(Gitlab::UpdateMirrorServiceJsonLogger).to receive(:error).with(hash_including(error_message: error_message))
+
+            subject.execute
           end
         end
       end

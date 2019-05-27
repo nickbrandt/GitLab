@@ -1,5 +1,0 @@
----
-title: Swap conditions to reduce frequency of database query
-merge_request: 11217
-author:
-type: performance

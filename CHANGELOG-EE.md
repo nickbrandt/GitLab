@@ -1,5 +1,104 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.0 (2019-05-22)
+
+### Security (1 change)
+
+- Destroy project remote pull mirrors instead of disabling. !10355
+
+### Fixed (26 changes)
+
+- Add missing endpoint for user information to GitHub API. !10482
+- Remove slack slash commands double up. !10555
+- Display Scoped Labels on Issue Board. !10669
+- Ensure custom group template feature is available only for groups on gold and silver. !10678
+- Fix removing and updating insights config, and foreign key constraints. !11030
+- Geo: Fix broken button to delete orphaned upload registries through Admin. !11156
+- Resolve: Epic labels in system notes point to the epic itself. !11234
+- Geo: Fix: Project sync failures usually double-increment *_retry_count. !11381
+- Fix unauthenticated GET of public Epics API. !11485
+- Hide ScopedBadge overflow notes. !11548
+- Fixes a CI failure in jest. !11586
+- Fix error when reordering/deleting subgroup epics. !11837
+- Fix some filter bar tokens not showing up when multiple assignees are enabled. !11939
+- Geo: Fix OAuth authentication with relative URLs. !11976
+- Fix for not being able to remove the last namespace/project from elasticsearch limited namespaces/projects. !11989
+- Fix approvals project settings section when merge requests disabled. !12070
+- Enable alert bot to use quick actions. !12127
+- Geo: Remove counts over geo_event_log table. !12146
+- Geo: Prevent RegistryFinder calls on the primary. !12183
+- Fix placement of LDAP icon in members list. !12304
+- Use path instead of a URL for accessing approval settings. !12414
+- Remove non-semantic use of `.row` in member listing controls. !12466
+- Force tag overwrite on mirror update. !12491
+- Fixes the feedback paths on the project security dashboard. !12849
+- Fixed starting a review on images.
+- Fix updating board attributes through API.
+
+### Changed (13 changes)
+
+- Group SAML enforcement requires active SSO session for group access. !10034
+- Geo: Rename "Disable" to "Pause|Resume" (Admin > Geo Nodes). !10297
+- Upgrade group security dashboard to use gitlab-ui line chart. !10479
+- Geo - Implement selective sync support for the LFS objects FDW queries. !10757
+- Documentation : Improve selective sync documentation. !11072
+- Geo: Implement selective sync support for the FDW queries to count the number of attachments to sync. !11107
+- Allowing Elasticsearch indexing gap recovering. !11408
+- Geo - Implement selective sync support for the FDW queries to count attachments. !11518
+- Geo - Implement selective sync support for the FDW queries to find attachments. !11544
+- Geo - Add selective sync support for the job artifacts FDW queries. !11892
+- Fetch all available groups when creating MR approval rule. !12096
+- SSO enforcement requires active SAML session for web access to project resources. !12109
+- Perform LDAP group sync on sign in only for new users.
+
+### Performance (3 changes)
+
+- Swap conditions to reduce frequency of database query. !11217
+- Add index for mirror_user_id to projects table. !11422
+- Geo - Improve performance of the selective sync cleanup worker. !11998
+
+### Added (27 changes, 2 of them are from the community)
+
+- Proxy websocket requests to build services. !9723
+- Add dependency proxy for containers. !9750
+- Added gitlab:elastic:projects_not_indexed rake task. !9854 (Jason Colyer)
+- Added Snowplow tracking to notes. !10104
+- Support multiple assignees for merge requests. !10161
+- Add UI to enable/disable a dependency proxy on a group level. !10386
+- Let the GitLab Alert bot open incident issues. !10460
+- Remove feature flag `:incident_management`. !10569
+- Allow multiple secondary nodes behind a load balancer. !10755
+- Copy LFS objects from pull mirror. !10779
+- Geo: Inform users about current replication lag in the UI on secondaries. !10807
+- Autosave description in epics. !10844
+- Keep track of packages_file in ProjectStatistics. !11020
+- Adds a dismissal item to the vulnerability modal. !11028
+- Add project level config for merge train. !11065
+- Support pie charts in Insights. !11186
+- Create ActiveRecordModel and table for Merge Train feature. !11204
+- Allow adding GitLab license at installation time. !11244
+- Added ZAP Full Scan support for DAST. !11269
+- Add created_at and updated_at filters to Epics API. !11315 (jramsay)
+- Add API to retrieve security vulnerabilities. !11539
+- Basic Rails implementation for BOM. !11613
+- Add Frontend Store and UI For Environments Dashboard MVC. !11702
+- Track clicks on uninstall button for kubernetes implementation. !12048
+- Add Vulnerabilities API scoping: severity, confidence, and dismissal. !12076
+- Alert users that protected environments affects feature flags. !12168
+- Support creating a new child epic from the API.
+
+### Other (8 changes, 1 of them is from the community)
+
+- Improve project settings page layout and UX. !10388
+- Uses the more explicit vulnerability feedback endpoints on the front end. !10461
+- Automatically enable multiple MR assignees feature flag. !10558
+- Move geo_log_cursor binary to the ee folder. !10821
+- Move sidekiq-cluster to ee/bin. !11001
+- Move ee-specific code from boards/components/issue_card_inner.vue. !11032 (Roman Rodionov)
+- Make all billing cards fit in view. !11602
+- Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
+
+
 ## 11.10.4 (2019-05-01)
 
 ### Fixed (1 change, 1 of them is from the community)

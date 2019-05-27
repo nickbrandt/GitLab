@@ -427,14 +427,14 @@ describe Geo::AttachmentRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
         end
 
-        it 'counts file registries for attachments' do
+        it 'does not apply the selective sync restriction' do
           create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
           create(:geo_file_registry, :attachment, file_id: upload_2.id)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
           create(:geo_file_registry, :attachment, file_id: upload_4.id)
           create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
 
-          expect(subject.count_registry).to eq 3
+          expect(subject.count_registry).to eq 5
         end
       end
 
@@ -443,14 +443,14 @@ describe Geo::AttachmentRegistryFinder, :geo do
           secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
         end
 
-        it 'counts file registries for attachments' do
+        it 'does not apply the selective sync restriction' do
           create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id)
           create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
           create(:geo_file_registry, :attachment, file_id: upload_3.id)
           create(:geo_file_registry, :attachment, file_id: upload_4.id)
           create(:geo_file_registry, :attachment, file_id: upload_5.id)
 
-          expect(subject.count_registry).to eq 3
+          expect(subject.count_registry).to eq 5
         end
       end
     end

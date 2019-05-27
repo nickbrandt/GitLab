@@ -103,7 +103,7 @@ describe Groups::AutocompleteService do
       it 'returns available commands' do
         expect(subject.commands(epic).map { |c| c[:name] })
           .to match_array(
-            [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close]
+            [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close, :child_epic, :remove_child_epic]
           )
       end
     end

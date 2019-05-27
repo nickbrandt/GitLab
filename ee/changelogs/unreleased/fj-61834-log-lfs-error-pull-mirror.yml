@@ -1,0 +1,5 @@
+---
+title: Avoid failing pull mirroring if LFS import fails
+merge_request: 13133
+author:
+type: changed

@@ -1,0 +1,5 @@
+---
+title: Fixed a bug where removing related issues could get stuck
+merge_request: 12316
+author:
+type: fixed

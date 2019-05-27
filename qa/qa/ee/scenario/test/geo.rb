@@ -49,8 +49,8 @@ module QA
             include QA::Scenario::Actable
 
             def initialize
-              @address = QA::Runtime::Scenario.geo_primary_address
               @name = QA::Runtime::Scenario.geo_primary_name
+              @address = QA::Runtime::Scenario.geo_primary_address
             end
 
             def add_license
@@ -74,6 +74,7 @@ module QA
 
               QA::Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
                 Resource::Geo::Node.fabricate! do |node|
+                  node.name = QA::Runtime::Scenario.geo_secondary_name
                   node.address = QA::Runtime::Scenario.geo_secondary_address
                 end
               end

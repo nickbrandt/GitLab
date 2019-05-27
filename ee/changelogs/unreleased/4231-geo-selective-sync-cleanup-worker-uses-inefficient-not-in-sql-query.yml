@@ -1,5 +1,0 @@
----
-title: Geo - Improve performance of the selective sync cleanup worker
-merge_request: 11998
-author:
-type: performance

@@ -613,31 +613,15 @@ describe Project do
     end
   end
 
-  describe '#shared_runners_limit_namespace' do
+  describe '#shared_runners_limit_namespace', :nested_groups do
     set(:root_ancestor) { create(:group) }
     set(:group) { create(:group, parent: root_ancestor) }
     let(:project) { create(:project, namespace: group) }
 
     subject { project.shared_runners_limit_namespace }
 
-    context 'when shared_runner_minutes_on_root_namespace is disabled' do
-      before do
-        stub_feature_flags(shared_runner_minutes_on_root_namespace: false)
-      end
-
-      it 'returns parent namespace' do
-        is_expected.to eq(group)
-      end
-    end
-
-    context 'when shared_runner_minutes_on_root_namespace is enabled', :nested_groups do
-      before do
-        stub_feature_flags(shared_runner_minutes_on_root_namespace: true)
-      end
-
-      it 'returns root namespace' do
-        is_expected.to eq(root_ancestor)
-      end
+    it 'returns root namespace' do
+      is_expected.to eq(root_ancestor)
     end
   end
 
