@@ -17,16 +17,14 @@ class UpdateAllMirrorsWorker
     # If we didn't get the lease, exit early
     return unless scheduling_ran
 
-    if Feature.enabled?(:update_all_mirrors_worker_rescheduling)
-      # Wait to give some jobs a chance to complete
-      Kernel.sleep(RESCHEDULE_WAIT)
+    # Wait to give some jobs a chance to complete
+    Kernel.sleep(RESCHEDULE_WAIT)
 
-      # If there's capacity left now (some jobs completed),
-      # reschedule this job to enqueue more work.
-      #
-      # This is in addition to the regular (cron-like) scheduling of this job.
-      reschedule_if_capacity_left
-    end
+    # If there's capacity left now (some jobs completed),
+    # reschedule this job to enqueue more work.
+    #
+    # This is in addition to the regular (cron-like) scheduling of this job.
+    reschedule_if_capacity_left
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
