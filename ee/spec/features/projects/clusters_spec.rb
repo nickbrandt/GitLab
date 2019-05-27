@@ -16,6 +16,7 @@ describe 'EE Clusters', :js do
       before do
         allow(License).to receive(:feature_available?).and_call_original
         allow(License).to receive(:feature_available?).with(:multiple_clusters).and_return(true)
+        allow_any_instance_of(Clusters::Cluster).to receive(:retrieve_connection_status).and_return(:connected)
       end
 
       context 'when user adds an existing cluster' do
