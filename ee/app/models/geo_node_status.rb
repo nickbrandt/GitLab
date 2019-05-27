@@ -145,13 +145,6 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_data_from_current_node
-    self.status_message =
-      begin
-        HealthCheck::Utils.process_checks(['geo'])
-      rescue NotImplementedError => e
-        e.to_s
-      end
-
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
@@ -175,77 +168,86 @@ class GeoNodeStatus < ApplicationRecord
     self.hashed_storage_attachments_max_id = Geo::HashedStorageAttachmentsEvent.maximum(:id)
     self.projects_count = geo_node.projects.count
 
+    load_status_message
     load_primary_data
     load_secondary_data
 
     self
   end
 
-  def load_primary_data
-    if Gitlab::Geo.primary?
-      self.lfs_objects_count = LfsObject.syncable.count
-      self.job_artifacts_count = Ci::JobArtifact.syncable.count
-      self.attachments_count = Upload.syncable.count
-
-      self.replication_slots_count = geo_node.replication_slots_count
-      self.replication_slots_used_count = geo_node.replication_slots_used_count
-      self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
-
-      if repository_verification_enabled
-        self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
-        self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
-        self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
-        self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
+  def load_status_message
+    self.status_message =
+      begin
+        HealthCheck::Utils.process_checks(['geo'])
+      rescue NotImplementedError => e
+        e.to_s
       end
+  end
 
-      self.repositories_checked_count = Project.where.not(last_repository_check_at: nil).count
-      self.repositories_checked_failed_count = Project.where(last_repository_check_failed: true).count
+  def load_primary_data
+    return unless Gitlab::Geo.primary?
+
+    self.lfs_objects_count = LfsObject.syncable.count
+    self.job_artifacts_count = Ci::JobArtifact.syncable.count
+    self.attachments_count = Upload.syncable.count
+
+    self.replication_slots_count = geo_node.replication_slots_count
+    self.replication_slots_used_count = geo_node.replication_slots_used_count
+    self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
+
+    if repository_verification_enabled
+      self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
+      self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
+      self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
+      self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
     end
   end
 
+
+
   def load_secondary_data # rubocop:disable Metrics/AbcSize
-    if Gitlab::Geo.secondary?
-      self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
-      self.cursor_last_event_id = current_cursor_last_event_id
-      self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
-      self.repositories_synced_count = registries_for_synced_projects(:repository).count
-      self.repositories_failed_count = registries_for_failed_projects(:repository).count
-      self.wikis_synced_count = registries_for_synced_projects(:wiki).count
-      self.wikis_failed_count = registries_for_failed_projects(:wiki).count
-      self.lfs_objects_count = lfs_objects_finder.count_syncable
-      self.lfs_objects_synced_count = lfs_objects_finder.count_synced
-      self.lfs_objects_failed_count = lfs_objects_finder.count_failed
-      self.lfs_objects_registry_count = lfs_objects_finder.count_registry
-      self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
-      self.job_artifacts_count = job_artifacts_finder.count_syncable
-      self.job_artifacts_synced_count = job_artifacts_finder.count_synced
-      self.job_artifacts_failed_count = job_artifacts_finder.count_failed
-      self.job_artifacts_registry_count = job_artifacts_finder.count_registry
-      self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
-      self.attachments_count = attachments_finder.count_syncable
-      self.attachments_synced_count = attachments_finder.count_synced
-      self.attachments_failed_count = attachments_finder.count_failed
-      self.attachments_registry_count = attachments_finder.count_registry
-      self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
+    return unless Gitlab::Geo.secondary?
 
-      load_verification_data
+    self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
+    self.cursor_last_event_id = current_cursor_last_event_id
+    self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
+    self.repositories_synced_count = registries_for_synced_projects(:repository).count
+    self.repositories_failed_count = registries_for_failed_projects(:repository).count
+    self.wikis_synced_count = registries_for_synced_projects(:wiki).count
+    self.wikis_failed_count = registries_for_failed_projects(:wiki).count
+    self.lfs_objects_count = lfs_objects_finder.count_syncable
+    self.lfs_objects_synced_count = lfs_objects_finder.count_synced
+    self.lfs_objects_failed_count = lfs_objects_finder.count_failed
+    self.lfs_objects_registry_count = lfs_objects_finder.count_registry
+    self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
+    self.job_artifacts_count = job_artifacts_finder.count_syncable
+    self.job_artifacts_synced_count = job_artifacts_finder.count_synced
+    self.job_artifacts_failed_count = job_artifacts_finder.count_failed
+    self.job_artifacts_registry_count = job_artifacts_finder.count_registry
+    self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
+    self.attachments_count = attachments_finder.count_syncable
+    self.attachments_synced_count = attachments_finder.count_synced
+    self.attachments_failed_count = attachments_finder.count_failed
+    self.attachments_registry_count = attachments_finder.count_registry
+    self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
 
-      self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
-      self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
-    end
+    load_verification_data
+
+    self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
+    self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
   end
 
   def load_verification_data
-    if repository_verification_enabled
-      self.repositories_verified_count = registries_for_verified_projects(:repository).count
-      self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
-      self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
-      self.wikis_verified_count = registries_for_verified_projects(:wiki).count
-      self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
-      self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
-      self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
-      self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
-    end
+    return unless repository_verification_enabled
+
+    self.repositories_verified_count = registries_for_verified_projects(:repository).count
+    self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
+    self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
+    self.wikis_verified_count = registries_for_verified_projects(:wiki).count
+    self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
+    self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
+    self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
+    self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
   end
 
   def current_cursor_last_event_id
