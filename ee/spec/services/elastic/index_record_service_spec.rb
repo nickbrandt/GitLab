@@ -125,4 +125,21 @@ describe Elastic::IndexRecordService, :elastic do
     expect(Note.elastic_search('note_2', options: options).present?).to eq(true)
     expect(Note.elastic_search('note_3', options: options).present?).to eq(true)
   end
+
+  it 'skips records for which indexing is disabled' do
+    project = nil
+
+    Sidekiq::Testing.disable! do
+      project = create :project, name: 'project_1'
+    end
+
+    expect(project).to receive(:use_elasticsearch?).and_return(false)
+
+    Sidekiq::Testing.inline! do
+      subject.execute(project, true)
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    expect(Project.elastic_search('project_1').present?).to eq(false)
+  end
 end

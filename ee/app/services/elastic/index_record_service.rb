@@ -8,6 +8,8 @@ module Elastic
 
     # @param indexing [Boolean] determines whether operation is "indexing" or "updating"
     def execute(record, indexing, options = {})
+      return true unless record.use_elasticsearch?
+
       record.__elasticsearch__.client = client
 
       import(record, record.class.nested?, indexing)

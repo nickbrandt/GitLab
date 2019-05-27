@@ -1,0 +1,5 @@
+---
+title: Respect limited indexing settings in rake tasks
+merge_request: 13437
+author:
+type: fixed
