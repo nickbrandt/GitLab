@@ -12,6 +12,11 @@ export default {
     issueToken,
   },
   props: {
+    inputId: {
+      type: String,
+      required: false,
+      default: '',
+    },
     references: {
       type: Array,
       required: false,
@@ -162,7 +167,7 @@ export default {
       >
         <issue-token
           :id-key="index"
-          :display-reference="reference"
+          :display-reference="reference.text || reference"
           :can-remove="true"
           :is-condensed="true"
           :path-id-separator="pathIdSeparator"
@@ -176,6 +181,7 @@ export default {
       </li>
       <li class="add-issuable-form-input-list-item">
         <input
+          :id="inputId"
           ref="input"
           :value="inputValue"
           :placeholder="inputPlaceholder"

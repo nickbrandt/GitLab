@@ -56,6 +56,9 @@ msgstr ""
 msgid " or <#issue id>"
 msgstr ""
 
+msgid " or <#merge request id>"
+msgstr ""
+
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -96,6 +99,11 @@ msgstr[1] ""
 
 msgid "%d fixed test result"
 msgid_plural "%d fixed test results"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d inaccessible merge request"
+msgid_plural "%d inaccessible merge requests"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2116,6 +2124,9 @@ msgid "Blocked by <strong>%d closed</strong> merge request."
 msgid_plural "Blocked by <strong>%d closed</strong> merge requests."
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Blocking merge requests"
+msgstr ""
 
 msgid "Blog"
 msgstr ""
@@ -9748,6 +9759,9 @@ msgid "Past due"
 msgstr ""
 
 msgid "Paste a machine public key here. Read more about how to generate it %{link_start}here%{link_end}"
+msgstr ""
+
+msgid "Paste a merge request link"
 msgstr ""
 
 msgid "Paste epic link"

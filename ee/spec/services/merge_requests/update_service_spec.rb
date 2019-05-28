@@ -179,5 +179,23 @@ describe MergeRequests::UpdateService, :mailer do
         expect(merge_request.reload.approvals).to be_empty
       end
     end
+
+    context 'updating blocking merge requests' do
+      it 'delegates to MergeRequests::UpdateBlocksService' do
+        expect(MergeRequests::UpdateBlocksService)
+          .to receive(:extract_params!)
+          .and_return(:extracted_params)
+
+        expect_next_instance_of(MergeRequests::UpdateBlocksService) do |service|
+          expect(service.merge_request).to eq(merge_request)
+          expect(service.current_user).to eq(user)
+          expect(service.params).to eq(:extracted_params)
+
+          expect(service).to receive(:execute)
+        end
+
+        update_merge_request({})
+      end
+    end
   end
 end

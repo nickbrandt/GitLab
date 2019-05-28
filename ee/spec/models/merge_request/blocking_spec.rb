@@ -68,4 +68,80 @@ describe MergeRequest do
       end
     end
   end
+
+  describe '#visible_blocking_merge_requests' do
+    let(:block) { create(:merge_request_block) }
+    let(:blocking_mr) { block.blocking_merge_request }
+    let(:blocked_mr) { block.blocked_merge_request }
+    let(:user) { create(:user) }
+
+    it 'shows blocking MR to developer' do
+      blocking_mr.target_project.team.add_developer(user)
+
+      expect(blocked_mr.visible_blocking_merge_requests(user)).to contain_exactly(blocking_mr)
+    end
+
+    it 'hides block from guest' do
+      blocking_mr.target_project.team.add_guest(user)
+
+      expect(blocked_mr.visible_blocking_merge_requests(user)).to be_empty
+    end
+
+    it 'hides block from anonymous user' do
+      expect(blocked_mr.visible_blocking_merge_requests(nil)).to be_empty
+    end
+  end
+
+  describe '#visible_blocking_merge_request_refs' do
+    let(:merge_request) { create(:merge_request) }
+    let(:other_mr) { create(:merge_request) }
+    let(:user) { create(:user) }
+
+    it 'returns the references for the result of #visible_blocking_merge_requests' do
+      expect(merge_request)
+        .to receive(:visible_blocking_merge_requests)
+        .with(user)
+        .and_return([other_mr])
+
+      expect(merge_request.visible_blocking_merge_request_refs(user))
+        .to eq([other_mr.to_reference(full: true)])
+    end
+  end
+
+  describe '#hidden_blocking_merge_requests_count' do
+    let(:block) { create(:merge_request_block) }
+    let(:blocking_mr) { block.blocking_merge_request }
+    let(:blocked_mr) { block.blocked_merge_request }
+    let(:user) { create(:user) }
+
+    it 'returns 0 when all MRs are visible' do
+      blocking_mr.target_project.team.add_developer(user)
+
+      expect(blocked_mr.hidden_blocking_merge_requests_count(user)).to eq(0)
+    end
+
+    context 'MR is hidden' do
+      before do
+        blocking_mr.target_project.team.add_guest(user)
+      end
+
+      it 'returns 1 when MR is unmerged by default' do
+        expect(blocked_mr.hidden_blocking_merge_requests_count(user)).to eq(1)
+      end
+
+      context 'MR is merged' do
+        before do
+          blocking_mr.update_columns(state: 'merged')
+        end
+
+        it 'returns 0 by default' do
+          expect(blocked_mr.hidden_blocking_merge_requests_count(user)).to eq(0)
+        end
+
+        it 'returns 1 when include_merged: true' do
+          expect(blocked_mr.hidden_blocking_merge_requests_count(user, include_merged: true)).to eq(1)
+        end
+      end
+    end
+  end
 end
