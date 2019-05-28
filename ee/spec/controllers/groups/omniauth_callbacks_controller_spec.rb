@@ -50,6 +50,15 @@ describe Groups::OmniauthCallbacksController do
       Rails.application.env_config['omniauth.auth'] = @original_env_config_omniauth_auth
     end
 
+    shared_examples 'works with session enforcement' do
+      it 'stores that a SAML session is active' do
+        expect(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:new).with(saml_provider).and_call_original
+        expect_any_instance_of(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:update_session)
+
+        post provider, params: { group_id: group }
+      end
+    end
+
     shared_examples "SAML session initiated" do
       it "redirects to RelayState" do
         post provider, params: { group_id: group, RelayState: '/explore' }
@@ -57,12 +66,7 @@ describe Groups::OmniauthCallbacksController do
         expect(response).to redirect_to('/explore')
       end
 
-      it 'stores that a SAML session is active' do
-        expect(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:new).with(saml_provider).and_call_original
-        expect_any_instance_of(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:update_session)
-
-        post provider, params: { group_id: group }
-      end
+      include_examples 'works with session enforcement'
     end
 
     shared_examples "and identity already linked" do
@@ -87,6 +91,14 @@ describe Groups::OmniauthCallbacksController do
           expect(response).not_to be_client_error
           expect(response).not_to be_server_error
         end
+      end
+
+      context 'with 2FA' do
+        before do
+          user.update!(otp_required_for_login: true)
+        end
+
+        include_examples 'works with session enforcement'
       end
     end
 
