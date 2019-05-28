@@ -24,6 +24,14 @@ export default {
       type: String,
       required: true,
     },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    documentationPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapGetters(['jobNotSetUp', 'jobFailed', 'isIncomplete']),
@@ -55,14 +63,14 @@ export default {
 <template>
   <gl-loading-icon v-if="!initialized" size="md" class="mt-4" />
 
-  <!-- TODO: add correct documentation link and SVG path -->
   <gl-empty-state
     v-else-if="jobNotSetUp"
-    :title="__('View dependency information for your project')"
+    :title="__('View dependency details for your project')"
     :description="
       __('The dependency list details information about the components used within your project.')
     "
-    :primary-button-link="'#'"
+    :svg-path="emptyStateSvgPath"
+    :primary-button-link="documentationPath"
     :primary-button-text="__('Learn more about the dependency list')"
   />
 

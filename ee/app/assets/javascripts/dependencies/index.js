@@ -4,7 +4,7 @@ import createStore from './store';
 
 export default () => {
   const el = document.querySelector('#js-dependencies-app');
-  const { endpoint } = el.dataset;
+  const { endpoint, emptyStateSvgPath, documentationPath } = el.dataset;
 
   const store = createStore();
 
@@ -18,6 +18,8 @@ export default () => {
       return createElement(DependenciesApp, {
         props: {
           endpoint,
+          emptyStateSvgPath,
+          documentationPath,
         },
       });
     },
