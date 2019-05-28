@@ -2,6 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlModal } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
+import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
 import { metricsGroupsAPIResponse, mockApiEndpoint } from 'spec/monitoring/mock_data';
 import propsData from 'spec/monitoring/dashboard_spec';
@@ -11,6 +12,7 @@ import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics
 describe('Dashboard', () => {
   let Component;
   let mock;
+  let store;
   let vm;
   const localVue = createLocalVue();
 
@@ -25,6 +27,7 @@ describe('Dashboard', () => {
       ee: true,
     };
 
+    store = createStore();
     mock = new MockAdapter(axios);
     mock.onGet(mockApiEndpoint).reply(200, metricsGroupsAPIResponse);
     Component = localVue.extend(Dashboard);
@@ -45,6 +48,7 @@ describe('Dashboard', () => {
             alertsEndpoint: '/endpoint',
             showTimeWindowDropdown: false,
           },
+          store,
         });
       });
 
@@ -66,6 +70,7 @@ describe('Dashboard', () => {
             alertsEndpoint: '/endpoint',
             showTimeWindowDropdown: false,
           },
+          store,
         });
       });
 
@@ -91,6 +96,7 @@ describe('Dashboard', () => {
             alertsEndpoint: '/endpoint',
             showTimeWindowDropdown: false,
           },
+          store,
         });
       });
 
@@ -114,6 +120,7 @@ describe('Dashboard', () => {
             alertsEndpoint: '/endpoint',
             showTimeWindowDropdown: false,
           },
+          store,
         });
 
         setTimeout(done);
