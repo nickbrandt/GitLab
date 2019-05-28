@@ -41,9 +41,13 @@ describe Groups::OmniauthCallbacksController do
 
   context "valid credentials" do
     before do
-      mock_auth_hash(provider, uid, user.email, response_object: saml_response)
+      @original_env_config_omniauth_auth = mock_auth_hash(provider, uid, user.email, response_object: saml_response)
       stub_omniauth_provider(provider, context: request)
       stub_last_request_id(last_request_id)
+    end
+
+    after do
+      Rails.application.env_config['omniauth.auth'] = @original_env_config_omniauth_auth
     end
 
     shared_examples "and identity already linked" do
