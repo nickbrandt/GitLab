@@ -730,32 +730,6 @@ describe ProjectsController do
     end
   end
 
-  describe 'GET edit' do
-    it 'does not allow an auditor user to access the page' do
-      sign_in(create(:user, :auditor))
-
-      get :edit,
-          params: {
-            namespace_id: project.namespace.path,
-            id: project.path
-          }
-
-      expect(response).to have_gitlab_http_status(404)
-    end
-
-    it 'allows an admin user to access the page' do
-      sign_in(create(:user, :admin))
-
-      get :edit,
-          params: {
-            namespace_id: project.namespace.path,
-            id: project.path
-          }
-
-      expect(response).to have_gitlab_http_status(200)
-    end
-  end
-
   describe 'POST #preview_markdown' do
     before do
       sign_in(user)
