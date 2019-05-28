@@ -1,0 +1,5 @@
+---
+title: Group SAML can be used to sign into a GitLab instance
+merge_request: 12660
+author:
+type: added

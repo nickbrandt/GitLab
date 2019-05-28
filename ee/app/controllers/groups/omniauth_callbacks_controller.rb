@@ -82,24 +82,6 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     Gitlab::Auth::GroupSaml::User.new(oauth, @saml_provider)
   end
 
-  override :sign_in_user_flow
-  def sign_in_user_flow(auth_user_class)
-    # User has successfully authenticated with the SAML provider for the group
-    # but is not signed in to the GitLab instance.
-
-    if sign_in_to_gitlab_enabled?
-      super
-    else
-      flash[:notice] = "You must be signed in to use SAML with this group"
-
-      redirect_to new_user_session_path
-    end
-  end
-
-  def sign_in_to_gitlab_enabled?
-    ::Feature.enabled?(:group_saml_allows_sign_in_to_gitlab, @unauthenticated_group)
-  end
-
   override :fail_login
   def fail_login(user)
     if user
