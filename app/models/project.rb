@@ -334,8 +334,8 @@ class Project < ApplicationRecord
   validates :star_count, numericality: { greater_than_or_equal_to: 0 }
   validate :check_personal_projects_limit, on: :create
   validate :check_repository_path_availability, on: :update, if: ->(project) { project.renamed? }
-  validate :visibility_level_allowed_by_group, if: -> { changes.has_key?(:visibility_level) }
-  validate :visibility_level_allowed_as_fork, if: -> { changes.has_key?(:visibility_level) }
+  validate :visibility_level_allowed_by_group, if: :should_validate_visibility_level?
+  validate :visibility_level_allowed_as_fork, if: :should_validate_visibility_level?
   validate :check_wiki_path_conflict
   validate :validate_pages_https_only, if: -> { changes.has_key?(:pages_https_only) }
   validates :repository_storage,
@@ -403,6 +403,7 @@ class Project < ApplicationRecord
   scope :with_builds_enabled, -> { with_feature_enabled(:builds) }
   scope :with_issues_enabled, -> { with_feature_enabled(:issues) }
   scope :with_issues_available_for_user, ->(current_user) { with_feature_available_for_user(:issues, current_user) }
+  scope :with_merge_requests_available_for_user, ->(current_user) { with_feature_available_for_user(:merge_requests, current_user) }
   scope :with_merge_requests_enabled, -> { with_feature_enabled(:merge_requests) }
   scope :with_remote_mirrors, -> { joins(:remote_mirrors).where(remote_mirrors: { enabled: true }).distinct }
 
@@ -586,6 +587,17 @@ class Project < ApplicationRecord
 
     def group_ids
       joins(:namespace).where(namespaces: { type: 'Group' }).select(:namespace_id)
+    end
+
+    # Returns ids of projects with milestones available for given user
+    #
+    # Used on queries to find milestones which user can see
+    # For example: Milestone.where(project_id: ids_with_milestone_available_for(user))
+    def ids_with_milestone_available_for(user)
+      with_issues_enabled = with_issues_available_for_user(user).select(:id)
+      with_merge_requests_enabled = with_merge_requests_available_for_user(user).select(:id)
+
+      from_union([with_issues_enabled, with_merge_requests_enabled]).select(:id)
     end
   end
 
@@ -876,6 +888,10 @@ class Project < ApplicationRecord
       end
 
     self.errors.add(:limit_reached, error % { limit: limit })
+  end
+
+  def should_validate_visibility_level?
+    new_record? || changes.has_key?(:visibility_level)
   end
 
   def visibility_level_allowed_by_group

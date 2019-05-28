@@ -150,7 +150,14 @@ module Gitlab
       end
 
       def milestones
-        Milestone.elastic_search(query, options: base_options)
+        # Must pass 'issues' and 'merge_requests' to check
+        # if any of the features is available for projects in Elastic::ApplicationSearch#project_ids_query
+        # Otherwise it will ignore project_ids and return milestones
+        # from projects with milestones disabled.
+        options = base_options
+        options[:features] = [:issues, :merge_requests]
+
+        Milestone.elastic_search(query, options: options)
       end
 
       def merge_requests

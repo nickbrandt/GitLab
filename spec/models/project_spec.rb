@@ -214,6 +214,13 @@ describe Project do
       expect(project2).not_to be_valid
     end
 
+    it 'validates the visibility' do
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_as_fork).and_call_original
+      expect_any_instance_of(described_class).to receive(:visibility_level_allowed_by_group).and_call_original
+
+      create(:project)
+    end
+
     describe 'wiki path conflict' do
       context "when the new path has been used by the wiki of other Project" do
         it 'has an error on the name attribute' do
@@ -3160,6 +3167,23 @@ describe Project do
 
         expect(projects).to eq([public_project])
       end
+    end
+  end
+
+  describe '.ids_with_milestone_available_for' do
+    let!(:user) { create(:user) }
+
+    it 'returns project ids with milestones available for user' do
+      project_1 = create(:project, :public, :merge_requests_disabled, :issues_disabled)
+      project_2 = create(:project, :public, :merge_requests_disabled)
+      project_3 = create(:project, :public, :issues_disabled)
+      project_4 = create(:project, :public)
+      project_4.project_feature.update(issues_access_level: ProjectFeature::PRIVATE, merge_requests_access_level: ProjectFeature::PRIVATE )
+
+      project_ids = described_class.ids_with_milestone_available_for(user).pluck(:id)
+
+      expect(project_ids).to include(project_2.id, project_3.id)
+      expect(project_ids).not_to include(project_1.id, project_4.id)
     end
   end
 
