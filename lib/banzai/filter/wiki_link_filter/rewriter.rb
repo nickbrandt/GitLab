@@ -60,7 +60,7 @@ module Banzai
         end
 
         def slug_considered_unsafe?
-          !!UNSAFE_SLUG_REGEXES.detect { |r| r.match?(@slug) }
+          UNSAFE_SLUG_REGEXES.any? { |r| r.match?(@slug) }
         end
       end
     end
