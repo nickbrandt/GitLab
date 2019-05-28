@@ -3740,9 +3740,6 @@ msgstr ""
 msgid "CurrentUser|Settings"
 msgstr ""
 
-msgid "Custom"
-msgstr ""
-
 msgid "Custom CI config path"
 msgstr ""
 
@@ -8654,6 +8651,9 @@ msgid "NotificationLevel|Participate"
 msgstr ""
 
 msgid "NotificationLevel|Watch"
+msgstr ""
+
+msgid "NotificationSetting|Custom"
 msgstr ""
 
 msgid "Notifications"
