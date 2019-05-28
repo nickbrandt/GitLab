@@ -5,6 +5,7 @@ import Flash from '~/flash';
 import CreateItemDropdown from '~/create_item_dropdown';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
+import { __ } from '~/locale';
 
 const PROTECTED_ENVIRONMENT_INPUT = 'input[name="protected_environment[name]"]';
 
@@ -37,7 +38,7 @@ export default class ProtectedEnvironmentCreate {
 
     this.createItemDropdown = new CreateItemDropdown({
       $dropdown: this.$form.find('.js-protected-environment-select'),
-      defaultToggleLabel: 'Protected Environment',
+      defaultToggleLabel: __('Protected Environment'),
       fieldName: 'protected_environment[name]',
       onSelect: this.onSelectCallback,
       getData: ProtectedEnvironmentCreate.getProtectedEnvironments,
@@ -66,7 +67,7 @@ export default class ProtectedEnvironmentCreate {
         callback(results);
       })
       .catch(() => {
-        Flash('An error occurred while fetching environments.');
+        Flash(__('An error occurred while fetching environments.'));
         callback([]);
       });
   }
@@ -114,6 +115,6 @@ export default class ProtectedEnvironmentCreate {
         window.location.hash = 'js-protected-environments-settings';
         window.location.reload();
       })
-      .catch(() => Flash('Failed to protect the environment'));
+      .catch(() => Flash(__('Failed to protect the environment')));
   }
 }

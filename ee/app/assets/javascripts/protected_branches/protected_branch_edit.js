@@ -4,6 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
+import { __ } from '~/locale';
 
 export default class ProtectedBranchEdit {
   constructor(options) {
@@ -84,7 +85,7 @@ export default class ProtectedBranchEdit {
       .catch(() => {
         this.$allowedToMergeDropdown.enable();
         this.$allowedToPushDropdown.enable();
-        Flash('Failed to update branch!', null, $('.js-protected-branches-list'));
+        Flash(__('Failed to update branch!'), null, $('.js-protected-branches-list'));
       });
   }
 

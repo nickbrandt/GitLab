@@ -5,6 +5,7 @@ import Flash from '~/flash';
 import CreateItemDropdown from '~/create_item_dropdown';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
+import { __ } from '~/locale';
 
 export default class ProtectedBranchCreate {
   constructor() {
@@ -45,7 +46,7 @@ export default class ProtectedBranchCreate {
 
     this.createItemDropdown = new CreateItemDropdown({
       $dropdown: this.$form.find('.js-protected-branch-select'),
-      defaultToggleLabel: 'Protected Branch',
+      defaultToggleLabel: __('Protected Branch'),
       fieldName: 'protected_branch[name]',
       onSelect: this.onSelectCallback,
       getData: ProtectedBranchCreate.getProtectedBranches,
@@ -111,6 +112,6 @@ export default class ProtectedBranchCreate {
       .then(() => {
         window.location.reload();
       })
-      .catch(() => Flash('Failed to protect the branch'));
+      .catch(() => Flash(__('Failed to protect the branch')));
   }
 }

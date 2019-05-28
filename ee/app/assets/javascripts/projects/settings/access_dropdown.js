@@ -3,7 +3,7 @@
 import _ from 'underscore';
 import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
-import { n__ } from '~/locale';
+import { n__, s__, __ } from '~/locale';
 import { LEVEL_TYPES, LEVEL_ID_PROP, ACCESS_LEVEL_NONE } from './constants';
 
 export default class AccessDropdown {
@@ -295,7 +295,7 @@ export default class AccessDropdown {
         this.groupsData = groupsResponse;
         callback(this.consolidateData(usersResponse.data, groupsResponse.data));
       })
-      .catch(() => Flash('Failed to load groups & users.'));
+      .catch(() => Flash(__('Failed to load groups & users.')));
   }
 
   consolidateData(usersResponse, groupsResponse) {
@@ -369,7 +369,7 @@ export default class AccessDropdown {
     });
 
     if (roles.length) {
-      consolidatedData = consolidatedData.concat([{ header: 'Roles' }], roles);
+      consolidatedData = consolidatedData.concat([{ header: s__('AccessDropdown|Roles') }], roles);
     }
 
     if (groups.length) {
@@ -377,11 +377,18 @@ export default class AccessDropdown {
         consolidatedData = consolidatedData.concat(['divider']);
       }
 
-      consolidatedData = consolidatedData.concat([{ header: 'Groups' }], groups);
+      consolidatedData = consolidatedData.concat(
+        [{ header: s__('AccessDropdown|Groups') }],
+        groups,
+      );
     }
 
     if (users.length) {
-      consolidatedData = consolidatedData.concat(['divider'], [{ header: 'Users' }], users);
+      consolidatedData = consolidatedData.concat(
+        ['divider'],
+        [{ header: s__('AccessDropdown|Users') }],
+        users,
+      );
     }
 
     return consolidatedData;

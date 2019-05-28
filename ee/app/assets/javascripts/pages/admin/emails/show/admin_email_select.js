@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import Api from '~/api';
+import { sprintf, __ } from '~/locale';
 
 function AdminEmailSelect() {
   import(/* webpackChunkName: 'select2' */ 'select2/select2')
@@ -12,7 +13,7 @@ function AdminEmailSelect() {
             var skip_ldap;
             skip_ldap = $(select).hasClass('skip_ldap');
             return $(select).select2({
-              placeholder: 'Select group or project',
+              placeholder: __('Select group or project'),
               multiple: $(select).hasClass('multiselect'),
               minimumInputLength: 0,
               query: function(query) {
@@ -77,17 +78,19 @@ AdminEmailSelect.prototype.formatResult = function(object) {
       '</div> </div>'
     );
   } else {
-    return "<div class='group-result'> <div class='group-name'>All</div> <div class='group-path'>All groups and projects</div> </div>";
+    return `<div class='group-result'> <div class='group-name'>${__(
+      'All',
+    )}</div> <div class='group-path'>${__('All groups and projects')}</div> </div>`;
   }
 };
 
 AdminEmailSelect.prototype.formatSelection = function(object) {
   if (object.path_with_namespace) {
-    return 'Project: ' + object.name;
+    return sprintf(__('Project: %{name}'), { name: object.name });
   } else if (object.path) {
-    return 'Group: ' + object.name;
+    return sprintf(__('Group: %{name}'), { name: object.name });
   } else {
-    return 'All groups and projects';
+    return __('All groups and projects');
   }
 };
 
