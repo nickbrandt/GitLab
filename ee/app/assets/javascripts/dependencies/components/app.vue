@@ -82,7 +82,7 @@ export default {
     <div class="d-sm-flex justify-content-between align-items-baseline my-2">
       <h4 class="h5">
         {{ __('Dependencies') }}
-        <gl-badge pill>{{ pageInfo.total }}</gl-badge>
+        <gl-badge v-if="pageInfo.total" pill>{{ pageInfo.total }}</gl-badge>
       </h4>
 
       <dependencies-actions />
