@@ -7,19 +7,19 @@ module EE
 
       override :execute
       def execute
-        if use_elasticsearch?
-          ::Gitlab::Elastic::ProjectSearchResults.new(current_user,
-                                                    params[:search],
-                                                    project.id,
-                                                    params[:repository_ref])
-        else
-          super
-        end
+        return super unless use_elasticsearch?
+
+        ::Gitlab::Elastic::ProjectSearchResults.new(
+          current_user,
+          params[:search],
+          project.id,
+          params[:repository_ref]
+        )
       end
 
       # This method is used in the top-level SearchService, so cannot be in-lined into #execute
       def use_elasticsearch?
-        project.use_elasticsearch?
+        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: project)
       end
     end
   end
