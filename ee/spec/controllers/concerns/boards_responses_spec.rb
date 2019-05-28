@@ -11,6 +11,11 @@ describe BoardsResponses do
 
   subject(:controller) { controller_class.new }
 
+  before do
+    stub_licensed_features(scoped_issue_board: true)
+    stub_licensed_features(multiple_project_issue_boards: true)
+  end
+
   describe '#serialize_as_json' do
     let!(:board) { create(:board) }
 
@@ -22,7 +27,7 @@ describe BoardsResponses do
       end
 
       it 'serialises properly' do
-        expected = { id: board.id }
+        expected = { id: board.id, name: board.name, milestone: { id: milestone.id, title: milestone.title } }
 
         expect(subject.serialize_as_json(board)).to match(expected)
       end
@@ -30,7 +35,7 @@ describe BoardsResponses do
 
     context 'without milestone' do
       it 'serialises properly' do
-        expected = { id: board.id }
+        expected = { id: board.id, name: board.name }
 
         expect(subject.serialize_as_json(board)).to eq(expected)
       end
