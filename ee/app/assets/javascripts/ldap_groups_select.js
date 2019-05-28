@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import Api from 'ee/api';
+import { __ } from '~/locale';
 
 export default function initLDAPGroupsSelect() {
   var groupFormatSelection, ldapGroupResult;
@@ -18,7 +19,7 @@ export default function initLDAPGroupsSelect() {
           id: function(group) {
             return group.cn;
           },
-          placeholder: 'Search for a LDAP group',
+          placeholder: __('Search for a LDAP group'),
           minimumInputLength: 1,
           query: function(query) {
             var provider;
@@ -44,7 +45,7 @@ export default function initLDAPGroupsSelect() {
           formatSelection: groupFormatSelection,
           dropdownCssClass: 'ajax-groups-dropdown',
           formatNoMatches: function(nomatch) {
-            return 'Match not found; try refining your search query.';
+            return __('Match not found; try refining your search query.');
           },
         });
       });
