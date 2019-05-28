@@ -1,0 +1,5 @@
+---
+title: Restrict child_epic and remove_child_epic quick actions when using mysql
+merge_request: 13152
+author:
+type: fixed
