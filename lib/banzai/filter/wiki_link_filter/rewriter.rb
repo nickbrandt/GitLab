@@ -4,7 +4,7 @@ module Banzai
   module Filter
     class WikiLinkFilter < HTML::Pipeline::Filter
       class Rewriter
-        UNSAFE_SLUG_REGEXES = [/^javascript:/i].freeze
+        UNSAFE_SLUG_REGEXES = [/\Ajavascript:/i].freeze
 
         def initialize(link_string, wiki:, slug:)
           @uri = Addressable::URI.parse(link_string)
@@ -60,7 +60,7 @@ module Banzai
         end
 
         def slug_considered_unsafe?
-          !!UNSAFE_SLUG_REGEXES.detect { |r| @slug =~ r }
+          UNSAFE_SLUG_REGEXES.any? { |r| r.match?(@slug) }
         end
       end
     end
