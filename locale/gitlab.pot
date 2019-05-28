@@ -6552,7 +6552,7 @@ msgstr ""
 msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commits and pull requests. %{more_info_link}"
 msgstr ""
 
-msgid "If your HTTP repository is not publicly accessible, add authentication information to the URL: <code>https://username:password@gitlab.company.com/group/project.git</code>."
+msgid "If your HTTP repository is not publicly accessible, add your credentials."
 msgstr ""
 
 msgid "ImageDiffViewer|2-up"
@@ -8756,6 +8756,9 @@ msgid "Part of merge request changes"
 msgstr ""
 
 msgid "Password"
+msgstr ""
+
+msgid "Password (optional)"
 msgstr ""
 
 msgid "Password authentication is unavailable."
@@ -13653,6 +13656,9 @@ msgid "UserProfile|You haven't created any snippets."
 msgstr ""
 
 msgid "UserProfile|Your projects can be available publicly, internally, or privately, at your choice."
+msgstr ""
+
+msgid "Username (optional)"
 msgstr ""
 
 msgid "Users"
