@@ -1471,6 +1471,9 @@ msgstr ""
 msgid "Are you sure you want to reset the health check token?"
 msgstr ""
 
+msgid "Are you sure you want to revoke this nickname?"
+msgstr ""
+
 msgid "Are you sure you want to stop this environment?"
 msgstr ""
 
@@ -7389,6 +7392,9 @@ msgstr ""
 msgid "Last updated"
 msgstr ""
 
+msgid "Last used"
+msgstr ""
+
 msgid "LastPushEvent|You pushed to"
 msgstr ""
 
@@ -8423,6 +8429,9 @@ msgid "Newly registered users will by default be external"
 msgstr ""
 
 msgid "Next"
+msgstr ""
+
+msgid "Nickname"
 msgstr ""
 
 msgid "No"
@@ -11384,6 +11393,9 @@ msgstr ""
 msgid "Serverless|There is currently no function data available from Knative. This could be for a variety of reasons including:"
 msgstr ""
 
+msgid "Service"
+msgstr ""
+
 msgid "Service Desk"
 msgstr ""
 
@@ -12398,6 +12410,9 @@ msgid "Target branch"
 msgstr ""
 
 msgid "Team"
+msgstr ""
+
+msgid "Team domain"
 msgstr ""
 
 msgid "Template"
@@ -14634,6 +14649,9 @@ msgstr ""
 msgid "You can resolve the merge conflict using either the Interactive mode, by choosing %{use_ours} or %{use_theirs} buttons, or by editing the files directly. Commit these changes into %{branch_name}"
 msgstr ""
 
+msgid "You can see your chat accounts."
+msgstr ""
+
 msgid "You can set up jobs to only use Runners with specific tags. Separate tags with commas."
 msgstr ""
 
@@ -14677,6 +14695,9 @@ msgid "You do not have permission to run the Web Terminal. Please contact a proj
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
+msgstr ""
+
+msgid "You don't have any active chat names."
 msgstr ""
 
 msgid "You don't have any applications"
