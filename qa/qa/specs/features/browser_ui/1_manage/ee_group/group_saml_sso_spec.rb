@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/73
-  context 'Manage', :orchestrated, :group_saml, :quarantine do
+  context 'Manage', :orchestrated, :group_saml do
     describe 'Group SAML SSO' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
@@ -32,7 +31,7 @@ module QA
 
         EE::Page::Group::SamlSSOSignIn.act { click_signin }
 
-        expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
+        expect(page).to have_content("Already signed in with SAML for #{Runtime::Env.sandbox_name}")
       end
 
       it 'Lets group admin test settings' do
@@ -55,7 +54,7 @@ module QA
     def login_to_idp_if_required_and_expect_success
       Vendor::SAMLIdp::Page::Login.perform { |login_page| login_page.login_if_required }
       expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
-        .or have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
+        .or have_content("Already signed in with SAML for #{Runtime::Env.sandbox_name}")
     end
   end
 end
