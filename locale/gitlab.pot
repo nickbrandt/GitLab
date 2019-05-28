@@ -1094,9 +1094,6 @@ msgstr ""
 msgid "An error occurred while fetching sidebar data"
 msgstr ""
 
-msgid "An error occurred while fetching stages."
-msgstr ""
-
 msgid "An error occurred while fetching the Service Desk address."
 msgstr ""
 
