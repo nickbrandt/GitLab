@@ -1,0 +1,5 @@
+---
+title: Hide action buttons while security dashboard is loading
+merge_request: 13576
+author:
+type: fixed
