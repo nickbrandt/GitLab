@@ -14,13 +14,31 @@ describe EpicLinks::ListService, :postgresql do
     epics.map do |epic|
       {
         id: epic.id,
+        iid: epic.iid,
         title: epic.title,
         state: epic.state,
+        created_at: epic.created_at,
+        closed_at: epic.closed_at,
         reference: epic.to_reference(group),
         path: "/groups/#{epic.group.full_path}/-/epics/#{epic.iid}",
-        relation_path: "/groups/#{parent_epic.group.full_path}/-/epics/#{parent_epic.iid}/links/#{epic.id}"
+        relation_path: "/groups/#{parent_epic.group.full_path}/-/epics/#{parent_epic.iid}/links/#{epic.id}",
+        has_children: epic.has_children?,
+        has_issues: epic.has_issues?,
+        full_path: epic.group.full_path,
+        can_admin: Ability.allowed?(user, :admin_epic, epic)
       }
     end
+  end
+
+  def expect_results_are_equal(results, expected)
+    results.each_index do |index|
+      expect(results[index][:created_at]).to be_like_time(expected[index][:created_at])
+    end
+
+    results.each  { |h| h.delete(:created_at) }
+    expected.each { |h| h.delete(:created_at) }
+
+    expect(results).to eq(expected)
   end
 
   describe '#execute' do
@@ -47,7 +65,7 @@ describe EpicLinks::ListService, :postgresql do
         it 'returns related issues JSON' do
           expected_result = epics_to_results([epic1, epic2])
 
-          expect(subject).to eq(expected_result)
+          expect_results_are_equal(subject, expected_result)
         end
       end
 
@@ -62,7 +80,7 @@ describe EpicLinks::ListService, :postgresql do
 
           expected_result = epics_to_results([epic1, epic2, epic_subgroup2, epic_subgroup1])
 
-          expect(subject).to eq(expected_result)
+          expect_results_are_equal(subject, expected_result)
         end
 
         it 'returns only some child epics for a subgroup member' do
@@ -70,7 +88,7 @@ describe EpicLinks::ListService, :postgresql do
 
           expected_result = epics_to_results([epic1, epic2, epic_subgroup2])
 
-          expect(subject).to eq(expected_result)
+          expect_results_are_equal(subject, expected_result)
         end
       end
     end

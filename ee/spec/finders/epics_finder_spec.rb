@@ -27,7 +27,7 @@ describe EpicsFinder do
       end
     end
 
-    # Enabeling the `request_store` for this to avoid counting queries that check
+    # Enabling the `request_store` for this to avoid counting queries that check
     # the license.
     context 'when epics feature is enabled', :request_store do
       before do
@@ -176,6 +176,23 @@ describe EpicsFinder do
             }
 
             expect(epics(params)).to contain_exactly(epic2)
+          end
+        end
+
+        context 'by iids' do
+          let(:subgroup)  { create(:group, :private, parent: group) }
+          let!(:subepic1) { create(:epic, group: subgroup, iid: epic1.iid) }
+
+          it 'returns the specified epics' do
+            params = { iids: [epic1.iid, epic2.iid] }
+
+            expect(epics(params)).to contain_exactly(epic1, epic2)
+          end
+
+          it 'does not return epics from the sub-group with the same iid' do
+            params = { iids: [epic1.iid] }
+
+            expect(epics(params)).to contain_exactly(epic1)
           end
         end
       end
