@@ -7,6 +7,8 @@ module EE
         super
 
         log_audit_event(member: member)
+
+        cleanup_group_identity(member)
       end
 
       private
@@ -17,6 +19,14 @@ module EE
           member.source,
           action: :destroy
         ).for_member(member).security_event
+      end
+
+      def cleanup_group_identity(member)
+        saml_provider = member.source.try(:saml_provider)
+
+        return unless saml_provider
+
+        saml_provider.identities.for_user(member.user).delete_all
       end
     end
   end
