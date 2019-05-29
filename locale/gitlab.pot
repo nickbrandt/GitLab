@@ -7000,6 +7000,9 @@ msgstr ""
 msgid "Invoke Time"
 msgstr ""
 
+msgid "Is using license seat:"
+msgstr ""
+
 msgid "IssuableStatus|Closed (%{moved_link_start}moved%{moved_link_end})"
 msgstr ""
 

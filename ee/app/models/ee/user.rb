@@ -217,6 +217,16 @@ module EE
       License.current.present?
     end
 
+    def using_license_seat?
+      return false unless active?
+
+      if License.current&.exclude_guests_from_active_count?
+        highest_role > ::Gitlab::Access::GUEST
+      else
+        highest_role > ::Gitlab::Access::NO_ACCESS
+      end
+    end
+
     def group_sso?(group)
       return false unless group
 

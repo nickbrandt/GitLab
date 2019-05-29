@@ -565,4 +565,36 @@ describe User do
       end
     end
   end
+
+  describe '#using_license_seat?' do
+    let(:user) { create(:user) }
+
+    context 'when user is inactive' do
+      before do
+        user.block
+      end
+
+      it 'returns false' do
+        expect(user.using_license_seat?).to eq false
+      end
+    end
+
+    context 'when user is active' do
+      let(:project_guest_user) { create(:project_member, :guest).user }
+
+      context 'user is guest' do
+        it 'returns false if license is ultimate' do
+          create(:license, plan: License::ULTIMATE_PLAN)
+
+          expect(project_guest_user.using_license_seat?).to eq false
+        end
+
+        it 'returns true if license is not ultimate' do
+          create(:license, plan: License::STARTER_PLAN)
+
+          expect(project_guest_user.using_license_seat?).to eq true
+        end
+      end
+    end
+  end
 end
