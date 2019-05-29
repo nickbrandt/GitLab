@@ -154,6 +154,7 @@ When the user is authenticated and `simple` is not set this returns something li
       "commit_count": 37,
       "storage_size": 1038090,
       "repository_size": 1038090,
+      "wiki_size" : 0,
       "lfs_objects_size": 0,
       "job_artifacts_size": 0,
       "packages_size": 0
@@ -237,6 +238,7 @@ When the user is authenticated and `simple` is not set this returns something li
       "commit_count": 12,
       "storage_size": 2066080,
       "repository_size": 2066080,
+      "wiki_size" : 0,
       "lfs_objects_size": 0,
       "job_artifacts_size": 0,
       "packages_size": 0
@@ -346,6 +348,7 @@ GET /users/:user_id/projects
       "commit_count": 37,
       "storage_size": 1038090,
       "repository_size": 1038090,
+      "wiki_size" : 0,
       "lfs_objects_size": 0,
       "job_artifacts_size": 0,
       "packages_size": 0
@@ -428,6 +431,7 @@ GET /users/:user_id/projects
       "commit_count": 12,
       "storage_size": 2066080,
       "repository_size": 2066080,
+      "wiki_size" : 0,
       "lfs_objects_size": 0,
       "job_artifacts_size": 0,
       "packages_size": 0
@@ -556,6 +560,7 @@ GET /projects/:id
     "commit_count": 37,
     "storage_size": 1038090,
     "repository_size": 1038090,
+    "wiki_size" : 0,
     "lfs_objects_size": 0,
     "job_artifacts_size": 0,
     "packages_size": 0
