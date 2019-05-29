@@ -34,7 +34,7 @@ describe DependencyProxy::PullManifestService do
     before do
       manifest_link = DependencyProxy::Registry.manifest_url(image, tag)
 
-      stub_request(:get, manifest_link).to_timeout
+      stub_full_request(manifest_link).to_timeout
     end
 
     it { expect(subject[:status]).to eq(:error) }

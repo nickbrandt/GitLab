@@ -34,7 +34,7 @@ describe DependencyProxy::DownloadBlobService do
     before do
       blob_url = DependencyProxy::Registry.blob_url(image, blob_sha)
 
-      stub_request(:get, blob_url).to_timeout
+      stub_full_request(blob_url).to_timeout
     end
 
     it { expect(subject[:status]).to eq(:error) }

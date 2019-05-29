@@ -52,12 +52,14 @@ describe Gitlab::Geo::Oauth::Session, :geo do
 
     context 'primary is configured with relative URL' do
       it 'includes primary relative URL path' do
-        primary_node.update(url: 'http:://localhost/relative-path/')
+        api_url = 'http://localhost/relative-path/'
+
+        primary_node.update(url: api_url)
 
         api_response = double(parsed: true)
 
         expect_any_instance_of(OAuth2::AccessToken)
-          .to receive(:get).with(%r{^http:://localhost/relative-path/}).and_return(api_response)
+          .to receive(:get).with(%r{^#{api_url}}).and_return(api_response)
 
         subject.authenticate('any token')
       end
