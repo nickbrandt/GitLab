@@ -98,10 +98,7 @@ describe 'Scoped issue boards', :js do
           wait_for_requests
 
           expect(page).to have_css('.js-boards-selector')
-          page.within '.js-boards-selector' do
-            find('.dropdown-menu-toggle').click
-            click_button 'Create new board'
-          end
+          click_on_create_new_board
 
           click_button 'Expand'
 
@@ -433,11 +430,9 @@ describe 'Scoped issue boards', :js do
     end
 
     it "doesn't show the input when creating a board" do
+      click_on_create_new_board
+
       page.within '.js-boards-selector' do
-        find('.dropdown-menu-toggle').click
-
-        click_button 'Create new board'
-
         # To make sure the form is shown
         expect(page).to have_field('board-new-name')
 
@@ -501,12 +496,7 @@ describe 'Scoped issue boards', :js do
   end
 
   def create_board_scope(filter, value)
-    page.within '.js-boards-selector' do
-      find('.dropdown-menu-toggle').click
-    end
-
-    click_button 'Create new board'
-
+    click_on_create_new_board
     find('#board-new-name').set 'test'
 
     click_button 'Expand'
@@ -528,6 +518,15 @@ describe 'Scoped issue boards', :js do
     wait_for_requests
 
     expect(page).not_to have_selector('.board-list-loading')
+  end
+
+  def click_on_create_new_board
+    page.within '.js-boards-selector' do
+      find('.dropdown-menu-toggle').click
+      wait_for_requests
+
+      click_button 'Create new board'
+    end
   end
 
   def update_board_scope(filter, value)
