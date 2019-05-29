@@ -39,7 +39,7 @@
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals',
         anchor: 'allowing-merge-request-authors-to-approve-their-own-merge-requests'), target: '_blank'
 
-- if Feature.enabled?(:approval_rules, project) && password_authentication_enabled_for_web?
+- if password_authentication_enabled_for_web?
   .form-group.self-approval
     .form-check
       = form.check_box :require_password_to_approve, class: 'form-check-input'
