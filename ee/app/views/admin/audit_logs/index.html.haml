@@ -53,4 +53,4 @@
             %td= event.target
             %td= event.ip_address
             %td= event.date
-    = paginate @events, theme: 'gitlab'
+    = paginate_without_count @events
