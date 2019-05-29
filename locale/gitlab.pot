@@ -3967,6 +3967,9 @@ msgstr ""
 msgid "Ends at (UTC)"
 msgstr ""
 
+msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
 msgid "Enter at least three characters to search"
 msgstr ""
 
@@ -10184,6 +10187,9 @@ msgid "SortOptions|Least popular"
 msgstr ""
 
 msgid "SortOptions|Less weight"
+msgstr ""
+
+msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "SortOptions|Milestone due date"
