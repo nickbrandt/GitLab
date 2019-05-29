@@ -732,7 +732,7 @@ describe Epic do
     it 'has child epics' do
       create(:epic, group: group, parent: epic)
 
-      expect(epic.has_children?).to be_truthy
+      expect(epic.reload.has_children?).to be_truthy
     end
   end
 
