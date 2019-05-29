@@ -1,6 +1,12 @@
 # Discussions API
 
-Discussions are set of related notes on snippets, issues, epics, merge requests or commits.
+Discussions are a set of related notes on:
+
+- Snippets
+- Issues
+- Epics **[ULTIMATE]**
+- Merge requests
+- Commits
 
 This includes system notes, which are notes about changes to the object (for example, when a milestone changes, there will be a corresponding system note). Label notes are not part of this API, but recorded as separate events in [resource label events](resource_label_events.md).
 

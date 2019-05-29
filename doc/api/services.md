@@ -1101,14 +1101,13 @@ Get JetBrains TeamCity CI service settings for a project.
 GET /projects/:id/services/teamcity
 ```
 
-## Jenkins CI
+## Jenkins CI **[STARTER]**
 
 A continuous integration and build server
 
 ### Create/Edit Jenkins CI service
 
 Set Jenkins CI service for a project.
-
 
 ```
 PUT /projects/:id/services/jenkins
@@ -1136,7 +1135,6 @@ Get Jenkins CI service settings for a project.
 ```
 GET /projects/:id/services/jenkins
 ```
-
 
 ## Jenkins CI (Deprecated) Service
 
