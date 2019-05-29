@@ -9,13 +9,13 @@ import getInitialState from 'ee/dependencies/store/state';
 import { SORT_ORDER, FETCH_ERROR_MESSAGE } from 'ee/dependencies/store/constants';
 import createFlash from '~/flash';
 
-import mockDependencies from './data/mock_dependencies';
+import mockDependenciesResponse from './data/mock_dependencies';
 
 jest.mock('~/flash', () => jest.fn());
 
 describe('Dependencies actions', () => {
   const pageInfo = {
-    page: 1,
+    page: 3,
     nextPage: 2,
     previousPage: 1,
     perPage: 20,
@@ -54,24 +54,6 @@ describe('Dependencies actions', () => {
     });
   });
 
-  describe('setDependenciesDownloadEndpoint', () => {
-    it('commits the correct mutation', done => {
-      testAction(
-        actions.setDependenciesDownloadEndpoint,
-        TEST_HOST,
-        getInitialState(),
-        [
-          {
-            type: types.SET_DEPENDENCIES_DOWNLOAD_ENDPOINT,
-            payload: TEST_HOST,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestDependencies', () => {
     it('commits the correct mutation', done => {
       testAction(
@@ -90,42 +72,24 @@ describe('Dependencies actions', () => {
   });
 
   describe('receiveDependenciesSuccess', () => {
-    describe('given an array of dependencies', () => {
-      it('commits the RECEIVE_DEPENDENCIES_SUCCESS mutation', done => {
-        testAction(
-          actions.receiveDependenciesSuccess,
-          { headers, data: mockDependencies },
-          getInitialState(),
-          [
-            {
-              type: types.RECEIVE_DEPENDENCIES_SUCCESS,
-              payload: { pageInfo, dependencies: mockDependencies },
+    it('commits the RECEIVE_DEPENDENCIES_SUCCESS mutation', done => {
+      testAction(
+        actions.receiveDependenciesSuccess,
+        { headers, data: mockDependenciesResponse },
+        getInitialState(),
+        [
+          {
+            type: types.RECEIVE_DEPENDENCIES_SUCCESS,
+            payload: {
+              dependencies: mockDependenciesResponse.dependencies,
+              reportInfo: mockDependenciesResponse.report,
+              pageInfo,
             },
-          ],
-          [],
-          done,
-        );
-      });
-    });
-
-    describe('given a report_status response', () => {
-      it('commits the SET_REPORT_STATUS mutation', done => {
-        const response = { report_status: 'file_not_found' };
-
-        testAction(
-          actions.receiveDependenciesSuccess,
-          { data: response },
-          getInitialState(),
-          [
-            {
-              type: types.SET_REPORT_STATUS,
-              payload: response.report_status,
-            },
-          ],
-          [],
-          done,
-        );
-      });
+          },
+        ],
+        [],
+        done,
+      );
     });
   });
 
@@ -150,7 +114,10 @@ describe('Dependencies actions', () => {
   });
 
   describe('fetchDependencies', () => {
-    const dependenciesTypeDescending = _.sortBy(mockDependencies, 'type').reverse();
+    const dependenciesPackagerDescending = {
+      ...mockDependenciesResponse,
+      dependencies: _.sortBy(mockDependenciesResponse.dependencies, 'packager').reverse(),
+    };
     let state;
     let mock;
 
@@ -164,17 +131,30 @@ describe('Dependencies actions', () => {
       mock.restore();
     });
 
+    describe('when endpoint is empty', () => {
+      beforeEach(() => {
+        state.endpoint = '';
+      });
+
+      it('does nothing', done => {
+        testAction(actions.fetchDependencies, undefined, state, [], [], done);
+      });
+    });
+
     describe('on success', () => {
       describe('given no params', () => {
         beforeEach(() => {
-          const sortParamsDefault = {
+          state.pageInfo = { ...pageInfo };
+
+          const paramsDefault = {
             sort_by: state.sortField,
             sort: state.sortOrder,
+            page: state.pageInfo.page,
           };
 
           mock
-            .onGet(state.endpoint, { params: sortParamsDefault })
-            .replyOnce(200, mockDependencies, headers);
+            .onGet(state.endpoint, { params: paramsDefault })
+            .replyOnce(200, mockDependenciesResponse, headers);
         });
 
         it('uses default sorting params from state', done => {
@@ -189,7 +169,7 @@ describe('Dependencies actions', () => {
               },
               {
                 type: 'receiveDependenciesSuccess',
-                payload: expect.objectContaining({ data: mockDependencies, headers }),
+                payload: expect.objectContaining({ data: mockDependenciesResponse, headers }),
               },
             ],
             done,
@@ -197,19 +177,19 @@ describe('Dependencies actions', () => {
         });
       });
 
-      describe('given sorting params', () => {
-        const sortParamsTypeDescending = { sort_by: 'type', sort: SORT_ORDER.descending };
+      describe('given params', () => {
+        const paramsGiven = { sort_by: 'packager', sort: SORT_ORDER.descending, page: 4 };
 
         beforeEach(() => {
           mock
-            .onGet(state.endpoint, { params: sortParamsTypeDescending })
-            .replyOnce(200, dependenciesTypeDescending, headers);
+            .onGet(state.endpoint, { params: paramsGiven })
+            .replyOnce(200, dependenciesPackagerDescending, headers);
         });
 
-        it('overrides default sorting params', done => {
+        it('overrides default params', done => {
           testAction(
             actions.fetchDependencies,
-            sortParamsTypeDescending,
+            paramsGiven,
             state,
             [],
             [
@@ -218,34 +198,7 @@ describe('Dependencies actions', () => {
               },
               {
                 type: 'receiveDependenciesSuccess',
-                payload: expect.objectContaining({ data: dependenciesTypeDescending, headers }),
-              },
-            ],
-            done,
-          );
-        });
-      });
-
-      describe('a response with report_status', () => {
-        const fileNotFoundResponse = { report_status: 'file_not_found' };
-
-        beforeEach(() => {
-          mock.onGet(state.endpoint).replyOnce(200, fileNotFoundResponse);
-        });
-
-        it('dispatches the receiveDependenciesSuccess action', done => {
-          testAction(
-            actions.fetchDependencies,
-            undefined,
-            state,
-            [],
-            [
-              {
-                type: 'requestDependencies',
-              },
-              {
-                type: 'receiveDependenciesSuccess',
-                payload: expect.objectContaining({ data: fileNotFoundResponse }),
+                payload: expect.objectContaining({ data: dependenciesPackagerDescending, headers }),
               },
             ],
             done,
@@ -313,7 +266,7 @@ describe('Dependencies actions', () => {
 
   describe('setSortField', () => {
     it('commits the SET_SORT_FIELD mutation and dispatch the fetchDependencies action', done => {
-      const field = 'type';
+      const field = 'packager';
 
       testAction(
         actions.setSortField,
@@ -328,6 +281,7 @@ describe('Dependencies actions', () => {
         [
           {
             type: 'fetchDependencies',
+            payload: { page: 1 },
           },
         ],
         done,
@@ -349,6 +303,7 @@ describe('Dependencies actions', () => {
         [
           {
             type: 'fetchDependencies',
+            payload: { page: 1 },
           },
         ],
         done,

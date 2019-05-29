@@ -1,5 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
+import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
 import { SORT_FIELDS } from 'ee/dependencies/store/constants';
 import DependenciesActions from 'ee/dependencies/components/dependencies_actions.vue';
@@ -13,6 +14,7 @@ describe('DependenciesActions component', () => {
 
     store = createStore();
     jest.spyOn(store, 'dispatch');
+
     wrapper = shallowMount(localVue.extend(DependenciesActions), {
       localVue,
       store,
@@ -52,13 +54,20 @@ describe('DependenciesActions component', () => {
     expect(store.dispatch).toHaveBeenCalledWith('toggleSortOrder');
   });
 
-  it('has a button to export the dependency list', () => {
-    const download = wrapper.find('.js-download');
-    expect(download.attributes()).toEqual(
-      expect.objectContaining({
-        href: expect.any(String),
-        download: expect.any(String),
-      }),
-    );
+  describe('given an endpoint', () => {
+    beforeEach(() => {
+      store.state.endpoint = `${TEST_HOST}/dependencies`;
+      return wrapper.vm.$nextTick();
+    });
+
+    it('has a button to export the dependency list', () => {
+      const download = wrapper.find('.js-download');
+      expect(download.attributes()).toEqual(
+        expect.objectContaining({
+          href: store.state.endpoint,
+          download: expect.any(String),
+        }),
+      );
+    });
   });
 });

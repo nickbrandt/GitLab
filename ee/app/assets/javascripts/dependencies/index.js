@@ -4,7 +4,7 @@ import createStore from './store';
 
 export default () => {
   const el = document.querySelector('#js-dependencies-app');
-  const { endpoint, dependenciesDownloadEndpoint } = el.dataset;
+  const { endpoint } = el.dataset;
 
   const store = createStore();
 
@@ -18,7 +18,6 @@ export default () => {
       return createElement(DependenciesApp, {
         props: {
           endpoint,
-          dependenciesDownloadEndpoint,
         },
       });
     },

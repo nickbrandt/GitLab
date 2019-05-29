@@ -4,7 +4,6 @@ import { GlBadge, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import DependenciesActions from './dependencies_actions.vue';
 import DependenciesTable from './dependencies_table.vue';
-import { REPORT_STATUS } from '../store/constants';
 
 export default {
   name: 'DependenciesApp',
@@ -17,10 +16,6 @@ export default {
     Pagination,
   },
   props: {
-    dependenciesDownloadEndpoint: {
-      type: String,
-      required: true,
-    },
     endpoint: {
       type: String,
       required: true,
@@ -33,26 +28,18 @@ export default {
       'errorLoading',
       'dependencies',
       'pageInfo',
-      'reportStatus',
+      'reportInfo',
     ]),
-    shouldRenderEmptyState() {
-      return this.reportStatus === REPORT_STATUS.notSetUp;
-    },
     shouldShowPagination() {
       return Boolean(!this.isLoading && !this.errorLoading && this.pageInfo && this.pageInfo.total);
     },
   },
   created() {
     this.setDependenciesEndpoint(this.endpoint);
-    this.setDependenciesDownloadEndpoint(this.dependenciesDownloadEndpoint);
     this.fetchDependencies();
   },
   methods: {
-    ...mapActions([
-      'setDependenciesEndpoint',
-      'setDependenciesDownloadEndpoint',
-      'fetchDependencies',
-    ]),
+    ...mapActions(['setDependenciesEndpoint', 'fetchDependencies']),
     fetchPage(page) {
       this.fetchDependencies({ page });
     },

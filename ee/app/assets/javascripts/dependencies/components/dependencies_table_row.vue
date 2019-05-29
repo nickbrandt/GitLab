@@ -1,6 +1,5 @@
 <script>
 import { GlSkeletonLoading } from '@gitlab/ui';
-import { PACKAGE_TYPES } from '../store/constants';
 
 export default {
   name: 'DependenciesTableRow',
@@ -17,12 +16,6 @@ export default {
       type: Boolean,
       required: false,
       default: true,
-    },
-  },
-  computed: {
-    packager() {
-      const { type } = this.dependency;
-      return PACKAGE_TYPES[type] || type;
     },
   },
 };
@@ -48,13 +41,13 @@ export default {
 
       <div class="table-section section-20 section-wrap">
         <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Packager') }}</div>
-        <div class="table-mobile-content">{{ packager }}</div>
+        <div class="table-mobile-content">{{ dependency.packager }}</div>
       </div>
 
       <div class="table-section flex-grow-1 section-wrap">
         <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Location') }}</div>
         <div class="table-mobile-content">
-          <a :href="dependency.location.blob_path">{{ dependency.location.blob_path }}</a>
+          <a :href="dependency.location.blob_path">{{ dependency.location.path }}</a>
         </div>
       </div>
     </template>

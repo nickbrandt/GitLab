@@ -16,7 +16,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   computed: {
-    ...mapState(['dependenciesDownloadEndpoint', 'sortField', 'sortFields', 'sortOrder']),
+    ...mapState(['endpoint', 'sortField', 'sortFields', 'sortOrder']),
     sortFieldName() {
       return this.sortFields[this.sortField];
     },
@@ -59,7 +59,7 @@ export default {
     </div>
     <gl-button
       v-gl-tooltip
-      :href="dependenciesDownloadEndpoint"
+      :href="endpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
