@@ -83,4 +83,35 @@ describe "Admin::Users" do
       end
     end
   end
+
+  describe 'show user keys for SSH and LDAP' do
+    let!(:key1) do
+      create(:ldap_key, user: user, title: "LDAP Key1")
+    end
+
+    let!(:key2) do
+      create(:key, user: user, title: "ssh-rsa Key2", key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4FIEBXGi4bPU8kzxMefudPIJ08/gNprdNTaO9BR/ndy3+58s2HCTw2xCHcsuBmq+TsAqgEidVq4skpqoTMB+Uot5Uzp9z4764rc48dZiI661izoREoKnuRQSsRqUTHg5wrLzwxlQbl1MVfRWQpqiz/5KjBC7yLEb9AbusjnWBk8wvC1bQPQ1uLAauEA7d836tgaIsym9BrLsMVnR4P1boWD3Xp1B1T/ImJwAGHvRmP/ycIqmKdSpMdJXwxcb40efWVj0Ibbe7ii9eeoLdHACqevUZi6fwfbymdow+FeqlkPoHyGg3Cu4vD/D8+8cRc7mE/zGCWcQ15Var83Tczour Key2")
+    end
+
+    it do
+      visit admin_users_path
+
+      click_link user.name
+      click_link 'SSH keys'
+
+      # Check that the regular Key shows the delete icon and the LDAPKey does not
+
+      # SSH key should be the first in the list
+      within('ul.content-list li.key-list-item:nth-of-type(1)') do
+        expect(page).to have_content(key2.title)
+        expect(page).to have_css('a[data-method=delete]', text: 'Remove')
+      end
+
+      # Next, LDAP key
+      within('ul.content-list li.key-list-item:nth-of-type(2)') do
+        expect(page).to have_content(key1.title)
+        expect(page).not_to have_css('a[data-method=delete]')
+      end
+    end
+  end
 end
