@@ -1,6 +1,11 @@
 # Notes API
 
-Notes are comments on snippets, issues, merge requests or epics.
+Notes are comments on:
+
+- Snippets
+- Issues
+- Merge requests
+- Epics **[ULTIMATE]**
 
 This includes system notes, which are notes about changes to the object (for example, when a milestone changes, there will be a corresponding system note). Label notes are not part of this API, but recorded as separate events in [resource label events](resource_label_events.md).
 

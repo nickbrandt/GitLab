@@ -211,7 +211,7 @@ Example response:
 
 ## Update a board **[STARTER]**
 
-> [Introduced][ee-5954] in GitLab 11.1.
+> [Introduced][ee-5954] in [GitLab Starter](https://about.gitlab.com/pricing/) 11.1.
 
 Updates a board.
 
@@ -405,13 +405,14 @@ POST /projects/:id/boards/:board_id/lists
 | `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `board_id` | integer | yes | The ID of a board |
 | `label_id` | integer | no | The ID of a label |
-| `assignee_id` | integer | no | The ID of a user |
-| `milestone_id` | integer | no | The ID of a milestone |
+| `assignee_id` **[PREMIUM]** | integer | no | The ID of a user |
+| `milestone_id` **[PREMIUM]** | integer | no | The ID of a milestone |
 
->**Note**: Label, assignee and milestone arguments are mutually exclusive,
+NOTE: **Note**:
+Label, assignee and milestone arguments are mutually exclusive,
 that is, only one of them are accepted in a request.
-Check the [Issue Board docs](../user/project/issue_board.md) for more
-information regarding the required license for each list type.
+Check the [Issue Board docs](../user/project/issue_board.md#summary-of-features-per-tier)
+for more information regarding the required license for each list type.
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/boards/1/lists?label_id=5
