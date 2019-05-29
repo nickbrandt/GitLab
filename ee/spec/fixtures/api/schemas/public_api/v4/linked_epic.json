@@ -7,12 +7,13 @@
     "group_id": { "type": "integer" },
     "parent_id": { "type": ["integer", "null"] },
     "has_children": { "type": "boolean" },
+    "has_issues": { "type": "boolean" },
     "reference": { "type": "string" },
     "url": { "type": "string" },
     "relation_url": { "type": "string" }
   },
   "required": [
-    "id", "iid", "group_id", "title", "parent_id", "has_children", "reference", "url", "relation_url"
+    "id", "iid", "group_id", "title", "parent_id", "has_children", "has_issues", "reference", "url", "relation_url"
   ],
   "additionalProperties": false
 }

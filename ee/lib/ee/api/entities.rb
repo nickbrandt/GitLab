@@ -208,6 +208,7 @@ module EE
         expose :group_id
         expose :parent_id
         expose :has_children?, as: :has_children
+        expose :has_issues?, as: :has_issues
         expose :reference do |epic|
           epic.to_reference(epic.parent.group)
         end

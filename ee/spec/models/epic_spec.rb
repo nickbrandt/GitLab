@@ -722,6 +722,34 @@ describe Epic do
     end
   end
 
+  describe '#has_children?' do
+    let(:epic) { create(:epic, group: group) }
+
+    it 'has no children' do
+      expect(epic.has_children?).to be_falsey
+    end
+
+    it 'has child epics' do
+      create(:epic, group: group, parent: epic)
+
+      expect(epic.has_children?).to be_truthy
+    end
+  end
+
+  describe '#has_issues?' do
+    let(:epic) { create(:epic, group: group) }
+
+    it 'has no issues' do
+      expect(epic.has_issues?).to be_falsey
+    end
+
+    it 'has child issues' do
+      create(:epic_issue, epic: epic, issue: create(:issue))
+
+      expect(epic.has_issues?).to be_truthy
+    end
+  end
+
   context 'mentioning other objects' do
     let(:epic) { create(:epic, group: group) }
 

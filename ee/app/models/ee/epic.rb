@@ -280,7 +280,11 @@ module EE
     end
 
     def has_children?
-      issues.any? || descendants.any?
+      descendants.any?
+    end
+
+    def has_issues?
+      issues.any?
     end
 
     def child?(id)
