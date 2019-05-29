@@ -3703,6 +3703,9 @@ msgstr ""
 msgid "Enforced SSO"
 msgstr ""
 
+msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
 msgid "Enter in your Bitbucket Server URL and personal access token below"
 msgstr ""
 
@@ -9317,6 +9320,9 @@ msgid "SortOptions|Least popular"
 msgstr ""
 
 msgid "SortOptions|Less weight"
+msgstr ""
+
+msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "SortOptions|Milestone due date"
