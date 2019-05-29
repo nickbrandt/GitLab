@@ -84,20 +84,40 @@ module EE
       def check_push_size!
         return unless check_size_limit?
 
+        git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
+
+        # Use #quarantine_size to get correct push size whenever a lof of changes
+        # gets pushed at the same time containing the same blobs. This is only
+        # doable if GIT_OBJECT_DIRECTORY_RELATIVE env var is set and happens
+        # when git push comes from CLI (not via UI and API).
+        #
+        # Fallback to determining push size using the changes_list so we can still
+        # determine the push size if env var isn't set (e.g. changes are made
+        # via UI and API).
+        push_size = git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? ? quarantine_size : changes_size
+
+        if project.changes_will_exceed_size_limit?(push_size)
+          raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+        end
+      end
+
+      def quarantine_size
+        project.repository.object_directory_size
+      end
+
+      def changes_size
         # If there are worktrees with a HEAD pointing to a non-existent object,
         # calls to `git rev-list --all` will fail in git 2.15+. This should also
         # clear stale lock files.
         project.repository.clean_stale_repository_files
 
-        push_size_in_bytes = 0
+        size_in_bytes = 0
 
         changes_list.each do |change|
-          push_size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size) # rubocop: disable CodeReuse/ActiveRecord
-
-          if project.changes_will_exceed_size_limit?(push_size_in_bytes)
-            raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
-          end
+          size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size) # rubocop: disable CodeReuse/ActiveRecord
         end
+
+        size_in_bytes
       end
 
       def check_size_limit?
