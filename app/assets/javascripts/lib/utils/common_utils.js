@@ -203,6 +203,71 @@ export const isMetaKey = e => e.metaKey || e.ctrlKey || e.altKey || e.shiftKey;
 // 3) Middle-click or Mouse Wheel Click (e.which is 2)
 export const isMetaClick = e => e.metaKey || e.ctrlKey || e.which === 2;
 
+export const getPlatformLeaderKey = () => {
+  if (navigator && navigator.platform && navigator.platform.startsWith('Mac')) {
+    return 'meta';
+  }
+  return 'ctrl';
+};
+
+export const getPlatformLeaderKeyHTML = () => {
+  if (getPlatformLeaderKey() === 'meta') {
+    return '&#8984;';
+  }
+  return 'Ctrl';
+};
+
+export const isPlatformLeaderKey = e => {
+  if (getPlatformLeaderKey() === 'meta') {
+    return !!e.metaKey;
+  }
+  return !!e.ctrlKey;
+};
+
+/**
+ * Tests if a KeyboardEvent corresponds exactly to a keystroke.
+ *
+ * A keystroke is given as a string, with individual keys separated by  `+` or `-` characters. Modifier keys may be given in any order, and the key itself must correspond to the KeyboardEvent's `key` property (except for the `+` or `-` keys, which should be represented by `'Plus'` and `'Minus'` in the keystroke string, respectively; and the spacebar, which may be represented by `'Space'`.
+ *
+ * Available modifiers are `'Shift'`, `'Control'`, `'Alt'`, `'Meta'`, and `'Leader'`. The `'Leader'` modifier corresponds to `meta` (Command) on MacOS, and `ctrl` otherwise. Care must be given with shift-sequences. `Shift-4` is not a valid sequence, but `Shift-$` is. The modifier keys must match those given in the keystroke string exactly. The keystroke string is case-insensitive, so `'Shift-F'` and `'shift-f'` are equivalent. `'Control'` and `'Ctrl'` are also interchangeable.
+ *
+ * Examples of keystroke strings: `'PageUp'`, `'Shift-Tab'`, `'Control-Alt-Minus'`, `'Leader-Z'`.
+ *
+ * @param e The KeyboardEvent to test.
+ * @param sequence Desired keystroke, represented in a string.
+ * @returns {boolean} True if the KeyboardEvent corresponds to the given keystroke.
+ */
+export const keystroke = (e, sequence) => {
+  if (!e || !sequence || sequence.length === 0) {
+    return false;
+  }
+
+  const chord = sequence
+    .toLowerCase()
+    .split(/[+-]/)
+    .map(note => note === 'leader' ? getPlatformLeaderKey(e) : note)
+    .map(note => note === 'minus' ? '-' : note)
+    .map(note => note === 'plus' ? '+' : note)
+    .map(note => note === 'space' ? ' ' : note)
+    .map(note => note === 'control' ? 'ctrl' : note);
+
+  const actualChord = [
+    e.altKey ? 'alt' : null,
+    e.ctrlKey ? 'ctrl' : null,
+    e.metaKey ? 'meta' : null,
+    e.shiftKey ? 'shift' : null,
+    e.key ? e.key.toLowerCase() : null,
+  ].filter(i => i);
+
+  const arrayEquiv = (arr1, arr2) => (
+    arr1.length === arr2.length &&
+    arr1.map(el => arr2.includes(el)).every(i => i) &&
+    arr2.map(el => arr1.includes(el)).every(i => i)
+  );
+
+  return arrayEquiv(chord, actualChord);
+};
+
 export const contentTop = () => {
   const perfBar = $('#js-peek').outerHeight() || 0;
   const mrTabsHeight = $('.merge-request-tabs').outerHeight() || 0;
