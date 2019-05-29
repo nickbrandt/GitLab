@@ -27,7 +27,6 @@ export default {
 </script>
 
 <template>
-  <!-- TODO: properly handle skeleton in case we're loading -->
   <div class="gl-responsive-table-row vulnerabilities-row p-2">
     <gl-skeleton-loading
       v-if="isLoading"
