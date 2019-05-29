@@ -40,13 +40,11 @@ export default {
         <gl-dropdown-item v-for="(name, id) in sortFields" :key="id" @click="setSortField(id)">
           <span class="d-flex">
             <icon
-              v-if="isCurrentSortField(id)"
-              class="flex-shrink-0 js-check"
+              class="flex-shrink-0 append-right-4"
+              :class="{ invisible: !isCurrentSortField(id) }"
               name="mobile-issue-close"
             />
-            <span :class="isCurrentSortField(id) ? 'prepend-left-4' : 'prepend-left-20'">{{
-              name
-            }}</span>
+            {{ name }}
           </span>
         </gl-dropdown-item>
       </gl-dropdown>
