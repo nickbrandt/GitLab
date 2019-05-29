@@ -113,6 +113,7 @@ export default {
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
       <div class="table-mobile-content action-buttons d-flex justify-content-end">
         <vulnerability-action-buttons
+          v-if="!isLoading"
           :vulnerability="vulnerability"
           :can-create-issue="canCreateIssue"
           :can-dismiss-vulnerability="canDismissVulnerability"
