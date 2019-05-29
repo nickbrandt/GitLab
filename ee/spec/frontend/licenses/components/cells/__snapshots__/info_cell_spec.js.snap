@@ -26,6 +26,7 @@ exports[`InfoCell renders a number value 1`] = `
      
     <glpopover-stub
       content="popoverContent"
+      cssclasses=""
       placement="bottom"
       triggers="hover"
     />
@@ -59,6 +60,7 @@ exports[`InfoCell renders a title and string value with an info popover through 
      
     <glpopover-stub
       content="popoverContent"
+      cssclasses=""
       placement="bottom"
       triggers="hover"
     />
