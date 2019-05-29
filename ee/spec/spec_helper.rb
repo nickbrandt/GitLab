@@ -1,3 +1,5 @@
+require Rails.root.join("spec/support/helpers/stub_requests.rb")
+
 Dir[Rails.root.join("ee/spec/support/helpers/*.rb")].each { |f| require f }
 Dir[Rails.root.join("ee/spec/support/shared_contexts/*.rb")].each { |f| require f }
 Dir[Rails.root.join("ee/spec/support/shared_examples/*.rb")].each { |f| require f }
