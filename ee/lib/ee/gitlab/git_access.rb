@@ -84,8 +84,6 @@ module EE
       def check_push_size!
         return unless check_size_limit?
 
-        git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
-
         # Use #quarantine_size to get correct push size whenever a lof of changes
         # gets pushed at the same time containing the same blobs. This is only
         # doable if GIT_OBJECT_DIRECTORY_RELATIVE env var is set and happens
@@ -94,10 +92,18 @@ module EE
         # Fallback to determining push size using the changes_list so we can still
         # determine the push size if env var isn't set (e.g. changes are made
         # via UI and API).
-        push_size = git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? ? quarantine_size : changes_size
+        push_size = check_quarantine_size? ? quarantine_size : changes_size
 
         if project.changes_will_exceed_size_limit?(push_size)
           raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+        end
+      end
+
+      def check_quarantine_size?
+        strong_memoize(:check_quarantine_size) do
+          git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
+
+          git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? && ::Feature.enabled?(:quarantine_push_size_check, default_enabled: true)
         end
       end
 
