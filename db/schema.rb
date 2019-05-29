@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190516011213) do
+ActiveRecord::Schema.define(version: 20190524062810) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -223,6 +223,8 @@ ActiveRecord::Schema.define(version: 20190516011213) do
     t.string "geo_node_allowed_ips", default: "0.0.0.0/0, ::/0"
     t.integer "elasticsearch_shards", default: 5, null: false
     t.integer "elasticsearch_replicas", default: 1, null: false
+    t.text "encrypted_lets_encrypt_private_key"
+    t.text "encrypted_lets_encrypt_private_key_iv"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree

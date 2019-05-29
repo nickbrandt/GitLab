@@ -101,10 +101,10 @@ describe Groups::AutocompleteService do
       end
 
       it 'returns available commands' do
-        expect(subject.commands(epic).map { |c| c[:name] })
-          .to match_array(
-            [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close, :child_epic, :remove_child_epic]
-          )
+        available_commands = [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close]
+        available_commands += [:child_epic, :remove_child_epic] if ::Epic.supports_nested_objects?
+
+        expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
       end
     end
   end

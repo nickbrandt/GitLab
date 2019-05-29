@@ -7,7 +7,8 @@ describe GroupSamlIdentityFinder do
 
   let(:user) { create(:user) }
   let!(:identity) { create(:group_saml_identity, user: user) }
-  let(:group) { identity.saml_provider.group }
+  let(:saml_provider) { identity.saml_provider }
+  let(:group) { saml_provider.group }
 
   subject { described_class.new(user: user) }
 
@@ -20,6 +21,21 @@ describe GroupSamlIdentityFinder do
       group.saml_provider.destroy!
 
       expect(described_class.find_by_group_and_uid(group: group, uid: identity.extern_uid)).to eq(nil)
+    end
+  end
+
+  describe '.not_managed_identities' do
+    subject { described_class.not_managed_identities(group: group) }
+
+    let!(:group_managed_identity) do
+      create(:group_saml_identity, saml_provider: saml_provider, user: create(:user, managing_group: group))
+    end
+    let!(:different_group_managed_identity) do
+      create(:group_saml_identity, saml_provider: saml_provider, user: create(:user, :group_managed))
+    end
+
+    it 'returns all identities of users not managed by given group' do
+      expect(subject).to match_array([identity, different_group_managed_identity])
     end
   end
 

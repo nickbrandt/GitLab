@@ -154,5 +154,33 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
           .to have_attributes(key: 'BRIDGE', value: 'var')
       end
     end
+
+    context 'when pipeline variables are defined' do
+      before do
+        upstream_pipeline.variables.create(key: 'PIPELINE_VARIABLE', value: 'my-value')
+      end
+
+      it 'does not pass pipeline variables directly downstream' do
+        pipeline = service.execute(bridge)
+
+        pipeline.variables.map(&:key).tap do |variables|
+          expect(variables).not_to include 'PIPELINE_VARIABLE'
+        end
+      end
+
+      context 'when using YAML variables interpolation' do
+        before do
+          bridge.yaml_variables = [{ key: 'BRIDGE', value: '$PIPELINE_VARIABLE-var', public: true }]
+        end
+
+        it 'makes it possible to pass pipeline variable downstream' do
+          pipeline = service.execute(bridge)
+
+          pipeline.variables.find_by(key: 'BRIDGE').tap do |variable|
+            expect(variable.value).to eq 'my-value-var'
+          end
+        end
+      end
+    end
   end
 end

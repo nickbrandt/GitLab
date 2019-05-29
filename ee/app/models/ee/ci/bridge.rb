@@ -44,7 +44,11 @@ module EE
       end
 
       def downstream_variables
-        yaml_variables.to_a.map { |hash| hash.except(:public) }
+        scoped_variables.to_runner_variables.yield_self do |all_variables|
+          yaml_variables.to_a.map do |hash|
+            { key: hash[:key], value: ::ExpandVariables.expand(hash[:value], all_variables) }
+          end
+        end
       end
     end
   end

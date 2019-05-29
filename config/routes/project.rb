@@ -26,17 +26,116 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           module: :projects,
           as: :project) do
 
-      resources :autocomplete_sources, only: [] do
-        collection do
-          get 'members'
-          get 'issues'
-          get 'merge_requests'
-          get 'labels'
-          get 'milestones'
-          get 'commands'
-          get 'snippets'
+      # Begin of the /-/ scope.
+      # Use this scope for all new project routes.
+      scope '-' do
+        get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
+
+        resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
+          collection do
+            resources :artifacts, only: [] do
+              collection do
+                get :latest_succeeded,
+                  path: '*ref_name_and_path',
+                  format: false
+              end
+            end
+          end
+
+          member do
+            get :status
+            post :cancel
+            post :unschedule
+            post :retry
+            post :play
+            post :erase
+            get :trace, defaults: { format: 'json' }
+            get :raw
+            get :terminal
+            get '/terminal.ws/authorize', to: 'jobs#terminal_websocket_authorize', constraints: { format: nil }
+          end
+
+          resource :artifacts, only: [] do
+            get :download
+            get :browse, path: 'browse(/*path)', format: false
+            get :file, path: 'file/*path', format: false
+            get :raw, path: 'raw/*path', format: false
+            post :keep
+          end
+        end
+
+        namespace :ci do
+          resource :lint, only: [:show, :create]
+        end
+
+        namespace :settings do
+          get :members, to: redirect("%{namespace_id}/%{project_id}/project_members")
+
+          resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
+            post :reset_cache
+            put :reset_registration_token
+          end
+
+          resource :operations, only: [:show, :update]
+          resource :integrations, only: [:show]
+
+          ## EE-specific
+          resource :slack, only: [:destroy, :edit, :update] do
+            get :slack_auth
+          end
+          ## EE-specific
+
+          resource :repository, only: [:show], controller: :repository do
+            post :create_deploy_token, path: 'deploy_token/create'
+            post :cleanup
+          end
+        end
+
+        ## EE-specific
+        resources :feature_flags
+        ## EE-specific
+
+        resources :autocomplete_sources, only: [] do
+          collection do
+            get 'members'
+            get 'issues'
+            get 'merge_requests'
+            get 'labels'
+            get 'milestones'
+            get 'commands'
+            get 'snippets'
+          end
+        end
+
+        resources :project_members, except: [:show, :new, :edit], constraints: { id: %r{[a-zA-Z./0-9_\-#%+]+} }, concerns: :access_requestable do
+          collection do
+            delete :leave
+
+            # Used for import team
+            # from another project
+            get :import
+            post :apply_import
+          end
+
+          member do
+            post :resend_invite
+          end
+        end
+
+        resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
+          member do
+            put :enable
+            put :disable
+          end
+        end
+
+        resources :deploy_tokens, constraints: { id: /\d+/ }, only: [] do
+          member do
+            put :revoke
+          end
         end
       end
+      # End of the /-/ scope.
 
       #
       # Templates
@@ -89,19 +188,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :notify, on: :collection
         end
         # EE-specific
-      end
-
-      resources :deploy_keys, constraints: { id: /\d+/ }, only: [:index, :new, :create, :edit, :update] do
-        member do
-          put :enable
-          put :disable
-        end
-      end
-
-      resources :deploy_tokens, constraints: { id: /\d+/ }, only: [] do
-        member do
-          put :revoke
-        end
       end
 
       resources :releases, only: [:index]
@@ -334,51 +420,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :functions, only: [:index]
       end
 
-      scope '-' do
-        get 'archive/*id', constraints: { format: Gitlab::PathRegex.archive_formats_regex, id: /.+?/ }, to: 'repositories#archive', as: 'archive'
-
-        resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
-          collection do
-            resources :artifacts, only: [] do
-              collection do
-                get :latest_succeeded,
-                  path: '*ref_name_and_path',
-                  format: false
-              end
-            end
-          end
-
-          member do
-            get :status
-            post :cancel
-            post :unschedule
-            post :retry
-            post :play
-            post :erase
-            get :trace, defaults: { format: 'json' }
-            get :raw
-            get :terminal
-            get '/terminal.ws/authorize', to: 'jobs#terminal_websocket_authorize', constraints: { format: nil }
-          end
-
-          resource :artifacts, only: [] do
-            get :download
-            get :browse, path: 'browse(/*path)', format: false
-            get :file, path: 'file/*path', format: false
-            get :raw, path: 'raw/*path', format: false
-            post :keep
-          end
-        end
-
-        namespace :ci do
-          resource :lint, only: [:show, :create]
-        end
-
-        ## EE-specific
-        resources :feature_flags
-        ## EE-specific
-      end
-
       draw :legacy_builds
 
       resources :hooks, only: [:index, :create, :edit, :update, :destroy], constraints: { id: /\d+/ } do
@@ -466,21 +507,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
       end
 
-      resources :project_members, except: [:show, :new, :edit], constraints: { id: %r{[a-zA-Z./0-9_\-#%+]+} }, concerns: :access_requestable do
-        collection do
-          delete :leave
-
-          # Used for import team
-          # from another project
-          get :import
-          post :apply_import
-        end
-
-        member do
-          post :resend_invite
-        end
-      end
-
       resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
       resources :notes, only: [:create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ } do
@@ -539,29 +565,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :audit_events, only: [:index]
       ## EE-specific
 
-      scope '-' do
-        namespace :settings do
-          get :members, to: redirect("%{namespace_id}/%{project_id}/project_members")
-
-          resource :ci_cd, only: [:show, :update], controller: 'ci_cd' do
-            post :reset_cache
-            put :reset_registration_token
-          end
-
-          resource :operations, only: [:show, :update]
-          resource :integrations, only: [:show]
-
-          resource :slack, only: [:destroy, :edit, :update] do
-            get :slack_auth
-          end
-
-          resource :repository, only: [:show], controller: :repository do
-            post :create_deploy_token, path: 'deploy_token/create'
-            post :cleanup
-          end
-        end
-      end
-
       resources :error_tracking, only: [:index], controller: :error_tracking do
         collection do
           post :list_projects
@@ -611,7 +614,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           constraints: { project_id: Gitlab::PathRegex.project_route_regex },
           module: :projects,
           as: :project) do
-      Gitlab::Routing.redirect_legacy_paths(self, :settings, :branches, :tags, :network, :graphs)
+      Gitlab::Routing.redirect_legacy_paths(self, :settings, :branches, :tags,
+                                            :network, :graphs, :autocomplete_sources,
+                                            :project_members, :deploy_keys, :deploy_tokens)
     end
   end
 end

@@ -39,7 +39,7 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   private
 
   def filter_params
-    params.permit(report_type: [], project_id: [], severity: [])
+    params.permit(report_type: [], confidence: [], project_id: [], severity: [])
       .merge(hide_dismissed: Gitlab::Utils.to_boolean(params[:hide_dismissed]))
   end
 

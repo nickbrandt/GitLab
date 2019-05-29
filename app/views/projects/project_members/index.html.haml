@@ -7,7 +7,7 @@
       %h4
         = _("Project members")
       - if can_admin_project_members
-        %p= share_project_description
+        %p= share_project_description(@project)
       - else
         %p
           = _("Members can be added by project <i>Maintainers</i> or <i>Owners</i>").html_safe

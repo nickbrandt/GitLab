@@ -33,6 +33,10 @@ export const BASE_FILTERS = {
     name: s__('ciReport|All severities'),
     id: 'all',
   },
+  confidence: {
+    name: s__('ciReport|All confidence levels'),
+    id: 'all',
+  },
   report_type: {
     name: s__('ciReport|All report types'),
     id: 'all',

@@ -280,11 +280,12 @@ describe API::Users do
     context "when authenticated and ldap is enabled" do
       it "returns non-ldap user" do
         create :omniauth_user, provider: "ldapserver1"
+
         get api("/users", user), params: { skip_ldap: "true" }
+
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to be_an Array
-        username = user.username
-        expect(json_response.first["username"]).to eq username
+        expect(json_response.first["username"]).to eq user.username
       end
     end
   end
@@ -644,13 +645,10 @@ describe API::Users do
     end
 
     it "updates user with new password and forces reset on next login" do
-      stub_licensed_features(extended_audit_events: true)
-
       put api("/users/#{user.id}", admin), params: { password: '12345678' }
 
       expect(response).to have_gitlab_http_status(200)
       expect(user.reload.password_expires_at).to be <= Time.now
-      expect(AuditEvent.count).to eq(1)
     end
 
     it "updates user with organization" do
@@ -740,17 +738,6 @@ describe API::Users do
       expect(user.reload.private_profile).to eq(true)
     end
 
-    # EE
-    it "updates shared_runners_minutes_limit" do
-      expect do
-        put api("/users/#{user.id}", admin), params: { shared_runners_minutes_limit: 133 }
-      end.to change { user.reload.shared_runners_minutes_limit }
-        .from(nil).to(133)
-
-      expect(response).to have_gitlab_http_status(200)
-      expect(json_response['shared_runners_minutes_limit']).to eq(133)
-    end
-
     it "does not update admin status" do
       put api("/users/#{admin_user.id}", admin), params: { can_create_group: false }
 
@@ -771,14 +758,6 @@ describe API::Users do
         expect do
           put api("/users/#{user.id}", user), params: attributes_for(:user)
         end.not_to change { user.reload.attributes }
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-
-      it "cannot update their own shared_runners_minutes_limit" do
-        expect do
-          put api("/users/#{user.id}", user), params: { shared_runners_minutes_limit: 133 }
-        end.not_to change { user.reload.shared_runners_minutes_limit }
 
         expect(response).to have_gitlab_http_status(403)
       end

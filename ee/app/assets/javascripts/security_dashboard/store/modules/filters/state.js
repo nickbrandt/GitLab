@@ -1,4 +1,4 @@
-import { SEVERITY_LEVELS, REPORT_TYPES, BASE_FILTERS } from './constants';
+import { SEVERITY_LEVELS, CONFIDENCE_LEVELS, REPORT_TYPES, BASE_FILTERS } from './constants';
 
 const optionsObjectToArray = obj => Object.entries(obj).map(([id, name]) => ({ id, name }));
 
@@ -8,6 +8,12 @@ export default () => ({
       name: 'Severity',
       id: 'severity',
       options: [BASE_FILTERS.severity, ...optionsObjectToArray(SEVERITY_LEVELS)],
+      selection: new Set(['all']),
+    },
+    {
+      name: 'Confidence',
+      id: 'confidence',
+      options: [BASE_FILTERS.confidence, ...optionsObjectToArray(CONFIDENCE_LEVELS)],
       selection: new Set(['all']),
     },
     {
