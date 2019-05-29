@@ -321,10 +321,6 @@ module ProjectsHelper
     Ability.allowed?(current_user, :admin_project_member, @project)
   end
 
-  def metrics_external_dashboard_url
-    @project.metrics_setting_external_dashboard_url
-  end
-
   def project_can_be_shared?
     !membership_locked? || @project.allowed_to_share_with_group?
   end
