@@ -8,9 +8,7 @@ module VisibleApprovable
   # Users in the list of approvers who have not already approved this MR.
   #
   def approvers_left
-    strong_memoize(:approvers_left) do
-      User.where(id: all_approvers_including_groups.map(&:id)).where.not(id: approved_by_users.select(:id))
-    end
+    approval_state.unactioned_approvers
   end
 
   # The list of approvers from either this MR (if they've been set on the MR) or the
@@ -22,58 +20,21 @@ module VisibleApprovable
   #
   # @return [Array<User>]
   def overall_approvers(exclude_code_owners: false)
-    code_owners = [] if exclude_code_owners
+    options = { target: :users }
+    options[:code_owner] = false if exclude_code_owners
 
-    if approvers_overwritten?
-      code_owners ||= [] # already persisted into database, no need to recompute
-      approvers_relation = approver_users
-    else
-      code_owners ||= self.code_owners.dup
-      approvers_relation = target_project.approver_users
-    end
-
-    approvers_relation = project.members_among(approvers_relation)
-
-    if author && !authors_can_approve?
-      approvers_relation = approvers_relation.where.not(id: author.id)
-    end
-
-    if committers.any? && !committers_can_approve?
-      approvers_relation = approvers_relation.where.not(id: committers.select(:id))
-    end
-
-    results = code_owners.concat(approvers_relation)
-    results.uniq!
-    results
-  end
-
-  def overall_approver_groups
-    approvers_overwritten? ? approver_groups : target_project.approver_groups
+    approvers = approval_state.filtered_approvers(options)
+    approvers.uniq!
+    approvers
   end
 
   def all_approvers_including_groups
-    strong_memoize(:all_approvers_including_groups) do
-      approvers = []
-
-      # Approvers not sourced from group level
-      approvers << overall_approvers
-
-      approvers << approvers_from_groups
-
-      approvers.flatten
-    end
+    approval_state.approvers
   end
 
   def approvers_from_groups
-    group_approvers = overall_approver_groups.flat_map(&:users)
-    group_approvers.delete(author) unless authors_can_approve?
-
-    unless committers_can_approve?
-      committer_approver_ids = committers.where(id: group_approvers.map(&:id)).pluck(:id)
-      group_approvers.reject! { |user| committer_approver_ids.include?(user.id) }
-    end
-
-    group_approvers
+    groups = approval_state.wrapped_approval_rules.flat_map(&:groups)
+    User.joins(:group_members).where(members: { source_id: groups })
   end
 
   def reset_approval_cache!

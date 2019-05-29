@@ -8,7 +8,6 @@ module EE
     include ::Approvable
     include ::Gitlab::Utils::StrongMemoize
     include FromUnion
-    prepend ApprovableForRule
 
     prepended do
       include Elastic::MergeRequestsSearch

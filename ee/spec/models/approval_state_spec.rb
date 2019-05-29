@@ -1174,7 +1174,82 @@ describe ApprovalState do
       let(:developer) { create_project_member(:developer) }
       let(:other_developer) { create_project_member(:developer) }
       let(:reporter) { create_project_member(:reporter) }
+      let(:guest) { create_project_member(:guest) }
       let(:stranger) { create(:user) }
+
+      context 'when the user is the author' do
+        context 'and author is an approver' do
+          before do
+            create(:approval_project_rule, project: project, users: [author])
+          end
+
+          it 'returns true when authors can approve' do
+            project.update!(merge_requests_author_approval: true)
+
+            expect(subject.can_approve?(author)).to be true
+          end
+
+          it 'returns false when authors cannot approve' do
+            project.update!(merge_requests_author_approval: false)
+
+            expect(subject.can_approve?(author)).to be false
+          end
+        end
+
+        context 'and author is not an approver' do
+          it 'returns true when authors can approve' do
+            project.update!(merge_requests_author_approval: true)
+
+            expect(subject.can_approve?(author)).to be true
+          end
+
+          it 'returns false when authors cannot approve' do
+            project.update!(merge_requests_author_approval: false)
+
+            expect(subject.can_approve?(author)).to be false
+          end
+        end
+      end
+
+      context 'when user is a committer' do
+        let(:user) { create(:user, email: merge_request.commits.without_merge_commits.first.committer_email) }
+
+        before do
+          project.add_developer(user)
+        end
+
+        context 'and committer is an approver' do
+          before do
+            create(:approval_project_rule, project: project, users: [user])
+          end
+
+          it 'return true when committers can approve' do
+            project.update!(merge_requests_disable_committers_approval: false)
+
+            expect(subject.can_approve?(user)).to be true
+          end
+
+          it 'return false when committers cannot approve' do
+            project.update!(merge_requests_disable_committers_approval: true)
+
+            expect(subject.can_approve?(user)).to be false
+          end
+        end
+
+        context 'and committer is not an approver' do
+          it 'return true when committers can approve' do
+            project.update!(merge_requests_disable_committers_approval: false)
+
+            expect(subject.can_approve?(user)).to be true
+          end
+
+          it 'return false when committers cannot approve' do
+            project.update!(merge_requests_disable_committers_approval: true)
+
+            expect(subject.can_approve?(user)).to be false
+          end
+        end
+      end
 
       context 'when there is one approver required' do
         let!(:rule) { create_rule(approvals_required: 1) }
@@ -1318,6 +1393,7 @@ describe ApprovalState do
 
             expect(subject.can_approve?(author)).to be_falsey
             expect(subject.can_approve?(reporter)).to be_falsey
+            expect(subject.can_approve?(guest)).to be_falsey
             expect(subject.can_approve?(stranger)).to be_falsey
             expect(subject.can_approve?(nil)).to be_falsey
           end
@@ -1347,6 +1423,7 @@ describe ApprovalState do
               expect(subject.can_approve?(author)).to be_falsey
               expect(subject.can_approve?(reporter)).to be_falsey
               expect(subject.can_approve?(other_developer)).to be_truthy
+              expect(subject.can_approve?(guest)).to be_falsey
               expect(subject.can_approve?(stranger)).to be_falsey
               expect(subject.can_approve?(nil)).to be_falsey
             end

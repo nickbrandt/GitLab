@@ -5,16 +5,15 @@ describe VisibleApprovable do
   let!(:project) { create(:project, :repository) }
   let!(:user) { project.creator }
 
-  before do
-    stub_feature_flags(approval_rules: false)
-  end
-
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
-    let!(:approver) { create(:approver, target: resource) }
+    let!(:approver) { create(:user) }
+    let!(:rule) { create(:approval_project_rule, project: project, groups: [public_group, private_group], users: [approver])}
+
+    before do
+      project.add_developer(approver)
+    end
 
     subject { resource.approvers_left }
 
@@ -25,130 +24,88 @@ describe VisibleApprovable do
     end
 
     it 'returns all approvers left' do
-      resource.approvals.create!(user: approver.user)
+      resource.approvals.create!(user: approver)
 
-      is_expected.to match_array(public_approver_group.users + private_approver_group.users)
+      is_expected.to match_array(public_group.users + private_group.users)
     end
   end
 
   describe '#overall_approvers' do
-    let!(:project_approver) { create(:approver, target: project) }
+    let(:approver) { create(:user) }
     let(:code_owner) { build(:user) }
 
+    let!(:project_regular_rule) { create(:approval_project_rule, project: project, users: [approver]) }
+    let!(:code_owner_rule) { create(:code_owner_rule, merge_request: resource, users: [code_owner]) }
+
     before do
-      allow(resource).to receive(:code_owners).and_return([code_owner])
-      project.add_developer(project_approver.user)
+      project.add_developer(approver)
+      project.add_developer(code_owner)
     end
 
     subject { resource.overall_approvers }
 
     it 'returns a list of all the project approvers' do
-      is_expected.to contain_exactly(project_approver.user, code_owner)
+      is_expected.to contain_exactly(approver, code_owner)
     end
 
     context 'when exclude_code_owners is true' do
       subject { resource.overall_approvers(exclude_code_owners: true) }
 
       it 'excludes code owners' do
-        is_expected.to contain_exactly(project_approver.user)
-      end
-    end
-
-    context 'when author is approver' do
-      let!(:author_approver) { create(:approver, target: project, user: resource.author) }
-
-      it 'excludes author if authors cannot approve' do
-        is_expected.not_to include(author_approver.user)
-      end
-
-      it 'includes author if authors are able to approve' do
-        project.update(merge_requests_author_approval: true)
-
-        is_expected.to include(author_approver.user)
-      end
-    end
-
-    context 'when committer is approver' do
-      let(:user) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
-      let!(:committer_approver) { create(:approver, target: project, user: user) }
-
-      before do
-        project.add_developer(user)
-      end
-
-      it 'excludes committer if committers cannot approve' do
-        project.update(merge_requests_disable_committers_approval: true)
-
-        is_expected.not_to include(committer_approver.user)
-      end
-
-      it 'includes committer if committers are able to approve' do
-        is_expected.to include(committer_approver.user)
+        is_expected.to contain_exactly(approver)
       end
     end
 
     context 'when approvers are overwritten' do
-      let!(:approver) { create(:approver, target: resource) }
+      let!(:merge_request_regular_rule) { create(:approval_merge_request_rule, merge_request: resource, users: [create(:user)]) }
 
-      before do
-        project.add_developer(approver.user)
-      end
-
-      it 'returns the list of all the merge request user approvers' do
-        is_expected.to contain_exactly(approver.user)
+      it 'returns the list of all the merge request level approvers' do
+        is_expected.to contain_exactly(*merge_request_regular_rule.users, code_owner)
       end
     end
 
-    context 'when approver is no longer part of project' do
-      it 'excludes non-project members' do
-        project.team.find_member(project_approver.user).destroy!
+    context 'when author is an approver' do
+      let!(:approver) { resource.author }
 
-        is_expected.not_to include(project_approver.user)
+      it 'excludes author if author cannot approve' do
+        project.update(merge_requests_author_approval: false)
+
+        is_expected.not_to include(approver)
+      end
+
+      it 'includes author if author is able to approve' do
+        project.update(merge_requests_author_approval: true)
+
+        is_expected.to include(approver)
       end
     end
-  end
 
-  describe '#overall_approver_groups' do
-    before do
-      group = create(:group_with_members)
-      create(:approver_group, target: project, group: group)
-    end
+    context 'when a committer is an approver' do
+      let!(:approver) { create(:user, email: resource.commits.without_merge_commits.first.committer_email) }
 
-    subject { resource.overall_approver_groups }
+      it 'excludes the committer if committers cannot approve' do
+        project.update(merge_requests_disable_committers_approval: true)
 
-    it 'returns all the project approver groups' do
-      is_expected.to match_array(project.approver_groups)
-    end
+        is_expected.not_to include(approver)
+      end
 
-    context 'when group approvers are overwritten' do
-      it 'returns all the merge request approver groups' do
-        group = create(:group_with_members)
-        create(:approver_group, target: resource, group: group)
+      it 'includes the committer if committers are able to approve' do
+        project.update(merge_requests_disable_committers_approval: false)
 
-        is_expected.to match_array(resource.approver_groups)
+        is_expected.to include(approver)
       end
     end
   end
 
   describe '#all_approvers_including_groups' do
     let!(:group) { create(:group_with_members) }
-    let!(:approver_group) { create(:approver_group, target: resource, group: group) }
-    let!(:approver) { create(:approver, target: resource) }
-
-    before do
-      project.add_developer(approver.user)
-    end
+    let!(:approver) { create(:user) }
+    let!(:rule) { create(:approval_project_rule, project: project, groups: [group], users: [approver]) }
 
     subject { resource.all_approvers_including_groups }
 
-    it 'only queries once' do
-      expect(resource).to receive(:overall_approvers).and_call_original.once
-
-      3.times { subject }
-    end
-
     it 'returns all approvers (groups and users)' do
-      is_expected.to match_array(approver_group.users + [approver.user])
+      is_expected.to match_array(group.users + [approver])
     end
   end
 
@@ -168,8 +125,9 @@ describe VisibleApprovable do
 
   describe '#reset_approval_cache!' do
     before do
-      approver = create(:approver, target: resource)
-      project.add_developer(approver.user)
+      approver = create(:user)
+      project.add_developer(approver)
+      create(:approval_project_rule, project: project, users: [approver])
     end
 
     subject { resource.reset_approval_cache! }

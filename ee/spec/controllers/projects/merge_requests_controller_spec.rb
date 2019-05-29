@@ -9,7 +9,6 @@ shared_examples 'approvals' do
   let!(:approval_rule) { create(:approval_project_rule, project: project, users: [approver, user], approvals_required: 2) }
 
   before do
-    # merge_request.update_attribute :approvals_before_merge, 2
     project.add_developer(approver)
   end
 
