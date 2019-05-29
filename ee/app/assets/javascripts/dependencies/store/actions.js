@@ -3,17 +3,7 @@ import createFlash from '~/flash';
 import { FETCH_ERROR_MESSAGE } from './constants';
 import { isDependenciesList, hasReportStatus } from './utils';
 import * as types from './mutation_types';
-import realAxios from '~/lib/utils/axios_utils';
-import mockAxios from './mock_axios';
-
-// TODO: remove mock-axios once the backend implementation is actually
-// available
-let axios;
-if (process.env.NODE_ENV === 'test') {
-  axios = realAxios;
-} else {
-  axios = mockAxios;
-}
+import axios from '~/lib/utils/axios_utils';
 
 export const setDependenciesEndpoint = ({ commit }, endpoint) =>
   commit(types.SET_DEPENDENCIES_ENDPOINT, endpoint);
