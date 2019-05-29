@@ -97,17 +97,41 @@ describe('Security Reports modal', () => {
   });
 
   describe('Vulnerability Details', () => {
-    it('is rendered', () => {
+    const blobPath = '/group/project/blob/1ab2c3d4e5/some/file.path#L0-0';
+    const namespaceValue = 'foobar';
+    const fileValue = '/some/file.path';
+
+    beforeEach(() => {
       const props = {
         modal: createState().modal,
       };
-      props.modal.data.namespace.value = 'foobar';
+      props.modal.vulnerability.blob_path = blobPath;
+      props.modal.data.namespace.value = namespaceValue;
+      props.modal.data.file.value = fileValue;
       vm = mountComponent(Component, props);
+    });
 
+    it('is rendered', () => {
       const vulnerabilityDetails = vm.$el.querySelector('.js-vulnerability-details');
 
       expect(vulnerabilityDetails).not.toBeNull();
       expect(vulnerabilityDetails.textContent).toContain('foobar');
+    });
+
+    it('computes valued fields properly', () => {
+      expect(vm.valuedFields).toMatchObject({
+        file: {
+          value: fileValue,
+          url: blobPath,
+          isLink: true,
+          text: 'File',
+        },
+        namespace: {
+          value: namespaceValue,
+          text: 'Namespace',
+          isLink: false,
+        },
+      });
     });
   });
 
