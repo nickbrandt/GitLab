@@ -135,10 +135,18 @@ describe Groups::SsoController do
 
       context 'and group managed accounts enforced' do
         context 'and oauth data available' do
-          let(:oauth_data) { { "info" => { "name" => 'Test', "email" => 'email@email.com' } } }
+          let(:oauth_data) { { "info" => { name: 'Test', email: 'testuser@email.com' } } }
 
           it 'has status 200' do
             expect(subject).to have_gitlab_http_status(200)
+          end
+
+          it 'suggests first available username automatically' do
+            create(:user, username: 'testuser')
+
+            subject
+
+            expect(controller.helpers.resource.username).to eq 'testuser1'
           end
 
           context 'and belongs to different group' do
@@ -175,7 +183,7 @@ describe Groups::SsoController do
     end
 
     let(:new_user_data) { { username: "myusername" } }
-    let(:oauth_data) { { "info" => { "name" => 'Test', "email" => 'email@email.com' } } }
+    let(:oauth_data) { { "info" => { name: 'Test', email: 'testuser@email.com' } } }
 
     let!(:saml_provider) { create(:saml_provider, :enforced_group_managed_accounts, group: group) }
 
