@@ -3694,6 +3694,9 @@ msgstr ""
 msgid "Ends at (UTC)"
 msgstr ""
 
+msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
 msgid "Enforce SSO-only authentication for this group"
 msgstr ""
 
@@ -8437,6 +8440,9 @@ msgid "Resolve discussion"
 msgstr ""
 
 msgid "Resolved"
+msgstr ""
+
+msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "Response"
