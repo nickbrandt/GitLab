@@ -171,9 +171,38 @@ module EE
       expose :api_unapprove_path do |merge_request|
         presenter(merge_request).api_unapprove_path
       end
+
+      expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }
+
+      private
+
+      def blocking_merge_requests
+        visible_mrs_by_state = Hash.new { |h, k| h[k] = [] }
+        visible_count = 0
+        hidden_blocking_count = 0
+
+        object.blocking_merge_requests.each do |mr|
+          if can?(current_user, :read_merge_request, mr)
+            visible_mrs_by_state[mr.state_name] << represent_blocking_mr(mr)
+            visible_count += 1
+          elsif !mr.merged? # Ignore merged hidden MRs to make display simpler
+            hidden_blocking_count += 1
+          end
+        end
+
+        {
+          total_count: visible_count + hidden_blocking_count,
+          hidden_count: hidden_blocking_count,
+          visible_merge_requests: visible_mrs_by_state
+        }
+      end
     end
 
-    private
+    def represent_blocking_mr(blocking_mr)
+      blocking_mr_options = options.merge(from_project: object.target_project)
+
+      ::BlockingMergeRequestEntity.represent(blocking_mr, blocking_mr_options)
+    end
 
     def head_pipeline_downloadable_path_for_report_type(file_type)
       object.head_pipeline&.present(current_user: current_user)

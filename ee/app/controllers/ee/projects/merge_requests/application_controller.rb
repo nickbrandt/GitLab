@@ -8,6 +8,15 @@ module EE
 
         private
 
+        def merge_request_includes(association)
+          super.includes( # rubocop:disable CodeReuse/ActiveRecord
+            blocking_merge_requests: [
+              :metrics, :assignees, :author, :head_pipeline, :milestone,
+              { source_project: :route, target_project: :route }
+            ]
+          )
+        end
+
         def merge_request_params
           clamp_approvals_before_merge(super)
         end

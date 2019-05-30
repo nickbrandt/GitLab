@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe 'Merge Request > User views blocked MR', :js do
+  let(:block) { create(:merge_request_block) }
+  let(:blocking_mr) { block.blocking_merge_request }
+  let(:blocked_mr) { block.blocked_merge_request }
+  let(:project) { blocked_mr.target_project }
+  let(:user) { create(:user) }
+
+  let(:merge_button) { find('.qa-merge-button') }
+
+  before do
+    project.add_developer(user)
+
+    sign_in(user)
+  end
+
+  context 'blocking merge requests are disabled' do
+    before do
+      stub_licensed_features(blocking_merge_requests: false)
+    end
+
+    it 'is mergeable' do
+      visit project_merge_request_path(project, blocked_mr)
+
+      expect(page).to have_button('Merge', disabled: false)
+    end
+  end
+
+  context 'blocking merge requests are enabled' do
+    before do
+      stub_licensed_features(blocking_merge_requests: true)
+    end
+
+    context 'blocking MR is not visible' do
+      it 'is not mergeable' do
+        visit project_merge_request_path(project, blocked_mr)
+
+        expect(page).to have_content('Blocked by 1 merge request')
+        expect(page).to have_button('Merge', disabled: true)
+
+        click_button 'Expand'
+
+        expect(page).not_to have_content(blocking_mr.title)
+        expect(page).to have_content("1 merge request that you don't have access to")
+      end
+    end
+
+    context 'blocking MR is visible' do
+      before do
+        blocking_mr.target_project.add_developer(user)
+      end
+
+      it 'is not mergeable' do
+        visit project_merge_request_path(project, blocked_mr)
+
+        expect(page).to have_content('Blocked by 1 merge request')
+        expect(page).to have_button('Merge', disabled: true)
+
+        click_button 'Expand'
+
+        expect(page).to have_content(blocking_mr.title)
+      end
+    end
+  end
+end
