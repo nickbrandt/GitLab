@@ -6,6 +6,7 @@ import MRWidgetService from 'ee/vue_merge_request_widget/services/mr_widget_serv
 import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import state from 'ee/vue_shared/security_reports/store/state';
 import mockData, {
@@ -39,7 +40,6 @@ describe('ee merge request widget options', () => {
   }
 
   beforeEach(() => {
-    gon.features = { approvalRules: false };
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
     Component = Vue.extend(mrWidgetOptions);
@@ -47,7 +47,6 @@ describe('ee merge request widget options', () => {
   });
 
   afterEach(() => {
-    gon.features = null;
     vm.$destroy();
     mock.restore();
 
@@ -850,16 +849,22 @@ describe('ee merge request widget options', () => {
   });
 
   describe('data', () => {
-    it('passes approvals_path to service', () => {
-      const approvalsPath = `${TEST_HOST}/approvals/path`;
+    it('passes approval api paths to service', () => {
+      const paths = {
+        api_approvals_path: `${TEST_HOST}/api/approvals/path`,
+        api_approval_settings_path: `${TEST_HOST}/api/approval/settings/path`,
+        api_approve_path: `${TEST_HOST}/api/approve/path`,
+        api_unapprove_path: `${TEST_HOST}/api/unapprove/path`,
+      };
+
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
-          approvals_path: approvalsPath,
+          ...paths,
         },
       });
 
-      expect(vm.service.approvalsPath).toEqual(approvalsPath);
+      expect(vm.service).toEqual(jasmine.objectContaining(convertObjectPropsToCamelCase(paths)));
     });
   });
 });

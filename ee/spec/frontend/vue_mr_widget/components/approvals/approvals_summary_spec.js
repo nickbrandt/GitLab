@@ -3,7 +3,7 @@ import _ from 'underscore';
 import { toNounSeriesText } from '~/lib/utils/grammar';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { APPROVED_MESSAGE } from 'ee/vue_merge_request_widget/components/approvals/messages';
-import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary.vue';
+import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
 
 const localVue = createLocalVue();
 

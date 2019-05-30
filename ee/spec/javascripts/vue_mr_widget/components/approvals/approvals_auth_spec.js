@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_auth.vue';
+import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/approvals_auth.vue';
 
 const TEST_PASSWORD = 'password';
 

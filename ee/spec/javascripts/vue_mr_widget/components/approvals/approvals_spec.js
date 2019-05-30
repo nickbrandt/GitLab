@@ -1,11 +1,11 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import eventHub from '~/vue_merge_request_widget/event_hub';
-import Approvals from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals.vue';
-import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary.vue';
-import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary_optional.vue';
-import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_footer.vue';
-import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_auth.vue';
+import Approvals from 'ee/vue_merge_request_widget/components/approvals/approvals.vue';
+import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/approvals_summary.vue';
+import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
+import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
+import ApprovalsAuth from 'ee/vue_merge_request_widget/components/approvals/approvals_auth.vue';
 
 import {
   FETCH_LOADING,

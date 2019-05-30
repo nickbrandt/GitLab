@@ -3,8 +3,8 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_list.vue';
-import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_footer.vue';
+import ApprovalsList from 'ee/vue_merge_request_widget/components/approvals/approvals_list.vue';
+import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
 
 const localVue = createLocalVue();
 

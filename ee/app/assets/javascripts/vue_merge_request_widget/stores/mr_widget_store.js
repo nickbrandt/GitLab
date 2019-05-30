@@ -59,7 +59,6 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.hasApprovalsAvailable = Boolean(
       data.has_approvals_available || this.hasApprovalsAvailable,
     );
-    this.approvalsPath = data.approvals_path || this.approvalsPath;
     this.apiApprovalsPath = data.api_approvals_path || this.apiApprovalsPath;
     this.apiApprovalSettingsPath = data.api_approval_settings_path || this.apiApprovalSettingsPath;
     this.apiApprovePath = data.api_approve_path || this.apiApprovePath;
@@ -69,13 +68,8 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setApprovals(data) {
     this.approvals = mapApprovalsResponse(data);
     this.approvalsLeft = !!data.approvals_left;
-    if (gon.features.approvalRules) {
-      this.isApproved = data.approved || false;
-      this.preventMerge = !this.isApproved;
-    } else {
-      this.isApproved = !this.approvalsLeft || false;
-      this.preventMerge = this.hasApprovalsAvailable && this.approvalsLeft;
-    }
+    this.isApproved = data.approved || false;
+    this.preventMerge = !this.isApproved;
   }
 
   setApprovalRules(data) {
