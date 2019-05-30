@@ -10552,6 +10552,9 @@ msgstr ""
 msgid "Resolved by %{resolvedByName}"
 msgstr ""
 
+msgid "Resolves IP addresses once and uses them to submit requests"
+msgstr ""
+
 msgid "Response"
 msgstr ""
 
@@ -11568,9 +11571,6 @@ msgid "SortOptions|Least popular"
 msgstr ""
 
 msgid "SortOptions|Less weight"
-msgstr ""
-
-msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "SortOptions|Milestone due date"
