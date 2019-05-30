@@ -9054,6 +9054,9 @@ msgstr ""
 msgid "Pipeline"
 msgstr ""
 
+msgid "Pipeline ID (IID)"
+msgstr ""
+
 msgid "Pipeline Schedule"
 msgstr ""
 
@@ -15525,6 +15528,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "invalid milestone state `%{state}`"
+msgstr ""
+
+msgid "is enabled."
 msgstr ""
 
 msgid "is invalid because there is downstream lock"
