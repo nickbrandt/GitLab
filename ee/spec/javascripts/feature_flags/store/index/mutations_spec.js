@@ -2,7 +2,7 @@ import state from 'ee/feature_flags/store/modules/index/state';
 import mutations from 'ee/feature_flags/store/modules/index/mutations';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { getRequestData } from '../../mock_data';
+import { getRequestData, rotateData } from '../../mock_data';
 
 describe('Feature flags store Mutations', () => {
   let stateCopy;
@@ -81,6 +81,52 @@ describe('Feature flags store Mutations', () => {
 
     it('should set hasError to true', () => {
       expect(stateCopy.hasError).toEqual(true);
+    });
+  });
+
+  describe('REQUEST_ROTATE_INSTANCE_ID', () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_ROTATE_INSTANCE_ID](stateCopy);
+    });
+
+    it('should set isRotating to true', () => {
+      expect(stateCopy.isRotating).toBe(true);
+    });
+
+    it('should set hasRotateError to false', () => {
+      expect(stateCopy.hasRotateError).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_ROTATE_INSTANCE_ID_SUCCESS', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_ROTATE_INSTANCE_ID_SUCCESS](stateCopy, { data: rotateData });
+    });
+
+    it('should set the instance id to the received data', () => {
+      expect(stateCopy.instanceId).toBe(rotateData.token);
+    });
+
+    it('should set isRotating to false', () => {
+      expect(stateCopy.isRotating).toBe(false);
+    });
+
+    it('should set hasRotateError to false', () => {
+      expect(stateCopy.hasRotateError).toBe(false);
+    });
+  });
+
+  describe('RECEIVE_ROTATE_INSTANCE_ID_ERROR', () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_ROTATE_INSTANCE_ID_ERROR](stateCopy);
+    });
+
+    it('should set isRotating to false', () => {
+      expect(stateCopy.isRotating).toBe(false);
+    });
+
+    it('should set hasRotateError to true', () => {
+      expect(stateCopy.hasRotateError).toBe(true);
     });
   });
 });

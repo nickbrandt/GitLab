@@ -7,6 +7,11 @@ export const setFeatureFlagsEndpoint = ({ commit }, endpoint) =>
 export const setFeatureFlagsOptions = ({ commit }, options) =>
   commit(types.SET_FEATURE_FLAGS_OPTIONS, options);
 
+export const setInstanceIdEndpoint = ({ commit }, endpoint) =>
+  commit(types.SET_INSTANCE_ID_ENDPOINT, endpoint);
+
+export const setInstanceId = ({ commit }, instanceId) => commit(types.SET_INSTANCE_ID, instanceId);
+
 export const fetchFeatureFlags = ({ state, dispatch }) => {
   dispatch('requestFeatureFlags');
 
@@ -27,6 +32,21 @@ export const requestFeatureFlags = ({ commit }) => commit(types.REQUEST_FEATURE_
 export const receiveFeatureFlagsSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_FEATURE_FLAGS_SUCCESS, response);
 export const receiveFeatureFlagsError = ({ commit }) => commit(types.RECEIVE_FEATURE_FLAGS_ERROR);
+
+export const rotateInstanceId = ({ state, dispatch }) => {
+  dispatch('requestRotateInstanceId');
+
+  axios
+    .get(state.rotateEndpoint)
+    .then(({ data = {}, headers }) => dispatch('receiveRotateInstanceIdSuccess', { data, headers }))
+    .catch(() => dispatch('receiveRotateInstanceIdError'));
+};
+
+export const requestRotateInstanceId = ({ commit }) => commit(types.REQUEST_ROTATE_INSTANCE_ID);
+export const receiveRotateInstanceIdSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_ROTATE_INSTANCE_ID_SUCCESS, response);
+export const receiveRotateInstanceIdError = ({ commit }) =>
+  commit(types.RECEIVE_ROTATE_INSTANCE_ID_ERROR);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
