@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Projects do
@@ -14,6 +16,77 @@ describe API::Projects do
       get api('/projects', user)
 
       expect(response).to have_gitlab_http_status(200)
+    end
+
+    context 'filters by verification flags' do
+      let(:project1) { create(:project, namespace: user.namespace) }
+
+      it 'filters by :repository_verification_failed' do
+        create(:repository_state, :repository_failed, project: project)
+        create(:repository_state, :wiki_failed, project: project1)
+
+        get api('/projects', user), params: { repository_checksum_failed: true }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to include_pagination_headers
+        expect(json_response).to be_an Array
+        expect(json_response.length).to eq(1)
+        expect(json_response.first['id']).to eq project.id
+      end
+
+      it 'filters by :wiki_verification_failed' do
+        create(:repository_state, :wiki_failed, project: project)
+        create(:repository_state, :repository_failed, project: project1)
+
+        get api('/projects', user), params: { wiki_checksum_failed: true }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to include_pagination_headers
+        expect(json_response).to be_an Array
+        expect(json_response.length).to eq(1)
+        expect(json_response.first['id']).to eq project.id
+      end
+    end
+  end
+
+  describe 'GET /projects/:id' do
+    describe 'packages_enabled attribute' do
+      it 'exposed when the feature is available' do
+        stub_licensed_features(packages: true)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).to have_key 'packages_enabled'
+      end
+
+      it 'not exposed when the feature is available' do
+        stub_licensed_features(packages: false)
+
+        get api("/projects/#{project.id}", user)
+
+        expect(json_response).not_to have_key 'packages_enabled'
+      end
+    end
+
+    describe 'repository_storage attribute' do
+      context 'when authenticated as an admin' do
+        let(:admin) { create(:admin) }
+
+        it 'returns repository_storage attribute' do
+          get api("/projects/#{project.id}", admin)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['repository_storage']).to eq(project.repository_storage)
+        end
+      end
+
+      context 'when authenticated as a regular user' do
+        it 'does not return repository_storage attribute' do
+          get api("/projects/#{project.id}", user)
+
+          expect(json_response).not_to have_key('repository_storage')
+        end
+      end
     end
   end
 
@@ -255,56 +328,17 @@ describe API::Projects do
         end
       end
     end
-  end
 
-  describe 'GET /projects' do
-    context 'filters by verification flags' do
-      let(:project1) { create(:project, namespace: user.namespace) }
+    describe 'updating approvals_before_merge attribute' do
+      context 'when authenticated as project owner' do
+        it 'updates approvals_before_merge' do
+          project_param = { approvals_before_merge: 3 }
 
-      it 'filters by :repository_verification_failed' do
-        create(:repository_state, :repository_failed, project: project)
-        create(:repository_state, :wiki_failed, project: project1)
+          put api("/projects/#{project.id}", user), params: project_param
 
-        get api('/projects', user), params: { repository_checksum_failed: true }
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to include_pagination_headers
-        expect(json_response).to be_an Array
-        expect(json_response.length).to eq(1)
-        expect(json_response.first['id']).to eq project.id
-      end
-
-      it 'filters by :wiki_verification_failed' do
-        create(:repository_state, :wiki_failed, project: project)
-        create(:repository_state, :repository_failed, project: project1)
-
-        get api('/projects', user), params: { wiki_checksum_failed: true }
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(response).to include_pagination_headers
-        expect(json_response).to be_an Array
-        expect(json_response.length).to eq(1)
-        expect(json_response.first['id']).to eq project.id
-      end
-    end
-  end
-
-  describe 'GET /projects/:id' do
-    describe 'packages_enabled attribute' do
-      it 'exposed when the feature is available' do
-        stub_licensed_features(packages: true)
-
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).to have_key 'packages_enabled'
-      end
-
-      it 'not exposed when the feature is available' do
-        stub_licensed_features(packages: false)
-
-        get api("/projects/#{project.id}", user)
-
-        expect(json_response).not_to have_key 'packages_enabled'
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['approvals_before_merge']).to eq(3)
+        end
       end
     end
   end
