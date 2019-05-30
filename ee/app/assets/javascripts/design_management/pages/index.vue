@@ -91,6 +91,9 @@ export default {
             projectPath: this.projectPath,
             iid: this.issueIid,
           },
+          context: {
+            hasUpload: true,
+          },
           update: (store, { data: { designManagementUpload } }) => {
             const data = store.readQuery({
               query: allDesignsQuery,

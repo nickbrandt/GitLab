@@ -92,6 +92,9 @@ describe('Design management index page', () => {
         ])
         .then(() => {
           expect(mutate).toHaveBeenCalledWith({
+            context: {
+              hasUpload: true,
+            },
             mutation: uploadDesignQuery,
             variables: {
               files: [{ name: 'test' }],
