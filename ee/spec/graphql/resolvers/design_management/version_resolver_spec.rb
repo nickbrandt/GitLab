@@ -35,7 +35,7 @@ describe Resolvers::DesignManagement::VersionResolver do
       end
     end
 
-    context "when the is anonymous" do
+    context "when the user is anonymous" do
       let(:current_user) { nil }
 
       it "returns nothing" do
@@ -43,7 +43,7 @@ describe Resolvers::DesignManagement::VersionResolver do
       end
     end
 
-    context "when the is cannot see designs" do
+    context "when the user cannot see designs" do
       it "returns nothing" do
         expect(resolve_versions(first_design, {}, current_user: create(:user))).to be_empty
       end

@@ -51,6 +51,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalProjectRule'
       has_many :audit_events, as: :entity
+      has_many :designs, inverse_of: :project, class_name: 'DesignManagement::Design'
       has_many :path_locks
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
       has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
@@ -580,6 +581,10 @@ module EE
       # GraphQL is also required for using Design Management
       feature_available?(:design_management) && ::Feature.enabled?(:design_management, self) &&
         ::Gitlab::Graphql.enabled?
+    end
+
+    def design_repository
+      @design_repository ||= DesignManagement::Repository.new(self)
     end
 
     private

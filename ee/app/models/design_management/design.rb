@@ -4,7 +4,7 @@ module DesignManagement
   class Design < ApplicationRecord
     include Gitlab::FileTypeDetection
 
-    belongs_to :project
+    belongs_to :project, inverse_of: :designs
     belongs_to :issue
 
     has_many :design_versions

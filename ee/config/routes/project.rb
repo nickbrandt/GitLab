@@ -71,6 +71,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
       end
+
+      scope '-' do
+        resources :designs, only: [], constraints: { id: /\d+/ } do
+          member do
+            get '(*ref)', action: 'show', as: '', constraints: { ref: Gitlab::PathRegex.git_reference_regex }
+          end
+        end
+      end
     end
   end
 end

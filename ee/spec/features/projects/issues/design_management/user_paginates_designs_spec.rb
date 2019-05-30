@@ -5,8 +5,8 @@ describe 'User paginates issue designs', :js do
   let(:issue) { create(:issue, project: project) }
 
   before do
-    create(:design, issue: issue, filename: 'world.png')
-    create(:design, issue: issue, filename: 'dk.png')
+    create(:design, :with_file, issue: issue, filename: 'world.png')
+    create(:design, :with_file, issue: issue, filename: 'dk.png')
 
     stub_licensed_features(design_management: true)
 

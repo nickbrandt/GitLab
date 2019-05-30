@@ -1,4 +1,5 @@
 fragment DesignListItem on Design {
   id
+  image
   filename
 }

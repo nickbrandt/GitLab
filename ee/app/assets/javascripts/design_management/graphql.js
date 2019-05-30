@@ -15,13 +15,9 @@ const defaultClient = createDefaultClient({
         variables: { fullPath: projectPath, iid: issueIid },
       });
 
-      return {
-        ...result.project.issue.designs.designs.edges.find(
-          ({ node }) => parseInt(node.id, 10) === id,
-        ).node,
-        // TODO: Remove this once backend exposes raw images
-        image: 'http://via.placeholder.com/1000',
-      };
+      return result.project.issue.designs.designs.edges.find(
+        ({ node }) => parseInt(node.id, 10) === id,
+      ).node;
     },
   },
 });
