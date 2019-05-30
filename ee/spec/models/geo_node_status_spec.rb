@@ -416,7 +416,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns 0 when project count is unknown' do
-      allow(subject).to receive(:repositories_count).and_return(nil)
+      allow(subject).to receive(:projects_count).and_return(nil)
 
       expect(subject.repositories_synced_in_percentage).to eq(0)
     end
@@ -441,7 +441,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns 0 when project count is unknown' do
-      allow(subject).to receive(:wikis_count).and_return(nil)
+      allow(subject).to receive(:projects_count).and_return(nil)
 
       expect(subject.wikis_synced_in_percentage).to eq(0)
     end
@@ -555,7 +555,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns 0 when project count is unknown' do
-      allow(subject).to receive(:repositories_count).and_return(nil)
+      allow(subject).to receive(:projects_count).and_return(nil)
 
       expect(subject.repositories_checksummed_in_percentage).to eq(0)
     end
@@ -617,7 +617,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns 0 when project count is unknown' do
-      allow(subject).to receive(:wikis_count).and_return(nil)
+      allow(subject).to receive(:projects_count).and_return(nil)
 
       expect(subject.wikis_checksummed_in_percentage).to eq(0)
     end
@@ -840,7 +840,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
   describe '#[]' do
     it 'returns values for each attribute' do
-      expect(subject[:repositories_count]).to eq(4)
+      expect(subject[:projects_count]).to eq(4)
       expect(subject[:repositories_synced_count]).to eq(0)
     end
 

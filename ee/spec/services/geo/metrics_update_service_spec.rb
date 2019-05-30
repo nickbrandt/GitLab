@@ -52,7 +52,6 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
   let(:primary_data) do
     {
       status_message: nil,
-      repositories_count: 10,
       projects_count: 10,
       lfs_objects_count: 100,
       job_artifacts_count: 100,
