@@ -1,0 +1,5 @@
+---
+title: Enable dependency proxy per group by default
+merge_request: 13574
+author:
+type: changed
