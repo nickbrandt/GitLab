@@ -1,5 +1,14 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.1 (2019-05-30)
+
+### Security (3 changes)
+
+- Filter relative links in wiki for XSS.
+- Fix XSS in Ancestor tooltip title.
+- Ignore out of range epic IDs.
+
+
 ## 11.11.0 (2019-05-22)
 
 ### Security (1 change)
