@@ -40,7 +40,7 @@ export default {
   data-merge-request-id='${this.appMetadata.mergeRequestId}'
   data-mr-url='${this.appMetadata.appUrl}'
   id='review-app-toolbar-script'
-  src='https://gitlab.com/public/visual-review-toolbar.js'
+  src='https://gitlab.com/assets/webpack/visual_review_toolbar.js'
 />`,
       };
     },
