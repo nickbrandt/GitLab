@@ -4013,6 +4013,18 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
+msgid "Dependencies|Component"
+msgstr ""
+
+msgid "Dependencies|Location"
+msgstr ""
+
+msgid "Dependencies|Packager"
+msgstr ""
+
+msgid "Dependencies|Version"
+msgstr ""
+
 msgid "Dependency Proxy"
 msgstr ""
 
