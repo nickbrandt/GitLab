@@ -10,7 +10,7 @@ module Projects
     def index
       respond_to do |format|
         format.json do
-          render json: paginated_dependecies
+          render json: report
         end
       end
     end
@@ -36,8 +36,18 @@ module Projects
     # format: { report: 'failed' }
     # after we'll have more then just mock data
     # reference: https://gitlab.com/gitlab-org/gitlab-ee/issues/10075#note_164915787
-    def paginated_dependecies
+    def paginated_dependencies
       Kaminari.paginate_array(found_dependencies).page(params[:page])
+    end
+
+    def report
+      {
+        dependencies: paginated_dependencies,
+        report: {
+          status: "some_status",
+          job_path: "some_ci_job_path"
+        }
+      }
     end
   end
 end

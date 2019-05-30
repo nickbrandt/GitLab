@@ -39,14 +39,12 @@ module Security
     def mock
       {
         name: fake_name,
-        type: %w(gem npm module).sample,
+        packager: ['Ruby(Bundler)', 'JavaScript (yarn)', 'JavaScript (npm)'].sample,
         location: {
-          blob_path: 'gitlab-org/gitlab-ee/blob/master/Gemfile.lock#L1248'
+          blob_path: 'gitlab-org/gitlab-ee/blob/master/Gemfile.lock',
+          path: "Gemfile.lock"
         },
-        version: '5.4.1',
-        requirements: [
-            '~>5.4.1'
-          ]
+        version: '5.4.1'
       }
     end
 
