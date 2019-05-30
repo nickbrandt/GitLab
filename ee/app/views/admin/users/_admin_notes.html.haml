@@ -1,5 +1,6 @@
 %fieldset
   %legend= _('Admin notes')
   .form-group.row
-    = f.label :note, _('AdminNote|Note'), class: 'col-form-label'
+    .col-sm-2.text-right
+      = f.label :note, _('AdminNote|Note'), class: 'col-form-label'
     .col-sm-10= f.text_area :note, class: 'form-control'
