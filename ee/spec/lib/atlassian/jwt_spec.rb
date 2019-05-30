@@ -34,20 +34,20 @@ describe Atlassian::Jwt do
   end
 
   describe '#build_claims' do
-    let(:options) { {} }
+    let(:other_options) { {} }
 
-    subject { Atlassian::Jwt.build_claims('gitlab', 'post', '/rest/devinfo/0.10/bulk', options) }
+    subject { described_class.build_claims(issuer: 'gitlab', method: 'post', uri: '/rest/devinfo/0.10/bulk', **other_options) }
 
     it 'sets the iss claim' do
       expect(subject[:iss]).to eq('gitlab')
     end
 
     it 'sets qsh claim based on HTTP method and path' do
-      expect(subject[:qsh]).to eq(Atlassian::Jwt.create_query_string_hash('post', '/rest/devinfo/0.10/bulk'))
+      expect(subject[:qsh]).to eq(described_class.create_query_string_hash('post', '/rest/devinfo/0.10/bulk'))
     end
 
     describe 'iat claim' do
-      it 'sets default value' do
+      it 'sets default value to current time' do
         Timecop.freeze do
           expect(subject[:iat]).to eq(Time.now.to_i)
         end
@@ -55,7 +55,7 @@ describe Atlassian::Jwt do
 
       context do
         let(:issued_time) { Time.now + 30.days }
-        let(:options) { { issued_at: issued_time.to_i } }
+        let(:other_options) { { issued_at: issued_time.to_i } }
 
         it 'allows overriding with option' do
           expect(subject[:iat]).to eq(issued_time.to_i)
@@ -64,7 +64,7 @@ describe Atlassian::Jwt do
     end
 
     describe 'exp claim' do
-      it 'sets default value' do
+      it 'sets default value to 1 minute from now' do
         Timecop.freeze do
           expect(subject[:exp]).to eq(Time.now.to_i + 60)
         end
@@ -72,7 +72,7 @@ describe Atlassian::Jwt do
 
       context do
         let(:expiry_time) { Time.now + 30.days }
-        let(:options) { { expires: expiry_time.to_i } }
+        let(:other_options) { { expires: expiry_time.to_i } }
 
         it 'allows overriding with option' do
           expect(subject[:exp]).to eq(expiry_time.to_i)
@@ -81,7 +81,7 @@ describe Atlassian::Jwt do
     end
 
     describe 'other claims' do
-      let(:options) { { other_claims: { some_claim: 'some_claim_value'} } }
+      let(:other_options) { { other_claims: { some_claim: 'some_claim_value' } } }
 
       it 'allows adding of additional claims' do
         expect(subject[:some_claim]).to eq('some_claim_value')

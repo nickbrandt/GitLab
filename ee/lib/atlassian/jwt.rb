@@ -26,11 +26,11 @@ module Atlassian
         )
       end
 
-      def build_claims(issuer, http_method, uri, base_uri: '', issued_at: nil, expires: nil, other_claims: {})
+      def build_claims(issuer:, method:, uri:, base_uri: '', issued_at: nil, expires: nil, other_claims: {})
         issued_at ||= Time.now.to_i
         expires ||= issued_at + 60
 
-        qsh = create_query_string_hash(http_method, uri, base_uri: base_uri)
+        qsh = create_query_string_hash(method, uri, base_uri: base_uri)
 
         {
           iss: issuer,
