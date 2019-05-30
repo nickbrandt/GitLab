@@ -19,14 +19,11 @@ function createMockTextarea() {
     el.value = el.value.slice(0, start) + text + el.value.slice(end);
     if (mode === 'select') {
       el.setSelectionRange(start, start + text.length);
-    }
-    else if (mode === 'start') {
+    } else if (mode === 'start') {
       el.setSelectionRange(start, start);
-    }
-    else if (mode === 'end') {
+    } else if (mode === 'end') {
       el.setSelectionRange(start + text.length, start + text.length);
-    }
-    else {
+    } else {
       // mode === 'preserve'
       // Algorithm here: https://www.w3.org/TR/html50/forms.html#dom-textarea/input-setrangetext
       const newEnd = start + text.length;
@@ -34,15 +31,13 @@ function createMockTextarea() {
 
       if (selStart > end) {
         selStart += delta;
-      }
-      else if (selStart > start) {
+      } else if (selStart > start) {
         selStart = start;
       }
 
       if (selEnd > end) {
         selEnd += delta;
-      }
-      else if (selEnd > start) {
+      } else if (selEnd > start) {
         selEnd = newEnd;
       }
 
@@ -110,7 +105,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(0, 11);
         ih.indent();
         expect(element.value).toBe('    foo\n    bar\n    baz');
-        expect(element.selection()).toEqual([0, 23])
+        expect(element.selection()).toEqual([0, 23]);
       });
 
       it('when all lines are partially selected; and the selection adapts', () => {
@@ -118,7 +113,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(2, 9);
         ih.indent();
         expect(element.value).toBe('    foo\n    bar\n    baz');
-        expect(element.selection()).toEqual([6, 21])
+        expect(element.selection()).toEqual([6, 21]);
       });
 
       it('when some lines are entirely selected; and entire lines remain selected', () => {
@@ -126,7 +121,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(4, 11);
         ih.indent();
         expect(element.value).toBe('foo\n    bar\n    baz');
-        expect(element.selection()).toEqual([4, 19])
+        expect(element.selection()).toEqual([4, 19]);
       });
 
       it('when some lines are partially selected; and the selection adapts', () => {
@@ -134,7 +129,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(5, 9);
         ih.indent();
         expect(element.value).toBe('foo\n    bar\n    baz');
-        expect(element.selection()).toEqual([5 + 4, 9 + 2 * 4])
+        expect(element.selection()).toEqual([5 + 4, 9 + 2 * 4]);
       });
 
       it('having different indentation when some lines are entirely selected; and entire lines remain selected', () => {
@@ -142,7 +137,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(8, 19);
         ih.indent();
         expect(element.value).toBe('    foo\n    bar\n        baz');
-        expect(element.selection()).toEqual([8, 27])
+        expect(element.selection()).toEqual([8, 27]);
       });
 
       it('having different indentation when some lines are partially selected; and the selection adapts', () => {
@@ -150,7 +145,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(9, 14);
         ih.indent();
         expect(element.value).toBe('    foo\n    bar\n        baz');
-        expect(element.selection()).toEqual([13, 22])
+        expect(element.selection()).toEqual([13, 22]);
       });
     });
   });
@@ -226,7 +221,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(0, 27);
         ih.unindent();
         expect(element.value).toBe('foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([0, 15])
+        expect(element.selection()).toEqual([0, 15]);
       });
 
       it('when all lines are partially selected', () => {
@@ -234,7 +229,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(5, 26);
         ih.unindent();
         expect(element.value).toBe('foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([1, 14])
+        expect(element.selection()).toEqual([1, 14]);
       });
 
       it('when all lines are entirely selected', () => {
@@ -242,7 +237,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(8, 27);
         ih.unindent();
         expect(element.value).toBe('    foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([8, 19])
+        expect(element.selection()).toEqual([8, 19]);
       });
 
       it('when some lines are entirely selected', () => {
@@ -250,7 +245,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(8, 27);
         ih.unindent();
         expect(element.value).toBe('    foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([8, 19])
+        expect(element.selection()).toEqual([8, 19]);
       });
 
       it('when some lines are partially selected', () => {
@@ -258,7 +253,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(17, 26);
         ih.unindent();
         expect(element.value).toBe('    foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([13, 18])
+        expect(element.selection()).toEqual([13, 18]);
       });
 
       it('when some lines are partially selected within their indents', () => {
@@ -266,7 +261,7 @@ describe('indent_helper', () => {
         element.setSelectionRange(10, 22);
         ih.unindent();
         expect(element.value).toBe('    foo\n    bar\nbaz');
-        expect(element.selection()).toEqual([8, 16])
+        expect(element.selection()).toEqual([8, 16]);
       });
     });
   });

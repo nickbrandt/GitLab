@@ -142,7 +142,9 @@ describe('UndoStack', () => {
 
   it('should enforce a max number of undo states', () => {
     // Try 2000 saves. Only the last 1000 should be preserved.
-    const sequence = Array(2000).fill(0).map((el, i) => i);
+    const sequence = Array(2000)
+      .fill(0)
+      .map((el, i) => i);
     sequence.forEach(stack.save.bind(stack));
     expect(stack.history.length).toBe(1000);
     expect(stack.history).toEqual(sequence.slice(1000));

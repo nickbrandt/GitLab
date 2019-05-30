@@ -275,7 +275,7 @@ describe('note_app', () => {
             .find(`.edit-note a[href="${markdownDocsPath}"]`)
             .text()
             .trim(),
-        ).toEqual('Markdown is supported');
+        ).toEqual('Markdown is supported.');
       });
     });
 

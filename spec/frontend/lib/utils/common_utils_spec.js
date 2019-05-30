@@ -3,17 +3,13 @@ import * as cu from '~/lib/utils/common_utils';
 const CMD_ENTITY = '&#8984;';
 
 let platform;
-Object.defineProperty(
-  navigator,
-  'platform',
-  {
-    configurable: true,
-    get: () => platform,
-    set: val => {
-      platform = val
-    },
-  }
-);
+Object.defineProperty(navigator, 'platform', {
+  configurable: true,
+  get: () => platform,
+  set: val => {
+    platform = val;
+  },
+});
 
 describe('common_utils', () => {
   describe('platform leader key helpers', () => {
@@ -70,7 +66,7 @@ describe('common_utils', () => {
         shiftKey: modifiers.includes('s'),
       };
     };
-    
+
     const { keystroke } = cu;
 
     it('short-circuits with bad arguments', () => {

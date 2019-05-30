@@ -4,7 +4,7 @@ import GfmAutoComplete, { defaultAutocompleteConfig } from 'ee_else_ce/gfm_auto_
 import dropzoneInput from './dropzone_input';
 import { addMarkdownListeners, removeMarkdownListeners } from './lib/utils/text_markdown';
 import IndentHelper from './helpers/indent_helper';
-import { getPlatformLeaderKeyHTML, keystroke } from "./lib/utils/common_utils";
+import { getPlatformLeaderKeyHTML, keystroke } from './lib/utils/common_utils';
 import UndoStack from './lib/utils/undo_stack';
 
 export default class GLForm {
@@ -127,27 +127,22 @@ export default class GLForm {
       if (this.undoStack.canUndo()) {
         this.setState(this.undoStack.undo());
       }
-    }
-    else if (keystroke(event, 'Leader+Shift+Z') || keystroke(event, 'Leader+Y')) {
+    } else if (keystroke(event, 'Leader+Shift+Z') || keystroke(event, 'Leader+Y')) {
       // ==== Redo ====
       event.preventDefault();
       if (this.undoStack.canRedo()) {
         this.setState(this.undoStack.redo());
       }
-    }
-    else if (keystroke(event, 'Space') || keystroke(event, 'Enter')) {
+    } else if (keystroke(event, 'Space') || keystroke(event, 'Enter')) {
       // ==== Save after finishing a word ====
       this.undoStack.save(this.textarea.val());
-    }
-    else if (this.textarea[0].selectionStart !== this.textarea[0].selectionEnd) {
+    } else if (this.textarea[0].selectionStart !== this.textarea[0].selectionEnd) {
       // ==== Save if killing a large selection ====
       this.undoStack.save(this.textarea.val());
-    }
-    else if (this.textarea.val() === '') {
+    } else if (this.textarea.val() === '') {
       // ==== Save if deleting everything ====
       this.undoStack.save('');
-    }
-    else {
+    } else {
       // ==== Save after 1 second of inactivity ====
       this.undoStack.scheduleSave(this.textarea.val());
     }
@@ -158,18 +153,15 @@ export default class GLForm {
       // ==== Unindent selected lines ====
       event.preventDefault();
       this.indentHelper.unindent();
-    }
-    else if (keystroke(event, 'Leader+]')) {
+    } else if (keystroke(event, 'Leader+]')) {
       // ==== Indent selected lines ====
       event.preventDefault();
       this.indentHelper.indent();
-    }
-    else if (keystroke(event, 'Enter')) {
+    } else if (keystroke(event, 'Enter')) {
       // ==== Auto-indent new lines ====
       event.preventDefault();
       this.indentHelper.newline();
-    }
-    else if (keystroke(event, 'Backspace')) {
+    } else if (keystroke(event, 'Backspace')) {
       // ==== Auto-delete indents at the beginning of the line ====
       this.indentHelper.backspace(event);
     }

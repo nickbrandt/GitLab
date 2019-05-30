@@ -3,6 +3,7 @@
  */
 
 import $ from 'jquery';
+import _ from 'underscore';
 import axios from './axios_utils';
 import { getLocationHash } from './url_utility';
 import { convertToCamelCase } from './text_utility';
@@ -242,15 +243,17 @@ export const keystroke = (e, sequence) => {
     return false;
   }
 
+  // The desired key chord. Each element represents a key.
   const chord = sequence
     .toLowerCase()
     .split(/[+-]/)
-    .map(note => note === 'leader' ? getPlatformLeaderKey(e) : note)
-    .map(note => note === 'minus' ? '-' : note)
-    .map(note => note === 'plus' ? '+' : note)
-    .map(note => note === 'space' ? ' ' : note)
-    .map(note => note === 'control' ? 'ctrl' : note);
+    .map(note => (note === 'leader' ? getPlatformLeaderKey(e) : note))
+    .map(note => (note === 'minus' ? '-' : note))
+    .map(note => (note === 'plus' ? '+' : note))
+    .map(note => (note === 'space' ? ' ' : note))
+    .map(note => (note === 'control' ? 'ctrl' : note));
 
+  // The chord that was actually pressed.
   const actualChord = [
     e.altKey ? 'alt' : null,
     e.ctrlKey ? 'ctrl' : null,
@@ -259,13 +262,10 @@ export const keystroke = (e, sequence) => {
     e.key ? e.key.toLowerCase() : null,
   ].filter(i => i);
 
-  const arrayEquiv = (arr1, arr2) => (
-    arr1.length === arr2.length &&
-    arr1.map(el => arr2.includes(el)).every(i => i) &&
-    arr2.map(el => arr1.includes(el)).every(i => i)
-  );
-
-  return arrayEquiv(chord, actualChord);
+  // chord and actualChord must match exactly
+  chord.sort();
+  actualChord.sort();
+  return _.isEqual(chord, actualChord);
 };
 
 export const contentTop = () => {

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 const INDENT_SEQUENCE = '    ';
 
 function countLeftSpaces(text) {
@@ -68,8 +66,7 @@ export default class IndentHelper {
       // indent right.
       const line = selectedLines[0];
       this.element.setRangeText(this.seq, line.start, line.start, 'end');
-    }
-    else {
+    } else {
       selectedLines.reverse();
       selectedLines.forEach(line => {
         this.element.setRangeText('    ', line.start, line.start, 'preserve');
@@ -86,7 +83,7 @@ export default class IndentHelper {
     lines
       .filter(line => line.text.startsWith(this.seq))
       .forEach(line => {
-        this.element.setRangeText('', line.start, line.start + this.seq.length, 'preserve')
+        this.element.setRangeText('', line.start, line.start + this.seq.length, 'preserve');
       });
   }
 
@@ -104,7 +101,7 @@ export default class IndentHelper {
     // Auto-indent the next line
     const currentLine = this.splitLines().find(line => line.end >= start);
     const spaces = countLeftSpaces(currentLine.text);
-    this.element.setRangeText(`\n${ ' '.repeat(spaces) }`, start, start, 'end');
+    this.element.setRangeText(`\n${' '.repeat(spaces)}`, start, start, 'end');
   }
 
   /**

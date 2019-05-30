@@ -1,6 +1,6 @@
 <script>
 import { GlLink } from '@gitlab/ui';
-import { getPlatformLeaderKeyHTML } from "~/lib/utils/common_utils";
+import { getPlatformLeaderKeyHTML } from '~/lib/utils/common_utils';
 
 export default {
   components: {
@@ -33,7 +33,7 @@ export default {
     },
     leaderKeyHTML() {
       return getPlatformLeaderKeyHTML();
-    }
+    },
   },
 };
 </script>
