@@ -22,8 +22,6 @@ describe DesignManagement::Version do
       expect { versions.each { |v| design.versions << v } }
         .not_to raise_error
     end
-
-    it { is_expected.to have_many(:notes).dependent(:delete_all) }
   end
 
   describe 'validations' do

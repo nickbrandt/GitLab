@@ -8,6 +8,7 @@ describe DesignManagement::Design do
     it { is_expected.to belong_to(:issue) }
     it { is_expected.to have_many(:design_versions) }
     it { is_expected.to have_many(:versions) }
+    it { is_expected.to have_many(:notes).dependent(:delete_all) }
   end
 
   describe 'validations' do
@@ -59,6 +60,30 @@ describe DesignManagement::Design do
       expected_path = "#{DesignManagement.designs_directory}/issue-#{design.issue.iid}/hello.jpg"
 
       expect(design.full_path).to eq(expected_path)
+    end
+  end
+
+  describe '#diff_refs' do
+    it "builds diff refs based on the first commit and it's for the design" do
+      design = create(:design, :with_file, versions_count: 3)
+
+      expect(design.diff_refs.base_sha).to eq(design.versions.ordered.second.sha)
+      expect(design.diff_refs.head_sha).to eq(design.versions.ordered.first.sha)
+    end
+
+    it 'builds diff refs based on the empty tree if there was only one version' do
+      design = create(:design, :with_file, versions_count: 1)
+
+      expect(design.diff_refs.base_sha).to eq(Gitlab::Git::BLANK_SHA)
+      expect(design.diff_refs.head_sha).to eq(design.diff_refs.head_sha)
+    end
+  end
+
+  describe '#repository' do
+    it 'is a design repository' do
+      design = build(:design)
+
+      expect(design.repository).to be_a(DesignManagement::Repository)
     end
   end
 end
