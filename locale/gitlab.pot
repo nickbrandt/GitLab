@@ -3694,6 +3694,9 @@ msgstr ""
 msgid "Ends at (UTC)"
 msgstr ""
 
+msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
 msgid "Enforce SSO-only authentication for this group"
 msgstr ""
 
@@ -3701,9 +3704,6 @@ msgid "Enforce users to have dedicated group managed accounts for this group"
 msgstr ""
 
 msgid "Enforced SSO"
-msgstr ""
-
-msgid "Enforce DNS rebinding attack protection"
 msgstr ""
 
 msgid "Enter in your Bitbucket Server URL and personal access token below"
@@ -8442,6 +8442,9 @@ msgstr ""
 msgid "Resolved"
 msgstr ""
 
+msgid "Resolves IP addresses once and uses them to submit requests"
+msgstr ""
+
 msgid "Response"
 msgstr ""
 
@@ -9320,9 +9323,6 @@ msgid "SortOptions|Least popular"
 msgstr ""
 
 msgid "SortOptions|Less weight"
-msgstr ""
-
-msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "SortOptions|Milestone due date"
