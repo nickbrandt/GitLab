@@ -346,6 +346,7 @@ export default {
               :markdown-docs-path="markdownDocsPath"
               :quick-actions-docs-path="quickActionsDocsPath"
               :add-spacing-classes="false"
+              :can-indent="true"
             >
               <textarea
                 id="note-body"
