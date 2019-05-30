@@ -1,4 +1,5 @@
 import addExtraTokensForMergeRequests from '~/filtered_search/add_extra_tokens_for_merge_requests';
+import { __ } from '~/locale';
 
 export default IssuableTokenKeys => {
   addExtraTokensForMergeRequests(IssuableTokenKeys);
@@ -7,12 +8,12 @@ export default IssuableTokenKeys => {
     {
       url: 'approver_usernames[]=None',
       tokenKey: 'approver',
-      value: 'None',
+      value: __('None'),
     },
     {
       url: 'approver_usernames[]=Any',
       tokenKey: 'approver',
-      value: 'Any',
+      value: __('Any'),
     },
   ];
 
