@@ -3998,40 +3998,34 @@ msgstr ""
 msgid "Dependencies"
 msgstr ""
 
-msgid "Dependencies|Bundler (Ruby)"
-msgstr ""
-
 msgid "Dependencies|Component"
 msgstr ""
 
 msgid "Dependencies|Component name"
 msgstr ""
 
-msgid "Dependencies|Composer (PHP)"
-msgstr ""
-
-msgid "Dependencies|Error fetching the Bill of Materials. Please check your network connection and try again."
-msgstr ""
-
 msgid "Dependencies|Export as JSON"
+msgstr ""
+
+msgid "Dependencies|Job failed to generate the dependency list"
 msgstr ""
 
 msgid "Dependencies|Location"
 msgstr ""
 
-msgid "Dependencies|Maven (Java)"
-msgstr ""
-
 msgid "Dependencies|Packager"
 msgstr ""
 
-msgid "Dependencies|Pip (Python)"
+msgid "Dependencies|The %{jobName} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
+msgstr ""
+
+msgid "Dependencies|Unsupported file(s) detected"
 msgstr ""
 
 msgid "Dependencies|Version"
 msgstr ""
 
-msgid "Dependencies|npm (JavaScript)"
+msgid "Dependencies|View dependency details for your project"
 msgstr ""
 
 msgid "Dependency Proxy"
@@ -4901,6 +4895,9 @@ msgid "Error fetching projects"
 msgstr ""
 
 msgid "Error fetching refs"
+msgstr ""
+
+msgid "Error fetching the dependency list. Please check your network connection and try again."
 msgstr ""
 
 msgid "Error fetching usage ping data."
@@ -8818,6 +8815,9 @@ msgid "One or more of your Bitbucket projects cannot be imported into GitLab dir
 msgstr ""
 
 msgid "One or more of your Google Code projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
+msgstr ""
+
+msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
 msgstr ""
 
 msgid "Only admins"
@@ -14161,9 +14161,6 @@ msgstr ""
 msgid "View app"
 msgstr ""
 
-msgid "View dependency information for your project"
-msgstr ""
-
 msgid "View deployment"
 msgstr ""
 
@@ -14192,6 +14189,9 @@ msgid "View in Sentry"
 msgstr ""
 
 msgid "View it on GitLab"
+msgstr ""
+
+msgid "View job"
 msgstr ""
 
 msgid "View job trace"

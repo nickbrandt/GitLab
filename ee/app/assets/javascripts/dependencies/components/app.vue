@@ -65,7 +65,7 @@ export default {
 
   <gl-empty-state
     v-else-if="jobNotSetUp"
-    :title="__('View dependency details for your project')"
+    :title="__('Dependencies|View dependency details for your project')"
     :description="
       __('The dependency list details information about the components used within your project.')
     "

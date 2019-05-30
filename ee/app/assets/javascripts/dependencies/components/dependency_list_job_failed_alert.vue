@@ -1,6 +1,6 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import { sprintf, __ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import DependencyListAlert from './dependency_list_alert.vue';
 
 export default {
@@ -18,8 +18,8 @@ export default {
   data() {
     return {
       message: sprintf(
-        __(
-          'The %{jobName} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again.',
+        s__(
+          'Dependencies|The %{jobName} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again.',
         ),
         { jobName: '<code>dependency_list</code>' },
         false,

@@ -10,7 +10,10 @@ export default {
 </script>
 
 <template>
-  <dependency-list-alert type="warning" :header-text="__('Unsupported file(s) detected')">
+  <dependency-list-alert
+    type="warning"
+    :header-text="s__('Dependencies|Unsupported file(s) detected')"
+  >
     <p>
       {{
         __(

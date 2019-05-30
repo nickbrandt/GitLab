@@ -140,7 +140,7 @@ exports[`DependenciesApp component on creation given the dependency list job has
   primarybuttonlink="http://test.host"
   primarybuttontext="Learn more about the dependency list"
   svgpath="/bar.svg"
-  title="View dependency details for your project"
+  title="Dependencies|View dependency details for your project"
 />
 `;
 
