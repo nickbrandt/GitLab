@@ -22,7 +22,11 @@ module Projects
     end
 
     def found_dependencies
-      ::Security::DependenciesFinder.new(project: @project, params: query_params).execute
+      finder.execute
+    end
+
+    def finder
+      ::Security::DependenciesFinder.new(project: @project, params: query_params)
     end
 
     def query_params
@@ -37,17 +41,30 @@ module Projects
     # after we'll have more then just mock data
     # reference: https://gitlab.com/gitlab-org/gitlab-ee/issues/10075#note_164915787
     def paginated_dependencies
-      Kaminari.paginate_array(found_dependencies).page(params[:page])
+      list = found_dependencies
+      if params[:page]
+        list = Kaminari.paginate_array(found_dependencies).page(params[:page])
+      end
+      list
     end
 
     def report
       {
         dependencies: paginated_dependencies,
         report: {
-          status: "some_status",
-          job_path: "some_ci_job_path"
+          status: finder.status,
+          job_path: Gitlab::Routing.url_helpers.project_build_path(@project, build.id, format: :json)
         }
       }
+    end
+
+    def build
+      pipeline = @project.all_pipelines.latest_successful_for(project.default_branch)
+      pipeline.builds
+                .where(name: SCANNING_JOB_NAME)
+                .latest
+                .with_reports(::Ci::JobArtifact.dependencies_list_reports)
+                .last
     end
   end
 end

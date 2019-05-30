@@ -6,11 +6,12 @@ module Gitlab
       module Security
         module Formatters
           class DependenciesList
-            attr_reader :path, :package_manager
+            attr_reader :path, :package_manager, :commit_path
 
-            def initialize(path, package_manager)
-              @path = path
+            def initialize(file_path, package_manager, commit_path)
+              @path = file_path
               @package_manager = package_manager
+              @commit_path = commit_path
             end
 
             def format(dependency)
@@ -19,7 +20,7 @@ module Gitlab
                 packager: packager,
                 location: {
                   blob_path: blob_path,
-                  path: path,
+                  path: file_path
                 },
                 version:  dependency['version']
               }
@@ -28,7 +29,7 @@ module Gitlab
             private
 
             def blob_path
-              "/group-name/project-name/blob/deb6f84e91fe4d21daa6b5558c517254ea2668a3/" + path
+              commit_path + file_path
             end
 
             def packager

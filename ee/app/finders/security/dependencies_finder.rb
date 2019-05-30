@@ -3,10 +3,12 @@
 module Security
   class DependenciesFinder
     attr_accessor :params
+    attr_accessor :status
     attr_reader :project
 
-    SORT_BY_VALUES = %w(name type).freeze
+    SORT_BY_VALUES = %w(name packager).freeze
     SORT_VALUES = %w(asc desc).freeze
+    SCANNING_JOB_NAME = 'dependency_scanning'.freeze
 
     # @param project [Project]
     # @param [Hash] params to sort dependencies
@@ -15,6 +17,7 @@ module Security
     def initialize(project:, params: {})
       @project = project
       @params = params
+      @status = :ok
     end
 
     # @return [Array<Hash>] collection of found dependencies
@@ -27,30 +30,19 @@ module Security
     private
 
     def init_collection
-      array = []
-      100.times { array << mock }
-      array
-    end
-
-    def fake_name
-      (0..16).map { ('a'..'z').to_a[rand 26] }.join
-    end
-
-    def mock
-      {
-        name: fake_name,
-        packager: ['Ruby(Bundler)', 'JavaScript (yarn)', 'JavaScript (npm)'].sample,
-        location: {
-          blob_path: 'gitlab-org/gitlab-ee/blob/master/Gemfile.lock',
-          path: "Gemfile.lock"
-        },
-        version: '5.4.1'
-      }
+      pipeline = project.all_pipelines.latest_successful_for(project.default_branch)
+      build = pipeline.builds
+                .where(name: SCANNING_JOB_NAME)
+                .latest
+                .with_reports(::Ci::JobArtifact.dependencies_list_reports)
+                .last
+      dependencies = build.collect_dependencies_list_report
+      dependencies
     end
 
     def sort(collection)
-      if @params[:sort_by] == 'type'
-        collection.sort_by! { |a| a[:type] }
+      if @params[:sort_by] == 'packager'
+        collection.sort_by! { |a| a[:packager] }
       else
         collection.sort_by! { |a| a[:name] }
       end
