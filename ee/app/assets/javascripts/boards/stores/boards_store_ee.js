@@ -134,7 +134,7 @@ class BoardsStoreEE {
     this.store.addList({
       id: 'promotion',
       list_type: 'promotion',
-      title: 'Improve Issue boards',
+      title: __('Improve Issue boards'),
       position: 0,
     });
 
