@@ -1716,6 +1716,12 @@ msgstr ""
 msgid "AutoDevOps|The Auto DevOps pipeline has been enabled and will be used if no alternative CI configuration file is found. %{more_information_link}"
 msgstr ""
 
+msgid "Automatic certificate management using %{lets_encrypt_link_start}Let's Encrypt%{lets_encrypt_link_end}"
+msgstr ""
+
+msgid "Automatic certificate management using Let's Encrypt"
+msgstr ""
+
 msgid "Automatically marked as default internal user"
 msgstr ""
 
@@ -7602,6 +7608,9 @@ msgstr ""
 msgid "Learn more about Web Terminal"
 msgstr ""
 
+msgid "Learn more about adding certificates to your project by following the %{docs_link_start}documentation on GitLab Pages%{docs_link_end}."
+msgstr ""
+
 msgid "Learn more about approvals."
 msgstr ""
 
@@ -7636,6 +7645,9 @@ msgid "Leave the \"File type\" and \"Delivery method\" options on their default 
 msgstr ""
 
 msgid "Let's Encrypt does not accept emails on example.com"
+msgstr ""
+
+msgid "Let's Encrypt is a free, automated, and open certificate authority (CA) that gives digital certificates in order to enable HTTPS (SSL/TLS) for websites. Learn more about Let's Encrypt configuration by following the %{docs_link_start}documentation on GitLab Pages%{docs_link_end}."
 msgstr ""
 
 msgid "License"
@@ -12837,6 +12849,9 @@ msgstr ""
 msgid "The branch for this project has no active pipeline configuration."
 msgstr ""
 
+msgid "The certificate will be shown here once it has been obtained from Let's Encrypt. This process may take up to an hour to complete."
+msgstr ""
+
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
@@ -13219,6 +13234,9 @@ msgid "This board's scope is reduced"
 msgstr ""
 
 msgid "This branch has changed since you started editing. Would you like to create a new branch?"
+msgstr ""
+
+msgid "This certificate is automatically managed by Let's Encrypt"
 msgstr ""
 
 msgid "This chart could not be displayed"
