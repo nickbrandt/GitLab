@@ -8,7 +8,7 @@ module Gitlab
           class DependenciesList
             attr_reader :path, :package_manager, :commit_path
 
-            def initialize(file_path, package_manager, commit_path)
+            def initialize(package_manager, file_path, commit_path)
               @path = file_path
               @package_manager = package_manager
               @commit_path = commit_path
@@ -40,10 +40,12 @@ module Gitlab
                 'JavaScript (Yarn)'
               when 'npm'
                 'JavaScript (npm)'
-              when 'pypi'
-                'Python (PyPI)'
+              when 'pip'
+                'Python (pip)'
               when 'maven'
                 'Java (Maven)'
+              when 'composer'
+                'PHP (Composer)'
               else
                 'Unknown'
               end
