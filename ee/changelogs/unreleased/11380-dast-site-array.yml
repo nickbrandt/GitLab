@@ -1,0 +1,5 @@
+---
+title: Handle case where site property is an array in DAST report
+merge_request: 13775
+author:
+type: fixed
