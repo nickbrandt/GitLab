@@ -1,6 +1,15 @@
 - can_override_approvers = project.can_override_approvers?
 
-= render 'shared/merge_request_approvals_settings/multiple_rules_form', form: form, project: project
+.form-group
+  = form.label :approver_ids, class: 'label-bold' do
+    = _("Add approvers")
+  #js-mr-approvals-settings{ data: { 'project_id': @project.id,
+    'project_path': expose_path(api_v4_projects_path(id: @project.id)),
+    'settings_path': expose_path(api_v4_projects_approval_settings_path(id: @project.id)),
+    'rules_path': expose_path(api_v4_projects_approval_settings_rules_path(id: @project.id)),
+    'allow_multi_rule': @project.multiple_approval_rules_available?.to_s } }
+    .text-center.prepend-top-default
+      = sprite_icon('spinner', size: 24, css_class: 'gl-spinner')
 
 - if project.code_owner_approval_required_available?
   .form-group.require-code-owner-approval
