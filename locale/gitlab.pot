@@ -1037,9 +1037,6 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occurding while fetching folder content."
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
@@ -1095,6 +1092,9 @@ msgid "An error occurred while dismissing the feature highlight. Refresh the pag
 msgstr ""
 
 msgid "An error occurred while enabling Service Desk."
+msgstr ""
+
+msgid "An error occurred while fetching folder content."
 msgstr ""
 
 msgid "An error occurred while fetching label colors."
