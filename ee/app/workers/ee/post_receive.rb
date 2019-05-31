@@ -31,7 +31,7 @@ module EE
     def update_wiki_es_indexes(post_received)
       return unless post_received.project.use_elasticsearch?
 
-      post_received.project.wiki.index_blobs
+      post_received.project.wiki.index_wiki_blobs
     end
   end
 end

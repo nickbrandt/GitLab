@@ -55,8 +55,8 @@ namespace :gitlab do
           puts "Indexing wiki of #{project.full_name}..."
 
           begin
-            project.wiki.index_blobs
-            puts "Done!".color(:green)
+            project.wiki.index_wiki_blobs
+            puts "Enqueued!".color(:green)
           rescue StandardError => e
             puts "#{e.message}, trace - #{e.backtrace}"
           end

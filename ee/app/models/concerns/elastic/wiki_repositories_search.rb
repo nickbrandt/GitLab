@@ -23,10 +23,18 @@ module Elastic
         self.__elasticsearch__.client
       end
 
+      def index_wiki_blobs
+        if ::Gitlab::CurrentSettings.elasticsearch_experimental_indexer?
+          ElasticCommitIndexerWorker.perform_async(project.id, nil, nil, true)
+        else
+          project.wiki.index_blobs
+        end
+      end
+
       def self.import
         Project.with_wiki_enabled.find_each do |project|
           if project.use_elasticsearch? && !project.wiki.empty?
-            project.wiki.index_blobs
+            project.wiki.index_wiki_blobs
           end
         end
       end

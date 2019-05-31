@@ -555,7 +555,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     before do
       if project_1.wiki_enabled?
         project_1.wiki.create_page('index_page', 'term')
-        project_1.wiki.index_blobs
+        project_1.wiki.index_wiki_blobs
       end
 
       Gitlab::Elastic::Helper.refresh_index
@@ -579,7 +579,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     it 'finds wiki blobs from public projects only' do
       project_2 = create :project, :repository, :private, :wiki_repo
       project_2.wiki.create_page('index_page', 'term')
-      project_2.wiki.index_blobs
+      project_2.wiki.index_wiki_blobs
       Gitlab::Elastic::Helper.refresh_index
 
       expect(results.wiki_blobs_count).to eq 1
@@ -870,7 +870,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       before do
         [public_project, internal_project, private_project1, private_project2].each do |project|
           project.wiki.create_page('index_page', 'term')
-          project.wiki.index_blobs
+          project.wiki.index_wiki_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index
