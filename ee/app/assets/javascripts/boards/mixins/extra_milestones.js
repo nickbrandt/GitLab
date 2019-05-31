@@ -1,14 +1,16 @@
+import { __ } from '~/locale';
+
 export default [
   {
     id: null,
-    title: 'Any Milestone',
+    title: __('Any Milestone'),
   },
   {
     id: -2,
-    title: 'Upcoming',
+    title: __('Upcoming'),
   },
   {
     id: -3,
-    title: 'Started',
+    title: __('Started'),
   },
 ];

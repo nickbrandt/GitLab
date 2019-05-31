@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import Cookies from 'js-cookie';
 import BurndownChart from './burndown_chart';
+import { s__ } from '~/locale';
 
 export default () => {
   // handle hint dismissal
@@ -24,7 +25,7 @@ export default () => {
     const chart = new BurndownChart({ container, startDate, dueDate });
 
     let currentView = 'count';
-    chart.setData(openIssuesCount, { label: 'Open issues', animate: true });
+    chart.setData(openIssuesCount, { label: s__('BurndownChartLabel|Open issues'), animate: true });
 
     $('.js-burndown-data-selector').on('click', 'button', function switchData() {
       const $this = $(this);
@@ -37,10 +38,16 @@ export default () => {
           .addClass('btn-inverted');
         switch (show) {
           case 'count':
-            chart.setData(openIssuesCount, { label: 'Open issues', animate: true });
+            chart.setData(openIssuesCount, {
+              label: s__('BurndownChartLabel|Open issues'),
+              animate: true,
+            });
             break;
           case 'weight':
-            chart.setData(openIssuesWeight, { label: 'Open issue weight', animate: true });
+            chart.setData(openIssuesWeight, {
+              label: s__('BurndownChartLabel|Open issue weight'),
+              animate: true,
+            });
             break;
           default:
             break;
