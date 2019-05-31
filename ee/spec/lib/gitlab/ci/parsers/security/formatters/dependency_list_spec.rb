@@ -2,13 +2,13 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::Security::Formatters::DependenciesList do
+describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
   let(:formatter) { described_class.new(commit_path) }
   let(:commit_path) { 'https://gitlab.com/org/project/blob/42424242424242424242' }
   let(:parsed_report) do
     JSON.parse!(
       File.read(
-        Rails.root.join('spec/fixtures/security-reports/dependencies_list/gl-dependency-scanning-report.json')
+        Rails.root.join('spec/fixtures/security-reports/dependency_list/gl-dependency-scanning-report.json')
       )
     )
   end

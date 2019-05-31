@@ -5,7 +5,7 @@ module Gitlab
     module Parsers
       module Security
         module Formatters
-          class DependenciesList
+          class DependencyList
             attr_reader :commit_path
 
             def initialize(commit_path)

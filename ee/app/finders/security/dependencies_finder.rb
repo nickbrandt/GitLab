@@ -34,9 +34,9 @@ module Security
       build = pipeline.builds
                 .where(name: SCANNING_JOB_NAME)
                 .latest
-                .with_reports(::Ci::JobArtifact.dependencies_list_reports)
+                .with_reports(::Ci::JobArtifact.dependency_list_reports)
                 .last
-      dependencies = build.collect_dependencies_list_report
+      dependencies = build.collect_dependency_list_report
       dependencies
     end
 

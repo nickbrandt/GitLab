@@ -63,7 +63,7 @@ module Projects
       pipeline.builds
                 .where(name: SCANNING_JOB_NAME)
                 .latest
-                .with_reports(::Ci::JobArtifact.dependencies_list_reports)
+                .with_reports(::Ci::JobArtifact.dependency_list_reports)
                 .last
     end
   end
