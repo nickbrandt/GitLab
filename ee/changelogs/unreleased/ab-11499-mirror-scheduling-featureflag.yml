@@ -1,0 +1,5 @@
+---
+title: Improve scheduling of mirror updates to reduce frequency of database queries
+merge_request: 11217
+author:
+type: performance
