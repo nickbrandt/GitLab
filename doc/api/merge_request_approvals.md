@@ -23,36 +23,6 @@ GET /projects/:id/approvals
 
 ```json
 {
-  "approvers": [
-    {
-      "user": {
-        "id": 5,
-        "name": "John Doe6",
-        "username": "user5",
-        "state":"active","avatar_url":"https://www.gravatar.com/avatar/4aea8cf834ed91844a2da4ff7ae6b491?s=80\u0026d=identicon","web_url":"http://localhost/user5"
-      }
-    }
-  ],
-  "approver_groups": [
-    {
-      "group": {
-        "id": 1,
-        "name": "group1",
-        "path": "group1",
-        "description": "",
-        "visibility": "public",
-        "lfs_enabled": false,
-        "avatar_url": null,
-        "web_url": "http://localhost/groups/group1",
-        "request_access_enabled": false,
-        "full_name": "group1",
-        "full_path": "group1",
-        "parent_id": null,
-        "ldap_cn": null,
-        "ldap_access": null
-      }
-    }
-  ],
   "approvals_before_merge": 2,
   "reset_approvals_on_push": true,
   "disable_overriding_approvers_per_merge_request": false
@@ -82,36 +52,6 @@ POST /projects/:id/approvals
 
 ```json
 {
-  "approvers": [
-    {
-      "user": {
-        "id": 5,
-        "name": "John Doe6",
-        "username": "user5",
-        "state":"active","avatar_url":"https://www.gravatar.com/avatar/4aea8cf834ed91844a2da4ff7ae6b491?s=80\u0026d=identicon","web_url":"http://localhost/user5"
-      }
-    }
-  ],
-  "approver_groups": [
-    {
-      "group": {
-        "id": 1,
-        "name": "group1",
-        "path": "group1",
-        "description": "",
-        "visibility": "public",
-        "lfs_enabled": false,
-        "avatar_url": null,
-        "web_url": "http://localhost/groups/group1",
-        "request_access_enabled": false,
-        "full_name": "group1",
-        "full_path": "group1",
-        "parent_id": null,
-        "ldap_cn": null,
-        "ldap_access": null
-      }
-    }
-  ],
   "approvals_before_merge": 2,
   "reset_approvals_on_push": true,
   "disable_overriding_approvers_per_merge_request": false,
@@ -227,8 +167,6 @@ GET /projects/:id/merge_requests/:merge_request_iid/approvals
       }
     }
   ],
-  "approvers": [],
-  "approver_groups": []
 }
 ```
 
@@ -264,9 +202,7 @@ POST /projects/:id/merge_requests/:merge_request_iid/approvals
   "merge_status": "cannot_be_merged",
   "approvals_required": 2,
   "approvals_left": 2,
-  "approved_by": [],
-  "approvers": [],
-  "approver_groups": []
+  "approved_by": []
 }
 ```
 
@@ -403,8 +339,6 @@ does not match, the response code will be `409`.
       }
     }
   ],
-  "approvers": [],
-  "approver_groups": []
 }
 ```
 
