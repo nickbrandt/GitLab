@@ -11306,9 +11306,6 @@ msgstr ""
 msgid "Search for projects, issues, etc."
 msgstr ""
 
-msgid "Search for users or groups"
-msgstr ""
-
 msgid "Search forks"
 msgstr ""
 
