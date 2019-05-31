@@ -5,16 +5,22 @@ module Gitlab
     module Parsers
       module Security
         class DependencyList
-          def parse(json_data, commit_path)
+          def parse(json_data, report, commit_path)
             report_data = JSON.parse!(json_data)
 
-            data = []
+            formatter = Formatters::DependencyList.new(commit_path)
             report_data['dependency_files'].each do |file|
-              formatter = Formatters::DependencyList.new(file['path'], file['package_manager'], commit_path)
               file['dependencies'].each do |dependency|
-                data << formatter.format(dependency)
+                report.add_dependency(formatter.format(dependency, file['package_manager'], trim_path(file['path'])))
               end
             end
+
+          end
+
+          private
+
+          def trim_path(path)
+            path.sub(/(.*)\//,'')
           end
         end
       end

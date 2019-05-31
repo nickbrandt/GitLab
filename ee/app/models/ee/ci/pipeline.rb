@@ -171,6 +171,14 @@ module EE
         end
       end
 
+      def dependency_list_report
+        ::Gitlab::Ci::Reports::DependencyList::Report.new.tap do |dependency_list_report|
+          builds.latest.with_reports(::Ci::JobArtifact.dependency_list_reports).each do |build|
+            build.collect_dependency_list_reports(dependency_list_report)
+          end
+        end
+      end
+
       def metrics_report
         ::Gitlab::Ci::Reports::Metrics::Report.new.tap do |metrics_report|
           builds.latest.with_reports(::Ci::JobArtifact.metrics_reports).each do |build|

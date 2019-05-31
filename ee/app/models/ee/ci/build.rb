@@ -80,7 +80,7 @@ module EE
         license_management_report
       end
 
-      def collect_dependency_list_report
+      def collect_dependency_list_reports(dependency_list_report)
         each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
           next if ::Feature.disabled?(:bill_of_materials, default_enabled: false)
 
