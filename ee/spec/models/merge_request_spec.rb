@@ -490,7 +490,7 @@ describe MergeRequest do
     end
 
     context 'when code owner rule exists' do
-      let!(:code_owner_rule) { subject.approval_rules.code_owner.create!(name: 'Code Owner', users: [create(:user)]) }
+      let!(:code_owner_rule) { create(:code_owner_rule, merge_request: subject, name: 'Code Owner', users: [create(:user)]) }
 
       it 'reuses and updates existing rule' do
         expect do

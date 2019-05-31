@@ -177,7 +177,10 @@ module EE
       if owners.present?
         ApplicationRecord.transaction do
           rule = approval_rules.code_owner.first
-          rule ||= approval_rules.code_owner.create!(name: ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER)
+          rule ||= ApprovalMergeRequestRule.find_or_create_code_owner_rule(
+            self,
+            ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER
+          )
 
           rule.users = owners.uniq
         end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190527194900) do
+ActiveRecord::Schema.define(version: 20190528173628) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -244,8 +244,11 @@ ActiveRecord::Schema.define(version: 20190527194900) do
     t.integer "approvals_required", limit: 2, default: 0, null: false
     t.boolean "code_owner", default: false, null: false
     t.string "name", null: false
+    t.integer "rule_type", limit: 2, default: 1, null: false
     t.index ["merge_request_id", "code_owner", "name"], name: "approval_rule_name_index_for_code_owners", unique: true, where: "(code_owner = true)", using: :btree
     t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1", using: :btree
+    t.index ["merge_request_id", "rule_type", "name"], name: "index_approval_rule_name_for_code_owners_rule_type", unique: true, where: "(rule_type = 2)", using: :btree
+    t.index ["merge_request_id", "rule_type"], name: "index_approval_rules_code_owners_rule_type", where: "(rule_type = 2)", using: :btree
   end
 
   create_table "approval_merge_request_rules_approved_approvers", force: :cascade do |t|

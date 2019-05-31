@@ -38,6 +38,22 @@ describe ApprovalMergeRequestRule do
         expect(new).to be_valid
         expect { new.save! }.not_to raise_error
       end
+
+      it 'validates code_owner when rule_type code_owner' do
+        new = build(:code_owner_rule)
+        expect(new).to be_valid
+
+        new.code_owner = false
+        expect(new).not_to be_valid
+      end
+
+      it 'validates code_owner when rule_type regular' do
+        new = build(:approval_merge_request_rule)
+        expect(new).to be_valid
+
+        new.code_owner = true
+        expect(new).not_to be_valid
+      end
     end
   end
 
@@ -58,6 +74,13 @@ describe ApprovalMergeRequestRule do
       it 'returns the correct rules' do
         expect(described_class.matching_pattern(['*.rb', '*.js']))
           .to contain_exactly(rb_rule, js_rule)
+      end
+    end
+
+    describe '.code_owners' do
+      it 'returns the correct rules' do
+        expect(described_class.code_owner)
+          .to contain_exactly(rb_rule, js_rule, css_rule)
       end
     end
   end
@@ -100,7 +123,7 @@ describe ApprovalMergeRequestRule do
     end
 
     it 'returns false for code owner records' do
-      subject = create(:approval_merge_request_rule, merge_request: merge_request, code_owner: true)
+      subject = create(:code_owner_rule, merge_request: merge_request)
 
       expect(subject.regular).to eq(false)
       expect(subject.regular?).to eq(false)
