@@ -6,20 +6,18 @@ module Gitlab
       module Security
         module Formatters
           class DependenciesList
-            attr_reader :path, :package_manager, :commit_path
+            attr_reader :commit_path
 
-            def initialize(package_manager, file_path, commit_path)
-              @path = file_path
-              @package_manager = package_manager
+            def initialize(commit_path)
               @commit_path = commit_path
             end
 
-            def format(dependency)
+            def format(dependency, package_manager, file_path)
               {
                 name:     dependency['package']['name'],
-                packager: packager,
+                packager: packager(package_manager),
                 location: {
-                  blob_path: blob_path,
+                  blob_path: blob_path(file_path),
                   path: file_path
                 },
                 version:  dependency['version']
@@ -28,11 +26,11 @@ module Gitlab
 
             private
 
-            def blob_path
-              commit_path + file_path
+            def blob_path(file_path)
+              "#{commit_path}/#{file_path}"
             end
 
-            def packager
+            def packager(package_manager)
               case package_manager
               when 'bundler'
                 'Ruby (Bundler)'
