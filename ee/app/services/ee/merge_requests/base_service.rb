@@ -29,12 +29,13 @@ module EE
 
         result = ::MergeRequests::MergeabilityCheckService.new(merge_request).execute
 
-        if result.success? && commit = merge_request.merge_ref_head
-          target_id, source_id = commit.parent_ids
+        if result.success?
+          merge_ref_head_payload = result.payload.fetch(:merge_ref_head, {})
+          commit_id, target_id, source_id = merge_ref_head_payload.values_at(:commit_id, :target_id, :source_id)
 
           ::Ci::CreatePipelineService.new(merge_request.source_project, user,
                                           ref: merge_request.merge_ref_path,
-                                          checkout_sha: commit.id,
+                                          checkout_sha: commit_id,
                                           target_sha: target_id,
                                           source_sha: source_id)
             .execute(:merge_request_event, merge_request: merge_request)
