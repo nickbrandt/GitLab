@@ -7,6 +7,8 @@ module QA
     class Project < Base
       include Events::Project
 
+      attr_accessor :initialize_with_readme
+
       attribute :id
       attribute :name
       attribute :description
@@ -16,7 +18,11 @@ module QA
       end
 
       attribute :path_with_namespace do
-        "#{group.sandbox.path}/#{group.path}/#{name}" if group
+        "#{sandbox_path}#{group.path}/#{name}" if group
+      end
+
+      def sandbox_path
+        group.respond_to?('sandbox') ? "#{group.sandbox.path}/" : ''
       end
 
       attribute :repository_ssh_location do
@@ -74,7 +80,11 @@ module QA
           name: name,
           description: description,
           visibility: 'public'
-        }
+        }.merge(post_body_options)
+      end
+
+      def post_body_options
+        initialize_with_readme ? { initialize_with_readme: initialize_with_readme } : {}
       end
 
       private
