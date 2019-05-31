@@ -35,7 +35,7 @@ describe VisibleApprovableForRule do
     let(:code_owner) { build(:user) }
 
     let!(:project_regular_rule) { create(:approval_project_rule, project: project, users: [approver]) }
-    let!(:code_owner_rule) { create(:approval_merge_request_rule, merge_request: resource, users: [code_owner], code_owner: true) }
+    let!(:code_owner_rule) { create(:code_owner_rule, merge_request: resource, users: [code_owner]) }
 
     before do
       project.add_developer(approver)
