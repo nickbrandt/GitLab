@@ -26,4 +26,57 @@ describe WebIdeTerminal do
   it 'returns the proxy_websocket_path of the build' do
     expect(subject.proxy_websocket_path).to end_with("/jobs/#{build.id}/proxy.ws")
   end
+
+  describe 'services' do
+    let(:services_with_aliases) do
+      {
+        services: [{ name: 'postgres', alias: 'postgres' },
+                   { name: 'docker:stable-dind', alias: 'docker' }]
+      }
+    end
+
+    before do
+      allow(build).to receive(:options).and_return(config)
+    end
+
+    context 'when image does not have an alias' do
+      let(:config) do
+        { image: 'ruby:2.1' }.merge(services_with_aliases)
+      end
+
+      it 'returns services aliases' do
+        expect(subject.services).to eq %w(postgres docker)
+      end
+    end
+
+    context 'when both image and services have aliases' do
+      let(:config) do
+        { image: { name: 'ruby:2.1', alias: 'ruby' } }.merge(services_with_aliases)
+      end
+
+      it 'returns all aliases' do
+        expect(subject.services).to eq %w(postgres docker ruby)
+      end
+    end
+
+    context 'when image and services does not have any alias' do
+      let(:config) do
+        { image: 'ruby:2.1', services: ['postgres'] }
+      end
+
+      it 'returns an empty array' do
+        expect(subject.services).to be_empty
+      end
+    end
+
+    context 'when no image nor services' do
+      let(:config) do
+        { script: %w(echo) }
+      end
+
+      it 'returns an empty array' do
+        expect(subject.services).to be_empty
+      end
+    end
+  end
 end
