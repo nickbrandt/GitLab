@@ -26,7 +26,7 @@ class AddIndexForCodeOwnerRuleTypeOnApprovalMergeRequestRules < ActiveRecord::Mi
     # Ensure only 1 code_owner rule per merge_request
     add_concurrent_index(
       :approval_merge_request_rules,
-      [:merge_request_id, :name],
+      [:merge_request_id, :rule_type, :name],
       unique: true,
       where: "rule_type = #{ApprovalMergeRequestRule.rule_types[:code_owner]}",
       name: INDEX_CODE_OWNERS_RULES_UNIQUENESS_NAME
@@ -35,7 +35,7 @@ class AddIndexForCodeOwnerRuleTypeOnApprovalMergeRequestRules < ActiveRecord::Mi
     # Support lookups for all code_owner rules per merge_request
     add_concurrent_index(
       :approval_merge_request_rules,
-      [:merge_request_id],
+      [:merge_request_id, :rule_type],
       where: "rule_type = #{ApprovalMergeRequestRule.rule_types[:code_owner]}",
       name: INDEX_CODE_OWNERS_RULES_QUERY_NAME
     )
