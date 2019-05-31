@@ -75,7 +75,7 @@ POST /projects/:id/approvals
 | Attribute                                        | Type    | Required | Description                                                   |
 | ------------------------------------------------ | ------- | -------- | ----------------------------------------------------------    |
 | `id`                                             | integer | yes      | The ID of a project                                           |
-| `approvals_before_merge`                         | integer | no       | How many approvals are required before an MR can be merged    |
+| `approvals_before_merge`                         | integer | no       | How many approvals are required before an MR can be merged. Deprecated in 12.0 in favor of Approval Rules API. |
 | `reset_approvals_on_push`                        | boolean | no       | Reset approvals on a new push                                 |
 | `disable_overriding_approvers_per_merge_request` | boolean | no       | Allow/Disallow overriding approvers per MR                    |
 | `merge_requests_author_approval`                 | boolean | no       | Allow/Disallow authors be able to self approve merge requests |
@@ -120,6 +120,8 @@ POST /projects/:id/approvals
 ```
 
 ### Change allowed approvers
+
+>**Note:** This API endpoint has been deprecated. Please use Approval Rule API instead.
 
 >**Note:** This API endpoint is only available on 10.6 Starter and above.
 
@@ -247,7 +249,7 @@ POST /projects/:id/merge_requests/:merge_request_iid/approvals
 |----------------------|---------|----------|--------------------------------------------|
 | `id`                 | integer | yes      | The ID of a project                        |
 | `merge_request_iid`  | integer | yes      | The IID of MR                              |
-| `approvals_required` | integer | yes      | Approvals required before MR can be merged |
+| `approvals_required` | integer | yes      | Approvals required before MR can be merged. Deprecated in 12.0 in favor of Approval Rules API. |
 
 ```json
 {
@@ -269,6 +271,8 @@ POST /projects/:id/merge_requests/:merge_request_iid/approvals
 ```
 
 ### Change allowed approvers for Merge Request
+
+>**Note:** This API endpoint has been deprecated. Please use Approval Rule API instead.
 
 >**Note:** This API endpoint is only available on 10.6 Starter and above.
 
