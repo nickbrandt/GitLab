@@ -17,8 +17,7 @@ describe BoardsResponses do
   end
 
   describe '#serialize_as_json' do
-    let!(:board) { create(:board) }
-
+    let!(:board) { create(:board, milestone: milestone) }
     context 'with milestone' do
       let(:milestone) { create(:milestone) }
 
@@ -34,6 +33,7 @@ describe BoardsResponses do
     end
 
     context 'without milestone' do
+      let(:milestone) { nil }
       it 'serialises properly' do
         expected = { id: board.id, name: board.name }
 
