@@ -290,7 +290,6 @@ tables:
     - created_at
     - updated_at
     - enabled
-    - domain
   project_custom_attributes:
     whitelist:
     - id
