@@ -14,6 +14,7 @@ describe WebIdeTerminalEntity do
   it { is_expected.to have_key(:cancel_path) }
   it { is_expected.to have_key(:retry_path) }
   it { is_expected.to have_key(:terminal_path) }
+  it { is_expected.to have_key(:services) }
 
   context 'when feature flag build_service_proxy is enabled' do
     before do
