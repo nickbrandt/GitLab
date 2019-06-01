@@ -90,6 +90,7 @@ class License < ApplicationRecord
   EEU_FEATURES = EEP_FEATURES + %i[
     security_dashboard
     dependency_scanning
+    dependency_list
     license_management
     sast
     sast_container

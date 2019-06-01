@@ -80,17 +80,15 @@ module EE
         license_management_report
       end
 
-      def collect_dependency_list_reports(dependency_list_report)
+      def collect_dependency_list_reports!(dependency_list_report)
         each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
-          next if ::Feature.disabled?(:bill_of_materials, default_enabled: false)
+          next unless project.feature_available?(:dependency_list)
 
-          next unless project.feature_available?(:dependency_scanning)
-
-          commit_path = project_blob_path(project, sha)
-          ::Gitlab::Ci::Parsers::DependencyList.parse(blob, commit_path)
+          commit_path = ::Gitlab::Routing.url_helpers.project_blob_path(project, sha)
+          ::Gitlab::Ci::Parsers::Security::DependencyList.new.parse!(blob, dependency_list_report, commit_path)
         end
 
-        license_management_report
+        dependency_list_report
       end
 
       def collect_metrics_reports!(metrics_report)
