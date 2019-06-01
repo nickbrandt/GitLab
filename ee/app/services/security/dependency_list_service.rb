@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Security
-  class DependenciesFinder
+  class DependencyListService
     attr_accessor :params
     attr_accessor :status
     attr_reader :project

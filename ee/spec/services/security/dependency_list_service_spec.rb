@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Security::DependenciesFinder do
+describe Security::DependencyListService do
   describe '#execute' do
     let(:project) { create :project }
     let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
