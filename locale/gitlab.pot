@@ -8731,9 +8731,6 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
-msgid "Not implemented!"
-msgstr ""
-
 msgid "Not now"
 msgstr ""
 
