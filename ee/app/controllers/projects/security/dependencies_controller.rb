@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Projects
+  module Security
   class DependenciesController < Projects::ApplicationController
     SORT_BY_PERMITTED_VALUES = %w(name type).freeze
     SORT_PERMITTED_VALUES = %w(asc desc).freeze
@@ -50,8 +51,8 @@ module Projects
       {
         dependencies: paginated_dependencies,
         report: {
-          status: finder.status,
-          job_path: Gitlab::Routing.url_helpers.project_build_path(@project, build.id, format: :json)
+          status: "finder.status",
+          job_path: "Gitlab::Routing.url_helpers.project_build_path(@project, build.id, format: :json)"
         }
       }
     end
@@ -64,5 +65,6 @@ module Projects
                 .with_reports(::Ci::JobArtifact.dependency_list_reports)
                 .last
     end
+  end
   end
 end
