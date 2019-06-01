@@ -5,7 +5,7 @@ module Gitlab
     module Parsers
       module Security
         class DependencyList
-          def parse(json_data, report, commit_path)
+          def parse!(json_data, report, commit_path)
             report_data = JSON.parse!(json_data)
 
             formatter = Formatters::DependencyList.new(commit_path)

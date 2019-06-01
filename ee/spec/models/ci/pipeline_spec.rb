@@ -330,6 +330,41 @@ describe Ci::Pipeline do
     end
   end
 
+  describe '#dependency_list_reports' do
+    subject { pipeline.dependency_list_report }
+
+    before do
+      stub_licensed_features(dependency_list: true)
+    end
+
+    context 'when pipeline has a build with dependency list reports' do
+      let!(:build_1) { create(:ci_build, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
+
+      before do
+        create(:ee_ci_job_artifact, :dependency_list, job: build_1, project: project)
+      end
+
+      it 'returns a dependency list report with collected data' do
+        expect(subject.dependencies.count).to eq(21)
+        expect(subject.dependencies[0][:name]).to eq('mini_portile2')
+      end
+
+      context 'when builds are retried' do
+        let!(:build_1) { create(:ci_build, :retried, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
+
+        it 'does not take retried builds into account' do
+          expect(subject.dependencies).to be_empty
+        end
+      end
+    end
+
+    context 'when pipeline does not have any builds with dependency_list reports' do
+      it 'returns an empty dependency_list report' do
+        expect(subject.dependencies).to be_empty
+      end
+    end
+  end
+
   describe '#metrics_report' do
     subject { pipeline.metrics_report }
 
