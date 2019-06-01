@@ -305,10 +305,11 @@ describe Ci::Build do
 
       it 'parses blobs and add the results to the report' do
         subject
+        commit_path = "/group#{group.id}/project#{project.id}/blob/#{job.sha}/yarn.lock"
 
         expect(dependency_list_report.dependencies.count).to eq(21)
         expect(dependency_list_report.dependencies[0][:name]).to eq('mini_portile2')
-        expect(dependency_list_report.dependencies[20][:version]).to eq('0.0.5')
+        expect(dependency_list_report.dependencies[20][:location][:blob_path]).to eq(commit_path)
       end
     end
 
