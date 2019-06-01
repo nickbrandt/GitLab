@@ -14,13 +14,12 @@ module Gitlab
                 report.add_dependency(formatter.format(dependency, file['package_manager'], trim_path(file['path'])))
               end
             end
-
           end
 
           private
 
           def trim_path(path)
-            path.sub(/(.*)\//,'')
+            path.sub(/(.*)\//, '')
           end
         end
       end

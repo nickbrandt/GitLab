@@ -42,9 +42,7 @@ module Projects
     # reference: https://gitlab.com/gitlab-org/gitlab-ee/issues/10075#note_164915787
     def paginated_dependencies
       list = found_dependencies
-      if params[:page]
-        list = Kaminari.paginate_array(found_dependencies).page(params[:page])
-      end
+      list = Kaminari.paginate_array(found_dependencies).page(params[:page]) if params[:page]
       list
     end
 

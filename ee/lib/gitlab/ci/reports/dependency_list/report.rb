@@ -7,7 +7,7 @@ module Gitlab
         class Report
           attr_accessor :dependencies
 
-          def initialize()
+          def initialize
             @dependencies = []
           end
 
