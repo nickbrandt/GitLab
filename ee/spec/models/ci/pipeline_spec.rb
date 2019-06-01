@@ -338,11 +338,8 @@ describe Ci::Pipeline do
     end
 
     context 'when pipeline has a build with dependency list reports' do
-      let!(:build_1) { create(:ci_build, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
-
-      before do
-        create(:ee_ci_job_artifact, :dependency_list, job: build_1, project: project)
-      end
+      let!(:build) { create(:ci_build, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
+      let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: build, project: project) }
 
       it 'returns a dependency list report with collected data' do
         expect(subject.dependencies.count).to eq(21)
@@ -350,7 +347,7 @@ describe Ci::Pipeline do
       end
 
       context 'when builds are retried' do
-        let!(:build_1) { create(:ci_build, :retried, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
+        let!(:build) { create(:ci_build, :retried, :success, name: 'dependency_list', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
           expect(subject.dependencies).to be_empty

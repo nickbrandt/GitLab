@@ -7,6 +7,14 @@ FactoryBot.define do
       config_source :webide_source
     end
 
+    trait :with_dependency_list_report do
+      status :success
+
+      after(:build) do |pipeline, evaluator|
+        pipeline.builds << build(:ee_ci_build, :dependency_list, pipeline: pipeline, project: pipeline.project)
+      end
+    end
+
     trait :with_license_management_report do
       status :success
 

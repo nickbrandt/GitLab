@@ -31,12 +31,7 @@ module Security
 
     def init_collection
       pipeline = project.all_pipelines.latest_successful_for(project.default_branch)
-      build = pipeline.builds
-                .where(name: SCANNING_JOB_NAME)
-                .latest
-                .with_reports(::Ci::JobArtifact.dependency_list_reports)
-                .last
-      dependencies = build.collect_dependency_list_report
+      dependencies = pipeline.dependency_list_report.dependencies
       dependencies
     end
 
