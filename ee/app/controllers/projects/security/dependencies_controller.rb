@@ -6,7 +6,7 @@ module Projects
     SORT_BY_PERMITTED_VALUES = %w(name type).freeze
     SORT_PERMITTED_VALUES = %w(asc desc).freeze
 
-    before_action :ensure_bill_of_materials_feature_flag_enabled
+    before_action :ensure_dependency_list_feature_available
 
     def index
       respond_to do |format|
@@ -18,22 +18,22 @@ module Projects
 
     private
 
-    def ensure_bill_of_materials_feature_flag_enabled
-      render_404 unless Feature.enabled?(:bill_of_materials, default_enabled: false)
+    def ensure_dependency_list_feature_available
+      render_404 unless project.feature_available?(:dependency_list)
     end
 
     def found_dependencies
-      finder.execute
+      service.execute
     end
 
-    def finder
-      ::Security::DependenciesFinder.new(project: @project, params: query_params)
+    def service
+      ::Security::DependencyListService.new(project: @project, params: query_params)
     end
 
     def query_params
       params.permit(:sort, :sort_by).delete_if do |key, value|
-        key == :sort_by && !value.in?(::Security::DependenciesFinder::SORT_BY_VALUES) ||
-          key == :sort && !value.in?(::Security::DependenciesFinder::SORT_VALUES)
+        key == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
+          key == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES)
       end
     end
 
@@ -51,7 +51,7 @@ module Projects
       {
         dependencies: paginated_dependencies,
         report: {
-          status: "finder.status",
+          status: status,
           job_path: "Gitlab::Routing.url_helpers.project_build_path(@project, build.id, format: :json)"
         }
       }
@@ -64,6 +64,17 @@ module Projects
                 .latest
                 .with_reports(::Ci::JobArtifact.dependency_list_reports)
                 .last
+    end
+
+    def status
+      case service.status
+      when 'no_list'
+        :job_failed
+      when 'no_job'
+        :job_not_set_up
+      else
+        :ok
+      end
     end
   end
   end

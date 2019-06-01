@@ -9,6 +9,7 @@ module Security
     SORT_BY_VALUES = %w(name packager).freeze
     SORT_VALUES = %w(asc desc).freeze
     SCANNING_JOB_NAME = 'dependency_scanning'.freeze
+    SERVICE_STATUSES = %w(found_list no_list no_job).freeze
 
     # @param project [Project]
     # @param [Hash] params to sort dependencies
@@ -17,7 +18,7 @@ module Security
     def initialize(project:, params: {})
       @project = project
       @params = params
-      @status = :ok
+      @status = SERVICE_STATUSES[0]
     end
 
     # @return [Array<Hash>] collection of found dependencies
@@ -30,8 +31,13 @@ module Security
     private
 
     def init_collection
-      pipeline = project.all_pipelines.latest_successful_for(project.default_branch)
-      dependencies = pipeline.dependency_list_report.dependencies
+      pipeline     = project.all_pipelines.latest_successful_for(project.default_branch)
+      dependencies = []
+      if pipeline
+        dependencies = pipeline.dependency_list_report.dependencies
+      else
+        status = SERVICE_STATUSES[2]
+      end
       dependencies
     end
 
