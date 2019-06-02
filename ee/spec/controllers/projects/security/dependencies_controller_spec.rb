@@ -58,7 +58,7 @@ describe Projects::Security::DependenciesController do
         end
 
         context 'without existing report' do
-          let!(:pipeline) { create(:ee_ci_pipeline, :with_licence_management_report, project: project) }
+          let!(:pipeline) { create(:ee_ci_pipeline, :with_sast_report, project: project) }
 
           it 'returns job_not_set_up status' do
             subject
@@ -73,12 +73,13 @@ describe Projects::Security::DependenciesController do
           let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
 
           it 'returns job_failed status' do
+            path = "/#{project.namespace.name}/#{project.name}/builds/#{pipeline.builds.last.id}"
             subject
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response['dependencies'].length).to eq(0)
             expect(json_response['report']['status']).to eq('job_failed')
-            expect(json_response['report']['job_path']).to eq('aaa')
+            expect(json_response['report']['job_path']).to eq(path)
           end
         end
       end
