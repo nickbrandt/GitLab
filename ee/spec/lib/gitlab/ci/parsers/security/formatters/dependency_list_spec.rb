@@ -16,7 +16,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
   describe '#format' do
     let(:dependency) { parsed_report['dependency_files'][0]['dependencies'][0] }
     let(:package_manager) { 'bundler' }
-    let(:file_path) { 'Gemfile.lock' }
+    let(:file_path) { 'rails/Gemfile.lock' }
 
     it 'format report into a right format' do
       data = formatter.format(dependency, package_manager, file_path)

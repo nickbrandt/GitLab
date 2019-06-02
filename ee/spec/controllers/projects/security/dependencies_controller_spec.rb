@@ -85,7 +85,7 @@ describe Projects::Security::DependenciesController do
       end
 
       context 'when feature is not available' do
-       it 'returns 404' do
+        it 'returns 404' do
           subject
 
           expect(response).to have_gitlab_http_status(404)

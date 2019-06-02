@@ -18,7 +18,7 @@ module Gitlab
                 packager: packager(package_manager),
                 location: {
                   blob_path: blob_path(file_path),
-                  path: file_path
+                  path: trim_path(file_path)
                 },
                 version:  dependency['version']
               }
@@ -27,7 +27,7 @@ module Gitlab
             private
 
             def blob_path(file_path)
-              "#{commit_path}/#{file_path}"
+              "#{commit_path}/#{trim_path(file_path)}"
             end
 
             def packager(package_manager)
@@ -47,6 +47,10 @@ module Gitlab
               else
                 'Unknown'
               end
+            end
+
+            def trim_path(path)
+              path.sub(/(.*)\//, '')
             end
           end
         end
