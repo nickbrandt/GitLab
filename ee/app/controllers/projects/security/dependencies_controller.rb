@@ -33,7 +33,6 @@ module Projects
       end
 
       def job_path
-        # "Gitlab::Routing.url_helpers.project_build_path(@project, build.id, format: :json)"
         build ? project_build_path(@project, build.id) : ''
       end
 
