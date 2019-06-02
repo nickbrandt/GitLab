@@ -4,10 +4,9 @@ require 'spec_helper'
 
 describe Security::DependencyListService do
   describe '#execute' do
-    let(:project) { create :project }
-    let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
+    let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report) }
 
-    subject { described_class.new(project: project, params: params).execute }
+    subject { described_class.new(pipeline: pipeline, params: params).execute }
 
     before do
       stub_licensed_features(dependency_list: true)
