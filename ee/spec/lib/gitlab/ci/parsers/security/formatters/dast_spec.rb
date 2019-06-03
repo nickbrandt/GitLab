@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
   let(:formatter) { described_class.new(file_vulnerability) }
-  let(:file_vulnerability) { parsed_report['site']['alerts'][0] }
+  let(:file_vulnerability) { parsed_report['site'].first['alerts'][0] }
 
   let(:parsed_report) do
     JSON.parse!(
