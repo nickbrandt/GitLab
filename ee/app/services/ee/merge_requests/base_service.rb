@@ -27,15 +27,17 @@ module EE
       def create_merge_request_pipeline_for(merge_request, user)
         return unless can_create_merge_request_pipeline_for?(merge_request)
 
-        ret = ::MergeRequests::MergeToRefService.new(merge_request.project, user)
-                                                .execute(merge_request)
+        result = ::MergeRequests::MergeabilityCheckService.new(merge_request).execute
 
-        if ret[:status] == :success
+        if result.success?
+          merge_ref_head_payload = result.payload.fetch(:merge_ref_head, {})
+          commit_id, target_id, source_id = merge_ref_head_payload.values_at(:commit_id, :target_id, :source_id)
+
           ::Ci::CreatePipelineService.new(merge_request.source_project, user,
                                           ref: merge_request.merge_ref_path,
-                                          checkout_sha: ret[:commit_id],
-                                          target_sha: ret[:target_id],
-                                          source_sha: ret[:source_id])
+                                          checkout_sha: commit_id,
+                                          target_sha: target_id,
+                                          source_sha: source_id)
             .execute(:merge_request_event, merge_request: merge_request)
         end
       end

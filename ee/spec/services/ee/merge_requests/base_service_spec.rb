@@ -99,12 +99,6 @@ describe MergeRequests::BaseService do
 
     it_behaves_like 'creates a merge requst pipeline'
 
-    context 'when merge request is WIP' do
-      let(:title) { 'WIP: Awesome merge request' }
-
-      it_behaves_like 'creates a detached merge requst pipeline'
-    end
-
     context 'when project setting for merge request pipelines is disabled' do
       let(:merge_pipelines_enabled) { false }
 
