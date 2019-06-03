@@ -80,7 +80,7 @@ export default class ApproversSelect {
       .then(() => {
         this.$approverSelect
           .select2({
-            placeholder: 'Search for users or groups',
+            placeholder: __('Search for users or groups'),
             multiple: true,
             minimumInputLength: 0,
             query: query => {

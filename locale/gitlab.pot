@@ -7898,6 +7898,9 @@ msgstr ""
 msgid "Marks todo as done."
 msgstr ""
 
+msgid "Match not found; try refining your search query."
+msgstr ""
+
 msgid "Maven Metadata"
 msgstr ""
 
@@ -11282,6 +11285,9 @@ msgstr ""
 msgid "Search files"
 msgstr ""
 
+msgid "Search for a LDAP group"
+msgstr ""
+
 msgid "Search for a group"
 msgstr ""
 
@@ -11289,6 +11295,9 @@ msgid "Search for a user"
 msgstr ""
 
 msgid "Search for projects, issues, etc."
+msgstr ""
+
+msgid "Search for users or groups"
 msgstr ""
 
 msgid "Search forks"
