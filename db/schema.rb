@@ -3289,7 +3289,6 @@ ActiveRecord::Schema.define(version: 20190530154715) do
     t.boolean "ghost"
     t.date "last_activity_on"
     t.boolean "notified_of_own_activity"
-    t.boolean "support_bot"
     t.string "preferred_language"
     t.boolean "email_opted_in"
     t.string "email_opted_in_ip"
@@ -3322,8 +3321,6 @@ ActiveRecord::Schema.define(version: 20190530154715) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
     t.index ["state"], name: "index_users_on_state", using: :btree
     t.index ["state"], name: "index_users_on_state_and_internal", where: "((ghost <> true) AND (bot_type IS NULL))", using: :btree
-    t.index ["state"], name: "index_users_on_state_and_internal_attrs", where: "((ghost <> true) AND (support_bot <> true))", using: :btree
-    t.index ["support_bot"], name: "index_users_on_support_bot", using: :btree
     t.index ["username"], name: "index_users_on_username", using: :btree
     t.index ["username"], name: "index_users_on_username_trigram", using: :gin, opclasses: {"username"=>"gin_trgm_ops"}
   end
