@@ -2,6 +2,7 @@
 
 require 'rspec/core'
 require 'rspec/expectations'
+require 'knapsack'
 
 module QA
   module Specs
