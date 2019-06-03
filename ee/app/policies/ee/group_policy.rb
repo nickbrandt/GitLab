@@ -45,6 +45,9 @@ module EE
       rule { can?(:read_group) & dependency_proxy_available }
         .enable :read_dependency_proxy
 
+      rule { developer & dependency_proxy_available }
+        .enable :admin_dependency_proxy
+
       rule { can?(:read_group) & epics_available }.enable :read_epic
 
       rule { reporter & epics_available }.policy do

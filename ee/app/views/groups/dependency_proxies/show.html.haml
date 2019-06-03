@@ -8,7 +8,7 @@
     = s_('Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
 
 - if @group.public?
-  - if can?(current_user, :admin_group, @group)
+  - if can?(current_user, :admin_dependency_proxy, @group)
     = form_for(@dependency_proxy, method: :put, url: group_dependency_proxy_path(@group)) do |f|
       .form-group
         .js-dependency-proxy-toggle-area
