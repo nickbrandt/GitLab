@@ -24,7 +24,6 @@ module QA
         end
 
         Page::Project::Issue::Show.perform do |show|
-          show.select_all_activities_filter
           show.comment('/promote')
 
           expect(show).to have_content("promoted to epic")
