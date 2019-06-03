@@ -28,8 +28,9 @@ module QA
               click_element :create_epic_button
             end
 
-            def click_first_epic
+            def click_first_epic(page = nil)
               all_elements(:epic_title_text).first.click
+              page.validate_elements_present! if page
             end
           end
         end

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/29
-  context 'Plan', :quarantine do
+  context 'Plan' do
     describe 'promote issue to epic' do
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 
@@ -10,21 +9,20 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
 
-        group = Resource::Group.fabricate!
+        group = Resource::Group.fabricate_via_api!
 
-        project = Resource::Project.fabricate! do |project|
+        project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'promote-issue-to-epic'
           project.description = 'Project to promote issue to epic'
           project.group = group
         end
 
-        Resource::Issue.fabricate! do |issue|
+        Resource::Issue.fabricate_via_browser_ui! do |issue|
           issue.title = issue_title
           issue.project = project
         end
 
         Page::Project::Issue::Show.perform do |show|
-          show.select_all_activities_filter
           show.comment('/promote')
 
           expect(show).to have_content("promoted to epic")
@@ -32,7 +30,9 @@ module QA
 
         group.visit!
         QA::EE::Page::Group::Menu.perform(&:click_group_epics_link)
-        QA::EE::Page::Group::Epic::Index.perform(&:click_first_epic)
+        QA::EE::Page::Group::Epic::Index.perform do |index|
+          index.click_first_epic(QA::EE::Page::Group::Epic::Show)
+        end
 
         expect(page).to have_content(issue_title)
         expect(page).to have_content(/promoted from issue .* \(closed\)/)
