@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190530154715) do
+ActiveRecord::Schema.define(version: 20190603124955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2453,6 +2453,7 @@ ActiveRecord::Schema.define(version: 20190530154715) do
     t.datetime_with_timezone "last_successful_update_at"
     t.index ["jid"], name: "index_project_mirror_data_on_jid", using: :btree
     t.index ["last_successful_update_at"], name: "index_project_mirror_data_on_last_successful_update_at", using: :btree
+    t.index ["last_update_at", "retry_count"], name: "index_project_mirror_data_on_last_update_at_and_retry_count", using: :btree
     t.index ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
     t.index ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
     t.index ["status"], name: "index_project_mirror_data_on_status", using: :btree
