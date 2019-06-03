@@ -10,15 +10,15 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
 
-        group = Resource::Group.fabricate!
+        group = Resource::Group.fabricate_via_api!
 
-        project = Resource::Project.fabricate! do |project|
+        project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'promote-issue-to-epic'
           project.description = 'Project to promote issue to epic'
           project.group = group
         end
 
-        Resource::Issue.fabricate! do |issue|
+        Resource::Issue.fabricate_via_browser_ui! do |issue|
           issue.title = issue_title
           issue.project = project
         end
