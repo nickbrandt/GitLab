@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/29
-  context 'Plan', :quarantine do
+  context 'Plan' do
     describe 'promote issue to epic' do
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 
@@ -31,7 +30,9 @@ module QA
 
         group.visit!
         QA::EE::Page::Group::Menu.perform(&:click_group_epics_link)
-        QA::EE::Page::Group::Epic::Index.perform(&:click_first_epic)
+        QA::EE::Page::Group::Epic::Index.perform do |index|
+          index.click_first_epic(QA::EE::Page::Group::Epic::Show)
+        end
 
         expect(page).to have_content(issue_title)
         expect(page).to have_content(/promoted from issue .* \(closed\)/)
