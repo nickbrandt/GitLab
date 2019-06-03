@@ -198,7 +198,7 @@ describe 'Promotions', :js do
       sign_in(user)
     end
 
-    it 'appears in milestone page' do
+    it 'appears in issue boards page' do
       visit project_boards_path(project)
 
       expect(find('.board-promotion-state')).to have_content "Upgrade your plan to improve Issue boards"
