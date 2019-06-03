@@ -108,6 +108,10 @@ export default {
       Object.keys(data).forEach(key => {
         if (data[key].value && data[key].value.length) {
           result[key] = data[key];
+          if (key === 'file' && this.vulnerability.blob_path) {
+            result[key].isLink = true;
+            result[key].url = this.vulnerability.blob_path;
+          }
         }
       });
 

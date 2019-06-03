@@ -1,3 +1,5 @@
+const isAbsoluteOrRootRelative = url => /^(https?:)?\//.test(url);
+
 /**
  * Checks if the provided URL is a safe URL (absolute http(s) URL)
  *
@@ -7,7 +9,7 @@
 export default url => {
   let parsedUrl;
 
-  if (!(url.startsWith('https:') || url.startsWith('http:'))) {
+  if (!isAbsoluteOrRootRelative(url)) {
     return false;
   }
 
