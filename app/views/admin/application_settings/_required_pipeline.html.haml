@@ -1,0 +1,10 @@
+= form_for @application_setting, url: admin_application_settings_path(anchor: 'js-required-pipeline-settings'), html: { class: 'fieldset-form' } do |f|
+  = form_errors(@application_setting)
+
+  %fieldset
+    .form-group
+      = f.label :shared_runners_text, s_('AdminSettings|Select a pipeline configuration file'), class: 'text-muted'
+      = dropdown_tag("Select a template", options: { toggle_class: 'js-ci-template-dropdown w-100', title: "Apply a template", filter: true, placeholder: "Filter", data: { data: gitlab_ci_ymls(nil) } } )
+      = f.text_field :shared_runners_text, value: @application_setting.shared_runners_text, id: 'required_template_name', class: 'hidden'
+
+  = f.submit _('Save changes'), class: "btn btn-success"
