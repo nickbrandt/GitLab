@@ -25,7 +25,7 @@ module Gitlab
           end
 
           def extract_vulnerabilities_from(data)
-            site = data['site']
+            site = data['site'].first
             results = []
 
             if site
