@@ -371,7 +371,7 @@ module Elastic
           options[:current_user],
           options[:project_ids],
           options[:public_and_internal_projects],
-          options[:feature]
+          options[:features]
         )
 
         query_hash[:query][:bool][:filter] ||= []
@@ -390,10 +390,10 @@ module Elastic
       # Builds an elasticsearch query that will select projects the user is
       # granted access to.
       #
-      # If a project feature is specified, it indicates interest in child
+      # If a project feature(s) is specified, it indicates interest in child
       # documents gated by that project feature - e.g., "issues". The feature's
       # visibility level must be taken into account.
-      def project_ids_query(user, project_ids, public_and_internal_projects, feature = nil)
+      def project_ids_query(user, project_ids, public_and_internal_projects, features = nil)
         # When reading cross project is not allowed, only allow searching a
         # a single project, so the `:read_*` ability is only checked once.
         unless Ability.allowed?(user, :read_cross_project)
@@ -404,18 +404,18 @@ module Elastic
         # anonymous users.
         # Pick private, internal and public projects the user is a member of.
         # Pick all private projects for admins & auditors.
-        conditions = [pick_projects_by_membership(project_ids, feature)]
+        conditions = [pick_projects_by_membership(project_ids, features)]
 
         if public_and_internal_projects
           # Skip internal projects for anonymous and external users.
           # Others are given access to all internal projects. Admins & auditors
           # get access to internal projects where the feature is private.
-          conditions << pick_projects_by_visibility(Project::INTERNAL, user, feature) if user && !user.external?
+          conditions << pick_projects_by_visibility(Project::INTERNAL, user, features) if user && !user.external?
 
           # All users, including anonymous, can access public projects.
           # Admins & auditors get access to public projects where the feature is
           # private.
-          conditions << pick_projects_by_visibility(Project::PUBLIC, user, feature)
+          conditions << pick_projects_by_visibility(Project::PUBLIC, user, features)
         end
 
         { should: conditions }
@@ -430,7 +430,7 @@ module Elastic
       # Admins & auditors are given access to all private projects. Access to
       # internal or public projects where the project feature is private is not
       # granted here.
-      def pick_projects_by_membership(project_ids, feature = nil)
+      def pick_projects_by_membership(project_ids, features = nil)
         condition =
           if project_ids == :any
             { term: { visibility_level: Project::PRIVATE } }
@@ -438,37 +438,43 @@ module Elastic
             { terms: { id: project_ids } }
           end
 
-        limit_by_feature(condition, feature, include_members_only: true)
+        limit_by_feature(condition, features, include_members_only: true)
       end
 
       # Grant access to projects of the specified visibility level to the user.
       #
       # If a project feature is specified, access is only granted if the feature
       # is enabled or, for admins & auditors, private.
-      def pick_projects_by_visibility(visibility, user, feature)
+      def pick_projects_by_visibility(visibility, user, features)
         condition = { term: { visibility_level: visibility } }
 
-        limit_by_feature(condition, feature, include_members_only: user&.full_private_access?)
+        limit_by_feature(condition, features, include_members_only: user&.full_private_access?)
       end
 
-      # If a project feature is specified, access is dependent on its visibility
+      # If a project feature(s) is specified, access is dependent on its visibility
       # level being enabled (or private if `include_members_only: true`).
       #
       # This method is a no-op if no project feature is specified.
+      # It accepts an array of features or a single feature, when an array is provided
+      # it queries if any of the features is enabled.
       #
-      # Always denies access to projects when the feature is disabled - even to
+      # Always denies access to projects when the features are disabled - even to
       # admins & auditors - as stale child documents may be present.
-      def limit_by_feature(condition, feature, include_members_only:)
-        return condition unless feature
+      def limit_by_feature(condition, features, include_members_only:)
+        return condition unless features
 
-        limit =
-          if include_members_only
-            { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
-          else
-            { term: { "#{feature}_access_level" => ::ProjectFeature::ENABLED } }
-          end
+        features = Array(features)
 
-        { bool: { filter: [condition, limit] } }
+        features.map do |feature|
+          limit =
+            if include_members_only
+              { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
+            else
+              { term: { "#{feature}_access_level" => ::ProjectFeature::ENABLED } }
+            end
+
+          { bool: { filter: [condition, limit] } }
+        end
       end
     end
   end
