@@ -4,6 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
+import { __ } from '~/locale';
 
 export default class ProtectedEnvironmentEdit {
   constructor(options) {
@@ -69,7 +70,7 @@ export default class ProtectedEnvironmentEdit {
       })
       .catch(() => {
         this.$allowedToDeployDropdown.enable();
-        Flash('Failed to update environment!', null, $('.js-protected-environments-list'));
+        Flash(__('Failed to update environment!'), null, $('.js-protected-environments-list'));
       });
   }
 

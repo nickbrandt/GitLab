@@ -606,6 +606,15 @@ msgstr ""
 msgid "Access to '%{classification_label}' not allowed"
 msgstr ""
 
+msgid "AccessDropdown|Groups"
+msgstr ""
+
+msgid "AccessDropdown|Roles"
+msgstr ""
+
+msgid "AccessDropdown|Users"
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -947,6 +956,9 @@ msgstr ""
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
 msgstr ""
 
+msgid "All groups and projects"
+msgstr ""
+
 msgid "All issues for this milestone are closed. You may close this milestone now."
 msgstr ""
 
@@ -1092,6 +1104,9 @@ msgid "An error occurred while dismissing the feature highlight. Refresh the pag
 msgstr ""
 
 msgid "An error occurred while enabling Service Desk."
+msgstr ""
+
+msgid "An error occurred while fetching environments."
 msgstr ""
 
 msgid "An error occurred while fetching folder content."
@@ -5290,10 +5305,19 @@ msgstr ""
 msgid "Failed to load errors from Sentry. Error message: %{errorMessage}"
 msgstr ""
 
+msgid "Failed to load groups & users."
+msgstr ""
+
 msgid "Failed to load related branches"
 msgstr ""
 
 msgid "Failed to promote label due to internal error. Please contact administrators."
+msgstr ""
+
+msgid "Failed to protect the branch"
+msgstr ""
+
+msgid "Failed to protect the environment"
 msgstr ""
 
 msgid "Failed to remove issue from board, please try again."
@@ -5333,6 +5357,9 @@ msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
 msgid "Failed to update branch!"
+msgstr ""
+
+msgid "Failed to update environment!"
 msgstr ""
 
 msgid "Failed to update issues, please try again."
@@ -6376,6 +6403,9 @@ msgid "Group:"
 msgstr ""
 
 msgid "Group: %{group_name}"
+msgstr ""
+
+msgid "Group: %{name}"
 msgstr ""
 
 msgid "GroupRoadmap|From %{dateWord}"
@@ -10023,6 +10053,9 @@ msgstr ""
 msgid "Project:"
 msgstr ""
 
+msgid "Project: %{name}"
+msgstr ""
+
 msgid "ProjectActivityRSS|Subscribe"
 msgstr ""
 
@@ -10411,6 +10444,9 @@ msgid "Protected"
 msgstr ""
 
 msgid "Protected Branch"
+msgstr ""
+
+msgid "Protected Environment"
 msgstr ""
 
 msgid "Protected Environments"
@@ -11487,6 +11523,9 @@ msgid "Select an existing Kubernetes cluster or create a new one"
 msgstr ""
 
 msgid "Select branch/tag"
+msgstr ""
+
+msgid "Select group or project"
 msgstr ""
 
 msgid "Select members to invite"

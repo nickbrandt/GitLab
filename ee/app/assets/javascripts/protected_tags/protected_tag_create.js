@@ -2,7 +2,7 @@ import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import CreateItemDropdown from '~/create_item_dropdown';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
 
@@ -35,7 +35,7 @@ export default class ProtectedTagCreate {
     // Protected tag dropdown
     this.createItemDropdown = new CreateItemDropdown({
       $dropdown: this.$form.find('.js-protected-tag-select'),
-      defaultToggleLabel: 'Protected Tag',
+      defaultToggleLabel: __('Protected Tag'),
       fieldName: 'protected_tag[name]',
       onSelect: this.onSelectCallback,
       getData: ProtectedTagCreate.getProtectedTags,
