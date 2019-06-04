@@ -332,6 +332,10 @@ export default {
             }}
           </mr-widget-alert-message>
 
+          <mr-widget-alert-message v-if="mr.mergeError" type="danger">
+            {{ mergeError }}
+          </mr-widget-alert-message>
+
           <source-branch-removal-status v-if="shouldRenderSourceBranchRemovalStatus" />
         </div>
       </div>
