@@ -13173,9 +13173,6 @@ msgstr[1] ""
 msgid "enabled"
 msgstr ""
 
-msgid "epic"
-msgstr ""
-
 msgid "error"
 msgstr ""
 
@@ -13248,9 +13245,6 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is out of the hierarchy of the Group owning the template"
-msgstr ""
-
-msgid "issue"
 msgstr ""
 
 msgid "issue boards"
@@ -13671,7 +13665,7 @@ msgstr ""
 msgid "severity|Unknown"
 msgstr ""
 
-msgid "should be higher than %{access} inherited membership from group %{group_name}"
+msgid "should be greater than or equal to %{access} inherited membership from group %{group_name}"
 msgstr ""
 
 msgid "show less"

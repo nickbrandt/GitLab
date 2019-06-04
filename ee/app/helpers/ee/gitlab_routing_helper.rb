@@ -32,7 +32,7 @@ module EE
     end
 
     def license_management_api_url(project)
-      api_v4_projects_managed_licenses_path(id: project.id)
+      expose_path(api_v4_projects_managed_licenses_path(id: project.id))
     end
 
     def license_management_settings_path(project)

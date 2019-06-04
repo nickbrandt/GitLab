@@ -34,7 +34,7 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_url("/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}/approvals")) }
+    it { is_expected.to eq(expose_path("/#{merge_request.project.full_path}/merge_requests/#{merge_request.iid}/approvals")) }
   end
 
   describe '#api_approvals_path' do
@@ -42,7 +42,7 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approvals")) }
+    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approvals")) }
   end
 
   describe '#api_approval_settings_path' do
@@ -50,13 +50,13 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approval_settings")) }
+    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approval_settings")) }
   end
 
   describe '#api_project_approval_settings_path' do
     subject { described_class.new(merge_request, current_user: user).api_project_approval_settings_path }
 
-    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/approval_settings")) }
+    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/approval_settings")) }
 
     context "when approvals not available" do
       let(:approval_feature_available) { false }
@@ -70,7 +70,7 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approve")) }
+    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/approve")) }
   end
 
   describe '#api_unapprove_path' do
@@ -78,7 +78,7 @@ describe MergeRequestPresenter do
 
     it_behaves_like 'is nil when needed'
 
-    it { is_expected.to eq(expose_url("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
+    it { is_expected.to eq(expose_path("/api/v4/projects/#{merge_request.project.id}/merge_requests/#{merge_request.iid}/unapprove")) }
   end
 
   describe '#approvers_left' do
