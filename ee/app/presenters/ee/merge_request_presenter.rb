@@ -18,13 +18,13 @@ module EE
 
     def api_approval_settings_path
       if expose_mr_approval_path?
-        expose_path(api_v4_projects_merge_requests_approval_settings_path(id: project.id, merge_request_iid: merge_request.iid))
+        expose_path(api_v4_projects_merge_requests_approval_rules_path(id: project.id, merge_request_iid: merge_request.iid))
       end
     end
 
     def api_project_approval_settings_path
       if approval_feature_available?
-        expose_path(api_v4_projects_approval_settings_path(id: project.id))
+        expose_path(api_v4_projects_approval_rules_path(id: project.id))
       end
     end
 

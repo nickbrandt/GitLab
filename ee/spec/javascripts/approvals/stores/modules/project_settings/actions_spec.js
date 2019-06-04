@@ -21,8 +21,8 @@ const TEST_RULE_RESPONSE = {
   groups: [{ id: 4 }],
   users: [{ id: 7 }, { id: 8 }],
 };
-const TEST_SETTINGS_PATH = 'projects/9/approval_settings';
-const TEST_RULES_PATH = 'projects/9/approval_settings/rules';
+const TEST_SETTINGS_PATH = 'projects/9/approval_rules';
+const TEST_RULES_PATH = 'projects/9/approval_rules';
 
 describe('EE approvals project settings module actions', () => {
   let state;

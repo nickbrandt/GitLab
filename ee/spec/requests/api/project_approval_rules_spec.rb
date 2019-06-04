@@ -10,10 +10,10 @@ describe API::ProjectApprovalRules do
   set(:project)  { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   set(:approver) { create(:user) }
 
-  let(:url) { "/projects/#{project.id}/approval_settings/rules" }
+  let(:url) { "/projects/#{project.id}/approval_rules" }
 
-  describe 'GET /projects/:id/approval_settings' do
-    let(:url) { "/projects/#{project.id}/approval_settings" }
+  describe 'GET /projects/:id/approval_rules' do
+    let(:url) { "/projects/#{project.id}/approval_rules" }
 
     context 'when the request is correct' do
       let!(:rule) do
@@ -89,7 +89,7 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'POST /projects/:id/approval_settings/rules' do
+  describe 'POST /projects/:id/approval_rules' do
     let(:current_user) { user }
     let(:params) do
       {
@@ -144,9 +144,9 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'PUT /projects/:id/approval_settings/:approval_rule_id' do
+  describe 'PUT /projects/:id/approval_rules/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
+    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
 
     shared_examples_for 'a user with access' do
       before do
@@ -210,9 +210,9 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'DELETE /projects/:id/approval_settings/rules/:approval_rule_id' do
+  describe 'DELETE /projects/:id/approval_rules/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
+    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
 
     it 'destroys' do
       delete api(url, user)
@@ -223,7 +223,7 @@ describe API::ProjectApprovalRules do
 
     context 'when approval rule not found' do
       let!(:approval_rule_2) { create(:approval_project_rule) }
-      let(:url) { "/projects/#{project.id}/approval_settings/#{approval_rule_2.id}" }
+      let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule_2.id}" }
 
       it 'returns not found' do
         delete api(url, user)
