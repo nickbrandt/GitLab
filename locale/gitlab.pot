@@ -13167,9 +13167,6 @@ msgstr[1] ""
 msgid "enabled"
 msgstr ""
 
-msgid "epic"
-msgstr ""
-
 msgid "error"
 msgstr ""
 
@@ -13242,9 +13239,6 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is out of the hierarchy of the Group owning the template"
-msgstr ""
-
-msgid "issue"
 msgstr ""
 
 msgid "issue boards"
