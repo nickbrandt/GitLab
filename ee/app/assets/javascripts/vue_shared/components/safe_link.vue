@@ -1,5 +1,5 @@
 <script>
-import isSafeURL from './is_safe_url';
+import { isSafeURL } from '~/lib/utils/url_utility';
 /**
  * Renders a link element (`<a>`) if the href is a absolute http(s) URL,
  * a `<span>` element otherwise
