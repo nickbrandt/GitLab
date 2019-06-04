@@ -181,7 +181,7 @@ export default () => {
             });
         }
 
-        boardsStore.detail.issue = newIssue;
+        boardsStore.setIssueDetail(newIssue);
       },
       clearDetailIssue() {
         boardsStore.clearDetailIssue();
