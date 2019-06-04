@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import { DAYS } from './constants';
@@ -156,7 +156,7 @@ export default {
   [types.RECEIVE_CREATE_ISSUE_ERROR](state) {
     state.isCreatingIssue = false;
     Vue.set(state.modal, 'isCreatingNewIssue', false);
-    Vue.set(state.modal, 'error', 'There was an error creating the issue');
+    Vue.set(state.modal, 'error', __('There was an error creating the issue'));
   },
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
     state.isDismissingVulnerability = true;
