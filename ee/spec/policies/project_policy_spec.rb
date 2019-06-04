@@ -324,6 +324,7 @@ describe ProjectPolicy do
 
     where(permission: %i[
       create_vulnerability_feedback
+      update_vulnerability_feedback
       destroy_vulnerability_feedback
     ])
 
