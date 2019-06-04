@@ -40,29 +40,10 @@ module EE
       def update_approvers
         return yield unless project.feature_available?(:code_owners)
 
-        if ::Feature.enabled?(:approval_rules, project, default_enabled: true)
-          results = yield
+        results = yield
 
-          merge_requests_for_source_branch.each do |merge_request|
-            ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute
-          end
-        else
-          previous_diffs = fetch_latest_merge_request_diffs
-
-          results = yield
-
-          merge_requests = merge_requests_for_source_branch
-          ActiveRecord::Associations::Preloader.new.preload(merge_requests, :latest_merge_request_diff) # rubocop: disable CodeReuse/ActiveRecord)
-
-          merge_requests.each do |merge_request|
-            previous_diff = previous_diffs.find { |diff| diff.merge_request == merge_request }
-            previous_code_owners = ::Gitlab::CodeOwners.for_merge_request(merge_request, merge_request_diff: previous_diff)
-            new_code_owners = merge_request.code_owners - previous_code_owners
-
-            create_approvers(merge_request, new_code_owners)
-
-            merge_request.sync_code_owners_with_approvers
-          end
+        merge_requests_for_source_branch.each do |merge_request|
+          ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute
         end
 
         results

@@ -2,16 +2,17 @@ require 'spec_helper'
 
 describe 'Project settings > [EE] Merge Requests', :js do
   include GitlabRoutingHelper
+  include FeatureApprovalHelper
 
   let(:user) { create(:user) }
   let(:project) { create(:project, approvals_before_merge: 1) }
   let(:group) { create(:group) }
   let(:group_member) { create(:user) }
   let(:non_member) { create(:user) }
+  let!(:config_selector) { '.js-approval-rules' }
+  let!(:modal_selector) { '#project-settings-approvals-create-modal' }
 
   before do
-    stub_feature_flags(approval_rules: false)
-
     sign_in(user)
     project.add_maintainer(user)
     group.add_developer(user)
@@ -21,68 +22,68 @@ describe 'Project settings > [EE] Merge Requests', :js do
   it 'adds approver' do
     visit edit_project_path(project)
 
-    find('#s2id_approver_user_and_group_ids .select2-input').click
-
-    wait_for_requests
-
-    expect(find('.select2-results')).to have_content(user.name)
-    find('.user-result', text: user.name).click
-    click_button 'Add'
-
-    expect(find('.js-current-approvers')).to have_content(user.name)
-
-    find('.js-select-user-and-group').click
-
-    expect(find('.select2-results')).not_to have_content(user.name)
-  end
-
-  it 'filter approvers' do
-    visit edit_project_path(project)
-    find('.js-select-user-and-group').click
+    open_modal
+    open_approver_select
 
     expect(find('.select2-results')).to have_content(user.name)
     expect(find('.select2-results')).not_to have_content(non_member.name)
+
+    find('.user-result', text: user.name).click
+    close_approver_select
+    click_button 'Add'
+
+    expect(find('.content-list')).to have_content(user.name)
+
+    open_approver_select
+
+    expect(find('.select2-results')).not_to have_content(user.name)
+
+    close_approver_select
+    click_button 'Update approvers'
+    wait_for_requests
+
+    expect_avatar(find('.js-members'), user)
   end
 
   it 'adds approver group' do
     visit edit_project_path(project)
 
-    find('#s2id_approver_user_and_group_ids .select2-input').click
-
-    wait_for_requests
-
-    within('.js-current-approvers') do
-      expect(find('.card-header .badge')).to have_content('0')
-    end
+    open_modal
+    open_approver_select
 
     expect(find('.select2-results')).to have_content(group.name)
-    find('.select2-results .group-result').click
+
+    find('.user-result', text: group.name).click
+    close_approver_select
     click_button 'Add'
 
-    expect(find('.approver-list-loader')).to be_visible
-    expect(page).to have_css('.js-current-approvers li.approver-group', count: 1)
+    expect(find('.content-list')).to have_content(group.name)
 
-    expect(page).to have_css('.js-current-approvers li.approver-group', count: 1)
-    within('.js-current-approvers') do
-      expect(find('.card-header .badge')).to have_content('2')
-    end
+    click_button 'Update approvers'
+    wait_for_requests
+
+    expect_avatar(find('.js-members'), group.users)
   end
 
   context 'with an approver group' do
+    let(:non_group_approver) { create(:user) }
+    let!(:rule) { create(:approval_project_rule, project: project, groups: [group], users: [non_group_approver]) }
+
     before do
-      create(:approver_group, group: group, target: project)
+      project.add_developer(non_group_approver)
     end
 
     it 'removes approver group' do
       visit edit_project_path(project)
 
-      expect(find('.js-current-approvers')).to have_content(group.name)
+      expect_avatar(find('.js-members'), rule.approvers)
 
-      within('.js-current-approvers') do
-        accept_confirm { click_on "Remove" }
-      end
+      open_modal
+      remove_approver(group.name)
+      click_button "Update approvers"
+      wait_for_requests
 
-      expect(find('.js-current-approvers')).not_to have_content(group.name)
+      expect_avatar(find('.js-members'), [non_group_approver])
     end
   end
 

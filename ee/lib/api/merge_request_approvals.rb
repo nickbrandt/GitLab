@@ -54,8 +54,6 @@ module API
           hidden: true
         }
         get 'approval_settings' do
-          not_found! unless ::Feature.enabled?(:approval_rules, user_project, default_enabled: true)
-
           merge_request = find_merge_request_with_access(params[:merge_request_iid])
 
           present merge_request.approval_state, with: ::EE::API::Entities::MergeRequestApprovalRules, current_user: current_user

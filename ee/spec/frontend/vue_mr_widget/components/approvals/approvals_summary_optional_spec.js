@@ -4,7 +4,7 @@ import {
   OPTIONAL,
   OPTIONAL_CAN_APPROVE,
 } from 'ee/vue_merge_request_widget/components/approvals/messages';
-import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary_optional.vue';
+import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/approvals_summary_optional.vue';
 
 const localVue = createLocalVue();
 

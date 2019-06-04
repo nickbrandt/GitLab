@@ -84,110 +84,36 @@ describe MergeRequestPresenter do
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
-    let!(:approver) { create(:approver, target: merge_request) }
+    let!(:approver) { create(:user) }
+    let!(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], groups: [private_group, public_group]) }
 
     before do
-      stub_feature_flags(approval_rules: false)
-      merge_request.approvals.create!(user: approver.user)
-    end
-
-    subject { described_class.new(merge_request, current_user: user).approvers_left }
-
-    it { is_expected.to match_array(public_approver_group.users) }
-
-    context 'when user has access to private group' do
-      before do
-        private_group.add_user(user, Gitlab::Access::DEVELOPER)
-      end
-
-      it do
-        approvers = public_approver_group.users + private_approver_group.users - [user]
-
-        is_expected.to match_array(approvers)
-      end
-    end
-  end
-
-  describe '#approvers_left with approval_rule enabled' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
-    let!(:approver) { create(:approver, target: merge_request) }
-
-    before do
-      merge_request.approvals.create!(user: approver.user)
+      merge_request.approvals.create!(user: approver)
     end
 
     subject { described_class.new(merge_request, current_user: user).approvers_left }
 
     it 'contains all approvers' do
-      approvers = public_approver_group.users + private_approver_group.users - [user]
+      approvers = public_group.users + private_group.users - [user]
 
       is_expected.to match_array(approvers)
-    end
-  end
-
-  describe '#overall_approver_groups' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
-
-    subject { described_class.new(merge_request, current_user: user).overall_approver_groups }
-
-    it { is_expected.to match_array([public_approver_group]) }
-
-    context 'when user has access to private group' do
-      before do
-        private_group.add_user(user, Gitlab::Access::DEVELOPER)
-      end
-
-      it { is_expected.to match_array([public_approver_group, private_approver_group]) }
-    end
-  end
-
-  describe '#all_approvers_including_groups' do
-    let!(:private_group) { create(:group_with_members, :private) }
-    let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
-    let!(:approver) { create(:approver, target: merge_request) }
-
-    subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
-
-    before do
-      stub_feature_flags(approval_rules: false)
-    end
-
-    it { is_expected.to match_array(public_approver_group.users + [approver.user]) }
-
-    context 'when user has access to private group' do
-      before do
-        private_group.add_user(user, Gitlab::Access::DEVELOPER)
-      end
-
-      it do
-        approvers = [public_approver_group.users, private_approver_group.users, approver.user].flatten - [user]
-
-        is_expected.to match_array(approvers)
-      end
     end
   end
 
   describe '#all_approvers_including_groups with approval_rule enabled' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
-    let!(:public_approver_group) { create(:approver_group, target: merge_request, group: public_group) }
-    let!(:private_approver_group) { create(:approver_group, target: merge_request, group: private_group) }
-    let!(:approver) { create(:approver, target: merge_request) }
+    let!(:approver) { create(:user) }
+    let!(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], groups: [private_group, public_group]) }
+
+    before do
+      project.add_developer(approver)
+    end
 
     subject { described_class.new(merge_request, current_user: user).all_approvers_including_groups }
 
     it do
-      approvers = [public_approver_group.users, private_approver_group.users, approver.user].flatten - [user]
+      approvers = [public_group.users, private_group.users, approver].flatten - [user]
 
       is_expected.to match_array(approvers)
     end

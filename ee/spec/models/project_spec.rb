@@ -1024,16 +1024,6 @@ describe Project do
         expect(project.visible_regular_approval_rules).to contain_exactly(approval_rules.first)
       end
     end
-
-    context 'when approval rules are disabled' do
-      before do
-        stub_feature_flags(approval_rules: false)
-      end
-
-      it 'does not return any approval rules' do
-        expect(project.visible_regular_approval_rules).to be_empty
-      end
-    end
   end
 
   describe '#min_fallback_approvals' do
@@ -1059,12 +1049,6 @@ describe Project do
         stub_licensed_features(multiple_approval_rules: false)
 
         expect(project.min_fallback_approvals).to eq(2)
-      end
-
-      it 'returns approvals before merge when code owner rules is disabled' do
-        stub_feature_flags(approval_rules: false)
-
-        expect(project.min_fallback_approvals).to eq(1)
       end
     end
   end
