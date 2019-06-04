@@ -2,7 +2,7 @@ import Vue from 'vue';
 import '~/boards/services/board_service';
 import Board from '~/boards/components/board';
 import '~/boards/models/list';
-import { mockBoardService } from 'spec/boards/mock_data';
+import { mockBoardService } from '../mock_data';
 
 describe('Board component', () => {
   let vm;
