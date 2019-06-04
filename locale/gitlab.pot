@@ -11459,10 +11459,22 @@ msgstr ""
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
 msgstr ""
 
+msgid "SecurityDashboard|Confidence"
+msgstr ""
+
 msgid "SecurityDashboard|Monitor vulnerabilities in your code"
 msgstr ""
 
 msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
+msgstr ""
+
+msgid "SecurityDashboard|Project"
+msgstr ""
+
+msgid "SecurityDashboard|Report type"
+msgstr ""
+
+msgid "SecurityDashboard|Severity"
 msgstr ""
 
 msgid "See metrics"
@@ -13111,6 +13123,9 @@ msgid "There was an error %{message} todo."
 msgstr ""
 
 msgid "There was an error adding a todo."
+msgstr ""
+
+msgid "There was an error creating the issue"
 msgstr ""
 
 msgid "There was an error deleting the todo."
