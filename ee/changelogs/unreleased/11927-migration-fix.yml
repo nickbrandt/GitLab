@@ -1,0 +1,5 @@
+---
+title: Fix "rule_type does not exist" error during consume_remaining_migrate_approver_to_approval_rules_in_batch_jobs migration
+merge_request: 13947
+author:
+type: fixed
