@@ -10,7 +10,7 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      segment ':id/approval_settings' do
+      segment ':id/approval_rules' do
         desc 'Get all project approval rules' do
           detail 'Private API subject to change'
           success EE::API::Entities::ProjectApprovalRules
@@ -21,22 +21,48 @@ module API
           present user_project, with: EE::API::Entities::ProjectApprovalRules, current_user: current_user
         end
 
-        segment 'rules' do
-          desc 'Create new approval rule' do
+        desc 'Create new approval rule' do
+          detail 'Private API subject to change'
+          success EE::API::Entities::ApprovalRule
+        end
+        params do
+          requires :name, type: String, desc: 'The name of the approval rule'
+          requires :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
+          optional :rule_type, type: String, desc: 'The type of approval rule'
+          optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
+          optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'
+        end
+        post do
+          authorize! :admin_project, user_project
+
+          result = ::ApprovalRules::CreateService.new(user_project, current_user, declared_params(include_missing: false)).execute
+
+          if result[:status] == :success
+            present result[:rule], with: EE::API::Entities::ApprovalRule, current_user: current_user
+          else
+            render_api_error!(result[:message], 400)
+          end
+        end
+
+        segment ':approval_rule_id' do
+          desc 'Update approval rule' do
             detail 'Private API subject to change'
             success EE::API::Entities::ApprovalRule
           end
           params do
-            requires :name, type: String, desc: 'The name of the approval rule'
-            requires :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
-            optional :rule_type, type: String, desc: 'The type of approval rule'
+            requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
+            optional :name, type: String, desc: 'The name of the approval rule'
+            optional :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
             optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
             optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'
+            optional :remove_hidden_groups, type: Boolean, desc: 'Whether hidden groups should be removed'
           end
-          post do
+          put do
             authorize! :admin_project, user_project
 
-            result = ::ApprovalRules::CreateService.new(user_project, current_user, declared_params(include_missing: false)).execute
+            params = declared_params(include_missing: false)
+            approval_rule = user_project.approval_rules.find(params.delete(:approval_rule_id))
+            result = ::ApprovalRules::UpdateService.new(approval_rule, current_user, params).execute
 
             if result[:status] == :success
               present result[:rule], with: EE::API::Entities::ApprovalRule, current_user: current_user
@@ -45,48 +71,22 @@ module API
             end
           end
 
-          segment ':approval_rule_id' do
-            desc 'Update approval rule' do
-              detail 'Private API subject to change'
-              success EE::API::Entities::ApprovalRule
-            end
-            params do
-              requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
-              optional :name, type: String, desc: 'The name of the approval rule'
-              optional :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
-              optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
-              optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'
-              optional :remove_hidden_groups, type: Boolean, desc: 'Whether hidden groups should be removed'
-            end
-            put do
-              authorize! :admin_project, user_project
+          desc 'Delete an approval rule' do
+            detail 'Private API subject to change'
+          end
+          params do
+            requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
+          end
+          delete do
+            authorize! :admin_project, user_project
 
-              params = declared_params(include_missing: false)
-              approval_rule = user_project.approval_rules.find(params.delete(:approval_rule_id))
-              result = ::ApprovalRules::UpdateService.new(approval_rule, current_user, params).execute
+            approval_rule = user_project.approval_rules.find(params[:approval_rule_id])
 
-              if result[:status] == :success
-                present result[:rule], with: EE::API::Entities::ApprovalRule, current_user: current_user
-              else
-                render_api_error!(result[:message], 400)
-              end
+            destroy_conditionally!(approval_rule) do |rule|
+              ::ApprovalRules::ProjectRuleDestroyService.new(rule).execute
             end
 
-            desc 'Delete an approval rule' do
-              detail 'Private API subject to change'
-            end
-            params do
-              requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
-            end
-            delete do
-              authorize! :admin_project, user_project
-
-              approval_rule = user_project.approval_rules.find(params[:approval_rule_id])
-
-              destroy_conditionally!(approval_rule) do |rule|
-                ::ApprovalRules::ProjectRuleDestroyService.new(rule).execute
-              end
-            end
+            no_content!
           end
         end
       end
