@@ -19,7 +19,7 @@ module Geo
     end
 
     def count_registry
-      registries_for_attachments.count
+      Geo::FileRegistry.attachments.count
     end
 
     def syncable
