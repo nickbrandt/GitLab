@@ -7,7 +7,7 @@ describe 'Projects > Settings' do
   let(:project) { create(:project, :repository, create_templates: :issue) }
   let(:role) { :maintainer }
   let(:create_issue) { 'Create an issue. Issues are created for each alert triggered.' }
-  let(:send_email) { 'Send an email notification to Developers.' }
+  let(:send_email) { 'Send a separate email notification to Developers.' }
 
   before do
     create(:project_incident_management_setting, send_email: true, project: project)
