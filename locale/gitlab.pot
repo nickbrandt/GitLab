@@ -7189,6 +7189,9 @@ msgstr ""
 msgid "Issue update failed"
 msgstr ""
 
+msgid "Issue was closed by %{name} %{reason}"
+msgstr ""
+
 msgid "IssueBoards|Board"
 msgstr ""
 
@@ -15684,6 +15687,9 @@ msgstr ""
 msgid "commented on %{link_to_project}"
 msgstr ""
 
+msgid "commit %{commit_id}"
+msgstr ""
+
 msgid "confidence|Confirmed"
 msgstr ""
 
@@ -16363,6 +16369,12 @@ msgid "uses Kubernetes clusters to deploy your code!"
 msgstr ""
 
 msgid "verify ownership"
+msgstr ""
+
+msgid "via %{closed_via}"
+msgstr ""
+
+msgid "via merge request %{link}"
 msgstr ""
 
 msgid "view it on GitLab"
