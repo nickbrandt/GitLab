@@ -99,6 +99,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
 
 
+## 11.10.6 (2019-06-04)
+
+### Fixed (5 changes, 1 of them is from the community)
+
+- Fix removing and updating insights config, and foreign key constraints. !11030
+- Fix the group's epic page. The Paste issue link placeholder shown as 'undefinedundefinedundefined' in Chinese environment. And the error message showed nothing. !11312 (wdmcheng)
+- Fix approvals project settings section when merge requests disabled. !12070
+- Use path instead of a URL for accessing approval settings. !12414
+- Fix relative url root issues with license management. !12488
+
+
 ## 11.10.4 (2019-05-01)
 
 ### Fixed (1 change, 1 of them is from the community)
