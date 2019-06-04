@@ -60,6 +60,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :proxy
           end
         end
+
+        resource :feature_flags_client, only: [] do
+          post :reset_token
+        end
       end
 
       resources :dependencies, only: [:index]

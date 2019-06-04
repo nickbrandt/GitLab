@@ -12,6 +12,7 @@ module EE
       vulnerability_feedback
       license_management
       feature_flag
+      feature_flags_client
       design
     ].freeze
 
@@ -153,6 +154,7 @@ module EE
         enable :admin_path_locks
         enable :update_approvers
         enable :destroy_package
+        enable :admin_feature_flags_client
       end
 
       rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
