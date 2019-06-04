@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.2 (2019-06-04)
+
+### Performance (1 change)
+
+- Geo - Does not apply selective sync restrictions while counting registries on the tracking database. !13257
+
+
 ## 11.11.0 (2019-05-22)
 
 ### Security (1 change)
