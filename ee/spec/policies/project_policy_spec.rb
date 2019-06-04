@@ -29,7 +29,7 @@ describe ProjectPolicy do
     end
     let(:additional_reporter_permissions) { [:admin_issue_link] }
     let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag] }
-    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches] }
+    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
     let(:auditor_permissions) do
       %i[
         download_code download_wiki_code read_project read_board read_list
