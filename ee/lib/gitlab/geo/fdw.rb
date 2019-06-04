@@ -24,7 +24,7 @@ module Gitlab
         end
 
         def enabled_for_selective_sync?
-          enabled? && Feature.enabled?(:use_fdw_queries_for_selective_sync)
+          enabled? && Feature.enabled?(:use_fdw_queries_for_selective_sync, default_enabled: true)
         end
 
         # Return full table name with foreign schema
