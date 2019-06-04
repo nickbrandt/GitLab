@@ -36,6 +36,7 @@ class UsersFinder
     users = by_external(users)
     users = by_2fa(users)
     users = by_created_at(users)
+    users = by_ids(users)
     users = by_custom_attributes(users)
 
     users
@@ -94,6 +95,14 @@ class UsersFinder
       users
     end
   end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def by_ids(users)
+    return users unless params[:ids]
+
+    users.where(id: params[:ids])
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
 end
 
 UsersFinder.prepend(EE::UsersFinder)
