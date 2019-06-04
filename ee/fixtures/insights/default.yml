@@ -1,6 +1,12 @@
 issues:
   title: Issues Dashboard
   charts:
+    - title: Issues created per month
+      type: bar
+      query:
+        issuable_type: issue
+        issuable_state: all
+        group_by: month
     - title: Bugs created per month by Priority
       type: stacked-bar
       query:
