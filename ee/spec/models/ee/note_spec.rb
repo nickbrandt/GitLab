@@ -38,4 +38,12 @@ describe Note do
       expect(note.parent).to eq(group)
     end
   end
+
+  describe '#for_design' do
+    it 'is true when the noteable is a design' do
+      note = build(:note, noteable: build(:design))
+
+      expect(note).to be_for_design
+    end
+  end
 end
