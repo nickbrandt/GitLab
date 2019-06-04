@@ -483,7 +483,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # EE-specific end
 
       ## EE-specific
-      resources :vulnerability_feedback, only: [:index, :create, :destroy], constraints: { id: /\d+/ }
+      resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
       get :issues, to: 'issues#calendar', constraints: lambda { |req| req.format == :ics }
 

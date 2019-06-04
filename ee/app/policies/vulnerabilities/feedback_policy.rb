@@ -15,6 +15,6 @@ module Vulnerabilities
         (~can?(:create_merge_request_in) | ~can?(:create_merge_request_from))
     end.prevent :create_vulnerability_feedback
 
-    rule { ~dismissal }.prevent :destroy_vulnerability_feedback
+    rule { ~dismissal }.prevent :destroy_vulnerability_feedback, :update_vulnerability_feedback
   end
 end

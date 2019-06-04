@@ -113,6 +113,7 @@ module EE
         enable :admin_board
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
+        enable :update_vulnerability_feedback
         enable :create_package
         enable :read_feature_flag
         enable :create_feature_flag

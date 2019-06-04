@@ -53,5 +53,11 @@ module Vulnerabilities
         raise ArgumentError.new("'#{feedback_params[:category]}' is not a valid category")
       end
     end
+
+    # A hard delete of the comment_author will cause the comment_author to be nil, but the comment
+    # will still exist.
+    def has_comment?
+      comment.present? && comment_author.present?
+    end
   end
 end

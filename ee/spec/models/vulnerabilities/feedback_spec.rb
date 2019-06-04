@@ -35,6 +35,31 @@ describe Vulnerabilities::Feedback do
     end
   end
 
+  describe '#has_comment?' do
+    let(:feedback) { build(:vulnerability_feedback, comment: comment, comment_author: comment_author) }
+    let(:comment) { 'a comment' }
+    let(:comment_author) { build(:user) }
+
+    subject { feedback.has_comment? }
+
+    context 'comment and comment_author are set' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'comment is set and comment_author is not' do
+      let(:comment_author) { nil }
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'comment and comment_author are not set' do
+      let(:comment) { nil }
+      let(:comment_author) { nil }
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
   describe '#find_or_init_for' do
     let(:group) { create(:group) }
     let(:project) { create(:project, :public, :repository, namespace: group) }

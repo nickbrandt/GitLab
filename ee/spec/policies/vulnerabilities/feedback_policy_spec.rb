@@ -75,6 +75,32 @@ describe Vulnerabilities::FeedbackPolicy do
     end
   end
 
+  describe 'update_vulnerability_feedback' do
+    context 'when feedback type is issue' do
+      let(:vulnerability_feedback) { Vulnerabilities::Feedback.new(project: project, feedback_type: :issue) }
+
+      it 'does not allow to update issue feedback' do
+        is_expected.to be_disallowed(:update_vulnerability_feedback)
+      end
+    end
+
+    context 'when feedback type is merge_request' do
+      let(:vulnerability_feedback) { Vulnerabilities::Feedback.new(project: project, feedback_type: :merge_request) }
+
+      it 'does not allow to update merge request feedback' do
+        is_expected.to be_disallowed(:update_vulnerability_feedback)
+      end
+    end
+
+    context 'when feedback type is dismissal' do
+      let(:vulnerability_feedback) { Vulnerabilities::Feedback.new(project: project, feedback_type: :dismissal) }
+
+      it 'allows to update dismissal feedback' do
+        is_expected.to be_allowed(:update_vulnerability_feedback)
+      end
+    end
+  end
+
   describe 'destroy_vulnerability_feedback' do
     context 'when feedback type is issue' do
       let(:vulnerability_feedback) { Vulnerabilities::Feedback.new(project: project, feedback_type: :issue) }
