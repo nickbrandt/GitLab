@@ -14,7 +14,6 @@ exports[`DependenciesTable component given a list of dependencies (loaded) match
       Component
     
     </div>
-     
     <div
       class="table-section section-15"
       role="rowheader"
@@ -23,7 +22,6 @@ exports[`DependenciesTable component given a list of dependencies (loaded) match
       Version
     
     </div>
-     
     <div
       class="table-section section-20"
       role="rowheader"
@@ -32,7 +30,6 @@ exports[`DependenciesTable component given a list of dependencies (loaded) match
       Packager
     
     </div>
-     
     <div
       class="table-section flex-grow-1"
       role="rowheader"
@@ -66,7 +63,6 @@ exports[`DependenciesTable component given a list of dependencies (loading) matc
       Component
     
     </div>
-     
     <div
       class="table-section section-15"
       role="rowheader"
@@ -75,7 +71,6 @@ exports[`DependenciesTable component given a list of dependencies (loading) matc
       Version
     
     </div>
-     
     <div
       class="table-section section-20"
       role="rowheader"
@@ -84,7 +79,6 @@ exports[`DependenciesTable component given a list of dependencies (loading) matc
       Packager
     
     </div>
-     
     <div
       class="table-section flex-grow-1"
       role="rowheader"
@@ -120,7 +114,6 @@ exports[`DependenciesTable component given an empty list of dependencies matches
       Component
     
     </div>
-     
     <div
       class="table-section section-15"
       role="rowheader"
@@ -129,7 +122,6 @@ exports[`DependenciesTable component given an empty list of dependencies matches
       Version
     
     </div>
-     
     <div
       class="table-section section-20"
       role="rowheader"
@@ -138,7 +130,6 @@ exports[`DependenciesTable component given an empty list of dependencies matches
       Packager
     
     </div>
-     
     <div
       class="table-section flex-grow-1"
       role="rowheader"

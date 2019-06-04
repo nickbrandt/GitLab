@@ -1,4 +1,5 @@
 <script>
+import { s__ } from '~/locale';
 import DependenciesTableRow from './dependencies_table_row.vue';
 
 export default {
@@ -16,23 +17,30 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      tableSections: [
+        { className: 'section-20', label: s__('Dependencies|Component') },
+        { className: 'section-15', label: s__('Dependencies|Version') },
+        { className: 'section-20', label: s__('Dependencies|Packager') },
+        { className: 'flex-grow-1', label: s__('Dependencies|Location') },
+      ],
+    };
+  },
 };
 </script>
 
 <template>
   <div>
     <div class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2" role="row">
-      <div class="table-section section-20" role="rowheader">
-        {{ s__('Dependencies|Component') }}
-      </div>
-      <div class="table-section section-15" role="rowheader">
-        {{ s__('Dependencies|Version') }}
-      </div>
-      <div class="table-section section-20" role="rowheader">
-        {{ s__('Dependencies|Packager') }}
-      </div>
-      <div class="table-section flex-grow-1" role="rowheader">
-        {{ s__('Dependencies|Location') }}
+      <div
+        v-for="(section, index) in tableSections"
+        :key="index"
+        class="table-section"
+        :class="section.className"
+        role="rowheader"
+      >
+        {{ section.label }}
       </div>
     </div>
 
