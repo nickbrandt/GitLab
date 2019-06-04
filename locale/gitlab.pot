@@ -7775,6 +7775,9 @@ msgstr ""
 msgid "Loading contribution stats for group members"
 msgstr ""
 
+msgid "Loading functions timed out. Please reload the page to try again."
+msgstr ""
+
 msgid "Loading the GitLab IDE..."
 msgstr ""
 
