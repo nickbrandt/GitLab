@@ -20,7 +20,7 @@ export default class SidebarContext {
         // which requires us to use `display: none;`
         // in `labels_select/base.vue` as well.
         // see: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4773#note_61844731
-        const isVisible = !!$selectbox.get(0).offsetParent;
+        const isVisible = Boolean($selectbox.get(0).offsetParent);
         $selectbox.toggle(!isVisible);
         $block.find('.js-value').toggle(isVisible);
 

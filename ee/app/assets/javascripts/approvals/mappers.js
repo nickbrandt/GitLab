@@ -15,7 +15,7 @@ export const mapApprovalFallbackRuleRequest = req => ({
 
 export const mapApprovalRuleResponse = res => ({
   id: res.id,
-  hasSource: !!res.source_rule,
+  hasSource: Boolean(res.source_rule),
   name: res.name,
   approvalsRequired: res.approvals_required,
   minApprovalsRequired: res.source_rule ? res.source_rule.approvals_required : 0,

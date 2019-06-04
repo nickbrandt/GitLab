@@ -55,12 +55,12 @@ export default {
   },
   computed: {
     formIsValid() {
-      return !!(
+      return Boolean(
         this.queryIsValid &&
-        this.title.length &&
-        this.yLabel.length &&
-        this.unit.length &&
-        this.group.length
+          this.title.length &&
+          this.yLabel.length &&
+          this.unit.length &&
+          this.group.length,
       );
     },
     validQueryMsg() {

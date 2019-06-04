@@ -62,10 +62,10 @@ export default {
         : s__('PrometheusAlerts|Edit alert');
     },
     hasAlerts() {
-      return !!Object.keys(this.alertsToManage).length;
+      return Boolean(Object.keys(this.alertsToManage).length);
     },
     formDisabled() {
-      return !!(this.errorMessage || this.isLoading);
+      return Boolean(this.errorMessage || this.isLoading);
     },
   },
   watch: {

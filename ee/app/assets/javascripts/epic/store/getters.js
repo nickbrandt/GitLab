@@ -6,7 +6,7 @@ import { statusType } from '../constants';
 
 export const isEpicOpen = state => state.state === statusType.open;
 
-export const isUserSignedIn = () => !!gon.current_user_id;
+export const isUserSignedIn = () => Boolean(gon.current_user_id);
 
 export const startDateTime = state => (state.startDate ? parsePikadayDate(state.startDate) : null);
 
