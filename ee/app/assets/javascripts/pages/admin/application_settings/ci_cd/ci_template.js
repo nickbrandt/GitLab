@@ -30,7 +30,7 @@ export default class CiTemplate {
     return {
       Reset: [
         {
-          name: 'None',
+          name: 'No Required Pipeline',
           id: '',
         },
         'divider',

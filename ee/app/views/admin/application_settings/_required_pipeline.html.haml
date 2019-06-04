@@ -1,0 +1,23 @@
+-# TODO: Change all references to `shared_runners_text` to be `required_template_name`
+- return unless License.feature_available?(:required_template_inclusion)
+
+%section.settings.as-required-pipeline.no-animate#js-required-pipeline-settings{ class: ('expanded' if expanded)}
+  .settings-header
+    %h4
+      = s_('AdminSettings|Required pipeline configuration')
+    %button.btn.btn-default.js-settings-toggle{ type: 'button' }
+      = expanded ? _('Collapse') : _('Expand')
+    %p
+      - link_start = '<a href="%{url}">'.html_safe % { url: help_page_path('ci/yaml/README') }
+      = s_('AdminSettings|Set an instance-wide auto included %{link_start}pipeline configuration%{link_end}. This pipeline configuration will be run after the project\'s own configuration.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
+  .settings-content
+    = form_for @application_setting, url: admin_application_settings_path(anchor: 'js-required-pipeline-settings'), html: { class: 'fieldset-form' } do |f|
+      = form_errors(@application_setting)
+
+      %fieldset
+        .form-group
+          = f.label :required_template_name, s_('AdminSettings|Select a pipeline configuration file'), class: 'text-muted'
+          = dropdown_tag(s_('AdminSettings|No Required Pipeline'), options: { toggle_class: 'js-ci-template-dropdown w-100', title: s_('AdminSettings|Select a Template'), filter: true, placeholder: "Filter", data: { data: gitlab_ci_ymls(nil) } } )
+          = f.text_field :required_template_name, value: @application_setting.required_template_name, id: 'required_template_name', class: 'hidden'
+
+      = f.submit _('Save changes'), class: "btn btn-success"

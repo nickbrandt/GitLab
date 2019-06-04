@@ -13,16 +13,7 @@
   .settings-content
     = render 'ci_cd'
 
-%section.settings.as-required-pipeline.no-animate#js-required-pipeline-settings{ class: ('expanded' if expanded_by_default?)}
-  .settings-header
-    %h4
-      = _('Required pipeline configuration')
-    %button.btn.btn-default.js-settings-toggle{ type: 'button' }
-      = expanded_by_default? ? _('Collapse') : _('Expand')
-    %p
-      = ('Set an instance-wide auto included pipeline configuration. This pipeline configuration will be run after the project\'s own configuration.')
-  .settings-content
-    = render 'required_pipeline'
+= render_if_exists 'admin/application_settings/required_pipeline', expanded: expanded_by_default?
 
 - if Gitlab.config.registry.enabled
   %section.settings.as-registry.no-animate#js-registry-settings{ class: ('expanded' if expanded_by_default?) }
