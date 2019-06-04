@@ -67,7 +67,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
 
   setApprovals(data) {
     this.approvals = mapApprovalsResponse(data);
-    this.approvalsLeft = !!data.approvals_left;
+    this.approvalsLeft = Boolean(data.approvals_left);
     this.isApproved = data.approved || false;
     this.preventMerge = !this.isApproved;
   }

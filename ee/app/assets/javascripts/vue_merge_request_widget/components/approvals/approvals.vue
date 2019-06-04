@@ -50,13 +50,13 @@ export default {
       return this.mr.approvals || {};
     },
     hasFooter() {
-      return !!this.approvals.has_approval_rules;
+      return Boolean(this.approvals.has_approval_rules);
     },
     approvedBy() {
       return this.approvals.approved_by ? this.approvals.approved_by.map(x => x.user) : [];
     },
     isApproved() {
-      return !!this.approvals.approved;
+      return Boolean(this.approvals.approved);
     },
     approvalsRequired() {
       return this.approvals.approvals_required || 0;
@@ -65,10 +65,10 @@ export default {
       return !this.approvedBy.length && !this.approvalsRequired;
     },
     userHasApproved() {
-      return !!this.approvals.user_has_approved;
+      return Boolean(this.approvals.user_has_approved);
     },
     userCanApprove() {
-      return !!this.approvals.user_can_approve;
+      return Boolean(this.approvals.user_can_approve);
     },
     showApprove() {
       return !this.userHasApproved && this.userCanApprove && this.mr.isOpen;
@@ -106,7 +106,7 @@ export default {
       return null;
     },
     hasAction() {
-      return !!this.action;
+      return Boolean(this.action);
     },
   },
   watch: {

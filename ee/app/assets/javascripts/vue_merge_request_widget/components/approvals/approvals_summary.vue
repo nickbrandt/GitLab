@@ -51,7 +51,7 @@ export default {
       );
     },
     hasApprovers() {
-      return !!this.approvers.length;
+      return Boolean(this.approvers.length);
     },
   },
   APPROVED_MESSAGE,

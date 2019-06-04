@@ -24,7 +24,8 @@ export default {
       type: Object,
       required: true,
       validator: license =>
-        !!license.name && Object.values(LICENSE_APPROVAL_STATUS).includes(license.approvalStatus),
+        Boolean(license.name) &&
+        Object.values(LICENSE_APPROVAL_STATUS).includes(license.approvalStatus),
     },
   },
   LICENSE_APPROVAL_STATUS,

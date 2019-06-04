@@ -176,7 +176,7 @@ export default class BurndownChart {
       this.idealData = [idealStart, idealEnd];
     }
 
-    this.scheduleLineAnimation = !!animate;
+    this.scheduleLineAnimation = Boolean(animate);
     this.scheduleRender();
   }
 

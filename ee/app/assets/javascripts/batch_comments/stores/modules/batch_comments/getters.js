@@ -29,16 +29,16 @@ export const draftsPerFileHashAndLine = state =>
   }, {});
 
 export const shouldRenderDraftRow = (state, getters) => (diffFileSha, line) =>
-  !!(
+  Boolean(
     diffFileSha in getters.draftsPerFileHashAndLine &&
-    getters.draftsPerFileHashAndLine[diffFileSha][line.line_code]
+      getters.draftsPerFileHashAndLine[diffFileSha][line.line_code],
   );
 
 export const shouldRenderParallelDraftRow = (state, getters) => (diffFileSha, line) => {
   const draftsForFile = getters.draftsPerFileHashAndLine[diffFileSha];
   const [lkey, rkey] = [parallelLineKey(line, 'left'), parallelLineKey(line, 'right')];
 
-  return draftsForFile ? !!(draftsForFile[lkey] || draftsForFile[rkey]) : false;
+  return draftsForFile ? Boolean(draftsForFile[lkey] || draftsForFile[rkey]) : false;
 };
 
 export const shouldRenderDraftRowInDiscussion = (state, getters) => discussionId =>
