@@ -14,15 +14,15 @@ module Vulnerabilities
 
     attr_accessor :vulnerability_data
 
-    enum feedback_type: { dismissal: 0, issue: 1, merge_request: 2 }
+    enum feedback_type: { dismissal: 0, issue: 1, merge_request: 2 }, _suffix: :type
     enum category: { sast: 0, dependency_scanning: 1, container_scanning: 2, dast: 3 }
 
     validates :project, presence: true
     validates :author, presence: true
     validates :comment_timestamp, :comment_author, presence: true, if: :comment?
-    validates :issue, presence: true, if: :issue?
-    validates :merge_request, presence: true, if: :merge_request?
-    validates :vulnerability_data, presence: true, unless: :dismissal?
+    validates :issue, presence: true, if: :issue_type?
+    validates :merge_request, presence: true, if: :merge_request_type?
+    validates :vulnerability_data, presence: true, unless: :dismissal_type?
     validates :feedback_type, presence: true
     validates :category, presence: true
     validates :project_fingerprint, presence: true, uniqueness: { scope: [:project_id, :category, :feedback_type] }
