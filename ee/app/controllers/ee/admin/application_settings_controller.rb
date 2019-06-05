@@ -26,6 +26,10 @@ module EE
           attrs << :pseudonymizer_enabled
         end
 
+        if License.feature_available?(:default_project_deletion_protection)
+          attrs << :default_project_deletion_protection
+        end
+
         attrs
       end
     end

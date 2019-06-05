@@ -9050,6 +9050,9 @@ msgstr ""
 msgid "Only admins"
 msgstr ""
 
+msgid "Only admins can delete project"
+msgstr ""
+
 msgid "Only mirror protected branches"
 msgstr ""
 
@@ -10206,6 +10209,9 @@ msgid "ProjectCreationLevel|Allowed to create projects"
 msgstr ""
 
 msgid "ProjectCreationLevel|Default project creation protection"
+msgstr ""
+
+msgid "ProjectCreationLevel|Default project deletion protection"
 msgstr ""
 
 msgid "ProjectCreationLevel|Developers + Maintainers"
