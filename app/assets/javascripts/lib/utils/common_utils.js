@@ -220,9 +220,9 @@ export const getPlatformLeaderKeyHTML = () => {
 
 export const isPlatformLeaderKey = e => {
   if (getPlatformLeaderKey() === 'meta') {
-    return !!e.metaKey;
+    return Boolean(e.metaKey);
   }
-  return !!e.ctrlKey;
+  return Boolean(e.ctrlKey);
 };
 
 /**
