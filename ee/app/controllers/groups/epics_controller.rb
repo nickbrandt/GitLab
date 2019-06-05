@@ -99,7 +99,7 @@ class Groups::EpicsController < Groups::ApplicationController
   end
 
   def preload_for_collection
-    @preload_for_collection ||= [:group, :author]
+    @preload_for_collection ||= [:group, :author, :labels]
   end
 
   def authorize_create_epic!

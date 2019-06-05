@@ -116,6 +116,26 @@ describe Groups::EpicsController do
         end
       end
 
+      context "when epic has multiple labels" do
+        render_views
+
+        let(:label) { create(:label) }
+        let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
+
+        it 'does not cause N+1 queries' do
+          get :index, params: { group_id: group }
+
+          control_count = ActiveRecord::QueryRecorder.new do
+            get :index, params: { group_id: group }
+          end
+
+          label = create(:label)
+          create(:labeled_epic, group: group, labels: [label])
+
+          expect { get :index, params: { group_id: group } }.not_to exceed_query_limit(control_count)
+        end
+      end
+
       context 'when format is JSON' do
         before do
           allow(Kaminari.config).to receive(:default_per_page).and_return(1)
