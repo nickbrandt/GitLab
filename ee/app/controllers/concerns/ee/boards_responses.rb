@@ -12,10 +12,5 @@ module EE
     def authorize_read_milestone
       authorize_action_for!(board, :read_milestone)
     end
-
-    override :serializer
-    def serializer
-      BoardSerializer.new(serializer: 'ee-board')
-    end
   end
 end

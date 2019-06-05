@@ -22,17 +22,17 @@ describe BoardsResponses do
       end
 
       it 'serialises properly' do
-        expected = { id: board.id }
+        expected = { id: board.id }.to_json
 
-        expect(subject.serialize_as_json(board)).to match(expected)
+        expect(subject.serialize_as_json(board).to_json).to eq(expected)
       end
     end
 
     context 'without milestone' do
       it 'serialises properly' do
-        expected = { id: board.id }
+        expected = { id: board.id }.to_json
 
-        expect(subject.serialize_as_json(board)).to eq(expected)
+        expect(subject.serialize_as_json(board).to_json).to eq(expected)
       end
     end
   end
