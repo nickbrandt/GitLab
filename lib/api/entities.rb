@@ -1103,10 +1103,6 @@ module API
       end
     end
 
-    class BoardSimple < Grape::Entity
-      expose :id
-    end
-
     class Compare < Grape::Entity
       expose :commit, using: Entities::Commit do |compare, options|
         ::Commit.decorate(compare.commits, nil).last
@@ -1670,7 +1666,6 @@ end
 API::Entities.prepend(EE::API::Entities::Entities) # rubocop: disable Cop/InjectEnterpriseEditionModule
 API::Entities.prepend_entity(::API::Entities::ApplicationSetting, with: EE::API::Entities::ApplicationSetting)
 API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Board)
-API::Entities.prepend_entity(::API::Entities::BoardSimple, with: EE::API::Entities::BoardSimple)
 API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)
 API::Entities.prepend_entity(::API::Entities::GroupDetail, with: EE::API::Entities::GroupDetail)
 API::Entities.prepend_entity(::API::Entities::IssueBasic, with: EE::API::Entities::IssueBasic)

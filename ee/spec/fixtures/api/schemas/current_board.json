@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "allOf": [
+    { "$ref": "board.json" },
+    {
+      "required" : [
+        "id",
+        "name",
+        "milestone_id",
+        "assignee_id",
+        "weight",
+        "label_ids",
+      ],
+      "properties": {
+        "assignee": {
+          "type": ["object", "null"],
+          "required": [
+            "id",
+            "name",
+            "username",
+            "avatar_url"
+          ]
+        },
+        "assignee": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "milestone.json" }
+          ]
+        },
+        "milestone": {
+          "type": ["object", "null"],
+          "required": [
+            "id",
+            "title"
+          ],
+          "properties": {
+            "id": { "type": "integer" },
+            "title": { "type": "string" }
+          }
+        }
+      }
+    }
+  ]
+}

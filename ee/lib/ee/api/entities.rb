@@ -140,15 +140,6 @@ module EE
         end
       end
 
-      module BoardSimple
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :name
-          expose :milestone, using: EE::API::Entities::MilestoneSimple, if: ->(board, _) { board&.milestone_id }
-        end
-      end
-
       module List
         extend ActiveSupport::Concern
 
@@ -728,11 +719,6 @@ module EE
 
       class ManagedLicense < Grape::Entity
         expose :id, :name, :approval_status
-      end
-
-      class MilestoneSimple < Grape::Entity
-        expose :id
-        expose :title
       end
     end
   end
