@@ -51,7 +51,6 @@ module API
 
         desc 'List approval rules for merge request', {
           success: ::EE::API::Entities::MergeRequestApprovalRules,
-          hidden: true
         }
         get 'approval_rules' do
           merge_request = find_merge_request_with_access(params[:merge_request_iid])
