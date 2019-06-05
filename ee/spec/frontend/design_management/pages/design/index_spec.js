@@ -14,7 +14,7 @@ describe('Design management design index page', () => {
     };
 
     vm = shallowMount(DesignIndex, {
-      propsData: { id: 1 },
+      propsData: { id: '1' },
       mocks: { $apollo },
     });
   }

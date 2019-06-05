@@ -26,7 +26,7 @@ describe('Design management pagination button component', () => {
   });
 
   it('renders router-link', () => {
-    createComponent({ id: 2 });
+    createComponent({ id: '2' });
 
     expect(vm.element).toMatchSnapshot();
   });
@@ -39,11 +39,11 @@ describe('Design management pagination button component', () => {
     });
 
     it('returns design link', () => {
-      createComponent({ id: 2 });
+      createComponent({ id: '2', filename: 'test' });
 
       expect(vm.vm.designLink).toEqual({
         name: 'design',
-        params: { id: 2 },
+        params: { id: 'test' },
       });
     });
   });

@@ -7,20 +7,20 @@ exports[`Design management pagination component renders pagination buttons 1`] =
   class="d-flex align-items-center"
 >
   
-  2 of 2
+  0 of 2
   
   <div
     class="btn-group ml-3"
   >
     <paginationbutton-stub
       class="js-previous-design"
-      design="[object Object]"
       iconname="angle-left"
       title="Go to previous design"
     />
      
     <paginationbutton-stub
       class="js-next-design"
+      design="[object Object]"
       iconname="angle-right"
       title="Go to next design"
     />
