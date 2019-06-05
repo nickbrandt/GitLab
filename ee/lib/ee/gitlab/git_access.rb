@@ -84,7 +84,7 @@ module EE
       def check_push_size!
         return unless check_size_limit?
 
-        # Use #check_quarantine_size to get correct push size whenever a lot of changes
+        # Use #check_repository_disk_size to get correct push size whenever a lot of changes
         # gets pushed at the same time containing the same blobs. This is only
         # doable if GIT_OBJECT_DIRECTORY_RELATIVE env var is set and happens
         # when git push comes from CLI (not via UI and API).
@@ -93,21 +93,19 @@ module EE
         # determine the push size if env var isn't set (e.g. changes are made
         # via UI and API).
         if check_quarantine_size?
-          check_quarantine_size
+          check_repository_disk_size
         else
           check_changes_size
         end
       end
 
       def check_quarantine_size?
-        strong_memoize(:check_quarantine_size) do
-          git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
+        git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
 
-          git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? && ::Feature.enabled?(:quarantine_push_size_check, default_enabled: true)
-        end
+        git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? && ::Feature.enabled?(:quarantine_push_size_check, default_enabled: true)
       end
 
-      def check_quarantine_size
+      def check_repository_disk_size
         check_size_against_limit(project.repository.object_directory_size)
       end
 
