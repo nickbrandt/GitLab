@@ -1,0 +1,5 @@
+---
+title: 'Resolve Graphql: N+1 in IssueType'
+merge_request: 13887
+author:
+type: performance
