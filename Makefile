@@ -135,7 +135,7 @@ check-formatting: $(TARGET_SETUP) install-goimports
 	@_support/validate-formatting.sh $(LOCAL_GO_FILES)
 
 # Megacheck will tailor some responses given a minimum Go version, so pass that through the CLI
-# Additionally, megacheck will not return failure exit codes unless explicitely told to via the
+# Additionally, megacheck will not return failure exit codes unless explicitly told to via the
 # `-simple.exit-non-zero` `-unused.exit-non-zero` and `-staticcheck.exit-non-zero` flags
 .PHONY: staticcheck
 staticcheck: $(TARGET_SETUP) govendor-sync

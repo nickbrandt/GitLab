@@ -17,7 +17,7 @@ import (
 
 // httpTransport defines a http.Transport with values
 // that are more restrictive than for http.DefaultTransport,
-// they define shorter TLS Handshake, and more agressive connection closing
+// they define shorter TLS Handshake, and more aggressive connection closing
 // to prevent the connection hanging and reduce FD usage
 var httpTransport = tracing.NewRoundTripper(correlation.NewInstrumentedRoundTripper(&http.Transport{
 	Proxy: http.ProxyFromEnvironment,

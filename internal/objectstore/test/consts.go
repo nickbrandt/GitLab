@@ -1,6 +1,6 @@
 package test
 
-// Some usefull const for testing purpose
+// Some useful const for testing purpose
 const (
 	// ObjectContent an example textual content
 	ObjectContent = "TEST OBJECT CONTENT"
