@@ -169,8 +169,7 @@ export default {
   },
   methods: {
     showPage(page) {
-      this.state.reload = false;
-      this.state.currentPage = page;
+      boardsStore.showPage(page);
     },
     loadBoards(toggleDropdown = true) {
       if (toggleDropdown && this.boards.length > 0) {
