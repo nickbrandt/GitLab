@@ -4064,10 +4064,19 @@ msgstr ""
 msgid "Dependencies|Component"
 msgstr ""
 
+msgid "Dependencies|Job failed to generate the dependency list"
+msgstr ""
+
 msgid "Dependencies|Location"
 msgstr ""
 
 msgid "Dependencies|Packager"
+msgstr ""
+
+msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
+msgstr ""
+
+msgid "Dependencies|Unsupported file(s) detected"
 msgstr ""
 
 msgid "Dependencies|Version"
@@ -8950,6 +8959,9 @@ msgid "One or more of your Bitbucket projects cannot be imported into GitLab dir
 msgstr ""
 
 msgid "One or more of your Google Code projects cannot be imported into GitLab directly because they use Subversion or Mercurial for version control, rather than Git."
+msgstr ""
+
+msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
 msgstr ""
 
 msgid "Only admins"
@@ -14528,6 +14540,9 @@ msgid "View in Sentry"
 msgstr ""
 
 msgid "View it on GitLab"
+msgstr ""
+
+msgid "View job"
 msgstr ""
 
 msgid "View job trace"
