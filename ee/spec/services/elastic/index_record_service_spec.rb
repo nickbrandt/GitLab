@@ -51,31 +51,48 @@ describe Elastic::IndexRecordService, :elastic do
     end
   end
 
-  it 'indexes all nested objects for a Project' do
-    # To be able to access it outside the following block
-    project = nil
+  context 'with nested associations' do
+    let(:project) { create :project, :repository }
 
-    Sidekiq::Testing.disable! do
-      project = create :project, :repository
-      create :issue, project: project
-      create :milestone, project: project
-      create :note, project: project
-      create :merge_request, target_project: project, source_project: project
-      create :project_snippet, project: project
+    before do
+      Sidekiq::Testing.disable! do
+        create :issue, project: project
+        create :milestone, project: project
+        create :note, project: project
+        create :merge_request, target_project: project, source_project: project
+        create :project_snippet, project: project
+      end
+
+      # Nothing should be in the index at this point
+      expect(Elasticsearch::Model.search('*').total_count).to be(0)
     end
 
-    expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id).and_call_original
+    it 'indexes records associated with the project' do
+      expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id).and_call_original
 
-    # Nothing should be in the index at this point
-    expect(Elasticsearch::Model.search('*').total_count).to be(0)
+      Sidekiq::Testing.inline! do
+        subject.execute(project, true)
+      end
+      Gitlab::Elastic::Helper.refresh_index
 
-    Sidekiq::Testing.inline! do
-      subject.execute(project, true)
+      ## All database objects + data from repository. The absolute value does not matter
+      expect(Elasticsearch::Model.search('*').total_count).to be > 40
     end
-    Gitlab::Elastic::Helper.refresh_index
 
-    ## All database objects + data from repository. The absolute value does not matter
-    expect(Elasticsearch::Model.search('*').total_count).to be > 40
+    it 'does not index records not associated with the project' do
+      other_project = create :project
+
+      expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(other_project.id).and_call_original
+
+      Sidekiq::Testing.inline! do
+        subject.execute(other_project, true)
+      end
+      Gitlab::Elastic::Helper.refresh_index
+
+      # Only the project itself should be in the index
+      expect(Elasticsearch::Model.search('*').total_count).to be 1
+      expect(Project.elastic_search('*').records).to contain_exactly(other_project)
+    end
   end
 
   it 'indexes changes during indexing gap' do

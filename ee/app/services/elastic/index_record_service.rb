@@ -35,8 +35,7 @@ module Elastic
 
     def initial_index_project(project)
       project.each_indexed_association do |klass, objects|
-        nested = klass.nested?
-        objects.find_each { |object| import(object, nested, true) }
+        objects.es_import
       end
 
       # Finally, index blobs/commits/wikis
