@@ -1956,6 +1956,12 @@ msgstr ""
 msgid "Boards"
 msgstr ""
 
+msgid "Boards|Edit board"
+msgstr ""
+
+msgid "Boards|View scope"
+msgstr ""
+
 msgid "Branch %{branchName} was not found in this project's repository."
 msgstr ""
 
@@ -11957,6 +11963,12 @@ msgid "Sign-in restrictions"
 msgstr ""
 
 msgid "Sign-up restrictions"
+msgstr ""
+
+msgid "SignUp|Name is too long (maximum is %{max_length} characters)."
+msgstr ""
+
+msgid "SignUp|Username is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "Signed in"
