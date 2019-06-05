@@ -36,4 +36,16 @@ describe 'EE-specific project routing' do
       expect(get('/gitlab/gitlabhq/-/designs/1/f166f5c7afaed9e1236e4e5965585f235795db4c3f45e8a9f6ea9dde098c')).to route_to('projects/designs#show', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '1', ref: 'f166f5c7afaed9e1236e4e5965585f235795db4c3f45e8a9f6ea9dde098c')
     end
   end
+
+  describe Projects::AutocompleteSourcesController, 'routing' do
+    it "to #epics" do
+      expect(get("/gitlab/gitlabhq/-/autocomplete_sources/epics")).to route_to("projects/autocomplete_sources#epics", namespace_id: 'gitlab', project_id: 'gitlabhq')
+    end
+  end
+
+  describe Projects::Settings::OperationsController, 'routing' do
+    it 'to #reset_alerting_token' do
+      expect(post('/gitlab/gitlabhq/-/settings/operations/reset_alerting_token')).to route_to('projects/settings/operations#reset_alerting_token', namespace_id: 'gitlab', project_id: 'gitlabhq')
+    end
+  end
 end
