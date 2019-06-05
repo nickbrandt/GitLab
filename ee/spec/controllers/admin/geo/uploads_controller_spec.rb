@@ -7,7 +7,7 @@ describe Admin::Geo::UploadsController, :geo do
 
   set(:admin) { create(:admin) }
   set(:secondary) { create(:geo_node) }
-  set(:synced_registry) { create(:geo_file_registry, :with_file, success: true) }
+  set(:synced_registry) { create(:geo_file_registry, :with_file, :attachment, success: true) }
   set(:failed_registry) { create(:geo_file_registry, :failed) }
   set(:never_registry) { create(:geo_file_registry, :failed, retry_count: nil) }
 
