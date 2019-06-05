@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::DependenciesController do
+describe Projects::Security::DependenciesController do
   describe 'GET index.json' do
     set(:project) { create(:project, :repository, :public) }
     set(:user) { create(:user) }
