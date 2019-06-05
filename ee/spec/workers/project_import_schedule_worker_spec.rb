@@ -2,6 +2,15 @@ require 'spec_helper'
 
 describe ProjectImportScheduleWorker do
   describe '#perform' do
+    it 'does nothing if the database is read-only' do
+      project = create(:project)
+
+      allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+      expect(ProjectImportState).not_to receive(:project_id).with(project_id: project.id)
+
+      subject.perform(project.id)
+    end
+
     it 'schedules an import for a project' do
       import_state = create(:import_state)
 

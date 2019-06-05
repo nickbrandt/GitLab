@@ -10,6 +10,13 @@ describe UpdateAllMirrorsWorker do
   end
 
   describe '#perform' do
+    it 'does nothing if the database is read-only' do
+      allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+      expect(worker).not_to receive(:schedule_mirrors!)
+
+      worker.perform
+    end
+
     it 'does not execute if cannot get the lease' do
       stub_exclusive_lease_taken
 
