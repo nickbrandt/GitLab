@@ -65,7 +65,7 @@ describe('Design management router', () => {
       const detail = vm.find(DesignDetail);
 
       expect(detail.exists()).toBe(true);
-      expect(detail.props('id')).toEqual(1);
+      expect(detail.props('id')).toEqual('1');
     });
   });
 });
