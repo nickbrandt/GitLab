@@ -26,7 +26,7 @@ module QA
           end
 
           def create_new_issue
-            click_on 'Submit issue'
+            click_element :issuable_create_button, Page::Project::Issue::Show
           end
         end
       end
