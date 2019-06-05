@@ -48,6 +48,12 @@ describe Gitlab::BackgroundMigration::PruneOrphanedGeoEvents, :migration, :postg
                                  tags_affected: 0)
     end
 
+    it 'does nothing if the database is read-only' do
+      allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+
+      expect { background_migration.perform(event_table_name) }.not_to change { Geo::RepositoryUpdatedEvent.count }
+    end
+
     it 'takes the first table if no table is specified' do
       expect(subject).to receive(:prune_orphaned_rows).with(described_class::EVENT_TABLES.first).and_call_original
 

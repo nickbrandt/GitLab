@@ -12,6 +12,7 @@ class SchedulePruneOrphanedGeoEvents < ActiveRecord::Migration[4.2]
 
   def up
     return unless Gitlab::Database.postgresql?
+    return if Gitlab::Database.read_only?
 
     BackgroundMigrationWorker.perform_async('PruneOrphanedGeoEvents')
   end
