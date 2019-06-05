@@ -40,8 +40,13 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
     params[:tag]
   end
 
+  def dependency_proxy
+    @dependency_proxy ||=
+      group.dependency_proxy_setting || group.create_dependency_proxy_setting
+  end
+
   def ensure_feature_enabled!
-    render_404 unless group.dependency_proxy_setting&.enabled
+    render_404 unless dependency_proxy.enabled
   end
 
   def ensure_token_granted!
