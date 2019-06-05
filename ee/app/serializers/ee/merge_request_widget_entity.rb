@@ -136,7 +136,15 @@ module EE
       end
 
       expose :merge_trains_enabled?, as: :merge_trains_enabled do |merge_request|
-        merge_request.target_project.merge_trains_enabled?
+        merge_trains_enabled?
+      end
+
+      expose :merge_trains_count, if: -> (*) { merge_trains_enabled? } do |merge_request|
+        MergeTrain.total_count_in_train(merge_request)
+      end
+
+      expose :merge_train_index, if: -> (merge_request) { merge_request.on_train? } do |merge_request|
+        merge_request.merge_train.index
       end
 
       expose :can_push_to_source_branch do |merge_request|
@@ -175,6 +183,10 @@ module EE
     def base_pipeline_downloadable_path_for_report_type(file_type)
       object.base_pipeline&.present(current_user: current_user)
         &.downloadable_path_for_report_type(file_type)
+    end
+
+    def merge_trains_enabled?
+      object.target_project.merge_trains_enabled?
     end
   end
 end
