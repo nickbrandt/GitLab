@@ -187,7 +187,7 @@ func (api *API) newRequest(r *http.Request, suffix string) (*http.Request, error
 	authReq.Header.Del("Trailers")
 	authReq.Header.Del("Upgrade")
 
-	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// Also forward the Host header, which is excluded from the Header map by the http library.
 	// This allows the Host header received by the backend to be consistent with other
 	// requests not going through gitlab-workhorse.
 	authReq.Host = r.Host
@@ -296,7 +296,7 @@ func passResponseBack(httpResponse *http.Response, w http.ResponseWriter, r *htt
 	bytesTotal.Add(float64(responseBody.Len()))
 
 	for k, v := range httpResponse.Header {
-		// Accomodate broken clients that do case-sensitive header lookup
+		// Accommodate broken clients that do case-sensitive header lookup
 		if k == "Www-Authenticate" {
 			w.Header()["WWW-Authenticate"] = v
 		} else {
