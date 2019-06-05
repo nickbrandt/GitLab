@@ -63,6 +63,32 @@ describe MergeTrain do
     end
   end
 
+  describe '.total_count_in_train' do
+    subject { described_class.total_count_in_train(merge_request) }
+
+    let!(:merge_request) { create_merge_request_on_train }
+
+    it 'returns the merge request' do
+      is_expected.to eq(1)
+    end
+
+    context 'when the other merge request is on the merge train' do
+      let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+
+      it 'returns the merge request' do
+        is_expected.to eq(2)
+      end
+    end
+
+    context 'when the merge request is not on merge train' do
+      let(:merge_request) { create(:merge_request) }
+
+      it 'returns empty array' do
+        is_expected.to be(0)
+      end
+    end
+  end
+
   describe '#all_next' do
     subject { merge_train.all_next }
 
@@ -111,6 +137,22 @@ describe MergeTrain do
       let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
 
       it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#index' do
+    subject { merge_train.index }
+
+    let(:merge_train) { merge_request.merge_train }
+    let!(:merge_request) { create_merge_request_on_train }
+
+    it { is_expected.to eq(0) }
+
+    context 'when the merge train is at the second queue' do
+      let(:merge_train) { merge_request_2.merge_train }
+      let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+
+      it { is_expected.to eq(1) }
     end
   end
 

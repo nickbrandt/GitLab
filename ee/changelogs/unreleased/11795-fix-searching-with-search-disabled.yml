@@ -1,0 +1,5 @@
+---
+title: Only use elasticsearch when it is enabled
+merge_request: 13495
+author:
+type: fixed

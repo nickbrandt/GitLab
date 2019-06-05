@@ -167,6 +167,22 @@ module EE
     end
     alias_method :elasticsearch_search?, :elasticsearch_search
 
+    # Determines whether a search should use elasticsearch, taking the scope
+    # (nil for global search, otherwise a namespace or project) into account
+    def search_using_elasticsearch?(scope: nil)
+      return false unless elasticsearch_indexing? && elasticsearch_search?
+      return true unless elasticsearch_limit_indexing?
+
+      case scope
+      when Namespace
+        elasticsearch_indexes_namespace?(scope)
+      when Project
+        elasticsearch_indexes_project?(scope)
+      else
+        false # Never use elasticsearch for the global scope when limiting is on
+      end
+    end
+
     def elasticsearch_url
       read_attribute(:elasticsearch_url).split(',').map(&:strip)
     end

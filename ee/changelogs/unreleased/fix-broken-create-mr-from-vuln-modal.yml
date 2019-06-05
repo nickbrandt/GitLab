@@ -1,0 +1,5 @@
+---
+title: Fix create mr from vuln modal regression
+merge_request: 13524
+author:
+type: fixed

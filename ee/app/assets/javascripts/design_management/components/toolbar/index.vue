@@ -14,7 +14,7 @@ export default {
   mixins: [timeagoMixin],
   props: {
     id: {
-      type: Number,
+      type: String,
       required: true,
     },
     isLoading: {

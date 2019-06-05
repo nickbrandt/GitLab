@@ -24,7 +24,7 @@ export default {
     designLink() {
       if (!this.design) return {};
 
-      return { name: 'design', params: { id: this.design.id } };
+      return { name: 'design', params: { id: this.design.filename } };
     },
   },
 };

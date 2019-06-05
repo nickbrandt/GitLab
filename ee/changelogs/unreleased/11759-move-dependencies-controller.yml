@@ -1,0 +1,5 @@
+---
+title: Move dependencies API endpoint to "security" namespace
+merge_request: 13897
+author:
+type: changed

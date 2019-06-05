@@ -3,6 +3,8 @@
 module Gitlab
   module Elastic
     class SearchResults
+      include Gitlab::Utils::StrongMemoize
+
       attr_reader :current_user, :query, :public_and_internal_projects
 
       # Limit search results by passed project ids
@@ -142,33 +144,41 @@ module Gitlab
       end
 
       def projects
-        Project.elastic_search(query, options: base_options)
+        strong_memoize(:projects) do
+          Project.elastic_search(query, options: base_options)
+        end
       end
 
       def issues
-        Issue.elastic_search(query, options: base_options)
+        strong_memoize(:issues) do
+          Issue.elastic_search(query, options: base_options)
+        end
       end
 
       def milestones
-        # Must pass 'issues' and 'merge_requests' to check
-        # if any of the features is available for projects in Elastic::ApplicationSearch#project_ids_query
-        # Otherwise it will ignore project_ids and return milestones
-        # from projects with milestones disabled.
-        options = base_options
-        options[:features] = [:issues, :merge_requests]
+        strong_memoize(:milestones) do
+          # Must pass 'issues' and 'merge_requests' to check
+          # if any of the features is available for projects in Elastic::ApplicationSearch#project_ids_query
+          # Otherwise it will ignore project_ids and return milestones
+          # from projects with milestones disabled.
+          options = base_options
+          options[:features] = [:issues, :merge_requests]
 
-        Milestone.elastic_search(query, options: options)
+          Milestone.elastic_search(query, options: options)
+        end
       end
 
       def merge_requests
-        options = base_options.merge(project_ids: non_guest_project_ids)
-        MergeRequest.elastic_search(query, options: options)
+        strong_memoize(:merge_requests) do
+          options = base_options.merge(project_ids: non_guest_project_ids)
+          MergeRequest.elastic_search(query, options: options)
+        end
       end
 
       def blobs
-        if query.blank?
-          Kaminari.paginate_array([])
-        else
+        return Kaminari.paginate_array([]) if query.blank?
+
+        strong_memoize(:blobs) do
           opt = {
             additional_filter: repository_filter
           }
@@ -182,9 +192,9 @@ module Gitlab
       end
 
       def wiki_blobs
-        if query.blank?
-          Kaminari.painate_array([])
-        else
+        return Kaminari.paginate_array([]) if query.blank?
+
+        strong_memoize(:wiki_blobs) do
           opt = {
             additional_filter: wiki_filter
           }
@@ -197,10 +207,16 @@ module Gitlab
         end
       end
 
+      # We're only memoizing once because this object only ever gets used to show a single page of results
+      # during its lifetime. We _must_ memoize the page we want because `#commits_count` does not have any
+      # inkling of the current page we're on - if we were to memoize with dynamic parameters we would end up
+      # hitting ES twice for any page that's not page 1, and that's something we want to avoid.
+      #
+      # It is safe to memoize the page we get here because this method is _always_ called before `#commits_count`
       def commits(page: 1, per_page: 20)
-        if query.blank?
-          Kaminari.paginate_array([])
-        else
+        return Kaminari.paginate_array([]) if query.blank?
+
+        strong_memoize(:commits) do
           options = {
             additional_filter: repository_filter
           }
