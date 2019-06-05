@@ -7,6 +7,12 @@ issues:
         issuable_type: issue
         issuable_state: all
         group_by: month
+    - title: Issues closed per month
+      type: bar
+      query:
+        issuable_type: issue
+        issuable_state: closed
+        group_by: month
     - title: Bugs created per month by Priority
       type: stacked-bar
       query:
