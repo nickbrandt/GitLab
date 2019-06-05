@@ -84,6 +84,11 @@ module EE
       def check_push_size!
         return unless check_size_limit?
 
+        # If there are worktrees with a HEAD pointing to a non-existent object,
+        # calls to `git rev-list --all` will fail in git 2.15+. This should also
+        # clear stale lock files.
+        project.repository.clean_stale_repository_files
+
         # Use #check_repository_disk_size to get correct push size whenever a lot of changes
         # gets pushed at the same time containing the same blobs. This is only
         # doable if GIT_OBJECT_DIRECTORY_RELATIVE env var is set and happens
@@ -110,11 +115,6 @@ module EE
       end
 
       def check_changes_size
-        # If there are worktrees with a HEAD pointing to a non-existent object,
-        # calls to `git rev-list --all` will fail in git 2.15+. This should also
-        # clear stale lock files.
-        project.repository.clean_stale_repository_files
-
         changes_size = 0
 
         changes_list.each do |change|
