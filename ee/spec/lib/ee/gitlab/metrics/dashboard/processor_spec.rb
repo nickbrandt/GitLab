@@ -13,7 +13,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
     let(:sequence) { described_class.new(*params).__send__(:sequence, insert_project_metrics: true) }
 
     it 'includes the alerts processing stage' do
-      expect(sequence.length).to eq(4)
+      expect(sequence.length).to eq(5)
     end
   end
 
