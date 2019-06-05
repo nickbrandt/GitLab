@@ -279,6 +279,70 @@ PUT /projects/:id/merge_requests/:merge_request_iid/approvers
 }
 ```
 
+### Get approval rules for Merge Request
+
+>**Note:** This API endpoint is only available on 12.0 Starter and above.
+
+You can request information about a merge request's approval rules using the following endpoint:
+
+```
+GET /projects/:id/merge_requests/:merge_request_iid/approval_rules
+```
+
+**Parameters:**
+
+| Attribute            | Type    | Required | Description                                               |
+|----------------------|---------|----------|-----------------------------------------------------------|
+| `id`                 | integer | yes      | The ID of a project                                       |
+| `merge_request_iid`  | integer | yes      | The IID of MR                                             |
+
+```json
+{
+  "approval_rules_overwritten": true,
+  "rules": [
+    {
+      "id": 1,
+      "name": "Ruby",
+      "rule_type": "regular",
+      "approvers": [
+        {
+          "id": 4,
+          "name": "John Doe",
+          "username": "jdoe",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+          "web_url": "http://localhost/jdoe"
+        }
+      ],
+      "approvals_required": 2,
+      "users": [
+        {
+          "id": 4,
+          "name": "John Doe",
+          "username": "jdoe",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+          "web_url": "http://localhost/jdoe"
+        }
+      ],
+      "groups": [],
+      "contains_hidden_groups": false,
+      "approved_by": [
+        {
+          "id": 4,
+          "name": "John Doe",
+          "username": "jdoe",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+          "web_url": "http://localhost/jdoe"
+        }
+      ],
+      "source_rule": null,
+      "approved": true
+    }
+  ]
+}
+```
 ## Approve Merge Request
 
 >**Note:** This API endpoint is only available on 8.9 Starter and above.
