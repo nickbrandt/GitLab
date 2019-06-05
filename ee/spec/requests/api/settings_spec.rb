@@ -142,7 +142,7 @@ describe API::Settings, 'EE Settings' do
     it_behaves_like 'settings for licensed features'
   end
 
-  context 'mirroring settings' do
+  context 'default project deletion protection' do
     let(:settings) { { default_project_deletion_protection: true } }
     let(:feature) { :default_project_deletion_protection }
 
