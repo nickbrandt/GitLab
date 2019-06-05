@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import createStore from 'ee/vue_shared/security_reports/store';
+import createStore from 'ee/security_dashboard/store';
 import SecurityReportApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
 
@@ -18,15 +18,59 @@ document.addEventListener('DOMContentLoaded', () => {
     refId,
     refPath,
     pipelineId,
-    createVulnerabilityFeedbackIssuePath,
-    createVulnerabilityFeedbackMergeRequestPath,
-    createVulnerabilityFeedbackDismissalPath,
-    ...rest
+    projectId,
+    projectName,
+    dashboardDocumentation,
+    emptyStateSvgPath,
+    vulnerabilitiesEndpoint,
+    vulnerabilitiesHistoryEndpoint,
+    vulnerabilitiesSummaryEndpoint,
+    vulnerabilityFeedbackHelpPath,
   } = securityTab.dataset;
 
   const parsedPipelineId = parseInt(pipelineId, 10);
+  const parsedHasPipelineData = parseBoolean(hasPipelineData);
 
   const store = createStore();
+
+  let props = {
+    hasPipelineData: parsedHasPipelineData,
+    dashboardDocumentation,
+    emptyStateSvgPath,
+    vulnerabilitiesEndpoint,
+    vulnerabilitiesHistoryEndpoint,
+    vulnerabilitiesSummaryEndpoint,
+    vulnerabilityFeedbackHelpPath,
+    securityDashboardHelpPath: dashboardDocumentation,
+    emptyStateIllustrationPath: emptyStateSvgPath,
+  };
+  if (parsedHasPipelineData) {
+    props = {
+      ...props,
+      project: {
+        id: projectId,
+        name: projectName,
+      },
+      triggeredBy: {
+        avatarPath: userAvatarPath,
+        name: userName,
+        path: userPath,
+      },
+      pipeline: {
+        id: parsedPipelineId,
+        created: pipelineCreated,
+        path: pipelinePath,
+      },
+      commit: {
+        id: commitId,
+        path: commitPath,
+      },
+      branch: {
+        id: refId,
+        path: refPath,
+      },
+    };
+  }
 
   return new Vue({
     el: securityTab,
@@ -37,35 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     methods: {},
     render(createElement) {
       return createElement('security-report-app', {
-        props: {
-          pipelineId: parsedPipelineId,
-          hasPipelineData: parseBoolean(hasPipelineData),
-          canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
-          canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
-          canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
-          createVulnerabilityFeedbackIssuePath,
-          createVulnerabilityFeedbackMergeRequestPath,
-          createVulnerabilityFeedbackDismissalPath,
-          triggeredBy: {
-            avatarPath: userAvatarPath,
-            name: userName,
-            path: userPath,
-          },
-          pipeline: {
-            id: parsedPipelineId,
-            created: pipelineCreated,
-            path: pipelinePath,
-          },
-          commit: {
-            id: commitId,
-            path: commitPath,
-          },
-          branch: {
-            id: refId,
-            path: refPath,
-          },
-          ...rest,
-        },
+        props,
       });
     },
   });

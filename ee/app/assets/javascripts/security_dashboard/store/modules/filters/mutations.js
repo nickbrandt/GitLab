@@ -47,4 +47,10 @@ export default {
     const { filterId, options } = payload;
     state.filters.find(filter => filter.id === filterId).options = options;
   },
+  [types.HIDE_FILTER](state, { filterId }) {
+    const hiddenFilter = state.filters.find(({ id }) => id === filterId);
+    if (hiddenFilter) {
+      hiddenFilter.hidden = true;
+    }
+  },
 };

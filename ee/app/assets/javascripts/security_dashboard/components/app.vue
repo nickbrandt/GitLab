@@ -1,4 +1,5 @@
 <script>
+import { isUndefined } from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
@@ -26,7 +27,8 @@ export default {
     },
     projectsEndpoint: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     vulnerabilitiesEndpoint: {
       type: String,
@@ -43,6 +45,12 @@ export default {
     vulnerabilityFeedbackHelpPath: {
       type: String,
       required: true,
+    },
+    lockToProject: {
+      type: Object,
+      required: false,
+      default: null,
+      validator: project => !isUndefined(project.id) && !isUndefined(project.name),
     },
   },
   computed: {
@@ -64,8 +72,17 @@ export default {
     vulnerability() {
       return this.modal.vulnerability;
     },
+    isLockedToProject() {
+      return this.lockToProject !== null;
+    },
   },
   created() {
+    if (this.isLockedToProject) {
+      this.lockFilter({
+        filterId: 'project_id',
+        optionId: this.lockToProject.id,
+      });
+    }
     this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
@@ -73,7 +90,9 @@ export default {
     this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
     this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
-    this.fetchProjects();
+    if (!this.isLockedToProject) {
+      this.fetchProjects();
+    }
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -91,6 +110,7 @@ export default {
       'undoDismiss',
     ]),
     ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
+    ...mapActions('filters', ['lockFilter']),
   },
 };
 </script>
@@ -98,9 +118,11 @@ export default {
 <template>
   <div>
     <filters />
-    <vulnerability-count-list />
+    <vulnerability-count-list :class="{ 'mb-0': isLockedToProject }" />
 
-    <vulnerability-chart />
+    <vulnerability-chart v-if="!isLockedToProject" />
+
+    <h4 v-if="!isLockedToProject" class="my-4">{{ __('Vulnerability List') }}</h4>
 
     <security-dashboard-table
       :dashboard-documentation="dashboardDocumentation"

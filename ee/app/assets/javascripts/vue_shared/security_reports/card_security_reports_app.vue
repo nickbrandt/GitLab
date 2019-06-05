@@ -1,18 +1,19 @@
 <script>
+import { isUndefined } from 'underscore';
 import { s__, sprintf } from '~/locale';
+import { GlEmptyState } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import EmptySecurityDashboard from './components/empty_security_dashboard.vue';
-import SplitSecurityReport from './split_security_reports_app.vue';
+import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 
 export default {
   components: {
-    EmptySecurityDashboard,
+    GlEmptyState,
     UserAvatarLink,
     Icon,
-    SplitSecurityReport,
     TimeagoTooltip,
+    SecurityDashboardApp,
   },
   props: {
     hasPipelineData: {
@@ -27,71 +28,6 @@ export default {
     },
     securityDashboardHelpPath: {
       type: String,
-      required: false,
-      default: null,
-    },
-    alwaysOpen: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    headBlobPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dastHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastContainerHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    dependencyScanningHeadPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastHelpPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    sastContainerHelpPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    dastHelpPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    dependencyScanningHelpPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    vulnerabilityFeedbackPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    vulnerabilityFeedbackHelpPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    pipelineId: {
-      type: Number,
       required: false,
       default: null,
     },
@@ -115,32 +51,40 @@ export default {
       required: false,
       default: () => ({}),
     },
-    canCreateIssue: {
-      type: Boolean,
+    project: {
+      type: Object,
       required: true,
+      validator: project => !isUndefined(project.id) && !isUndefined(project.name),
     },
-    canCreateMergeRequest: {
-      type: Boolean,
-      required: true,
-    },
-    canDismissVulnerability: {
-      type: Boolean,
-      required: true,
-    },
-    createVulnerabilityFeedbackIssuePath: {
+    dashboardDocumentation: {
       type: String,
       required: false,
-      default: '',
+      default: null,
     },
-    createVulnerabilityFeedbackMergeRequestPath: {
+    emptyStateSvgPath: {
       type: String,
       required: false,
-      default: '',
+      default: null,
     },
-    createVulnerabilityFeedbackDismissalPath: {
+    vulnerabilityFeedbackHelpPath: {
       type: String,
       required: false,
-      default: '',
+      default: null,
+    },
+    vulnerabilitiesEndpoint: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    vulnerabilitiesSummaryEndpoint: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    vulnerabilitiesHistoryEndpoint: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   computed: {
@@ -153,60 +97,61 @@ export default {
         false,
       );
     },
+    emptyStateDescription() {
+      return s__(
+        `SecurityDashboard|
+         The security dashboard displays the latest security report.
+         Use it to find and fix vulnerabilities.`,
+      ).trim();
+    },
   },
 };
 </script>
 <template>
   <div>
-    <div v-if="hasPipelineData" class="card security-dashboard prepend-top-default">
-      <div class="card-header">
-        <span class="js-security-dashboard-left">
-          <span v-html="headline"></span>
-          <timeago-tooltip :time="pipeline.created" />
-          {{ __('by') }}
-          <user-avatar-link
-            :link-href="triggeredBy.path"
-            :img-src="triggeredBy.avatarPath"
-            :img-alt="triggeredBy.name"
-            :img-size="24"
-            :username="triggeredBy.name"
-            class="avatar-image-container"
-          />
-        </span>
-        <span class="js-security-dashboard-right pull-right">
-          <icon name="branch" /> <a :href="branch.path" class="monospace">{{ branch.id }}</a>
-          <span class="text-muted prepend-left-5 append-right-5">&middot;</span>
-          <icon name="commit" /> <a :href="commit.path" class="monospace">{{ commit.id }}</a>
-        </span>
+    <template v-if="hasPipelineData">
+      <div class="card security-dashboard prepend-top-default">
+        <div class="card-header border-bottom-0">
+          <span class="js-security-dashboard-left">
+            <span v-html="headline"></span>
+            <timeago-tooltip :time="pipeline.created" />
+            {{ __('by') }}
+            <user-avatar-link
+              :link-href="triggeredBy.path"
+              :img-src="triggeredBy.avatarPath"
+              :img-alt="triggeredBy.name"
+              :img-size="24"
+              :username="triggeredBy.name"
+              class="avatar-image-container"
+            />
+          </span>
+          <span class="js-security-dashboard-right pull-right">
+            <icon name="branch" />
+            <a :href="branch.path" class="monospace">{{ branch.id }}</a>
+            <span class="text-muted prepend-left-5 append-right-5">&middot;</span>
+            <icon name="commit" />
+            <a :href="commit.path" class="monospace">{{ commit.id }}</a>
+          </span>
+        </div>
       </div>
-      <split-security-report
-        :pipeline-id="pipelineId"
-        :head-blob-path="headBlobPath"
-        :sast-head-path="sastHeadPath"
-        :dast-head-path="dastHeadPath"
-        :sast-container-head-path="sastContainerHeadPath"
-        :dependency-scanning-head-path="dependencyScanningHeadPath"
-        :sast-help-path="sastHelpPath"
-        :sast-container-help-path="sastContainerHelpPath"
-        :dast-help-path="dastHelpPath"
-        :dependency-scanning-help-path="dependencyScanningHelpPath"
-        :vulnerability-feedback-path="vulnerabilityFeedbackPath"
+      <h4 class="mt-4 mb-3">{{ __('Vulnerabilities') }}</h4>
+      <security-dashboard-app
+        :lock-to-project="project"
+        :dashboard-documentation="dashboardDocumentation"
+        :empty-state-svg-path="emptyStateSvgPath"
+        :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
+        :vulnerabilities-count-endpoint="vulnerabilitiesSummaryEndpoint"
+        :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-        :create-vulnerability-feedback-issue-path="createVulnerabilityFeedbackIssuePath"
-        :create-vulnerability-feedback-merge-request-path="
-          createVulnerabilityFeedbackMergeRequestPath
-        "
-        :create-vulnerability-feedback-dismissal-path="createVulnerabilityFeedbackDismissalPath"
-        :can-create-issue="canCreateIssue"
-        :can-create-merge-request="canCreateMergeRequest"
-        :can-dismiss-vulnerability="canDismissVulnerability"
-        always-open
       />
-    </div>
-    <empty-security-dashboard
+    </template>
+    <gl-empty-state
       v-else
-      :help-path="securityDashboardHelpPath"
-      :illustration-path="emptyStateIllustrationPath"
+      :title="s__('SecurityDashboard|Monitor vulnerabilities in your code')"
+      :svg-path="emptyStateIllustrationPath"
+      :description="emptyStateDescription"
+      :primary-button-link="securityDashboardHelpPath"
+      :primary-button-text="__('Learn more')"
     />
   </div>
 </template>
