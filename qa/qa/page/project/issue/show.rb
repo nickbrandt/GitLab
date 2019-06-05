@@ -15,8 +15,8 @@ module QA
           end
 
           view 'app/assets/javascripts/notes/components/comment_form.vue' do
-            element :comment_button
-            element :comment_input
+            element :comment_button, required: true
+            element :comment_input, required: true
           end
 
           view 'app/assets/javascripts/notes/components/discussion_filter.vue' do
