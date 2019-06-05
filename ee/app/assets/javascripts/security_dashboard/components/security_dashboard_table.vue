@@ -1,13 +1,13 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
+import { GlEmptyState } from '@gitlab/ui';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
-import EmptyState from './empty_state.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
-    EmptyState,
+    GlEmptyState,
     Pagination,
     SecurityDashboardTableRow,
   },
@@ -54,8 +54,6 @@ export default {
 
 <template>
   <div class="ci-table">
-    <h4 class="my-4">{{ __('Vulnerability List') }}</h4>
-
     <div
       class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
       role="row"
@@ -94,10 +92,17 @@ export default {
         @openModal="openModal({ vulnerability })"
       />
 
-      <empty-state
+      <gl-empty-state
         v-if="showEmptyState"
+        :title="s__(`Security Reports|We've found no vulnerabilities for your group`)"
         :svg-path="emptyStateSvgPath"
-        :link="dashboardDocumentation"
+        :description="
+          s__(
+            `Security Reports|While it's rare to have no vulnerabilities for your group, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly.`,
+          )
+        "
+        :primary-button-link="dashboardDocumentation"
+        :primary-button-text="s__('Security Reports|Learn more about setting up your dashboard')"
       />
 
       <pagination
