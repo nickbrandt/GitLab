@@ -10,6 +10,11 @@
       = icon('external-link')
   .col-lg-9
     = render 'info'
+%section.row.border-top.mt-4
+  .col-lg-3.append-bottom-default
+    %h4.page-title
+      = s_('GroupSAML|Configuration')
+  .col-lg-9
     = render 'form', group: @group, saml_provider: @saml_provider
 - if Feature.enabled?(:group_scim, @group)
   %section.row.border-top.mt-4
@@ -18,3 +23,4 @@
         = s_('GroupSAML|SCIM Token')
     .col-lg-9
       = render 'scim_token'
+
