@@ -1,0 +1,5 @@
+---
+title: Fix Git over HTTP when using SAML SSO Enforcement
+merge_request: 13485
+author:
+type: fixed
