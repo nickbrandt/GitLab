@@ -4,6 +4,7 @@ import {
 } from '~/reports/components/issue_body';
 import PerformanceIssueBody from 'ee/vue_merge_request_widget/components/performance_issue_body.vue';
 import CodequalityIssueBody from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
+import BlockingMergeRequestsBody from 'ee/vue_merge_request_widget/components/blocking_merge_requests/blocking_merge_request_body.vue';
 import LicenseIssueBody from 'ee/vue_shared/license_management/components/license_issue_body.vue';
 import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_body.vue';
 import SastContainerIssueBody from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
@@ -19,6 +20,7 @@ export const components = {
   SastIssueBody,
   DastIssueBody,
   MetricsReportsIssueBody,
+  BlockingMergeRequestsBody,
 };
 
 export const componentNames = {
@@ -30,4 +32,5 @@ export const componentNames = {
   SastIssueBody: SastIssueBody.name,
   DastIssueBody: DastIssueBody.name,
   MetricsReportsIssueBody: MetricsReportsIssueBody.name,
+  BlockingMergeRequestsBody: BlockingMergeRequestsBody.name,
 };

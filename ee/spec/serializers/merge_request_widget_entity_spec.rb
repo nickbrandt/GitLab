@@ -14,7 +14,7 @@ describe MergeRequestWidgetEntity do
     project.add_developer(user)
   end
 
-  subject do
+  subject(:entity) do
     described_class.new(merge_request, current_user: user, request: request)
   end
 
@@ -224,6 +224,58 @@ describe MergeRequestWidgetEntity do
 
       it 'does not have merge train index' do
         expect(subject.as_json).not_to include(:merge_train_index)
+      end
+    end
+  end
+
+  describe 'blocking merge requests' do
+    set(:merge_request_block) { create(:merge_request_block, blocked_merge_request: merge_request) }
+
+    let(:blocking_mr) { merge_request_block.blocking_merge_request }
+
+    subject { entity.as_json[:blocking_merge_requests] }
+
+    context 'feature disabled' do
+      before do
+        stub_licensed_features(blocking_merge_requests: false)
+      end
+
+      it 'does not have the blocking_merge_requests member' do
+        expect(entity.as_json).not_to include(:blocking_merge_requests)
+      end
+    end
+
+    context 'feature enabled' do
+      before do
+        stub_licensed_features(blocking_merge_requests: true)
+      end
+
+      it 'shows the blocking merge request if visible' do
+        blocking_mr.project.add_developer(user)
+
+        is_expected.to include(
+          hidden_count: 0,
+          total_count: 1,
+          visible_merge_requests: { opened: [kind_of(BlockingMergeRequestEntity)] }
+        )
+      end
+
+      it 'hides the blocking merge request if not visible' do
+        is_expected.to eq(
+          hidden_count: 1,
+          total_count: 1,
+          visible_merge_requests: {}
+        )
+      end
+
+      it 'does not count a merged and hidden blocking MR' do
+        blocking_mr.update_columns(state: 'merged')
+
+        is_expected.to eq(
+          hidden_count: 0,
+          total_count: 0,
+          visible_merge_requests: {}
+        )
       end
     end
   end

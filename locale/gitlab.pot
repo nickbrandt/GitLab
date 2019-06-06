@@ -105,6 +105,11 @@ msgid_plural "%d merge requests"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d merge request that you don't have access to."
+msgid_plural "%d merge requests that you don't have access to."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d metric"
 msgid_plural "%d metrics"
 msgstr[0] ""
@@ -313,6 +318,14 @@ msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
 msgid "'%{source}' is not a import source"
+msgstr ""
+
+msgid "(%d closed)"
+msgid_plural "(%d closed)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "(%{mrCount} merged)"
 msgstr ""
 
 msgid "(No changes)"
@@ -1946,6 +1959,16 @@ msgstr ""
 
 msgid "Blocked"
 msgstr ""
+
+msgid "Blocked by %d merge request"
+msgid_plural "Blocked by %d merge requests"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Blocked by <strong>%d closed</strong> merge request."
+msgid_plural "Blocked by <strong>%d closed</strong> merge requests."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Blog"
 msgstr ""
@@ -8675,6 +8698,9 @@ msgid "No activities found"
 msgstr ""
 
 msgid "No available namespaces to fork the project."
+msgstr ""
+
+msgid "No blocking merge requests "
 msgstr ""
 
 msgid "No branches found"
