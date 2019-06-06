@@ -451,7 +451,7 @@ describe ProjectPolicy do
     end
   end
 
-    describe 'remove_project when default_project_deletion_protection is set to true' do
+  describe 'remove_project when default_project_deletion_protection is set to true' do
     before do
       allow(Gitlab::CurrentSettings.current_application_settings)
         .to receive(:default_project_deletion_protection) { true }
