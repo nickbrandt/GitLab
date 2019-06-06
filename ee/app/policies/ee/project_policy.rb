@@ -210,7 +210,7 @@ module EE
 
       rule { owner | reporter }.enable :build_read_project
 
-      rule { owner & owner_cannot_destroy_project }.prevent :remove_project
+      rule { ~admin & owner & owner_cannot_destroy_project }.prevent :remove_project
 
       rule { archived }.policy do
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|

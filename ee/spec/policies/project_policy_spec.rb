@@ -451,16 +451,23 @@ describe ProjectPolicy do
     end
   end
 
-  describe 'remove_project when default_project_deletion_protection is set to true' do
+    describe 'remove_project when default_project_deletion_protection is set to true' do
     before do
       allow(Gitlab::CurrentSettings.current_application_settings)
-          .to receive(:default_project_deletion_protection) { true }
+        .to receive(:default_project_deletion_protection) { true }
     end
 
     context 'with admin' do
       let(:current_user) { admin }
 
       it { is_expected.to be_allowed(:remove_project) }
+
+      context 'who owns the project' do
+        let(:current_user) { admin }
+        let(:project) { create(:project, :public, namespace: admin.namespace) }
+
+        it { is_expected.to be_allowed(:remove_project) }
+      end
     end
 
     context 'with owner' do
