@@ -4,9 +4,9 @@ module Vulnerabilities
   class FeedbackPolicy < BasePolicy
     delegate { @subject.project }
 
-    condition(:issue) { @subject.issue_type? }
-    condition(:merge_request) { @subject.merge_request_type? }
-    condition(:dismissal) { @subject.dismissal_type? }
+    condition(:issue) { @subject.for_issue? }
+    condition(:merge_request) { @subject.for_merge_request? }
+    condition(:dismissal) { @subject.for_dismissal? }
 
     rule { issue & ~can?(:create_issue) }.prevent :create_vulnerability_feedback
 

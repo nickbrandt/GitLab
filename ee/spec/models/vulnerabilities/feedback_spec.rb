@@ -7,7 +7,7 @@ describe Vulnerabilities::Feedback do
     is_expected.to(
       define_enum_for(:feedback_type)
       .with_values(dismissal: 0, issue: 1, merge_request: 2)
-      .with_suffix(:type)
+      .with_prefix(:for)
     )
   }
   it { is_expected.to define_enum_for(:category) }
