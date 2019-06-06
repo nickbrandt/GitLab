@@ -1,7 +1,7 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 import _ from 'underscore';
-import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __, s__ } from '~/locale';
@@ -12,6 +12,8 @@ import {
   historyPushState,
   buildUrlWithCurrentLocation,
 } from '~/lib/utils/common_utils';
+
+import ConfigureFeatureFlagsModal from './configure_feature_flags_modal.vue';
 
 const { mapState, mapActions } = createNamespacedHelpers('index');
 
@@ -24,6 +26,10 @@ export default {
     GlEmptyState,
     GlLoadingIcon,
     GlButton,
+    ConfigureFeatureFlagsModal,
+  },
+  directives: {
+    GlModal: GlModalDirective,
   },
   props: {
     endpoint: {
@@ -39,6 +45,18 @@ export default {
       required: true,
     },
     featureFlagsHelpPagePath: {
+      type: String,
+      required: true,
+    },
+    featureFlagsAnchoredHelpPagePath: {
+      type: String,
+      required: true,
+    },
+    unleashApiUrl: {
+      type: String,
+      required: true,
+    },
+    unleashApiInstanceId: {
       type: String,
       required: true,
     },
@@ -160,15 +178,22 @@ export default {
 </script>
 <template>
   <div>
+    <configure-feature-flags-modal
+      v-if="canUserConfigure"
+      :help-path="featureFlagsHelpPagePath"
+      :help-anchor="featureFlagsAnchoredHelpPagePath"
+      :api-url="unleashApiUrl"
+      :instance-id="unleashApiInstanceId"
+      modal-id="configure-feature-flags"
+    />
     <h3 class="page-title with-button">
       {{ s__('FeatureFlags|Feature Flags') }}
       <div class="pull-right">
         <button
           v-if="canUserConfigure"
+          v-gl-modal="'configure-feature-flags'"
           type="button"
           class="js-ff-configure append-right-8 btn-inverted btn btn-primary"
-          data-toggle="modal"
-          data-target="#configure-feature-flags-modal"
         >
           {{ s__('FeatureFlags|Configure') }}
         </button>
