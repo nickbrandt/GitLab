@@ -191,7 +191,7 @@ sast:
 You can supply many other [settings variables](https://gitlab.com/gitlab-org/security-products/sast#settings)
 via `docker run --env` to customize your job execution.
 
-## Manual job definition for GitLab 11.4 and earlier (deprecated)
+### Manual job definition for GitLab 11.4 and earlier (deprecated)
 
 CAUTION: **Deprecated:**
 Before GitLab 11.5, the SAST job and artifact had to be named specifically
