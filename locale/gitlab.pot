@@ -6874,6 +6874,9 @@ msgstr ""
 msgid "If checked, group owners can manage LDAP group links and LDAP member overrides"
 msgstr ""
 
+msgid "If checked, new group memberships and permissions can only be added via LDAP synchronization"
+msgstr ""
+
 msgid "If disabled, a diverged local branch will not be automatically updated with commits from its remote counterpart, to prevent local data loss. If the default branch (%{default_branch}) has diverged and cannot be updated, mirroring will fail. Other diverged branches are silently ignored."
 msgstr ""
 
@@ -7874,6 +7877,9 @@ msgid "Lock"
 msgstr ""
 
 msgid "Lock %{issuableDisplayName}"
+msgstr ""
+
+msgid "Lock memberships to LDAP synchronization"
 msgstr ""
 
 msgid "Lock not found"

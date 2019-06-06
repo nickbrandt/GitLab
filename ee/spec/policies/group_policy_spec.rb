@@ -174,6 +174,28 @@ describe GroupPolicy do
       it { is_expected.to be_allowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
     end
+
+    context 'when memberships locked to LDAP' do
+      before do
+        stub_application_setting(allow_group_owners_to_manage_ldap: true)
+        stub_application_setting(lock_memberships_to_ldap: true)
+      end
+
+      context 'admin' do
+        let(:current_user) { admin }
+
+        it { is_expected.to be_allowed(:override_group_member) }
+        it { is_expected.to be_allowed(:update_group_member) }
+      end
+
+      context 'owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.not_to be_allowed(:admin_group_member) }
+        it { is_expected.not_to be_allowed(:override_group_member) }
+        it { is_expected.not_to be_allowed(:update_group_member) }
+      end
+    end
   end
 
   describe 'create_jira_connect_subscription' do

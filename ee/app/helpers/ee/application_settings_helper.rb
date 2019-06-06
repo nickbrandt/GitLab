@@ -37,6 +37,7 @@ module EE
         :geo_status_timeout,
         :geo_node_allowed_ips,
         :help_text,
+        :lock_memberships_to_ldap,
         :pseudonymizer_enabled,
         :repository_size_limit,
         :shared_runners_minutes,

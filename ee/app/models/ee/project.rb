@@ -306,11 +306,12 @@ module EE
     end
 
     def group_ldap_synced?
-      if group
-        group.ldap_synced?
-      else
-        false
-      end
+      group&.ldap_synced?
+    end
+
+    override :allowed_to_share_with_group?
+    def allowed_to_share_with_group?
+      super && !(group && ::Gitlab::CurrentSettings.lock_memberships_to_ldap?)
     end
 
     def reference_issue_tracker?

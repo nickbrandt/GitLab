@@ -14,8 +14,11 @@ module EE
       end
 
       condition(:can_owners_manage_ldap, scope: :global) do
-        ::Gitlab::CurrentSettings.current_application_settings
-          .allow_group_owners_to_manage_ldap
+        ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
+      end
+
+      condition(:memberships_locked_to_ldap, scope: :global) do
+        ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end
 
       condition(:security_dashboard_feature_disabled) do
@@ -78,6 +81,12 @@ module EE
       rule { ldap_synced & (admin | owner) }.enable :update_group_member
 
       rule { ldap_synced & (admin | (can_owners_manage_ldap & owner)) }.enable :override_group_member
+
+      rule { memberships_locked_to_ldap & ~admin }.policy do
+        prevent :admin_group_member
+        prevent :update_group_member
+        prevent :override_group_member
+      end
 
       rule { developer }.policy do
         enable :read_group_security_dashboard
