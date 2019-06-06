@@ -33,6 +33,32 @@ module Gitlab
         def project
           merge_request.target_project
         end
+
+        def self.find_or_create_code_owner_rule(merge_request, pattern)
+          merge_request.approval_rules.safe_find_or_create_by(
+            code_owner: true,
+            name: pattern
+          )
+        end
+
+        def self.safe_find_or_create_by(*args)
+          safe_ensure_unique(retries: 1) do
+            find_or_create_by(*args)
+          end
+        end
+
+        def self.safe_ensure_unique(retries: 0)
+          transaction(requires_new: true) do
+            yield
+          end
+        rescue ActiveRecord::RecordNotUnique
+          if retries > 0
+            retries -= 1
+            retry
+          end
+
+          false
+        end
       end
 
       class ApprovalMergeRequestRuleSource < ActiveRecord::Base
@@ -73,7 +99,21 @@ module Gitlab
           return if state == 'merged' || state == 'closed'
 
           Gitlab::GitalyClient.allow_n_plus_1_calls do
-            ::MergeRequest.find(id).sync_code_owners_with_approvers
+            owners = ::MergeRequest.find(id).code_owners
+
+            if owners.present?
+              ApplicationRecord.transaction do
+                rule = approval_rules.code_owner.first
+                rule ||= ApprovalMergeRequestRule.find_or_create_code_owner_rule(
+                  self,
+                  'Code Owner'
+                )
+
+                rule.users = owners.uniq
+              end
+            else
+              approval_rules.code_owner.delete_all
+            end
           end
         end
       end
