@@ -1,0 +1,5 @@
+---
+title: Allow design blobs to be stored in Git LFS
+merge_request: 13389
+author:
+type: added
