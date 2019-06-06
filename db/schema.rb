@@ -1770,6 +1770,7 @@ ActiveRecord::Schema.define(version: 20190611161641) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "repository_type", limit: 2
+    t.index ["lfs_object_id"], name: "index_lfs_objects_projects_on_lfs_object_id", using: :btree
     t.index ["project_id"], name: "index_lfs_objects_projects_on_project_id", using: :btree
   end
 
