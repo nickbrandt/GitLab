@@ -12,7 +12,7 @@ query childItems($fullPath: ID!, $iid: ID) {
         adminEpic
         createEpic
       }
-      children(first: 50) {
+      children {
         edges {
           node {
             id
@@ -36,7 +36,7 @@ query childItems($fullPath: ID!, $iid: ID) {
           }
         }
       }
-      issues(first: 50) {
+      issues {
         edges {
           node {
             iid
