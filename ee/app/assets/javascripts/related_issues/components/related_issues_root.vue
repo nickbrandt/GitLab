@@ -34,8 +34,6 @@ import {
   addRelatedIssueErrorMap,
 } from '../constants';
 
-const SPACE_FACTOR = 1;
-
 export default {
   name: 'RelatedIssuesRoot',
   components: {
@@ -200,25 +198,7 @@ export default {
           });
       }
     },
-    onInput({ newValue, caretPos }) {
-      const rawReferences = newValue.split(/\s/);
-
-      let touchedReference;
-      let iteratingPos = 0;
-      const untouchedRawReferences = rawReferences
-        .filter(reference => {
-          let isTouched = false;
-          if (caretPos >= iteratingPos && caretPos <= iteratingPos + reference.length) {
-            touchedReference = reference;
-            isTouched = true;
-          }
-
-          // `+ SPACE_FACTOR` to factor in the missing space we split at earlier
-          iteratingPos = iteratingPos + reference.length + SPACE_FACTOR;
-          return !isTouched;
-        })
-        .filter(reference => reference.trim().length > 0);
-
+    onInput({ untouchedRawReferences, touchedReference }) {
       this.store.setPendingReferences(this.state.pendingReferences.concat(untouchedRawReferences));
       this.inputValue = `${touchedReference}`;
     },

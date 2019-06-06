@@ -32,6 +32,9 @@ export default {
       'initialDescriptionText',
       'lockVersion',
     ]),
+    isEpicTreeEnabled() {
+      return gon.features && gon.features.epicTrees;
+    },
   },
 };
 </script>
@@ -61,7 +64,7 @@ export default {
       />
     </div>
     <related-items
-      v-if="subepicsSupported"
+      v-if="subepicsSupported && !isEpicTreeEnabled"
       :endpoint="epicLinksEndpoint"
       :can-admin="canAdmin"
       :can-reorder="canAdmin"
@@ -72,6 +75,7 @@ export default {
       css-class="js-related-epics-block"
     />
     <related-items
+      v-if="!isEpicTreeEnabled"
       :endpoint="issueLinksEndpoint"
       :can-admin="canAdmin"
       :can-reorder="canAdmin"

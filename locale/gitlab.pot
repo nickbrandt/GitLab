@@ -693,6 +693,9 @@ msgstr ""
 msgid "Add an SSH key"
 msgstr ""
 
+msgid "Add an issue"
+msgstr ""
+
 msgid "Add approvers"
 msgstr ""
 
@@ -4915,7 +4918,25 @@ msgstr ""
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
 msgstr ""
 
+msgid "Epics|%{epicsCount} epics and %{issuesCount} issues"
+msgstr ""
+
+msgid "Epics|Add an epic"
+msgstr ""
+
+msgid "Epics|Add an existing epic as a child epic."
+msgstr ""
+
 msgid "Epics|An error occurred while saving the %{epicDateType} date"
+msgstr ""
+
+msgid "Epics|Are you sure you want to remove %{bStart}%{targetIssueTitle}%{bEnd} from %{bStart}%{parentEpicTitle}%{bEnd}?"
+msgstr ""
+
+msgid "Epics|Create an epic within this group and add it as a child epic."
+msgstr ""
+
+msgid "Epics|Create new epic"
 msgstr ""
 
 msgid "Epics|How can I solve this?"
@@ -4924,7 +4945,22 @@ msgstr ""
 msgid "Epics|More information"
 msgstr ""
 
+msgid "Epics|Remove epic"
+msgstr ""
+
+msgid "Epics|Remove issue"
+msgstr ""
+
+msgid "Epics|Something went wrong while creating child epics."
+msgstr ""
+
+msgid "Epics|Something went wrong while fetching child epics."
+msgstr ""
+
 msgid "Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely."
+msgstr ""
+
+msgid "Epics|This will also remove any descendents of %{bStart}%{targetEpicTitle}%{bEnd} from %{bStart}%{parentEpicTitle}%{bEnd}. Are you sure?"
 msgstr ""
 
 msgid "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic."
@@ -8552,6 +8588,9 @@ msgid "New environment"
 msgstr ""
 
 msgid "New epic"
+msgstr ""
+
+msgid "New epic title"
 msgstr ""
 
 msgid "New file"
@@ -13898,6 +13937,9 @@ msgid "TransferProject|Project with same name or path in target namespace alread
 msgstr ""
 
 msgid "TransferProject|Transfer failed, please contact an admin."
+msgstr ""
+
+msgid "Tree"
 msgstr ""
 
 msgid "Tree view"
