@@ -7132,6 +7132,9 @@ msgstr ""
 msgid "Invalid Login or password"
 msgstr ""
 
+msgid "Invalid date"
+msgstr ""
+
 msgid "Invalid feature"
 msgstr ""
 
