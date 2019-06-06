@@ -2265,8 +2265,6 @@ ActiveRecord::Schema.define(version: 20190603124955) do
     t.datetime_with_timezone "enabled_until"
     t.datetime_with_timezone "remove_at"
     t.boolean "auto_ssl_enabled", default: false, null: false
-    t.datetime_with_timezone "certificate_valid_not_before"
-    t.datetime_with_timezone "certificate_valid_not_after"
     t.index ["domain"], name: "index_pages_domains_on_domain", unique: true, using: :btree
     t.index ["project_id", "enabled_until"], name: "index_pages_domains_on_project_id_and_enabled_until", using: :btree
     t.index ["project_id"], name: "index_pages_domains_on_project_id", using: :btree
