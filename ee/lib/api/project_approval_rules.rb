@@ -12,7 +12,6 @@ module API
     resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       segment ':id/approval_rules' do
         desc 'Get all project approval rules' do
-          detail 'Private API subject to change'
           success EE::API::Entities::ProjectApprovalRules
         end
         get do
@@ -22,7 +21,6 @@ module API
         end
 
         desc 'Create new approval rule' do
-          detail 'Private API subject to change'
           success EE::API::Entities::ApprovalRule
         end
         params do
@@ -46,7 +44,6 @@ module API
 
         segment ':approval_rule_id' do
           desc 'Update approval rule' do
-            detail 'Private API subject to change'
             success EE::API::Entities::ApprovalRule
           end
           params do
@@ -72,7 +69,6 @@ module API
           end
 
           desc 'Delete an approval rule' do
-            detail 'Private API subject to change'
           end
           params do
             requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
