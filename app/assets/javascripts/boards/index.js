@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Vue from 'vue';
 
 import Flash from '~/flash';
-import { __ } from '~/locale';
+import { s__, __ } from '~/locale';
 import '~/vue_shared/models/label';
 import '~/vue_shared/models/assignee';
 
@@ -235,7 +235,7 @@ export default () => {
       },
       computed: {
         buttonText() {
-          return this.canAdminList ? 'Edit board' : 'View scope';
+          return this.canAdminList ? s__('Boards|Edit board') : s__('Boards|View scope');
         },
         tooltipTitle() {
           return this.hasScope ? __("This board's scope is reduced") : '';
