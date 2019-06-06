@@ -49,6 +49,7 @@ describe 'Epic show', :js do
     it 'shows epic tabs' do
       page.within('.js-epic-tabs-container') do
         expect(find('.epic-tabs #discussion-tab')).to have_content('Discussion')
+        expect(find('.epic-tabs #tree-tab')).to have_content('Tree')
         expect(find('.epic-tabs #roadmap-tab')).to have_content('Roadmap')
       end
     end
@@ -60,12 +61,21 @@ describe 'Epic show', :js do
     end
   end
 
-  describe 'Epic child epics' do
-    it 'shows child epics list' do
-      page.within('.js-related-epics-block') do
-        expect(find('.issue-count-badge-count')).to have_content('2')
-        expect(find('.js-related-issues-token-list-item:nth-child(1) .sortable-link')).to have_content('Child epic B')
-        expect(find('.js-related-issues-token-list-item:nth-child(2) .sortable-link')).to have_content('Child epic A')
+  describe 'Tree tab' do
+    before do
+      find('.js-epic-tabs-container #tree-tab').click
+      wait_for_requests
+    end
+
+    it 'shows Related items tree with child epics' do
+      page.within('.js-epic-tabs-content #tree') do
+        expect(page).to have_selector('.related-items-tree-container')
+
+        page.within('.related-items-tree-container') do
+          expect(page.find('.issue-count-badge')).to have_content('2')
+          expect(find('.tree-item:nth-child(1) .sortable-link')).to have_content('Child epic B')
+          expect(find('.tree-item:nth-child(2) .sortable-link')).to have_content('Child epic A')
+        end
       end
     end
   end

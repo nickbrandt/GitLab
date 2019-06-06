@@ -14,6 +14,10 @@ class Groups::EpicsController < Groups::ApplicationController
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
 
+  before_action do
+    push_frontend_feature_flag(:epic_trees)
+  end
+
   def index
     @epics = @issuables
 

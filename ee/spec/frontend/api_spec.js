@@ -45,4 +45,29 @@ describe('Api', () => {
         .catch(done.fail);
     });
   });
+
+  describe('createChildEpic', () => {
+    it('calls `axios.post` using params `groupId`, `parentEpicIid` and title', done => {
+      const groupId = 'gitlab-org';
+      const parentEpicIid = 1;
+      const title = 'Sample epic';
+      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/groups/${groupId}/epics/${parentEpicIid}/epics`;
+      const expectedRes = {
+        title,
+        id: 20,
+        iid: 5,
+      };
+
+      mock.onPost(expectedUrl).reply(200, expectedRes);
+
+      Api.createChildEpic({ groupId, parentEpicIid, title })
+        .then(({ data }) => {
+          expect(data.title).toBe(expectedRes.title);
+          expect(data.id).toBe(expectedRes.id);
+          expect(data.iid).toBe(expectedRes.iid);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
 });

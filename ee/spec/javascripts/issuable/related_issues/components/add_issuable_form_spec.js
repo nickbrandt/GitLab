@@ -199,12 +199,17 @@ describe('AddIssuableForm', () => {
     it('when filling in the input', () => {
       spyOn(vm, '$emit');
       const newInputValue = 'filling in things';
+      const untouchedRawReferences = newInputValue.trim().split(/\s/);
+      const touchedReference = untouchedRawReferences.pop();
+
       vm.$refs.input.value = newInputValue;
       vm.onInput();
 
       expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormInput', {
         newValue: newInputValue,
         caretPos: newInputValue.length,
+        untouchedRawReferences,
+        touchedReference,
       });
     });
 
