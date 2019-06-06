@@ -28,6 +28,15 @@ FactoryBot.define do
       end
     end
 
+    trait :dependency_list do
+      success
+      name :dependency_scanning
+
+      after(:build) do |build|
+        build.job_artifacts << build(:ee_ci_job_artifact, :dependency_list, job: build)
+      end
+    end
+
     trait :metrics do
       after(:build) do |build|
         build.job_artifacts << build(:ee_ci_job_artifact, :metrics, job: build)
