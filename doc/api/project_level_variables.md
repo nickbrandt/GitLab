@@ -1,4 +1,4 @@
-# Project-level Variables  API
+# Project-level Variables API
 
 ## List project variables
 
@@ -84,6 +84,7 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitla
 {
     "key": "NEW_VARIABLE",
     "value": "new value",
+    "protected": false,
     "variable_type": "env_var",
     "protected": false,
     "environment_scope": "*",
