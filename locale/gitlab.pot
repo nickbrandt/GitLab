@@ -3976,6 +3976,9 @@ msgstr ""
 msgid "Default issue template"
 msgstr ""
 
+msgid "Default project deletion protection"
+msgstr ""
+
 msgid "Default: Directly import the Google Code email address or username"
 msgstr ""
 
@@ -10209,9 +10212,6 @@ msgid "ProjectCreationLevel|Allowed to create projects"
 msgstr ""
 
 msgid "ProjectCreationLevel|Default project creation protection"
-msgstr ""
-
-msgid "ProjectCreationLevel|Default project deletion protection"
 msgstr ""
 
 msgid "ProjectCreationLevel|Developers + Maintainers"
