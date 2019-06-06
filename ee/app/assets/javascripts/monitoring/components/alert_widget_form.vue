@@ -4,7 +4,14 @@ import _ from 'underscore';
 import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import { alertsValidator, queriesValidator } from '../validators';
-import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import {
+  GlFormGroup,
+  GlFormInput,
+  GlDropdown,
+  GlDropdownItem,
+  GlTooltipDirective,
+} from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
 
 Vue.use(Translate);
 
@@ -28,8 +35,14 @@ const OPERATORS = {
 
 export default {
   components: {
+    GlFormGroup,
+    GlFormInput,
     GlDropdown,
     GlDropdownItem,
+    Icon,
+  },
+  directives: {
+    GlTooltipDirective,
   },
   props: {
     disabled: {
@@ -55,16 +68,24 @@ export default {
       threshold: null,
       prometheusMetricId: null,
       selectedAlert: {},
+      alertQuery: '',
     };
   },
   computed: {
+    isValidQuery() {
+      // TODO: Add query validation check (most likely via http request)
+      return this.alertQuery.length ? true : null;
+    },
     currentQuery() {
       return this.relevantQueries.find(query => query.metricId === this.prometheusMetricId) || {};
     },
     formDisabled() {
       // We need a prometheusMetricId to determine whether we're
       // creating/updating/deleting
-      return this.disabled || !this.prometheusMetricId;
+      return this.disabled || !(this.prometheusMetricId || this.isValidQuery);
+    },
+    supportsComputedAlerts() {
+      return gon.features && gon.features.prometheusComputedAlerts;
     },
     queryDropdownLabel() {
       return this.currentQuery.label || s__('PrometheusAlerts|Select query');
@@ -137,12 +158,44 @@ export default {
       this.selectedAlert = {};
     },
   },
+  alertQueryText: {
+    label: __('Query'),
+    validFeedback: __('Query is valid'),
+    invalidFeedback: __('Invalid query'),
+    descriptionTooltip: __(
+      'Example: Usage = single query. (Requested) / (Capacity) = multiple queries combined into a formula.',
+    ),
+  },
 };
 </script>
 
 <template>
   <div class="alert-form">
-    <gl-dropdown :text="queryDropdownLabel" class="form-group" toggle-class="dropdown-menu-toggle">
+    <gl-form-group
+      v-if="supportsComputedAlerts"
+      :label="$options.alertQueryText.label"
+      :valid-feedback="$options.alertQueryText.validFeedback"
+      :invalid-feedback="$options.alertQueryText.invalidFeedback"
+      :state="isValidQuery"
+    >
+      <gl-form-input v-model.trim="alertQuery" :state="isValidQuery" />
+      <template #description>
+        <div class="d-flex align-items-center">
+          {{ __('Single or combined queries') }}
+          <icon
+            v-gl-tooltip-directive="$options.alertQueryText.descriptionTooltip"
+            name="question"
+            class="prepend-left-4"
+          />
+        </div>
+      </template>
+    </gl-form-group>
+    <gl-dropdown
+      v-else
+      :text="queryDropdownLabel"
+      class="form-group"
+      toggle-class="dropdown-menu-toggle"
+    >
       <gl-dropdown-item
         v-for="query in relevantQueries"
         :key="query.metricId"
