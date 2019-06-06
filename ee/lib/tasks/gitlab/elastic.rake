@@ -9,40 +9,34 @@ namespace :gitlab do
 
       Rake::Task["gitlab:elastic:create_empty_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
+      Rake::Task["gitlab:elastic:index_projects"].invoke
       Rake::Task["gitlab:elastic:index_wikis"].invoke
-      Rake::Task["gitlab:elastic:index_database"].invoke
-      Rake::Task["gitlab:elastic:index_repositories"].invoke
+      Rake::Task["gitlab:elastic:index_snippets"].invoke
     end
 
-    desc "GitLab | Elasticsearch | Index project repositories in the background"
-    task index_repositories_async: :environment do
-      print "Enqueuing project repositories in batches of #{batch_size}"
+    desc "GitLab | Elasticsearch | Index projects in the background"
+    task index_projects: :environment do
+      print "Enqueuing projects"
 
-      project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.perform_async(start, finish)
+      project_id_batches do |ids|
+        args = ids.collect do |id|
+          [:index, 'Project', id, nil] # es_id is unused for :index
+        end
+
+        ElasticIndexerWorker.bulk_perform_async(args)
         print "."
       end
 
       puts "OK"
     end
 
-    desc "GitLab | ElasticSearch | Check project repository indexing status"
-    task index_repositories_status: :environment do
+    desc "GitLab | ElasticSearch | Check project indexing status"
+    task index_projects_status: :environment do
       indexed = IndexStatus.count
       projects = Project.count
       percent = (indexed / projects.to_f) * 100.0
 
       puts "Indexing is %.2f%% complete (%d/%d projects)" % [percent, indexed, projects]
-    end
-
-    desc "GitLab | Elasticsearch | Index project repositories"
-    task index_repositories: :environment do
-      print "Indexing project repositories..."
-
-      Sidekiq::Logging.logger = Logger.new(STDOUT)
-      project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.new.perform(start, finish)
-      end
     end
 
     desc 'GitLab | Elasticsearch | Unlock repositories for indexing in case something gets stuck'
@@ -70,34 +64,15 @@ namespace :gitlab do
       end
     end
 
-    INDEXABLE_CLASSES = {
-      "Project"      => "index_projects",
-      "Issue"        => "index_issues",
-      "MergeRequest" => "index_merge_requests",
-      "Snippet"      => "index_snippets",
-      "Note"         => "index_notes",
-      "Milestone"    => "index_milestones"
-    }.freeze
+    desc "GitLab | Elasticsearch | Index all snippets"
+    task index_snippets: :environment do
+      logger = Logger.new(STDOUT)
+      logger.info("Indexing snippets...")
 
-    INDEXABLE_CLASSES.each do |klass_name, task_name|
-      task task_name => :environment do
-        logger = Logger.new(STDOUT)
-        logger.info("Indexing #{klass_name.pluralize}...")
+      Snippet.es_import
 
-        klass = Kernel.const_get(klass_name)
-
-        if klass_name == 'Note'
-          Note.searchable.es_import
-        else
-          klass.es_import
-        end
-
-        logger.info("Indexing #{klass_name.pluralize}... " + "done".color(:green))
-      end
+      logger.info("Indexing snippets... " + "done".color(:green))
     end
-
-    desc "GitLab | Elasticsearch | Index all database objects"
-    multitask index_database: INDEXABLE_CLASSES.values
 
     desc "GitLab | Elasticsearch | Create empty index"
     task create_empty_index: :environment do
@@ -190,10 +165,6 @@ namespace :gitlab do
       end
     end
 
-    def batch_size
-      ENV.fetch('BATCH', 300).to_i
-    end
-
     def project_id_batches(&blk)
       relation = Project
 
@@ -201,10 +172,14 @@ namespace :gitlab do
         relation = relation.includes(:index_status).where('index_statuses.id IS NULL').references(:index_statuses)
       end
 
-      relation.all.in_batches(of: batch_size, start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
+      if ::Gitlab::CurrentSettings.elasticsearch_limit_indexing?
+        relation = relation.where(id: ::Gitlab::CurrentSettings.elasticsearch_limited_projects.select(:id))
+      end
+
+      relation.all.in_batches(start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
         ids = relation.reorder(:id).pluck(:id)
         Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, ids) }
-        yield ids[0], ids[-1]
+        yield ids
       end
     end
 
