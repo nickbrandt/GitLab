@@ -4,6 +4,7 @@ import {
   findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
+  getDastSite,
   parseDastIssues,
   filterByKey,
   getUnapprovedVulnerabilities,
@@ -346,6 +347,16 @@ describe('security reports utils', () => {
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(containerScanningFeedbacks[0]);
       expect(parsed.issue_feedback).toEqual(containerScanningFeedbacks[1]);
+    });
+  });
+
+  describe('getDastSite', () => {
+    it.each([{}, 'site', 1, [], undefined])('returns argument as is if arg is %p', arg => {
+      expect(getDastSite(arg)).toEqual(arg);
+    });
+
+    it('returns first item if arg is a non-empty array', () => {
+      expect(getDastSite([{}])).toEqual({});
     });
   });
 
