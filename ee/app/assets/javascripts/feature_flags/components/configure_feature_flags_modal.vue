@@ -1,7 +1,7 @@
 <script>
 import { GlModal, GlButton } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
-// import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
+import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 
 export default {
   modalTitle: s__('FeatureFlags|Configure feature flags'),
@@ -13,7 +13,7 @@ export default {
   components: {
     GlModal,
     GlButton,
-    // ModalCopyButton,
+    ModalCopyButton,
   },
 
   props: {
@@ -71,19 +71,19 @@ export default {
       <div class="input-group">
         <input
           id="api_url"
-          v-model="apiUrl"
+          :value="apiUrl"
           readonly
           class="form-control"
           type="text"
           name="api_url"
         />
         <span class="input-group-append">
-          <!-- <modal-copy-button -->
-          <!--   :text="apiUrl" -->
-          <!--   :title="$options.apiUrlCopyText" -->
-          <!--   :modal-id="modalId" -->
-          <!--   class="input-group-text btn btn-default" -->
-          <!-- /> -->
+          <modal-copy-button
+            :text="apiUrl"
+            :title="$options.apiUrlCopyText"
+            :modal-id="modalId"
+            class="input-group-text btn btn-default"
+          />
         </span>
       </div>
     </div>
@@ -92,18 +92,19 @@ export default {
       <div class="input-group">
         <input
           id="instance_id"
-          v-model="instanceId"
+          :value="instanceId"
           class="form-control"
           type="text"
           name="instance_id"
-          readonly="readonly"
+          readonly
         />
         <span class="input-group-append">
-          <!-- <modal-copy-button -->
-          <!--   :text="instanceId" -->
-          <!--   :title="$options.instanceIdCopyText" -->
-          <!--   class="input-group-text btn btn-default" -->
-          <!-- /> -->
+          <modal-copy-button
+            :text="instanceId"
+            :title="$options.instanceIdCopyText"
+            :modal-id="modalId"
+            class="input-group-text btn btn-default"
+          />
         </span>
       </div>
     </div>
