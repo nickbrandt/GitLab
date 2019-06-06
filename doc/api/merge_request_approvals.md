@@ -59,6 +59,180 @@ POST /projects/:id/approvals
 }
 ```
 
+### Get project-level rules
+
+>**Note:** This API endpoint is only available on 12.0 Starter and above.
+
+You can request information about a project's approval rules using the following endpoint:
+
+```
+GET /projects/:id/approval_rules
+```
+
+**Parameters:**
+
+| Attribute            | Type    | Required | Description                                               |
+|----------------------|---------|----------|-----------------------------------------------------------|
+| `id`                 | integer | yes      | The ID of a project                                       |
+
+```json
+{
+  "rules": [
+    {
+      "id": 1,
+      "name": "security",
+      "rule_type": "regular",
+      "approvers": [
+        {
+          "id": 5,
+          "name": "John Doe",
+          "username": "jdoe",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+          "web_url": "http://localhost/jdoe"
+        }
+      ],
+      "approvals_required": 3,
+      "users": [
+        {
+          "id": 5,
+          "name": "John Doe",
+          "username": "jdoe",
+          "state": "active",
+          "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+          "web_url": "http://localhost/jdoe"
+        }
+      ],
+      "groups": [],
+      "contains_hidden_groups": false
+    }
+  ],
+  "fallback_approvals_required": 3
+}
+```
+
+### Create project-level rule
+
+>**Note:** This API endpoint is only available on 12.0 Starter and above.
+
+You can create project approval rules using the following endpoint:
+
+```
+POST /projects/:id/approval_rules
+```
+
+**Parameters:**
+
+| Attribute            | Type    | Required | Description                                               |
+|----------------------|---------|----------|-----------------------------------------------------------|
+| `id`                 | integer | yes      | The ID of a project                                       |
+| `name`               | string  | yes      | The name of the approval rule                             |
+| `approvals_required` | integer | yes      | The number of required approvals for this rule            |
+| `users`              | integer | no       | The ids of users as approvers                             |
+| `groups`             | integer | no       | The ids of groups as approvers                            |
+
+```json
+{
+  "id": 1,
+  "name": "security",
+  "rule_type": "regular",
+  "approvers": [
+    {
+      "id": 2,
+      "name": "John Doe",
+      "username": "jdoe",
+      "state": "active",
+      "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+      "web_url": "http://localhost/jdoe"
+    }
+  ],
+  "approvals_required": 1,
+  "users": [
+    {
+      "id": 2,
+      "name": "John Doe",
+      "username": "jdoe",
+      "state": "active",
+      "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+      "web_url": "http://localhost/jdoe"
+    }
+  ],
+  "groups": [],
+  "contains_hidden_groups": false
+}
+```
+
+### Update project-level rule
+
+>**Note:** This API endpoint is only available on 12.0 Starter and above.
+
+You can update project approval rules using the following endpoint:
+
+```
+PUT /projects/:id/approval_rules/:approval_rule_id
+```
+
+**Important:** Approvers and groups not in the `users`/`groups` param will be **removed**
+
+**Parameters:**
+
+| Attribute            | Type    | Required | Description                                               |
+|----------------------|---------|----------|-----------------------------------------------------------|
+| `id`                 | integer | yes      | The ID of a project                                       |
+| `approval_rule_id`   | integer | yes      | The ID of a approval rule                                 |
+| `name`               | string  | yes      | The name of the approval rule                             |
+| `approvals_required` | integer | yes      | The number of required approvals for this rule            |
+| `users`              | integer | no       | The ids of users as approvers                             |
+| `groups`             | integer | no       | The ids of groups as approvers                            |
+
+```json
+{
+  "id": 1,
+  "name": "security",
+  "rule_type": "regular",
+  "approvers": [
+    {
+      "id": 2,
+      "name": "John Doe",
+      "username": "jdoe",
+      "state": "active",
+      "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+      "web_url": "http://localhost/jdoe"
+    }
+  ],
+  "approvals_required": 1,
+  "users": [
+    {
+      "id": 2,
+      "name": "John Doe",
+      "username": "jdoe",
+      "state": "active",
+      "avatar_url": "https://www.gravatar.com/avatar/0?s=80&d=identicon",
+      "web_url": "http://localhost/jdoe"
+    }
+  ],
+  "groups": [],
+  "contains_hidden_groups": false
+}
+```
+
+### Delete project-level rule
+
+>**Note:** This API endpoint is only available on 12.0 Starter and above.
+
+You can delete project approval rules using the following endpoint:
+
+```
+DELETE /projects/:id/approval_rules/:approval_rule_id
+```
+
+**Parameters:**
+
+| Attribute            | Type    | Required | Description                                               |
+|----------------------|---------|----------|-----------------------------------------------------------|
+| `id`                 | integer | yes      | The ID of a project                                       |
+| `approval_rule_id`   | integer | yes      | The ID of a approval rule
+
 ### Change allowed approvers
 
 >**Note:** This API endpoint has been deprecated. Please use Approval Rule API instead.
