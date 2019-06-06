@@ -19,6 +19,8 @@
     .col-sm-6.right
       - if namespace.shared_runners_minutes_limit_enabled?
         #{namespace_shared_runner_limits_percent_used(namespace)}% used
+      - elsif !namespace.shared_runners_enabled?
+        0% used
       - else
         = s_('UsageQuota|Unlimited')
 
@@ -35,18 +37,26 @@
         = _('Minutes')
 
   %tbody
-    - projects.each do |project|
-      %tr
-        %td
-          .avatar-container.s20.d-none.d-sm-block
-            = project_icon(project, alt: '', class: 'avatar project-avatar s20')
-          %strong= link_to project.full_name, project
-        %td
-          = project.shared_runners_minutes
-    - if projects.blank?
+    - if !namespace.shared_runners_enabled?
       %tr
         %td{ colspan: 2 }
           .nothing-here-block
-            = s_('UsageQuota|This group has no projects which use shared runners')
+            - runners_doc_path = help_page_path('ci/runners/README.html')
+            - help_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: runners_doc_path }
+            = s_('UsageQuota|%{help_link_start}Shared runners%{help_link_end} are disabled, so there are no limits set on pipeline usage').html_safe % { help_link_start: help_link_start, help_link_end: '</a>'.html_safe }
+    - else
+      - projects.each do |project|
+        %tr
+          %td
+            .avatar-container.s20.d-none.d-sm-block
+              = project_icon(project, alt: '', class: 'avatar project-avatar s20')
+            %strong= link_to project.full_name, project
+          %td
+            = project.shared_runners_minutes
+      - if projects.blank?
+        %tr
+          %td{ colspan: 2 }
+            .nothing-here-block
+              = s_('UsageQuota|This namespace has no projects which use shared runners')
 
 = paginate projects, theme: "gitlab"
