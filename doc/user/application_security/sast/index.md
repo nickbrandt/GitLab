@@ -221,6 +221,119 @@ sast:
     paths: [gl-sast-report.json]
 ```
 
+## Reports JSON format
+
+CAUTION: **Caution:**
+JSON report artifacts are not a public API of SAST and their format may change in future.
+
+SAST tool emits a JSON report report file. Here is an example of a structure for such report will all important parts of
+it highlighted:
+
+```json5
+{
+  "version": "2.0",
+  "vulnerabilities": [
+    {
+      "category": "sast",
+      "name": "Predictable pseudorandom number generator",
+      "message": "Predictable pseudorandom number generator",
+      "description": "The use of java.util.Random is predictable",
+      "cve": "818bf5dacb291e15d9e6dc3c5ac32178:PREDICTABLE_RANDOM",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "scanner": {
+        "id": "find_sec_bugs",
+        "name": "Find Security Bugs"
+      },
+      "location": {
+        "file": "groovy/src/main/groovy/com/gitlab/security_products/tests/App.groovy",
+        "start_line": 47,
+        "end_line": 47,
+        "class": "com.gitlab.security_products.tests.App",
+        "method": "generateSecretToken2",
+        "dependency": {
+          "package": {}
+        }
+      },
+      "identifiers": [
+        {
+          "type": "find_sec_bugs_type",
+          "name": "Find Security Bugs-PREDICTABLE_RANDOM",
+          "value": "PREDICTABLE_RANDOM",
+          "url": "https://find-sec-bugs.github.io/bugs.htm#PREDICTABLE_RANDOM"
+        },
+        {
+          "type": "cwe",
+          "name": "CWE-330",
+          "value": "330",
+          "url": "https://cwe.mitre.org/data/definitions/330.html"
+        }
+      ]
+    },   
+    {
+      "category": "sast",
+      // "name" may be omitted because it could be not reported by a particular analyzer
+      "message": "Probable insecure usage of temp file/directory.",
+      "cve": "python/hardcoded/hardcoded-tmp.py:4ad6d4c40a8c263fc265f3384724014e0a4f8dd6200af83e51ff120420038031:B108",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "scanner": {
+        "id": "bandit",
+        "name": "Bandit"
+      },
+      "location": {
+        "file": "python/hardcoded/hardcoded-tmp.py",
+        "start_line": 10,
+        "end_line": 10,
+        "dependency": {
+          "package": {}
+        }
+      },
+      "identifiers": [
+        {
+          "type": "bandit_test_id",
+          "name": "Bandit Test ID B108",
+          "value": "B108",
+          "url": "https://docs.openstack.org/bandit/latest/plugins/b108_hardcoded_tmp_directory.html"
+        }
+      ]
+    },    
+  ],
+  "remediations": []
+}
+```
+
+Here is the description of the report file structure nodes and their meaning:
+
+| Report JSON node                        | Function |
+|-----------------------------------------|----------|
+| `version`                               | Current version of the report syntax. |
+| `vulnerabilities`                       | Array of vulnerability objects. |
+| `vulnerabilities[].category`            | Describes where this vulnerability belongs (SAST, Dependency Scanning etc.). For SAST, it will always be `sast`. |
+| `vulnerabilities[].name`                | Name of the vulnerability, this must not include occurrence's specific information. |
+| `vulnerabilities[].message`             | A short text that describes the vulnerability, it may include occurrence's specific information. |
+| `vulnerabilities[].description`         | A long text that describes the vulnerability. |
+| `vulnerabilities[].cve`                 | A fingerprint string value that represents a concrete occurrence of the vulnerability. Is used to determine whether two vulnerability occurrences are same or different. May not be 100% accurate. And **this is NOT a [CVE](https://cve.mitre.org/)**. |
+| `vulnerabilities[].severity`            | Describes how much the vulnerability impacts the software. Possible values: `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`. |
+| `vulnerabilities[].confidence`          | Describes how reliable the vulnerability's assessment is. Possible values: `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`. |
+| `vulnerabilities[].solution`            | Explains how to fix the vulnerability. |
+| `vulnerabilities[].scanner`             | A node that describes the analyzer used find this vulnerability. |
+| `vulnerabilities[].scanner.id`          | Id of the scanner as a snake_case string (mandatory). |
+| `vulnerabilities[].scanner.name`        | Name of the scanner, for display purposes (mandatory). |
+| `vulnerabilities[].location`            | A node that tells which class and/or method is affected by the vulnerability. | 
+| `vulnerabilities[].location.file`       | File is the path relative to the search path. |
+| `vulnerabilities[].location.start_line` | The first line of the code affected by the vulnerability. |
+| `vulnerabilities[].location.end_line`   | The last line of the code affected by the vulnerability. |
+| `vulnerabilities[].location.class`      | If specified, provides the name of the class where the vulnerability is located. |
+| `vulnerabilities[].location.method`     | If specified, provides the name of the method where the vulnerability is located. |
+| `vulnerabilities[].location.dependency` | A node that describes the dependency of a project where the vulnerability is located. Used by [Dependency Scanning](../dependency_scanning/index.md) but is present in SAST report since both tools share the same report format. For SAST, always holds `{ "package": {} }` value. |
+| `vulnerabilities[].identifiers`         | An array of references that identify a vulnerability on internal or external DBs. |
+| `vulnerabilities[].identifiers[].type`  | Type of the identifier. Possible values: common identifier types (among `cve`, `cwe`, `osvdb`, and `usn`) or analyzer-dependent ones (e.g. `bandit_test_id` for [Bandit analyzer](https://wiki.openstack.org/wiki/Security/Projects/Bandit)). |
+| `vulnerabilities[].identifiers[].name`  | Name of the identifier for display purpose. |
+| `vulnerabilities[].identifiers[].value` | Value of the identifier for matching purpose. |
+| `vulnerabilities[].identifiers[].url`   | URL to identifier's documentation. |
+| `remediations`                          | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. Used by [Dependency Scanning](../dependency_scanning/index.md) but is present in SAST report since both tools share the same report format. For SAST, always holds `[]` value. |
+
 ## Secret detection
 
 GitLab is also able to detect secrets and credentials that have been unintentionally pushed to the repository.
