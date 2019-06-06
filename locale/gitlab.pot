@@ -5167,6 +5167,9 @@ msgstr ""
 msgid "Everything you need to create a GitLab Pages site using plain HTML."
 msgstr ""
 
+msgid "Example: Usage = single query. (Requested) / (Capacity) = multiple queries combined into a formula."
+msgstr ""
+
 msgid "Except policy:"
 msgstr ""
 
@@ -7154,6 +7157,9 @@ msgid "Invalid input, please avoid emojis"
 msgstr ""
 
 msgid "Invalid pin code"
+msgstr ""
+
+msgid "Invalid query"
 msgstr ""
 
 msgid "Invalid repository path"
@@ -10668,6 +10674,9 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
+msgid "Query is valid"
+msgstr ""
+
 msgid "Quick actions can be used in the issues description and comment boxes."
 msgstr ""
 
@@ -11981,6 +11990,9 @@ msgid "Signing in using your %{label} account without a pre-existing GitLab acco
 msgstr ""
 
 msgid "Similar issues"
+msgstr ""
+
+msgid "Single or combined queries"
 msgstr ""
 
 msgid "Size"
