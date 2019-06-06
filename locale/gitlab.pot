@@ -4067,6 +4067,9 @@ msgstr ""
 msgid "Dependencies|Component"
 msgstr ""
 
+msgid "Dependencies|Component name"
+msgstr ""
+
 msgid "Dependencies|Job failed to generate the dependency list"
 msgstr ""
 
@@ -5003,6 +5006,9 @@ msgid "Error fetching projects"
 msgstr ""
 
 msgid "Error fetching refs"
+msgstr ""
+
+msgid "Error fetching the dependency list. Please check your network connection and try again."
 msgstr ""
 
 msgid "Error fetching usage ping data."
