@@ -46,6 +46,12 @@ export default {
     itemReference() {
       return this.item.reference;
     },
+    itemWebPath() {
+      // Here, GraphQL API (during item fetch) returns `webPath`
+      // and Rails API (during item add) returns `path`,
+      // we need to make both accessible.
+      return this.item.path || this.item.webPath;
+    },
     isOpen() {
       return this.item.state === ChildState.Open;
     },
@@ -74,7 +80,7 @@ export default {
       return this.itemReference.split(this.item.pathIdSeparator).pop();
     },
     computedPath() {
-      return this.item.webPath.length ? this.item.webPath : null;
+      return this.itemWebPath.length ? this.itemWebPath : null;
     },
     itemActionInProgress() {
       return (

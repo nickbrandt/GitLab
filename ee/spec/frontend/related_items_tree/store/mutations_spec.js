@@ -46,6 +46,20 @@ describe('RelatedItemsTree', () => {
         });
       });
 
+      describe(types.SET_CHILDREN_COUNT, () => {
+        it('should set provided `epicsCount` and `issuesCount` to state', () => {
+          const data = {
+            epicsCount: 4,
+            issuesCount: 5,
+          };
+
+          mutations[types.SET_CHILDREN_COUNT](state, data);
+
+          expect(state.epicsCount).toBe(data.epicsCount);
+          expect(state.issuesCount).toBe(data.issuesCount);
+        });
+      });
+
       describe(types.SET_ITEM_CHILDREN, () => {
         it('should set provided `data.children` to `state.children` with reference key as present in `data.parentItem`', () => {
           const data = {

@@ -23,6 +23,22 @@ export const setInitialConfig = ({ commit }, data) => commit(types.SET_INITIAL_C
 export const setInitialParentItem = ({ commit }, data) =>
   commit(types.SET_INITIAL_PARENT_ITEM, data);
 
+export const setChildrenCount = ({ commit, state }, { children, isRemoved = false }) => {
+  const [epicsCount, issuesCount] = children.reduce(
+    (acc, item) => {
+      if (item.type === ChildType.Epic) {
+        acc[0] += isRemoved ? -1 : 1;
+      } else {
+        acc[1] += isRemoved ? -1 : 1;
+      }
+      return acc;
+    },
+    [state.epicsCount || 0, state.issuesCount || 0],
+  );
+
+  commit(types.SET_CHILDREN_COUNT, { epicsCount, issuesCount });
+};
+
 export const expandItem = ({ commit }, data) => commit(types.EXPAND_ITEM, data);
 export const collapseItem = ({ commit }, data) => commit(types.COLLAPSE_ITEM, data);
 
@@ -32,6 +48,8 @@ export const setItemChildren = ({ commit, dispatch }, { parentItem, children, is
     children,
     isSubItem,
   });
+
+  dispatch('setChildrenCount', { children });
 
   if (isSubItem) {
     dispatch('expandItem', {
@@ -131,6 +149,8 @@ export const removeItem = ({ dispatch }, { parentItem, item }) => {
         parentItem,
         item,
       });
+
+      dispatch('setChildrenCount', { children: [item], isRemoved: true });
     })
     .catch(({ status }) => {
       dispatch('receiveRemoveItemFailure', {
@@ -167,6 +187,8 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { actionTyp
     insertAt: isEpic ? getters.epicsBeginAtIndex : 0,
     items,
   });
+
+  dispatch('setChildrenCount', { children: items });
 
   dispatch('setItemChildrenFlags', {
     children: items,
@@ -223,6 +245,8 @@ export const receiveCreateItemSuccess = (
     insertAt: isEpic ? getters.epicsBeginAtIndex : 0,
     item,
   });
+
+  dispatch('setChildrenCount', { children: [item] });
 
   dispatch('setItemChildrenFlags', {
     children: [item],
