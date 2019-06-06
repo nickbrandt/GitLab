@@ -368,7 +368,7 @@ curl --output artifacts.zip --header "PRIVATE-TOKEN: <your_access_token>" "https
 ```
 
 To use this in a [`script` definition](../ci/yaml/README.md#script) inside
-`.gitlab-ci.yml`, you can use either:
+`.gitlab-ci.yml` **[PREMIUM]**, you can use either:
 
 - The `JOB-TOKEN` header with the GitLab-provided `CI_JOB_TOKEN` variable.
   For example, the following job will download the artifacts of the job with ID
@@ -434,7 +434,7 @@ curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/a
 ```
 
 To use this in a [`script` definition](../ci/yaml/README.md#script) inside
-`.gitlab-ci.yml`, you can use either:
+`.gitlab-ci.yml` **[PREMIUM]**, you can use either:
 
 - The `JOB-TOKEN` header with the GitLab-provided `CI_JOB_TOKEN` variable.
   For example, the following job will download the artifacts of the `test` job
