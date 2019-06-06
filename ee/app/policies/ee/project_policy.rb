@@ -46,6 +46,16 @@ module EE
       end
 
       with_scope :subject
+      condition(:commit_committer_check_available) do
+        @subject.feature_available?(:commit_committer_check)
+      end
+
+      with_scope :subject
+      condition(:reject_unsigned_commits_available) do
+        @subject.feature_available?(:reject_unsigned_commits)
+      end
+
+      with_scope :subject
       condition(:pod_logs_enabled) do
         @subject.feature_available?(:pod_logs, @user)
       end
@@ -184,7 +194,19 @@ module EE
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.enable :change_commit_committer_check
+      rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
+
+      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
+        enable :change_commit_committer_check
+      end
+
+      rule { commit_committer_check_available }.policy do
+        enable :read_commit_committer_check
+      end
+
+      rule { ~commit_committer_check_available }.policy do
+        prevent :change_commit_committer_check
+      end
 
       rule { owner | reporter }.enable :build_read_project
 

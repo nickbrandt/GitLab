@@ -689,4 +689,35 @@ describe ProjectPolicy do
 
     it { is_expected.to be_allowed(:reporter_access) }
   end
+
+  context 'commit_committer_check is not enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: false)
+    end
+
+    let(:current_user) { maintainer }
+
+    it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+    it { is_expected.not_to be_allowed(:read_commit_committer_check) }
+  end
+
+  context 'commit_committer_check is enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: true)
+    end
+
+    context 'the user is a maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
+
+    context 'the user is a developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
+  end
 end
