@@ -8,14 +8,22 @@
     = s_('UsageQuota|Usage of group resources across the projects in the %{strong_start}%{group_name}%{strong_end} group').html_safe % { strong_start: '<strong>'.html_safe, strong_end: '</strong>'.html_safe, group_name: @group.name }
 
 .top-area.scrolling-tabs-container.inner-page-scroll-tabs
-  %ul.nav-links.scrolling-tabs.separator{ role: 'tablist' }
+  %ul.nav.nav-tabs.nav-links.scrolling-tabs.separator.js-storage-tabs{ role: 'tablist' }
     %li.nav-item
-      %a.nav-link.active#pipelines-quota{ href: 'pipelines-quota-tab', data: { toggle: 'tab' }, 'aria-controls': 'pipelines-quota-tab', 'aria-selected': true }
+      %a.nav-link#pipelines-quota{ data: { toggle: "tab", action: '#pipelines-quota-tab' }, href: '#pipelines-quota-tab', 'aria-controls': '#pipelines-quota-tab', 'aria-selected': true }
         = s_('UsageQuota|Pipelines')
+    - if Gitlab::Graphql.enabled?
+      %li.nav-item
+        %a.nav-link#storage-quota{ data: { toggle: "tab", action: '#storage-quota-tab' }, href: '#storage-quota-tab', 'aria-controls': '#storage-quota-tab', 'aria-selected': false }
+          = s_('UsageQuota|Storage')
   .nav-controls
     = link_to s_('UsageQuota|Buy additional minutes'), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', class: 'btn btn-inverted btn-success float-right'
 
 .tab-content
-  .tab-pane.show.active#pipelines-quota-tab{ role: 'tabpanel' }
+  .tab-pane#pipelines-quota-tab
     = render "namespaces/pipelines_quota/list",
       locals: { namespace: @group, projects: @projects }
+  .tab-pane#storage-quota-tab
+    - if Gitlab::Graphql.enabled?
+      #js-storage-counter-app{ data: { namespace_path: @group.full_path } }
+

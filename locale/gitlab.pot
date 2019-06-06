@@ -13861,6 +13861,9 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Toggle project"
+msgstr ""
+
 msgid "Toggle sidebar"
 msgstr ""
 
@@ -14275,16 +14278,37 @@ msgstr ""
 msgid "Usage statistics"
 msgstr ""
 
+msgid "UsageQuota|%{help_link_start}Shared runners%{help_link_end} are disabled, so there are no limits set on pipeline usage"
+msgstr ""
+
+msgid "UsageQuota|Artifacts"
+msgstr ""
+
 msgid "UsageQuota|Buy additional minutes"
+msgstr ""
+
+msgid "UsageQuota|Commit count"
 msgstr ""
 
 msgid "UsageQuota|Current period usage"
 msgstr ""
 
+msgid "UsageQuota|LFS Storage"
+msgstr ""
+
+msgid "UsageQuota|Packages"
+msgstr ""
+
 msgid "UsageQuota|Pipelines"
 msgstr ""
 
-msgid "UsageQuota|This group has no projects which use shared runners"
+msgid "UsageQuota|Repository"
+msgstr ""
+
+msgid "UsageQuota|Storage"
+msgstr ""
+
+msgid "UsageQuota|This namespace has no projects which use shared runners"
 msgstr ""
 
 msgid "UsageQuota|Unlimited"
@@ -14303,6 +14327,9 @@ msgid "UsageQuota|Usage quotas"
 msgstr ""
 
 msgid "UsageQuota|Usage since"
+msgstr ""
+
+msgid "UsageQuota|Wiki"
 msgstr ""
 
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"

@@ -35,22 +35,22 @@ describe 'Groups > Usage Quotas' do
     let(:group) { create(:group, :with_not_used_build_minutes_limit) }
     let!(:project) { create(:project, namespace: group, shared_runners_enabled: false) }
 
-    it 'is not linked within the group settings dropdown' do
+    it 'is linked within the group settings dropdown' do
       visit edit_group_path(group)
 
-      expect(page).not_to have_link('Usage Quotas')
+      expect(page).to have_link('Usage Quotas')
     end
 
     it 'shows correct group quota info' do
       visit_pipeline_quota_page
 
       page.within('.pipeline-quota') do
-        expect(page).to have_content("300 / Unlimited minutes")
+        expect(page).to have_content("0%")
         expect(page).to have_selector('.bg-success')
       end
 
       page.within('.pipeline-project-metrics') do
-        expect(page).to have_content('This group has no projects which use shared runners')
+        expect(page).to have_content('Shared runners are disabled, so there are no limits set on pipeline usage')
       end
     end
   end
