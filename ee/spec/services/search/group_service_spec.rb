@@ -40,18 +40,18 @@ describe Search::GroupService, :elastic do
     end
 
     context 'finding projects by name' do
-      subject { results.objects('projects') }
+      subject { results.objects('projects').map(&:id) }
 
       context 'in parent group' do
         let(:search_group) { nested_group.parent }
 
-        it { is_expected.to match_array([project1, project2, project3]) }
+        it { is_expected.to match_array([project1.id, project2.id, project3.id]) }
       end
 
       context 'in subgroup' do
         let(:search_group) { nested_group }
 
-        it { is_expected.to match_array([project1, project2]) }
+        it { is_expected.to match_array([project1.id, project2.id]) }
       end
     end
   end

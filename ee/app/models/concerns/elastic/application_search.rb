@@ -331,7 +331,7 @@ module Elastic
         self.import(options)
       end
 
-      def basic_query_hash(fields, query)
+      def basic_query_hash(fields, query, page: nil, per_page: nil)
         query_hash = if query.present?
                        {
                          query: {
@@ -359,6 +359,9 @@ module Elastic
                          track_scores: true
                        }
                      end
+
+        query_hash[:size] = per_page if per_page
+        query_hash[:from] = per_page * (page - 1) if per_page && page
 
         query_hash[:sort] = [
           { updated_at: { order: :desc } },
