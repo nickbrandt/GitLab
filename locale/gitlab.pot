@@ -4046,6 +4046,9 @@ msgstr ""
 msgid "Dependencies|Component name"
 msgstr ""
 
+msgid "Dependencies|Export as JSON"
+msgstr ""
+
 msgid "Dependencies|Job failed to generate the dependency list"
 msgstr ""
 
