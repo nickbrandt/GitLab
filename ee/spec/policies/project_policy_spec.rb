@@ -463,7 +463,6 @@ describe ProjectPolicy do
       it { is_expected.to be_allowed(:remove_project) }
 
       context 'who owns the project' do
-        let(:current_user) { admin }
         let(:project) { create(:project, :public, namespace: admin.namespace) }
 
         it { is_expected.to be_allowed(:remove_project) }
