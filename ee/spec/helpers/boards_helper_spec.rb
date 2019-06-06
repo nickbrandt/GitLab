@@ -2,16 +2,40 @@
 require 'spec_helper'
 
 describe BoardsHelper do
+  let(:project) { create(:project) }
+
   describe '#board_list_data' do
     let(:results) { helper.board_list_data }
 
     it 'contains an endpoint to get users list' do
-      project = create(:project)
       board = create(:board, project: project)
       assign(:board, board)
       assign(:project, project)
 
       expect(results).to include(list_assignees_path: "/-/boards/#{board.id}/users.json")
+    end
+  end
+
+  describe '#current_board_json' do
+    let(:board_json) { JSON.parse(helper.current_board_json.to_json) }
+    let(:user) { create(:user) }
+    let(:label1) { create(:label, name: "feijoa") }
+    let(:label2) { create(:label, name: "pineapple") }
+    let(:milestone) { create(:milestone) }
+
+    it 'serializes with child object attributes' do
+      user = create(:user)
+      board = create(:board, project: project, milestone: milestone, assignee: user, labels: [label1, label2])
+      assign(:board, board)
+
+      expect(board_json).to match_schema('current-board', dir: 'ee')
+    end
+
+    it 'can serialise with a basic set of attributes' do
+      board = create(:board, project: project)
+      assign(:board, board)
+
+      expect(board_json).to match_schema('current-board', dir: 'ee')
     end
   end
 end

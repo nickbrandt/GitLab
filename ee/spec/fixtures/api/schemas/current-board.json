@@ -5,13 +5,14 @@
     {
       "required" : [
         "id",
-        "name",
-        "milestone_id",
-        "assignee_id",
-        "weight",
-        "label_ids",
+        "name"
       ],
       "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "milestone_id": { "type": ["integer", "null"] },
+        "weight": { "type": ["integer", "null"] },
+        "label_ids": { "type": "array" },
         "assignee": {
           "type": ["object", "null"],
           "required": [
@@ -21,12 +22,7 @@
             "avatar_url"
           ]
         },
-        "assignee": {
-          "oneOf": [
-            { "type": "null" },
-            { "$ref": "milestone.json" }
-          ]
-        },
+        "labels": { "$ref": "board-labels.json" },
         "milestone": {
           "type": ["object", "null"],
           "required": [

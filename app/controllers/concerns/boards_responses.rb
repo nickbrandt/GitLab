@@ -76,7 +76,7 @@ module BoardsResponses
     respond_to do |format|
       format.html
       format.json do
-        render json: serialize_as_json(resource).as_json
+        render json: serialize_as_json(resource)
       end
     end
   end

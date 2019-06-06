@@ -13,8 +13,8 @@ describe BoardSerializer do
   context 'serialization' do
     let(:serializer) { 'board' }
 
-    it 'matches issue_sidebar_extras json schema' do
-      expect(json_entity).to match_schema('entities/board_simple', dir: 'ee')
+    it 'matches current board json schema' do
+      expect(json_entity).to match_schema('board', dir: 'ee')
     end
   end
 end

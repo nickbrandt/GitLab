@@ -14,26 +14,10 @@ describe BoardsResponses do
   describe '#serialize_as_json' do
     let!(:board) { create(:board) }
 
-    context 'with milestone' do
-      let(:milestone) { create(:milestone) }
+    it 'serializes properly' do
+      expected = { id: board.id }
 
-      before do
-        board.update_attribute(:milestone_id, milestone.id)
-      end
-
-      it 'serialises properly' do
-        expected = { id: board.id }.to_json
-
-        expect(subject.serialize_as_json(board).to_json).to eq(expected)
-      end
-    end
-
-    context 'without milestone' do
-      it 'serialises properly' do
-        expected = { id: board.id }.to_json
-
-        expect(subject.serialize_as_json(board).to_json).to eq(expected)
-      end
+      expect(subject.serialize_as_json(board).to_h).to include(expected)
     end
   end
 end

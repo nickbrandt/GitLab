@@ -43,17 +43,14 @@ module EE
       parent.is_a?(Group) ? recent_group_boards_path(@group) : recent_project_boards_path(@project)
     end
 
+    def serializer
+      CurrentBoardSerializer.new
+    end
+
     def current_board_json
       board = @board || @boards.first
 
-      board.to_json(
-        only: [:id, :name, :milestone_id, :assignee_id, :weight, :label_ids],
-        include: {
-          milestone: { only: [:id, :title, :name] },
-          assignee: { only: [:id, :name, :username], methods: [:avatar_url] },
-          labels: { only: [:title, :color, :id] }
-        }
-      )
+      serializer.represent(board)
     end
 
     override :boards_link_text
