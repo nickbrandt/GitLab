@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlButton, GlDropdown, GlDropdownItem, GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import { SORT_ORDER } from '../store/constants';
@@ -16,7 +16,8 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   computed: {
-    ...mapState(['endpoint', 'sortField', 'sortFields', 'sortOrder']),
+    ...mapState(['sortField', 'sortFields', 'sortOrder']),
+    ...mapGetters(['downloadEndpoint']),
     sortFieldName() {
       return this.sortFields[this.sortField];
     },
@@ -59,7 +60,7 @@ export default {
     </div>
     <gl-button
       v-gl-tooltip
-      :href="endpoint"
+      :href="downloadEndpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
