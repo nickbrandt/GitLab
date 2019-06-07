@@ -137,7 +137,11 @@ Example response:
          "award_emoji":"http://example.com/api/v4/projects/1/issues/76/award_emoji",
          "project":"http://example.com/api/v4/projects/1"
       },
-      "subscribed": false
+      "subscribed": false,
+      "task_completion_status":{
+         "count":0,
+         "completed_count":0
+      }
    }
 ]
 ```
@@ -269,7 +273,11 @@ Example response:
          "award_emoji":"http://example.com/api/v4/projects/4/issues/41/award_emoji",
          "project":"http://example.com/api/v4/projects/4"
       },
-      "subscribed": false
+      "subscribed": false,
+      "task_completion_status":{
+         "count":0,
+         "completed_count":0
+      }
    }
 ]
 ```
@@ -409,7 +417,11 @@ Example response:
          "award_emoji":"http://example.com/api/v4/projects/4/issues/41/award_emoji",
          "project":"http://example.com/api/v4/projects/4"
       },
-      "subscribed": false
+      "subscribed": false,
+      "task_completion_status":{
+         "count":0,
+         "completed_count":0
+      }
    }
 ]
 ```
@@ -507,6 +519,10 @@ Example response:
       "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
       "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
       "project": "http://example.com/api/v4/projects/1"
+   },
+   "task_completion_status":{
+      "count":0,
+      "completed_count":0
    }
 }
 ```
@@ -592,6 +608,10 @@ Example response:
       "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
       "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
       "project": "http://example.com/api/v4/projects/1"
+   },
+   "task_completion_status":{
+      "count":0,
+      "completed_count":0
    }
 }
 ```
@@ -685,6 +705,10 @@ Example response:
       "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
       "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
       "project": "http://example.com/api/v4/projects/1"
+   },
+   "task_completion_status":{
+      "count":0,
+      "completed_count":0
    }
 }
 ```
@@ -792,6 +816,10 @@ Example response:
     "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
     "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
     "project": "http://example.com/api/v4/projects/1"
+  },
+  "task_completion_status":{
+     "count":0,
+     "completed_count":0
   }
 }
 ```
@@ -878,6 +906,10 @@ Example response:
     "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
     "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
     "project": "http://example.com/api/v4/projects/1"
+  },
+  "task_completion_status":{
+     "count":0,
+     "completed_count":0
   }
 }
 ```
@@ -944,7 +976,11 @@ Example response:
   "due_date": null,
   "web_url": "http://example.com/example/example/issues/12",
   "confidential": false,
-  "discussion_locked": false
+  "discussion_locked": false,
+  "task_completion_status":{
+     "count":0,
+     "completed_count":0
+  }
 }
 ```
 
@@ -1042,8 +1078,11 @@ Example response:
     "due_date": null,
     "web_url": "http://example.com/example/example/issues/110",
     "confidential": false,
-    "weight": null,
-    "discussion_locked": false
+    "discussion_locked": false,
+    "task_completion_status":{
+       "count":0,
+       "completed_count":0
+    }
   },
   "target_url": "https://gitlab.example.com/gitlab-org/gitlab-ci/issues/10",
   "body": "Vel voluptas atque dicta mollitia adipisci qui at.",
