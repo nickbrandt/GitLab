@@ -2368,6 +2368,7 @@ ActiveRecord::Schema.define(version: 20190603124955) do
     t.boolean "group_runners_enabled", default: true, null: false
     t.boolean "merge_pipelines_enabled"
     t.boolean "merge_trains_enabled", default: false, null: false
+    t.integer "default_git_depth"
     t.index ["project_id"], name: "index_project_ci_cd_settings_on_project_id", unique: true, using: :btree
   end
 
