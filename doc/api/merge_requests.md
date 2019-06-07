@@ -1205,7 +1205,7 @@ Parameters:
 
 ## Returns the up to date merge-ref HEAD commit
 
-Merge the changes between the merge request source and target branches into `refs/merge-requests/:iid/merge` 
+Merge the changes between the merge request source and target branches into `refs/merge-requests/:iid/merge`
 ref, of the target project repository, if possible. This ref will have the state the target branch would have if
 a regular merge action was taken.
 
