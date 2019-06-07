@@ -12,6 +12,59 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
 
       subject(:rollout_status) { service.rollout_status(environment) }
 
+      context 'legacy deployments based on app label' do
+        let(:legacy_deployment) do
+          kube_deployment(name: 'legacy-deployment').tap do |deployment|
+            deployment['metadata']['annotations'].delete('app.gitlab.com/env')
+            deployment['metadata']['annotations'].delete('app.gitlab.com/app')
+            deployment['metadata']['labels']['app'] = environment.slug
+          end
+        end
+
+        let(:legacy_pod) do
+          kube_pod(name: 'legacy-pod').tap do |pod|
+            pod['metadata']['annotations'].delete('app.gitlab.com/env')
+            pod['metadata']['annotations'].delete('app.gitlab.com/app')
+            pod['metadata']['labels']['app'] = environment.slug
+          end
+        end
+
+        context 'only legacy deployments' do
+          before do
+            stub_reactive_cache(
+              service,
+              deployments: [legacy_deployment],
+              pods: [legacy_pod]
+            )
+          end
+
+          it 'contains legacy deployments' do
+            expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+
+            expect(rollout_status.deployments.map(&:name)).to contain_exactly('legacy-deployment')
+          end
+        end
+
+        context 'new deployment based on annotations' do
+          let(:matched_deployment) { kube_deployment(name: 'matched-deployment', environment_slug: environment.slug, project_slug: project.full_path_slug) }
+          let(:matched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+
+          before do
+            stub_reactive_cache(
+              service,
+              deployments: [matched_deployment, legacy_deployment],
+              pods: [matched_pod, legacy_pod]
+            )
+          end
+
+          it 'contains only matching deployments' do
+            expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+
+            expect(rollout_status.deployments.map(&:name)).to contain_exactly('matched-deployment')
+          end
+        end
+      end
+
       context 'with valid deployments' do
         let(:matched_deployment) { kube_deployment(environment_slug: environment.slug, project_slug: project.full_path_slug) }
         let(:unmatched_deployment) { kube_deployment }
