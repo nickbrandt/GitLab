@@ -16,6 +16,7 @@ class BoardsStoreEE {
       this.addPromotion();
     };
     this.store.loadList = (listPath, listType) => this.loadList(listPath, listType);
+    this.store.setCurrentBoard = board => this.setCurrentBoard(board);
     this.store.removePromotionState = () => {
       this.removePromotion();
     };
@@ -154,6 +155,13 @@ class BoardsStoreEE {
 
   promotionIsHidden() {
     return parseBoolean(Cookies.get('promotion_issue_board_hidden'));
+  }
+
+  setCurrentBoard(board) {
+    const { state } = this.store;
+    state.currentBoard = board;
+    state.assignees = [];
+    state.milestones = [];
   }
 
   updateWeight(newWeight, id) {
