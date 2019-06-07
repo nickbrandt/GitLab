@@ -6362,6 +6362,9 @@ msgstr ""
 msgid "Go to your fork"
 msgstr ""
 
+msgid "Golden Tanuki"
+msgstr ""
+
 msgid "Google Code import"
 msgstr ""
 
@@ -14464,6 +14467,24 @@ msgid "User was successfully removed from project."
 msgstr ""
 
 msgid "User was successfully updated."
+msgstr ""
+
+msgid "UserOnboardingTour|%{activeTour}/%{totalTours}"
+msgstr ""
+
+msgid "UserOnboardingTour|%{completed}/%{total} steps completed"
+msgstr ""
+
+msgid "UserOnboardingTour|Exit 'Learn GitLab'"
+msgstr ""
+
+msgid "UserOnboardingTour|Learn GitLab"
+msgstr ""
+
+msgid "UserOnboardingTour|Restart this step"
+msgstr ""
+
+msgid "UserOnboardingTour|Skip this step"
 msgstr ""
 
 msgid "UserProfile|Activity"
