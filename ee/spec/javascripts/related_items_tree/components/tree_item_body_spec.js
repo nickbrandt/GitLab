@@ -67,6 +67,40 @@ describe('RelatedItemsTree', () => {
         });
       });
 
+      describe('itemWebPath', () => {
+        const mockPath = '/foo/bar';
+
+        it('returns value of `item.path`', done => {
+          wrapper.setProps({
+            item: Object.assign({}, mockItem, {
+              path: mockPath,
+              webPath: undefined,
+            }),
+          });
+
+          wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.itemWebPath).toBe(mockPath);
+
+            done();
+          });
+        });
+
+        it('returns value of `item.webPath` when `item.path` is undefined', done => {
+          wrapper.setProps({
+            item: Object.assign({}, mockItem, {
+              path: undefined,
+              webPath: mockPath,
+            }),
+          });
+
+          wrapper.vm.$nextTick(() => {
+            expect(wrapper.vm.itemWebPath).toBe(mockPath);
+
+            done();
+          });
+        });
+      });
+
       describe('isOpen', () => {
         it('returns true when `item.state` value is `opened`', done => {
           wrapper.setProps({
@@ -214,11 +248,11 @@ describe('RelatedItemsTree', () => {
       });
 
       describe('computedPath', () => {
-        it('returns value of `item.webPath` when it is defined', () => {
+        it('returns value of `itemWebPath` when it is defined', () => {
           expect(wrapper.vm.computedPath).toBe(mockItem.webPath);
         });
 
-        it('returns `null` when `item.webPath` is empty', done => {
+        it('returns `null` when `itemWebPath` is empty', done => {
           wrapper.setProps({
             item: Object.assign({}, mockItem, {
               webPath: '',

@@ -110,6 +110,8 @@ export const mockIssue2 = {
 
 export const mockEpics = [mockEpic1, mockEpic2];
 
+export const mockIssues = [mockIssue1, mockIssue2];
+
 export const mockQueryResponse = {
   data: {
     group: {

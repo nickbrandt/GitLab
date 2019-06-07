@@ -20,6 +20,7 @@ import {
   mockParentItem,
   mockQueryResponse,
   mockEpics,
+  mockIssues,
   mockEpic1,
 } from '../mock_data';
 
@@ -55,6 +56,57 @@ describe('RelatedItemTree', () => {
             mockParentItem,
             {},
             [{ type: types.SET_INITIAL_PARENT_ITEM, payload: mockParentItem }],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('setChildrenCount', () => {
+        const mockEpicsWithType = mockEpics.map(item =>
+          Object.assign({}, item, {
+            type: ChildType.Epic,
+          }),
+        );
+
+        const mockIssuesWithType = mockIssues.map(item =>
+          Object.assign({}, item, {
+            type: ChildType.Issue,
+          }),
+        );
+
+        const mockChildren = [...mockEpicsWithType, ...mockIssuesWithType];
+
+        it('should set `epicsCount` and `issuesCount`, by incrementing it, on state', done => {
+          testAction(
+            actions.setChildrenCount,
+            { children: mockChildren, isRemoved: false },
+            {},
+            [
+              {
+                type: types.SET_CHILDREN_COUNT,
+                payload: { epicsCount: mockEpics.length, issuesCount: mockIssues.length },
+              },
+            ],
+            [],
+            done,
+          );
+        });
+
+        it('should set `epicsCount` and `issuesCount`, by decrementing it, on state', done => {
+          testAction(
+            actions.setChildrenCount,
+            { children: mockChildren, isRemoved: true },
+            {
+              epicsCount: mockEpics.length,
+              issuesCount: mockIssues.length,
+            },
+            [
+              {
+                type: types.SET_CHILDREN_COUNT,
+                payload: { epicsCount: 0, issuesCount: 0 },
+              },
+            ],
             [],
             done,
           );
@@ -101,7 +153,12 @@ describe('RelatedItemTree', () => {
                 payload: mockPayload,
               },
             ],
-            [],
+            [
+              {
+                type: 'setChildrenCount',
+                payload: { children: mockPayload.children },
+              },
+            ],
             done,
           );
         });
@@ -120,6 +177,10 @@ describe('RelatedItemTree', () => {
               },
             ],
             [
+              {
+                type: 'setChildrenCount',
+                payload: { children: mockPayload.children },
+              },
               {
                 type: 'expandItem',
                 payload: { parentItem: mockPayload.parentItem },
@@ -470,6 +531,10 @@ describe('RelatedItemTree', () => {
                 type: 'receiveRemoveItemSuccess',
                 payload: { parentItem: data.parentItem, item: data.item },
               },
+              {
+                type: 'setChildrenCount',
+                payload: { children: [data.item], isRemoved: true },
+              },
             ],
             done,
           );
@@ -606,6 +671,10 @@ describe('RelatedItemTree', () => {
               },
             ],
             [
+              {
+                type: 'setChildrenCount',
+                payload: { children: mockEpicsWithoutPerm },
+              },
               {
                 type: 'setItemChildrenFlags',
                 payload: { children: mockEpicsWithoutPerm, isSubItem: false },
@@ -755,6 +824,10 @@ describe('RelatedItemTree', () => {
               },
             ],
             [
+              {
+                type: 'setChildrenCount',
+                payload: { children: [mockItems[0]] },
+              },
               {
                 type: 'setItemChildrenFlags',
                 payload: { children: [mockItems[0]], isSubItem: false },

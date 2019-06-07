@@ -74,7 +74,8 @@ describe('RelatedItemsTree', () => {
 
       describe('headerItems', () => {
         it('returns an item within array containing Epic iconName, count, qaClass & type props', () => {
-          const epicHeaderItem = getters.headerItems(state, mockGetters)[0];
+          state.epicsCount = 2;
+          const epicHeaderItem = getters.headerItems(state)[0];
 
           expect(epicHeaderItem).toEqual(
             expect.objectContaining({
@@ -87,7 +88,8 @@ describe('RelatedItemsTree', () => {
         });
 
         it('returns an item within array containing Issue iconName, count, qaClass & type props', () => {
-          const epicHeaderItem = getters.headerItems(state, mockGetters)[1];
+          state.issuesCount = 2;
+          const epicHeaderItem = getters.headerItems(state)[1];
 
           expect(epicHeaderItem).toEqual(
             expect.objectContaining({

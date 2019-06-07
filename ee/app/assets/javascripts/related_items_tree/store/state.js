@@ -6,6 +6,8 @@ export default () => ({
 
   children: {},
   childrenFlags: {},
+  epicsCount: 0,
+  issuesCount: 0,
 
   // Add Item Form Data
   actionType: '',
