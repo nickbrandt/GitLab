@@ -29,7 +29,6 @@ FactoryBot.define do
     end
 
     trait :dependency_list do
-      success
       name :dependency_scanning
 
       after(:build) do |build|

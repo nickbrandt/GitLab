@@ -30,13 +30,13 @@ module Security
     end
 
     def sort(collection)
-      if @params[:sort_by] == 'packager'
+      if params[:sort_by] == 'packager'
         collection.sort_by! { |a| a[:packager] }
       else
         collection.sort_by! { |a| a[:name] }
       end
 
-      collection.reverse! if @params[:sort] == 'desc'
+      collection.reverse! if params[:sort] == 'desc'
 
       collection
     end
