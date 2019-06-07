@@ -13,7 +13,7 @@ describe('DependenciesActions component', () => {
     const localVue = createLocalVue();
 
     store = createStore();
-    jest.spyOn(store, 'dispatch');
+    jest.spyOn(store, 'dispatch').mockImplementation();
 
     wrapper = shallowMount(localVue.extend(DependenciesActions), {
       localVue,
@@ -24,6 +24,8 @@ describe('DependenciesActions component', () => {
 
   beforeEach(() => {
     factory();
+    store.state.endpoint = `${TEST_HOST}/dependencies`;
+    return wrapper.vm.$nextTick();
   });
 
   afterEach(() => {
@@ -54,20 +56,13 @@ describe('DependenciesActions component', () => {
     expect(store.dispatch).toHaveBeenCalledWith('toggleSortOrder');
   });
 
-  describe('given an endpoint', () => {
-    beforeEach(() => {
-      store.state.endpoint = `${TEST_HOST}/dependencies`;
-      return wrapper.vm.$nextTick();
-    });
-
-    it('has a button to export the dependency list', () => {
-      const download = wrapper.find('.js-download');
-      expect(download.attributes()).toEqual(
-        expect.objectContaining({
-          href: store.state.endpoint,
-          download: expect.any(String),
-        }),
-      );
-    });
+  it('has a button to export the dependency list', () => {
+    const download = wrapper.find('.js-download');
+    expect(download.attributes()).toEqual(
+      expect.objectContaining({
+        href: store.getters.downloadEndpoint,
+        download: expect.any(String),
+      }),
+    );
   });
 });

@@ -61,7 +61,7 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
     class="js-download"
     data-original-title="Export as JSON"
     download="dependencies.json"
-    href=""
+    href="http://test.host/dependencies.json"
     title=""
   >
     <icon-stub
