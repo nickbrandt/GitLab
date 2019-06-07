@@ -1,5 +1,11 @@
 @import 'page_bundles/ide_mixins';
 
+.ide-right-sidebar {
+  .multi-file-commit-panel-inner.ide-right-sidebar-terminal {
+    padding-top: 0;
+  }
+}
+
 .ide-terminal {
   @include ide-trace-view();
 
