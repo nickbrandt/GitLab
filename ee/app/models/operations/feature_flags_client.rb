@@ -11,7 +11,7 @@ module Operations
     validates :project, presence: true
     validates :token, presence: true
 
-    add_authentication_token_field :token
+    add_authentication_token_field :token, encrypted: :optional
 
     before_validation :ensure_token!
 
@@ -19,7 +19,7 @@ module Operations
       return unless project
       return unless token
 
-      find_by(token: token, project: project)
+      where(project_id: project).find_by_token(token)
     end
   end
 end
