@@ -46,7 +46,6 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: true,
             alertsEndpoint: '/endpoint',
-            showTimeWindowDropdown: false,
           },
           store,
         });
@@ -68,7 +67,6 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: false,
             alertsEndpoint: '/endpoint',
-            showTimeWindowDropdown: false,
           },
           store,
         });
@@ -94,7 +92,6 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: true,
             alertsEndpoint: '/endpoint',
-            showTimeWindowDropdown: false,
           },
           store,
         });
@@ -118,7 +115,6 @@ describe('Dashboard', () => {
             hasMetrics: true,
             prometheusAlertsAvailable: true,
             alertsEndpoint: '/endpoint',
-            showTimeWindowDropdown: false,
           },
           store,
         });
