@@ -47,6 +47,11 @@ export default {
       },
     };
   },
+  computed: {
+    seatsInUseComponent() {
+      return this.license.plan === 'ultimate' ? 'info-cell' : 'cell';
+    },
+  },
   methods: {
     licenseeValue(key) {
       return this.license.licensee[key] || __('Unknown');
@@ -68,7 +73,8 @@ export default {
       <div class="license-row d-flex">
         <header-cell :title="__('Usage')" icon="monitor" />
         <cell :title="__('Seats in license')" :value="license.userLimit || __('Unlimited')" />
-        <info-cell
+        <component
+          :is="seatsInUseComponent"
           :title="__('Seats currently in use')"
           :value="currentActiveUserCount"
           :popover-content="info.currentActiveUserCount"
