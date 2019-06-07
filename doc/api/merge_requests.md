@@ -140,7 +140,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -284,7 +287,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -416,7 +422,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -552,7 +561,10 @@ Parameters:
   },
   "diverged_commits_count": 2,
   "rebase_in_progress": false,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -586,7 +598,7 @@ Parameters:
     "state": "active",
     "avatar_url": "http://www.gravatar.com/avatar/10fc7f102be8de7657fb4d80898bbfe3?s=80&d=identicon",
     "web_url": "http://localhost/user2"
-  },
+  }
 ]
 ```
 
@@ -709,7 +721,11 @@ Parameters:
     "total_time_spent": 0,
     "human_time_estimate": null,
     "human_total_time_spent": null
-  }
+  },
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  },
   "changes": [
     {
     "old_path": "VERSION",
@@ -882,7 +898,10 @@ order for it to take effect:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1020,7 +1039,10 @@ Must include at least one non-required attribute from above.
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1174,7 +1196,10 @@ Parameters:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1329,7 +1354,10 @@ Parameters:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1365,7 +1393,7 @@ If the rebase operation is ongoing, the response will include the following:
 
 ```json
 {
-  "rebase_in_progress": true
+  "rebase_in_progress": true,
   "merge_error": null
 }
 ```
@@ -1376,7 +1404,7 @@ the following:
 ```json
 {
   "rebase_in_progress": false,
-  "merge_error": null,
+  "merge_error": null
 }
 ```
 
@@ -1385,7 +1413,7 @@ If the rebase operation fails, the response will include the following:
 ```json
 {
   "rebase_in_progress": false,
-  "merge_error": "Rebase failed. Please rebase locally",
+  "merge_error": "Rebase failed. Please rebase locally"
 }
 ```
 
@@ -1593,7 +1621,10 @@ Example response:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1723,7 +1754,10 @@ Example response:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
