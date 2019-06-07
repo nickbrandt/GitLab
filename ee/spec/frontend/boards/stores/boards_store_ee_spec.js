@@ -56,4 +56,35 @@ describe('BoardsStoreEE', () => {
       });
     });
   });
+
+  describe('setCurrentBoard', () => {
+    const dummyBoard = 'skateboard';
+
+    it('sets the current board', () => {
+      const { state } = BoardsStoreEE.store;
+      state.currentBoard = null;
+
+      BoardsStoreEE.setCurrentBoard(dummyBoard);
+
+      expect(state.currentBoard).toEqual(dummyBoard);
+    });
+
+    it('resets assignees', () => {
+      const { state } = BoardsStoreEE.store;
+      state.assignees = 'some assignees';
+
+      BoardsStoreEE.setCurrentBoard(dummyBoard);
+
+      expect(state.assignees).toEqual([]);
+    });
+
+    it('resets milestones', () => {
+      const { state } = BoardsStoreEE.store;
+      state.milestones = 'some milestones';
+
+      BoardsStoreEE.setCurrentBoard(dummyBoard);
+
+      expect(state.milestones).toEqual([]);
+    });
+  });
 });
