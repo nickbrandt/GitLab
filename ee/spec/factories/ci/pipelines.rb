@@ -7,12 +7,12 @@ FactoryBot.define do
       config_source :webide_source
     end
 
-    %i[license_management dependency_list].each do |report_type|
+    %i[license_management dependency_list dependency_scanning sast].each do |report_type|
       trait "with_#{report_type}_report".to_sym do
         status :success
 
         after(:build) do |pipeline, evaluator|
-          pipeline.builds << build(:ee_ci_build, report_type, pipeline: pipeline, project: pipeline.project)
+          pipeline.builds << build(:ee_ci_build, report_type, :success, pipeline: pipeline, project: pipeline.project)
         end
       end
     end

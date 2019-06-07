@@ -8,23 +8,30 @@ module Projects
       def index
         respond_to do |format|
           format.json do
-            render json: paginated_dependencies
+            render json: ::DependencyListSerializer.new(project: project)
+                           .represent(paginated_dependencies, build: build)
           end
         end
       end
 
       private
 
+      def build
+        @build ||= pipeline.builds.latest
+                  .with_reports(::Ci::JobArtifact.dependency_list_reports)
+                  .last
+      end
+
       def ensure_dependency_list_feature_available
         render_404 unless project.feature_available?(:dependency_list)
       end
 
-      def found_dependencies
-        @dependencies ||= pipeline ? service.execute : []
+      def dependencies
+        @dependencies ||= build&.success? ? service.execute : []
       end
 
       def paginated_dependencies
-        params[:page] ? Kaminari.paginate_array(found_dependencies).page(params[:page]) : found_dependencies
+        params[:page] ? Kaminari.paginate_array(dependencies).page(params[:page]) : dependencies
       end
 
       def pipeline

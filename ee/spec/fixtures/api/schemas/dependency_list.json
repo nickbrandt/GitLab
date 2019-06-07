@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": [
+    "dependencies",
+    "report"
+  ],
+  "properties": {
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "./dependency.json"
+      }
+    },
+    "report": {
+      "status": { "type": "string" },
+      "job_path": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

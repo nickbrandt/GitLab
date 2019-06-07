@@ -22,7 +22,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
 
     it 'format report into a right format' do
       data = formatter.format(dependency, package_manager, file_path)
-      blob_path = "/#{project.namespace.name}/#{project.name}/blob/#{sha}/rails/Gemfile.lock"
+      blob_path = "/#{project.full_path}/blob/#{sha}/rails/Gemfile.lock"
 
       expect(data[:name]).to eq('mini_portile2')
       expect(data[:packager]).to eq('Ruby (Bundler)')
