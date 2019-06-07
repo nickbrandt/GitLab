@@ -4063,6 +4063,9 @@ msgstr ""
 msgid "Deny"
 msgstr ""
 
+msgid "Dependencies"
+msgstr ""
+
 msgid "Dependencies|Component"
 msgstr ""
 
@@ -7674,6 +7677,9 @@ msgid "Learn more about group-level project templates"
 msgstr ""
 
 msgid "Learn more about signing commits"
+msgstr ""
+
+msgid "Learn more about the dependency list"
 msgstr ""
 
 msgid "Learn more in the"
@@ -12953,6 +12959,9 @@ msgstr ""
 msgid "The content of this page is not encoded in UTF-8. Edits can only be made via the Git repository."
 msgstr ""
 
+msgid "The dependency list details information about the components used within your project."
+msgstr ""
+
 msgid "The deployment of this job to %{environmentLink} did not succeed."
 msgstr ""
 
@@ -14620,6 +14629,9 @@ msgid "Version"
 msgstr ""
 
 msgid "View app"
+msgstr ""
+
+msgid "View dependency details for your project"
 msgstr ""
 
 msgid "View deployment"
