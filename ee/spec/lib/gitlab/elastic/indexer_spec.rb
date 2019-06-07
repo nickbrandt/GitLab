@@ -30,6 +30,52 @@ describe Gitlab::Elastic::Indexer do
     end
   end
 
+  context 'wikis' do
+    let!(:project) { create(:project, :wiki_repo) }
+    let(:indexer) { described_class.new(project, wiki: true) }
+
+    before do
+      project.wiki.create_page('test.md', '# term')
+    end
+
+    it 'does not ask for IndexStatus' do
+      expect(project).not_to receive(:index_status)
+      expect(project.wiki).not_to receive(:index_status)
+      expect_popen.and_return(popen_success)
+
+      indexer.run
+    end
+
+    it 'raises if it cannot find gitlab-elasticsearch-indexer' do
+      expect(described_class).to receive(:experimental_indexer_present?).and_return(false)
+
+      expect { indexer.run }.to raise_error('`gitlab-elasticsearch-indexer` is required for indexing wikis')
+    end
+
+    it 'runs the indexer with the right flags' do
+      expect(described_class).to receive(:experimental_indexer_present?).and_return(true)
+
+      expect_popen.with(
+        [
+          'gitlab-elasticsearch-indexer',
+          '--blob-type=wiki_blob',
+          '--skip-commits',
+          project.id.to_s,
+          "#{project.wiki.repository.disk_path}.git"
+        ],
+        nil,
+        hash_including(
+          'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+          'RAILS_ENV'               => Rails.env,
+          'FROM_SHA'                => expected_from_sha,
+          'TO_SHA'                  => nil
+        )
+      ).and_return(popen_success)
+
+      indexer.run
+    end
+  end
+
   context 'repository has unborn head' do
     it 'updates the index status without running the indexing command' do
       allow(project.repository).to receive(:exists?).and_return(false)

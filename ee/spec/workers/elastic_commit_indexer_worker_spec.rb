@@ -23,5 +23,14 @@ describe ElasticCommitIndexerWorker do
 
       expect(subject.perform(1)).to be_truthy
     end
+
+    it 'runs indexer in wiki mode if asked to' do
+      indexer = double
+
+      expect(indexer).to receive(:run)
+      expect(Gitlab::Elastic::Indexer).to receive(:new).with(project, wiki: true).and_return(indexer)
+
+      subject.perform(project.id, nil, nil, true)
+    end
   end
 end

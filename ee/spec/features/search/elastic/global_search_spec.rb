@@ -145,7 +145,7 @@ describe 'Global elastic search', :elastic do
   describe 'I search through the wiki blobs' do
     before do
       project.wiki.create_page('test.md', '# term')
-      project.wiki.index_blobs
+      project.wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end

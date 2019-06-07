@@ -24,8 +24,9 @@ module Gitlab
 
       attr_reader :project, :index_status
 
-      def initialize(project)
+      def initialize(project, wiki: false)
         @project = project
+        @wiki = wiki
 
         # We accept any form of settings, including string and array
         # This is why JSON is needed
@@ -41,7 +42,7 @@ module Gitlab
         end
 
         # Use the eager-loaded association if available.
-        @index_status = project.index_status
+        @index_status = project.index_status unless wiki?
       end
 
       def run(to_sha = nil)
@@ -50,20 +51,24 @@ module Gitlab
         head_commit = repository.try(:commit)
 
         if repository.nil? || !repository.exists? || repository.empty? || head_commit.nil?
-          update_index_status(Gitlab::Git::BLANK_SHA)
+          update_index_status(Gitlab::Git::BLANK_SHA) unless wiki?
           return
         end
 
         run_indexer!(to_sha)
-        update_index_status(to_sha)
+        update_index_status(to_sha) unless wiki?
 
         true
       end
 
       private
 
+      def wiki?
+        @wiki
+      end
+
       def repository
-        project.repository
+        wiki? ? project.wiki.repository : project.repository
       end
 
       def path_to_indexer
@@ -76,16 +81,26 @@ module Gitlab
 
       def use_experimental_indexer?
         strong_memoize(:use_experimental_indexer) do
-          Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
+          if wiki?
+            raise '`gitlab-elasticsearch-indexer` is required for indexing wikis' unless self.class.experimental_indexer_present?
+
+            true
+          else
+            Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
+          end
         end
       end
 
       def run_indexer!(to_sha)
         if index_status && !repository_contains_last_indexed_commit?
-          project.repository.delete_index_for_commits_and_blobs
+          repository.delete_index_for_commits_and_blobs
         end
 
-        command = [path_to_indexer, project.id.to_s, repository_path]
+        command = if wiki?
+                    [path_to_indexer, "--blob-type=wiki_blob", "--skip-commits", project.id.to_s, repository_path]
+                  else
+                    [path_to_indexer, project.id.to_s, repository_path]
+                  end
 
         vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
 
