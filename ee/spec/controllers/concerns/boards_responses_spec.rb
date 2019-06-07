@@ -26,7 +26,7 @@ describe BoardsResponses do
       end
 
       it 'serialises properly' do
-        expected = { id: board.id, name: board.name, milestone: { id: milestone.id, title: milestone.title } }
+        expected = { id: board.id, name: board.name, milestone: { id: milestone.id, title: milestone.title } }.as_json
 
         expect(subject.serialize_as_json(board)).to match(expected)
       end
@@ -35,9 +35,9 @@ describe BoardsResponses do
     context 'without milestone' do
       let(:milestone) { nil }
       it 'serialises properly' do
-        expected = { id: board.id, name: board.name }
+        expected = { id: board.id, name: board.name }.as_json
 
-        expect(subject.serialize_as_json(board)).to eq(expected)
+        expect(subject.serialize_as_json(board)).to match(expected)
       end
     end
   end

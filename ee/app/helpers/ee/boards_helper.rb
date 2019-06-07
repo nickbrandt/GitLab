@@ -47,10 +47,10 @@ module EE
       CurrentBoardSerializer.new
     end
 
-    def current_board_json
+    def current_board
       board = @board || @boards.first
 
-      serializer.represent(board)
+      serializer.represent(board).as_json
     end
 
     override :boards_link_text

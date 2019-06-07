@@ -16,15 +16,14 @@ describe BoardsHelper do
     end
   end
 
-  describe '#current_board_json' do
-    let(:board_json) { JSON.parse(helper.current_board_json.to_json) }
+  describe '#current_board' do
+    let(:board_json) { helper.current_board }
     let(:user) { create(:user) }
     let(:label1) { create(:label, name: "feijoa") }
     let(:label2) { create(:label, name: "pineapple") }
     let(:milestone) { create(:milestone) }
 
     it 'serializes with child object attributes' do
-      user = create(:user)
       board = create(:board, project: project, milestone: milestone, assignee: user, labels: [label1, label2])
       assign(:board, board)
 
