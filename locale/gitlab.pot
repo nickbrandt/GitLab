@@ -7194,6 +7194,9 @@ msgstr ""
 msgid "Invalid repository path"
 msgstr ""
 
+msgid "Invalid server response"
+msgstr ""
+
 msgid "Invalid two-factor code."
 msgstr ""
 

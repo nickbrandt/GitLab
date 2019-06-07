@@ -4,6 +4,7 @@ import { FETCH_ERROR_MESSAGE } from './constants';
 import { isValidResponse } from './utils';
 import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
+import { __ } from '~/locale';
 
 export const setDependenciesEndpoint = ({ commit }, endpoint) =>
   commit(types.SET_DEPENDENCIES_ENDPOINT, endpoint);
@@ -41,7 +42,7 @@ export const fetchDependencies = ({ state, dispatch }, params = {}) => {
       if (isValidResponse(response)) {
         dispatch('receiveDependenciesSuccess', response);
       } else {
-        throw new Error('Invalid server response');
+        throw new Error(__('Invalid server response'));
       }
     })
     .catch(error => {
