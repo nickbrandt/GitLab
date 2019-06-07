@@ -38,10 +38,10 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
             )
           end
 
-          it 'contains legacy deployments' do
+          it 'contains nothing' do
             expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
 
-            expect(rollout_status.deployments.map(&:name)).to contain_exactly('legacy-deployment')
+            expect(rollout_status.deployments).to eq([])
           end
         end
 
