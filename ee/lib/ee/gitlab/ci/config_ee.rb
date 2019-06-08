@@ -3,7 +3,9 @@
 module EE
   module Gitlab
     module Ci
-      module Config
+      # This is named ConfigEE to avoid collisions with the
+      # EE::Gitlab::Ci::Config namespace
+      module ConfigEE
         extend ::Gitlab::Utils::Override
 
         override :rescue_errors
