@@ -11,16 +11,15 @@ module Geo
     end
 
     def count_synced
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.synced).count
+      registries_for_attachments.merge(Geo::FileRegistry.synced).count
     end
 
     def count_failed
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.failed).count
+      registries_for_attachments.merge(Geo::FileRegistry.failed).count
     end
 
     def count_synced_missing_on_primary
       registries_for_attachments
-        .syncable
         .merge(Geo::FileRegistry.synced)
         .merge(Geo::FileRegistry.missing_on_primary)
         .count
@@ -28,9 +27,9 @@ module Geo
 
     def syncable
       if selective_sync?
-        attachments.syncable
+        attachments
       else
-        Upload.syncable
+        Upload
       end
     end
 
@@ -48,7 +47,6 @@ module Geo
     def find_unsynced(batch_size:, except_file_ids: [])
       attachments
         .missing_file_registry
-        .syncable
         .id_not_in(except_file_ids)
         .limit(batch_size)
     end

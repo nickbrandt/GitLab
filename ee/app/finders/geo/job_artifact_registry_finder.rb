@@ -24,9 +24,9 @@ module Geo
 
     def syncable
       if selective_sync?
-        job_artifacts.syncable
+        job_artifacts.not_expired
       else
-        Ci::JobArtifact.syncable
+        Ci::JobArtifact.not_expired
       end
     end
 
@@ -43,7 +43,7 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_artifact_ids: [])
       job_artifacts
-        .syncable
+        .not_expired
         .missing_job_artifact_registry
         .id_not_in(except_artifact_ids)
         .limit(batch_size)
@@ -90,7 +90,7 @@ module Geo
     def registries_for_job_artifacts
       job_artifacts
         .inner_join_job_artifact_registry
-        .syncable
+        .not_expired
     end
   end
 end

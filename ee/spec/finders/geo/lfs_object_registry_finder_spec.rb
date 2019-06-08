@@ -61,12 +61,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         it 'counts LFS objects' do
           expect(subject.count_syncable).to eq 2
         end
-
-        it 'ignores remote LFS objects' do
-          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
-
-          expect(subject.count_syncable).to eq 1
-        end
       end
 
       context 'with selective sync by shard' do
@@ -76,12 +70,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
 
         it 'counts LFS objects' do
           expect(subject.count_syncable).to eq 2
-        end
-
-        it 'ignores remote LFS objects' do
-          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
-
-          expect(subject.count_syncable).to eq 1
         end
       end
     end
@@ -150,14 +138,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         expect(subject.count_synced).to eq 2
       end
 
-      it 'ignores remote LFS objects' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
-
-        expect(subject.count_synced).to eq 2
-      end
-
       context 'with selective sync by namespace' do
         before do
           allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
@@ -173,15 +153,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
-
-          expect(subject.count_synced).to eq 1
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
-          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_synced).to eq 1
         end
@@ -206,17 +177,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_4.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_5.id)
-
-          expect(subject.count_synced).to eq 1
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_5.id)
-          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_synced).to eq 1
         end
@@ -232,14 +192,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         expect(subject.count_failed).to eq 2
       end
 
-      it 'ignores remote LFS objects' do
-        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_remote_1.id)
-        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
-        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
-
-        expect(subject.count_failed).to eq 2
-      end
-
       context 'with selective sync by namespace' do
         before do
           allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
@@ -255,15 +207,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
-
-          expect(subject.count_failed).to eq 1
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
-          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
         end
@@ -288,17 +231,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
           create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
           create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_5.id)
-
-          expect(subject.count_failed).to eq 1
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_4.id)
-          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_5.id)
-          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
 
           expect(subject.count_failed).to eq 1
         end
@@ -326,12 +258,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
         expect(subject.count_synced_missing_on_primary).to eq 1
       end
 
-      it 'ignores remote LFS objects' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
       context 'with selective sync by namespace' do
         before do
           allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
@@ -349,13 +275,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, missing_on_primary: true)
 
           expect(subject.count_synced_missing_on_primary).to eq 2
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
         end
       end
     end
@@ -400,15 +319,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
 
           expect(lfs_objects).to match_ids(lfs_object_1, lfs_object_3)
         end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
-          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
-
-          lfs_objects = subject.find_unsynced(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_3)
-        end
       end
 
       context 'with selective sync by shard' do
@@ -430,14 +340,6 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
           lfs_objects = subject.find_unsynced(batch_size: 10)
 
           expect(lfs_objects).to match_ids(lfs_object_5)
-        end
-
-        it 'ignores remote LFS objects' do
-          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
-
-          lfs_objects = subject.find_unsynced(batch_size: 10)
-
-          expect(lfs_objects).to match_ids(lfs_object_4)
         end
       end
     end

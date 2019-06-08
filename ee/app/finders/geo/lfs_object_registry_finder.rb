@@ -24,7 +24,7 @@ module Geo
 
     def syncable
       if selective_sync?
-        current_node.lfs_objects.syncable
+        current_node.lfs_objects
       else
         LfsObject.syncable
       end
@@ -41,7 +41,6 @@ module Geo
     def find_unsynced(batch_size:, except_file_ids: [])
       current_node
         .lfs_objects
-        .syncable
         .missing_file_registry
         .id_not_in(except_file_ids)
         .limit(batch_size)

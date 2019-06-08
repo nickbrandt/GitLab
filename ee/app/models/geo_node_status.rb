@@ -279,9 +279,9 @@ class GeoNodeStatus < ApplicationRecord
   def load_primary_data
     return unless Gitlab::Geo.primary?
 
-    self.lfs_objects_count = LfsObject.syncable.count
-    self.job_artifacts_count = Ci::JobArtifact.syncable.count
-    self.attachments_count = Upload.syncable.count
+    self.lfs_objects_count = LfsObject.count
+    self.job_artifacts_count = Ci::JobArtifact.not_expired.count
+    self.attachments_count = Upload.count
 
     self.replication_slots_count = geo_node.replication_slots_count
     self.replication_slots_used_count = geo_node.replication_slots_used_count
