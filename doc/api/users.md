@@ -105,7 +105,8 @@ GET /users
     "identities": [
       {"provider": "github", "extern_uid": "2435223452345"},
       {"provider": "bitbucket", "extern_uid": "john.smith"},
-      {"provider": "google_oauth2", "extern_uid": "8776128412476123468721346"}
+      {"provider": "google_oauth2", "extern_uid": "8776128412476123468721346"},
+      {"provider": "group_saml", "extern_uid": "123789", "saml_provider_id": 10}
     ],
     "can_create_group": true,
     "can_create_project": true,
@@ -252,14 +253,15 @@ Parameters:
   "identities": [
     {"provider": "github", "extern_uid": "2435223452345"},
     {"provider": "bitbucket", "extern_uid": "john.smith"},
-    {"provider": "google_oauth2", "extern_uid": "8776128412476123468721346"}
+    {"provider": "google_oauth2", "extern_uid": "8776128412476123468721346"},
+    {"provider": "group_saml", "extern_uid": "123789", "saml_provider_id": 10}
   ],
   "can_create_group": true,
   "can_create_project": true,
   "two_factor_enabled": true,
   "external": false,
   "private_profile": false,
-  "shared_runners_minutes_limit": 133
+  "shared_runners_minutes_limit": 133,
   "extra_shared_runners_minutes_limit": 133
 }
 ```
@@ -293,6 +295,7 @@ Parameters:
 - `projects_limit` (optional)    - Number of projects user can create
 - `extern_uid` (optional)        - External UID
 - `provider` (optional)          - External provider name
+- `group_id_for_saml` (optional) - ID of group where SAML has been configured
 - `bio` (optional)               - User's biography
 - `location` (optional)          - User's location
 - `public_email` (optional)      - The public email of the user
@@ -327,6 +330,7 @@ Parameters:
 - `projects_limit`                 - Limit projects each user can create
 - `extern_uid`                     - External UID
 - `provider`                       - External provider name
+- `group_id_for_saml` (optional)   - ID of group where SAML has been configured
 - `bio`                            - User's biography
 - `location` (optional)            - User's location
 - `public_email` (optional)        - The public email of the user

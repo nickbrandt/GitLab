@@ -69,6 +69,14 @@ module EE
         end
       end
 
+      module Identity
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :saml_provider_id
+        end
+      end
+
       module ProtectedRefAccess
         extend ActiveSupport::Concern
 
