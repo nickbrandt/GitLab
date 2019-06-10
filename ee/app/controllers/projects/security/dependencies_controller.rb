@@ -8,6 +8,8 @@ module Projects
       def index
         respond_to do |format|
           format.json do
+            ::Gitlab::UsageCounters::DependencyList.increment(project.id)
+
             render json: ::DependencyListSerializer.new(project: project)
                            .represent(paginated_dependencies, build: build)
           end
@@ -17,7 +19,10 @@ module Projects
       private
 
       def build
-        @build ||= pipeline.builds.latest
+        return unless pipeline
+        return @build if @build
+
+        @build = pipeline.builds.latest
                   .with_reports(::Ci::JobArtifact.dependency_list_reports)
                   .last
       end
