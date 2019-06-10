@@ -696,7 +696,16 @@ module API
               type: String,
               desc: 'The password of the user'
             }
-          ]
+          ],
+          'unify-circuit' => [
+            {
+              required: true,
+              name: :webhook,
+              type: String,
+              desc: 'The Unify Circuit webhook. e.g. https://circuit.com/rest/v2/webhooks/incoming/…'
+            },
+            chat_notification_events
+          ].flatten
         }
       end
 

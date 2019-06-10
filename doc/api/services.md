@@ -229,6 +229,50 @@ Get Campfire service settings for a project.
 GET /projects/:id/services/campfire
 ```
 
+## Unify Circuit
+
+Unify Circuit RTC and collaboration tool.
+
+### Create/Edit Unify Circuit service
+
+Set Unify Circuit service for a project.
+
+```
+PUT /projects/:id/services/unify-circuit
+```
+
+Parameters:
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `webhook` | string | true | The Unify Circuit webhook. For example, `https://circuit.com/rest/v2/webhooks/incoming/...`. |
+| `notify_only_broken_pipelines` | boolean | false | Send notifications for broken pipelines |
+| `branches_to_be_notified` | string | all | Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected" |
+| `push_events` | boolean | false | Enable notifications for push events |
+| `issues_events` | boolean | false | Enable notifications for issue events |
+| `confidential_issues_events` | boolean | false | Enable notifications for confidential issue events |
+| `merge_requests_events` | boolean | false | Enable notifications for merge request events |
+| `tag_push_events` | boolean | false | Enable notifications for tag push events |
+| `note_events` | boolean | false | Enable notifications for note events |
+| `pipeline_events` | boolean | false | Enable notifications for pipeline events |
+| `wiki_page_events` | boolean | false | Enable notifications for wiki page events |
+
+### Delete Unify Circuit service
+
+Delete Unify Circuit service for a project.
+
+```
+DELETE /projects/:id/services/unify-circuit
+```
+
+### Get Unify Circuit service settings
+
+Get Unify Circuit service settings for a project.
+
+```
+GET /projects/:id/services/unify-circuit
+```
+
 ## Custom Issue Tracker
 
 Custom issue tracker
