@@ -215,13 +215,13 @@ export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) 
   const {
     report_type,
     project_fingerprint,
-    vulnerability_feedback_merge_request_path,
+    create_vulnerability_feedback_merge_request_path,
   } = vulnerability;
 
   dispatch('requestCreateMergeRequest');
 
   axios
-    .post(vulnerability_feedback_merge_request_path, {
+    .post(create_vulnerability_feedback_merge_request_path, {
       vulnerability_feedback: {
         feedback_type: 'merge_request',
         category: report_type,
