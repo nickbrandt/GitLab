@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.3 (2019-06-10)
+
+### Fixed (1 change)
+
+- Fix create mr from vuln modal regression. !13524
+
+
 ## 11.11.2 (2019-06-04)
 
 ### Performance (1 change)
