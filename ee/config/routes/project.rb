@@ -83,6 +83,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resource :dependencies, only: [:show]
+
       namespace :security do
         resources :dependencies, only: [:index]
       end
