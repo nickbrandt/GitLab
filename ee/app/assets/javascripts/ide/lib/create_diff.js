@@ -2,7 +2,17 @@ import { commitActionForFile } from '~/ide/stores/utils';
 import { commitActionTypes } from '~/ide/constants';
 import createFileDiff from './create_file_diff';
 
-const filesWithChanges = ({ stagedFiles = [], changedFiles = [] }) => {
+const getDeletedParents = (entries, file) => {
+  const parent = file.parentPath && entries[file.parentPath];
+
+  if (parent && parent.deleted) {
+    return [parent, ...getDeletedParents(entries, parent)];
+  }
+
+  return [];
+};
+
+const filesWithChanges = ({ stagedFiles = [], changedFiles = [], entries = {} }) => {
   // We need changed files to overwrite staged, so put them at the end.
   const changes = stagedFiles.concat(changedFiles).reduce((acc, file) => {
     const key = file.path;
@@ -37,6 +47,20 @@ const filesWithChanges = ({ stagedFiles = [], changedFiles = [] }) => {
         // Otherwise, treat the move as a delete / create.
         Object.assign(change, { action: commitActionTypes.create });
       }
+    });
+
+  // Next, we need to add deleted directories by looking at the parents
+  Object.values(changes)
+    .filter(change => change.action === commitActionTypes.delete && change.file.parentPath)
+    .forEach(({ file }) => {
+      // Do nothing if we've already visited this directory.
+      if (changes[file.parentPath]) {
+        return;
+      }
+
+      getDeletedParents(entries, file).forEach(parent => {
+        changes[parent.path] = { action: commitActionTypes.delete, file: parent };
+      });
     });
 
   return Object.values(changes);

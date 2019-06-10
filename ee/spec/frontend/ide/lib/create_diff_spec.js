@@ -6,6 +6,7 @@ import {
   createUpdatedFile,
   createDeletedFile,
   createMovedFile,
+  createEntries,
 } from '../file_helpers';
 
 const PATH_FOO = 'test/foo.md';
@@ -159,6 +160,23 @@ ${LINES.map(line => `-${line}`).join('\n')}
     expect(result).toEqual({
       patch: expectedPatch,
       toDelete: [PATH_ZED],
+    });
+  });
+
+  it('deletes deleted parent directories', () => {
+    const deletedFiles = ['foo/bar/zed/test.md', 'foo/bar/zed/test2.md'];
+    const entries = deletedFiles.reduce((acc, path) => Object.assign(acc, createEntries(path)), {});
+    const allDeleted = [...deletedFiles, 'foo/bar/zed', 'foo/bar'];
+    allDeleted.forEach(path => {
+      entries[path].deleted = true;
+    });
+    const changedFiles = deletedFiles.map(x => entries[x]);
+
+    const result = createDiff({ changedFiles, entries });
+
+    expect(result).toEqual({
+      patch: '',
+      toDelete: allDeleted,
     });
   });
 });
