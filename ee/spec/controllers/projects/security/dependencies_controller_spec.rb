@@ -22,6 +22,12 @@ describe Projects::Security::DependenciesController do
           stub_licensed_features(dependency_list: true)
         end
 
+        it 'counts usage of the feature' do
+          expect(::Gitlab::UsageCounters::DependencyList).to receive(:increment).with(project.id)
+
+          get :index, params: params, format: :json
+        end
+
         context 'with existing report' do
           let!(:pipeline) { create(:ee_ci_pipeline, :with_dependency_list_report, project: project) }
 

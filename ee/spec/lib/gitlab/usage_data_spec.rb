@@ -82,6 +82,7 @@ describe Gitlab::UsageData do
         projects_jira_dvcs_server_active
         feature_flags
         operations_dashboard
+        dependency_list_usages_total
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)

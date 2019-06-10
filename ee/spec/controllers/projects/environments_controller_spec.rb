@@ -119,7 +119,7 @@ describe Projects::EnvironmentsController do
       end
 
       it 'registers a usage of the endpoint' do
-        expect(::Gitlab::PodLogsUsageCounter).to receive(:increment).with(project.id)
+        expect(::Gitlab::UsageCounters::PodLogs).to receive(:increment).with(project.id)
 
         get :logs, params: environment_params(pod_name: pod_name, format: :json)
       end
