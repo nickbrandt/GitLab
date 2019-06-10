@@ -65,6 +65,8 @@ module EE
 
       validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
 
+      validates :required_instance_ci_template, presence: true, allow_nil: true
+
       validate :check_geo_node_allowed_ips
     end
 

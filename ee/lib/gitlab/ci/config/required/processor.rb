@@ -13,7 +13,7 @@ module Gitlab
 
           def perform
             return @config unless ::License.feature_available?(:required_ci_templates)
-            return @config unless required_ci_template_name
+            return @config unless required_ci_template_name.present?
 
             merge_required_template
           end
