@@ -54,7 +54,6 @@ describe Gitlab::UsageData do
         license_id
         elasticsearch_enabled
         geo_enabled
-        pod_logs_usages
       ))
     end
 
@@ -65,27 +64,28 @@ describe Gitlab::UsageData do
       expect(count_data[:projects]).to eq(3)
 
       expect(count_data.keys).to include(*%i(
-        projects_mirrored_with_pipelines_enabled
+        container_scanning_jobs
+        dast_jobs
+        dependency_list_usages_total
+        dependency_scanning_jobs
         epics
+        feature_flags
         geo_nodes
+        incident_issues
         ldap_group_links
         ldap_keys
         ldap_users
-        projects_reporting_ci_cd_back_to_github
-        container_scanning_jobs
-        dast_jobs
-        dependency_scanning_jobs
         license_management_jobs
-        sast_jobs
-        projects_with_prometheus_alerts
-        projects_with_packages
-        projects_with_tracing_enabled
+        operations_dashboard
+        pod_logs_usages_total
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
-        feature_flags
-        operations_dashboard
-        dependency_list_usages_total
-        incident_issues
+        projects_mirrored_with_pipelines_enabled
+        projects_reporting_ci_cd_back_to_github
+        projects_with_packages
+        projects_with_prometheus_alerts
+        projects_with_tracing_enabled
+        sast_jobs
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
