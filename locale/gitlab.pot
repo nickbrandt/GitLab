@@ -14388,9 +14388,6 @@ msgstr ""
 msgid "UsageQuota|Buy additional minutes"
 msgstr ""
 
-msgid "UsageQuota|Commit count"
-msgstr ""
-
 msgid "UsageQuota|Current period usage"
 msgstr ""
 
