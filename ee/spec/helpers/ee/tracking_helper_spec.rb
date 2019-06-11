@@ -4,16 +4,32 @@ require 'spec_helper'
 
 describe EE::TrackingHelper do
   describe '#tracking_attrs' do
-    it 'returns a hash of snowplow data attrs if snowplow is enabled' do
-      stub_application_setting(snowplow_enabled: true)
+    using RSpec::Parameterized::TableSyntax
 
-      expect(helper.tracking_attrs('a', 'b', 'c')).to eq(data: { track_label: 'a', track_event: 'b', track_property: 'c' })
+    let(:input) { %w(a b c) }
+    let(:results) do
+      {
+        no_data: {},
+        with_data: { data: { track_label: 'a', track_event: 'b', track_property: 'c' } }
+      }
     end
 
-    it 'returns an empty hash if snowplow is disabled' do
-      stub_application_setting(snowplow_enabled: false)
+    where(:snowplow_enabled, :environment, :result) do
+      true  | 'production'  | :with_data
+      false | 'production'  | :no_data
+      true  | 'development' | :no_data
+      false | 'development' | :no_data
+      true  | 'test'        | :no_data
+      false | 'test'        | :no_data
+    end
 
-      expect(helper.tracking_attrs('a', 'b', 'c')).to eq({})
+    with_them do
+      it 'returns a hash' do
+        stub_application_setting(snowplow_enabled: snowplow_enabled)
+        allow(Rails).to receive(:env).and_return(environment.inquiry)
+
+        expect(helper.tracking_attrs(*input)).to eq(results[result])
+      end
     end
   end
 end

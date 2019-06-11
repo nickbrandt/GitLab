@@ -6,7 +6,7 @@ module EE
 
     override :tracking_attrs
     def tracking_attrs(label, event, property)
-      return {} unless snowplow_enabled?
+      return {} unless tracking_enabled?
 
       {
         data: {
@@ -19,8 +19,9 @@ module EE
 
     private
 
-    def snowplow_enabled?
-      ::Gitlab::CurrentSettings.snowplow_enabled?
+    def tracking_enabled?
+      Rails.env.production? &&
+        ::Gitlab::CurrentSettings.snowplow_enabled?
     end
   end
 end
