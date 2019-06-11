@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Burndown do
   set(:user) { create(:user) }
-  set(:non_member) { create(:user) }
   let(:start_date) { "2017-03-01" }
   let(:due_date) { "2017-03-03" }
 
@@ -17,31 +16,58 @@ describe Burndown do
       end
     end
 
-    subject { described_class.new(milestone, user).to_json }
+    subject { described_class.new(milestone, user).as_json }
 
-    it "generates an array with date, issue count and weight" do
-      expect(subject).to eq([
-        ["2017-03-01", 4, 8],
-        ["2017-03-02", 5, 10],
-        ["2017-03-03", 3, 6]
-      ].to_json)
+    it 'generates an array of issues with with date, issue weight and action' do
+      expect(subject).to match_array([
+        { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'created' },
+        { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'closed' },
+        { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'created' },
+        { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'created' },
+        { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'created' },
+        { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'closed' },
+        { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'closed' },
+        { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'created' },
+        { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'reopened' }
+      ])
+    end
+
+    context 'when issues belong to a public project' do
+      set(:non_member) { create(:user) }
+
+      subject do
+        project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+        described_class.new(milestone, non_member).as_json.each { |event| event[:created_at] = event[:created_at].to_date }
+      end
+
+      it 'does not include confidential issues for users who are not project members' do
+        expect(subject).to match_array([
+          { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'closed' },
+          { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'closed' },
+          { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'reopened' }
+        ])
+      end
     end
 
     it "returns empty array if milestone start date is nil" do
       milestone.update(start_date: nil)
 
-      expect(subject).to eq([].to_json)
+      expect(subject).to eq([])
     end
 
     it "returns empty array if milestone due date is nil" do
       milestone.update(due_date: nil)
 
-      expect(subject).to eq([].to_json)
+      expect(subject).to eq([])
     end
 
     it "counts until today if milestone due date > Date.today" do
       Timecop.travel(milestone.due_date - 1.day) do
-        expect(JSON.parse(subject).last[0]).to eq(Time.now.strftime("%Y-%m-%d"))
+        expect(subject.max_by { |event| event[:created_at] }[:created_at].to_date).to eq(Date.today)
       end
     end
 
@@ -51,17 +77,43 @@ describe Burndown do
       expect(burndown).to be_accurate
     end
 
+    it "is accurate with no issues" do
+      burndown = described_class.new(create(:milestone), user)
+
+      burndown.milestone.project.add_master(user)
+
+      expect(burndown).to be_accurate
+    end
+
+    context "when there are no closed issues" do
+      before do
+        milestone.issues.delete_all
+        create(:issue, issue_params.merge(created_at: milestone.start_date.end_of_day))
+      end
+
+      it "sets attribute empty to false" do
+        burndown = described_class.new(milestone, user)
+
+        expect(burndown).not_to be_empty
+      end
+    end
+
     context "when all closed issues does not have closed events" do
       before do
         Event.where(target: milestone.issues, action: Event::CLOSED).destroy_all # rubocop: disable DestroyAll
       end
 
       it "considers closed_at as milestone start date" do
-        expect(subject).to eq([
-          ["2017-03-01", 4, 8],
-          ["2017-03-02", 4, 8],
-          ["2017-03-03", 4, 8]
-        ].to_json)
+        expect(subject).to match_array([
+          { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'closed' },
+          { created_at: Date.new(2017, 3, 1).beginning_of_day,  weight: 2, action: 'closed' },
+          { created_at: Date.new(2017, 3, 2).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'created' },
+          { created_at: Date.new(2017, 3, 3).beginning_of_day,  weight: 2, action: 'reopened' }
+        ])
       end
 
       it "sets attribute empty to true" do
@@ -71,46 +123,15 @@ describe Burndown do
       end
     end
 
-    context "when one or more closed issues does not have a closed event" do
-      before do
-        Event.where(target: milestone.issues.closed.first, action: Event::CLOSED).destroy_all # rubocop: disable DestroyAll
-      end
-
+    context "when one but not all closed issues does not have a closed event" do
       it "sets attribute accurate to false" do
+        Event.where(target: milestone.issues.closed.first, action: Event::CLOSED).destroy_all # rubocop: disable DestroyAll
         burndown = described_class.new(milestone, user)
 
-        expect(burndown).not_to be_accurate
-      end
-    end
-
-    context 'when issues are created at the middle of the milestone' do
-      let(:creation_date) { "2017-03-02" }
-
-      it 'accounts for counts in issues created at the middle of the milestone' do
-        project = try(:group_project) || try(:project)
-
-        create(:issue, milestone: milestone, project: project, created_at: creation_date, weight: 2)
-        create(:issue, milestone: milestone, project: project, created_at: creation_date, weight: 3)
-
-        expect(subject).to eq([
-          ['2017-03-01', 4, 8],
-          ['2017-03-02', 7, 15],
-          ['2017-03-03', 5, 11]
-        ].to_json)
-      end
-    end
-
-    context 'when issues belong to a public project' do
-      it 'does not include confidential issues for users who are not project members' do
-        project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
-
-        expected_result = [
-            ["2017-03-01", 3, 6],
-            ["2017-03-02", 4, 8],
-            ["2017-03-03", 2, 4]
-        ].to_json
-
-        expect(described_class.new(milestone, non_member).to_json).to eq(expected_result)
+        aggregate_failures do
+          expect(burndown).not_to be_empty
+          expect(burndown).not_to be_accurate
+        end
       end
     end
   end
@@ -124,8 +145,7 @@ describe Burndown do
           milestone: milestone,
           weight: 2,
           project_id: project.id,
-          author: user,
-          created_at: milestone.start_date
+          author: user
         }
       end
       let(:scope) { project }
@@ -153,8 +173,7 @@ describe Burndown do
             milestone: milestone,
             weight: 2,
             project_id: group_project.id,
-            author: user,
-            created_at: milestone.start_date
+            author: user
           }
         end
         let(:scope) { group }
@@ -170,8 +189,7 @@ describe Burndown do
             milestone: milestone,
             weight: 2,
             project_id: group_project.id,
-            author: user,
-            created_at: milestone.start_date
+            author: user
           }
         end
         let(:scope) { group }
@@ -179,52 +197,61 @@ describe Burndown do
     end
   end
 
-  # Creates, closes and reopens issues only for odd days numbers
   def build_sample(milestone, issue_params)
     project.add_master(user)
 
-    milestone.start_date.upto(milestone.due_date) do |date|
-      day = date.day
-      next if day.even?
+    issues = []
+    confidential_issues = []
 
-      count = day
+    milestone.start_date.yesterday.upto(milestone.due_date) do |date|
       Timecop.travel(date) do
-        # Create issues
-        issues = create_list(:issue, count, issue_params)
+        # Make sure issues are created at exactly the beginning of the day to
+        # facilitate comparison in specs
+        issue_params_for_date = issue_params.merge(created_at: date.beginning_of_day)
 
-        issues.each do |issue|
-          # Turns out we need to make sure older events that are not "closed"
-          # won't be caught by the query.
-          Event.create!(author: user,
-                        target: issue,
-                        created_at: Date.yesterday,
-                        action: Event::CREATED)
+        # Create one issue each day
+        issues << create(:issue, issue_params_for_date)
+
+        if Date.today == milestone.start_date - 1.day
+          # Close issue created before milestone start date to make sure issues
+          # and events created before the milestone starts are included
+          close_issue(issues.first)
         end
 
-        # Close issues
-        closed = issues.slice(0..count / 2)
-        closed.each { |issue| close_issue(issue) }
+        if Date.today == milestone.start_date
+          # Create one confidential issue to assist in testing issue visibility.
+          confidential_issues << create(:issue, :confidential, issue_params_for_date)
+        end
 
-        # Reopen issues
-        reopened_issues = closed.slice(0..count / 4)
-        reopened_issues.each { |issue| reopen_issue(issue) }
+        if Date.today == milestone.start_date + 1.day
+          # Close issue created on milestone start date
+          close_issue(issues.second)
 
-        # This generates an issue with multiple closing events
-        issue_closed_twice = reopened_issues.last
-        close_issue(issue_closed_twice)
-        reopen_issue(issue_closed_twice)
+          # Close confidential issue to assist in testing event visibility.
+          close_issue(confidential_issues.first)
+        end
 
-        # create one confidential issue
-        create(:issue, :confidential, issue_params) if Date.today == milestone.start_date
+        if Date.today == milestone.start_date + 2.days
+          # Reopen issue created on milestone start date
+          reopen_issue(issues.second)
+        end
       end
     end
   end
 
   def close_issue(issue)
     Issues::CloseService.new(issue.project, user, {}).execute(issue)
+    adjust_issue_event_creation_time(issue.events.last)
   end
 
   def reopen_issue(issue)
     Issues::ReopenService.new(issue.project, user, {}).execute(issue)
+    adjust_issue_event_creation_time(issue.events.last)
+  end
+
+  # Make sure issue events are created at exactly the beginning of the day to
+  # facilitate comparison in specs
+  def adjust_issue_event_creation_time(event)
+    event.update!(created_at: event.created_at.beginning_of_day)
   end
 end
