@@ -116,35 +116,41 @@ export default class GLForm {
       We need this because the toolbar buttons and indentation helpers mess with
       the browser's native undo/redo capability.
      */
-    if (this.undoStack.isEmpty()) {
+
+    const content = this.textarea.val();
+    const { selectionStart, selectionEnd } = this.textarea[0];
+    const stack = this.undoStack;
+
+    if (stack.isEmpty()) {
       // ==== Save initial state in undo history ====
-      this.undoStack.save(this.textarea.val());
+      stack.save(content);
     }
+
     if (keystroke(event, 'Leader+Z')) {
       // ==== Undo ====
       event.preventDefault();
-      this.undoStack.save(this.textarea.val());
-      if (this.undoStack.canUndo()) {
-        this.setState(this.undoStack.undo());
+      stack.save(content);
+      if (stack.canUndo()) {
+        this.setState(stack.undo());
       }
     } else if (keystroke(event, 'Leader+Shift+Z') || keystroke(event, 'Leader+Y')) {
       // ==== Redo ====
       event.preventDefault();
-      if (this.undoStack.canRedo()) {
-        this.setState(this.undoStack.redo());
+      if (stack.canRedo()) {
+        this.setState(stack.redo());
       }
     } else if (keystroke(event, 'Space') || keystroke(event, 'Enter')) {
       // ==== Save after finishing a word ====
-      this.undoStack.save(this.textarea.val());
-    } else if (this.textarea[0].selectionStart !== this.textarea[0].selectionEnd) {
+      stack.save(content);
+    } else if (selectionStart !== selectionEnd) {
       // ==== Save if killing a large selection ====
-      this.undoStack.save(this.textarea.val());
-    } else if (this.textarea.val() === '') {
+      stack.save(content);
+    } else if (content === '') {
       // ==== Save if deleting everything ====
-      this.undoStack.save('');
+      stack.save('');
     } else {
       // ==== Save after 1 second of inactivity ====
-      this.undoStack.scheduleSave(this.textarea.val());
+      stack.scheduleSave(content);
     }
   }
 

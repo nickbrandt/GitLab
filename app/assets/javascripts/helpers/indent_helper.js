@@ -69,7 +69,7 @@ export default class IndentHelper {
     } else {
       selectedLines.reverse();
       selectedLines.forEach(line => {
-        this.element.setRangeText('    ', line.start, line.start, 'preserve');
+        this.element.setRangeText(INDENT_SEQUENCE, line.start, line.start, 'preserve');
       });
     }
   }
