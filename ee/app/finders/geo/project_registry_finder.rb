@@ -79,20 +79,12 @@ module Geo
     end
 
     def find_projects_updated_recently(shard_name:, batch_size:)
-      finder_klass_for_projects_updated_recently
+      Geo::ProjectUpdatedRecentlyFinder
         .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
         .execute
     end
 
     private
-
-    def finder_klass_for_projects_updated_recently
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectUpdatedRecentlyFinder
-      else
-        Geo::ProjectUpdatedRecentlyFinder
-      end
-    end
 
     def registries_for_synced_projects(type)
       Geo::ProjectRegistrySyncedFinder

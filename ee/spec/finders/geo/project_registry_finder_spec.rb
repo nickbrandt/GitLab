@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Geo::ProjectRegistryFinder, :geo do
-  using RSpec::Parameterized::TableSyntax
-
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly
@@ -380,35 +378,6 @@ describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
-  shared_examples 'delegates to the proper finder' do |legacy_finder_klass, finder_klass, method, args|
-    where(:selective_sync, :fdw_enabled, :fdw_for_selective_sync, :finder) do
-      false | false | false | legacy_finder_klass
-      false | false | true  | legacy_finder_klass
-      false | true  | true  | finder_klass
-      false | true  | false | finder_klass
-      true  | false | false | legacy_finder_klass
-      true  | false | true  | legacy_finder_klass
-      true  | true  | true  | finder_klass
-      true  | true  | false | legacy_finder_klass
-    end
-
-    with_them do
-      before do
-        stub_fdw(fdw_enabled)
-        stub_feature_flags(use_fdw_queries_for_selective_sync: fdw_for_selective_sync)
-        stub_selective_sync(secondary, selective_sync)
-      end
-
-      it 'delegates to the proper finder' do
-        expect_next_instance_of(finder) do |finder|
-          expect(finder).to receive(:execute).once
-        end
-
-        subject.public_send(method, *args)
-      end
-    end
-  end
-
   context 'FDW', :geo_fdw do
     context 'with use_fdw_queries_for_selective_sync disabled' do
       before do
@@ -438,10 +407,13 @@ describe Geo::ProjectRegistryFinder, :geo do
   end
 
   describe '#find_projects_updated_recently', :geo_fdw do
-    include_examples 'delegates to the proper finder',
-      Geo::LegacyProjectUpdatedRecentlyFinder,
-      Geo::ProjectUpdatedRecentlyFinder,
-      :find_projects_updated_recently, [shard_name: 'default', batch_size: 100]
+    it 'delegates to the proper finder' do
+      expect_next_instance_of(Geo::ProjectUpdatedRecentlyFinder) do |finder|
+        expect(finder).to receive(:execute).once
+      end
+
+      subject.find_projects_updated_recently(shard_name: 'default', batch_size: 100)
+    end
   end
 
   describe '#find_failed_project_registries', :geo_fdw do
