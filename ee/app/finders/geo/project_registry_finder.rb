@@ -114,16 +114,8 @@ module Geo
         .execute
     end
 
-    def finder_klass_for_verified_registries
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistryVerifiedFinder
-      else
-        Geo::ProjectRegistryVerifiedFinder
-      end
-    end
-
     def registries_for_verified_projects(type)
-      finder_klass_for_verified_registries
+      Geo::ProjectRegistryVerifiedFinder
         .new(current_node: current_node, type: type)
         .execute
     end
