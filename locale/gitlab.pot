@@ -5034,6 +5034,9 @@ msgstr ""
 msgid "Error loading branches."
 msgstr ""
 
+msgid "Error loading burndown chart data"
+msgstr ""
+
 msgid "Error loading file viewer."
 msgstr ""
 

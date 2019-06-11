@@ -4,7 +4,7 @@ import BurndownChart from './burndown_chart';
 import BurndownChartData from './burndown_chart_data';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 
 export default () => {
   // handle hint dismissal
@@ -71,6 +71,6 @@ export default () => {
         window.addEventListener('resize', () => chart.animateResize(1));
         $(document).on('click', '.js-sidebar-toggle', () => chart.animateResize(2));
       })
-      .catch(() => new Flash('Error loading burndown chart data'));
+      .catch(() => new Flash(__('Error loading burndown chart data')));
   }
 };
