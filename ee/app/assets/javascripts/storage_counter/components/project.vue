@@ -49,6 +49,7 @@ export default {
       delete statisticsCopy.storageSize;
       // eslint-disable-next-line no-underscore-dangle
       delete statisticsCopy.__typename;
+      delete statisticsCopy.commitCount;
 
       return statisticsCopy;
     },
@@ -72,7 +73,6 @@ export default {
     },
   },
   i18nStatisticsMap: {
-    commitCount: s__('UsageQuota|Commit count'),
     repositorySize: s__('UsageQuota|Repository'),
     lfsObjectsSize: s__('UsageQuota|LFS Storage'),
     buildArtifactsSize: s__('UsageQuota|Artifacts'),
