@@ -287,18 +287,6 @@ describe API::Epics do
         expect_paginated_array_response(epic.id)
       end
 
-      it 'returns an array of epics with no label when using the legacy No+Label filter' do
-        get api(url), params: { labels: 'No Label' }
-
-        expect_paginated_array_response(epic.id)
-      end
-
-      it 'returns an array of epics with no label when using the legacy No+Label filter with labels param as array' do
-        get api(url), params: { labels: ['No Label'] }
-
-        expect_paginated_array_response(epic.id)
-      end
-
       it_behaves_like 'can admin epics'
     end
 
