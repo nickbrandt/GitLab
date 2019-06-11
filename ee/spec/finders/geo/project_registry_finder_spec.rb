@@ -24,7 +24,7 @@ describe Geo::ProjectRegistryFinder, :geo do
     stub_current_geo_node(secondary)
   end
 
-  shared_examples 'counts all the things' do |method_prefix|
+  shared_examples 'counts all the things' do
     describe '#count_synced_repositories' do
       before do
         create(:geo_project_registry, :synced, project: project)
@@ -415,7 +415,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         stub_feature_flags(use_fdw_queries_for_selective_sync: false)
       end
 
-      include_examples 'counts all the things', 'fdw'
+      include_examples 'counts all the things'
     end
 
     context 'with use_fdw_queries_for_selective_sync enabled' do
@@ -423,7 +423,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         stub_feature_flags(use_fdw_queries_for_selective_sync: true)
       end
 
-      include_examples 'counts all the things', 'fdw'
+      include_examples 'counts all the things'
     end
   end
 
@@ -432,7 +432,299 @@ describe Geo::ProjectRegistryFinder, :geo do
       stub_fdw_disabled
     end
 
-    include_examples 'counts all the things', 'legacy'
+    describe '#count_failed_repositories' do
+      before do
+        create(:geo_project_registry, :synced, project: project)
+        create(:geo_project_registry, :repository_sync_failed, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_sync_failed, project: project_2_in_synced_group)
+        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :repository_sync_failed, project: project_4_broken_storage)
+      end
+
+      it 'counts registries that repository sync has failed' do
+        expect(subject.count_failed_repositories).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that repository sync has failed where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_failed_repositories).to eq 2
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that repository sync has failed where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_failed_repositories).to eq 1
+        end
+      end
+    end
+
+    describe '#count_failed_wikis' do
+      before do
+        create(:geo_project_registry, :synced, project: project)
+        create(:geo_project_registry, :wiki_sync_failed, project: project_1_in_synced_group)
+        create(:geo_project_registry, :repository_sync_failed, project: project_2_in_synced_group)
+        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :wiki_sync_failed, project: project_4_broken_storage)
+      end
+
+      it 'counts registries that wiki sync has failed' do
+        expect(subject.count_failed_wikis).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that wiki sync has failed where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_failed_wikis).to eq 2
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that wiki sync has failed where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_failed_wikis).to eq 1
+        end
+      end
+    end
+
+    describe '#count_verified_repositories' do
+      before do
+        create(:geo_project_registry, :repository_verified, :wiki_verified, project: project)
+        create(:geo_project_registry, :repository_verified, project: project_1_in_synced_group)
+        create(:geo_project_registry, :repository_verification_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :repository_verified, project: project_4_broken_storage)
+        create(:geo_project_registry, :wiki_verified, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that repository have beend verified' do
+        expect(subject.count_verified_repositories).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that repository have beend verified where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_verified_repositories).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that repository have beend verified where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_verified_repositories).to eq 1
+        end
+      end
+    end
+
+    describe '#count_verified_wikis' do
+      before do
+        create(:geo_project_registry, :wiki_verified, :wiki_verified, project: project)
+        create(:geo_project_registry, :wiki_verified, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_3_in_synced_group)
+        create(:geo_project_registry, :wiki_verified, project: project_4_broken_storage)
+        create(:geo_project_registry, :repository_verified, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that wiki have beend verified' do
+        expect(subject.count_verified_wikis).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that wiki have beend verified where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_verified_wikis).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that wiki have beend verified where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_verified_wikis).to eq 1
+        end
+      end
+    end
+
+    describe '#count_verification_failed_repositories' do
+      before do
+        create(:geo_project_registry, :repository_verification_failed, :wiki_verification_failed, project: project)
+        create(:geo_project_registry, :repository_verification_failed, project: project_1_in_synced_group)
+        create(:geo_project_registry, :repository_verification_failed, project: project_4_broken_storage)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that repository verification has failed' do
+        expect(subject.count_verification_failed_repositories).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that repository verification has failed where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_verification_failed_repositories).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that repository verification has failed where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_verification_failed_repositories).to eq 1
+        end
+      end
+    end
+
+    describe '#count_verification_failed_wikis' do
+      before do
+        create(:geo_project_registry, :repository_verification_failed, :wiki_verification_failed, project: project)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_verification_failed, project: project_4_broken_storage)
+        create(:geo_project_registry, :repository_verification_failed, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that wiki verification has failed' do
+        expect(subject.count_verification_failed_wikis).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that wiki verification has failed where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_verification_failed_wikis).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that wiki verification has failed where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_verification_failed_wikis).to eq 1
+        end
+      end
+    end
+
+    describe '#count_repositories_retrying_verification' do
+      before do
+        create(:geo_project_registry, :repository_retrying_verification, :wiki_retrying_verification, project: project)
+        create(:geo_project_registry, :repository_retrying_verification, project: project_1_in_synced_group)
+        create(:geo_project_registry, :repository_retrying_verification, project: project_4_broken_storage)
+        create(:geo_project_registry, :wiki_retrying_verification, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that repository retrying verification' do
+        expect(subject.count_repositories_retrying_verification).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that repository retrying verification where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_repositories_retrying_verification).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that repository retrying verification where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_repositories_retrying_verification).to eq 1
+        end
+      end
+    end
+
+    describe '#count_wikis_retrying_verification' do
+      before do
+        create(:geo_project_registry, :repository_retrying_verification, :wiki_retrying_verification, project: project)
+        create(:geo_project_registry, :repository_retrying_verification, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_retrying_verification, project: project_2_in_synced_group)
+        create(:geo_project_registry, :wiki_retrying_verification, project: project_4_broken_storage)
+      end
+
+      it 'counts registries that wiki retrying verification' do
+        expect(subject.count_wikis_retrying_verification).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts registries that wiki retrying verification where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_wikis_retrying_verification).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts registries that wiki retrying verification where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_wikis_retrying_verification).to eq 1
+        end
+      end
+    end
+
+    describe '#count_repositories_checksum_mismatch' do
+      before do
+        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_checksum_mismatch, project: project)
+        create(:geo_project_registry, :repository_checksum_mismatch, project: project_1_in_synced_group)
+        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_verified, project: project_4_broken_storage)
+        create(:geo_project_registry, :wiki_checksum_mismatch, project: project_2_in_synced_group)
+      end
+
+      it 'counts registries that repository mismatch' do
+        expect(subject.count_repositories_checksum_mismatch).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts mismatch registries where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_repositories_checksum_mismatch).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts mismatch registries where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_repositories_checksum_mismatch).to eq 1
+        end
+      end
+    end
+
+    describe '#count_wikis_checksum_mismatch' do
+      before do
+        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_checksum_mismatch, project: project)
+        create(:geo_project_registry, :repository_checksum_mismatch, project: project_1_in_synced_group)
+        create(:geo_project_registry, :wiki_checksum_mismatch, project: project_2_in_synced_group)
+        create(:geo_project_registry, :repository_verified, :wiki_checksum_mismatch, project: project_4_broken_storage)
+      end
+
+      it 'counts registries that wiki mismatch' do
+        expect(subject.count_wikis_checksum_mismatch).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        it 'counts mismatch registries where projects belongs to the namespaces' do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+          expect(subject.count_wikis_checksum_mismatch).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        it 'counts mismatch registries where projects belongs to the shards' do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+
+          expect(subject.count_wikis_checksum_mismatch).to eq 1
+        end
+      end
+    end
   end
 
   describe '#find_unsynced_projects', :geo_fdw do

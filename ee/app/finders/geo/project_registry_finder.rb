@@ -102,16 +102,8 @@ module Geo
       end
     end
 
-    def finder_klass_for_synced_registries
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistrySyncedFinder
-      else
-        Geo::ProjectRegistrySyncedFinder
-      end
-    end
-
     def registries_for_synced_projects(type)
-      finder_klass_for_synced_registries
+      Geo::ProjectRegistrySyncedFinder
         .new(current_node: current_node, type: type)
         .execute
     end
