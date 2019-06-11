@@ -38,14 +38,6 @@ describe Gitlab::Elastic::Indexer do
       project.wiki.create_page('test.md', '# term')
     end
 
-    it 'does not ask for IndexStatus' do
-      expect(project).not_to receive(:index_status)
-      expect(project.wiki).not_to receive(:index_status)
-      expect_popen.and_return(popen_success)
-
-      indexer.run
-    end
-
     it 'raises if it cannot find gitlab-elasticsearch-indexer' do
       expect(described_class).to receive(:experimental_indexer_present?).and_return(false)
 

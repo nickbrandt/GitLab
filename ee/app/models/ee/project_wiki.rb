@@ -15,20 +15,10 @@ module EE
       [::Gitlab.config.build_gitlab_kerberos_url, '/', full_path, '.git'].join('')
     end
 
-    def update_elastic_index
-      index_wiki_blobs if project.use_elasticsearch?
-    end
-
     def path_to_repo
       @path_to_repo ||=
         File.join(::Gitlab.config.repositories.storages[project.repository_storage].legacy_disk_path,
                   "#{disk_path}.git")
-    end
-
-    override :update_project_activity
-    def update_project_activity
-      update_elastic_index
-      super
     end
   end
 end
