@@ -428,10 +428,13 @@ describe Geo::ProjectRegistryFinder, :geo do
   end
 
   describe '#find_unsynced_projects', :geo_fdw do
-    include_examples 'delegates to the proper finder',
-      Geo::LegacyProjectUnsyncedFinder,
-      Geo::ProjectUnsyncedFinder,
-      :find_unsynced_projects, [shard_name: 'default', batch_size: 100]
+    it 'delegates to the proper finder' do
+      expect_next_instance_of(Geo::ProjectUnsyncedFinder) do |finder|
+        expect(finder).to receive(:execute).once
+      end
+
+      subject.find_unsynced_projects(shard_name: 'default', batch_size: 100)
+    end
   end
 
   describe '#find_projects_updated_recently', :geo_fdw do

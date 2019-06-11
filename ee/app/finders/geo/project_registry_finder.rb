@@ -73,7 +73,7 @@ module Geo
     end
 
     def find_unsynced_projects(shard_name:, batch_size:)
-      finder_klass_for_unsynced_projects
+      Geo::ProjectUnsyncedFinder
         .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
         .execute
     end
@@ -85,14 +85,6 @@ module Geo
     end
 
     private
-
-    def finder_klass_for_unsynced_projects
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectUnsyncedFinder
-      else
-        Geo::ProjectUnsyncedFinder
-      end
-    end
 
     def finder_klass_for_projects_updated_recently
       if use_legacy_queries_for_selective_sync?
