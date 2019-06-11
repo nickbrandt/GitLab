@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  # https://gitlab.com/gitlab-org/quality/staging/issues/58
+  context 'Plan', :quarantine do
     describe 'promote issue to epic' do
       let(:issue_title) { "My Awesome Issue #{SecureRandom.hex(8)}" }
 
