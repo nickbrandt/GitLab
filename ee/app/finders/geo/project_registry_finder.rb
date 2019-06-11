@@ -126,16 +126,8 @@ module Geo
         .execute
     end
 
-    def finder_klass_for_registries_retrying_verification
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistryRetryingVerificationFinder
-      else
-        Geo::ProjectRegistryRetryingVerificationFinder
-      end
-    end
-
     def registries_retrying_verification(type)
-      finder_klass_for_registries_retrying_verification
+      Geo::ProjectRegistryRetryingVerificationFinder
         .new(current_node: current_node, type: type)
         .execute
     end
