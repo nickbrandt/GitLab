@@ -6,7 +6,7 @@ namespace :geo do
   include ActionView::Helpers::DateHelper
   include ActionView::Helpers::NumberHelper
 
-  GEO_LICENSE_ERROR_TEXT = 'GitLab Geo is not supported with this license. Please contact sales@gitlab.com.'.freeze
+  GEO_LICENSE_ERROR_TEXT = 'GitLab Geo is not supported with this license. Please contact the sales team: https://about.gitlab.com/sales.'.freeze
 
   namespace :db do |ns|
     desc 'Drops the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
