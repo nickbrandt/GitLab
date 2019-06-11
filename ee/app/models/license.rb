@@ -84,6 +84,7 @@ class License < ApplicationRecord
     dependency_proxy
     metrics_reports
     custom_prometheus_metrics
+    cycle_analytics_for_groups
   ]
   EEP_FEATURES.freeze
 
