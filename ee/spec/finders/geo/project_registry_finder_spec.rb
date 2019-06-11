@@ -452,10 +452,13 @@ describe Geo::ProjectRegistryFinder, :geo do
   end
 
   describe '#find_registries_to_verify', :geo_fdw do
-    include_examples 'delegates to the proper finder',
-      Geo::LegacyProjectRegistryPendingVerificationFinder,
-      Geo::ProjectRegistryPendingVerificationFinder,
-      :find_registries_to_verify, [shard_name: 'default', batch_size: 100]
+    it 'delegates to the proper finder' do
+      expect_next_instance_of(Geo::ProjectRegistryPendingVerificationFinder) do |finder|
+        expect(finder).to receive(:execute).once
+      end
+
+      subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)
+    end
   end
 
   describe '#find_verification_failed_project_registries', :geo_fdw do

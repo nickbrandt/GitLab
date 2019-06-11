@@ -67,7 +67,7 @@ module Geo
     end
 
     def find_registries_to_verify(shard_name:, batch_size:)
-      finder_klass_for_registries_pending_verification
+      Geo::ProjectRegistryPendingVerificationFinder
         .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
         .execute
     end
@@ -136,14 +136,6 @@ module Geo
       Geo::ProjectRegistryMismatchFinder
         .new(current_node: current_node, type: type)
         .execute
-    end
-
-    def finder_klass_for_registries_pending_verification
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistryPendingVerificationFinder
-      else
-        Geo::ProjectRegistryPendingVerificationFinder
-      end
     end
   end
 end
