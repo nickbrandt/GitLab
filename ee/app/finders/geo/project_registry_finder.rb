@@ -140,16 +140,8 @@ module Geo
         .execute
     end
 
-    def finder_klass_for_mismatch_registries
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistryMismatchFinder
-      else
-        Geo::ProjectRegistryMismatchFinder
-      end
-    end
-
     def registries_for_mismatch_projects(type)
-      finder_klass_for_mismatch_registries
+      Geo::ProjectRegistryMismatchFinder
         .new(current_node: current_node, type: type)
         .execute
     end

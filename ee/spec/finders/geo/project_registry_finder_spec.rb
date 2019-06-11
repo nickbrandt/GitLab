@@ -489,64 +489,6 @@ describe Geo::ProjectRegistryFinder, :geo do
         end
       end
     end
-
-    describe '#count_repositories_checksum_mismatch' do
-      before do
-        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_checksum_mismatch, project: project)
-        create(:geo_project_registry, :repository_checksum_mismatch, project: project_1_in_synced_group)
-        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_verified, project: project_4_broken_storage)
-        create(:geo_project_registry, :wiki_checksum_mismatch, project: project_2_in_synced_group)
-      end
-
-      it 'counts registries that repository mismatch' do
-        expect(subject.count_repositories_checksum_mismatch).to eq 3
-      end
-
-      context 'with selective sync by namespace' do
-        it 'counts mismatch registries where projects belongs to the namespaces' do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-
-          expect(subject.count_repositories_checksum_mismatch).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        it 'counts mismatch registries where projects belongs to the shards' do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-          expect(subject.count_repositories_checksum_mismatch).to eq 1
-        end
-      end
-    end
-
-    describe '#count_wikis_checksum_mismatch' do
-      before do
-        create(:geo_project_registry, :repository_checksum_mismatch, :wiki_checksum_mismatch, project: project)
-        create(:geo_project_registry, :repository_checksum_mismatch, project: project_1_in_synced_group)
-        create(:geo_project_registry, :wiki_checksum_mismatch, project: project_2_in_synced_group)
-        create(:geo_project_registry, :repository_verified, :wiki_checksum_mismatch, project: project_4_broken_storage)
-      end
-
-      it 'counts registries that wiki mismatch' do
-        expect(subject.count_wikis_checksum_mismatch).to eq 3
-      end
-
-      context 'with selective sync by namespace' do
-        it 'counts mismatch registries where projects belongs to the namespaces' do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-
-          expect(subject.count_wikis_checksum_mismatch).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        it 'counts mismatch registries where projects belongs to the shards' do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-          expect(subject.count_wikis_checksum_mismatch).to eq 1
-        end
-      end
-    end
   end
 
   describe '#find_unsynced_projects', :geo_fdw do
@@ -591,9 +533,12 @@ describe Geo::ProjectRegistryFinder, :geo do
   end
 
   describe '#find_checksum_mismatch_project_registries', :geo_fdw do
-    include_examples 'delegates to the proper finder',
-      Geo::LegacyProjectRegistryMismatchFinder,
-      Geo::ProjectRegistryMismatchFinder,
-      :find_checksum_mismatch_project_registries, ['repository']
+    it 'delegates to the proper finder' do
+      expect_next_instance_of(Geo::ProjectRegistryMismatchFinder) do |finder|
+        expect(finder).to receive(:execute).once
+      end
+
+      subject.find_checksum_mismatch_project_registries('repository')
+    end
   end
 end
