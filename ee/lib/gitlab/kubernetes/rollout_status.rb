@@ -10,14 +10,6 @@ module Gitlab
     class RolloutStatus
       attr_reader :deployments, :instances, :completion, :status
 
-      STATUS_MAP = {
-        running: 'running',
-        failed: 'failed',
-        unkonw: 'unknown',
-        succeeded: 'succeeded',
-        pending: 'pending'
-      }.freeze
-
       def complete?
         completion == 100
       end
@@ -60,7 +52,8 @@ module Gitlab
           if @instances.empty?
             100
           else
-            finished = @instances.select { |instance| instance[:status] == STATUS_MAP[:running] }.count
+            # We downcase the pod status in Gitlab::Kubernetes::Deployment#deployment_instance
+            finished = @instances.count { |instance| instance[:status] == Gitlab::Kubernetes::Pod::RUNNING.downcase }
 
             (finished / @instances.count.to_f * 100).to_i
           end
