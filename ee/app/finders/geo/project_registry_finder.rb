@@ -108,16 +108,8 @@ module Geo
         .execute
     end
 
-    def finder_klass_for_failed_registries
-      if use_legacy_queries_for_selective_sync?
-        Geo::LegacyProjectRegistrySyncFailedFinder
-      else
-        Geo::ProjectRegistrySyncFailedFinder
-      end
-    end
-
     def registries_for_failed_projects(type)
-      finder_klass_for_failed_registries
+      Geo::ProjectRegistrySyncFailedFinder
         .new(current_node: current_node, type: type)
         .execute
     end

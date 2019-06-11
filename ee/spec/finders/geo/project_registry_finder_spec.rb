@@ -432,66 +432,6 @@ describe Geo::ProjectRegistryFinder, :geo do
       stub_fdw_disabled
     end
 
-    describe '#count_failed_repositories' do
-      before do
-        create(:geo_project_registry, :synced, project: project)
-        create(:geo_project_registry, :repository_sync_failed, project: project_1_in_synced_group)
-        create(:geo_project_registry, :wiki_sync_failed, project: project_2_in_synced_group)
-        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
-        create(:geo_project_registry, :repository_sync_failed, project: project_4_broken_storage)
-      end
-
-      it 'counts registries that repository sync has failed' do
-        expect(subject.count_failed_repositories).to eq 3
-      end
-
-      context 'with selective sync by namespace' do
-        it 'counts registries that repository sync has failed where projects belongs to the namespaces' do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-
-          expect(subject.count_failed_repositories).to eq 2
-        end
-      end
-
-      context 'with selective sync by shard' do
-        it 'counts registries that repository sync has failed where projects belongs to the shards' do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-          expect(subject.count_failed_repositories).to eq 1
-        end
-      end
-    end
-
-    describe '#count_failed_wikis' do
-      before do
-        create(:geo_project_registry, :synced, project: project)
-        create(:geo_project_registry, :wiki_sync_failed, project: project_1_in_synced_group)
-        create(:geo_project_registry, :repository_sync_failed, project: project_2_in_synced_group)
-        create(:geo_project_registry, :sync_failed, project: project_3_in_synced_group)
-        create(:geo_project_registry, :wiki_sync_failed, project: project_4_broken_storage)
-      end
-
-      it 'counts registries that wiki sync has failed' do
-        expect(subject.count_failed_wikis).to eq 3
-      end
-
-      context 'with selective sync by namespace' do
-        it 'counts registries that wiki sync has failed where projects belongs to the namespaces' do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-
-          expect(subject.count_failed_wikis).to eq 2
-        end
-      end
-
-      context 'with selective sync by shard' do
-        it 'counts registries that wiki sync has failed where projects belongs to the shards' do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-
-          expect(subject.count_failed_wikis).to eq 1
-        end
-      end
-    end
-
     describe '#count_verified_repositories' do
       before do
         create(:geo_project_registry, :repository_verified, :wiki_verified, project: project)
@@ -742,10 +682,13 @@ describe Geo::ProjectRegistryFinder, :geo do
   end
 
   describe '#find_failed_project_registries', :geo_fdw do
-    include_examples 'delegates to the proper finder',
-      Geo::LegacyProjectRegistrySyncFailedFinder,
-      Geo::ProjectRegistrySyncFailedFinder,
-      :find_failed_project_registries, ['repository']
+    it 'delegates to the proper finder' do
+      expect_next_instance_of(Geo::ProjectRegistrySyncFailedFinder) do |finder|
+        expect(finder).to receive(:execute).once
+      end
+
+      subject.find_failed_project_registries('repository')
+    end
   end
 
   describe '#find_registries_to_verify', :geo_fdw do
