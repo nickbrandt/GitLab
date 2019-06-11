@@ -79,7 +79,7 @@ module EE
     end
 
     def get_on_train!(user)
-      create_merge_train!(user: user)
+      create_merge_train!(user: user, target_project: target_project, target_branch: target_branch)
     end
 
     def get_off_train!
