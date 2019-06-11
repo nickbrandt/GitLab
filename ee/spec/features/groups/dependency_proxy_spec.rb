@@ -3,14 +3,14 @@
 require 'spec_helper'
 
 describe 'Group Dependency Proxy' do
-  let(:owner) { create(:user) }
   let(:developer) { create(:user) }
+  let(:reporter) { create(:user) }
   let(:group) { create(:group) }
   let(:path) { group_dependency_proxy_path(group) }
 
   before do
-    group.add_owner(owner)
     group.add_developer(developer)
+    group.add_reporter(reporter)
 
     enable_feature
     stub_licensed_features(dependency_proxy: true)
@@ -29,9 +29,9 @@ describe 'Group Dependency Proxy' do
     end
 
     context 'feature is available', :js do
-      context 'when logged in as group owner' do
+      context 'when logged in as group developer' do
         before do
-          sign_in(owner)
+          sign_in(developer)
           visit path
         end
 
@@ -57,9 +57,9 @@ describe 'Group Dependency Proxy' do
         end
       end
 
-      context 'when logged in as group developer' do
+      context 'when logged in as group reporter' do
         before do
-          sign_in(developer)
+          sign_in(reporter)
           visit path
         end
 
@@ -72,7 +72,7 @@ describe 'Group Dependency Proxy' do
 
     context 'feature is not avaible' do
       before do
-        sign_in(owner)
+        sign_in(developer)
       end
 
       context 'group is private' do
