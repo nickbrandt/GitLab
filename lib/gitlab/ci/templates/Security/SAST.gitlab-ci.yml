@@ -31,6 +31,7 @@ sast:
     - |
       docker run \
         $(propagate_env_vars \
+          SAST_BANDIT_EXCLUDED_PATHS \
           SAST_ANALYZER_IMAGES \
           SAST_ANALYZER_IMAGE_PREFIX \
           SAST_ANALYZER_IMAGE_TAG \
