@@ -1,27 +1,74 @@
 import extendStore from 'ee/ide/stores/extend';
 import terminalPlugin from 'ee/ide/stores/plugins/terminal';
+import terminalSyncPlugin from 'ee/ide/stores/plugins/terminal_sync';
 
-jest.mock('ee/ide/stores/plugins/terminal', () => {
-  const plugin = jest.fn();
-  return jest.fn(() => plugin);
-});
+jest.mock('ee/ide/stores/plugins/terminal', () => jest.fn());
+jest.mock('ee/ide/stores/plugins/terminal_sync', () => jest.fn());
 
 describe('ee/ide/stores/extend', () => {
+  let prevGon;
   let store;
   let el;
 
   beforeEach(() => {
+    prevGon = global.gon;
     store = {};
     el = {};
 
-    extendStore(store, el);
+    [terminalPlugin, terminalSyncPlugin].forEach(x => {
+      const plugin = jest.fn();
+
+      x.mockImplementation(() => plugin);
+    });
   });
 
-  it('creates terminal plugin', () => {
-    expect(terminalPlugin).toHaveBeenCalledWith(el);
+  afterEach(() => {
+    global.gon = prevGon;
+    terminalPlugin.mockClear();
+    terminalSyncPlugin.mockClear();
   });
 
-  it('calls terminal plugin', () => {
-    expect(terminalPlugin()).toHaveBeenCalledWith(store);
+  const withGonFeatures = features => {
+    global.gon = { ...global.gon, features };
+  };
+
+  describe('terminalPlugin', () => {
+    beforeEach(() => {
+      extendStore(store, el);
+    });
+
+    it('is created', () => {
+      expect(terminalPlugin).toHaveBeenCalledWith(el);
+    });
+
+    it('is called with store', () => {
+      expect(terminalPlugin()).toHaveBeenCalledWith(store);
+    });
+  });
+
+  describe('terminalSyncPlugin', () => {
+    describe('when buildServiceProxy feature is enabled', () => {
+      beforeEach(() => {
+        withGonFeatures({ buildServiceProxy: true });
+
+        extendStore(store, el);
+      });
+
+      it('is created', () => {
+        expect(terminalSyncPlugin).toHaveBeenCalledWith(el);
+      });
+
+      it('is called with store', () => {
+        expect(terminalSyncPlugin()).toHaveBeenCalledWith(store);
+      });
+    });
+
+    describe('when buildServiceProxy feature is disabled', () => {
+      it('is not created', () => {
+        extendStore(store, el);
+
+        expect(terminalSyncPlugin).not.toHaveBeenCalled();
+      });
+    });
   });
 });
