@@ -2,13 +2,12 @@
 
 module Groups
   module CycleAnalytics
-    class EventsController < Projects::ApplicationController
+    class EventsController < Groups::ApplicationController
       include CycleAnalyticsParams
 
-      before_action :authorize_read_cycle_analytics!
-      before_action :authorize_read_build!, only: [:test, :staging]
-      before_action :authorize_read_issue!, only: [:issue, :production]
-      before_action :authorize_read_merge_request!, only: [:code, :review]
+      before_action :group
+
+      before_action :authorize_group_cycle_analytics!
 
       def issue
         render_events(cycle_analytics[:issue].events)
@@ -50,7 +49,7 @@ module Groups
       end
 
       def cycle_analytics
-        @cycle_analytics ||= ::CycleAnalytics.new(project, options(events_params))
+        @cycle_analytics ||= ::CycleAnalytics.new(@group.projects.first, options(events_params))
       end
 
       def events_params

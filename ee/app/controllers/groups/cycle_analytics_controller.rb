@@ -10,7 +10,7 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   layout 'group'
 
   before_action :whitelist_query_limiting, only: [:show]
-  before_action :check_cycle_analytics_for_groups_available!
+  before_action :authorize_group_cycle_analytics!
 
   def show
     @cycle_analytics = ::CycleAnalytics.new(@group.projects.first, options(cycle_analytics_params))

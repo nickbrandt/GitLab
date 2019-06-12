@@ -32,6 +32,12 @@ class Groups::ApplicationController < ApplicationController
     end
   end
 
+  def authorize_group_cycle_analytics!
+    unless can?(current_user, :read_group_cycle_analytics, group)
+      return render_403
+    end
+  end
+
   def build_canonical_path(group)
     params[:group_id] = group.to_param
 
