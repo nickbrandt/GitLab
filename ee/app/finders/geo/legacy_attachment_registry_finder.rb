@@ -26,17 +26,6 @@ module Geo
       )
     end
 
-    def registries_for_attachments
-      return Geo::FileRegistry.attachments unless selective_sync?
-
-      legacy_inner_join_registry_ids(
-        Geo::FileRegistry.attachments,
-        attachments.pluck_primary_key,
-        Geo::FileRegistry,
-        foreign_key: :file_id
-      )
-    end
-
     private
 
     def attachments

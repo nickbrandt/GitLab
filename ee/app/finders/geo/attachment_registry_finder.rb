@@ -104,13 +104,7 @@ module Geo
     end
 
     def registries_for_attachments
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.registries_for_attachments
-      else
-        attachments
-          .inner_join_file_registry
-          .merge(Geo::FileRegistry.attachments)
-      end
+      attachments.inner_join_file_registry.merge(Geo::FileRegistry.attachments)
     end
 
     def attachments
