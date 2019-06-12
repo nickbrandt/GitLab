@@ -45,21 +45,6 @@ describe 'Merge request > User sees merge widget', :js do
 
         expect(page).not_to have_css('.danger_message')
       end
-
-      context 'when target branch is advanced' do
-        let(:options) { { target_sha: 'old-commit' } }
-
-        it 'shows a warning that fork project cannot create merge request pipelines' do
-          visit project_merge_request_path(project, merge_request)
-
-          within('.danger_message') do
-            expect(page)
-              .to have_content('The target branch has advanced, which invalidates ' \
-                               'the merge request pipeline. Please update the source ' \
-                               'branch and retry merging')
-          end
-        end
-      end
     end
 
     context 'when merge request is submitted from a forked project' do

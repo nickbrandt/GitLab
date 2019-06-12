@@ -322,18 +322,6 @@ export default {
             }}
           </mr-widget-alert-message>
 
-          <mr-widget-alert-message
-            v-if="showTargetBranchAdvancedError"
-            type="danger"
-            :help-path="mr.mergeRequestPipelinesHelpPath"
-          >
-            {{
-              s__(
-                'mrWidget|The target branch has advanced, which invalidates the merge request pipeline. Please update the source branch and retry merging',
-              )
-            }}
-          </mr-widget-alert-message>
-
           <mr-widget-alert-message v-if="mr.mergeError" type="danger">
             {{ mergeError }}
           </mr-widget-alert-message>
