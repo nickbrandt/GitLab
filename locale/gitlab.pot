@@ -3982,6 +3982,9 @@ msgstr ""
 msgid "Default issue template"
 msgstr ""
 
+msgid "Default project deletion protection"
+msgstr ""
+
 msgid "Default: Directly import the Google Code email address or username"
 msgstr ""
 
@@ -9057,6 +9060,9 @@ msgid "One or more of your dependency files are not supported, and the dependenc
 msgstr ""
 
 msgid "Only admins"
+msgstr ""
+
+msgid "Only admins can delete project"
 msgstr ""
 
 msgid "Only mirror protected branches"

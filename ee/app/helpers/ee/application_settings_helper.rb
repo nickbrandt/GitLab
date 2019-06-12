@@ -75,6 +75,7 @@ module EE
       repository_mirror_attributes + %i[
         email_additional_text
         file_template_project_id
+        default_project_deletion_protection
       ]
     end
   end

@@ -24,6 +24,10 @@ module EE
               attrs = attrs.except(:file_template_project_id)
             end
 
+            unless ::License.feature_available?(:default_project_deletion_protection)
+              attrs = attrs.except(:default_project_deletion_protection)
+            end
+
             attrs
           end
           # rubocop: enable CodeReuse/ActiveRecord

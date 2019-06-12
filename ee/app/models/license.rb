@@ -69,6 +69,7 @@ class License < ApplicationRecord
     reject_unsigned_commits
     commit_committer_check
     ci_cd_projects
+    default_project_deletion_protection
     protected_environments
     custom_project_templates
     group_project_templates

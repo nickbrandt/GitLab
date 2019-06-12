@@ -210,6 +210,8 @@ module EE
 
       rule { owner | reporter }.enable :build_read_project
 
+      rule { ~admin & owner & owner_cannot_destroy_project }.prevent :remove_project
+
       rule { archived }.policy do
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|
           prevent(*::ProjectPolicy.create_update_admin_destroy(feature))
@@ -226,6 +228,11 @@ module EE
 
       condition(:needs_new_sso_session) do
         ::Gitlab::Auth::GroupSaml::SsoEnforcer.group_access_restricted?(subject.group)
+      end
+
+      condition(:owner_cannot_destroy_project) do
+        ::Gitlab::CurrentSettings.current_application_settings
+          .default_project_deletion_protection
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal

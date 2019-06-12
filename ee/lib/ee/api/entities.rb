@@ -158,6 +158,7 @@ module EE
           end)
           expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
           expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
+          expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
         end
       end
 
