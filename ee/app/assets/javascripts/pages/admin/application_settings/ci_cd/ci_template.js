@@ -2,10 +2,9 @@ import $ from 'jquery';
 
 export default class CiTemplate {
   constructor() {
-    this.$input = $('#required_template_name');
+    this.$input = $('#required_instance_ci_template_name');
     this.$dropdown = $('.js-ci-template-dropdown');
     this.$dropdownToggle = this.$dropdown.find('.dropdown-toggle-text');
-
     this.initDropdown();
   }
 
