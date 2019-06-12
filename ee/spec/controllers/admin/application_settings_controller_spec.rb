@@ -82,9 +82,7 @@ describe Admin::ApplicationSettingsController do
     end
 
     context 'default project deletion protection' do
-      let(:settings) do
-        { default_project_deletion_protection: true }
-      end
+      let(:settings) { { default_project_deletion_protection: true } }
       let(:feature) { :default_project_deletion_protection }
 
       it_behaves_like 'settings for licensed features'
