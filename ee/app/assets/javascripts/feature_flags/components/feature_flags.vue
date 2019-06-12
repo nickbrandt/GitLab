@@ -6,7 +6,7 @@ import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __, s__ } from '~/locale';
 import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
-import TablePagination from '~/vue_shared/components/table_pagination.vue';
+import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import {
   getParameterByName,
   historyPushState,
