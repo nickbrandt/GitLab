@@ -7,7 +7,7 @@ module InsightsFeature
   DEFAULT_INSIGHT_CONFIG = 'ee/fixtures/insights/default.yml'
 
   def insights_available?
-    beta_feature_available?(:insights)
+    feature_available?(:insights)
   end
 
   def insights_config(follow_group: true)
