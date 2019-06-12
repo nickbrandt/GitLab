@@ -754,6 +754,12 @@ msgstr ""
 msgid "Add reaction"
 msgstr ""
 
+msgid "Add to merge train"
+msgstr ""
+
+msgid "Add to merge train when pipeline succeeds"
+msgstr ""
+
 msgid "Add to project"
 msgstr ""
 
@@ -8077,6 +8083,9 @@ msgstr ""
 msgid "Members of <strong>%{project_name}</strong>"
 msgstr ""
 
+msgid "Merge"
+msgstr ""
+
 msgid "Merge Request"
 msgstr ""
 
@@ -12483,6 +12492,12 @@ msgstr ""
 msgid "Start discussion & reopen %{noteable_name}"
 msgstr ""
 
+msgid "Start merge train"
+msgstr ""
+
+msgid "Start merge train when pipeline succeeds"
+msgstr ""
+
 msgid "Start the Runner!"
 msgstr ""
 
@@ -16257,6 +16272,9 @@ msgstr ""
 msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage is %{emphasisStart} unchanged %{emphasisEnd} at %{memoryFrom}MB"
 msgstr ""
 
+msgid "mrWidget|Added to the merge train by"
+msgstr ""
+
 msgid "mrWidget|Allows commits from members who can merge to the target branch"
 msgstr ""
 
@@ -16386,6 +16404,9 @@ msgstr ""
 msgid "mrWidget|Refreshing now"
 msgstr ""
 
+msgid "mrWidget|Remove from merge train"
+msgstr ""
+
 msgid "mrWidget|Request to merge"
 msgstr ""
 
@@ -16476,7 +16497,13 @@ msgstr ""
 msgid "mrWidget|into"
 msgstr ""
 
+msgid "mrWidget|to be added to the merge train when the pipeline succeeds"
+msgstr ""
+
 msgid "mrWidget|to be merged automatically when the pipeline succeeds"
+msgstr ""
+
+msgid "mrWidget|to start a merge train when the pipeline succeeds"
 msgstr ""
 
 msgid "must be greater than start date"
