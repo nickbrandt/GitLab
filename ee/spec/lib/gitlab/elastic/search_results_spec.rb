@@ -95,11 +95,11 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'lists found issues' do
       results = described_class.new(user, 'hello world', limit_project_ids)
-      issue_ids = results.objects('issues').map(&:id)
+      issues = results.objects('issues')
 
-      expect(issue_ids).to include(@issue_1.id, @issue_2.id)
-      expect(issue_ids).not_to include(@issue_3.id)
-
+      expect(issues).to include @issue_1
+      expect(issues).to include @issue_2
+      expect(issues).not_to include @issue_3
       expect(results.issues_count).to eq 2
     end
 
@@ -112,11 +112,11 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'lists issue when search by a valid iid' do
       results = described_class.new(user, '#2', limit_project_ids)
-      issue_ids = results.objects('issues').map(&:id)
+      issues = results.objects('issues')
 
-      expect(issue_ids).to include @issue_2.id
-      expect(issue_ids).not_to include(@issue_1.id, @issue_3.id)
-
+      expect(issues).not_to include @issue_1
+      expect(issues).to include @issue_2
+      expect(issues).not_to include @issue_3
       expect(results.issues_count).to eq 1
     end
 
@@ -154,56 +154,53 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       it 'does not list confidential issues for guests' do
         results = described_class.new(nil, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include @issue.id
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_3.id,
-                                         @security_issue_4.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 1
       end
 
       it 'does not list confidential issues for non project members' do
         results = described_class.new(non_member, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include @issue.id
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_3.id,
-                                         @security_issue_4.id,
-                                         @security_issue_5.id)
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 1
       end
 
       it 'lists confidential issues for author' do
         results = described_class.new(author, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_1.id,
-                                     @security_issue_3.id)
-        expect(issue_ids).not_to include(@security_issue_2.id,
-                                         @security_issue_4.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 3
       end
 
       it 'lists confidential issues for assignee' do
         results = described_class.new(assignee, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_2.id,
-                                     @security_issue_4.id)
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_3.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 3
       end
 
@@ -212,28 +209,27 @@ describe Gitlab::Elastic::SearchResults, :elastic do
         project_2.add_developer(member)
 
         results = described_class.new(member, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_1.id,
-                                     @security_issue_2.id,
-                                     @security_issue_3.id)
-        expect(issue_ids).not_to include(@security_issue_4.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).to include @security_issue_1
+        expect(issues).to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 4
       end
 
       it 'lists all issues for admin' do
         results = described_class.new(admin, query, limit_project_ids)
-        issues = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issues).to include(@issue.id,
-                                     @security_issue_1.id,
-                                     @security_issue_2.id,
-                                     @security_issue_3.id,
-                                     @security_issue_4.id)
-        expect(issues).not_to include @security_issue_5.id
+        expect(issues).to include @issue
+        expect(issues).to include @security_issue_1
+        expect(issues).to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 5
       end
     end
@@ -243,55 +239,53 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       it 'does not list confidential issues for guests' do
         results = described_class.new(nil, query, limit_project_ids)
-        issues = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issues).to include @issue.id
-        expect(issues).not_to include(@security_issue_1.id,
-                                      @security_issue_2.id,
-                                      @security_issue_3.id,
-                                      @security_issue_4.id,
-                                      @security_issue_5.id)
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 1
       end
 
       it 'does not list confidential issues for non project members' do
         results = described_class.new(non_member, query, limit_project_ids)
-        issues = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issues).to include @issue.id
-        expect(issues).not_to include(@security_issue_1.id,
-                                      @security_issue_2.id,
-                                      @security_issue_3.id,
-                                      @security_issue_4.id,
-                                      @security_issue_5.id)
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 1
       end
 
       it 'lists confidential issues for author' do
         results = described_class.new(author, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_3.id)
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_4.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).not_to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 2
       end
 
       it 'lists confidential issues for assignee' do
         results = described_class.new(assignee, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_4.id)
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_3.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).not_to include @security_issue_3
+        expect(issues).to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 2
       end
 
@@ -300,28 +294,27 @@ describe Gitlab::Elastic::SearchResults, :elastic do
         project_3.add_developer(member)
 
         results = described_class.new(member, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_3.id,
-                                     @security_issue_4.id)
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_5.id)
-
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 3
       end
 
       it 'lists all issues for admin' do
         results = described_class.new(admin, query, limit_project_ids)
-        issue_ids = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issue_ids).to include(@issue.id,
-                                     @security_issue_3.id,
-                                     @security_issue_4.id)
-        expect(issue_ids).not_to include(@security_issue_1.id,
-                                         @security_issue_2.id,
-                                         @security_issue_5.id)
+        expect(issues).to include @issue
+        expect(issues).not_to include @security_issue_1
+        expect(issues).not_to include @security_issue_2
+        expect(issues).to include @security_issue_3
+        expect(issues).to include @security_issue_4
+        expect(issues).not_to include @security_issue_5
         expect(results.issues_count).to eq 3
       end
     end
@@ -358,10 +351,11 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'lists found merge requests' do
       results = described_class.new(user, 'hello world', limit_project_ids)
-      merge_requests = results.objects('merge_requests').map(&:id)
+      merge_requests = results.objects('merge_requests')
 
-      expect(merge_requests).to include(@merge_request_1.id, @merge_request_2.id)
-      expect(merge_requests).not_to include @merge_request_3.id
+      expect(merge_requests).to include @merge_request_1
+      expect(merge_requests).to include @merge_request_2
+      expect(merge_requests).not_to include @merge_request_3
       expect(results.merge_requests_count).to eq 2
     end
 
@@ -374,10 +368,11 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'lists merge request when search by a valid iid' do
       results = described_class.new(user, '#2', limit_project_ids)
-      merge_requests = results.objects('merge_requests').map(&:id)
+      merge_requests = results.objects('merge_requests')
 
-      expect(merge_requests).to include @merge_request_2.id
-      expect(merge_requests).not_to include(@merge_request_1.id, @merge_request_3.id)
+      expect(merge_requests).not_to include @merge_request_1
+      expect(merge_requests).to include @merge_request_2
+      expect(merge_requests).not_to include @merge_request_3
       expect(results.merge_requests_count).to eq 1
     end
 
@@ -683,17 +678,18 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
-        issues = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issues).to include(issue_1.id, issue_3.id, issue_4.id)
-
+        expect(issues).to include issue_1
+        expect(issues).to include issue_3
+        expect(issues).to include issue_4
         expect(results.issues_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'project', [])
-        issues = results.objects('issues').map(&:id)
+        issues = results.objects('issues')
 
-        expect(issues).to include issue_4.id
+        expect(issues).to include issue_4
         expect(results.issues_count).to eq 1
       end
     end
@@ -825,17 +821,18 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
-        projects = results.objects('projects').map(&:id)
+        milestones = results.objects('projects')
 
-        expect(projects).to include(internal_project.id, private_project2.id, public_project.id)
-
+        expect(milestones).to include internal_project
+        expect(milestones).to include private_project2
+        expect(milestones).to include public_project
         expect(results.projects_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'project', [])
-        projects = results.objects('projects').map(&:id)
+        projects = results.objects('projects')
 
-        expect(projects).to include public_project.id
+        expect(projects).to include public_project
         expect(results.projects_count).to eq 1
       end
     end
@@ -851,17 +848,18 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
         # Authenticated search
         results = described_class.new(user, 'project', limit_project_ids)
-        merge_requests = results.objects('merge_requests').map(&:id)
+        merge_requests = results.objects('merge_requests')
 
-        expect(merge_requests).to include(merge_request_1.id, merge_request_3.id, merge_request_4.id)
-
+        expect(merge_requests).to include merge_request_1
+        expect(merge_requests).to include merge_request_3
+        expect(merge_requests).to include merge_request_4
         expect(results.merge_requests_count).to eq 3
 
         # Unauthenticated search
         results = described_class.new(nil, 'project', [])
-        merge_requests = results.objects('merge_requests').map(&:id)
+        merge_requests = results.objects('merge_requests')
 
-        expect(merge_requests).to include merge_request_4.id
+        expect(merge_requests).to include merge_request_4
         expect(results.merge_requests_count).to eq 1
       end
     end
