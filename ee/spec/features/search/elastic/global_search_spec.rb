@@ -15,7 +15,7 @@ describe 'Global elastic search', :elastic do
     stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
-  shared_examples 'a pure Elasticsearch result' do
+  shared_examples 'an efficient database result' do
     it 'avoids N+1 database queries' do
       create(object, creation_args)
       Gitlab::Elastic::Helper.refresh_index
@@ -38,7 +38,7 @@ describe 'Global elastic search', :elastic do
       let(:path) { search_path(search: 'initial', scope: 'issues') }
       let(:query_count_multiplier) { 0 }
 
-      it_behaves_like 'a pure Elasticsearch result'
+      it_behaves_like 'an efficient database result'
     end
 
     context 'searching projects' do
@@ -48,25 +48,16 @@ describe 'Global elastic search', :elastic do
       # Each Project requires 4 extra queries: one for each "count" (forks, open MRs, open Issues) and one for access level
       let(:query_count_multiplier) { 4 }
 
-      it_behaves_like 'a pure Elasticsearch result'
+      it_behaves_like 'an efficient database result'
     end
 
     context 'searching merge requests' do
-      it 'avoids N+1 database queries' do
-        path = search_path(search: 'initial', scope: 'merge_requests')
+      let(:object) { :merge_request }
+      let(:creation_args) { { title: 'initial' } }
+      let(:path) { search_path(search: 'initial*', scope: 'merge_requests') }
+      let(:query_count_multiplier) { 0 }
 
-        create(:merge_request, title: 'initial', source_project: project)
-        Gitlab::Elastic::Helper.refresh_index
-
-        control_count = ActiveRecord::QueryRecorder.new { visit path }.count
-
-        merge_requests = create_list(:merge_request, 10, title: 'initial')
-        merge_requests.each { |mr| mr.target_project.add_maintainer(user) }
-        Gitlab::Elastic::Helper.refresh_index
-
-        # Each MR loaded has a Route load that has been tricky to track down
-        expect { visit path }.not_to exceed_query_limit(control_count + 11)
-      end
+      it_behaves_like 'an efficient database result'
     end
 
     context 'searching milestones' do
@@ -75,7 +66,7 @@ describe 'Global elastic search', :elastic do
       let(:path) { search_path(search: 'milestone*', scope: 'milestones') }
       let(:query_count_multiplier) { 0 }
 
-      it_behaves_like 'a pure Elasticsearch result'
+      it_behaves_like 'an efficient database result'
     end
   end
 
