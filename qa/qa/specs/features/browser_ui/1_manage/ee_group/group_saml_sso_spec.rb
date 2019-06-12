@@ -132,7 +132,7 @@ module QA
     def add_user_to_group_via_api(username, group, access_level)
       api_client = Runtime::API::Client.new(:gitlab)
       response = get Runtime::API::Request.new(api_client, "/users?username=#{username}").url
-      post Runtime::API::Request.new(api_client, group.api_members_path).url, {user_id: parse_body(response).first[:id], access_level: access_level}
+      post Runtime::API::Request.new(api_client, group.api_members_path).url, { user_id: parse_body(response).first[:id], access_level: access_level }
     end
   end
 end
