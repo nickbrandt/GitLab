@@ -133,7 +133,8 @@ module EE
             projects_with_tracing_enabled: count(ProjectTracingSetting),
             projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
             operations_dashboard: operations_dashboard_usage,
-            dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total]
+            dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
+            incident_issues: count(::Issue.authored(::User.alert_bot))
           }).merge(service_desk_counts).merge(security_products_usage)
 
           # MySql does not support recursive queries so we can't retrieve epics relationship depth
