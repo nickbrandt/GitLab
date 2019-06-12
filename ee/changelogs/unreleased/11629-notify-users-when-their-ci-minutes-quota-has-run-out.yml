@@ -1,0 +1,5 @@
+---
+title: Notify users when their CI minutes quota has run out
+merge_request: 13735
+author:
+type: added
