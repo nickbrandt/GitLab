@@ -222,7 +222,7 @@ export default {
     <div class="row">
       <div v-if="settings.allowMultiRule" class="form-group col-sm-6">
         <label class="label-wrapper">
-          <span class="form-label label-bold">{{ s__('ApprovalRule|Name') }}</span>
+          <span class="mb-2 bold inline">{{ s__('ApprovalRule|Name') }}</span>
           <input
             v-model="name"
             :class="{ 'is-invalid': validation.name }"
@@ -236,9 +236,9 @@ export default {
       </div>
       <div class="form-group col-sm-6">
         <label class="label-wrapper">
-          <span class="form-label label-bold">{{
-            s__('ApprovalRule|No. approvals required')
-          }}</span>
+          <span class="mb-2 bold inline">
+            {{ s__('ApprovalRule|No. approvals required') }}
+          </span>
           <input
             v-model.number="approvalsRequired"
             :class="{ 'is-invalid': validation.approvalsRequired }"
@@ -264,11 +264,13 @@ export default {
           />
           <div class="invalid-feedback">{{ validation.approvers }}</div>
         </div>
-        <gl-button variant="success" class="btn-inverted prepend-left-8" @click="addSelection">
-          {{ __('Add') }}
-        </gl-button>
+        <gl-button variant="success" class="btn-inverted prepend-left-8" @click="addSelection">{{
+          __('Add')
+        }}</gl-button>
       </div>
     </div>
-    <div class="bordered-box overflow-auto h-12em"><approvers-list v-model="approvers" /></div>
+    <div class="bordered-box overflow-auto h-12em">
+      <approvers-list v-model="approvers" />
+    </div>
   </form>
 </template>

@@ -65,7 +65,7 @@ module Elastic
       def self.elastic_search(query, options: {})
         options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9 description)
 
-        query_hash = basic_query_hash(options[:in], query)
+        query_hash = basic_query_hash(options[:in], query, page: options[:page], per_page: options[:per_page])
 
         filters = []
 

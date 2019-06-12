@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import DashboardFilter from './filter.vue';
 
 export default {
@@ -7,7 +7,9 @@ export default {
     DashboardFilter,
   },
   computed: {
-    ...mapState('filters', ['filters']),
+    ...mapGetters({
+      filters: 'filters/visibleFilters',
+    }),
   },
 };
 </script>

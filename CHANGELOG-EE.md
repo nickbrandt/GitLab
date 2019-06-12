@@ -1,5 +1,19 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.3 (2019-06-10)
+
+### Fixed (1 change)
+
+- Fix create mr from vuln modal regression. !13524
+
+
+## 11.11.2 (2019-06-04)
+
+### Performance (1 change)
+
+- Geo - Does not apply selective sync restrictions while counting registries on the tracking database. !13257
+
+
 ## 11.11.0 (2019-05-22)
 
 ### Security (1 change)
@@ -97,6 +111,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Move ee-specific code from boards/components/issue_card_inner.vue. !11032 (Roman Rodionov)
 - Make all billing cards fit in view. !11602
 - Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
+
+
+## 11.10.6 (2019-06-04)
+
+### Fixed (5 changes, 1 of them is from the community)
+
+- Fix removing and updating insights config, and foreign key constraints. !11030
+- Fix the group's epic page. The Paste issue link placeholder shown as 'undefinedundefinedundefined' in Chinese environment. And the error message showed nothing. !11312 (wdmcheng)
+- Fix approvals project settings section when merge requests disabled. !12070
+- Use path instead of a URL for accessing approval settings. !12414
+- Fix relative url root issues with license management. !12488
 
 
 ## 11.10.4 (2019-05-01)
@@ -248,6 +273,15 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Extract EE specific files and externalize strings in admin application settings. !9930
 - Add specs for coerced labels parameter in Epics API. !9932
 - Improve project service desk settings. !10381
+
+
+## 11.9.12 (2019-05-30)
+
+### Security (3 changes, 1 of them is from the community)
+
+- Filter relative links in wiki for XSS. (kerrizor)
+- Fix XSS in Ancestor tooltip title.
+- Ignore out of range epic IDs.
 
 
 ## 11.9.10 (2019-04-26)

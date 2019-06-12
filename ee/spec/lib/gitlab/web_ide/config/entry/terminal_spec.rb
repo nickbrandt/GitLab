@@ -45,6 +45,21 @@ describe Gitlab::WebIde::Config::Entry::Terminal do
           end
         end
       end
+
+      context 'when unknown port keys detected' do
+        let(:config) do
+          {
+            image: { name: "ruby", ports: [80] },
+            services: [{ name: "mysql", alias: "service2", ports: [{ number: 81, invalid_key: 'foobar' }] }]
+          }
+        end
+
+        it 'is not valid' do
+          expect(entry).not_to be_valid
+          expect(entry.errors.first)
+            .to match /port config contains unknown keys: invalid_key/
+        end
+      end
     end
 
     context 'when entry value is not correct' do

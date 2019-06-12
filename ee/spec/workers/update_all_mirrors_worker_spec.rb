@@ -10,6 +10,13 @@ describe UpdateAllMirrorsWorker do
   end
 
   describe '#perform' do
+    it 'does nothing if the database is read-only' do
+      allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+      expect(worker).not_to receive(:schedule_mirrors!)
+
+      worker.perform
+    end
+
     it 'does not execute if cannot get the lease' do
       stub_exclusive_lease_taken
 
@@ -24,32 +31,26 @@ describe UpdateAllMirrorsWorker do
       worker.perform
     end
 
-    context 'with update_all_mirrors_worker_rescheduling feature' do
-      before do
-        stub_feature_flags(update_all_mirrors_worker_rescheduling: true)
-      end
+    it 'sleeps a bit after scheduling mirrors' do
+      expect(Kernel).to receive(:sleep).with(described_class::RESCHEDULE_WAIT)
 
-      it 'sleeps a bit after scheduling mirrors' do
-        expect(Kernel).to receive(:sleep).with(described_class::RESCHEDULE_WAIT)
+      worker.perform
+    end
 
-        worker.perform
-      end
+    it 'reschedules the job if capacity is left' do
+      allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(true)
 
-      it 'reschedules the job if capacity is left' do
-        allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(true)
+      expect(described_class).to receive(:perform_async)
 
-        expect(described_class).to receive(:perform_async)
+      worker.perform
+    end
 
-        worker.perform
-      end
+    it 'does not reschedule the job if no capacity left' do
+      allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
 
-      it 'does not reschedule the job if no capacity left' do
-        allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
+      expect(described_class).not_to receive(:perform_async)
 
-        expect(described_class).not_to receive(:perform_async)
-
-        worker.perform
-      end
+      worker.perform
     end
   end
 

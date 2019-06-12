@@ -12,7 +12,7 @@ module Elastic
         # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
         data = {}
 
-        [:id, :title, :description, :project_id, :created_at, :updated_at].each do |attr|
+        [:id, :iid, :title, :description, :project_id, :created_at, :updated_at].each do |attr|
           data[attr.to_s] = safely_read_attribute_for_elasticsearch(attr)
         end
 
@@ -26,7 +26,7 @@ module Elastic
       def self.elastic_search(query, options: {})
         options[:in] = %w(title^2 description)
 
-        query_hash = basic_query_hash(options[:in], query)
+        query_hash = basic_query_hash(options[:in], query, page: options[:page], per_page: options[:per_page])
 
         query_hash = project_ids_filter(query_hash, options)
 

@@ -1,0 +1,5 @@
+---
+title: Make burndown chart timezone aware
+merge_request: 10328
+author:
+type: fixed

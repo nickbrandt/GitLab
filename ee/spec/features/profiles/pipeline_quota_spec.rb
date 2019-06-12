@@ -23,14 +23,14 @@ describe 'Profile > Pipeline Quota' do
 
   describe 'shared runners use' do
     where(:shared_runners_enabled, :used, :quota, :usage_class, :usage_text) do
-      false | 300  | 500 | 'success' | '300 / Unlimited minutes Unlimited'
+      false | 300  | 500 | 'success' | '300 / Unlimited minutes 0% used'
       true  | 300  | nil | 'success' | '300 / Unlimited minutes Unlimited'
       true  | 300  | 500 | 'success' | '300 / 500 minutes 60% used'
       true  | 1000 | 500 | 'danger'  | '1000 / 500 minutes 200% used'
     end
 
     with_them do
-      let(:no_shared_runners_text) { 'This group has no projects which use shared runners' }
+      let(:no_shared_runners_text) { 'Shared runners are disabled, so there are no limits set on pipeline usage' }
 
       before do
         project.update!(shared_runners_enabled: shared_runners_enabled)

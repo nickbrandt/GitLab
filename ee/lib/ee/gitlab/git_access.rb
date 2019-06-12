@@ -89,14 +89,44 @@ module EE
         # clear stale lock files.
         project.repository.clean_stale_repository_files
 
-        push_size_in_bytes = 0
+        # Use #check_repository_disk_size to get correct push size whenever a lot of changes
+        # gets pushed at the same time containing the same blobs. This is only
+        # doable if GIT_OBJECT_DIRECTORY_RELATIVE env var is set and happens
+        # when git push comes from CLI (not via UI and API).
+        #
+        # Fallback to determining push size using the changes_list so we can still
+        # determine the push size if env var isn't set (e.g. changes are made
+        # via UI and API).
+        if check_quarantine_size?
+          check_repository_disk_size
+        else
+          check_changes_size
+        end
+      end
+
+      def check_quarantine_size?
+        git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
+
+        git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? && ::Feature.enabled?(:quarantine_push_size_check, default_enabled: true)
+      end
+
+      def check_repository_disk_size
+        check_size_against_limit(project.repository.object_directory_size)
+      end
+
+      def check_changes_size
+        changes_size = 0
 
         changes_list.each do |change|
-          push_size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size) # rubocop: disable CodeReuse/ActiveRecord
+          changes_size += repository.new_blobs(change[:newrev]).sum(&:size) # rubocop: disable CodeReuse/ActiveRecord
 
-          if project.changes_will_exceed_size_limit?(push_size_in_bytes)
-            raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
-          end
+          check_size_against_limit(changes_size)
+        end
+      end
+
+      def check_size_against_limit(size)
+        if project.changes_will_exceed_size_limit?(size)
+          raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
         end
       end
 

@@ -2,13 +2,12 @@ require 'rails_helper'
 
 describe 'Merge request > User sets approvers', :js do
   include ProjectForksHelper
+  include FeatureApprovalHelper
 
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
-
-  before do
-    stub_feature_flags(approval_rules: false)
-  end
+  let!(:config_selector) { '.js-approval-rules' }
+  let!(:modal_selector) { '#mr-edit-approvals-create-modal' }
 
   context 'when editing an MR with a different author' do
     let(:author) { create(:user) }
@@ -20,11 +19,12 @@ describe 'Merge request > User sets approvers', :js do
 
       sign_in(user)
       visit edit_project_merge_request_path(project, merge_request)
-
-      find('#s2id_merge_request_approver_ids .select2-input').click
     end
 
     it 'does not allow setting the author as an approver but allows setting the current user as an approver' do
+      open_modal
+      open_approver_select
+
       expect(find('.select2-results')).not_to have_content(author.name)
       expect(find('.select2-results')).to have_content(user.name)
     end
@@ -41,13 +41,13 @@ describe 'Merge request > User sets approvers', :js do
 
       sign_in(user)
       visit project_new_merge_request_path(forked_project, merge_request: { target_branch: 'master', source_branch: 'feature' })
-
-      find('#s2id_merge_request_approver_ids .select2-input').click
     end
 
     it 'allows setting other users as approvers but does not allow setting the current user as an approver, and filters non members from approvers list' do
+      open_modal
+      open_approver_select
+
       expect(find('.select2-results')).to have_content(other_user.name)
-      expect(find('.select2-results')).not_to have_content(user.name)
       expect(find('.select2-results')).not_to have_content(non_member.name)
     end
   end
@@ -57,7 +57,6 @@ describe 'Merge request > User sets approvers', :js do
       let(:other_user) { create(:user) }
 
       before do
-        stub_feature_flags(approval_rules: false) # TODO https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
         project.add_developer(user)
         project.add_developer(other_user)
 
@@ -69,42 +68,55 @@ describe 'Merge request > User sets approvers', :js do
         group.add_developer(other_user)
 
         visit project_new_merge_request_path(project, merge_request: { target_branch: 'master', source_branch: 'feature' })
-        find('#s2id_merge_request_approver_group_ids .select2-input').click
 
-        wait_for_requests
+        open_modal
+        open_approver_select
+
+        expect(find('.select2-results')).not_to have_content(group.name)
+
+        close_approver_select
+        group.add_developer(user) # only display groups that user has access to
+        open_approver_select
 
         expect(find('.select2-results')).to have_content(group.name)
 
-        find('.select2-results').click
-        click_on("Submit merge request")
+        find('.select2-results .user-result', text: group.name).click
+        close_approver_select
+        click_button 'Add'
+        click_button 'Update approvers'
 
-        find('.approvals-components')
-        expect(page).to have_content("Requires 1 more approval")
-        expect(page).to have_selector(".approvals-required-text a[title='#{other_user.name}']")
+        click_on("Submit merge request")
+        wait_for_all_requests
+
+        expect(page).to have_content("Requires approval.")
+        expect(page).to have_selector("img[alt='#{other_user.name}']")
       end
 
       it 'allows delete approvers group when it is set in project' do
         approver = create :user
+        project.add_developer(approver)
         group = create :group
         group.add_developer(other_user)
-        create :approver_group, group: group, target: project
-        create :approver, user: approver, target: project
+        group.add_developer(approver)
+        create :approval_project_rule, project: project, users: [approver], groups: [group], approvals_required: 1
 
         visit project_new_merge_request_path(project, merge_request: { target_branch: 'master', source_branch: 'feature' })
 
-        within('.approver-list li.approver-group') do
-          accept_confirm { click_on "Remove" }
+        open_modal
+        remove_approver(group.name)
+
+        within(modal_selector) do
+          expect(page).to have_css('.content-list li', count: 1)
         end
 
-        expect(page).to have_css('.approver-list li', count: 1)
-
+        click_button 'Update approvers'
         click_on("Submit merge request")
-
+        wait_for_all_requests
+        click_on("View eligible approvers") if page.has_button?("View eligible approvers")
         wait_for_requests
 
-        expect(page).not_to have_selector(".approvals-required-text a[title='#{other_user.name}']")
-        expect(page).to have_selector(".approvals-required-text a[title='#{approver.name}']")
-        expect(page).to have_content("Requires 1 more approval")
+        expect(page).not_to have_selector(".js-approvers img[alt='#{other_user.name}']")
+        expect(page).to have_selector(".js-approvers img[alt='#{approver.name}']")
       end
     end
 
@@ -113,7 +125,6 @@ describe 'Merge request > User sets approvers', :js do
       let(:merge_request) { create(:merge_request, source_project: project) }
 
       before do
-        stub_feature_flags(approval_rules: false) # TODO https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
         project.add_developer(user)
 
         sign_in(user)
@@ -122,71 +133,94 @@ describe 'Merge request > User sets approvers', :js do
       it 'allows setting groups as approvers' do
         group = create :group
         group.add_developer(other_user)
-        group.add_developer(user)
 
         visit edit_project_merge_request_path(project, merge_request)
-        find('#s2id_merge_request_approver_group_ids .select2-input').click
 
-        wait_for_requests
+        open_modal
+        open_approver_select
+
+        expect(find('.select2-results')).not_to have_content(group.name)
+
+        close_approver_select
+        group.add_developer(user) # only display groups that user has access to
+        open_approver_select
 
         expect(find('.select2-results')).to have_content(group.name)
 
-        find('.select2-results').click
-        click_on("Save changes")
+        find('.select2-results .user-result', text: group.name).click
+        close_approver_select
+        click_button 'Add'
+        click_button 'Update approvers'
 
-        wait_for_requests
-        find('.approvals-components')
-        expect(page).to have_content("Requires 1 more approval")
+        click_on("Save changes")
+        wait_for_all_requests
+
+        expect(page).to have_content("Requires approval.")
+        expect(page).to have_selector("img[alt='#{other_user.name}']")
       end
 
       it 'allows delete approvers group when it`s set in project' do
         approver = create :user
+        project.add_developer(approver)
         group = create :group
         group.add_developer(other_user)
-        create :approver_group, group: group, target: project
-        create :approver, user: approver, target: project
+        group.add_developer(approver)
+        create :approval_project_rule, project: project, users: [approver], groups: [group], approvals_required: 1
 
         visit edit_project_merge_request_path(project, merge_request)
 
-        within('.approver-list li.approver-group') do
-          accept_confirm { click_on "Remove" }
+        open_modal
+        remove_approver(group.name)
+
+        wait_for_requests
+        within(modal_selector) do
+          expect(page).to have_css('.content-list li', count: 1)
         end
 
-        expect(page).to have_css('.approver-list li', count: 1)
-
+        click_button 'Update approvers'
         click_on("Save changes")
+        wait_for_all_requests
 
-        find('.approvals-components')
-        expect(page).to have_content("Requires 1 more approval")
-        expect(page).to have_selector(".approvals-required-text a[title='#{approver.name}']")
+        click_on("View eligible approvers")
+        wait_for_requests
+
+        expect(page).not_to have_selector(".js-approvers img[alt='#{other_user.name}']")
+        expect(page).to have_selector(".js-approvers img[alt='#{approver.name}']")
+        expect(page).to have_content("Requires approval.")
       end
 
       it 'allows changing approvals number' do
-        create_list :approver, 3, target: project
+        approvers = create_list(:user, 3)
+        approvers.each { |approver| project.add_developer(approver) }
+        create :approval_project_rule, project: project, users: approvers, approvals_required: 2
 
         visit project_merge_request_path(project, merge_request)
+        wait_for_requests
 
         # project setting in the beginning on the show MR page
-        find('.approvals-components')
-        expect(page).to have_content("Requires 1 more approval")
+        expect(page).to have_content("Requires 2 more approvals")
 
         find('.merge-request').click_on 'Edit'
+        open_modal
 
-        # project setting in the beginning on the edit MR page
-        expect(find('#merge_request_approvals_before_merge').value).to eq('1')
+        expect(page).to have_field 'No. approvals required', exact: 2
 
-        fill_in 'merge_request_approvals_before_merge', with: '3'
+        fill_in 'No. approvals required', with: '3'
 
+        click_button 'Update approvers'
         click_on('Save changes')
+        wait_for_all_requests
 
         # new MR setting on the show MR page
-        find('.approvals-components')
         expect(page).to have_content("Requires 3 more approvals")
 
-        find('.merge-request').click_on 'Edit'
-
         # new MR setting on the edit MR page
-        expect(find('#merge_request_approvals_before_merge').value).to eq('3')
+        find('.merge-request').click_on 'Edit'
+        wait_for_requests
+
+        open_modal
+
+        expect(page).to have_field 'No. approvals required', exact: 3
       end
     end
   end

@@ -1,0 +1,5 @@
+---
+title: Update response schema for DependencyList endpoint and add status
+merge_request: 13918
+author:
+type: changed

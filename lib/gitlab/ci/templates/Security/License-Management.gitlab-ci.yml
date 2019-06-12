@@ -5,7 +5,7 @@
 # How to set: https://docs.gitlab.com/ee/ci/yaml/#variables
 
 variables:
-  LICENSE_MANAGEMENT_SETUP_CMD: '' # If needed, specify a command to setup your environment with a custom package manager.
+  LICENSE_MANAGEMENT_SETUP_CMD: ''  # If needed, specify a command to setup your environment with a custom package manager.
 
 license_management:
   stage: test

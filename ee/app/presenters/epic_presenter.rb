@@ -13,6 +13,28 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
     }
   end
 
+  def group_epic_path
+    url_builder.group_epic_path(epic.group, epic)
+  end
+
+  def group_epic_url
+    url_builder.group_epic_url(epic.group, epic)
+  end
+
+  def group_epic_link_path
+    return unless epic.parent
+
+    url_builder.group_epic_link_path(epic.group, epic.parent.iid, epic.id)
+  end
+
+  def epic_reference(full: false)
+    if full
+      epic.to_reference(full: true)
+    else
+      epic.to_reference(epic.parent&.group || epic.group)
+    end
+  end
+
   private
 
   def initial_data
@@ -111,11 +133,16 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
       {
         id: epic.id,
         title: epic.title,
-        url: epic_path(epic),
+        url: group_epic_path,
         state: epic.state,
         human_readable_end_date: epic.end_date&.to_s(:medium),
         human_readable_timestamp: remaining_days_in_words(epic.end_date, epic.start_date)
       }
     end
+  end
+
+  # important for using routing helpers in GraphQL
+  def url_builder
+    @url_builder ||= Gitlab::UrlBuilder.new(epic)
   end
 end

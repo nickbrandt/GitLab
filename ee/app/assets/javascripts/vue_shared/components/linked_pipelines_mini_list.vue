@@ -36,10 +36,10 @@ export default {
   computed: {
     // Exactly one of these (triggeredBy and triggered) must be truthy. Never both. Never neither.
     isUpstream() {
-      return !!this.triggeredBy.length && !this.triggered.length;
+      return Boolean(this.triggeredBy.length) && !this.triggered.length;
     },
     isDownstream() {
-      return !this.triggeredBy.length && !!this.triggered.length;
+      return !this.triggeredBy.length && Boolean(this.triggered.length);
     },
     linkedPipelines() {
       return this.isUpstream ? this.triggeredBy : this.triggered;

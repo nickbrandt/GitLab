@@ -138,4 +138,19 @@ describe 'Git HTTP requests' do
       it_behaves_like 'pushes are allowed'
     end
   end
+
+  describe 'when SSO is enforced' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+    let(:project) { create(:project, :repository, :private, group: group) }
+    let(:env) { { user: user.username, password: user.password } }
+    let(:path) { "#{project.full_path}.git" }
+
+    before do
+      project.add_developer(user)
+      create(:saml_provider, group: group, enforced_sso: true)
+    end
+
+    it_behaves_like 'pulls are allowed'
+  end
 end

@@ -6,6 +6,7 @@ export default {
   geoNodesPath: '/api/:version/geo_nodes',
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
+  childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
 
   approverUsers(search, options, callback = () => {}) {
     const url = Api.buildUrl('/autocomplete/users.json');
@@ -47,5 +48,15 @@ export default {
 
         return data;
       });
+  },
+
+  createChildEpic({ groupId, parentEpicIid, title }) {
+    const url = Api.buildUrl(this.childEpicPath)
+      .replace(':id', groupId)
+      .replace(':epic_iid', parentEpicIid);
+
+    return axios.post(url, {
+      title,
+    });
   },
 };

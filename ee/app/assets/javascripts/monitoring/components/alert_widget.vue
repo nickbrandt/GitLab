@@ -62,10 +62,13 @@ export default {
         : s__('PrometheusAlerts|Edit alert');
     },
     hasAlerts() {
-      return !!Object.keys(this.alertsToManage).length;
+      return Boolean(Object.keys(this.alertsToManage).length);
     },
     formDisabled() {
-      return !!(this.errorMessage || this.isLoading);
+      return Boolean(this.errorMessage || this.isLoading);
+    },
+    supportsComputedAlerts() {
+      return gon.features && gon.features.prometheusComputedAlerts;
     },
   },
   watch: {
@@ -200,7 +203,11 @@ export default {
       <icon :name="alertIcon" :size="16" aria-hidden="true" />
       <icon :size="16" name="arrow-down" aria-hidden="true" class="chevron" />
     </button>
-    <div ref="dropdownMenu" :class="{ show: isOpen }" class="dropdown-menu alert-dropdown-menu">
+    <div
+      ref="dropdownMenu"
+      :class="{ show: isOpen, 'h-auto': supportsComputedAlerts }"
+      class="dropdown-menu alert-dropdown-menu"
+    >
       <div class="dropdown-title m0">
         <span>{{ dropdownTitle }}</span>
         <button
@@ -212,7 +219,7 @@ export default {
           <icon :size="12" name="close" aria-hidden="true" />
         </button>
       </div>
-      <div class="dropdown-content">
+      <div :class="{ 'mh-100': supportsComputedAlerts }" class="dropdown-content">
         <alert-widget-form
           ref="widgetForm"
           :disabled="formDisabled"

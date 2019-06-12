@@ -2,9 +2,9 @@ import $ from 'jquery';
 import Vue from 'vue';
 
 import Flash from '~/flash';
-import { __ } from '~/locale';
-import '~/vue_shared/models/label';
-import '~/vue_shared/models/assignee';
+import { s__, __ } from '~/locale';
+import './models/label';
+import './models/assignee';
 
 import FilteredSearchBoards from './filtered_search_boards';
 import eventHub from './eventhub';
@@ -181,7 +181,7 @@ export default () => {
             });
         }
 
-        boardsStore.detail.issue = newIssue;
+        boardsStore.setIssueDetail(newIssue);
       },
       clearDetailIssue() {
         boardsStore.clearDetailIssue();
@@ -235,7 +235,7 @@ export default () => {
       },
       computed: {
         buttonText() {
-          return this.canAdminList ? 'Edit board' : 'View scope';
+          return this.canAdminList ? s__('Boards|Edit board') : s__('Boards|View scope');
         },
         tooltipTitle() {
           return this.hasScope ? __("This board's scope is reduced") : '';

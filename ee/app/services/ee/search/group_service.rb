@@ -7,7 +7,7 @@ module EE
 
       override :use_elasticsearch?
       def use_elasticsearch?
-        group&.use_elasticsearch?
+        ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: group)
       end
 
       override :elastic_projects
@@ -22,11 +22,17 @@ module EE
 
       override :execute
       def execute
-        return super unless ::Gitlab::CurrentSettings.elasticsearch_search?
+        return super unless use_elasticsearch?
 
         ::Gitlab::Elastic::GroupSearchResults.new(
-          current_user, elastic_projects, projects, group, params[:search],
-          elastic_global, default_project_filter: default_project_filter)
+          current_user,
+          elastic_projects,
+          projects,
+          group,
+          params[:search],
+          elastic_global,
+          default_project_filter: default_project_filter
+        )
       end
     end
   end

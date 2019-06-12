@@ -1,12 +1,7 @@
 - if can?(current_user, :read_operations_dashboard)
-  %li.dropdown
-    %button#js-dashboards-menu.btn-link{ type: 'button', data: { toggle: 'dropdown' }, 'aria-label': _('Operations Dashboard'), 'aria-haspopup': true, 'aria-expanded': false }
-      = sprite_icon('dashboard', size: 18)
-    .dropdown-menu{ 'aria-labelledby': "js-dashboards-menu" }
-      .dropdown-bold-header
-        = _('Dashboards')
-      - if Feature.enabled?('environments_dashboard')
-        = link_to operations_environments_path, class: 'dropdown-item', title: _('Environments'), aria: { label: _('Environments') } do
-          = _('Environments')
-      = link_to operations_path, class: 'dropdown-item', title: _('Operations'), aria: { label: _('Operations') } do
-        = _('Operations')
+  %button#js-dashboards-menu.btn-link{ type: 'button', data: { toggle: 'dropdown' }, 'aria-label': _('Operations Dashboard'), 'aria-haspopup': true, 'aria-expanded': false }
+    = sprite_icon('dashboard', size: 18)
+  .dropdown-menu{ 'aria-labelledby': "js-dashboards-menu" }
+    .dropdown-bold-header
+      = _('Dashboards')
+    = render_if_exists 'dashboard/operations/nav_link_list'

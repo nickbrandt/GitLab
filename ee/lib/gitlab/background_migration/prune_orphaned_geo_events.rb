@@ -56,9 +56,10 @@ module Gitlab
       end
 
       def perform(table_name = EVENT_TABLES.first)
-        deleted = prune_orphaned_rows(table_name)
+        return if Gitlab::Database.read_only?
 
-        table_name = next_table(table_name) if deleted.zero?
+        deleted_rows = prune_orphaned_rows(table_name)
+        table_name   = next_table(table_name) if deleted_rows.zero?
 
         BackgroundMigrationWorker.perform_in(RESCHEDULE_DELAY, self.class.name, table_name) if table_name
       end

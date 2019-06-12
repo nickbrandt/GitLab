@@ -5,12 +5,11 @@ shared_examples 'approvals' do
     JSON.parse(response.body)
   end
 
-  let!(:approver) { create(:approver, target: project) }
-  let!(:user_approver) { create(:approver, target: project, user: user) }
+  let!(:approver) { create(:user) }
+  let!(:approval_rule) { create(:approval_project_rule, project: project, users: [approver, user], approvals_required: 2) }
 
   before do
-    merge_request.update_attribute :approvals_before_merge, 2
-    project.add_developer(approver.user)
+    project.add_developer(approver)
   end
 
   describe 'approve' do
@@ -34,12 +33,12 @@ shared_examples 'approvals' do
       expect(approvals['user_has_approved']).to be true
       expect(approvals['user_can_approve']).to be false
       expect(approvals['suggested_approvers'].size).to eq 1
-      expect(approvals['suggested_approvers'][0]['username']).to eq approver.user.username
+      expect(approvals['suggested_approvers'][0]['username']).to eq approver.username
     end
   end
 
   describe 'approvals' do
-    let!(:approval) { create(:approval, merge_request: merge_request, user: approver.user) }
+    let!(:approval) { create(:approval, merge_request: merge_request, user: approver) }
 
     def get_approvals
       get :approvals,
@@ -59,28 +58,11 @@ shared_examples 'approvals' do
       expect(response).to be_success
       expect(approvals['approvals_left']).to eq 1
       expect(approvals['approved_by'].size).to eq 1
-      expect(approvals['approved_by'][0]['user']['username']).to eq approver.user.username
+      expect(approvals['approved_by'][0]['user']['username']).to eq approver.username
       expect(approvals['user_has_approved']).to be false
       expect(approvals['user_can_approve']).to be true
       expect(approvals['suggested_approvers'].size).to eq 1
       expect(approvals['suggested_approvers'][0]['username']).to eq user.username
-    end
-
-    context 'with unauthorized group' do
-      let(:private_group) { create(:group_with_members, :private) }
-
-      before do
-        create(:approver_group, target: merge_request, group: private_group)
-      end
-
-      it 'does not expose approvers from a private group the current user has no access to' do
-        get_approvals
-
-        approvals = json_response
-
-        expect(response).to be_success
-        expect(approvals['suggested_approvers'].size).to eq(0)
-      end
     end
   end
 
@@ -119,7 +101,6 @@ describe Projects::MergeRequestsController do
   let(:viewer)        { user }
 
   before do
-    stub_feature_flags(approval_rules: false)
     sign_in(viewer)
   end
 

@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "required": [
+    "name",
+    "packager",
+    "version",
+    "location"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "packager": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "location": {
+      "blob_path": {
+        "type": "string"
+      },
+      "path": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

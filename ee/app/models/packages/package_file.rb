@@ -3,7 +3,8 @@ class Packages::PackageFile < ApplicationRecord
   include UpdateProjectStatistics
 
   delegate :project, :project_id, to: :package
-  update_project_statistics stat: :packages_size
+
+  update_project_statistics project_statistics_name: :packages_size
 
   belongs_to :package
 

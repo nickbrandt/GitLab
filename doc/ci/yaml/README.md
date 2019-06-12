@@ -1,3 +1,7 @@
+---
+type: reference
+---
+
 # GitLab CI/CD Pipeline Configuration Reference
 
 GitLab CI/CD [pipelines](../pipelines.md) are configured using a YAML file called `.gitlab-ci.yml` within each project.
@@ -108,7 +112,7 @@ The following table lists available parameters for jobs:
 | [`parallel`](#parallel)                            | How many instances of a job should be run in parallel.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | [`trigger`](#trigger-premium)                      | Defines a downstream pipeline trigger.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | [`include`](#include)                              | Allows this job to include external YAML files. Also available: `include:local`, `include:file`, `include:template`, and `include:remote`.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| [`extends`](#extends)                              | Configuration entry that this job is going to inherit from.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [`extends`](#extends)                              | Configuration entries that this job is going to inherit from.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | [`pages`](#pages)                                  | Upload the result of a job to use with GitLab Pages.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | [`variables`](#variables)                          | Define job variables on a job level.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
@@ -1185,9 +1189,9 @@ skip the download step.
 > - Job artifacts are only collected for successful jobs by default.
 
 `artifacts` is used to specify a list of files and directories which should be
-attached to the job after success.
+attached to the job when it [succeeds, fails, or always](#artifactswhen).
 
-The artifacts will be sent to GitLab after the job finishes successfully and will
+The artifacts will be sent to GitLab after the job finishes and will
 be available for download in the GitLab UI.
 
 [Read more about artifacts](../../user/project/pipelines/job_artifacts.md).
@@ -2117,7 +2121,7 @@ docker-test:
 
 > Introduced in GitLab 11.3.
 
-`extends` defines an entry name that a job that uses `extends` is going to
+`extends` defines entry names that a job that uses `extends` is going to
 inherit from.
 
 It is an alternative to using [YAML anchors](#anchors) and is a little
@@ -2192,6 +2196,46 @@ rspec 2:
 spinach:
   extends: .tests
   script: rake spinach
+```
+
+It's also possible to use multiple parents for `extends`.
+The algorithm used for merge is "closest scope wins", so keys
+from the last member will always shadow anything defined on other levels.
+For example:
+
+```yaml
+.only-important:
+  only:
+    - master
+    - stable
+  tags:
+    - production
+
+.in-docker:
+  tags:
+    - docker
+  image: alpine
+
+rspec:
+  extends:
+    - .only-important
+    - .in-docker
+  script:
+    - rake rspec
+```
+
+This results in the following `rspec` job:
+
+```yaml
+rspec:
+  only:
+    - master
+    - stable
+  tags:
+    - docker
+  image: alpine
+  script:
+    - rake rspec
 ```
 
 ### Using `extends` and `include` together
@@ -2746,6 +2790,18 @@ using Git 2.10 or newer:
 ```sh
 git push -o ci.skip
 ```
+
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->
 
 [ce-6323]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6323
 [ce-6669]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6669

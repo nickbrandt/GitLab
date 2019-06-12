@@ -6,6 +6,7 @@ import { axisBottom, axisLeft } from 'd3-axis';
 import { line } from 'd3-shape';
 import { transition } from 'd3-transition';
 import { easeLinear } from 'd3-ease';
+import { s__ } from '~/locale';
 
 const d3 = {
   select,
@@ -45,7 +46,7 @@ export default class BurndownChart {
     this.xAxisGroup.append('line').attr('class', 'domain-line');
 
     // create y-axis label
-    this.label = 'Remaining';
+    this.label = s__('BurndownChartLabel|Remaining');
     const yAxisLabel = this.yAxisGroup.append('g').attr('class', 'axis-label');
     this.yAxisLabelText = yAxisLabel.append('text').text(this.label);
     this.yAxisLabelBBox = this.yAxisLabelText.node().getBBox();
@@ -58,7 +59,7 @@ export default class BurndownChart {
 
     this.chartLegendIdealKey = this.chartLegendGroup.append('g');
     this.chartLegendIdealKey.append('line').attr('class', 'ideal line');
-    this.chartLegendIdealKey.append('text').text('Guideline');
+    this.chartLegendIdealKey.append('text').text(s__('BurndownChartLabel|Guideline'));
     this.chartLegendIdealKeyBBox = this.chartLegendIdealKey
       .select('text')
       .node()
@@ -66,7 +67,7 @@ export default class BurndownChart {
 
     this.chartLegendActualKey = this.chartLegendGroup.append('g');
     this.chartLegendActualKey.append('line').attr('class', 'actual line');
-    this.chartLegendActualKey.append('text').text('Progress');
+    this.chartLegendActualKey.append('text').text(s__('BurndownChartLabel|Progress'));
     this.chartLegendActualKeyBBox = this.chartLegendActualKey
       .select('text')
       .node()
@@ -143,7 +144,7 @@ export default class BurndownChart {
   }
 
   // set data and force re-render
-  setData(data, { label = 'Remaining', animate } = {}) {
+  setData(data, { label = s__('BurndownChartLabel|Remaining'), animate } = {}) {
     this.data = data
       .map(datum => ({
         date: new Date(datum[0]),
@@ -175,7 +176,7 @@ export default class BurndownChart {
       this.idealData = [idealStart, idealEnd];
     }
 
-    this.scheduleLineAnimation = !!animate;
+    this.scheduleLineAnimation = Boolean(animate);
     this.scheduleRender();
   }
 

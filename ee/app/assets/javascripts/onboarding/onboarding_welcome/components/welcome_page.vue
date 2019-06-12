@@ -1,15 +1,18 @@
 <script>
 import { __ } from '~/locale';
-import { GlLink, GlPopover } from '@gitlab/ui';
+import { GlLink } from '@gitlab/ui';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
+import HelpContentPopover from './../../onboarding_helper/components/help_content_popover.vue';
+import ActionPopover from './../../onboarding_helper/components/action_popover.vue';
 import { redirectTo } from '~/lib/utils/url_utility';
 import onboardingUtils from './../../utils';
 
 export default {
   components: {
     GlLink,
-    GlPopover,
     UserAvatarImage,
+    HelpContentPopover,
+    ActionPopover,
   },
   props: {
     userAvatarUrl: {
@@ -31,20 +34,23 @@ export default {
       helpText: __(
         "Don't worry, you can access this tour by clicking on the help icon in the top right corner and choose <strong>Learn GitLab</strong>.",
       ),
+      helpPopover: {
+        target: null,
+        content: {
+          text: __('White helpers give contextual information.'),
+          buttons: [{ text: __('OK'), btnClass: 'btn-primary', disabled: true }],
+        },
+      },
+      actionPopover: {
+        target: null,
+        content: __('Blue helpers indicate an action to be taken.'),
+        cssClasses: ['blue'],
+      },
     };
   },
   mounted() {
-    // workaround for appending a custom class to the bs popover which cannot be done via props
-    // see https://github.com/bootstrap-vue/bootstrap-vue/issues/1983
-    this.$root.$on('bv::popover::show', bvEventObj => {
-      const {
-        target: { dataset },
-      } = bvEventObj;
-
-      if (dataset.class) {
-        bvEventObj.relatedTarget.classList.add(dataset.class);
-      }
-    });
+    this.helpPopover.target = this.$refs.helpPopoverTrigger;
+    this.actionPopover.target = this.$refs.actionPopoverTrigger;
   },
   methods: {
     startTour() {
@@ -81,43 +87,40 @@ export default {
     </p>
     <div class="text-center mt-4 mb-4">
       <div
-        id="popover-container"
+        id="js-popover-container"
         class="popover-container d-flex justify-content-around align-items-end mb-8"
       >
-        <button id="help-popover-trigger" type="button" class="btn-link btn-disabled"></button>
+        <button ref="helpPopoverTrigger" type="button" class="btn-link btn-disabled"></button>
         <button
-          id="action-popover-trigger"
+          ref="actionPopoverTrigger"
           type="button"
           class="btn-link btn-disabled mb-3"
-          data-class="blue"
         ></button>
-        <gl-popover
-          target="help-popover-trigger"
+
+        <help-content-popover
+          v-if="helpPopover.target"
+          :target="helpPopover.target"
+          :help-content="helpPopover.content"
           placement="top"
-          container="popover-container"
+          container="js-popover-container"
           show
-        >
-          <p class="mb-2">
-            {{ __('White helpers give contextual information.') }}
-          </p>
-          <button disabled type="button" :aria-label="__('OK')" class="btn btn-xs popover-btn">
-            {{ __('OK') }}
-          </button>
-        </gl-popover>
-        <gl-popover
-          target="action-popover-trigger"
+        />
+
+        <action-popover
+          v-if="actionPopover.target"
+          :target="actionPopover.target"
+          :content="actionPopover.content"
+          :css-classes="actionPopover.cssClasses"
           placement="top"
-          container="popover-container"
-          show
-        >
-          {{ __('Blue helpers indicate an action to be taken.') }}
-        </gl-popover>
+          container="js-popover-container"
+          show-default
+        />
       </div>
-      <gl-link class="btn btn-success" @click="startTour">
+      <gl-link class="qa-start-tour-btn btn btn-success" @click="startTour">
         {{ __("Ok let's go") }}
       </gl-link>
       <p class="small mt-8">
-        <gl-link @click="skipTour">
+        <gl-link class="qa-skip-tour-btn" @click="skipTour">
           {{ __('Skip this for now') }}
         </gl-link>
       </p>
@@ -129,11 +132,6 @@ export default {
 <style scoped>
 .popover-container {
   height: 140px;
-}
-.popover-btn[disabled] {
-  background-color: #1b69b6 !important;
-  border-color: #1b69b6 !important;
-  color: white !important;
 }
 p.large {
   font-size: 16px;

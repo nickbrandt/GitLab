@@ -4,6 +4,7 @@ import {
   parseSastIssues,
   parseDependencyScanningIssues,
   filterByKey,
+  getDastSite,
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
@@ -176,9 +177,11 @@ export default {
   },
 
   [types.RECEIVE_DAST_REPORTS](state, reports) {
+    const headSite = getDastSite(reports.head.site);
     if (reports.head && reports.base) {
-      const headIssues = parseDastIssues(reports.head.site.alerts, reports.enrichData);
-      const baseIssues = parseDastIssues(reports.base.site.alerts, reports.enrichData);
+      const baseSite = getDastSite(reports.base.site);
+      const headIssues = parseDastIssues(headSite.alerts, reports.enrichData);
+      const baseIssues = parseDastIssues(baseSite.alerts, reports.enrichData);
       const filterKey = 'pluginid';
       const newIssues = filterByKey(headIssues, baseIssues, filterKey);
       const resolvedIssues = filterByKey(baseIssues, headIssues, filterKey);
@@ -186,8 +189,8 @@ export default {
       Vue.set(state.dast, 'newIssues', newIssues);
       Vue.set(state.dast, 'resolvedIssues', resolvedIssues);
       Vue.set(state.dast, 'isLoading', false);
-    } else if (reports.head && reports.head.site && !reports.base) {
-      const newIssues = parseDastIssues(reports.head.site.alerts, reports.enrichData);
+    } else if (reports.head && headSite && !reports.base) {
+      const newIssues = parseDastIssues(headSite.alerts, reports.enrichData);
 
       Vue.set(state.dast, 'newIssues', newIssues);
       Vue.set(state.dast, 'isLoading', false);

@@ -16,7 +16,7 @@ module EE
     end
 
     def update_elastic_index
-      index_blobs if project.use_elasticsearch?
+      index_wiki_blobs if project.use_elasticsearch?
     end
 
     def path_to_repo

@@ -10,15 +10,10 @@ describe API::ProjectApprovals do
 
   let(:url) { "/projects/#{project.id}/approvals" }
 
-  before do
-    stub_feature_flags(approval_rules: false)
-  end
-
-  describe 'GET /projects/:id/approvers' do
+  describe 'GET /projects/:id/approvals' do
     context 'when the request is correct' do
       before do
-        project.approvers.create(user: approver)
-        project.approver_groups.create(group: group)
+        create(:approval_project_rule, project: project, users: [approver], groups: [group])
 
         get api(url, user)
       end
@@ -34,7 +29,7 @@ describe API::ProjectApprovals do
 
     it 'only shows approver groups that are visible to the user' do
       private_group = create(:group, :private)
-      project.approver_groups.create(group: private_group)
+      create(:approval_project_rule, project: project, users: [approver], groups: [private_group])
 
       get api(url, user)
 
@@ -43,7 +38,7 @@ describe API::ProjectApprovals do
     end
   end
 
-  describe 'POST /projects/:id/approvers' do
+  describe 'POST /projects/:id/approvals' do
     shared_examples_for 'a user with access' do
       context 'when missing parameters' do
         it 'returns 400 status' do

@@ -7,6 +7,20 @@ module Approvable
   # such as approver_groups and target_project in presenters
   include ::VisibleApprovable
 
+  FORWARDABLE_METHODS = %i{
+    approval_needed?
+    approved?
+    approvals_left
+    can_approve?
+    has_approved?
+    any_approver_allowed?
+    authors_can_approve?
+    committers_can_approve?
+    approvers_overwritten?
+  }.freeze
+
+  delegate(*FORWARDABLE_METHODS, to: :approval_state)
+
   def approval_feature_available?
     strong_memoize(:approval_feature_available) do
       if project
@@ -21,28 +35,8 @@ module Approvable
     @approval_state ||= ApprovalState.new(self)
   end
 
-  def approval_needed?
-    approvals_required&.nonzero?
-  end
-
-  def approved?
-    approvals_left < 1
-  end
-
   def approvals_given
     approvals.size
-  end
-
-  # Number of approvals remaining (excluding existing approvals) before the MR is
-  # considered approved. If there are fewer potential approvers than approvals left,
-  # users should either reduce the number of approvers on projects and/or merge
-  # requests settings and/or allow MR authors to approve their own merge
-  # requests (in case only one approval is needed).
-  #
-  def approvals_left
-    approvals_left_count = approvals_required - approvals.size
-
-    [approvals_left_count, 0].max
   end
 
   def approvals_required
@@ -53,58 +47,6 @@ module Approvable
     return unless approval_feature_available?
 
     super
-  end
-
-  # Even though this method is used in VisibleApprovable
-  # we do not want to encounter a scenario where there are
-  # no user approvers but there is one merge request group
-  # approver that is not visible to the current_user,
-  # which would make this method return false
-  # when it should still report as overwritten.
-  # To prevent this from happening, approvers_overwritten?
-  # makes use of the unfiltered version of approver_groups so that
-  # it always takes into account every approver
-  # available
-  #
-  def approvers_overwritten?
-    approvers.to_a.any? || approver_groups.to_a.any?
-  end
-
-  def can_approve?(user)
-    return false unless user
-    # The check below considers authors and committers being able to approve the MR.
-    # That is, they're included/excluded from that list accordingly.
-    return true if approvers_left.include?(user)
-    # We can safely unauthorize authors and committers if it reaches this guard clause.
-    return false if author == user
-    return false if committers.include?(user)
-    return false unless user.can?(:update_merge_request, self)
-
-    any_approver_allowed? && approvals.where(user: user).empty?
-  end
-
-  def has_approved?(user)
-    return false unless user
-
-    approved_by_users.include?(user)
-  end
-
-  # Once there are fewer approvers left in the list than approvals required or
-  # there are no more approvals required
-  # allow other project members to approve the MR.
-  #
-  def any_approver_allowed?
-    remaining_approvals = approvals_left
-
-    remaining_approvals.zero? || remaining_approvals > approvers_left.count
-  end
-
-  def authors_can_approve?
-    target_project.merge_requests_author_approval?
-  end
-
-  def committers_can_approve?
-    !target_project.merge_requests_disable_committers_approval?
   end
 
   def approver_ids=(value)

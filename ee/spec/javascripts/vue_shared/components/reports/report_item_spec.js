@@ -125,4 +125,33 @@ describe('Report issue', () => {
       );
     });
   });
+
+  describe('showReportSectionStatusIcon', () => {
+    it('does not render CI Status Icon when showReportSectionStatusIcon is false', () => {
+      vm = mountComponentWithStore(ReportIssue, {
+        store,
+        props: {
+          issue: parsedDast[0],
+          component: componentNames.DastIssueBody,
+          status: STATUS_SUCCESS,
+          showReportSectionStatusIcon: false,
+        },
+      });
+
+      expect(vm.$el.querySelectorAll('.report-block-list-icon')).toHaveLength(0);
+    });
+
+    it('shows status icon when unspecified', () => {
+      vm = mountComponentWithStore(ReportIssue, {
+        store,
+        props: {
+          issue: parsedDast[0],
+          component: componentNames.DastIssueBody,
+          status: STATUS_SUCCESS,
+        },
+      });
+
+      expect(vm.$el.querySelectorAll('.report-block-list-icon')).toHaveLength(1);
+    });
+  });
 });

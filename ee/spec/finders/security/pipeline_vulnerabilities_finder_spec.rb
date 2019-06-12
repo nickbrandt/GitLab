@@ -18,7 +18,7 @@ describe Security::PipelineVulnerabilitiesFinder do
     set(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast, project: project) }
 
     let(:cs_count) { read_fixture(artifact_cs)['unapproved'].count }
-    let(:dast_count) { read_fixture(artifact_dast).dig('site', 'alerts').first['instances'].count }
+    let(:dast_count) { read_fixture(artifact_dast)['site'].first['alerts'].first['instances'].count }
     let(:ds_count) { read_fixture(artifact_ds)['vulnerabilities'].count }
     let(:sast_count) { read_fixture(artifact_sast)['vulnerabilities'].count }
 

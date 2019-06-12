@@ -138,4 +138,12 @@ describe Snippet, :elastic do
 
     expect(snippet.as_indexed_json).to eq(expected_hash)
   end
+
+  it 'uses same index for Snippet subclasses' do
+    Snippet.subclasses.each do |snippet_class|
+      expect(snippet_class.index_name).to eq(Snippet.index_name)
+      expect(snippet_class.document_type).to eq(Snippet.document_type)
+      expect(snippet_class.mappings.to_hash).to eq(Snippet.mappings.to_hash)
+    end
+  end
 end

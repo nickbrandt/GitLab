@@ -30,10 +30,10 @@ module Elastic
           if query =~ /#(\d+)\z/
             iid_query_hash(Regexp.last_match(1))
           else
-            basic_query_hash(%w(title^2 description), query)
+            basic_query_hash(%w(title^2 description), query, page: options[:page], per_page: options[:per_page])
           end
 
-        options[:feature] = 'issues'
+        options[:features] = 'issues'
         query_hash = project_ids_filter(query_hash, options)
         query_hash = confidentiality_filter(query_hash, options[:current_user])
 

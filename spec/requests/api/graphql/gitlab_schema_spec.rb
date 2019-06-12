@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'GitlabSchema configurations' do
   include GraphqlHelpers
 
-  let(:project) { create(:project) }
+  set(:project) { create(:project) }
 
   shared_examples 'imposing query limits' do
     describe '#max_complexity' do
@@ -109,6 +109,42 @@ describe 'GitlabSchema configurations' do
       post_graphql(query, current_user: nil)
 
       expect(graphql_errors).to be_nil
+    end
+  end
+
+  context 'logging' do
+    let(:query) { File.read(Rails.root.join('spec/fixtures/api/graphql/introspection.graphql')) }
+
+    it 'logs the query complexity and depth' do
+      analyzer_memo = {
+        query_string: query,
+        variables: {}.to_s,
+        complexity: 181,
+        depth: 0,
+        duration: 7
+      }
+
+      expect_any_instance_of(Gitlab::Graphql::QueryAnalyzers::LoggerAnalyzer).to receive(:duration).and_return(7)
+      expect(Gitlab::GraphqlLogger).to receive(:info).with(analyzer_memo)
+
+      post_graphql(query, current_user: nil)
+    end
+
+    it 'logs using `format_message`' do
+      expect_any_instance_of(Gitlab::GraphqlLogger).to receive(:format_message)
+
+      post_graphql(query, current_user: nil)
+    end
+  end
+
+  context "global id's" do
+    it 'uses GlobalID to expose ids' do
+      post_graphql(graphql_query_for('project', { 'fullPath' => project.full_path }, %w(id)),
+                   current_user: project.owner)
+
+      parsed_id = GlobalID.parse(graphql_data['project']['id'])
+
+      expect(parsed_id).to eq(project.to_global_id)
     end
   end
 end

@@ -11,10 +11,13 @@
   = form.label :approver_ids, class: 'col-form-label col-sm-2' do
     Approvers
   .col-sm-10
-    - if Feature.enabled?(:approval_rules, @target_project, default_enabled: true)
-      = render 'shared/issuable/approvals_multiple_rule', issuable: issuable, presenter: presenter
-    - else
-      = render 'shared/issuable/approvals_single_rule', issuable: issuable, presenter: presenter, form: form
+    #js-mr-approvals-input{ data: { 'project_id': @target_project.id,
+      'can_edit': can?(current_user, :update_approvers, issuable).to_s,
+      'allow_multi_rule': @target_project.multiple_approval_rules_available?.to_s,
+      'mr_id': issuable.iid,
+      'mr_settings_path': presenter.api_approval_settings_path,
+      'project_settings_path': presenter.api_project_approval_settings_path } }
+      = sprite_icon('spinner', size: 24, css_class: 'gl-spinner')
     - if can_update_approvers
       - approver_presenter = MergeRequestApproverPresenter.new(issuable, skip_user: current_user)
       .form-text.text-muted.suggested-approvers

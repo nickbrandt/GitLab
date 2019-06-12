@@ -161,16 +161,13 @@ export default {
     },
   },
   created() {
-    this.state.currentBoard = this.currentBoard;
-    boardsStore.state.assignees = [];
-    boardsStore.state.milestones = [];
+    boardsStore.setCurrentBoard(this.currentBoard);
     $('#js-add-list').on('hide.bs.dropdown', this.handleDropdownHide);
     $('.js-new-board-list-tabs').on('click', this.handleDropdownTabClick);
   },
   methods: {
     showPage(page) {
-      this.state.reload = false;
-      this.state.currentPage = page;
+      boardsStore.showPage(page);
     },
     loadBoards(toggleDropdown = true) {
       if (toggleDropdown && this.boards.length > 0) {

@@ -11,7 +11,9 @@ class Explore::OnboardingController < Explore::ApplicationController
   def set_project!
     @project = get_onboarding_demo_project
 
-    render_404 unless @project && can?(current_user, :read_project, @project)
+    return render_404 unless @project && can?(current_user, :read_project, @project)
+
+    session[:onboarding_project] = { project_full_path: @project.web_url, project_name: @project.name }
   end
 
   def get_onboarding_demo_project

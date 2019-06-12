@@ -25,3 +25,11 @@ export const createMovedFile = (path, prevPath, content) =>
   Object.assign(createNewFile(path, content), {
     prevPath,
   });
+
+export const createEntries = path =>
+  path.split('/').reduce((acc, part, idx, parts) => {
+    const parentPath = parts.slice(0, idx).join('/');
+    const fullPath = parentPath ? `${parentPath}/${part}` : part;
+
+    return Object.assign(acc, { [fullPath]: { ...createFile(fullPath), parentPath } });
+  }, {});

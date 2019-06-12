@@ -62,6 +62,13 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     super
   end
 
+  override :prompt_for_two_factor
+  def prompt_for_two_factor(user)
+    store_active_saml_session
+
+    super
+  end
+
   def store_active_saml_session
     Gitlab::Auth::GroupSaml::SsoEnforcer.new(@saml_provider).update_session
   end

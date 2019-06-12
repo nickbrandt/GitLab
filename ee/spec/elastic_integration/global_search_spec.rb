@@ -156,7 +156,7 @@ describe 'GlobalSearch' do
 
       project.repository.index_blobs
       project.repository.index_commits
-      project.wiki.index_blobs
+      project.wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end

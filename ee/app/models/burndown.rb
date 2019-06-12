@@ -3,23 +3,8 @@
 class Burndown
   include Gitlab::Utils::StrongMemoize
 
-  class Issue
-    attr_reader :closed_at, :weight, :state
-
-    def initialize(closed_at, weight, state)
-      @closed_at = closed_at
-      @weight = weight
-      @state = state
-    end
-
-    def reopened?
-      @state == 'opened' && @closed_at.present?
-    end
-  end
-
-  attr_reader :start_date, :due_date, :end_date, :accurate, :legacy_data, :milestone, :current_user
+  attr_reader :start_date, :due_date, :end_date, :accurate, :milestone, :current_user
   alias_method :accurate?, :accurate
-  alias_method :empty?, :legacy_data
 
   def initialize(milestone, current_user)
     @milestone = milestone
@@ -29,132 +14,97 @@ class Burndown
     @end_date = @milestone.due_date
     @end_date = Date.today if @end_date.present? && @end_date > Date.today
 
-    @accurate = milestone_issues.all?(&:closed_at)
-    @legacy_data = milestone_issues.any? && milestone_issues.none?(&:closed_at)
+    @accurate = true
   end
 
-  # Returns the chart data in the following format:
-  # [date, issue count, issue weight] eg: [["2017-03-01", 33, 127], ["2017-03-02", 35, 73], ["2017-03-03", 28, 50]...]
+  # Returns an array of milestone issue event data in the following format:
+  # [{"created_at":"2019-03-10T16:00:00.039Z", "weight":null, "action":"closed" }, ... ]
   def as_json(opts = nil)
     return [] unless valid?
 
-    open_issues_count = 0
-    open_issues_weight = 0
+    burndown_events
+  end
 
-    start_date.upto(end_date).each_with_object([]) do |date, chart_data|
-      closed, reopened = closed_and_reopened_issues_by(date)
-
-      closed_issues_count = closed.count
-      closed_issues_weight = sum_issues_weight(closed)
-
-      issues_created = opened_issues_on(date)
-      open_issues_count += issues_created.count
-      open_issues_weight += sum_issues_weight(issues_created)
-
-      open_issues_count -= closed_issues_count
-      open_issues_weight -= closed_issues_weight
-
-      chart_data << [date.strftime("%Y-%m-%d"), open_issues_count, open_issues_weight]
-
-      reopened_count = reopened.count
-      reopened_weight = sum_issues_weight(reopened)
-
-      open_issues_count += reopened_count
-      open_issues_weight += reopened_weight
-    end
+  def empty?
+    burndown_events.any? && legacy_data?
   end
 
   def valid?
     start_date && due_date
   end
 
+  # If all closed issues have no closed events, mark burndown chart as containing legacy data
+  def legacy_data?
+    strong_memoize(:legacy_data) do
+      closed_events = milestone_issues.select(&:closed?)
+      closed_events.any? && !Event.closed.where(target: closed_events, action: Event::CLOSED).exists?
+    end
+  end
+
   private
 
-  def opened_issues_on(date)
-    return {} if opened_issues_grouped_by_date.empty?
-
-    date = date.to_date
-
-    # If issues.created_at < milestone.start_date
-    # we consider all of them created at milestone.start_date
-    if date == start_date
-      first_issue_created_at = opened_issues_grouped_by_date.keys.first
-      days_before_start_date = start_date.downto(first_issue_created_at).to_a
-      opened_issues_grouped_by_date.values_at(*days_before_start_date).flatten.compact
-    else
-      opened_issues_grouped_by_date[date] || []
-    end
+  def burndown_events
+    milestone_issues
+      .map { |issue| burndown_events_for(issue) }
+      .flatten
   end
 
-  def opened_issues_grouped_by_date
-    strong_memoize(:opened_issues_grouped_by_date) do
-      issues =
-        @milestone
-          .issues_visible_to_user(current_user)
-          .where('issues.created_at <= ?', end_date)
-          .reorder(nil)
-          .order('issues.created_at').to_a
-
-      issues.group_by do |issue|
-        issue.created_at.to_date
-      end
-    end
-  end
-
-  def sum_issues_weight(issues)
-    issues.map(&:weight).compact.sum
-  end
-
-  def closed_and_reopened_issues_by(date)
-    current_date = date.to_date
-
-    closed =
-      milestone_issues.select do |issue|
-        (issue.closed_at&.to_date || start_date) == current_date
-      end
-
-    reopened = closed.select(&:reopened?)
-
-    [closed, reopened]
+  def burndown_events_for(issue)
+    [
+      transformed_create_event_for(issue),
+      transformed_action_events_for(issue),
+      transformed_legacy_closed_event_for(issue)
+    ].compact
   end
 
   def milestone_issues
-    @milestone_issues ||=
-      begin
-        # We make use of `events` table to get the closed_at timestamp.
-        # `issues.closed_at` can't be used once it's nullified if the issue is
-        # reopened.
-        internal_clause =
-          @milestone.issues_visible_to_user(current_user)
-            .joins("LEFT OUTER JOIN events e ON issues.id = e.target_id AND e.target_type = 'Issue' AND e.action = #{Event::CLOSED}")
-            .where("state = 'closed' OR (state = 'opened' AND e.action = #{Event::CLOSED})") # rubocop:disable GitlabSecurity/SqlInjection
+    return [] unless valid?
 
-        rel =
-          if Gitlab::Database.postgresql?
-            ::Issue
-              .select("*")
-              .from(internal_clause.select('DISTINCT ON (issues.id) issues.id, issues.state, issues.weight, e.created_at AS closed_at'))
-              .order('closed_at ASC')
-              .pluck('closed_at, weight, state')
-          else
-            # In rails 5 mysql's `only_full_group_by` option is enabled by default,
-            # this means that `GROUP` clause must include all columns used in `SELECT`
-            # clause. Adding all columns to `GROUP` means that we have now
-            # duplicates (by issue ID) in records. To get rid of these, we unify them
-            # on ruby side by issue id. Finally we drop the issue id attribute from records
-            # because this is not accepted when creating Issue object.
-            ::Issue
-              .select("*")
-              .from(internal_clause.select('issues.id, issues.state, issues.weight, e.created_at AS closed_at'))
-              .group(:id, :closed_at, :weight, :state)
-              .having('closed_at = MIN(closed_at) OR closed_at IS NULL')
-              .order('closed_at ASC')
-              .pluck('id, closed_at, weight, state')
-              .uniq(&:first)
-              .map { |attrs| attrs.drop(1) }
-          end
+    strong_memoize(:milestone_issues) do
+      @milestone
+        .issues_visible_to_user(current_user)
+        .where('issues.created_at <= ?', end_date.end_of_day)
+    end
+  end
 
-        rel.map { |attrs| Issue.new(*attrs) }
-      end
+  def milestone_events_per_issue
+    return [] unless valid?
+
+    strong_memoize(:milestone_events_per_issue) do
+      Event
+        .where(target: milestone_issues, action: [Event::CLOSED, Event::REOPENED])
+        .where('created_at <= ?', end_date.end_of_day)
+        .group_by(&:target_id)
+    end
+  end
+
+  # Use issue creation date as the source of truth for created events
+  def transformed_create_event_for(issue)
+    build_burndown_event(issue.created_at, issue.weight, 'created')
+  end
+
+  # Use issue events as the source of truth for events other than 'created'
+  def transformed_action_events_for(issue)
+    events_for_issue = milestone_events_per_issue[issue.id]
+    return [] unless events_for_issue
+
+    events_for_issue.map do |event|
+      build_burndown_event(event.created_at, issue.weight, Event::ACTIONS.key(event.action).to_s)
+    end
+  end
+
+  # If issue is closed but has no closed events, treat it as though closed on milestone start date
+  def transformed_legacy_closed_event_for(issue)
+    return [] unless issue.closed?
+    return [] if milestone_events_per_issue[issue.id]&.any?(&:closed_action?)
+
+    # Mark burndown chart as inaccurate
+    @accurate = false
+
+    build_burndown_event(milestone.start_date.beginning_of_day, issue.weight, 'closed')
+  end
+
+  def build_burndown_event(created_at, issue_weight, action)
+    { created_at: created_at, weight: issue_weight, action: action }
   end
 end

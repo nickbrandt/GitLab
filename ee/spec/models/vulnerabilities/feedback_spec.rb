@@ -3,7 +3,13 @@
 require 'spec_helper'
 
 describe Vulnerabilities::Feedback do
-  it { is_expected.to define_enum_for(:feedback_type) }
+  it {
+    is_expected.to(
+      define_enum_for(:feedback_type)
+      .with_values(dismissal: 0, issue: 1, merge_request: 2)
+      .with_prefix(:for)
+    )
+  }
   it { is_expected.to define_enum_for(:category) }
 
   describe 'associations' do
@@ -32,6 +38,31 @@ describe Vulnerabilities::Feedback do
       it 'validates presence of comment_author' do
         expect(feedback).to validate_presence_of(:comment_author)
       end
+    end
+  end
+
+  describe '#has_comment?' do
+    let(:feedback) { build(:vulnerability_feedback, comment: comment, comment_author: comment_author) }
+    let(:comment) { 'a comment' }
+    let(:comment_author) { build(:user) }
+
+    subject { feedback.has_comment? }
+
+    context 'comment and comment_author are set' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'comment is set and comment_author is not' do
+      let(:comment_author) { nil }
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'comment and comment_author are not set' do
+      let(:comment) { nil }
+      let(:comment_author) { nil }
+
+      it { is_expected.to be_falsy }
     end
   end
 

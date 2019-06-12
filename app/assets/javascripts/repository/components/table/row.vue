@@ -1,8 +1,12 @@
 <script>
+import { GlBadge } from '@gitlab/ui';
 import { getIconName } from '../../utils/icon';
 import getRefMixin from '../../mixins/get_ref';
 
 export default {
+  components: {
+    GlBadge,
+  },
   mixins: [getRefMixin],
   props: {
     id: {
@@ -20,6 +24,16 @@ export default {
     type: {
       type: String,
       required: true,
+    },
+    url: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    lfsOid: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   computed: {
@@ -59,9 +73,12 @@ export default {
   <tr v-once :class="`file_${id}`" class="tree-item" @click="openRow">
     <td class="tree-item-file-name">
       <i :aria-label="type" role="img" :class="iconName" class="fa fa-fw"></i>
-      <component :is="linkComponent" :to="routerLinkTo" class="str-truncated">
+      <component :is="linkComponent" :to="routerLinkTo" :href="url" class="str-truncated">
         {{ fullPath }}
       </component>
+      <gl-badge v-if="lfsOid" variant="default" class="label-lfs ml-1">
+        LFS
+      </gl-badge>
       <template v-if="isSubmodule">
         @ <a href="#" class="commit-sha">{{ shortSha }}</a>
       </template>

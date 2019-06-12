@@ -9,23 +9,16 @@ describe 'shared/issuable/_approvals.html.haml' do
   let(:form) { double('form') }
 
   before do
-    stub_feature_flags(approval_rules: false)
-
     allow(view).to receive(:can?).and_return(true)
     allow(view).to receive(:current_user).and_return(user)
     allow(form).to receive(:label)
     allow(form).to receive(:number_field)
     allow(MergeRequestApproverPresenter).to receive(:new).and_return(approver_presenter)
     assign(:project, project)
+    assign(:target_project, project)
   end
 
   context 'has no approvers' do
-    it 'shows empty approvers list' do
-      render 'shared/issuable/approvals', form: form, issuable: merge_request, presenter: presenter
-
-      expect(rendered).to have_text('There are no approvers')
-    end
-
     context 'can override approvers' do
       before do
         render 'shared/issuable/approvals', form: form, issuable: merge_request, presenter: presenter
@@ -33,14 +26,6 @@ describe 'shared/issuable/_approvals.html.haml' do
 
       it 'shows suggested approvers' do
         expect(rendered).to have_css('.suggested-approvers')
-      end
-
-      it 'shows select approvers field' do
-        expect(rendered).to have_css('#merge_request_approver_ids', visible: false)
-      end
-
-      it 'shows select approver groups field' do
-        expect(rendered).to have_css('#merge_request_approver_group_ids', visible: false)
       end
     end
 
@@ -80,14 +65,6 @@ describe 'shared/issuable/_approvals.html.haml' do
 
       expect(rendered).to have_text(approver[:name])
       expect(rendered).to have_text(approver_group[:name])
-    end
-
-    context 'can override approvers' do
-      it 'shows remove button for approver' do
-        render 'shared/issuable/approvals', form: form, issuable: merge_request, presenter: presenter
-
-        expect(rendered).to have_css('.btn-remove')
-      end
     end
 
     context 'can not override approvers' do

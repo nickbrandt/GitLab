@@ -50,7 +50,7 @@ module DesignManagement
       {
         action: new_file?(design) ? :create : :update,
         file_path: design.full_path,
-        content: file.to_io
+        content: file_content(file, design.full_path)
       }
     end
 
@@ -96,6 +96,13 @@ module DesignManagement
 
     def new_file?(design)
       design.new_design? && existing_metadata.none? { |blob| blob.path == design.full_path }
+    end
+
+    def file_content(file, full_path)
+      return file.to_io if Feature.disabled?(:store_designs_in_lfs)
+
+      transformer = Lfs::FileTransformer.new(project, target_branch)
+      transformer.new_file(full_path, file.to_io).content
     end
 
     def existing_metadata

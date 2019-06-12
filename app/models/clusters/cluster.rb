@@ -8,7 +8,6 @@ module Clusters
     include ReactiveCaching
 
     self.table_name = 'clusters'
-    self.reactive_cache_key = -> (cluster) { [cluster.class.model_name.singular, cluster.id] }
 
     PROJECT_ONLY_APPLICATIONS = {
       Applications::Jupyter.application_name => Applications::Jupyter,
@@ -221,6 +220,10 @@ module Clusters
 
         variables.append(key: KUBE_INGRESS_BASE_DOMAIN, value: kube_ingress_domain)
       end
+    end
+
+    def knative_services_finder(project)
+      @knative_services_finder ||= KnativeServicesFinder.new(self, project)
     end
 
     private

@@ -198,6 +198,14 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
 };
 
 /**
+ * Extracts the site property out of a DAST report
+ * This should be dropped once we support multi-sites reports
+ *
+ * @param {Object|Array} site
+ */
+export const getDastSite = site => (Array.isArray(site) && site.length ? site[0] : site);
+
+/**
  * Parses DAST into a common format to allow to use the same Vue component.
  * DAST report is currently the straigh output from the underlying tool (ZAProxy)
  * hence the formatting happenning here.

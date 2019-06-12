@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import _ from 'underscore';
 
-import ListLabel from '~/vue_shared/models/label';
+import ListLabel from '../../models/label';
 
 import LabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
 

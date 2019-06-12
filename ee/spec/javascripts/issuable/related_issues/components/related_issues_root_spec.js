@@ -304,8 +304,8 @@ describe('RelatedIssuesRoot', () => {
       it('fill in issue number reference and adds to pending related issues', () => {
         const input = '#123 ';
         vm.onInput({
-          newValue: input,
-          caretPos: input.length,
+          untouchedRawReferences: [input.trim()],
+          touchedReference: input,
         });
 
         expect(vm.state.pendingReferences.length).toEqual(1);
@@ -314,7 +314,7 @@ describe('RelatedIssuesRoot', () => {
 
       it('fill in with full reference', () => {
         const input = 'asdf/qwer#444 ';
-        vm.onInput({ newValue: input, caretPos: input.length });
+        vm.onInput({ untouchedRawReferences: [input.trim()], touchedReference: input });
 
         expect(vm.state.pendingReferences.length).toEqual(1);
         expect(vm.state.pendingReferences[0]).toEqual('asdf/qwer#444');
@@ -323,7 +323,7 @@ describe('RelatedIssuesRoot', () => {
       it('fill in with issue link', () => {
         const link = 'http://localhost:3000/foo/bar/issues/111';
         const input = `${link} `;
-        vm.onInput({ newValue: input, caretPos: input.length });
+        vm.onInput({ untouchedRawReferences: [input.trim()], touchedReference: input });
 
         expect(vm.state.pendingReferences.length).toEqual(1);
         expect(vm.state.pendingReferences[0]).toEqual(link);
@@ -331,7 +331,7 @@ describe('RelatedIssuesRoot', () => {
 
       it('fill in with multiple references', () => {
         const input = 'asdf/qwer#444 #12 ';
-        vm.onInput({ newValue: input, caretPos: input.length });
+        vm.onInput({ untouchedRawReferences: input.trim().split(/\s/), touchedReference: 2 });
 
         expect(vm.state.pendingReferences.length).toEqual(2);
         expect(vm.state.pendingReferences[0]).toEqual('asdf/qwer#444');
@@ -340,30 +340,11 @@ describe('RelatedIssuesRoot', () => {
 
       it('fill in with some invalid things', () => {
         const input = 'something random ';
-        vm.onInput({ newValue: input, caretPos: input.length });
+        vm.onInput({ untouchedRawReferences: input.trim().split(/\s/), touchedReference: 2 });
 
         expect(vm.state.pendingReferences.length).toEqual(2);
         expect(vm.state.pendingReferences[0]).toEqual('something');
         expect(vm.state.pendingReferences[1]).toEqual('random');
-      });
-
-      it('fill in invalid and some legit references', () => {
-        const input = 'something random #123 ';
-        vm.onInput({ newValue: input, caretPos: input.length });
-
-        expect(vm.state.pendingReferences.length).toEqual(3);
-        expect(vm.state.pendingReferences[0]).toEqual('something');
-        expect(vm.state.pendingReferences[1]).toEqual('random');
-        expect(vm.state.pendingReferences[2]).toEqual('#123');
-      });
-
-      it('keep reference piece in input while we are touching it', () => {
-        const input = 'a #123 b ';
-        vm.onInput({ newValue: input, caretPos: 3 });
-
-        expect(vm.state.pendingReferences.length).toEqual(2);
-        expect(vm.state.pendingReferences[0]).toEqual('a');
-        expect(vm.state.pendingReferences[1]).toEqual('b');
       });
     });
 

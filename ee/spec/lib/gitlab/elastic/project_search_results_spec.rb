@@ -47,9 +47,9 @@ describe Gitlab::Elastic::ProjectSearchResults do
 
       # Wiki
       project.wiki.create_page('index_page', 'term')
-      project.wiki.index_blobs
+      project.wiki.index_wiki_blobs
       project1.wiki.create_page('index_page', ' term')
-      project1.wiki.index_blobs
+      project1.wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index
 
@@ -70,7 +70,7 @@ describe Gitlab::Elastic::ProjectSearchResults do
 
         # Wiki
         project.wiki.create_page('index_page', 'term')
-        project.wiki.index_blobs
+        project.wiki.index_wiki_blobs
 
         Gitlab::Elastic::Helper.refresh_index
 
@@ -162,31 +162,31 @@ describe Gitlab::Elastic::ProjectSearchResults do
 
     it 'does not list project confidential issues for non project members' do
       results = described_class.new(non_member, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).not_to include security_issue_1
-      expect(issues).not_to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).not_to include security_issue_1.id
+      expect(issues).not_to include security_issue_2.id
       expect(results.issues_count).to eq 1
     end
 
     it 'lists project confidential issues for author' do
       results = described_class.new(author, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).to include security_issue_1
-      expect(issues).not_to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).to include security_issue_1.id
+      expect(issues).not_to include security_issue_2.id
       expect(results.issues_count).to eq 2
     end
 
     it 'lists project confidential issues for assignee' do
       results = described_class.new(assignee, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).not_to include security_issue_1
-      expect(issues).to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).not_to include security_issue_1.id
+      expect(issues).to include security_issue_2.id
       expect(results.issues_count).to eq 2
     end
 
@@ -194,11 +194,11 @@ describe Gitlab::Elastic::ProjectSearchResults do
       project.add_developer(member)
 
       results = described_class.new(member, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).to include security_issue_1
-      expect(issues).to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).to include security_issue_1.id
+      expect(issues).to include security_issue_2.id
       expect(results.issues_count).to eq 3
     end
 
@@ -206,21 +206,21 @@ describe Gitlab::Elastic::ProjectSearchResults do
       project.add_guest(member)
 
       results = described_class.new(member, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).not_to include security_issue_1
-      expect(issues).not_to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).not_to include security_issue_1.id
+      expect(issues).not_to include security_issue_2.id
       expect(results.issues_count).to eq 1
     end
 
     it 'lists all project issues for admin' do
       results = described_class.new(admin, query, project.id)
-      issues = results.objects('issues')
+      issues = results.objects('issues').map(&:id)
 
-      expect(issues).to include issue
-      expect(issues).to include security_issue_1
-      expect(issues).to include security_issue_2
+      expect(issues).to include issue.id
+      expect(issues).to include security_issue_1.id
+      expect(issues).to include security_issue_2.id
       expect(results.issues_count).to eq 3
     end
   end

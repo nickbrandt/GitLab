@@ -290,7 +290,6 @@ tables:
     - created_at
     - updated_at
     - enabled
-    - domain
   project_custom_attributes:
     whitelist:
     - id
@@ -471,7 +470,7 @@ tables:
     - ghost
     - last_activity_on
     - notified_of_own_activity
-    - support_bot
+    - bot_type
     - preferred_language
     - theme_id
 

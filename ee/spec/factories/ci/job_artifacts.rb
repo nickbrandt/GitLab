@@ -151,5 +151,15 @@ FactoryBot.define do
           Rails.root.join('ee/spec/fixtures/alternate_metrics.txt.gz'), 'application/x-gzip')
       end
     end
+
+    trait :dependency_list do
+      file_format :raw
+      file_type :dependency_scanning
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/security-reports/dependency_list/gl-dependency-scanning-report.json'), 'text/plain')
+      end
+    end
   end
 end

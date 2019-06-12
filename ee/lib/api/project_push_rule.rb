@@ -5,6 +5,11 @@ module API
     before { authenticate! }
     before { authorize_admin_project }
     before { check_project_feature_available!(:push_rules) }
+    before do
+      if params.has_key?(:commit_committer_check)
+        authorize! :change_commit_committer_check, user_project
+      end
+    end
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
@@ -21,9 +26,11 @@ module API
           optional :author_email_regex, type: String, desc: 'All commit author emails must match this'
           optional :file_name_regex, type: String, desc: 'All commited filenames must not match this'
           optional :max_file_size, type: Integer, desc: 'Maximum file size (MB)'
+          optional :commit_committer_check, type: Boolean, desc: 'Users may only push their own commits'
           at_least_one_of :deny_delete_tag, :member_check, :prevent_secrets,
                           :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :author_email_regex,
-                          :file_name_regex, :max_file_size
+                          :file_name_regex, :max_file_size,
+                          :commit_committer_check
         end
       end
 
@@ -32,7 +39,7 @@ module API
       end
       get ":id/push_rule" do
         push_rule = user_project.push_rule
-        present push_rule, with: EE::API::Entities::ProjectPushRule
+        present push_rule, with: EE::API::Entities::ProjectPushRule, user: current_user
       end
 
       desc 'Add a push rule to a project' do
@@ -46,7 +53,7 @@ module API
           error!("Project push rule exists", 422)
         else
           push_rule = user_project.create_push_rule(declared_params(include_missing: false))
-          present push_rule, with: EE::API::Entities::ProjectPushRule
+          present push_rule, with: EE::API::Entities::ProjectPushRule, user: current_user
         end
       end
 
@@ -61,7 +68,7 @@ module API
         not_found!('Push Rule') unless push_rule
 
         if push_rule.update(declared_params(include_missing: false))
-          present push_rule, with: EE::API::Entities::ProjectPushRule
+          present push_rule, with: EE::API::Entities::ProjectPushRule, user: current_user
         else
           render_validation_error!(push_rule)
         end

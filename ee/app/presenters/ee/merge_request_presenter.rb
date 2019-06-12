@@ -3,7 +3,6 @@
 module EE
   module MergeRequestPresenter
     include ::VisibleApprovable
-    prepend VisibleApprovableForRule
 
     def approvals_path
       if expose_mr_approval_path?

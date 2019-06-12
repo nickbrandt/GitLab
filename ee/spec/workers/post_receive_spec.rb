@@ -72,7 +72,7 @@ describe PostReceive do
     it 'triggers wiki index update when ElasticSearch is enabled', :elastic do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
-      expect_any_instance_of(ProjectWiki).to receive(:index_blobs)
+      expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
 
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
@@ -88,7 +88,7 @@ describe PostReceive do
 
       context 'when the project is not enabled specifically' do
         it 'does not trigger wiki index update' do
-          expect_any_instance_of(ProjectWiki).not_to receive(:index_blobs)
+          expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
 
           described_class.new.perform(gl_repository, key_id, base64_changes)
         end
@@ -100,7 +100,7 @@ describe PostReceive do
         end
 
         it 'triggers wiki index update' do
-          expect_any_instance_of(ProjectWiki).to receive(:index_blobs)
+          expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
 
           described_class.new.perform(gl_repository, key_id, base64_changes)
         end
@@ -116,7 +116,7 @@ describe PostReceive do
         end
 
         it 'triggers wiki index update' do
-          expect_any_instance_of(ProjectWiki).to receive(:index_blobs)
+          expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
 
           described_class.new.perform(gl_repository, key_id, base64_changes)
         end

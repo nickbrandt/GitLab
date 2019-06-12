@@ -3,7 +3,7 @@
 
 - if pipeline.expose_security_dashboard?
   %li.js-security-tab-link
-    = link_to security_project_pipeline_path(project, pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab' do
+    = link_to security_project_pipeline_path(project, pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab qa-security-tab' do
       = _("Security")
       %span.badge.badge-pill.js-sast-counter.hidden
 

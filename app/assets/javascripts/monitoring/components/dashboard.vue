@@ -38,7 +38,7 @@ export default {
     GlModalDirective,
   },
   props: {
-    externalDashboardPath: {
+    externalDashboardUrl: {
       type: String,
       required: false,
       default: '',
@@ -106,10 +106,6 @@ export default {
       type: String,
       required: true,
     },
-    showTimeWindowDropdown: {
-      type: Boolean,
-      required: true,
-    },
     customMetricsAvailable: {
       type: Boolean,
       required: false,
@@ -172,7 +168,7 @@ export default {
     if (!this.hasMetrics) {
       this.setGettingStartedEmptyState();
     } else {
-      this.fetchData(getTimeDiff(this.timeWindows.eightHours));
+      this.fetchData(getTimeDiff(this.selectedTimeWindow));
 
       sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
       sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
@@ -248,7 +244,7 @@ export default {
             >
           </gl-dropdown>
         </div>
-        <div v-if="showTimeWindowDropdown" class="d-flex align-items-center">
+        <div class="d-flex align-items-center prepend-left-8">
           <strong>{{ s__('Metrics|Show last') }}</strong>
           <gl-dropdown
             class="prepend-left-10 js-time-window-dropdown"
@@ -299,10 +295,11 @@ export default {
           </gl-modal>
         </div>
         <gl-button
-          v-if="externalDashboardPath.length"
+          v-if="externalDashboardUrl.length"
           class="js-external-dashboard-link prepend-left-8"
           variant="primary"
-          :href="externalDashboardPath"
+          :href="externalDashboardUrl"
+          target="_blank"
         >
           {{ __('View full dashboard') }}
           <icon name="external-link" />

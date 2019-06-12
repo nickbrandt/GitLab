@@ -7,7 +7,7 @@ module QA
     class Project < Base
       include Events::Project
 
-      attr_accessor :initialize_with_readme
+      attr_writer :initialize_with_readme
 
       attribute :id
       attribute :name
@@ -39,6 +39,7 @@ module QA
 
       def initialize
         @description = 'My awesome project'
+        @initialize_with_readme = false
       end
 
       def name=(raw_name)
@@ -55,6 +56,7 @@ module QA
           page.choose_name(@name)
           page.add_description(@description)
           page.set_visibility('Public')
+          page.enable_initialize_with_readme if @initialize_with_readme
           page.create_new_project
         end
       end
@@ -79,12 +81,9 @@ module QA
           path: name,
           name: name,
           description: description,
-          visibility: 'public'
-        }.merge(post_body_options)
-      end
-
-      def post_body_options
-        initialize_with_readme ? { initialize_with_readme: initialize_with_readme } : {}
+          visibility: 'public',
+          initialize_with_readme: @initialize_with_readme
+        }
       end
 
       private

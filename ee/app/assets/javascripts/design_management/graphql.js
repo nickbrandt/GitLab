@@ -15,9 +15,8 @@ const defaultClient = createDefaultClient({
         variables: { fullPath: projectPath, iid: issueIid },
       });
 
-      return result.project.issue.designs.designs.edges.find(
-        ({ node }) => parseInt(node.id, 10) === id,
-      ).node;
+      return result.project.issue.designs.designs.edges.find(({ node }) => node.filename === id)
+        .node;
     },
   },
 });

@@ -1,4 +1,5 @@
 import { shallowMount, RouterLinkStub } from '@vue/test-utils';
+import { GlBadge } from '@gitlab/ui';
 import TableRow from '~/repository/components/table/row.vue';
 
 let vm;
@@ -85,5 +86,29 @@ describe('Repository table row component', () => {
     });
 
     expect(vm.find('.commit-sha').text()).toContain('1');
+  });
+
+  it('renders link with href', () => {
+    factory({
+      id: '1',
+      path: 'test',
+      type: 'blob',
+      url: 'https://test.com',
+      currentPath: '/',
+    });
+
+    expect(vm.find('a').attributes('href')).toEqual('https://test.com');
+  });
+
+  it('renders LFS badge', () => {
+    factory({
+      id: '1',
+      path: 'test',
+      type: 'commit',
+      currentPath: '/',
+      lfsOid: '1',
+    });
+
+    expect(vm.find(GlBadge).exists()).toBe(true);
   });
 });

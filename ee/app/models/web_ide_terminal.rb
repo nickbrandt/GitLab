@@ -32,6 +32,10 @@ class WebIdeTerminal
     proxy_project_job_path(project, build, format: :ws)
   end
 
+  def services
+    build.services.map(&:alias).compact + Array(build.image&.alias)
+  end
+
   private
 
   def web_ide_terminal_route_generator(action, options = {})

@@ -100,7 +100,7 @@ export default {
             this.fetchFiles();
           }
         })
-        .catch(() => createFlash(__('An error occurding while fetching folder content.')));
+        .catch(() => createFlash(__('An error occurred while fetching folder content.')));
     },
     normalizeData(key, data) {
       return this.entries[key].concat(data.map(({ node }) => node));
@@ -134,6 +134,8 @@ export default {
               :current-path="path"
               :path="entry.flatPath"
               :type="entry.type"
+              :url="entry.webUrl"
+              :lfs-oid="entry.lfsOid"
             />
           </template>
         </tbody>

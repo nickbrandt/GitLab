@@ -73,7 +73,7 @@ describe 'Group elastic search', :js do
 
     before do
       wiki.create_page('test.md', '# term')
-      wiki.index_blobs
+      wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end

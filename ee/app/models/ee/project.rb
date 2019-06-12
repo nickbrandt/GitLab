@@ -62,7 +62,7 @@ module EE
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
-      has_many :merge_trains
+      has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -324,8 +324,6 @@ module EE
     end
 
     def visible_regular_approval_rules
-      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self, default_enabled: true)
-
       strong_memoize(:visible_regular_approval_rules) do
         regular_rules = approval_rules.regular.order(:id)
 

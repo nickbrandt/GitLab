@@ -29,7 +29,7 @@ describe ProjectPolicy do
     end
     let(:additional_reporter_permissions) { [:admin_issue_link] }
     let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag] }
-    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches] }
+    let(:additional_maintainer_permissions) { %i[push_code_to_protected_branches admin_feature_flags_client] }
     let(:auditor_permissions) do
       %i[
         download_code download_wiki_code read_project read_board read_list
@@ -324,6 +324,7 @@ describe ProjectPolicy do
 
     where(permission: %i[
       create_vulnerability_feedback
+      update_vulnerability_feedback
       destroy_vulnerability_feedback
     ])
 
@@ -687,5 +688,36 @@ describe ProjectPolicy do
     let(:current_user) { User.alert_bot }
 
     it { is_expected.to be_allowed(:reporter_access) }
+  end
+
+  context 'commit_committer_check is not enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: false)
+    end
+
+    let(:current_user) { maintainer }
+
+    it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+    it { is_expected.not_to be_allowed(:read_commit_committer_check) }
+  end
+
+  context 'commit_committer_check is enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: true)
+    end
+
+    context 'the user is a maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
+
+    context 'the user is a developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
   end
 end

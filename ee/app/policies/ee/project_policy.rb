@@ -12,6 +12,7 @@ module EE
       vulnerability_feedback
       license_management
       feature_flag
+      feature_flags_client
       design
     ].freeze
 
@@ -42,6 +43,16 @@ module EE
       with_scope :global
       condition(:commit_committer_check_disabled_globally) do
         !PushRule.global&.commit_committer_check
+      end
+
+      with_scope :subject
+      condition(:commit_committer_check_available) do
+        @subject.feature_available?(:commit_committer_check)
+      end
+
+      with_scope :subject
+      condition(:reject_unsigned_commits_available) do
+        @subject.feature_available?(:reject_unsigned_commits)
       end
 
       with_scope :subject
@@ -112,6 +123,7 @@ module EE
         enable :admin_board
         enable :create_vulnerability_feedback
         enable :destroy_vulnerability_feedback
+        enable :update_vulnerability_feedback
         enable :create_package
         enable :read_feature_flag
         enable :create_feature_flag
@@ -153,6 +165,7 @@ module EE
         enable :admin_path_locks
         enable :update_approvers
         enable :destroy_package
+        enable :admin_feature_flags_client
       end
 
       rule { license_management_enabled & can?(:maintainer_access) }.enable :admin_software_license_policy
@@ -181,7 +194,19 @@ module EE
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.enable :change_commit_committer_check
+      rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
+
+      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
+        enable :change_commit_committer_check
+      end
+
+      rule { commit_committer_check_available }.policy do
+        enable :read_commit_committer_check
+      end
+
+      rule { ~commit_committer_check_available }.policy do
+        prevent :change_commit_committer_check
+      end
 
       rule { owner | reporter }.enable :build_read_project
 

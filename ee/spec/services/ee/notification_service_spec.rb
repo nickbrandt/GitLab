@@ -491,8 +491,6 @@ describe EE::NotificationService, :mailer do
     end
 
     before do
-      stub_feature_flags(approval_rules: false)
-
       project.add_maintainer(merge_request.author)
       merge_request.assignees.each { |assignee| project.add_maintainer(assignee) }
       build_team(merge_request.target_project)
@@ -511,10 +509,10 @@ describe EE::NotificationService, :mailer do
 
       context 'when the target project has approvers set' do
         let(:project_approvers) { create_list(:user, 3) }
+        let!(:rule) { create(:approval_project_rule, project: project, users: project_approvers, approvals_required: 1 )}
 
         before do
           merge_request.target_project.update(approvals_before_merge: 1)
-          project_approvers.each { |approver| create(:approver, user: approver, target: merge_request.target_project) }
           reset_delivered_emails!
         end
 
@@ -525,7 +523,7 @@ describe EE::NotificationService, :mailer do
         end
 
         it 'does not email the approvers when approval is not necessary' do
-          merge_request.target_project.update(approvals_before_merge: 0)
+          rule.update(approvals_required: 0)
           notification.new_merge_request(merge_request, @u_disabled)
 
           project_approvers.each { |approver| should_not_email(approver) }
@@ -533,9 +531,9 @@ describe EE::NotificationService, :mailer do
 
         context 'when the merge request has approvers set' do
           let(:mr_approvers) { create_list(:user, 3) }
+          let!(:mr_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: mr_approvers, approvals_required: 1 )}
 
           before do
-            mr_approvers.each { |approver| create(:approver, user: approver, target: merge_request) }
             reset_delivered_emails!
           end
 

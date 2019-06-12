@@ -11,6 +11,10 @@ module EE
       def replyable_types
         super + %w(Epic)
       end
+
+      def resolvable_types
+        super + %w(DesignManagement::Design)
+      end
     end
 
     override :note_etag_key

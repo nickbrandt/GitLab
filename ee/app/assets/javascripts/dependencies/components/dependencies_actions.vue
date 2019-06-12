@@ -1,0 +1,71 @@
+<script>
+import { mapActions, mapGetters, mapState } from 'vuex';
+import { GlButton, GlDropdown, GlDropdownItem, GlTooltipDirective } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { SORT_ORDER } from '../store/constants';
+
+export default {
+  name: 'DependenciesActions',
+  components: {
+    GlButton,
+    GlDropdown,
+    GlDropdownItem,
+    Icon,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
+  computed: {
+    ...mapState(['sortField', 'sortFields', 'sortOrder']),
+    ...mapGetters(['downloadEndpoint']),
+    sortFieldName() {
+      return this.sortFields[this.sortField];
+    },
+    sortOrderIcon() {
+      return this.sortOrder === SORT_ORDER.ascending ? 'sort-lowest' : 'sort-highest';
+    },
+  },
+  methods: {
+    ...mapActions(['setSortField', 'toggleSortOrder']),
+    isCurrentSortField(id) {
+      return id === this.sortField;
+    },
+  },
+};
+</script>
+
+<template>
+  <div class="btn-toolbar">
+    <div class="btn-group flex-grow-1 mr-2">
+      <gl-dropdown :text="sortFieldName" class="flex-grow-1 text-center" right>
+        <gl-dropdown-item v-for="(name, id) in sortFields" :key="id" @click="setSortField(id)">
+          <span class="d-flex">
+            <icon
+              class="flex-shrink-0 append-right-4"
+              :class="{ invisible: !isCurrentSortField(id) }"
+              name="mobile-issue-close"
+            />
+            {{ name }}
+          </span>
+        </gl-dropdown-item>
+      </gl-dropdown>
+      <gl-button
+        v-gl-tooltip
+        :title="__('Sort direction')"
+        class="flex-grow-0 js-sort-order"
+        @click="toggleSortOrder"
+      >
+        <icon :name="sortOrderIcon" />
+      </gl-button>
+    </div>
+    <gl-button
+      v-gl-tooltip
+      :href="downloadEndpoint"
+      download="dependencies.json"
+      :title="s__('Dependencies|Export as JSON')"
+      class="js-download"
+    >
+      <icon name="download" />
+    </gl-button>
+  </div>
+</template>

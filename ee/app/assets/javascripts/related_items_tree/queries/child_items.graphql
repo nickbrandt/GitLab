@@ -1,0 +1,73 @@
+query childItems($fullPath: ID!, $iid: ID) {
+  group(fullPath: $fullPath) {
+    id
+    path
+    fullPath
+    epic(iid: $iid) {
+      id
+      iid
+      title
+      webPath
+      userPermissions {
+        adminEpic
+        createEpic
+      }
+      children {
+        edges {
+          node {
+            id
+            iid
+            title
+            state
+            webPath
+            reference(full: true)
+            relationPath
+            createdAt
+            closedAt
+            hasChildren
+            hasIssues
+            userPermissions {
+              adminEpic
+              createEpic
+            }
+            group {
+              fullPath
+            }
+          }
+        }
+      }
+      issues {
+        edges {
+          node {
+            iid
+            title
+            closedAt
+            state
+            createdAt
+            confidential
+            dueDate
+            weight
+            webPath
+            reference
+            relationPath
+            assignees {
+              edges {
+                node {
+                  webUrl
+                  name
+                  username
+                  avatarUrl
+                }
+              }
+            }
+            milestone {
+              title
+              startDate
+              dueDate
+            }
+          }
+        }
+      }
+    }
+  }
+}
