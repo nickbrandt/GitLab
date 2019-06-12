@@ -141,14 +141,10 @@ module Geo
     end
 
     def attachments_synced_missing_on_primary
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.attachments_synced_missing_on_primary
-      else
-        registries_for_attachments
-          .syncable
-          .merge(Geo::FileRegistry.synced)
-          .merge(Geo::FileRegistry.missing_on_primary)
-      end
+      registries_for_attachments
+        .syncable
+        .merge(Geo::FileRegistry.synced)
+        .merge(Geo::FileRegistry.missing_on_primary)
     end
   end
 end

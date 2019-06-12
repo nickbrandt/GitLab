@@ -26,14 +26,6 @@ module Geo
       )
     end
 
-    def attachments_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::FileRegistry.attachments.synced.missing_on_primary.pluck_file_key,
-        Upload
-      )
-    end
-
     def registries_for_attachments
       return Geo::FileRegistry.attachments unless selective_sync?
 

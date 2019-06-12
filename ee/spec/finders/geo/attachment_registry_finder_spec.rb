@@ -179,81 +179,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
     end
 
-    describe '#count_synced_missing_on_primary' do
-      let!(:upload_1) { create(:upload, model: synced_group) }
-      let!(:upload_2) { create(:upload, model: unsynced_group) }
-      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
-      let!(:upload_4) { create(:upload, model: unsynced_project) }
-      let!(:upload_5) { create(:upload, :personal_snippet_upload) }
-      let(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
-
-      it 'counts attachments that have been synced and are missing on the primary' do
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: false)
-        create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 3
-      end
-
-      it 'ignores remote attachments' do
-        create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 2
-      end
-
-      context 'with selective sync by namespace' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'counts attachments that have been synced and are missing on the primary' do
-          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 2
-        end
-
-        it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        before do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-        end
-
-        it 'counts attachments that have been synced and are missing on the primary' do
-          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 3
-        end
-
-        it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
-      end
-    end
-
     describe '#count_registry' do
       let!(:upload_1) { create(:upload, model: synced_group) }
       let!(:upload_2) { create(:upload, model: unsynced_group) }
@@ -494,6 +419,81 @@ describe Geo::AttachmentRegistryFinder, :geo do
         end
       end
 
+      describe '#count_synced_missing_on_primary' do
+        let!(:upload_1) { create(:upload, model: synced_group) }
+        let!(:upload_2) { create(:upload, model: unsynced_group) }
+        let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
+        let!(:upload_4) { create(:upload, model: unsynced_project) }
+        let!(:upload_5) { create(:upload, :personal_snippet_upload) }
+        let(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
+
+        it 'counts attachments that have been synced and are missing on the primary' do
+          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
+          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+          create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: false)
+          create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
+
+          expect(subject.count_synced_missing_on_primary).to eq 3
+        end
+
+        it 'ignores remote attachments' do
+          create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
+          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+
+          expect(subject.count_synced_missing_on_primary).to eq 2
+        end
+
+        context 'with selective sync by namespace' do
+          before do
+            secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+          end
+
+          it 'counts attachments that have been synced and are missing on the primary' do
+            create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
+
+            expect(subject.count_synced_missing_on_primary).to eq 2
+          end
+
+          it 'ignores remote attachments' do
+            create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+
+            expect(subject.count_synced_missing_on_primary).to eq 1
+          end
+        end
+
+        context 'with selective sync by shard' do
+          before do
+            secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+          end
+
+          it 'counts attachments that have been synced and are missing on the primary' do
+            create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
+
+            expect(subject.count_synced_missing_on_primary).to eq 3
+          end
+
+          it 'ignores remote attachments' do
+            create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
+            create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
+
+            expect(subject.count_synced_missing_on_primary).to eq 1
+          end
+        end
+      end
+
       include_examples 'finds all the things'
     end
   end
@@ -551,81 +551,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
           upload_4.update!(store: ObjectStorage::Store::REMOTE)
 
           expect(subject.count_syncable).to eq 2
-        end
-      end
-    end
-
-    describe '#count_synced_missing_on_primary' do
-      let!(:upload_1) { create(:upload, model: synced_group) }
-      let!(:upload_2) { create(:upload, model: unsynced_group) }
-      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
-      let!(:upload_4) { create(:upload, model: unsynced_project) }
-      let!(:upload_5) { create(:upload, :personal_snippet_upload) }
-      let(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
-
-      it 'counts attachments that have been synced and are missing on the primary' do
-        create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: false)
-        create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 3
-      end
-
-      it 'ignores remote attachments' do
-        create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-        create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 2
-      end
-
-      context 'with selective sync by namespace' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'counts attachments that have been synced and are missing on the primary' do
-          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 2
-        end
-
-        it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
-      end
-
-      context 'with selective sync by shard' do
-        before do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-        end
-
-        it 'counts attachments that have been synced and are missing on the primary' do
-          create(:geo_file_registry, :attachment, :failed, file_id: upload_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_4.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_5.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 3
-        end
-
-        it 'ignores remote attachments' do
-          create(:geo_file_registry, :attachment, file_id: upload_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :attachment, file_id: upload_3.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
         end
       end
     end
