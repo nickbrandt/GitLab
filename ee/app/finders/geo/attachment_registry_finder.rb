@@ -2,24 +2,32 @@
 
 module Geo
   class AttachmentRegistryFinder < FileRegistryFinder
+    def initialize(current_node:)
+      @current_node = Geo::Fdw::GeoNode.find(current_node.id)
+    end
+
+    def count_registry
+      Geo::FileRegistry.attachments.count
+    end
+
     def count_syncable
       syncable.count
     end
 
     def count_synced
-      attachments_synced.count
+      registries_for_attachments.syncable.merge(Geo::FileRegistry.synced).count
     end
 
     def count_failed
-      attachments_failed.count
+      registries_for_attachments.syncable.merge(Geo::FileRegistry.failed).count
     end
 
     def count_synced_missing_on_primary
-      attachments_synced_missing_on_primary.count
-    end
-
-    def count_registry
-      Geo::FileRegistry.attachments.count
+      registries_for_attachments
+        .syncable
+        .merge(Geo::FileRegistry.synced)
+        .merge(Geo::FileRegistry.missing_on_primary)
+        .count
     end
 
     def syncable
@@ -42,13 +50,22 @@ module Geo
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      attachments_unsynced(except_file_ids: except_file_ids).limit(batch_size)
+      attachments
+        .missing_file_registry
+        .syncable
+        .id_not_in(except_file_ids)
+        .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      attachments_migrated_local(except_file_ids: except_file_ids).limit(batch_size)
+      attachments
+        .inner_join_file_registry
+        .with_files_stored_remotely
+        .merge(Geo::FileRegistry.attachments)
+        .id_not_in(except_file_ids)
+        .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -77,46 +94,12 @@ module Geo
 
     private
 
-    def fdw_geo_node
-      @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
+    def attachments
+      current_node.attachments
     end
 
     def registries_for_attachments
       attachments.inner_join_file_registry.merge(Geo::FileRegistry.attachments)
-    end
-
-    def attachments
-      fdw_geo_node.attachments
-    end
-
-    def attachments_synced
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.synced)
-    end
-
-    def attachments_migrated_local(except_file_ids:)
-      attachments
-        .inner_join_file_registry
-        .with_files_stored_remotely
-        .merge(Geo::FileRegistry.attachments)
-        .id_not_in(except_file_ids)
-    end
-
-    def attachments_unsynced(except_file_ids:)
-      attachments
-        .missing_file_registry
-        .syncable
-        .id_not_in(except_file_ids)
-    end
-
-    def attachments_failed
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.failed)
-    end
-
-    def attachments_synced_missing_on_primary
-      registries_for_attachments
-        .syncable
-        .merge(Geo::FileRegistry.synced)
-        .merge(Geo::FileRegistry.missing_on_primary)
     end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::AttachmentRegistryFinder, :geo do
+describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly
@@ -475,8 +475,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
     end
   end
 
-  context 'FDW', :geo_fdw do
-    include_examples 'counts all the things'
-    include_examples 'finds all the things'
-  end
+  include_examples 'counts all the things'
+  include_examples 'finds all the things'
 end
