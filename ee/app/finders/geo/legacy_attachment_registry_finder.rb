@@ -6,14 +6,6 @@ module Geo
       attachments.syncable
     end
 
-    def attachments_synced
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::FileRegistry.attachments.synced.pluck_file_key,
-        Upload
-      )
-    end
-
     def attachments_migrated_local(except_file_ids:)
       registry_file_ids = Geo::FileRegistry.attachments.pluck_file_key - except_file_ids
 

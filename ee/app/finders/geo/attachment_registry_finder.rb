@@ -118,13 +118,7 @@ module Geo
     end
 
     def attachments_synced
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.attachments_synced
-      else
-        registries_for_attachments
-          .syncable
-          .merge(Geo::FileRegistry.synced)
-      end
+      registries_for_attachments.syncable.merge(Geo::FileRegistry.synced)
     end
 
     def attachments_migrated_local(except_file_ids:)
