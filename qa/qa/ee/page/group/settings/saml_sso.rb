@@ -9,6 +9,7 @@ module QA
             view 'ee/app/views/groups/saml_providers/_form.html.haml' do
               element :identity_provider_sso_field
               element :certificate_fingerprint_field
+              element :enforced_sso_toggle_button
               element :save_changes_button
             end
 
@@ -26,6 +27,10 @@ module QA
 
             def set_cert_fingerprint(fingerprint)
               fill_element :certificate_fingerprint_field, fingerprint
+            end
+
+            def enforce_sso
+              click_element :enforced_sso_toggle_button unless find_element(:enforced_sso_toggle_button)[:class].include?('is-checked')
             end
 
             def click_save_changes
