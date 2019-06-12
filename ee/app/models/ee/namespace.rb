@@ -28,6 +28,8 @@ module EE
     PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.keys.freeze
 
     prepended do
+      include EachBatch
+
       belongs_to :plan
 
       has_one :namespace_statistics
