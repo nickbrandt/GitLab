@@ -24,10 +24,6 @@ module QA
         end
 
         Page::Project::Issue::Show.perform do |show|
-          # Due to the randomness of tests execution, sometimes a previous test
-          # may have changed the filter, which makes the below action needed.
-          # TODO: Make this test completely independent, not requiring the below step.
-          show.select_all_activities_filter
           show.comment('/promote')
 
           expect(show).to have_content("promoted to epic")
