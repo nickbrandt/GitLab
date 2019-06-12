@@ -23,9 +23,7 @@ module Geo
     end
 
     def syncable
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.syncable
-      elsif selective_sync?
+      if selective_sync?
         attachments.syncable
       else
         Upload.syncable
@@ -78,12 +76,6 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     private
-
-    # rubocop:disable CodeReuse/Finder
-    def legacy_finder
-      @legacy_finder ||= Geo::LegacyAttachmentRegistryFinder.new(current_node: current_node)
-    end
-    # rubocop:enable CodeReuse/Finder
 
     def fdw_geo_node
       @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
