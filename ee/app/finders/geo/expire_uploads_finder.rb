@@ -5,11 +5,7 @@ module Geo
     UPLOAD_TYPE = 'file'
 
     def find_project_uploads(project)
-      if Gitlab::Geo::Fdw.enabled?
-        Geo::Fdw::Upload.for_model_with_type(project, UPLOAD_TYPE)
-      else
-        legacy_find_project_uploads(project)
-      end
+      Geo::Fdw::Upload.for_model_with_type(project, UPLOAD_TYPE)
     end
 
     def find_file_registries_uploads(project)
@@ -36,21 +32,6 @@ module Geo
           AS uploads (id)
           ON uploads.id = file_registry.file_id
          AND file_registry.file_type='#{UPLOAD_TYPE}'
-      SQL
-    end
-    # rubocop:enable CodeReuse/ActiveRecord
-
-    # rubocop:disable CodeReuse/ActiveRecord
-    def legacy_find_project_uploads(project)
-      file_registry_ids = legacy_find_file_registries_uploads(project).pluck(:file_id)
-      return Upload.none if file_registry_ids.empty?
-
-      values_sql = file_registry_ids.map { |f_id| "(#{f_id})" }.join(',')
-
-      Upload.joins(<<~SQL)
-        JOIN (VALUES #{values_sql})
-          AS file_registry (file_id)
-          ON (file_registry.file_id = uploads.id)
       SQL
     end
     # rubocop:enable CodeReuse/ActiveRecord
