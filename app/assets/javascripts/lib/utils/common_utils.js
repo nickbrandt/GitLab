@@ -3,7 +3,6 @@
  */
 
 import $ from 'jquery';
-import _ from 'underscore';
 import axios from './axios_utils';
 import { getLocationHash } from './url_utility';
 import { convertToCamelCase } from './text_utility';
@@ -228,44 +227,39 @@ export const isPlatformLeaderKey = e => {
 /**
  * Tests if a KeyboardEvent corresponds exactly to a keystroke.
  *
- * A keystroke is given as a string, with individual keys separated by  `+` or `-` characters. Modifier keys may be given in any order, and the key itself must correspond to the KeyboardEvent's `key` property (except for the `+` or `-` keys, which should be represented by `'Plus'` and `'Minus'` in the keystroke string, respectively; and the spacebar, which may be represented by `'Space'`.
+ * @example
+ *     // Matches the enter key with exactly zero modifiers
+ *     keystroke(event, 13)
  *
- * Available modifiers are `'Shift'`, `'Control'`, `'Alt'`, `'Meta'`, and `'Leader'`. The `'Leader'` modifier corresponds to `meta` (Command) on MacOS, and `ctrl` otherwise. Care must be given with shift-sequences. `Shift-4` is not a valid sequence, but `Shift-$` is. The modifier keys must match those given in the keystroke string exactly. The keystroke string is case-insensitive, so `'Shift-F'` and `'shift-f'` are equivalent. `'Control'` and `'Ctrl'` are also interchangeable.
- *
- * Examples of keystroke strings: `'PageUp'`, `'Shift-Tab'`, `'Control-Alt-Minus'`, `'Leader-Z'`.
+ * @example
+ *     // Matches Control-Shift-Z
+ *     keystroke(event, 90, 'cs')
  *
  * @param e The KeyboardEvent to test.
- * @param sequence Desired keystroke, represented in a string.
+ * @param keyCode The key code of the key to test. Why keycodes? IE/Edge don't support the more convenient `key` and `code` properties.
+ * @param modifiers A string of modifiers keys. Each modifier key is represented by one character. The set of pressed modifier keys must match the given string exactly. Available options are 'a' for Alt/Option, 'c' for Control, 'm' for Meta/Command, 's' for Shift, and 'l' for the leader key (Meta on MacOS and Control otherwise).
  * @returns {boolean} True if the KeyboardEvent corresponds to the given keystroke.
  */
-export const keystroke = (e, sequence) => {
-  if (!e || !sequence || sequence.length === 0) {
+export const keystroke = (e, keyCode, modifiers = '') => {
+  if (!e || !keyCode) {
     return false;
   }
 
-  // The desired key chord. Each element represents a key.
-  const chord = sequence
-    .toLowerCase()
-    .split(/[+-]/)
-    .map(note => (note === 'leader' ? getPlatformLeaderKey(e) : note))
-    .map(note => (note === 'minus' ? '-' : note))
-    .map(note => (note === 'plus' ? '+' : note))
-    .map(note => (note === 'space' ? ' ' : note))
-    .map(note => (note === 'control' ? 'ctrl' : note));
+  const leader = getPlatformLeaderKey();
+  const mods = modifiers.toLowerCase().replace('l', leader.charAt(0));
 
-  // The chord that was actually pressed.
-  const actualChord = [
-    e.altKey ? 'alt' : null,
-    e.ctrlKey ? 'ctrl' : null,
-    e.metaKey ? 'meta' : null,
-    e.shiftKey ? 'shift' : null,
-    e.key ? e.key.toLowerCase() : null,
-  ].filter(i => i);
+  // Match depressed modifier keys
+  if (
+    e.altKey !== mods.includes('a') ||
+    e.ctrlKey !== mods.includes('c') ||
+    e.metaKey !== mods.includes('m') ||
+    e.shiftKey !== mods.includes('s')
+  ) {
+    return false;
+  }
 
-  // chord and actualChord must match exactly
-  chord.sort();
-  actualChord.sort();
-  return _.isEqual(chord, actualChord);
+  // Match the depressed key
+  return keyCode === (e.keyCode || e.which);
 };
 
 export const contentTop = () => {

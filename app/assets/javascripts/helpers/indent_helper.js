@@ -32,6 +32,62 @@ export default class IndentHelper {
   }
 
   /**
+   * Re-implementation of textarea's setRangeText method, because IE/Edge don't support it.
+   *
+   * @see https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea%2Finput-setrangetext
+   */
+  setRangeText(replacement, start, end, selectMode) {
+    // Disable eslint to remain as faithful as possible to the above linked spec
+    /* eslint-disable no-param-reassign, no-case-declarations */
+    const text = this.element.value;
+
+    if (start > end) {
+      throw new RangeError('setRangeText: start index must be less than or equal to end index');
+    }
+
+    // Clamp to [0, len]
+    start = Math.max(0, Math.min(start, text.length));
+    end = Math.max(0, Math.min(end, text.length));
+
+    let selection = { start: this.element.selectionStart, end: this.element.selectionEnd };
+
+    this.element.value = text.slice(0, start) + replacement + text.slice(end);
+
+    const newLength = replacement.length;
+    const newEnd = start + newLength;
+
+    switch (selectMode) {
+      case 'select':
+        selection = { start, newEnd };
+        break;
+      case 'start':
+        selection = { start, end: start };
+        break;
+      case 'end':
+        selection = { start: newEnd, end: newEnd };
+        break;
+      case 'preserve':
+      default:
+        const oldLength = end - start;
+        const delta = newLength - oldLength;
+        if (selection.start > end) {
+          selection.start += delta;
+        } else if (selection.start > start) {
+          selection.start = start;
+        }
+        if (selection.end > end) {
+          selection.end += delta;
+        } else if (selection.end > start) {
+          selection.end = newEnd;
+        }
+    }
+
+    this.element.setSelectionRange(selection.start, selection.end);
+
+    /* eslint-enable no-param-reassign, no-case-declarations */
+  }
+
+  /**
    * Returns an array of lines in the textarea, with information about their
    * start/end offsets and whether they are included in the current selection.
    */
@@ -65,11 +121,11 @@ export default class IndentHelper {
       // Special case: if cursor is at the beginning of the line, move it one
       // indent right.
       const line = selectedLines[0];
-      this.element.setRangeText(this.seq, line.start, line.start, 'end');
+      this.setRangeText(this.seq, line.start, line.start, 'end');
     } else {
       selectedLines.reverse();
       selectedLines.forEach(line => {
-        this.element.setRangeText(INDENT_SEQUENCE, line.start, line.start, 'preserve');
+        this.setRangeText(INDENT_SEQUENCE, line.start, line.start, 'preserve');
       });
     }
   }
@@ -83,7 +139,7 @@ export default class IndentHelper {
     lines
       .filter(line => line.text.startsWith(this.seq))
       .forEach(line => {
-        this.element.setRangeText('', line.start, line.start + this.seq.length, 'preserve');
+        this.setRangeText('', line.start, line.start + this.seq.length, 'preserve');
       });
   }
 
@@ -95,13 +151,13 @@ export default class IndentHelper {
 
     if (this.isRangeSelection()) {
       // Manually kill the selection before calculating the indent
-      this.element.setRangeText('', start, end, 'start');
+      this.setRangeText('', start, end, 'start');
     }
 
     // Auto-indent the next line
     const currentLine = this.splitLines().find(line => line.end >= start);
     const spaces = countLeftSpaces(currentLine.text);
-    this.element.setRangeText(`\n${' '.repeat(spaces)}`, start, start, 'end');
+    this.setRangeText(`\n${' '.repeat(spaces)}`, start, start, 'end');
   }
 
   /**
@@ -123,7 +179,7 @@ export default class IndentHelper {
         if (spacesToDelete === 0) {
           spacesToDelete = this.seq.length;
         }
-        this.element.setRangeText('', start - spacesToDelete, start, 'start');
+        this.setRangeText('', start - spacesToDelete, start, 'start');
       }
     }
   }

@@ -7,6 +7,15 @@ import IndentHelper from './helpers/indent_helper';
 import { getPlatformLeaderKeyHTML, keystroke } from './lib/utils/common_utils';
 import UndoStack from './lib/utils/undo_stack';
 
+// Keycodes
+const CODE_BACKSPACE = 8;
+const CODE_ENTER = 13;
+const CODE_SPACE = 32;
+const CODE_Y = 89;
+const CODE_Z = 90;
+const CODE_LEFT_BRACKET = 219;
+const CODE_RIGHT_BRACKET = 221;
+
 export default class GLForm {
   constructor(form, enableGFM = {}) {
     this.handleKeyShortcuts = this.handleKeyShortcuts.bind(this);
@@ -126,20 +135,20 @@ export default class GLForm {
       stack.save(content);
     }
 
-    if (keystroke(event, 'Leader+Z')) {
+    if (keystroke(event, CODE_Z, 'l')) {
       // ==== Undo ====
       event.preventDefault();
       stack.save(content);
       if (stack.canUndo()) {
         this.setState(stack.undo());
       }
-    } else if (keystroke(event, 'Leader+Shift+Z') || keystroke(event, 'Leader+Y')) {
+    } else if (keystroke(event, CODE_Z, 'ls') || keystroke(event, CODE_Y, 'l')) {
       // ==== Redo ====
       event.preventDefault();
       if (stack.canRedo()) {
         this.setState(stack.redo());
       }
-    } else if (keystroke(event, 'Space') || keystroke(event, 'Enter')) {
+    } else if (keystroke(event, CODE_SPACE) || keystroke(event, CODE_ENTER)) {
       // ==== Save after finishing a word ====
       stack.save(content);
     } else if (selectionStart !== selectionEnd) {
@@ -155,19 +164,19 @@ export default class GLForm {
   }
 
   handleIndent(event) {
-    if (keystroke(event, 'Leader+[')) {
+    if (keystroke(event, CODE_LEFT_BRACKET, 'l')) {
       // ==== Unindent selected lines ====
       event.preventDefault();
       this.indentHelper.unindent();
-    } else if (keystroke(event, 'Leader+]')) {
+    } else if (keystroke(event, CODE_RIGHT_BRACKET, 'l')) {
       // ==== Indent selected lines ====
       event.preventDefault();
       this.indentHelper.indent();
-    } else if (keystroke(event, 'Enter')) {
+    } else if (keystroke(event, CODE_ENTER)) {
       // ==== Auto-indent new lines ====
       event.preventDefault();
       this.indentHelper.newline();
-    } else if (keystroke(event, 'Backspace')) {
+    } else if (keystroke(event, CODE_BACKSPACE)) {
       // ==== Auto-delete indents at the beginning of the line ====
       this.indentHelper.backspace(event);
     }

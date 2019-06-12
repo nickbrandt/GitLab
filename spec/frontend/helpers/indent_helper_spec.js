@@ -9,42 +9,6 @@ function createMockTextarea() {
     const [start, end] = el.selection();
     return start === end ? start : undefined;
   };
-
-  // Mock the setRangeText function, because JSDOM has a bug.
-  // https://github.com/jsdom/jsdom/issues/2601
-  el.setRangeText = jest.fn().mockImplementation((text, start, end, mode = 'preserve') => {
-    let selStart = el.selectionStart;
-    let selEnd = el.selectionEnd;
-
-    el.value = el.value.slice(0, start) + text + el.value.slice(end);
-    if (mode === 'select') {
-      el.setSelectionRange(start, start + text.length);
-    } else if (mode === 'start') {
-      el.setSelectionRange(start, start);
-    } else if (mode === 'end') {
-      el.setSelectionRange(start + text.length, start + text.length);
-    } else {
-      // mode === 'preserve'
-      // Algorithm here: https://www.w3.org/TR/html50/forms.html#dom-textarea/input-setrangetext
-      const newEnd = start + text.length;
-      const delta = text.length - (end - start);
-
-      if (selStart > end) {
-        selStart += delta;
-      } else if (selStart > start) {
-        selStart = start;
-      }
-
-      if (selEnd > end) {
-        selEnd += delta;
-      } else if (selEnd > start) {
-        selEnd = newEnd;
-      }
-
-      el.setSelectionRange(selStart, selEnd);
-    }
-  });
-
   return el;
 }
 
@@ -55,19 +19,6 @@ describe('indent_helper', () => {
   beforeEach(() => {
     element = createMockTextarea();
     ih = new IndentHelper(element);
-  });
-
-  it('test creates a mock textarea', () => {
-    expect(element.tagName.toLowerCase()).toBe('textarea');
-    expect(element.value).toBe('');
-    element.setRangeText('foobar', 0, 0, 'select');
-    expect(element.value).toBe('foobar');
-    expect(element.selectionStart).toBe(0);
-    expect(element.selectionEnd).toBe(6);
-
-    element.setSelectionRange(999, 999);
-    expect(element.selectionStart).toBe(6);
-    expect(element.selectionEnd).toBe(6);
   });
 
   describe('indents', () => {
