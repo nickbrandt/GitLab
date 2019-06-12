@@ -44,14 +44,7 @@ module Geo
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      relation =
-        if use_legacy_queries_for_selective_sync?
-          legacy_finder.attachments_unsynced(except_file_ids: except_file_ids)
-        else
-          attachments_unsynced(except_file_ids: except_file_ids)
-        end
-
-      relation.limit(batch_size)
+      attachments_unsynced(except_file_ids: except_file_ids).limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

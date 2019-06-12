@@ -16,16 +16,6 @@ module Geo
       )
     end
 
-    def attachments_unsynced(except_file_ids:)
-      registry_file_ids = Geo::FileRegistry.attachments.pluck_file_key | except_file_ids
-
-      legacy_left_outer_join_registry_ids(
-        syncable,
-        registry_file_ids,
-        Upload
-      )
-    end
-
     private
 
     def attachments
