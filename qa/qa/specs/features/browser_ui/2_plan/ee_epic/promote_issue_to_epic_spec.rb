@@ -32,8 +32,6 @@ module QA
           # confidential information)' from being shown, which may cause the click not
           # to work properly.
           show.comment('/promote ')
-
-          expect(show).to have_content("promoted to epic")
         end
 
         group.visit!
