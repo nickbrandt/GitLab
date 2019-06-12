@@ -71,12 +71,30 @@ module API
 
           error!('Overriding approvals is disabled', 422) if merge_request.project.disable_overriding_approvers_per_merge_request
 
-          merge_request = ::MergeRequests::UpdateService.new(user_project, current_user, approvals_before_merge: params[:approvals_required]).execute(merge_request)
+          if merge_request.approval_state.use_fallback?
+            merge_request = ::MergeRequests::UpdateService.new(user_project, current_user, approvals_before_merge: params[:approvals_required]).execute(merge_request)
 
-          if merge_request.valid?
-            present_approval(merge_request)
+            if merge_request.valid?
+              present_approval(merge_request)
+            else
+              handle_merge_request_errors! merge_request.errors
+            end
           else
-            handle_merge_request_errors! merge_request.errors
+            rule = merge_request.approval_rules.regular.first
+
+            unless rule
+              ::ApprovalRules::CopyToMergeRequestService.new(merge_request, current_user).execute
+              rule = merge_request.approval_rules.regular.first
+            end
+
+            result = ::ApprovalRules::UpdateService.new(rule, current_user, params.slice(:approvals_required)).execute
+
+            if result[:status] == :success
+              merge_request.reset_approval_cache!
+              present_approval(merge_request)
+            else
+              render_api_error!(result[:message], 400)
+            end
           end
         end
 

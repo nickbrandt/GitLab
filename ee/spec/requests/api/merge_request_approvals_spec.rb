@@ -171,6 +171,39 @@ describe API::MergeRequestApprovals do
           expect(response).to have_gitlab_http_status(201)
           expect(json_response['approvals_required']).to eq(5)
         end
+
+        context 'when only project regular rule exists' do
+          let!(:project_rule) { create(:approval_project_rule, project: project, users: [approver], approvals_required: 3) }
+
+          it 'copies over project rules and update its approvals_required' do
+            expect do
+              post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
+            end.to change { merge_request.approval_rules.count }.by(1)
+
+            merge_request.reset_approval_cache!
+            rule = merge_request.approval_rules.first
+            puts rule.id
+
+            expect(project_rule.reload.approvals_required).to eq(3)
+            expect(rule.approvals_required).to eq(5)
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response['approvals_required']).to eq(5)
+          end
+        end
+
+        context 'when merge request regular rule exists' do
+          let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: [approver], approvals_required: 3) }
+
+          it 'updates regular rule' do
+            expect do
+              post api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approvals", current_user), params: { approvals_required: 5 }
+            end.not_to change { merge_request.reload.approvals_before_merge }
+
+            expect(rule.reload.approvals_required).to eq(5)
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response['approvals_required']).to eq(5)
+          end
+        end
       end
 
       context 'when disable_overriding_approvers_per_merge_request is true on the project' do
