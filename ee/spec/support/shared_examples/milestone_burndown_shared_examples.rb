@@ -9,9 +9,12 @@ shared_examples_for 'group and project milestone burndowns' do |route_definition
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response).to be_an Array
-      expect(json_response.first['created_at'].to_time).to eq(Date.today.beginning_of_day)
-      expect(json_response.first['weight']).to eq(2)
+      expect(json_response.first['created_at'].to_time).to eq(Date.today.middle_of_day)
+      expect(json_response.first['weight']).to eq(5)
       expect(json_response.first['action']).to eq('created')
+      expect(json_response.last['created_at'].to_time).to eq(Date.today.beginning_of_day)
+      expect(json_response.last['weight']).to eq(2)
+      expect(json_response.last['action']).to eq('created')
     end
 
     it 'returns 404 when user is not authorized to read milestone' do
