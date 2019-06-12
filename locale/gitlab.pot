@@ -3454,6 +3454,9 @@ msgstr ""
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
 msgstr ""
 
+msgid "Connecting to terminal sync service"
+msgstr ""
+
 msgid "Connecting..."
 msgstr ""
 
@@ -12939,6 +12942,9 @@ msgstr ""
 msgid "Terminal for environment"
 msgstr ""
 
+msgid "Terminal sync service is running"
+msgstr ""
+
 msgid "Terms of Service Agreement and Privacy Policy"
 msgstr ""
 
@@ -14380,6 +14386,9 @@ msgid "UploadLink|click to upload"
 msgstr ""
 
 msgid "Uploaded on"
+msgstr ""
+
+msgid "Uploading changes to terminal"
 msgstr ""
 
 msgid "Uploads"
