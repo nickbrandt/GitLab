@@ -8,8 +8,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
-  # Deprecated scope until code_owner column has been migrated to rule_type
-  scope :code_owner, -> { where(code_owner: true).or(rule_type: :code_owner) }
 
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
@@ -31,16 +29,32 @@ class ApprovalMergeRequestRule < ApplicationRecord
     code_owner: 2
   }
 
+  # Deprecated scope until code_owner column has been migrated to rule_type
+  scope :code_owner, -> { where(code_owner: true).or(where(rule_type: :code_owner)) }
+
   def self.find_or_create_code_owner_rule(merge_request, pattern)
-    merge_request.approval_rules.safe_find_or_create_by(
-      rule_type: :code_owner,
-      code_owner: true, # deprecated, replaced with `rule_type: :code_owner`
-      name: pattern
-    )
+    merge_request.approval_rules.code_owner.where(name: pattern).first_or_create do |rule|
+      rule.rule_type = :code_owner
+      rule.code_owner = true # deprecated, replaced with `rule_type: :code_owner`
+    end
+  rescue ActiveRecord::RecordNotUnique
+    retry
   end
 
   def project
     merge_request.target_project
+  end
+
+  # ApprovalRuleLike interface
+  # Temporary override to handle legacy records that have not yet been migrated
+  def regular?
+    read_attribute(:rule_type) == 'regular' || code_owner == false
+  end
+  alias_method :regular, :regular?
+
+  # Temporary override to handle legacy records that have not yet been migrated
+  def code_owner?
+    read_attribute(:rule_type) == 'code_owner' || code_owner
   end
 
   def approval_project_rule_id=(approval_project_rule_id)
@@ -73,9 +87,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
     self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
   end
-
-  # ApprovalRuleLike interface
-  alias_method :regular, :regular?
 
   private
 
