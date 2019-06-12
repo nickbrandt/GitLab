@@ -503,59 +503,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
       stub_fdw_disabled
     end
 
-    describe '#find_migrated_local' do
-      let!(:upload_1) { create(:upload, model: synced_group) }
-      let!(:upload_2) { create(:upload, model: unsynced_group) }
-      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project) }
-      let!(:upload_4) { create(:upload, model: unsynced_project) }
-      let!(:upload_5) { create(:upload, model: synced_project) }
-      let!(:upload_remote_1) { create(:upload, :object_storage, model: synced_project) }
-      let!(:upload_remote_2) { create(:upload, :object_storage, model: unsynced_project) }
-
-      before do
-        create(:geo_file_registry, :avatar, file_id: upload_remote_1.id)
-        create(:geo_file_registry, :avatar, file_id: upload_remote_2.id)
-      end
-
-      it 'returns attachments stored remotely and successfully synced locally' do
-        attachments = subject.find_migrated_local(batch_size: 100, except_file_ids: [upload_remote_2.id])
-
-        expect(attachments).to match_ids(upload_remote_1)
-      end
-
-      it 'excludes attachments stored remotely, but not synced yet' do
-        create(:upload, :object_storage, model: synced_group)
-
-        attachments = subject.find_migrated_local(batch_size: 100)
-
-        expect(attachments).to match_ids(upload_remote_1, upload_remote_2)
-      end
-
-      context 'with selective sync by namespace' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'returns attachments stored remotely and successfully synced locally' do
-          attachments = subject.find_migrated_local(batch_size: 10)
-
-          expect(attachments).to match_ids(upload_remote_1)
-        end
-      end
-
-      context 'with selective sync by shard' do
-        before do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-        end
-
-        it 'returns attachments stored remotely and successfully synced locally' do
-          attachments = subject.find_migrated_local(batch_size: 10)
-
-          expect(attachments).to match_ids(upload_remote_2)
-        end
-      end
-    end
-
     describe '#count_syncable' do
       let!(:upload_1) { create(:upload, model: synced_group) }
       let!(:upload_2) { create(:upload, model: unsynced_group) }
