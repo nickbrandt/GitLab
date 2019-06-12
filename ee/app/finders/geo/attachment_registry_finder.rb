@@ -137,13 +137,7 @@ module Geo
     end
 
     def attachments_failed
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.attachments_failed
-      else
-        registries_for_attachments
-          .syncable
-          .merge(Geo::FileRegistry.failed)
-      end
+      registries_for_attachments.syncable.merge(Geo::FileRegistry.failed)
     end
 
     def attachments_synced_missing_on_primary

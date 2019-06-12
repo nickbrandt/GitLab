@@ -26,14 +26,6 @@ module Geo
       )
     end
 
-    def attachments_failed
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::FileRegistry.attachments.failed.pluck_file_key,
-        Upload
-      )
-    end
-
     def attachments_synced_missing_on_primary
       legacy_inner_join_registry_ids(
         syncable,
