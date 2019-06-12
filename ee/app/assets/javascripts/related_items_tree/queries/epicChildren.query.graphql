@@ -1,0 +1,27 @@
+#import "./epic.fragment.graphql"
+#import "./issue.fragment.graphql"
+
+query childItems($fullPath: ID!, $iid: ID) {
+  group(fullPath: $fullPath) {
+    id
+    path
+    fullPath
+    epic(iid: $iid) {
+      ...BaseEpic
+      children {
+        edges {
+          node {
+            ...EpicNode
+          }
+        }
+      }
+      issues {
+        edges {
+          node {
+            ...IssueNode
+          }
+        }
+      }
+    }
+  }
+}

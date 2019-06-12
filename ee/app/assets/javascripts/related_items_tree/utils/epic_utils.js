@@ -2,14 +2,7 @@ import createGqClient from '~/lib/graphql';
 
 import { ChildType, PathIdSeparator } from '../constants';
 
-export const gqClient = createGqClient(
-  {},
-  {
-    cacheConfig: {
-      addTypename: false,
-    },
-  },
-);
+export const gqClient = createGqClient();
 
 /**
  * Returns formatted child item to include additional
