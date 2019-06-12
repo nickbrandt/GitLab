@@ -68,15 +68,15 @@ module QA
 
         it 'user clones and pushes to project within a group using Git HTTP' do
           branch_name = "new_branch"
-          user_attributes = {
-            email: 'saml_dev@example.com',
-            name: 'SAML Developer',
-            username: 'saml_dev',
-            password: 'password'
-          }
-          create_user_via_api(user_attributes)
 
-          add_user_to_group_via_api(user_attributes[:username], @group, '30')
+          user = Resource::User.new.tap do |user|
+            user.name = 'SAML Developer'
+            user.username = 'saml_dev'
+          end
+
+          create_user_via_api(user)
+
+          add_user_to_group_via_api(user.username, @group, '30')
 
           EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
@@ -97,23 +97,11 @@ module QA
 
           @project.visit!
 
-          Git::Repository.perform do |repository|
-            repository.uri = @project.repository_http_location.uri
-
-            repository.username = user_attributes[:username]
-            repository.password = user_attributes[:password]
-
-            repository.act do
-              clone
-              configure_identity(user_attributes[:name], user_attributes[:email])
-              checkout(branch_name, new_branch: true)
-              commit_file('test.rb', 'class Test; end', 'Add Test class')
-              commit_file('README.md', '# Test', 'Add Readme')
-              push_changes(branch_name)
-            end
+          Resource::Repository::ProjectPush.fabricate! do |push|
+            push.project = @project
+            push.branch_name = branch_name
+            push.user = user
           end
-
-          @project.wait_for_push_new_branch(branch_name)
         end
       end
       after(:all) do
@@ -134,17 +122,17 @@ module QA
 
     def create_user_via_api(user)
       Resource::User.fabricate_via_api! do |resource|
-        resource.username = user[:username]
-        resource.name = user[:name]
-        resource.email = user[:email]
-        resource.password = user[:password]
+        resource.username = user.username
+        resource.name = user.name
+        resource.email = user.email
+        resource.password = user.password
       end
     end
 
     def add_user_to_group_via_api(username, group, access_level)
       api_client = Runtime::API::Client.new(:gitlab)
       response = get Runtime::API::Request.new(api_client, "/users?username=#{username}").url
-      post Runtime::API::Request.new(api_client, group.api_members_path).url, { user_id: parse_body(response).first[:id], access_level: access_level }
+      post Runtime::API::Request.new(api_client, group.api_members_path).url, {user_id: parse_body(response).first[:id], access_level: access_level}
     end
   end
 end
