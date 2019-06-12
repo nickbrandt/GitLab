@@ -13,3 +13,9 @@ export const ONBOARDING_PROPS_DEFAULTS = {
   lastStepIndex: -1,
   createdProjectPath: '',
 };
+
+export const ACCEPTING_MR_LABEL_TEXT = 'Accepting merge requests';
+
+export const LABEL_SEARCH_QUERY = `scope=all&state=opened&label_name[]=${encodeURIComponent(
+  ACCEPTING_MR_LABEL_TEXT,
+)}`;
