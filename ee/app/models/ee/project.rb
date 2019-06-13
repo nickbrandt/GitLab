@@ -76,6 +76,8 @@ module EE
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
+      has_many :project_aliases
+
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
       scope :mirror, -> { where(mirror: true) }
