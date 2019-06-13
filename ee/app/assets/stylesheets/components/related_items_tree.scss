@@ -12,30 +12,12 @@
     border-bottom: 1px solid $border-color;
   }
 
-  .related-items-tree-body {
-    > .tree-root {
-      padding-top: $gl-vert-padding;
-      padding-bottom: 0;
-
-      > .list-item:last-child .tree-root:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
   .sub-tree-root {
     margin-left: $gl-padding-24;
     padding: 0;
   }
 
   .tree-item {
-    &.has-children.item-expanded {
-      > .list-item-body > .card-slim,
-      > .tree-root .tree-item:last-child .card-slim {
-        margin-bottom: $gl-vert-padding;
-      }
-    }
-
     .btn-tree-item-chevron {
       margin-bottom: $gl-padding-4;
       margin-right: $gl-padding-4;
@@ -58,5 +40,21 @@
       margin-left: $gl-padding-4 / 2;
       margin-right: $gl-padding-4;
     }
+  }
+}
+
+.related-items-tree-body > .tree-root {
+  padding-top: $gl-vert-padding;
+  padding-bottom: 0;
+}
+
+.tree-root > .list-item:last-child .tree-root:last-child {
+  margin-bottom: 0;
+}
+
+.tree-item.has-children.item-expanded {
+  > .list-item-body > .card-slim,
+  .tree-item:last-child .card-slim {
+    margin-bottom: $gl-vert-padding;
   }
 }
