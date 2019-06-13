@@ -204,6 +204,7 @@ export const isMetaKey = e => e.metaKey || e.ctrlKey || e.altKey || e.shiftKey;
 export const isMetaClick = e => e.metaKey || e.ctrlKey || e.which === 2;
 
 export const getPlatformLeaderKey = () => {
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   if (navigator && navigator.platform && navigator.platform.startsWith('Mac')) {
     return 'meta';
   }
@@ -214,6 +215,7 @@ export const getPlatformLeaderKeyHTML = () => {
   if (getPlatformLeaderKey() === 'meta') {
     return '&#8984;';
   }
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   return 'Ctrl';
 };
 
