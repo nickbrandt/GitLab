@@ -55,6 +55,20 @@ describe ApprovalMergeRequestRule do
         expect(new).not_to be_valid
       end
     end
+
+    context 'report_approver rules' do
+      it 'is valid' do
+        expect(build(:report_approver_rule)).to be_valid
+      end
+
+      it 'validates presence of report_type' do
+        rule = build(:report_approver_rule)
+        expect(rule).to be_valid
+
+        rule.report_type = nil
+        expect(rule).not_to be_valid
+      end
+    end
   end
 
   context 'scopes'  do

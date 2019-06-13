@@ -45,7 +45,15 @@ module ApprovalRuleLike
     end
   end
 
-  def rule_type
-    @rule_type ||= code_owner? ? :code_owner : :regular
+  def code_owner?
+    raise NotImplementedError
+  end
+
+  def regular?
+    raise NotImplementedError
+  end
+
+  def report_approver?
+    raise NotImplementedError
   end
 end

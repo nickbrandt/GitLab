@@ -34,4 +34,10 @@ describe ApprovalProjectRule do
       expect(subject.code_owner?).to eq(false)
     end
   end
+
+  describe '#rule_type' do
+    it 'returns the correct type' do
+      expect(build(:approval_project_rule).rule_type).to eq('regular')
+    end
+  end
 end

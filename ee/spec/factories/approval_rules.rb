@@ -13,6 +13,13 @@ FactoryBot.define do
     sequence(:name) { |n| "*-#{n}.js" }
   end
 
+  factory :report_approver_rule, parent: :approval_merge_request_rule do
+    merge_request
+    rule_type :report_approver
+    report_type :security
+    sequence(:name) { |n| "*-#{n}.js" }
+  end
+
   factory :approval_project_rule do
     project
     name ApprovalRuleLike::DEFAULT_NAME
