@@ -370,4 +370,38 @@ describe SystemNoteService do
       end
     end
   end
+
+  describe '.add_to_merge_train_when_pipeline_succeeds' do
+    subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, noteable.diff_head_commit) }
+
+    let(:pipeline) { build(:ci_pipeline_without_jobs) }
+
+    let(:noteable) do
+      create(:merge_request, source_project: project, target_project: project)
+    end
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'merge' }
+    end
+
+    it "posts the 'add to merge train when pipeline succeeds' system note" do
+      expect(subject.note).to match(%r{enabled automatic add to merge train when the pipeline for (\w+/\w+@)?\h{40} succeeds})
+    end
+  end
+
+  describe '.cancel_add_to_merge_train_when_pipeline_succeeds' do
+    subject { described_class.cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author) }
+
+    let(:noteable) do
+      create(:merge_request, source_project: project, target_project: project)
+    end
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'merge' }
+    end
+
+    it "posts the 'add to merge train when pipeline succeeds' system note" do
+      expect(subject.note).to eq 'cancelled automatic add to merge train'
+    end
+  end
 end

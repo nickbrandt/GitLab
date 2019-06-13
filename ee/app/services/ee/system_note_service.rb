@@ -210,5 +210,19 @@ module EE
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
+
+    # Called when 'add to merge train when pipeline succeeds' is executed
+    def add_to_merge_train_when_pipeline_succeeds(noteable, project, author, last_commit)
+      body = "enabled automatic add to merge train when the pipeline for #{last_commit.to_reference(project)} succeeds"
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    # Called when 'add to merge train when pipeline succeeds' is canceled
+    def cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author)
+      body = 'cancelled automatic add to merge train'
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
   end
 end

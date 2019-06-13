@@ -24,6 +24,12 @@ FactoryBot.modify do
       end
     end
 
+    trait :add_to_merge_train_when_pipeline_succeeds do
+      auto_merge_enabled true
+      auto_merge_strategy AutoMergeService::STRATEGY_ADD_TO_MERGE_TRAIN_WHEN_PIPELINE_SUCCEEDS
+      merge_user { author }
+    end
+
     transient do
       approval_groups []
       approval_users []
