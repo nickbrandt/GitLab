@@ -10,16 +10,40 @@ describe 'Groups > Usage Quotas' do
     sign_in(user)
   end
 
+  shared_examples 'linked in group settings dropdown' do
+    it 'is linked within the group settings dropdown' do
+      visit edit_group_path(group)
+
+      page.within('.nav-sidebar') do
+        expect(page).to have_link('Usage Quotas')
+      end
+    end
+
+    context 'when usage_quotas is not available' do
+      before do
+        stub_licensed_features(usage_quotas: false)
+      end
+
+      it 'is not linked within the group settings dropdown' do
+        visit edit_group_path(group)
+
+        page.within('.nav-sidebar') do
+          expect(page).not_to have_link('Usage Quotas')
+        end
+      end
+
+      it 'renders a 404' do
+        visit_pipeline_quota_page
+
+        expect(page).to have_http_status(:not_found)
+      end
+    end
+  end
+
   context 'with no quota' do
     let(:group) { create(:group, :with_build_minutes) }
 
-    it 'is not linked within the group settings dropdown' do
-      visit group_path(group)
-
-      page.within('.nav-sidebar') do
-        expect(page).not_to have_selector(:link_or_button, 'Pipeline Quota')
-      end
-    end
+    include_examples 'linked in group settings dropdown'
 
     it 'shows correct group quota info' do
       visit_pipeline_quota_page
@@ -35,11 +59,7 @@ describe 'Groups > Usage Quotas' do
     let(:group) { create(:group, :with_not_used_build_minutes_limit) }
     let!(:project) { create(:project, namespace: group, shared_runners_enabled: false) }
 
-    it 'is linked within the group settings dropdown' do
-      visit edit_group_path(group)
-
-      expect(page).to have_link('Usage Quotas')
-    end
+    include_examples 'linked in group settings dropdown'
 
     it 'shows correct group quota info' do
       visit_pipeline_quota_page
@@ -58,11 +78,7 @@ describe 'Groups > Usage Quotas' do
   context 'minutes under quota' do
     let(:group) { create(:group, :with_not_used_build_minutes_limit) }
 
-    it 'is linked within the group settings tab' do
-      visit edit_group_path(group)
-
-      expect(page).to have_link('Usage Quotas')
-    end
+    include_examples 'linked in group settings dropdown'
 
     it 'shows correct group quota info' do
       visit_pipeline_quota_page
@@ -79,11 +95,7 @@ describe 'Groups > Usage Quotas' do
     let(:group) { create(:group, :with_used_build_minutes_limit) }
     let!(:other_project) { create(:project, namespace: group, shared_runners_enabled: false) }
 
-    it 'is linked within the group settings tab' do
-      visit edit_group_path(group)
-
-      expect(page).to have_link('Usage Quotas')
-    end
+    include_examples 'linked in group settings dropdown'
 
     it 'shows correct group quota and projects info' do
       visit_pipeline_quota_page

@@ -14460,9 +14460,6 @@ msgstr ""
 msgid "UsageQuota|Usage of group resources across the projects in the %{strong_start}%{group_name}%{strong_end} group"
 msgstr ""
 
-msgid "UsageQuota|Usage quotas"
-msgstr ""
-
 msgid "UsageQuota|Usage since"
 msgstr ""
 
