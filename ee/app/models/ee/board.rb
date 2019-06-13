@@ -23,7 +23,7 @@ module EE
 
       validates :name, presence: true
 
-      scope :with_associations, -> { preload(:destroyable_lists, :milestone, :board_labels, :labels) }
+      scope :with_associations, -> { preload(:destroyable_lists, :milestone, :board_labels, :labels, :assignee) }
     end
 
     override :scoped?
