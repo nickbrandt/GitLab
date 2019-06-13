@@ -189,5 +189,26 @@ module EE
     def change_epics_relation_act(subject_epic, user, action, text, text_params)
       create_note(NoteSummary.new(subject_epic, nil, user, text % text_params, action: action))
     end
+
+    # Called when 'merge train' is executed
+    def merge_train(noteable, project, author, merge_train)
+      index = merge_train.index
+
+      body = if index == 0
+               'started a merge train'
+             else
+               "added this merge request to the merge train at index #{index}"
+             end
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    # Called when 'merge train' is canceled
+    def cancel_merge_train(noteable, project, author, reason: nil)
+      body = 'removed this merge request from the merge train'
+      body += " because #{reason}" if reason
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
   end
 end

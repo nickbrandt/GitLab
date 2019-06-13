@@ -622,46 +622,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#get_on_train!' do
-    subject { merge_request.get_on_train!(user) }
-
-    let(:user) { create(:user) }
-
-    it 'gets on the train' do
-      expect { subject }.to change { MergeTrain.count }.by(1)
-    end
-
-    context 'when the merge request is already on a merge train' do
-      before do
-        merge_request.get_on_train!(user)
-      end
-
-      it 'raises an exception' do
-        expect { merge_request.get_on_train!(user) }.to raise_exception(ActiveRecord::RecordNotUnique)
-      end
-    end
-  end
-
-  describe '#get_off_train!' do
-    subject { merge_request.get_off_train! }
-
-    let!(:merge_request) do
-      create(:merge_request, :on_train, source_project: project, target_project: project)
-    end
-
-    it 'gets off from the train' do
-      expect { subject }.to change { MergeTrain.count }.by(-1)
-    end
-
-    context 'when the merge request is not on a merge train yet' do
-      let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
-
-      it 'raises an exception' do
-        expect { subject }.to raise_exception(NoMethodError)
-      end
-    end
-  end
-
   describe '#on_train?' do
     subject { merge_request.on_train? }
 
