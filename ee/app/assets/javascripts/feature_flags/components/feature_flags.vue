@@ -52,6 +52,11 @@ export default {
       type: String,
       required: true,
     },
+    rotateInstanceIdPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     unleashApiUrl: {
       type: String,
       required: true,
@@ -82,7 +87,20 @@ export default {
     disabled: 'disabled',
   },
   computed: {
-    ...mapState(['featureFlags', 'count', 'pageInfo', 'isLoading', 'hasError', 'options']),
+    ...mapState([
+      'featureFlags',
+      'count',
+      'pageInfo',
+      'isLoading',
+      'hasError',
+      'options',
+      'instanceId',
+      'isRotating',
+      'hasRotateError',
+    ]),
+    canUserRotateToken() {
+      return this.rotateInstanceIdPath !== '';
+    },
     shouldRenderTabs() {
       /* Do not show tabs until after the first request to get the count */
       return this.count.all !== undefined;
@@ -144,9 +162,18 @@ export default {
     this.setFeatureFlagsEndpoint(this.endpoint);
     this.setFeatureFlagsOptions({ scope: this.scope, page: this.page });
     this.fetchFeatureFlags();
+    this.setInstanceId(this.unleashApiInstanceId);
+    this.setInstanceIdEndpoint(this.rotateInstanceIdPath);
   },
   methods: {
-    ...mapActions(['setFeatureFlagsEndpoint', 'setFeatureFlagsOptions', 'fetchFeatureFlags']),
+    ...mapActions([
+      'setFeatureFlagsEndpoint',
+      'setFeatureFlagsOptions',
+      'fetchFeatureFlags',
+      'setInstanceIdEndpoint',
+      'setInstanceId',
+      'rotateInstanceId',
+    ]),
     onChangeTab(scope) {
       this.scope = scope;
       this.updateFeatureFlagOptions({
@@ -183,8 +210,12 @@ export default {
       :help-path="featureFlagsHelpPagePath"
       :help-anchor="featureFlagsAnchoredHelpPagePath"
       :api-url="unleashApiUrl"
-      :instance-id="unleashApiInstanceId"
+      :instance-id="instanceId"
+      :is-rotating="isRotating"
+      :has-rotate-error="hasRotateError"
+      :can-user-rotate-token="canUserRotateToken"
       modal-id="configure-feature-flags"
+      @token="rotateInstanceId()"
     />
     <h3 class="page-title with-button">
       {{ s__('FeatureFlags|Feature Flags') }}

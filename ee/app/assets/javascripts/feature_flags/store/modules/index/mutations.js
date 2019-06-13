@@ -11,6 +11,9 @@ export default {
   [types.SET_INSTANCE_ID_ENDPOINT](state, endpoint) {
     state.rotateEndpoint = endpoint;
   },
+  [types.SET_INSTANCE_ID](state, instance) {
+    state.instanceId = instance;
+  },
   [types.REQUEST_FEATURE_FLAGS](state) {
     state.isLoading = true;
   },

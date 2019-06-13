@@ -10840,10 +10840,16 @@ msgid_plural "Refreshing in %d seconds to show the updated status..."
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Regenerate instance ID"
+msgstr ""
+
 msgid "Regenerate key"
 msgstr ""
 
 msgid "Regenerate recovery codes"
+msgstr ""
+
+msgid "Regenerating the instance ID can break integration depending on the client you are using."
 msgstr ""
 
 msgid "Regex pattern"
@@ -14182,6 +14188,9 @@ msgid "URL"
 msgstr ""
 
 msgid "Unable to connect to server: %{error}"
+msgstr ""
+
+msgid "Unable to generate new instance ID"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
