@@ -26,7 +26,7 @@ module Elastic
       def self.elastic_search(query, options: {})
         options[:in] = %w(title^2 description)
 
-        query_hash = basic_query_hash(options[:in], query, page: options[:page], per_page: options[:per_page])
+        query_hash = basic_query_hash(options[:in], query)
 
         query_hash = project_ids_filter(query_hash, options)
 
