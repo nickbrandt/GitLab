@@ -65,9 +65,11 @@ export default {
       ) {
         return '';
       } else if (startDate === firstDayOfWeek) {
+        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
         return 'left: 0;';
       }
 
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
       return `left: ${startDate * dayWidth - dayWidth / 2}px;`;
     },
     /**
