@@ -14589,10 +14589,16 @@ msgstr ""
 msgid "UserOnboardingTour|Commits are shown in chronological order and can be filtered by the commit message or by the branch."
 msgstr ""
 
+msgid "UserOnboardingTour|Create a project"
+msgstr ""
+
 msgid "UserOnboardingTour|Exit 'Learn GitLab'"
 msgstr ""
 
 msgid "UserOnboardingTour|Got it"
+msgstr ""
+
+msgid "UserOnboardingTour|Guided GitLab Tour"
 msgstr ""
 
 msgid "UserOnboardingTour|Here you can compare the changes of this branch to another one. Changes are divided by files so that it's easier to see what was changed where."
@@ -14611,6 +14617,9 @@ msgid "UserOnboardingTour|Here you can see what changes were made with this comm
 msgstr ""
 
 msgid "UserOnboardingTour|Here's an overview of branches in the %{emphasisStart}%{projectName}%{emphasisEnd} project. They're split into Active and Stale.%{lineBreak}%{lineBreak}From here, you can create a new merge request, from a branch or compare the branch to any other branch in the project. By default, it will compare it to the master branch."
+msgstr ""
+
+msgid "UserOnboardingTour|Invite colleagues"
 msgstr ""
 
 msgid "UserOnboardingTour|Issues are great for communicating and keeping track of progess in GitLab. These are all issues that are open in the %{emphasisStart}%{projectName}%{emphasisEnd}.%{lineBreak}%{lineBreak}You can help us improve GitLab by contributing work to issues that are labeled <span class=\"badge color-label accept-mr-label\">Accepting merge requests</span>.%{lineBreak}%{lineBreak}This list can be filtered by labels, milestones, assignees, authors... We'll show you how it looks like when the list is filtered by a label."
@@ -14650,6 +14659,9 @@ msgid "UserOnboardingTour|Sweet! Your project was created is is ready to be used
 msgstr ""
 
 msgid "UserOnboardingTour|Take a look. Here's a nifty menu for quickly creating issues, merge requests, snippets, projects and groups. Click on it and select \"New project\" from the \"GitLab\" section to get started."
+msgstr ""
+
+msgid "UserOnboardingTour|Thanks for taking the guided tour. Remember, if you want to go through it again, you can start %{emphasisStart}Learn GitLab%{emphasisEnd} in the help menu on the top right."
 msgstr ""
 
 msgid "UserOnboardingTour|That's it for issues. Let'st take a look at %{emphasisStart}Merge Requests%{emphasisEnd}."
