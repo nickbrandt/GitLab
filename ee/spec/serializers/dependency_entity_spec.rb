@@ -18,10 +18,6 @@ describe DependencyEntity do
 
     subject { described_class.represent(dependency).as_json }
 
-    it { is_expected.to include(:name) }
-    it { is_expected.to include(:version) }
-    it { is_expected.to include(:packager) }
-    it { expect(subject[:location]).to include(:blob_path) }
-    it { expect(subject[:location]).to include(:path) }
+    it { is_expected.to eq(dependency) }
   end
 end
