@@ -14,7 +14,7 @@ import {
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
 import { ActionType, ChildType, ChildState } from '../constants';
 
-import childItems from '../queries/child_items.graphql';
+import epicChildren from '../queries/epicChildren.query.graphql';
 
 import * as types from './mutation_types';
 
@@ -74,7 +74,7 @@ export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
 
   gqClient
     .query({
-      query: childItems,
+      query: epicChildren,
       variables: { iid: parentItem.iid, fullPath: parentItem.fullPath },
     })
     .then(({ data }) => {
