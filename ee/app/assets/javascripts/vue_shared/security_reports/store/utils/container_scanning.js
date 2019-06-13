@@ -77,8 +77,10 @@ export const formatContainerScanningSolution = ({ fixedby, featurename, featurev
 };
 
 export const parseContainerScanningSeverity = severity => {
+  /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
   if (severity === 'Defcon1') {
     return SEVERITY_LEVELS.critical;
+    /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
   } else if (severity === 'Negligible') {
     return SEVERITY_LEVELS.low;
   }
@@ -114,6 +116,7 @@ export const parseSastContainer = (issues = [], feedback = [], image) =>
         image,
         operating_system: issue.namespace,
       },
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
       scanner: { id: 'clair', name: 'Clair' },
       identifiers: [
         {

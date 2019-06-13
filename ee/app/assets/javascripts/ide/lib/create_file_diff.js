@@ -1,3 +1,4 @@
+/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
 import { createTwoFilesPatch } from 'diff';
 import { commitActionTypes } from '~/ide/constants';
 
