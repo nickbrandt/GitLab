@@ -43,7 +43,11 @@ class EpicsFinder < IssuableFinder
     return @group if defined?(@group)
 
     group = Group.find(params[:group_id])
-    group = nil unless Ability.allowed?(current_user, :read_epic, group)
+
+    unless Ability.allowed?(current_user, :read_epic, group)
+      raise ActiveRecord::RecordNotFound
+                .new("Could not find a Group with ID #{params[:group_id]}")
+    end
 
     @group = group
   end
