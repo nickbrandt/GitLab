@@ -22,10 +22,11 @@
       %span
         Audit Events
 
+- if @group.feature_available?(:usage_quotas)
   = nav_link(path: 'usage_quota#index') do
     = link_to group_usage_quotas_path(@group), title: s_('UsageQuota|Usage Quotas') do
       %span
-        = s_('UsageQuota|Usage quotas')
+        = s_('UsageQuota|Usage Quotas')
 
 - if Gitlab::CurrentSettings.should_check_namespace_plan?
   = nav_link(path: 'billings#index') do
