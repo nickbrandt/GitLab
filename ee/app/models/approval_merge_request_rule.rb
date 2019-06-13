@@ -10,6 +10,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
 
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
+  validates :report_type, presence: true, if: :report_approver?
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
   # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
   validates :code_owner, inclusion: { in: [true], if: :code_owner? }
@@ -27,7 +28,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   enum rule_type: {
     regular: 1,
-    code_owner: 2
+    code_owner: 2,
+    report_approver: 3
+  }
+
+  enum report_type: {
+    security: 1
   }
 
   # Deprecated scope until code_owner column has been migrated to rule_type

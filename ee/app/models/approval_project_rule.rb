@@ -19,7 +19,16 @@ class ApprovalProjectRule < ApplicationRecord
   end
   alias_method :code_owner?, :code_owner
 
+  def report_approver
+    false
+  end
+  alias_method :report_approver?, :report_approver
+
   def source_rule
     nil
+  end
+
+  def rule_type
+    'regular'
   end
 end
