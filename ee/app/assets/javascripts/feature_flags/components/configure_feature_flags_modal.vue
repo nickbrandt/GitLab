@@ -1,7 +1,9 @@
 <script>
-import { GlModal, GlButton } from '@gitlab/ui';
+import { GlModal, GlButton, GlTooltipDirective, GlLoadingIcon } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
+import Callout from '~/vue_shared/components/callout.vue';
 
 export default {
   modalTitle: s__('FeatureFlags|Configure feature flags'),
@@ -9,11 +11,23 @@ export default {
   apiUrlCopyText: __('Copy URL to clipboard'),
   instanceIdLabelText: s__('FeatureFlags|Instance ID'),
   instanceIdCopyText: __('Copy ID to clipboard'),
+  regenerateInstanceIdTooltip: __('Regenerate instance ID'),
+  instanceIdRegenerateError: __('Unable to generate new instance ID'),
+  instanceIdRegenerateText: __(
+    'Regenerating the instance ID can break integration depending on the client you are using.',
+  ),
 
   components: {
     GlModal,
     GlButton,
     ModalCopyButton,
+    Icon,
+    Callout,
+    GlLoadingIcon,
+  },
+
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
 
   props: {
@@ -29,16 +43,26 @@ export default {
       type: String,
       required: true,
     },
-
     instanceId: {
       type: String,
       required: true,
     },
-
     modalId: {
       type: String,
       required: false,
       default: 'configure-feature-flags',
+    },
+    isRotating: {
+      type: Boolean,
+      required: true,
+    },
+    hasRotateError: {
+      type: Boolean,
+      required: true,
+    },
+    canUserRotateToken: {
+      type: Boolean,
+      required: true,
     },
   },
 
@@ -49,13 +73,19 @@ export default {
           'FeatureFlags|Install a %{docs_link_anchored_start}compatible client library%{docs_link_anchored_end} and specify the API URL, application name, and instance ID during the configuration setup. %{docs_link_start}More Information%{docs_link_end}',
         ),
         {
-          docs_link_anchored_start: `<a href="${this.helpAnchor}">`,
+          docs_link_anchored_start: `<a href="${this.helpAnchor}" target="_blank">`,
           docs_link_anchored_end: '</a>',
-          docs_link_start: `<a href="${this.helpPath}">`,
+          docs_link_start: `<a href="${this.helpPath}" target="_blank">`,
           docs_link_end: '</a>',
         },
         false,
       );
+    },
+  },
+
+  methods: {
+    rotateToken() {
+      this.$emit('token');
     },
   },
 };
@@ -82,7 +112,7 @@ export default {
             :text="apiUrl"
             :title="$options.apiUrlCopyText"
             :modal-id="modalId"
-            class="input-group-text btn btn-default"
+            class="input-group-text"
           />
         </span>
       </div>
@@ -97,16 +127,45 @@ export default {
           type="text"
           name="instance_id"
           readonly
+          :disabled="isRotating"
         />
-        <span class="input-group-append">
+
+        <gl-loading-icon
+          v-if="isRotating"
+          class="position-absolute align-self-center instance-id-loading-icon"
+        />
+
+        <div class="input-group-append">
+          <gl-button
+            v-if="canUserRotateToken"
+            v-gl-tooltip.hover
+            :title="$options.regenerateInstanceIdTooltip"
+            class="input-group-text js-ff-rotate-token-button"
+            @click="rotateToken"
+          >
+            <icon name="retry" />
+          </gl-button>
           <modal-copy-button
             :text="instanceId"
             :title="$options.instanceIdCopyText"
             :modal-id="modalId"
-            class="input-group-text btn btn-default"
+            :disabled="isRotating"
+            class="input-group-text"
           />
-        </span>
+        </div>
       </div>
     </div>
+    <div
+      v-if="hasRotateError"
+      class="text-danger d-flex align-items-center font-weight-normal mb-2"
+    >
+      <icon name="warning" class="mr-1" />
+      <span>{{ $options.instanceIdRegenerateError }}</span>
+    </div>
+    <callout
+      v-if="canUserRotateToken"
+      category="info"
+      :message="$options.instanceIdRegenerateText"
+    />
   </gl-modal>
 </template>

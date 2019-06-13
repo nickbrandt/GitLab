@@ -25,6 +25,7 @@ export default () =>
           csrfToken: csrf.token,
           canUserConfigure: this.dataset.canUserAdminFeatureFlag,
           newFeatureFlagPath: this.dataset.newFeatureFlagPath,
+          rotateInstanceIdPath: this.dataset.rotateInstanceIdPath,
         },
       });
     },

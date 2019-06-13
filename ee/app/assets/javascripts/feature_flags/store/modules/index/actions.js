@@ -37,7 +37,7 @@ export const rotateInstanceId = ({ state, dispatch }) => {
   dispatch('requestRotateInstanceId');
 
   axios
-    .get(state.rotateEndpoint)
+    .post(state.rotateEndpoint)
     .then(({ data = {}, headers }) => dispatch('receiveRotateInstanceIdSuccess', { data, headers }))
     .catch(() => dispatch('receiveRotateInstanceIdError'));
 };

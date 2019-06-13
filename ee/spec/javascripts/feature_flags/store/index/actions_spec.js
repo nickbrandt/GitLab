@@ -195,7 +195,7 @@ describe('Feature flags actions', () => {
 
     describe('success', () => {
       it('dispatches requestRotateInstanceId and receiveRotateInstanceIdSuccess ', done => {
-        mock.onGet(`${TEST_HOST}/endpoint.json`).replyOnce(200, rotateData, {});
+        mock.onPost(`${TEST_HOST}/endpoint.json`).replyOnce(200, rotateData, {});
 
         testAction(
           rotateInstanceId,
