@@ -10,6 +10,8 @@ module Types
 
     present_using EpicPresenter
 
+    implements(Types::Notes::NoteableType)
+
     field :id, GraphQL::ID_TYPE, null: false
     field :iid, GraphQL::ID_TYPE, null: false
     field :title, GraphQL::STRING_TYPE, null: true

@@ -7,6 +7,8 @@ module Types
 
       authorize :read_design
 
+      implements(Types::Notes::NoteableType)
+
       field :id, GraphQL::ID_TYPE, null: false
       field :project, Types::ProjectType, null: false
       field :issue, Types::IssueType, null: false
