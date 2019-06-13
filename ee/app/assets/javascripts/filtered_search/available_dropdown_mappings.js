@@ -4,9 +4,19 @@ import DropdownWeight from './dropdown_weight';
 import AvailableDropdownMappingsCE from '~/filtered_search/available_dropdown_mappings';
 
 export default class AvailableDropdownMappings {
-  constructor(container, baseEndpoint, groupsOnly, includeAncestorGroups, includeDescendantGroups) {
+  constructor(
+    container,
+    baseEndpoint,
+    labelsEndpoint,
+    milestonesEndpoint,
+    groupsOnly,
+    includeAncestorGroups,
+    includeDescendantGroups,
+  ) {
     this.container = container;
     this.baseEndpoint = baseEndpoint;
+    this.labelsEndpoint = labelsEndpoint;
+    this.milestonesEndpoint = milestonesEndpoint;
     this.groupsOnly = groupsOnly;
     this.includeAncestorGroups = includeAncestorGroups;
     this.includeDescendantGroups = includeDescendantGroups;
@@ -14,6 +24,8 @@ export default class AvailableDropdownMappings {
     this.ceAvailableMappings = new AvailableDropdownMappingsCE(
       container,
       baseEndpoint,
+      labelsEndpoint,
+      milestonesEndpoint,
       groupsOnly,
       includeAncestorGroups,
       includeDescendantGroups,
@@ -49,7 +61,7 @@ export default class AvailableDropdownMappings {
   }
 
   getMilestoneEndpoint() {
-    let endpoint = `${this.baseEndpoint}/milestones.json`;
+    let endpoint = `${this.milestonesEndpoint}.json`;
 
     if (this.groupsOnly) {
       endpoint = `${endpoint}?only_group_milestones=true`;
