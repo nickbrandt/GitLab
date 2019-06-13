@@ -69,7 +69,7 @@ module BoardsResponses
   end
 
   def serialize_as_json(resource)
-    resource.as_json(only: [:id])
+    serializer.represent(resource).as_json
   end
 
   def respond_with(resource)
@@ -79,6 +79,10 @@ module BoardsResponses
         render json: serialize_as_json(resource)
       end
     end
+  end
+
+  def serializer
+    BoardSerializer.new
   end
 end
 
