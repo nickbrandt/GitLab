@@ -93,11 +93,11 @@ const GUIDED_GITLAB_TOUR = [
         text: sprintf(
           s__(
             "UserOnboardingTour|Here you can see what changes were made with this commit, on what branch and if there's a related merge request. The status of the pipeline will also show up if CI/CD is set up.%{lineBreak}%{lineBreak}You can also comment on the lines of code that were changed and start a discussion with your colleagues!",
-            {
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: [{ text: s__('UserOnboardingTour|Got it'), btnClass: 'btn-primary' }],
       },
@@ -286,11 +286,11 @@ const GUIDED_GITLAB_TOUR = [
         text: sprintf(
           s__(
             "UserOnboardingTour|The structure of this page is very similar to the onfe of issues. Status, description, discussion and the sidebar are all here.%{lineBreak}%{lineBreak}But take a look below the description and you'll notice that there's more information about the merge request, the CI/CD pipeline and the options for approving it.%{lineBreak}%{lineBreak}Below, alongside the discussion you can also see more information about commits in this merge request, the status of pipelines and review all changes that were made.",
-            {
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: [{ text: s__('UserOnboardingTour|Got it'), btnClass: 'btn-primary' }],
       },
@@ -351,11 +351,11 @@ const GUIDED_GITLAB_TOUR = [
         text: sprintf(
           s__(
             'UserOnboardingTour|Here you can see the breakdown of the pipelines: its stages and jobs in each of the stages and their status.%{lineBreak}%{lineBreak}Our CI/CD pipelines are quite complex, most of our users have fewer and simpler pipelines.',
-            {
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: [
           {
@@ -416,11 +416,13 @@ const CREATE_PROJECT_TOUR = [
         text: sprintf(
           s__(
             "UserOnboardingTour|Here you can create a project from scratch, start with a template or import a repository from other platforms. Whatever you choose, we'll guide you through the process.%{lineBreak}%{lineBreak}Choose a way to create a project and click on %{emphasisStart}Create Project%{emphasisEnd} to progress to the next step.",
-            {
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            emphasisStart: '<strong>',
+            emphasisEnd: '</strong>',
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: null,
       },
@@ -435,11 +437,11 @@ const CREATE_PROJECT_TOUR = [
         text: sprintf(
           s__(
             'UserOnboardingTour|Sweet! Your project was created is is ready to be used.%{lineBreak}%{lineBreak}You can start adding files to the repository or clone it. One last thing we want to show you is how to invite your colleagues to your new project.',
-            {
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: [
           {
@@ -502,13 +504,13 @@ const INVITE_COLLEAGUES_TOUR = [
         text: sprintf(
           s__(
             'UserOnboardingTour|Here you can see the current members of the project (just you at the moment) and invite new members.%{lineBreak}%{lineBreak}You can invite multiple members at once (existing GitLab users or invite by email) and you can also set their roles and permissions.%{lineBreak}%{lineBreak}Add a few members and click on %{emphasisStart}Add to project%{emphasisEnd} to complete this step.',
-            {
-              emphasisStart: '<strong>',
-              emphasisEnd: '</strong>',
-              lineBreak: '</br>',
-            },
-            false,
           ),
+          {
+            emphasisStart: '<strong>',
+            emphasisEnd: '</strong>',
+            lineBreak: '</br>',
+          },
+          false,
         ),
         buttons: [
           {
