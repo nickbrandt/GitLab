@@ -30,8 +30,10 @@ describe 'Merge request > User edits MR with approval rules', :js do
     project.update_attribute(:disable_overriding_approvers_per_merge_request, false)
     stub_licensed_features(multiple_approval_rules: true)
 
+    approver = create(:user)
     mr_rule_names.each do |name|
-      create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 1, name: name)
+      create(:approval_merge_request_rule,
+        merge_request: merge_request, approvals_required: 1, name: name, users: [approver])
     end
 
     sign_in(author)
