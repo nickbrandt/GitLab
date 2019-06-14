@@ -140,7 +140,12 @@ describe('RelatedItemTree', () => {
       });
 
       describe('setItemChildren', () => {
-        const mockPayload = { children: ['foo'], parentItem: mockParentItem, isSubItem: false };
+        const mockPayload = {
+          children: ['foo'],
+          parentItem: mockParentItem,
+          isSubItem: false,
+          append: false,
+        };
 
         it('should set provided `children` values on state.children with provided parentItem.reference key', done => {
           testAction(
@@ -198,6 +203,46 @@ describe('RelatedItemTree', () => {
             { children: [{ reference: '&1' }] },
             {},
             [{ type: types.SET_ITEM_CHILDREN_FLAGS, payload: { children: [{ reference: '&1' }] } }],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('setEpicPageInfo', () => {
+        it('should set `epicEndCursor` and `hasMoreEpics` to `state.childrenFlags`', done => {
+          const { pageInfo } = mockQueryResponse.data.group.epic.children;
+
+          testAction(
+            actions.setEpicPageInfo,
+            { parentItem: mockParentItem, pageInfo },
+            {},
+            [
+              {
+                type: types.SET_EPIC_PAGE_INFO,
+                payload: { parentItem: mockParentItem, pageInfo },
+              },
+            ],
+            [],
+            done,
+          );
+        });
+      });
+
+      describe('setIssuePageInfo', () => {
+        it('should set `issueEndCursor` and `hasMoreIssues` to `state.childrenFlags`', done => {
+          const { pageInfo } = mockQueryResponse.data.group.epic.issues;
+
+          testAction(
+            actions.setIssuePageInfo,
+            { parentItem: mockParentItem, pageInfo },
+            {},
+            [
+              {
+                type: types.SET_ISSUE_PAGE_INFO,
+                payload: { parentItem: mockParentItem, pageInfo },
+              },
+            ],
             [],
             done,
           );
@@ -278,7 +323,7 @@ describe('RelatedItemTree', () => {
           );
         });
 
-        it('should dispatch `receiveItemsSuccess`, `setItemChildren` and `setItemChildrenFlags` on request success', done => {
+        it('should dispatch `receiveItemsSuccess`, `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', done => {
           spyOn(epicUtils.gqClient, 'query').and.returnValue(
             Promise.resolve({
               data: mockQueryResponse.data,
@@ -286,6 +331,8 @@ describe('RelatedItemTree', () => {
           );
 
           const children = epicUtils.processQueryResponse(mockQueryResponse.data.group);
+          const epicPageInfo = mockQueryResponse.data.group.epic.children.pageInfo;
+          const issuesPageInfo = mockQueryResponse.data.group.epic.issues.pageInfo;
 
           testAction(
             actions.fetchItems,
@@ -320,6 +367,20 @@ describe('RelatedItemTree', () => {
                   children,
                 },
               },
+              {
+                type: 'setEpicPageInfo',
+                payload: {
+                  parentItem: mockParentItem,
+                  pageInfo: epicPageInfo,
+                },
+              },
+              {
+                type: 'setIssuePageInfo',
+                payload: {
+                  parentItem: mockParentItem,
+                  pageInfo: issuesPageInfo,
+                },
+              },
             ],
             done,
           );
@@ -343,6 +404,99 @@ describe('RelatedItemTree', () => {
                 payload: {
                   parentItem: mockParentItem,
                   isSubItem: false,
+                },
+              },
+            ],
+            done,
+          );
+        });
+      });
+
+      describe('receiveNextPageItemsFailure', () => {
+        beforeEach(() => {
+          setFixtures('<div class="flash-container"></div>');
+        });
+
+        it('should show flash error with message "Something went wrong while fetching child epics."', () => {
+          const message = 'Something went wrong while fetching child epics.';
+          actions.receiveNextPageItemsFailure(
+            {
+              commit: () => {},
+            },
+            {},
+          );
+
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            message,
+          );
+        });
+      });
+
+      describe('fetchNextPageItems', () => {
+        it('should dispatch `setItemChildren`, `setItemChildrenFlags`, `setEpicPageInfo` and `setIssuePageInfo` on request success', done => {
+          spyOn(epicUtils.gqClient, 'query').and.returnValue(
+            Promise.resolve({
+              data: mockQueryResponse.data,
+            }),
+          );
+
+          const epicPageInfo = mockQueryResponse.data.group.epic.children.pageInfo;
+          const issuesPageInfo = mockQueryResponse.data.group.epic.issues.pageInfo;
+
+          testAction(
+            actions.fetchNextPageItems,
+            { parentItem: mockParentItem, isSubItem: false },
+            { childrenFlags: { 'gitlab-org&1': {} } },
+            [],
+            [
+              {
+                type: 'setItemChildren',
+                payload: {
+                  parentItem: mockParentItem,
+                  isSubItem: false,
+                  append: true,
+                  children: [],
+                },
+              },
+              {
+                type: 'setItemChildrenFlags',
+                payload: {
+                  isSubItem: false,
+                  children: [],
+                },
+              },
+              {
+                type: 'setEpicPageInfo',
+                payload: {
+                  parentItem: mockParentItem,
+                  pageInfo: epicPageInfo,
+                },
+              },
+              {
+                type: 'setIssuePageInfo',
+                payload: {
+                  parentItem: mockParentItem,
+                  pageInfo: issuesPageInfo,
+                },
+              },
+            ],
+            done,
+          );
+        });
+
+        it('should dispatch `receiveNextPageItemsFailure` on request failure', done => {
+          spyOn(epicUtils.gqClient, 'query').and.returnValue(Promise.reject());
+
+          testAction(
+            actions.fetchNextPageItems,
+            { parentItem: mockParentItem, isSubItem: false },
+            { childrenFlags: { 'gitlab-org&1': {} } },
+            [],
+            [
+              {
+                type: 'receiveNextPageItemsFailure',
+                payload: {
+                  parentItem: mockParentItem,
                 },
               },
             ],

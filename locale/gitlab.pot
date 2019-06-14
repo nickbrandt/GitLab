@@ -5158,6 +5158,9 @@ msgstr ""
 msgid "Epics|Remove issue"
 msgstr ""
 
+msgid "Epics|Show more"
+msgstr ""
+
 msgid "Epics|Something went wrong while creating child epics."
 msgstr ""
 
