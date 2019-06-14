@@ -189,6 +189,7 @@ class License < ApplicationRecord
     object_storage
     repository_size_limit
     custom_project_templates
+    usage_quotas
   ].freeze
 
   validate :valid_license

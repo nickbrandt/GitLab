@@ -19,6 +19,20 @@ describe 'Groups > Usage Quotas' do
       end
     end
 
+    context 'when checking namespace plan' do
+      before do
+        stub_application_setting_on_object(group, should_check_namespace_plan: true)
+      end
+
+      it 'is linked within the group settings dropdown' do
+        visit edit_group_path(group)
+
+        page.within('.nav-sidebar') do
+          expect(page).to have_link('Usage Quotas')
+        end
+      end
+    end
+
     context 'when usage_quotas is not available' do
       before do
         stub_licensed_features(usage_quotas: false)
