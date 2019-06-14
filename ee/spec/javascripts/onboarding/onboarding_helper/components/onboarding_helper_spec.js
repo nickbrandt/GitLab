@@ -2,7 +2,7 @@ import component from 'ee/onboarding/onboarding_helper/components/onboarding_hel
 import TourPartsList from 'ee/onboarding/onboarding_helper/components/tour_parts_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import { shallowMount } from '@vue/test-utils';
-import { GlProgressBar } from '@gitlab/ui';
+import { GlProgressBar, GlLoadingIcon } from '@gitlab/ui';
 
 describe('User onboarding tour parts list', () => {
   let wrapper;
@@ -24,6 +24,7 @@ describe('User onboarding tour parts list', () => {
     initialShow: false,
     dismissPopover: false,
     goldenTanukiSvgPath: 'illustrations/golden_tanuki.svg',
+    showLoadingIcon: false,
   };
 
   function createComponent(propsData) {
@@ -197,6 +198,19 @@ describe('User onboarding tour parts list', () => {
         wrapper.find('.qa-skip-step-link').vm.$emit('click');
 
         expect(wrapper.emitted('skipStep')).toBeTruthy();
+      });
+
+      it('displays the loading icon instead of the tanuki SVG when the "Skip this step" link is clicked', done => {
+        wrapper.find('.qa-skip-step-link').vm.$emit('click');
+
+        expect(wrapper.vm.showLoadingIcon).toBe(true);
+
+        wrapper.vm.$nextTick(() => {
+          expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+          expect(wrapper.find('.avatar img').exists()).toBe(false);
+
+          done();
+        });
       });
     });
 

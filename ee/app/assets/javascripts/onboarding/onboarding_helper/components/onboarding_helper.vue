@@ -1,6 +1,6 @@
 <script>
 import { __, s__, sprintf } from '~/locale';
-import { GlLink, GlProgressBar, GlButton } from '@gitlab/ui';
+import { GlLink, GlProgressBar, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import userAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import HelpContentPopover from './help_content_popover.vue';
@@ -14,6 +14,7 @@ export default {
     GlLink,
     GlProgressBar,
     GlButton,
+    GlLoadingIcon,
     HelpContentPopover,
     TourPartsList,
   },
@@ -68,6 +69,7 @@ export default {
       showPopover: false,
       popoverDismissed: false,
       helpContentTrigger: null,
+      showLoadingIcon: false,
     };
   },
   computed: {
@@ -124,6 +126,7 @@ export default {
       }
     },
     skipStep() {
+      this.showLoadingIcon = true;
       this.$emit('skipStep');
     },
     restartStep() {
@@ -158,7 +161,13 @@ export default {
     />
     <div class="d-flex align-items-center cursor-pointer">
       <div class="avatar s48 mr-1 d-flex">
-        <img :src="goldenTanukiSvgPath" :alt="s__('Golden Tanuki')" class="m-auto" />
+        <img
+          v-if="!showLoadingIcon"
+          :src="goldenTanukiSvgPath"
+          :alt="s__('Golden Tanuki')"
+          class="m-auto"
+        />
+        <gl-loading-icon v-else :inline="true" class="m-auto" />
       </div>
       <div class="d-flex flex-grow justify-content-between">
         <div class="qa-headline">
