@@ -29,7 +29,7 @@ describe EpicPresenter do
       expect(presenter.show_data.keys).to match_array([:initial, :meta])
     end
 
-    it 'has correct ancestors' do
+    it 'has correct ancestors', :nested_groups do
       metadata     = JSON.parse(presenter.show_data[:meta])
       ancestor_url = metadata['ancestors'].first['url']
 
