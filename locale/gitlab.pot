@@ -4164,6 +4164,12 @@ msgstr ""
 msgid "Deploy key was successfully updated."
 msgstr ""
 
+msgid "DeployBoard|Matching on the %{labelStart}app%{labelEnd} label has been removed for deploy boards."
+msgstr ""
+
+msgid "DeployBoard|To see all instances on your board, you must update your chart and redeploy."
+msgstr ""
+
 msgid "DeployKeys|+%{count} others"
 msgstr ""
 
@@ -8537,6 +8543,9 @@ msgid "Months"
 msgstr ""
 
 msgid "More"
+msgstr ""
+
+msgid "More Information"
 msgstr ""
 
 msgid "More actions"

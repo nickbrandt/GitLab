@@ -54,9 +54,12 @@ export default {
     },
     legacyLabelWarningMessage() {
       return sprintf(
-        s__('DeployBoard|Matching on the %{label} label has been removed for deploy boards.'),
+        s__(
+          'DeployBoard|Matching on the %{labelStart}app%{labelEnd} label has been removed for deploy boards.',
+        ),
         {
-          label: '<code>app</code>',
+          labelStart: '<code>',
+          labelEnd: '</code>',
         },
         false,
       );
