@@ -470,7 +470,7 @@ const INVITE_COLLEAGUES_TOUR = [
       selector: '#js-onboarding-settings-link',
       text: sprintf(
         s__(
-          'UserOnboardingTour|Adding other memembers to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}.',
+          'UserOnboardingTour|Adding other members to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}.',
         ),
         {
           emphasisStart: '<strong>',
