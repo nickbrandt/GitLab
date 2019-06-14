@@ -16,6 +16,7 @@ describe('Visual Review App Link', () => {
         mergeRequestId: 1,
         sourceProjectId: 20,
         appUrl: 'http://gitlab.example.com',
+        sourceProjectPath: 'source/project',
       },
       link: 'http://example.com',
     };
@@ -55,6 +56,12 @@ describe('Visual Review App Link', () => {
     it('with expected project Id', () => {
       expect(wrapper.find(GlModal).text()).toEqual(
         expect.stringContaining(`data-project-id='${propsData.appMetadata.sourceProjectId}'`),
+      );
+    });
+
+    it('with expected project path', () => {
+      expect(wrapper.find(GlModal).text()).toEqual(
+        expect.stringContaining(`data-project-path='${propsData.appMetadata.sourceProjectPath}'`),
       );
     });
 
