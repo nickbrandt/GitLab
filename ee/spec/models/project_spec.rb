@@ -2101,6 +2101,34 @@ describe Project do
     end
   end
 
+  describe '#allowed_to_share_with_group?' do
+    context 'for group related project' do
+      subject(:project) { build_stubbed(:project, namespace: group, group: group) }
+      let(:group) { build_stubbed :group }
+
+      context 'with lock_memberships_to_ldap application setting enabled' do
+        before do
+          stub_application_setting(lock_memberships_to_ldap: true)
+        end
+
+        it { is_expected.not_to be_allowed_to_share_with_group }
+      end
+    end
+
+    context 'personal project' do
+      subject(:project) { build_stubbed(:project, namespace: namespace) }
+      let(:namespace) { build_stubbed :namespace }
+
+      context 'with lock_memberships_to_ldap application setting enabled' do
+        before do
+          stub_application_setting(lock_memberships_to_ldap: true)
+        end
+
+        it { is_expected.to be_allowed_to_share_with_group }
+      end
+    end
+  end
+
   # Despite stubbing the current node as the primary or secondary, the
   # behaviour for EE::Project#lfs_http_url_to_repo() is to call
   # Project#lfs_http_url_to_repo() which does not have a Geo context.

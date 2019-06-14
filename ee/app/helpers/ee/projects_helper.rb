@@ -139,11 +139,11 @@ module EE
 
     override :membership_locked?
     def membership_locked?
-      if @project.group && @project.group.membership_lock
-        true
-      else
-        false
-      end
+      group = @project.group
+
+      return false unless group
+
+      group.membership_lock? || ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
     end
 
     def group_project_templates_count(group_id)
