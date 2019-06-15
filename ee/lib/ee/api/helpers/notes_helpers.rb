@@ -16,7 +16,7 @@ module EE
         end
 
         def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
-          if noteable_type.to_s.underscore == 'epic' && parent_type == 'group'
+          if noteable_type == ::Epic && parent_type == 'group'
             return EpicsFinder.new(current_user, group_id: parent_id.to_i).find(noteable_id)
           end
 
