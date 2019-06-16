@@ -26,8 +26,8 @@ describe ProjectsHelper do
       it 'builds incident_management_setting' do
         expect(helper.project_incident_management_setting.persisted?).to be(false)
 
-        expect(helper.project_incident_management_setting.send_email).to be(true)
-        expect(helper.project_incident_management_setting.create_issue).to be(false)
+        expect(helper.project_incident_management_setting.send_email).to be(false)
+        expect(helper.project_incident_management_setting.create_issue).to be(true)
         expect(helper.project_incident_management_setting.issue_template_key).to be(nil)
       end
     end
