@@ -3310,7 +3310,13 @@ msgstr ""
 msgid "Comment & resolve discussion"
 msgstr ""
 
+msgid "Comment & resolve thread"
+msgstr ""
+
 msgid "Comment & unresolve discussion"
+msgstr ""
+
+msgid "Comment & unresolve thread"
 msgstr ""
 
 msgid "Comment form position"
@@ -8283,7 +8289,7 @@ msgstr ""
 msgid "MergeRequests|Reply..."
 msgstr ""
 
-msgid "MergeRequests|Resolve this discussion in a new issue"
+msgid "MergeRequests|Resolve this thread in a new issue"
 msgstr ""
 
 msgid "MergeRequests|Saving the comment failed"
@@ -11335,13 +11341,16 @@ msgstr ""
 msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
 msgstr ""
 
-msgid "Resolve all discussions in new issue"
+msgid "Resolve all threads in new issue"
 msgstr ""
 
 msgid "Resolve conflicts on source branch"
 msgstr ""
 
 msgid "Resolve discussion"
+msgstr ""
+
+msgid "Resolve thread"
 msgstr ""
 
 msgid "Resolved"
@@ -14150,13 +14159,13 @@ msgstr ""
 msgid "Toggle commit list"
 msgstr ""
 
-msgid "Toggle discussion"
-msgstr ""
-
 msgid "Toggle emoji award"
 msgstr ""
 
 msgid "Toggle navigation"
+msgstr ""
+
+msgid "Toggle thread"
 msgstr ""
 
 msgid "Toggle project"
@@ -14421,6 +14430,9 @@ msgid "Unlocks the discussion"
 msgstr ""
 
 msgid "Unresolve discussion"
+msgstr ""
+
+msgid "Unresolve thread"
 msgstr ""
 
 msgid "Unschedule job"
@@ -16284,11 +16296,6 @@ msgstr ""
 msgid "disabled"
 msgstr ""
 
-msgid "discussion resolved"
-msgid_plural "discussions resolved"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "done"
 msgstr ""
 
@@ -16670,7 +16677,7 @@ msgstr ""
 msgid "mrWidget|There are merge conflicts"
 msgstr ""
 
-msgid "mrWidget|There are unresolved discussions. Please resolve these discussions"
+msgid "mrWidget|There are unresolved threads. Please resolve these threads"
 msgstr ""
 
 msgid "mrWidget|This feature merges changes from the target branch to the source branch. You cannot use this feature since the source branch is protected."
@@ -16886,6 +16893,11 @@ msgstr ""
 
 msgid "to help your contributors communicate effectively!"
 msgstr ""
+
+msgid "thread resolved"
+msgid_plural "threads resolved"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "triggered"
 msgstr ""
