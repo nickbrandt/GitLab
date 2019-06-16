@@ -22,6 +22,8 @@ module EE
       has_many :labels, through: :board_labels
 
       validates :name, presence: true
+
+      scope :with_associations, -> { preload(:destroyable_lists, :milestone, :board_labels, :labels) }
     end
 
     override :scoped?
