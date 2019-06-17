@@ -52,15 +52,108 @@ describe('Dependencies actions', () => {
       ));
   });
 
-  describe('requestDependencies', () => {
-    it('commits the REQUEST_DEPENDENCIES mutation', () =>
+  describe('requestDependenciesPagination', () => {
+    it('commits the REQUEST_DEPENDENCIES_PAGINATION mutation', () =>
       testAction(
-        actions.requestDependencies,
+        actions.requestDependenciesPagination,
         undefined,
         getInitialState(),
         [
           {
+            type: types.REQUEST_DEPENDENCIES_PAGINATION,
+          },
+        ],
+        [],
+      ));
+  });
+
+  describe('receiveDependenciesPaginationSuccess', () => {
+    const total = 123;
+    it('commits the RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS mutation', () =>
+      testAction(
+        actions.receiveDependenciesPaginationSuccess,
+        total,
+        getInitialState(),
+        [
+          {
+            type: types.RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS,
+            payload: total,
+          },
+        ],
+        [],
+      ));
+  });
+
+  describe('receiveDependenciesPaginationError', () => {
+    it('commits the RECEIVE_DEPENDENCIES_PAGINATION_ERROR mutation', () =>
+      testAction(
+        actions.receiveDependenciesPaginationError,
+        undefined,
+        getInitialState(),
+        [
+          {
+            type: types.RECEIVE_DEPENDENCIES_PAGINATION_ERROR,
+          },
+        ],
+        [],
+      ));
+  });
+
+  describe('fetchDependenciesPagination', () => {
+    let mock;
+    let state;
+
+    beforeEach(() => {
+      state = getInitialState();
+      state.endpoint = `${TEST_HOST}/dependencies`;
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onGet(state.endpoint).replyOnce(200, mockDependenciesResponse);
+      });
+
+      it('dispatches the correct actions', () =>
+        testAction(
+          actions.fetchDependenciesPagination,
+          undefined,
+          state,
+          [],
+          [
+            {
+              type: 'requestDependenciesPagination',
+            },
+            {
+              type: 'receiveDependenciesPaginationSuccess',
+              payload: mockDependenciesResponse.dependencies.length,
+            },
+          ],
+        ));
+    });
+
+    /**
+     * Tests for error conditions are in
+     * `ee/spec/javascripts/dependencies/store/actions_spec.js`. They cannot be
+     * tested here due to https://gitlab.com/gitlab-org/gitlab-ce/issues/63225.
+     */
+  });
+
+  describe('requestDependencies', () => {
+    const page = 4;
+    it('commits the REQUEST_DEPENDENCIES mutation', () =>
+      testAction(
+        actions.requestDependencies,
+        { page },
+        getInitialState(),
+        [
+          {
             type: types.REQUEST_DEPENDENCIES,
+            payload: { page },
           },
         ],
         [],
@@ -134,10 +227,11 @@ describe('Dependencies actions', () => {
 
     describe('on success', () => {
       describe('given no params', () => {
+        let paramsDefault;
         beforeEach(() => {
           state.pageInfo = { ...pageInfo };
 
-          const paramsDefault = {
+          paramsDefault = {
             sort_by: state.sortField,
             sort: state.sortOrder,
             page: state.pageInfo.page,
@@ -157,6 +251,7 @@ describe('Dependencies actions', () => {
             [
               {
                 type: 'requestDependencies',
+                payload: { page: paramsDefault.page },
               },
               {
                 type: 'receiveDependenciesSuccess',
@@ -184,6 +279,7 @@ describe('Dependencies actions', () => {
             [
               {
                 type: 'requestDependencies',
+                payload: { page: paramsGiven.page },
               },
               {
                 type: 'receiveDependenciesSuccess',
@@ -199,7 +295,9 @@ describe('Dependencies actions', () => {
       ${'an invalid response'} | ${[200, { foo: 'bar' }]}
       ${'a response error'}    | ${[500]}
     `('given $responseType', ({ responseDetails }) => {
+      let page;
       beforeEach(() => {
+        ({ page } = state.pageInfo);
         mock.onGet(state.endpoint).replyOnce(...responseDetails);
       });
 
@@ -212,6 +310,7 @@ describe('Dependencies actions', () => {
           [
             {
               type: 'requestDependencies',
+              payload: { page },
             },
             {
               type: 'receiveDependenciesError',
