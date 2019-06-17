@@ -46,7 +46,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.text "message_font_color"
     t.string "favicon"
     t.boolean "email_header_and_footer_enabled", default: false, null: false
-    t.integer "updated_by"
   end
 
   create_table "application_setting_terms", id: :serial, force: :cascade do |t|
@@ -1667,8 +1666,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.datetime_with_timezone "closed_at"
     t.integer "closed_by_id"
     t.integer "state_id", limit: 2
-    t.string "service_desk_reply_to"
-    t.integer "weight"
     t.index ["author_id"], name: "index_issues_on_author_id", using: :btree
     t.index ["closed_by_id"], name: "index_issues_on_closed_by_id", using: :btree
     t.index ["confidential"], name: "index_issues_on_confidential", using: :btree
@@ -1987,7 +1984,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.integer "latest_merge_request_diff_id"
     t.boolean "allow_maintainer_to_push"
     t.integer "state_id", limit: 2
-    t.integer "approvals_before_merge"
     t.index ["assignee_id"], name: "index_merge_requests_on_assignee_id", using: :btree
     t.index ["author_id"], name: "index_merge_requests_on_author_id", using: :btree
     t.index ["created_at"], name: "index_merge_requests_on_created_at", using: :btree
@@ -2099,20 +2095,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.boolean "auto_devops_enabled"
     t.integer "extra_shared_runners_minutes_limit"
     t.datetime_with_timezone "last_ci_minutes_notification_at"
-    t.integer "custom_project_templates_group_id"
-    t.integer "file_template_project_id"
-    t.string "ldap_sync_error"
-    t.datetime "ldap_sync_last_successful_update_at"
-    t.datetime "ldap_sync_last_sync_at"
-    t.datetime "ldap_sync_last_update_at"
-    t.integer "plan_id"
-    t.bigint "repository_size_limit"
-    t.string "saml_discovery_token"
-    t.integer "shared_runners_minutes_limit"
-    t.datetime_with_timezone "trial_ends_on"
-    t.integer "extra_shared_runners_minutes_limit"
-    t.string "ldap_sync_status", default: "ready", null: false
-    t.boolean "membership_lock", default: false
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
@@ -2206,7 +2188,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.boolean "issue_due"
     t.boolean "new_epic"
     t.string "notification_email"
-    t.boolean "new_epic"
     t.index ["source_id", "source_type"], name: "index_notification_settings_on_source_id_and_source_type", using: :btree
     t.index ["user_id", "source_id", "source_type"], name: "index_notifications_on_user_id_and_source_id_and_source_type", unique: true, using: :btree
     t.index ["user_id"], name: "index_notification_settings_on_user_id", using: :btree
@@ -2584,8 +2565,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.datetime "shared_runners_seconds_last_reset"
     t.bigint "packages_size", default: 0, null: false
     t.bigint "wiki_size"
-    t.bigint "shared_runners_seconds", default: 0, null: false
-    t.datetime "shared_runners_seconds_last_reset"
     t.index ["namespace_id"], name: "index_project_statistics_on_namespace_id", using: :btree
     t.index ["project_id"], name: "index_project_statistics_on_project_id", unique: true, using: :btree
   end
@@ -3291,10 +3270,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.string "timezone"
     t.boolean "time_display_relative"
     t.boolean "time_format_in_24h"
-    t.integer "epic_notes_filter", limit: 2, default: 0, null: false
-    t.string "epics_sort"
-    t.integer "roadmap_epics_state"
-    t.string "roadmaps_sort"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
@@ -3558,7 +3533,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.string "encrypted_token_iv"
     t.string "encrypted_url"
     t.string "encrypted_url_iv"
-    t.integer "group_id"
     t.index ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
     t.index ["type"], name: "index_web_hooks_on_type", using: :btree
   end
