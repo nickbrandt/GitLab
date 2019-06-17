@@ -37,15 +37,8 @@ There are two editions of GitLab:
 
 ## Licensing
 
-GitLab Community Edition (CE) is available freely under the MIT Expat license.
-
-All content that resides under the `ee/` directory of this repository (if it exists), is
-part of GitLab Enterprise Edition (EE) and is licensed under the license defined
-in `ee/LICENSE`.
-
-All third party components incorporated into the GitLab Software are licensed under the original license provided by the owner of the applicable component.
-
-All Documentation content that resides under the `doc/` directory of this repository is licensed under Creative Commons: CC BY-SA 4.0.
+See the [LICENSE](LICENSE) file for licensing information as it pertains to
+files in this repository.
 
 ## Hiring
 
