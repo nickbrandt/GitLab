@@ -69,6 +69,7 @@ describe Elastic::IndexRecordService, :elastic do
 
     it 'indexes records associated with the project' do
       expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id).and_call_original
+      expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true).and_call_original
 
       Sidekiq::Testing.inline! do
         subject.execute(project, true)
@@ -83,6 +84,7 @@ describe Elastic::IndexRecordService, :elastic do
       other_project = create :project
 
       expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(other_project.id).and_call_original
+      expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(other_project.id, nil, nil, true).and_call_original
 
       Sidekiq::Testing.inline! do
         subject.execute(other_project, true)
