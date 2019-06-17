@@ -4764,6 +4764,9 @@ msgstr ""
 msgid "Enforce DNS rebinding attack protection"
 msgstr ""
 
+msgid "Enter IP address range"
+msgstr ""
+
 msgid "Enter at least three characters to search"
 msgstr ""
 
@@ -6880,6 +6883,12 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
+msgid "IP address restriction is not editable in subgroups. Value inherited from top-level parent group."
+msgstr ""
+
+msgid "IP subnet restriction only allowed for top-level groups"
+msgstr ""
+
 msgid "Identifier"
 msgstr ""
 
@@ -8878,6 +8887,9 @@ msgid "No schedules"
 msgstr ""
 
 msgid "No start date"
+msgstr ""
+
+msgid "No value set by top-level parent group."
 msgstr ""
 
 msgid "No, directly import the existing email addresses and usernames."
@@ -11297,6 +11309,9 @@ msgstr ""
 msgid "Restart Terminal"
 msgstr ""
 
+msgid "Restrict access by IP address"
+msgstr ""
+
 msgid "Resume"
 msgstr ""
 
@@ -13542,6 +13557,9 @@ msgid "This group"
 msgstr ""
 
 msgid "This group does not provide any group Runners yet."
+msgstr ""
+
+msgid "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Example: <code>192.168.0.0/24</code>. %{read_more_link}."
 msgstr ""
 
 msgid "This is a \"Ghost User\", created to hold all issues authored by users that have since been deleted. This user cannot be removed."
@@ -16265,6 +16283,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "invalid milestone state `%{state}`"
+msgstr ""
+
+msgid "is an invalid IP address range"
 msgstr ""
 
 msgid "is enabled."

@@ -29,6 +29,10 @@ module EE
         sso_enforcement_prevents_access?
       end
 
+      condition(:ip_enforcement_prevents_access) do
+        !::Gitlab::IpRestriction::Enforcer.new(subject).allows_current_ip?
+      end
+
       condition(:dependency_proxy_available) do
         @subject.feature_available?(:dependency_proxy)
       end
@@ -97,6 +101,10 @@ module EE
       end
 
       rule { needs_new_sso_session }.policy do
+        prevent :read_group
+      end
+
+      rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
       end
     end

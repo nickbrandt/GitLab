@@ -87,6 +87,46 @@ describe GroupPolicy do
     end
   end
 
+  context 'with ip restriction' do
+    let(:current_user) { developer }
+    let(:group) { create(:group, :public) }
+
+    before do
+      allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
+      stub_licensed_features(group_ip_restriction: true)
+    end
+
+    context 'without restriction' do
+      it { is_expected.to be_allowed(:read_group) }
+    end
+
+    context 'with restriction' do
+      before do
+        create(:ip_restriction, group: group, range: range)
+      end
+
+      context 'address is within the range' do
+        let(:range) { '192.168.0.0/24' }
+
+        it { is_expected.to be_allowed(:read_group) }
+      end
+
+      context 'address is outside the range' do
+        let(:range) { '10.0.0.0/8' }
+
+        context 'as developer' do
+          it { is_expected.to be_disallowed(:read_group) }
+        end
+
+        context 'as owner' do
+          let(:current_user) { owner }
+
+          it { is_expected.to be_allowed(:read_group) }
+        end
+      end
+    end
+  end
+
   context 'when LDAP sync is not enabled' do
     context 'owner' do
       let(:current_user) { owner }
