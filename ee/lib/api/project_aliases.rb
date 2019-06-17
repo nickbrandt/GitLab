@@ -2,6 +2,7 @@
 
 module API
   class ProjectAliases < Grape::API
+    before { check_feature_availability }
     before { authenticated_as_admin! }
 
     helpers do
@@ -11,6 +12,10 @@ module API
 
       def project
         find_project!(params[:project_id])
+      end
+
+      def check_feature_availability
+        forbidden! unless ::License.feature_available?(:project_aliases)
       end
     end
 
