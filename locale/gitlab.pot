@@ -9239,6 +9239,18 @@ msgstr ""
 msgid "Pages getting started guide"
 msgstr ""
 
+msgid "Pagination|Go to first page"
+msgstr ""
+
+msgid "Pagination|Go to last page"
+msgstr ""
+
+msgid "Pagination|Go to next page"
+msgstr ""
+
+msgid "Pagination|Go to previous page"
+msgstr ""
+
 msgid "Pagination|Last »"
 msgstr ""
 
@@ -12516,6 +12528,12 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
+msgid "Start merge train"
+msgstr ""
+
+msgid "Start merge train when pipeline succeeds"
+msgstr ""
+
 msgid "Start the Runner!"
 msgstr ""
 
@@ -12523,12 +12541,6 @@ msgid "Start thread"
 msgstr ""
 
 msgid "Start thread & close %{noteable_name}"
-msgstr ""
-
-msgid "Start merge train"
-msgstr ""
-
-msgid "Start merge train when pipeline succeeds"
 msgstr ""
 
 msgid "Start thread & reopen %{noteable_name}"
@@ -14010,13 +14022,13 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
-msgid "Toggle thread"
-msgstr ""
-
 msgid "Toggle project"
 msgstr ""
 
 msgid "Toggle sidebar"
+msgstr ""
+
+msgid "Toggle thread"
 msgstr ""
 
 msgid "ToggleButton|Toggle Status: OFF"
@@ -16724,13 +16736,13 @@ msgstr ""
 msgid "this document"
 msgstr ""
 
-msgid "to help your contributors communicate effectively!"
-msgstr ""
-
 msgid "thread resolved"
 msgid_plural "threads resolved"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "to help your contributors communicate effectively!"
+msgstr ""
 
 msgid "triggered"
 msgstr ""
