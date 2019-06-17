@@ -35,6 +35,7 @@ module QA
               Geo::Secondary.act do
                 replicate_database
                 wait_for_services
+                authorize
               end
             end
 
@@ -103,6 +104,19 @@ module QA
             def initialize
               @address = QA::Runtime::Scenario.geo_secondary_address
               @name = QA::Runtime::Scenario.geo_secondary_name
+            end
+
+            def authorize
+              # Provide OAuth authorization now so that tests don't have to
+              QA::Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
+                QA::Page::Main::Login.perform(&:sign_in_using_credentials)
+                QA::Page::Main::OAuth.perform do |oauth|
+                  oauth.authorize! if oauth.needs_authorization?
+                end
+
+                # Log out so that tests are in an initially unauthenticated state
+                QA::Page::Main::Menu.perform(&:sign_out)
+              end
             end
 
             def replicate_database

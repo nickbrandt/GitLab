@@ -5,14 +5,24 @@ module QA
     describe 'GitLab SSH push' do
       let(:file_name) { 'README.md' }
 
+      after do
+        # Log out so subsequent tests can start unauthenticated
+        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects)
+        Page::Main::Menu.perform do |menu|
+          menu.sign_out if menu.has_personal_area?(wait: 0)
+        end
+      end
+
       context 'regular git commit' do
         it "is replicated to the secondary" do
           key_title = "key for ssh tests #{Time.now.to_f}"
           file_content = 'This is a Geo project!  Commit from primary.'
+          project = nil
+          key = nil
 
           Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
             # Visit the primary node and login
-            Page::Main::Login.act { sign_in_using_credentials }
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate! do |resource|
@@ -41,36 +51,36 @@ module QA
               expect(page).to have_content(file_name)
               expect(page).to have_content(file_content)
             end
+          end
 
-            Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-              # Visit the secondary node and login
-              Page::Main::OAuth.act { authorize! if needs_authorization? }
+          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
+            # Visit the secondary node and login
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
-              EE::Page::Main::Banner.perform do |banner|
-                expect(banner).to have_secondary_read_only_banner
-              end
+            EE::Page::Main::Banner.perform do |banner|
+              expect(banner).to have_secondary_read_only_banner
+            end
 
-              # Ensure the SSH key has replicated
-              Page::Main::Menu.act { click_settings_link }
-              Page::Profile::Menu.act { click_ssh_keys }
+            # Ensure the SSH key has replicated
+            Page::Main::Menu.act { click_settings_link }
+            Page::Profile::Menu.act { click_ssh_keys }
 
-              expect(page).to have_content(key_title)
-              expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.fingerprint)
 
-              # Ensure project has replicated
-              Page::Main::Menu.perform { |menu| menu.go_to_projects }
-              Page::Dashboard::Projects.perform do |dashboard|
-                dashboard.wait_for_project_replication(project.name)
-                dashboard.go_to_project(project.name)
-              end
+            # Ensure project has replicated
+            Page::Main::Menu.perform { |menu| menu.go_to_projects }
+            Page::Dashboard::Projects.perform do |dashboard|
+              dashboard.wait_for_project_replication(project.name)
+              dashboard.go_to_project(project.name)
+            end
 
-              # Validate the content has been sync'd from the primary
-              Page::Project::Show.perform do |show|
-                show.wait_for_repository_replication_with(file_content)
+            # Validate the content has been sync'd from the primary
+            Page::Project::Show.perform do |show|
+              show.wait_for_repository_replication_with(file_content)
 
-                expect(page).to have_content(file_name)
-                expect(page).to have_content(file_content)
-              end
+              expect(page).to have_content(file_name)
+              expect(page).to have_content(file_content)
             end
           end
         end
@@ -80,10 +90,12 @@ module QA
         it "is replicated to the secondary" do
           key_title = "key for ssh tests #{Time.now.to_f}"
           file_content = 'The rendered file could not be displayed because it is stored in LFS.'
+          project = nil
+          key = nil
 
           Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
             # Visit the primary node and login
-            Page::Main::Login.act { sign_in_using_credentials }
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
             # Create a new SSH key for the user
             key = Resource::SSHKey.fabricate! do |resource|
@@ -115,36 +127,36 @@ module QA
               expect(page).to have_content(file_name)
               expect(page).to have_content(file_content)
             end
+          end
 
-            Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-              # Visit the secondary node and login
-              Page::Main::OAuth.act { authorize! if needs_authorization? }
+          Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
+            # Visit the secondary node and login
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
-              EE::Page::Main::Banner.perform do |banner|
-                expect(banner).to have_secondary_read_only_banner
-              end
+            EE::Page::Main::Banner.perform do |banner|
+              expect(banner).to have_secondary_read_only_banner
+            end
 
-              # Ensure the SSH key has replicated
-              Page::Main::Menu.act { click_settings_link }
-              Page::Profile::Menu.act { click_ssh_keys }
+            # Ensure the SSH key has replicated
+            Page::Main::Menu.act { click_settings_link }
+            Page::Profile::Menu.act { click_ssh_keys }
 
-              expect(page).to have_content(key_title)
-              expect(page).to have_content(key.fingerprint)
+            expect(page).to have_content(key_title)
+            expect(page).to have_content(key.fingerprint)
 
-              # Ensure project has replicated
-              Page::Main::Menu.perform { |menu| menu.go_to_projects }
-              Page::Dashboard::Projects.perform do |dashboard|
-                dashboard.wait_for_project_replication(project.name)
-                dashboard.go_to_project(project.name)
-              end
+            # Ensure project has replicated
+            Page::Main::Menu.perform { |menu| menu.go_to_projects }
+            Page::Dashboard::Projects.perform do |dashboard|
+              dashboard.wait_for_project_replication(project.name)
+              dashboard.go_to_project(project.name)
+            end
 
-              # Validate the content has been sync'd from the primary
-              Page::Project::Show.perform do |show|
-                show.wait_for_repository_replication_with(file_name)
+            # Validate the content has been sync'd from the primary
+            Page::Project::Show.perform do |show|
+              show.wait_for_repository_replication_with(file_name)
 
-                expect(page).to have_content(file_name)
-                expect(page).to have_content(file_content)
-              end
+              expect(page).to have_content(file_name)
+              expect(page).to have_content(file_content)
             end
           end
         end
