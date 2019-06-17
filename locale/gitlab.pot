@@ -8868,6 +8868,9 @@ msgstr ""
 msgid "No repository"
 msgstr ""
 
+msgid "No required pipeline"
+msgstr ""
+
 msgid "No runners found"
 msgstr ""
 
@@ -9393,9 +9396,6 @@ msgid "Pin code"
 msgstr ""
 
 msgid "Pipeline"
-msgstr ""
-
-msgid "Pipeline ID (IID)"
 msgstr ""
 
 msgid "Pipeline Schedule"
