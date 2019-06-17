@@ -24,7 +24,7 @@ describe 'User Onboarding' do
         find('.header-help-dropdown-toggle').click
 
         page.within('.header-help') do
-          expect(page).to have_link('Learn GitLab', href: explore_onboarding_index_path)
+          expect(page).to have_link('Learn GitLab', href: explore_onboarding_index_path(from_help_menu: true))
         end
       end
     end
