@@ -21,3 +21,5 @@ export const REPORT_STATUS = {
 export const FETCH_ERROR_MESSAGE = __(
   'Error fetching the dependency list. Please check your network connection and try again.',
 );
+
+export const DEPENDENCIES_PER_PAGE = 20;

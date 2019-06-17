@@ -22,7 +22,7 @@ describe('DependenciesApp component', () => {
     const localVue = createLocalVue();
 
     store = createStore();
-    jest.spyOn(store, 'dispatch').mockImplementation();
+    jest.spyOn(store, 'dispatch').mockImplementation(() => Promise.resolve());
 
     wrapper = shallowMount(DependenciesApp, {
       localVue,
@@ -52,6 +52,7 @@ describe('DependenciesApp component', () => {
     it('dispatches the correct initial actions', () => {
       expect(store.dispatch.mock.calls).toEqual([
         ['setDependenciesEndpoint', basicAppProps.endpoint],
+        ['fetchDependenciesPagination'],
         ['fetchDependencies'],
       ]);
     });

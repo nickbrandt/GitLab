@@ -7,6 +7,18 @@ import { TEST_HOST } from 'helpers/test_constants';
 describe('Dependencies mutations', () => {
   let state;
 
+  const errorLoadingState = () => ({
+    isLoading: false,
+    errorLoading: true,
+    dependencies: [],
+    pageInfo: {},
+    initialized: true,
+    reportInfo: {
+      status: REPORT_STATUS.ok,
+      jobPath: '',
+    },
+  });
+
   beforeEach(() => {
     state = getInitialState();
   });
@@ -19,14 +31,47 @@ describe('Dependencies mutations', () => {
     });
   });
 
-  describe(types.REQUEST_DEPENDENCIES, () => {
+  describe(types.REQUEST_DEPENDENCIES_PAGINATION, () => {
     beforeEach(() => {
-      mutations[types.REQUEST_DEPENDENCIES](state);
+      mutations[types.REQUEST_DEPENDENCIES_PAGINATION](state);
+    });
+
+    it('correctly mutates the state', () => {
+      expect(state.isLoading).toBe(true);
+    });
+  });
+
+  describe(types.RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS, () => {
+    const total = 123;
+    beforeEach(() => {
+      mutations[types.RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS](state, total);
+    });
+
+    it('correctly mutates the state', () => {
+      expect(state.pageInfo.total).toBe(total);
+    });
+  });
+
+  describe(types.RECEIVE_DEPENDENCIES_PAGINATION_ERROR, () => {
+    beforeEach(() => {
+      mutations[types.RECEIVE_DEPENDENCIES_PAGINATION_ERROR](state);
+    });
+
+    it('correctly mutates the state', () => {
+      expect(state).toEqual(expect.objectContaining(errorLoadingState()));
+    });
+  });
+
+  describe(types.REQUEST_DEPENDENCIES, () => {
+    const page = 4;
+    beforeEach(() => {
+      mutations[types.REQUEST_DEPENDENCIES](state, { page });
     });
 
     it('correctly mutates the state', () => {
       expect(state.isLoading).toBe(true);
       expect(state.errorLoading).toBe(false);
+      expect(state.pageInfo.page).toBe(page);
     });
   });
 
@@ -37,21 +82,27 @@ describe('Dependencies mutations', () => {
       status: REPORT_STATUS.jobFailed,
       job_path: 'foo',
     };
+    let originalPageInfo;
 
     beforeEach(() => {
+      originalPageInfo = state.pageInfo;
       mutations[types.RECEIVE_DEPENDENCIES_SUCCESS](state, { dependencies, reportInfo, pageInfo });
     });
 
     it('correctly mutates the state', () => {
-      expect(state.isLoading).toBe(false);
-      expect(state.errorLoading).toBe(false);
-      expect(state.dependencies).toBe(dependencies);
-      expect(state.pageInfo).toBe(pageInfo);
-      expect(state.initialized).toBe(true);
-      expect(state.reportInfo).toEqual({
-        status: REPORT_STATUS.jobFailed,
-        jobPath: 'foo',
-      });
+      expect(state).toEqual(
+        expect.objectContaining({
+          isLoading: false,
+          errorLoading: false,
+          dependencies,
+          pageInfo: originalPageInfo,
+          initialized: true,
+          reportInfo: {
+            status: REPORT_STATUS.jobFailed,
+            jobPath: 'foo',
+          },
+        }),
+      );
     });
   });
 
@@ -61,15 +112,7 @@ describe('Dependencies mutations', () => {
     });
 
     it('correctly mutates the state', () => {
-      expect(state.isLoading).toBe(false);
-      expect(state.errorLoading).toBe(true);
-      expect(state.dependencies).toEqual([]);
-      expect(state.pageInfo).toEqual({});
-      expect(state.initialized).toBe(true);
-      expect(state.reportInfo).toEqual({
-        status: REPORT_STATUS.ok,
-        jobPath: '',
-      });
+      expect(state).toEqual(expect.objectContaining(errorLoadingState()));
     });
   });
 
