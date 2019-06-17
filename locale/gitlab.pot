@@ -859,7 +859,25 @@ msgstr ""
 msgid "AdminSettings|Environment variables are protected by default"
 msgstr ""
 
+msgid "AdminSettings|No required pipeline"
+msgstr ""
+
+msgid "AdminSettings|Required pipeline configuration"
+msgstr ""
+
+msgid "AdminSettings|Select a pipeline configuration file"
+msgstr ""
+
+msgid "AdminSettings|Select a template"
+msgstr ""
+
+msgid "AdminSettings|Set an instance-wide auto included %{link_start}pipeline configuration%{link_end}. This pipeline configuration will be run after the project's own configuration."
+msgstr ""
+
 msgid "AdminSettings|Specify a domain to use by default for every project's Auto Review Apps and Auto Deploy stages."
+msgstr ""
+
+msgid "AdminSettings|The required pipeline configuration can be selected from the %{code_start}gitlab-ci%{code_end} directory inside of the configured %{link_start}instance template repository%{link_end} or from GitLab provided configurations."
 msgstr ""
 
 msgid "AdminSettings|When creating a new environment variable it will be protected by default."
