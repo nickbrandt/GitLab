@@ -108,6 +108,7 @@ export default {
             :deploy-board-data="model.deployBoardData"
             :is-loading="model.isLoadingDeployBoard"
             :is-empty="model.isEmptyDeployBoard"
+            :has-legacy-app-label="model.hasLegacyAppLabel"
             :logs-path="model.logs_path"
           />
         </div>
