@@ -12,16 +12,23 @@ describe('User onboarding welcome page', () => {
     userAvatarUrl: 'my-user.avatar.com',
     projectFullPath: 'my-dummy-project/path',
     skipUrl: 'skip.url.com',
+    fromHelpMenu: false,
   };
+
+  function createComponent(propsData) {
+    wrapper = shallowMount(component, { propsData });
+  }
 
   afterEach(() => {
     wrapper.destroy();
   });
 
   beforeEach(done => {
-    wrapper = shallowMount(component, { propsData: props });
+    createComponent(props);
     Vue.nextTick(done);
   });
+
+  const findSkipBtn = () => wrapper.find('.qa-skip-tour-btn');
 
   describe('methods', () => {
     describe('startTour', () => {
@@ -147,11 +154,21 @@ describe('User onboarding welcome page', () => {
       expect(btn.text()).toContain("Ok let's go");
     });
 
-    it('displays the "Skip this for now" link', () => {
-      const btn = wrapper.find('.qa-skip-tour-btn');
+    it('displays "Skip this for now" as link text if fromHelpMenu is false', () => {
+      expect(findSkipBtn().exists()).toBe(true);
+      expect(findSkipBtn().text()).toContain('Skip this for now');
+    });
 
-      expect(btn.exists()).toBe(true);
-      expect(btn.text()).toContain('Skip this for now');
+    it('displays "No, not interested right now" as link text if fromHelpMenu is true', () => {
+      const propsData = {
+        ...props,
+        fromHelpMenu: true,
+      };
+
+      createComponent(propsData);
+
+      expect(findSkipBtn().exists()).toBe(true);
+      expect(findSkipBtn().text()).toContain('No, not interested right now');
     });
 
     it('displays a note on how users can start the tour from the help menu', () => {
