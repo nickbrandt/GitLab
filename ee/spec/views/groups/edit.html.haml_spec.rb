@@ -33,7 +33,7 @@ describe 'groups/edit.html.haml' do
       end
     end
 
-    context 'subgroup' do
+    context 'subgroup', :nested_groups do
       let(:group) { create(:group, :nested) }
 
       before do
