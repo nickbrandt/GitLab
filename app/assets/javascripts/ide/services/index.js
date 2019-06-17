@@ -1,4 +1,5 @@
 import axios from '~/lib/utils/axios_utils';
+import { joinPaths } from '~/lib/utils/url_utility';
 import Api from '~/api';
 
 export default {
@@ -32,7 +33,7 @@ export default {
     }
 
     return axios
-      .get(file.rawPath.replace(`/raw/${file.branchId}/${file.path}`, `/raw/${sha}/${file.path}`), {
+      .get(joinPaths(gon.relative_url_root || '/', file.projectId, 'raw', sha, file.path), {
         transformResponse: [f => f],
       })
       .then(({ data }) => data);
@@ -58,8 +59,8 @@ export default {
   commit(projectId, payload) {
     return Api.commitMultiple(projectId, payload);
   },
-  getFiles(projectUrl, branchId) {
-    const url = `${projectUrl}/files/${branchId}`;
+  getFiles(projectUrl, ref) {
+    const url = `${projectUrl}/files/${ref}`;
     return axios.get(url, { params: { format: 'json' } });
   },
   lastCommitPipelines({ getters }) {
