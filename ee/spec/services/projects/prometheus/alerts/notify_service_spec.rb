@@ -230,7 +230,17 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       context 'when incident_management_setting does not exist' do
-        it_behaves_like 'notifies alerts'
+        it_behaves_like 'persists events'
+
+        it 'does not send notification email' do
+          expect(project.feature_available?(:incident_management)).to eq(true)
+
+          expect_next_instance_of(NotificationService) do |service|
+            expect(service).not_to receive(:async)
+          end
+
+          expect(subject).to eq(true)
+        end
       end
 
       context 'when incident_management_setting.send_email is true' do
