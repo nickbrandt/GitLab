@@ -14607,7 +14607,7 @@ msgstr ""
 msgid "UserOnboardingTour|%{emphasisStart}Well done!%{emphasisEnd}%{lineBreak}%{lineBreak}That's it for our guided tour, congratulations for making it all the way to the end!%{lineBreak}%{lineBreak}We hope this gave you a good overview of GitLab and how it can help you. We'll now show you how to create your own project and invite your colleagues."
 msgstr ""
 
-msgid "UserOnboardingTour|Adding other memembers to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}."
+msgid "UserOnboardingTour|Adding other members to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}."
 msgstr ""
 
 msgid "UserOnboardingTour|Alright, that's it for Commits. Let's take a look at the %{emphasisStart}Branches%{emphasisEnd}."
