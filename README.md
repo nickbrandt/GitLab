@@ -1,5 +1,7 @@
 # GitLab
 
+![logo](https://about.gitlab.com/images/logo.png)
+
 ## Test coverage
 
 - [![Ruby coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=coverage)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-ruby) Ruby
@@ -10,8 +12,6 @@
 The canonical source of GitLab Community Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/).
 
 The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ee).
-
-# ![logo](https://about.gitlab.com/images/logo.png) GitLab
 
 ## Free trial
 
