@@ -174,7 +174,9 @@ export default {
           <span>
             To see deployment progress for your environments, make sure your deployments are in
             Kubernetes namespace
-            <code>{{ projectName }}</code> and labeled with <code>app=$CI_ENVIRONMENT_SLUG</code>.
+            <code>{{ projectName }}</code>
+            , and annotated with <code>app.gitlab.com/app=$CI_PROJECT_PATH_SLUG</code> and
+            <code>app.gitlab.com/env=$CI_ENVIRONMENT_SLUG</code>.
           </span>
         </section>
       </div>
