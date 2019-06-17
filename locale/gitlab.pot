@@ -5714,12 +5714,6 @@ msgstr ""
 msgid "First day of the week"
 msgstr ""
 
-msgid "FirstPushedBy|First"
-msgstr ""
-
-msgid "FirstPushedBy|pushed by"
-msgstr ""
-
 msgid "Fixed date"
 msgstr ""
 
@@ -10937,9 +10931,6 @@ msgid "Registration"
 msgstr ""
 
 msgid "Registry"
-msgstr ""
-
-msgid "Related Commits"
 msgstr ""
 
 msgid "Related Deployed Jobs"
