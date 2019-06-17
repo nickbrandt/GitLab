@@ -81,8 +81,7 @@ module EE
       end
 
       def collect_dependency_list_reports!(dependency_list_report)
-        flag_enabled = ::Feature.enabled?(:dependency_list, default_enabled: false)
-        if flag_enabled && project.feature_available?(:dependency_list)
+        if ::Feature.enabled?(:dependency_list) && project.feature_available?(:dependency_list)
           dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
