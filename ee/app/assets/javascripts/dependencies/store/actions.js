@@ -9,7 +9,43 @@ import { __ } from '~/locale';
 export const setDependenciesEndpoint = ({ commit }, endpoint) =>
   commit(types.SET_DEPENDENCIES_ENDPOINT, endpoint);
 
-export const requestDependencies = ({ commit }) => commit(types.REQUEST_DEPENDENCIES);
+export const requestDependenciesPagination = ({ commit }) =>
+  commit(types.REQUEST_DEPENDENCIES_PAGINATION);
+
+export const receiveDependenciesPaginationSuccess = ({ commit }, payload) =>
+  commit(types.RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS, payload);
+
+export const receiveDependenciesPaginationError = ({ commit }) =>
+  commit(types.RECEIVE_DEPENDENCIES_PAGINATION_ERROR);
+
+export const fetchDependenciesPagination = ({ state, dispatch }) => {
+  const onError = error => {
+    dispatch('receiveDependenciesPaginationError', error);
+    createFlash(FETCH_ERROR_MESSAGE);
+    throw error;
+  };
+
+  dispatch('requestDependenciesPagination');
+
+  if (!state.endpoint) {
+    return Promise.reject(new Error('endpoint_missing')).catch(onError);
+  }
+
+  return axios
+    .get(state.endpoint)
+    .then(response => {
+      if (isValidResponse(response)) {
+        const total = response.data.dependencies.length;
+        dispatch('receiveDependenciesPaginationSuccess', total);
+      } else {
+        throw new Error(__('Invalid server response'));
+      }
+    })
+    .catch(onError);
+};
+
+export const requestDependencies = ({ commit }, payload) =>
+  commit(types.REQUEST_DEPENDENCIES, payload);
 
 export const receiveDependenciesSuccess = ({ commit }, { headers, data }) => {
   const normalizedHeaders = normalizeHeaders(headers);
@@ -27,14 +63,15 @@ export const fetchDependencies = ({ state, dispatch }, params = {}) => {
     return;
   }
 
-  dispatch('requestDependencies');
+  const page = params.page || state.pageInfo.page || 1;
+  dispatch('requestDependencies', { page });
 
   axios
     .get(state.endpoint, {
       params: {
         sort_by: state.sortField,
         sort: state.sortOrder,
-        page: state.pageInfo.page || 1,
+        page,
         ...params,
       },
     })

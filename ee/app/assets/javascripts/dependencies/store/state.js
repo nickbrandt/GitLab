@@ -1,4 +1,4 @@
-import { REPORT_STATUS, SORT_FIELDS, SORT_ORDER } from './constants';
+import { REPORT_STATUS, SORT_FIELDS, SORT_ORDER, DEPENDENCIES_PER_PAGE } from './constants';
 
 export default () => ({
   endpoint: '',
@@ -6,7 +6,11 @@ export default () => ({
   isLoading: false,
   errorLoading: false,
   dependencies: [],
-  pageInfo: {},
+  pageInfo: {
+    page: 1,
+    perPage: DEPENDENCIES_PER_PAGE,
+    total: 0,
+  },
   reportInfo: {
     status: REPORT_STATUS.ok,
     jobPath: '',
