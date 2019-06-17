@@ -48,15 +48,16 @@ export default {
     :placement="placement"
     :show="show"
     :disabled="disabled"
+    :css-classes="['onboarding-popover']"
   >
-    <div class="onboarding-popover">
+    <div>
       <p v-html="helpContent.text"></p>
       <template v-if="helpContent.buttons">
         <gl-button
           v-for="(button, index) in helpContent.buttons"
           :key="index"
           :class="button.btnClass"
-          class="btn btn-xs mr-2"
+          class="btn btn-sm mr-2"
           :disabled="button.disabled"
           @click="callButtonAction(button)"
         >
