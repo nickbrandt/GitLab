@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { __ } from '~/locale';
 
 export default class CiTemplate {
   constructor() {
@@ -29,7 +30,7 @@ export default class CiTemplate {
     return {
       Reset: [
         {
-          name: 'No required pipeline',
+          name: __('No required pipeline'),
           id: null,
         },
         'divider',
