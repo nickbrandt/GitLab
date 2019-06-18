@@ -46,5 +46,49 @@ describe NamespaceStatistics do
 
       it { is_expected.to eq(0) }
     end
+
+    context 'when limit is defined globally' do
+      before do
+        namespace.update_attribute(:shared_runners_minutes_limit, nil)
+
+        stub_application_setting(shared_runners_minutes: 100)
+      end
+
+      context 'when usage is above the main quota' do
+        before do
+          namespace_statistics.update_attribute(:shared_runners_seconds, 101 * 60)
+        end
+
+        context 'and extra CI minutes have been assigned' do
+          before do
+            namespace.update_attribute(:extra_shared_runners_minutes_limit, 50)
+          end
+
+          it { is_expected.to eq(1) }
+        end
+
+        context 'and extra CI minutes have not been assigned' do
+          before do
+            namespace.update_attribute(:extra_shared_runners_minutes_limit, nil)
+          end
+
+          it { is_expected.to eq(0) }
+        end
+      end
+
+      context 'when usage is below the main quota' do
+        before do
+          namespace_statistics.update_attribute(:shared_runners_seconds, 90 * 60)
+        end
+
+        context 'and extra CI minutes have been assigned' do
+          before do
+            namespace.update_attribute(:extra_shared_runners_minutes_limit, 50)
+          end
+
+          it { is_expected.to eq(0) }
+        end
+      end
+    end
   end
 end
