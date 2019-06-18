@@ -7874,6 +7874,9 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "Limit display of time tracking units to hours."
+msgstr ""
+
 msgid "Limit namespaces and projects that can be indexed"
 msgstr ""
 
