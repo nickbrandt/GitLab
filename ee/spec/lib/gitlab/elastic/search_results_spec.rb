@@ -25,6 +25,20 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     end
   end
 
+  shared_examples_for 'a paginated object' do |object_type|
+    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+
+    it 'does not explode when given a page as a string' do
+      expect { results.objects(object_type, "2") }.not_to raise_error
+    end
+
+    it 'paginates' do
+      objects = results.objects(object_type, 2)
+      expect(objects).to respond_to(:total_count, :limit, :offset)
+      expect(objects.offset_value).to eq(20)
+    end
+  end
+
   describe 'parse_search_result' do
     let(:blob) do
       {
@@ -92,6 +106,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       Gitlab::Elastic::Helper.refresh_index
     end
+
+    it_behaves_like 'a paginated object', 'issues'
 
     it 'lists found issues' do
       results = described_class.new(user, 'hello world', limit_project_ids)
@@ -349,6 +365,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
+    it_behaves_like 'a paginated object', 'merge_requests'
+
     it 'lists found merge requests' do
       results = described_class.new(user, 'hello world', limit_project_ids)
       merge_requests = results.objects('merge_requests')
@@ -434,6 +452,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
         blob['_source']['blob']['path']
       end
     end
+
+    it_behaves_like 'a paginated object', 'blobs'
 
     it 'finds blobs' do
       results = described_class.new(user, 'def', limit_project_ids)
@@ -556,6 +576,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
+    it_behaves_like 'a paginated object', 'wiki_blobs'
+
     it 'finds wiki blobs' do
       blobs = results.objects('wiki_blobs')
 
@@ -628,6 +650,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       Gitlab::Elastic::Helper.refresh_index
     end
+
+    it_behaves_like 'a paginated object', 'commits'
 
     it 'finds commits' do
       results = described_class.new(user, 'add', limit_project_ids)
@@ -703,6 +727,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       before do
         Gitlab::Elastic::Helper.refresh_index
       end
+
+      it_behaves_like 'a paginated object', 'milestones'
 
       context 'when project ids are present' do
         context 'when authenticated' do
@@ -811,6 +837,8 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     end
 
     context 'Projects' do
+      it_behaves_like 'a paginated object', 'projects'
+
       it 'finds right set of projects' do
         internal_project
         private_project1
