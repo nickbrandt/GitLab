@@ -45,13 +45,6 @@ describe 'Group routing', "routing" do
           .to redirect_to('/groups/complex.group-namegit/-/boards/issues')
       end
 
-      it 'redirects when the nested group does not exist' do
-        create(:group, path: 'boards', parent: parent)
-
-        expect(get('/groups/complex.group-namegit/boards/issues/'))
-          .to redirect_to('/groups/complex.group-namegit/boards/-/issues')
-      end
-
       it 'does not redirect when the nested group exists' do
         boards_group = create(:group, path: 'boards', parent: parent)
         create(:group, path: 'issues', parent: boards_group)
