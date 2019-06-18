@@ -12,14 +12,14 @@ import _ from 'underscore';
 import { n__, s__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlLink } from '@gitlab/ui';
 import instanceComponent from './deploy_board_instance_component.vue';
 
 export default {
   components: {
     instanceComponent,
     GlLoadingIcon,
-    GlButton,
+    GlLink,
   },
   directives: {
     tooltip,
@@ -55,11 +55,10 @@ export default {
     legacyLabelWarningMessage() {
       return sprintf(
         s__(
-          'DeployBoard|Matching on the %{labelStart}app%{labelEnd} label has been removed for deploy boards.',
+          'DeployBoard|Matching on the %{appLabel} label has been removed for deploy boards. To see all instances on your board, you must update your chart and redeploy.',
         ),
         {
-          labelStart: '<code>',
-          labelEnd: '</code>',
+          appLabel: '<code>app</code>',
         },
         false,
       );
@@ -99,19 +98,14 @@ export default {
   <div class="js-deploy-board deploy-board">
     <gl-loading-icon v-if="isLoading" />
     <template v-else>
-      <div v-if="hasLegacyAppLabel" class="warning_message mb-0">
+      <div v-if="hasLegacyAppLabel" class="bs-callout bs-callout-warning mb-0 mt-0">
         <span v-html="legacyLabelWarningMessage"></span>
-        {{
-          s__(
-            'DeployBoard|To see all instances on your board, you must update your chart and redeploy.',
-          )
-        }}
-        <gl-button
-          variant="link"
+        <gl-link
           target="blank"
           href="https://docs.gitlab.com/ee/user/project/deploy_boards.html#enabling-deploy-boards"
-          >{{ __('More Information') }}</gl-button
         >
+          <strong>{{ __('More Information') }}</strong>
+        </gl-link>
       </div>
 
       <div v-if="canRenderDeployBoard" class="deploy-board-information">
@@ -152,17 +146,18 @@ export default {
             class="btn"
             data-method="post"
             rel="nofollow"
-            >Rollback</a
           >
-
+            Rollback
+          </a>
           <a
             v-if="deployBoardData.abort_url"
             :href="deployBoardData.abort_url"
             class="btn btn-red btn-inverted"
             data-method="post"
             rel="nofollow"
-            >Abort</a
           >
+            Abort
+          </a>
         </section>
       </div>
 
@@ -173,10 +168,10 @@ export default {
           <span class="deploy-board-empty-state-title d-flex">Kubernetes deployment not found</span>
           <span>
             To see deployment progress for your environments, make sure your deployments are in
-            Kubernetes namespace
-            <code>{{ projectName }}</code>
-            , and annotated with <code>app.gitlab.com/app=$CI_PROJECT_PATH_SLUG</code> and
-            <code>app.gitlab.com/env=$CI_ENVIRONMENT_SLUG</code>.
+            Kubernetes namespace <code>{{ projectName }}</code
+            >, and annotated with
+            <code>app.gitlab.com/app=$CI_PROJECT_PATH_SLUG</code>
+            and <code>app.gitlab.com/env=$CI_ENVIRONMENT_SLUG</code>.
           </span>
         </section>
       </div>

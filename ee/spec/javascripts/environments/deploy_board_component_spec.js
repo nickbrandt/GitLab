@@ -116,7 +116,7 @@ describe('Deploy Board', () => {
     });
 
     it('should render legacy label warning message', () => {
-      const warningMessage = component.$el.querySelector('.warning_message');
+      const warningMessage = component.$el.querySelector('.bs-callout-warning');
 
       expect(warningMessage).toBeTruthy();
       expect(warningMessage.innerText).toContain(
