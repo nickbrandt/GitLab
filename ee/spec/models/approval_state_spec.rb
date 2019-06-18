@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe ApprovalState do
   def create_rule(additional_params = {})
-    params = additional_params.merge(merge_request: merge_request)
+    default_approver = create(:user)
+    params = additional_params.reverse_merge(merge_request: merge_request, users: [default_approver])
     factory = params.delete(:code_owner) ? :code_owner_rule : :approval_merge_request_rule
 
     create(factory, params)
@@ -101,11 +102,23 @@ describe ApprovalState do
 
     context 'when approval rule on the merge request exists' do
       before do
-        create(:approval_merge_request_rule, merge_request: merge_request)
+        create(:approval_merge_request_rule, merge_request: merge_request, users: approvers)
       end
 
-      it 'returns true' do
-        expect(subject.approval_rules_overwritten?).to eq(true)
+      context 'without approvers' do
+        let(:approvers) { [] }
+
+        it 'returns false' do
+          expect(subject.approval_rules_overwritten?).to eq(false)
+        end
+      end
+
+      context 'with approvers' do
+        let(:approvers) { [create(:user)] }
+
+        it 'returns true' do
+          expect(subject.approval_rules_overwritten?).to eq(true)
+        end
       end
     end
 
@@ -618,10 +631,11 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1) }
+        let!(:rule) { create_rule(approvals_required: 1, users: []) }
 
         context 'when that approver is the MR author' do
           before do
+            project.update!(approvals_before_merge: 2)
             rule.users << author
           end
 
@@ -629,12 +643,44 @@ describe ApprovalState do
 
           it_behaves_like 'a MR that all members with write access can approve'
 
-          it 'requires one approval' do
-            expect(subject.approvals_left).to eq(1)
-          end
-
           it 'does not allow a logged-out user to approve the MR' do
             expect(subject.can_approve?(nil)).to be_falsey
+          end
+
+          it 'fallback rule is used' do
+            expect(subject.approvals_left).to eq(2)
+          end
+
+          it 'is not approved' do
+            expect(subject.approved?).to eq(false)
+          end
+
+          context 'with project approval rule' do
+            before do
+              create(:approval_project_rule, project: project, approvals_required: 1, users: [approver])
+            end
+
+            context 'with approvers' do
+              let(:approver) { create(:user) }
+
+              it 'requires one approval' do
+                rule = subject.wrapped_approval_rules.last.approval_rule
+
+                expect(rule).to be_a(ApprovalProjectRule)
+                expect(subject.approvers).to eq([approver])
+              end
+            end
+
+            context 'without approvers' do
+              let(:approver) { author }
+
+              it 'requires one approval' do
+                rule = subject.wrapped_approval_rules.last
+
+                expect(rule).to be_a(ApprovalMergeRequestFallback)
+                expect(subject.approvers).to eq([])
+              end
+            end
           end
         end
 
@@ -1072,7 +1118,7 @@ describe ApprovalState do
 
       it 'includes approvers from first rule and code owner rule' do
         create_rules
-        approvers = rule1.users + [group_approver1]
+        approvers = rule1.users + code_owner_rule.users + [group_approver1]
 
         expect(subject.approvers).to contain_exactly(*approvers)
       end
@@ -1252,10 +1298,11 @@ describe ApprovalState do
       end
 
       context 'when there is one approver required' do
-        let!(:rule) { create_rule(approvals_required: 1) }
+        let!(:rule) { create_rule(approvals_required: 1, users: []) }
 
         context 'when that approver is the MR author' do
           before do
+            project.update!(approvals_before_merge: 1)
             rule.users << author
           end
 
@@ -1269,6 +1316,10 @@ describe ApprovalState do
 
           it 'does not allow a logged-out user to approve the MR' do
             expect(subject.can_approve?(nil)).to be_falsey
+          end
+
+          it 'is not approved' do
+            expect(subject.approved?).to eq(false)
           end
         end
 

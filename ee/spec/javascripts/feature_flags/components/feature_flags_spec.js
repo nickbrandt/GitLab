@@ -12,7 +12,11 @@ describe('Feature Flags', () => {
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
     featureFlagsHelpPagePath: '/help/feature-flags',
+    featureFlagsAnchoredHelpPagePath: '/help/feature-flags#unleash-clients',
+    unleashApiUrl: `${TEST_HOST}/api/unleash`,
+    unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
     canUserConfigure: true,
+    canUserRotateToken: true,
     newFeatureFlagPath: 'feature-flags/new',
   };
 
@@ -38,6 +42,10 @@ describe('Feature Flags', () => {
       errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
       featureFlagsHelpPagePath: '/help/feature-flags',
       canUserConfigure: false,
+      canUserRotateToken: false,
+      featureFlagsAnchoredHelpPagePath: '/help/feature-flags#unleash-clients',
+      unleashApiUrl: `${TEST_HOST}/api/unleash`,
+      unleashApiInstanceId: 'oP6sCNRqtRHmpy1gw2-F',
     };
 
     beforeEach(done => {
@@ -247,6 +255,24 @@ describe('Feature Flags', () => {
 
     it('renders new feature flag button', () => {
       expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+    });
+  });
+
+  describe('rotate instance id', () => {
+    beforeEach(done => {
+      component = mountComponent(FeatureFlagsComponent, mockData);
+
+      setTimeout(() => {
+        done();
+      }, 0);
+    });
+
+    it('should fire the rotate action when a `token` event is received', () => {
+      const actionSpy = spyOn(component, 'rotateInstanceId');
+      const [modal] = component.$children;
+      modal.$emit('token');
+
+      expect(actionSpy).toHaveBeenCalled();
     });
   });
 });

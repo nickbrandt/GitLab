@@ -10,6 +10,8 @@ class UpdateAllMirrorsWorker
   RESCHEDULE_WAIT = 10.seconds
 
   def perform
+    return if Gitlab::Database.read_only?
+
     scheduling_ran = with_lease do
       schedule_mirrors!
     end

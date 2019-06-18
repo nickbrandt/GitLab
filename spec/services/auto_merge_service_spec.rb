@@ -10,8 +10,8 @@ describe AutoMergeService do
   describe '.all_strategies' do
     subject { described_class.all_strategies }
 
-    it 'returns all strategies' do
-      is_expected.to eq(AutoMergeService::STRATEGIES)
+    it 'includes merge when pipeline succeeds' do
+      is_expected.to include(AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
     end
   end
 
@@ -85,6 +85,30 @@ describe AutoMergeService do
 
     context 'when the head piipeline succeeded' do
       let(:pipeline_status) { :success }
+
+      it 'returns failed' do
+        is_expected.to eq(:failed)
+      end
+    end
+  end
+
+  describe '#update' do
+    subject { service.update(merge_request) }
+
+    context 'when auto merge is enabled' do
+      let(:merge_request) { create(:merge_request, :merge_when_pipeline_succeeds) }
+
+      it 'delegates to a relevant service instance' do
+        expect_next_instance_of(AutoMerge::MergeWhenPipelineSucceedsService) do |service|
+          expect(service).to receive(:update).with(merge_request)
+        end
+
+        subject
+      end
+    end
+
+    context 'when auto merge is not enabled' do
+      let(:merge_request) { create(:merge_request) }
 
       it 'returns failed' do
         is_expected.to eq(:failed)

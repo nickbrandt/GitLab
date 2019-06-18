@@ -18,6 +18,17 @@ module EE
           def custom_namespace_present_options
             { requested_hosted_plan: params[:requested_hosted_plan] }
           end
+
+          def update_namespace(namespace)
+            update_attrs = declared_params(include_missing: false)
+
+            # Reset last_ci_minutes_notification_at if customer purchased extra CI minutes.
+            if params[:extra_shared_runners_minutes_limit].present?
+              update_attrs[:last_ci_minutes_notification_at] = nil
+            end
+
+            namespace.update(update_attrs)
+          end
         end
 
         resource :namespaces do
@@ -48,7 +59,7 @@ module EE
 
             break not_found!('Namespace') unless namespace
 
-            if namespace.update(declared_params(include_missing: false))
+            if update_namespace(namespace)
               present namespace, with: ::API::Entities::Namespace, current_user: current_user
             else
               render_validation_error!(namespace)

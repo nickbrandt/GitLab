@@ -1,0 +1,5 @@
+---
+title: Fix incorrect epic ancestor links
+merge_request: 14092
+author:
+type: fixed

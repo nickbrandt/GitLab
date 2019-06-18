@@ -1,17 +1,19 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 import _ from 'underscore';
-import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __, s__ } from '~/locale';
 import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
-import TablePagination from '~/vue_shared/components/table_pagination.vue';
+import TablePagination from '~/vue_shared/components/pagination/table_pagination.vue';
 import {
   getParameterByName,
   historyPushState,
   buildUrlWithCurrentLocation,
 } from '~/lib/utils/common_utils';
+
+import ConfigureFeatureFlagsModal from './configure_feature_flags_modal.vue';
 
 const { mapState, mapActions } = createNamespacedHelpers('index');
 
@@ -24,6 +26,10 @@ export default {
     GlEmptyState,
     GlLoadingIcon,
     GlButton,
+    ConfigureFeatureFlagsModal,
+  },
+  directives: {
+    GlModal: GlModalDirective,
   },
   props: {
     endpoint: {
@@ -39,6 +45,23 @@ export default {
       required: true,
     },
     featureFlagsHelpPagePath: {
+      type: String,
+      required: true,
+    },
+    featureFlagsAnchoredHelpPagePath: {
+      type: String,
+      required: true,
+    },
+    rotateInstanceIdPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    unleashApiUrl: {
+      type: String,
+      required: true,
+    },
+    unleashApiInstanceId: {
       type: String,
       required: true,
     },
@@ -64,7 +87,20 @@ export default {
     disabled: 'disabled',
   },
   computed: {
-    ...mapState(['featureFlags', 'count', 'pageInfo', 'isLoading', 'hasError', 'options']),
+    ...mapState([
+      'featureFlags',
+      'count',
+      'pageInfo',
+      'isLoading',
+      'hasError',
+      'options',
+      'instanceId',
+      'isRotating',
+      'hasRotateError',
+    ]),
+    canUserRotateToken() {
+      return this.rotateInstanceIdPath !== '';
+    },
     shouldRenderTabs() {
       /* Do not show tabs until after the first request to get the count */
       return this.count.all !== undefined;
@@ -126,9 +162,18 @@ export default {
     this.setFeatureFlagsEndpoint(this.endpoint);
     this.setFeatureFlagsOptions({ scope: this.scope, page: this.page });
     this.fetchFeatureFlags();
+    this.setInstanceId(this.unleashApiInstanceId);
+    this.setInstanceIdEndpoint(this.rotateInstanceIdPath);
   },
   methods: {
-    ...mapActions(['setFeatureFlagsEndpoint', 'setFeatureFlagsOptions', 'fetchFeatureFlags']),
+    ...mapActions([
+      'setFeatureFlagsEndpoint',
+      'setFeatureFlagsOptions',
+      'fetchFeatureFlags',
+      'setInstanceIdEndpoint',
+      'setInstanceId',
+      'rotateInstanceId',
+    ]),
     onChangeTab(scope) {
       this.scope = scope;
       this.updateFeatureFlagOptions({
@@ -160,15 +205,26 @@ export default {
 </script>
 <template>
   <div>
+    <configure-feature-flags-modal
+      v-if="canUserConfigure"
+      :help-path="featureFlagsHelpPagePath"
+      :help-anchor="featureFlagsAnchoredHelpPagePath"
+      :api-url="unleashApiUrl"
+      :instance-id="instanceId"
+      :is-rotating="isRotating"
+      :has-rotate-error="hasRotateError"
+      :can-user-rotate-token="canUserRotateToken"
+      modal-id="configure-feature-flags"
+      @token="rotateInstanceId()"
+    />
     <h3 class="page-title with-button">
       {{ s__('FeatureFlags|Feature Flags') }}
       <div class="pull-right">
         <button
           v-if="canUserConfigure"
+          v-gl-modal="'configure-feature-flags'"
           type="button"
           class="js-ff-configure append-right-8 btn-inverted btn btn-primary"
-          data-toggle="modal"
-          data-target="#configure-feature-flags-modal"
         >
           {{ s__('FeatureFlags|Configure') }}
         </button>

@@ -286,6 +286,22 @@ module Elastic
     end
 
     class_methods do
+      # Support STI models
+      def inherited(subclass)
+        super
+
+        # Avoid SystemStackError in Model.import
+        # See https://github.com/elastic/elasticsearch-rails/issues/144
+        subclass.include Elasticsearch::Model
+
+        # Use ES configuration from parent model
+        # TODO: Revisit after upgrading to elasticsearch-model 7.0.0
+        # See https://github.com/elastic/elasticsearch-rails/commit/b8455db186664e21927bfb271bab6390853e7ff3
+        subclass.__elasticsearch__.index_name = self.index_name
+        subclass.__elasticsearch__.document_type = self.document_type
+        subclass.__elasticsearch__.instance_variable_set(:@mapping, self.mapping.dup)
+      end
+
       # Should be overridden for all nested models
       def nested?
         false

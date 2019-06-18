@@ -292,6 +292,36 @@ describe Ci::Build do
     end
   end
 
+  describe '#collect_dependency_list_reports!' do
+    let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: job, project: job.project) }
+    let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
+
+    subject { job.collect_dependency_list_reports!(dependency_list_report) }
+
+    context 'with available licensed feature' do
+      before do
+        stub_licensed_features(dependency_list: true)
+      end
+
+      it 'parses blobs and add the results to the report' do
+        subject
+        blob_path = "/#{project.full_path}/blob/#{job.sha}/yarn/yarn.lock"
+
+        expect(dependency_list_report.dependencies.count).to eq(21)
+        expect(dependency_list_report.dependencies[0][:name]).to eq('mini_portile2')
+        expect(dependency_list_report.dependencies[20][:location][:blob_path]).to eq(blob_path)
+      end
+    end
+
+    context 'with disabled licensed feature' do
+      it 'does NOT parse dependency list report' do
+        subject
+
+        expect(dependency_list_report.dependencies.count).to eq(0)
+      end
+    end
+  end
+
   describe '#collect_metrics_reports!' do
     subject { job.collect_metrics_reports!(metrics_report) }
 

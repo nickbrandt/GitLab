@@ -1,3 +1,4 @@
+/* eslint-disable @gitlab/i18n/no-non-i18n-strings */
 export const LICENSE_APPROVAL_STATUS = {
   APPROVED: 'approved',
   BLACKLISTED: 'blacklisted',

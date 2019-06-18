@@ -24,6 +24,12 @@ class AutoMergeService < BaseService
     service.execute(merge_request)
   end
 
+  def update(merge_request)
+    return :failed unless merge_request.auto_merge_enabled?
+
+    get_service_instance(merge_request.auto_merge_strategy).update(merge_request)
+  end
+
   def process(merge_request)
     return unless merge_request.auto_merge_enabled?
 
@@ -48,3 +54,5 @@ class AutoMergeService < BaseService
     self.class.get_service_class(strategy)&.new(project, current_user, params)
   end
 end
+
+AutoMergeService.prepend(EE::AutoMergeService)

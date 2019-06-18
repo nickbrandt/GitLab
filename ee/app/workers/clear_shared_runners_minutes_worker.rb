@@ -19,6 +19,10 @@ class ClearSharedRunnersMinutesWorker
         .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
     end
 
+    Namespace.where.not(last_ci_minutes_notification_at: nil).each_batch do |relation|
+      relation.update_all(last_ci_minutes_notification_at: nil)
+    end
+
     NamespaceStatistics.where.not(shared_runners_seconds: 0)
       .update_all(
         shared_runners_seconds: 0,

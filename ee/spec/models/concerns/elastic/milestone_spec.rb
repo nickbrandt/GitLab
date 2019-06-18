@@ -39,6 +39,7 @@ describe Milestone, :elastic do
 
     expected_hash = milestone.attributes.extract!(
       'id',
+      'iid',
       'title',
       'description',
       'project_id',

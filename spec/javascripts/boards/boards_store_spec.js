@@ -6,8 +6,8 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import Cookies from 'js-cookie';
 
-import '~/vue_shared/models/label';
-import '~/vue_shared/models/assignee';
+import '~/boards/models/label';
+import '~/boards/models/assignee';
 import '~/boards/models/issue';
 import '~/boards/models/list';
 import '~/boards/services/board_service';
@@ -309,6 +309,17 @@ describe('Store', () => {
 
         done();
       });
+    });
+  });
+
+  describe('setListDetail', () => {
+    it('sets the list detail', () => {
+      boardsStore.detail.list = 'not a list';
+
+      const dummyValue = 'new list';
+      boardsStore.setListDetail(dummyValue);
+
+      expect(boardsStore.detail.list).toEqual(dummyValue);
     });
   });
 

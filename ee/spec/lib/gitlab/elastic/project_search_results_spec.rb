@@ -47,9 +47,9 @@ describe Gitlab::Elastic::ProjectSearchResults do
 
       # Wiki
       project.wiki.create_page('index_page', 'term')
-      project.wiki.index_blobs
+      project.wiki.index_wiki_blobs
       project1.wiki.create_page('index_page', ' term')
-      project1.wiki.index_blobs
+      project1.wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index
 
@@ -70,7 +70,7 @@ describe Gitlab::Elastic::ProjectSearchResults do
 
         # Wiki
         project.wiki.create_page('index_page', 'term')
-        project.wiki.index_blobs
+        project.wiki.index_wiki_blobs
 
         Gitlab::Elastic::Helper.refresh_index
 

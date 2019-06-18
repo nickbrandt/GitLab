@@ -23,9 +23,15 @@ module QA
         end
 
         Page::Project::Issue::Show.perform do |show|
-          show.comment('/promote')
-
-          expect(show).to have_content("promoted to epic")
+          # Due to the randomness of tests execution, sometimes a previous test
+          # may have changed the filter, which makes the below action needed.
+          # TODO: Make this test completely independent, not requiring the below step.
+          show.select_all_activities_filter
+          # We add a space together with the '/promote' string to avoid test flakiness
+          # due to the tooltip '/promote Promote issue to an epic (may expose
+          # confidential information)' from being shown, which may cause the click not
+          # to work properly.
+          show.comment('/promote ')
         end
 
         group.visit!

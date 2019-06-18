@@ -10,6 +10,8 @@ class ProjectImportScheduleWorker
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(project_id)
+    return if Gitlab::Database.read_only?
+
     import_state = ProjectImportState.find_by(project_id: project_id)
     raise ImportStateNotFound unless import_state
 

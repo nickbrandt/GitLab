@@ -50,7 +50,7 @@ describe 'Epics through GroupQuery' do
       it 'returns epics successfully' do
         expect(response).to have_gitlab_http_status(200)
         expect(graphql_errors).to be_nil
-        expect(node_array('id').first).to eq epic.id.to_s
+        expect(node_array('id').first).to eq epic.to_global_id.to_s
         expect(graphql_data['group']['epicsEnabled']).to be_truthy
       end
     end
@@ -67,7 +67,7 @@ describe 'Epics through GroupQuery' do
       it 'sorts by created_at descending by default' do
         post_graphql(query, current_user: user)
 
-        expect_array_response([epic2.id, epic.id])
+        expect_array_response([epic2.to_global_id.to_s, epic.to_global_id.to_s])
       end
 
       describe 'can admin epics' do
@@ -147,7 +147,7 @@ describe 'Epics through GroupQuery' do
       it 'returns an epic successfully' do
         expect(response).to have_gitlab_http_status(:success)
         expect(graphql_errors).to be_nil
-        expect(epic_data['id']).to eq epic.id.to_s
+        expect(epic_data['id']).to eq epic.to_global_id.to_s
         expect(graphql_data['group']['epicsEnabled']).to be_truthy
       end
     end
@@ -156,7 +156,7 @@ describe 'Epics through GroupQuery' do
   def expect_array_response(items)
     expect(response).to have_gitlab_http_status(:success)
     expect(epics_data).to be_an Array
-    expect(node_array('id').map(&:to_i)).to eq(Array(items))
+    expect(node_array('id')).to eq(Array(items))
   end
 
   def node_array(extract_attribute = nil)

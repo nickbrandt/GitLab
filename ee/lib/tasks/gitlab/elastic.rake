@@ -9,40 +9,33 @@ namespace :gitlab do
 
       Rake::Task["gitlab:elastic:create_empty_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
-      Rake::Task["gitlab:elastic:index_wikis"].invoke
-      Rake::Task["gitlab:elastic:index_database"].invoke
-      Rake::Task["gitlab:elastic:index_repositories"].invoke
+      Rake::Task["gitlab:elastic:index_projects"].invoke
+      Rake::Task["gitlab:elastic:index_snippets"].invoke
     end
 
-    desc "GitLab | Elasticsearch | Index project repositories in the background"
-    task index_repositories_async: :environment do
-      print "Enqueuing project repositories in batches of #{batch_size}"
+    desc "GitLab | Elasticsearch | Index projects in the background"
+    task index_projects: :environment do
+      print "Enqueuing projects"
 
-      project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.perform_async(start, finish)
+      project_id_batches do |ids|
+        args = ids.collect do |id|
+          [:index, 'Project', id, nil] # es_id is unused for :index
+        end
+
+        ElasticIndexerWorker.bulk_perform_async(args)
         print "."
       end
 
       puts "OK"
     end
 
-    desc "GitLab | ElasticSearch | Check project repository indexing status"
-    task index_repositories_status: :environment do
+    desc "GitLab | ElasticSearch | Check project indexing status"
+    task index_projects_status: :environment do
       indexed = IndexStatus.count
       projects = Project.count
       percent = (indexed / projects.to_f) * 100.0
 
       puts "Indexing is %.2f%% complete (%d/%d projects)" % [percent, indexed, projects]
-    end
-
-    desc "GitLab | Elasticsearch | Index project repositories"
-    task index_repositories: :environment do
-      print "Indexing project repositories..."
-
-      Sidekiq::Logging.logger = Logger.new(STDOUT)
-      project_id_batches do |start, finish|
-        ElasticBatchProjectIndexerWorker.new.perform(start, finish)
-      end
     end
 
     desc 'GitLab | Elasticsearch | Unlock repositories for indexing in case something gets stuck'
@@ -52,52 +45,15 @@ namespace :gitlab do
       puts 'Cleared all locked projects. Incremental indexing should work now.'
     end
 
-    desc "GitLab | Elasticsearch | Index wiki repositories"
-    task index_wikis: :environment do
-      projects = apply_project_filters(Project.with_wiki_enabled)
+    desc "GitLab | Elasticsearch | Index all snippets"
+    task index_snippets: :environment do
+      logger = Logger.new(STDOUT)
+      logger.info("Indexing snippets...")
 
-      projects.find_each do |project|
-        if project.use_elasticsearch? && !project.wiki.empty?
-          puts "Indexing wiki of #{project.full_name}..."
+      Snippet.es_import
 
-          begin
-            project.wiki.index_blobs
-            puts "Done!".color(:green)
-          rescue StandardError => e
-            puts "#{e.message}, trace - #{e.backtrace}"
-          end
-        end
-      end
+      logger.info("Indexing snippets... " + "done".color(:green))
     end
-
-    INDEXABLE_CLASSES = {
-      "Project"      => "index_projects",
-      "Issue"        => "index_issues",
-      "MergeRequest" => "index_merge_requests",
-      "Snippet"      => "index_snippets",
-      "Note"         => "index_notes",
-      "Milestone"    => "index_milestones"
-    }.freeze
-
-    INDEXABLE_CLASSES.each do |klass_name, task_name|
-      task task_name => :environment do
-        logger = Logger.new(STDOUT)
-        logger.info("Indexing #{klass_name.pluralize}...")
-
-        klass = Kernel.const_get(klass_name)
-
-        if klass_name == 'Note'
-          Note.searchable.es_import
-        else
-          klass.es_import
-        end
-
-        logger.info("Indexing #{klass_name.pluralize}... " + "done".color(:green))
-      end
-    end
-
-    desc "GitLab | Elasticsearch | Index all database objects"
-    multitask index_database: INDEXABLE_CLASSES.values
 
     desc "GitLab | Elasticsearch | Create empty index"
     task create_empty_index: :environment do
@@ -123,62 +79,6 @@ namespace :gitlab do
       puts "Index recreated".color(:green)
     end
 
-    desc "GitLab | Elasticsearch | Add feature access levels to project"
-    task add_feature_visibility_levels_to_project: :environment do
-      client = Project.__elasticsearch__.client
-
-      #### Check if this task has already been run ####
-      mapping = client.indices.get(index: Project.index_name)
-      project_fields = mapping[Project.index_name]['mappings']['project']['properties'].keys
-
-      if project_fields.include?('issues_access_level')
-        puts 'Index mapping is already up to date'.color(:yellow)
-        exit
-      end
-
-      ####
-
-      project_fields = {
-        properties: {
-          issues_access_level: {
-              type: :integer
-          },
-          merge_requests_access_level: {
-              type: :integer
-          },
-          snippets_access_level: {
-              type: :integer
-          },
-          wiki_access_level: {
-              type: :integer
-          },
-          repository_access_level: {
-              type: :integer
-          }
-        }
-      }
-
-      note_fields = {
-        properties: {
-          noteable_type: {
-            type: :string,
-            index: :not_analyzed
-          },
-          noteable_id: {
-            type: :integer
-          }
-        }
-      }
-
-      client.indices.put_mapping(index: Project.index_name, type: :project, body: project_fields)
-      client.indices.put_mapping(index: Project.index_name, type: :note, body: note_fields)
-
-      Project.__elasticsearch__.import
-      Note.searchable.import_with_parent
-
-      puts "Done".color(:green)
-    end
-
     desc "GitLab | Elasticsearch | Display which projects are not indexed"
     task projects_not_indexed: :environment do
       not_indexed = Project.where.not(id: IndexStatus.select(:project_id).distinct)
@@ -190,10 +90,6 @@ namespace :gitlab do
       end
     end
 
-    def batch_size
-      ENV.fetch('BATCH', 300).to_i
-    end
-
     def project_id_batches(&blk)
       relation = Project
 
@@ -201,23 +97,15 @@ namespace :gitlab do
         relation = relation.includes(:index_status).where('index_statuses.id IS NULL').references(:index_statuses)
       end
 
-      relation.all.in_batches(of: batch_size, start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
+      if ::Gitlab::CurrentSettings.elasticsearch_limit_indexing?
+        relation = relation.where(id: ::Gitlab::CurrentSettings.elasticsearch_limited_projects.select(:id))
+      end
+
+      relation.all.in_batches(start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
         ids = relation.reorder(:id).pluck(:id)
         Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, ids) }
-        yield ids[0], ids[-1]
+        yield ids
       end
-    end
-
-    def apply_project_filters(projects)
-      if ENV['ID_FROM']
-        projects = projects.where("projects.id >= ?", ENV['ID_FROM'])
-      end
-
-      if ENV['ID_TO']
-        projects = projects.where("projects.id <= ?", ENV['ID_TO'])
-      end
-
-      projects
     end
 
     def display_unindexed(projects)

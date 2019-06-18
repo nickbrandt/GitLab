@@ -1,14 +1,12 @@
 # coding: utf-8
 require 'spec_helper'
 
-describe Gitlab::Elastic::SearchResults do
+describe Gitlab::Elastic::SearchResults, :elastic do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
   end
 
   after do
-    Gitlab::Elastic::Helper.delete_index
     stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
@@ -16,6 +14,16 @@ describe Gitlab::Elastic::SearchResults do
   let(:project_1) { create(:project, :repository, :wiki_repo) }
   let(:project_2) { create(:project, :repository, :wiki_repo) }
   let(:limit_project_ids) { [project_1.id] }
+
+  describe 'counts' do
+    it 'does not hit Elasticsearch twice for result and counts' do
+      expect(Repository).to receive(:find_commits_by_message_with_elastic).with('hello world', anything).once.and_call_original
+
+      results = described_class.new(user, 'hello world', limit_project_ids)
+      expect(results.objects('commits', 2)).to be_empty
+      expect(results.commits_count).to eq 0
+    end
+  end
 
   describe 'parse_search_result' do
     let(:blob) do
@@ -542,7 +550,7 @@ describe Gitlab::Elastic::SearchResults do
     before do
       if project_1.wiki_enabled?
         project_1.wiki.create_page('index_page', 'term')
-        project_1.wiki.index_blobs
+        project_1.wiki.index_wiki_blobs
       end
 
       Gitlab::Elastic::Helper.refresh_index
@@ -566,7 +574,7 @@ describe Gitlab::Elastic::SearchResults do
     it 'finds wiki blobs from public projects only' do
       project_2 = create :project, :repository, :private, :wiki_repo
       project_2.wiki.create_page('index_page', 'term')
-      project_2.wiki.index_blobs
+      project_2.wiki.index_wiki_blobs
       Gitlab::Elastic::Helper.refresh_index
 
       expect(results.wiki_blobs_count).to eq 1
@@ -860,7 +868,7 @@ describe Gitlab::Elastic::SearchResults do
       before do
         [public_project, internal_project, private_project1, private_project2].each do |project|
           project.wiki.create_page('index_page', 'term')
-          project.wiki.index_blobs
+          project.wiki.index_wiki_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index

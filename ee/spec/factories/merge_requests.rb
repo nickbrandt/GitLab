@@ -13,9 +13,21 @@ FactoryBot.modify do
         train_creator { author }
       end
 
+      auto_merge_enabled true
+      auto_merge_strategy AutoMergeService::STRATEGY_MERGE_TRAIN
+      merge_user { train_creator }
+
       after :create do |merge_request, evaluator|
-        merge_request.get_on_train!(evaluator.train_creator)
+        merge_request.create_merge_train(user: evaluator.train_creator,
+                                         target_project: merge_request.target_project,
+                                         target_branch: merge_request.target_branch)
       end
+    end
+
+    trait :add_to_merge_train_when_pipeline_succeeds do
+      auto_merge_enabled true
+      auto_merge_strategy AutoMergeService::STRATEGY_ADD_TO_MERGE_TRAIN_WHEN_PIPELINE_SUCCEEDS
+      merge_user { author }
     end
 
     transient do

@@ -1,0 +1,10 @@
+- return unless License.feature_available?(:default_project_deletion_protection)
+
+- f = local_assigns.fetch(:form)
+
+.form-group
+  = f.label s_('Default project deletion protection'), class: 'label-bold'
+  .form-check
+    = f.check_box :default_project_deletion_protection, class: 'form-check-input'
+    = f.label :default_project_deletion_protection, class: 'form-check-label' do
+      = _('Only admins can delete project')

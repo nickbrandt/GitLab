@@ -203,9 +203,12 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           it 'creates rule' do
             expect do
               described_class.new.perform(target_type, target.id)
-            end.to change { target.approval_rules.code_owner.count }.by(1)
+            end.to change { target.approval_rules.count }.by(1)
 
-            expect(target.approval_rules.code_owner.first.users).to contain_exactly(*owners)
+            rule = target.approval_rules.first
+
+            expect(rule.read_attribute(:code_owner)).to eq(true)
+            expect(rule.users).to contain_exactly(*owners)
           end
         end
 

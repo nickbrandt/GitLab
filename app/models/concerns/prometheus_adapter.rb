@@ -8,7 +8,6 @@ module PrometheusAdapter
     # We can't prepend outside of this model due to the use of `included`, so this must stay here.
     prepend EE::PrometheusAdapter # rubocop: disable Cop/InjectEnterpriseEditionModule
 
-    self.reactive_cache_key = ->(adapter) { [adapter.class.model_name.singular, adapter.id] }
     self.reactive_cache_lease_timeout = 30.seconds
     self.reactive_cache_refresh_interval = 30.seconds
     self.reactive_cache_lifetime = 1.minute

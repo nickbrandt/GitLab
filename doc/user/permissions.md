@@ -17,7 +17,10 @@ will be unassigned automatically.
 GitLab [administrators](../administration/index.md) receive all permissions.
 
 To add or import a user, you can follow the
-[project members documentation](../user/project/members/index.md).
+[project members documentation](project/members/index.md).
+
+For information on eligible approvers for Merge Requests, see
+[Eligible approvers](project/merge_requests/merge_request_approvals.md#eligible-approvers).
 
 ## Principles behind permissions
 
@@ -196,21 +199,22 @@ Any user can remove themselves from a group, unless they are the last Owner of
 the group. The following table depicts the various user permission levels in a
 group.
 
-| Action                                | Guest | Reporter | Developer | Maintainer | Owner |
-|---------------------------------------|-------|----------|-----------|------------|-------|
-| Browse group                          | ✓     | ✓        | ✓         |  ✓         | ✓     |
-| View Insights charts **[ULTIMATE]**   | ✓     | ✓        | ✓         |  ✓         | ✓     |
-| View group epic **[ULTIMATE]**        | ✓     | ✓        | ✓         |  ✓         | ✓     |
-| Create/edit group epic **[ULTIMATE]** |       | ✓        | ✓         | ✓          | ✓     |
-| Manage group labels                   |       | ✓        | ✓         | ✓          | ✓     |
-| Create project in group               |       |          | ✓         | ✓          | ✓     |
-| Create/edit/delete group milestones   |       |          | ✓         | ✓          | ✓     |
-| Edit group                            |       |          |           |            | ✓     |
-| Create subgroup                       |       |          |           |            | ✓     |
-| Manage group members                  |       |          |           |            | ✓     |
-| Remove group                          |       |          |           |            | ✓     |
-| Delete group epic **[ULTIMATE]**      |       |          |           |            | ✓     |
-| View group Audit Events               |       |          |           |            | ✓     |
+| Action                                          | Guest | Reporter | Developer | Maintainer | Owner |
+|-------------------------------------------------|-------|----------|-----------|------------|-------|
+| Browse group                                    | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View Insights charts **[ULTIMATE]**             | ✓     | ✓        | ✓         | ✓          | ✓     |
+| View group epic **[ULTIMATE]**                  | ✓     | ✓        | ✓         | ✓          | ✓     |
+| Create/edit group epic **[ULTIMATE]**           |       | ✓        | ✓         | ✓          | ✓     |
+| Manage group labels                             |       | ✓        | ✓         | ✓          | ✓     |
+| Create project in group                         |       |          | ✓         | ✓          | ✓     |
+| Create/edit/delete group milestones             |       |          | ✓         | ✓          | ✓     |
+| Enable/disable a dependency proxy **[PREMIUM]** |       |          | ✓         | ✓          | ✓     |
+| Edit group                                      |       |          |           |            | ✓     |
+| Create subgroup                                 |       |          |           |            | ✓     |
+| Manage group members                            |       |          |           |            | ✓     |
+| Remove group                                    |       |          |           |            | ✓     |
+| Delete group epic **[ULTIMATE]**                |       |          |           |            | ✓     |
+| View group Audit Events                         |       |          |           |            | ✓     |
 
 ### Subgroup permissions
 

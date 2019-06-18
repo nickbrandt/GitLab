@@ -34,6 +34,7 @@ class License < ApplicationRecord
     repository_mirrors
     repository_size_limit
     scoped_issue_board
+    usage_quotas
     visual_review_app
   ].freeze
 
@@ -69,6 +70,7 @@ class License < ApplicationRecord
     reject_unsigned_commits
     commit_committer_check
     ci_cd_projects
+    default_project_deletion_protection
     protected_environments
     custom_project_templates
     group_project_templates
@@ -90,6 +92,7 @@ class License < ApplicationRecord
   EEU_FEATURES = EEP_FEATURES + %i[
     security_dashboard
     dependency_scanning
+    dependency_list
     license_management
     sast
     sast_container
@@ -104,6 +107,7 @@ class License < ApplicationRecord
     insights
     web_ide_terminal
     incident_management
+    group_ip_restriction
   ]
   EEU_FEATURES.freeze
 
@@ -186,6 +190,7 @@ class License < ApplicationRecord
     object_storage
     repository_size_limit
     custom_project_templates
+    usage_quotas
   ].freeze
 
   validate :valid_license

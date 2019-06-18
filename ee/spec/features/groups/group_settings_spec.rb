@@ -174,7 +174,7 @@ describe 'Edit group settings' do
             results = find_all('.select2-result')
 
             expect(results.count).to eq(1)
-            expect(results.last.text).to eq "#{nested_group.full_name} #{nested_group.full_path}"
+            expect(results.last.text).to eq "#{nested_group.full_name}\n#{nested_group.full_path}"
           end
         end
       end

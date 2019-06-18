@@ -6,8 +6,8 @@ module Quality
       class Issues < Seeders::Issues
         TEAM_LABELS = %w[Plan Create Manage Verify Secure].freeze
         TYPE_LABELS = %w[bug feature].freeze
-        SEVERITY_LABELS = %w[severity::1 severity::2 severity::3 severity::4].freeze
-        PRIORITY_LABELS = %w[priority::1 priority::2 priority::3 priority::4].freeze
+        SEVERITY_LABELS = %w[S::1 S::2 S::3 S::4].freeze
+        PRIORITY_LABELS = %w[P::1 P::2 P::3 P::4].freeze
 
         private
 

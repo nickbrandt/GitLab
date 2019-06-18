@@ -49,7 +49,7 @@ describe API::Search do
         wiki = create(:project_wiki, project: project)
         create(:wiki_page, wiki: wiki, attrs: { title: 'home', content: "Awesome page" })
 
-        project.wiki.index_blobs
+        project.wiki.index_wiki_blobs
         Gitlab::Elastic::Helper.refresh_index
 
         get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }

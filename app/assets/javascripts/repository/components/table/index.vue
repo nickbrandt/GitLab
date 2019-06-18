@@ -134,6 +134,8 @@ export default {
               :current-path="path"
               :path="entry.flatPath"
               :type="entry.type"
+              :url="entry.webUrl"
+              :lfs-oid="entry.lfsOid"
             />
           </template>
         </tbody>

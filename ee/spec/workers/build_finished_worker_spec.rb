@@ -1,0 +1,45 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe BuildFinishedWorker do
+  let(:ci_runner) { create(:ci_runner) }
+  let(:build) { create(:ee_ci_build, :success, runner: ci_runner) }
+  let(:project) { build.project }
+  let(:namespace) { project.shared_runners_limit_namespace }
+
+  subject do
+    described_class.new.perform(build.id)
+  end
+
+  def namespace_stats
+    namespace.namespace_statistics || namespace.create_namespace_statistics
+  end
+
+  def project_stats
+    project.statistics || project.create_statistics(namespace: project.namespace)
+  end
+
+  describe '#perform' do
+    before do
+      allow_any_instance_of(EE::Project).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
+    end
+
+    it 'updates the project stats' do
+      expect { subject }.to change { project_stats.reload.shared_runners_seconds }
+    end
+
+    it 'updates the namespace stats' do
+      expect { subject }.to change { namespace_stats.reload.shared_runners_seconds }
+    end
+
+    it 'notifies the owners of Groups' do
+      namespace.update_attribute(:shared_runners_minutes_limit, 2000)
+      namespace_stats.update_attribute(:shared_runners_seconds, 2100 * 60)
+
+      expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace.name, namespace.owner.email).and_return(spy)
+
+      subject
+    end
+  end
+end

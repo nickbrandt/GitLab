@@ -38,6 +38,8 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.initPerformanceReport(data);
     this.licenseManagement = data.license_management;
     this.metricsReportsPath = data.metrics_reports_path;
+
+    this.blockingMergeRequests = data.blocking_merge_requests;
   }
 
   setData(data, isRebased) {

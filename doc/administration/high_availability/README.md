@@ -26,8 +26,7 @@ experience with GitLab.com and Enterprise Edition on-premises customers.
 
 For a detailed insight into how GitLab scales and configures GitLab.com, you can
 watch [this 1 hour Q&A](https://www.youtube.com/watch?v=uCU8jdYzpac)
-with [John Northrup](https://gitlab.com/northrup), one of our infrastructure
-engineers, and live questions coming in from some of our customers.
+with [John Northrup](https://gitlab.com/northrup), and live questions coming in from some of our customers.
 
 ## GitLab Components
 
@@ -73,10 +72,10 @@ Complete the following installation steps in order. A link at the end of each
 section will bring you back to the Scalable Architecture Examples section so
 you can continue with the next step.
 
-1. [PostgreSQL](./database.md#postgresql-in-a-scaled-environment)
-1. [Redis](./redis.md#redis-in-a-scaled-environment)
-1. [Gitaly](./gitaly.md) (recommended) or [NFS](./nfs.md)
-1. [GitLab application nodes](./gitlab.md)
+1. [PostgreSQL](database.md#postgresql-in-a-scaled-environment)
+1. [Redis](redis.md#redis-in-a-scaled-environment)
+1. [Gitaly](gitaly.md) (recommended) or [NFS](nfs.md)
+1. [GitLab application nodes](gitlab.md)
 
 ### Full Scaling
 

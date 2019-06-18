@@ -156,6 +156,18 @@ describe API::Namespaces do
         expect(json_response['message']).to eq('plan' => ['is not included in the list'])
       end
     end
+
+    context 'when namespace has a value for last_ci_minutes_notification_at' do
+      before do
+        group1.update_attribute(:last_ci_minutes_notification_at, Time.now)
+      end
+
+      it 'resets that value when assigning extra CI minutes' do
+        expect do
+          put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
+        end.to change { group1.reload.last_ci_minutes_notification_at }.to(nil)
+      end
+    end
   end
 
   describe 'POST :id/gitlab_subscription' do

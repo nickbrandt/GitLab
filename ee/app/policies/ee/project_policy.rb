@@ -46,6 +46,16 @@ module EE
       end
 
       with_scope :subject
+      condition(:commit_committer_check_available) do
+        @subject.feature_available?(:commit_committer_check)
+      end
+
+      with_scope :subject
+      condition(:reject_unsigned_commits_available) do
+        @subject.feature_available?(:reject_unsigned_commits)
+      end
+
+      with_scope :subject
       condition(:pod_logs_enabled) do
         @subject.feature_available?(:pod_logs, @user)
       end
@@ -184,9 +194,23 @@ module EE
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.enable :change_commit_committer_check
+      rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
+
+      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
+        enable :change_commit_committer_check
+      end
+
+      rule { commit_committer_check_available }.policy do
+        enable :read_commit_committer_check
+      end
+
+      rule { ~commit_committer_check_available }.policy do
+        prevent :change_commit_committer_check
+      end
 
       rule { owner | reporter }.enable :build_read_project
+
+      rule { ~admin & owner & owner_cannot_destroy_project }.prevent :remove_project
 
       rule { archived }.policy do
         READONLY_FEATURES_WHEN_ARCHIVED.each do |feature|
@@ -204,6 +228,19 @@ module EE
 
       condition(:needs_new_sso_session) do
         ::Gitlab::Auth::GroupSaml::SsoEnforcer.group_access_restricted?(subject.group)
+      end
+
+      condition(:ip_enforcement_prevents_access) do
+        !::Gitlab::IpRestriction::Enforcer.new(subject.group).allows_current_ip? if subject.group
+      end
+
+      condition(:owner_cannot_destroy_project) do
+        ::Gitlab::CurrentSettings.current_application_settings
+          .default_project_deletion_protection
+      end
+
+      rule { ip_enforcement_prevents_access }.policy do
+        prevent :read_project
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal

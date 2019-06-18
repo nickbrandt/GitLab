@@ -158,6 +158,7 @@ module EE
           end)
           expose :email_additional_text, if: ->(_instance, _opts) { ::License.feature_available?(:email_additional_text) }
           expose :file_template_project_id, if: ->(_instance, _opts) { ::License.feature_available?(:custom_file_templates) }
+          expose :default_project_deletion_protection, if: ->(_instance, _opts) { ::License.feature_available?(:default_project_deletion_protection) }
         end
       end
 
@@ -191,6 +192,9 @@ module EE
         expose :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :deny_delete_tag
         expose :member_check, :prevent_secrets, :author_email_regex
         expose :file_name_regex, :max_file_size
+        expose :commit_committer_check, if: ->(rule, opts) do
+          Ability.allowed?(opts[:user], :read_commit_committer_check, rule.project)
+        end
       end
 
       class LdapGroupLink < Grape::Entity

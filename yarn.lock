@@ -693,15 +693,22 @@
     eslint-plugin-promise "^4.1.1"
     eslint-plugin-vue "^5.0.0"
 
-"@gitlab/svgs@^1.63.0":
-  version "1.63.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.63.0.tgz#9dd544026d203e4ce6efed72b05db68f710c4d49"
-  integrity sha512-YztrReFTg31B7v5wtUC5j15KHNcMebtW+kACytEU42XomMaIwk4USIbygqWlq0VRHA2VHJrHApfJHIjxiCCQcA==
+"@gitlab/eslint-plugin-i18n@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/eslint-plugin-i18n/-/eslint-plugin-i18n-1.1.0.tgz#e494d599e644ce3a094ea85f87dbbda41a924c5e"
+  integrity sha512-Cwm7sLtQnUDqvxE9Ez8UMslyosPCpMVLxBnFb+2n6QcBZmXRao4aNSVRkmlsDZYgYegWhOGn3Qq3MLy4BSqauQ==
+  dependencies:
+    requireindex "~1.1.0"
 
-"@gitlab/ui@^3.10.1":
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-3.10.1.tgz#473e1383b05847d7226257228a8fd8d2905a9415"
-  integrity sha512-LReB+EIBvZlfeEX2s/azuz6NvegrwwzficvBxK5yPCztjDeegcEsTDlt0F32mX6DcvNFacuuAyWN8QtgpaWkhA==
+"@gitlab/svgs@^1.65.0":
+  version "1.65.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.65.0.tgz#48a3a64c0b5524de4e57d51b82a71274af17744d"
+  integrity sha512-GC9JgVu4/2Ysc3hKFmX6TQV6tqvHZDcfd/DzBzYjy3rHO9qYMZFnw/CKCGa8LkU9F79vfDo3G8NSja7FDXMccw==
+
+"@gitlab/ui@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-4.1.0.tgz#bc80ba7846862a336b9f285c42c3fd0f29147c82"
+  integrity sha512-YVIOVtKSjuhQX3ZWA1DBT75Q9rMPvpJIVko5X3yzfRSc9KsPSgVRiOKieDtAviO7LLaeTxMZNzT4J3oY7ejGCw==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.2.1"
@@ -9438,6 +9445,11 @@ require-uncached@^1.0.3:
   dependencies:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
+
+requireindex@~1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.1.0.tgz#e5404b81557ef75db6e49c5a72004893fe03e162"
+  integrity sha1-5UBLgVV+91225JxacgBIk/4D4WI=
 
 requires-port@1.x.x, requires-port@^1.0.0:
   version "1.0.0"

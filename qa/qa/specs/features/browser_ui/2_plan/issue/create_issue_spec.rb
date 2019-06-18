@@ -23,7 +23,6 @@ module QA
           create_issue
 
           Page::Project::Issue::Show.perform do |show|
-            show.select_all_activities_filter
             show.comment('See attached banana for scale', attachment: file_to_attach)
 
             show.refresh
@@ -43,7 +42,7 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
 
-        Resource::Issue.fabricate! do |issue|
+        Resource::Issue.fabricate_via_browser_ui! do |issue|
           issue.title = issue_title
         end
       end

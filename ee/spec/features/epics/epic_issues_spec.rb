@@ -30,6 +30,11 @@ describe 'Epic Issues', :js do
 
     sign_in(user)
     visit group_epic_path(group, epic)
+
+    wait_for_requests
+
+    find('.js-epic-tabs-container #tree-tab').click
+
     wait_for_requests
   end
 
@@ -39,27 +44,19 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see issues from public project but cannot delete the associations' do
-      within('.js-related-issues-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 1)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li', count: 3)
         expect(page).to have_content(public_issue.title)
         expect(page).not_to have_selector('button.js-issue-item-remove-button')
       end
     end
 
     it 'user cannot add new issues to the epic' do
-      expect(page).not_to have_selector('.js-related-issues-block h3.card-title button')
+      expect(page).not_to have_selector('.related-items-tree-container .js-add-issues-button')
     end
 
     it 'user cannot add new epics to the epic', :postgresql do
-      expect(page).not_to have_selector('.js-related-epics-block h3.card-title button')
-    end
-
-    it 'user cannot reorder issues in epic' do
-      expect(page).not_to have_selector('.js-related-issues-block .js-related-issues-token-list-item.user-can-drag')
-    end
-
-    it 'user cannot reorder epics in epic', :postgresql do
-      expect(page).not_to have_selector('.js-related-epics-block .js-related-epics-token-list-item.user-can-drag')
+      expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-button')
     end
   end
 
@@ -69,23 +66,23 @@ describe 'Epic Issues', :js do
     let(:epic_to_add) { create(:epic, group: group) }
 
     def add_issues(references)
-      find('.js-related-issues-block h3.card-title button').click
-      find('.js-related-issues-block .js-add-issuable-form-input').set(references)
+      find('.related-items-tree-container .js-add-issues-button').click
+      find('.related-items-tree-container .js-add-issuable-form-input').set(references)
       # When adding long references, for some reason the input gets stuck
       # waiting for more text. Send a keystroke before clicking the button to
       # get out of this mode.
-      find('.js-related-issues-block .js-add-issuable-form-input').send_keys(:tab)
-      find('.js-related-issues-block .js-add-issuable-form-add-button').click
+      find('.related-items-tree-container .js-add-issuable-form-input').send_keys(:tab)
+      find('.related-items-tree-container .js-add-issuable-form-add-button').click
 
       wait_for_requests
     end
 
     def add_epics(references)
-      find('.js-related-epics-block h3.card-title button').click
-      find('.js-related-epics-block .js-add-issuable-form-input').set(references)
+      find('.related-items-tree-container .js-add-epics-button').click
+      find('.related-items-tree-container .js-add-issuable-form-input').set(references)
 
-      find('.js-related-epics-block .js-add-issuable-form-input').send_keys(:tab)
-      find('.js-related-epics-block .js-add-issuable-form-add-button').click
+      find('.related-items-tree-container .js-add-issuable-form-input').send_keys(:tab)
+      find('.related-items-tree-container .js-add-issuable-form-add-button').click
 
       wait_for_requests
     end
@@ -96,34 +93,36 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see all issues of the group and delete the associations' do
-      within('.js-related-issues-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 2)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-issue', count: 2)
         expect(page).to have_content(public_issue.title)
         expect(page).to have_content(private_issue.title)
 
-        first('li button.js-issue-item-remove-button').click
+        first('li.js-item-type-issue button.js-issue-item-remove-button').click
       end
+      first('#item-remove-confirmation .modal-footer .btn-danger').click
 
       wait_for_requests
 
-      within('.js-related-issues-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 1)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-issue', count: 1)
       end
     end
 
     it 'user can see all epics of the group and delete the associations', :postgresql do
-      within('.js-related-epics-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 2)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-epic', count: 2)
         expect(page).to have_content(nested_epics[0].title)
         expect(page).to have_content(nested_epics[1].title)
 
-        first('li button.js-issue-item-remove-button').click
+        first('li.js-item-type-epic button.js-issue-item-remove-button').click
       end
+      first('#item-remove-confirmation .modal-footer .btn-danger').click
 
       wait_for_requests
 
-      within('.js-related-epics-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 1)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-epic', count: 1)
       end
     end
 
@@ -131,20 +130,19 @@ describe 'Epic Issues', :js do
       add_issues("#{issue_invalid.to_reference(full: true)}")
 
       expect(page).to have_selector('.content-wrapper .alert-wrapper .flash-text')
-      expect(find('.flash-alert')).to have_text('No Issue found for given params')
+      expect(find('.flash-alert')).to have_text("We can't find an issue that matches what you are looking for.")
     end
 
     it 'user can add new issues to the epic' do
-      references = "#{issue_to_add.to_reference(full: true)} #{issue_invalid.to_reference(full: true)}"
+      references = "#{issue_to_add.to_reference(full: true)}"
 
       add_issues(references)
 
       expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
-      expect(page).not_to have_content('No Issue found for given params')
+      expect(page).not_to have_content("We can't find an issue that matches what you are looking for.")
 
-      within('.js-related-issues-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 3)
-        expect(page).to have_content(issue_to_add.title)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-issue', count: 3)
       end
     end
 
@@ -153,32 +151,11 @@ describe 'Epic Issues', :js do
       add_epics(references)
 
       expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
-      expect(page).not_to have_content('No Epic found for given params')
+      expect(page).not_to have_content("We can't find an epic that matches what you are looking for.")
 
-      within('.js-related-epics-block ul.related-items-list') do
-        expect(page).to have_selector('li', count: 3)
-        expect(page).to have_content(epic_to_add.title)
+      within('.related-items-tree-container ul.related-items-list') do
+        expect(page).to have_selector('li.js-item-type-epic', count: 3)
       end
-    end
-
-    it 'user can reorder issues in epic' do
-      expect(first('.js-related-issues-block .js-related-issues-token-list-item')).to have_content(public_issue.title)
-      expect(page.all('.js-related-issues-block .js-related-issues-token-list-item').last).to have_content(private_issue.title)
-
-      drag_to(selector: '.js-related-issues-block .related-items-list', to_index: 1)
-
-      expect(first('.js-related-issues-block .js-related-issues-token-list-item')).to have_content(private_issue.title)
-      expect(page.all('.js-related-issues-block .js-related-issues-token-list-item').last).to have_content(public_issue.title)
-    end
-
-    it 'user can reorder epics in epic', :postgresql do
-      expect(first('.js-related-epics-block .js-related-issues-token-list-item')).to have_content(nested_epics[0].title)
-      expect(page.all('.js-related-epics-block .js-related-issues-token-list-item').last).to have_content(nested_epics[1].title)
-
-      drag_to(selector: '.js-related-epics-block .related-items-list', to_index: 1)
-
-      expect(first('.js-related-epics-block .js-related-issues-token-list-item')).to have_content(nested_epics[1].title)
-      expect(page.all('.js-related-epics-block .js-related-issues-token-list-item').last).to have_content(nested_epics[0].title)
     end
   end
 end

@@ -1,0 +1,5 @@
+---
+title: Avoid loading database objects for Elasticsearch results
+merge_request: 12691
+author:
+type: performance

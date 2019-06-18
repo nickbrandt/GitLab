@@ -7,7 +7,7 @@ describe('Design management pagination component', () => {
   function createComponent() {
     vm = shallowMount(Pagination, {
       propsData: {
-        id: 2,
+        id: '2',
       },
     });
   }
@@ -26,7 +26,7 @@ describe('Design management pagination component', () => {
 
   it('renders pagination buttons', () => {
     vm.setData({
-      designs: [{ id: 1 }, { id: 2 }],
+      designs: [{ id: '1' }, { id: '2' }],
     });
 
     expect(vm.element).toMatchSnapshot();

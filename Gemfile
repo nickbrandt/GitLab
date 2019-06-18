@@ -41,7 +41,7 @@ gem 'omniauth-shibboleth', '~> 1.3.0'
 gem 'omniauth-twitter', '~> 1.4'
 gem 'omniauth_crowd', '~> 2.2.0'
 gem 'omniauth-authentiq', '~> 0.3.3'
-gem 'omniauth_openid_connect', '~> 0.3.0'
+gem 'omniauth_openid_connect', '~> 0.3.1'
 gem "omniauth-ultraauth", '~> 0.0.2'
 gem 'omniauth-salesforce', '~> 1.0.5'
 gem 'rack-oauth2', '~> 1.9.3'
@@ -123,7 +123,7 @@ gem 'seed-fu', '~> 2.3.7'
 
 # Search
 gem 'elasticsearch-model', '~> 0.1.9'
-gem 'elasticsearch-rails', '~> 0.1.9'
+gem 'elasticsearch-rails', '~> 0.1.9', require: 'elasticsearch/rails/instrumentation'
 gem 'elasticsearch-api',   '5.0.3'
 gem 'aws-sdk'
 gem 'faraday_middleware-aws-signers-v4'
@@ -140,6 +140,7 @@ gem 'org-ruby', '~> 0.9.12'
 gem 'creole', '~> 0.5.0'
 gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 1.5.8'
+gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '0.0.8'
 gem 'rouge', '~> 3.1'
 gem 'truncato', '~> 0.7.11'
@@ -287,12 +288,12 @@ gem 'base32', '~> 0.3.0'
 gem "gitlab-license", "~> 1.0"
 
 # Sentry integration
-gem 'sentry-raven', '~> 2.7'
+gem 'sentry-raven', '~> 2.9'
 
 gem 'premailer-rails', '~> 1.9.7'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '~> 0.2.0'
+gem 'gitlab-labkit', '~> 0.3.0'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false
@@ -351,7 +352,7 @@ group :development, :test do
   gem 'database_cleaner', '~> 1.7.0'
   gem 'factory_bot_rails', '~> 4.8.2'
   gem 'rspec-rails', '~> 3.7.0'
-  gem 'rspec-retry', '~> 0.4.5'
+  gem 'rspec-retry', '~> 0.6.1'
   gem 'rspec_profiling', '~> 0.0.5'
   gem 'rspec-set', '~> 0.1.3'
   gem 'rspec-parameterized', require: false
@@ -362,7 +363,7 @@ group :development, :test do
   # Generate Fake data
   gem 'ffaker', '~> 2.10'
 
-  gem 'capybara', '~> 2.18.0'
+  gem 'capybara', '~> 3.22.0'
   gem 'capybara-screenshot', '~> 1.0.22'
   gem 'selenium-webdriver', '~> 3.141'
 
@@ -444,7 +445,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 1.27.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 1.32.0', require: 'gitaly'
 
 gem 'grpc', '~> 1.19.0'
 

@@ -71,21 +71,6 @@ module EE
       end
     end
 
-    override :mergeable_ci_state?
-    def mergeable_ci_state?
-      return false unless validate_merge_request_pipelines
-
-      super
-    end
-
-    def get_on_train!(user)
-      create_merge_train!(user: user)
-    end
-
-    def get_off_train!
-      merge_train.destroy!
-    end
-
     def on_train?
       merge_train.present?
     end
@@ -97,12 +82,6 @@ module EE
 
     def supports_weight?
       false
-    end
-
-    def validate_merge_request_pipelines
-      return true unless project.merge_pipelines_enabled?
-
-      actual_head_pipeline&.latest_merge_request_pipeline?
     end
 
     def validate_approval_rule_source

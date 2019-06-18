@@ -262,6 +262,45 @@ describe ProjectPolicy do
         end
       end
     end
+
+    context 'with ip restriction' do
+      let(:current_user) { create(:admin) }
+      let(:group) { create(:group, :public) }
+      let(:project) { create(:project, group: group) }
+
+      before do
+        allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
+        stub_licensed_features(group_ip_restriction: true)
+      end
+
+      context 'group without restriction' do
+        it { is_expected.to be_allowed(:read_project) }
+      end
+
+      context 'group with restriction' do
+        before do
+          create(:ip_restriction, group: group, range: range)
+        end
+
+        context 'address is within the range' do
+          let(:range) { '192.168.0.0/24' }
+
+          it { is_expected.to be_allowed(:read_project) }
+        end
+
+        context 'address is outside the range' do
+          let(:range) { '10.0.0.0/8' }
+
+          it { is_expected.to be_disallowed(:read_project) }
+        end
+      end
+
+      context 'without group' do
+        let(:project) { create(:project, :repository, namespace: current_user.namespace) }
+
+        it { is_expected.to be_allowed(:read_project) }
+      end
+    end
   end
 
   describe 'read_vulnerability_feedback' do
@@ -448,6 +487,31 @@ describe ProjectPolicy do
       let(:current_user) { nil }
 
       it { is_expected.to be_allowed(:read_package) }
+    end
+  end
+
+  describe 'remove_project when default_project_deletion_protection is set to true' do
+    before do
+      allow(Gitlab::CurrentSettings.current_application_settings)
+        .to receive(:default_project_deletion_protection) { true }
+    end
+
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:remove_project) }
+
+      context 'who owns the project' do
+        let(:project) { create(:project, :public, namespace: admin.namespace) }
+
+        it { is_expected.to be_allowed(:remove_project) }
+      end
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_disallowed(:remove_project) }
     end
   end
 
@@ -688,5 +752,36 @@ describe ProjectPolicy do
     let(:current_user) { User.alert_bot }
 
     it { is_expected.to be_allowed(:reporter_access) }
+  end
+
+  context 'commit_committer_check is not enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: false)
+    end
+
+    let(:current_user) { maintainer }
+
+    it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+    it { is_expected.not_to be_allowed(:read_commit_committer_check) }
+  end
+
+  context 'commit_committer_check is enabled by the current license' do
+    before do
+      stub_licensed_features(commit_committer_check: true)
+    end
+
+    context 'the user is a maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
+
+    context 'the user is a developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.not_to be_allowed(:change_commit_committer_check) }
+      it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
   end
 end

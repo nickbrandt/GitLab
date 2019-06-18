@@ -1,3 +1,7 @@
+---
+type: howto, reference
+---
+
 # GitLab and SSH keys
 
 Git is a distributed version control system, which means you can work locally
@@ -50,8 +54,7 @@ more information, you can read this
 We'll focus on ED25519 and RSA and here.
 
 NOTE: **Note:**
-As an admin, you can restrict
-[which keys should be permitted and their minimum length](../security/ssh_keys_restrictions.md).
+As an admin, you can [restrict which keys should be permitted and their minimum length](../security/ssh_keys_restrictions.md).
 By default, all keys are permitted, which is also the case for
 [GitLab.com](../user/gitlab_com/index.md#ssh-host-keys-fingerprints).
 
@@ -61,9 +64,14 @@ Following [best practices](https://linux-audit.com/using-ed25519-openssh-keys-in
 you should always favor [ED25519](https://ed25519.cr.yp.to/) SSH keys, since they
 are more secure and have better performance over the other types.
 
-They were introduced in OpenSSH 6.5, so any modern OS should include the
-option to create them. If for any reason your OS or the GitLab instance you
-interact with doesn't support this, you can fallback to RSA.
+ED25519 SSH keys were introduced in OpenSSH 6.5, 
+so any modern OS should include the option to create them. 
+If for any reason your OS or the GitLab instance you interact with doesn't 
+support ED25519, you can fallback to RSA.
+
+NOTE: **Note:**
+Omnibus does not ship with OpenSSH, so it uses the version on your GitLab server. If using 
+Omnibus, ensure the version of OpenSSH installed is version 6.5 or newer if you want to use ED25519 SSH keys.
 
 ### RSA SSH keys
 
@@ -91,9 +99,8 @@ ssh-keygen -o -f ~/.ssh/id_rsa
 
 ## Generating a new SSH key pair
 
-Before creating an SSH key pair, make sure to read about the
-[different types of keys](#types-of-ssh-keys-and-which-to-choose) to understand
-their differences.
+Before creating an SSH key pair, make sure to understand the
+[different types of keys](#types-of-ssh-keys-and-which-to-choose).
 
 To create a new SSH key pair:
 
@@ -332,7 +339,7 @@ not implicitly give any access just by setting them up.
 
 ### Eclipse
 
-How to add your SSH key to Eclipse: <https://wiki.eclipse.org/EGit/User_Guide#Eclipse_SSH_Configuration>
+If you are using [EGit](https://www.eclipse.org/egit/), you can [add your SSH key to Eclipse](https://wiki.eclipse.org/EGit/User_Guide#Eclipse_SSH_Configuration).
 
 ## SSH on the GitLab server
 

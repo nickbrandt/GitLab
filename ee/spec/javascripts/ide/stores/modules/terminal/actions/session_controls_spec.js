@@ -16,6 +16,8 @@ const TEST_SESSION = {
   cancel_path: 'path/cancel',
   retry_path: 'path/retry',
   terminal_path: 'path/terminal',
+  proxy_websocket_path: 'path/proxy',
+  services: ['test-service'],
 };
 
 describe('EE IDE store terminal session controls actions', () => {
@@ -73,6 +75,8 @@ describe('EE IDE store terminal session controls actions', () => {
               cancelPath: TEST_SESSION.cancel_path,
               retryPath: TEST_SESSION.retry_path,
               terminalPath: TEST_SESSION.terminal_path,
+              proxyWebsocketPath: TEST_SESSION.proxy_websocket_path,
+              services: TEST_SESSION.services,
             },
           },
         ],

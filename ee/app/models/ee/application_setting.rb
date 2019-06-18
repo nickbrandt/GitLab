@@ -75,12 +75,14 @@ module EE
       def defaults
         super.merge(
           allow_group_owners_to_manage_ldap: true,
+          default_project_deletion_protection: false,
           elasticsearch_aws: false,
           elasticsearch_aws_region: ENV['ELASTIC_REGION'] || 'us-east-1',
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
+          lock_memberships_to_ldap: false,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],
@@ -166,6 +168,22 @@ module EE
       License.feature_available?(:elastic_search) && super
     end
     alias_method :elasticsearch_search?, :elasticsearch_search
+
+    # Determines whether a search should use elasticsearch, taking the scope
+    # (nil for global search, otherwise a namespace or project) into account
+    def search_using_elasticsearch?(scope: nil)
+      return false unless elasticsearch_indexing? && elasticsearch_search?
+      return true unless elasticsearch_limit_indexing?
+
+      case scope
+      when Namespace
+        elasticsearch_indexes_namespace?(scope)
+      when Project
+        elasticsearch_indexes_project?(scope)
+      else
+        false # Never use elasticsearch for the global scope when limiting is on
+      end
+    end
 
     def elasticsearch_url
       read_attribute(:elasticsearch_url).split(',').map(&:strip)

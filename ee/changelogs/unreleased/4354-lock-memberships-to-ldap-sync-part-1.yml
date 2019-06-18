@@ -1,0 +1,5 @@
+---
+title: Provide application-wide LDAP membership lock setting
+merge_request: 4354
+author:
+type: added

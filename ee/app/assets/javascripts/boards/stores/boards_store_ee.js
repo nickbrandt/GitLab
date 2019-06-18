@@ -1,11 +1,12 @@
 /* eslint-disable class-methods-use-this */
 import _ from 'underscore';
 import Cookies from 'js-cookie';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import BoardService from 'ee/boards/services/board_service';
 import sidebarEventHub from '~/sidebar/event_hub';
 import createFlash from '~/flash';
 import { parseBoolean } from '~/lib/utils/common_utils';
+import axios from '~/lib/utils/axios_utils';
 
 class BoardsStoreEE {
   initEESpecific(boardsStore) {
@@ -14,6 +15,8 @@ class BoardsStoreEE {
     this.store.addPromotionState = () => {
       this.addPromotion();
     };
+    this.store.loadList = (listPath, listType) => this.loadList(listPath, listType);
+    this.store.setCurrentBoard = board => this.setCurrentBoard(board);
     this.store.removePromotionState = () => {
       this.removePromotion();
     };
@@ -80,6 +83,7 @@ class BoardsStoreEE {
 
     let { milestoneTitle } = this.store.boardConfig;
     if (this.store.boardConfig.milestoneId === 0) {
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
       milestoneTitle = 'No+Milestone';
     } else {
       milestoneTitle = encodeURIComponent(milestoneTitle);
@@ -92,6 +96,7 @@ class BoardsStoreEE {
     let { weight } = this.store.boardConfig;
     if (weight !== -1) {
       if (weight === 0) {
+        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
         weight = 'No+Weight';
       }
       updateFilterPath('weight', weight);
@@ -154,6 +159,13 @@ class BoardsStoreEE {
     return parseBoolean(Cookies.get('promotion_issue_board_hidden'));
   }
 
+  setCurrentBoard(board) {
+    const { state } = this.store;
+    state.currentBoard = board;
+    state.assignees = [];
+    state.milestones = [];
+  }
+
   updateWeight(newWeight, id) {
     const { issue } = this.store.detail;
     if (issue.id === id && issue.sidebarInfoEndpoint) {
@@ -178,6 +190,25 @@ class BoardsStoreEE {
           createFlash(__('An error occurred when updating the issue weight'));
         });
     }
+  }
+
+  loadList(listPath, listType) {
+    if (this.store.state[listType].length) {
+      return Promise.resolve();
+    }
+
+    return axios
+      .get(listPath)
+      .then(({ data }) => {
+        this.store.state[listType] = data;
+      })
+      .catch(() => {
+        createFlash(
+          sprintf(__('Something went wrong while fetching %{listType} list'), {
+            listType,
+          }),
+        );
+      });
   }
 }
 

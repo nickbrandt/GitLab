@@ -238,6 +238,64 @@ describe ApplicationSetting do
     end
   end
 
+  describe '#search_using_elasticsearch?' do
+    # Constructs a truth table with 16 entries to run the specs against
+    where(indexing: [true, false], searching: [true, false], limiting: [true, false])
+
+    with_them do
+      set(:included_project_container) { create(:elasticsearch_indexed_project) }
+      set(:included_namespace_container) { create(:elasticsearch_indexed_namespace) }
+
+      set(:included_project) { included_project_container.project }
+      set(:included_namespace) { included_namespace_container.namespace }
+
+      set(:excluded_project) { create(:project) }
+      set(:excluded_namespace) { create(:namespace) }
+
+      let(:only_when_enabled_globally) { indexing && searching && !limiting }
+
+      subject { setting.search_using_elasticsearch?(scope: scope) }
+
+      before do
+        setting.update!(
+          elasticsearch_indexing: indexing,
+          elasticsearch_search: searching,
+          elasticsearch_limit_indexing: limiting
+        )
+      end
+
+      context 'global scope' do
+        let(:scope) { nil }
+
+        it { is_expected.to eq(only_when_enabled_globally) }
+      end
+
+      context 'namespace (in scope)' do
+        let(:scope) { included_namespace }
+
+        it { is_expected.to eq(indexing && searching) }
+      end
+
+      context 'namespace (not in scope)' do
+        let(:scope) { excluded_namespace }
+
+        it { is_expected.to eq(only_when_enabled_globally) }
+      end
+
+      context 'project (in scope)' do
+        let(:scope) { included_project }
+
+        it { is_expected.to eq(indexing && searching) }
+      end
+
+      context 'project (not in scope)' do
+        let(:scope) { excluded_project }
+
+        it { is_expected.to eq(only_when_enabled_globally) }
+      end
+    end
+  end
+
   describe 'custom project templates' do
     let(:group) { create(:group) }
     let(:projects) { create_list(:project, 3, namespace: group) }

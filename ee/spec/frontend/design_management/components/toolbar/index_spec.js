@@ -21,7 +21,7 @@ describe('Design management toolbar component', () => {
 
     vm = shallowMount(Toolbar, {
       propsData: {
-        id: 1,
+        id: '1',
         isLoading,
         name: 'test.jpg',
         updatedAt: updatedAt.toString(),

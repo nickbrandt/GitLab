@@ -25,6 +25,10 @@
         %li.notes-tab.qa-notes-tab
           %a#discussion-tab.active{ href: '#discussion', data: { toggle: 'tab' } }
             = _('Discussion')
+        - if Feature.enabled?(:epic_trees)
+          %li.tree-tab
+            %a#tree-tab{ href: '#tree', data: { toggle: 'tab' } }
+              = _('Tree')
         %li.roadmap-tab
           %a#roadmap-tab{ href: '#roadmap', data: { toggle: 'tab' } }
             = _('Roadmap')
@@ -39,6 +43,15 @@
         %script.js-notes-data{ type: "application/json" }= initial_notes_data(true).to_json.html_safe
         .issuable-discussion
           = render 'discussion'
+  - if Feature.enabled?(:epic_trees)
+    #tree.tab-pane
+      .row
+        %section.col-md-12
+          #js-tree{ data: { iid: @epic.iid,
+            full_path: @group.full_path,
+            auto_complete_epics: 'true',
+            auto_complete_issues: 'false',
+            initial: issuable_initial_data(@epic).to_json } }
   #roadmap.tab-pane
     .row
       %section.col-md-12

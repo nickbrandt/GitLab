@@ -1,4 +1,5 @@
 <script>
+import _ from 'underscore';
 import Deployment from './deployment.vue';
 import MrWidgetContainer from './mr_widget_container.vue';
 import MrWidgetPipeline from './mr_widget_pipeline.vue';
@@ -17,6 +18,8 @@ export default {
     Deployment,
     MrWidgetContainer,
     MrWidgetPipeline,
+    MergeTrainInfo: () =>
+      import('ee_component/vue_merge_request_widget/components/merge_train_info.vue'),
   },
   props: {
     mr: {
@@ -50,6 +53,7 @@ export default {
         appUrl: this.mr.appUrl,
         mergeRequestId: this.mr.iid,
         sourceProjectId: this.mr.sourceProjectId,
+        sourceProjectPath: this.mr.sourceProjectFullPath,
       };
     },
     pipeline() {
@@ -57,6 +61,9 @@ export default {
     },
     showVisualReviewAppLink() {
       return Boolean(this.mr.visualReviewFF && this.mr.visualReviewAppAvailable);
+    },
+    showMergeTrainInfo() {
+      return _.isNumber(this.mr.mergeTrainIndex);
     },
   },
 };
@@ -79,10 +86,15 @@ export default {
           :class="deploymentClass"
           :deployment="deployment"
           :show-metrics="hasDeploymentMetrics"
-          :show-visual-review-app="true"
+          :show-visual-review-app="showVisualReviewAppLink"
           :visual-review-app-meta="visualReviewAppMeta"
         />
       </div>
+      <merge-train-info
+        v-if="showMergeTrainInfo"
+        class="mr-widget-extension"
+        :merge-train-index="mr.mergeTrainIndex"
+      />
     </template>
   </mr-widget-container>
 </template>

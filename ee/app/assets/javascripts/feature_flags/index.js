@@ -19,9 +19,13 @@ export default () =>
           endpoint: this.dataset.endpoint,
           errorStateSvgPath: this.dataset.errorStateSvgPath,
           featureFlagsHelpPagePath: this.dataset.featureFlagsHelpPagePath,
+          featureFlagsAnchoredHelpPagePath: this.dataset.featureFlagsAnchoredHelpPagePath,
+          unleashApiUrl: this.dataset.unleashApiUrl,
+          unleashApiInstanceId: this.dataset.unleashApiInstanceId || '',
           csrfToken: csrf.token,
           canUserConfigure: this.dataset.canUserAdminFeatureFlag,
           newFeatureFlagPath: this.dataset.newFeatureFlagPath,
+          rotateInstanceIdPath: this.dataset.rotateInstanceIdPath,
         },
       });
     },

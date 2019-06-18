@@ -265,6 +265,7 @@ module API
 
       expose :open_issues_count, if: lambda { |project, options| project.feature_available?(:issues, options[:current_user]) }
       expose :runners_token, if: lambda { |_project, options| options[:user_can_admin_project] }
+      expose :ci_default_git_depth
       expose :public_builds, as: :public_jobs
       expose :ci_config_path, if: -> (project, options) { Ability.allowed?(options[:current_user], :download_code, project) }
       expose :shared_with_groups do |project, options|
@@ -287,6 +288,7 @@ module API
         # N+1 is solved then by using `subject.tags.map(&:name)`
         # MR describing the solution: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/20555
         super(projects_relation).preload(:group)
+                                .preload(:ci_cd_settings)
                                 .preload(project_group_links: { group: :route },
                                          fork_network: :root_project,
                                          fork_network_member: :forked_from_project,
@@ -576,6 +578,8 @@ module API
       expose :time_stats, using: 'API::Entities::IssuableTimeStats' do |issue|
         issue
       end
+
+      expose :task_completion_status
     end
 
     class Issue < IssueBasic
@@ -699,7 +703,7 @@ module API
       # See https://gitlab.com/gitlab-org/gitlab-ce/issues/42344 for more
       # information.
       expose :merge_status do |merge_request|
-        merge_request.check_mergeability
+        merge_request.check_if_can_be_merged
         merge_request.merge_status
       end
       expose :diff_head_sha, as: :sha
@@ -724,6 +728,8 @@ module API
       end
 
       expose :squash
+
+      expose :task_completion_status
     end
 
     class MergeRequest < MergeRequestBasic
@@ -991,7 +997,7 @@ module API
 
     class ProjectService < Grape::Entity
       expose :id, :title, :created_at, :updated_at, :active
-      expose :push_events, :issues_events, :confidential_issues_events
+      expose :commit_events, :push_events, :issues_events, :confidential_issues_events
       expose :merge_requests_events, :tag_push_events, :note_events
       expose :confidential_note_events, :pipeline_events, :wiki_page_events
       expose :job_events

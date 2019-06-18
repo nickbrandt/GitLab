@@ -4,6 +4,8 @@ module Types
   class IssueType < BaseObject
     graphql_name 'Issue'
 
+    implements(Types::Notes::NoteableType)
+
     authorize :read_issue
 
     expose_permissions Types::PermissionTypes::Issue
@@ -49,6 +51,8 @@ module Types
 
     field :created_at, Types::TimeType, null: false
     field :updated_at, Types::TimeType, null: false
+
+    field :task_completion_status, Types::TaskCompletionStatus, null: false
   end
 end
 

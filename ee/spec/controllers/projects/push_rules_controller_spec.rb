@@ -34,54 +34,58 @@ describe Projects::PushRulesController do
       end
     end
 
+    shared_examples 'updateable setting' do |rule_attr, updates, new_value|
+      it "#{updates ? 'updates' : 'does not update'} the setting" do
+        patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => new_value } }
+
+        be_new, be_old = new_value ? [be_truthy, be_falsy] : [be_falsy, be_truthy]
+        expect(project.reload_push_rule.public_send(rule_attr)).to(updates ? be_new : be_old)
+      end
+    end
+
+    shared_examples 'a setting with global default' do |rule_attr, updates: true, updates_when_global_enabled: true|
+      context 'when disabled' do
+        before do
+          stub_licensed_features(rule_attr => false)
+        end
+        it_behaves_like 'updateable setting', rule_attr, false, true
+      end
+
+      context 'when enabled' do
+        before do
+          stub_licensed_features(rule_attr => true)
+        end
+        it_behaves_like 'updateable setting', rule_attr, updates, true
+      end
+
+      context 'when global setting is enabled' do
+        before do
+          stub_licensed_features(rule_attr => true)
+          create(:push_rule_sample, rule_attr => true)
+        end
+        it_behaves_like 'updateable setting', rule_attr, updates_when_global_enabled, false
+      end
+    end
+
     PushRule::SETTINGS_WITH_GLOBAL_DEFAULT.each do |rule_attr|
       context "Updating #{rule_attr} rule" do
         context 'as an admin' do
           let(:user) { create(:admin) }
-
-          it 'updates the setting' do
-            patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
-
-            expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
-          end
+          it_behaves_like 'a setting with global default', rule_attr, updates: true
         end
 
         context 'as a maintainer user' do
           before do
             project.add_maintainer(user)
           end
-
-          context 'when global setting is disabled' do
-            it 'updates the setting' do
-              patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
-
-              expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
-            end
-          end
-
-          context 'when global setting is enabled' do
-            before do
-              create(:push_rule_sample, rule_attr => true)
-            end
-
-            it 'does not update the setting' do
-              patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => false } }
-
-              expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
-            end
-          end
+          it_behaves_like 'a setting with global default', rule_attr, updates: true, updates_when_global_enabled: false
         end
 
         context 'as a developer user' do
           before do
             project.add_developer(user)
           end
-
-          it 'does not update the setting' do
-            patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
-
-            expect(project.reload_push_rule.public_send(rule_attr)).to be_falsy
-          end
+          it_behaves_like 'a setting with global default', rule_attr, updates: false, updates_when_global_enabled: false
         end
       end
     end

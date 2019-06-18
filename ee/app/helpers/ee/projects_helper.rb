@@ -139,11 +139,11 @@ module EE
 
     override :membership_locked?
     def membership_locked?
-      if @project.group && @project.group.membership_lock
-        true
-      else
-        false
-      end
+      group = @project.group
+
+      return false unless group
+
+      group.membership_lock? || ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
     end
 
     def group_project_templates_count(group_id)
@@ -161,18 +161,14 @@ module EE
         }
       else
         {
-          head_blob_path: project_blob_path(project, pipeline.sha),
-          sast_head_path: pipeline.downloadable_path_for_report_type(:sast),
-          dependency_scanning_head_path: pipeline.downloadable_path_for_report_type(:dependency_scanning),
-          dast_head_path: pipeline.downloadable_path_for_report_type(:dast),
-          sast_container_head_path: pipeline.downloadable_path_for_report_type(:container_scanning),
-          vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
+          project: { id: project.id, name: project.name },
+          vulnerabilities_endpoint: group_security_vulnerabilities_path(project.group),
+          vulnerabilities_summary_endpoint: summary_group_security_vulnerabilities_path(project.group),
+          vulnerabilities_history_endpoint: history_group_security_vulnerabilities_path(project.group),
+          vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
+          empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
+          dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
           pipeline_id: pipeline.id,
-          vulnerability_feedback_help_path: help_page_path('user/application_security/index'),
-          sast_help_path: help_page_path('user/application_security/sast/index'),
-          dependency_scanning_help_path: help_page_path('user/application_security/dependency_scanning/index'),
-          dast_help_path: help_page_path('user/application_security/dast/index'),
-          sast_container_help_path: help_page_path('user/application_security/container_scanning/index'),
           user_path: user_url(pipeline.user),
           user_avatar_path: pipeline.user.avatar_url,
           user_name: pipeline.user.name,
@@ -181,11 +177,8 @@ module EE
           ref_id: pipeline.ref,
           ref_path: project_commits_url(project, pipeline.ref),
           pipeline_path: pipeline_url(pipeline),
-          pipeline_created: pipeline.created_at.to_s,
-          has_pipeline_data: "true",
-          create_vulnerability_feedback_issue_path: create_vulnerability_feedback_issue_path(project),
-          create_vulnerability_feedback_merge_request_path: create_vulnerability_feedback_merge_request_path(project),
-          create_vulnerability_feedback_dismissal_path: create_vulnerability_feedback_dismissal_path(project)
+          pipeline_created: pipeline.created_at.to_s(:iso8601),
+          has_pipeline_data: "true"
         }
       end
     end

@@ -18,6 +18,8 @@ module EE
       has_many :epics
 
       has_one :saml_provider
+      has_one :ip_restriction
+      accepts_nested_attributes_for :ip_restriction, allow_destroy: true
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
       has_one :scim_oauth_access_token
@@ -179,6 +181,12 @@ module EE
 
     def first_non_empty_project
       projects.detect { |project| !project.empty_repo? }
+    end
+
+    def root_ancestor_ip_restriction
+      return ip_restriction if parent_id.nil?
+
+      root_ancestor.ip_restriction
     end
 
     # Overrides a method defined in `::EE::Namespace`

@@ -131,6 +131,44 @@ describe DesignManagement::SaveDesignsService do
         end
       end
 
+      context 'when LFS is enabled' do
+        before do
+          allow(project).to receive(:lfs_enabled?).and_return(true)
+        end
+
+        context 'and the `store_designs_in_lfs` feature is enabled' do
+          before do
+            stub_feature_flags(store_designs_in_lfs: true)
+
+            expect_next_instance_of(Lfs::FileTransformer) do |transformer|
+              expect(transformer).to receive(:lfs_file?).and_return(true)
+            end
+          end
+
+          it 'saves the design to LFS' do
+            expect { service.execute }.to change { LfsObject.count }.by(1)
+          end
+
+          it 'saves the repository_type of the LfsObjectsProject as design' do
+            expect do
+              service.execute
+            end.to change { project.lfs_objects_projects.count }.from(0).to(1)
+
+            expect(project.lfs_objects_projects.first.repository_type).to eq('design')
+          end
+        end
+
+        context 'and the `store_designs_in_lfs` feature is not enabled' do
+          before do
+            stub_feature_flags(store_designs_in_lfs: false)
+          end
+
+          it 'does not save the design to LFS' do
+            expect { service.execute }.not_to change { LfsObject.count }
+          end
+        end
+      end
+
       context 'when the user is not allowed to upload designs' do
         let(:user) { create(:user) }
 

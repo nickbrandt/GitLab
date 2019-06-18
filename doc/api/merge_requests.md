@@ -140,7 +140,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -284,7 +287,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -416,7 +422,10 @@ Parameters:
       "human_total_time_spent": null
     },
     "squash": false,
-    "approvals_before_merge": null
+    "task_completion_status":{
+      "count":0,
+      "completed_count":0
+    }
   }
 ]
 ```
@@ -552,7 +561,10 @@ Parameters:
   },
   "diverged_commits_count": 2,
   "rebase_in_progress": false,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -586,7 +598,7 @@ Parameters:
     "state": "active",
     "avatar_url": "http://www.gravatar.com/avatar/10fc7f102be8de7657fb4d80898bbfe3?s=80&d=identicon",
     "web_url": "http://localhost/user2"
-  },
+  }
 ]
 ```
 
@@ -709,7 +721,11 @@ Parameters:
     "total_time_spent": 0,
     "human_time_estimate": null,
     "human_total_time_spent": null
-  }
+  },
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  },
   "changes": [
     {
     "old_path": "VERSION",
@@ -882,7 +898,10 @@ order for it to take effect:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1020,7 +1039,10 @@ Must include at least one non-required attribute from above.
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1174,33 +1196,40 @@ Parameters:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
-## Returns the up to date merge-ref HEAD commit
+## Merge to default merge ref path
 
 Merge the changes between the merge request source and target branches into `refs/merge-requests/:iid/merge` 
-ref, of the target project repository, if possible. This ref will have the state the target branch would have if
+ref, of the target project repository. This ref will have the state the target branch would have if
 a regular merge action was taken.
 
-This is not a regular merge action given it doesn't change the merge request target branch state in any manner.
+This is not a regular merge action given it doesn't change the merge request state in any manner.
 
-This ref (`refs/merge-requests/:iid/merge`) isn't necessarily overwritten when submitting
-requests to this API, though it'll make sure the ref has the latest possible state.
+This ref (`refs/merge-requests/:iid/merge`) is **always** overwritten when submitting
+requests to this API, so none of its state is kept or used in the process.
 
-If the merge request has conflicts, is empty or already merged, you'll get a `400` and a descriptive error message.
+If the merge request has conflicts, is empty or already merged,
+you'll get a `400` and a descriptive error message. If you don't have permissions to do so, 
+you'll get a `403`.
 
-It returns the HEAD commit of `refs/merge-requests/:iid/merge` in the response body in case of `200`.
+It returns the HEAD commit of `refs/merge-requests/:iid/merge` in the response body in
+case of `200`.
 
 ```
-GET /projects/:id/merge_requests/:merge_request_iid/merge_ref
+PUT /projects/:id/merge_requests/:merge_request_iid/merge_to_ref
 ```
 
 Parameters:
 
 - `id` (required) - The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 - `merge_request_iid` (required)            - Internal ID of MR
+- `merge_commit_message` (optional)         - Custom merge commit message
 
 ```json
 {
@@ -1329,7 +1358,10 @@ Parameters:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1365,7 +1397,7 @@ If the rebase operation is ongoing, the response will include the following:
 
 ```json
 {
-  "rebase_in_progress": true
+  "rebase_in_progress": true,
   "merge_error": null
 }
 ```
@@ -1376,7 +1408,7 @@ the following:
 ```json
 {
   "rebase_in_progress": false,
-  "merge_error": null,
+  "merge_error": null
 }
 ```
 
@@ -1385,7 +1417,7 @@ If the rebase operation fails, the response will include the following:
 ```json
 {
   "rebase_in_progress": false,
-  "merge_error": "Rebase failed. Please rebase locally",
+  "merge_error": "Rebase failed. Please rebase locally"
 }
 ```
 
@@ -1593,7 +1625,10 @@ Example response:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 
@@ -1723,7 +1758,10 @@ Example response:
     "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
   },
   "diverged_commits_count": 2,
-  "approvals_before_merge": null
+  "task_completion_status":{
+    "count":0,
+    "completed_count":0
+  }
 }
 ```
 

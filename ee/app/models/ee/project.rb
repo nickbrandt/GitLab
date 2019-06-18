@@ -62,7 +62,7 @@ module EE
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
       has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
-      has_many :merge_trains
+      has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
@@ -306,11 +306,12 @@ module EE
     end
 
     def group_ldap_synced?
-      if group
-        group.ldap_synced?
-      else
-        false
-      end
+      group&.ldap_synced?
+    end
+
+    override :allowed_to_share_with_group?
+    def allowed_to_share_with_group?
+      super && !(group && ::Gitlab::CurrentSettings.lock_memberships_to_ldap?)
     end
 
     def reference_issue_tracker?

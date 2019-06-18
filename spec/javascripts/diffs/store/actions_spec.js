@@ -37,6 +37,7 @@ import actions, {
   toggleFullDiff,
   setFileCollapsed,
   setExpandedDiffLines,
+  setSuggestPopoverDismissed,
 } from '~/diffs/store/actions';
 import eventHub from '~/notes/event_hub';
 import * as types from '~/diffs/store/mutation_types';
@@ -68,12 +69,19 @@ describe('DiffsStoreActions', () => {
     it('should set given endpoint and project path', done => {
       const endpoint = '/diffs/set/endpoint';
       const projectPath = '/root/project';
+      const dismissEndpoint = '/-/user_callouts';
+      const showSuggestPopover = false;
 
       testAction(
         setBaseConfig,
-        { endpoint, projectPath },
-        { endpoint: '', projectPath: '' },
-        [{ type: types.SET_BASE_CONFIG, payload: { endpoint, projectPath } }],
+        { endpoint, projectPath, dismissEndpoint, showSuggestPopover },
+        { endpoint: '', projectPath: '', dismissEndpoint: '', showSuggestPopover: true },
+        [
+          {
+            type: types.SET_BASE_CONFIG,
+            payload: { endpoint, projectPath, dismissEndpoint, showSuggestPopover },
+          },
+        ],
         [],
         done,
       );
@@ -396,6 +404,7 @@ describe('DiffsStoreActions', () => {
   });
 
   describe('loadCollapsedDiff', () => {
+    const state = { showWhitespace: true };
     it('should fetch data and call mutation with response and the give parameter', done => {
       const file = { hash: 123, load_collapsed_diff_url: '/load/collapsed/diff/url' };
       const data = { hash: 123, parallelDiffLines: [{ lineCode: 1 }] };
@@ -403,7 +412,7 @@ describe('DiffsStoreActions', () => {
       const commit = jasmine.createSpy('commit');
       mock.onGet(file.loadCollapsedDiffUrl).reply(200, data);
 
-      loadCollapsedDiff({ commit, getters: { commitId: null } }, file)
+      loadCollapsedDiff({ commit, getters: { commitId: null }, state }, file)
         .then(() => {
           expect(commit).toHaveBeenCalledWith(types.ADD_COLLAPSED_DIFFS, { file, data });
 
@@ -421,10 +430,10 @@ describe('DiffsStoreActions', () => {
 
       spyOn(axios, 'get').and.returnValue(Promise.resolve({ data: {} }));
 
-      loadCollapsedDiff({ commit() {}, getters }, file);
+      loadCollapsedDiff({ commit() {}, getters, state }, file);
 
       expect(axios.get).toHaveBeenCalledWith(file.load_collapsed_diff_url, {
-        params: { commit_id: null },
+        params: { commit_id: null, w: '0' },
       });
     });
 
@@ -436,10 +445,10 @@ describe('DiffsStoreActions', () => {
 
       spyOn(axios, 'get').and.returnValue(Promise.resolve({ data: {} }));
 
-      loadCollapsedDiff({ commit() {}, getters }, file);
+      loadCollapsedDiff({ commit() {}, getters, state }, file);
 
       expect(axios.get).toHaveBeenCalledWith(file.load_collapsed_diff_url, {
-        params: { commit_id: '123' },
+        params: { commit_id: '123', w: '0' },
       });
     });
   });
@@ -1076,6 +1085,32 @@ describe('DiffsStoreActions', () => {
         ],
         [],
         done,
+      );
+    });
+  });
+
+  describe('setSuggestPopoverDismissed', () => {
+    it('commits SET_SHOW_SUGGEST_POPOVER', done => {
+      const state = { dismissEndpoint: `${gl.TEST_HOST}/-/user_callouts` };
+      const mock = new MockAdapter(axios);
+      mock.onPost(state.dismissEndpoint).reply(200, {});
+
+      spyOn(axios, 'post').and.callThrough();
+
+      testAction(
+        setSuggestPopoverDismissed,
+        null,
+        state,
+        [{ type: types.SET_SHOW_SUGGEST_POPOVER }],
+        [],
+        () => {
+          expect(axios.post).toHaveBeenCalledWith(state.dismissEndpoint, {
+            feature_name: 'suggest_popover_dismissed',
+          });
+
+          mock.restore();
+          done();
+        },
       );
     });
   });

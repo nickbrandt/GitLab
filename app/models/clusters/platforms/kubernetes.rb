@@ -11,7 +11,6 @@ module Clusters
       RESERVED_NAMESPACES = %w(gitlab-managed-apps).freeze
 
       self.table_name = 'cluster_platforms_kubernetes'
-      self.reactive_cache_key = ->(kubernetes) { [kubernetes.class.model_name.singular, kubernetes.id] }
 
       belongs_to :cluster, inverse_of: :platform_kubernetes, class_name: 'Clusters::Cluster'
 
@@ -81,9 +80,18 @@ module Clusters
               .append(key: 'KUBE_CA_PEM_FILE', value: ca_pem, file: true)
           end
 
-          if kubernetes_namespace = cluster.kubernetes_namespaces.has_service_account_token.find_by(project: project)
+          if !cluster.managed?
+            project_namespace = namespace.presence || "#{project.path}-#{project.id}".downcase
+
+            variables
+              .append(key: 'KUBE_URL', value: api_url)
+              .append(key: 'KUBE_TOKEN', value: token, public: false, masked: true)
+              .append(key: 'KUBE_NAMESPACE', value: project_namespace)
+              .append(key: 'KUBECONFIG', value: kubeconfig(project_namespace), public: false, file: true)
+
+          elsif kubernetes_namespace = cluster.kubernetes_namespaces.has_service_account_token.find_by(project: project)
             variables.concat(kubernetes_namespace.predefined_variables)
-          elsif cluster.project_type? || !cluster.managed?
+          elsif cluster.project_type?
             # As of 11.11 a user can create a cluster that they manage themselves,
             # which replicates the existing project-level cluster behaviour.
             # Once we have marked all project-level clusters that make use of this

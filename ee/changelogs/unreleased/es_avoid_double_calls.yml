@@ -1,0 +1,5 @@
+---
+title: Avoid hitting Elasticsearch more than once on search
+merge_request: 13120
+author:
+type: performance

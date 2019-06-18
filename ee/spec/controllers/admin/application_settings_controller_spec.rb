@@ -35,6 +35,7 @@ describe Admin::ApplicationSettingsController do
           slack_app_secret: 'slack_app_secret',
           slack_app_verification_token: 'slack_app_verification_token',
           allow_group_owners_to_manage_ldap: false,
+          lock_memberships_to_ldap: true,
           geo_node_allowed_ips: '0.0.0.0/0, ::/0'
       }
 
@@ -77,6 +78,13 @@ describe Admin::ApplicationSettingsController do
         }
       end
       let(:feature) { :repository_mirrors }
+
+      it_behaves_like 'settings for licensed features'
+    end
+
+    context 'default project deletion protection' do
+      let(:settings) { { default_project_deletion_protection: true } }
+      let(:feature) { :default_project_deletion_protection }
 
       it_behaves_like 'settings for licensed features'
     end

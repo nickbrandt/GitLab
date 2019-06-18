@@ -5,6 +5,7 @@ import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metr
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
 import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
+import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 
 import { n__, s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
@@ -16,6 +17,7 @@ export default {
     MrWidgetLicenses,
     MrWidgetApprovals,
     MrWidgetGeoSecondaryNode,
+    BlockingMergeRequestsReport,
     GroupedSecurityReportsApp,
     GroupedMetricsReportsApp,
     ReportSection,
@@ -216,6 +218,7 @@ export default {
       :service="service"
     />
     <div class="mr-section-container mr-widget-workflow">
+      <blocking-merge-requests-report :mr="mr" />
       <report-section
         v-if="shouldRenderCodeQuality"
         :status="codequalityStatus"
@@ -315,18 +318,6 @@ export default {
             {{
               s__(
                 'mrWidget|Fork merge requests do not create merge request pipelines which validate a post merge result',
-              )
-            }}
-          </mr-widget-alert-message>
-
-          <mr-widget-alert-message
-            v-if="showTargetBranchAdvancedError"
-            type="danger"
-            :help-path="mr.mergeRequestPipelinesHelpPath"
-          >
-            {{
-              s__(
-                'mrWidget|The target branch has advanced, which invalidates the merge request pipeline. Please update the source branch and retry merging',
               )
             }}
           </mr-widget-alert-message>

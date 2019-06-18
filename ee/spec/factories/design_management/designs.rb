@@ -6,6 +6,14 @@ FactoryBot.define do
     project { issue.project }
     sequence(:filename) { |n| "homescreen-#{n}.jpg" }
 
+    trait :with_lfs_file do
+      with_file
+
+      transient do
+        file Gitlab::Git::LfsPointerFile.new('').pointer
+      end
+    end
+
     trait :with_file do
       transient do
         versions_count 1

@@ -3,8 +3,8 @@
 import Vue from 'vue';
 import _ from 'underscore';
 
-import '~/vue_shared/models/label';
-import '~/vue_shared/models/assignee';
+import '~/boards/models/label';
+import '~/boards/models/assignee';
 import '~/boards/models/list';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import { listObj } from 'spec/boards/mock_data';

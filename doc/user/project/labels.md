@@ -24,13 +24,19 @@ in the label’s title, using the format `key::value`. For example:
 
 ![A sample scoped label](img/key_value_labels.png)
 
-Two scoped labels with the same key but a different value cannot simultaneously
-apply to an issue, epic, or merge request. For example, if an issue already has `priority::3`
-and you apply `priority::2` to it, `priority::3` is automatically removed from the issue.
-
 An issue, epic, or merge request cannot have two scoped labels with the same key.
 For example, if an issue is already labeled `priority::3` and you apply the label `priority::2` to it,
 `priority::3` is automatically removed.
+
+This functionality is demonstrated in a video titled [Use scoped labels in GitLab 11.10 for custom fields and custom workflows](https://www.youtube.com/watch?v=4BCBby6du3c).
+
+### Labels with multiple colon pairs
+
+If labels have multiple instances of `::`, the longest path from left to right, until the last `::`, is considered the "key" or the "scope".
+
+For example, `nested::key1::value1` and `nested::key1::value2` cannot both exist on the same issue. Adding the latter label will automatically remove the former due to the shared scope of `nested::key1`.
+
+`nested::key1::value1` and `nested::key2::value1` can both exist on the same issue, as these are considered to use two different label scopes, `nested::key1` and `nested::key2`.
 
 ### Workflows with scoped labels **[PREMIUM]**
 

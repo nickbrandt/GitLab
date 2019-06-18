@@ -33,7 +33,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def show
     close_merge_request_if_no_source_project
-    @merge_request.check_mergeability
+    mark_merge_request_mergeable
 
     respond_to do |format|
       format.html do
@@ -251,6 +251,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     @merge_request.has_no_commits? && !@merge_request.target_branch_exists?
   end
 
+  def mark_merge_request_mergeable
+    @merge_request.check_if_can_be_merged
+  end
+
   def merge!
     # Disable the CI check if auto_merge_strategy is specified since we have
     # to wait until CI completes to know
@@ -269,9 +273,15 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     @merge_request.update(merge_error: nil, squash: merge_params.fetch(:squash, false))
 
     if auto_merge_requested?
-      AutoMergeService.new(project, current_user, merge_params)
-        .execute(merge_request,
-                 params[:auto_merge_strategy] || AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
+      if merge_request.auto_merge_enabled?
+        # TODO: We should have a dedicated endpoint for updating merge params.
+        #       See https://gitlab.com/gitlab-org/gitlab-ce/issues/63130.
+        AutoMergeService.new(project, current_user, merge_params).update(merge_request)
+      else
+        AutoMergeService.new(project, current_user, merge_params)
+          .execute(merge_request,
+                   params[:auto_merge_strategy] || AutoMergeService::STRATEGY_MERGE_WHEN_PIPELINE_SUCCEEDS)
+      end
     else
       @merge_request.merge_async(current_user.id, merge_params)
 

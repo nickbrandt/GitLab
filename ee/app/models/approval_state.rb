@@ -51,12 +51,12 @@ class ApprovalState
   end
 
   def has_non_fallback_rules?
-    regular_rules.present? || code_owner_rules.present?
+    has_regular_rule_with_approvers? || code_owner_rules.present?
   end
 
   # Use the fallback rule if regular rules are empty
   def use_fallback?
-    regular_rules.empty?
+    !has_regular_rule_with_approvers?
   end
 
   def fallback_rule
@@ -65,7 +65,7 @@ class ApprovalState
 
   # Determines which set of rules to use (MR or project)
   def approval_rules_overwritten?
-    regular_merge_request_rules.any? ||
+    regular_merge_request_rules.any? { |rule| rule.approvers.present? } ||
       (project.can_override_approvers? && merge_request.approvals_before_merge.present?)
   end
   alias_method :approvers_overwritten?, :approval_rules_overwritten?
@@ -83,7 +83,7 @@ class ApprovalState
   end
 
   def any_approver_allowed?
-    regular_rules.empty? || approved?
+    !has_regular_rule_with_approvers? || approved?
   end
 
   def approvals_required
@@ -171,6 +171,10 @@ class ApprovalState
   end
 
   private
+
+  def has_regular_rule_with_approvers?
+    regular_rules.any? { |rule| rule.approvers.present? }
+  end
 
   def regular_rules
     strong_memoize(:regular_rules) do

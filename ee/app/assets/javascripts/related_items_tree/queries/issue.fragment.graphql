@@ -1,0 +1,28 @@
+fragment IssueNode on EpicIssue {
+  iid
+  title
+  closedAt
+  state
+  createdAt
+  confidential
+  dueDate
+  weight
+  webPath
+  reference
+  relationPath
+  assignees {
+    edges {
+      node {
+        webUrl
+        name
+        username
+        avatarUrl
+      }
+    }
+  }
+  milestone {
+    title
+    startDate
+    dueDate
+  }
+}

@@ -78,8 +78,12 @@ module QA
         page.evaluate_script('xhr.status') == 200
       end
 
-      def find_element(name, text: nil, wait: Capybara.default_max_wait_time)
-        find(element_selector_css(name), wait: wait, text: text)
+      def find_element(name, **kwargs)
+        find(element_selector_css(name), kwargs)
+      end
+
+      def active_element?(name)
+        find_element(name, class: 'active')
       end
 
       def all_elements(name)
@@ -132,6 +136,15 @@ module QA
         has_no_css?('.fa-spinner', wait: Capybara.default_max_wait_time)
       end
 
+      def wait_for_animated_element(name)
+        # It would be ideal if we could detect when the animation is complete
+        # but in some cases there's nothing we can easily access via capybara
+        # so instead we wait for the element, and then we wait a little longer
+        raise ElementNotFound, %Q(Couldn't find element named "#{name}") unless has_element?(name)
+
+        sleep 1
+      end
+
       def within_element(name, text: nil)
         page.within(element_selector_css(name), text: text) do
           yield
@@ -182,6 +195,10 @@ module QA
 
       def self.elements
         views.map(&:elements).flatten
+      end
+
+      def send_keys_to_element(name, keys)
+        find_element(name).send_keys(keys)
       end
 
       class DSL

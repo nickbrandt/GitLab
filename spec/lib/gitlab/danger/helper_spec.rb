@@ -162,7 +162,6 @@ describe Gitlab::Danger::Helper do
       'db/foo' | :database
       'qa/foo' | :qa
 
-      'ee/db/foo' | :database
       'ee/qa/foo' | :qa
 
       'changelogs/foo'    | :none
@@ -200,6 +199,16 @@ describe Gitlab::Danger::Helper do
       subject { helper.label_for_category(category) }
 
       it { is_expected.to eq(expected_label) }
+    end
+  end
+
+  describe '#new_teammates' do
+    it 'returns an array of Teammate' do
+      usernames = %w[filipa iamphil]
+
+      teammates = helper.new_teammates(usernames)
+
+      expect(teammates.map(&:username)).to eq(usernames)
     end
   end
 end

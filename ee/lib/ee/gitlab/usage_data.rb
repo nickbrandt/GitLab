@@ -120,19 +120,22 @@ module EE
           usage_data = super
 
           usage_data[:counts] = usage_data[:counts].merge({
+            dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
             epics: count(::Epic),
             feature_flags: count(Operations::FeatureFlag),
             geo_nodes: count(::GeoNode),
+            incident_issues: count(::Issue.authored(::User.alert_bot)),
             ldap_group_links: count(::LdapGroupLink),
             ldap_keys: count(::LDAPKey),
             ldap_users: count(::User.ldap),
-            projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-            projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
-            projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
-            projects_with_packages: count(::Packages::Package.select('distinct project_id')),
-            projects_with_tracing_enabled: count(ProjectTracingSetting),
+            operations_dashboard: operations_dashboard_usage,
+            pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
             projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-            operations_dashboard: operations_dashboard_usage
+            projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
+            projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+            projects_with_packages: count(::Packages::Package.select('distinct project_id')),
+            projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
+            projects_with_tracing_enabled: count(ProjectTracingSetting)
           }).merge(service_desk_counts).merge(security_products_usage)
 
           # MySql does not support recursive queries so we can't retrieve epics relationship depth
@@ -141,13 +144,6 @@ module EE
           end
 
           usage_data
-        end
-
-        override :usage_counters
-        def usage_counters
-          super.merge(
-            pod_logs_usages: ::Gitlab::PodLogsUsageCounter.usage_totals
-          )
         end
 
         override :jira_usage

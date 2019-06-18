@@ -1,7 +1,15 @@
+---
+type: reference, howto
+---
+
 # Groups
 
-With GitLab Groups you can assemble related projects together
-and grant members access to several projects at once.
+With GitLab Groups, you can:
+
+- Assemble related projects together.
+- Grant members access to several projects at once.
+
+For a video introduction to GitLab Groups, see [GitLab University: Repositories, Projects and Groups](https://www.youtube.com/watch?v=4TWfh1aKHHw).
 
 Groups can also be nested in [subgroups](subgroups/index.md).
 
@@ -9,17 +17,21 @@ Find your groups by clicking **Groups > Your Groups** in the top navigation.
 
 ![GitLab Groups](img/groups.png)
 
-> The groups dropdown in the top navigation was [introduced][ce-36234] in [GitLab 11.1](https://about.gitlab.com/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
+> The **Groups** dropdown in the top navigation was [introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/36234) in [GitLab 11.1](https://about.gitlab.com/2018/07/22/gitlab-11-1-released/#groups-dropdown-in-navigation).
 
-The Groups page displays:
+The **Groups** page displays:
 
-- All groups you are a member of.
-- How many projects each group contains.
-- How many members a group has.
-- The group visibility.
-- A link to the group settings if you have sufficient permissions.
+- All groups you are a member of, when **Your groups** is selected.
+- A list of public groups, when **Explore public groups** is selected.
 
-By clicking the last button, you can leave that group.
+Each group on the **Groups** page is listed with:
+
+- How many subgroups it has.
+- How many projects it contains.
+- How many members the group has, not including members inherited from parent groups.
+- The group's visibility.
+- A link to the group's settings, if you have sufficient permissions.
+- A link to leave the group, if you are a member.
 
 ## Use cases
 
@@ -100,6 +112,8 @@ Add the following information:
    what this group is about.
 1. Optionally, choose an avatar for your group.
 1. Choose the [visibility level](../../public_access/public_access.md).
+
+For more details on creating groups, watch the video [GitLab Namespaces (users, groups and subgroups)](https://youtu.be/r0sJgjR2f5A).
 
 ## Add users to a group
 
@@ -203,10 +217,8 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 
 ## Insights **[ULTIMATE]**
 
-> Introduced in [GitLab Ultimate][ee] 11.9 behind the `insights` feature flag.
-
-Configure the Insights that matter for your groups or projects, allowing users to explore data
-such as: 
+Configure the Insights that matter for your groups or projects, allowing users
+to explore data such as:
 
 - Triage hygiene
 - Issues created/closed per a given period
@@ -220,8 +232,8 @@ such as:
 From GitLab 10.5, you can transfer groups in the following ways:
 
 - Transfer a subgroup to a new parent group.
-- Convert a top-level group into a subgroup by transfering it to the desired group.
-- Convert a subgroup into a top-level group by transfering it out of its current group.
+- Convert a top-level group into a subgroup by transferring it to the desired group.
+- Convert a subgroup into a top-level group by transferring it out of its current group.
 
 When transferring groups, note:
 
@@ -363,6 +375,18 @@ With [GitLab Issues Analytics](issues_analytics/index.md), you can see a bar cha
 ## Dependency Proxy **[PREMIUM]**
 
 Use GitLab as a [dependency proxy](dependency_proxy/index.md) for upstream Docker images.
+
+<!-- ## Troubleshooting
+
+Include any troubleshooting steps that you can foresee. If you know beforehand what issues
+one might have when setting this up, or when something is changed, or on upgrading, it's
+important to describe those, too. Think of things that may go wrong and include them here.
+This is important to minimize requests for support, and to avoid doc comments with
+questions that you know someone might ask.
+
+Each scenario can be a third-level heading, e.g. `### Getting error message X`.
+If you have none to add when creating a doc, leave this section in place
+but commented out to help encourage others to add to it in the future. -->
 
 [ee]: https://about.gitlab.com/pricing/
 [ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534

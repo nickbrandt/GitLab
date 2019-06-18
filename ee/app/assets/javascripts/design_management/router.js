@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'underscore';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from './pages/index.vue';
@@ -39,9 +40,9 @@ const router = new VueRouter({
             from,
             next,
           ) {
-            if (id > 0) next();
+            if (_.isString(id)) next();
           },
-          props: ({ params: { id } }) => ({ id: parseInt(id, 10) }),
+          props: ({ params: { id } }) => ({ id }),
         },
       ],
     },

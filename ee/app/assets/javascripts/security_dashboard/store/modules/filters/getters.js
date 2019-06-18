@@ -32,6 +32,8 @@ export const activeFilters = state =>
     return acc;
   }, {});
 
+export const visibleFilters = ({ filters }) => filters.filter(({ hidden }) => !hidden);
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 // This is no longer needed after gitlab-ce#52179 is merged
 export default () => {};

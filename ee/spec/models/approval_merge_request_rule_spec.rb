@@ -55,6 +55,20 @@ describe ApprovalMergeRequestRule do
         expect(new).not_to be_valid
       end
     end
+
+    context 'report_approver rules' do
+      it 'is valid' do
+        expect(build(:report_approver_rule)).to be_valid
+      end
+
+      it 'validates presence of report_type' do
+        rule = build(:report_approver_rule)
+        expect(rule).to be_valid
+
+        rule.report_type = nil
+        expect(rule).not_to be_valid
+      end
+    end
   end
 
   context 'scopes'  do
@@ -96,12 +110,20 @@ describe ApprovalMergeRequestRule do
 
     it 'creates a new rule if it does not exist' do
       expect { described_class.find_or_create_code_owner_rule(merge_request, '*.js') }
-        .to change { merge_request.approval_rules.count }.by(1)
+        .to change { merge_request.approval_rules.matching_pattern('*.js').count }.by(1)
+    end
+
+    it 'finds an existing rule using deprecated code_owner column' do
+      deprecated_code_owner_rule = create(:code_owner_rule, name: '*.md', merge_request: merge_request)
+      deprecated_code_owner_rule.update_column(:rule_type, described_class.rule_types[:regular])
+
+      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.md'))
+        .to eq(deprecated_code_owner_rule)
     end
 
     it 'retries when a record was created between the find and the create' do
-      expect(described_class).to receive(:find_or_create_by).and_raise(ActiveRecord::RecordNotUnique)
-      allow(described_class).to receive(:find_or_create_by).and_call_original
+      expect(described_class).to receive(:where).and_raise(ActiveRecord::RecordNotUnique)
+      allow(described_class).to receive(:where).and_call_original
 
       expect(described_class.find_or_create_code_owner_rule(merge_request, '*.js')).not_to be_nil
     end
@@ -127,6 +149,18 @@ describe ApprovalMergeRequestRule do
 
       expect(subject.regular).to eq(false)
       expect(subject.regular?).to eq(false)
+    end
+  end
+
+  describe '#code_owner?' do
+    it 'returns true when deprecated code_owner bool is set' do
+      code_owner_rule = build(:code_owner_rule)
+
+      expect(code_owner_rule.code_owner?).to be true
+
+      code_owner_rule.rule_type = :regular
+
+      expect(code_owner_rule.code_owner?).to be true
     end
   end
 

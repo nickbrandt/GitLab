@@ -60,6 +60,7 @@ describe API::MergeRequestApprovals do
     context 'when private group approver' do
       before do
         private_group = create(:group, :private)
+        private_group.add_developer(create(:user))
         merge_request.approver_groups.create(group: private_group)
       end
 
@@ -138,7 +139,9 @@ describe API::MergeRequestApprovals do
     end
 
     it 'excludes private groups' do
-      private_group = create :group, :private
+      private_group = create(:group, :private)
+
+      rule.users << approver
       rule.groups << private_group
 
       get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)

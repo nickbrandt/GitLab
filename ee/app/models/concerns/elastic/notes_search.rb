@@ -7,14 +7,6 @@ module Elastic
     included do
       include ApplicationSearch
 
-      def self.inherited(subclass)
-        super
-
-        subclass.__elasticsearch__.index_name = self.index_name
-        subclass.__elasticsearch__.document_type = self.document_type
-        subclass.__elasticsearch__.instance_variable_set(:@mapping, self.mapping.dup)
-      end
-
       def es_type
         'note'
       end
