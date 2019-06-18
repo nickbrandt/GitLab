@@ -27,7 +27,6 @@ class License < ApplicationRecord
     multiple_ldap_servers
     multiple_issue_assignees
     multiple_merge_request_assignees
-    multiple_project_issue_boards
     push_rules
     protected_refs_for_users
     related_issues
@@ -133,7 +132,6 @@ class License < ApplicationRecord
     jenkins_integration
     merge_request_approvers
     multiple_issue_assignees
-    multiple_project_issue_boards
     multiple_group_issue_boards
     protected_refs_for_users
     push_rules

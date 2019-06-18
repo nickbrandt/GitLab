@@ -38,24 +38,30 @@ shared_examples 'redirects to last visited board' do
 
   context 'when multiple boards are disabled' do
     before do
-      stub_licensed_features(multiple_project_issue_boards: false, multiple_group_issue_boards: false)
+      stub_licensed_features(multiple_group_issue_boards: false)
     end
 
     it 'renders first board' do
-      list_boards
+      list_boards(format: :html)
 
-      expect(response).to render_template :index
-      expect(response.content_type).to eq 'text/html'
+      if parent.is_a?(Group)
+        expect(response).to render_template :index
+        expect(response.content_type).to eq 'text/html'
+        expect(response).to have_gitlab_http_status(200)
+      else
+        expect(response.content_type).to eq 'text/html'
+        expect(response).to have_gitlab_http_status(302)
+      end
     end
   end
 
   context 'when multiple boards are enabled' do
     before do
-      stub_licensed_features(multiple_project_issue_boards: true, multiple_group_issue_boards: true)
+      stub_licensed_features(multiple_group_issue_boards: true)
     end
 
     it 'redirects to latest visited board' do
-      list_boards
+      list_boards(format: :html)
 
       board_path = if parent.is_a?(Group)
                      group_board_path(group_id: parent, id: boards[1].id)
@@ -68,7 +74,7 @@ shared_examples 'redirects to last visited board' do
   end
 end
 
-def list_boards(recent: false)
+def list_boards(recent: false, format: :json)
   action = recent ? :recent : :index
   params = if parent.is_a?(Group)
              { group_id: parent }
@@ -76,7 +82,7 @@ def list_boards(recent: false)
              { namespace_id: parent.namespace, project_id: parent }
            end
 
-  get action, params: params, format: :json
+  get action, params: params, format: format
 end
 
 def visit_board(board, time)

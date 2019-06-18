@@ -14,7 +14,7 @@ module MultipleBoardsActions
   end
 
   def recent
-    recent_visits = ::Boards::Visits::LatestService.new(parent, current_user, count: 4).execute
+    recent_visits = ::Boards::VisitsFinder.new(parent, current_user).latest(4)
     recent_boards = recent_visits.map(&:board)
 
     render json: serialize_as_json(recent_boards)
@@ -25,7 +25,7 @@ module MultipleBoardsActions
 
     respond_to do |format|
       format.json do
-        if board.valid?
+        if board.persisted?
           extra_json = { board_path: board_path(board) }
           render json: serialize_as_json(board).merge(extra_json)
         else
@@ -37,11 +37,10 @@ module MultipleBoardsActions
 
   def update
     service = Boards::UpdateService.new(parent, current_user, board_params)
-    service.execute(board)
 
     respond_to do |format|
       format.json do
-        if board.valid?
+        if service.execute(board)
           extra_json = { board_path: board_path(board) }
           render json: serialize_as_json(board).merge(extra_json)
         else
@@ -64,11 +63,13 @@ module MultipleBoardsActions
   private
 
   def redirect_to_recent_board
-    return if request.format.json? || !parent.multiple_issue_boards_available?
+    return if request.format.json? || !parent.multiple_issue_boards_available? || !latest_visited_board
 
-    if recently_visited = Boards::Visits::LatestService.new(parent, current_user).execute
-      redirect_to board_path(recently_visited.board)
-    end
+    redirect_to board_path(latest_visited_board.board)
+  end
+
+  def latest_visited_board
+    @latest_visited_board ||= Boards::VisitsFinder.new(parent, current_user).latest
   end
 
   def authorize_create_board!

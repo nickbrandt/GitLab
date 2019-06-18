@@ -22,7 +22,7 @@ shared_examples 'multiple issue boards show' do
 
   context 'when multiple issue boards is disabled' do
     before do
-      stub_licensed_features(multiple_project_issue_boards: false, multiple_group_issue_boards: false)
+      stub_licensed_features(multiple_group_issue_boards: false)
     end
 
     it 'let user view the default shown board' do
@@ -32,10 +32,14 @@ shared_examples 'multiple issue boards show' do
       expect(assigns(:board)).to eq(board2)
     end
 
-    it 'renders 404 when board is not the default' do
+    it 'renders 200 when project board is not the default' do
       show(board1)
 
-      expect(response).to have_gitlab_http_status(404)
+      if parent.is_a?(Project)
+        expect(response).to have_gitlab_http_status(200)
+      else
+        expect(response).to have_gitlab_http_status(404)
+      end
     end
   end
 

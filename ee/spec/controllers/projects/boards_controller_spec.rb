@@ -10,11 +10,13 @@ describe Projects::BoardsController do
   end
 
   describe 'GET index' do
+    let(:parent) { project }
+
     it 'returns a list of project boards including milestones' do
       create(:board, project: project, milestone: create(:milestone, project: project))
       create(:board, project: project, milestone_id: Milestone::Upcoming.id)
 
-      list_boards format: :json
+      list_boards
 
       parsed_response = JSON.parse(response.body)
 
@@ -22,17 +24,7 @@ describe Projects::BoardsController do
       expect(parsed_response.length).to eq 2
     end
 
-    it_behaves_like 'redirects to last visited board' do
-      let(:parent) { project }
-    end
-
-    def list_boards(format: :html)
-      get :index, params: {
-                    namespace_id: project.namespace,
-                    project_id: project
-                  },
-                  format: format
-    end
+    it_behaves_like 'redirects to last visited board'
   end
 
   describe 'GET recent' do
@@ -49,10 +41,6 @@ describe Projects::BoardsController do
 
   describe 'POST create' do
     context 'with the multiple issue boards available' do
-      before do
-        stub_licensed_features(multiple_project_issue_boards: true)
-      end
-
       context 'with valid params' do
         let(:user) { create(:user) }
         let(:milestone) { create(:milestone, project: project) }
@@ -110,14 +98,6 @@ describe Projects::BoardsController do
           expect(response).to have_gitlab_http_status(404)
         end
       end
-    end
-
-    it 'renders a 404 when multiple issue boards are not available' do
-      stub_licensed_features(multiple_project_issue_boards: false)
-
-      create_board name: 'Backend'
-
-      expect(response).to have_gitlab_http_status(404)
     end
 
     def create_board(board_params)
