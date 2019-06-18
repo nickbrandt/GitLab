@@ -21,15 +21,6 @@ import (
 
 const NginxResponseBufferHeader = "X-Accel-Buffering"
 
-func Fail500(w http.ResponseWriter, r *http.Request, err error) {
-	http.Error(w, "Internal server error", 500)
-	if err != nil {
-		captureRavenError(r, err)
-	}
-
-	printError(r, err)
-}
-
 func LogError(r *http.Request, err error) {
 	if err != nil {
 		captureRavenError(r, err)
@@ -38,14 +29,17 @@ func LogError(r *http.Request, err error) {
 	printError(r, err)
 }
 
-func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
-	CaptureAndFail(w, r, err, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
-}
-
 func CaptureAndFail(w http.ResponseWriter, r *http.Request, err error, msg string, code int) {
 	http.Error(w, msg, code)
-	captureRavenError(r, err)
-	printError(r, err)
+	LogError(r, err)
+}
+
+func Fail500(w http.ResponseWriter, r *http.Request, err error) {
+	CaptureAndFail(w, r, err, "Internal server error", http.StatusInternalServerError)
+}
+
+func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
+	CaptureAndFail(w, r, err, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
 }
 
 func printError(r *http.Request, err error) {
