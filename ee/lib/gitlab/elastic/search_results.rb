@@ -22,7 +22,9 @@ module Gitlab
         @public_and_internal_projects = public_and_internal_projects
       end
 
-      def objects(scope, page = nil)
+      def objects(scope, page = 1)
+        page = (page || 1).to_i
+
         case scope
         when 'projects'
           eager_load(projects, page, eager: [:route, :namespace])
@@ -43,21 +45,6 @@ module Gitlab
         else
           Kaminari.paginate_array([])
         end
-      end
-
-      # Apply some eager loading to the `records` of an ES result object without
-      # losing pagination information
-      def eager_load(es_result, page, eager:)
-        page ||= 1
-        paginated_base = es_result.page(page).per(per_page)
-        relation = paginated_base.records.includes(eager) # rubocop:disable CodeReuse/ActiveRecord
-
-        Kaminari.paginate_array(
-          relation,
-          total_count: paginated_base.total_count,
-          limit: per_page,
-          offset: per_page * (page - 1)
-        )
       end
 
       def generic_search_results
@@ -149,6 +136,20 @@ module Gitlab
       end
 
       private
+
+      # Apply some eager loading to the `records` of an ES result object without
+      # losing pagination information
+      def eager_load(es_result, page, eager:)
+        paginated_base = es_result.page(page).per(per_page)
+        relation = paginated_base.records.includes(eager) # rubocop:disable CodeReuse/ActiveRecord
+
+        Kaminari.paginate_array(
+          relation,
+          total_count: paginated_base.total_count,
+          limit: per_page,
+          offset: per_page * (page - 1)
+        )
+      end
 
       def base_options
         {
