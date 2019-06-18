@@ -1,0 +1,5 @@
+---
+title: Rename `TOKEN_TYPES` to `USER_TOKEN_TYPES`
+merge_request: 14209
+author: Arun Kumar Mohan
+type: other
