@@ -34,7 +34,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 8,
+    percentageCompleted: 0,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/tree/master$`, ''),
@@ -68,7 +68,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 16,
+    percentageCompleted: 8,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/commits/master$`, ''),
@@ -84,7 +84,7 @@ const GUIDED_GITLAB_TOUR = [
       selector: '.js-onboarding-commit-item',
       text: s__('UserOnboardingTour|Click to open the latest commit to see its details.'),
     },
-    percentageCompleted: 24,
+    percentageCompleted: 16,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/commit/[a-z0-9]+$`, ''),
@@ -115,7 +115,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 32,
+    percentageCompleted: 24,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/-/branches$`, ''),
@@ -149,7 +149,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 40,
+    percentageCompleted: 32,
   },
   {
     forUrl: ({ projectFullPath }) =>
@@ -175,7 +175,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 48,
+    percentageCompleted: 40,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/issues$`, ''),
@@ -204,7 +204,7 @@ const GUIDED_GITLAB_TOUR = [
       },
     ],
     actionPopover: null,
-    percentageCompleted: 56,
+    percentageCompleted: 48,
   },
   {
     forUrl: ({ projectFullPath }) =>
@@ -226,7 +226,7 @@ const GUIDED_GITLAB_TOUR = [
       selector: '.js-onboarding-issue-item',
       text: s__('UserOnboardingTour|Open one of the issues by clicking on its title.'),
     },
-    percentageCompleted: 64,
+    percentageCompleted: 56,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/issues/[0-9]+$`, ''),
@@ -259,7 +259,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 72,
+    percentageCompleted: 64,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests$`, ''),
@@ -277,7 +277,7 @@ const GUIDED_GITLAB_TOUR = [
         "UserOnboardingTour|Let's take a closer look at a merge request. Click on the title of one.",
       ),
     },
-    percentageCompleted: 80,
+    percentageCompleted: 72,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/merge_requests/[0-9]+$`, ''),
@@ -308,7 +308,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 88,
+    percentageCompleted: 80,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/pipelines$`, ''),
@@ -342,7 +342,7 @@ const GUIDED_GITLAB_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 96,
+    percentageCompleted: 88,
   },
   {
     forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/pipelines/[0-9]+$`, ''),
@@ -392,7 +392,7 @@ const GUIDED_GITLAB_TOUR = [
       },
     ],
     actionPopover: null,
-    percentageCompleted: 100,
+    percentageCompleted: 96,
   },
 ];
 
@@ -428,7 +428,7 @@ const CREATE_PROJECT_TOUR = [
       },
     ],
     actionPopover: null,
-    percentageCompleted: 50,
+    percentageCompleted: 33,
   },
   {
     forUrl: ({ createdProjectPath }) => new RegExp(`${createdProjectPath}$`, ''),
@@ -458,7 +458,7 @@ const CREATE_PROJECT_TOUR = [
       },
     ],
     actionPopover: null,
-    percentageCompleted: 100,
+    percentageCompleted: 66,
   },
 ];
 
@@ -479,7 +479,7 @@ const INVITE_COLLEAGUES_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 33,
+    percentageCompleted: 0,
   },
   {
     forUrl: ({ createdProjectPath }) => new RegExp(`${createdProjectPath}/edit$`, ''),
@@ -495,7 +495,7 @@ const INVITE_COLLEAGUES_TOUR = [
         false,
       ),
     },
-    percentageCompleted: 66,
+    percentageCompleted: 33,
   },
   {
     forUrl: ({ createdProjectPath }) => new RegExp(`${createdProjectPath}/-/project_members$`, ''),
@@ -522,7 +522,7 @@ const INVITE_COLLEAGUES_TOUR = [
       },
     ],
     actionPopover: null,
-    percentageCompleted: 100,
+    percentageCompleted: 66,
   },
 ];
 
