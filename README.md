@@ -17,28 +17,6 @@ The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab
 
 You can request a free trial of GitLab Ultimate [on our website](https://about.gitlab.com/free-trial/).
 
-## Subscriber onboarding information
-
-Thank you for purchasing a GitLab subscription!
-
-For standard subscribers, please see **emergency contact info and other useful information** in [the Standard subscribers README](https://gitlab.com/standard/standard-subscriber-information/tree/master#README).
-
-GitLab Enterprise Edition repository:
-https://gitlab.com/gitlab-org/gitlab-ee
-
-Download GitLab Enterprise Edition:
-https://about.gitlab.com/downloads-ee
-
-Documentation:
-http://doc.gitlab.com/ee/
-
-To upgrade from CE, just perform a normal upgrade, but use an EE package:
-https://about.gitlab.com/upgrade/
-
-If you need help with your GitLab installation and for any technical questions please see the [support page](https://about.gitlab.com/support/)
-
-For all other questions, please see our [contact page](https://about.gitlab.com/contact/)
-
 ## Open source software to collaborate on code
 
 To see how GitLab looks please see the [features page on our website](https://about.gitlab.com/features/).
