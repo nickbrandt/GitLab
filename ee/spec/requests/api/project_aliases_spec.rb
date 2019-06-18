@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe API::ProjectAliases, api: true do
-  set(:user)  { create(:user) }
-  set(:admin) { create(:admin) }
+  let(:user)  { create(:user) }
+  let(:admin) { create(:admin) }
 
   context 'without premium license' do
     describe 'GET /project_aliases' do
@@ -55,15 +55,9 @@ describe API::ProjectAliases, api: true do
   end
 
   context 'with premium license' do
-    before do
-      create(:license, plan: License::PREMIUM_PLAN)
-    end
-
-    describe 'GET /project_aliases' do
+    shared_examples_for 'GitLab administrator only API endpoint' do
       context 'anonymous user' do
-        before do
-          get api('/project_aliases')
-        end
+        let(:user) { nil }
 
         it 'returns 401' do
           expect(response).to have_gitlab_http_status(401)
@@ -71,22 +65,27 @@ describe API::ProjectAliases, api: true do
       end
 
       context 'regular user' do
-        before do
-          get api('/project_aliases', user)
-        end
-
         it 'returns 403' do
           expect(response).to have_gitlab_http_status(403)
         end
       end
+    end
+
+    before do
+      create(:license, plan: License::PREMIUM_PLAN)
+    end
+
+    describe 'GET /project_aliases' do
+      before do
+        get api('/project_aliases', user)
+      end
+
+      it_behaves_like 'GitLab administrator only API endpoint'
 
       context 'admin' do
+        let(:user) { admin }
         let!(:project_alias_1) { create(:project_alias) }
         let!(:project_alias_2) { create(:project_alias) }
-
-        before do
-          get api('/project_aliases', admin)
-        end
 
         it 'returns the project aliases list' do
           expect(response).to have_gitlab_http_status(200)
@@ -97,33 +96,18 @@ describe API::ProjectAliases, api: true do
 
     describe 'GET /project_aliases/:name' do
       let(:project_alias) { create(:project_alias) }
+      let(:alias_name) { project_alias.name }
 
-      context 'anonymous user' do
-        before do
-          get api("/project_aliases/#{project_alias.name}")
-        end
-
-        it 'returns 401' do
-          expect(response).to have_gitlab_http_status(401)
-        end
+      before do
+        get api("/project_aliases/#{alias_name}", user)
       end
 
-      context 'regular user' do
-        before do
-          get api("/project_aliases/#{project_alias.name}", user)
-        end
-
-        it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
+      it_behaves_like 'GitLab administrator only API endpoint'
 
       context 'admin' do
-        context 'existing project alias' do
-          before do
-            get api("/project_aliases/#{project_alias.name}", admin)
-          end
+        let(:user) { admin }
 
+        context 'existing project alias' do
           it 'returns the project alias' do
             expect(response).to have_gitlab_http_status(200)
             expect(response).to match_response_schema('public_api/v4/project_alias', dir: 'ee')
@@ -131,9 +115,7 @@ describe API::ProjectAliases, api: true do
         end
 
         context 'non-existent project alias' do
-          before do
-            get api("/project_aliases/some-project", admin)
-          end
+          let(:alias_name) { 'some-project' }
 
           it 'returns 404' do
             expect(response).to have_gitlab_http_status(404)
@@ -144,44 +126,26 @@ describe API::ProjectAliases, api: true do
 
     describe 'POST /project_aliases' do
       let(:project) { create(:project) }
+      let(:project_alias) { create(:project_alias) }
+      let(:alias_name) { project_alias.name }
 
-      context 'anonymous user' do
-        before do
-          post api("/project_aliases")
-        end
-
-        it 'returns 401' do
-          expect(response).to have_gitlab_http_status(401)
-        end
+      before do
+        post api("/project_aliases", user), params: { project_id: project.id, name: alias_name }
       end
 
-      context 'regular user' do
-        before do
-          post api("/project_aliases", user)
-        end
-
-        it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
+      it_behaves_like 'GitLab administrator only API endpoint'
 
       context 'admin' do
+        let(:user) { admin }
+
         context 'existing project alias' do
-          let(:project_alias) { create(:project_alias) }
-
-          before do
-            post api("/project_aliases", admin), params: { project_id: project.id, name: project_alias.name }
-          end
-
           it 'returns 400' do
             expect(response).to have_gitlab_http_status(400)
           end
         end
 
         context 'non-existent project alias' do
-          before do
-            post api("/project_aliases", admin), params: { project_id: project.id, name: 'some-project' }
-          end
+          let(:alias_name) { 'some-project' }
 
           it 'returns 200' do
             expect(response).to have_gitlab_http_status(201)
@@ -193,42 +157,25 @@ describe API::ProjectAliases, api: true do
 
     describe 'DELETE /project_aliases/:name' do
       let(:project_alias) { create(:project_alias) }
+      let(:alias_name) { project_alias.name }
 
-      context 'anonymous user' do
-        before do
-          delete api("/project_aliases/#{project_alias.name}")
-        end
-
-        it 'returns 401' do
-          expect(response).to have_gitlab_http_status(401)
-        end
+      before do
+        delete api("/project_aliases/#{alias_name}", user)
       end
 
-      context 'regular user' do
-        before do
-          delete api("/project_aliases/#{project_alias.name}", user)
-        end
-
-        it 'returns 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
+      it_behaves_like 'GitLab administrator only API endpoint'
 
       context 'admin' do
-        context 'existing project alias' do
-          before do
-            delete api("/project_aliases/#{project_alias.name}", admin)
-          end
+        let(:user) { admin }
 
+        context 'existing project alias' do
           it 'returns 204' do
             expect(response).to have_gitlab_http_status(204)
           end
         end
 
         context 'non-existent project alias' do
-          before do
-            delete api("/project_aliases/some-project", admin)
-          end
+          let(:alias_name) { 'some-project' }
 
           it 'returns 404' do
             expect(response).to have_gitlab_http_status(404)

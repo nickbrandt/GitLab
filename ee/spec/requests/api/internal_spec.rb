@@ -27,22 +27,25 @@ describe API::Internal do
 
     context "project alias" do
       let(:project) { create(:project, :public, :repository) }
+      let(:project_alias) { create(:project_alias, project: project) }
+
+      def check_access_by_alias(alias_name)
+        post(
+          api("/internal/allowed"),
+          params: {
+            action: "git-upload-pack",
+            key_id: key.id,
+            project: alias_name,
+            protocol: 'ssh',
+            secret_token: secret_token
+          }
+        )
+      end
 
       context "without premium license" do
         context "project matches a project alias" do
-          let(:project_alias) { create(:project_alias, project: project) }
-
           before do
-            post(
-              api("/internal/allowed"),
-              params: {
-                action: "git-upload-pack",
-                key_id: key.id,
-                project: project_alias.name,
-                protocol: 'ssh',
-                secret_token: secret_token
-              }
-            )
+            check_access_by_alias(project_alias.name)
           end
 
           it "does not allow access because project can't be found" do
@@ -57,19 +60,8 @@ describe API::Internal do
         end
 
         context "project matches a project alias" do
-          let(:project_alias) { create(:project_alias, project: project) }
-
           before do
-            post(
-              api("/internal/allowed"),
-              params: {
-                action: "git-upload-pack",
-                key_id: key.id,
-                project: project_alias.name,
-                protocol: 'ssh',
-                secret_token: secret_token
-              }
-            )
+            check_access_by_alias(project_alias.name)
           end
 
           it "allows access" do
@@ -79,16 +71,7 @@ describe API::Internal do
 
         context "project doesn't match a project alias" do
           before do
-            post(
-              api("/internal/allowed"),
-              params: {
-                action: "git-upload-pack",
-                key_id: key.id,
-                project: "some-project",
-                protocol: 'ssh',
-                secret_token: secret_token
-              }
-            )
+            check_access_by_alias('some-project')
           end
 
           it "does not allow access because project can't be found" do
