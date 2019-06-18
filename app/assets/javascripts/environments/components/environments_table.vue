@@ -22,6 +22,11 @@ export default {
       required: true,
       default: () => [],
     },
+    deployBoardsHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     canReadEnvironment: {
       type: Boolean,
       required: false,
@@ -106,6 +111,7 @@ export default {
         <div class="deploy-board-container">
           <deploy-board
             :deploy-board-data="model.deployBoardData"
+            :deploy-boards-help-path="deployBoardsHelpPath"
             :is-loading="model.isLoadingDeployBoard"
             :is-empty="model.isEmptyDeployBoard"
             :has-legacy-app-label="model.hasLegacyAppLabel"

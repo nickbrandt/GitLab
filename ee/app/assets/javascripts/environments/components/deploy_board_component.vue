@@ -29,6 +29,11 @@ export default {
       type: Object,
       required: true,
     },
+    deployBoardsHelpPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     isLoading: {
       type: Boolean,
       required: true,
@@ -100,10 +105,7 @@ export default {
     <template v-else>
       <div v-if="hasLegacyAppLabel" class="bs-callout bs-callout-warning mb-0 mt-0">
         <span v-html="legacyLabelWarningMessage"></span>
-        <gl-link
-          target="blank"
-          href="https://docs.gitlab.com/ee/user/project/deploy_boards.html#enabling-deploy-boards"
-        >
+        <gl-link target="blank" :href="deployBoardsHelpPath">
           <strong>{{ __('More Information') }}</strong>
         </gl-link>
       </div>
