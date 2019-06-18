@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 # This is based on https://bitbucket.org/atlassian/atlassian-jwt-ruby
 # which is unmaintained and incompatible with later versions of jwt-ruby
 
@@ -18,10 +20,24 @@ module Atlassian
         ::JWT.encode(payload, secret, algorithm, header_fields)
       end
 
-      def create_query_string_hash(http_method, uri, base_uri = '')
+      def create_query_string_hash(http_method, uri, base_uri: '')
         Digest::SHA256.hexdigest(
           create_canonical_request(http_method, uri, base_uri)
         )
+      end
+
+      def build_claims(issuer:, method:, uri:, base_uri: '', issued_at: nil, expires: nil, other_claims: {})
+        issued_at ||= Time.now.to_i
+        expires ||= issued_at + 60
+
+        qsh = create_query_string_hash(method, uri, base_uri: base_uri)
+
+        {
+          iss: issuer,
+          iat: issued_at,
+          exp: expires,
+          qsh: qsh
+        }.merge(other_claims)
       end
 
       private
