@@ -43,6 +43,7 @@ describe 'Database schema' do
     geo_upload_deleted_events: %w[upload_id model_id],
     identities: %w[user_id],
     issues: %w[last_edited_by_id state_id],
+    jira_tracker_data: %w[jira_issue_transition_id],
     keys: %w[user_id],
     label_links: %w[target_id],
     lfs_objects_projects: %w[lfs_object_id project_id],

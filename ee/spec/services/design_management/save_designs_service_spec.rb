@@ -148,6 +148,14 @@ describe DesignManagement::SaveDesignsService do
           it 'saves the design to LFS' do
             expect { service.execute }.to change { LfsObject.count }.by(1)
           end
+
+          it 'saves the repository_type of the LfsObjectsProject as design' do
+            expect do
+              service.execute
+            end.to change { project.lfs_objects_projects.count }.from(0).to(1)
+
+            expect(project.lfs_objects_projects.first.repository_type).to eq('design')
+          end
         end
 
         context 'and the `store_designs_in_lfs` feature is not enabled' do

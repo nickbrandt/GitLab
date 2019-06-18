@@ -28,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    fromHelpMenu: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -47,6 +51,11 @@ export default {
         cssClasses: ['blue'],
       },
     };
+  },
+  computed: {
+    skipText() {
+      return this.fromHelpMenu ? __('No, not interested right now') : __('Skip this for now');
+    },
   },
   mounted() {
     this.helpPopover.target = this.$refs.helpPopoverTrigger;
@@ -121,7 +130,7 @@ export default {
       </gl-link>
       <p class="small mt-8">
         <gl-link class="qa-skip-tour-btn" @click="skipTour">
-          {{ __('Skip this for now') }}
+          {{ skipText }}
         </gl-link>
       </p>
       <p class="small ml-4 mr-4" v-html="helpText"></p>

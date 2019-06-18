@@ -37,6 +37,7 @@ export default {
       return {
         script: `<script defer
   data-project-id='${this.appMetadata.sourceProjectId}'
+  data-project-path='${this.appMetadata.sourceProjectPath}'
   data-merge-request-id='${this.appMetadata.mergeRequestId}'
   data-mr-url='${this.appMetadata.appUrl}'
   id='review-app-toolbar-script'

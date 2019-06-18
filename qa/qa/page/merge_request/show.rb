@@ -112,6 +112,14 @@ module QA
           end
         end
 
+        def has_title?(title)
+          has_element?(:title, text: title)
+        end
+
+        def has_description?(description)
+          has_element?(:description, text: description)
+        end
+
         def merge!
           # The merge button is disabled on load
           wait do

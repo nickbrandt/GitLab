@@ -5,6 +5,10 @@ module EE
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
+    prepended do
+      before_action :set_ip_restriction, only: [:edit]
+    end
+
     override :render_show_html
     def render_show_html
       if redirect_show_path
@@ -28,6 +32,7 @@ module EE
         params_ee << { insight_attributes: [:id, :project_id, :_destroy] } if current_group&.insights_available?
         params_ee << :file_template_project_id if current_group&.feature_available?(:custom_file_templates_for_namespace)
         params_ee << :custom_project_templates_group_id if current_group&.group_project_template_available?
+        params_ee << { ip_restriction_attributes: [:id, :range] } if current_group&.feature_available?(:group_ip_restriction)
       end
     end
 
@@ -52,6 +57,12 @@ module EE
 
     def default_group_view
       EE::User::DEFAULT_GROUP_VIEW
+    end
+
+    def set_ip_restriction
+      return if group.ip_restriction.present?
+
+      group.build_ip_restriction
     end
   end
 end

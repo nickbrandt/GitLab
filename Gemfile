@@ -123,7 +123,7 @@ gem 'seed-fu', '~> 2.3.7'
 
 # Search
 gem 'elasticsearch-model', '~> 0.1.9'
-gem 'elasticsearch-rails', '~> 0.1.9'
+gem 'elasticsearch-rails', '~> 0.1.9', require: 'elasticsearch/rails/instrumentation'
 gem 'elasticsearch-api',   '5.0.3'
 gem 'aws-sdk'
 gem 'faraday_middleware-aws-signers-v4'
@@ -293,7 +293,7 @@ gem 'sentry-raven', '~> 2.9'
 gem 'premailer-rails', '~> 1.9.7'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '~> 0.2.0'
+gem 'gitlab-labkit', '~> 0.3.0'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false

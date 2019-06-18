@@ -10,7 +10,6 @@ namespace :gitlab do
       Rake::Task["gitlab:elastic:create_empty_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
       Rake::Task["gitlab:elastic:index_projects"].invoke
-      Rake::Task["gitlab:elastic:index_wikis"].invoke
       Rake::Task["gitlab:elastic:index_snippets"].invoke
     end
 
@@ -44,24 +43,6 @@ namespace :gitlab do
       Gitlab::Redis::SharedState.with { |redis| redis.del(:elastic_projects_indexing) }
 
       puts 'Cleared all locked projects. Incremental indexing should work now.'
-    end
-
-    desc "GitLab | Elasticsearch | Index wiki repositories"
-    task index_wikis: :environment do
-      projects = apply_project_filters(Project.with_wiki_enabled)
-
-      projects.find_each do |project|
-        if project.use_elasticsearch? && !project.wiki.empty?
-          puts "Indexing wiki of #{project.full_name}..."
-
-          begin
-            project.wiki.index_wiki_blobs
-            puts "Enqueued!".color(:green)
-          rescue StandardError => e
-            puts "#{e.message}, trace - #{e.backtrace}"
-          end
-        end
-      end
     end
 
     desc "GitLab | Elasticsearch | Index all snippets"
@@ -125,18 +106,6 @@ namespace :gitlab do
         Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, ids) }
         yield ids
       end
-    end
-
-    def apply_project_filters(projects)
-      if ENV['ID_FROM']
-        projects = projects.where("projects.id >= ?", ENV['ID_FROM'])
-      end
-
-      if ENV['ID_TO']
-        projects = projects.where("projects.id <= ?", ENV['ID_TO'])
-      end
-
-      projects
     end
 
     def display_unindexed(projects)
