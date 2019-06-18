@@ -257,4 +257,96 @@ describe Notes::QuickActionsService do
       end
     end
   end
+
+  context '/relate command' do
+    shared_examples 'relate command' do
+      let(:note) { create(:note_on_issue, noteable: issue, project: project, note: note_text) }
+
+      it 'relates issues' do
+        execute(note)
+
+        expect(issue.related_issues(user)).to match_array(issues_related)
+      end
+    end
+
+    context 'user is member of project' do
+      before do
+        group.add_developer(user)
+      end
+
+      context 'relate a single issue' do
+        let(:other_issue) { create(:issue, project: project) }
+        let(:issues_related) { [other_issue] }
+        let(:note_text) { "/relate #{other_issue.to_reference}" }
+
+        it_behaves_like 'relate command'
+      end
+
+      context 'relate multiple issues at once' do
+        let(:second_issue) { create(:issue, project: project) }
+        let(:third_issue) { create(:issue, project: project) }
+        let(:issues_related) { [second_issue, third_issue] }
+        let(:note_text) { "/relate #{second_issue.to_reference} #{third_issue.to_reference}" }
+
+        it_behaves_like 'relate command'
+      end
+
+      context 'empty relate command' do
+        let(:issues_related) { [] }
+        let(:note_text) { '/relate' }
+
+        it_behaves_like 'relate command'
+      end
+
+      context 'already having related issues' do
+        let(:second_issue) { create(:issue, project: project) }
+        let(:third_issue) { create(:issue, project: project) }
+        let(:issues_related) { [second_issue, third_issue] }
+        let(:note_text) { "/relate #{third_issue.to_reference(project)}" }
+
+        before do
+          create(:issue_link, source: issue, target: second_issue)
+        end
+
+        it_behaves_like 'relate command'
+      end
+
+      context 'cross project' do
+        let(:other_project) { create(:project, group: group) }
+
+        context 'relate a cross project issue' do
+          let(:other_issue) { create(:issue, project: other_project) }
+          let(:issues_related) { [other_issue] }
+          let(:note_text) { "/relate #{other_issue.to_reference(project)}" }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'relate multiple cross projects issues at once' do
+          let(:second_issue) { create(:issue, project: other_project) }
+          let(:third_issue) { create(:issue, project: other_project) }
+          let(:issues_related) { [second_issue, third_issue] }
+          let(:note_text) { "/relate #{second_issue.to_reference(project)} #{third_issue.to_reference(project)}" }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'relate an non-existing issue' do
+          let(:issues_related) { [] }
+          let(:note_text) { "/relate imaginary#1234" }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'relate a private issue' do
+          let(:private_project) { create(:project, :private) }
+          let(:other_issue) { create(:issue, project: private_project) }
+          let(:issues_related) { [] }
+          let(:note_text) { "/relate #{other_issue.to_reference(project)}" }
+
+          it_behaves_like 'relate command'
+        end
+      end
+    end
+  end
 end

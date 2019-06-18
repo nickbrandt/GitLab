@@ -355,15 +355,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    shared_examples 'related command' do
-      it 'fetches issue and populates related_issues if content contains /relate related_issues' do
-        issue_related # populate the issue
-        _, updates = service.execute(content, issuable)
-
-        expect(updates[:related_issues]).to match_array([issue_related])
-      end
-    end
-
     shared_examples 'copy_metadata command' do
       it 'fetches issue or merge request and copies labels and milestone if content contains /copy_metadata reference' do
         source_issuable # populate the issue
@@ -1003,56 +994,6 @@ describe QuickActions::InterpretService do
       end
     end
 
-    context '/relate command' do
-      it_behaves_like 'related command' do
-        let(:issue_related) { create(:issue, project: project) }
-        let(:content) { "/relate #{issue_related.to_reference}" }
-        let(:issuable) { issue }
-      end
-
-      it_behaves_like 'related command' do
-        let(:issue_related) { create(:issue, project: project) }
-        let(:issue_related_another) { create(:issue, project: project) }
-        let(:content) { "/relate #{issue_related.to_reference} #{issue_related_another.to_reference}" }
-        let(:issuable) { issue }
-      end
-
-      it_behaves_like 'empty command' do
-        let(:content) { '/relate' }
-        let(:issuable) { issue }
-      end
-
-      context 'cross project references' do
-        it_behaves_like 'related command' do
-          let(:other_project) { create(:project, :public) }
-          let(:issue_related) { create(:issue, project: other_project) }
-          let(:content) { "/relate #{issue_related.to_reference(project)}" }
-          let(:issuable) { issue }
-        end
-
-        it_behaves_like 'related command' do
-          let(:other_project) { create(:project, :public) }
-          let(:issue_related) { create(:issue, project: other_project) }
-          let(:issue_related_another) { create(:issue, project: other_project) }
-          let(:content) { "/relate #{issue_related.to_reference(project)} #{issue_related_another.to_reference(project)}" }
-          let(:issuable) { issue }
-        end
-
-        it_behaves_like 'empty command' do
-          let(:content) { "/relate imaginary#1234" }
-          let(:issuable) { issue }
-        end
-
-        it_behaves_like 'empty command' do
-          let(:other_project) { create(:project, :private) }
-          let(:issue_related) { create(:issue, project: other_project) }
-
-          let(:content) { "/relate #{issue_related.to_reference(project)}" }
-          let(:issuable) { issue }
-        end
-      end
-    end
-
     context 'when current_user cannot :admin_issue' do
       let(:visitor) { create(:user) }
       let(:issue) { create(:issue, project: project, author: visitor) }
@@ -1110,12 +1051,6 @@ describe QuickActions::InterpretService do
 
       it_behaves_like 'empty command' do
         let(:content) { '/duplicate #{issue.to_reference}' }
-        let(:issuable) { issue }
-      end
-
-      it_behaves_like 'empty command' do
-        let(:issue_related) { create(:issue, project: project) }
-        let(:content) { '/relate #{issue_related.to_reference}' }
         let(:issuable) { issue }
       end
 
