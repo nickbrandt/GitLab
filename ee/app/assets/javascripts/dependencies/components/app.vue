@@ -55,12 +55,10 @@ export default {
   },
   created() {
     this.setDependenciesEndpoint(this.endpoint);
-    this.fetchDependenciesPagination()
-      .then(() => this.fetchDependencies())
-      .catch(() => {});
+    this.fetchDependencies();
   },
   methods: {
-    ...mapActions(['setDependenciesEndpoint', 'fetchDependenciesPagination', 'fetchDependencies']),
+    ...mapActions(['setDependenciesEndpoint', 'fetchDependencies']),
     fetchPage(page) {
       this.fetchDependencies({ page });
     },

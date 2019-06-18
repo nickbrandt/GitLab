@@ -5,30 +5,13 @@ export default {
   [types.SET_DEPENDENCIES_ENDPOINT](state, payload) {
     state.endpoint = payload;
   },
-  [types.REQUEST_DEPENDENCIES_PAGINATION](state) {
-    state.isLoading = true;
-  },
-  [types.RECEIVE_DEPENDENCIES_PAGINATION_SUCCESS](state, total) {
-    state.pageInfo.total = total;
-  },
-  [types.RECEIVE_DEPENDENCIES_PAGINATION_ERROR](state) {
-    state.isLoading = false;
-    state.errorLoading = true;
-    state.dependencies = [];
-    state.pageInfo = {};
-    state.reportInfo = {
-      status: REPORT_STATUS.ok,
-      jobPath: '',
-    };
-    state.initialized = true;
-  },
-  [types.REQUEST_DEPENDENCIES](state, { page }) {
+  [types.REQUEST_DEPENDENCIES](state) {
     state.isLoading = true;
     state.errorLoading = false;
-    state.pageInfo.page = page;
   },
-  [types.RECEIVE_DEPENDENCIES_SUCCESS](state, { dependencies, reportInfo }) {
+  [types.RECEIVE_DEPENDENCIES_SUCCESS](state, { dependencies, reportInfo, pageInfo }) {
     state.dependencies = dependencies;
+    state.pageInfo = pageInfo;
     state.isLoading = false;
     state.errorLoading = false;
     state.reportInfo.status = reportInfo.status;
