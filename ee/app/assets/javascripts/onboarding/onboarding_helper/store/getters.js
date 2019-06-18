@@ -41,15 +41,15 @@ export const totalTourPartSteps = state => {
   return 0;
 };
 
-export const percentageCompleted = (state, getters) => {
-  const { tourData, tourKey } = state;
+export const percentageCompleted = state => {
+  const { tourData, tourKey, lastStepIndex } = state;
 
-  if (getters.stepIndex === null || !tourData || !tourData[tourKey]) {
+  if (lastStepIndex === -1 || !tourData || !tourData[tourKey]) {
     return 0;
   }
 
-  return tourData[tourKey][getters.stepIndex]
-    ? tourData[tourKey][getters.stepIndex].percentageCompleted
+  return tourData[tourKey][lastStepIndex]
+    ? tourData[tourKey][lastStepIndex].percentageCompleted
     : 0;
 };
 
