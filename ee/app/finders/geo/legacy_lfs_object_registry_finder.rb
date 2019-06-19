@@ -6,14 +6,6 @@ module Geo
       current_node.lfs_objects.syncable
     end
 
-    def lfs_objects_failed
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::FileRegistry.lfs_objects.failed.pluck_file_key,
-        LfsObject
-      )
-    end
-
     def lfs_objects_unsynced(except_file_ids:)
       registry_file_ids = Geo::FileRegistry.lfs_objects.pluck_file_key | except_file_ids
 
