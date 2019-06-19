@@ -35,6 +35,37 @@ describe Boards::Issues::CreateService do
         expect(issue.milestone).to eq(board_milestone)
         expect(issue.labels).to contain_exactly(label, board_label)
       end
+
+      context 'when board is scoped by weight' do
+        it 'creates issue weight 0 weight' do
+          board.update(weight: 0)
+
+          issue = service.execute
+
+          expect(issue.weight).to be_zero
+          expect(issue).to be_valid
+        end
+
+        it 'creates issue with nil weight' do
+          board.update(weight: nil)
+
+          issue = service.execute
+
+          expect(issue.weight).to be_nil
+          expect(issue).to be_valid
+        end
+
+        context 'when board weight is invalid' do
+          it 'creates issue with nil weight' do
+            board.update(weight: -1)
+
+            issue = service.execute
+
+            expect(issue.weight).to be_nil
+            expect(issue).to be_valid
+          end
+        end
+      end
     end
 
     context 'assignees list' do

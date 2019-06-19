@@ -13,13 +13,18 @@ module EE
             milestone_id = list.milestone_id || board.milestone_id
 
             options[:label_ids].concat(board.label_ids)
+            options[:weight] = board.weight if valid_weight?
+
             options.merge!(
-              weight: board.weight,
               milestone_id: milestone_id,
               # This can be removed when boards have multiple assignee support.
               # See https://gitlab.com/gitlab-org/gitlab-ee/issues/3786
               assignee_ids: assignee_ids)
           end
+        end
+
+        def valid_weight?
+          board.weight.present? && board.weight >= 0
         end
       end
     end
