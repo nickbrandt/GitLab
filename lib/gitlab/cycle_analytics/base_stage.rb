@@ -5,8 +5,8 @@ module Gitlab
     class BaseStage
       include BaseQuery
 
-      def initialize(project:, options:)
-        @project = project
+      def initialize(projects:, options:)
+        @projects = projects
         @options = options
       end
 
@@ -23,18 +23,18 @@ module Gitlab
       end
 
       def median
-        BatchLoader.for(@project.id).batch(key: name) do |project_ids, loader|
+        ids = @projects.map(&:id)
+        BatchLoader.for(@projects.first.id).batch(key: name) do |project_ids, loader|
           cte_table = Arel::Table.new("cte_table_for_#{name}")
-
           # Build a `SELECT` query. We find the first of the `end_time_attrs` that isn't `NULL` (call this end_time).
           # Next, we find the first of the start_time_attrs that isn't `NULL` (call this start_time).
           # We compute the (end_time - start_time) interval, and give it an alias based on the current
           # cycle analytics stage.
           interval_query = Arel::Nodes::As.new(cte_table,
-            subtract_datetimes(stage_query(project_ids), start_time_attrs, end_time_attrs, name.to_s))
+            subtract_datetimes(stage_query(ids), start_time_attrs, end_time_attrs, name.to_s))
 
           if project_ids.one?
-            loader.call(@project.id, median_datetime(cte_table, interval_query, name))
+            loader.call(@projects.first.id, median_datetime(cte_table, interval_query, name))
           else
             begin
               median_datetimes(cte_table, interval_query, name, :project_id)&.each do |project_id, median|
@@ -54,7 +54,7 @@ module Gitlab
       private
 
       def event_fetcher
-        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(project: @project,
+        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(projects: @projects,
                                                                           stage: name,
                                                                           options: event_options)
       end
