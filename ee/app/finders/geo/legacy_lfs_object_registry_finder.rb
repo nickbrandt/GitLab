@@ -23,16 +23,5 @@ module Geo
         LfsObject
       )
     end
-
-    def registries_for_lfs_objects
-      return Geo::FileRegistry.lfs_objects unless selective_sync?
-
-      legacy_inner_join_registry_ids(
-        Geo::FileRegistry.lfs_objects,
-        current_node.lfs_objects.pluck_primary_key,
-        Geo::FileRegistry,
-        foreign_key: :file_id
-      )
-    end
   end
 end

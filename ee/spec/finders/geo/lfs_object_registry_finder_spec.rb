@@ -797,6 +797,162 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
     end
 
-    include_examples 'finds all the things'
+    describe '#find_unsynced' do
+      it 'returns LFS objects without an entry on the tracking database' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+
+        lfs_objects = subject.find_unsynced(batch_size: 10)
+
+        expect(lfs_objects).to match_ids(lfs_object_2, lfs_object_4, lfs_object_5)
+      end
+
+      it 'excludes LFS objects without an entry on the tracking database' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+
+        lfs_objects = subject.find_unsynced(batch_size: 10, except_file_ids: [lfs_object_2.id])
+
+        expect(lfs_objects).to match_ids(lfs_object_4, lfs_object_5)
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_3)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_4)
+
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'returns LFS objects without an entry on the tracking database' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+
+          lfs_objects = subject.find_unsynced(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_1, lfs_object_3)
+        end
+
+        it 'ignores remote LFS objects' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          lfs_objects = subject.find_unsynced(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_3)
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
+
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts LFS objects that sync has failed' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
+
+          lfs_objects = subject.find_unsynced(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_5)
+        end
+
+        it 'ignores remote LFS objects' do
+          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          lfs_objects = subject.find_unsynced(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_4)
+        end
+      end
+    end
+
+    describe '#find_migrated_local' do
+      it 'returns LFS objects remotely and successfully synced locally' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+
+        lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+        expect(lfs_objects).to match_ids(lfs_object_remote_1)
+      end
+
+      it 'excludes LFS objects stored remotely, but not synced yet' do
+        create(:lfs_object, :object_storage)
+
+        lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+        expect(lfs_objects).to be_empty
+      end
+
+      it 'excludes synced LFS objects that are stored locally' do
+        create(:geo_file_registry, :avatar, file_id: lfs_object_1.id)
+
+        lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+        expect(lfs_objects).to be_empty
+      end
+
+      it 'excludes except_file_ids' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_2.id)
+
+        lfs_objects = subject.find_migrated_local(batch_size: 10, except_file_ids: [lfs_object_remote_1.id])
+
+        expect(lfs_objects).to match_ids(lfs_object_remote_2)
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_remote_2)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_remote_3)
+
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'returns LFS objects remotely and successfully synced locally' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_2.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_3.id)
+
+          lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_remote_2)
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_remote_1)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_2)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_3)
+
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'returns LFS objects remotely and successfully synced locally' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_2.id)
+
+          lfs_objects = subject.find_migrated_local(batch_size: 10)
+
+          expect(lfs_objects).to match_ids(lfs_object_remote_2)
+        end
+      end
+    end
   end
 end
