@@ -134,11 +134,7 @@ module Geo
     end
 
     def lfs_objects_synced_missing_on_primary
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.lfs_objects_synced_missing_on_primary
-      else
-        fdw_geo_node.lfs_objects.synced.missing_on_primary
-      end
+      fdw_geo_node.lfs_objects.synced.missing_on_primary
     end
   end
 end

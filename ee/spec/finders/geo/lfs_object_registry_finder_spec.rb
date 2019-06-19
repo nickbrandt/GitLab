@@ -797,61 +797,6 @@ describe Geo::LfsObjectRegistryFinder, :geo do
       end
     end
 
-    describe '#count_synced_missing_on_primary' do
-      it 'counts LFS objects that have been synced and are missing on the primary' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 1
-      end
-
-      it 'excludes LFS objects that are not missing on the primary' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 1
-      end
-
-      it 'excludes LFS objects that are not synced' do
-        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id, missing_on_primary: true)
-        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 1
-      end
-
-      it 'ignores remote LFS objects' do
-        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
-
-        expect(subject.count_synced_missing_on_primary).to eq 0
-      end
-
-      context 'with selective sync by namespace' do
-        before do
-          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
-
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
-          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
-          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
-
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'counts LFS objects that has been synced' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 2
-        end
-
-        it 'ignores remote LFS objects' do
-          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
-          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
-
-          expect(subject.count_synced_missing_on_primary).to eq 1
-        end
-      end
-    end
-
     include_examples 'finds all the things'
   end
 end

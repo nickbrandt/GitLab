@@ -24,14 +24,6 @@ module Geo
       )
     end
 
-    def lfs_objects_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::FileRegistry.lfs_objects.synced.missing_on_primary.pluck_file_key,
-        LfsObject
-      )
-    end
-
     def registries_for_lfs_objects
       return Geo::FileRegistry.lfs_objects unless selective_sync?
 
