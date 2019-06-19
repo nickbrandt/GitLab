@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import * as types from './mutation_types';
 
 export default {
@@ -6,7 +7,12 @@ export default {
     state.configLoading = true;
   },
   [types.RECEIVE_CONFIG_SUCCESS](state, data) {
-    state.configData = data;
+    const validConfig = _.pick(
+      data,
+      Object.keys(data).filter(key => data[key].title && data[key].charts),
+    );
+
+    state.configData = validConfig;
     state.configLoading = false;
   },
   [types.RECEIVE_CONFIG_ERROR](state) {
