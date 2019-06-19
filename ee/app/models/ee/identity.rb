@@ -9,6 +9,8 @@ module EE
 
       validates :name_id, presence: true, if: :saml_provider
 
+      validates :saml_provider_id, presence: true, if: :group_saml?
+
       validates :secondary_extern_uid,
         allow_blank: true,
         uniqueness: {
@@ -24,6 +26,10 @@ module EE
 
       def name_id
         extern_uid
+      end
+
+      def group_saml?
+        provider.to_s == "group_saml"
       end
     end
 

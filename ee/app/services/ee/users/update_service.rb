@@ -5,6 +5,16 @@ module EE
     module UpdateService
       extend ::Gitlab::Utils::Override
       include EE::Audit::Changes # rubocop: disable Cop/InjectEnterpriseEditionModule
+      include ::Gitlab::Utils::StrongMemoize
+
+      attr_reader :group_id_for_saml
+
+      override :initialize
+      def initialize(current_user, params = {})
+        super
+        @group_id_for_saml = params.delete(:group_id_for_saml)
+        @params = params.dup
+      end
 
       private
 
@@ -21,10 +31,35 @@ module EE
         @user
       end
 
+      override :identity_params
+      def identity_params
+        if group_id_for_saml.present?
+          super.merge(saml_provider_id: saml_provider_id)
+        else
+          super
+        end
+      end
+
+      override :identity_attributes
+      def identity_attributes
+        super.push(:saml_provider_id)
+      end
+
       override :assign_attributes
       def assign_attributes
         params.reject! { |key, _| SamlProvider::USER_ATTRIBUTES_LOCKED_FOR_MANAGED_ACCOUNTS.include?(key.to_sym) } if model.group_managed_account?
         super
+      end
+
+      def saml_provider_id
+        strong_memoize(:saml_provider_id) do
+          if group_id_for_saml.present?
+            group = GroupFinder.new(current_user).execute(id: group_id_for_saml)
+            group&.saml_provider&.id
+          else
+            nil
+          end
+        end
       end
     end
   end

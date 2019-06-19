@@ -5,11 +5,13 @@ module EE
     module Helpers
       module UsersHelpers
         extend ActiveSupport::Concern
+        extend ::Gitlab::Utils::Override
 
         prepended do
           params :optional_params_ee do
             optional :shared_runners_minutes_limit, type: Integer, desc: 'Pipeline minutes quota for this user'
             optional :extra_shared_runners_minutes_limit, type: Integer, desc: '(admin-only) Extra pipeline minutes quota for this user'
+            optional :group_id_for_saml, type: Integer, desc: 'ID for group where SAML has been configured'
           end
 
           params :optional_index_params_ee do
