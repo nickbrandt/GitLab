@@ -108,14 +108,10 @@ module Geo
     end
 
     def registries_for_job_artifacts
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.registries_for_job_artifacts
-      else
-        fdw_geo_node
-          .job_artifacts
-          .inner_join_job_artifact_registry
-          .syncable
-      end
+      fdw_geo_node
+        .job_artifacts
+        .inner_join_job_artifact_registry
+        .syncable
     end
 
     def job_artifacts_unsynced(except_artifact_ids:)

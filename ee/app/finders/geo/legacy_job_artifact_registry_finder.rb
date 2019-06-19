@@ -25,16 +25,5 @@ module Geo
         Ci::JobArtifact
       )
     end
-
-    def registries_for_job_artifacts
-      return Geo::JobArtifactRegistry.all unless selective_sync?
-
-      legacy_inner_join_registry_ids(
-        Geo::JobArtifactRegistry.all,
-        current_node.job_artifacts.pluck_primary_key,
-        Geo::JobArtifactRegistry,
-        foreign_key: :artifact_id
-      )
-    end
   end
 end
