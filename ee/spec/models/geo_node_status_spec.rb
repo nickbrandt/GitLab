@@ -122,6 +122,12 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#projects_count' do
+    it 'counts the number of projects' do
+      expect(subject.projects_count).to eq 4
+    end
+  end
+
   describe '#attachments_synced_count' do
     it 'only counts successful syncs' do
       create_list(:user, 3, avatar: fixture_file_upload('spec/fixtures/dk.png', 'image/png'))
@@ -997,12 +1003,6 @@ describe GeoNodeStatus, :geo, :geo_fdw do
         stub_current_geo_node(primary)
       end
 
-      it 'does not call ProjectRegistryFinder#count_projects' do
-        expect_any_instance_of(Geo::ProjectRegistryFinder).not_to receive(:count_projects)
-
-        subject
-      end
-
       it 'does not call LfsObjectRegistryFinder#count_syncable' do
         expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:count_syncable)
 
@@ -1023,12 +1023,6 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     context 'on the secondary' do
-      it 'calls ProjectRegistryFinder#count_projects' do
-        expect_any_instance_of(Geo::ProjectRegistryFinder).to receive(:count_projects)
-
-        subject
-      end
-
       it 'calls LfsObjectRegistryFinder#count_syncable' do
         expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
 

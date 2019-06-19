@@ -49,24 +49,21 @@ module API
         use :pagination
       end
       get '/current/failures' do
-        geo_node = Gitlab::Geo.current_node
+        not_found!('Geo node not found') unless Gitlab::Geo.current_node
+        forbidden!('Failures can only be requested from a secondary node') unless Gitlab::Geo.current_node.secondary?
 
-        forbidden!('Failures can only be requested from a secondary node') unless geo_node.secondary?
+        finder_klass = case params[:failure_type]
+                       when 'sync'
+                         ::Geo::ProjectRegistrySyncFailedFinder
+                       when 'verification'
+                         ::Geo::ProjectRegistryVerificationFailedFinder
+                       when 'checksum_mismatch'
+                         ::Geo::ProjectRegistryMismatchFinder
+                       else
+                         not_found!('Failure type unknown')
+                       end
 
-        not_found!('Geo node not found') unless geo_node
-
-        finder = ::Geo::ProjectRegistryFinder.new(current_node: geo_node)
-
-        project_registries = case params[:failure_type]
-                             when 'sync'
-                               finder.find_failed_project_registries(params[:type])
-                             when 'verification'
-                               finder.find_verification_failed_project_registries(params[:type])
-                             when 'checksum_mismatch'
-                               finder.find_checksum_mismatch_project_registries(params[:type])
-                             else
-                               not_found!('Failure type unknown')
-                             end
+        project_registries = finder_klass.new(current_node: Gitlab::Geo.current_node, type: params[:type]).execute
 
         present paginate(project_registries), with: ::GeoProjectRegistryEntity
       end
