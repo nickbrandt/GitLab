@@ -47,14 +47,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      relation =
-        if use_legacy_queries_for_selective_sync?
-          legacy_finder.lfs_objects_migrated_local(except_file_ids: except_file_ids)
-        else
-          lfs_objects_migrated_local(except_file_ids: except_file_ids)
-        end
-
-      relation.limit(batch_size)
+      lfs_objects_migrated_local(except_file_ids: except_file_ids).limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
