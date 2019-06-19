@@ -12,3 +12,5 @@ module ClusterableActions
     !subject.clusters.empty?
   end
 end
+
+ClusterableActions.prepend(EE::ClusterableActions)
