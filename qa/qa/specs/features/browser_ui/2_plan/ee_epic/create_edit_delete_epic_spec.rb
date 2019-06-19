@@ -35,7 +35,7 @@ module QA
       end
 
       it 'adds/removes issue to/from epic' do
-        create_issue_and_epic_resource
+        create_issue_and_epic_resources
         visit_first_epic_page
 
         EE::Page::Group::Epic::Show.perform do |show_page|
@@ -48,7 +48,7 @@ module QA
       end
 
       it 'comments on epic' do
-        create_issue_and_epic_resource
+        create_issue_and_epic_resources
         visit_first_epic_page
 
         comment = 'My Epic Comment'
@@ -60,7 +60,7 @@ module QA
       end
 
       it 'closes and reopens an epic' do
-        create_issue_and_epic_resource
+        create_issue_and_epic_resources
         visit_first_epic_page
 
         EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
@@ -73,7 +73,7 @@ module QA
       end
 
       it 'adds/removes issue to/from epic using quick actions' do
-        create_issue_and_epic_resource
+        create_issue_and_epic_resources
 
         @issue.visit!
 
@@ -90,7 +90,7 @@ module QA
         expect(page).to have_content('removed issue')
       end
 
-      def create_issue_and_epic_resource
+      def create_issue_and_epic_resources
         @issue = Resource::Issue.fabricate_via_api! do |issue|
           issue.title = 'Issue created via API'
           issue.labels = []
