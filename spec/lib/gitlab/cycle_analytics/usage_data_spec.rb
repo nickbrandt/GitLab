@@ -31,10 +31,9 @@ describe Gitlab::CycleAnalytics::UsageData do
     shared_examples 'a valid usage data result' do
       it 'returns the aggregated usage data of every selected project' do
         result = subject.to_json
-
         expect(result).to have_key(:avg_cycle_analytics)
 
-        CycleAnalytics::STAGES.each do |stage|
+        CycleAnalytics::Base::STAGES.each do |stage|
           expect(result[:avg_cycle_analytics]).to have_key(stage)
 
           stage_values    = result[:avg_cycle_analytics][stage]

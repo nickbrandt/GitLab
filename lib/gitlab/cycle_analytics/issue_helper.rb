@@ -5,6 +5,7 @@ module Gitlab
     module IssueHelper
       def stage_query(project_ids)
         query = issue_table.join(issue_metrics_table).on(issue_table[:id].eq(issue_metrics_table[:issue_id]))
+          .join(projects_table).on(issue_table[:project_id].eq(projects_table[:id]))
           .project(issue_table[:project_id].as("project_id"))
           .where(issue_table[:project_id].in(project_ids))
           .where(issue_table[:created_at].gteq(@options[:from])) # rubocop:disable Gitlab/ModuleWithInstanceVariables

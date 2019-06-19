@@ -31,6 +31,10 @@ module Gitlab
         Issue::Metrics.arel_table
       end
 
+      def projects_table
+        Project.arel_table
+      end
+
       def user_table
         User.arel_table
       end

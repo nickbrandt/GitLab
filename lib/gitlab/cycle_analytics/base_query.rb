@@ -10,12 +10,13 @@ module Gitlab
       private
 
       def base_query
-        @base_query ||= stage_query(@project.id) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        @base_query ||= stage_query(projects.map(&:id))
       end
 
       def stage_query(project_ids)
         query = mr_closing_issues_table.join(issue_table).on(issue_table[:id].eq(mr_closing_issues_table[:issue_id]))
           .join(issue_metrics_table).on(issue_table[:id].eq(issue_metrics_table[:issue_id]))
+          .join(projects_table).on(issue_table[:project_id].eq(projects_table[:id]))
           .project(issue_table[:project_id].as("project_id"))
           .where(issue_table[:project_id].in(project_ids))
           .where(issue_table[:created_at].gteq(@options[:from])) # rubocop:disable Gitlab/ModuleWithInstanceVariables
