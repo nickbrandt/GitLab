@@ -80,7 +80,11 @@ module QA
         Page::Project::Issue::Show.perform do |show_page|
           show_page.wait_for_related_issues_to_load
           show_page.comment("/epic #{@epic_web_url}")
+
+          expect(show_page).to have_content('added to epic')
+
           show_page.comment("/remove_epic")
+
           expect(show_page).to have_content('removed from epic')
         end
 
