@@ -34,6 +34,7 @@ export default {
   },
   computed: {
     copyString() {
+      /* eslint-disable no-useless-escape */
       return {
         script: `<script defer
   data-project-id='${this.appMetadata.sourceProjectId}'
@@ -41,9 +42,9 @@ export default {
   data-merge-request-id='${this.appMetadata.mergeRequestId}'
   data-mr-url='${this.appMetadata.appUrl}'
   id='review-app-toolbar-script'
-  src='https://gitlab.com/assets/webpack/visual_review_toolbar.js'
-/>`,
+  src='https://gitlab.com/assets/webpack/visual_review_toolbar.js'><\/script>`,
       };
+      /* eslint-enable no-useless-escape */
     },
     instructionText() {
       return {
