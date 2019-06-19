@@ -40,12 +40,31 @@ describe ProjectWiki, :elastic do
     project.wiki.index_wiki_blobs
   end
 
-  it 'indexes inside Rails if experiemntal indexer is not enabled' do
+  it 'indexes inside Rails if experimental indexer is not enabled' do
     stub_ee_application_setting(elasticsearch_experimental_indexer: false)
 
     expect(project.wiki).to receive(:index_blobs)
     expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
 
     project.wiki.index_wiki_blobs
+  end
+
+  it 'can delete wiki pages' do
+    expect(project.wiki.search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
+
+    Sidekiq::Testing.inline! do
+      project.wiki.find_page('omega_page').delete
+      last_commit = project.wiki.repository.commit.sha
+
+      expect_next_instance_of(Gitlab::Elastic::Indexer) do |indexer|
+        expect(indexer).to receive(:run).with(last_commit).and_call_original
+      end
+
+      project.wiki.index_wiki_blobs(last_commit)
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    expect(project.wiki.search('term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(0)
   end
 end

@@ -3,8 +3,10 @@ require 'spec_helper'
 
 describe PostReceive do
   let(:changes) { "123456 789012 refs/heads/tést\n654321 210987 refs/tags/tag" }
+  let(:changes_with_master) { "#{changes}\n423423 797823 refs/heads/master" }
   let(:wrongly_encoded_changes) { changes.encode("ISO-8859-1").force_encoding("UTF-8") }
   let(:base64_changes) { Base64.encode64(wrongly_encoded_changes) }
+  let(:base64_changes_with_master) { Base64.encode64(changes_with_master) }
   let(:gl_repository) { "project-#{project.id}" }
   let(:key) { create(:key, user: project.owner) }
   let(:key_id) { key.shell_id }
@@ -69,10 +71,18 @@ describe PostReceive do
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
 
-    it 'triggers wiki index update when ElasticSearch is enabled', :elastic do
+    it 'triggers wiki index update when ElasticSearch is enabled and pushed to master', :elastic do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
 
       expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
+
+      described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
+    end
+
+    it 'does not trigger wiki index update when Elasticsearch is enabled and not pushed to master', :elastic do
+      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+
+      expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
 
       described_class.new.perform(gl_repository, key_id, base64_changes)
     end
@@ -90,7 +100,7 @@ describe PostReceive do
         it 'does not trigger wiki index update' do
           expect_any_instance_of(ProjectWiki).not_to receive(:index_wiki_blobs)
 
-          described_class.new.perform(gl_repository, key_id, base64_changes)
+          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
         end
       end
 
@@ -102,23 +112,25 @@ describe PostReceive do
         it 'triggers wiki index update' do
           expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
 
-          described_class.new.perform(gl_repository, key_id, base64_changes)
+          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
         end
       end
 
       context 'when a group is enabled' do
+        let(:user) { create(:user) }
         let(:group) { create(:group) }
         let(:project) { create(:project, :wiki_repo, group: group) }
-        let(:key) { create(:key, user: group.owner) }
+        let(:key) { create(:key, user: user) }
 
         before do
           create :elasticsearch_indexed_namespace, namespace: group
+          group.add_owner(user)
         end
 
         it 'triggers wiki index update' do
           expect_any_instance_of(ProjectWiki).to receive(:index_wiki_blobs)
 
-          described_class.new.perform(gl_repository, key_id, base64_changes)
+          described_class.new.perform(gl_repository, key_id, base64_changes_with_master)
         end
       end
     end

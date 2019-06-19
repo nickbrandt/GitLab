@@ -32,6 +32,7 @@ describe 'Project elastic search', :js, :elastic do
 
     it 'finds wiki pages' do
       project.wiki.create_page('test.md', 'Test searching for a wiki page')
+      project.wiki.index_wiki_blobs
 
       expect_search_result(scope: 'Wiki', term: 'Test', result: 'Test searching for a wiki page')
     end

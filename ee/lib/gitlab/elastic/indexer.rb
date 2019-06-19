@@ -42,7 +42,7 @@ module Gitlab
         end
 
         # Use the eager-loaded association if available.
-        @index_status = project.index_status unless wiki?
+        @index_status = project.index_status
       end
 
       def run(to_sha = nil)
@@ -51,12 +51,12 @@ module Gitlab
         head_commit = repository.try(:commit)
 
         if repository.nil? || !repository.exists? || repository.empty? || head_commit.nil?
-          update_index_status(Gitlab::Git::BLANK_SHA) unless wiki?
+          update_index_status(Gitlab::Git::BLANK_SHA)
           return
         end
 
         run_indexer!(to_sha)
-        update_index_status(to_sha) unless wiki?
+        update_index_status(to_sha)
 
         true
       end
@@ -96,11 +96,12 @@ module Gitlab
           repository.delete_index_for_commits_and_blobs
         end
 
-        command = if wiki?
-                    [path_to_indexer, "--blob-type=wiki_blob", "--skip-commits", project.id.to_s, repository_path]
-                  else
-                    [path_to_indexer, project.id.to_s, repository_path]
-                  end
+        command =
+          if wiki?
+            [path_to_indexer, "--blob-type=wiki_blob", "--skip-commits", project.id.to_s, repository_path]
+          else
+            [path_to_indexer, project.id.to_s, repository_path]
+          end
 
         vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
 
@@ -110,7 +111,11 @@ module Gitlab
       end
 
       def last_commit
-        index_status&.last_commit
+        if wiki?
+          index_status&.last_wiki_commit
+        else
+          index_status&.last_commit
+        end
       end
 
       def from_sha
@@ -150,7 +155,15 @@ module Gitlab
 
         sha = head_commit.try(:sha)
         sha ||= Gitlab::Git::BLANK_SHA
-        @index_status.update(last_commit: sha, indexed_at: Time.now)
+
+        attributes =
+          if wiki?
+            { last_wiki_commit: sha, wiki_indexed_at: Time.now }
+          else
+            { last_commit: sha, indexed_at: Time.now }
+          end
+
+        @index_status.update(attributes)
         project.reload_index_status
       end
       # rubocop: enable CodeReuse/ActiveRecord
