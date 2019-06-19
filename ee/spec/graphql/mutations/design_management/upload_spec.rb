@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe Mutations::DesignManagement::Upload do
+  include DesignManagementTestHelpers
+
   let(:issue) { create(:issue) }
   let(:user) { issue.author }
   let(:project) { issue.project }
@@ -24,16 +26,12 @@ describe Mutations::DesignManagement::Upload do
     end
 
     context "when the feature is not available" do
-      before do
-        stub_licensed_features(design_management: false)
-      end
-
       it_behaves_like "resource not available"
     end
 
     context "when the feature is available" do
       before do
-        stub_licensed_features(design_management: true)
+        enable_design_management
       end
 
       context "when the user is not allowed to upload designs" do

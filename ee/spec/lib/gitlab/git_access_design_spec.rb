@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe Gitlab::GitAccessDesign do
+  include DesignManagementTestHelpers
+
   set(:project) { create(:project) }
   set(:user) { project.owner }
   let(:protocol) { 'web' }
@@ -14,8 +16,7 @@ describe Gitlab::GitAccessDesign do
     subject { access.check('git-receive-pack', ::Gitlab::GitAccess::ANY) }
 
     before do
-      stub_licensed_features(design_management: true)
-      stub_feature_flags(design_managment: true)
+      enable_design_management
     end
 
     context "when the user is allowed to manage designs" do

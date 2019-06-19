@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 describe 'User views issue designs', :js do
+  include DesignManagementTestHelpers
+
   let(:project) { create(:project_empty_repo, :public) }
   let(:issue) { create(:issue, project: project) }
 
   before do
-    create(:design, :with_file, issue: issue, filename: 'world.png')
+    enable_design_management
 
-    stub_licensed_features(design_management: true)
+    create(:design, :with_file, issue: issue, filename: 'world.png')
 
     visit project_issue_path(project, issue)
 

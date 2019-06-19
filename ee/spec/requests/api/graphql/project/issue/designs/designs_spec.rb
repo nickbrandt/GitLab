@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe "Getting designs related to an issue" do
   include GraphqlHelpers
+  include DesignManagementTestHelpers
 
   set(:design) { create(:design) }
   set(:current_user) { design.project.owner }
@@ -65,8 +66,7 @@ describe "Getting designs related to an issue" do
 
   context "when the feature is available" do
     before do
-      stub_licensed_features(design_management: true)
-      stub_feature_flags(deesign_managment: true)
+      enable_design_management
     end
 
     it "returns the design filename" do

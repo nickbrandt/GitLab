@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe 'Getting designs related to an issue' do
   include GraphqlHelpers
+  include DesignManagementTestHelpers
 
   set(:project) { create(:project, :public) }
   set(:issue) { create(:issue, project: project) }
@@ -12,8 +13,7 @@ describe 'Getting designs related to an issue' do
   set(:note) { create(:diff_note_on_design, noteable: design, project: project) }
 
   before do
-    stub_licensed_features(design_management: true)
-    stub_feature_flags(design_managment: true)
+    enable_design_management
 
     note
   end

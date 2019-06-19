@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe 'User design permissions', :js do
+  include DesignManagementTestHelpers
+
   let(:project) { create(:project_empty_repo, :public) }
   let(:issue) { create(:issue, project: project) }
 
   before do
-    stub_licensed_features(design_management: true)
+    enable_design_management
 
     visit project_issue_path(project, issue)
 
