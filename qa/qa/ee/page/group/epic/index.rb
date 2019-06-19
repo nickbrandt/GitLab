@@ -36,7 +36,7 @@ module QA
             # This is a workaround to get the URL of the first epic
             # since this attribute is not exposed by the API.
             # See https://gitlab.com/gitlab-org/gitlab-ee/issues/11241.
-            def web_url
+            def web_url_of_first_epic
               page.all('.qa-epic-title-text a').first[:href]
             end
           end

@@ -106,7 +106,7 @@ module QA
         page.visit "#{@issue.project.group.web_url}/-/epics/"
 
         EE::Page::Group::Epic::Index.perform do |epic_index_page|
-          @epic_web_url = epic_index_page.web_url
+          @epic_web_url = epic_index_page.web_url_of_first_epic
           epic_index_page.click_first_epic
         end
       end
