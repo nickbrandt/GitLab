@@ -6,14 +6,6 @@ module Geo
       current_node.job_artifacts.syncable
     end
 
-    def job_artifacts_synced_missing_on_primary
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::JobArtifactRegistry.synced.missing_on_primary.pluck_artifact_key,
-        Ci::JobArtifact
-      )
-    end
-
     def job_artifacts_unsynced(except_artifact_ids: [])
       registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key | except_artifact_ids
 

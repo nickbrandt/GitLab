@@ -7,15 +7,21 @@ module Geo
     end
 
     def count_synced
-      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced).count
+      registries_for_job_artifacts
+        .merge(Geo::JobArtifactRegistry.synced)
+        .count
     end
 
     def count_failed
-      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.failed).count
+      registries_for_job_artifacts
+        .merge(Geo::JobArtifactRegistry.failed)
+        .count
     end
 
     def count_synced_missing_on_primary
-      job_artifacts_synced_missing_on_primary.count
+      registries_for_job_artifacts
+        .merge(Geo::JobArtifactRegistry.synced.missing_on_primary)
+        .count
     end
 
     def count_registry
@@ -109,14 +115,6 @@ module Geo
           .job_artifacts
           .inner_join_job_artifact_registry
           .syncable
-      end
-    end
-
-    def job_artifacts_synced_missing_on_primary
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.job_artifacts_synced_missing_on_primary
-      else
-        registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced.missing_on_primary)
       end
     end
 
