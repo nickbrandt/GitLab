@@ -83,8 +83,8 @@ module QA
 
         page.visit @epic_web_url
 
-        expect(page).to have_content('added issue', count: 2)
-        expect(page).to have_content('removed issue', count: 2)
+        expect(page).to have_content('added issue')
+        expect(page).to have_content('removed issue')
       end
 
       def create_resources_and_visit_epic_page
