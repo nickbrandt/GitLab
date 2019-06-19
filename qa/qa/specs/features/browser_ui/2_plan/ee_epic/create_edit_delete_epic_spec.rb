@@ -101,7 +101,7 @@ module QA
         end
 
         @epic = EE::Resource::Epic.fabricate_via_api! do |epic|
-          epic.group = @issue.project.group.id
+          epic.group = @issue.project.group
           epic.title = 'Epic created via API'
         end
       end

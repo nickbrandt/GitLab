@@ -34,11 +34,11 @@ module QA
         end
 
         def api_get_path
-          "/groups/#{group}/epics/#{id}"
+          "/groups/#{group.id}/epics/#{id}"
         end
 
         def api_post_path
-          "/groups/#{group}/epics"
+          "/groups/#{group.id}/epics"
         end
 
         def api_post_body
