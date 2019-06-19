@@ -47,7 +47,7 @@ module QA
         end
       end
 
-      it 'comments on epic' do
+      it 'comments on epic', :quarantine do
         create_issue_and_epic_resources
         visit_first_epic_page
 
@@ -72,7 +72,7 @@ module QA
         expect(page).to have_content('Open')
       end
 
-      it 'adds/removes issue to/from epic using quick actions' do
+      it 'adds/removes issue to/from epic using quick actions', :quarantine do
         create_issue_and_epic_resources
 
         @issue.visit!
