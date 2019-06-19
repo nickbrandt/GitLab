@@ -2,9 +2,10 @@ require 'spec_helper'
 
 describe Resolvers::DesignManagement::VersionResolver do
   include GraphqlHelpers
+  include DesignManagementTestHelpers
 
   before do
-    stub_licensed_features(design_management: true)
+    enable_design_management
   end
 
   describe "#resolve" do

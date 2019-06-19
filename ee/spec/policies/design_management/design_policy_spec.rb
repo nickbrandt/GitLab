@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe DesignManagement::DesignPolicy do
+  include DesignManagementTestHelpers
+
   include_context 'ProjectPolicy context'
 
   let(:guest_design_abilities) { %i[read_design] }
@@ -96,6 +98,7 @@ describe DesignManagement::DesignPolicy do
     before do
       stub_licensed_features(design_management: true)
       stub_feature_flags(design_management: false)
+      allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
     end
 
     it_behaves_like "design abilities not available"
@@ -105,6 +108,17 @@ describe DesignManagement::DesignPolicy do
     before do
       stub_licensed_features(design_management: false)
       stub_feature_flags(design_management: true)
+      allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
+    end
+
+    it_behaves_like "design abilities not available"
+  end
+
+  context "when LFS is not enabled" do
+    before do
+      stub_licensed_features(design_management: true)
+      stub_feature_flags(design_management: true)
+      allow(Gitlab.config.lfs).to receive(:enabled).and_return(false)
     end
 
     it_behaves_like "design abilities not available"
@@ -112,8 +126,7 @@ describe DesignManagement::DesignPolicy do
 
   context "when the feature is available" do
     before do
-      stub_licensed_features(design_management: true)
-      stub_feature_flags(design_management: true)
+      enable_design_management
     end
 
     it_behaves_like "design abilities available for members"

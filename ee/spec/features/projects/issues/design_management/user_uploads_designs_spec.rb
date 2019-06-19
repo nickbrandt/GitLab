@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'User uploads new design', :js do
+  include DesignManagementTestHelpers
+
   let(:user) { project.owner }
   let(:project) { create(:project_empty_repo, :public) }
   let(:issue) { create(:issue, project: project) }
@@ -11,7 +13,7 @@ describe 'User uploads new design', :js do
 
   context "when the feature is available" do
     before do
-      stub_licensed_features(design_management: true)
+      enable_design_management
 
       visit project_issue_path(project, issue)
 
@@ -33,8 +35,6 @@ describe 'User uploads new design', :js do
 
   context 'when the feature is not available' do
     before do
-      stub_licensed_features(design_management: false)
-
       visit project_issue_path(project, issue)
     end
 

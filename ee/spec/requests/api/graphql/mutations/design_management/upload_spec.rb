@@ -3,6 +3,7 @@ require "spec_helper"
 
 describe "uploading designs" do
   include GraphqlHelpers
+  include DesignManagementTestHelpers
 
   let(:current_user) { create(:user) }
   let(:issue) { create(:issue) }
@@ -22,8 +23,7 @@ describe "uploading designs" do
   let(:mutation_response) { graphql_mutation_response(:design_management_upload) }
 
   before do
-    stub_feature_flags(design_mangement: true)
-    stub_licensed_features(design_management: true)
+    enable_design_management
 
     project.add_developer(current_user)
   end

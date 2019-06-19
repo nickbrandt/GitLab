@@ -1,14 +1,16 @@
 require 'spec_helper'
 
 describe 'User paginates issue designs', :js do
+  include DesignManagementTestHelpers
+
   let(:project) { create(:project_empty_repo, :public) }
   let(:issue) { create(:issue, project: project) }
 
   before do
+    enable_design_management
+
     create(:design, :with_file, issue: issue, filename: 'world.png')
     create(:design, :with_file, issue: issue, filename: 'dk.png')
-
-    stub_licensed_features(design_management: true)
 
     visit project_issue_path(project, issue)
 
