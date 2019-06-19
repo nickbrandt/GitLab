@@ -31,6 +31,27 @@ describe Geo::LfsObjectRegistryFinder, :geo do
     stub_lfs_object_storage
   end
 
+  shared_examples_for 'a file registry finder' do
+    it 'responds to file registry finder methods' do
+      file_registry_finder_methods = %i{
+        syncable
+        count_syncable
+        count_synced
+        count_failed
+        count_synced_missing_on_primary
+        count_registry
+        find_unsynced
+        find_migrated_local
+        find_retryable_failed_registries
+        find_retryable_synced_missing_on_primary_registries
+      }
+
+      file_registry_finder_methods.each do |method|
+        expect(subject).to respond_to(method)
+      end
+    end
+  end
+
   shared_examples 'counts all the things' do
     describe '#count_syncable' do
       before do
@@ -642,5 +663,277 @@ describe Geo::LfsObjectRegistryFinder, :geo do
     end
   end
 
-  it_behaves_like 'a file registry finder'
+  context 'FDW', :geo_fdw do
+    context 'with use_fdw_queries_for_selective_sync disabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: false)
+      end
+
+      include_examples 'counts all the things'
+      include_examples 'finds all the things'
+    end
+
+    context 'with use_fdw_queries_for_selective_sync enabled' do
+      before do
+        stub_feature_flags(use_fdw_queries_for_selective_sync: true)
+      end
+
+      include_examples 'counts all the things'
+      include_examples 'finds all the things'
+    end
+  end
+
+  context 'Legacy' do
+    before do
+      stub_fdw_disabled
+    end
+
+    describe '#count_syncable' do
+      before do
+        allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+        create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+        create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+        create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
+        create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
+      end
+
+      it 'counts LFS objects' do
+        expect(subject.count_syncable).to eq 5
+      end
+
+      it 'ignores remote LFS objects' do
+        lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+        expect(subject.count_syncable).to eq 4
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts LFS objects' do
+          expect(subject.count_syncable).to eq 2
+        end
+
+        it 'ignores remote LFS objects' do
+          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts LFS objects' do
+          expect(subject.count_syncable).to eq 2
+        end
+
+        it 'ignores remote LFS objects' do
+          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 1
+        end
+      end
+    end
+
+    describe '#count_registry' do
+      it 'counts file registries for LFS objects' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
+        create(:geo_file_registry, :avatar)
+
+        expect(subject.count_registry).to eq 3
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'does not apply the selective sync restriction' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id)
+          create(:geo_file_registry, :avatar)
+
+          expect(subject.count_registry).to eq 3
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project_in_nested_group, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_remote_1)
+
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'does not apply the selective sync restriction' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
+          create(:geo_file_registry, :avatar)
+
+          expect(subject.count_registry).to eq 3
+        end
+      end
+    end
+
+    describe '#count_failed' do
+      it 'counts LFS objects that sync has failed' do
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+
+        expect(subject.count_failed).to eq 2
+      end
+
+      it 'ignores remote LFS objects' do
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_remote_1.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+
+        expect(subject.count_failed).to eq 2
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts LFS objects that sync has failed' do
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+
+          expect(subject.count_failed).to eq 1
+        end
+
+        it 'ignores remote LFS objects' do
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+          lfs_object_1.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_failed).to eq 1
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_4)
+          create(:lfs_objects_project, project: project_broken_storage, lfs_object: lfs_object_5)
+
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts LFS objects that sync has failed' do
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_4.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_5.id)
+
+          expect(subject.count_failed).to eq 1
+        end
+
+        it 'ignores remote LFS objects' do
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_2.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_3.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_4.id)
+          create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_5.id)
+          lfs_object_5.update_column(:file_store, ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_failed).to eq 1
+        end
+      end
+    end
+
+    describe '#count_synced_missing_on_primary' do
+      it 'counts LFS objects that have been synced and are missing on the primary' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, missing_on_primary: true)
+
+        expect(subject.count_synced_missing_on_primary).to eq 1
+      end
+
+      it 'excludes LFS objects that are not missing on the primary' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
+
+        expect(subject.count_synced_missing_on_primary).to eq 1
+      end
+
+      it 'excludes LFS objects that are not synced' do
+        create(:geo_file_registry, :lfs, :failed, file_id: lfs_object_1.id, missing_on_primary: true)
+        create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
+
+        expect(subject.count_synced_missing_on_primary).to eq 1
+      end
+
+      it 'ignores remote LFS objects' do
+        create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
+
+        expect(subject.count_synced_missing_on_primary).to eq 0
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
+
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_1)
+          create(:lfs_objects_project, project: synced_project, lfs_object: lfs_object_2)
+          create(:lfs_objects_project, project: unsynced_project, lfs_object: lfs_object_3)
+
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts LFS objects that has been synced' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_1.id, missing_on_primary: true)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_3.id, missing_on_primary: true)
+
+          expect(subject.count_synced_missing_on_primary).to eq 2
+        end
+
+        it 'ignores remote LFS objects' do
+          create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id, missing_on_primary: true)
+          create(:geo_file_registry, :lfs, file_id: lfs_object_2.id, missing_on_primary: true)
+
+          expect(subject.count_synced_missing_on_primary).to eq 1
+        end
+      end
+    end
+
+    include_examples 'finds all the things'
+  end
 end

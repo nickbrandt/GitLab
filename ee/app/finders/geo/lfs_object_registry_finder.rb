@@ -110,11 +110,7 @@ module Geo
     end
 
     def lfs_objects_synced
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.lfs_objects_synced
-      else
-        fdw_geo_node.lfs_objects.synced
-      end
+      fdw_geo_node.lfs_objects.synced
     end
 
     def lfs_objects_failed
