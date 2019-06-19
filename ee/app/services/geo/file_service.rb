@@ -9,6 +9,7 @@ module Geo
 
     DEFAULT_OBJECT_TYPES = %i[attachment avatar file import_export namespace_file personal_file favicon].freeze
     DEFAULT_SERVICE_TYPE = :file
+    UPLOAD_OBJECT_TYPE = :file
 
     def initialize(object_type, object_db_id)
       @object_type = object_type.to_sym

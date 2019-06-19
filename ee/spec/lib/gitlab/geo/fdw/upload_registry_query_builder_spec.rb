@@ -12,14 +12,8 @@ describe Gitlab::Geo::Fdw::UploadRegistryQueryBuilder, :geo, :geo_fdw do
   let!(:file_registry_3) { create(:geo_file_registry, file_id: upload_3.id) }
 
   describe '#for_model' do
-    it 'returns registries that upload belong to the model' do
-      expect(subject.for_model(project)).to match_ids(file_registry_1, file_registry_2)
-    end
-  end
-
-  describe '#with_type' do
-    it 'returns registries filtered by file_type' do
-      expect(subject.with_type('file')).to match_ids(file_registry_1, file_registry_3)
+    it 'returns registries for uploads that belong to the model' do
+      expect(subject.for_model(project)).to match_ids(file_registry_1)
     end
   end
 end

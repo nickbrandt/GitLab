@@ -13,10 +13,10 @@ module Geo
       scope :syncable, -> { with_files_stored_locally }
 
       class << self
-        def for_model_with_type(model, type)
+        def for_model(model)
           inner_join_file_registry
             .where(model_id: model.id, model_type: model.class.name)
-            .merge(Geo::FileRegistry.with_file_type(type))
+            .merge(Geo::FileRegistry.uploads)
         end
 
         def inner_join_file_registry

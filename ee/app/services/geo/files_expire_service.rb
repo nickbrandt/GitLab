@@ -5,7 +5,6 @@ module Geo
     include ::Gitlab::Geo::LogHelpers
 
     BATCH_SIZE = 500
-    UPLOAD_TYPE = 'file'
 
     attr_reader :project, :old_full_path
 
@@ -26,7 +25,7 @@ module Geo
     def execute
       return unless Gitlab::Geo.secondary?
 
-      uploads = Geo::Fdw::Upload.for_model_with_type(project, UPLOAD_TYPE)
+      uploads = Geo::Fdw::Upload.for_model(project)
       log_info("Expiring replicated attachments after project rename", count: uploads.count)
 
       schedule_file_removal(uploads)
@@ -61,7 +60,6 @@ module Geo
     def mark_for_resync!
       Gitlab::Geo::Fdw::UploadRegistryQueryBuilder.new
         .for_model(project)
-        .with_type(UPLOAD_TYPE)
         .delete_all
     end
 
