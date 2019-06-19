@@ -2,29 +2,33 @@
 
 module Geo
   class LfsObjectRegistryFinder < FileRegistryFinder
-    def count_syncable
-      syncable.count
-    end
-
-    def count_synced
-      lfs_objects_synced.count
-    end
-
-    def count_failed
-      lfs_objects_failed.count
-    end
-
-    def count_synced_missing_on_primary
-      lfs_objects_synced_missing_on_primary.count
+    def initialize(current_node:)
+      @current_node = Geo::Fdw::GeoNode.find(current_node.id)
     end
 
     def count_registry
       Geo::FileRegistry.lfs_objects.count
     end
 
+    def count_syncable
+      syncable.count
+    end
+
+    def count_synced
+      lfs_objects.synced.count
+    end
+
+    def count_failed
+      lfs_objects.failed.count
+    end
+
+    def count_synced_missing_on_primary
+      lfs_objects.synced.missing_on_primary.count
+    end
+
     def syncable
       if selective_sync?
-        fdw_geo_node.lfs_objects.syncable
+        current_node.lfs_objects.syncable
       else
         LfsObject.syncable
       end
@@ -39,13 +43,22 @@ module Geo
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      lfs_objects_unsynced(except_file_ids: except_file_ids).limit(batch_size)
+      current_node
+        .lfs_objects
+        .syncable
+        .missing_file_registry
+        .id_not_in(except_file_ids)
+        .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      lfs_objects_migrated_local(except_file_ids: except_file_ids).limit(batch_size)
+      lfs_objects
+        .inner_join_file_registry
+        .with_files_stored_remotely
+        .id_not_in(except_file_ids)
+        .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
@@ -72,40 +85,12 @@ module Geo
 
     private
 
-    def fdw_geo_node
-      @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
+    def lfs_objects
+      current_node.lfs_objects
     end
 
     def registries_for_lfs_objects
-      fdw_geo_node.lfs_object_registries
-    end
-
-    def lfs_objects_synced
-      fdw_geo_node.lfs_objects.synced
-    end
-
-    def lfs_objects_failed
-      fdw_geo_node.lfs_objects.failed
-    end
-
-    def lfs_objects_unsynced(except_file_ids:)
-      fdw_geo_node
-        .lfs_objects
-        .syncable
-        .missing_file_registry
-        .id_not_in(except_file_ids)
-    end
-
-    def lfs_objects_migrated_local(except_file_ids:)
-      fdw_geo_node
-        .lfs_objects
-        .inner_join_file_registry
-        .with_files_stored_remotely
-        .id_not_in(except_file_ids)
-    end
-
-    def lfs_objects_synced_missing_on_primary
-      fdw_geo_node.lfs_objects.synced.missing_on_primary
+      current_node.lfs_object_registries
     end
   end
 end
