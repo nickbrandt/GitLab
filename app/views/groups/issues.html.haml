@@ -1,5 +1,4 @@
-- @project = @group.projects.first
-- @can_bulk_update = can?(current_user, :admin_issue, @project)
+- @can_bulk_update = can?(current_user, :admin_issue, @group)
 
 - page_title "Issues"
 = content_for :meta_tags do
@@ -21,6 +20,6 @@
   = render 'shared/issuable/search_bar', type: :issues
 
   - if @can_bulk_update
-    = render 'shared/issuable/bulk_update_sidebar', type: :issues
+    = render 'shared/issuable/group_bulk_update_sidebar', type: :issues
 
   = render 'shared/issues'

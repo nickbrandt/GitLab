@@ -1,7 +1,12 @@
+# Language: Ruby, Level: Level 3
 # frozen_string_literal: true
 
 module Issuable
   class BulkUpdateService < IssuableBaseService
+    def initialize(parent, user = nil, params = {})
+      super
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
     def execute(type)
       model_class = type.classify.constantize
