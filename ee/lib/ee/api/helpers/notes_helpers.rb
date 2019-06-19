@@ -15,15 +15,12 @@ module EE
           end
         end
 
-        def find_group_epic(id)
-          finder_params = { group_id: user_group.id }
-          EpicsFinder.new(current_user, finder_params).find(id)
-        end
-
-        def noteable_parent_str(noteable_class)
-          parent_class = ::Epic <= noteable_class ? ::Group : ::Project
-
-          parent_class.to_s.underscore
+        def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
+          if noteable_type == ::Epic
+            EpicsFinder.new(current_user, group_id: parent_id).find(noteable_id)
+          else
+            super
+          end
         end
       end
     end
