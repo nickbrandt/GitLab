@@ -2,37 +2,33 @@
 
 module Geo
   class JobArtifactRegistryFinder < RegistryFinder
-    def count_syncable
-      syncable.count
-    end
-
-    def count_synced
-      registries_for_job_artifacts
-        .merge(Geo::JobArtifactRegistry.synced)
-        .count
-    end
-
-    def count_failed
-      registries_for_job_artifacts
-        .merge(Geo::JobArtifactRegistry.failed)
-        .count
-    end
-
-    def count_synced_missing_on_primary
-      registries_for_job_artifacts
-        .merge(Geo::JobArtifactRegistry.synced.missing_on_primary)
-        .count
+    def initialize(current_node:)
+      @current_node = Geo::Fdw::GeoNode.find(current_node.id)
     end
 
     def count_registry
       Geo::JobArtifactRegistry.count
     end
 
+    def count_syncable
+      syncable.count
+    end
+
+    def count_synced
+      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced).count
+    end
+
+    def count_failed
+      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.failed).count
+    end
+
+    def count_synced_missing_on_primary
+      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced.missing_on_primary).count
+    end
+
     def syncable
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.syncable
-      elsif selective_sync?
-        fdw_geo_node.job_artifacts.syncable
+      if selective_sync?
+        job_artifacts.syncable
       else
         Ci::JobArtifact.syncable
       end
@@ -50,8 +46,7 @@ module Geo
     # @param [Array<Integer>] except_artifact_ids ids that will be ignored from the query
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_artifact_ids: [])
-      fdw_geo_node
-        .job_artifacts
+      job_artifacts
         .syncable
         .missing_job_artifact_registry
         .id_not_in(except_artifact_ids)
@@ -61,8 +56,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_artifact_ids: [])
-      fdw_geo_node
-        .job_artifacts
+      job_artifacts
         .inner_join_job_artifact_registry
         .with_files_stored_remotely
         .id_not_in(except_artifact_ids)
@@ -93,19 +87,12 @@ module Geo
 
     private
 
-    # rubocop:disable CodeReuse/Finder
-    def legacy_finder
-      @legacy_finder ||= Geo::LegacyJobArtifactRegistryFinder.new(current_node: current_node)
-    end
-    # rubocop:enable CodeReuse/Finder
-
-    def fdw_geo_node
-      @fdw_geo_node ||= Geo::Fdw::GeoNode.find(current_node.id)
+    def job_artifacts
+      current_node.job_artifacts
     end
 
     def registries_for_job_artifacts
-      fdw_geo_node
-        .job_artifacts
+      job_artifacts
         .inner_join_job_artifact_registry
         .syncable
     end
