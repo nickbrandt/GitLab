@@ -597,8 +597,12 @@ module EE
     end
 
     def licensed_feature_available?(feature, user = nil)
+      # Explicit enablement of the feature flag for the project or user bypasses license check
+      return true if ::Feature.enabled?(feature, self)
+      return true if user && ::Feature.enabled?(feature, user)
       # This feature might not be behind a feature flag at all, so default to true
-      return false unless ::Feature.enabled?(feature, user, default_enabled: true)
+      return false if ::Feature.disabled?(feature, self, default_enabled: true)
+      return false if user && ::Feature.disabled?(feature, user, default_enabled: true)
 
       available_features = strong_memoize(:licensed_feature_available) do
         Hash.new do |h, f|

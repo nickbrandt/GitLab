@@ -1,0 +1,5 @@
+---
+title: Fix license check when a feature flag set for a group or project
+merge_request: 14275
+author:
+type: fixed

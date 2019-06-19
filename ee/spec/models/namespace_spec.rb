@@ -190,9 +190,17 @@ describe Namespace do
     end
 
     it 'only checks the plan once' do
+      # Since feature flags are enabled by default in tests, we need to
+      # explictely stub the two Feature calls otherwise
+      # ::Feature.enabled?(feature, self) would return true and if we'd set
+      # stub_feature_flags(feature => { enabled: false, thing: group }), then
+      # ::Feature.disabled?(feature, self, default_enabled: true) would return true.
+      # Here, we fake the implicit (default) enablement of the :service_desk feature flag.
+      allow(Feature).to receive(:enabled?).with(feature, group) { false }
+      allow(Feature).to receive(:disabled?).with(feature, group, default_enabled: true) { false }
       expect(group).to receive(:load_feature_available).once.and_call_original
 
-      2.times { group.feature_available?(:service_desk) }
+      2.times { group.feature_available?(feature) }
     end
 
     context 'when checking namespace plan' do
@@ -201,6 +209,15 @@ describe Namespace do
       end
 
       it 'combines the global setting with the group setting when not running on premise' do
+        # Since feature flags are enabled by default in tests, we need to
+        # explictely stub the two Feature calls otherwise
+        # ::Feature.enabled?(feature, self) would return true and if we'd set
+        # stub_feature_flags(feature => { enabled: false, thing: group }), then
+        # ::Feature.disabled?(feature, self, default_enabled: true) would return true.
+        # Here, we fake the implicit (default) enablement of the :service_desk feature flag.
+        allow(Feature).to receive(:enabled?).with(feature, group) { false }
+        allow(Feature).to receive(:disabled?).with(feature, group, default_enabled: true) { false }
+
         is_expected.to be_falsy
       end
 
@@ -229,6 +246,15 @@ describe Namespace do
         let(:hosted_plan) { create(:bronze_plan) }
 
         it 'returns false' do
+          # Since feature flags are enabled by default in tests, we need to
+          # explictely stub the two Feature calls otherwise
+          # ::Feature.enabled?(feature, self) would return true and if we'd set
+          # stub_feature_flags(feature => { enabled: false, thing: group }), then
+          # ::Feature.disabled?(feature, self, default_enabled: true) would return true.
+          # Here, we fake the implicit (default) enablement of the :service_desk feature flag.
+          allow(Feature).to receive(:enabled?).with(feature, group) { false }
+          allow(Feature).to receive(:disabled?).with(feature, group, default_enabled: true) { false }
+
           is_expected.to be_falsy
         end
       end
@@ -248,11 +274,20 @@ describe Namespace do
       end
 
       it 'returns `false` when the feature is not included in the global license' do
+        # Since feature flags are enabled by default in tests, we need to
+        # explictely stub the two Feature calls otherwise
+        # ::Feature.enabled?(feature, self) would return true and if we'd set
+        # stub_feature_flags(feature => { enabled: false, thing: group }), then
+        # ::Feature.disabled?(feature, self, default_enabled: true) would return true.
+        # Here, we fake the implicit (default) enablement of the :service_desk feature flag.
+        allow(Feature).to receive(:enabled?).with(feature, group) { false }
+        allow(Feature).to receive(:disabled?).with(feature, group, default_enabled: true) { false }
+
         is_expected.to be_falsy
       end
     end
 
-    context 'when feature is disabled by a feature flag' do
+    context 'when feature is disabled by a global feature flag' do
       it 'returns false' do
         stub_feature_flags(feature => false)
 
@@ -260,9 +295,27 @@ describe Namespace do
       end
     end
 
-    context 'when feature is enabled by a feature flag' do
+    context 'when feature is enabled by a global feature flag' do
       it 'returns true' do
         stub_feature_flags(feature => true)
+
+        is_expected.to eq(true)
+      end
+    end
+
+    context 'when feature is disabled by a feature flag for this namespace' do
+      it 'returns false' do
+        stub_feature_flags(feature => true)
+        stub_feature_flags(feature => { enabled: false, thing: group })
+
+        is_expected.to eq(false)
+      end
+    end
+
+    context 'when feature is enabled by a feature flag for this namespace' do
+      it 'returns true' do
+        stub_feature_flags(feature => false)
+        stub_feature_flags(feature => { enabled: true, thing: group })
 
         is_expected.to eq(true)
       end

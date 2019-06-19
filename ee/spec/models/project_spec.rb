@@ -425,11 +425,83 @@ describe Project do
                   is_expected.to eq(true)
                 end
 
-                context 'when feature is disabled by a feature flag' do
+                context 'when feature is disabled by a global feature flag' do
                   it 'returns false' do
                     stub_feature_flags(feature => false)
 
                     is_expected.to eq(false)
+                  end
+                end
+
+                context 'when feature is enabled by a global feature flag' do
+                  it 'returns true' do
+                    stub_feature_flags(feature => true)
+
+                    is_expected.to eq(true)
+                  end
+                end
+
+                context 'when feature is disabled by a feature flag for this project' do
+                  it 'returns true' do
+                    stub_feature_flags(feature => true)
+                    stub_feature_flags(feature => { enabled: false, thing: user })
+                    stub_feature_flags(feature => { enabled: false, thing: project })
+
+                    is_expected.to eq(false)
+                  end
+                end
+
+                context 'when feature is enabled by a feature flag for this project' do
+                  it 'returns true' do
+                    stub_feature_flags(feature => false)
+                    stub_feature_flags(feature => { enabled: false, thing: user })
+                    stub_feature_flags(feature => { enabled: true, thing: project })
+
+                    is_expected.to eq(true)
+                  end
+                end
+
+                context 'when feature is disabled by a feature flag for this user' do
+                  it 'returns true' do
+                    stub_feature_flags(feature => true)
+                    stub_feature_flags(feature => { enabled: false, thing: user })
+                    stub_feature_flags(feature => { enabled: false, thing: project })
+
+                    is_expected.to eq(false)
+                  end
+                end
+
+                context 'when feature is enabled by a feature flag for this user' do
+                  it 'returns true' do
+                    stub_feature_flags(feature => false)
+                    stub_feature_flags(feature => { enabled: true, thing: user })
+                    stub_feature_flags(feature => { enabled: false, thing: project })
+
+                    is_expected.to eq(true)
+                  end
+                end
+
+                context 'when given user is nil' do
+                  let(:user) { nil }
+
+                  context 'when feature is enabled by a feature flag for this project' do
+                    it 'returns true' do
+                      stub_feature_flags(feature => false)
+                      stub_feature_flags(feature => { enabled: false, thing: user })
+                      stub_feature_flags(feature => { enabled: true, thing: project })
+
+                      is_expected.to eq(true)
+                    end
+                  end
+
+                  context 'when feature is enabled by a feature flag for a user' do
+                    it 'returns true' do
+                      stub_feature_flags(feature => false)
+                      stub_feature_flags(feature => { enabled: true, thing: build(:user) })
+                      stub_feature_flags(feature => { enabled: false, thing: project })
+
+                      is_expected.to eq(false)
+                    end
                   end
                 end
               end
@@ -452,6 +524,9 @@ describe Project do
                   let(:plan_license) { build(:bronze_plan) }
 
                   it 'returns false' do
+                    stub_feature_flags(feature => { enabled: false, thing: user })
+                    stub_feature_flags(feature => { enabled: false, thing: project })
+
                     is_expected.to eq(false)
                   end
                 end
@@ -462,6 +537,9 @@ describe Project do
                 let(:plan_license) { build(:gold_plan) }
 
                 it 'returns false' do
+                  stub_feature_flags(feature => { enabled: false, thing: user })
+                  stub_feature_flags(feature => { enabled: false, thing: project })
+
                   is_expected.to eq(false)
                 end
               end
@@ -483,6 +561,9 @@ describe Project do
               let(:allowed_on_global_license) { false }
 
               it 'returns false' do
+                stub_feature_flags(feature => { enabled: false, thing: user })
+                stub_feature_flags(feature => { enabled: false, thing: project })
+
                 is_expected.to eq(false)
               end
             end
@@ -492,6 +573,14 @@ describe Project do
     end
 
     it 'only loads licensed availability once' do
+      # Since feature flags are enabled by default in tests, we need to
+      # explictely stub the two Feature calls otherwise
+      # ::Feature.enabled?(feature, self) would return true and if we'd set
+      # stub_feature_flags(feature => { enabled: false, thing: project }), then
+      # ::Feature.disabled?(feature, self, default_enabled: true) would return true.
+      # Here, we fake the implicit (default) enablement of the :service_desk feature flag.
+      allow(Feature).to receive(:enabled?).with(:service_desk, project) { false }
+      allow(Feature).to receive(:disabled?).with(:service_desk, project, default_enabled: true) { false }
       expect(project).to receive(:load_licensed_feature_available)
                              .once.and_call_original
 
