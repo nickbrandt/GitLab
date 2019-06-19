@@ -6,8 +6,13 @@ module EE
     extend ::Gitlab::Utils::Override
 
     EE_PERMITTED_KEYS = %w[
-        weight
+      weight
     ].freeze
+
+    override :authorize_admin_issuable!
+    def authorize_admin_issuable!
+      return access_denied! unless can?(current_user, :"admin_#{resource_name}", parent)
+    end
 
     override :permitted_keys
     def permitted_keys
