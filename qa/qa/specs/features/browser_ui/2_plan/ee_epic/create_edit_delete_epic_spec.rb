@@ -98,10 +98,12 @@ module QA
           epic.title = 'Epic created via API'
         end
 
-        # Epics have no web_url exposed via the API, and so we build it here.
-        # Related issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/11241
-        @epic_web_url = "#{@issue.project.group.web_url}/-/epics/1"
-        page.visit @epic_web_url
+        page.visit "#{@issue.project.group.web_url}/-/epics/"
+
+        EE::Page::Group::Epic::Index.perform do |epic_index_page|
+          @epic_web_url = epic_index_page.web_url
+          epic_index_page.click_first_epic
+        end
       end
     end
   end
