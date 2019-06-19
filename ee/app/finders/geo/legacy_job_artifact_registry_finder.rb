@@ -6,14 +6,6 @@ module Geo
       current_node.job_artifacts.syncable
     end
 
-    def job_artifacts_synced
-      legacy_inner_join_registry_ids(
-        syncable,
-        Geo::JobArtifactRegistry.synced.pluck_artifact_key,
-        Ci::JobArtifact
-      )
-    end
-
     def job_artifacts_failed
       legacy_inner_join_registry_ids(
         syncable,

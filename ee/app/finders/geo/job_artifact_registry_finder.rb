@@ -7,7 +7,7 @@ module Geo
     end
 
     def count_synced
-      job_artifacts_synced.count
+      registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced).count
     end
 
     def count_failed
@@ -109,14 +109,6 @@ module Geo
           .job_artifacts
           .inner_join_job_artifact_registry
           .syncable
-      end
-    end
-
-    def job_artifacts_synced
-      if use_legacy_queries_for_selective_sync?
-        legacy_finder.job_artifacts_synced
-      else
-        registries_for_job_artifacts.merge(Geo::JobArtifactRegistry.synced)
       end
     end
 
