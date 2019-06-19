@@ -5,8 +5,8 @@ module Gitlab
     # Calculates the rollout status for a set of kubernetes deployments.
     #
     # A GitLab environment may be composed of several Kubernetes deployments and
-    # other resources, unified by an `app=` label. The rollout status sums the
-    # Kubernetes deployments together.
+    # other resources. The rollout status sums the Kubernetes deployments
+    # together.
     class RolloutStatus
       attr_reader :deployments, :instances, :completion, :status
 
