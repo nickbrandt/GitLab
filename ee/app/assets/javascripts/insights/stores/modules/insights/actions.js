@@ -54,7 +54,7 @@ export const setActiveTab = ({ commit, state }, key) => {
   commit(types.SET_ACTIVE_PAGE, page);
 };
 
-export const setChartData = ({ commit }, store) => commit(types.SET_CHART_DATA, store);
+export const initChartData = ({ commit }, store) => commit(types.INIT_CHART_DATA, store);
 export const setPageLoading = ({ commit }, pageLoading) =>
   commit(types.SET_PAGE_LOADING, pageLoading);
 
