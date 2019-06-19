@@ -37,21 +37,11 @@ module Geo
     # You can pass a list with `except_file_ids:` so you can exclude items you
     # already scheduled but haven't finished and aren't persisted to the database yet
     #
-    # TODO: Alternative here is to use some sort of window function with a cursor instead
-    #       of simply limiting the query and passing a list of items we don't want
-    #
     # @param [Integer] batch_size used to limit the results returned
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      relation =
-        if use_legacy_queries_for_selective_sync?
-          legacy_finder.lfs_objects_unsynced(except_file_ids: except_file_ids)
-        else
-          lfs_objects_unsynced(except_file_ids: except_file_ids)
-        end
-
-      relation.limit(batch_size)
+      lfs_objects_unsynced(except_file_ids: except_file_ids).limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
