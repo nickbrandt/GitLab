@@ -6,16 +6,6 @@ module Geo
       current_node.job_artifacts.syncable
     end
 
-    def job_artifacts_unsynced(except_artifact_ids: [])
-      registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key | except_artifact_ids
-
-      legacy_left_outer_join_registry_ids(
-        syncable,
-        registry_artifact_ids,
-        Ci::JobArtifact
-      )
-    end
-
     def job_artifacts_migrated_local(except_artifact_ids: [])
       registry_artifact_ids = Geo::JobArtifactRegistry.pluck_artifact_key - except_artifact_ids
 

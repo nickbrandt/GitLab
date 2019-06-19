@@ -50,14 +50,12 @@ module Geo
     # @param [Array<Integer>] except_artifact_ids ids that will be ignored from the query
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_artifact_ids: [])
-      relation =
-        if use_legacy_queries_for_selective_sync?
-          legacy_finder.job_artifacts_unsynced(except_artifact_ids: except_artifact_ids)
-        else
-          job_artifacts_unsynced(except_artifact_ids: except_artifact_ids)
-        end
-
-      relation.limit(batch_size)
+      fdw_geo_node
+        .job_artifacts
+        .syncable
+        .missing_job_artifact_registry
+        .id_not_in(except_artifact_ids)
+        .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -112,14 +110,6 @@ module Geo
         .job_artifacts
         .inner_join_job_artifact_registry
         .syncable
-    end
-
-    def job_artifacts_unsynced(except_artifact_ids:)
-      fdw_geo_node
-        .job_artifacts
-        .syncable
-        .missing_job_artifact_registry
-        .id_not_in(except_artifact_ids)
     end
 
     def job_artifacts_migrated_local(except_artifact_ids:)

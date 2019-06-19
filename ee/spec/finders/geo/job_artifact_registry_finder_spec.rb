@@ -716,6 +716,68 @@ describe Geo::JobArtifactRegistryFinder, :geo do
       end
     end
 
-    include_examples 'finds all the things'
+    describe '#find_migrated_local' do
+      let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
+      let!(:job_artifact_remote_1) { create(:ci_job_artifact, :remote_store, project: synced_project) }
+      let!(:job_artifact_remote_2) { create(:ci_job_artifact, :remote_store, project: unsynced_project) }
+      let!(:job_artifact_remote_3) { create(:ci_job_artifact, :remote_store, project: project_broken_storage, expire_at: Date.yesterday) }
+
+      it 'returns job artifacts remotely and successfully synced locally' do
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_2.id)
+
+        job_artifacts = subject.find_migrated_local(batch_size: 10, except_artifact_ids: [job_artifact_remote_1.id])
+
+        expect(job_artifacts).to match_ids(job_artifact_remote_2)
+      end
+
+      it 'excludes synced job artifacts that are stored locally' do
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_2.id)
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_1.id)
+
+        job_artifacts = subject.find_migrated_local(batch_size: 10)
+
+        expect(job_artifacts).to match_ids(job_artifact_remote_1, job_artifact_remote_2)
+      end
+
+      it 'includes synced job artifacts that are expired' do
+        create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_3.id)
+
+        job_artifacts = subject.find_migrated_local(batch_size: 10)
+
+        expect(job_artifacts).to match_ids(job_artifact_remote_3)
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'returns job artifacts remotely and successfully synced locally' do
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_2.id)
+
+          job_artifacts = subject.find_migrated_local(batch_size: 10)
+
+          expect(job_artifacts).to match_ids(job_artifact_remote_1)
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'returns job artifacts remotely and successfully synced locally' do
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_1.id)
+          create(:geo_job_artifact_registry, artifact_id: job_artifact_remote_3.id)
+
+          job_artifacts = subject.find_migrated_local(batch_size: 10)
+
+          expect(job_artifacts).to match_ids(job_artifact_remote_3)
+        end
+      end
+    end
   end
 end
