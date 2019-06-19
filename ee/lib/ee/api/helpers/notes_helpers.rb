@@ -16,11 +16,11 @@ module EE
         end
 
         def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
-          if noteable_type == ::Epic && parent_type == 'group'
-            return EpicsFinder.new(current_user, group_id: parent_id.to_i).find(noteable_id)
+          if noteable_type == ::Epic
+            EpicsFinder.new(current_user, group_id: parent_id).find(noteable_id)
+          else
+            super
           end
-
-          super
         end
       end
     end
