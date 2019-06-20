@@ -36,7 +36,7 @@ module QA
 
       it 'adds/removes issue to/from epic' do
         create_issue_and_epic_resources
-        visit_first_epic_page
+        @epic.visit!
 
         EE::Page::Group::Epic::Show.perform do |show_page|
           show_page.add_issue_to_epic(@issue.web_url)
@@ -49,7 +49,7 @@ module QA
 
       it 'comments on epic', :quarantine do
         create_issue_and_epic_resources
-        visit_first_epic_page
+        @epic.visit!
 
         comment = 'My Epic Comment'
         EE::Page::Group::Epic::Show.perform do |show_page|
@@ -61,7 +61,7 @@ module QA
 
       it 'closes and reopens an epic' do
         create_issue_and_epic_resources
-        visit_first_epic_page
+        @epic.visit!
 
         EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
 
@@ -74,12 +74,11 @@ module QA
 
       it 'adds/removes issue to/from epic using quick actions', :quarantine do
         create_issue_and_epic_resources
-
         @issue.visit!
 
         Page::Project::Issue::Show.perform do |show_page|
           show_page.wait_for_related_issues_to_load
-          show_page.comment("/epic #{@epic_web_url}")
+          show_page.comment("/epic #{@issue.project.group.web_url}/-/epics/#{@epic.iid}")
 
           expect(show_page).to have_content('added to epic')
 
@@ -88,7 +87,7 @@ module QA
           expect(show_page).to have_content('removed from epic')
         end
 
-        page.visit @epic_web_url
+        @epic.visit!
 
         expect(page).to have_content('added issue')
         expect(page).to have_content('removed issue')
@@ -103,15 +102,6 @@ module QA
         @epic = EE::Resource::Epic.fabricate_via_api! do |epic|
           epic.group = @issue.project.group
           epic.title = 'Epic created via API'
-        end
-      end
-
-      def visit_first_epic_page
-        page.visit "#{@issue.project.group.web_url}/-/epics/"
-
-        EE::Page::Group::Epic::Index.perform do |epic_index_page|
-          @epic_web_url = epic_index_page.web_url_of_first_epic
-          epic_index_page.click_first_epic
         end
       end
     end
