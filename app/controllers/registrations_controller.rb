@@ -3,6 +3,7 @@
 class RegistrationsController < Devise::RegistrationsController
   include Recaptcha::Verify
   include AcceptsPendingInvitations
+  include RecaptchaExperimentHelper
 
   prepend_before_action :check_captcha, only: :create
   before_action :whitelist_query_limiting, only: [:destroy]
@@ -95,6 +96,7 @@ class RegistrationsController < Devise::RegistrationsController
     ensure_correct_params!
 
     return unless Feature.enabled?(:registrations_recaptcha, default_enabled: true) # reCAPTCHA on the UI will still display however
+    return unless show_recaptcha_sign_up?
     return unless Gitlab::Recaptcha.load_configurations!
 
     return if verify_recaptcha

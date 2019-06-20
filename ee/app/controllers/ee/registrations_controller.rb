@@ -3,8 +3,16 @@
 module EE
   module RegistrationsController
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     private
+
+    override :user_created_message
+    def user_created_message(confirmed: false)
+      experiments = "experiment_growth_recaptcha?#{show_recaptcha_sign_up?}"
+
+      super(confirmed: confirmed) + ", experiments:#{experiments}"
+    end
 
     def sign_up_params
       clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password, :email_opted_in)

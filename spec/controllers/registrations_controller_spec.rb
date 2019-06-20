@@ -107,6 +107,14 @@ describe RegistrationsController do
       end
     end
 
+    it "logs a 'User Created' message" do
+      stub_feature_flags(registrations_recaptcha: false)
+
+      expect(Gitlab::AppLogger).to receive(:info).with(/\AUser Created: username=new_username email=new@user.com.+\z/).and_call_original
+
+      post(:create, params: user_params)
+    end
+
     it 'handles when params are new_user' do
       post(:create, params: { new_user: base_user_params })
 
