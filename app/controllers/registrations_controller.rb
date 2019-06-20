@@ -67,16 +67,20 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def after_sign_up_path_for(user)
-    Gitlab::AppLogger.info("User Created: username=#{user.username} email=#{user.email} ip=#{request.remote_ip} confirmed:#{user.confirmed?}")
+    Gitlab::AppLogger.info(user_created_message(confirmed: user.confirmed?))
     user.confirmed? ? stored_location_for(user) || dashboard_projects_path : users_almost_there_path
   end
 
   def after_inactive_sign_up_path_for(resource)
-    Gitlab::AppLogger.info("User Created: username=#{resource.username} email=#{resource.email} ip=#{request.remote_ip} confirmed:false")
+    Gitlab::AppLogger.info(user_created_message)
     users_almost_there_path
   end
 
   private
+
+  def user_created_message(confirmed: false)
+    "User Created: username=#{resource.username} email=#{resource.email} ip=#{request.remote_ip} confirmed:#{confirmed}"
+  end
 
   def ensure_correct_params!
     # To avoid duplicate form fields on the login page, the registration form
