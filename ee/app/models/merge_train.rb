@@ -41,12 +41,20 @@ class MergeTrain < ApplicationRecord
     self.class.all_in_train(merge_request).where('merge_trains.id > ?', id)
   end
 
+  def all_prev
+    self.class.all_in_train(merge_request).where('merge_trains.id < ?', id)
+  end
+
   def next
     all_next.first
   end
 
+  def prev
+    all_prev.last
+  end
+
   def index
-    self.class.all_in_train(merge_request).where('merge_trains.id < ?', id).count
+    all_prev.count
   end
 
   def first_in_train?
@@ -54,6 +62,6 @@ class MergeTrain < ApplicationRecord
   end
 
   def follower_in_train?
-    self.class.all_in_train(merge_request).where('merge_trains.id < ?', id).exists?
+    all_prev.exists?
   end
 end

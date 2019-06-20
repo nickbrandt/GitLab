@@ -15,7 +15,7 @@ describe MergeTrains::RefreshMergeRequestsService do
     project.add_maintainer(maintainer_2)
   end
 
-  describe '#execute' do
+  describe '#execute', :clean_gitlab_redis_queues do
     subject { service.execute(merge_request) }
 
     let!(:merge_request_1) do
@@ -32,12 +32,17 @@ describe MergeTrains::RefreshMergeRequestsService do
 
     let(:refresh_service_1) { double }
     let(:refresh_service_2) { double }
+    let(:refresh_service_1_result) { { status: :success } }
+    let(:refresh_service_2_result) { { status: :success } }
 
     before do
       allow(MergeTrains::RefreshMergeRequestService)
-        .to receive(:new).with(project, maintainer_1) { refresh_service_1 }
+        .to receive(:new).with(project, maintainer_1, anything) { refresh_service_1 }
       allow(MergeTrains::RefreshMergeRequestService)
-        .to receive(:new).with(project, maintainer_2) { refresh_service_2 }
+        .to receive(:new).with(project, maintainer_2, anything) { refresh_service_2 }
+
+      allow(refresh_service_1).to receive(:execute) { refresh_service_1_result }
+      allow(refresh_service_2).to receive(:execute) { refresh_service_2_result }
     end
 
     context 'when merge request 1 is passed' do
@@ -48,6 +53,52 @@ describe MergeTrains::RefreshMergeRequestsService do
         expect(refresh_service_2).to receive(:execute).with(merge_request_2)
 
         subject
+      end
+
+      context 'when merge_trains_parallel_pipelines feature flag is disabled' do
+        before do
+          stub_feature_flags(merge_trains_parallel_pipelines: false)
+        end
+
+        it 'does not refresh merge request 2' do
+          expect(refresh_service_1).to receive(:execute).with(merge_request_1)
+          expect(refresh_service_2).not_to receive(:execute).with(merge_request_2)
+
+          subject
+        end
+      end
+
+      context 'when refresh service 1 returns error status' do
+        let(:refresh_service_1_result) { { status: :error, message: 'Failed to create ref' } }
+
+        it 'specifies require_recreate to refresh service 2' do
+          allow(MergeTrains::RefreshMergeRequestService)
+            .to receive(:new).with(project, maintainer_2, require_recreate: true) { refresh_service_2 }
+
+          subject
+        end
+      end
+
+      context 'when refresh service 1 returns success status and did not create a pipeline' do
+        let(:refresh_service_1_result) { { status: :success, pipeline_created: false } }
+
+        it 'does not specify require_recreate to refresh service 2' do
+          allow(MergeTrains::RefreshMergeRequestService)
+            .to receive(:new).with(project, maintainer_2, require_recreate: false) { refresh_service_2 }
+
+          subject
+        end
+      end
+
+      context 'when refresh service 1 returns success status and created a pipeline' do
+        let(:refresh_service_1_result) { { status: :success, pipeline_created: true } }
+
+        it 'specifies require_recreate to refresh service 2' do
+          allow(MergeTrains::RefreshMergeRequestService)
+            .to receive(:new).with(project, maintainer_2, require_recreate: true) { refresh_service_2 }
+
+          subject
+        end
       end
 
       context 'when merge request 1 is not on a merge train' do
