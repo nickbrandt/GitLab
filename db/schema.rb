@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190613030606) do
+ActiveRecord::Schema.define(version: 20190619175843) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2595,7 +2595,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.integer "visibility_level", default: 0, null: false
     t.boolean "archived", default: false, null: false
     t.string "avatar"
-    t.string "import_status"
     t.text "merge_requests_template"
     t.integer "star_count", default: 0, null: false
     t.boolean "merge_requests_rebase_enabled", default: false
@@ -2609,7 +2608,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.datetime "mirror_last_update_at"
     t.datetime "mirror_last_successful_update_at"
     t.integer "mirror_user_id"
-    t.text "import_error"
     t.boolean "shared_runners_enabled", default: true, null: false
     t.string "runners_token"
     t.string "build_coverage_regex"
@@ -2635,7 +2633,6 @@ ActiveRecord::Schema.define(version: 20190613030606) do
     t.boolean "printing_merge_request_link_enabled", default: true, null: false
     t.integer "auto_cancel_pending_pipelines", default: 1, null: false
     t.boolean "service_desk_enabled", default: true
-    t.string "import_jid"
     t.integer "cached_markdown_version"
     t.text "delete_error"
     t.datetime "last_repository_updated_at"
