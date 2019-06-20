@@ -264,5 +264,3 @@ module EE
     end
   end
 end
-
-EE::ProjectPolicy.include(EE::ClusterableActions)
