@@ -181,18 +181,13 @@ describe Gitlab::GitAccess do
       # Delete branch so Repository#new_blobs can return results
       repository.delete_branch('2-mb-file')
       repository.delete_branch('wip')
+
+      allow(project).to receive(:repository_and_lfs_size).and_return(repository_size)
+      project.update_attribute(:repository_size_limit, repository_size_limit)
     end
 
-    context 'when repository size is over limit' do
-      before do
-        allow(project).to receive(:repository_and_lfs_size).and_return(2.megabytes)
-
-        project.update_attribute(:repository_size_limit, 1.megabytes)
-      end
-
+    shared_examples_for 'a push to repository over the limit' do
       it 'rejects the push' do
-        expect(repository.new_blobs(sha_with_smallest_changes)).to be_present
-
         expect do
           push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/master")
         end.to raise_error(described_class::UnauthorizedError, /Your push has been rejected/)
@@ -207,13 +202,7 @@ describe Gitlab::GitAccess do
       end
     end
 
-    context 'when repository size is below the limit' do
-      before do
-        allow(project).to receive(:repository_and_lfs_size).and_return(1.megabyte)
-
-        project.update_attribute(:repository_size_limit, 2.megabytes)
-      end
-
+    shared_examples_for 'a push to repository below the limit' do
       context 'when trying to authenticate the user' do
         it 'does not raise an error' do
           expect { push_changes }.not_to raise_error
@@ -229,26 +218,106 @@ describe Gitlab::GitAccess do
           end.not_to raise_error
         end
       end
+    end
 
-      context 'when new change exceeds the limit' do
-        it 'rejects the push' do
-          expect(repository.new_blobs(sha_with_2_mb_file)).to be_present
+    shared_examples_for 'a push to repository using git-rev-list for checking against repository size limit' do
+      context 'when repository size is over limit' do
+        let(:repository_size) { 2.megabytes }
+        let(:repository_size_limit) { 1.megabyte }
 
-          expect do
-            push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
-          end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+        it_behaves_like 'a push to repository over the limit'
+      end
+
+      context 'when repository size is below the limit' do
+        let(:repository_size) { 1.megabyte }
+        let(:repository_size_limit) { 2.megabytes }
+
+        it_behaves_like 'a push to repository below the limit'
+
+        context 'when new change exceeds the limit' do
+          it 'rejects the push' do
+            expect(repository.new_blobs(sha_with_2_mb_file)).to be_present
+
+            expect do
+              push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
+            end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+          end
+        end
+
+        context 'when new change does not exceed the limit' do
+          it 'accepts the push' do
+            expect(repository.new_blobs(sha_with_smallest_changes)).to be_present
+
+            expect do
+              push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/my_branch_3")
+            end.not_to raise_error
+          end
+        end
+      end
+    end
+
+    context 'when GIT_OBJECT_DIRECTORY_RELATIVE env var is set' do
+      before do
+        allow(Gitlab::Git::HookEnv)
+          .to receive(:all)
+          .with(repository.gl_repository)
+          .and_return({ 'GIT_OBJECT_DIRECTORY_RELATIVE' => 'objects' })
+      end
+
+      context 'when quarantine_push_size_check feature is enabled (default)' do
+        let(:object_directory_size) { 1.megabyte }
+
+        before do
+          # Stub the object directory size to "simulate" quarantine size
+          allow(repository)
+            .to receive(:object_directory_size)
+            .and_return(object_directory_size)
+        end
+
+        context 'when repository size is over limit' do
+          let(:repository_size) { 2.megabytes }
+          let(:repository_size_limit) { 1.megabyte }
+
+          it_behaves_like 'a push to repository over the limit'
+        end
+
+        context 'when repository size is below the limit' do
+          let(:repository_size) { 1.megabyte }
+          let(:repository_size_limit) { 2.megabytes }
+
+          it_behaves_like 'a push to repository below the limit'
+
+          context 'when object directory (quarantine) size exceeds the limit' do
+            let(:object_directory_size) { 2.megabytes }
+
+            it 'rejects the push' do
+              expect do
+                push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
+              end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+            end
+          end
+
+          context 'when object directory (quarantine) size does not exceed the limit' do
+            it 'accepts the push' do
+              expect do
+                push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/my_branch_3")
+              end.not_to raise_error
+            end
+          end
         end
       end
 
-      context 'when new change does not exceeds the limit' do
-        it 'accepts the push' do
-          expect(repository.new_blobs(sha_with_smallest_changes)).to be_present
-
-          expect do
-            push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/my_branch_3")
-          end.not_to raise_error
+      context 'when quarantine_push_size_check feature is disabled' do
+        before do
+          stub_feature_flags(quarantine_push_size_check: false)
         end
+
+        it_behaves_like 'a push to repository using git-rev-list for checking against repository size limit'
       end
+    end
+
+    context 'when GIT_OBJECT_DIRECTORY_RELATIVE env var is not set' do
+      it_behaves_like 'a push to repository using git-rev-list for checking against repository size limit'
     end
   end
 
