@@ -6,7 +6,8 @@ describe RegistrationsController do
   include TermsHelper
 
   describe '#create' do
-    let(:user_params) { { user: { name: 'new_user', username: 'new_username', email: 'new@user.com', password: 'Any_password' } } }
+    let(:base_user_params) { { name: 'new_user', username: 'new_username', email: 'new@user.com', password: 'Any_password' } }
+    let(:user_params) { { user: base_user_params } }
 
     context 'email confirmation' do
       around do |example|
@@ -104,6 +105,12 @@ describe RegistrationsController do
         expect(subject.current_user).to be_present
         expect(subject.current_user.terms_accepted?).to be(true)
       end
+    end
+
+    it 'handles when params are new_user' do
+      post(:create, params: { new_user: base_user_params })
+
+      expect(subject.current_user).not_to be_nil
     end
   end
 
