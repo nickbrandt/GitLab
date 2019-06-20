@@ -11,6 +11,7 @@ module QA
         end
 
         attribute :id
+        attribute :iid
 
         def fabricate!
           group.visit!
