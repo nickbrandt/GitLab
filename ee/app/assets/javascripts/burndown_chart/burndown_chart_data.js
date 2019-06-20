@@ -3,9 +3,9 @@ import dateFormat from 'dateformat';
 export default class BurndownChartData {
   constructor(burndownEvents, startDate, dueDate) {
     this.dateFormatMask = 'yyyy-mm-dd';
-    this.burndownEvents = this.convertEventsToLocalTimezone(burndownEvents);
     this.startDate = startDate;
     this.dueDate = dueDate;
+    this.burndownEvents = this.processRawEvents(burndownEvents);
 
     // determine when to stop burndown chart
     const today = dateFormat(new Date(), this.dateFormatMask);
@@ -44,10 +44,16 @@ export default class BurndownChartData {
     return chartData;
   }
 
-  convertEventsToLocalTimezone(events) {
+  // Process raw milestone events:
+  // 1. Set event creation date to milestone start date if created before milestone start
+  // 2. Convert event creation date to local timezone
+  processRawEvents(events) {
     return events.map(event => ({
       ...event,
-      created_at: dateFormat(event.created_at, this.dateFormatMask),
+      created_at: dateFormat(
+        new Date(event.created_at) < new Date(this.startDate) ? this.startDate : event.created_at,
+        this.dateFormatMask,
+      ),
     }));
   }
 
