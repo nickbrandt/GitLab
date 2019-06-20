@@ -31,7 +31,7 @@ module QA
         def resource_web_url(resource)
           super
         rescue ResourceURLMissingError
-          # this particular resource does not expose a web_url property
+          "#{group.web_url}/-/epics/#{iid}"
         end
 
         def api_get_path
