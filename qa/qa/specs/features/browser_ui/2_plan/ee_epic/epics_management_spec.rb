@@ -43,9 +43,11 @@ module QA
 
           EE::Page::Group::Epic::Show.perform do |show_page|
             show_page.add_issue_to_epic(issue.web_url)
+
             expect(show_page).to have_content('added issue')
 
             show_page.remove_issue_from_epic
+
             expect(show_page).to have_content('removed issue')
           end
         end
