@@ -9,17 +9,31 @@ module Types
 
       implements(Types::Notes::NoteableType)
 
+      alias_method :design, :object
+
       field :id, GraphQL::ID_TYPE, null: false
       field :project, Types::ProjectType, null: false
       field :issue, Types::IssueType, null: false
       field :filename, GraphQL::STRING_TYPE, null: false
-      field :image, GraphQL::STRING_TYPE, null: false, resolve: -> (design, _args, _ctx) do
-        Gitlab::Routing.url_helpers.project_design_url(design.project, design)
-      end
+      field :image, GraphQL::STRING_TYPE, null: false, extras: [:parent]
       field :versions,
             Types::DesignManagement::VersionType.connection_type,
             resolver: Resolvers::DesignManagement::VersionResolver,
-            description: "All versions related to this design ordered newest first"
+            description: "All versions related to this design ordered newest first",
+            extras: [:parent]
+
+      def image(parent:)
+        # Find an `at_version` argument passed to a parent node.
+        #
+        # If no argument is found then a nil value for sha is fine
+        # and the image displayed will be the latest version
+        version_id = Gitlab::Graphql::FindArgumentInParent.find(parent, :at_version, limit_depth: 4)
+        sha = version_id ? GitlabSchema.object_from_id(version_id).sha : nil
+
+        project = Gitlab::Graphql::Loaders::BatchModelLoader.new(Project, design.project_id).find
+
+        Gitlab::Routing.url_helpers.project_design_url(project, design, sha)
+      end
     end
   end
 end
