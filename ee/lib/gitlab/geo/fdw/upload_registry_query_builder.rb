@@ -5,9 +5,7 @@
 #
 # Basic usage:
 #
-#     Gitlab::Geo::Fdw::UploadRegistryQueryBuilder
-#       .new
-#       .for_project_with_type(project, 'file')
+#     Gitlab::Geo::Fdw::UploadRegistryQueryBuilder.new.for_model(project)
 #
 module Gitlab
   module Geo
@@ -18,6 +16,7 @@ module Gitlab
           reflect(
             query
               .joins(fdw_inner_join_uploads)
+              .merge(::Geo::FileRegistry.uploads)
               .where(
                 fdw_upload_table[:model_id].eq(model.id)
                   .and(fdw_upload_table[:model_type].eq(model.class.name))
@@ -25,10 +24,6 @@ module Gitlab
           )
         end
         # rubocop:enable CodeReuse/ActiveRecord
-
-        def with_type(type)
-          reflect(query.merge(::Geo::FileRegistry.with_file_type(type)))
-        end
 
         private
 
