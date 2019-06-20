@@ -3,9 +3,12 @@ export default () => ({
     head: null,
     base: null,
   },
+  headReportEndpoint: null,
 
   isLoading: false,
   hasError: false,
+
+  newIssuesCount: null,
 
   newIssues: [],
   resolvedIssues: [],

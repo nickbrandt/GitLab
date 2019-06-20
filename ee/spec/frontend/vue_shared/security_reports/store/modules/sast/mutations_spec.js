@@ -177,4 +177,59 @@ describe('sast module mutations', () => {
       });
     });
   });
+
+  describe(types.SET_HEAD_REPORT_ENDPOINT, () => {
+    it('should set the head report endpoint', () => {
+      mutations[types.SET_HEAD_REPORT_ENDPOINT](state, path);
+
+      expect(state.headReportEndpoint).toBe(path);
+    });
+  });
+
+  describe(types.REQUEST_HEAD_REPORT, () => {
+    it('should set the `isLoading` status to `true`', () => {
+      mutations[types.REQUEST_HEAD_REPORT](state);
+
+      expect(state.isLoading).toBe(true);
+    });
+  });
+
+  describe(types.RECEIVE_HEAD_REPORT_ERROR, () => {
+    beforeEach(() => {
+      state.isLoading = true;
+      mutations[types.RECEIVE_HEAD_REPORT_ERROR](state);
+    });
+
+    it('should set the `isLoading` status to `false`', () => {
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('should set the `hasError` status to `true`', () => {
+      expect(state.hasError).toBe(true);
+    });
+  });
+
+  describe(types.RECEIVE_HEAD_REPORT_SUCCESS, () => {
+    const data = {};
+    const count = '100';
+
+    beforeEach(() => {
+      state.isLoading = true;
+      mutations[types.RECEIVE_HEAD_REPORT_SUCCESS](state, { data, count });
+    });
+
+    it('should set the `isLoading` status to `false`', () => {
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('should set and parse the newIssuesCount', () => {
+      // First we check if it has a type of Number
+      expect(state.newIssuesCount).toEqual(jasmine.any(Number));
+      expect(state.newIssuesCount).toBe(100);
+    });
+
+    it('should set the new issues', () => {
+      expect(state.newIssues).toBe(data);
+    });
+  });
 });

@@ -28,6 +28,7 @@ export default () => {
       sastContainerHeadPath,
       dastHelpPath,
       sastContainerHelpPath,
+      headReportEndpoint,
     } = datasetOptions;
     const pipelineId = parseInt(datasetOptions.pipelineId, 10);
 
@@ -63,6 +64,7 @@ export default () => {
             canCreateIssue: Boolean(createVulnerabilityFeedbackIssuePath),
             canCreateMergeRequest: Boolean(createVulnerabilityFeedbackMergeRequestPath),
             canDismissVulnerability: Boolean(createVulnerabilityFeedbackDismissalPath),
+            headReportEndpoint,
           },
           on: {
             updateBadgeCount: count => {

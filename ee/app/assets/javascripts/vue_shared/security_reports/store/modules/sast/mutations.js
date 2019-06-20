@@ -78,4 +78,23 @@ export default {
       state.allIssues.splice(allIssuesIndex, 1, issue);
     }
   },
+
+  [types.SET_HEAD_REPORT_ENDPOINT](state, path) {
+    state.headReportEndpoint = path;
+  },
+
+  [types.REQUEST_HEAD_REPORT](state) {
+    state.isLoading = true;
+  },
+
+  [types.RECEIVE_HEAD_REPORT_SUCCESS](state, { data, count }) {
+    state.isLoading = false;
+    state.newIssuesCount = parseInt(count, 10);
+    state.newIssues = data;
+  },
+
+  [types.RECEIVE_HEAD_REPORT_ERROR](state) {
+    state.isLoading = false;
+    state.hasError = true;
+  },
 };

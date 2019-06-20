@@ -164,7 +164,10 @@ export default {
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
     ]),
-    ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
+    ...mapGetters('sast', {
+      sastGroupedSummaryText: 'groupedSummaryText',
+      sastStatusIcon: 'statusIcon',
+    }),
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
@@ -286,7 +289,7 @@ export default {
     <div slot="body" class="mr-widget-grouped-section report-block">
       <template v-if="sastHeadPath">
         <summary-row
-          :summary="groupedSastText"
+          :summary="sastGroupedSummaryText"
           :status-icon="sastStatusIcon"
           :popover-options="sastPopover"
           class="js-sast-widget"

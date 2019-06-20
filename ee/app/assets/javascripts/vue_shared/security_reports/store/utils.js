@@ -414,3 +414,26 @@ export const groupedReportText = (report, reportType, errorMessage, loadingMessa
     paths,
   });
 };
+
+/**
+ * Generates a string that explains the number of vulnerabilities a report has
+ *
+ * @param {String} reportType
+ * @param {Number} issuesCount
+ * @returns {String}
+ */
+export const summaryTextBuilder = (reportType, issuesCount = 0) => {
+  if (issuesCount === 0) {
+    return sprintf(s__('ciReport|%{reportType} detected no vulnerabilities'), {
+      reportType,
+    });
+  }
+  return sprintf(
+    n__(
+      'ciReport|%{reportType} detected %{vulnerabilityCount} vulnerability',
+      'ciReport|%{reportType} detected %{vulnerabilityCount} vulnerabilities',
+      issuesCount,
+    ),
+    { reportType, vulnerabilityCount: issuesCount },
+  );
+};

@@ -44,4 +44,38 @@ export const fetchReports = ({ state, rootState, dispatch }) => {
 export const updateVulnerability = ({ commit }, vulnerability) =>
   commit(types.UPDATE_VULNERABILITY, vulnerability);
 
+export const setHeadReportEndpoint = ({ commit }, endpoint) =>
+  commit(types.SET_HEAD_REPORT_ENDPOINT, endpoint);
+
+export const fetchHeadReport = ({ state, dispatch }) => {
+  dispatch('requestHeadReport');
+
+  axios
+    .get(state.headReportEndpoint, {
+      params: {
+        report_type: 'sast',
+      },
+    })
+    .then(({ data, headers }) => {
+      const count = headers ? headers['x-total'] : 0;
+
+      dispatch('receiveHeadReportSuccess', { data, count });
+    })
+    .catch(() => {
+      dispatch('receiveHeadReportError');
+    });
+};
+
+export const requestHeadReport = ({ commit }) => {
+  commit(types.REQUEST_HEAD_REPORT);
+};
+
+export const receiveHeadReportSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_HEAD_REPORT_SUCCESS, payload);
+};
+
+export const receiveHeadReportError = ({ commit }) => {
+  commit(types.RECEIVE_HEAD_REPORT_ERROR);
+};
+
 export default () => {};

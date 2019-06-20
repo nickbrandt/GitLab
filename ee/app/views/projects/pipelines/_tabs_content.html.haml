@@ -18,6 +18,7 @@
     sast_container_head_path: sast_container_endpoint,
     pipeline_id: pipeline.id,
     source_branch: pipeline.ref,
+    head_report_endpoint: expose_path(api_v4_projects_vulnerabilities_path(id: project.id, params: { pipeline_id: pipeline.id })),
     vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
     vulnerability_feedback_help_path: help_page_path('user/application_security/index'),
     sast_help_path: help_page_path('user/application_security/sast/index'),

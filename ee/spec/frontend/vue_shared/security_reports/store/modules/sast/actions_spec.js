@@ -9,6 +9,7 @@ import * as actions from 'ee/vue_shared/security_reports/store/modules/sast/acti
 const headPath = 'head-path.json';
 const basePath = 'base-path.json';
 const blobPath = 'blob-path.json';
+const headReportEndpoint = 'head-report-endpoint';
 const reports = {
   base: 'base',
   head: 'head',
@@ -183,6 +184,131 @@ describe('sast report actions', () => {
           {
             type: types.UPDATE_VULNERABILITY,
             payload: issue,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setHeadReportEndpoint', () => {
+    it(`should commit ${types.SET_HEAD_REPORT_ENDPOINT} with the correct endpoint`, done => {
+      testAction(
+        actions.setHeadReportEndpoint,
+        headReportEndpoint,
+        state,
+        [
+          {
+            type: types.SET_HEAD_REPORT_ENDPOINT,
+            payload: headReportEndpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchHeadReport', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+      state.headReportEndpoint = headReportEndpoint;
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('when everything goes according to plan', () => {
+      const count = 100;
+      const data = [1, 2, 3, 4, 5];
+
+      beforeEach(() => {
+        mock.onGet(headReportEndpoint).replyOnce(200, data, { 'x-total': count });
+      });
+
+      it('should dispatch the `receiveHeadReportSuccess` action', done => {
+        testAction(
+          actions.fetchHeadReport,
+          {},
+          { ...rootState, ...state },
+          [],
+          [
+            { type: 'requestHeadReport' },
+            {
+              type: 'receiveHeadReportSuccess',
+              payload: {
+                data,
+                count,
+              },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when the API endpoint fails', () => {
+      beforeEach(() => {
+        mock.onGet(headReportEndpoint).replyOnce(500);
+      });
+
+      it('should dispatch the `receiveHeadReportError` action', done => {
+        testAction(
+          actions.fetchHeadReport,
+          {},
+          { ...rootState, ...state },
+          [],
+          [{ type: 'requestHeadReport' }, { type: 'receiveHeadReportError' }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('requestHeadReport', () => {
+    it(`should commit ${types.REQUEST_HEAD_REPORT}`, done => {
+      testAction(
+        actions.requestHeadReport,
+        {},
+        state,
+        [{ type: types.REQUEST_HEAD_REPORT }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveHeadReportsSuccess', () => {
+    it(`should commit ${types.RECEIVE_HEAD_REPORT_SUCCESS} with the correct response`, done => {
+      testAction(
+        actions.receiveHeadReportSuccess,
+        reports,
+        state,
+        [
+          {
+            type: types.RECEIVE_HEAD_REPORT_SUCCESS,
+            payload: reports,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveHeadReportError', () => {
+    it(`should commit ${types.RECEIVE_HEAD_REPORT_ERROR} with the correct response`, done => {
+      testAction(
+        actions.receiveHeadReportError,
+        [],
+        state,
+        [
+          {
+            type: types.RECEIVE_HEAD_REPORT_ERROR,
           },
         ],
         [],

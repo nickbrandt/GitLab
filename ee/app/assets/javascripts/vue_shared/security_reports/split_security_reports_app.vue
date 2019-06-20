@@ -1,6 +1,6 @@
 <script>
-import { mapActions, mapState } from 'vuex';
-import { s__, sprintf, n__ } from '~/locale';
+import { mapActions, mapState, mapGetters } from 'vuex';
+import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import ReportSection from '~/reports/components/report_section.vue';
 import { componentNames } from 'ee/reports/components/issue_body';
@@ -8,6 +8,7 @@ import IssueModal from './components/modal.vue';
 import mixin from './mixins/security_report_mixin';
 import reportsMixin from './mixins/reports_mixin';
 import messages from './store/messages';
+import { summaryTextBuilder } from './store/utils';
 
 export default {
   components: {
@@ -113,6 +114,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    headReportEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   componentNames,
   computed: {
@@ -125,27 +130,24 @@ export default {
       'canCreateIssuePermission',
       'canCreateFeedbackPermission',
     ]),
-
-    sastText() {
-      return this.summaryTextBuilder(messages.SAST, this.sast.newIssues.length);
-    },
+    ...mapGetters('sast', {
+      sastSummaryText: 'summaryText',
+      sastIssueCount: 'issueCount',
+    }),
 
     dependencyScanningText() {
-      return this.summaryTextBuilder(
+      return summaryTextBuilder(
         messages.DEPENDENCY_SCANNING,
         this.dependencyScanning.newIssues.length,
       );
     },
 
     sastContainerText() {
-      return this.summaryTextBuilder(
-        messages.CONTAINER_SCANNING,
-        this.sastContainer.newIssues.length,
-      );
+      return summaryTextBuilder(messages.CONTAINER_SCANNING, this.sastContainer.newIssues.length);
     },
 
     dastText() {
-      return this.summaryTextBuilder(messages.DAST, this.dast.newIssues.length);
+      return summaryTextBuilder(messages.DAST, this.dast.newIssues.length);
     },
 
     issuesCount() {
@@ -153,7 +155,7 @@ export default {
         this.dast.newIssues.length +
         this.dependencyScanning.newIssues.length +
         this.sastContainer.newIssues.length +
-        this.sast.newIssues.length
+        this.sastIssueCount
       );
     },
   },
@@ -176,8 +178,11 @@ export default {
     this.setPipelineId(this.pipelineId);
     this.setCanCreateIssuePermission(this.canCreateIssue);
     this.setCanCreateFeedbackPermission(this.canCreateFeedback);
+    this.setSastHeadReportEndpoint(this.headReportEndpoint);
 
-    if (this.sastHeadPath) {
+    if (gon.features && gon.features.sastPipelineReportApi) {
+      this.fetchSastHeadReport();
+    } else if (this.sastHeadPath) {
       this.setSastHeadPath(this.sastHeadPath);
 
       this.fetchSastReports().catch(() =>
@@ -238,24 +243,11 @@ export default {
       'addDismissalComment',
     ]),
     ...mapActions('sast', {
-      setSastHeadPath: 'setHeadPath',
+      fetchSastHeadReport: 'fetchHeadReport',
       fetchSastReports: 'fetchReports',
+      setSastHeadPath: 'setHeadPath',
+      setSastHeadReportEndpoint: 'setHeadReportEndpoint',
     }),
-    summaryTextBuilder(reportType, issuesCount = 0) {
-      if (issuesCount === 0) {
-        return sprintf(s__('ciReport|%{reportType} detected no vulnerabilities'), {
-          reportType,
-        });
-      }
-      return sprintf(
-        n__(
-          'ciReport|%{reportType} detected %{vulnerabilityCount} vulnerability',
-          'ciReport|%{reportType} detected %{vulnerabilityCount} vulnerabilities',
-          issuesCount,
-        ),
-        { reportType, vulnerabilityCount: issuesCount },
-      );
-    },
   },
 };
 </script>
@@ -268,7 +260,7 @@ export default {
       :status="checkReportStatus(sast.isLoading, sast.hasError)"
       :loading-text="$options.messages.SAST_IS_LOADING"
       :error-text="$options.messages.SAST_HAS_ERROR"
-      :success-text="sastText"
+      :success-text="sastSummaryText"
       :unresolved-issues="sast.newIssues"
       :has-issues="sast.newIssues.length > 0"
       :popover-options="sastPopover"

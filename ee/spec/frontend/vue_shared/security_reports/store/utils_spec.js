@@ -11,6 +11,7 @@ import {
   statusIcon,
   countIssues,
   groupedReportText,
+  summaryTextBuilder,
 } from 'ee/vue_shared/security_reports/store/utils';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import {
@@ -620,6 +621,28 @@ describe('security reports utils', () => {
       const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
 
       expect(result).toBe(`${reportType} detected no vulnerabilities for the source branch only`);
+    });
+  });
+
+  describe('summaryTextBuilder', () => {
+    const reportType = 'TPS';
+
+    it('should return the correct text when there are no vulnerabilities', () => {
+      const result = summaryTextBuilder(reportType, 0);
+
+      expect(result).toBe(`${reportType} detected no vulnerabilities`);
+    });
+
+    it("should return the correct text when there's only one vulnerability", () => {
+      const result = summaryTextBuilder(reportType, 1);
+
+      expect(result).toBe(`${reportType} detected 1 vulnerability`);
+    });
+
+    it('should return the correct text when there are multiple vulnerabilities', () => {
+      const result = summaryTextBuilder(reportType, 100);
+
+      expect(result).toBe(`${reportType} detected 100 vulnerabilities`);
     });
   });
 });
