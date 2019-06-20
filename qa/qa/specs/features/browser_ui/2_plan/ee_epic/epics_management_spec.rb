@@ -34,74 +34,77 @@ module QA
         end
       end
 
-      it 'adds/removes issue to/from epic' do
-        create_issue_and_epic_resources
-        @epic.visit!
+      context 'Resources created via API' do
+        let(:issue) { create_issue_resource }
+        let(:epic)  { create_epic_resource(issue.project.group) }
 
-        EE::Page::Group::Epic::Show.perform do |show_page|
-          show_page.add_issue_to_epic(@issue.web_url)
-          expect(show_page).to have_content('added issue')
+        it 'adds/removes issue to/from epic' do
+          epic.visit!
 
-          show_page.remove_issue_from_epic
-          expect(show_page).to have_content('removed issue')
-        end
-      end
+          EE::Page::Group::Epic::Show.perform do |show_page|
+            show_page.add_issue_to_epic(issue.web_url)
+            expect(show_page).to have_content('added issue')
 
-      it 'comments on epic', :quarantine do
-        create_issue_and_epic_resources
-        @epic.visit!
-
-        comment = 'My Epic Comment'
-        EE::Page::Group::Epic::Show.perform do |show_page|
-          show_page.add_comment_to_epic(comment)
+            show_page.remove_issue_from_epic
+            expect(show_page).to have_content('removed issue')
+          end
         end
 
-        expect(page).to have_content(comment)
-      end
+        it 'comments on epic', :quarantine do
+          epic.visit!
 
-      it 'closes and reopens an epic' do
-        create_issue_and_epic_resources
-        @epic.visit!
+          comment = 'My Epic Comment'
+          EE::Page::Group::Epic::Show.perform do |show_page|
+            show_page.add_comment_to_epic(comment)
+          end
 
-        EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
-
-        expect(page).to have_content('Closed')
-
-        EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
-
-        expect(page).to have_content('Open')
-      end
-
-      it 'adds/removes issue to/from epic using quick actions', :quarantine do
-        create_issue_and_epic_resources
-        @issue.visit!
-
-        Page::Project::Issue::Show.perform do |show_page|
-          show_page.wait_for_related_issues_to_load
-          show_page.comment("/epic #{@issue.project.group.web_url}/-/epics/#{@epic.iid}")
-
-          expect(show_page).to have_content('added to epic')
-
-          show_page.comment("/remove_epic")
-
-          expect(show_page).to have_content('removed from epic')
+          expect(page).to have_content(comment)
         end
 
-        @epic.visit!
+        it 'closes and reopens an epic' do
+          epic.visit!
 
-        expect(page).to have_content('added issue')
-        expect(page).to have_content('removed issue')
-      end
+          EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
 
-      def create_issue_and_epic_resources
-        @issue = Resource::Issue.fabricate_via_api! do |issue|
-          issue.title = 'Issue created via API'
-          issue.labels = []
+          expect(page).to have_content('Closed')
+
+          EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
+
+          expect(page).to have_content('Open')
         end
 
-        @epic = EE::Resource::Epic.fabricate_via_api! do |epic|
-          epic.group = @issue.project.group
-          epic.title = 'Epic created via API'
+        it 'adds/removes issue to/from epic using quick actions', :quarantine do
+          issue.visit!
+
+          Page::Project::Issue::Show.perform do |show_page|
+            show_page.wait_for_related_issues_to_load
+            show_page.comment("/epic #{issue.project.group.web_url}/-/epics/#{epic.iid}")
+
+            expect(show_page).to have_content('added to epic')
+
+            show_page.comment("/remove_epic")
+
+            expect(show_page).to have_content('removed from epic')
+          end
+
+          epic.visit!
+
+          expect(page).to have_content('added issue')
+          expect(page).to have_content('removed issue')
+        end
+
+        def create_issue_resource
+          Resource::Issue.fabricate_via_api! do |issue|
+            issue.labels = ''
+            issue.title = 'Issue created via API'
+          end
+        end
+
+        def create_epic_resource(group)
+          EE::Resource::Epic.fabricate_via_api! do |epic|
+            epic.group = group
+            epic.title = 'Epic created via API'
+          end
         end
       end
     end
