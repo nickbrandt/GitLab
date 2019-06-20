@@ -1024,7 +1024,7 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
     context 'on the secondary' do
       it 'calls LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:count_syncable)
 
         subject
       end
