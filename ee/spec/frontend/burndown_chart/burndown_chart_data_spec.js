@@ -2,24 +2,18 @@ import dateFormat from 'dateformat';
 import BurndownChartData from 'ee/burndown_chart/burndown_chart_data';
 
 describe('BurndownChartData', () => {
+  const startDate = '2017-03-01';
+  const dueDate = '2017-03-03';
+
   const milestoneEvents = [
     { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
     { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
-    { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
-    { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
-    { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'created' },
-    { created_at: '2017-03-01T00:00:00.190Z', weight: 2, action: 'closed' },
-    { created_at: '2017-03-01T00:00:00.478Z', weight: 2, action: 'reopened' },
-    { created_at: '2017-03-01T00:00:00.597Z', weight: 2, action: 'closed' },
-    { created_at: '2017-03-01T00:00:00.767Z', weight: 2, action: 'reopened' },
-    { created_at: '2017-03-03T00:00:00.260Z', weight: 2, action: 'closed' },
-    { created_at: '2017-03-03T00:00:00.152Z', weight: 2, action: 'closed' },
-    { created_at: '2017-03-03T00:00:00.572Z', weight: 2, action: 'reopened' },
-    { created_at: '2017-03-03T00:00:00.450Z', weight: 2, action: 'closed' },
-    { created_at: '2017-03-03T00:00:00.352Z', weight: 2, action: 'reopened' },
+    { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'created' },
+    { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'closed' },
+    { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'closed' },
+    { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'created' },
+    { created_at: '2017-03-03T00:00:00.000Z', weight: 2, action: 'reopened' },
   ];
-  const startDate = '2017-03-01';
-  const dueDate = '2017-03-03';
 
   let burndownChartData;
 
@@ -30,10 +24,28 @@ describe('BurndownChartData', () => {
   describe('generate', () => {
     it('generates an array of arrays with date, issue count and weight', () => {
       expect(burndownChartData.generate()).toEqual([
-        ['2017-03-01', 5, 10],
-        ['2017-03-02', 5, 10],
-        ['2017-03-03', 4, 8],
+        ['2017-03-01', 2, 4],
+        ['2017-03-02', 1, 2],
+        ['2017-03-03', 3, 6],
       ]);
+    });
+
+    describe('when issues are created before start date', () => {
+      beforeAll(() => {
+        milestoneEvents.push({
+          created_at: '2017-02-28T00:00:00.000Z',
+          weight: 2,
+          action: 'created',
+        });
+      });
+
+      it('generates an array of arrays with date, issue count and weight', () => {
+        expect(burndownChartData.generate()).toEqual([
+          ['2017-03-01', 3, 6],
+          ['2017-03-02', 2, 4],
+          ['2017-03-03', 4, 8],
+        ]);
+      });
     });
 
     describe('when viewing before due date', () => {
