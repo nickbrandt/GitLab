@@ -10,7 +10,7 @@ module EE
         included do
           desc _('Mark this issue as related to another issue')
           explanation do |related_reference|
-            _('Marks this issue related to %{issue_ref}.') % { issue_ref: related_reference }
+            _('Marks this issue as related to %{issue_ref}.') % { issue_ref: related_reference }
           end
           params '#issue'
           types Issue
