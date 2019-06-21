@@ -1,0 +1,16 @@
+- if group_packages_nav?
+  = nav_link(path: group_packages_nav_link_paths) do
+    = link_to group_packages_path(@group) do
+      .nav-icon-container
+        = sprite_icon('package')
+      %span.nav-item-name.qa-group-settings-item
+        = _('Packages')
+    %ul.sidebar-sub-level-items
+      - if group_packages_list_nav?
+        = nav_link(controller: 'groups/packages') do
+          = link_to group_packages_path(@group), title: _('Packages') do
+            %span= _('List')
+      - if group_dependency_proxy_nav?
+        = nav_link(controller: 'groups/dependency_proxies') do
+          = link_to group_dependency_proxy_path(@group), title: _('Dependency Proxy') do
+            %span= _('Dependency Proxy')

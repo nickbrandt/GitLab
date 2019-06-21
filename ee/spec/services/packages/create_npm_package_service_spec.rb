@@ -7,23 +7,11 @@ describe Packages::CreateNpmPackageService do
   let(:version) { '1.0.1'.freeze }
 
   let(:params) do
-    {
-      name: package_name,
-      versions: {
-        version => {
-          dist: {
-            shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
-          }
-        }
-      },
-      '_attachments' => {
-        "#{package_name}-#{version}.tgz" => {
-          'content_type' => 'application/octet-stream',
-          'data' => 'aGVsbG8K',
-          'length' => 8
-        }
-      }
-    }
+    JSON.parse(
+      fixture_file('npm/payload.json', dir: 'ee')
+        .gsub('@root/npm-test', package_name)
+        .gsub('1.0.1', version))
+      .with_indifferent_access
   end
 
   shared_examples 'valid package' do
