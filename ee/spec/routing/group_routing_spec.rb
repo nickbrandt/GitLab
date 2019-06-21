@@ -110,4 +110,12 @@ describe 'Group routing', "routing" do
       end
     end
   end
+
+  describe 'packages' do
+    it 'routes to packages index page' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/packages')).to route_to('groups/packages#index', group_id: 'gitlabhq')
+    end
+  end
 end
