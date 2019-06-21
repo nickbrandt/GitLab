@@ -113,12 +113,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resource :dependency_proxy, only: [:show, :update]
     resources :packages, only: [:index]
   end
-
-  scope(path: 'groups/*group_id') do
-    Gitlab::Routing.redirect_legacy_paths(self, :analytics, :ldap, :ldap_group_links,
-                                          :notification_setting, :audit_events,
-                                          :pipeline_quota, :hooks, :boards)
-  end
 end
 
 # Dependency proxy for containers
