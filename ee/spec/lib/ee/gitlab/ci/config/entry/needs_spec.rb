@@ -7,7 +7,7 @@ describe EE::Gitlab::Ci::Config::Entry::Needs do
   subject { described_class.new(config) }
 
   context 'when upstream config is a non-empty string' do
-    let(:config) { { project: 'some/project' } }
+    let(:config) { { pipeline: 'some/project' } }
 
     describe '#valid?' do
       it { is_expected.to be_valid }
@@ -15,7 +15,7 @@ describe EE::Gitlab::Ci::Config::Entry::Needs do
 
     describe '#value' do
       it 'is returns a upstream configuration hash' do
-        expect(subject.value).to eq(project: 'some/project')
+        expect(subject.value).to eq(pipeline: 'some/project')
       end
     end
   end
@@ -37,7 +37,7 @@ describe EE::Gitlab::Ci::Config::Entry::Needs do
 
   context 'when upstream configuration is not valid' do
     context 'when branch is not provided' do
-      let(:config) { { project: 123 } }
+      let(:config) { { pipeline: 123 } }
 
       describe '#valid?' do
         it { is_expected.not_to be_valid }
@@ -46,7 +46,7 @@ describe EE::Gitlab::Ci::Config::Entry::Needs do
       describe '#errors' do
         it 'returns an error message' do
           expect(subject.errors.first)
-            .to eq('needs project should be a string')
+            .to eq('needs pipeline should be a string')
         end
       end
     end

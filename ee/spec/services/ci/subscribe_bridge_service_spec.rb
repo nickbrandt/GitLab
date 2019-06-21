@@ -70,7 +70,7 @@ describe Ci::SubscribeBridgeService do
       let(:upstream_project) { nil }
 
       before do
-        bridge.options = { needs: { project: 'some/project' } }
+        bridge.options = { needs: { pipeline: 'some/project' } }
       end
 
       it 'drops the bridge' do

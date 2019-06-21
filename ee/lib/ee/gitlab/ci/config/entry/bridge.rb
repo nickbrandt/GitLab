@@ -24,7 +24,7 @@ module EE
 
               validate do
                 unless trigger.present? || needs.present?
-                  errors.add(:config, 'should contain either a trigger or a needs:project')
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
                 end
               end
 

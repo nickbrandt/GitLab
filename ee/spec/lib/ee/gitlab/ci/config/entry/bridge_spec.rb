@@ -64,8 +64,8 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
-    context 'when needs project config is a non-empty string' do
-      let(:config) { { needs: { project: 'some/project' } } }
+    context 'when needs pipeline config is a non-empty string' do
+      let(:config) { { needs: { pipeline: 'some/project' } } }
 
       describe '#valid?' do
         it { is_expected.to be_valid }
@@ -74,7 +74,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       describe '#value' do
         it 'is returns a bridge job configuration' do
           expect(subject.value).to eq(name: :my_bridge,
-                                      needs: { project: 'some/project' },
+                                      needs: { pipeline: 'some/project' },
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] })
@@ -106,7 +106,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     context 'when bridge configuration contains all supported keys' do
       let(:config) do
         { trigger: { project: 'some/project', branch: 'feature' },
-          needs: { project: 'other/project' },
+          needs: { pipeline: 'other/project' },
           when: 'always',
           extends: '.some-key',
           stage: 'deploy',
@@ -127,7 +127,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty trigger config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:project')
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
         end
       end
     end
@@ -141,7 +141,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty upstream config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:project')
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
         end
       end
     end

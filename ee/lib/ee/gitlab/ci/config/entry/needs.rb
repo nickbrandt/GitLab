@@ -12,13 +12,13 @@ module EE
             include ::Gitlab::Config::Entry::Validatable
             include ::Gitlab::Config::Entry::Attributable
 
-            ALLOWED_KEYS = %i[project].freeze
-            attributes :project
+            ALLOWED_KEYS = %i[pipeline].freeze
+            attributes :pipeline
 
             validations do
               validates :config, presence: true
               validates :config, allowed_keys: ALLOWED_KEYS
-              validates :project, type: String, presence: true
+              validates :pipeline, type: String, presence: true
             end
           end
         end

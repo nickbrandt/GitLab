@@ -179,7 +179,7 @@ the ones defined in the upstream project will take precedence.
 ### Mirroring status from upstream pipeline
 
 You can mirror the pipeline status from an upstream pipeline to a bridge job by
-using the `needs:project` keyword. The latest pipeline status from master is
+using the `needs:pipeline` keyword. The latest pipeline status from master is
 replicated to the bridge job.
 
 Example:
@@ -188,7 +188,7 @@ Example:
 upstream_bridge:
   stage: test
   needs:
-    project: other/project
+    pipeline: other/project
 ```
 
 ### Limitations

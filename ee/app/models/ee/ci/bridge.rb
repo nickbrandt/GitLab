@@ -55,7 +55,7 @@ module EE
       end
 
       def upstream_project
-        options&.dig(:needs, :project)
+        options&.dig(:needs, :pipeline)
       end
 
       def target_ref

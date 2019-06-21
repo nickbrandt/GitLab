@@ -37,14 +37,14 @@ describe Gitlab::Ci::Pipeline::Seed::Build do
 
     context 'when job is an upstream bridge' do
       let(:attributes) do
-        { name: 'rspec', ref: 'master', options: { needs: { project: 'my/project' } } }
+        { name: 'rspec', ref: 'master', options: { needs: { pipeline: 'my/project' } } }
       end
 
       it { is_expected.to be_truthy }
 
       context 'when upstream definition is empty' do
         let(:attributes) do
-          { name: 'rspec', ref: 'master', options: { needs: { project: '' } } }
+          { name: 'rspec', ref: 'master', options: { needs: { pipeline: '' } } }
         end
 
         it { is_expected.to be_falsey }
