@@ -9,25 +9,28 @@ import { approvedLicense, blacklistedLicense } from 'ee_spec/license_management/
 describe('LicenseManagement', () => {
   const Component = Vue.extend(LicenseManagement);
   const apiUrl = `${TEST_HOST}/license_management`;
+
   let vm;
-  let store;
   let actions;
+
+  const initVue = (mergeState = {}) => {
+    const store = new Vuex.Store({
+      state: {
+        managedLicenses: [approvedLicense, blacklistedLicense],
+        currentLicenseInModal: approvedLicense,
+        isLoadingManagedLicenses: true,
+        ...mergeState,
+      },
+      actions,
+    });
+    return mountComponentWithStore(Component, { props: { apiUrl }, store });
+  };
 
   beforeEach(() => {
     actions = {
       setAPISettings: jasmine.createSpy('setAPISettings').and.callFake(() => {}),
       loadManagedLicenses: jasmine.createSpy('loadManagedLicenses').and.callFake(() => {}),
     };
-
-    store = new Vuex.Store({
-      state: {
-        managedLicenses: [approvedLicense, blacklistedLicense],
-        currentLicenseInModal: approvedLicense,
-        isLoadingManagedLicenses: true,
-      },
-      actions,
-    });
-    vm = mountComponentWithStore(Component, { props: { apiUrl }, store });
   });
 
   afterEach(() => {
@@ -35,7 +38,8 @@ describe('LicenseManagement', () => {
   });
 
   describe('License Form', () => {
-    it('should render the form if the form is open', done => {
+    it('should render the form if the form is open and disable the form button', done => {
+      vm = initVue({ isLoadingManagedLicenses: false });
       vm.formIsOpen = true;
 
       return Vue.nextTick()
@@ -45,13 +49,14 @@ describe('LicenseManagement', () => {
           expect(formEl).not.toBeNull();
           const buttonEl = vm.$el.querySelector('.js-open-form');
 
-          expect(buttonEl).toBeNull();
+          expect(buttonEl).toHaveClass('disabled');
           done();
         })
         .catch(done.fail);
     });
 
     it('should render the button if the form is closed', done => {
+      vm = initVue({ isLoadingManagedLicenses: false });
       vm.formIsOpen = false;
 
       return Vue.nextTick()
@@ -67,30 +72,37 @@ describe('LicenseManagement', () => {
         .catch(done.fail);
     });
 
-    it('clicking the Add a license button opens the form', () => {
-      const linkEl = vm.$el.querySelector('.js-open-form');
+    it('clicking the Add a license button opens the form', done => {
+      vm = initVue({ isLoadingManagedLicenses: false });
 
-      expect(vm.formIsOpen).toBe(false);
+      return Vue.nextTick()
+        .then(() => {
+          const linkEl = vm.$el.querySelector('.js-open-form');
 
-      linkEl.click();
+          expect(vm.formIsOpen).toBe(false);
 
-      expect(vm.formIsOpen).toBe(true);
+          linkEl.click();
+
+          expect(vm.formIsOpen).toBe(true);
+          done();
+        })
+        .catch(done.fail);
     });
   });
 
   it('should render loading icon', done => {
-    store.replaceState({ ...store.state, isLoadingManagedLicenses: true });
+    vm = initVue({ isLoadingManagedLicenses: true });
 
     return Vue.nextTick()
       .then(() => {
-        expect(vm.$el.querySelector('.loading-container')).not.toBeNull();
+        expect(vm.$el.classList.contains('loading-container')).toEqual(true);
         done();
       })
       .catch(done.fail);
   });
 
   it('should render callout if no licenses are managed', done => {
-    store.replaceState({ ...store.state, managedLicenses: [], isLoadingManagedLicenses: false });
+    vm = initVue({ managedLicenses: [], isLoadingManagedLicenses: false });
 
     return Vue.nextTick()
       .then(() => {
@@ -104,7 +116,7 @@ describe('LicenseManagement', () => {
   });
 
   it('should render delete confirmation modal', done => {
-    store.replaceState({ ...store.state });
+    vm = initVue({ isLoadingManagedLicenses: false });
 
     return Vue.nextTick()
       .then(() => {
@@ -115,7 +127,7 @@ describe('LicenseManagement', () => {
   });
 
   it('should render list of managed licenses', done => {
-    store.replaceState({ ...store.state, isLoadingManagedLicenses: false });
+    vm = initVue({ isLoadingManagedLicenses: false });
 
     return Vue.nextTick()
       .then(() => {
@@ -127,18 +139,24 @@ describe('LicenseManagement', () => {
       .catch(done.fail);
   });
 
-  it('should set api settings after mount and init API calls', () =>
-    Vue.nextTick().then(() => {
-      expect(actions.setAPISettings).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        { apiUrlManageLicenses: apiUrl },
-        undefined,
-      );
+  it('should set api settings after mount and init API calls', done => {
+    vm = initVue();
 
-      expect(actions.loadManagedLicenses).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        undefined,
-        undefined,
-      );
-    }));
+    return Vue.nextTick()
+      .then(() => {
+        expect(actions.setAPISettings).toHaveBeenCalledWith(
+          jasmine.any(Object),
+          { apiUrlManageLicenses: apiUrl },
+          undefined,
+        );
+
+        expect(actions.loadManagedLicenses).toHaveBeenCalledWith(
+          jasmine.any(Object),
+          undefined,
+          undefined,
+        );
+        done();
+      })
+      .catch(done.fail);
+  });
 });

@@ -1,5 +1,5 @@
 import * as types from './mutation_types';
-import { normalizeLicense, byLicenseNameComparator } from './utils';
+import { normalizeLicense } from './utils';
 
 export default {
   [types.SET_LICENSE_IN_MODAL](state, license) {
@@ -17,7 +17,7 @@ export default {
   },
 
   [types.RECEIVE_LOAD_MANAGED_LICENSES](state, licenses = []) {
-    const managedLicenses = licenses.map(normalizeLicense).sort(byLicenseNameComparator);
+    const managedLicenses = licenses.map(normalizeLicense).reverse();
 
     Object.assign(state, {
       managedLicenses,

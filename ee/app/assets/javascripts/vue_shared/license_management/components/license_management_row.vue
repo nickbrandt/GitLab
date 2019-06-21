@@ -55,7 +55,7 @@ export default {
 };
 </script>
 <template>
-  <li class="list-group-item">
+  <div>
     <issue-status-icon :status="status" class="float-left append-right-default" />
     <span class="js-license-name">{{ license.name }}</span>
     <div class="float-right">
@@ -85,5 +85,5 @@ export default {
         </button>
       </div>
     </div>
-  </li>
+  </div>
 </template>

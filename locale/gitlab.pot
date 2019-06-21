@@ -7826,6 +7826,9 @@ msgstr ""
 msgid "LicenseManagement|There are currently no approved or blacklisted licenses in this project."
 msgstr ""
 
+msgid "LicenseManagement|There are currently no approved or blacklisted licenses that match in this project."
+msgstr ""
+
 msgid "LicenseManagement|This license already exists in this project."
 msgstr ""
 
