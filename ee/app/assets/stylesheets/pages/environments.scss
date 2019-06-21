@@ -2,15 +2,20 @@
  * Deploy boards
 */
 .deploy-board {
-  padding: 10px;
   background-color: $gray-light;
   min-height: 20px;
 
-  > div {
+  > .loading-container,
+  > .deploy-board-empty,
+  > .deploy-board-information {
+    padding: 10px;
+  }
+
+  > .deploy-board-information {
     display: flex;
     justify-content: space-between;
 
-    .deploy-board-information {
+    .deploy-board-status {
       order: 1;
       display: flex;
       width: 70px;

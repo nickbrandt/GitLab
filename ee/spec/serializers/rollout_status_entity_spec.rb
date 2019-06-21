@@ -3,19 +3,23 @@ require 'spec_helper'
 describe RolloutStatusEntity do
   include KubernetesHelpers
 
+  let(:rollout_status) { kube_deployment_rollout_status }
+
   let(:entity) do
     described_class.new(rollout_status, request: double)
   end
 
   subject { entity.as_json }
 
+  it "exposes status" do
+    is_expected.to include(:status)
+  end
+
+  it 'exposes has_legacy_app_label' do
+    is_expected.to include(:has_legacy_app_label)
+  end
+
   context 'when kube deployment is valid' do
-    let(:rollout_status) { kube_deployment_rollout_status }
-
-    it "exposes status" do
-      is_expected.to include(:status)
-    end
-
     it "exposes deployment data" do
       is_expected.to include(:instances, :completion, :is_completed)
     end

@@ -14,6 +14,9 @@
         "is_completed": {
             "type": "boolean"
         },
+        "has_legacy_app_label": {
+            "type": "boolean"
+        },
         "instances": {
             "type": "array",
             "items": {
