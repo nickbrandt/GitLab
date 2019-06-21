@@ -5,7 +5,7 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
   include ReactiveCachingHelpers
 
   shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-    let(:service) { project.deployment_platform }
+    let(:service) { create(:kubernetes_service) }
 
     describe '#rollout_status' do
       let(:environment) { build(:environment, project: project, name: "env", slug: "env-000000") }
@@ -130,7 +130,7 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
 
   describe '#calculate_reactive_cache' do
     let(:project) { create(:kubernetes_project) }
-    let(:service) { project.deployment_platform }
+    let(:service) { create(:kubernetes_service, project: project) }
     let(:namespace) { service.kubernetes_namespace_for(project) }
 
     subject { service.calculate_reactive_cache }
@@ -187,7 +187,7 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
 
     context 'Platforms::Kubernetes' do
       let(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-      let(:service) { cluster.platform_kubernetes }
+      let(:service) { create(:kubernetes_service, project: project) }
       let(:project) { cluster.first_project }
 
       include_examples 'cache expiry'
@@ -195,7 +195,7 @@ describe KubernetesService, models: true, use_clean_rails_memory_store_caching: 
 
     context 'KubernetesService' do
       let(:project) { create(:kubernetes_project) }
-      let(:service) { project.deployment_platform }
+      let(:service) { create(:kubernetes_service, project: project) }
 
       include_examples 'cache expiry'
     end
