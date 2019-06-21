@@ -276,7 +276,15 @@ module EESpecificCheck
   end
 
   def ce_repo_url
-    @ce_repo_url ||= ENV.fetch('CI_REPOSITORY_URL', 'https://gitlab.com/gitlab-org/gitlab-ce.git').sub('gitlab-ee', 'gitlab-ce')
+    @ce_repo_url ||=
+      begin
+        repo_url = ENV.fetch('CI_REPOSITORY_URL', 'https://gitlab.com/gitlab-org/gitlab-ce.git')
+        # This workaround can be removed once we rename the dev CE project
+        # https://gitlab.com/gitlab-org/gitlab-ce/issues/59107
+        project_name = repo_url =~ /dev\.gitlab\.org/ ? 'gitlabhq' : 'gitlab-ce'
+
+        repo_url.sub('gitlab-ee', project_name)
+      end
   end
 
   def current_head
