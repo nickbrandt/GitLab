@@ -65,6 +65,7 @@ The following items will be exported:
 - Project configuration, including services
 - Issues with comments, merge requests with diffs and comments, labels, milestones, snippets,
   and other project entities
+- Issue Boards
 - LFS objects
 
 The following items will NOT be exported:
