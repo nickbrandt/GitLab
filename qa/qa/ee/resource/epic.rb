@@ -10,6 +10,9 @@ module QA
           QA::Resource::Group.fabricate!
         end
 
+        attribute :id
+        attribute :iid
+
         def fabricate!
           group.visit!
 
@@ -23,6 +26,26 @@ module QA
               page.has_text?(@title)
             end
           end
+        end
+
+        def resource_web_url(resource)
+          super
+        rescue ResourceURLMissingError
+          "#{group.web_url}/-/epics/#{iid}"
+        end
+
+        def api_get_path
+          "/groups/#{group.id}/epics/#{id}"
+        end
+
+        def api_post_path
+          "/groups/#{group.id}/epics"
+        end
+
+        def api_post_body
+          {
+            title: title
+          }
         end
       end
     end
