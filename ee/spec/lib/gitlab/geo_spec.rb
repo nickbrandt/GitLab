@@ -234,7 +234,7 @@ describe Gitlab::Geo, :geo, :request_store do
     context 'when the feature flag has been set' do
       context 'when the feature flag is set to enabled' do
         it 'returns true' do
-          Feature.enable('geo_repository_verification')
+          stub_feature_flags(geo_repository_verification: true)
 
           expect(described_class.repository_verification_enabled?).to eq true
         end
@@ -242,7 +242,7 @@ describe Gitlab::Geo, :geo, :request_store do
 
       context 'when the feature flag is set to disabled' do
         it 'returns false' do
-          Feature.disable('geo_repository_verification')
+          stub_feature_flags(geo_repository_verification: false)
 
           expect(described_class.repository_verification_enabled?).to eq false
         end
