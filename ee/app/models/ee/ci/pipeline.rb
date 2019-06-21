@@ -130,31 +130,13 @@ module EE
       end
 
       def any_report_artifact_for_type(file_type)
-        report_artifact_for_file_type(file_type) || legacy_report_artifact_for_file_type(file_type)
+        report_artifact_for_file_type(file_type)
       end
 
       def report_artifact_for_file_type(file_type)
         return unless available_licensed_report_type?(file_type)
 
         job_artifacts.where(file_type: ::Ci::JobArtifact.file_types[file_type]).last
-      end
-
-      def legacy_report_artifact_for_file_type(file_type)
-        return unless available_licensed_report_type?(file_type)
-
-        legacy_names = LEGACY_REPORT_FORMATS[file_type]
-        return unless legacy_names
-
-        builds.success.latest.where(name: legacy_names[:names]).each do |build|
-          legacy_names[:files].each do |file_name|
-            next unless build.has_artifact?(file_name)
-
-            return OpenStruct.new(build: build, path: file_name)
-          end
-        end
-
-        # In case there is no artifact return nil
-        nil
       end
 
       def expose_license_management_data?
