@@ -21,9 +21,7 @@ export default {
   computed: {
     eventText() {
       const { project, feedback } = this;
-      const mergeRequestLink = `<a href="${feedback.merge_request_path}">!${
-        feedback.merge_request_iid
-      }</a>`;
+      const mergeRequestLink = `<a href="${feedback.merge_request_path}">!${feedback.merge_request_iid}</a>`;
 
       if (project && project.value && project.url) {
         const projectLink = `<a href="${_.escape(project.url)}">${_.escape(project.value)}</a>`;

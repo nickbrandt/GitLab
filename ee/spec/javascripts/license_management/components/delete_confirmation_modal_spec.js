@@ -37,9 +37,7 @@ describe('DeleteConfirmationModal', () => {
     describe('confirmationText', () => {
       it('returns information text with current license name in bold', () => {
         expect(vm.confirmationText).toBe(
-          `You are about to remove the license, <strong>${
-            approvedLicense.name
-          }</strong>, from this project.`,
+          `You are about to remove the license, <strong>${approvedLicense.name}</strong>, from this project.`,
         );
       });
 
