@@ -7,6 +7,7 @@ module EE
     override :sidebar_projects_paths
     def sidebar_projects_paths
       super + %w[
+        projects/dependencies#show
         projects/security/dashboard#show
         projects/insights#show
       ]
