@@ -38,7 +38,8 @@ module QA
         end
       end
 
-      context 'instance level' do
+      # https://gitlab.com/gitlab-org/quality/staging/issues/59
+      context 'instance level', :quarantine do
         before do
           # Log out if already logged in
           Page::Main::Menu.perform do |menu|
