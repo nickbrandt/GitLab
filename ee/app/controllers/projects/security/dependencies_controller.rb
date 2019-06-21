@@ -32,8 +32,7 @@ module Projects
       end
 
       def ensure_dependency_list_feature_available
-        render_404 unless ::Feature.enabled?(:dependency_list) &&
-          project.feature_available?(:dependency_list)
+        render_404 unless project.feature_available?(:dependency_list)
       end
 
       def dependencies
