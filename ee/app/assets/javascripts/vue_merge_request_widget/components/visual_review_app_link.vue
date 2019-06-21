@@ -1,5 +1,6 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
+import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 
@@ -8,6 +9,7 @@ export default {
     GlButton,
     GlModal,
     Icon,
+    ModalCopyButton,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -127,7 +129,15 @@ export default {
       <p v-html="instructionText.intro"></p>
       <div>
         <p v-html="instructionText.step1"></p>
-        <pre> {{ copyString.script }} </pre>
+        <div class="flex align-items-start">
+          <pre> {{ copyString.script }} </pre>
+          <modal-copy-button
+            title="Copy script"
+            :text="copyString.script"
+            :modal-id="modalId"
+            css-classes="border-0"
+          />
+        </div>
       </div>
       <p v-html="instructionText.step2"></p>
       <p v-html="instructionText.step3"></p>

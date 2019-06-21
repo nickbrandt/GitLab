@@ -1,6 +1,7 @@
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import VisualReviewAppLink from 'ee/vue_merge_request_widget/components/visual_review_app_link.vue';
 import { GlButton, GlModal } from '@gitlab/ui';
+import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 
 const localVue = createLocalVue();
 
@@ -52,7 +53,6 @@ describe('Visual Review App Link', () => {
         localVue,
       });
     });
-
     it('with expected project Id', () => {
       expect(wrapper.find(GlModal).text()).toEqual(
         expect.stringContaining(`data-project-id='${propsData.appMetadata.sourceProjectId}'`),
@@ -84,6 +84,17 @@ describe('Visual Review App Link', () => {
           .find('a')
           .attributes('href'),
       ).toEqual(propsData.link);
+    });
+  });
+
+  describe('renders the copyToClipboard button', () => {
+    it('within the modal', () => {
+      expect(wrapper.find(ModalCopyButton)).toBeTruthy();
+    });
+
+    it('with the expected modalId', () => {
+      const renderedId = wrapper.find(GlModal).attributes('modalid');
+      expect(wrapper.find(ModalCopyButton).props().modalId).toBe(renderedId);
     });
   });
 });
