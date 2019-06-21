@@ -48,9 +48,7 @@ export const percentageCompleted = state => {
     return 0;
   }
 
-  return tourData[tourKey][lastStepIndex]
-    ? tourData[tourKey][lastStepIndex].percentageCompleted
-    : 0;
+  return Math.floor((100 * lastStepIndex) / tourData[tourKey].length);
 };
 
 export const actionPopover = (state, getters) =>
