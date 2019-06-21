@@ -13103,9 +13103,6 @@ msgstr ""
 msgid "The branch for this project has no active pipeline configuration."
 msgstr ""
 
-msgid "The certificate will be shown here once it has been obtained from Let's Encrypt. This process may take up to an hour to complete."
-msgstr ""
-
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
@@ -13503,9 +13500,6 @@ msgid "This board's scope is reduced"
 msgstr ""
 
 msgid "This branch has changed since you started editing. Would you like to create a new branch?"
-msgstr ""
-
-msgid "This certificate is automatically managed by Let's Encrypt"
 msgstr ""
 
 msgid "This chart could not be displayed"
