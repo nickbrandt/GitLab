@@ -238,6 +238,7 @@ describe Project do
 
         let!(:default_cluster) do
           create(:cluster,
+                 :not_managed,
                  platform_type: :kubernetes,
                  projects: [project],
                  environment_scope: '*',
@@ -246,6 +247,7 @@ describe Project do
 
         let!(:review_env_cluster) do
           create(:cluster,
+                 :not_managed,
                  platform_type: :kubernetes,
                  projects: [project],
                  environment_scope: 'review/*',
