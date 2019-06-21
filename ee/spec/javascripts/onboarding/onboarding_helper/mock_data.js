@@ -17,7 +17,6 @@ export const mockTourData = {
         text: 'foo',
         placement: 'top',
       },
-      percentageCompleted: 10,
     },
     {
       forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/foo/bar$`, ''),
@@ -31,7 +30,6 @@ export const mockTourData = {
         selector: '',
         text: 'bar',
       },
-      percentageCompleted: 20,
     },
     {
       forUrl: ({ projectFullPath }) => new RegExp(`${projectFullPath}/xyz`, ''),
@@ -41,7 +39,6 @@ export const mockTourData = {
         text: 'foo',
         placement: 'top',
       },
-      percentageCompleted: 30,
     },
   ],
 };
