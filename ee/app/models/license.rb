@@ -15,6 +15,7 @@ class License < ApplicationRecord
     contribution_analytics
     elastic_search
     export_issues
+    group_bulk_edit
     group_burndown_charts
     group_webhooks
     issuable_default_templates
