@@ -1,10 +1,9 @@
-New Epic <%= @epic.to_reference(full: true) %> was created.
+<%= sanitize_name(@epic.author_name) %> created an epic:
 
-<%= url_for(group_epic_url(@epic.group, @epic)) %>
-
-Author: <%= sanitize_name(@epic.author_name) %>
 <% if @epic.assignee %>
-Assignee: <%= sanitize_name(@epic.assignee.name) %>
+  <%= assignees_label(@issue) %>
 <% end %>
 
-<%= @epic.description %>
+<% if @epic.description -%>
+ <%= @epic.description %>
+<% end %>
