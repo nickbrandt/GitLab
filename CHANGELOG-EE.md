@@ -1,5 +1,137 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.0.0 (2019-06-22)
+
+### Security (2 changes)
+
+- Filter relative links in wiki for XSS.
+- Fix XSS in Ancestor tooltip title.
+
+### Removed (2 changes)
+
+- Remove old approver system in favor of new approval rule system. !12436
+- Geo: Remove deprecated wikis_count and repositories_count fields from the public API. !13025
+
+### Fixed (36 changes, 1 of them is from the community)
+
+- Group SAML identities cleaned up when leaving a group. !5817
+- Make root relative URLs clickable in vulnerability modal. !9767
+- Make burndown chart timezone aware. !10328
+- Prevent files paths from overflowing in vulnerability info modal. !10606
+- Fixed a bug where removing related issues could get stuck. !12316
+- Fix anchor link in UI. !12737
+- Add feature flag to group_scim javascript. !13078
+- Geo - Enable Cron job to perform repository checks on a Geo secondary node. !13103
+- Restrict child_epic and remove_child_epic quick actions when using mysql. !13152
+- Disable licenses_app feature flag by default. !13291
+- Fix security dashboard errors on IE11. !13319
+- Respect limited indexing settings in rake tasks. !13437
+- Geo - Does not redirect user to the custom home page URL on a Geo secondary. !13447
+- Use quarantine size to check push size against repository size limit. !13460
+- Fix SSO Enforcement when used with 2FA. !13473
+- Fix Git over HTTP when using SAML SSO Enforcement. !13485
+- Only use elasticsearch when it is enabled. !13495
+- Add referenced-commands in no overflow list. !13550
+- Hide action buttons while security dashboard is loading. !13576
+- Fix alignment of label for admin notes on admin. !13592 (Takuya Noguchi)
+- Use elasticsearch go indexer for wikis. !13743
+- Handle case where site property is an array in DAST report. !13775
+- Fix dast report parsing regression caused by change in zaproxy. !13789
+- Fix port validation in .gitlab-webide.yml. !13846
+- Fix "rule_type does not exist" error during consume_remaining_migrate_approver_to_approval_rules_in_batch_jobs migration. !13947
+- Hide operations nav icon for small screens. !13960
+- Remove free user info from non-ultimate license. !14010
+- Use fallback approval rule if no eligible rules exist. !14042
+- Fix 'Group > Usage Quota' menu item. !14043
+- Fix incorrect epic ancestor links. !14092
+- Show Usage Quotas regardless of namespace subscription. !14135
+- Fix calculation of used extra CI minutes. !14217
+- Remove class hiding spinner in board switcher.
+- Fix broken filter by approvers.
+- Remove extra spaces in MR list view approval counts.
+- Remove extra border on tracing empty state page.
+
+### Changed (18 changes)
+
+- Allow merge requests to be merged even when it does not have up-to-date pipeline when merge request pipeline is enabled. !12309
+- Migrate code_owners to rule_type enum on approval_merge_request_rules. !13036
+- Avoid failing pull mirroring if LFS import fails. !13133
+- Updates Pipeline Quota page to accomodate for Storage Quotas. !13139
+- Align group and project level security dashboard UX. !13180
+- Remove shared_runner_minutes_on_root_namespace feature flag. !13208
+- Enable dependency proxy per group by default. !13574
+- Move dependencies API endpoint to "security" namespace. !13897
+- Allow developers to configure dependency proxy. !13899
+- Use real data in `:project/security/dependencies` endpoint. !13906
+- Use bulk-indexing API for project associations. !13917
+- Update response schema for DependencyList endpoint and add status. !13918
+- Geo - Make foreign data wrapper a hard requirement. !13940
+- Polish SAML SSO configuration page. !13982
+- Make Insights Generally Available. !14067
+- Automatically index wikis in elasticsearch. !14095
+- Require Hashed Storage to be enabled to create new Geo Nodes. !14102
+- Changes to default insights charts.
+
+### Performance (7 changes)
+
+- Omit page counts in admin audit logs. !1306
+- Improve scheduling of mirror updates to reduce frequency of database queries. !11217
+- Limit count to improve query performance. !12231
+- Avoid loading database objects for Elasticsearch results. !12691
+- Avoid hitting Elasticsearch more than once on search. !13120
+- Add index to count pending mirror updates. !13901
+- Performance improvement when loading epics list. !13904
+
+### Added (34 changes, 1 of them is from the community)
+
+- Provide application-wide LDAP membership lock setting. !4354
+- Added a "Require user password to approve" option on projects for merge request approvals to enable compliance in FDA regulated fields". !10364 (James Davila, Paul Knopf, Greg Smethells)
+- Add "Allow merge trains" option to project settings page. !10803
+- Add optional reason when dismissing vulnerabilities. !11226
+- System notes for adding and removing epic relationships. !11416
+- Show if user is using a license seat on admin user page. !11449
+- Allow merge requests to block other MRs from being merged. !11600
+- SSO enforement redirects to group sign in when not using SAML. !12246
+- When a merge request is blocked by other unmerged merge requests, display them on the show page of a merge request. !12357
+- Group SAML can be used to sign into a GitLab instance. !12660
+- IP address restriction for groups. !12669
+- Make the number of Elasticsearch shards and replicas configurable. !12713
+- Add quick actions for adding and removing child epic relations to epic. !12772
+- Adds a confidence filter to the Group Security Dashboard. !12805
+- Expose Design blobs through GraphQL. !13037
+- Expand pipeline variables passed downstream. !13197
+- Add support for querying epics with GraphQL. !13248
+- Add Merge Train auto merge strategy. !13278
+- Adds Storage Counter. !13294
+- Allow design blobs to be stored in Git LFS. !13389
+- JIT users provisioning for group SAML. !13552
+- Add Ability for Maintainers to Rotate Instance Id in Feature Flags. !13722
+- Notify users when their CI minutes quota has run out. !13735
+- Use Flipper as an A/B testing framework. !13755
+- [New Auto Merge Strategy] Add To Merge Train When Pipeline Succeeds. !13767
+- Add `dependency_list` report. !13900
+- Add admin form to enforce a pipeline on an instance. !13923
+- Count usage of DependencyList endpoint. !13962
+- Add preliminary Dependency List frontend implementation. !13968
+- Add Admin settings to disable project deletion. !14002
+- Usage ping: Track amount of incident issues. !14013
+- Sync file changes from Web IDE to Web Terminal. !14035
+- Add report_approver to approval_merge_request_rules. !14050
+- Add merge train position message under pipeline in merge request widget. !14064
+
+### Other (9 changes, 2 of them are from the community)
+
+- New user flow for SSOing into a GitLab.com group. !10338
+- Improve vulnerability API. !12760 (Robert Schilling)
+- Add action popover component for user onboarding. !13346
+- Add help content popover component for user onboarding. !13363
+- Expose services in the web ide terminal entity. !13665
+- Rename boards spec name. !13725 (George Tsiolis)
+- Fix typos in i18n strings for onboarding tour. !14153
+- Externalize strings of chat page in user profile. !28632
+- Remove commit count from storage quotass.
+
+
 ## 11.11.3 (2019-06-10)
 
 ### Fixed (1 change)

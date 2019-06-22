@@ -1,6 +1,0 @@
----
-title: 'Geo: Remove deprecated wikis_count and repositories_count fields from the
-  public API'
-merge_request: 13025
-author:
-type: removed

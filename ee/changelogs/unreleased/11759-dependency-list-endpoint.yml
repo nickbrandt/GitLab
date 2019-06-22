@@ -1,5 +1,0 @@
----
-title: Use real data in `:project/security/dependencies` endpoint
-merge_request: 13906
-author:
-type: changed

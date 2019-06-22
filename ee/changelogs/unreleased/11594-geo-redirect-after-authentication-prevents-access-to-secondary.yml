@@ -1,5 +1,0 @@
----
-title: Geo - Does not redirect user to the custom home page URL on a Geo secondary
-merge_request: 13447
-author:
-type: fixed

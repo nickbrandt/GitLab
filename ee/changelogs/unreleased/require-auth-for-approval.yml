@@ -1,6 +1,0 @@
----
-title: Added a "Require user password to approve" option on projects for merge request
-  approvals to enable compliance in FDA regulated fields"
-merge_request: 10364
-author: James Davila, Paul Knopf, Greg Smethells
-type: added

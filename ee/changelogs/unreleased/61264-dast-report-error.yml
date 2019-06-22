@@ -1,5 +1,0 @@
----
-title: Fix dast report parsing regression caused by change in zaproxy
-merge_request: 13789
-author:
-type: fixed
