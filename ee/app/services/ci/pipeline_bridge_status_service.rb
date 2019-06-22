@@ -18,6 +18,10 @@ module Ci
         bridge.cancel!
       when 'skipped'
         bridge.skip!
+      when 'manual'
+        bridge.update(status: 'manual')
+      when 'scheduled'
+        bridge.schedule!
       end
     end
   end

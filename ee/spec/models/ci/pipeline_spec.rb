@@ -433,6 +433,14 @@ describe Ci::Pipeline do
           pipeline.succeed!
         end
       end
+
+      context 'when transitioning to blocked' do
+        it 'schedules the pipeline bridge worker' do
+          expect(::Ci::PipelineBridgeStatusWorker).to receive(:perform_async).with(pipeline.id)
+
+          pipeline.block!
+        end
+      end
     end
   end
 

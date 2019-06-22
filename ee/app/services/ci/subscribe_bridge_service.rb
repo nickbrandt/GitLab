@@ -21,7 +21,7 @@ module Ci
 
       bridge_updates = { upstream_pipeline: upstream_pipeline }
 
-      if completed_status?(upstream_pipeline.status)
+      if upstream_pipeline.complete? || upstream_pipeline.blocked?
         bridge_updates[:status] = upstream_pipeline.status
       end
 
@@ -40,10 +40,6 @@ module Ci
       strong_memoize(:upstream_pipeline) do
         upstream_project.pipeline_for(upstream_project.default_branch)
       end
-    end
-
-    def completed_status?(status)
-      Ci::Pipeline::COMPLETED_STATUSES.include?(status)
     end
   end
 end
