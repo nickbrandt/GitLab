@@ -8,9 +8,9 @@ describe Gitlab::Geo, :geo, :request_store do
   set(:secondary_node) { create(:geo_node) }
 
   shared_examples 'a Geo cached value' do |method, key|
-    it 'includes Rails.version in the cache key' do
+    it 'includes GitLab version and Rails.version in the cache key' do
       expect(Rails.cache).to receive(:write)
-        .with("geo:#{key}:#{Rails.version}", an_instance_of(String), expires_in: 15.seconds)
+        .with("geo:#{key}:#{Gitlab::VERSION}:#{Rails.version}", an_instance_of(String), expires_in: 15.seconds)
 
       described_class.public_send(method)
     end
@@ -171,7 +171,7 @@ describe Gitlab::Geo, :geo, :request_store do
   describe '.expire_cache!' do
     it 'clears the Geo cache keys', :request_store do
       described_class::CACHE_KEYS.each do |raw_key|
-        expect(Rails.cache).to receive(:delete).with("geo:#{raw_key}:#{Rails.version}")
+        expect(Rails.cache).to receive(:delete).with("geo:#{raw_key}:#{Gitlab::VERSION}:#{Rails.version}")
       end
 
       described_class.expire_cache!
