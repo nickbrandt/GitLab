@@ -1,5 +1,0 @@
----
-title: Fix SSO Enforcement when used with 2FA
-merge_request: 13473
-author:
-type: fixed

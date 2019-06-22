@@ -1,5 +1,0 @@
----
-title: Disable licenses_app feature flag by default
-merge_request: 13291
-author:
-type: fixed

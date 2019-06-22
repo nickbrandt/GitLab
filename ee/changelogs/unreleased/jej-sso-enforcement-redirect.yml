@@ -1,5 +1,0 @@
----
-title: SSO enforement redirects to group sign in when not using SAML
-merge_request: 12246
-author:
-type: added

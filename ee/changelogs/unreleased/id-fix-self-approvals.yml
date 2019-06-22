@@ -1,5 +1,0 @@
----
-title: Use fallback approval rule if no eligible rules exist
-merge_request: 14042
-author:
-type: fixed
