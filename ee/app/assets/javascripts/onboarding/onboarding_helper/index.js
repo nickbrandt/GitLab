@@ -13,14 +13,14 @@ export default function() {
     return false;
   }
 
-  const { projectFullPath, projectName } = el.dataset;
   const tourData = onboardingUtils.getOnboardingLocalStorageState();
-  const url = window.location.href;
 
-  if (!tourData) {
+  if (!tourData || onboardingUtils.isOnboardingDismissed()) {
     return false;
   }
 
+  const { projectFullPath, projectName, goldenTanukiSvgPath } = el.dataset;
+  const url = window.location.href;
   const { tourKey, lastStepIndex, createdProjectPath } = tourData;
   const store = createStore();
 
@@ -51,6 +51,7 @@ export default function() {
         props: {
           tourTitles: TOUR_TITLES,
           exitTourContent: EXIT_TOUR_CONTENT,
+          goldenTanukiSvgPath,
         },
       });
     },
