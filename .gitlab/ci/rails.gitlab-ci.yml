@@ -215,6 +215,7 @@ ee_compat_check:
     - master
     - tags
     - /[\d-]+-stable(-ee)?/
+    - /[\d-]+-auto-deploy-\d{7}/
     - /^security-/
     - branches@gitlab-org/gitlab-ee
     - branches@gitlab/gitlab-ee
