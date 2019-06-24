@@ -53,16 +53,20 @@ export default {
     <div>
       <p v-html="helpContent.text"></p>
       <template v-if="helpContent.buttons">
-        <gl-button
-          v-for="(button, index) in helpContent.buttons"
-          :key="index"
-          :class="button.btnClass"
-          class="btn btn-sm mr-2"
-          :disabled="button.disabled"
-          @click="callButtonAction(button)"
-        >
-          {{ button.text }}
-        </gl-button>
+        <template v-for="(button, index) in helpContent.buttons">
+          <gl-button
+            v-if="!button.readOnly"
+            :key="index"
+            :class="button.btnClass"
+            class="btn btn-sm mr-2"
+            @click="callButtonAction(button)"
+          >
+            {{ button.text }}
+          </gl-button>
+          <span v-else :key="index" :class="button.btnClass" class="btn btn-sm mr-2">
+            {{ button.text }}
+          </span>
+        </template>
       </template>
     </div>
   </gl-popover>

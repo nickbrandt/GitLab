@@ -121,9 +121,14 @@ export default {
     },
     handleClickPopoverButton(button) {
       const { showExitTourContent, exitTour, redirectPath, nextPart, dismissPopover } = button;
-      const helpContentItems = this.stepContent.getHelpContent({ projectName: this.projectName });
+      const helpContentItems = this.stepContent
+        ? this.stepContent.getHelpContent({ projectName: this.projectName })
+        : null;
+
       const showNextContentItem =
-        helpContentItems.length > 1 && this.helpContentIndex < helpContentItems.length - 1;
+        helpContentItems &&
+        helpContentItems.length > 1 &&
+        this.helpContentIndex < helpContentItems.length - 1;
 
       // display exit tour content
       if (showExitTourContent) {
@@ -166,6 +171,7 @@ export default {
     },
     showExitTourContent(showExitTour) {
       this.dismissPopover = false;
+      this.showStepContent = true;
       this.setExitTour(showExitTour);
     },
     handleExitTour() {
