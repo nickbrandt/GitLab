@@ -101,6 +101,7 @@ flaky-examples-check:
     - master
     - tags
     - /[\d-]+-stable(-ee)?/
+    - /[\d-]+-auto-deploy-\d{7}/
     - /^security-/
     - /\bce\-to\-ee\b/
 
