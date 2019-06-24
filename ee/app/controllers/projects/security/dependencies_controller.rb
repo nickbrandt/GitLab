@@ -10,8 +10,7 @@ module Projects
           format.json do
             ::Gitlab::UsageCounters::DependencyList.increment(project.id)
 
-            render json: ::DependencyListSerializer.new(project: project)
-                           .represent(paginated_dependencies, build: build)
+            render json: serializer.represent(dependencies, build: build)
           end
         end
       end
@@ -27,16 +26,17 @@ module Projects
                   .last
       end
 
+      def collect_dependencies
+        found_dependencies = build&.success? ? service.execute : []
+        ::Gitlab::DependenciesCollection.new(found_dependencies)
+      end
+
       def ensure_dependency_list_feature_available
         render_404 unless project.feature_available?(:dependency_list)
       end
 
       def dependencies
-        @dependencies ||= build&.success? ? service.execute : []
-      end
-
-      def paginated_dependencies
-        params[:page] ? Kaminari.paginate_array(dependencies).page(params[:page]) : dependencies
+        @dependencies ||= collect_dependencies
       end
 
       def pipeline
@@ -48,6 +48,12 @@ module Projects
           key == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
             key == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES)
         end
+      end
+
+      def serializer
+        serializer = ::DependencyListSerializer.new(project: project)
+        serializer = serializer.with_pagination(request, response) if params[:page]
+        serializer
       end
 
       def service

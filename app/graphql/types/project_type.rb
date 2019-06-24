@@ -17,6 +17,7 @@ module Types
     field :name, GraphQL::STRING_TYPE, null: false
 
     field :description, GraphQL::STRING_TYPE, null: true
+    markdown_field :description_html, null: true
 
     field :tag_list, GraphQL::STRING_TYPE, null: true
 
@@ -70,7 +71,7 @@ module Types
     field :group, Types::GroupType, null: true
 
     field :statistics, Types::ProjectStatisticsType,
-          null: false,
+          null: true,
           resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchProjectStatisticsLoader.new(obj.id).find }
 
     field :repository, Types::RepositoryType, null: false

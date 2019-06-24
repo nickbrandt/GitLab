@@ -33,21 +33,17 @@ module Geo
           current_node.verification_max_capacity
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def load_pending_resources
-          finder.find_registries_to_verify(shard_name: shard_name, batch_size: db_retrieve_batch_size)
-                .pluck(:id)
+          Geo::ProjectRegistryPendingVerificationFinder
+            .new(current_node: current_node, shard_name: shard_name, batch_size: db_retrieve_batch_size)
+            .execute
+            .pluck_primary_key
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def schedule_job(registry_id)
           job_id = Geo::RepositoryVerification::Secondary::SingleWorker.perform_async(registry_id)
 
           { id: registry_id, job_id: job_id } if job_id
-        end
-
-        def finder
-          @finder ||= Geo::ProjectRegistryFinder.new(current_node: current_node)
         end
       end
     end

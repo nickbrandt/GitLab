@@ -1,5 +1,0 @@
----
-title: When a merge request is blocked by other unmerged merge requests, display them on the show page of a merge request
-merge_request: 12357
-author:
-type: added

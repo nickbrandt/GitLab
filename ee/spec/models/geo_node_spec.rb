@@ -94,6 +94,22 @@ describe GeoNode, :geo, type: :model do
         it { is_expected.not_to be_valid }
       end
     end
+
+    context 'when validating requirement for hashed storage' do
+      subject { build(:geo_node) }
+
+      context 'when hashed storage is enabled' do
+        it { is_expected.to be_valid }
+      end
+
+      context 'when hashed_storage is disabled' do
+        before do
+          stub_application_setting(hashed_storage_enabled: false)
+        end
+
+        it { is_expected.to be_invalid }
+      end
+    end
   end
 
   context 'default values' do
@@ -110,7 +126,7 @@ describe GeoNode, :geo, type: :model do
   context 'prevent locking yourself out' do
     it 'does not accept adding a non primary node with same details as current_node' do
       stub_geo_setting(node_name: 'foo')
-      node = build(:geo_node, :primary, primary: false, name: 'foo')
+      node = build(:geo_node, primary: false, name: 'foo')
 
       expect(node).not_to be_valid
       expect(node.errors.full_messages.count).to eq(1)

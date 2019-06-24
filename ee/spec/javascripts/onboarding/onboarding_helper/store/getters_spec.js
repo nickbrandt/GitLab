@@ -161,11 +161,9 @@ describe('User onboarding store getters', () => {
 
   describe('percentageCompleted', () => {
     it('returns the percentage completed for the current step', () => {
-      const localGetters = {
-        stepIndex: 1,
-      };
+      localState.lastStepIndex = 1;
 
-      expect(getters.percentageCompleted(localState, localGetters)).toBe(20);
+      expect(getters.percentageCompleted(localState)).toBe(33);
     });
 
     it('returns the 0 if there is no step index', () => {

@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     vulnerabilitiesHistoryEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
+    securityDashboardHelpPath,
+    emptyStateIllustrationPath,
   } = securityTab.dataset;
 
   const parsedPipelineId = parseInt(pipelineId, 10);
@@ -41,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     vulnerabilitiesHistoryEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
-    securityDashboardHelpPath: dashboardDocumentation,
-    emptyStateIllustrationPath: emptyStateSvgPath,
+    securityDashboardHelpPath,
+    emptyStateIllustrationPath,
   };
   if (parsedHasPipelineData) {
     props = {

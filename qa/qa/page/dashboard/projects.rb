@@ -7,7 +7,7 @@ module QA
         prepend QA::EE::Page::Dashboard::Projects
 
         view 'app/views/shared/projects/_search_form.html.haml' do
-          element :form_filter_by_name, /form_tag.+id: 'project-filter-form'/ # rubocop:disable QA/ElementWithPattern
+          element :project_filter_form, required: true
         end
 
         def go_to_project(name)
@@ -16,10 +16,14 @@ module QA
           find_link(text: name).click
         end
 
+        def self.path
+          '/'
+        end
+
         private
 
         def filter_by_name(name)
-          page.within('form#project-filter-form') do
+          within_element(:project_filter_form) do
             fill_in :name, with: name
           end
         end

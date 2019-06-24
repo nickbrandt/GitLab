@@ -60,10 +60,6 @@ module Geo
       scheduled_jobs.map { |data| data[:project_id] }
     end
 
-    def finder
-      @finder ||= ProjectRegistryFinder.new(current_node: current_node)
-    end
-
     def load_pending_resources
       resources = find_project_ids_not_synced(batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.size
@@ -77,20 +73,32 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_project_ids_not_synced(batch_size:)
-      finder.find_unsynced_projects(shard_name: shard_name, batch_size: batch_size)
+      find_unsynced_projects(batch_size: batch_size)
         .id_not_in(scheduled_project_ids)
         .reorder(last_repository_updated_at: :desc)
         .pluck_primary_key
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    def find_unsynced_projects(batch_size:)
+      Geo::ProjectUnsyncedFinder
+        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
+        .execute
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
     def find_project_ids_updated_recently(batch_size:)
-      finder.find_projects_updated_recently(shard_name: shard_name, batch_size: batch_size)
+      find_projects_updated_recently(batch_size: batch_size)
         .id_not_in(scheduled_project_ids)
         .order('project_registry.last_repository_synced_at ASC NULLS FIRST, projects.last_repository_updated_at ASC')
         .pluck_primary_key
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def find_projects_updated_recently(batch_size:)
+      Geo::ProjectUpdatedRecentlyFinder
+        .new(current_node: current_node, shard_name: shard_name, batch_size: batch_size)
+        .execute
+    end
   end
 end

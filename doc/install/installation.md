@@ -263,7 +263,7 @@ Since GitLab 8.17, GitLab requires the use of Node to compile JavaScript
 assets, and Yarn to manage JavaScript dependencies. The current minimum
 requirements for these are:
 
-- `node` >= v8.10.0.
+- `node` >= v8.10.0. (We recommend node 12.x as it is faster)
 - `yarn` >= v1.10.0.
 
 In many distros,
@@ -271,8 +271,8 @@ the versions provided by the official package repositories are out of date, so
 we'll need to install through the following commands:
 
 ```sh
-# install node v8.x
-curl --location https://deb.nodesource.com/setup_8.x | sudo bash -
+# install node v12.x
+curl --location https://deb.nodesource.com/setup_12.x | sudo bash -
 sudo apt-get install -y nodejs
 
 curl --silent --show-error https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -293,10 +293,9 @@ sudo adduser --disabled-login --gecos 'GitLab' git
 
 ## 6. Database
 
-We recommend using a PostgreSQL database. For MySQL, see the [MySQL setup guide](database_mysql.md).
-
 NOTE: **Note:**
-Because we need to make use of extensions and concurrent index removal, you need at least PostgreSQL 9.2.
+Starting from GitLab 12.1, only PostgreSQL is supported. Because we need to make
+use of extensions and concurrent index removal, you need at least PostgreSQL 9.2.
 
 1. Install the database packages:
 
@@ -493,7 +492,7 @@ sudo -u git -H editor config/resque.yml
 ```
 
 CAUTION: **Caution:**
-Make sure to edit both `gitlab.yml` and `unicorn.rb` to match your setup. 
+Make sure to edit both `gitlab.yml` and `unicorn.rb` to match your setup.
 If you want to use Puma web server, see [Using Puma](#using-puma) for the additional steps.
 
 NOTE: **Note:**
@@ -502,13 +501,8 @@ If you want to use HTTPS, see [Using HTTPS](#using-https) for the additional ste
 ### Configure GitLab DB Settings
 
 ```sh
-# PostgreSQL only:
 sudo -u git cp config/database.yml.postgresql config/database.yml
 
-# MySQL only:
-sudo -u git cp config/database.yml.mysql config/database.yml
-
-# PostgreSQL only:
 # Remove host, username, and password lines from config/database.yml.
 # Once modified, the `production` settings will be as follows:
 #
@@ -520,7 +514,7 @@ sudo -u git cp config/database.yml.mysql config/database.yml
 #
 sudo -u git -H editor config/database.yml
 
-# MySQL and remote PostgreSQL only:
+# Remote PostgreSQL only:
 # Update username/password in config/database.yml.
 # You only need to adapt the production settings (first part).
 # If you followed the database guide then please do as follows:
@@ -528,7 +522,6 @@ sudo -u git -H editor config/database.yml
 # You can keep the double quotes around the password
 sudo -u git -H editor config/database.yml
 
-# PostgreSQL and MySQL:
 # Make config/database.yml readable to git only
 sudo -u git -H chmod o-rwx config/database.yml
 ```
@@ -544,11 +537,7 @@ Make sure you have `bundle` (run `bundle -v`):
 - `< 2.x`.
 
 ```sh
-# For PostgreSQL (note, the option says "without ... mysql")
 sudo -u git -H bundle install --deployment --without development test mysql aws kerberos
-
-# Or if you use MySQL (note, the option says "without ... postgres")
-sudo -u git -H bundle install --deployment --without development test postgres aws kerberos
 ```
 
 NOTE: **Note:**

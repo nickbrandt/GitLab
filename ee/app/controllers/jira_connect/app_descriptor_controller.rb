@@ -9,9 +9,9 @@ class JiraConnect::AppDescriptorController < JiraConnect::ApplicationController
 
   def show
     render json: {
-      name: "GitLab for Jira (#{Gitlab.config.gitlab.host})",
+      name: Atlassian::JiraConnect.app_name,
       description: 'Integrate commits, branches and merge requests from GitLab into Jira',
-      key: "gitlab-jira-connect-#{Gitlab.config.gitlab.host}",
+      key: Atlassian::JiraConnect.app_key,
       baseUrl: jira_connect_base_url(protocol: 'https'),
       lifecycle: {
         installed: relative_to_base_path(jira_connect_events_installed_path),

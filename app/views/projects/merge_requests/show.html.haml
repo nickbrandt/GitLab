@@ -19,7 +19,7 @@
     -# haml-lint:disable InlineJavaScript
     :javascript
       window.gl = window.gl || {};
-      window.gl.mrWidgetData = #{serialize_issuable(@merge_request, serializer: 'widget')}
+      window.gl.mrWidgetData = #{serialize_issuable(@merge_request, serializer: 'widget', issues_links: true)}
 
       window.gl.mrWidgetData.squash_before_merge_help_path = '#{help_page_path("user/project/merge_requests/squash_and_merge")}';
       window.gl.mrWidgetData.troubleshooting_docs_path = '#{help_page_path('user/project/merge_requests/index.md', anchor: 'troubleshooting')}';
@@ -80,7 +80,9 @@
         current_user_data: UserSerializer.new(project: @project).represent(current_user, {}, MergeRequestUserEntity).to_json,
         project_path: project_path(@merge_request.project),
         changes_empty_state_illustration: image_path('illustrations/merge_request_changes_empty.svg'),
-        is_fluid_layout: fluid_layout.to_s } }
+        is_fluid_layout: fluid_layout.to_s,
+        dismiss_endpoint: user_callouts_path,
+        show_suggest_popover: show_suggest_popover?.to_s } }
 
     .mr-loading-status
       = spinner

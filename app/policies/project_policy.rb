@@ -258,6 +258,7 @@ class ProjectPolicy < BasePolicy
     enable :resolve_note
     enable :create_container_image
     enable :update_container_image
+    enable :destroy_container_image
     enable :create_environment
     enable :create_deployment
     enable :create_release
@@ -296,6 +297,7 @@ class ProjectPolicy < BasePolicy
   end
 
   rule { (mirror_available & can?(:admin_project)) | admin }.enable :admin_remote_mirror
+  rule { can?(:push_code) }.enable :admin_tag
 
   rule { archived }.policy do
     prevent :push_code
@@ -444,6 +446,10 @@ class ProjectPolicy < BasePolicy
     prevent :developer_access
     prevent :maintainer_access
     prevent :owner_access
+  end
+
+  rule { blocked }.policy do
+    prevent :create_pipeline
   end
 
   private

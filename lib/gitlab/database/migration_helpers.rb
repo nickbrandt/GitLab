@@ -149,7 +149,7 @@ module Gitlab
       # column - The name of the column to create the foreign key on.
       # on_delete - The action to perform when associated data is removed,
       #             defaults to "CASCADE".
-      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade)
+      def add_concurrent_foreign_key(source, target, column:, on_delete: :cascade, name: nil)
         # Transactions would result in ALTER TABLE locks being held for the
         # duration of the transaction, defeating the purpose of this method.
         if transaction_open?
@@ -167,14 +167,18 @@ module Gitlab
             return
           end
 
-          return add_foreign_key(source, target,
-                                 column: column,
-                                 on_delete: on_delete)
+          key_options = { column: column, on_delete: on_delete }
+
+          # The MySQL adapter tries to create a foreign key without a name when
+          # `:name` is nil, instead of generating a name for us.
+          key_options[:name] = name if name
+
+          return add_foreign_key(source, target, key_options)
         else
           on_delete = 'SET NULL' if on_delete == :nullify
         end
 
-        key_name = concurrent_foreign_key_name(source, column)
+        key_name = name || concurrent_foreign_key_name(source, column)
 
         unless foreign_key_exists?(source, target, column: column)
           Rails.logger.warn "Foreign key not created because it exists already " \
@@ -221,7 +225,10 @@ module Gitlab
       # here is based on Rails' foreign_key_name() method, which unfortunately
       # is private so we can't rely on it directly.
       def concurrent_foreign_key_name(table, column)
-        "fk_#{Digest::SHA256.hexdigest("#{table}_#{column}_fk").first(10)}"
+        identifier = "#{table}_#{column}_fk"
+        hashed_identifier = Digest::SHA256.hexdigest(identifier).first(10)
+
+        "fk_#{hashed_identifier}"
       end
 
       # Long-running migrations may take more than the timeout allowed by

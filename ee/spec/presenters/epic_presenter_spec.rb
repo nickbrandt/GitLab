@@ -29,6 +29,13 @@ describe EpicPresenter do
       expect(presenter.show_data.keys).to match_array([:initial, :meta])
     end
 
+    it 'has correct ancestors', :nested_groups do
+      metadata     = JSON.parse(presenter.show_data[:meta])
+      ancestor_url = metadata['ancestors'].first['url']
+
+      expect(ancestor_url).to eq "/groups/#{parent_epic.group.full_path}/-/epics/#{parent_epic.iid}"
+    end
+
     it 'returns the correct json schema for epic initial data' do
       data = presenter.show_data(author_icon: 'icon_path')
 

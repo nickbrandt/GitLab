@@ -859,7 +859,25 @@ msgstr ""
 msgid "AdminSettings|Environment variables are protected by default"
 msgstr ""
 
+msgid "AdminSettings|No required pipeline"
+msgstr ""
+
+msgid "AdminSettings|Required pipeline configuration"
+msgstr ""
+
+msgid "AdminSettings|Select a pipeline configuration file"
+msgstr ""
+
+msgid "AdminSettings|Select a template"
+msgstr ""
+
+msgid "AdminSettings|Set an instance-wide auto included %{link_start}pipeline configuration%{link_end}. This pipeline configuration will be run after the project's own configuration."
+msgstr ""
+
 msgid "AdminSettings|Specify a domain to use by default for every project's Auto Review Apps and Auto Deploy stages."
+msgstr ""
+
+msgid "AdminSettings|The required pipeline configuration can be selected from the %{code_start}gitlab-ci%{code_end} directory inside of the configured %{link_start}instance template repository%{link_end} or from GitLab provided configurations."
 msgstr ""
 
 msgid "AdminSettings|When creating a new environment variable it will be protected by default."
@@ -1691,6 +1709,9 @@ msgid "Auto DevOps enabled"
 msgstr ""
 
 msgid "Auto DevOps, runners and job artifacts"
+msgstr ""
+
+msgid "Auto License Complience"
 msgstr ""
 
 msgid "Auto-cancel redundant, pending pipelines"
@@ -3484,9 +3505,6 @@ msgstr ""
 msgid "Container registry images"
 msgstr ""
 
-msgid "ContainerRegistry|Created"
-msgstr ""
-
 msgid "ContainerRegistry|First log in to GitLab&rsquo;s Container Registry using your GitLab username and password. If you have %{link_2fa} you need to use a %{link_token}:"
 msgstr ""
 
@@ -3494,6 +3512,9 @@ msgid "ContainerRegistry|GitLab supports up to 3 levels of image names. The foll
 msgstr ""
 
 msgid "ContainerRegistry|How to use the Container Registry"
+msgstr ""
+
+msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
 msgid "ContainerRegistry|Learn more about"
@@ -3505,10 +3526,13 @@ msgstr ""
 msgid "ContainerRegistry|Once you log in, you&rsquo;re free to create and upload a container image using the common %{build} and %{push} commands"
 msgstr ""
 
-msgid "ContainerRegistry|Remove repository"
+msgid "ContainerRegistry|Remove image"
 msgstr ""
 
-msgid "ContainerRegistry|Remove tag"
+msgid "ContainerRegistry|Remove image and tags"
+msgstr ""
+
+msgid "ContainerRegistry|Remove repository"
 msgstr ""
 
 msgid "ContainerRegistry|Size"
@@ -3524,6 +3548,12 @@ msgid "ContainerRegistry|Use different image names"
 msgstr ""
 
 msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images."
+msgstr ""
+
+msgid "ContainerRegistry|You are about to delete the image <b>%{title}</b>. This will delete the image and all tags pointing to this image."
+msgstr ""
+
+msgid "ContainerRegistry|You are about to remove repository <b>%{title}</b>. Once you confirm, this repository will be permanently deleted."
 msgstr ""
 
 msgid "ContainerRegistry|You can also use a %{deploy_token} for read-only access to the registry images."
@@ -3722,6 +3752,12 @@ msgid "Create branch"
 msgstr ""
 
 msgid "Create commit"
+msgstr ""
+
+msgid "Create confidential merge request"
+msgstr ""
+
+msgid "Create confidential merge request and branch"
 msgstr ""
 
 msgid "Create directory"
@@ -4135,6 +4171,9 @@ msgid "Deploy Keys"
 msgstr ""
 
 msgid "Deploy key was successfully updated."
+msgstr ""
+
+msgid "DeployBoard|Matching on the %{appLabel} label has been removed for deploy boards. To see all instances on your board, you must update your chart and redeploy."
 msgstr ""
 
 msgid "DeployKeys|+%{count} others"
@@ -4744,6 +4783,9 @@ msgid "Ends at (UTC)"
 msgstr ""
 
 msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
+msgid "Enter IP address range"
 msgstr ""
 
 msgid "Enter at least three characters to search"
@@ -5508,7 +5550,7 @@ msgstr ""
 msgid "FeatureFlags|Feature Flag"
 msgstr ""
 
-msgid "FeatureFlags|Feature Flag behavior is built up by creating a set of rules to define the status of target environments. A default wildcare rule %{codeStart}*%{codeEnd} for %{boldStart}All Environments%{boldEnd} is set, and you are able to add as many rules as you need by choosing environment specs below. You can toggle the behavior for each of your rules to set them %{boldStart}Active%{boldEnd} or %{boldStart}Inactive%{boldEnd}."
+msgid "FeatureFlags|Feature Flag behavior is built up by creating a set of rules to define the status of target environments. A default wildcard rule %{codeStart}*%{codeEnd} for %{boldStart}All Environments%{boldEnd} is set, and you are able to add as many rules as you need by choosing environment specs below. You can toggle the behavior for each of your rules to set them %{boldStart}Active%{boldEnd} or %{boldStart}Inactive%{boldEnd}."
 msgstr ""
 
 msgid "FeatureFlags|Feature Flags"
@@ -5587,9 +5629,6 @@ msgid "Fetching licenses failed. The request endpoint was not found."
 msgstr ""
 
 msgid "Fetching licenses failed. You are not permitted to perform this action."
-msgstr ""
-
-msgid "Fields on this page are now uneditable, you can configure"
 msgstr ""
 
 msgid "File"
@@ -5694,12 +5733,6 @@ msgid "Finished"
 msgstr ""
 
 msgid "First day of the week"
-msgstr ""
-
-msgid "FirstPushedBy|First"
-msgstr ""
-
-msgid "FirstPushedBy|pushed by"
 msgstr ""
 
 msgid "Fixed date"
@@ -6353,6 +6386,9 @@ msgstr ""
 msgid "Gitea Import"
 msgstr ""
 
+msgid "Gitlab CI/CD"
+msgstr ""
+
 msgid "Given access %{time_ago}"
 msgstr ""
 
@@ -6396,6 +6432,9 @@ msgid "Google Takeout"
 msgstr ""
 
 msgid "Google authentication is not %{link_to_documentation}. Ask your GitLab administrator if you want to use this service."
+msgstr ""
+
+msgid "Got it"
 msgstr ""
 
 msgid "Got it!"
@@ -6865,6 +6904,12 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
+msgid "IP address restriction is not editable in subgroups. Value inherited from top-level parent group."
+msgstr ""
+
+msgid "IP subnet restriction only allowed for top-level groups"
+msgstr ""
+
 msgid "Identifier"
 msgstr ""
 
@@ -6875,6 +6920,9 @@ msgid "If any job surpasses this timeout threshold, it will be marked as failed.
 msgstr ""
 
 msgid "If checked, group owners can manage LDAP group links and LDAP member overrides"
+msgstr ""
+
+msgid "If checked, new group memberships and permissions can only be added via LDAP synchronization"
 msgstr ""
 
 msgid "If disabled, a diverged local branch will not be automatically updated with commits from its remote counterpart, to prevent local data loss. If the default branch (%{default_branch}) has diverged and cannot be updated, mirroring will fail. Other diverged branches are silently ignored."
@@ -7473,6 +7521,9 @@ msgstr ""
 msgid "Job|with"
 msgstr ""
 
+msgid "Join Zoom meeting"
+msgstr ""
+
 msgid "Jul"
 msgstr ""
 
@@ -7524,7 +7575,7 @@ msgstr ""
 msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
-msgid "Kubernetes service integration has been deprecated. %{deprecated_message_content} your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page"
+msgid "Kubernetes service integration has been disabled. Fields on this page are not used by GitLab, you can configure your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page"
 msgstr ""
 
 msgid "LDAP settings"
@@ -7736,6 +7787,9 @@ msgstr ""
 msgid "License"
 msgstr ""
 
+msgid "License Compliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
+msgstr ""
+
 msgid "LicenseManagement|Add a license"
 msgstr ""
 
@@ -7781,9 +7835,6 @@ msgstr ""
 msgid "LicenseManagement|License name"
 msgstr ""
 
-msgid "LicenseManagement|Manage approved and blacklisted licenses for this project."
-msgstr ""
-
 msgid "LicenseManagement|Packages"
 msgstr ""
 
@@ -7797,6 +7848,9 @@ msgid "LicenseManagement|Submit"
 msgstr ""
 
 msgid "LicenseManagement|There are currently no approved or blacklisted licenses in this project."
+msgstr ""
+
+msgid "LicenseManagement|There are currently no approved or blacklisted licenses that match in this project."
 msgstr ""
 
 msgid "LicenseManagement|This license already exists in this project."
@@ -7877,6 +7931,9 @@ msgid "Lock"
 msgstr ""
 
 msgid "Lock %{issuableDisplayName}"
+msgstr ""
+
+msgid "Lock memberships to LDAP synchronization"
 msgstr ""
 
 msgid "Lock not found"
@@ -8227,6 +8284,9 @@ msgstr ""
 msgid "MergeRequest| %{paragraphStart}changed the description %{descriptionChangedTimes} times %{timeDifferenceMinutes}%{paragraphEnd}"
 msgstr ""
 
+msgid "MergeRequest|Error dismissing suggestion popover. Please try again."
+msgstr ""
+
 msgid "MergeRequest|Error loading full diff. Please try again."
 msgstr ""
 
@@ -8494,6 +8554,9 @@ msgstr ""
 msgid "More"
 msgstr ""
 
+msgid "More Information"
+msgstr ""
+
 msgid "More actions"
 msgstr ""
 
@@ -8703,6 +8766,9 @@ msgstr ""
 msgid "New users set to external"
 msgstr ""
 
+msgid "New! Suggest changes directly"
+msgstr ""
+
 msgid "New..."
 msgstr ""
 
@@ -8838,6 +8904,9 @@ msgstr ""
 msgid "No repository"
 msgstr ""
 
+msgid "No required pipeline"
+msgstr ""
+
 msgid "No runners found"
 msgstr ""
 
@@ -8847,7 +8916,13 @@ msgstr ""
 msgid "No start date"
 msgstr ""
 
+msgid "No value set by top-level parent group."
+msgstr ""
+
 msgid "No, directly import the existing email addresses and usernames."
+msgstr ""
+
+msgid "No, not interested right now"
 msgstr ""
 
 msgid "Node was successfully created."
@@ -9233,16 +9308,28 @@ msgstr ""
 msgid "Pages getting started guide"
 msgstr ""
 
+msgid "Pagination|Go to first page"
+msgstr ""
+
+msgid "Pagination|Go to last page"
+msgstr ""
+
+msgid "Pagination|Go to next page"
+msgstr ""
+
+msgid "Pagination|Go to previous page"
+msgstr ""
+
 msgid "Pagination|Last »"
 msgstr ""
 
-msgid "Pagination|Next"
-msgstr ""
-
-msgid "Pagination|Prev"
+msgid "Pagination|Next ›"
 msgstr ""
 
 msgid "Pagination|« First"
+msgstr ""
+
+msgid "Pagination|‹ Prev"
 msgstr ""
 
 msgid "Parameter"
@@ -9348,9 +9435,6 @@ msgid "Pin code"
 msgstr ""
 
 msgid "Pipeline"
-msgstr ""
-
-msgid "Pipeline ID (IID)"
 msgstr ""
 
 msgid "Pipeline Schedule"
@@ -9693,6 +9777,9 @@ msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
+msgstr ""
+
+msgid "Pre-release"
 msgstr ""
 
 msgid "Preferences"
@@ -10888,9 +10975,6 @@ msgstr ""
 msgid "Registry"
 msgstr ""
 
-msgid "Related Commits"
-msgstr ""
-
 msgid "Related Deployed Jobs"
 msgstr ""
 
@@ -11253,6 +11337,9 @@ msgid "Response metrics (NGINX)"
 msgstr ""
 
 msgid "Restart Terminal"
+msgstr ""
+
+msgid "Restrict access by IP address"
 msgstr ""
 
 msgid "Resume"
@@ -12019,6 +12106,9 @@ msgstr ""
 msgid "Show comments only"
 msgstr ""
 
+msgid "Show commit description"
+msgstr ""
+
 msgid "Show complete raw log"
 msgstr ""
 
@@ -12723,6 +12813,9 @@ msgstr ""
 msgid "Successfully unlocked"
 msgstr ""
 
+msgid "Suggest code changes which are immediately applied. Try it out!"
+msgstr ""
+
 msgid "Suggested change"
 msgstr ""
 
@@ -13040,9 +13133,6 @@ msgstr ""
 msgid "The branch for this project has no active pipeline configuration."
 msgstr ""
 
-msgid "The certificate will be shown here once it has been obtained from Let's Encrypt. This process may take up to an hour to complete."
-msgstr ""
-
 msgid "The character highlighter helps you keep the subject line to %{titleLength} characters and wrap the body at %{bodyLength} so they are readable in git."
 msgstr ""
 
@@ -13101,6 +13191,9 @@ msgid "The group settings for %{group_links} require you to enable Two-Factor Au
 msgstr ""
 
 msgid "The import will time out after %{timeout}. For repositories that take longer, use a clone/push combination."
+msgstr ""
+
+msgid "The instance-level Kubernetes service integration is disabled. Your data has been migrated to an <a href=\"%{url}\"/>instance-level cluster</a>."
 msgstr ""
 
 msgid "The invitation could not be accepted."
@@ -13439,9 +13532,6 @@ msgstr ""
 msgid "This branch has changed since you started editing. Would you like to create a new branch?"
 msgstr ""
 
-msgid "This certificate is automatically managed by Let's Encrypt"
-msgstr ""
-
 msgid "This chart could not be displayed"
 msgstr ""
 
@@ -13497,6 +13587,9 @@ msgid "This group"
 msgstr ""
 
 msgid "This group does not provide any group Runners yet."
+msgstr ""
+
+msgid "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Example: <code>192.168.0.0/24</code>. %{read_more_link}."
 msgstr ""
 
 msgid "This is a \"Ghost User\", created to hold all issues authored by users that have since been deleted. This user cannot be removed."
@@ -14574,7 +14667,7 @@ msgstr ""
 msgid "UserOnboardingTour|%{emphasisStart}Well done!%{emphasisEnd}%{lineBreak}%{lineBreak}That's it for our guided tour, congratulations for making it all the way to the end!%{lineBreak}%{lineBreak}We hope this gave you a good overview of GitLab and how it can help you. We'll now show you how to create your own project and invite your colleagues."
 msgstr ""
 
-msgid "UserOnboardingTour|Adding other memembers to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}."
+msgid "UserOnboardingTour|Adding other members to a project is done through Project Settings. Click on %{emphasisStart}Settings%{emphasisEnd}."
 msgstr ""
 
 msgid "UserOnboardingTour|Alright, that's it for Commits. Let's take a look at the %{emphasisStart}Branches%{emphasisEnd}."
@@ -15629,9 +15722,6 @@ msgstr ""
 msgid "Your Groups"
 msgstr ""
 
-msgid "Your Kubernetes cluster information on this page is still editable, but you are advised to disable and reconfigure"
-msgstr ""
-
 msgid "Your Primary Email will be used for avatar detection."
 msgstr ""
 
@@ -16222,6 +16312,9 @@ msgstr[1] ""
 msgid "invalid milestone state `%{state}`"
 msgstr ""
 
+msgid "is an invalid IP address range"
+msgstr ""
+
 msgid "is enabled."
 msgstr ""
 
@@ -16312,6 +16405,9 @@ msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage %{emphasisSta
 msgstr ""
 
 msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage is %{emphasisStart} unchanged %{emphasisEnd} at %{memoryFrom}MB"
+msgstr ""
+
+msgid "mrWidget|Added to the merge train at position %{mergeTrainPosition}"
 msgstr ""
 
 msgid "mrWidget|Added to the merge train by"

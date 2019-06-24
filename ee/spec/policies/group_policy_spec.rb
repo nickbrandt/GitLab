@@ -87,6 +87,46 @@ describe GroupPolicy do
     end
   end
 
+  context 'with ip restriction' do
+    let(:current_user) { developer }
+    let(:group) { create(:group, :public) }
+
+    before do
+      allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
+      stub_licensed_features(group_ip_restriction: true)
+    end
+
+    context 'without restriction' do
+      it { is_expected.to be_allowed(:read_group) }
+    end
+
+    context 'with restriction' do
+      before do
+        create(:ip_restriction, group: group, range: range)
+      end
+
+      context 'address is within the range' do
+        let(:range) { '192.168.0.0/24' }
+
+        it { is_expected.to be_allowed(:read_group) }
+      end
+
+      context 'address is outside the range' do
+        let(:range) { '10.0.0.0/8' }
+
+        context 'as developer' do
+          it { is_expected.to be_disallowed(:read_group) }
+        end
+
+        context 'as owner' do
+          let(:current_user) { owner }
+
+          it { is_expected.to be_allowed(:read_group) }
+        end
+      end
+    end
+  end
+
   context 'when LDAP sync is not enabled' do
     context 'owner' do
       let(:current_user) { owner }
@@ -173,6 +213,28 @@ describe GroupPolicy do
 
       it { is_expected.to be_allowed(:override_group_member) }
       it { is_expected.to be_allowed(:admin_ldap_group_links) }
+    end
+
+    context 'when memberships locked to LDAP' do
+      before do
+        stub_application_setting(allow_group_owners_to_manage_ldap: true)
+        stub_application_setting(lock_memberships_to_ldap: true)
+      end
+
+      context 'admin' do
+        let(:current_user) { admin }
+
+        it { is_expected.to be_allowed(:override_group_member) }
+        it { is_expected.to be_allowed(:update_group_member) }
+      end
+
+      context 'owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.not_to be_allowed(:admin_group_member) }
+        it { is_expected.not_to be_allowed(:override_group_member) }
+        it { is_expected.not_to be_allowed(:update_group_member) }
+      end
     end
   end
 

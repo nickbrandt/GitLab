@@ -218,7 +218,7 @@ dependency_scanning:
 CAUTION: **Caution:**
 The JSON report artifacts are not a public API of Dependency Scanning and their format may change in future.
 
-The Dependency Scanning tool emits a JSON report file. Here is an example of a structure for a report will all important parts of
+The Dependency Scanning tool emits a JSON report file. Here is an example of the report structure with all important parts of
 it highlighted:
 
 ```json-doc
@@ -343,10 +343,10 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].severity`                         | How much the vulnerability impacts the software. Possible values: `Undefined` (an analyzer has not provided this info), `Info`, `Unknown`, `Low`, `Medium`, `High`, `Critical`. |
 | `vulnerabilities[].confidence`                       | How reliable the vulnerability's assessment is. Possible values: `Undefined` (an analyzer has not provided this info), `Ignore`, `Unknown`, `Experimental`, `Low`, `Medium`, `High`, `Confirmed`. |
 | `vulnerabilities[].solution`                         | Explanation of how to fix the vulnerability. Optional. |
-| `vulnerabilities[].scanner`                          | A node that describes the analyzer used find this vulnerability. |
+| `vulnerabilities[].scanner`                          | A node that describes the analyzer used to find this vulnerability. |
 | `vulnerabilities[].scanner.id`                       | Id of the scanner as a snake_case string. |
 | `vulnerabilities[].scanner.name`                     | Name of the scanner, for display purposes. |
-| `vulnerabilities[].location`                         | A node that tells which class and/or method is affected by the vulnerability. | 
+| `vulnerabilities[].location`                         | A node that tells where the vulnerability is located. |
 | `vulnerabilities[].location.file`                    | Path to the dependencies file (e.g., `yarn.lock`). Optional. |
 | `vulnerabilities[].location.dependency`              | A node that describes the dependency of a project where the vulnerability is located. |
 | `vulnerabilities[].location.dependency.package`      | A node that provides the information on the package where the vulnerability is located. |
@@ -360,7 +360,7 @@ the report JSON unless stated otherwise. Presence of optional fields depends on 
 | `vulnerabilities[].links`                            | An array of references to external documentation pieces or articles that describe the vulnerability further. Optional. |
 | `vulnerabilities[].links[].name`                     | Name of the vulnerability details link. Optional. |
 | `vulnerabilities[].links[].url`                      | URL of the vulnerability details document. Optional. |
-| `remediations`                                       | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. |
+| `remediations`                                       | An array of objects containing information on cured vulnerabilities along with patch diffs to apply. Empty if no remediations provided by an underlying analyzer. |
 | `remediations[].fixes`                               | An array of strings that represent references to vulnerabilities fixed by this particular remediation. |
 | `remediations[].fixes[].cve`                         | A string value that describes a fixed vulnerability occurrence in the same format as `vulnerabilities[].cve`. |
 | `remediations[].summary`                             | Overview of how the vulnerabilities have been fixed. |
@@ -379,14 +379,14 @@ Once a vulnerability is found, you can interact with it. Read more on how to
 
 ## Dependency List
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/10075)
-in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/10075) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 
-An additional benefit of Dependency Scanning is the ability to get a list of your project's dependencies with their versions. 
+An additional benefit of Dependency Scanning is the ability to get a list of your
+project's dependencies with their versions. This list can be generated only for
+[languages and package managers](#supported-languages-and-package-managers)
+supported by Gemnasium.
 
-This list can be generated only for [supported languages and package managers](#supported-languages-and-package-managers).
-
-To see the generated dependency list, navigate to the Dependency List page under your project's left sidebar menu **Project > Dependency List**.
+To see the generated dependency list, navigate to your project's **Project > Dependency List**.
 
 ## Contributing to the vulnerability database
 

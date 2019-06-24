@@ -13,7 +13,7 @@ class Groups::UsageQuotasController < Groups::ApplicationController
   private
 
   def verify_usage_quotas_enabled!
-    render_404 unless @group.feature_available?(:usage_quotas)
+    render_404 unless License.feature_available?(:usage_quotas)
     render_404 if @group.has_parent?
   end
 end

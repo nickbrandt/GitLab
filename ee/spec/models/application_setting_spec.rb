@@ -39,6 +39,11 @@ describe ApplicationSetting do
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
 
+    it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
+    it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
+    it { is_expected.not_to allow_value("  ").for(:required_instance_ci_template) }
+    it { is_expected.to allow_value("template_name").for(:required_instance_ci_template) }
+
     describe 'when additional email text is enabled' do
       before do
         stub_licensed_features(email_additional_text: true)

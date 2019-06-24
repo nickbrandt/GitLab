@@ -9,7 +9,6 @@ module EE
       super + %w[
         groups/security/dashboard#show
         groups/insights#show
-        groups/dependency_proxies#show
       ]
     end
 
@@ -26,6 +25,26 @@ module EE
       show_lfs = group.lfs_enabled? ? 'and their respective LFS files' : ''
 
       "Repositories within this group #{show_lfs} will be restricted to this maximum size. Can be overridden inside each project. 0 for unlimited. Leave empty to inherit the global value."
+    end
+
+    def group_packages_nav_link_paths
+      %w[
+        groups/packages#index
+        groups/dependency_proxies#show
+      ]
+    end
+
+    def group_packages_nav?
+      group_packages_list_nav? ||
+        group_dependency_proxy_nav?
+    end
+
+    def group_packages_list_nav?
+      @group.packages_feature_available?
+    end
+
+    def group_dependency_proxy_nav?
+      @group.dependency_proxy_feature_available?
     end
 
     private

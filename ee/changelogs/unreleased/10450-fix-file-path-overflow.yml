@@ -1,5 +1,0 @@
----
-title: Prevent files paths from overflowing in vulnerability info modal
-merge_request: 10606
-author:
-type: fixed

@@ -21,17 +21,9 @@ module EE
     def process_wiki_changes(post_received)
       super
 
-      update_wiki_es_indexes(post_received)
-
       if ::Gitlab::Geo.primary?
         ::Geo::RepositoryUpdatedService.new(post_received.project.wiki.repository).execute
       end
-    end
-
-    def update_wiki_es_indexes(post_received)
-      return unless post_received.project.use_elasticsearch?
-
-      post_received.project.wiki.index_wiki_blobs
     end
   end
 end

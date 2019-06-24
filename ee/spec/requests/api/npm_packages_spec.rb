@@ -194,22 +194,9 @@ describe API::NpmPackages do
     end
 
     def upload_params(package_name)
-      {
-        name: package_name,
-        versions: {
-          '1.0.1' => {
-            dist: {
-              shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
-            }
-          }
-        },
-        '_attachments' => {
-          "#{package_name}-1.0.1.tgz" => {
-            'data' => 'aGVsbG8K',
-            'length' => 8
-          }
-        }
-      }
+      JSON.parse(
+        fixture_file('npm/payload.json', dir: 'ee')
+          .gsub('@root/npm-test', package_name))
     end
   end
 

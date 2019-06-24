@@ -65,6 +65,8 @@ module EE
 
       validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
 
+      validates :required_instance_ci_template, presence: true, allow_nil: true
+
       validate :check_geo_node_allowed_ips
     end
 
@@ -82,6 +84,7 @@ module EE
           elasticsearch_shards: 5,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
           email_additional_text: nil,
+          lock_memberships_to_ldap: false,
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],

@@ -13,7 +13,6 @@ describe 'gitlab:elastic namespace rake tasks', :elastic, :sidekiq do
       expect(Rake::Task['gitlab:elastic:create_empty_index']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:clear_index_status']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:index_projects']).to receive(:invoke).ordered
-      expect(Rake::Task['gitlab:elastic:index_wikis']).to receive(:invoke).ordered
       expect(Rake::Task['gitlab:elastic:index_snippets']).to receive(:invoke).ordered
 
       run_rake_task 'gitlab:elastic:index'

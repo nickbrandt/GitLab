@@ -98,7 +98,7 @@ describe 'Pipeline', :js do
 
     context 'with a sast artifact' do
       before do
-        create(:ee_ci_build, :legacy_sast, pipeline: pipeline)
+        create(:ee_ci_build, :sast, pipeline: pipeline)
 
         visit security_project_pipeline_path(project, pipeline)
       end
@@ -135,7 +135,7 @@ describe 'Pipeline', :js do
 
     context 'with a license management artifact' do
       before do
-        create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
+        create(:ee_ci_build, :license_management, pipeline: pipeline)
 
         visit licenses_project_pipeline_path(project, pipeline)
       end
@@ -143,7 +143,7 @@ describe 'Pipeline', :js do
       it 'shows jobs tab pane as active' do
         expect(page).to have_content('Licenses')
         expect(page).to have_css('#js-tab-licenses')
-        expect(find('.js-licenses-counter')).to have_content('0')
+        expect(find('.js-licenses-counter')).to have_content('4')
       end
 
       it 'shows security report section' do

@@ -11,7 +11,7 @@ module ActiveRecord
 
     def show_backtrace(values)
       Rails.logger.debug("QueryRecorder SQL: #{values[:sql]}")
-      caller.each { |line| Rails.logger.debug("   --> #{line}") }
+      Gitlab::Profiler.clean_backtrace(caller).each { |line| Rails.logger.debug("   --> #{line}") }
     end
 
     def callback(name, start, finish, message_id, values)
@@ -34,6 +34,10 @@ module ActiveRecord
 
     def log_message
       @log.join("\n\n")
+    end
+
+    def occurrences
+      @log.group_by(&:to_s).transform_values(&:count)
     end
   end
 end

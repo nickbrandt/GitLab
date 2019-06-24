@@ -33,7 +33,35 @@ describe MergeRequestWidgetEntity do
     expect(subject.as_json[:approvals_before_merge]).to eq(0)
   end
 
-  describe 'test report artifacts' do
+  def create_all_artifacts
+    artifacts = %i(codequality sast dependency_scanning container_scanning dast license_management performance)
+
+    artifacts.each do |artifact_type|
+      create(:ee_ci_build, artifact_type, :success, pipeline: pipeline, project: pipeline.project)
+    end
+
+    pipeline.reload
+  end
+
+  it 'avoids N+1 queries', :request_store do
+    allow(pipeline).to receive(:available_licensed_report_type?).and_return(true)
+    allow(merge_request).to receive_messages(base_pipeline: pipeline, head_pipeline: pipeline)
+    create_all_artifacts
+    serializer = MergeRequestSerializer.new(current_user: user, project: project)
+
+    serializer.represent(merge_request)
+
+    RequestStore.clear!
+
+    control = ActiveRecord::QueryRecorder.new { serializer.represent(merge_request) }
+
+    create_all_artifacts
+    RequestStore.clear!
+
+    expect { serializer.represent(merge_request) }.not_to exceed_query_limit(control)
+  end
+
+  describe 'test report artifacts', :request_store do
     using RSpec::Parameterized::TableSyntax
 
     where(:json_entry, :artifact_type) do
@@ -69,16 +97,6 @@ describe MergeRequestWidgetEntity do
           end
         end
 
-        context "with legacy report artifacts" do
-          before do
-            create(:ee_ci_build, :"legacy_#{artifact_type}", pipeline: pipeline)
-          end
-
-          it "has data entry" do
-            expect(subject.as_json).to include(json_entry)
-          end
-        end
-
         context "without artifacts" do
           it "does not have data entry" do
             expect(subject.as_json).not_to include(json_entry)
@@ -88,7 +106,7 @@ describe MergeRequestWidgetEntity do
     end
   end
 
-  describe '#license_management' do
+  describe '#license_management', :request_store do
     before do
       allow(merge_request).to receive_messages(
         head_pipeline: pipeline, target_project: project)
@@ -139,26 +157,11 @@ describe MergeRequestWidgetEntity do
       end
     end
 
-    context 'when legacy artifact is defined' do
-      before do
-        create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
-      end
-
-      it 'is included, if license manage management features are on' do
-        expect(subject.as_json).to include(:license_management)
-        expect(subject.as_json[:license_management]).to include(:head_path)
-        expect(subject.as_json[:license_management]).to include(:base_path)
-        expect(subject.as_json[:license_management]).to include(:managed_licenses_path)
-        expect(subject.as_json[:license_management]).to include(:can_manage_licenses)
-        expect(subject.as_json[:license_management]).to include(:license_management_full_report_path)
-      end
-    end
-
     describe '#managed_licenses_path' do
       let(:managed_licenses_path) { expose_path(api_v4_projects_managed_licenses_path(id: project.id)) }
 
       before do
-        create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
+        create(:ee_ci_build, :license_management, pipeline: pipeline)
       end
 
       it 'is a path for target project' do

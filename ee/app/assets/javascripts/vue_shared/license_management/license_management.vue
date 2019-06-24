@@ -5,6 +5,7 @@ import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
+import PaginatedList from '~/vue_shared/components/paginated_list.vue';
 import createStore from './store/index';
 
 const store = createStore();
@@ -17,6 +18,7 @@ export default {
     LicenseManagementRow,
     GlButton,
     GlLoadingIcon,
+    PaginatedList,
   },
   props: {
     apiUrl: {
@@ -28,9 +30,6 @@ export default {
     return { formIsOpen: false };
   },
   store,
-  emptyMessage: s__(
-    'LicenseManagement|There are currently no approved or blacklisted licenses in this project.',
-  ),
   computed: {
     ...mapState(['managedLicenses', 'isLoadingManagedLicenses']),
   },
@@ -49,30 +48,49 @@ export default {
       this.formIsOpen = false;
     },
   },
+  emptyMessage: s__(
+    'LicenseManagement|There are currently no approved or blacklisted licenses in this project.',
+  ),
+  emptySearchMessage: s__(
+    'LicenseManagement|There are currently no approved or blacklisted licenses that match in this project.',
+  ),
 };
 </script>
 <template>
-  <div class="license-management">
+  <gl-loading-icon v-if="isLoadingManagedLicenses" />
+  <div v-else class="license-management">
     <delete-confirmation-modal />
-    <gl-loading-icon v-if="isLoadingManagedLicenses" />
-    <ul v-if="managedLicenses.length" class="list-group list-group-flush">
-      <license-management-row
-        v-for="license in managedLicenses"
-        :key="license.name"
-        :license="license"
-      />
-    </ul>
-    <div v-else class="bs-callout bs-callout-warning">{{ $options.emptyMessage }}</div>
-    <div class="prepend-top-default">
-      <add-license-form
-        v-if="formIsOpen"
-        :managed-licenses="managedLicenses"
-        @addLicense="setLicenseApproval"
-        @closeForm="closeAddLicenseForm"
-      />
-      <gl-button v-else class="js-open-form" variant="default" @click="openAddLicenseForm">
-        {{ s__('LicenseManagement|Add a license') }}
-      </gl-button>
-    </div>
+
+    <paginated-list
+      :list="managedLicenses"
+      :empty-search-message="$options.emptySearchMessage"
+      :empty-message="$options.emptyMessage"
+      filter="name"
+    >
+      <template #header>
+        <gl-button
+          class="js-open-form order-1"
+          :disabled="formIsOpen"
+          variant="success"
+          @click="openAddLicenseForm"
+        >
+          {{ s__('LicenseManagement|Add a license') }}
+        </gl-button>
+      </template>
+
+      <template #subheader>
+        <div v-if="formIsOpen" class="prepend-top-default append-bottom-default">
+          <add-license-form
+            :managed-licenses="managedLicenses"
+            @addLicense="setLicenseApproval"
+            @closeForm="closeAddLicenseForm"
+          />
+        </div>
+      </template>
+
+      <template #default="{ listItem }">
+        <license-management-row :license="listItem" />
+      </template>
+    </paginated-list>
   </div>
 </template>

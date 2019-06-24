@@ -60,8 +60,8 @@ export default {
     boundary="viewport"
     :placement="placement"
     :show="showPopover"
-    :css-classes="['blue', 'onboarding-action-popover-container']"
+    :css-classes="['blue', 'onboarding-popover']"
   >
-    <div class="onboarding-popover" v-html="content"></div>
+    <div v-html="content"></div>
   </gl-popover>
 </template>

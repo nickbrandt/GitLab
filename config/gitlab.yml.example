@@ -344,9 +344,9 @@ production: &base
     schedule_migrate_external_diffs_worker:
       cron: "15 * * * *"
 
-    ##
-    # GitLab EE only jobs:
-
+  # GitLab EE only jobs. These jobs are automatically enabled for an EE
+  # installation, and ignored for a CE installation.
+  ee_cron_jobs:
     # Snapshot active users statistics
     historical_data_worker:
       cron: "0 12 * * *"
@@ -1088,7 +1088,6 @@ test:
     external_providers: []
 
     providers:
-      - { name: 'group_saml' }
       - { name: 'cas3',
           label: 'cas3',
           args: { url: 'https://sso.example.com',

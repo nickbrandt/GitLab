@@ -1,5 +1,0 @@
----
-title: Omit page counts in admin audit logs
-merge_request: 1306
-author:
-type: performance

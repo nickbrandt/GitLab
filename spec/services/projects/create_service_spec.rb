@@ -152,6 +152,33 @@ describe Projects::CreateService, '#execute' do
     end
   end
 
+  context 'default visibility level' do
+    let(:group) { create(:group, :private) }
+
+    before do
+      stub_application_setting(default_project_visibility: Gitlab::VisibilityLevel::INTERNAL)
+      group.add_developer(user)
+
+      opts.merge!(
+        visibility: 'private',
+        name: 'test',
+        namespace: group,
+        path: 'foo'
+      )
+    end
+
+    it 'creates a private project' do
+      project = create_project(user, opts)
+
+      expect(project).to respond_to(:errors)
+
+      expect(project.errors.any?).to be(false)
+      expect(project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
+      expect(project.saved?).to be(true)
+      expect(project.valid?).to be(true)
+    end
+  end
+
   context 'restricted visibility level' do
     before do
       stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::PUBLIC])
@@ -201,6 +228,7 @@ describe Projects::CreateService, '#execute' do
 
       context 'with legacy storage' do
         before do
+          stub_application_setting(hashed_storage_enabled: false)
           gitlab_shell.create_repository(repository_storage, "#{user.namespace.full_path}/existing", 'group/project')
         end
 
@@ -232,7 +260,6 @@ describe Projects::CreateService, '#execute' do
         let(:hashed_path) { '@hashed/6b/86/6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b' }
 
         before do
-          stub_application_setting(hashed_storage_enabled: true)
           allow(Digest::SHA2).to receive(:hexdigest) { hash }
         end
 

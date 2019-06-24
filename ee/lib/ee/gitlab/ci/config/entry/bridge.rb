@@ -50,6 +50,16 @@ module EE
             helpers(*ALLOWED_KEYS)
             attributes(*ALLOWED_KEYS)
 
+            def self.matching?(name, config)
+              ::Feature.enabled?(:cross_project_pipeline_triggers, default_enabled: true) &&
+                !name.to_s.start_with?('.') &&
+                config.is_a?(Hash) && config.key?(:trigger)
+            end
+
+            def self.visible?
+              true
+            end
+
             def name
               @metadata[:name]
             end

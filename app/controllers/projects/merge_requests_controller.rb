@@ -16,7 +16,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
 
-  around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
+  around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]
 
   def index
     @merge_requests = @issuables
@@ -33,7 +33,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def show
     close_merge_request_if_no_source_project
-    mark_merge_request_mergeable
+    @merge_request.check_mergeability
 
     respond_to do |format|
       format.html do
@@ -249,10 +249,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def target_branch_missing?
     @merge_request.has_no_commits? && !@merge_request.target_branch_exists?
-  end
-
-  def mark_merge_request_mergeable
-    @merge_request.check_if_can_be_merged
   end
 
   def merge!

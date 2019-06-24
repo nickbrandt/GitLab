@@ -1,123 +1,109 @@
 require 'spec_helper'
 
 describe Gitlab::Ci::Config::Entry::Jobs do
-  subject do
-    described_class.new(
-      {
-        '.hidden_job'.to_sym => { script: 'something' },
-        '.hidden_bridge'.to_sym => { trigger: 'my/project' },
-        regular_job: { script: 'something' },
-        my_trigger: { trigger: 'my/project' }
-      }
-    )
+  let(:config) do
+    {
+      '.hidden_job'.to_sym => { script: 'something' },
+      '.hidden_bridge'.to_sym => { trigger: 'my/project' },
+      regular_job: { script: 'something' },
+      my_trigger: { trigger: 'my/project' }
+    }
   end
 
-  context 'when cross-project pipeline triggers are enabled' do
-    before do
-      stub_feature_flags(cross_project_pipeline_triggers: true)
+  describe '.all_types' do
+    subject { described_class.all_types }
 
-      subject.compose!
-    end
+    it { is_expected.to include(::EE::Gitlab::Ci::Config::Entry::Bridge) }
+  end
 
-    describe '#node_type' do
-      it 'correctly identifies hidden jobs' do
-        expect(subject.node_type(:'.hidden_job'))
-          .to eq ::Gitlab::Ci::Config::Entry::Hidden
+  describe '.find_type' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { described_class.find_type(name, config[name]) }
+
+    context 'when cross-project pipeline triggers are enabled' do
+      before do
+        stub_feature_flags(cross_project_pipeline_triggers: true)
       end
 
-      it 'correctly identifies hidden bridge jobs' do
-        expect(subject.node_type(:'.hidden_bridge'))
-          .to eq ::Gitlab::Ci::Config::Entry::Hidden
+      where(:name, :type) do
+        :'.hidden_job'    | ::Gitlab::Ci::Config::Entry::Hidden
+        :'.hidden_bridge' | ::Gitlab::Ci::Config::Entry::Hidden
+        :regular_job      | ::Gitlab::Ci::Config::Entry::Job
+        :my_trigger       | ::EE::Gitlab::Ci::Config::Entry::Bridge
       end
 
-      it 'correctly identifies regular jobs' do
-        expect(subject.node_type(:regular_job))
-          .to eq ::Gitlab::Ci::Config::Entry::Job
-      end
-
-      it 'correctly identifies cross-project triggers' do
-        expect(subject.node_type(:my_trigger))
-          .to eq ::EE::Gitlab::Ci::Config::Entry::Bridge
-      end
-    end
-
-    describe '#bridge?' do
-      it 'returns true when a job is a trigger' do
-        expect(subject.bridge?(:my_trigger)).to be true
-      end
-
-      it 'returns false when a job is not a trigger' do
-        expect(subject.bridge?(:regular_job)).to be false
+      with_them do
+        it { is_expected.to eq(type) }
       end
     end
 
-    describe '#hidden?' do
-      it 'does not claim that a bridge job is hidden' do
-        expect(subject.hidden?(:my_trigger)).to be false
+    context 'when cross-project pipeline triggers are disabled' do
+      before do
+        stub_feature_flags(cross_project_pipeline_triggers: false)
       end
-    end
 
-    describe '#valid?' do
-      it { is_expected.to be_valid }
-    end
+      where(:name, :type) do
+        :'.hidden_job'    | ::Gitlab::Ci::Config::Entry::Hidden
+        :'.hidden_bridge' | ::Gitlab::Ci::Config::Entry::Hidden
+        :regular_job      | ::Gitlab::Ci::Config::Entry::Job
+        :my_trigger       | nil
+      end
 
-    describe '#value' do
-      it 'returns a correct hash representing all jobs' do
-        expect(subject.value).to eq(
-          my_trigger: {
-            name: :my_trigger,
-            trigger: { project: 'my/project' },
-            stage: 'test',
-            only: { refs: %w[branches tags] },
-            ignore: false
-          },
-          regular_job: {
-            script: %w[something],
-            name: :regular_job,
-            stage: 'test',
-            only: { refs: %w[branches tags] },
-            ignore: false
-          })
+      with_them do
+        it { is_expected.to eq(type) }
       end
     end
   end
 
-  context 'when cross-project pipeline triggers are disabled' do
-    before do
-      stub_feature_flags(cross_project_pipeline_triggers: false)
-
-      subject.compose!
+  describe '.new' do
+    subject do
+      described_class.new(config)
     end
 
-    describe '#node_type' do
-      it 'correctly identifies hidden jobs' do
-        expect(subject.node_type(:'.hidden_job'))
-          .to eq ::Gitlab::Ci::Config::Entry::Hidden
+    context 'when cross-project pipeline triggers are enabled' do
+      before do
+        stub_feature_flags(cross_project_pipeline_triggers: true)
+
+        subject.compose!
       end
 
-      it 'correctly identifies regular jobs' do
-        expect(subject.node_type(:regular_job))
-          .to eq ::Gitlab::Ci::Config::Entry::Job
+      describe '#valid?' do
+        it { is_expected.to be_valid }
       end
 
-      it 'does not identify trigger job as a bridge job' do
-        expect(subject.node_type(:my_trigger))
-          .to eq ::Gitlab::Ci::Config::Entry::Job
+      describe '#value' do
+        it 'returns a correct hash representing all jobs' do
+          expect(subject.value).to eq(
+            my_trigger: {
+              name: :my_trigger,
+              trigger: { project: 'my/project' },
+              stage: 'test',
+              only: { refs: %w[branches tags] },
+              ignore: false
+            },
+            regular_job: {
+              script: %w[something],
+              name: :regular_job,
+              stage: 'test',
+              only: { refs: %w[branches tags] },
+              variables: {},
+              ignore: false
+            })
+        end
       end
     end
 
-    describe '#bridge?' do
-      it 'returns false even when a job is a trigger' do
-        expect(subject.bridge?(:my_trigger)).to be false
+    context 'when cross-project pipeline triggers are disabled' do
+      before do
+        stub_feature_flags(cross_project_pipeline_triggers: false)
+
+        subject.compose!
       end
 
-      it 'returns false when a job is not a trigger' do
-        expect(subject.bridge?(:regular_job)).to be false
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
       end
-    end
-
-    describe '#valid?' do
-      it { is_expected.not_to be_valid }
     end
   end
 end

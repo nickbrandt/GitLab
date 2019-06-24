@@ -8,7 +8,7 @@ class Geo::FileRegistry < Geo::BaseRegistry
   scope :fresh, -> { order(created_at: :desc) }
   scope :lfs_objects, -> { where(file_type: :lfs) }
   scope :never, -> { where(success: false, retry_count: nil) }
-  scope :with_file_type, ->(type) { where(file_type: type) }
+  scope :uploads, -> { where(file_type: Geo::FileService::UPLOAD_OBJECT_TYPE) }
 
   self.inheritance_column = 'file_type'
 

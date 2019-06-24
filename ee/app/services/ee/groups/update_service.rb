@@ -12,6 +12,8 @@ module EE
           return false if group.errors.present?
         end
 
+        handle_ip_restriction_deletion
+
         remove_insight_if_insight_project_absent
 
         super.tap { |success| log_audit_event if success }
@@ -67,6 +69,26 @@ module EE
           params[:insight_attributes][:_destroy] = true
           params[:insight_attributes].delete(:project_id)
         end
+      end
+
+      def handle_ip_restriction_deletion
+        return unless ip_restriction_editable?
+
+        return unless group.ip_restriction.present?
+
+        ip_restriction_params = params[:ip_restriction_attributes]
+
+        return unless ip_restriction_params
+
+        if ip_restriction_params[:range]&.blank?
+          ip_restriction_params[:_destroy] = 1
+        end
+      end
+
+      def ip_restriction_editable?
+        return false if group.parent_id.present?
+
+        true
       end
 
       def log_audit_event

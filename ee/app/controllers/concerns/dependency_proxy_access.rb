@@ -11,8 +11,7 @@ module DependencyProxyAccess
   private
 
   def verify_dependency_proxy_enabled!
-    render_404 unless Gitlab.config.dependency_proxy.enabled &&
-        group.feature_available?(:dependency_proxy)
+    render_404 unless group.dependency_proxy_feature_available?
   end
 
   def authorize_read_dependency_proxy!

@@ -230,9 +230,17 @@ module EE
         ::Gitlab::Auth::GroupSaml::SsoEnforcer.group_access_restricted?(subject.group)
       end
 
+      condition(:ip_enforcement_prevents_access) do
+        !::Gitlab::IpRestriction::Enforcer.new(subject.group).allows_current_ip? if subject.group
+      end
+
       condition(:owner_cannot_destroy_project) do
         ::Gitlab::CurrentSettings.current_application_settings
           .default_project_deletion_protection
+      end
+
+      rule { ip_enforcement_prevents_access }.policy do
+        prevent :read_project
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal
@@ -256,5 +264,3 @@ module EE
     end
   end
 end
-
-EE::ProjectPolicy.include(EE::ClusterableActions)

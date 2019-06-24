@@ -99,4 +99,29 @@ describe('Deploy Board', () => {
       expect(component.$el.querySelector('.fa-spin')).toBeDefined();
     });
   });
+
+  describe('with hasLegacyAppLabel equal true', () => {
+    let component;
+
+    beforeEach(() => {
+      component = new DeployBoardComponent({
+        propsData: {
+          isLoading: false,
+          isEmpty: false,
+          logsPath: environment.log_path,
+          hasLegacyAppLabel: true,
+          deployBoardData: {},
+        },
+      }).$mount();
+    });
+
+    it('should render legacy label warning message', () => {
+      const warningMessage = component.$el.querySelector('.bs-callout-warning');
+
+      expect(warningMessage).toBeTruthy();
+      expect(warningMessage.innerText).toContain(
+        'Matching on the app label has been removed for deploy boards.',
+      );
+    });
+  });
 });

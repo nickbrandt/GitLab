@@ -59,6 +59,8 @@ specific environment, there are lot of uses cases. To name a few:
 
 To display the Deploy Boards for a specific [environment] you should:
 
+1. Have [defined an environment](../../ci/environments.md#defining-environments) with a deploy stage.
+
 1. Have a Kubernetes cluster up and running.
 
     NOTE: **Running on OpenShift:**
@@ -86,8 +88,10 @@ To display the Deploy Boards for a specific [environment] you should:
    Kubernetes.
 
    NOTE: **Note:**
-   The Kubernetes label of `app` is deprecated and may be removed in next major
-   release, GitLab 12.0.
+   Matching based on the Kubernetes `app` label was removed in [GitLab
+   12.1](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/14020).
+   To migrate, please apply the required annotations (see above) and
+   re-deploy your application.
 
     ![Deploy Boards Kubernetes Label](img/deploy_boards_kubernetes_label.png)
 

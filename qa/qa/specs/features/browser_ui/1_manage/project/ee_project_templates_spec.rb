@@ -38,7 +38,7 @@ module QA
         end
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/51
+      # https://gitlab.com/gitlab-org/quality/staging/issues/59
       context 'instance level', :quarantine do
         before do
           # Log out if already logged in

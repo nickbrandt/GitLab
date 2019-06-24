@@ -18,6 +18,8 @@ module EE
       has_many :epics
 
       has_one :saml_provider
+      has_one :ip_restriction
+      accepts_nested_attributes_for :ip_restriction, allow_destroy: true
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
       has_one :scim_oauth_access_token
@@ -181,6 +183,12 @@ module EE
       projects.detect { |project| !project.empty_repo? }
     end
 
+    def root_ancestor_ip_restriction
+      return ip_restriction if parent_id.nil?
+
+      root_ancestor.ip_restriction
+    end
+
     # Overrides a method defined in `::EE::Namespace`
     override :checked_file_template_project
     def checked_file_template_project(*args, &blk)
@@ -209,6 +217,14 @@ module EE
       else
         users_with_descendants.count
       end
+    end
+
+    def packages_feature_available?
+      ::Gitlab.config.packages.enabled && feature_available?(:packages)
+    end
+
+    def dependency_proxy_feature_available?
+      ::Gitlab.config.dependency_proxy.enabled && feature_available?(:dependency_proxy)
     end
 
     private

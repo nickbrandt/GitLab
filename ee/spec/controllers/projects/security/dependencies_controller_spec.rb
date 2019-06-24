@@ -83,6 +83,7 @@ describe Projects::Security::DependenciesController do
 
               it 'returns paginated list' do
                 expect(json_response['dependencies'].length).to eq(1)
+                expect(response).to include_pagination_headers
               end
             end
           end

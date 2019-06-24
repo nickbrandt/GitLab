@@ -268,9 +268,10 @@ be unique.
 
 To change your group path:
 
-1. Navigate to your group's **Settings > General**.
-1. Enter a new name under **Group path**.
-1. Click **Save group**.
+1. Navigate to your group's **Settings > General** page.
+1. Expand the **Path, transfer, remove** section.
+1. Enter a new name under **Change group path**.
+1. Click **Change group path**.
 
 CAUTION: **Caution:**
 It is currently not possible to rename a namespace if it contains a
@@ -323,6 +324,25 @@ This will disable the option for all users who previously had permissions to
 operate project memberships, so no new users can be added. Furthermore, any
 request to add a new user to a project through API will not be possible.
 
+#### IP access restriction **[ULTIMATE]**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1985) in
+[GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
+
+To make sure only people from within your organization can access particular
+resources, you have the option to restrict access to groups and their
+underlying projects, issues, etc, by IP address. This can help ensure that
+particular content doesn't leave the premises, while not blocking off access to
+the entire instance.
+
+Add whitelisted IP subnet using CIDR notation to the group settings and anyone
+coming from a different IP address won't be able to access the restricted
+content.
+
+Restriction currently applies to UI, API access is not restricted.
+To avoid accidental lock-out, admins and group owners are are able to access
+the group regardless of the IP restriction.
+
 #### Group file templates **[PREMIUM]**
 
 Group file templates allow you to share a set of templates for common file
@@ -361,6 +381,14 @@ Define project templates at a group level by setting a group as the template sou
 - **Audit Events**: View [Audit Events](../../administration/audit_events.md)
   for the group. **[STARTER ONLY]**
 - **Pipelines quota**: Keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group.
+
+#### Storage usage quota **[STARTER]**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/13294) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.0.
+
+A group owner can check the aggregated storage usage for all the project in a group, sub-groups included, in the **Storage** tab of the **Usage Quotas** page available to the group page settings list.
+
+![Group storage usage quota](img/group_storage_usage_quota.png)
 
 ## User contribution analysis **[STARTER]**
 

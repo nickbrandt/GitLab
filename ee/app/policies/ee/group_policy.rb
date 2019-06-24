@@ -14,8 +14,11 @@ module EE
       end
 
       condition(:can_owners_manage_ldap, scope: :global) do
-        ::Gitlab::CurrentSettings.current_application_settings
-          .allow_group_owners_to_manage_ldap
+        ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
+      end
+
+      condition(:memberships_locked_to_ldap, scope: :global) do
+        ::Gitlab::CurrentSettings.lock_memberships_to_ldap?
       end
 
       condition(:security_dashboard_feature_disabled) do
@@ -24,6 +27,10 @@ module EE
 
       condition(:needs_new_sso_session) do
         sso_enforcement_prevents_access?
+      end
+
+      condition(:ip_enforcement_prevents_access) do
+        !::Gitlab::IpRestriction::Enforcer.new(subject).allows_current_ip?
       end
 
       condition(:dependency_proxy_available) do
@@ -79,6 +86,12 @@ module EE
 
       rule { ldap_synced & (admin | (can_owners_manage_ldap & owner)) }.enable :override_group_member
 
+      rule { memberships_locked_to_ldap & ~admin }.policy do
+        prevent :admin_group_member
+        prevent :update_group_member
+        prevent :override_group_member
+      end
+
       rule { developer }.policy do
         enable :read_group_security_dashboard
       end
@@ -88,6 +101,10 @@ module EE
       end
 
       rule { needs_new_sso_session }.policy do
+        prevent :read_group
+      end
+
+      rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
       end
     end
@@ -107,5 +124,3 @@ module EE
     end
   end
 end
-
-EE::GroupPolicy.include(EE::ClusterableActions)

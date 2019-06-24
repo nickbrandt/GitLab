@@ -703,7 +703,7 @@ module API
       # See https://gitlab.com/gitlab-org/gitlab-ce/issues/42344 for more
       # information.
       expose :merge_status do |merge_request|
-        merge_request.check_if_can_be_merged
+        merge_request.check_mergeability
         merge_request.merge_status
       end
       expose :diff_head_sha, as: :sha
@@ -997,7 +997,7 @@ module API
 
     class ProjectService < Grape::Entity
       expose :id, :title, :created_at, :updated_at, :active
-      expose :push_events, :issues_events, :confidential_issues_events
+      expose :commit_events, :push_events, :issues_events, :confidential_issues_events
       expose :merge_requests_events, :tag_push_events, :note_events
       expose :confidential_note_events, :pipeline_events, :wiki_page_events
       expose :job_events
@@ -1680,3 +1680,4 @@ API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entitie
 API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
 API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)
+API::Entities.prepend_entity(::API::Entities::Identity, with: EE::API::Entities::Identity)

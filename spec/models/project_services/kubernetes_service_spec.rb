@@ -7,7 +7,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
 
   let(:project) { create(:kubernetes_project) }
-  let(:service) { project.deployment_platform }
+  let(:service) { create(:kubernetes_service, project: project) }
 
   describe 'Associations' do
     it { is_expected.to belong_to :project }
@@ -17,6 +17,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
     context 'when service is active' do
       before do
         subject.active = true
+        subject.skip_deprecation_validation = true
       end
 
       it { is_expected.not_to validate_presence_of(:namespace) }
@@ -67,6 +68,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
       before do
         kubernetes_service.update_attribute(:active, false)
+        kubernetes_service.skip_deprecation_validation = false
         kubernetes_service.properties['namespace'] = "foo"
       end
 
@@ -76,16 +78,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
       it 'includes an error with a deprecation message' do
         kubernetes_service.valid?
-        expect(kubernetes_service.errors[:base].first).to match(/Kubernetes service integration has been deprecated/)
-      end
-    end
-
-    context 'with a non-deprecated service' do
-      let(:kubernetes_service) { create(:kubernetes_service) }
-
-      it 'updates attributes' do
-        kubernetes_service.properties['namespace'] = 'foo'
-        expect(kubernetes_service.save).to be_truthy
+        expect(kubernetes_service.errors[:base].first).to match(/Kubernetes service integration has been disabled/)
       end
     end
 
@@ -93,6 +86,7 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
       let(:kubernetes_service) { create(:kubernetes_service) }
 
       before do
+        kubernetes_service.skip_deprecation_validation = false
         kubernetes_service.active = false
         kubernetes_service.properties['namespace'] = 'foo'
         kubernetes_service.save
@@ -108,19 +102,6 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
 
       it 'updates attributes' do
         expect(kubernetes_service.properties['namespace']).to eq("foo")
-      end
-    end
-
-    context 'with a template service' do
-      let(:kubernetes_service) { create(:kubernetes_service, template: true, active: false) }
-
-      before do
-        kubernetes_service.properties['namespace'] = 'foo'
-      end
-
-      it 'updates attributes' do
-        expect(kubernetes_service.save).to be_truthy
-        expect(kubernetes_service.properties['namespace']).to eq('foo')
       end
     end
   end
@@ -393,17 +374,8 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
   describe "#deprecated?" do
     let(:kubernetes_service) { create(:kubernetes_service) }
 
-    context 'with an active kubernetes service' do
-      it 'returns false' do
-        expect(kubernetes_service.deprecated?).to be_falsy
-      end
-    end
-
-    context 'with a inactive kubernetes service' do
-      it 'returns true' do
-        kubernetes_service.update_attribute(:active, false)
-        expect(kubernetes_service.deprecated?).to be_truthy
-      end
+    it 'returns true' do
+      expect(kubernetes_service.deprecated?).to be_truthy
     end
   end
 
@@ -411,19 +383,13 @@ describe KubernetesService, :use_clean_rails_memory_store_caching do
     let(:kubernetes_service) { create(:kubernetes_service) }
 
     it 'indicates the service is deprecated' do
-      expect(kubernetes_service.deprecation_message).to match(/Kubernetes service integration has been deprecated/)
-    end
-
-    context 'if the services is active' do
-      it 'returns a message' do
-        expect(kubernetes_service.deprecation_message).to match(/Your Kubernetes cluster information on this page is still editable/)
-      end
+      expect(kubernetes_service.deprecation_message).to match(/Kubernetes service integration has been disabled/)
     end
 
     context 'if the service is not active' do
       it 'returns a message' do
         kubernetes_service.update_attribute(:active, false)
-        expect(kubernetes_service.deprecation_message).to match(/Fields on this page are now uneditable/)
+        expect(kubernetes_service.deprecation_message).to match(/Fields on this page are not used by GitLab/)
       end
     end
   end

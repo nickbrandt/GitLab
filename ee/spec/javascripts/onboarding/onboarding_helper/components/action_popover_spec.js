@@ -80,7 +80,7 @@ describe('User onboarding action popover', () => {
 
   describe('template', () => {
     it('shows the content passed in as prop', () => {
-      expect(wrapper.find('.onboarding-popover').text()).toEqual(content);
+      expect(wrapper.text()).toEqual(content);
     });
   });
 });

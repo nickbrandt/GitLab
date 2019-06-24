@@ -306,11 +306,12 @@ module EE
     end
 
     def group_ldap_synced?
-      if group
-        group.ldap_synced?
-      else
-        false
-      end
+      group&.ldap_synced?
+    end
+
+    override :allowed_to_share_with_group?
+    def allowed_to_share_with_group?
+      super && !(group && ::Gitlab::CurrentSettings.lock_memberships_to_ldap?)
     end
 
     def reference_issue_tracker?
@@ -573,12 +574,14 @@ module EE
     end
 
     def design_management_enabled?
+      # LFS and GraphQL are required for using Design Management
+      #
       # Checking both feature availability on the license, as well as the feature
       # flag, because we don't want to enable design_management by default on
       # on prem installs yet.
-      # GraphQL is also required for using Design Management
-      feature_available?(:design_management) && ::Feature.enabled?(:design_management, self) &&
-        ::Gitlab::Graphql.enabled?
+      lfs_enabled? && ::Gitlab::Graphql.enabled? &&
+        feature_available?(:design_management) &&
+        ::Feature.enabled?(:design_management, self)
     end
 
     def design_repository

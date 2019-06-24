@@ -1,0 +1,42 @@
+- page_title _("Packages")
+
+- if @packages.any?
+  .table-holder
+    .gl-responsive-table-row.table-row-header{ role: 'row' }
+      .table-section.section-30{ role: 'rowheader' }
+        = _('Name')
+      .table-section.section-20{ role: 'rowheader' }
+        = _('Project')
+      .table-section.section-20{ role: 'rowheader' }
+        = _('Version')
+      .table-section.section-10{ role: 'rowheader' }
+        = _('Type')
+      .table-section.section-20{ role: 'rowheader' }
+        = _('Created')
+    - @packages.each do |package|
+      .gl-responsive-table-row
+        .table-section.section-30
+          .table-mobile-header{ role: "rowheader" }= _("Name")
+          .table-mobile-content.flex-truncate-parent
+            = link_to package.name, project_package_path(package.project, package), class: 'flex-truncate-child'
+        .table-section.section-20
+          .table-mobile-header{ role: "rowheader" }= _("Project")
+          .table-mobile-content
+            = link_to_project(package.project)
+        .table-section.section-20
+          .table-mobile-header{ role: "rowheader" }= _("Version")
+          .table-mobile-content
+            = package.version
+        .table-section.section-10
+          .table-mobile-header{ role: "rowheader" }= _("Type")
+          .table-mobile-content
+            = package.package_type
+        .table-section.section-20
+          .table-mobile-header{ role: "rowheader" }= _("Created")
+          .table-mobile-content
+            = time_ago_with_tooltip(package.created_at)
+    = paginate @packages, theme: "gitlab"
+- else
+  .row.empty-state
+    .col-12
+      = render 'shared/packages/no_packages'

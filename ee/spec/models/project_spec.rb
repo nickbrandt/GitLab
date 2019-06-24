@@ -238,6 +238,7 @@ describe Project do
 
         let!(:default_cluster) do
           create(:cluster,
+                 :not_managed,
                  platform_type: :kubernetes,
                  projects: [project],
                  environment_scope: '*',
@@ -246,6 +247,7 @@ describe Project do
 
         let!(:review_env_cluster) do
           create(:cluster,
+                 :not_managed,
                  platform_type: :kubernetes,
                  projects: [project],
                  environment_scope: 'review/*',
@@ -1830,18 +1832,20 @@ describe Project do
 
   describe "#design_management_enabled?" do
     let(:project) { build(:project) }
-    where(:feature_enabled, :license_enabled, :graphql, :expected) do
-      false | false | false | false
-      false | true  | false | false
-      true  | false | false | false
-      false | false | true  | false
-      true  | true  | true  | true
+    where(:feature_enabled, :license_enabled, :graphql, :lfs, :expected) do
+      false | false | false | false | false
+      true  | false | false | false | false
+      false | true  | false | false | false
+      false | false | true  | false | false
+      false | false | false | true | false
+      true  | true  | true | true | true
     end
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
         stub_feature_flags(design_management: feature_enabled, graphql: graphql)
+        expect(project).to receive(:lfs_enabled?).and_return(lfs)
       end
 
       it "knows if design management is available" do
@@ -2098,6 +2102,34 @@ describe Project do
       expect(project).to receive(:create_import_state)
 
       project.update(mirror: true, mirror_user: project.owner, import_url: 'http://foo.com')
+    end
+  end
+
+  describe '#allowed_to_share_with_group?' do
+    context 'for group related project' do
+      subject(:project) { build_stubbed(:project, namespace: group, group: group) }
+      let(:group) { build_stubbed :group }
+
+      context 'with lock_memberships_to_ldap application setting enabled' do
+        before do
+          stub_application_setting(lock_memberships_to_ldap: true)
+        end
+
+        it { is_expected.not_to be_allowed_to_share_with_group }
+      end
+    end
+
+    context 'personal project' do
+      subject(:project) { build_stubbed(:project, namespace: namespace) }
+      let(:namespace) { build_stubbed :namespace }
+
+      context 'with lock_memberships_to_ldap application setting enabled' do
+        before do
+          stub_application_setting(lock_memberships_to_ldap: true)
+        end
+
+        it { is_expected.to be_allowed_to_share_with_group }
+      end
     end
   end
 

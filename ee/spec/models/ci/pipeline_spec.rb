@@ -26,26 +26,6 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#with_legacy_security_reports scope' do
-    let(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_4) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_5) { create(:ci_pipeline_without_jobs, project: project) }
-
-    before do
-      create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
-      create(:ee_ci_build, :legacy_dependency_scanning, pipeline: pipeline_2)
-      create(:ee_ci_build, :legacy_container_scanning, pipeline: pipeline_3)
-      create(:ee_ci_build, :legacy_dast, pipeline: pipeline_4)
-      create(:ee_ci_build, :success, :artifacts, name: 'foobar', pipeline: pipeline_5)
-    end
-
-    it "returns pipeline with security reports" do
-      expect(described_class.with_legacy_security_reports).to contain_exactly(pipeline_1, pipeline_2, pipeline_3, pipeline_4)
-    end
-  end
-
   describe '#with_vulnerabilities scope' do
     let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
     let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
@@ -134,45 +114,6 @@ describe Ci::Pipeline do
       context "for file_type: #{file_type}" do
         let(:file_type) { file_type }
         let(:expected) { artifact }
-
-        if licensed_features.nil?
-          it_behaves_like 'unlicensed report type'
-        elsif licensed_features.size == 1
-          it_behaves_like 'licensed report type', licensed_features.first
-        else
-          it_behaves_like 'multi-licensed report type', licensed_features
-        end
-      end
-    end
-  end
-
-  describe '#legacy_report_artifact_for_file_type' do
-    let(:build_name) { ::EE::Ci::Pipeline::LEGACY_REPORT_FORMATS[file_type][:names].first }
-    let(:artifact_path) { ::EE::Ci::Pipeline::LEGACY_REPORT_FORMATS[file_type][:files].first }
-
-    let!(:build) do
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: build_name,
-        pipeline: pipeline,
-        options: {
-          artifacts: {
-            paths: [artifact_path]
-          }
-        }
-      )
-    end
-
-    subject { pipeline.legacy_report_artifact_for_file_type(file_type) }
-
-    described_class::LEGACY_REPORT_FORMATS.each do |file_type, _|
-      licensed_features = described_class::REPORT_LICENSED_FEATURES[file_type]
-
-      context "for file_type: #{file_type}" do
-        let(:file_type) { file_type }
-        let(:expected) { OpenStruct.new(build: build, path: artifact_path) }
 
         if licensed_features.nil?
           it_behaves_like 'unlicensed report type'

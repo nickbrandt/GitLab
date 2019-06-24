@@ -4,8 +4,6 @@ require 'rails/all'
 
 Bundler.require(:default, Rails.env)
 
-require 'elasticsearch/rails/instrumentation'
-
 module Gitlab
   class Application < Rails::Application
     require_dependency Rails.root.join('lib/gitlab/redis/wrapper')
@@ -49,7 +47,6 @@ module Gitlab
 
     config.generators.templates.push("#{config.root}/generator_templates")
 
-    ## EE-specific paths config START
     ee_paths = config.eager_load_paths.each_with_object([]) do |path, memo|
       ee_path = config.root.join('ee', Pathname.new(path).relative_path_from(config.root))
       memo << ee_path.to_s if ee_path.exist?
@@ -62,7 +59,6 @@ module Gitlab
     # Other than Ruby modules we load EE first
     config.paths['lib/tasks'].unshift "#{config.root}/ee/lib/tasks"
     config.paths['app/views'].unshift "#{config.root}/ee/app/views"
-    ## EE-specific paths config END
 
     # Rake tasks ignore the eager loading settings, so we need to set the
     # autoload paths explicitly
@@ -170,6 +166,7 @@ module Gitlab
 
     # Import gitlab-svgs directly from vendored directory
     config.assets.paths << "#{config.root}/node_modules/@gitlab/svgs/dist"
+    config.assets.paths << "#{config.root}/node_modules"
     config.assets.precompile << "icons.svg"
     config.assets.precompile << "icons.json"
     config.assets.precompile << "illustrations/*.svg"
@@ -178,7 +175,6 @@ module Gitlab
     config.assets.paths << "#{config.root}/node_modules/xterm/src/"
     config.assets.precompile << "xterm.css"
 
-    ## EE-specific assets config START
     %w[images javascripts stylesheets].each do |path|
       config.assets.paths << "#{config.root}/ee/app/assets/#{path}"
       config.assets.precompile << "jira_connect.js"
@@ -195,7 +191,6 @@ module Gitlab
         !['.js', '.css', ''].include?(File.extname(logical_path))
     end
     config.assets.precompile << LOOSE_EE_APP_ASSETS
-    ## EE-specific assets config END
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'

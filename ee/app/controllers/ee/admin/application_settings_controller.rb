@@ -30,6 +30,10 @@ module EE
           attrs << :default_project_deletion_protection
         end
 
+        if License.feature_available?(:required_ci_templates)
+          attrs << :required_instance_ci_template
+        end
+
         attrs
       end
     end

@@ -17,28 +17,6 @@ The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab
 
 You can request a free trial of GitLab Ultimate [on our website](https://about.gitlab.com/free-trial/).
 
-## Subscriber onboarding information
-
-Thank you for purchasing a GitLab subscription!
-
-For standard subscribers, please see **emergency contact info and other useful information** in [the Standard subscribers README](https://gitlab.com/standard/standard-subscriber-information/tree/master#README).
-
-GitLab Enterprise Edition repository:
-https://gitlab.com/gitlab-org/gitlab-ee
-
-Download GitLab Enterprise Edition:
-https://about.gitlab.com/downloads-ee
-
-Documentation:
-http://doc.gitlab.com/ee/
-
-To upgrade from CE, just perform a normal upgrade, but use an EE package:
-https://about.gitlab.com/upgrade/
-
-If you need help with your GitLab installation and for any technical questions please see the [support page](https://about.gitlab.com/support/)
-
-For all other questions, please see our [contact page](https://about.gitlab.com/contact/)
-
 ## Open source software to collaborate on code
 
 To see how GitLab looks please see the [features page on our website](https://about.gitlab.com/features/).
@@ -83,8 +61,6 @@ Compared to an installation from source, this is faster and less error prone.
 Just select your operating system, download the respective package (Debian or RPM) and install it using the system's package manager.
 
 There are various other options to install GitLab, please refer to the [installation page on the GitLab website](https://about.gitlab.com/installation/) for more information.
-
-You can access a new installation with the login **`root`** and password **`5iveL!fe`**, after login you are required to set a unique password.
 
 ## Contributing
 
@@ -155,4 +131,3 @@ Please see [Getting help for GitLab](https://about.gitlab.com/getting-help/) on 
 ## Is it awesome?
 
 [These people](https://twitter.com/gitlab/likes) seem to like it.
-

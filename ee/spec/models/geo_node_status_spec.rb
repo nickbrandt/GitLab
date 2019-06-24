@@ -33,8 +33,10 @@ describe GeoNodeStatus, :geo, :geo_fdw do
   describe '#update_cache!' do
     it 'writes a cache' do
       rails_cache = double
+      allow(Rails).to receive(:cache).and_return(rails_cache)
+      allow(rails_cache).to receive(:fetch).with('flipper:persisted_names', expires_in: 1.minute).and_return([described_class.cache_key])
+
       expect(rails_cache).to receive(:write).with(described_class.cache_key, kind_of(Hash))
-      expect(Rails).to receive(:cache).and_return(rails_cache)
 
       described_class.new.update_cache!
     end
@@ -117,6 +119,12 @@ describe GeoNodeStatus, :geo, :geo_fdw do
 
         expect(subject.health).to eq 'something went wrong'
       end
+    end
+  end
+
+  describe '#projects_count' do
+    it 'counts the number of projects' do
+      expect(subject.projects_count).to eq 4
     end
   end
 
@@ -995,12 +1003,6 @@ describe GeoNodeStatus, :geo, :geo_fdw do
         stub_current_geo_node(primary)
       end
 
-      it 'does not call ProjectRegistryFinder#count_projects' do
-        expect_any_instance_of(Geo::ProjectRegistryFinder).not_to receive(:count_projects)
-
-        subject
-      end
-
       it 'does not call LfsObjectRegistryFinder#count_syncable' do
         expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:count_syncable)
 
@@ -1021,14 +1023,8 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     context 'on the secondary' do
-      it 'calls ProjectRegistryFinder#count_projects' do
-        expect_any_instance_of(Geo::ProjectRegistryFinder).to receive(:count_projects)
-
-        subject
-      end
-
       it 'calls LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:count_syncable)
 
         subject
       end

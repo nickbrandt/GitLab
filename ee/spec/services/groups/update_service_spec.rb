@@ -154,6 +154,32 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'setting ip_restriction' do
+    let(:group) { create(:group) }
+
+    subject { update_group(group, user, params) }
+
+    before do
+      stub_licensed_features(group_ip_restriction: true)
+    end
+
+    context 'when ip_restriction already exists' do
+      let!(:ip_restriction) { IpRestriction.create!(group: group, range: '10.0.0.0/8') }
+
+      context 'empty ip restriction param' do
+        let(:params) { { ip_restriction_attributes: { id: ip_restriction.id, range: '' } } }
+
+        it 'deletes ip restriction' do
+          expect(group.ip_restriction.range).to eql('10.0.0.0/8')
+
+          subject
+
+          expect(group.reload.ip_restriction).to be_nil
+        end
+      end
+    end
+  end
+
   context 'updating protected params' do
     let(:attrs) { { shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100 } }
 

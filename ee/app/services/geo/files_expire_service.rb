@@ -25,7 +25,7 @@ module Geo
     def execute
       return unless Gitlab::Geo.secondary?
 
-      uploads = finder.find_project_uploads(project)
+      uploads = Geo::Fdw::Upload.for_model(project)
       log_info("Expiring replicated attachments after project rename", count: uploads.count)
 
       schedule_file_removal(uploads)
@@ -58,11 +58,9 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     def mark_for_resync!
-      finder.find_file_registries_uploads(project).delete_all
-    end
-
-    def finder
-      @finder ||= ::Geo::ExpireUploadsFinder.new
+      Gitlab::Geo::Fdw::UploadRegistryQueryBuilder.new
+        .for_model(project)
+        .delete_all
     end
 
     # This is called by LogHelpers to build json log with context info

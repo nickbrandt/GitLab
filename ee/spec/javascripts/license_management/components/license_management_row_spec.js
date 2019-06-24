@@ -132,8 +132,8 @@ describe('LicenseManagementRow', () => {
   });
 
   describe('template', () => {
-    it('renders component container element with class `list-group-item`', () => {
-      expect(vm.$el.classList.contains('list-group-item')).toBe(true);
+    it('renders component container element as a div', () => {
+      expect(vm.$el.tagName).toBe('DIV');
     });
 
     it('renders status icon', () => {

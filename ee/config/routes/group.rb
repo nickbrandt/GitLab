@@ -117,12 +117,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     get 'boards(/*extra_params)', as: :legacy_ee_group_boards_redirect, to: legacy_ee_group_boards_redirect
 
     resource :dependency_proxy, only: [:show, :update]
-  end
-
-  scope(path: 'groups/*group_id') do
-    Gitlab::Routing.redirect_legacy_paths(self, :analytics, :ldap, :ldap_group_links,
-                                          :notification_setting, :audit_events,
-                                          :pipeline_quota, :hooks, :boards)
+    resources :packages, only: [:index]
   end
 end
 

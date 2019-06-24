@@ -82,7 +82,8 @@ deploy the bundled PostgreSQL.
 1. Note the PostgreSQL node's IP address or hostname, port, and
    plain text password. These will be necessary when configuring the GitLab
    application servers later.
-
+1. [Enable monitoring](#enable-monitoring)
+   
 Advanced configuration options are supported and can be added if
 needed.
 
@@ -111,7 +112,7 @@ deploy the bundled PostgreSQL.
 > - If you are a Community Edition or Starter user, consider using a cloud hosted solution.
 > - This document will not cover installations from source.
 >
-> - If HA setup is not what you were looking for, see the [database configuration document](http://docs.gitlab.com/omnibus/settings/database.html)
+> - If HA setup is not what you were looking for, see the [database configuration document](https://docs.gitlab.com/omnibus/settings/database.html)
 >   for the Omnibus GitLab packages.
 >
 > Please read this document fully before attempting to configure PostgreSQL HA
@@ -399,6 +400,7 @@ check the [Troubleshooting section](#troubleshooting) before proceeding.
    ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
+1. [Enable Monitoring](#enable-monitoring)
 
 > Please note:
 >
@@ -1086,6 +1088,25 @@ the previous section:
       the `gitlab` database user
    1. [Reconfigure GitLab] for the changes to take effect
 
+## Enable Monitoring
+
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/3786) in GitLab 12.0.
+
+If you enable Monitoring, it must be enabled on **all** database servers.
+
+1. Create/edit `/etc/gitlab/gitlab.rb` and add the following configuration:
+
+   ```ruby
+   # Enable service discovery for Prometheus
+   consul['monitoring_service_discovery'] = true
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   postgres_exporter['listen_address'] = '0.0.0.0:9187'
+   ```
+
+1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
+
 ## Troubleshooting
 
 #### Consul and PostgreSQL changes not taking effect.
@@ -1146,7 +1167,7 @@ postgresql['trust_auth_cidr_addresses'] = %w(123.123.123.123/32 <other_cidrs>)
 If you're running into an issue with a component not outlined here, be sure to check the troubleshooting section of their specific documentation page.
 
 - [Consul](consul.md#troubleshooting)
-- [PostgreSQL](http://docs.gitlab.com/omnibus/settings/database.html#troubleshooting)
+- [PostgreSQL](https://docs.gitlab.com/omnibus/settings/database.html#troubleshooting)
 - [GitLab application](gitlab.md#troubleshooting)
 
 ## Configure using Omnibus

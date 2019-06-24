@@ -37,7 +37,8 @@ class GeoNode < ApplicationRecord
   validates :verification_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :minimum_reverification_interval, numericality: { greater_than_or_equal_to: 1 }
 
-  validate :check_not_adding_primary_as_secondary, if: :secondary?
+  validate :require_current_node_to_be_primary, if: :secondary?
+  validate :require_hashed_storage, on: :create
 
   after_save :expire_cache!
   after_destroy :expire_cache!
@@ -287,9 +288,16 @@ class GeoNode < ApplicationRecord
   end
 
   # Prevent locking yourself out
-  def check_not_adding_primary_as_secondary
+  def require_current_node_to_be_primary
     if name == self.class.current_node_name
       errors.add(:base, 'Current node must be the primary node or you will be locking yourself out')
+    end
+  end
+
+  # Prevent creating a Geo Node unless Hashed Storage is enabled
+  def require_hashed_storage
+    unless Gitlab::CurrentSettings.hashed_storage_enabled?
+      errors.add(:base, 'Hashed Storage must be enabled to use Geo')
     end
   end
 

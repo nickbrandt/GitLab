@@ -1,5 +1,0 @@
----
-title: Migrate code_owners to rule_type enum on approval_merge_request_rules
-merge_request: 13036
-author:
-type: changed

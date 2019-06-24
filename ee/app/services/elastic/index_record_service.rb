@@ -36,12 +36,14 @@ module Elastic
     end
 
     def initial_index_project(project)
+      # Enqueue the repository indexing jobs immediately so they run in parallel
+      # One for the project repository, one for the wiki repository
+      ElasticCommitIndexerWorker.perform_async(project.id)
+      ElasticCommitIndexerWorker.perform_async(project.id, nil, nil, true)
+
       project.each_indexed_association do |klass, objects|
         objects.es_import
       end
-
-      # Finally, index blobs/commits/wikis
-      ElasticCommitIndexerWorker.perform_async(project.id)
     end
 
     def import(record, nested, indexing)

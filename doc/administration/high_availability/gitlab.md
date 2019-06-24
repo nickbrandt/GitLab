@@ -66,7 +66,7 @@
     gitlab_rails['redis_port'] = '6379'
     gitlab_rails['redis_host'] = '10.1.0.6' # IP/hostname of Redis server
     gitlab_rails['redis_password'] = 'Redis Password'
-    
+
     # Ensure UIDs and GIDs match between servers for permissions via NFS
     user['uid'] = 9000
     user['gid'] = 9000
@@ -76,19 +76,22 @@
     registry['gid'] = 9002
     ```
 
+1. [Enable monitoring](#enable-monitoring)
+
     > **Note:** To maintain uniformity of links across HA clusters, the `external_url`
     on the first application server as well as the additional application
     servers should point to the external url that users will use to access GitLab.
     In a typical HA setup, this will be the url of the load balancer which will
     route traffic to all GitLab application servers in the HA cluster.
-    > 
+    >
     > **Note:** When you specify `https` in the `external_url`, as in the example
     above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
     certificates are not present, Nginx will fail to start. See
-    [Nginx documentation](http://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
+    [Nginx documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
     for more information.
     >
-    > **Note:** It is best to set the `uid` and `gid`s prior to the initial reconfigure of GitLab. Omnibus will not recursively `chown` directories if set after the initial reconfigure.
+    > **Note:** It is best to set the `uid` and `gid`s prior to the initial reconfigure
+    of GitLab. Omnibus will not recursively `chown` directories if set after the initial reconfigure.
 
 ## First GitLab application server
 
@@ -128,6 +131,46 @@ need some extra configuration.
    High Availability cluster behind a load balancer.
 
 1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
+
+## Enable Monitoring
+
+> [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/3786) in GitLab 12.0.
+
+If you enable Monitoring, it must be enabled on **all** GitLab servers.
+
+1. Create/edit `/etc/gitlab/gitlab.rb` and add the following configuration:
+
+   ```ruby
+   # Enable service discovery for Prometheus
+   consul['enable'] = true
+   consul['monitoring_service_discovery'] =  true
+
+   # Replace placeholders
+   # Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z
+   # with the addresses of the Consul server nodes
+   consul['configuration'] = {
+      retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z),
+   }
+
+   # Set the network addresses that the exporters will listen on
+   node_exporter['listen_address'] = '0.0.0.0:9100'
+   gitlab_workhorse['prometheus_listen_addr'] = '0.0.0.0:9229'
+   sidekiq['listen_address'] = "0.0.0.0"
+   unicorn['listen'] = '0.0.0.0'
+
+   # Add the monitoring node's IP address to the monitoring whitelist and allow it to scrape the NGINX metrics
+   # Replace placeholder
+   # monitoring.gitlab.example.com
+   # with the addresses gathered for the monitoring node
+   gitlab_rails['monitoring_whitelist'] = ['monitoring.gitlab.example.com']
+   nginx['status']['options']['allow'] = ['monitoring.gitlab.example.com']
+   ```
+
+1. Run `sudo gitlab-ctl reconfigure` to compile the configuration.
+
+> **Warning:** After changing `unicorn['listen']` in `gitlab.rb`, and running `sudo gitlab-ctl reconfigure`,
+  it can take an extended period of time for unicorn to complete reloading after receiving a `HUP`.
+  For more information, see the [issue](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/4401).
 
 ## Troubleshooting
 

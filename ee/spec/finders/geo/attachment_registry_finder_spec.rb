@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Geo::AttachmentRegistryFinder, :geo do
+describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
   include ::EE::GeoHelpers
 
   # Using let() instead of set() because set() does not work properly
-  # when using the :delete DatabaseCleaner strategy, which is required for FDW
-  # tests because a foreign table can't see changes inside a transaction of a
-  # different connection.
+  # when using the :delete DatabaseCleaner strategy, which is required
+  # for FDW tests because a foreign table can't see changes inside a
+  # transaction of a different connection.
   let(:secondary) { create(:geo_node) }
 
   let(:synced_group) { create(:group) }
@@ -129,56 +129,6 @@ describe Geo::AttachmentRegistryFinder, :geo do
   end
 
   shared_examples 'counts all the things' do
-    describe '#count_syncable' do
-      let!(:upload_1) { create(:upload, model: synced_group) }
-      let!(:upload_2) { create(:upload, model: unsynced_group) }
-      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
-      let!(:upload_4) { create(:upload, model: unsynced_project) }
-      let!(:upload_5) { create(:upload, :personal_snippet_upload) }
-
-      it 'counts attachments' do
-        expect(subject.count_syncable).to eq 5
-      end
-
-      it 'ignores remote attachments' do
-        upload_1.update!(store: ObjectStorage::Store::REMOTE)
-
-        expect(subject.count_syncable).to eq 4
-      end
-
-      context 'with selective sync by namespace' do
-        before do
-          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
-        end
-
-        it 'counts attachments' do
-          expect(subject.count_syncable).to eq 3
-        end
-
-        it 'ignores remote attachments' do
-          upload_1.update!(store: ObjectStorage::Store::REMOTE)
-
-          expect(subject.count_syncable).to eq 2
-        end
-      end
-
-      context 'with selective sync by shard' do
-        before do
-          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
-        end
-
-        it 'counts attachments' do
-          expect(subject.count_syncable).to eq 3
-        end
-
-        it 'ignores remote attachments' do
-          upload_4.update!(store: ObjectStorage::Store::REMOTE)
-
-          expect(subject.count_syncable).to eq 2
-        end
-      end
-    end
-
     describe '#count_synced' do
       let!(:upload_1) { create(:upload, model: synced_group) }
       let!(:upload_2) { create(:upload, model: unsynced_group) }
@@ -404,6 +354,56 @@ describe Geo::AttachmentRegistryFinder, :geo do
       end
     end
 
+    describe '#count_syncable' do
+      let!(:upload_1) { create(:upload, model: synced_group) }
+      let!(:upload_2) { create(:upload, model: unsynced_group) }
+      let!(:upload_3) { create(:upload, :issuable_upload, model: synced_project_in_nested_group) }
+      let!(:upload_4) { create(:upload, model: unsynced_project) }
+      let!(:upload_5) { create(:upload, :personal_snippet_upload) }
+
+      it 'counts attachments' do
+        expect(subject.count_syncable).to eq 5
+      end
+
+      it 'ignores remote attachments' do
+        upload_1.update!(store: ObjectStorage::Store::REMOTE)
+
+        expect(subject.count_syncable).to eq 4
+      end
+
+      context 'with selective sync by namespace' do
+        before do
+          secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+        end
+
+        it 'counts attachments' do
+          expect(subject.count_syncable).to eq 3
+        end
+
+        it 'ignores remote attachments' do
+          upload_1.update!(store: ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 2
+        end
+      end
+
+      context 'with selective sync by shard' do
+        before do
+          secondary.update!(selective_sync_type: 'shards', selective_sync_shards: ['broken'])
+        end
+
+        it 'counts attachments' do
+          expect(subject.count_syncable).to eq 3
+        end
+
+        it 'ignores remote attachments' do
+          upload_4.update!(store: ObjectStorage::Store::REMOTE)
+
+          expect(subject.count_syncable).to eq 2
+        end
+      end
+    end
+
     describe '#count_registry' do
       let!(:upload_1) { create(:upload, model: synced_group) }
       let!(:upload_2) { create(:upload, model: unsynced_group) }
@@ -456,5 +456,25 @@ describe Geo::AttachmentRegistryFinder, :geo do
     end
   end
 
-  it_behaves_like 'a file registry finder'
+  it 'responds to file registry finder methods' do
+    file_registry_finder_methods = %i{
+      syncable
+      count_syncable
+      count_synced
+      count_failed
+      count_synced_missing_on_primary
+      count_registry
+      find_unsynced
+      find_migrated_local
+      find_retryable_failed_registries
+      find_retryable_synced_missing_on_primary_registries
+    }
+
+    file_registry_finder_methods.each do |method|
+      expect(subject).to respond_to(method)
+    end
+  end
+
+  include_examples 'counts all the things'
+  include_examples 'finds all the things'
 end

@@ -262,6 +262,45 @@ describe ProjectPolicy do
         end
       end
     end
+
+    context 'with ip restriction' do
+      let(:current_user) { create(:admin) }
+      let(:group) { create(:group, :public) }
+      let(:project) { create(:project, group: group) }
+
+      before do
+        allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
+        stub_licensed_features(group_ip_restriction: true)
+      end
+
+      context 'group without restriction' do
+        it { is_expected.to be_allowed(:read_project) }
+      end
+
+      context 'group with restriction' do
+        before do
+          create(:ip_restriction, group: group, range: range)
+        end
+
+        context 'address is within the range' do
+          let(:range) { '192.168.0.0/24' }
+
+          it { is_expected.to be_allowed(:read_project) }
+        end
+
+        context 'address is outside the range' do
+          let(:range) { '10.0.0.0/8' }
+
+          it { is_expected.to be_disallowed(:read_project) }
+        end
+      end
+
+      context 'without group' do
+        let(:project) { create(:project, :repository, namespace: current_user.namespace) }
+
+        it { is_expected.to be_allowed(:read_project) }
+      end
+    end
   end
 
   describe 'read_vulnerability_feedback' do

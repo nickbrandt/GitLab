@@ -1,5 +1,0 @@
----
-title: Geo - Enable Cron job to perform repository checks on a Geo secondary node
-merge_request: 13103
-author:
-type: fixed
