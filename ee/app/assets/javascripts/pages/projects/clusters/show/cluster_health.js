@@ -9,6 +9,7 @@ export default () => {
       showLegend: false,
       showPanels: false,
       forceSmallGraph: true,
+      smallEmptyState: true,
       currentEnvironmentName: '',
       environmentsEndpoint: '',
       hasMetrics: true,
