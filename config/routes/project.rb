@@ -79,11 +79,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resource :operations, only: [:show, :update]
           resource :integrations, only: [:show]
 
-          ## EE-specific
-          resource :slack, only: [:destroy, :edit, :update] do
-            get :slack_auth
+          Gitlab.ee do
+            resource :slack, only: [:destroy, :edit, :update] do
+              get :slack_auth
+            end
           end
-          ## EE-specific
 
           resource :repository, only: [:show], controller: :repository do
             post :create_deploy_token, path: 'deploy_token/create'
@@ -91,9 +91,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
-        ## EE-specific
-        resources :feature_flags
-        ## EE-specific
+        Gitlab.ee do
+          resources :feature_flags
+        end
 
         resources :autocomplete_sources, only: [] do
           collection do
@@ -214,11 +214,11 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :active_common, on: :collection
         end
 
-        # EE-specific
-        resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
-          post :notify, on: :collection
+        Gitlab.ee do
+          resources :alerts, constraints: { id: /\d+/ }, only: [:index, :create, :show, :update, :destroy] do
+            post :notify, on: :collection
+          end
         end
-        # EE-specific
       end
 
       resources :merge_requests, concerns: :awardable, except: [:new, :create], constraints: { id: /\d+/ } do
@@ -230,13 +230,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :ci_environments_status
           post :toggle_subscription
 
-          ## EE-specific
-          get :approvals
-          post :approvals, action: :approve
-          delete :approvals, action: :unapprove
+          Gitlab.ee do
+            get :approvals
+            post :approvals, action: :approve
+            delete :approvals, action: :unapprove
 
-          post :rebase
-          ## EE-specific
+            post :rebase
+          end
 
           post :remove_wip
           post :assign_related_issues
@@ -270,22 +270,20 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :bulk_update
         end
 
-        ## EE-specific
-        resources :approvers, only: :destroy
-        delete 'approvers', to: 'approvers#destroy_via_user_id', as: :approver_via_user_id
-        resources :approver_groups, only: :destroy
-        ## EE-specific
+        Gitlab.ee do
+          resources :approvers, only: :destroy
+          delete 'approvers', to: 'approvers#destroy_via_user_id', as: :approver_via_user_id
+          resources :approver_groups, only: :destroy
 
-        ## EE-specific
-        scope module: :merge_requests do
-          resources :drafts, only: [:index, :update, :create, :destroy] do
-            collection do
-              post :publish
-              delete :discard
+          scope module: :merge_requests do
+            resources :drafts, only: [:index, :update, :create, :destroy] do
+              collection do
+                post :publish
+                delete :discard
+              end
             end
           end
         end
-        ## EE-specific
 
         resources :discussions, only: [:show], constraints: { id: /\h{40}/ } do
           member do
@@ -317,16 +315,16 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
-      resources :path_locks, only: [:index, :destroy] do
-        collection do
-          post :toggle
+      Gitlab.ee do
+        resources :path_locks, only: [:index, :destroy] do
+          collection do
+            post :toggle
+          end
         end
-      end
 
-      ## EE-specific
-      get '/service_desk' => 'service_desk#show', as: :service_desk
-      put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
+        get '/service_desk' => 'service_desk#show', as: :service_desk
+        put '/service_desk' => 'service_desk#update', as: :service_desk_refresh
+      end
 
       resource :variables, only: [:show, :update]
 
@@ -343,9 +341,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
-      resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
-      ## EE-specific
+      Gitlab.ee do
+        resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
+      end
 
       resources :pipelines, only: [:index, :new, :create, :show] do
         collection do
@@ -398,8 +396,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           get '/prometheus/api/v1/*proxy_path', to: 'environments/prometheus_api#proxy', as: :prometheus_api
 
-          # EE
-          get :logs
+          Gitlab.ee do
+            get :logs
+          end
         end
 
         collection do
@@ -416,13 +415,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
-      resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
-        collection do
-          get 'search'
+      Gitlab.ee do
+        resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
+          collection do
+            get 'search'
+          end
         end
       end
-      ## EE-specific
 
       resource :cycle_analytics, only: [:show]
 
@@ -476,14 +475,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      # EE-specific start
-      namespace :security do
-        resource :dashboard, only: [:show], controller: :dashboard
-      end
-      # EE-specific end
+      Gitlab.ee do
+        namespace :security do
+          resource :dashboard, only: [:show], controller: :dashboard
+        end
 
-      ## EE-specific
-      resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+        resources :vulnerability_feedback, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
+      end
 
       get :issues, to: 'issues#calendar', constraints: lambda { |req| req.format == :ics }
 
@@ -504,10 +502,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :bulk_update
           post :import_csv
 
-          ## EE-specific START
-          post :export_csv
-          get :service_desk
-          ## EE-specific END
+          Gitlab.ee do
+            post :export_csv
+            get :service_desk
+          end
         end
 
         resources :issue_links, only: [:index, :create, :destroy], as: 'links', path: 'links'
@@ -544,10 +542,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
-      resources :approvers, only: :destroy
-      resources :approver_groups, only: :destroy
-      ## EE-specific
+      Gitlab.ee do
+        resources :approvers, only: :destroy
+        resources :approver_groups, only: :destroy
+      end
 
       resources :runner_projects, only: [:create, :destroy]
       resources :badges, only: [:index] do
@@ -563,9 +561,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
-      resources :audit_events, only: [:index]
-      ## EE-specific
+      Gitlab.ee do
+        resources :audit_events, only: [:index]
+      end
 
       resources :error_tracking, only: [:index], controller: :error_tracking do
         collection do
@@ -578,9 +576,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       draw :wiki
       draw :repository
 
-      ## EE-specific
-      resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
-      ## EE-specific
+      Gitlab.ee do
+        resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+      end
     end
 
     resources(:projects,

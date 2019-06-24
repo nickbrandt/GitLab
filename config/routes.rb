@@ -111,8 +111,9 @@ Rails.application.routes.draw do
       end
 
       member do
-        # EE specific
-        get :metrics, format: :json
+        Gitlab.ee do
+          get :metrics, format: :json
+        end
 
         scope :applications do
           post '/:application', to: 'clusters/applications#create', as: :install_applications
