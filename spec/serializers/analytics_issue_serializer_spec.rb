@@ -3,7 +3,7 @@ require 'spec_helper'
 describe AnalyticsIssueSerializer do
   subject do
     described_class
-      .new(project: project, entity: :merge_request)
+      .new(namespace: project.namespace, entity: :merge_request)
       .represent(resource)
   end
 
@@ -16,7 +16,8 @@ describe AnalyticsIssueSerializer do
       iid: "1",
       id: "1",
       created_at: "2016-11-12 15:04:02.948604",
-      author: user
+      author: user,
+      name: project.name
     }
   end
 

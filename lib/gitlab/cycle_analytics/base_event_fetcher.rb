@@ -73,7 +73,7 @@ module Gitlab
       end
 
       def serialization_context
-        namespace = @group ? @group : @project.namespace
+        namespace = @group ? @group.name : @project.namespace
         { namespace: namespace }
       end
     end

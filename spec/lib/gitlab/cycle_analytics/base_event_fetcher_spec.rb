@@ -13,7 +13,7 @@ describe Gitlab::CycleAnalytics::BaseEventFetcher do
   end
 
   subject do
-    described_class.new(project: project,
+    described_class.new(projects: [project],
                         stage: :issue,
                         options: options).fetch
   end

@@ -10,7 +10,8 @@ module Gitlab
                         issue_table[:iid],
                         issue_table[:id],
                         issue_table[:created_at],
-                        issue_table[:author_id]]
+                        issue_table[:author_id],
+                        projects_table[:name]]
 
         super(*args)
       end

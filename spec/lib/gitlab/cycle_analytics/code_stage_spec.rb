@@ -11,7 +11,7 @@ describe Gitlab::CycleAnalytics::CodeStage do
   let!(:mr_1) { create(:merge_request, source_project: project, created_at: 15.minutes.ago) }
   let!(:mr_2) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'A') }
   let!(:mr_3) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B') }
-  let(:stage) { described_class.new(project: project, options: { from: 2.days.ago, current_user: project.creator }) }
+  let(:stage) { described_class.new(projects: [project], options: { from: 2.days.ago, current_user: project.creator }) }
 
   before do
     issue_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago, first_mentioned_in_commit_at: 45.minutes.ago)

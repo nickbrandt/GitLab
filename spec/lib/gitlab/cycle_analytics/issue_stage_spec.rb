@@ -8,7 +8,7 @@ describe Gitlab::CycleAnalytics::IssueStage do
   let!(:issue_2) { create(:issue, project: project, created_at: 60.minutes.ago) }
   let!(:issue_3) { create(:issue, project: project, created_at: 30.minutes.ago) }
   let!(:issue_without_milestone) { create(:issue, project: project, created_at: 1.minute.ago) }
-  let(:stage) { described_class.new(project: project, options: { from: 2.days.ago, current_user: project.creator }) }
+  let(:stage) { described_class.new(projects: [project], options: { from: 2.days.ago, current_user: project.creator }) }
 
   before do
     issue_1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago )
