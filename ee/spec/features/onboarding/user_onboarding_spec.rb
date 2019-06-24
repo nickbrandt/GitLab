@@ -29,7 +29,7 @@ describe 'User Onboarding' do
       end
     end
 
-    context 'welcome page' do
+    describe 'welcome page' do
       before do
         allow(Project).to receive(:find_by_full_path).and_return(project)
         project.add_guest(user)
@@ -39,6 +39,21 @@ describe 'User Onboarding' do
         visit explore_onboarding_index_path
 
         expect(page).to have_content('Welcome to the Guided GitLab Tour')
+      end
+    end
+
+    describe 'onboarding helper' do
+      before do
+        allow(Project).to receive(:find_by_full_path).and_return(project)
+        project.add_guest(user)
+      end
+
+      it 'shows the onboarding helper on the onboarding project' do
+        visit explore_onboarding_index_path
+
+        find('.btn-success').click
+
+        expect(page).to have_css('#js-onboarding-helper', visible: true)
       end
     end
   end
@@ -57,6 +72,22 @@ describe 'User Onboarding' do
         page.within('.header-help') do
           expect(page).not_to have_link('Learn GitLab')
         end
+      end
+    end
+
+    describe 'welcome page' do
+      it 'does not show the "Learn GitLab" welcome page' do
+        visit explore_onboarding_index_path
+
+        expect(page).not_to have_content('Welcome to the Guided GitLab Tour')
+      end
+    end
+
+    describe 'onboarding helper' do
+      it 'does not show the onboarding helper on the onboarding project' do
+        visit project_path(project)
+
+        expect(page).not_to have_css('#js-onboarding-helper')
       end
     end
   end
