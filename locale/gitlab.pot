@@ -4849,6 +4849,9 @@ msgstr ""
 msgid "Enable error tracking"
 msgstr ""
 
+msgid "Enable feature to choose access level"
+msgstr ""
+
 msgid "Enable for this project"
 msgstr ""
 
@@ -5354,6 +5357,9 @@ msgid "Every week (Sundays at 4:00am)"
 msgstr ""
 
 msgid "Everyone"
+msgstr ""
+
+msgid "Everyone With Access"
 msgstr ""
 
 msgid "Everyone can contribute"
@@ -9301,6 +9307,9 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
+msgstr ""
+
+msgid "Only Project Members"
 msgstr ""
 
 msgid "Only admins"
