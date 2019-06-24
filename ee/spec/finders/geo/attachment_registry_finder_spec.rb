@@ -22,7 +22,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
   let(:upload_4) { create(:upload, model: unsynced_project) }
   let(:upload_5) { create(:upload, model: synced_project) }
 
-  subject { described_class.new(current_node: secondary) }
+  subject { described_class.new(current_node_id: secondary.id) }
 
   before do
     stub_current_geo_node(secondary)

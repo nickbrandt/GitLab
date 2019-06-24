@@ -24,7 +24,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
   let(:lfs_object_remote_2) { create(:lfs_object, :object_storage) }
   let(:lfs_object_remote_3) { create(:lfs_object, :object_storage) }
 
-  subject { described_class.new(current_node: secondary) }
+  subject { described_class.new(current_node_id: secondary.id) }
 
   before do
     stub_current_geo_node(secondary)

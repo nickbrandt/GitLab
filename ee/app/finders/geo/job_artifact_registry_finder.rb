@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class JobArtifactRegistryFinder < RegistryFinder
-    def initialize(current_node:)
-      @current_node = Geo::Fdw::GeoNode.find(current_node.id)
-    end
-
+  class JobArtifactRegistryFinder < FileRegistryFinder
     def count_registry
       Geo::JobArtifactRegistry.count
     end

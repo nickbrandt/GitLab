@@ -13,7 +13,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
   let(:unsynced_project) { create(:project) }
   let(:project_broken_storage) { create(:project, :broken_storage) }
 
-  subject { described_class.new(current_node: secondary) }
+  subject { described_class.new(current_node_id: secondary.id) }
 
   before do
     stub_current_geo_node(secondary)

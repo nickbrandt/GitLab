@@ -94,15 +94,15 @@ module Geo
     end
 
     def attachments_finder
-      @attachments_finder ||= AttachmentRegistryFinder.new(current_node: current_node)
+      @attachments_finder ||= AttachmentRegistryFinder.new(current_node_id: current_node.id)
     end
 
     def lfs_objects_finder
-      @lfs_objects_finder ||= LfsObjectRegistryFinder.new(current_node: current_node)
+      @lfs_objects_finder ||= LfsObjectRegistryFinder.new(current_node_id: current_node.id)
     end
 
     def job_artifacts_finder
-      @job_artifacts_finder ||= JobArtifactRegistryFinder.new(current_node: current_node)
+      @job_artifacts_finder ||= JobArtifactRegistryFinder.new(current_node_id: current_node.id)
     end
   end
 end
