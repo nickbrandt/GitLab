@@ -12135,6 +12135,9 @@ msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Showing last %{size} of log -"
+msgstr ""
+
 msgid "Side-by-side"
 msgstr ""
 
