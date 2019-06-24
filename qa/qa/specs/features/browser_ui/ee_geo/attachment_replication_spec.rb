@@ -26,7 +26,10 @@ module QA
           @issue = Resource::Issue.fabricate! do |issue|
             issue.title = 'My geo issue'
             issue.project = @project
+            issue.labels = ''
           end
+
+          @issue.visit!
 
           Page::Project::Issue::Show.perform do |show|
             show.comment('See attached banana for scale', attachment: file_to_attach)
