@@ -1711,6 +1711,9 @@ msgstr ""
 msgid "Auto DevOps, runners and job artifacts"
 msgstr ""
 
+msgid "Auto License Complience"
+msgstr ""
+
 msgid "Auto-cancel redundant, pending pipelines"
 msgstr ""
 
@@ -6383,6 +6386,9 @@ msgstr ""
 msgid "Gitea Import"
 msgstr ""
 
+msgid "Gitlab CI/CD"
+msgstr ""
+
 msgid "Given access %{time_ago}"
 msgstr ""
 
@@ -7781,6 +7787,9 @@ msgstr ""
 msgid "License"
 msgstr ""
 
+msgid "License Compliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
+msgstr ""
+
 msgid "LicenseManagement|Add a license"
 msgstr ""
 
@@ -7824,9 +7833,6 @@ msgid "LicenseManagement|License details"
 msgstr ""
 
 msgid "LicenseManagement|License name"
-msgstr ""
-
-msgid "LicenseManagement|Manage approved and blacklisted licenses for this project."
 msgstr ""
 
 msgid "LicenseManagement|Packages"
