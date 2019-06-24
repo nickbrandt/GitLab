@@ -9,6 +9,8 @@
     %button.btn.js-settings-toggle{ type: 'button' }
       = expanded ? _('Collapse') : _('Expand')
     %p
-      = s_('LicenseManagement|Manage approved and blacklisted licenses for this project.')
+      - ci = link_to(s_('Gitlab CI/CD'), 'https://docs.gitlab.com/ee/ci/', target: '_blank', rel: 'noopener noreferrer')
+      - license = link_to(s_('Auto License Complience'), 'https://docs.gitlab.com/ee/topics/autodevops/index.html#auto-license-management-ultimate', target: '_blank', rel: 'noopener noreferrer')
+      = s_('License Compliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request.').html_safe % { ci: ci, license: license }
   .settings-content
     #js-managed-licenses{ data: { api_url: @license_management_url } }
