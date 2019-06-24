@@ -5,11 +5,12 @@ import IssuableIndex from '~/issuable_index';
 
 describe('Issuable', () => {
   let Issuable;
+
   describe('initBulkUpdate', () => {
     it('should not set bulkUpdateSidebar', () => {
       Issuable = new IssuableIndex('issue_');
 
-      expect(Issuable.bulkUpdateSidebar).not.toBeDefined();
+      expect(Issuable.bulkUpdateSidebar).toBeNull();
     });
 
     it('should set bulkUpdateSidebar', () => {
