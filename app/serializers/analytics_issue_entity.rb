@@ -26,8 +26,6 @@ class AnalyticsIssueEntity < Grape::Entity
   private
 
   def url_to(route, object)
-    puts request.inspect
-    puts object.inspect
     public_send("#{route}_url", request.namespace, object[:name], object[:iid].to_s) # rubocop:disable GitlabSecurity/PublicSend
   end
 end

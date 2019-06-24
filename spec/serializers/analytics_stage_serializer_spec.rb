@@ -6,7 +6,7 @@ describe AnalyticsStageSerializer do
   end
 
   let(:resource) do
-    Gitlab::CycleAnalytics::CodeStage.new(project: double, options: {})
+    Gitlab::CycleAnalytics::CodeStage.new(projects: [double], options: {})
   end
 
   before do
