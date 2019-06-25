@@ -6469,6 +6469,9 @@ msgstr ""
 msgid "Gitaly Servers"
 msgstr ""
 
+msgid "Gitaly calls"
+msgstr ""
+
 msgid "Gitaly|Address"
 msgstr ""
 
@@ -11620,6 +11623,9 @@ msgid "SAML SSO for %{group_name}"
 msgstr ""
 
 msgid "SAML for %{group_name}"
+msgstr ""
+
+msgid "SQL queries"
 msgstr ""
 
 msgid "SSH Key"
@@ -16871,6 +16877,9 @@ msgstr ""
 msgid "processing"
 msgstr ""
 
+msgid "profile"
+msgstr ""
+
 msgid "project"
 msgid_plural "projects"
 msgstr[0] ""
@@ -16981,6 +16990,9 @@ msgid "this document"
 msgstr ""
 
 msgid "to help your contributors communicate effectively!"
+msgstr ""
+
+msgid "trace"
 msgstr ""
 
 msgid "triggered"
