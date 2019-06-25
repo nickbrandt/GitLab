@@ -68,7 +68,7 @@ module Gitlab
       end
 
       def allowed_ids_source
-        { project_id: @project.id }
+        group ? { group_id: group.id } : { project_id: @project.id }
       end
 
       def serialization_context
