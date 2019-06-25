@@ -2660,6 +2660,9 @@ msgstr ""
 msgid "Clear search input"
 msgstr ""
 
+msgid "Clear templates search input"
+msgstr ""
+
 msgid "Clear weight"
 msgstr ""
 
@@ -8937,6 +8940,9 @@ msgstr ""
 msgid "No start date"
 msgstr ""
 
+msgid "No template"
+msgstr ""
+
 msgid "No value set by top-level parent group."
 msgstr ""
 
@@ -11304,6 +11310,9 @@ msgid "Reset key"
 msgstr ""
 
 msgid "Reset runners registration token"
+msgstr ""
+
+msgid "Reset template"
 msgstr ""
 
 msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
