@@ -23,7 +23,7 @@ func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
 
 func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, url *regexp.Regexp, apiResponse interface{}, returnCode, expectedCode int) *httptest.ResponseRecorder {
 	if ts == nil {
-		ts = testAuthServer(url, returnCode, apiResponse)
+		ts = testAuthServer(url, nil, returnCode, apiResponse)
 		defer ts.Close()
 	}
 

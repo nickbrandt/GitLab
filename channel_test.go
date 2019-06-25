@@ -157,7 +157,7 @@ func wireupChannel(channelPath string, modifier func(*api.Response), subprotocol
 	if modifier != nil {
 		modifier(authResponse)
 	}
-	upstream := testAuthServer(nil, 200, authResponse)
+	upstream := testAuthServer(nil, nil, 200, authResponse)
 	workhorse := startWorkhorseServer(upstream.URL)
 
 	return serverConns, websocketURL(workhorse.URL, channelPath), func() {
