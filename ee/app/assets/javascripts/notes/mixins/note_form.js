@@ -60,7 +60,7 @@ export default {
       return resolveStatus;
     },
     handleAddToReview() {
-      // check if draft should resolve discussion
+      // check if draft should resolve thread
       const shouldResolve =
         (this.discussionResolved && !this.isUnresolving) ||
         (!this.discussionResolved && this.isResolving);
