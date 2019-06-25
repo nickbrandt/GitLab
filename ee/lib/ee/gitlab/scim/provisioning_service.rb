@@ -8,7 +8,7 @@ module EE
 
         IDENTITY_PROVIDER = 'group_saml'
         PASSWORD_AUTOMATICALLY_SET = true
-        SKIP_EMAIL_CONFIRMATION = true
+        SKIP_EMAIL_CONFIRMATION = false
         DEFAULT_ACCESS = :guest
 
         def initialize(group, parsed_hash)
