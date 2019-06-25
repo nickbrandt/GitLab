@@ -54,7 +54,7 @@ describe 'Epic show', :js do
       end
     end
 
-    it 'shows epic discussion filter dropdown' do
+    it 'shows epic thread filter dropdown' do
       page.within('.js-epic-tabs-container') do
         expect(find('.js-discussion-filter-container #discussion-filter-dropdown')).to have_content('Show all activity')
       end
@@ -97,7 +97,7 @@ describe 'Epic show', :js do
       end
     end
 
-    it 'does not show discussion filter dropdown' do
+    it 'does not show thread filter dropdown' do
       expect(find('.js-epic-tabs-container')).to have_selector('.js-discussion-filter-container', visible: false)
     end
 
