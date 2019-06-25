@@ -789,10 +789,14 @@ migration:path-mysql:
 migration:upgrade-pg-ce-to-ee:
   <<: *migration-paths-upgrade-ce-to-ee
   <<: *use-pg
+  only:
+    - /[\d-]+-stable(-ee)?/
 
 migration:upgrade-mysql-ce-to-ee:
   <<: *migration-paths-upgrade-ce-to-ee
   <<: *use-mysql
+  only:
+    - /[\d-]+-stable(-ee)?/
 
 .db-rollback: &db-rollback
   <<: *dedicated-no-docs-and-no-qa-pull-cache-job
@@ -1312,4 +1316,3 @@ schedule:review-performance:
   <<: *review-schedules-only
   script:
     - wait_for_job_to_be_done "schedule:review-deploy"
-
