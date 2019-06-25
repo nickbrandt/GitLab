@@ -9,7 +9,7 @@ module Gitlab
 
       MAX_EVENTS = 50
 
-      def initialize(project:, stage:, options:)
+      def initialize(project: nil, stage:, options:)
         @project = project
         @stage = stage
         @options = options
@@ -72,12 +72,16 @@ module Gitlab
       end
 
       def serialization_context
-        namespace = @group ? @group.name : @project.namespace
+        namespace = group ? group.name : @project.namespace
         { namespace: namespace }
       end
 
       def projects
-        [@project]
+        group ? group.projects : [@project]
+      end
+
+      def group
+        @group ||= @options.fetch(:group, nil)
       end
     end
   end

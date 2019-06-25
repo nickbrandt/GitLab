@@ -13,9 +13,17 @@ module CycleAnalytics
                                                               current_user: @options[:current_user]).data
     end
 
-    def permissions(user:)
+    def permissions(user: nil)
       STAGES.each_with_object({}) do |stage, obj|
         obj[stage] = true
+      end
+    end
+
+    private
+
+    def stats_per_stage
+      STAGES.map do |stage_name|
+        self[stage_name].as_json(serializer: GroupAnalyticsStageSerializer)
       end
     end
   end

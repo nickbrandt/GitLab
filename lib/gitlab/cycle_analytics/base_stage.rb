@@ -5,7 +5,7 @@ module Gitlab
     class BaseStage
       include BaseQuery
 
-      def initialize(project:, options:)
+      def initialize(project: nil, options:)
         @project = project
         @options = options
       end
@@ -14,8 +14,8 @@ module Gitlab
         event_fetcher.fetch
       end
 
-      def as_json
-        AnalyticsStageSerializer.new.represent(self)
+      def as_json(serializer: AnalyticsStageSerializer)
+        serializer.new.represent(self)
       end
 
       def title
@@ -36,6 +36,10 @@ module Gitlab
             end
           end
         end
+      end
+
+      def group_median
+        median_query(projects.map(&:id))
       end
 
       def median_query(project_ids)
@@ -73,7 +77,11 @@ module Gitlab
       end
 
       def projects
-        [@project]
+        group ? group.projects : [@project]
+      end
+
+      def group
+        @group ||= @options.fetch(:group, nil)
       end
     end
   end
