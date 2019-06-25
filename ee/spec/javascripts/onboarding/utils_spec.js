@@ -28,10 +28,17 @@ describe('User onboarding utils', () => {
 
   describe('updateOnboardingDismissed', () => {
     it('set the dismissed state on the cookie', () => {
-      const dismissed = true;
-      Cookies.set(ONBOARDING_DISMISSED_COOKIE_NAME, dismissed);
+      onboardingUtils.updateOnboardingDismissed(true);
 
-      expect(Cookies.get(ONBOARDING_DISMISSED_COOKIE_NAME)).toBe(`${dismissed}`);
+      expect(Cookies.get(ONBOARDING_DISMISSED_COOKIE_NAME)).toBe('true');
+    });
+
+    it('removes onboarding related data from localStorage', () => {
+      spyOn(localStorage, 'removeItem');
+
+      onboardingUtils.updateOnboardingDismissed(true);
+
+      expect(localStorage.removeItem).toHaveBeenCalledWith(STORAGE_KEY);
     });
   });
 
