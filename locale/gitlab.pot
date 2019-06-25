@@ -2504,9 +2504,6 @@ msgstr ""
 msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
-msgid "Choose your merge method, options, checks, and set up a default merge request description template."
-msgstr ""
-
 msgid "CiStatusLabel|canceled"
 msgstr ""
 
@@ -4013,6 +4010,9 @@ msgid "Default classification label"
 msgstr ""
 
 msgid "Default description template for issues"
+msgstr ""
+
+msgid "Default description template for merge requests"
 msgstr ""
 
 msgid "Default first day of the week"
@@ -10383,6 +10383,12 @@ msgid "ProjectSettings|Automatically resolve merge request diff discussions when
 msgstr ""
 
 msgid "ProjectSettings|Badges"
+msgstr ""
+
+msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
+msgstr ""
+
+msgid "ProjectSettings|Choose your merge method, merge options, merge checks, and set up a default description template for merge requests."
 msgstr ""
 
 msgid "ProjectSettings|Contact an admin to change this setting."
