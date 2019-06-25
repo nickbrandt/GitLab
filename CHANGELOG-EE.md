@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.0.2 (2019-06-25)
+
+### Fixed (1 change)
+
+- Take into account events created before milestone start. !14184
+
+
 ## 12.0.1 (2019-06-24)
 
 - No changes.
