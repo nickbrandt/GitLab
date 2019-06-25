@@ -88,7 +88,7 @@ func TestAllowedClone(t *testing.T) {
 	require.NoError(t, ensureGitalyRepository(t, apiResponse))
 
 	// Prepare test server and backend
-	ts := testAuthServer(nil, 200, apiResponse)
+	ts := testAuthServer(nil, nil, 200, apiResponse)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -112,7 +112,7 @@ func TestAllowedShallowClone(t *testing.T) {
 	require.NoError(t, ensureGitalyRepository(t, apiResponse))
 
 	// Prepare test server and backend
-	ts := testAuthServer(nil, 200, apiResponse)
+	ts := testAuthServer(nil, nil, 200, apiResponse)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -136,7 +136,7 @@ func TestAllowedPush(t *testing.T) {
 	require.NoError(t, ensureGitalyRepository(t, apiResponse))
 
 	// Prepare the test server and backend
-	ts := testAuthServer(nil, 200, apiResponse)
+	ts := testAuthServer(nil, nil, 200, apiResponse)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()

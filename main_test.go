@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -59,7 +60,7 @@ func TestDeniedClone(t *testing.T) {
 	require.NoError(t, os.RemoveAll(scratchDir))
 
 	// Prepare test server and backend
-	ts := testAuthServer(nil, 403, "Access denied")
+	ts := testAuthServer(nil, nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -73,7 +74,7 @@ func TestDeniedClone(t *testing.T) {
 
 func TestDeniedPush(t *testing.T) {
 	// Prepare the test server and backend
-	ts := testAuthServer(nil, 403, "Access denied")
+	ts := testAuthServer(nil, nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -491,9 +492,20 @@ func newBranch() string {
 	return fmt.Sprintf("branch-%d", time.Now().UnixNano())
 }
 
-func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
+func testAuthServer(url *regexp.Regexp, params url.Values, code int, body interface{}) *httptest.Server {
 	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", api.ResponseContentType)
+
+		if params != nil {
+			currentParams := r.URL.Query()
+			for key := range params {
+				if currentParams.Get(key) != params.Get(key) {
+					log.Println("UPSTREAM", r.Method, r.URL, "DENY", "invalid auth server params")
+					w.WriteHeader(http.StatusForbidden)
+					return
+				}
+			}
+		}
 
 		// Write pure string
 		if data, ok := body.(string); ok {
