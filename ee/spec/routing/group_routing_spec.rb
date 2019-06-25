@@ -80,4 +80,12 @@ describe 'Group routing', "routing" do
       expect(get('/groups/gitlabhq/-/packages')).to route_to('groups/packages#index', group_id: 'gitlabhq')
     end
   end
+
+  describe 'issues' do
+    it 'routes post to #bulk_update' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(post('/groups/gitlabhq/-/issues/bulk_update')).to route_to('groups/issues#bulk_update', group_id: 'gitlabhq')
+    end
+  end
 end
