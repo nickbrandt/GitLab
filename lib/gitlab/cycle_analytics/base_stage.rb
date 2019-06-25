@@ -5,9 +5,8 @@ module Gitlab
     class BaseStage
       include BaseQuery
 
-      def initialize(projects:, options:)
-        @projects = projects
-        @project = projects.first
+      def initialize(project:, options:)
+        @project = project
         @options = options
       end
 
@@ -64,13 +63,17 @@ module Gitlab
       private
 
       def event_fetcher
-        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(projects: @projects,
+        @event_fetcher ||= Gitlab::CycleAnalytics::EventFetcher[name].new(project: @project,
                                                                           stage: name,
                                                                           options: event_options)
       end
 
       def event_options
         @options.merge(start_time_attrs: start_time_attrs, end_time_attrs: end_time_attrs)
+      end
+
+      def projects
+        [@project]
       end
     end
   end

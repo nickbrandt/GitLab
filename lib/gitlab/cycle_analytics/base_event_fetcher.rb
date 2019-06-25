@@ -9,9 +9,8 @@ module Gitlab
 
       MAX_EVENTS = 50
 
-      def initialize(projects:, stage:, options:)
-        @projects = projects
-        @project = @projects.first
+      def initialize(project:, stage:, options:)
+        @project = project
         @stage = stage
         @options = options
       end
@@ -75,6 +74,10 @@ module Gitlab
       def serialization_context
         namespace = @group ? @group.name : @project.namespace
         { namespace: namespace }
+      end
+
+      def projects
+        [@project]
       end
     end
   end

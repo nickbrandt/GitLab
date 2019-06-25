@@ -19,7 +19,7 @@ module CycleAnalytics
     end
 
     def [](stage_name)
-      Gitlab::CycleAnalytics::Stage[stage_name].new(projects: @projects, options: @options)
+      Gitlab::CycleAnalytics::Stage[stage_name].new(project: @project, options: @options)
     end
 
     private

@@ -2,8 +2,8 @@
 
 module CycleAnalytics
   class GroupLevel < Base
-    def initialize(project: nil, projects:, options:)
-      @projects = projects
+    def initialize(project: nil, options:)
+      @project = project
       @options = options
     end
 

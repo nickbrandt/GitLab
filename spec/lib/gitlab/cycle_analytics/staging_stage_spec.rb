@@ -14,7 +14,7 @@ describe Gitlab::CycleAnalytics::StagingStage do
   let(:build_1) { create(:ci_build, project: project) }
   let(:build_2) { create(:ci_build, project: project) }
 
-  let(:stage) { described_class.new(projects: [project], options: { from: 2.days.ago, current_user: project.creator }) }
+  let(:stage) { described_class.new(project: project, options: { from: 2.days.ago, current_user: project.creator }) }
 
   before do
     mr_1.metrics.update!(merged_at: 80.minutes.ago, first_deployed_to_production_at: 50.minutes.ago, pipeline_id: build_1.commit_id)
