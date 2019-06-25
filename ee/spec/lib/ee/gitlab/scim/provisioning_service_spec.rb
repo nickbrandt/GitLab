@@ -44,6 +44,15 @@ describe ::EE::Gitlab::Scim::ProvisioningService do
         expect(User.find_by(service_params.except(:extern_uid))).to be_a(User)
       end
 
+      it 'user record requires confirmation' do
+        service.execute
+
+        user = User.find_by(email: service_params[:email])
+
+        expect(user).to be_present
+        expect(user).not_to be_confirmed
+      end
+
       context 'existing user' do
         before do
           create(:user, email: 'work@example.com')
