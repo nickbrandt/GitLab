@@ -21,7 +21,7 @@ export const addDraftToDiscussion = ({ commit }, { endpoint, data }) =>
       return res;
     })
     .catch(() => {
-      flash(__('An error occurred adding a draft to the discussion.'));
+      flash(__('An error occurred adding a draft to the thread.'));
     });
 
 export const createNewDraft = ({ commit }, { endpoint, data }) =>
