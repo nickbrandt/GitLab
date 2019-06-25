@@ -2873,6 +2873,9 @@ msgstr ""
 msgid "Closed issues"
 msgstr ""
 
+msgid "Cluster Health"
+msgstr ""
+
 msgid "ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}."
 msgstr ""
 
