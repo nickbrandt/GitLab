@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Discussion Comments Epic', :js do
+describe 'Thread Comments Epic', :js do
   let(:user) { create(:user) }
   let(:epic) { create(:epic) }
 
@@ -12,5 +12,5 @@ describe 'Discussion Comments Epic', :js do
     visit group_epic_path(epic.group, epic)
   end
 
-  it_behaves_like 'discussion comments', 'epic'
+  it_behaves_like 'thread comments', 'epic'
 end
