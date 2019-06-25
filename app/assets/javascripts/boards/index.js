@@ -56,6 +56,7 @@ export default () => {
   }
 
   boardsStore.create();
+  boardsStore.setTimeTrackingLimitToHours($boardApp.dataset.timeTrackingLimitToHours);
 
   issueBoardsApp = new Vue({
     el: $boardApp,
