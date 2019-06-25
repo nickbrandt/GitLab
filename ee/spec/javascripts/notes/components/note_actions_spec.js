@@ -53,7 +53,7 @@ describe('noteActions', () => {
 
       expect(resolveButton.exists()).toBe(true);
       expect(resolveButton.attributes('data-original-title')).toEqual(
-        'Discussion stays unresolved',
+        'Thread stays unresolved',
       );
     });
   });
