@@ -86,24 +86,24 @@ module Gitlab
     end
 
     def self.request_store_cache
-      @request_store_cache ||= Gitlab::JsonCache.new(namespace: :geo, backend: Gitlab::SafeRequestStore)
+      Gitlab::SafeRequestStore
     end
 
-    def self.cache_value(key, as: nil, &block)
+    def self.cache_value(raw_key, as: nil, &block)
       return yield unless request_store_cache.active?
 
-      request_store_cache.fetch(key, as: as) do
+      request_store_cache.fetch(cache.cache_key(raw_key)) do
         # We need a short expire time as we can't manually expire on a secondary node
-        cache.fetch(key, as: as, expires_in: 15.seconds) { yield }
+        cache.fetch(raw_key, as: as, expires_in: 15.seconds) { yield }
       end
     end
 
     def self.expire_cache!
       return true unless request_store_cache.active?
 
-      CACHE_KEYS.each do |key|
-        cache.expire(key)
-        request_store_cache.expire(key)
+      CACHE_KEYS.each do |raw_key|
+        cache.expire(raw_key)
+        request_store_cache.delete(cache.cache_key(raw_key))
       end
 
       true
