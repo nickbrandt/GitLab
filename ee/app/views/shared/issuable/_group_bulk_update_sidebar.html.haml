@@ -1,5 +1,4 @@
 - type = local_assigns.fetch(:type)
-- @project = @group.projects.first
 
 %aside.issues-bulk-update.js-right-sidebar.right-sidebar{ "aria-live" => "polite", data: { 'signed-in': current_user.present? } }
   .issuable-sidebar.hidden
@@ -12,7 +11,7 @@
         .title
           Milestone
         .filter-item
-          = dropdown_tag("Select milestone", options: { title: "Assign milestone", toggle_class: "js-milestone-select js-extra-options js-filter-submit js-filter-bulk-update", filter: true, dropdown_class: "dropdown-menu-selectable dropdown-menu-milestone", placeholder: "Search milestones", data: { show_no: true, field_name: "update[milestone_id]", project_id: @project.id, milestones: project_milestones_path(@project, :json), use_id: true, default_label: "Milestone" } })
+          = dropdown_tag("Select milestone", options: { title: "Assign milestone", toggle_class: "js-milestone-select js-extra-options js-filter-submit js-filter-bulk-update", filter: true, dropdown_class: "dropdown-menu-selectable dropdown-menu-milestone", placeholder: "Search milestones", data: { show_no: true, field_name: "update[milestone_id]", milestones: milestones_filter_path(only_group_milestones: true, format: :json), use_id: true, default_label: "Milestone" } })
 
       = hidden_field_tag "update[issuable_ids]", []
       = hidden_field_tag :state_event, params[:state_event]
