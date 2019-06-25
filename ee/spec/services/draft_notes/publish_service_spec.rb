@@ -189,17 +189,17 @@ describe DraftNotes::PublishService do
     end
   end
 
-  context 'with drafts that resolve discussions' do
+  context 'with drafts that resolve threads' do
     let!(:note) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project) }
     let!(:draft_note) { create(:draft_note, merge_request: merge_request, author: user, resolve_discussion: true, discussion_id: note.discussion.reply_id) }
 
-    it 'resolves the discussion' do
+    it 'resolves the thread' do
       publish(draft: draft_note)
 
       expect(note.discussion.resolved?).to be true
     end
 
-    it 'sends notifications if all discussions are resolved' do
+    it 'sends notifications if all threads are resolved' do
       expect_any_instance_of(MergeRequests::ResolvedDiscussionNotificationService).to receive(:execute).with(merge_request)
 
       publish
