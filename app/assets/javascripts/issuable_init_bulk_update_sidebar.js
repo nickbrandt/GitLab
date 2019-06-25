@@ -14,5 +14,7 @@ export default {
 
       this.bulkUpdateSidebar = new IssuableBulkUpdateSidebar();
     }
-  }
-}
+
+    return this.bulkUpdateSidebar;
+  },
+};
