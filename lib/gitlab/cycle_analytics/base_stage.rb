@@ -56,7 +56,7 @@ module Gitlab
       end
 
       def cte_table
-        cte_table = Arel::Table.new("cte_table_for_#{name}")
+        Arel::Table.new("cte_table_for_#{name}")
       end
 
       def interval_query(project_ids)
