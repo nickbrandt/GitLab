@@ -546,6 +546,15 @@ entry.
 - Creates a vendors folder for external CSS.
 
 
+## 11.10.7 (2019-06-26)
+
+### Fixed (3 changes)
+
+- Remove a default git depth in Pipelines for merge requests. !28926
+- Fix label click scrolling to top. !29202
+- Fix scrolling to top on assignee change. !29500
+
+
 ## 11.10.6 (2019-06-04)
 
 ### Fixed (7 changes, 1 of them is from the community)
