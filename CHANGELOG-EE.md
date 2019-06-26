@@ -256,6 +256,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
 
 
+## 11.10.7 (2019-06-26)
+
+### Fixed (1 change)
+
+- Use quarantine size to check push size against repository size limit. !14271
+
+
 ## 11.10.6 (2019-06-04)
 
 ### Fixed (5 changes, 1 of them is from the community)
