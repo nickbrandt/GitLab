@@ -37,7 +37,6 @@ describe Gitlab::CycleAnalytics::PlanStage do
     end
   end
 
-
   context 'when group is given' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }
