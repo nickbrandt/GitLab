@@ -2504,8 +2504,8 @@ ActiveRecord::Schema.define(version: 20190620112608) do
   end
 
   create_table "project_incident_management_settings", primary_key: "project_id", id: :serial, force: :cascade do |t|
-    t.boolean "create_issue", default: false, null: false
-    t.boolean "send_email", default: true, null: false
+    t.boolean "create_issue", default: true, null: false
+    t.boolean "send_email", default: false, null: false
     t.text "issue_template_key"
   end
 
