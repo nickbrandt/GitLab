@@ -372,7 +372,7 @@ describe SystemNoteService do
   end
 
   describe '.add_to_merge_train_when_pipeline_succeeds' do
-    subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, noteable.diff_head_commit) }
+    subject { described_class.add_to_merge_train_when_pipeline_succeeds(noteable, project, author, pipeline.sha) }
 
     let(:pipeline) { build(:ci_pipeline_without_jobs) }
 

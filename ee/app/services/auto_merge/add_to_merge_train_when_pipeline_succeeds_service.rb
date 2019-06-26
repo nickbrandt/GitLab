@@ -4,7 +4,7 @@ module AutoMerge
   class AddToMergeTrainWhenPipelineSucceedsService < AutoMerge::BaseService
     def execute(merge_request)
       super do
-        SystemNoteService.add_to_merge_train_when_pipeline_succeeds(merge_request, project, current_user, merge_request.diff_head_commit)
+        SystemNoteService.add_to_merge_train_when_pipeline_succeeds(merge_request, project, current_user, merge_request.actual_head_pipeline.sha)
       end
     end
 

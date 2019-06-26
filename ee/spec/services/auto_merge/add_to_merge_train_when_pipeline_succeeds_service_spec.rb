@@ -29,7 +29,7 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
     it 'enables auto merge' do
       expect(SystemNoteService)
         .to receive(:add_to_merge_train_when_pipeline_succeeds)
-        .with(merge_request, project, user, merge_request.diff_head_commit)
+        .with(merge_request, project, user, merge_request.actual_head_pipeline.sha)
 
       subject
 
