@@ -2,7 +2,8 @@
 
 module QA
   context 'Manage', :orchestrated, :group_saml do
-    describe 'Group SAML SSO' do
+    # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/110
+    describe 'Group SAML SSO', :quarantine do
       include Support::Api
 
       before(:all) do
