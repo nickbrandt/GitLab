@@ -204,10 +204,19 @@ module EE
     end
 
     # Called when 'merge train' is canceled
-    def cancel_merge_train(noteable, project, author, reason: nil)
+    def cancel_merge_train(noteable, project, author)
       body = 'removed this merge request from the merge train'
-      body += " because #{reason}" if reason
 
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    # Called when 'merge train' is aborted
+    def abort_merge_train(noteable, project, author, reason)
+      body = "removed this merge request from the merge train because #{reason}"
+
+      ##
+      # TODO: Abort message should be sent by the system, not a particular user.
+      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
 
@@ -222,6 +231,16 @@ module EE
     def cancel_add_to_merge_train_when_pipeline_succeeds(noteable, project, author)
       body = 'cancelled automatic add to merge train'
 
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    # Called when 'add to merge train when pipeline succeeds' is aborted
+    def abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, reason)
+      body = "aborted automatic add to merge train because #{reason}"
+
+      ##
+      # TODO: Abort message should be sent by the system, not a particular user.
+      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
   end
