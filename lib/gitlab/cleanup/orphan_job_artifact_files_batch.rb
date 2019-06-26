@@ -78,3 +78,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Cleanup::OrphanJobArtifactFilesBatch.prepend(EE::Gitlab::Cleanup::OrphanJobArtifactFilesBatch)

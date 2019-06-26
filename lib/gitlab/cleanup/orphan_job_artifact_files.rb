@@ -130,3 +130,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Cleanup::OrphanJobArtifactFiles.prepend(EE::Gitlab::Cleanup::OrphanJobArtifactFiles)
