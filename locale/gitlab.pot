@@ -8903,9 +8903,6 @@ msgstr ""
 msgid "More Information"
 msgstr ""
 
-msgid "More actions"
-msgstr ""
-
 msgid "More info"
 msgstr ""
 

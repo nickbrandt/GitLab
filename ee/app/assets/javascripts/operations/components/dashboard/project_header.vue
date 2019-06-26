@@ -60,22 +60,13 @@ export default {
         <span class="js-project-name bold"> {{ project.name }}</span>
       </gl-link>
     </div>
-    <div class="dropdown js-more-actions">
-      <button
-        v-gl-tooltip
-        class="js-more-actions-toggle d-flex align-items-center bg-transparent border-0 p-0 ml-2"
-        data-toggle="dropdown"
-        :title="__('More actions')"
-      >
-        <icon name="ellipsis_v" class="text-secondary" />
-      </button>
-      <ul class="dropdown-menu dropdown-menu-right">
-        <li>
-          <gl-button class="btn btn-transparent js-remove-button" @click="onRemove">
-            <span class="text-danger"> {{ __('Remove') }} </span>
-          </gl-button>
-        </li>
-      </ul>
-    </div>
+    <gl-button
+      v-gl-tooltip
+      class="remove-button bg-transparent border-0 p-0 text-secondary"
+      title="Remove Card"
+      @click="onRemove"
+    >
+      <icon name="remove" />
+    </gl-button>
   </div>
 </template>
