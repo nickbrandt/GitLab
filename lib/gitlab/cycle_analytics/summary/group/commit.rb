@@ -14,7 +14,7 @@ module Gitlab
             # @value ||= count_commits
           end
 
-          private
+          # private
 
           # Don't use the `Gitlab::Git::Repository#log` method, because it enforces
           # a limit. Since we need a commit count, we _can't_ enforce a limit, so
