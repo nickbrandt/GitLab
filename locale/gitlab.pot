@@ -3313,13 +3313,7 @@ msgstr ""
 msgid "Comment & resolve thread"
 msgstr ""
 
-msgid "Comment & resolve thread"
-msgstr ""
-
 msgid "Comment & unresolve discussion"
-msgstr ""
-
-msgid "Comment & unresolve thread"
 msgstr ""
 
 msgid "Comment & unresolve thread"
@@ -8304,18 +8298,6 @@ msgstr ""
 msgid "MergeRequests|Thread will be unresolved"
 msgstr ""
 
-msgid "MergeRequests|Thread stays resolved"
-msgstr ""
-
-msgid "MergeRequests|Thread stays unresolved"
-msgstr ""
-
-msgid "MergeRequests|Thread will be resolved"
-msgstr ""
-
-msgid "MergeRequests|Thread will be unresolved"
-msgstr ""
-
 msgid "MergeRequests|Toggle comments for this file"
 msgstr ""
 
@@ -9374,30 +9356,6 @@ msgid "Pages Domains"
 msgstr ""
 
 msgid "Pages getting started guide"
-msgstr ""
-
-msgid "Pagination|Go to first page"
-msgstr ""
-
-msgid "Pagination|Go to last page"
-msgstr ""
-
-msgid "Pagination|Go to next page"
-msgstr ""
-
-msgid "Pagination|Go to previous page"
-msgstr ""
-
-msgid "Pagination|Go to first page"
-msgstr ""
-
-msgid "Pagination|Go to last page"
-msgstr ""
-
-msgid "Pagination|Go to next page"
-msgstr ""
-
-msgid "Pagination|Go to previous page"
 msgstr ""
 
 msgid "Pagination|Go to first page"
@@ -11390,9 +11348,6 @@ msgid "Resolve conflicts on source branch"
 msgstr ""
 
 msgid "Resolve discussion"
-msgstr ""
-
-msgid "Resolve thread"
 msgstr ""
 
 msgid "Resolve thread"
@@ -14214,9 +14169,6 @@ msgid "Toggle project"
 msgstr ""
 
 msgid "Toggle sidebar"
-msgstr ""
-
-msgid "Toggle thread"
 msgstr ""
 
 msgid "Toggle thread"
