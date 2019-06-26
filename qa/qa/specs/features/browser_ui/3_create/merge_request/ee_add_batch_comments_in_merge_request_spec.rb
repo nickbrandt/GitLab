@@ -3,7 +3,8 @@
 module QA
   context 'Create' do
     describe 'batch comments in merge request' do
-      it 'user submits, discards batch comments' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/60
+      it 'user submits, discards batch comments', :quarantine do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
