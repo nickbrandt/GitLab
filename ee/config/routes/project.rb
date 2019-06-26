@@ -81,6 +81,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       namespace :security do
         resources :dependencies, only: [:index]
+        resource :dashboard, only: [:show], controller: :dashboard
+        resources :vulnerabilities, only: [:index], controller: :vulnerabilities do
+          collection do
+            get :summary
+            get :history
+          end
+        end
       end
     end
   end

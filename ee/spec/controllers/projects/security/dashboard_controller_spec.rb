@@ -24,6 +24,28 @@ describe Projects::Security::DashboardController do
         stub_licensed_features(security_dashboard: true)
       end
 
+      context 'when the project does not belong to a group' do
+        it 'returns the latest pipeline with security reports for the project' do
+          project = create(:project, :repository, :public)
+          user = create(:user)
+          pipeline = create(
+            :ci_pipeline_without_jobs,
+            sha: project.commit.id,
+            project: project,
+            user: user
+          )
+          create(:ee_ci_build, :sast, pipeline: pipeline)
+
+          show_security_dashboard
+
+          p response.body
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to render_template(:show)
+          expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
+        end
+      end
+
       context 'when uses legacy reports syntax' do
         before do
           create(:ci_build, :artifacts, pipeline: pipeline, name: 'sast')
