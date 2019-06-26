@@ -36,3 +36,10 @@ export const pageInfoNoCharts = {
     title: 'Page No Charts',
   },
 };
+
+export const configData = {
+  example: pageInfo,
+  invalid: {
+    key: 'key',
+  },
+};
