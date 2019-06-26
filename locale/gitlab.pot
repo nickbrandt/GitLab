@@ -146,7 +146,7 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
-msgid "%{authorsName}'s discussion"
+msgid "%{authorsName}'s thread"
 msgstr ""
 
 msgid "%{commit_author_link} authored %{commit_timeago}"
@@ -1097,7 +1097,7 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occurred adding a draft to the discussion."
+msgid "An error occurred adding a draft to the thread."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
@@ -8268,18 +8268,6 @@ msgstr ""
 msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
-msgid "MergeRequests|Discussion stays resolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion stays unresolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion will be resolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion will be unresolved"
-msgstr ""
-
 msgid "MergeRequests|Failed to squash. Should be done manually."
 msgstr ""
 
@@ -8296,6 +8284,18 @@ msgid "MergeRequests|Saving the comment failed"
 msgstr ""
 
 msgid "MergeRequests|Squash task canceled: another squash is already in progress."
+msgstr ""
+
+msgid "MergeRequests|Thread stays resolved"
+msgstr ""
+
+msgid "MergeRequests|Thread stays unresolved"
+msgstr ""
+
+msgid "MergeRequests|Thread will be resolved"
+msgstr ""
+
+msgid "MergeRequests|Thread will be unresolved"
 msgstr ""
 
 msgid "MergeRequests|Toggle comments for this file"
