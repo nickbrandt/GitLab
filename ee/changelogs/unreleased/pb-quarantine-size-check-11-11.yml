@@ -1,5 +1,0 @@
----
-title: Use quarantine size to check push size against repository size limit
-merge_request: 14269
-author:
-type: fixed
