@@ -1,9 +1,9 @@
 import Visibility from 'visibilityjs';
+import PipelineStore from 'ee_else_ce/pipelines/stores/pipeline_store';
 import Flash from '../flash';
 import Poll from '../lib/utils/poll';
 import { __ } from '../locale';
-import PipelineService from '~/pipelines/services/pipeline_service';
-import PipelineStore from 'ee/pipelines/stores/pipeline_store'; // eslint-disable-line import/order
+import PipelineService from './services/pipeline_service';
 
 export default class pipelinesMediator {
   constructor(options = {}) {
