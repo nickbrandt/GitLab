@@ -1,17 +1,5 @@
-import { REPORT_STATUS, SORT_FIELDS, SORT_ORDER } from './constants';
+import { DEPENDENCY_LIST_TYPES } from './constants';
 
 export default () => ({
-  endpoint: '',
-  initialized: false,
-  isLoading: false,
-  errorLoading: false,
-  dependencies: [],
-  pageInfo: {},
-  reportInfo: {
-    status: REPORT_STATUS.ok,
-    jobPath: '',
-  },
-  sortField: 'name',
-  sortFields: SORT_FIELDS,
-  sortOrder: SORT_ORDER.ascending,
+  currentList: DEPENDENCY_LIST_TYPES.all,
 });

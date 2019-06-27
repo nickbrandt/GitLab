@@ -1,6 +1,6 @@
 import { TEST_HOST } from 'helpers/test_constants';
-import * as getters from 'ee/dependencies/store/getters';
-import { REPORT_STATUS } from 'ee/dependencies/store/constants';
+import * as getters from 'ee/dependencies/store/modules/list/getters';
+import { REPORT_STATUS } from 'ee/dependencies/store/modules/list/constants';
 
 describe('Dependencies getters', () => {
   describe.each`
