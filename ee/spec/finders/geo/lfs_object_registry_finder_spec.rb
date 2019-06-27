@@ -24,7 +24,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
   let(:lfs_object_remote_2) { create(:lfs_object, :object_storage) }
   let(:lfs_object_remote_3) { create(:lfs_object, :object_storage) }
 
-  subject { described_class.new(current_node: secondary) }
+  subject { described_class.new(current_node_id: secondary.id) }
 
   before do
     stub_current_geo_node(secondary)
@@ -642,25 +642,5 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
     end
   end
 
-  it 'responds to file registry finder methods' do
-    file_registry_finder_methods = %i{
-      syncable
-      count_syncable
-      count_synced
-      count_failed
-      count_synced_missing_on_primary
-      count_registry
-      find_unsynced
-      find_migrated_local
-      find_retryable_failed_registries
-      find_retryable_synced_missing_on_primary_registries
-    }
-
-    file_registry_finder_methods.each do |method|
-      expect(subject).to respond_to(method)
-    end
-  end
-
-  include_examples 'counts all the things'
-  include_examples 'finds all the things'
+  it_behaves_like 'a file registry finder'
 end
