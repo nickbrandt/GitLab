@@ -44,6 +44,6 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   end
 
   def found_vulnerabilities(collection = :latest)
-    ::Security::VulnerabilitiesFinder.new(group: group, params: filter_params).execute(collection)
+    ::Security::VulnerabilitiesFinder.new(group, params: filter_params).execute(collection)
   end
 end

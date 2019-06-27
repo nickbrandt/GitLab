@@ -38,8 +38,6 @@ describe Projects::Security::DashboardController do
 
           show_security_dashboard
 
-          p response.body
-
           expect(response).to have_gitlab_http_status(200)
           expect(response).to render_template(:show)
           expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
