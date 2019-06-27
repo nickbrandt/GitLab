@@ -25,6 +25,10 @@ module QA
               element :add_issue_input
             end
 
+            view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
+              element :related_issuable_item
+            end
+
             view 'ee/app/assets/javascripts/related_issues/constants.js' do
               element :add_issues_button
             end
@@ -57,6 +61,14 @@ module QA
 
             def close_reopen_epic
               click_element :close_reopen_epic_button
+            end
+
+            def has_related_issuable_item?
+              has_element?(:related_issuable_item)
+            end
+
+            def has_no_related_issuable_item?
+              has_no_element?(:related_issuable_item)
             end
           end
         end

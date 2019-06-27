@@ -258,6 +258,7 @@ export default {
               :can-reorder="canReorder"
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
+              class="qa-related-issuable-item"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             >
               <span v-if="issue.weight" slot="weight" class="order-md-1">
