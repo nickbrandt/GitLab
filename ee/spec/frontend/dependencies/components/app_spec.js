@@ -1,7 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
-import { REPORT_STATUS } from 'ee/dependencies/store/constants';
+import { DEPENDENCY_LIST_TYPES } from 'ee/dependencies/store/constants';
+import { REPORT_STATUS } from 'ee/dependencies/store/modules/list/constants';
 import DependenciesApp from 'ee/dependencies/components/app.vue';
 import DependenciesTable from 'ee/dependencies/components/dependencies_table.vue';
 import DependencyListIncompleteAlert from 'ee/dependencies/components/dependency_list_incomplete_alert.vue';
@@ -11,6 +12,7 @@ import Pagination from '~/vue_shared/components/pagination_links.vue';
 describe('DependenciesApp component', () => {
   let store;
   let wrapper;
+  const listType = DEPENDENCY_LIST_TYPES.all;
 
   const basicAppProps = {
     endpoint: '/foo',
@@ -51,8 +53,8 @@ describe('DependenciesApp component', () => {
 
     it('dispatches the correct initial actions', () => {
       expect(store.dispatch.mock.calls).toEqual([
-        ['setDependenciesEndpoint', basicAppProps.endpoint],
-        ['fetchDependencies'],
+        [`${listType}/setDependenciesEndpoint`, basicAppProps.endpoint],
+        [`${listType}/fetchDependencies`, undefined],
       ]);
     });
 
@@ -64,13 +66,13 @@ describe('DependenciesApp component', () => {
       beforeEach(() => {
         dependencies = ['foo', 'bar'];
 
-        Object.assign(store.state, {
+        Object.assign(store.state[listType], {
           initialized: true,
           isLoading: false,
           dependencies,
         });
-        store.state.pageInfo.total = 100;
-        store.state.reportInfo.status = REPORT_STATUS.ok;
+        store.state[listType].pageInfo.total = 100;
+        store.state[listType].reportInfo.status = REPORT_STATUS.ok;
 
         return wrapper.vm.$nextTick();
       });
@@ -88,7 +90,7 @@ describe('DependenciesApp component', () => {
 
       it('passes the correct props to the pagination', () => {
         expectComponentWithProps(Pagination, {
-          pageInfo: store.state.pageInfo,
+          pageInfo: store.state[listType].pageInfo,
           change: wrapper.vm.fetchPage,
         });
       });
@@ -98,13 +100,13 @@ describe('DependenciesApp component', () => {
       beforeEach(() => {
         dependencies = [];
 
-        Object.assign(store.state, {
+        Object.assign(store.state[listType], {
           initialized: true,
           isLoading: false,
           dependencies,
         });
-        store.state.pageInfo.total = 0;
-        store.state.reportInfo.status = REPORT_STATUS.jobNotSetUp;
+        store.state[listType].pageInfo.total = 0;
+        store.state[listType].reportInfo.status = REPORT_STATUS.jobNotSetUp;
 
         return wrapper.vm.$nextTick();
       });
@@ -118,14 +120,14 @@ describe('DependenciesApp component', () => {
       beforeEach(() => {
         dependencies = [];
 
-        Object.assign(store.state, {
+        Object.assign(store.state[listType], {
           initialized: true,
           isLoading: false,
           dependencies,
         });
-        store.state.pageInfo.total = 0;
-        store.state.reportInfo.status = REPORT_STATUS.jobFailed;
-        store.state.reportInfo.jobPath = '/jobs/foo/321';
+        store.state[listType].pageInfo.total = 0;
+        store.state[listType].reportInfo.status = REPORT_STATUS.jobFailed;
+        store.state[listType].reportInfo.jobPath = '/jobs/foo/321';
 
         return wrapper.vm.$nextTick();
       });
@@ -136,7 +138,7 @@ describe('DependenciesApp component', () => {
 
       it('passes the correct props to the job failure alert', () => {
         expectComponentWithProps(DependencyListJobFailedAlert, {
-          jobPath: store.state.reportInfo.jobPath,
+          jobPath: store.state[listType].reportInfo.jobPath,
         });
       });
 
@@ -168,13 +170,13 @@ describe('DependenciesApp component', () => {
       beforeEach(() => {
         dependencies = ['foo', 'bar'];
 
-        Object.assign(store.state, {
+        Object.assign(store.state[listType], {
           initialized: true,
           isLoading: false,
           dependencies,
         });
-        store.state.pageInfo.total = 100;
-        store.state.reportInfo.status = REPORT_STATUS.incomplete;
+        store.state[listType].pageInfo.total = 100;
+        store.state[listType].reportInfo.status = REPORT_STATUS.incomplete;
 
         return wrapper.vm.$nextTick();
       });
@@ -197,7 +199,7 @@ describe('DependenciesApp component', () => {
 
       it('passes the correct props to the pagination', () => {
         expectComponentWithProps(Pagination, {
-          pageInfo: store.state.pageInfo,
+          pageInfo: store.state[listType].pageInfo,
           change: wrapper.vm.fetchPage,
         });
       });
@@ -219,7 +221,7 @@ describe('DependenciesApp component', () => {
       beforeEach(() => {
         dependencies = [];
 
-        Object.assign(store.state, {
+        Object.assign(store.state[listType], {
           initialized: true,
           isLoading: false,
           errorLoading: true,

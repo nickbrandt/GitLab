@@ -3,10 +3,10 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'helpers/test_constants';
-import * as actions from 'ee/dependencies/store/actions';
-import * as types from 'ee/dependencies/store/mutation_types';
-import getInitialState from 'ee/dependencies/store/state';
-import { SORT_ORDER, FETCH_ERROR_MESSAGE } from 'ee/dependencies/store/constants';
+import * as actions from 'ee/dependencies/store/modules/list/actions';
+import * as types from 'ee/dependencies/store/modules/list/mutation_types';
+import getInitialState from 'ee/dependencies/store/modules/list/state';
+import { SORT_ORDER, FETCH_ERROR_MESSAGE } from 'ee/dependencies/store/modules/list/constants';
 import createFlash from '~/flash';
 
 import mockDependenciesResponse from './data/mock_dependencies';
