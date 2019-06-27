@@ -54,7 +54,7 @@ module Gitlab
         attr_reader :entity, :current_user, :opts
 
         def finder
-          issuable_type = opts[:issuable_type].to_sym
+          issuable_type = opts[:issuable_type]&.to_sym
 
           FINDERS[issuable_type] ||
             raise(InvalidIssuableTypeError, "Invalid `:issuable_type` option: `#{opts[:issuable_type]}`. Allowed values are #{FINDERS.keys}!")
