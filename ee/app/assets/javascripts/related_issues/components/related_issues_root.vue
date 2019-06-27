@@ -32,6 +32,7 @@ import {
   relatedIssuesRemoveErrorMap,
   pathIndeterminateErrorMap,
   addRelatedIssueErrorMap,
+  issuableTypesMap,
 } from '../constants';
 
 export default {
@@ -67,7 +68,7 @@ export default {
     issuableType: {
       type: String,
       required: false,
-      default: 'issue',
+      default: issuableTypesMap.ISSUE,
     },
     allowAutoComplete: {
       type: Boolean,
