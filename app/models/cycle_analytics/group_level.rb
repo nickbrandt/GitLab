@@ -8,7 +8,7 @@ module CycleAnalytics
     end
 
     def summary
-      @summary ||= ::Gitlab::CycleAnalytics::GroupStageSummary.new(@project,
+      @summary ||= ::Gitlab::CycleAnalytics::GroupStageSummary.new(@options[:group],
                                                               from: @options[:from],
                                                               current_user: @options[:current_user]).data
     end
