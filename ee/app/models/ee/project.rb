@@ -217,20 +217,6 @@ module EE
         shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?
     end
 
-    # This makes the feature disabled by default, in contrary to how
-    # `#feature_available?` makes a feature enabled by default.
-    #
-    # This allows to:
-    # - Enable the feature flag for a given project, regardless of the license.
-    #   This is useful for early testing a feature in production on a given project.
-    # - Enable the feature flag globally and still check that the license allows
-    #   it. This is the case when we're ready to enable a feature for anyone
-    #   with the correct license.
-    def beta_feature_available?(feature)
-      ::Feature.enabled?(feature, self) ||
-        (::Feature.enabled?(feature) && feature_available?(feature))
-    end
-
     def feature_available?(feature, user = nil)
       if ::ProjectFeature::FEATURES.include?(feature)
         super
