@@ -41,10 +41,11 @@ resource :profile, only: [:show, :update] do
       end
     end
 
-    ## EE-specific
-    resource :slack, only: [:edit] do
-      member do
-        get :slack_link
+    Gitlab.ee do
+      resource :slack, only: [:edit] do
+        member do
+          get :slack_link
+        end
       end
     end
 
@@ -72,9 +73,9 @@ resource :profile, only: [:show, :update] do
 
     resources :u2f_registrations, only: [:destroy]
 
-    ## EE-specific
-    resources :pipeline_quota, only: [:index]
-    resources :billings, only: [:index]
-    ## EE-specific
+    Gitlab.ee do
+      resources :pipeline_quota, only: [:index]
+      resources :billings, only: [:index]
+    end
   end
 end
