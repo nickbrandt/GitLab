@@ -10,4 +10,7 @@ describe ProjectAlias do
   it { is_expected.to validate_presence_of(:project) }
   it { is_expected.to validate_presence_of(:name) }
   it { is_expected.to validate_uniqueness_of(:name) }
+  it { is_expected.not_to allow_value('/foo').for(:name) }
+  it { is_expected.not_to allow_value('foo/foo').for(:name) }
+  it { is_expected.not_to allow_value('foo.git').for(:name) }
 end
