@@ -425,9 +425,25 @@ describe Group do
       context 'with an invalid config file' do
         let(:insights_file_content) { ': foo bar' }
 
-        it 'returns the insights config data' do
+        it 'returns nil' do
           expect(group.insights_config).to be_nil
         end
+      end
+    end
+
+    context 'when group has an Insights project configured which is in a nested group' do
+      before do
+        nested_group = create(:group, parent: group)
+        project = create(:project, :custom_repo, group: nested_group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+        group.create_insight!(project: project)
+      end
+
+      let(:insights_file_content) { 'key: monthlyBugsCreated' }
+
+      it 'returns the insights config data' do
+        insights_config = group.insights_config
+
+        expect(insights_config).to eq(key: 'monthlyBugsCreated')
       end
     end
   end
