@@ -9,6 +9,10 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   before_action :whitelist_query_limiting, only: [:show]
   before_action :authorize_group_cycle_analytics!
 
+  before_action(:only => :show) do |controller|
+    routable_required if controller.request.format.json?
+  end
+
   def show
     respond_to do |format|
       format.html
@@ -25,7 +29,6 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   end
 
   def cycle_analytics_json
-    return {} unless cycle_analytics_params.key?(:group_id) || cycle_analytics_params.key?(:project_id)
     cycle_analytics = cycle_analytics_stats
     {
       summary: cycle_analytics.summary,
@@ -35,10 +38,10 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   end
 
   def cycle_analytics_stats
-    if cycle_analytics_params.key?(:group_id) && group
-      ::CycleAnalytics::GroupLevel.new(options: options(cycle_analytics_params).merge(group: group))
-    elsif cycle_analytics_params.key?(:project_id) && project
+    if project
       ::CycleAnalytics::ProjectLevel.new(project: project, options: options(cycle_analytics_params))
+    elsif group
+      ::CycleAnalytics::GroupLevel.new(options: options(cycle_analytics_params).merge(group: group))
     end
   end
 
@@ -47,17 +50,26 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
   end
 
   def authorize_group_cycle_analytics!
-    unless can?(current_user, :read_group_cycle_analytics, group)
+    unless can?(current_user, :read_group_cycle_analytics, namespace_or_group)
       return render_403
     end
   end
 
+  def routable_required
+    return render_404 unless group || project
+  end
+
   def group
-    find_routable!(Group, cycle_analytics_params[:group_id])
+    @group ||= find_routable!(Group, cycle_analytics_params[:group_id])
   end
 
   def project
-    path = File.join(cycle_analytics_params[:namespace_id], cycle_analytics_params[:project_id])
-    find_routable!(Project, path)
+    return @project if @project
+    path = File.join(cycle_analytics_params[:namespace_id].to_s, cycle_analytics_params[:project_id].to_s)
+    @project ||= find_routable!(Project, path)
+  end
+
+  def namespace_or_group
+    group || find_routable!(Group, cycle_analytics_params[:namespace_id])
   end
 end
