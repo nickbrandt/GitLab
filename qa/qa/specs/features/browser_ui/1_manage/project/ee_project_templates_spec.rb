@@ -38,8 +38,7 @@ module QA
         end
       end
 
-      # https://gitlab.com/gitlab-org/quality/staging/issues/59
-      context 'instance level', :quarantine do
+      context 'instance level' do
         before do
           # Log out if already logged in
           Page::Main::Menu.perform do |menu|
@@ -83,6 +82,12 @@ module QA
 
       context 'group level' do
         before do
+          # Log out if already logged in. This is necessary because
+          # a previous test might have logged in as admin
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           Page::Main::Login.perform(&:sign_in_using_credentials)
 
