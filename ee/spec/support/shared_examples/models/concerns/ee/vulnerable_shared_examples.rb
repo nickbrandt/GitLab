@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 shared_examples_for EE::Vulnerable do
-  let(:project) { create(:project, namespace: group) }
   let(:external_project) { create(:project) }
   let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
 
@@ -17,13 +16,19 @@ shared_examples_for EE::Vulnerable do
     new_vuln.pipelines << pipeline_ran_against_new_sha
   end
 
+  def project
+    return vulnerable if vulnerable.is_a?(Project)
+
+    @project ||= create(:project, namespace: vulnerable)
+  end
+
   def create_vulnerability(project, pipeline = nil)
     pipeline ||= create(:ci_pipeline, :success, project: project)
     create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
   end
 
   describe '#latest_vulnerabilities' do
-    subject { group.latest_vulnerabilities }
+    subject { vulnerable.latest_vulnerabilities }
 
     it 'returns vulnerabilities for the latest successful pipelines of projects belonging to the vulnerable entity' do
       is_expected.to contain_exactly(new_vuln)
@@ -43,9 +48,9 @@ shared_examples_for EE::Vulnerable do
   end
 
   describe '#latest_vulnerabilities_with_sha' do
-    subject { group.latest_vulnerabilities_with_sha }
+    subject { vulnerable.latest_vulnerabilities_with_sha }
 
-    it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
+    it 'returns vulns only for the latest successful pipelines of projects belonging to the vulnerable' do
       is_expected.to contain_exactly(new_vuln)
     end
 
@@ -65,9 +70,9 @@ shared_examples_for EE::Vulnerable do
   end
 
   describe '#all_vulnerabilities' do
-    subject { group.all_vulnerabilities }
+    subject { vulnerable.all_vulnerabilities }
 
-    it 'returns vulns for all successful pipelines of projects belonging to the group' do
+    it 'returns vulns for all successful pipelines of projects belonging to the vulnerable' do
       is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln)
     end
 

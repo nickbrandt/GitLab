@@ -3,7 +3,10 @@ require 'spec_helper'
 describe Group do
   let(:group) { create(:group) }
 
-  it_behaves_like EE::Vulnerable
+  it_behaves_like EE::Vulnerable do
+    let(:vulnerable) { create(:group) }
+  end
+
   it { is_expected.to include_module(EE::Group) }
 
   describe 'associations' do
