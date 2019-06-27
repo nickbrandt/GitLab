@@ -237,11 +237,6 @@ module EE
       end
     end
 
-    override :multiple_issue_boards_available?
-    def multiple_issue_boards_available?
-      feature_available?(:multiple_project_issue_boards)
-    end
-
     def multiple_approval_rules_available?
       feature_available?(:multiple_approval_rules)
     end

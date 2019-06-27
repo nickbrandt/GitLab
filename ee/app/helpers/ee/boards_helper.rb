@@ -17,8 +17,7 @@ module EE
     override :board_data
     def board_data
       show_feature_promotion = (@project && show_promotions? &&
-                                (!@project.feature_available?(:multiple_project_issue_boards) ||
-                                 !@project.feature_available?(:scoped_issue_board) ||
+                                (!@project.feature_available?(:scoped_issue_board) ||
                                  !@project.feature_available?(:issue_board_focus_mode)))
 
       data = {

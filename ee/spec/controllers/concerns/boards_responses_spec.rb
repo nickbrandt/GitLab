@@ -13,7 +13,6 @@ describe BoardsResponses do
 
   before do
     stub_licensed_features(scoped_issue_board: true)
-    stub_licensed_features(multiple_project_issue_boards: true)
   end
 
   describe '#serialize_as_json' do
