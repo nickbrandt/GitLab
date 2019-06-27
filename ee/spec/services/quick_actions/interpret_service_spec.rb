@@ -682,19 +682,37 @@ describe QuickActions::InterpretService do
     end
 
     context 'issuable weights licensed' do
+      let(:issuable) { issue }
+
       before do
         stub_licensed_features(issue_weights: true)
       end
 
-      it_behaves_like 'weight command' do
-        let(:weight) { 5 }
+      context 'weight' do
         let(:content) { "/weight #{weight}" }
-        let(:issuable) { issue }
+
+        it_behaves_like 'weight command' do
+          let(:weight) { 5 }
+        end
+
+        it_behaves_like 'weight command' do
+          let(:weight) { 0 }
+        end
+
+        context 'when weight is negative' do
+          it 'does not populate weight' do
+            content = "/weight -10"
+            _, updates = service.execute(content, issuable)
+
+            expect(updates).to be_empty
+          end
+        end
       end
 
-      it_behaves_like 'clear weight command' do
-        let(:content) { '/clear_weight' }
-        let(:issuable) { issue }
+      context 'clear_weight' do
+        it_behaves_like 'clear weight command' do
+          let(:content) { '/clear_weight' }
+        end
       end
     end
 

@@ -27,6 +27,37 @@ describe Issues::UpdateService do
         end
       end
 
+      context 'updating weight' do
+        before do
+          project.add_maintainer(user)
+          issue.update(weight: 3)
+        end
+
+        context 'when weight is integer' do
+          it 'updates to the exact value' do
+            expect { update_issue(weight: 2) }.to change { issue.weight }.to(2)
+          end
+        end
+
+        context 'when weight is integer' do
+          it 'rounds the value down' do
+            expect { update_issue(weight: 1.8) }.to change { issue.weight }.to(1)
+          end
+        end
+
+        context 'when weight is zero' do
+          it 'sets the value to zero' do
+            expect { update_issue(weight: 0) }.to change { issue.weight }.to(0)
+          end
+        end
+
+        context 'when weight is a string' do
+          it 'sets the value to 0' do
+            expect { update_issue(weight: 'abc') }.to change { issue.weight }.to(0)
+          end
+        end
+      end
+
       context 'updating other fields' do
         it 'does not call epic#update_start_and_due_dates' do
           expect(epic).not_to receive(:update_start_and_due_dates)
