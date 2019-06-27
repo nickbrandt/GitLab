@@ -1,34 +1,39 @@
 import { __ } from '~/locale';
 
+export const issuableTypesMap = {
+  ISSUE: 'issue',
+  EPIC: 'epic',
+};
+
 export const autoCompleteTextMap = {
   true: {
-    issue: __(' or <#issue id>'),
-    epic: __(' or <#epic id>'),
+    [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
+    [issuableTypesMap.EPIC]: __(' or <#epic id>'),
   },
   false: {
-    issue: '',
-    epic: '',
+    [issuableTypesMap.ISSUE]: '',
+    [issuableTypesMap.EPIC]: '',
   },
 };
 
 export const inputPlaceholderTextMap = {
-  issue: __('Paste issue link'),
-  epic: __('Paste epic link'),
+  [issuableTypesMap.ISSUE]: __('Paste issue link'),
+  [issuableTypesMap.EPIC]: __('Paste epic link'),
 };
 
 export const relatedIssuesRemoveErrorMap = {
-  issue: __('An error occurred while removing issues.'),
-  epic: __('An error occurred while removing epics.'),
+  [issuableTypesMap.ISSUE]: __('An error occurred while removing issues.'),
+  [issuableTypesMap.EPIC]: __('An error occurred while removing epics.'),
 };
 
 export const pathIndeterminateErrorMap = {
-  issue: __('We could not determine the path to remove the issue'),
-  epic: __('We could not determine the path to remove the epic'),
+  [issuableTypesMap.ISSUE]: __('We could not determine the path to remove the issue'),
+  [issuableTypesMap.EPIC]: __('We could not determine the path to remove the epic'),
 };
 
 export const addRelatedIssueErrorMap = {
-  issue: __("We can't find an issue that matches what you are looking for."),
-  epic: __("We can't find an epic that matches what you are looking for."),
+  [issuableTypesMap.ISSUE]: __("We can't find an issue that matches what you are looking for."),
+  [issuableTypesMap.EPIC]: __("We can't find an epic that matches what you are looking for."),
 };
 
 /**
@@ -37,8 +42,8 @@ export const addRelatedIssueErrorMap = {
  * them inside i18n functions.
  */
 export const issuableIconMap = {
-  issue: 'issues',
-  epic: 'epic',
+  [issuableTypesMap.ISSUE]: 'issues',
+  [issuableTypesMap.EPIC]: 'epic',
 };
 
 /**
@@ -47,6 +52,6 @@ export const issuableIconMap = {
  * them inside i18n functions.
  */
 export const issuableQaClassMap = {
-  issue: 'qa-add-issues-button',
-  epic: 'qa-add-epics-button',
+  [issuableTypesMap.ISSUE]: 'qa-add-issues-button',
+  [issuableTypesMap.EPIC]: 'qa-add-epics-button',
 };

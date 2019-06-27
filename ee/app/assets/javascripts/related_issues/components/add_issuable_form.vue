@@ -1,17 +1,13 @@
 <script>
-import $ from 'jquery';
-import GfmAutoComplete from 'ee_else_ce/gfm_auto_complete';
 import { GlLoadingIcon } from '@gitlab/ui';
-import issueToken from './issue_token.vue';
-import { autoCompleteTextMap, inputPlaceholderTextMap } from '../constants';
-
-const SPACE_FACTOR = 1;
+import RelatedIssuableInput from './related_issuable_input.vue';
+import { issuableTypesMap } from '../constants';
 
 export default {
   name: 'AddIssuableForm',
   components: {
-    issueToken,
     GlLoadingIcon,
+    RelatedIssuableInput,
   },
   props: {
     inputValue: {
@@ -40,112 +36,31 @@ export default {
     issuableType: {
       type: String,
       required: false,
-      default: 'issue',
+      default: issuableTypesMap.ISSUE,
     },
   },
-
-  data() {
-    return {
-      isInputFocused: false,
-      isAutoCompleteOpen: false,
-    };
-  },
-
   computed: {
-    inputPlaceholder() {
-      const { issuableType, allowAutoComplete } = this;
-      const allowAutoCompleteText = autoCompleteTextMap[allowAutoComplete][issuableType];
-      return `${inputPlaceholderTextMap[issuableType]}${allowAutoCompleteText}`;
-    },
     isSubmitButtonDisabled() {
       return (
         (this.inputValue.length === 0 && this.pendingReferences.length === 0) || this.isSubmitting
       );
     },
-    allowAutoComplete() {
-      return Object.keys(this.autoCompleteSources).length > 0;
-    },
   },
-
-  mounted() {
-    const $input = $(this.$refs.input);
-    if (this.allowAutoComplete) {
-      this.gfmAutoComplete = new GfmAutoComplete(this.autoCompleteSources);
-      this.gfmAutoComplete.setup($input, {
-        issues: true,
-        epics: true,
-      });
-      $input.on('shown-issues.atwho', this.onAutoCompleteToggled.bind(this, true));
-      $input.on('hidden-issues.atwho', this.onAutoCompleteToggled.bind(this, false));
-    }
-
-    this.$refs.input.focus();
-  },
-
-  beforeDestroy() {
-    const $input = $(this.$refs.input);
-    $input.off('shown-issues.atwho');
-    $input.off('hidden-issues.atwho');
-    $input.off('inserted-issues.atwho', this.onInput);
-  },
-
   methods: {
-    onInput() {
-      const { value } = this.$refs.input;
-      const caretPos = $(this.$refs.input).caret('pos');
-      const rawRefs = value.split(/\s/);
-      let touchedReference;
-      let position = 0;
-
-      const untouchedRawRefs = rawRefs
-        .filter(ref => {
-          let isTouched = false;
-          if (caretPos >= position && caretPos <= position + ref.length) {
-            touchedReference = ref;
-            isTouched = true;
-          }
-
-          // `+ SPACE_FACTOR` to factor in the missing space we split at earlier
-          position = position + ref.length + SPACE_FACTOR;
-
-          return !isTouched;
-        })
-        .filter(ref => ref.trim().length > 0);
-
-      this.$emit('addIssuableFormInput', {
-        newValue: value,
-        untouchedRawReferences: untouchedRawRefs,
-        touchedReference,
-        caretPos,
-      });
-    },
-    onFocus() {
-      this.isInputFocused = true;
-    },
-    onBlur() {
-      this.isInputFocused = false;
-
-      // Avoid tokenizing partial input when clicking an autocomplete item
-      if (!this.isAutoCompleteOpen) {
-        const { value } = this.$refs.input;
-        this.$emit('addIssuableFormBlur', value);
-      }
-    },
-    onAutoCompleteToggled(isOpen) {
-      this.isAutoCompleteOpen = isOpen;
-    },
-    onInputWrapperClick() {
-      this.$refs.input.focus();
-    },
     onPendingIssuableRemoveRequest(params) {
       this.$emit('pendingIssuableRemoveRequest', params);
     },
     onFormSubmit() {
-      const { value } = this.$refs.input;
-      this.$emit('addIssuableFormSubmit', value);
+      this.$emit('addIssuableFormSubmit', this.$refs.relatedIssuableInput.$refs.input.value);
     },
     onFormCancel() {
       this.$emit('addIssuableFormCancel');
+    },
+    onAddIssuableFormInput(params) {
+      this.$emit('addIssuableFormInput', params);
+    },
+    onAddIssuableFormBlur(params) {
+      this.$emit('addIssuableFormBlur', params);
     },
   },
 };
@@ -153,49 +68,20 @@ export default {
 
 <template>
   <form @submit.prevent="onFormSubmit">
-    <div
-      ref="issuableFormWrapper"
-      :class="{ focus: isInputFocused }"
-      class="add-issuable-form-input-wrapper form-control"
-      role="button"
-      @click="onInputWrapperClick"
-    >
-      <ul class="add-issuable-form-input-token-list">
-        <!--
-          We need to ensure this key changes any time the pendingReferences array is updated
-          else two consecutive pending ref strings in an array with the same name will collide
-          and cause odd behavior when one is removed.
-        -->
-        <li
-          v-for="(reference, index) in pendingReferences"
-          :key="`related-issues-token-${reference}`"
-          class="js-add-issuable-form-token-list-item add-issuable-form-token-list-item"
-        >
-          <issue-token
-            :id-key="index"
-            :display-reference="reference"
-            :can-remove="true"
-            :is-condensed="true"
-            :path-id-separator="pathIdSeparator"
-            event-namespace="pendingIssuable"
-            @pendingIssuableRemoveRequest="onPendingIssuableRemoveRequest"
-          />
-        </li>
-        <li class="add-issuable-form-input-list-item">
-          <input
-            ref="input"
-            :value="inputValue"
-            :placeholder="inputPlaceholder"
-            type="text"
-            class="js-add-issuable-form-input add-issuable-form-input qa-add-issue-input"
-            @input="onInput"
-            @focus="onFocus"
-            @blur="onBlur"
-            @keyup.escape.exact="onFormCancel"
-          />
-        </li>
-      </ul>
-    </div>
+    <related-issuable-input
+      ref="relatedIssuableInput"
+      :focus-on-mount="true"
+      :references="pendingReferences"
+      :path-id-separator="pathIdSeparator"
+      :input-value="inputValue"
+      :auto-complete-sources="autoCompleteSources"
+      :auto-complete-options="{ issues: true, epics: true }"
+      :issuable-type="issuableType"
+      @pendingIssuableRemoveRequest="onPendingIssuableRemoveRequest"
+      @formCancel="onFormCancel"
+      @addIssuableFormBlur="onAddIssuableFormBlur"
+      @addIssuableFormInput="onAddIssuableFormInput"
+    />
     <div class="add-issuable-form-actions clearfix">
       <button
         ref="addButton"
