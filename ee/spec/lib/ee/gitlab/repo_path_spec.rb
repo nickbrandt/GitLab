@@ -18,7 +18,7 @@ describe Gitlab::RepoPath do
 
     context 'with premium license' do
       before do
-        create(:license, plan: License::PREMIUM_PLAN)
+        stub_licensed_features(project_aliases: true)
       end
 
       context 'project_path matches a project alias' do

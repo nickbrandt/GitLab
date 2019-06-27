@@ -72,7 +72,7 @@ describe API::ProjectAliases, api: true do
     end
 
     before do
-      create(:license, plan: License::PREMIUM_PLAN)
+      stub_licensed_features(project_aliases: true)
     end
 
     describe 'GET /project_aliases' do
@@ -90,6 +90,7 @@ describe API::ProjectAliases, api: true do
         it 'returns the project aliases list' do
           expect(response).to have_gitlab_http_status(200)
           expect(response).to match_response_schema('public_api/v4/project_aliases', dir: 'ee')
+          expect(response).to include_pagination_headers
         end
       end
     end

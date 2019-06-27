@@ -2,6 +2,8 @@
 
 module API
   class ProjectAliases < Grape::API
+    include PaginationParams
+
     before { check_feature_availability }
     before { authenticated_as_admin! }
 
@@ -23,8 +25,11 @@ module API
       desc 'Get a list of all project aliases' do
         success EE::API::Entities::ProjectAlias
       end
+      params do
+        use :pagination
+      end
       get do
-        present ProjectAlias.all, with: EE::API::Entities::ProjectAlias
+        present paginate(ProjectAlias.all), with: EE::API::Entities::ProjectAlias
       end
 
       desc 'Get info of specific project alias by name' do
