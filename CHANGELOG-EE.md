@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.5 (2019-06-27)
+
+### Security (2 changes)
+
+- Gate MR head_pipeline behind read_pipeline ability.
+- Do not allow localhost urls in GitHub Integration.
+
+
 ## 11.11.4 (2019-06-26)
 
 ### Fixed (1 change)
