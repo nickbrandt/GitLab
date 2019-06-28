@@ -6,8 +6,6 @@ describe Gitlab::Geo::LfsTransfer do
   set(:primary_node) { create(:geo_node, :primary) }
   set(:secondary_node) { create(:geo_node) }
   set(:lfs_object) { create(:lfs_object, :with_file) }
-  let(:content) { SecureRandom.random_bytes(10) }
-  let(:size) { File.stat(lfs_object.file.path).size }
 
   subject do
     described_class.new(lfs_object)
@@ -30,6 +28,8 @@ describe Gitlab::Geo::LfsTransfer do
 
     context 'when the HTTP response is successful' do
       it 'returns a successful result' do
+        content = SecureRandom.random_bytes(10)
+        size = content.bytesize
         expect(FileUtils).to receive(:mv).with(anything, lfs_object.file.path).and_call_original
         response = double(:response, success?: true)
         expect(Gitlab::HTTP).to receive(:get).and_yield(content.to_s).and_return(response)
