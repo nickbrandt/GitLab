@@ -8178,6 +8178,9 @@ msgstr ""
 msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
+msgid "Mark this issue as related to another issue"
+msgstr ""
+
 msgid "Mark todo as done"
 msgstr ""
 
@@ -8191,6 +8194,9 @@ msgid "Markdown enabled"
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
+msgstr ""
+
+msgid "Marks this issue as related to %{issue_ref}."
 msgstr ""
 
 msgid "Marks todo as done."
