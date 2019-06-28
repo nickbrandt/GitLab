@@ -13223,9 +13223,6 @@ msgstr ""
 msgid "Trigger was created successfully."
 msgstr ""
 
-msgid "Trigger was re-assigned."
-msgstr ""
-
 msgid "Trigger was successfully updated."
 msgstr ""
 
