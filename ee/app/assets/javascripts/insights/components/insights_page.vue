@@ -49,7 +49,6 @@ export default {
   },
   watch: {
     pageConfig() {
-      this.setChartData({});
       this.setPageLoading(true);
       this.fetchCharts();
     },
@@ -58,7 +57,7 @@ export default {
     this.fetchCharts();
   },
   methods: {
-    ...mapActions('insights', ['fetchChartData', 'setChartData', 'setPageLoading']),
+    ...mapActions('insights', ['fetchChartData', 'initChartData', 'setPageLoading']),
     chartType(type) {
       switch (type) {
         case 'line':
@@ -70,6 +69,8 @@ export default {
     },
     fetchCharts() {
       if (this.hasChartsConfigured) {
+        this.initChartData(this.chartKeys);
+
         const insightsRequests = this.charts.map(chart =>
           this.fetchChartData({ endpoint: this.queryEndpoint, chart }),
         );
