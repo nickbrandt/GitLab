@@ -11249,9 +11249,6 @@ msgstr ""
 msgid "Registration"
 msgstr ""
 
-msgid "Registry"
-msgstr ""
-
 msgid "Related Deployed Jobs"
 msgstr ""
 
