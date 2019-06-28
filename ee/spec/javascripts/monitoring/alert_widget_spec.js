@@ -2,6 +2,7 @@ import Vue from 'vue';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import AlertsService from 'ee/monitoring/services/alerts_service';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import waitForPromises from 'spec/helpers/wait_for_promises';
 
 describe('AlertWidget', () => {
   let AlertWidgetComponent;
@@ -184,10 +185,13 @@ describe('AlertWidget', () => {
     vm.$refs.widgetForm.$emit('create', alertParams);
 
     expect(AlertsService.prototype.createAlert).toHaveBeenCalledWith(alertParams);
-    Vue.nextTick(() => {
-      expect(vm.isLoading).toEqual(false);
-      done();
-    });
+
+    waitForPromises()
+      .then(() => {
+        expect(vm.isLoading).toEqual(false);
+        done();
+      })
+      .catch(done.fail);
   });
 
   it('updates an alert with an appropriate handler', done => {
@@ -195,7 +199,9 @@ describe('AlertWidget', () => {
     const newAlertParams = { operator: '=', threshold: 12 };
 
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(Promise.resolve(alertParams));
-    spyOn(AlertsService.prototype, 'updateAlert').and.returnValue(Promise.resolve({}));
+    spyOn(AlertsService.prototype, 'updateAlert').and.returnValue(
+      Promise.resolve({ ...alertParams, ...newAlertParams }),
+    );
 
     vm = mountComponent(AlertWidgetComponent, propsWithAlertData);
     vm.$on('setAlerts', mockSetAlerts);
@@ -207,10 +213,12 @@ describe('AlertWidget', () => {
     });
 
     expect(AlertsService.prototype.updateAlert).toHaveBeenCalledWith(alertPath, newAlertParams);
-    Vue.nextTick(() => {
-      expect(vm.isLoading).toEqual(false);
-      done();
-    });
+    waitForPromises()
+      .then(() => {
+        expect(vm.isLoading).toEqual(false);
+        done();
+      })
+      .catch(done.fail);
   });
 
   it('deletes an alert with an appropriate handler', done => {
@@ -225,10 +233,12 @@ describe('AlertWidget', () => {
     vm.$refs.widgetForm.$emit('delete', { alert: alertPath });
 
     expect(AlertsService.prototype.deleteAlert).toHaveBeenCalledWith(alertPath);
-    Vue.nextTick(() => {
-      expect(vm.isLoading).toEqual(false);
-      expect(vm.alertSummary).toBeFalsy();
-      done();
-    });
+    waitForPromises()
+      .then(() => {
+        expect(vm.isLoading).toEqual(false);
+        expect(vm.alertSummary).toBeFalsy();
+        done();
+      })
+      .catch(done.fail);
   });
 });
