@@ -1,80 +1,42 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/solution_card.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
 import { trimText } from 'helpers/text_helper';
+import { shallowMount } from '@vue/test-utils';
+import { s__ } from '~/locale';
 
 describe('Solution Card', () => {
   const Component = Vue.extend(component);
   const solution = 'Upgrade to XYZ';
   const remediation = { summary: 'Update to 123', fixes: [], diff: 'SGVsbG8gR2l0TGFi' };
-  let vm;
+  const vulnerabilityFeedbackHelpPath = '/foo';
+
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('computed properties', () => {
     describe('solutionText', () => {
       it('takes the value of solution', () => {
-        const props = { solution };
-        vm = mountComponent(Component, props);
+        const propsData = { solution };
+        wrapper = shallowMount(Component, { propsData });
 
-        expect(vm.solutionText).toEqual(solution);
+        expect(wrapper.vm.solutionText).toEqual(solution);
       });
 
       it('takes the summary from a remediation', () => {
-        const props = { remediation };
-        vm = mountComponent(Component, props);
+        const propsData = { remediation };
+        wrapper = shallowMount(Component, { propsData });
 
-        expect(vm.solutionText).toEqual(remediation.summary);
+        expect(wrapper.vm.solutionText).toEqual(remediation.summary);
       });
 
       it('takes the summary from a remediation, if both are defined', () => {
-        const props = { remediation, solution };
-        vm = mountComponent(Component, props);
+        const propsData = { remediation, solution };
+        wrapper = shallowMount(Component, { propsData });
 
-        expect(vm.solutionText).toEqual(remediation.summary);
-      });
-    });
-
-    describe('remediationDiff', () => {
-      it('returns the base64 diff from a remediation', () => {
-        const props = { remediation };
-        vm = mountComponent(Component, props);
-
-        expect(vm.remediationDiff).toEqual(remediation.diff);
-      });
-    });
-
-    describe('hasDiff', () => {
-      it('is false if only the solution is defined', () => {
-        const props = { solution };
-        vm = mountComponent(Component, props);
-
-        expect(vm.hasDiff).toBe(false);
-      });
-
-      it('is false if remediation misses a diff', () => {
-        const props = { remediation: { summary: 'XYZ' } };
-        vm = mountComponent(Component, props);
-
-        expect(vm.hasDiff).toBe(false);
-      });
-
-      it('is true if remediation has a diff', () => {
-        const props = { remediation };
-        vm = mountComponent(Component, props);
-
-        expect(vm.hasDiff).toBe(true);
-      });
-    });
-
-    describe('downloadUrl', () => {
-      it('returns dataUrl for a remediation diff ', () => {
-        const props = { remediation };
-        vm = mountComponent(Component, props);
-
-        expect(vm.downloadUrl).toBe('data:text/plain;base64,SGVsbG8gR2l0TGFi');
+        expect(wrapper.vm.solutionText).toEqual(remediation.summary);
       });
     });
   });
@@ -82,47 +44,84 @@ describe('Solution Card', () => {
   describe('rendering', () => {
     describe('with solution', () => {
       beforeEach(() => {
-        const props = { solution };
-        vm = mountComponent(Component, props);
+        const propsData = { solution };
+        wrapper = shallowMount(Component, { propsData });
       });
 
       it('renders the solution text and label', () => {
-        expect(trimText(vm.$el.querySelector('.card-body').textContent)).toContain(
-          `Solution: ${solution}`,
-        );
+        expect(trimText(wrapper.find('.card-body').text())).toContain(`Solution: ${solution}`);
       });
 
       it('does not render the card footer', () => {
-        expect(vm.$el.querySelector('.card-footer')).toBeNull();
+        expect(wrapper.contains('.card-footer')).toBe(false);
       });
 
       it('does not render the download link', () => {
-        expect(vm.$el.querySelector('a')).toBeNull();
+        expect(wrapper.contains('a')).toBe(false);
       });
     });
 
     describe('with remediation', () => {
       beforeEach(() => {
-        const props = { remediation };
-        vm = mountComponent(Component, props);
+        const propsData = { remediation, vulnerabilityFeedbackHelpPath, hasRemediation: true };
+        wrapper = shallowMount(Component, { propsData });
       });
 
       it('renders the solution text and label', () => {
-        expect(trimText(vm.$el.querySelector('.card-body').textContent)).toContain(
+        expect(trimText(wrapper.find('.card-body').text())).toContain(
           `Solution: ${remediation.summary}`,
         );
       });
 
       it('renders the card footer', () => {
-        expect(vm.$el.querySelector('.card-footer')).not.toBeNull();
+        expect(wrapper.contains('.card-footer')).toBe(true);
       });
 
-      it('renders the download link', () => {
-        const linkEl = vm.$el.querySelector('a');
+      describe('with download patch', () => {
+        beforeEach(() => {
+          wrapper.setProps({ hasDownload: true });
+        });
 
-        expect(linkEl).not.toBeNull();
-        expect(linkEl.getAttribute('href')).toEqual(vm.downloadUrl);
-        expect(linkEl.getAttribute('download')).toEqual('remediation.patch');
+        it('renders the learn more about remediation solutions', () => {
+          expect(wrapper.find('.card-footer').text()).toContain(
+            s__('ciReport|Learn more about interacting with security reports'),
+          );
+        });
+
+        it('does not render the download and apply solution message when there is a file download and a merge request already exists', () => {
+          wrapper.setProps({ hasMr: true });
+          expect(wrapper.contains('.card-footer')).toBe(false);
+        });
+
+        it('renders the create a merge request to implement this solution message', () => {
+          expect(wrapper.find('.card-footer').text()).toContain(
+            s__(
+              'ciReport|Create a merge request to implement this solution, or download and apply the patch manually.',
+            ),
+          );
+        });
+      });
+
+      describe('without download patch', () => {
+        it('renders the learn more about remediation solutions', () => {
+          expect(wrapper.find('.card-footer').text()).toContain(
+            s__('ciReport|Learn more about interacting with security reports'),
+          );
+        });
+
+        it('does not render the download and apply solution message', () => {
+          expect(wrapper.find('.card-footer').text()).not.toContain(
+            s__('ciReport|Download and apply the patch manually to resolve.'),
+          );
+        });
+
+        it('does not render the create a merge request to implement this solution message', () => {
+          expect(wrapper.find('.card-footer').text()).not.toContain(
+            s__(
+              'ciReport|Create a merge request to implement this solution, or download and apply the patch manually.',
+            ),
+          );
+        });
       });
     });
   });

@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
+import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__ } from '~/locale';
@@ -215,6 +216,20 @@ export const receiveUndoDismissError = ({ commit }, { flashError }) => {
       document.querySelector('.ci-table'),
     );
   }
+};
+
+export const downloadPatch = ({ state }) => {
+  /* 
+    This action doesn't actually mutate the Vuex state and is a dirty
+    workaround to modifying the dom. We do this because gl-split-button 
+    relies on a old version of vue-bootstrap and it doesn't allow us to 
+    set a href for a file download. 
+
+    https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
+  */
+  const { vulnerability } = state.modal;
+  downloadPatchHelper(vulnerability.remediations[0].diff);
+  $('#modal-mrwidget-security-issue').modal('hide');
 };
 
 export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) => {
