@@ -6,9 +6,7 @@ require 'support/helpers/api_helpers'
 shared_examples VulnerabilitiesActions do
   include ApiHelpers
 
-  set(:group) { create(:group) }
   set(:group_other) { create(:group) }
-  set(:user) { create(:user) }
   set(:project_dev) { create(:project, :private, :repository, group: group) }
   set(:project_guest) { create(:project, :private, :repository, group: group) }
   set(:project_other) { create(:project, :public, :repository, group: group_other) }
@@ -36,18 +34,6 @@ shared_examples VulnerabilitiesActions do
     context 'when security dashboard feature is enabled' do
       before do
         stub_licensed_features(security_dashboard: true)
-      end
-
-      context 'when user has guest access' do
-        before do
-          group.add_guest(user)
-        end
-
-        it 'returns 403' do
-          subject
-
-          expect(response).to have_gitlab_http_status(403)
-        end
       end
 
       context 'when user has developer access' do
