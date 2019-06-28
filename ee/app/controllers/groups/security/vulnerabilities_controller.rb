@@ -3,8 +3,6 @@
 class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
   include VulnerabilitiesActions
 
-  HISTORY_RANGE = 3.months
-
   alias_method :vulnerable, :group
 
   before_action :authorize_read_group_security_dashboard!

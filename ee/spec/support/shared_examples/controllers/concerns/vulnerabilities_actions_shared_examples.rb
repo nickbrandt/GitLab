@@ -6,12 +6,33 @@ require 'support/helpers/api_helpers'
 shared_examples VulnerabilitiesActions do
   include ApiHelpers
 
-  let(:user) { create(:user) }
-  let(:group_other) { create(:group) }
-  let(:project_dev) { create(:project, :private, :repository, group: vulnerable) }
-  let(:project_guest) { create(:project, :private, :repository, group: vulnerable) }
-  let(:project_other) { create(:project, :public, :repository, group: group_other) }
-  let(:projects) { [project_dev, project_guest, project_other] }
+  # let(:user) { create(:user) }
+  # let(:group_other) { create(:group) }
+  # let(:project_dev) { create(:project, :private, :repository, group: my_group) }
+  # let(:project_guest) { create(:project, :private, :repository, group: my_group) }
+  # let(:project_other) { create(:project, :public, :repository, group: group_other) }
+
+  # def my_group
+  #   return vulnerable if vulnerable.is_a?(Group)
+
+  #   @group ||= create(:group)
+  # end
+
+  # def projects
+  #   @projects ||= if vulnerable.is_a?(Project)
+  #                   [vulnerable, project_dev, project_guest]
+  #                 else
+  #                   [project_dev, project_guest, project_other]
+  #                 end
+  # end
+
+  # def projects_count
+  #   @projects_count ||= if vulnerable.is_a?(Project)
+  #                         1
+  #                       else
+  #                         projects.count
+  #                       end
+  # end
 
   before do
     sign_in(user)
@@ -54,7 +75,7 @@ shared_examples VulnerabilitiesActions do
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
-            expect(json_response.length).to eq 2
+            expect(json_response.length).to eq projects_count
             expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
           end
         end
