@@ -17,14 +17,6 @@ describe Security::VulnerabilitiesFinder do
 
     subject { described_class.new(group, params: params).execute }
 
-    it 'is agnostic between projects and groups' do
-      group_vulnerabilities = described_class.new(group).execute
-      project_vulnerabilities = described_class.new(project1).execute
-
-      expect(group_vulnerabilities.count).to be(4)
-      expect(project_vulnerabilities.count).to be(2)
-    end
-
     context 'by report type' do
       context 'when sast' do
         let(:params) { { report_type: %w[sast] } }
