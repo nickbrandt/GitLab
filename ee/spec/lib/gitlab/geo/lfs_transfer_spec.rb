@@ -6,7 +6,6 @@ describe Gitlab::Geo::LfsTransfer do
   set(:primary_node) { create(:geo_node, :primary) }
   set(:secondary_node) { create(:geo_node) }
   set(:lfs_object) { create(:lfs_object, :with_file) }
-  let(:url) { primary_node.geo_transfers_url(:lfs, lfs_object.id.to_s) }
   let(:content) { SecureRandom.random_bytes(10) }
   let(:size) { File.stat(lfs_object.file.path).size }
 
