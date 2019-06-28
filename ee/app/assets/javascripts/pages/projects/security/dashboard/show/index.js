@@ -1,7 +1,10 @@
 import Vue from 'vue';
+import { GlToast } from '@gitlab/ui';
 import createStore from 'ee/security_dashboard/store';
 import SecurityReportApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
+
+Vue.use(GlToast);
 
 document.addEventListener('DOMContentLoaded', () => {
   const securityTab = document.getElementById('js-security-report-app');

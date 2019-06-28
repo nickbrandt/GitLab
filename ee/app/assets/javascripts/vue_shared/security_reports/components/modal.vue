@@ -12,6 +12,7 @@ import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_re
 import ModalFooter from 'ee/vue_shared/security_reports/components/modal_footer.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
+import { getVulnerabilityDismissedMessage } from './toast_utils';
 
 export default {
   components: {
@@ -58,6 +59,11 @@ export default {
     dismissalCommentErrorMessage: '',
   }),
   computed: {
+    decoratedListeners() {
+      return {
+        dismissVulnerability: this.handleDismissVulnerability,
+      };
+    },
     hasDismissedBy() {
       return (
         this.vulnerability &&
@@ -146,7 +152,16 @@ export default {
       };
     },
   },
+  created() {
+    this.decorateEventListeners();
+  },
   methods: {
+    decorateEventListeners() {
+      Object.entries(this.decoratedListeners).forEach(([name, listener]) => {
+        this.$off(name);
+        this.$on(name, listener);
+      });
+    },
     dismissVulnerabilityWithComment() {
       if (this.localDismissalComment.length) {
         this.$emit('dismissVulnerability', this.localDismissalComment);
@@ -156,6 +171,17 @@ export default {
     },
     clearDismissalError() {
       this.dismissalCommentErrorMessage = '';
+    },
+    handleDismissVulnerability(event) {
+      const { dismissVulnerability } = this.$listeners;
+      if (typeof dismissVulnerability !== 'function') {
+        return Promise.resolve();
+      }
+
+      const name = this.modal.title;
+      return dismissVulnerability(event).then(() => {
+        this.$toast.show(getVulnerabilityDismissedMessage(name));
+      });
     },
   },
 };

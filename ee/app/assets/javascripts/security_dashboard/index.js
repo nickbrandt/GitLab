@@ -1,7 +1,10 @@
 import Vue from 'vue';
+import { GlToast } from '@gitlab/ui';
 import GroupSecurityDashboardApp from './components/app.vue';
 import createStore from './store';
 import router from './store/router';
+
+Vue.use(GlToast);
 
 export default () => {
   const el = document.getElementById('js-group-security-dashboard');

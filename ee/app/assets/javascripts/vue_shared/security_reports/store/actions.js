@@ -229,7 +229,7 @@ export const receiveDismissVulnerabilityError = ({ commit }, error) =>
 export const dismissVulnerability = ({ state, dispatch }, comment) => {
   dispatch('requestDismissVulnerability');
 
-  axios
+  return axios
     .post(state.createVulnerabilityFeedbackDismissalPath, {
       vulnerability_feedback: {
         category: state.modal.vulnerability.category,
@@ -268,11 +268,12 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
 
       $('#modal-mrwidget-security-issue').modal('hide');
     })
-    .catch(() => {
+    .catch(error => {
       dispatch(
         'receiveDismissVulnerabilityError',
         s__('ciReport|There was an error dismissing the vulnerability. Please try again.'),
       );
+      throw error;
     });
 };
 

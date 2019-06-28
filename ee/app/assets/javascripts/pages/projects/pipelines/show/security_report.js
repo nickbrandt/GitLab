@@ -1,10 +1,12 @@
 import Vue from 'vue';
+import { GlToast } from '@gitlab/ui';
 import Translate from '~/vue_shared/translate';
 import SecurityReportApp from 'ee/vue_shared/security_reports/split_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
 import { updateBadgeCount } from './utils';
 
 Vue.use(Translate);
+Vue.use(GlToast);
 
 export default () => {
   const securityTab = document.getElementById('js-security-report-app');

@@ -138,7 +138,7 @@ export const receiveCreateIssueError = ({ commit }, { flashError }) => {
 export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, comment }) => {
   dispatch('requestDismissVulnerability');
 
-  axios
+  return axios
     .post(vulnerability.create_vulnerability_feedback_dismissal_path, {
       vulnerability_feedback: {
         category: vulnerability.report_type,
@@ -156,8 +156,9 @@ export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, 
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDismissVulnerabilitySuccess', { id, data });
     })
-    .catch(() => {
+    .catch(error => {
       dispatch('receiveDismissVulnerabilityError', { flashError });
+      throw error;
     });
 };
 
