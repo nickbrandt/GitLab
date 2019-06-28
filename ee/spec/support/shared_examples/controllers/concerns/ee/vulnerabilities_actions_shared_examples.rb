@@ -6,18 +6,23 @@ shared_examples ::EE::VulnerabilitiesActions do
   include ApiHelpers
 
   let(:user) { create(:user) }
-  let(:project) { create(:project, namespace: group) }
   let(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
+  def project
+    return vulnerable if vulnerable.is_a?(Project)
+
+    @project ||= create(:project, namespace: vulnerable)
+  end
+
   before do
-    group.add_developer(user)
+    vulnerable.add_developer(user)
 
     sign_in(user)
     stub_licensed_features(security_dashboard: true)
   end
 
   describe 'GET index.json' do
-    subject { get :index, params: { group_id: group }, format: :json }
+    subject { get :index, params: vulnerable_params, format: :json }
 
     it 'returns an ordered list of vulnerabilities' do
       critical_vulnerability = create(
@@ -40,7 +45,7 @@ shared_examples ::EE::VulnerabilitiesActions do
       it 'returns the list of vulnerabilities that are on the requested page' do
         create_list(:vulnerabilities_occurrence, 35, pipelines: [pipeline], project: project)
 
-        get :index, params: { group_id: group, page: 2 }, format: :json
+        get :index, params: vulnerable_params.merge(page: 2), format: :json
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response.length).to eq 15
@@ -48,7 +53,7 @@ shared_examples ::EE::VulnerabilitiesActions do
     end
 
     context 'when the vulnerabilities have feedback' do
-      subject { get :index, params: { group_id: group }, format: :json }
+      subject { get :index, params: vulnerable_params, format: :json }
 
       it 'avoids N+1 queries', :with_request_store do
         vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, report_type: :sast)
@@ -83,7 +88,7 @@ shared_examples ::EE::VulnerabilitiesActions do
       end
 
       it 'returns a list of vulnerabilities for sast only if filter is enabled' do
-        get :index, params: { group_id: group, report_type: ['sast'] }, format: :json
+        get :index, params: vulnerable_params.merge(report_type: ['sast']), format: :json
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response.length).to eq 1
@@ -92,7 +97,7 @@ shared_examples ::EE::VulnerabilitiesActions do
       end
 
       it "returns a list of vulnerabilities of all types with multi filter" do
-        get :index, params: { group_id: group, report_type: %w[sast dependency_scanning] }, format: :json
+        get :index, params: vulnerable_params.merge(report_type: %w[sast dependency_scanning]), format: :json
 
         expect(json_response.length).to eq 2
         expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
@@ -113,7 +118,7 @@ shared_examples ::EE::VulnerabilitiesActions do
     end
 
     it 'returns vulnerabilities counts for all report types' do
-      get :summary, params: { group_id: group }, format: :json
+      get :summary, params: vulnerable_params, format: :json
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['high']).to eq(3)
@@ -124,7 +129,7 @@ shared_examples ::EE::VulnerabilitiesActions do
 
     context 'with enabled filters' do
       it 'returns counts for filtered vulnerabilities' do
-        get :summary, params: { group_id: group, report_type: %w[sast dast], severity: %[high low] }, format: :json
+        get :summary, params: vulnerable_params.merge(report_type: %w[sast dast], severity: %[high low]), format: :json
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['high']).to eq(3)
@@ -136,7 +141,7 @@ shared_examples ::EE::VulnerabilitiesActions do
   end
 
   describe 'GET history.json' do
-    subject { get :history, params: { group_id: group }, format: :json }
+    subject { get :history, params: vulnerable_params, format: :json }
 
     before do
       travel_to(Time.zone.parse('2018-11-10')) do
@@ -201,7 +206,7 @@ shared_examples ::EE::VulnerabilitiesActions do
 
     it 'returns filtered history if filters are enabled' do
       travel_to(Time.zone.parse('2019-02-11')) do
-        get :history, params: { group_id: group, report_type: %w[sast] }, format: :json
+        get :history, params: vulnerable_params.merge(report_type: %w[sast]), format: :json
       end
 
       expect(response).to have_gitlab_http_status(200)

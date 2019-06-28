@@ -6,7 +6,10 @@ describe Groups::Security::VulnerabilitiesController do
   let(:group) { create(:group) }
   let(:user) { create(:user) }
 
-  it_behaves_like ::EE::VulnerabilitiesActions
+  it_behaves_like ::EE::VulnerabilitiesActions do
+    let(:vulnerable) { group }
+    let(:vulnerable_params) { { group_id: group } }
+  end
 
   before do
     sign_in(user)
