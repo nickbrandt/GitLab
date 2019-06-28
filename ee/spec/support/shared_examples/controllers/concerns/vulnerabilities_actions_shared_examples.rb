@@ -6,10 +6,11 @@ require 'support/helpers/api_helpers'
 shared_examples VulnerabilitiesActions do
   include ApiHelpers
 
-  set(:group_other) { create(:group) }
-  set(:project_dev) { create(:project, :private, :repository, group: group) }
-  set(:project_guest) { create(:project, :private, :repository, group: group) }
-  set(:project_other) { create(:project, :public, :repository, group: group_other) }
+  let(:user) { create(:user) }
+  let(:group_other) { create(:group) }
+  let(:project_dev) { create(:project, :private, :repository, group: vulnerable) }
+  let(:project_guest) { create(:project, :private, :repository, group: vulnerable) }
+  let(:project_other) { create(:project, :public, :repository, group: group_other) }
   let(:projects) { [project_dev, project_guest, project_other] }
 
   before do
@@ -17,7 +18,7 @@ shared_examples VulnerabilitiesActions do
   end
 
   describe 'GET index.json' do
-    subject { get :index, params: { group_id: group }, format: :json }
+    subject { get :index, params: vulnerable_params, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -38,7 +39,7 @@ shared_examples VulnerabilitiesActions do
 
       context 'when user has developer access' do
         before do
-          group.add_developer(user)
+          vulnerable.add_developer(user)
         end
 
         context 'when no page request' do
@@ -66,7 +67,7 @@ shared_examples VulnerabilitiesActions do
           end
 
           it "returns a list of vulnerabilities" do
-            get :index, params: { group_id: group, page: 2 }, format: :json
+            get :index, params: vulnerable_params.merge({ page: 2 }), format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
@@ -88,7 +89,7 @@ shared_examples VulnerabilitiesActions do
           private
 
           def get_index
-            get :index, params: { group_id: group }, format: :json
+            get :index, params: vulnerable_params, format: :json
           end
         end
 
@@ -111,7 +112,7 @@ shared_examples VulnerabilitiesActions do
           end
 
           it "returns a list of vulnerabilities for sast only if filter is enabled" do
-            get :index, params: { group_id: group, report_type: ['sast'] }, format: :json
+            get :index, params: vulnerable_params.merge({ report_type: ['sast'] }), format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
@@ -121,7 +122,7 @@ shared_examples VulnerabilitiesActions do
           end
 
           it "returns a list of vulnerabilities of all types with multi filter" do
-            get :index, params: { group_id: group, report_type: %w[sast dependency_scanning] }, format: :json
+            get :index, params: vulnerable_params.merge({ report_type: %w[sast dependency_scanning] }), format: :json
 
             expect(json_response.length).to eq 3
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
@@ -152,7 +153,7 @@ shared_examples VulnerabilitiesActions do
   end
 
   describe 'GET summary.json' do
-    subject { get :summary, params: { group_id: group }, format: :json }
+    subject { get :summary, params: vulnerable_params, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -190,7 +191,7 @@ shared_examples VulnerabilitiesActions do
 
       context 'when user has guest access' do
         before do
-          group.add_guest(user)
+          vulnerable.add_guest(user)
         end
 
         it 'returns 403' do
@@ -202,7 +203,7 @@ shared_examples VulnerabilitiesActions do
 
       context 'when user has developer access' do
         before do
-          group.add_developer(user)
+          vulnerable.add_developer(user)
         end
 
         it 'returns vulnerabilities counts for all report types' do
@@ -218,7 +219,7 @@ shared_examples VulnerabilitiesActions do
 
         context 'with enabled filters' do
           it 'returns counts for filtered vulnerabilities' do
-            get :summary, params: { group_id: group, report_type: %w[sast dast], severity: %[high low] }, format: :json
+            get :summary, params: vulnerable_params.merge({ report_type: %w[sast dast], severity: %[high low] }), format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Hash)
@@ -233,7 +234,7 @@ shared_examples VulnerabilitiesActions do
   end
 
   describe 'GET history.json' do
-    subject { get :history, params: { group_id: group }, format: :json }
+    subject { get :history, params: vulnerable_params, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -287,7 +288,7 @@ shared_examples VulnerabilitiesActions do
 
       context 'when user has guest access' do
         before do
-          group.add_guest(user)
+          vulnerable.add_guest(user)
         end
 
         it 'returns 403' do
@@ -299,7 +300,7 @@ shared_examples VulnerabilitiesActions do
 
       context 'when user has developer access' do
         before do
-          group.add_developer(user)
+          vulnerable.add_developer(user)
         end
 
         it 'returns vulnerability history within last 90 days' do
@@ -339,7 +340,7 @@ shared_examples VulnerabilitiesActions do
 
         it 'returns filtered history if filters are enabled' do
           travel_to(Time.zone.parse('2019-02-10')) do
-            get :history, params: { group_id: group, report_type: %w[dependency_scanning sast dast container_scanning] }, format: :json
+            get :history, params: vulnerable_params.merge({ report_type: %w[dependency_scanning sast dast container_scanning] }), format: :json
           end
 
           expect(response).to have_gitlab_http_status(200)

@@ -5,10 +5,13 @@ require 'spec_helper'
 describe Groups::Security::VulnerabilitiesController do
   include ApiHelpers
 
-  it_behaves_like VulnerabilitiesActions
+  let(:group) { create(:group) }
+  let(:user) { create(:user) }
 
-  set(:group) { create(:group) }
-  set(:user) { create(:user) }
+  it_behaves_like VulnerabilitiesActions do
+    let(:vulnerable) { group }
+    let(:vulnerable_params) { { group_id: group } }
+  end
 
   describe 'permissions for all actions' do
     before do
@@ -32,7 +35,7 @@ describe Groups::Security::VulnerabilitiesController do
 
     context 'when user has developer access' do
       before do
-        group.add_guest(user)
+        group.add_developer(user)
       end
 
       it 'grants access' do
