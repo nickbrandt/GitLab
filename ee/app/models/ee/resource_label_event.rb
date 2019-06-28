@@ -15,6 +15,11 @@ module EE
       end
     end
 
+    override :discussion_id_key
+    def discussion_id_key
+      (super + [label&.scoped_label?]).compact # label can be nil as we don't remove resource events when deleting labels
+    end
+
     override :issuable
     def issuable
       epic || super
