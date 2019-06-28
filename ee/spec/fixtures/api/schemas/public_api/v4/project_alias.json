@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "required" : [
+        "id",
+        "project_id",
+        "name"
+      ],
+      "properties": {
+        "id": { "type": "integer" },
+        "project_id": { "type": "integer" },
+        "name": { "type": "string" }
+      }
+    }
+  ]
+}

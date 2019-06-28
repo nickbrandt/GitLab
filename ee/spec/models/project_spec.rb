@@ -34,6 +34,7 @@ describe Project do
     it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
 
     it { is_expected.to have_one(:github_service) }
+    it { is_expected.to have_many(:project_aliases) }
   end
 
   context 'scopes' do
