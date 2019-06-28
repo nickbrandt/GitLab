@@ -151,6 +151,7 @@ describe 'Scoped issue boards', :js do
 
       context 'weight' do
         let!(:issue_weight_1) { create(:issue, project: project, weight: 1) }
+        let!(:issue_weight_none) { create(:issue, project: project, weight: nil) }
 
         it 'creates board filtering by weight' do
           create_board_weight(1)
@@ -171,6 +172,12 @@ describe 'Scoped issue boards', :js do
           create_board_weight('Any')
 
           expect(page).to have_selector('.board-card', count: 4)
+        end
+
+        it 'creates board filtering by "None" weight' do
+          create_board_weight('None')
+
+          expect(page).to have_selector('.board-card', count: 5)
         end
 
         it 'displays dot highlight and tooltip' do

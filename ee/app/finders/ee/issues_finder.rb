@@ -27,9 +27,9 @@ module EE
       return items unless weights?
 
       if filter_by_no_weight?
-        items.where(weight: [-1, nil])
+        items.where(weight: nil)
       elsif filter_by_any_weight?
-        items.where.not(weight: [-1, nil])
+        items
       else
         items.where(weight: params[:weight])
       end
