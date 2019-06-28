@@ -2100,7 +2100,13 @@ msgstr ""
 msgid "Boards"
 msgstr ""
 
+msgid "Boards|Collapse"
+msgstr ""
+
 msgid "Boards|Edit board"
+msgstr ""
+
+msgid "Boards|Expand"
 msgstr ""
 
 msgid "Boards|View scope"
