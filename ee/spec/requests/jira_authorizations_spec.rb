@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'JIRA authorization requests' do
+describe 'Jira authorization requests' do
   let(:user) { create :user }
   let(:application) { create :oauth_application, scopes: 'api' }
   let(:redirect_uri) { oauth_jira_callback_url(host: "http://www.example.com") }

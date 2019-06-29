@@ -388,8 +388,8 @@ describe API::V3::Github do
       end
 
       context 'updating project feature usage' do
-        it 'counts JIRA cloud integration as enabled' do
-          user_agent = 'JIRA DVCS Connector Vertigo/4.42.0'
+        it 'counts Jira Cloud integration as enabled' do
+          user_agent = 'Jira DVCS Connector Vertigo/4.42.0'
 
           Timecop.freeze do
             jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
@@ -398,8 +398,8 @@ describe API::V3::Github do
           end
         end
 
-        it 'counts JIRA server integration as enabled' do
-          user_agent = 'JIRA DVCS Connector/3.2.4'
+        it 'counts Jira Server integration as enabled' do
+          user_agent = 'Jira DVCS Connector/3.2.4'
 
           Timecop.freeze do
             jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
@@ -528,7 +528,7 @@ describe API::V3::Github do
     end
   end
 
-  def jira_get(path, user_agent = 'JIRA DVCS Connector/3.2.4')
+  def jira_get(path, user_agent = 'Jira DVCS Connector/3.2.4')
     get path, headers: { 'User-Agent' => user_agent }
   end
 

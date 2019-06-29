@@ -4,14 +4,14 @@ require 'rails_helper'
 
 describe ProjectFeatureUsage, type: :model do
   describe '.jira_dvcs_integrations_enabled_count' do
-    it 'returns count of projects with JIRA DVCS cloud enabled' do
+    it 'returns count of projects with Jira DVCS Cloud enabled' do
       create(:project).feature_usage.log_jira_dvcs_integration_usage
       create(:project).feature_usage.log_jira_dvcs_integration_usage
 
       expect(described_class.with_jira_dvcs_integration_enabled.count).to eq(2)
     end
 
-    it 'returns count of projects with JIRA DVCS server enabled' do
+    it 'returns count of projects with Jira DVCS Server enabled' do
       create(:project).feature_usage.log_jira_dvcs_integration_usage(cloud: false)
       create(:project).feature_usage.log_jira_dvcs_integration_usage(cloud: false)
 
@@ -24,7 +24,7 @@ describe ProjectFeatureUsage, type: :model do
 
     subject { project.feature_usage }
 
-    it 'logs JIRA DVCS cloud last sync' do
+    it 'logs Jira DVCS Cloud last sync' do
       Timecop.freeze do
         subject.log_jira_dvcs_integration_usage
 
@@ -33,7 +33,7 @@ describe ProjectFeatureUsage, type: :model do
       end
     end
 
-    it 'logs JIRA DVCS server last sync' do
+    it 'logs Jira DVCS Server last sync' do
       Timecop.freeze do
         subject.log_jira_dvcs_integration_usage(cloud: false)
 
