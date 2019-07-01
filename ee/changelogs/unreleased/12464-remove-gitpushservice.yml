@@ -1,0 +1,5 @@
+---
+title: Remove unused EE::GitPushService
+merge_request: 14483
+author:
+type: other
