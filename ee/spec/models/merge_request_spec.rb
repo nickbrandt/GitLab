@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # Store feature-specific specs in `ee/spec/models/merge_request instead of
@@ -186,18 +188,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#code_owners' do
-    subject(:merge_request) { build(:merge_request) }
-    let(:owners) { [double(:owner)] }
-
-    it 'returns code owners, frozen' do
-      allow(::Gitlab::CodeOwners).to receive(:for_merge_request).with(subject).and_return(owners)
-
-      expect(subject.code_owners).to eq(owners)
-      expect(subject.code_owners).to be_frozen
-    end
-  end
-
   describe '#approvals_before_merge' do
     where(:license_value, :db_value, :expected) do
       true  | 5   | 5
@@ -216,54 +206,6 @@ describe MergeRequest do
       end
 
       it { is_expected.to eq(expected) }
-    end
-  end
-
-  describe '#sync_code_owners_with_approvers' do
-    let(:owners) { create_list(:user, 2) }
-
-    before do
-      allow(subject).to receive(:code_owners).and_return(owners)
-    end
-
-    it 'does nothing when merge request is merged' do
-      allow(subject).to receive(:merged?).and_return(true)
-
-      expect do
-        subject.sync_code_owners_with_approvers
-      end.not_to change { subject.approval_rules.count }
-    end
-
-    context 'when code owner rule does not exist' do
-      it 'creates rule' do
-        expect do
-          subject.sync_code_owners_with_approvers
-        end.to change { subject.approval_rules.code_owner.count }.by(1)
-
-        expect(subject.approval_rules.code_owner.first.users).to contain_exactly(*owners)
-      end
-    end
-
-    context 'when code owner rule exists' do
-      let!(:code_owner_rule) { create(:code_owner_rule, merge_request: subject, name: 'Code Owner', users: [create(:user)]) }
-
-      it 'reuses and updates existing rule' do
-        expect do
-          subject.sync_code_owners_with_approvers
-        end.not_to change { subject.approval_rules.count }
-
-        expect(code_owner_rule.reload.users).to contain_exactly(*owners)
-      end
-
-      context 'when there is no code owner' do
-        let(:owners) { [] }
-
-        it 'removes rule' do
-          subject.sync_code_owners_with_approvers
-
-          expect(subject.approval_rules.exists?(code_owner_rule.id)).to eq(false)
-        end
-      end
     end
   end
 

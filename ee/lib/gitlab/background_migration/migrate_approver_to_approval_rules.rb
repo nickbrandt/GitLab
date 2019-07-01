@@ -99,7 +99,9 @@ module Gitlab
           return if state == 'merged' || state == 'closed'
 
           Gitlab::GitalyClient.allow_n_plus_1_calls do
-            owners = ::MergeRequest.find(id).code_owners
+            gl_merge_request = ::MergeRequest.find(id)
+            owners = Gitlab::CodeOwners.entries_for_merge_request(gl_merge_request)
+                       .flat_map(&:users).uniq
 
             if owners.present?
               ApplicationRecord.transaction do
