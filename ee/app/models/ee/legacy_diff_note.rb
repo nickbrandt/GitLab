@@ -5,7 +5,7 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      include Elastic::NotesSearch
+      include Elastic::ApplicationVersionedSearch
     end
   end
 end

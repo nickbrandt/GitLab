@@ -53,7 +53,7 @@ describe Milestone, :elastic do
       'type' => milestone.es_type
     })
 
-    expect(milestone.as_indexed_json).to eq(expected_hash)
+    expect(milestone.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it_behaves_like 'no results when the user cannot read cross project' do

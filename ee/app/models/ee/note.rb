@@ -7,7 +7,7 @@ module EE
 
     prepended do
       include ::ObjectStorage::BackgroundMove
-      include Elastic::NotesSearch
+      include Elastic::ApplicationVersionedSearch
 
       belongs_to :review, inverse_of: :notes
 

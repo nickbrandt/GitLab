@@ -88,7 +88,7 @@ describe Note, :elastic do
       type
     )
 
-    expect(note.as_indexed_json.keys).to eq(expected_hash_keys)
+    expect(note.__elasticsearch__.as_indexed_json.keys).to eq(expected_hash_keys)
   end
 
   it "does not create ElasticIndexerWorker job for system messages" do
@@ -105,7 +105,7 @@ describe Note, :elastic do
     Note.subclasses.each do |note_class|
       expect(note_class.index_name).to eq(Note.index_name)
       expect(note_class.document_type).to eq(Note.document_type)
-      expect(note_class.mappings.to_hash).to eq(Note.mappings.to_hash)
+      expect(note_class.__elasticsearch__.mappings.to_hash).to eq(Note.__elasticsearch__.mappings.to_hash)
     end
   end
 

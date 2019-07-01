@@ -5,7 +5,7 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      include Elastic::MilestonesSearch
+      include Elastic::ApplicationVersionedSearch
 
       has_many :boards
     end

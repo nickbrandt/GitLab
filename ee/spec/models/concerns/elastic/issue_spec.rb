@@ -89,7 +89,7 @@ describe Issue, :elastic do
 
     expected_hash['assignee_id'] = [assignee.id]
 
-    expect(issue.as_indexed_json).to eq(expected_hash)
+    expect(issue.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it_behaves_like 'no results when the user cannot read cross project' do
