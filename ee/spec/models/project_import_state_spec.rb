@@ -28,42 +28,39 @@ describe ProjectImportState, type: :model do
   end
 
   describe 'transitions' do
+    let(:import_state) { create(:import_state, :started, import_type: :github) }
+    let(:project) { import_state.project }
+
     context 'state transition: [:started] => [:finished]' do
-      context 'elasticsearch indexing disabled' do
+      context 'elasticsearch indexing disabled for this project' do
         before do
-          stub_ee_application_setting(elasticsearch_indexing: false)
+          expect(project).to receive(:use_elasticsearch?).and_return(false)
         end
 
         it 'does not index the repository' do
-          import_state = create(:import_state, :started, import_type: :github)
-
           expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
 
           import_state.finish
         end
       end
 
-      context 'elasticsearch indexing enabled' do
-        let(:import_state) { create(:import_state, :started, import_type: :github) }
-
+      context 'elasticsearch indexing enabled for this project' do
         before do
-          stub_ee_application_setting(elasticsearch_indexing: true)
+          expect(project).to receive(:use_elasticsearch?).and_return(true)
         end
 
         context 'no index status' do
           it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, Gitlab::Git::BLANK_SHA)
+            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, nil)
 
             import_state.finish
           end
         end
 
         context 'with index status' do
-          let!(:index_status) { import_state.project.index_status }
+          let(:index_status) { IndexStatus.create!(project: project, indexed_at: Time.now, last_commit: 'foo') }
 
           it 'schedules a progressive index of the repository' do
-            index_status.update!(indexed_at: Time.now, last_commit: 'foo')
-
             expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(import_state.project_id, index_status.last_commit)
 
             import_state.finish
