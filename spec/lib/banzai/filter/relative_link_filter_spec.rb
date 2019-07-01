@@ -88,6 +88,11 @@ describe Banzai::Filter::RelativeLinkFilter do
     expect { filter(act) }.not_to raise_error
   end
 
+  it 'does not explode with an escaped null byte' do
+    act = link("/%00")
+    expect { filter(act) }.not_to raise_error
+  end
+
   it 'ignores ref if commit is passed' do
     doc = filter(link('non/existent.file'), commit: project.commit('empty-branch') )
     expect(doc.at_css('a')['href'])

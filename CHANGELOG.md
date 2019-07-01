@@ -2,6 +2,21 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 11.11.5 (2019-06-27)
+
+### Security (9 changes)
+
+- Persist tmp snippet uploads at users.
+- Fix DoS vulnerability in color validation regex.
+- Expose merge requests count based on user access.
+- Fix Denial of Service for comments when rendering issues/MR comments.
+- Add missing authorizations in GraphQL.
+- Prevent Billion Laughs attack.
+- Correctly check permissions when creating snippet notes.
+- Prevent the detection of merge request templates by unauthorized users.
+- Disable Rails SQL query cache when applying service templates.
+
+
 ## 11.11.4 (2019-06-26)
 
 ### Fixed (3 changes)
