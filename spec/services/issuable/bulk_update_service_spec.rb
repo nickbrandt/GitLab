@@ -14,6 +14,23 @@ describe Issuable::BulkUpdateService do
     Issuable::BulkUpdateService.new(parent, user, bulk_update_params).execute(type)
   end
 
+  shared_examples 'updates milestones' do
+    it 'succeeds' do
+      result = bulk_update(issues, milestone_id: milestone.id)
+
+      expect(result[:success]).to be_truthy
+      expect(result[:count]).to eq(issues.count)
+    end
+
+    it 'updates the issues milestone' do
+      bulk_update(issues, milestone_id: milestone.id)
+
+      issues.each do |issue|
+        expect(issue.reload.milestone).to eq(milestone)
+      end
+    end
+  end
+
   context 'when parent is a project' do
     let(:parent) { project }
 
@@ -156,20 +173,10 @@ describe Issuable::BulkUpdateService do
     end
 
     describe 'updating milestones' do
-      let(:issue)     { create(:issue, project: project) }
+      let(:issues)    { [create(:issue, project: project)] }
       let(:milestone) { create(:milestone, project: project) }
 
-      it 'succeeds' do
-        result = bulk_update(issue, milestone_id: milestone.id)
-
-        expect(result[:success]).to be_truthy
-        expect(result[:count]).to eq(1)
-      end
-
-      it 'updates the issue milestone' do
-        expect { bulk_update(issue, milestone_id: milestone.id) }
-          .to change { issue.reload.milestone }.from(nil).to(milestone)
-      end
+      it_behaves_like 'updates milestones'
     end
 
     describe 'updating labels' do
@@ -356,33 +363,22 @@ describe Issuable::BulkUpdateService do
   end
 
   context 'when parent is a group' do
-    let(:group)    { create(:group) }
-    let(:project1) { create(:project, :repository, group: group) }
-    let(:project2) { create(:project, :repository, group: group) }
-    let(:parent)   { group }
+    let(:group)     { create(:group) }
+    let(:parent)    { group }
 
-    describe 'updating milestones' do
+    context 'updating milestone' do
+      let(:milestone) { create(:milestone, group: group) }
+      let(:project1)  { create(:project, :repository, group: group) }
+      let(:project2)  { create(:project, :repository, group: group) }
       let(:issue1)    { create(:issue, project: project1) }
       let(:issue2)    { create(:issue, project: project2) }
-      let(:group_milestone) { create(:milestone, group: group) }
+      let(:issues)    { [issue1, issue2] }
 
       before do
         group.add_maintainer(user)
       end
 
-      it 'succeeds' do
-        result = bulk_update([issue1, issue2], milestone_id: group_milestone.id)
-
-        expect(result[:success]).to be_truthy
-        expect(result[:count]).to eq(2)
-      end
-
-      it 'updates the issue milestone' do
-        bulk_update([issue1, issue2], milestone_id: group_milestone.id)
-
-        expect(issue1.reload.milestone).to eq(group_milestone)
-        expect(issue2.reload.milestone).to eq(group_milestone)
-      end
+      it_behaves_like 'updates milestones'
     end
   end
 end
