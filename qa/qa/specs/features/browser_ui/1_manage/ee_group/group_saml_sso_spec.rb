@@ -78,6 +78,8 @@ module QA
 
           add_user_to_group_via_api(user.username, @group, '30')
 
+          @group.visit!
+
           EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
           EE::Page::Group::Settings::SamlSSO.perform do |page|
