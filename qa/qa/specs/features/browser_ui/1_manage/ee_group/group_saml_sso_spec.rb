@@ -104,8 +104,9 @@ module QA
           end
         end
       end
+
       after(:all) do
-        remove_group(@group)
+        remove_group(@group) unless @group.nil?
       end
     end
 
