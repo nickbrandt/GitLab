@@ -6,6 +6,7 @@ import DependenciesActions from './dependencies_actions.vue';
 import DependenciesTable from './dependencies_table.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
+import { DEPENDENCY_LIST_TYPES } from '../store/constants';
 
 export default {
   name: 'DependenciesApp',
@@ -32,6 +33,11 @@ export default {
       type: String,
       required: true,
     },
+    dependencyListVulnerabilities: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -40,8 +46,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isJobNotSetUp', 'isJobFailed', 'isIncomplete']),
-    ...mapState([
+    ...mapState(['currentList']),
+    ...mapGetters(DEPENDENCY_LIST_TYPES.all, ['isJobNotSetUp', 'isJobFailed', 'isIncomplete']),
+    ...mapState(DEPENDENCY_LIST_TYPES.all, [
       'initialized',
       'isLoading',
       'errorLoading',
@@ -58,7 +65,7 @@ export default {
     this.fetchDependencies();
   },
   methods: {
-    ...mapActions(['setDependenciesEndpoint', 'fetchDependencies']),
+    ...mapActions(DEPENDENCY_LIST_TYPES.all, ['setDependenciesEndpoint', 'fetchDependencies']),
     fetchPage(page) {
       this.fetchDependencies({ page });
     },
@@ -104,7 +111,7 @@ export default {
         <gl-badge v-if="pageInfo.total" pill>{{ pageInfo.total }}</gl-badge>
       </h4>
 
-      <dependencies-actions />
+      <dependencies-actions :namespace="currentList" />
     </div>
 
     <dependencies-table :dependencies="dependencies" :is-loading="isLoading" />

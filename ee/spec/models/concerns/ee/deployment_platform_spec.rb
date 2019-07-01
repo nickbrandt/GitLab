@@ -110,16 +110,6 @@ describe EE::DeploymentPlatform do
           it_behaves_like 'matching environment scope'
         end
       end
-
-      context 'when feature flag disabled' do
-        before do
-          stub_feature_flags(group_clusters: false)
-        end
-
-        it 'returns nil' do
-          expect(subject).to be_nil
-        end
-      end
     end
 
     context 'with instance clusters' do

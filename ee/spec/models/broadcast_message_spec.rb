@@ -5,16 +5,16 @@ describe BroadcastMessage do
 
   describe '.current', :use_clean_rails_memory_store_caching do
     context 'without Geo' do
-      it 'caches the output for a long time' do
+      it 'caches the output of the query for two weeks' do
         expect(Gitlab::Geo).to receive(:enabled?).and_return(false).exactly(2).times
 
         create(:broadcast_message)
 
-        expect(described_class).to receive(:where).and_call_original.once
+        expect(described_class).to receive(:current_and_future_messages).and_call_original.twice
 
         described_class.current
 
-        Timecop.travel(1.year) do
+        Timecop.travel(3.weeks) do
           described_class.current
         end
       end
@@ -22,16 +22,16 @@ describe BroadcastMessage do
 
     context 'with Geo' do
       context 'on the primary' do
-        it 'caches the output for a long time' do
-          expect(Gitlab::Geo).to receive(:secondary?).and_return(false).exactly(2).times
+        it 'caches the output of the query for two weeks' do
+          expect(Gitlab::Geo).to receive(:enabled?).and_return(false).exactly(2).times
 
           create(:broadcast_message)
 
-          expect(described_class).to receive(:where).and_call_original.once
+          expect(described_class).to receive(:current_and_future_messages).and_call_original.twice
 
           described_class.current
 
-          Timecop.travel(1.year) do
+          Timecop.travel(3.weeks) do
             described_class.current
           end
         end

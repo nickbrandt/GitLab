@@ -1,8 +1,9 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import { GlButton, GlDropdown, GlDropdownItem, GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import { SORT_ORDER } from '../store/constants';
+import { DEPENDENCY_LIST_TYPES } from '../store/constants';
+import { SORT_ORDER } from '../store/modules/list/constants';
 
 export default {
   name: 'DependenciesActions',
@@ -15,9 +16,28 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  props: {
+    namespace: {
+      type: String,
+      required: true,
+      validator: value => Object.values(DEPENDENCY_LIST_TYPES).includes(value),
+    },
+  },
   computed: {
-    ...mapState(['sortField', 'sortFields', 'sortOrder']),
-    ...mapGetters(['downloadEndpoint']),
+    ...mapState({
+      sortField(state) {
+        return state[this.namespace].sortField;
+      },
+      sortFields(state) {
+        return state[this.namespace].sortFields;
+      },
+      sortOrder(state) {
+        return state[this.namespace].sortOrder;
+      },
+      downloadEndpoint(state, getters) {
+        return getters[`${this.namespace}/downloadEndpoint`];
+      },
+    }),
     sortFieldName() {
       return this.sortFields[this.sortField];
     },
@@ -26,7 +46,14 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['setSortField', 'toggleSortOrder']),
+    ...mapActions({
+      setSortField(dispatch, field) {
+        dispatch(`${this.namespace}/setSortField`, field);
+      },
+      toggleSortOrder(dispatch) {
+        dispatch(`${this.namespace}/toggleSortOrder`);
+      },
+    }),
     isCurrentSortField(id) {
       return id === this.sortField;
     },

@@ -3,7 +3,7 @@
     = link_to group_packages_path(@group) do
       .nav-icon-container
         = sprite_icon('package')
-      %span.nav-item-name.qa-group-settings-item
+      %span.nav-item-name
         = _('Packages')
     %ul.sidebar-sub-level-items
       - if group_packages_list_nav?

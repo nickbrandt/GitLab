@@ -42,7 +42,9 @@ describe('Batch comments review bar component', () => {
       vm.$el.querySelector('.btn.btn-align-content').click();
 
       vm.$nextTick(() => {
-        vm.$el.querySelector('.modal .btn-danger').click();
+        const modal = document.querySelector('#discard-draft-review');
+
+        modal.querySelector('.btn-danger').click();
 
         expect(vm.$store.dispatch).toHaveBeenCalled();
 

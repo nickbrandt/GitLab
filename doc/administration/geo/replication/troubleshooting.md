@@ -331,7 +331,7 @@ There are a few key points to remember:
 
 1. The FDW settings are configured on the Geo **tracking** database.
 1. The configured foreign server enables a login to the Geo
-**secondary**, read-only database.
+   **secondary**, read-only database.
 
 By default, the Geo secondary and tracking database are running on the
 same host on different ports. That is, 5432 and 5431 respectively.
@@ -350,7 +350,7 @@ To check the configuration:
     ```
 
 1. Check whether any tables are present. If everything is working, you
-should see something like this:
+   should see something like this:
 
     ```sql
     gitlabhq_geo_production=# SELECT * from information_schema.foreign_tables;
@@ -503,6 +503,15 @@ To resolve this, run the following command:
 ```sh
 sudo gitlab-rake geo:db:refresh_foreign_tables
 ```
+
+## Expired artifacts
+
+If you notice for some reason there are more artifacts on the Geo
+secondary node than on the Geo primary node, you can use the rake task
+to [cleanup orphan artifact files](../../../raketasks/cleanup.md#remove-orphan-artifact-files).
+
+On a Geo **secondary** node, this command will also clean up all Geo
+registry record related to the orphan files on disk.
 
 ## Fixing common errors
 

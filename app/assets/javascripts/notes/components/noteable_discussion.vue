@@ -126,10 +126,7 @@ export default {
       return this.discussion.resolved_by_push ? __('Automatically resolved') : __('Resolved');
     },
     shouldShowJumpToNextDiscussion() {
-      return this.showJumpToNextDiscussion(
-        this.discussion.id,
-        this.discussionsByDiffOrder ? 'diff' : 'discussion',
-      );
+      return this.showJumpToNextDiscussion(this.discussionsByDiffOrder ? 'diff' : 'discussion');
     },
     shouldRenderDiffs() {
       return this.discussion.diff_discussion && this.renderDiffFile;
@@ -382,7 +379,7 @@ Please check your network connection and try again.`;
                   class="discussion-reply-holder"
                 >
                   <user-avatar-link
-                    v-if="!isReplying && currentUser"
+                    v-if="!isReplying && userCanReply"
                     :link-href="currentUser.path"
                     :img-src="currentUser.avatar_url"
                     :img-alt="currentUser.name"

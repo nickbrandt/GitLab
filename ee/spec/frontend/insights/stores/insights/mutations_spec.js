@@ -1,6 +1,7 @@
 import createState from 'ee/insights/stores/modules/insights/state';
 import mutations from 'ee/insights/stores/modules/insights/mutations';
 import * as types from 'ee/insights/stores/modules/insights/mutation_types';
+import { configData } from '../../../../javascripts/insights/mock_data';
 
 describe('Insights mutations', () => {
   let state;
@@ -33,22 +34,19 @@ describe('Insights mutations', () => {
   });
 
   describe(types.RECEIVE_CONFIG_SUCCESS, () => {
-    const data = [
-      {
-        key: 'chart',
-      },
-    ];
-
     it('sets configLoading state to false on success', () => {
-      mutations[types.RECEIVE_CONFIG_SUCCESS](state, data);
+      mutations[types.RECEIVE_CONFIG_SUCCESS](state, configData);
 
       expect(state.configLoading).toBe(false);
     });
 
     it('sets configData state to incoming data on success', () => {
-      mutations[types.RECEIVE_CONFIG_SUCCESS](state, data);
+      mutations[types.RECEIVE_CONFIG_SUCCESS](state, configData);
 
-      expect(state.configData).toBe(data);
+      const expected = Object.assign({}, configData);
+      delete expected.invalid;
+
+      expect(state.configData).toEqual(expected);
     });
   });
 
@@ -164,13 +162,13 @@ describe('Insights mutations', () => {
     });
   });
 
-  describe(types.SET_CHART_DATA, () => {
-    const chartData = { a: { data: 'data' } };
+  describe(types.INIT_CHART_DATA, () => {
+    const keys = ['a', 'b'];
 
     it('sets chartData state', () => {
-      mutations[types.SET_CHART_DATA](state, chartData);
+      mutations[types.INIT_CHART_DATA](state, keys);
 
-      expect(state.chartData).toBe(chartData);
+      expect(state.chartData).toEqual({ a: {}, b: {} });
     });
   });
 

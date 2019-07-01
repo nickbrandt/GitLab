@@ -16,6 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+msgid " (from %{timeoutSource})"
+msgstr ""
+
 msgid " Please sign in."
 msgstr ""
 
@@ -59,6 +62,11 @@ msgstr[1] ""
 
 msgid "%d commit behind"
 msgid_plural "%d commits behind"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d commit,"
+msgid_plural "%d commits,"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -493,6 +501,9 @@ msgstr ""
 msgid "<no name set>"
 msgstr ""
 
+msgid "<no scopes selected>"
+msgstr ""
+
 msgid "<strong>%{changedFilesLength} unstaged</strong> and <strong>%{stagedFilesLength} staged</strong> changes"
 msgstr ""
 
@@ -628,6 +639,54 @@ msgstr ""
 msgid "AccessDropdown|Users"
 msgstr ""
 
+msgid "AccessTokens|Access Tokens"
+msgstr ""
+
+msgid "AccessTokens|Are you sure? Any RSS or calendar URLs currently in use will stop working."
+msgstr ""
+
+msgid "AccessTokens|Are you sure? Any issue email addresses currently in use will stop working."
+msgstr ""
+
+msgid "AccessTokens|Created"
+msgstr ""
+
+msgid "AccessTokens|Feed token"
+msgstr ""
+
+msgid "AccessTokens|Incoming email token"
+msgstr ""
+
+msgid "AccessTokens|It cannot be used to access any other data."
+msgstr ""
+
+msgid "AccessTokens|Keep this token secret. Anyone who gets ahold of it can create issues as if they were you. You should %{link_reset_it} if that ever happens."
+msgstr ""
+
+msgid "AccessTokens|Keep this token secret. Anyone who gets ahold of it can read activity and issue RSS feeds or your calendar feed as if they were you. You should %{link_reset_it} if that ever happens."
+msgstr ""
+
+msgid "AccessTokens|Personal Access Tokens"
+msgstr ""
+
+msgid "AccessTokens|They are the only accepted password when you have Two-Factor Authentication (2FA) enabled."
+msgstr ""
+
+msgid "AccessTokens|You can also use personal access tokens to authenticate against Git over HTTP."
+msgstr ""
+
+msgid "AccessTokens|You can generate a personal access token for each application you use that needs access to the GitLab API."
+msgstr ""
+
+msgid "AccessTokens|Your feed token is used to authenticate you when your RSS reader loads a personalized RSS feed or when your calendar application loads a personalized calendar, and is included in those feed URLs."
+msgstr ""
+
+msgid "AccessTokens|Your incoming email token is used to authenticate you when you create a new issue by email, and is included in your personal project-specific email addresses."
+msgstr ""
+
+msgid "AccessTokens|reset it"
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -646,6 +705,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Active %{type} Tokens (%{token_length})"
+msgstr ""
+
 msgid "Active Sessions"
 msgstr ""
 
@@ -654,6 +716,11 @@ msgstr ""
 
 msgid "Add"
 msgstr ""
+
+msgid "Add %d issue"
+msgid_plural "Add %d issues"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Add CHANGELOG"
 msgstr ""
@@ -671,6 +738,9 @@ msgid "Add Kubernetes cluster"
 msgstr ""
 
 msgid "Add README"
+msgstr ""
+
+msgid "Add a %{type} token"
 msgstr ""
 
 msgid "Add a GPG key"
@@ -728,6 +798,9 @@ msgid "Add header and footer to emails. Please note that color settings will onl
 msgstr ""
 
 msgid "Add image comment"
+msgstr ""
+
+msgid "Add issues"
 msgstr ""
 
 msgid "Add italic text"
@@ -1308,6 +1381,9 @@ msgstr ""
 msgid "An error occurred. Please try again."
 msgstr ""
 
+msgid "An issue can be a bug, a todo or a feature request that needs to be discussed in a project. Besides, issues are searchable and filterable."
+msgstr ""
+
 msgid "An unexpected error occurred while checking the project environment."
 msgstr ""
 
@@ -1524,6 +1600,9 @@ msgid "Are you sure you want to reset the SCIM token? SCIM provisioning will sto
 msgstr ""
 
 msgid "Are you sure you want to reset the health check token?"
+msgstr ""
+
+msgid "Are you sure you want to revoke this %{type} Token? This action cannot be undone."
 msgstr ""
 
 msgid "Are you sure you want to revoke this nickname?"
@@ -2006,10 +2085,28 @@ msgstr ""
 msgid "Blue helpers indicate an action to be taken."
 msgstr ""
 
+msgid "BoardBlankState|Add default lists"
+msgstr ""
+
+msgid "BoardBlankState|Add the following default lists to your Issue Board with one click:"
+msgstr ""
+
+msgid "BoardBlankState|Nevermind, I'll use my own"
+msgstr ""
+
+msgid "BoardBlankState|Starting out with the default set of lists will get you right on the way to making the most of your board."
+msgstr ""
+
 msgid "Boards"
 msgstr ""
 
+msgid "Boards|Collapse"
+msgstr ""
+
 msgid "Boards|Edit board"
+msgstr ""
+
+msgid "Boards|Expand"
 msgstr ""
 
 msgid "Boards|View scope"
@@ -2504,9 +2601,6 @@ msgstr ""
 msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
-msgid "Choose your merge method, options, checks, and set up a default merge request description template."
-msgstr ""
-
 msgid "CiStatusLabel|canceled"
 msgstr ""
 
@@ -2655,6 +2749,9 @@ msgid "Clear search"
 msgstr ""
 
 msgid "Clear search input"
+msgstr ""
+
+msgid "Clear templates search input"
 msgstr ""
 
 msgid "Clear weight"
@@ -3430,6 +3527,9 @@ msgstr ""
 msgid "Configure Let's Encrypt"
 msgstr ""
 
+msgid "Configure Prometheus"
+msgstr ""
+
 msgid "Configure Tracing"
 msgstr ""
 
@@ -3437,6 +3537,9 @@ msgid "Configure a <code>.gitlab-webide.yml</code> file in the <code>.gitlab</co
 msgstr ""
 
 msgid "Configure automatic git checks and housekeeping on repositories."
+msgstr ""
+
+msgid "Configure existing installation"
 msgstr ""
 
 msgid "Configure limits for web and API requests."
@@ -3664,6 +3767,9 @@ msgstr ""
 msgid "Copy link"
 msgstr ""
 
+msgid "Copy personal access token to clipboard"
+msgstr ""
+
 msgid "Copy reference to clipboard"
 msgstr ""
 
@@ -3713,6 +3819,9 @@ msgid "Coverage"
 msgstr ""
 
 msgid "Create"
+msgstr ""
+
+msgid "Create %{type} token"
 msgstr ""
 
 msgid "Create New Directory"
@@ -3857,6 +3966,9 @@ msgid "Creates branch '%{branch_name}' and a merge request to resolve this issue
 msgstr ""
 
 msgid "Creating epic"
+msgstr ""
+
+msgid "Creating graphs uses the data from the Prometheus server. If this takes a long time, ensure that data is available."
 msgstr ""
 
 msgid "Cron Timezone"
@@ -4013,6 +4125,9 @@ msgid "Default classification label"
 msgstr ""
 
 msgid "Default description template for issues"
+msgstr ""
+
+msgid "Default description template for merge requests"
 msgstr ""
 
 msgid "Default first day of the week"
@@ -4323,6 +4438,9 @@ msgstr ""
 msgid "Description:"
 msgstr ""
 
+msgid "Deselect all"
+msgstr ""
+
 msgid "DesignManagement|%{current_design} of %{designs_count}"
 msgstr ""
 
@@ -4372,6 +4490,9 @@ msgid "Diff content limits"
 msgstr ""
 
 msgid "Diff limits"
+msgstr ""
+
+msgid "DiffsCompareBaseBranch|(base)"
 msgstr ""
 
 msgid "Diffs|No file name available"
@@ -4483,6 +4604,9 @@ msgid "Dockerfile"
 msgstr ""
 
 msgid "Documentation for popular identity providers"
+msgstr ""
+
+msgid "Doing"
 msgstr ""
 
 msgid "Domain"
@@ -4708,9 +4832,6 @@ msgid "Enable Pseudonymizer data collection"
 msgstr ""
 
 msgid "Enable SAML authentication for this group"
-msgstr ""
-
-msgid "Enable Sentry for error reporting and logging."
 msgstr ""
 
 msgid "Enable access to the Performance Bar for a given group."
@@ -5043,9 +5164,6 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-msgid "Error Reporting and Logging"
-msgstr ""
-
 msgid "Error Tracking"
 msgstr ""
 
@@ -5284,6 +5402,12 @@ msgid "Expired"
 msgstr ""
 
 msgid "Expired %{expiredOn}"
+msgstr ""
+
+msgid "Expires"
+msgstr ""
+
+msgid "Expires at"
 msgstr ""
 
 msgid "Expires in %{expires_at}"
@@ -6293,6 +6417,9 @@ msgstr ""
 msgid "Get started with error tracking"
 msgstr ""
 
+msgid "Get started with performance monitoring"
+msgstr ""
+
 msgid "Getting started with releases"
 msgstr ""
 
@@ -6402,6 +6529,9 @@ msgid "Go Micro is a framework for micro service development."
 msgstr ""
 
 msgid "Go back"
+msgstr ""
+
+msgid "Go back to %{startTag}Open issues%{endTag} and select some issues to add to your board."
 msgstr ""
 
 msgid "Go full screen"
@@ -6783,6 +6913,9 @@ msgid "Help page"
 msgstr ""
 
 msgid "Help page text and support page url."
+msgstr ""
+
+msgid "Helps prevent bots from creating accounts. We currently only support %{recaptcha_v2_link_start}reCAPTCHA v2%{recaptcha_v2_link_end}"
 msgstr ""
 
 msgid "Hide archived projects"
@@ -7174,6 +7307,9 @@ msgstr ""
 msgid "Install a soft token authenticator like %{free_otp_link} or Google Authenticator from your application repository and scan this QR code. More information is available in the %{help_link_start}documentation%{help_link_end}."
 msgstr ""
 
+msgid "Install on clusters"
+msgstr ""
+
 msgid "Installed"
 msgstr ""
 
@@ -7395,13 +7531,13 @@ msgstr ""
 msgid "JiraService|If different from Web URL"
 msgstr ""
 
-msgid "JiraService|JIRA API URL"
+msgid "JiraService|Jira API URL"
 msgstr ""
 
-msgid "JiraService|JIRA comments will be created when an issue gets referenced in a commit."
+msgid "JiraService|Jira comments will be created when an issue gets referenced in a commit."
 msgstr ""
 
-msgid "JiraService|JIRA comments will be created when an issue gets referenced in a merge request."
+msgid "JiraService|Jira comments will be created when an issue gets referenced in a merge request."
 msgstr ""
 
 msgid "JiraService|Jira issue tracker"
@@ -7871,6 +8007,9 @@ msgstr ""
 msgid "Licenses"
 msgstr ""
 
+msgid "Limit display of time tracking units to hours."
+msgstr ""
+
 msgid "Limit namespaces and projects that can be indexed"
 msgstr ""
 
@@ -7913,6 +8052,9 @@ msgid "Loading contribution stats for group members"
 msgstr ""
 
 msgid "Loading functions timed out. Please reload the page to try again."
+msgstr ""
+
+msgid "Loading issues"
 msgstr ""
 
 msgid "Loading the GitLab IDE..."
@@ -7996,6 +8138,9 @@ msgstr ""
 msgid "Make issue confidential."
 msgstr ""
 
+msgid "Make sure you save it - you won't be able to access it again."
+msgstr ""
+
 msgid "Make sure you're logged into the account that owns the projects you'd like to import."
 msgstr ""
 
@@ -8044,6 +8189,9 @@ msgstr ""
 msgid "Manual job"
 msgstr ""
 
+msgid "ManualOrdering|Couldn't save the order of the issues"
+msgstr ""
+
 msgid "Map a FogBugz account ID to a GitLab user"
 msgstr ""
 
@@ -8071,6 +8219,9 @@ msgstr ""
 msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
+msgid "Mark this issue as related to another issue"
+msgstr ""
+
 msgid "Mark todo as done"
 msgstr ""
 
@@ -8084,6 +8235,9 @@ msgid "Markdown enabled"
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
+msgstr ""
+
+msgid "Marks this issue as related to %{issue_ref}."
 msgstr ""
 
 msgid "Marks todo as done."
@@ -8784,6 +8938,9 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No %{header} for this request."
+msgstr ""
+
 msgid "No %{providerTitle} repositories available to import"
 msgstr ""
 
@@ -8827,6 +8984,9 @@ msgid "No contributions were found"
 msgstr ""
 
 msgid "No credit card required."
+msgstr ""
+
+msgid "No data found"
 msgstr ""
 
 msgid "No details available"
@@ -8914,6 +9074,9 @@ msgid "No schedules"
 msgstr ""
 
 msgid "No start date"
+msgstr ""
+
+msgid "No template"
 msgstr ""
 
 msgid "No value set by top-level parent group."
@@ -9182,6 +9345,9 @@ msgstr ""
 msgid "Open in Xcode"
 msgstr ""
 
+msgid "Open issues"
+msgstr ""
+
 msgid "Open projects"
 msgstr ""
 
@@ -9404,6 +9570,18 @@ msgstr ""
 msgid "Performance optimization"
 msgstr ""
 
+msgid "PerformanceBar|Gitaly calls"
+msgstr ""
+
+msgid "PerformanceBar|SQL queries"
+msgstr ""
+
+msgid "PerformanceBar|profile"
+msgstr ""
+
+msgid "PerformanceBar|trace"
+msgstr ""
+
 msgid "Permissions"
 msgstr ""
 
@@ -9429,6 +9607,9 @@ msgid "Phabricator Tasks"
 msgstr ""
 
 msgid "Pick a name"
+msgstr ""
+
+msgid "Pick a name for the application, and we'll give you a unique %{type} token."
 msgstr ""
 
 msgid "Pin code"
@@ -10025,6 +10206,9 @@ msgstr ""
 msgid "Profiles|Full name"
 msgstr ""
 
+msgid "Profiles|Impersonation"
+msgstr ""
+
 msgid "Profiles|Include private contributions on my profile"
 msgstr ""
 
@@ -10065,6 +10249,9 @@ msgid "Profiles|Organization"
 msgstr ""
 
 msgid "Profiles|Path"
+msgstr ""
+
+msgid "Profiles|Personal Access"
 msgstr ""
 
 msgid "Profiles|Position and size your new avatar"
@@ -10200,6 +10387,12 @@ msgid "Profiles|Your status"
 msgstr ""
 
 msgid "Profiles|e.g. My MacBook key"
+msgstr ""
+
+msgid "Profiles|impersonation"
+msgstr ""
+
+msgid "Profiles|personal access"
 msgstr ""
 
 msgid "Profiles|username"
@@ -10385,6 +10578,12 @@ msgstr ""
 msgid "ProjectSettings|Badges"
 msgstr ""
 
+msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
+msgstr ""
+
+msgid "ProjectSettings|Choose your merge method, merge options, merge checks, and set up a default description template for merge requests."
+msgstr ""
+
 msgid "ProjectSettings|Contact an admin to change this setting."
 msgstr ""
 
@@ -10554,6 +10753,9 @@ msgid "ProjectsDropdown|Sorry, no projects matched your search"
 msgstr ""
 
 msgid "ProjectsDropdown|This feature requires browser localStorage support"
+msgstr ""
+
+msgid "Prometheus server"
 msgstr ""
 
 msgid "PrometheusAlerts|Add alert"
@@ -11044,6 +11246,9 @@ msgstr ""
 msgid "Remove fork relationship"
 msgstr ""
 
+msgid "Remove from board"
+msgstr ""
+
 msgid "Remove group"
 msgstr ""
 
@@ -11280,6 +11485,9 @@ msgid "Reset key"
 msgstr ""
 
 msgid "Reset runners registration token"
+msgstr ""
+
+msgid "Reset template"
 msgstr ""
 
 msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
@@ -11572,6 +11780,9 @@ msgstr ""
 msgid "Scoped label"
 msgstr ""
 
+msgid "Scopes"
+msgstr ""
+
 msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
 msgstr ""
 
@@ -11785,6 +11996,9 @@ msgstr ""
 msgid "Select a new namespace"
 msgstr ""
 
+msgid "Select a project"
+msgstr ""
+
 msgid "Select a project to read Insights configuration file"
 msgstr ""
 
@@ -11795,6 +12009,9 @@ msgid "Select a template repository"
 msgstr ""
 
 msgid "Select a timezone"
+msgstr ""
+
+msgid "Select all"
 msgstr ""
 
 msgid "Select an existing Kubernetes cluster or create a new one"
@@ -11839,7 +12056,7 @@ msgstr ""
 msgid "Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \"By <a href=\"#\">@johnsmith</a>\"). It will also associate and/or assign these issues and comments with the selected user."
 msgstr ""
 
-msgid "Send an email notification to Developers."
+msgid "Send a separate email notification to Developers."
 msgstr ""
 
 msgid "Send confirmation email"
@@ -12103,6 +12320,9 @@ msgstr ""
 msgid "Show command"
 msgstr ""
 
+msgid "Show comments"
+msgstr ""
+
 msgid "Show comments only"
 msgstr ""
 
@@ -12131,6 +12351,12 @@ msgid "Showing %d event"
 msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Showing all issues"
+msgstr ""
+
+msgid "Showing last %{size} of log -"
+msgstr ""
 
 msgid "Side-by-side"
 msgstr ""
@@ -12645,6 +12871,9 @@ msgstr ""
 msgid "Status:"
 msgstr ""
 
+msgid "Stay updated about the performance and health of your environment by configuring Prometheus to monitor your deployments."
+msgstr ""
+
 msgid "Stop Terminal"
 msgstr ""
 
@@ -12688,6 +12917,9 @@ msgid "Submit as spam"
 msgstr ""
 
 msgid "Submit feedback"
+msgstr ""
+
+msgid "Submit issue"
 msgstr ""
 
 msgid "Submit review"
@@ -13406,6 +13638,9 @@ msgstr ""
 msgid "There are no issues to show"
 msgstr ""
 
+msgid "There are no issues to show."
+msgstr ""
+
 msgid "There are no labels yet"
 msgstr ""
 
@@ -13742,6 +13977,9 @@ msgstr ""
 msgid "This user cannot be unlocked manually from GitLab"
 msgstr ""
 
+msgid "This user has no active %{type} Tokens."
+msgstr ""
+
 msgid "This user has no identities"
 msgstr ""
 
@@ -13761,6 +13999,9 @@ msgid "Those emails automatically become issues (with the comments becoming the 
 msgstr ""
 
 msgid "Thursday"
+msgstr ""
+
+msgid "Time"
 msgstr ""
 
 msgid "Time based: Yes"
@@ -13959,6 +14200,9 @@ msgstr ""
 msgid "To %{link_to_help} of your domain, add the above key to a TXT record within to your DNS configuration."
 msgstr ""
 
+msgid "To Do"
+msgstr ""
+
 msgid "To GitLab"
 msgstr ""
 
@@ -14032,6 +14276,9 @@ msgid "To preserve performance only <strong>%{display_size} of %{real_size}</str
 msgstr ""
 
 msgid "To receive alerts from manually configured Prometheus services, add the following URL and Authorization key to your Prometheus webhook config file. Learn more about %{linkStart}configuring Prometheus%{linkEnd} to send alerts to GitLab."
+msgstr ""
+
+msgid "To see all the user's personal access tokens you must impersonate them first."
 msgstr ""
 
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
@@ -14281,6 +14528,9 @@ msgid "U2F only works with HTTPS-enabled websites. Contact your administrator fo
 msgstr ""
 
 msgid "URL"
+msgstr ""
+
+msgid "Unable to connect to Prometheus server"
 msgstr ""
 
 msgid "Unable to connect to server: %{error}"
@@ -15123,6 +15373,9 @@ msgstr ""
 msgid "Wait for the source to load to copy it to the clipboard"
 msgstr ""
 
+msgid "Waiting for performance data"
+msgstr ""
+
 msgid "Want to see the data? Please ask an administrator for access."
 msgstr ""
 
@@ -15419,6 +15672,9 @@ msgstr ""
 msgid "You are attempting to update a file that has changed since you started editing it."
 msgstr ""
 
+msgid "You are connected to the Prometheus server, but there is currently no data to display."
+msgstr ""
+
 msgid "You are going to remove %{group_name}, this will also remove all of its subgroups and projects. Removed groups CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
@@ -15593,6 +15849,12 @@ msgstr ""
 msgid "You have reached your project limit"
 msgstr ""
 
+msgid "You haven't added any issues to your project yet"
+msgstr ""
+
+msgid "You haven't selected any issues yet"
+msgstr ""
+
 msgid "You left the \"%{membershipable_human_name}\" %{source_type}."
 msgstr ""
 
@@ -15720,6 +15982,9 @@ msgid "Your GPG keys (%{count})"
 msgstr ""
 
 msgid "Your Groups"
+msgstr ""
+
+msgid "Your New Personal Access Token"
 msgstr ""
 
 msgid "Your Primary Email will be used for avatar detection."
@@ -15974,6 +16239,9 @@ msgstr ""
 msgid "ciReport|All severities"
 msgstr ""
 
+msgid "ciReport|Automatically apply the patch in a new branch"
+msgstr ""
+
 msgid "ciReport|Class"
 msgstr ""
 
@@ -15992,10 +16260,10 @@ msgstr ""
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
-msgid "ciReport|Create issue"
+msgid "ciReport|Create a merge request to implement this solution, or download and apply the patch manually."
 msgstr ""
 
-msgid "ciReport|Create merge request"
+msgid "ciReport|Create issue"
 msgstr ""
 
 msgid "ciReport|DAST"
@@ -16013,10 +16281,10 @@ msgstr ""
 msgid "ciReport|Description"
 msgstr ""
 
-msgid "ciReport|Download and apply the patch to fix this vulnerability."
+msgid "ciReport|Download patch to resolve"
 msgstr ""
 
-msgid "ciReport|Download patch"
+msgid "ciReport|Download the patch to apply it manually"
 msgstr ""
 
 msgid "ciReport|Dynamic Application Security Testing (DAST) detects known vulnerabilities in your web application."
@@ -16037,16 +16305,13 @@ msgstr ""
 msgid "ciReport|Image"
 msgstr ""
 
-msgid "ciReport|Implement this solution by creating a merge request"
-msgstr ""
-
 msgid "ciReport|Instances"
 msgstr ""
 
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
-msgid "ciReport|Learn more about interacting with security reports (Alpha)."
+msgid "ciReport|Learn more about interacting with security reports"
 msgstr ""
 
 msgid "ciReport|License management detected %d license for the source branch only"
@@ -16087,6 +16352,9 @@ msgid "ciReport|No changes to performance metrics"
 msgstr ""
 
 msgid "ciReport|Performance metrics"
+msgstr ""
+
+msgid "ciReport|Resolve with merge request"
 msgstr ""
 
 msgid "ciReport|SAST"
@@ -16816,6 +17084,9 @@ msgstr ""
 msgid "to help your contributors communicate effectively!"
 msgstr ""
 
+msgid "to list"
+msgstr ""
+
 msgid "triggered"
 msgstr ""
 
@@ -16829,6 +17100,9 @@ msgid "uses Kubernetes clusters to deploy your code!"
 msgstr ""
 
 msgid "verify ownership"
+msgstr ""
+
+msgid "version %{versionIndex}"
 msgstr ""
 
 msgid "via %{closed_via}"

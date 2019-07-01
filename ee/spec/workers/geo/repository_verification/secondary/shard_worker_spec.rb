@@ -96,7 +96,7 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :c
       let(:project5_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
       let(:project6_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
 
-      it 'handles multiple batches of projects needing verification' do
+      it 'handles multiple batches of projects needing verification', :quarantine do
         reg1 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project1_repo_verified)
         reg2 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project2_repo_verified)
 

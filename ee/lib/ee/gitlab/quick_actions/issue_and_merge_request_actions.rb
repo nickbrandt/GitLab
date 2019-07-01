@@ -34,7 +34,7 @@ module EE
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
           end
           parse_params do |weight|
-            weight.to_i if weight.to_i > 0
+            weight.to_i if weight.to_i >= 0
           end
           command :weight do |weight|
             @updates[:weight] = weight if weight

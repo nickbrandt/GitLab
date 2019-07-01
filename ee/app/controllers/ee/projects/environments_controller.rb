@@ -33,7 +33,7 @@ module EE
       end
 
       def pod_logs
-        environment.deployment_platform.read_pod_logs(params[:pod_name])
+        environment.deployment_platform.read_pod_logs(params[:pod_name], environment.deployment_namespace)
       end
 
       def authorize_create_environment_terminal!

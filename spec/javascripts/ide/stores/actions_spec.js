@@ -492,6 +492,33 @@ describe('Multi-file store actions', () => {
         done,
       );
     });
+
+    it('does not delete a folder after it is emptied', done => {
+      const testFolder = {
+        type: 'tree',
+        tree: [],
+      };
+      const testEntry = {
+        path: 'testFolder/entry-to-delete',
+        parentPath: 'testFolder',
+        opened: false,
+        tree: [],
+      };
+      testFolder.tree.push(testEntry);
+      store.state.entries = {
+        testFolder,
+        'testFolder/entry-to-delete': testEntry,
+      };
+
+      testAction(
+        deleteEntry,
+        'testFolder/entry-to-delete',
+        store.state,
+        [{ type: types.DELETE_ENTRY, payload: 'testFolder/entry-to-delete' }],
+        [{ type: 'burstUnusedSeal' }, { type: 'triggerFilesChange' }],
+        done,
+      );
+    });
   });
 
   describe('renameEntry', () => {
@@ -509,8 +536,15 @@ describe('Multi-file store actions', () => {
             type: types.RENAME_ENTRY,
             payload: { path: 'test', name: 'new-name', entryPath: null, parentPath: 'parent-path' },
           },
+          {
+            type: types.TOGGLE_FILE_CHANGED,
+            payload: {
+              file: store.state.entries['parent-path/new-name'],
+              changed: true,
+            },
+          },
         ],
-        [{ type: 'deleteEntry', payload: 'test' }, { type: 'triggerFilesChange' }],
+        [{ type: 'triggerFilesChange' }],
         done,
       );
     });
@@ -557,7 +591,6 @@ describe('Multi-file store actions', () => {
               parentPath: 'parent-path/new-name',
             },
           },
-          { type: 'deleteEntry', payload: 'test' },
           { type: 'triggerFilesChange' },
         ],
         done,

@@ -1,98 +1,144 @@
 import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/modal.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import { mount, shallowMount } from '@vue/test-utils';
 
 describe('Security Reports modal', () => {
   const Component = Vue.extend(component);
-  let vm;
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   describe('with permissions', () => {
     describe('with dismissed issue', () => {
       beforeEach(() => {
-        const props = {
+        const propsData = {
           modal: createState().modal,
           canDismissVulnerability: true,
         };
-        props.modal.vulnerability.isDismissed = true;
-        props.modal.vulnerability.dismissalFeedback = {
+        propsData.modal.vulnerability.isDismissed = true;
+        propsData.modal.vulnerability.dismissalFeedback = {
           author: { username: 'jsmith', name: 'John Smith' },
           pipeline: { id: '123', path: '#' },
         };
-        vm = mountComponent(Component, props);
+        wrapper = mount(Component, { propsData });
       });
 
       it('renders dismissal author and associated pipeline', () => {
-        expect(vm.$el.textContent.trim()).toContain('John Smith');
-        expect(vm.$el.textContent.trim()).toContain('@jsmith');
-        expect(vm.$el.textContent.trim()).toContain('#123');
+        expect(wrapper.text().trim()).toContain('John Smith');
+        expect(wrapper.text().trim()).toContain('@jsmith');
+        expect(wrapper.text().trim()).toContain('#123');
       });
     });
 
     describe('with not dismissed issue', () => {
       beforeEach(() => {
-        const props = {
+        const propsData = {
           modal: createState().modal,
           canDismissVulnerability: true,
         };
-        vm = mountComponent(Component, props);
+        wrapper = mount(Component, { propsData });
       });
 
       it('renders the footer', () => {
-        expect(vm.$el.classList.contains('modal-hide-footer')).toEqual(false);
+        expect(wrapper.classes('modal-hide-footer')).toBe(false);
+      });
+    });
+
+    describe('with merge request available', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+          canCreateIssue: true,
+          canCreateMergeRequest: true,
+        };
+        const summary = 'Upgrade to 123';
+        const diff = 'abc123';
+        propsData.modal.vulnerability.remediations = [{ summary, diff }];
+        wrapper = mount(Component, { propsData, sync: true });
+      });
+
+      it('renders create merge request and issue button as a split button', () => {
+        expect(wrapper.contains('.js-split-button')).toBe(true);
+        expect(wrapper.find('.js-split-button').text()).toContain('Resolve with merge request');
+        expect(wrapper.find('.js-split-button').text()).toContain('Create issue');
+      });
+
+      describe('with merge request created', () => {
+        it('renders the issue button as a single button', done => {
+          const propsData = {
+            modal: createState().modal,
+            canCreateIssue: true,
+            canCreateMergeRequest: true,
+          };
+
+          propsData.modal.vulnerability.hasMergeRequest = true;
+
+          wrapper.setProps(propsData);
+
+          Vue.nextTick()
+            .then(() => {
+              expect(wrapper.contains('.js-split-button')).toBe(false);
+              expect(wrapper.contains('.js-action-button')).toBe(true);
+              expect(wrapper.find('.js-action-button').text()).not.toContain(
+                'Resolve with merge request',
+              );
+              expect(wrapper.find('.js-action-button').text()).toContain('Create issue');
+              done();
+            })
+            .catch(done.fail);
+        });
       });
     });
 
     describe('data', () => {
       beforeEach(() => {
-        const props = {
+        const propsData = {
           modal: createState().modal,
           vulnerabilityFeedbackHelpPath: 'feedbacksHelpPath',
         };
-        props.modal.title = 'Arbitrary file existence disclosure in Action Pack';
-        vm = mountComponent(Component, props);
+        propsData.modal.title = 'Arbitrary file existence disclosure in Action Pack';
+        wrapper = mount(Component, { propsData });
       });
 
       it('renders title', () => {
-        expect(vm.$el.textContent).toContain('Arbitrary file existence disclosure in Action Pack');
+        expect(wrapper.text()).toContain('Arbitrary file existence disclosure in Action Pack');
       });
 
       it('renders help link', () => {
-        expect(
-          vm.$el.querySelector('.js-link-vulnerabilityFeedbackHelpPath').getAttribute('href'),
-        ).toEqual('feedbacksHelpPath');
+        expect(wrapper.find('.js-link-vulnerabilityFeedbackHelpPath').attributes('href')).toBe(
+          'feedbacksHelpPath#solutions-for-vulnerabilities',
+        );
       });
     });
   });
 
   describe('without permissions', () => {
     beforeEach(() => {
-      const props = {
+      const propsData = {
         modal: createState().modal,
       };
-      vm = mountComponent(Component, props);
+      wrapper = shallowMount(Component, { propsData });
     });
 
     it('does not display the footer', () => {
-      expect(vm.$el.classList.contains('modal-hide-footer')).toEqual(true);
+      expect(wrapper.classes('modal-hide-footer')).toBe(true);
     });
   });
 
   describe('with a resolved issue', () => {
     beforeEach(() => {
-      const props = {
+      const propsData = {
         modal: createState().modal,
       };
-      props.modal.isResolved = true;
-      vm = mountComponent(Component, props);
+      propsData.modal.isResolved = true;
+      wrapper = shallowMount(Component, { propsData });
     });
 
     it('does not display the footer', () => {
-      expect(vm.$el.classList.contains('modal-hide-footer')).toBeTruthy();
+      expect(wrapper.classes('modal-hide-footer')).toBe(true);
     });
   });
 
@@ -102,24 +148,24 @@ describe('Security Reports modal', () => {
     const fileValue = '/some/file.path';
 
     beforeEach(() => {
-      const props = {
+      const propsData = {
         modal: createState().modal,
       };
-      props.modal.vulnerability.blob_path = blobPath;
-      props.modal.data.namespace.value = namespaceValue;
-      props.modal.data.file.value = fileValue;
-      vm = mountComponent(Component, props);
+      propsData.modal.vulnerability.blob_path = blobPath;
+      propsData.modal.data.namespace.value = namespaceValue;
+      propsData.modal.data.file.value = fileValue;
+      wrapper = mount(Component, { propsData });
     });
 
     it('is rendered', () => {
-      const vulnerabilityDetails = vm.$el.querySelector('.js-vulnerability-details');
+      const vulnerabilityDetails = wrapper.find('.js-vulnerability-details');
 
-      expect(vulnerabilityDetails).not.toBeNull();
-      expect(vulnerabilityDetails.textContent).toContain('foobar');
+      expect(vulnerabilityDetails.exists()).toBe(true);
+      expect(vulnerabilityDetails.text()).toContain('foobar');
     });
 
     it('computes valued fields properly', () => {
-      expect(vm.valuedFields).toMatchObject({
+      expect(wrapper.vm.valuedFields).toMatchObject({
         file: {
           value: fileValue,
           url: blobPath,
@@ -137,46 +183,46 @@ describe('Security Reports modal', () => {
 
   describe('Solution Card', () => {
     it('is rendered if the vulnerability has a solution', () => {
-      const props = {
+      const propsData = {
         modal: createState().modal,
       };
 
       const solution = 'Upgrade to XYZ';
-      props.modal.vulnerability.solution = solution;
-      vm = mountComponent(Component, props);
+      propsData.modal.vulnerability.solution = solution;
+      wrapper = mount(Component, { propsData });
 
-      const solutionCard = vm.$el.querySelector('.js-solution-card');
+      const solutionCard = wrapper.find('.js-solution-card');
 
-      expect(solutionCard).not.toBeNull();
-      expect(solutionCard.textContent).toContain(solution);
-      expect(vm.$el.querySelector('hr')).toBeNull();
+      expect(solutionCard.exists()).toBe(true);
+      expect(solutionCard.text()).toContain(solution);
+      expect(wrapper.contains('hr')).toBe(false);
     });
 
     it('is rendered if the vulnerability has a remediation', () => {
-      const props = {
+      const propsData = {
         modal: createState().modal,
       };
       const summary = 'Upgrade to 123';
-      props.modal.vulnerability.remediations = [{ summary }];
-      vm = mountComponent(Component, props);
+      propsData.modal.vulnerability.remediations = [{ summary }];
+      wrapper = mount(Component, { propsData });
 
-      const solutionCard = vm.$el.querySelector('.js-solution-card');
+      const solutionCard = wrapper.find('.js-solution-card');
 
-      expect(solutionCard).not.toBeNull();
-      expect(solutionCard.textContent).toContain(summary);
-      expect(vm.$el.querySelector('hr')).toBeNull();
+      expect(solutionCard.exists()).toBe(true);
+      expect(solutionCard.text()).toContain(summary);
+      expect(wrapper.contains('hr')).toBe(false);
     });
 
-    it('is not rendered if the vulnerability has neither a remediation nor a solution but renders a HR instead.', () => {
-      const props = {
+    it('is rendered if the vulnerability has neither a remediation nor a solution', () => {
+      const propsData = {
         modal: createState().modal,
       };
-      vm = mountComponent(Component, props);
+      wrapper = mount(Component, { propsData });
 
-      const solutionCard = vm.$el.querySelector('.js-solution-card');
+      const solutionCard = wrapper.find('.js-solution-card');
 
-      expect(solutionCard).toBeNull();
-      expect(vm.$el.querySelector('hr')).not.toBeNull();
+      expect(solutionCard.exists()).toBe(true);
+      expect(wrapper.contains('hr')).toBe(false);
     });
   });
 });

@@ -17,6 +17,9 @@ describe('LicenseManagementRow', () => {
   let store;
   let actions;
 
+  const findNthDropdown = num => [...vm.$el.querySelectorAll('.dropdown-item')][num];
+  const findNthDropdownIcon = num => findNthDropdown(num).querySelector('svg');
+
   beforeEach(() => {
     actions = {
       setLicenseInModal: jasmine.createSpy('setLicenseInModal'),
@@ -60,13 +63,13 @@ describe('LicenseManagementRow', () => {
 
     describe('template', () => {
       it('first dropdown element should have a visible icon', () => {
-        const firstOption = vm.$el.querySelector('.dropdown-item:nth-child(1) svg');
+        const firstOption = findNthDropdownIcon(0);
 
         expect(firstOption.classList).toContain(visibleClass);
       });
 
       it('second dropdown element should have no visible icon', () => {
-        const secondOption = vm.$el.querySelector('.dropdown-item:nth-child(2) svg');
+        const secondOption = findNthDropdownIcon(1);
 
         expect(secondOption.classList).toContain(invisibleClass);
       });
@@ -95,13 +98,13 @@ describe('LicenseManagementRow', () => {
 
     describe('template', () => {
       it('first dropdown element should have no visible icon', () => {
-        const firstOption = vm.$el.querySelector('.dropdown-item:nth-child(1) svg');
+        const firstOption = findNthDropdownIcon(0);
 
         expect(firstOption.classList).toContain(invisibleClass);
       });
 
       it('second dropdown element should have a visible icon', () => {
-        const secondOption = vm.$el.querySelector('.dropdown-item:nth-child(2) svg');
+        const secondOption = findNthDropdownIcon(1);
 
         expect(secondOption.classList).toContain(visibleClass);
       });
@@ -117,14 +120,14 @@ describe('LicenseManagementRow', () => {
     });
 
     it('triggering approveLicense by clicking the first dropdown option', () => {
-      const linkEl = vm.$el.querySelector('.dropdown-item:nth-child(1)');
+      const linkEl = findNthDropdown(0);
       linkEl.click();
 
       expect(actions.approveLicense).toHaveBeenCalled();
     });
 
     it('triggering approveLicense blacklistLicense by clicking the second dropdown option', () => {
-      const linkEl = vm.$el.querySelector('.dropdown-item:nth-child(2)');
+      const linkEl = findNthDropdown(1);
       linkEl.click();
 
       expect(actions.blacklistLicense).toHaveBeenCalled();
@@ -166,12 +169,12 @@ describe('LicenseManagementRow', () => {
 
       expect(dropdownEl).not.toBeNull();
 
-      const firstOption = dropdownEl.querySelector('.dropdown-item:nth-child(1)');
+      const firstOption = findNthDropdown(0);
 
       expect(firstOption).not.toBeNull();
       expect(firstOption.innerText.trim()).toBe('Approved');
 
-      const secondOption = dropdownEl.querySelector('.dropdown-item:nth-child(2)');
+      const secondOption = findNthDropdown(1);
 
       expect(secondOption).not.toBeNull();
       expect(secondOption.innerText.trim()).toBe('Blacklisted');

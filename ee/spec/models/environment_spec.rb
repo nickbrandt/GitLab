@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-describe Environment do
+describe Environment, :use_clean_rails_memory_store_caching do
+  include ReactiveCachingHelpers
+
   let(:project) { create(:project, :stubbed_repository) }
   let(:environment) { create(:environment, project: project) }
 
@@ -14,13 +16,16 @@ describe Environment do
     end
 
     context 'when environment has a rollout status' do
-      it 'returns the pod_names' do
-        pod_name = "pod_1"
+      let(:pod_name) { 'pod_1' }
+      let(:rollout_status) { instance_double(::Gitlab::Kubernetes::RolloutStatus, instances: [{ pod_name: pod_name }]) }
+
+      before do
         create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
         create(:deployment, :success, environment: environment)
+      end
 
-        allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances)
-          .and_return([{ pod_name: pod_name }])
+      it 'returns the pod_names' do
+        allow(environment).to receive(:rollout_status).and_return(rollout_status)
 
         expect(environment.pod_names).to eq([pod_name])
       end
@@ -98,44 +103,54 @@ describe Environment do
     end
   end
 
+  describe '#reactive_cache_updated' do
+    let(:mock_store) { double }
+
+    subject { environment.reactive_cache_updated }
+
+    it 'expires the environments path for the project' do
+      expect(::Gitlab::EtagCaching::Store).to receive(:new).and_return(mock_store)
+      expect(mock_store).to receive(:touch).with(::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+
+      subject
+    end
+  end
+
   describe '#rollout_status' do
-    shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
-      subject { environment.rollout_status }
+    let(:cluster) { create(:cluster, :project, :provided_by_user) }
+    let(:project) { cluster.project }
+    let(:environment) { create(:environment, project: project) }
+    let!(:deployment) { create(:deployment, :success, environment: environment) }
 
-      context 'when the environment has rollout status' do
-        before do
-          allow(environment).to receive(:has_terminals?).and_return(true)
-        end
+    subject { environment.rollout_status }
 
-        it 'returns the rollout status from the deployment service' do
-          expect(environment.deployment_platform)
-            .to receive(:rollout_status).with(environment)
-            .and_return(:fake_rollout_status)
+    context 'cached rollout status is present' do
+      let(:pods) { %w(pod1 pod2) }
+      let(:deployments) { %w(deployment1 deployment2) }
 
-          is_expected.to eq(:fake_rollout_status)
-        end
+      before do
+        stub_reactive_cache(environment, pods: pods, deployments: deployments)
       end
 
-      context 'when the environment does not have rollout status' do
-        before do
-          allow(environment).to receive(:has_terminals?).and_return(false)
-        end
+      it 'fetches the rollout status from the deployment platform' do
+        expect(environment.deployment_platform).to receive(:rollout_status)
+          .with(environment, pods: pods, deployments: deployments)
+          .and_return(:mock_rollout_status)
 
-        it { is_expected.to eq(nil) }
+        is_expected.to eq(:mock_rollout_status)
       end
     end
 
-    context 'when user configured kubernetes from Integration > Kubernetes' do
-      let(:project) { create(:kubernetes_project) }
+    context 'cached rollout status is not present' do
+      before do
+        stub_reactive_cache(environment, nil)
+      end
 
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
-    end
+      it 'falls back to a loading status' do
+        expect(::Gitlab::Kubernetes::RolloutStatus).to receive(:loading).and_return(:mock_loading_status)
 
-    context 'when user configured kubernetes from CI/CD > Clusters' do
-      let!(:cluster) { create(:cluster, :project, :provided_by_gcp) }
-      let(:project) { cluster.project }
-
-      it_behaves_like 'same behavior between KubernetesService and Platform::Kubernetes'
+        is_expected.to eq(:mock_loading_status)
+      end
     end
   end
 end

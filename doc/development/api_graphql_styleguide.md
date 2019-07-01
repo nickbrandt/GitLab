@@ -198,9 +198,9 @@ abilities as in the Rails app.
 If the:
 
 - Currently authenticated user fails the authorization, the authorized
-resource will be returned as `null`.
+  resource will be returned as `null`.
 - Resource is part of a collection, the collection will be filtered to
-exclude the objects that the user's authorization checks failed against.
+  exclude the objects that the user's authorization checks failed against.
 
 TIP: **Tip:**
 Try to load only what the currently authenticated user is allowed to
@@ -447,7 +447,7 @@ want to validate the abilities for.
 
 Alternatively, we can add a `find_object` method that will load the
 object on the mutation. This would allow you to use the
-`authorized_find!` and `authorized_find!` helper methods.
+`authorized_find!` helper method.
 
 When a user is not allowed to perform the action, or an object is not
 found, we should raise a

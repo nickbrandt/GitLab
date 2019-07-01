@@ -343,7 +343,7 @@ describe SystemNoteService do
       end
 
       it "posts the 'merge train' system note" do
-        expect(subject.note).to eq('added this merge request to the merge train at index 1')
+        expect(subject.note).to eq('added this merge request to the merge train at position 2')
       end
     end
   end

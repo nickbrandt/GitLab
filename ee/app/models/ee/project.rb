@@ -76,6 +76,8 @@ module EE
       has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
       has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
+      has_many :project_aliases
+
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
       scope :mirror, -> { where(mirror: true) }
@@ -235,11 +237,6 @@ module EE
       else
         licensed_feature_available?(feature, user)
       end
-    end
-
-    override :multiple_issue_boards_available?
-    def multiple_issue_boards_available?
-      feature_available?(:multiple_project_issue_boards)
     end
 
     def multiple_approval_rules_available?

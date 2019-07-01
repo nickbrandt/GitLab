@@ -258,22 +258,24 @@ export default {
               :can-reorder="canReorder"
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
+              class="qa-related-issuable-item"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             >
-              <issue-weight
-                v-if="issue.weight"
-                slot="weight"
-                :weight="issue.weight"
-                class="item-weight d-flex align-items-center ml-2 mr-0"
-                tag-name="span"
-              />
-              <issue-due-date
-                v-if="issue.due_date"
-                slot="dueDate"
-                :date="issue.due_date"
-                tooltip-placement="top"
-                css-class="item-due-date d-flex align-items-center ml-2 mr-0"
-              />
+              <span v-if="issue.weight" slot="weight" class="order-md-1">
+                <issue-weight
+                  :weight="issue.weight"
+                  class="item-weight d-flex align-items-center"
+                  tag-name="span"
+                />
+              </span>
+
+              <span v-if="issue.due_date" slot="dueDate" class="order-md-1">
+                <issue-due-date
+                  :date="issue.due_date"
+                  tooltip-placement="top"
+                  css-class="item-due-date d-flex align-items-center"
+                />
+              </span>
             </related-issuable-item>
           </li>
         </ul>

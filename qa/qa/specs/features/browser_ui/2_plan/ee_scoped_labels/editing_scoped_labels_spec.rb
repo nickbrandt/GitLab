@@ -11,7 +11,7 @@ module QA
 
         issue = Resource::Issue.fabricate_via_api! do |issue|
           issue.title = 'Issue to test the scoped labels'
-          issue.labels = @initial_label
+          issue.labels = [@initial_label]
         end
 
         [@new_label_same_scope, @new_label_different_scope].each do |label|

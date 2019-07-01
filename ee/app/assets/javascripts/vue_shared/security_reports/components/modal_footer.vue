@@ -33,6 +33,11 @@ export default {
       required: false,
       default: false,
     },
+    canDownloadPatch: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     canDismissVulnerability: {
       type: Boolean,
       required: false,
@@ -49,14 +54,23 @@ export default {
         action: 'createNewIssue',
       };
       const MRButton = {
-        name: s__('ciReport|Create merge request'),
-        tagline: s__('ciReport|Implement this solution by creating a merge request'),
+        name: s__('ciReport|Resolve with merge request'),
+        tagline: s__('ciReport|Automatically apply the patch in a new branch'),
         isLoading: this.modal.isCreatingMergeRequest,
         action: 'createMergeRequest',
+      };
+      const DownloadButton = {
+        name: s__('ciReport|Download patch to resolve'),
+        tagline: s__('ciReport|Download the patch to apply it manually'),
+        action: 'downloadPatch',
       };
 
       if (this.canCreateMergeRequest) {
         buttons.push(MRButton);
+      }
+
+      if (this.canDownloadPatch) {
+        buttons.push(DownloadButton);
       }
 
       if (this.canCreateIssue) {
@@ -87,8 +101,10 @@ export default {
     <split-button
       v-if="actionButtons.length > 1"
       :buttons="actionButtons"
+      class="js-split-button"
       @createMergeRequest="$emit('createMergeRequest')"
       @createNewIssue="$emit('createNewIssue')"
+      @downloadPatch="$emit('downloadPatch')"
     />
 
     <loading-button
@@ -97,6 +113,7 @@ export default {
       :disabled="actionButtons[0].isLoading"
       :label="actionButtons[0].name"
       container-class="btn btn-success btn-inverted"
+      class="js-action-button"
       @click="$emit(actionButtons[0].action)"
     />
   </div>

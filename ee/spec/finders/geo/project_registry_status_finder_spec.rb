@@ -18,8 +18,6 @@ describe Geo::ProjectRegistryStatusFinder, :geo, :geo_tracking_db do
   set(:never_synced_registry) { create(:geo_project_registry) }
   set(:never_synced_registry_with_failure) { create(:geo_project_registry, :repository_sync_failed) }
 
-  subject { described_class.new(current_node: secondary) }
-
   before do
     stub_current_geo_node(secondary)
   end

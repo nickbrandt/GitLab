@@ -682,19 +682,37 @@ describe QuickActions::InterpretService do
     end
 
     context 'issuable weights licensed' do
+      let(:issuable) { issue }
+
       before do
         stub_licensed_features(issue_weights: true)
       end
 
-      it_behaves_like 'weight command' do
-        let(:weight) { 5 }
+      context 'weight' do
         let(:content) { "/weight #{weight}" }
-        let(:issuable) { issue }
+
+        it_behaves_like 'weight command' do
+          let(:weight) { 5 }
+        end
+
+        it_behaves_like 'weight command' do
+          let(:weight) { 0 }
+        end
+
+        context 'when weight is negative' do
+          it 'does not populate weight' do
+            content = "/weight -10"
+            _, updates = service.execute(content, issuable)
+
+            expect(updates).to be_empty
+          end
+        end
       end
 
-      it_behaves_like 'clear weight command' do
-        let(:content) { '/clear_weight' }
-        let(:issuable) { issue }
+      context 'clear_weight' do
+        it_behaves_like 'clear weight command' do
+          let(:content) { '/clear_weight' }
+        end
       end
     end
 
@@ -751,6 +769,101 @@ describe QuickActions::InterpretService do
       it_behaves_like 'empty command' do
         let(:content) { "/merge" }
         let(:issuable) { build(:merge_request, source_project: project) }
+      end
+    end
+
+    context 'relate command' do
+      shared_examples 'relate command' do
+        it 'relates issues' do
+          service.execute(content, issue)
+
+          expect(IssueLink.where(source: issue).map(&:target)).to match_array(issues_related)
+        end
+      end
+
+      context 'user is member of group' do
+        before do
+          group.add_developer(user)
+        end
+
+        context 'relate a single issue' do
+          let(:other_issue) { create(:issue, project: project) }
+          let(:issues_related) { [other_issue] }
+          let(:content) { "/relate #{other_issue.to_reference}" }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'relate multiple issues at once' do
+          let(:second_issue) { create(:issue, project: project) }
+          let(:third_issue) { create(:issue, project: project) }
+          let(:issues_related) { [second_issue, third_issue] }
+          let(:content) { "/relate #{second_issue.to_reference} #{third_issue.to_reference}" }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'empty relate command' do
+          let(:issues_related) { [] }
+          let(:content) { '/relate' }
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'already having related issues' do
+          let(:second_issue) { create(:issue, project: project) }
+          let(:third_issue) { create(:issue, project: project) }
+          let(:issues_related) { [second_issue, third_issue] }
+          let(:content) { "/relate #{third_issue.to_reference(project)}" }
+
+          before do
+            create(:issue_link, source: issue, target: second_issue)
+          end
+
+          it_behaves_like 'relate command'
+        end
+
+        context 'cross project' do
+          let(:another_group) { create(:group, :public) }
+          let(:other_project) { create(:project, group: another_group) }
+
+          before do
+            another_group.add_developer(current_user)
+          end
+
+          context 'relate a cross project issue' do
+            let(:other_issue) { create(:issue, project: other_project) }
+            let(:issues_related) { [other_issue] }
+            let(:content) { "/relate #{other_issue.to_reference(project)}" }
+
+            it_behaves_like 'relate command'
+          end
+
+          context 'relate multiple cross projects issues at once' do
+            let(:second_issue) { create(:issue, project: other_project) }
+            let(:third_issue) { create(:issue, project: other_project) }
+            let(:issues_related) { [second_issue, third_issue] }
+            let(:content) { "/relate #{second_issue.to_reference(project)} #{third_issue.to_reference(project)}" }
+
+            it_behaves_like 'relate command'
+          end
+
+          context 'relate a non-existing issue' do
+            let(:issues_related) { [] }
+            let(:content) { "/relate imaginary#1234" }
+
+            it_behaves_like 'relate command'
+          end
+
+          context 'relate a private issue' do
+            let(:private_project) { create(:project, :private) }
+            let(:other_issue) { create(:issue, project: private_project) }
+            let(:issues_related) { [] }
+            let(:content) { "/relate #{other_issue.to_reference(project)}" }
+
+            it_behaves_like 'relate command'
+          end
+        end
       end
     end
   end

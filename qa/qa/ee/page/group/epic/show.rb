@@ -22,7 +22,14 @@ module QA
 
             view 'ee/app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
               element :add_issue_button
+            end
+
+            view 'ee/app/assets/javascripts/related_issues/components/related_issuable_input.vue' do
               element :add_issue_input
+            end
+
+            view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
+              element :related_issuable_item
             end
 
             view 'ee/app/assets/javascripts/related_issues/constants.js' do
@@ -57,6 +64,14 @@ module QA
 
             def close_reopen_epic
               click_element :close_reopen_epic_button
+            end
+
+            def has_related_issuable_item?
+              has_element?(:related_issuable_item)
+            end
+
+            def has_no_related_issuable_item?
+              has_no_element?(:related_issuable_item)
             end
           end
         end

@@ -1,6 +1,7 @@
 <script>
+import settingsMixin from 'ee_else_ce/pages/projects/shared/permissions/mixins/settings_pannel_mixin';
 import projectFeatureSetting from './project_feature_setting.vue';
-import projectFeatureToggle from '../../../../../vue_shared/components/toggle_button.vue';
+import projectFeatureToggle from '~/vue_shared/components/toggle_button.vue';
 import projectSettingRow from './project_setting_row.vue';
 import { visibilityOptions, visibilityLevelDescriptions } from '../constants';
 import { toggleHiddenClassBySelector } from '../external';
@@ -11,6 +12,7 @@ export default {
     projectFeatureToggle,
     projectSettingRow,
   },
+  mixins: [settingsMixin],
 
   props: {
     currentSettings: {
@@ -78,7 +80,6 @@ export default {
       default: '',
     },
   },
-
   data() {
     const defaults = {
       visibilityOptions,
@@ -92,7 +93,6 @@ export default {
       pagesAccessLevel: 20,
       containerRegistryEnabled: true,
       lfsEnabled: true,
-      packagesEnabled: true,
       requestAccessEnabled: true,
       highlightChangesClass: false,
     };
@@ -159,26 +159,6 @@ export default {
       }
     },
 
-    repositoryAccessLevel(value, oldValue) {
-      if (value < oldValue) {
-        // sub-features cannot have more premissive access level
-        this.mergeRequestsAccessLevel = Math.min(this.mergeRequestsAccessLevel, value);
-        this.buildsAccessLevel = Math.min(this.buildsAccessLevel, value);
-
-        if (value === 0) {
-          this.containerRegistryEnabled = false;
-          this.lfsEnabled = false;
-          this.packagesEnabled = false;
-        }
-      } else if (oldValue === 0) {
-        this.mergeRequestsAccessLevel = value;
-        this.buildsAccessLevel = value;
-        this.containerRegistryEnabled = true;
-        this.lfsEnabled = true;
-        this.packagesEnabled = true;
-      }
-    },
-
     issuesAccessLevel(value, oldValue) {
       if (value === 0) toggleHiddenClassBySelector('.issues-feature', true);
       else if (oldValue === 0) toggleHiddenClassBySelector('.issues-feature', false);
@@ -220,23 +200,20 @@ export default {
               <option
                 :value="visibilityOptions.PRIVATE"
                 :disabled="!visibilityAllowed(visibilityOptions.PRIVATE)"
+                >Private</option
               >
-                Private
-              </option>
               <option
                 :value="visibilityOptions.INTERNAL"
                 :disabled="!visibilityAllowed(visibilityOptions.INTERNAL)"
+                >Internal</option
               >
-                Internal
-              </option>
               <option
                 :value="visibilityOptions.PUBLIC"
                 :disabled="!visibilityAllowed(visibilityOptions.PUBLIC)"
+                >Public</option
               >
-                Public
-              </option>
             </select>
-            <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"> </i>
+            <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"></i>
           </div>
         </div>
         <span class="form-text text-muted">{{ visibilityLevelDescription }}</span>

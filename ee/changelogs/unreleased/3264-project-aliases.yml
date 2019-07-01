@@ -1,0 +1,5 @@
+---
+title: Support remapping of Git repos via SSH with project aliases
+merge_request: 14108
+author:
+type: added

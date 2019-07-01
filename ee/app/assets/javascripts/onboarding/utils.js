@@ -8,8 +8,13 @@ import {
 
 const isOnboardingDismissed = () => Cookies.get(ONBOARDING_DISMISSED_COOKIE_NAME) === 'true';
 
-const updateOnboardingDismissed = dismissed =>
+const updateOnboardingDismissed = dismissed => {
   Cookies.set(ONBOARDING_DISMISSED_COOKIE_NAME, dismissed);
+
+  if (dismissed && AccessorUtilities.isLocalStorageAccessSafe()) {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+};
 
 const resetOnboardingLocalStorage = () => {
   if (AccessorUtilities.isLocalStorageAccessSafe()) {

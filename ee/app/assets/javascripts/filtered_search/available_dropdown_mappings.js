@@ -6,7 +6,7 @@ import AvailableDropdownMappingsCE from '~/filtered_search/available_dropdown_ma
 export default class AvailableDropdownMappings {
   constructor(
     container,
-    baseEndpoint,
+    runnerTagsEndpoint,
     labelsEndpoint,
     milestonesEndpoint,
     groupsOnly,
@@ -14,7 +14,7 @@ export default class AvailableDropdownMappings {
     includeDescendantGroups,
   ) {
     this.container = container;
-    this.baseEndpoint = baseEndpoint;
+    this.runnerTagsEndpoint = runnerTagsEndpoint;
     this.labelsEndpoint = labelsEndpoint;
     this.milestonesEndpoint = milestonesEndpoint;
     this.groupsOnly = groupsOnly;
@@ -23,7 +23,7 @@ export default class AvailableDropdownMappings {
 
     this.ceAvailableMappings = new AvailableDropdownMappingsCE(
       container,
-      baseEndpoint,
+      runnerTagsEndpoint,
       labelsEndpoint,
       milestonesEndpoint,
       groupsOnly,

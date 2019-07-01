@@ -41,12 +41,13 @@ You can create groups for numerous reasons. To name a couple:
 - Make it easier to `@mention` all of your team at once in issues and merge requests by creating a group and including the appropriate members.
 
 For example, you could create a group for your company members, and create a [subgroup](subgroups/index.md) for each individual team. Let's say you create a group called `company-team`, and you create subgroups in this group for the individual teams `backend-team`, `frontend-team`, and `production-team`.
-    - When you start a new implementation from an issue, you add a comment:
-        _"`@company-team`, let's do it! `@company-team/backend-team` you're good to go!"_
-    - When your backend team needs help from frontend, they add a comment:
-        _"`@company-team/frontend-team` could you help us here please?"_
-    - When the frontend team completes their implementation, they comment:
-        _"`@company-team/backend-team`, it's done! Let's ship it `@company-team/production-team`!"_
+
+- When you start a new implementation from an issue, you add a comment:
+  _"`@company-team`, let's do it! `@company-team/backend-team` you're good to go!"_
+- When your backend team needs help from frontend, they add a comment:
+  _"`@company-team/frontend-team` could you help us here please?"_
+- When the frontend team completes their implementation, they comment:
+  _"`@company-team/backend-team`, it's done! Let's ship it `@company-team/production-team`!"_
 
 ## Namespaces
 
@@ -216,6 +217,8 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 [Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
 ## Insights **[ULTIMATE]**
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/725) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 
 Configure the Insights that matter for your groups or projects, allowing users
 to explore data such as:

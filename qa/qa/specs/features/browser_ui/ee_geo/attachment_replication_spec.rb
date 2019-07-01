@@ -28,6 +28,8 @@ module QA
             issue.project = @project
           end
 
+          @issue.visit!
+
           Page::Project::Issue::Show.perform do |show|
             show.comment('See attached banana for scale', attachment: file_to_attach)
           end

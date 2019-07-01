@@ -17,13 +17,14 @@ module EE
     def find_group_cluster_platform_kubernetes(environment: nil)
       return super unless environment && feature_available?(:multiple_clusters)
 
-      # on_environment use CASE which returns numbers in descending order
-      # So we have to use `hierarchy_order: :desc` + last
+      # With relevant_only: true
+      # on_environment use CASE which returns numbers in ascending order
+      # So we can use `hierarchy_order: :asc` + first
       ::Clusters::Cluster
         .enabled
-        .on_environment(environment)
-        .ancestor_clusters_for_clusterable(self, hierarchy_order: :desc)
-        .last&.platform_kubernetes
+        .on_environment(environment, relevant_only: true)
+        .ancestor_clusters_for_clusterable(self, hierarchy_order: :asc)
+        .first&.platform_kubernetes
     end
 
     override :find_instance_cluster_platform_kubernetes

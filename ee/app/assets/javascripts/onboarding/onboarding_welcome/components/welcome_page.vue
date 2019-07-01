@@ -42,7 +42,7 @@ export default {
         target: null,
         content: {
           text: __('White helpers give contextual information.'),
-          buttons: [{ text: __('OK'), btnClass: 'btn-primary', disabled: true }],
+          buttons: [{ text: __('OK'), btnClass: 'btn-primary', readOnly: true }],
         },
       },
       actionPopover: {

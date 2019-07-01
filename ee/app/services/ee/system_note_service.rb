@@ -197,7 +197,7 @@ module EE
       body = if index == 0
                'started a merge train'
              else
-               "added this merge request to the merge train at index #{index}"
+               "added this merge request to the merge train at position #{index + 1}"
              end
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))

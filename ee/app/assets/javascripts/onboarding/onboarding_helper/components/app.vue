@@ -2,9 +2,12 @@
 import _ from 'underscore';
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { redirectTo } from '~/lib/utils/url_utility';
+import Stats from 'ee/stats';
 import OnboardingHelper from './onboarding_helper.vue';
 import actionPopoverUtils from './../action_popover_utils';
 import eventHub from '../event_hub';
+
+const TRACKING_CATEGORY = 'onboarding';
 
 export default {
   components: {
@@ -108,6 +111,10 @@ export default {
     },
     handleRestartStep() {
       this.showExitTourContent(false);
+      Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+        label: this.getTrackingLabel(),
+        property: 'restart_this_step',
+      });
       eventHub.$emit('onboardingHelper.hideActionPopover');
     },
     handleSkipStep() {
@@ -115,15 +122,24 @@ export default {
         const { selector } = this.actionPopover;
         const popoverEl = selector ? document.querySelector(selector) : null;
         if (popoverEl) {
+          Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+            label: this.getTrackingLabel(),
+            property: 'skip_this_step',
+          });
           popoverEl.click();
         }
       }
     },
     handleClickPopoverButton(button) {
       const { showExitTourContent, exitTour, redirectPath, nextPart, dismissPopover } = button;
-      const helpContentItems = this.stepContent.getHelpContent({ projectName: this.projectName });
+      const helpContentItems = this.stepContent
+        ? this.stepContent.getHelpContent({ projectName: this.projectName })
+        : null;
+
       const showNextContentItem =
-        helpContentItems.length > 1 && this.helpContentIndex < helpContentItems.length - 1;
+        helpContentItems &&
+        helpContentItems.length > 1 &&
+        this.helpContentIndex < helpContentItems.length - 1;
 
       // display exit tour content
       if (showExitTourContent) {
@@ -161,11 +177,23 @@ export default {
         return;
       }
 
-      // show action popover
+      Stats.trackEvent(TRACKING_CATEGORY, 'click_button', {
+        label: this.getTrackingLabel(),
+        property: 'got_it',
+      });
+
       this.showActionPopover();
+    },
+    handleShowExitTourContent(showExitTour) {
+      Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+        label: this.getTrackingLabel(),
+        property: 'exit_learn_gitlab',
+      });
+      this.showExitTourContent(showExitTour);
     },
     showExitTourContent(showExitTour) {
       this.dismissPopover = false;
+      this.showStepContent = true;
       this.setExitTour(showExitTour);
     },
     handleExitTour() {
@@ -177,6 +205,10 @@ export default {
     },
     afterAppearHook() {
       this.initialShowPopover = true;
+    },
+    getTrackingLabel() {
+      const step = this.stepIndex + 1;
+      return `part_${this.tourKey}_step_${step}`;
     },
   },
 };
@@ -198,7 +230,7 @@ export default {
       @clickPopoverButton="handleClickPopoverButton"
       @restartStep="handleRestartStep"
       @skipStep="handleSkipStep"
-      @showExitTourContent="showExitTourContent"
+      @showExitTourContent="handleShowExitTourContent"
       @exitTour="handleExitTour"
     />
   </transition>

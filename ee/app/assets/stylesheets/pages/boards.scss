@@ -61,17 +61,14 @@
 }
 
 .board-type-assignee {
-  .board-title-text,
-  .board-title-sub-text {
-    @include str-truncated(110px);
-  }
-
   .board-title-text {
-    margin-right: 0;
+    margin-right: $gl-padding-8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .board-title-sub-text {
-    margin-right: auto;
     color: $gl-text-color-secondary;
     font-weight: normal;
   }

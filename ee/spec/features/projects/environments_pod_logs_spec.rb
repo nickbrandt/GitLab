@@ -16,7 +16,8 @@ describe 'Environment > Pod Logs', :js do
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
     create(:deployment, :success, environment: environment)
 
-    allow_any_instance_of(EE::KubernetesService).to receive(:read_pod_logs).with(pod_name).and_return(kube_logs_body)
+    allow_any_instance_of(EE::KubernetesService).to receive(:read_pod_logs)
+      .with(pod_name, environment.deployment_namespace).and_return(kube_logs_body)
     allow_any_instance_of(EE::Environment).to receive(:pod_names).and_return(pod_names)
 
     sign_in(project.owner)

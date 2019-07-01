@@ -2,10 +2,6 @@
 
 module Geo
   class LfsObjectRegistryFinder < FileRegistryFinder
-    def initialize(current_node:)
-      @current_node = Geo::Fdw::GeoNode.find(current_node.id)
-    end
-
     def count_registry
       Geo::FileRegistry.lfs_objects.count
     end

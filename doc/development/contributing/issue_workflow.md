@@ -43,6 +43,10 @@ The descriptions on the [labels page][labels-page] explain what falls under each
 Subject labels are labels that define what area or feature of GitLab this issue
 hits. They are not always necessary, but very convenient.
 
+Subject labels are now used to infer and apply relevant group and devops stage
+labels. Please apply them whenever possible to facilitate accurate matching.
+Please refer to [this merge request][inferred-labels] for more information.
+
 Examples of subject labels are ~wiki, ~ldap, ~api,
 ~issues, ~"merge requests", ~labels, and ~"Container Registry".
 
@@ -65,10 +69,12 @@ The current team labels are:
 - ~Defend
 - ~Distribution
 - ~Documentation
+- ~Ecosystem
 - ~Geo
 - ~Gitaly
 - ~Growth
 - ~Manage
+- ~Memory
 - ~Monitor
 - ~Plan
 - ~Quality
@@ -186,20 +192,20 @@ There can be multiple facets of the impact. The below is a guideline.
 
 If a bug seems to fall between two severity labels, assign it to the higher-severity label.
 
-* Example(s) of ~S1
-  * Data corruption/loss. 
-  * Security breach.
-  * Unable to create an issue or merge request. 
-  * Unable to add a comment or discussion to the issue or merge request.
-* Example(s) of ~S2
-  * Cannot submit changes through the web IDE but the commandline works.
-  * A status widget on the merge request page is not working but information can be seen in the test pipeline page.
-* Example(s) of ~S3
-  * Can create merge requests only from the Merge Requests list view, not from an Issue page.
-  * Status is not updated in real time and needs a page refresh.
-* Example(s) of ~S4
-  * Label colors are incorrect.
-  * UI elements are not fully aligned.
+- Example(s) of ~S1
+  - Data corruption/loss. 
+  - Security breach.
+  - Unable to create an issue or merge request. 
+  - Unable to add a comment or discussion to the issue or merge request.
+- Example(s) of ~S2
+  - Cannot submit changes through the web IDE but the commandline works.
+  - A status widget on the merge request page is not working but information can be seen in the test pipeline page.
+- Example(s) of ~S3
+  - Can create merge requests only from the Merge Requests list view, not from an Issue page.
+  - Status is not updated in real time and needs a page refresh.
+- Example(s) of ~S4
+  - Label colors are incorrect.
+  - UI elements are not fully aligned.
   
 ## Label for community contributors
 
@@ -442,3 +448,4 @@ A recent example of this was the issue for
 [labels-page]: https://gitlab.com/gitlab-org/gitlab-ce/labels
 [ce-tracker]: https://gitlab.com/gitlab-org/gitlab-ce/issues
 [ee-tracker]: https://gitlab.com/gitlab-org/gitlab-ee/issues
+[inferred-labels]: https://gitlab.com/gitlab-org/quality/triage-ops/merge_requests/155

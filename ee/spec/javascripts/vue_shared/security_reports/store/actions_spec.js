@@ -43,6 +43,7 @@ import actions, {
   receiveCreateIssue,
   receiveCreateIssueError,
   createNewIssue,
+  downloadPatch,
   requestCreateMergeRequest,
   receiveCreateMergeRequestSuccess,
   receiveCreateMergeRequestError,
@@ -1566,6 +1567,32 @@ describe('security reports actions', () => {
         ],
         done,
       );
+    });
+  });
+
+  describe('downloadPatch', () => {
+    it('creates a download link and clicks on it to download the file', () => {
+      spyOn(document, 'createElement').and.callThrough();
+      spyOn(document.body, 'appendChild').and.callThrough();
+      spyOn(document.body, 'removeChild').and.callThrough();
+
+      downloadPatch({
+        state: {
+          modal: {
+            vulnerability: {
+              remediations: [
+                {
+                  diff: 'abcdef',
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      expect(document.createElement).toHaveBeenCalledTimes(1);
+      expect(document.body.appendChild).toHaveBeenCalledTimes(1);
+      expect(document.body.removeChild).toHaveBeenCalledTimes(1);
     });
   });
 

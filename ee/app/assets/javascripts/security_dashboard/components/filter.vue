@@ -48,8 +48,8 @@ export default {
     isSelected(option) {
       return this.selection.has(option.id);
     },
-    closeDropdown(event) {
-      this.$root.$emit('clicked::link', event);
+    closeDropdown() {
+      this.$refs.dropdown.$children[0].hide(true);
     },
   },
 };
@@ -58,7 +58,7 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <gl-dropdown class="d-block mt-1" menu-class="dropdown-extended-height">
+    <gl-dropdown ref="dropdown" class="d-block mt-1" menu-class="dropdown-extended-height">
       <template slot="button-content">
         <span class="text-truncate">
           {{ selectedOptionText.firstOption }}

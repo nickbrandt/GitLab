@@ -66,15 +66,6 @@ describe Boards::CreateService, services: true do
         end
       end
     end
-
-    it 'skips creating a second board when the feature is not available' do
-      stub_licensed_features(multiple_project_issue_boards: false)
-      service = described_class.new(parent, double)
-
-      expect(service.execute).not_to be_nil
-
-      expect { service.execute }.not_to change(parent.boards, :count)
-    end
   end
 
   describe '#execute' do
@@ -84,6 +75,14 @@ describe Boards::CreateService, services: true do
 
     it_behaves_like 'boards create service' do
       let(:parent) { create(:group) }
+
+      it 'skips creating a second board when the feature is not available' do
+        stub_licensed_features(multiple_group_issue_boards: false)
+        service = described_class.new(parent, double)
+
+        expect(service.execute).not_to be_nil
+        expect { service.execute }.not_to change(parent.boards, :count)
+      end
     end
 
     it_behaves_like 'board with milestone predefined scope' do

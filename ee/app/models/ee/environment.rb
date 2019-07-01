@@ -12,6 +12,15 @@ module EE
       has_one :last_pipeline, through: :last_deployable, source: 'pipeline'
     end
 
+    def reactive_cache_updated
+      super
+
+      ::Gitlab::EtagCaching::Store.new.tap do |store|
+        store.touch(
+          ::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+      end
+    end
+
     def pod_names
       return [] unless rollout_status
 
@@ -37,7 +46,11 @@ module EE
     end
 
     def rollout_status
-      deployment_platform.rollout_status(self) if has_terminals?
+      result = with_reactive_cache do |data|
+        deployment_platform.rollout_status(self, data)
+      end
+
+      result || ::Gitlab::Kubernetes::RolloutStatus.loading
     end
   end
 end

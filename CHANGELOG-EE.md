@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.0.2 (2019-06-25)
+
+### Fixed (1 change)
+
+- Take into account events created before milestone start. !14184
+
+
+## 12.0.1 (2019-06-24)
+
+- No changes.
+
 ## 12.0.0 (2019-06-22)
 
 ### Security (2 changes)
@@ -132,6 +143,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove commit count from storage quotass.
 
 
+## 11.11.4 (2019-06-26)
+
+### Fixed (1 change)
+
+- Use quarantine size to check push size against repository size limit. !14269
+
+
 ## 11.11.3 (2019-06-10)
 
 ### Fixed (1 change)
@@ -243,6 +261,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Move ee-specific code from boards/components/issue_card_inner.vue. !11032 (Roman Rodionov)
 - Make all billing cards fit in view. !11602
 - Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
+
+
+## 11.10.7 (2019-06-26)
+
+### Fixed (1 change)
+
+- Use quarantine size to check push size against repository size limit. !14271
 
 
 ## 11.10.6 (2019-06-04)

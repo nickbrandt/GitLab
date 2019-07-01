@@ -244,15 +244,15 @@ describe('Insights store actions', () => {
     });
   });
 
-  describe('setChartData', () => {
-    it('commits SET_CHART_DATA', done => {
-      const chartData = { a: { data: 'data' } };
+  describe('initChartData', () => {
+    it('commits INIT_CHART_DATA', done => {
+      const keys = ['a', 'b'];
 
       testAction(
-        actions.setChartData,
-        chartData,
+        actions.initChartData,
+        keys,
         null,
-        [{ type: 'SET_CHART_DATA', payload: chartData }],
+        [{ type: 'INIT_CHART_DATA', payload: keys }],
         [],
         done,
       );

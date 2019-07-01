@@ -3,7 +3,7 @@ import { mapActions, mapState } from 'vuex';
 import { s__, sprintf, n__ } from '~/locale';
 import createFlash from '~/flash';
 import ReportSection from '~/reports/components/report_section.vue';
-import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
+import { componentNames } from 'ee/reports/components/issue_body';
 import IssueModal from './components/modal.vue';
 import mixin from './mixins/security_report_mixin';
 import reportsMixin from './mixins/reports_mixin';
@@ -236,6 +236,7 @@ export default {
       'createMergeRequest',
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
+      'downloadPatch',
     ]),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {
@@ -325,6 +326,7 @@ export default {
       @dismissVulnerability="dismissVulnerability"
       @openDismissalCommentBox="openDismissalCommentBox()"
       @revertDismissVulnerability="revertDismissVulnerability"
+      @downloadPatch="downloadPatch"
     />
   </div>
 </template>

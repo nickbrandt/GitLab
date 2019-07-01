@@ -12,6 +12,7 @@ describe('custom metrics form fields component', () => {
   const validQueryResponse = { data: { success: true, query: { valid: true, error: '' } } };
   const csrfToken = 'mockToken';
   const formOperation = 'post';
+  const debouncedValidateQueryMock = jest.fn();
   const makeFormData = (data = {}) => ({
     formData: {
       title: '',
@@ -32,6 +33,9 @@ describe('custom metrics form fields component', () => {
       },
       csrfToken,
       sync: false,
+      methods: {
+        debouncedValidateQuery: debouncedValidateQueryMock,
+      },
     });
   };
 
@@ -120,18 +124,14 @@ describe('custom metrics form fields component', () => {
       jest.runAllTimers();
     });
 
-    it('checks validity on user input', done => {
+    it('checks validity on user input', () => {
       const query = 'changedQuery';
       mountComponent();
-      const spy = jest.spyOn(component.vm, 'debouncedValidateQuery');
-      const queryInput = getNamedInput(name);
-      queryInput.value = query;
-      queryInput.dispatchEvent(new Event('input'));
+      const queryInput = component.find(`input[name="${name}"]`);
+      queryInput.setValue(query);
+      queryInput.trigger('input');
 
-      component.vm.$nextTick(() => {
-        expect(spy).toHaveBeenCalledWith(query);
-        done();
-      });
+      expect(debouncedValidateQueryMock).toHaveBeenCalledWith(query);
     });
 
     describe('when query is invalid', () => {
