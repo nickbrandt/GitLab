@@ -4306,6 +4306,9 @@ msgstr ""
 msgid "DeployBoard|Matching on the %{appLabel} label has been removed for deploy boards. To see all instances on your board, you must update your chart and redeploy."
 msgstr ""
 
+msgid "Deploy to..."
+msgstr ""
+
 msgid "DeployKeys|+%{count} others"
 msgstr ""
 
