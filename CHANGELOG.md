@@ -4,6 +4,7 @@ entry.
 
 ## 12.0.3 (2019-06-27)
 
+- No changes.
 ### Security (9 changes)
 
 - Persist tmp snippet uploads at users.
