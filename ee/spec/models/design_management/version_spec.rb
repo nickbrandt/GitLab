@@ -33,16 +33,30 @@ describe DesignManagement::Version do
   end
 
   describe "scopes" do
+    let(:version_1) { create(:design_version) }
+    let(:version_2) { create(:design_version) }
+
     describe ".for_designs" do
       it "only returns versions related to the specified designs" do
-        version_1 = create(:design_version)
-        version_2 = create(:design_version)
         _other_version = create(:design_version)
         designs = [create(:design, versions: [version_1]),
                    create(:design, versions: [version_2])]
 
         expect(described_class.for_designs(designs))
           .to contain_exactly(version_1, version_2)
+      end
+    end
+
+    describe '.earlier_or_equal_to' do
+      it 'only returns versions created earlier or later than the given version' do
+        expect(described_class.earlier_or_equal_to(version_1)).to eq([version_1])
+        expect(described_class.earlier_or_equal_to(version_2)).to contain_exactly(version_1, version_2)
+      end
+
+      it 'can be passed either a DesignManagement::Design or an ID' do
+        [version_1, version_1.id].each do |arg|
+          expect(described_class.earlier_or_equal_to(arg)).to eq([version_1])
+        end
       end
     end
   end

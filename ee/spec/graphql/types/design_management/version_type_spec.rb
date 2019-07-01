@@ -5,5 +5,5 @@ require 'spec_helper'
 describe GitlabSchema.types['DesignVersion'] do
   it { expect(described_class).to require_graphql_authorizations(:read_design) }
 
-  it { expect(described_class).to have_graphql_fields(:sha, :designs) }
+  it { expect(described_class).to have_graphql_fields(:id, :sha, :designs) }
 end

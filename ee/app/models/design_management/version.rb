@@ -19,7 +19,7 @@ module DesignManagement
     scope :for_designs, -> (designs) do
       where(id: DesignVersion.where(design_id: designs).select(:version_id)).distinct
     end
-
+    scope :earlier_or_equal_to, -> (version) { where('id <= ?', version) }
     scope :ordered, -> { order(id: :desc) }
 
     def self.create_for_designs(designs, sha)
