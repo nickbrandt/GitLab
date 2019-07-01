@@ -66,7 +66,7 @@ module API
             next unless collection
 
             targets = collection.map(&:target)
-            options[type] = { issuable_metadata: issuable_meta_data(targets, type) }
+            options[type] = { issuable_metadata: issuable_meta_data(targets, type, current_user) }
           end
         end
       end

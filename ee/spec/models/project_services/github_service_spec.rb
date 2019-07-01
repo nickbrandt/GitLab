@@ -30,6 +30,18 @@ describe GithubService do
     it { is_expected.to belong_to :project }
   end
 
+  describe "Validations" do
+    context 'when base_url is a localhost url' do
+      let(:base_url) { 'http://127.0.0.1' }
+
+      describe '#valid?' do
+        it 'is not valid' do
+          expect(subject).not_to be_valid
+        end
+      end
+    end
+  end
+
   describe "#owner" do
     it 'is determined from the repo URL' do
       expect(subject.owner).to eq owner
@@ -68,6 +80,16 @@ describe GithubService do
     let(:status_options) { { context: 'security', target_url: 'https://localhost.pipeline.example.com', description: "SAST passed" } }
     let(:status_message) { double(sha: sha, status: :success, status_options: status_options) }
     let(:notifier) { instance_double(GithubService::StatusNotifier) }
+
+    context 'the service is invalid' do
+      it 'does not notify GitHub of a status change' do
+        allow(subject).to receive(:invalid?).and_return(true)
+
+        expect(GithubService::StatusMessage).not_to receive(:from_pipeline_data)
+
+        subject.execute(pipeline_sample_data)
+      end
+    end
 
     it 'notifies GitHub of a status change' do
       expect(notifier).to receive(:notify)
