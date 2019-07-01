@@ -566,6 +566,7 @@ entry.
 
 ## 11.10.8 (2019-06-27)
 
+- No changes.
 ### Security (9 changes)
 
 - Add missing authorizations in GraphQL.
