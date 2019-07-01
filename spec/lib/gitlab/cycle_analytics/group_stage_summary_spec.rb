@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Gitlab::CycleAnalytics::GroupStageSummary do
@@ -26,29 +27,6 @@ describe Gitlab::CycleAnalytics::GroupStageSummary do
       expect(subject.first[:value]).to eq(2)
     end
   end
-
-  # describe "#commits" do
-  #   it "finds the number of commits created after the 'from date'" do
-  #     Timecop.freeze(5.days.ago) { create_commit("Test message", project, user, 'master') }
-  #     Timecop.freeze(5.days.from_now) { create_commit("Test message", project_2, user, 'master') }
-  #     Timecop.freeze(5.days.from_now) { create_commit("Test message", project, user, 'master') }
-
-  #     expect(subject.second[:value]).to eq(2)
-  #   end
-
-  #   it "doesn't find commits from other projects" do
-  #     Timecop.freeze(5.days.from_now) { create_commit("Test message", create(:project, :repository, namespace: create(:group)), user, 'master') }
-
-  #     expect(subject.second[:value]).to eq(0)
-  #   end
-
-  #   it "finds a large (> 100) snumber of commits if present" do
-  #     Timecop.freeze(5.days.from_now) { create_commit("Test message", project, user, 'master', count: 51) }
-  #     Timecop.freeze(5.days.from_now) { create_commit("Test message", project_2, user, 'master', count: 51) }
-
-  #     expect(subject.second[:value]).to eq(100)
-  #   end
-  # end
 
   describe "#deploys" do
     it "finds the number of deploys made created after the 'from date'" do

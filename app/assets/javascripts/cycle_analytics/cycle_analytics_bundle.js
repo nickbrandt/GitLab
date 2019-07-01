@@ -2,6 +2,7 @@ import $ from 'jquery';
 import Vue from 'vue';
 import Cookies from 'js-cookie';
 import Flash from '../flash';
+import { __ } from '~/locale';
 import Translate from '../vue_shared/translate';
 import banner from './components/banner.vue';
 import stageCodeComponent from './components/stage_code_component.vue';
@@ -11,18 +12,23 @@ import stageStagingComponent from './components/stage_staging_component.vue';
 import stageTestComponent from './components/stage_test_component.vue';
 import CycleAnalyticsService from './cycle_analytics_service';
 import CycleAnalyticsStore from './cycle_analytics_store';
-import { __ } from '~/locale';
+// import eventHub from '../../../../ee/app/assets/javascripts/analytics/shared/eventhub';
+import GroupsDropdownFilter from '../../../../ee/app/assets/javascripts/analytics/shared/components/groups_dropdown_filter.vue';
+import ProjectsDropdownFilter from '../../../../ee/app/assets/javascripts/analytics/shared/components/projects_dropdown_filter.vue';
 
 Vue.use(Translate);
 
 export default () => {
   const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
+  const cycleAnalyticsEl = document.querySelector('#cycle-analytics');
 
   // eslint-disable-next-line no-new
   new Vue({
     el: '#cycle-analytics',
     name: 'CycleAnalytics',
     components: {
+      GroupsDropdownFilter,
+      ProjectsDropdownFilter,
       banner,
       'stage-issue-component': stageComponent,
       'stage-plan-component': stageComponent,
@@ -33,12 +39,8 @@ export default () => {
       'stage-production-component': stageComponent,
     },
     data() {
-      const cycleAnalyticsEl = document.querySelector('#cycle-analytics');
-      const cycleAnalyticsService = new CycleAnalyticsService({
-        requestPath: cycleAnalyticsEl.dataset.requestPath,
-      });
-
       return {
+        selectedGroup: null,
         store: CycleAnalyticsStore,
         state: CycleAnalyticsStore.state,
         isLoading: false,
@@ -47,7 +49,7 @@ export default () => {
         hasError: false,
         startDate: 30,
         isOverviewDialogDismissed: Cookies.get(OVERVIEW_DIALOG_COOKIE),
-        service: cycleAnalyticsService,
+        service: this.createCycleAnalyticsService(cycleAnalyticsEl.dataset.requestPath),
       };
     },
     computed: {
@@ -56,7 +58,16 @@ export default () => {
       },
     },
     created() {
-      this.fetchCycleAnalyticsData();
+      // Conditional check placed here to prevent this method from being called on the 
+      // new Cycle Analytics page. Once the old page has been removed this entire 
+      // created method can be entirely removed and the cycleAnalyticsEl const moved 
+      // back into being a local variable within the data method.
+      if(cycleAnalyticsEl.dataset.requestPath)
+        this.fetchCycleAnalyticsData();
+    },
+    mounted() {
+      // this.$on('setSelectedGroup', this.setSelectedGroup);
+      // this.$on('setSelectedProject', this.setSelectedProject);
     },
     methods: {
       handleError() {
@@ -133,6 +144,23 @@ export default () => {
         this.isOverviewDialogDismissed = true;
         Cookies.set(OVERVIEW_DIALOG_COOKIE, '1', { expires: 365 });
       },
+      createCycleAnalyticsService(requestPath) {
+        return new CycleAnalyticsService({
+          requestPath,
+        });
+      },
+      renderSelectedItem(selectedItemURL) {
+        this.service = this.createCycleAnalyticsService(selectedItemURL);
+        this.fetchCycleAnalyticsData();
+      },
+      setSelectedGroup(selectedGroup) {
+        this.selectedGroup = selectedGroup;
+        this.renderSelectedItem(`/groups/${selectedGroup.path}/-/cycle_analytics`);
+      },
+      setSelectedProject(selectedProject) {
+        this.selectedProject = selectedProject;
+        this.renderSelectedItem(`/${selectedProject.path}/cycle_analytics`);
+      }
     },
   });
 };

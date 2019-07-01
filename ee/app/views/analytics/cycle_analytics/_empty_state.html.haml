@@ -1,0 +1,9 @@
+.row.empty-state.mt-3{ "v-show" => "!selectedGroup" }
+  .col-12
+    .svg-content
+      = image_tag 'illustrations/analytics/cycle-analytics-empty-chart.svg'
+  .col-12
+    .text-content
+      %h4= _("Cycle Analytics can help you determine your team’s velocity")
+      %p
+        = _("Start by choosing a group to see how your team is spending time. You can then drill down to the project level.")
