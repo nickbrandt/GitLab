@@ -19,7 +19,7 @@ module EE
 
       has_one :saml_provider
       has_one :ip_restriction
-      accepts_nested_attributes_for :ip_restriction, allow_destroy: true
+      accepts_nested_attributes_for :ip_restriction, allow_destroy: true, reject_if: :all_blank
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
       has_one :scim_oauth_access_token
