@@ -2,6 +2,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 12.0.3 (2019-06-27)
 
+- No changes.
 ### Security (2 changes)
 
 - Gate MR head_pipeline behind read_pipeline ability.
