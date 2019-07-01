@@ -790,13 +790,13 @@ migration:upgrade-pg-ce-to-ee:
   <<: *migration-paths-upgrade-ce-to-ee
   <<: *use-pg
   only:
-    - /[\d-]+-stable(-ee)?/
+    - /^[\d-]+-stable(-ee)?$/
 
 migration:upgrade-mysql-ce-to-ee:
   <<: *migration-paths-upgrade-ce-to-ee
   <<: *use-mysql
   only:
-    - /[\d-]+-stable(-ee)?/
+    - /^[\d-]+-stable(-ee)?$/
 
 .db-rollback: &db-rollback
   <<: *dedicated-no-docs-and-no-qa-pull-cache-job
