@@ -193,6 +193,23 @@ describe API::MergeRequests do
     end
   end
 
+  describe "DELETE /projects/:id/merge_requests/:merge_request_iid" do
+    context "when the merge request is on the merge train" do
+      let!(:merge_request) { create(:merge_request, :on_train, source_project: project, target_project: project) }
+
+      before do
+        ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user, target_ref: merge_request.train_ref_path)
+                                          .execute(merge_request)
+      end
+
+      it 'removes train ref' do
+        expect do
+          delete api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user)
+        end.to change { project.repository.ref_exists?(merge_request.train_ref_path) }.from(true).to(false)
+      end
+    end
+  end
+
   context 'when authenticated' do
     def expect_response_contain_exactly(*items)
       expect(response).to have_gitlab_http_status(200)

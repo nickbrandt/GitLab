@@ -24,7 +24,7 @@ module AutoMerge
       next_merge_request = merge_request.merge_train&.next
 
       super do
-        if merge_request.merge_train&.delete
+        if merge_request.merge_train&.destroy
           SystemNoteService.cancel_merge_train(merge_request, project, current_user)
           AutoMergeProcessWorker.perform_async(next_merge_request.id) if next_merge_request
         end

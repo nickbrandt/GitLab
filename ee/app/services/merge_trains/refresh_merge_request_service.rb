@@ -68,7 +68,7 @@ module MergeTrains
 
       raise ProcessError, 'failed to merge' unless merge_request.merged?
 
-      merge_train.delete
+      merge_train.destroy
     end
 
     def stale_pipeline?

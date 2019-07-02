@@ -125,6 +125,24 @@ describe AutoMerge::MergeTrainService do
       subject
     end
 
+    context 'when train ref exists' do
+      before do
+        merge_request.project.repository.create_ref(merge_request.target_branch, merge_request.train_ref_path)
+      end
+
+      it 'deletes train ref' do
+        expect { subject }
+          .to change { merge_request.project.repository.ref_exists?(merge_request.train_ref_path) }
+          .from(true).to(false)
+      end
+    end
+
+    context 'when train ref does not exist' do
+      it 'does not raise an error' do
+        expect { subject }.not_to raise_error
+      end
+    end
+
     context 'when the other merge request is following the merge request' do
       let!(:merge_request_2) do
         create(:merge_request, :on_train,

@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 class MergeTrain < ApplicationRecord
+  include AfterCommitQueue
+
   belongs_to :target_project, class_name: "Project"
   belongs_to :merge_request
   belongs_to :user
   belongs_to :pipeline, class_name: 'Ci::Pipeline'
+
+  after_destroy do |merge_train|
+    run_after_commit { merge_train.merge_request.cleanup_refs(only: :train) }
+  end
 
   class << self
     def all_in_train(merge_request)
