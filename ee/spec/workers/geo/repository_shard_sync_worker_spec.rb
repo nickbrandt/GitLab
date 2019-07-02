@@ -266,6 +266,11 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
     context 'backoff time' do
       let(:cache_key) { "#{described_class.name.underscore}:shard:#{shard_name}:skip" }
 
+      before do
+        allow(Rails.cache).to receive(:read).and_call_original
+        allow(Rails.cache).to receive(:write).and_call_original
+      end
+
       it 'sets the back off time when there are no pending items' do
         create(:geo_project_registry, :synced, project: unsynced_project_in_restricted_group)
         create(:geo_project_registry, :synced, project: unsynced_project)
