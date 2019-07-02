@@ -11780,6 +11780,9 @@ msgstr ""
 msgid "Save variables"
 msgstr ""
 
+msgid "Saving"
+msgstr ""
+
 msgid "Saving project."
 msgstr ""
 
@@ -14623,6 +14626,12 @@ msgstr ""
 msgid "Unfortunately, your email message to GitLab could not be processed."
 msgstr ""
 
+msgid "Uninstall"
+msgstr ""
+
+msgid "Uninstalling"
+msgstr ""
+
 msgid "Unknown"
 msgstr ""
 
@@ -14738,6 +14747,9 @@ msgid "Updated"
 msgstr ""
 
 msgid "Updated %{updated_at} by %{updated_by}"
+msgstr ""
+
+msgid "Updated to"
 msgstr ""
 
 msgid "Updating"
