@@ -6,8 +6,8 @@ describe DraftNotes::PublishService do
   let(:project) { merge_request.target_project }
   let(:user) { merge_request.author }
 
-  def publish(draft: nil)
-    DraftNotes::PublishService.new(merge_request, user).execute(draft)
+  def publish(params: nil, draft: nil)
+    DraftNotes::PublishService.new(merge_request, user, params).execute(draft)
   end
 
   context 'single draft note' do
@@ -19,7 +19,6 @@ describe DraftNotes::PublishService do
     end
 
     it 'does not skip notification' do
-      expect(Notes::CreateService).to receive(:new).with(project, user, drafts.first.publish_params).and_call_original
       expect_next_instance_of(NotificationService) do |notification_service|
         expect(notification_service).to receive(:new_note)
       end
@@ -27,6 +26,17 @@ describe DraftNotes::PublishService do
       result = publish(draft: drafts.first)
 
       expect(result[:status]).to eq(:success)
+    end
+
+    context 'commit_id is present is params' do
+      let(:commit_id) { 'abc123' }
+
+      it 'creates note with commit_id' do
+        result = publish(params: { commit_id: 'abc123' }, draft: drafts.first)
+
+        expect(merge_request.notes.first.commit_id).to eq(commit_id)
+        expect(result[:status]).to eq(:success)
+      end
     end
   end
 
@@ -76,6 +86,20 @@ describe DraftNotes::PublishService do
       end
 
       publish
+    end
+
+    context 'commit_id is present is params' do
+      let(:commit_id) { 'abc123' }
+
+      it 'creates note with commit_id' do
+        result = publish(params: { commit_id: commit_id })
+
+        merge_request.notes.each do |note|
+          expect(note.commit_id).to eq(commit_id)
+        end
+
+        expect(result[:status]).to eq(:success)
+      end
     end
   end
 

@@ -44,7 +44,12 @@ module DraftNotes
       # codes.
       draft.diff_file&.unfold_diff_lines(draft.original_position)
 
-      note = Notes::CreateService.new(draft.project, draft.author, draft.publish_params).execute
+      note = Notes::CreateService.new(
+        draft.project,
+        draft.author,
+        draft.publish_params.merge(commit_id: params.try(:[], :commit_id))
+      ).execute
+
       set_discussion_resolve_status(note, draft)
 
       note

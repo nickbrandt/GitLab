@@ -41,7 +41,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def publish
-    result = DraftNotes::PublishService.new(merge_request, current_user).execute(draft_note(allow_nil: true))
+    result = DraftNotes::PublishService.new(merge_request, current_user, params).execute(draft_note(allow_nil: true))
 
     if result[:status] == :success
       head :ok
