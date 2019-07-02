@@ -71,11 +71,11 @@ describe('RelatedItemsTree', () => {
       it('returns array of issues and epics from query response with issues being on top of the list', () => {
         const formattedChildren = epicUtils.processQueryResponse(mockQueryResponse.data.group);
 
-        expect(formattedChildren.length).toBe(4); // 2 Issues and 2 Epics
-        expect(formattedChildren[0]).toHaveProperty('type', ChildType.Issue);
-        expect(formattedChildren[1]).toHaveProperty('type', ChildType.Issue);
-        expect(formattedChildren[2]).toHaveProperty('type', ChildType.Epic);
-        expect(formattedChildren[3]).toHaveProperty('type', ChildType.Epic);
+        expect(formattedChildren.length).toBe(4); // 2 Epics and 2 Issues
+        expect(formattedChildren[0]).toHaveProperty('type', ChildType.Epic);
+        expect(formattedChildren[1]).toHaveProperty('type', ChildType.Epic);
+        expect(formattedChildren[2]).toHaveProperty('type', ChildType.Issue);
+        expect(formattedChildren[3]).toHaveProperty('type', ChildType.Issue);
       });
     });
   });
