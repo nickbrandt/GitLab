@@ -49,25 +49,24 @@ describe Group do
     context 'validates if custom_project_templates_group_id is allowed' do
       let(:subgroup_1) { create(:group, parent: group) }
 
-      it 'rejects change if the assigned group is not a descendant' do
+      it 'rejects change if the assigned group is not a subgroup' do
         group.custom_project_templates_group_id = create(:group).id
 
         expect(group).not_to be_valid
-        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a descendant of the group']
+        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a subgroup of the group']
       end
 
-      it 'allows value if the current group is a top parent and the value is from a descendant' do
-        subgroup = create(:group, parent: group)
-        group.custom_project_templates_group_id = subgroup.id
+      it 'allows value if the assigned value is from a subgroup' do
+        group.custom_project_templates_group_id = subgroup_1.id
 
         expect(group).to be_valid
       end
 
-      it 'allows value if the current group is a subgroup and the value is from a descendant' do
+      it 'rejects change if the assigned value is from a subgroup\'s descendant group' do
         subgroup_1_1 = create(:group, parent: subgroup_1)
-        subgroup_1.custom_project_templates_group_id = subgroup_1_1.id
+        group.custom_project_templates_group_id = subgroup_1_1.id
 
-        expect(group).to be_valid
+        expect(group).not_to be_valid
       end
 
       it 'allows value when it is blank' do
