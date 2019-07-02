@@ -4723,6 +4723,9 @@ msgstr ""
 msgid "Edit issues"
 msgstr ""
 
+msgid "Edit merge requests"
+msgstr ""
+
 msgid "Edit public deploy key"
 msgstr ""
 

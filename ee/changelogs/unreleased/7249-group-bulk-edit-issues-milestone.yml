@@ -1,5 +1,5 @@
 ---
-title: Allow bulk editing group issues milestones
+title: Allow bulk editing group issues and merge requests milestones
 merge_request: 14141
 author:
 type: added
