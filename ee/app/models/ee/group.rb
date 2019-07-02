@@ -10,7 +10,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      include ::EE::Vulnerable # rubocop: disable Cop/InjectEnterpriseEditionModule
+      include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
 

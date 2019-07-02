@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-shared_examples_for EE::Vulnerable do
+shared_examples_for Vulnerable do
   let(:project) { create(:project, namespace: group) }
   let(:external_project) { create(:project) }
   let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
