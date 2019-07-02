@@ -64,7 +64,7 @@ class Groups::CycleAnalytics::EventsController < Groups::ApplicationController
 
   def authorize_group_cycle_analytics!
     unless can?(current_user, :read_group_cycle_analytics, group)
-      return render_403
+      render_403
     end
   end
 end

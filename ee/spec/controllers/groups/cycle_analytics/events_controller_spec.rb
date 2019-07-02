@@ -47,7 +47,7 @@ describe Groups::CycleAnalytics::EventsController do
             },
             format: :json)
 
-        expect(response.status).to eq (403)
+        expect(response.status).to eq(403)
       end
     end
   end
