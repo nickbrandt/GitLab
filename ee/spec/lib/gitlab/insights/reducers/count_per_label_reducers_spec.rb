@@ -29,9 +29,9 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
 
   let(:expected) do
     {
-      label_manage.title => 1,
-      label_plan.title => 1,
-      Gitlab::Insights::UNCATEGORIZED => 1
+      Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 1,
+      Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 1,
+      Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 1
     }
   end
 
@@ -39,8 +39,11 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerLabelReducer do
     expect { reduce(issuable_relation, nil) }.to raise_error(described_class::InvalidLabelsError, "Invalid value for `labels`: `[]`. It must be a non-empty array!")
   end
 
-  it 'returns issuables with only the needed fields' do
-    expect(subject).to eq(expected)
+  it 'returns issuables with only the needed fields', :aggregate_failures do
+    subject.keys.each_with_index do |label, index|
+      expect(label).to eq(expected.keys[index])
+    end
+    expect(subject.values).to eq(expected.values)
   end
 
   it 'avoids N + 1 queries' do

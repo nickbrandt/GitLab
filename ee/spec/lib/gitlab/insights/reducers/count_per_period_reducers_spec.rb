@@ -28,11 +28,11 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
 
   let(:expected) do
     {
-      'January 2019' => 1,
-      'February 2019' => 0,
-      'March 2019' => 1,
-      'April 2019' => 1,
-      'May 2019' => 0
+      Gitlab::Insights::InsightLabel.new('January 2019') => 1,
+      Gitlab::Insights::InsightLabel.new('February 2019') => 0,
+      Gitlab::Insights::InsightLabel.new('March 2019') => 1,
+      Gitlab::Insights::InsightLabel.new('April 2019') => 1,
+      Gitlab::Insights::InsightLabel.new('May 2019') => 0
     }
   end
 
@@ -48,8 +48,11 @@ RSpec.describe Gitlab::Insights::Reducers::CountPerPeriodReducer do
     expect { reduce(issuable_relation, 'month', -1) }.to raise_error(described_class::InvalidPeriodLimitError, "Invalid value for `period_limit`: `-1`. Value must be greater than 0!")
   end
 
-  it 'returns issuables with only the needed fields' do
-    expect(subject).to eq(expected)
+  it 'returns issuables with only the needed fields', :aggregate_failures do
+    subject.keys.each_with_index do |label, index|
+      expect(label).to eq(expected.keys[index])
+    end
+    expect(subject.values).to eq(expected.values)
   end
 
   it 'avoids N + 1 queries' do

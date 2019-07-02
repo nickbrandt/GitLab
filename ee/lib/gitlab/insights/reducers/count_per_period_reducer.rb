@@ -22,15 +22,12 @@ module Gitlab
 
         # Returns a hash { period => value_for_period(issuables) }, e.g.
         #   {
-        #     'January 2019' => 1,
-        #     'February 2019' => 1,
-        #     'March 2019' => 1
+        #     #<InsightLabel @title='January 2019', @color='#990000'> => 1,
+        #     #<InsightLabel @title='February 2019', @color='#009900'> => 1,
+        #     #<InsightLabel @title='March 2019', @color='#000099'> => 2
         #   }
         def reduce
-          (0...period_limit).reverse_each.each_with_object({}) do |period_ago, hash|
-            period_time = normalized_time(period_ago.public_send(period).ago) # rubocop:disable GitlabSecurity/PublicSend
-            hash[period_time.strftime(period_format)] = value_for_period(issuables_grouped_by_normalized_period.fetch(period_time, []))
-          end
+          count_per_period
         end
 
         private
@@ -48,6 +45,15 @@ module Gitlab
 
           unless period_limit > 0
             raise InvalidPeriodLimitError, "Invalid value for `period_limit`: `#{period_limit}`. Value must be greater than 0!"
+          end
+        end
+
+        def count_per_period
+          (0...period_limit).reverse_each.each_with_object({}) do |period_ago, hash|
+            period_time = normalized_time(period_ago.public_send(period).ago) # rubocop:disable GitlabSecurity/PublicSend
+            insight_label = InsightLabel.new(period_time.strftime(period_format))
+
+            hash[insight_label] = value_for_period(issuables_grouped_by_normalized_period.fetch(period_time, []))
           end
         end
 

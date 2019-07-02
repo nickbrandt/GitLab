@@ -29,36 +29,48 @@ RSpec.describe Gitlab::Insights::Reducers::LabelCountPerPeriodReducer do
 
   let(:expected) do
     {
-      'January 2019' => {
-        label_manage.title => 0,
-        label_plan.title => 0,
-        Gitlab::Insights::UNCATEGORIZED => 1
+      Gitlab::Insights::InsightLabel.new('January 2019') => {
+        Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 0,
+        Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 0,
+        Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 1
       },
-      'February 2019' => {
-        label_manage.title => 0,
-        label_plan.title => 0,
-        Gitlab::Insights::UNCATEGORIZED => 0
+      Gitlab::Insights::InsightLabel.new('February 2019') => {
+        Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 0,
+        Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 0,
+        Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 0
       },
-      'March 2019' => {
-        label_manage.title => 1,
-        label_plan.title => 0,
-        Gitlab::Insights::UNCATEGORIZED => 0
+      Gitlab::Insights::InsightLabel.new('March 2019') => {
+        Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 1,
+        Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 0,
+        Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 0
       },
-      'April 2019' => {
-        label_manage.title => 0,
-        label_plan.title => 1,
-        Gitlab::Insights::UNCATEGORIZED => 0
+      Gitlab::Insights::InsightLabel.new('April 2019') => {
+        Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 0,
+        Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 1,
+        Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 0
       },
-      'May 2019' => {
-        label_manage.title => 0,
-        label_plan.title => 0,
-        Gitlab::Insights::UNCATEGORIZED => 0
+      Gitlab::Insights::InsightLabel.new('May 2019') => {
+        Gitlab::Insights::InsightLabel.new(label_manage.title, label_manage.color) => 0,
+        Gitlab::Insights::InsightLabel.new(label_plan.title, label_plan.color) => 0,
+        Gitlab::Insights::InsightLabel.new(Gitlab::Insights::UNCATEGORIZED, Gitlab::Insights::UNCATEGORIZED_COLOR) => 0
       }
     }
   end
 
-  it 'returns issuables with only the needed fields' do
-    expect(subject).to eq(expected)
+  it 'returns issuables with only the needed fields', :aggregate_failures do
+    subject.keys.each_with_index do |month, index|
+      expect(month).to eq(expected.keys[index])
+    end
+
+    subject.values.each_with_index do |labels_count, index1|
+      labels_count.keys.each_with_index do |label, index2|
+        # p expected.values
+        # p index1, index2
+        expect(label).to eq(expected.values[index1].keys[index2])
+      end
+
+      expect(labels_count.values).to eq(expected.values[index1].values)
+    end
   end
 
   it 'avoids N + 1 queries' do

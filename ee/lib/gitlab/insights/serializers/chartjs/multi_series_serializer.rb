@@ -24,27 +24,30 @@ module Gitlab
           # input - A hash of the form `Hash[Symbol|String, Hash[Symbol|String, Integer]]`, e.g.
           #   {
           #     'January 2019' => {
-          #       Manage: 1,
-          #       Plan: 1,
-          #       undefined: 2
+          #       InsightLabel.new('Manage', '#990000') => 1,
+          #       InsightLabel.new('Plan', '#009900') => 1,
+          #       InsightLabel.new('undefined', '#000099') => 2
           #     },
           #     'February 2019' => {
-          #       Manage: 0,
-          #       Plan: 1,
-          #       undefined: 0
+          #       InsightLabel.new('Manage', '#990000') => 0,
+          #       InsightLabel.new('Plan', '#009900') => 1,
+          #       InsightLabel.new('undefined', '#000099') => 1
           #     }
           #   }
           #
           # Returns the series data as a hash, e.g.
           #   {
-          #     Manage: [1, 0],
-          #     Plan: [1, 1],
-          #     undefined: [2, 0]
+          #     InsightLabel.new('Manage', '#990000') => [1, 0],
+          #     InsightLabel.new('Plan', '#009900') => [1, 1],
+          #     InsightLabel.new('undefined', '#000099') => [2, 1]
           #   }
           def build_series_data(input)
-            input.each_with_object(Hash.new { |h, k| h[k] = [] }) do |(_, data), series_data|
-              data.each do |serie_name, count|
-                series_data[serie_name] << count
+            initial_hash = Hash.new { |h, k| h[k] = [] }
+            input.each_with_object(initial_hash) do |(_, data), series_data|
+              data.each do |insight_label, count|
+                # Use the first InsightLabel that equals the current one to populate the hash key
+                insight_label_key, _ = series_data.detect { |k, _| k == insight_label }
+                series_data[insight_label_key || insight_label] << count
               end
             end
           end

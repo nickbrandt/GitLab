@@ -9,10 +9,10 @@ FactoryBot.define do
   factory :insights_issues_by_team, class: Hash do
     initialize_with do
       {
-        Manage: 1,
-        Plan: 3,
-        Create: 2,
-        undefined: 1
+        Gitlab::Insights::InsightLabel.new('Manage', 'red') => 1,
+        Gitlab::Insights::InsightLabel.new('Plan', 'blue') => 3,
+        Gitlab::Insights::InsightLabel.new('Create') => 2,
+        Gitlab::Insights::InsightLabel.new('undefined', 'gray') => 1
       }.with_indifferent_access
     end
   end
@@ -20,9 +20,9 @@ FactoryBot.define do
   factory :insights_merge_requests_per_month, class: Hash do
     initialize_with do
       {
-        'January 2019' => 1,
-        'February 2019' => 2,
-        'March 2019' => 3
+        Gitlab::Insights::InsightLabel.new('January 2019') => 1,
+        Gitlab::Insights::InsightLabel.new('February 2019') => 2,
+        Gitlab::Insights::InsightLabel.new('March 2019') => 3
       }
     end
   end
@@ -30,23 +30,23 @@ FactoryBot.define do
   factory :insights_issues_by_team_per_month, class: Hash do
     initialize_with do
       {
-        'January 2019' => {
-          Manage: 1,
-          Plan: 1,
-          Create: 1,
-          undefined: 0
+        Gitlab::Insights::InsightLabel.new('January 2019') => {
+          Gitlab::Insights::InsightLabel.new('Manage', 'red') => 1,
+          Gitlab::Insights::InsightLabel.new('Plan', 'blue') => 1,
+          Gitlab::Insights::InsightLabel.new('Create') => 1,
+          Gitlab::Insights::InsightLabel.new('undefined', 'gray') => 0
         }.with_indifferent_access,
-        'February 2019' => {
-          Manage: 0,
-          Plan: 1,
-          Create: 0,
-          undefined: 0
+        Gitlab::Insights::InsightLabel.new('February 2019') => {
+          Gitlab::Insights::InsightLabel.new('Manage', 'red') => 0,
+          Gitlab::Insights::InsightLabel.new('Plan', 'blue') => 1,
+          Gitlab::Insights::InsightLabel.new('Create') => 0,
+          Gitlab::Insights::InsightLabel.new('undefined', 'gray') => 0
         }.with_indifferent_access,
-        'March 2019' => {
-          Manage: 0,
-          Plan: 1,
-          Create: 1,
-          undefined: 1
+        Gitlab::Insights::InsightLabel.new('March 2019') => {
+          Gitlab::Insights::InsightLabel.new('Manage', 'red') => 0,
+          Gitlab::Insights::InsightLabel.new('Plan', 'blue') => 1,
+          Gitlab::Insights::InsightLabel.new('Create') => 1,
+          Gitlab::Insights::InsightLabel.new('undefined', 'gray') => 1
         }.with_indifferent_access
       }
     end

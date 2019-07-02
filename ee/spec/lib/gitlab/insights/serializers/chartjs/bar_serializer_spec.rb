@@ -11,7 +11,7 @@ RSpec.describe Gitlab::Insights::Serializers::Chartjs::BarSerializer do
         {
           label: nil,
           data: [1, 3, 2, 1],
-          backgroundColor: %w[#34e34c #0b6cbd #686e69 #808080]
+          backgroundColor: %w[red blue #686e69 gray]
         }
       ]
     }.with_indifferent_access

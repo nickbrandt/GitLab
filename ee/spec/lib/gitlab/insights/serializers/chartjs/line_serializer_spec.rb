@@ -14,22 +14,22 @@ RSpec.describe Gitlab::Insights::Serializers::Chartjs::LineSerializer do
         {
           label: 'Manage',
           data: [1, 0, 0],
-          borderColor: '#34e34c'
+          borderColor: 'red'
         },
         {
           label: 'Plan',
           data: [1, 1, 1],
-          borderColor: '#0b6cbd'
+          borderColor: 'blue'
         },
         {
           label: 'Create',
           data: [1, 0, 1],
-          borderColor: '#686e69'
+          borderColor: 'green'
         },
         {
           label: 'undefined',
           data: [0, 0, 1],
-          borderColor: '#808080'
+          borderColor: 'gray'
         }
       ]
     }.with_indifferent_access

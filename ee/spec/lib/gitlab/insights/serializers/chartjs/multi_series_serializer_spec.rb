@@ -11,22 +11,22 @@ RSpec.describe Gitlab::Insights::Serializers::Chartjs::MultiSeriesSerializer do
         {
           label: 'Manage',
           data: [1, 0, 0],
-          backgroundColor: '#34e34c'
+          backgroundColor: 'red'
         },
         {
           label: 'Plan',
           data: [1, 1, 1],
-          backgroundColor: '#0b6cbd'
+          backgroundColor: 'blue'
         },
         {
           label: 'Create',
           data: [1, 0, 1],
-          backgroundColor: '#686e69'
+          backgroundColor: 'green'
         },
         {
           label: 'undefined',
           data: [0, 0, 1],
-          backgroundColor: '#808080'
+          backgroundColor: 'gray'
         }
       ]
     }.with_indifferent_access

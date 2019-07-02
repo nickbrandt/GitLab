@@ -9,11 +9,11 @@ module Gitlab
 
           # Returns a serie dataset, e.g.
           #   { label: 'Manage', data: [1, 2], borderColor: 'red' }
-          def dataset(label, serie_data, color)
+          def dataset(label_title, serie_data, label_color)
             {
-              label: label,
+              label: label_title,
               data: serie_data,
-              borderColor: color
+              borderColor: label_color
             }.with_indifferent_access
           end
         end
