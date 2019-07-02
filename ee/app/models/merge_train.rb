@@ -21,6 +21,11 @@ class MergeTrain < ApplicationRecord
       all_in_train(merge_request).first
     end
 
+    def first_in_train_from(merge_request_ids)
+      merge_request = MergeRequest.find(merge_request_ids.first)
+      all_in_train(merge_request).where(id: merge_request_ids).first
+    end
+
     def total_count_in_train(merge_request)
       all_in_train(merge_request).count
     end
