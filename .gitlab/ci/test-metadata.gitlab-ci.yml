@@ -12,7 +12,9 @@
       - rspec_profiling/
 
 retrieve-tests-metadata:
-  <<: *tests-metadata-state
+  extends:
+    - .tests-metadata-state
+    - .no-docs-and-no-qa
   stage: prepare
   cache:
     key: tests_metadata
@@ -73,9 +75,10 @@ flaky-examples-check:
   only:
     - branches
   except:
-    - master
-    - /(^docs[\/-].*|.*-docs$)/
-    - /(^qa[\/-].*|.*-qa$)/
+    refs:
+      - master
+      - /(^docs[\/-].*|.*-docs$)/
+      - /(^qa[\/-].*|.*-qa$)/
   artifacts:
     expire_in: 30d
     paths:

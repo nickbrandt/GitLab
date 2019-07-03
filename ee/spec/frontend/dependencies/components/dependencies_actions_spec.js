@@ -2,14 +2,16 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlDropdownItem } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import createStore from 'ee/dependencies/store';
-import { SORT_FIELDS } from 'ee/dependencies/store/constants';
+import { DEPENDENCY_LIST_TYPES } from 'ee/dependencies/store/constants';
+import { SORT_FIELDS } from 'ee/dependencies/store/modules/list/constants';
 import DependenciesActions from 'ee/dependencies/components/dependencies_actions.vue';
 
 describe('DependenciesActions component', () => {
   let store;
   let wrapper;
+  const listType = DEPENDENCY_LIST_TYPES.all;
 
-  const factory = () => {
+  const factory = (props = {}) => {
     const localVue = createLocalVue();
 
     store = createStore();
@@ -19,12 +21,13 @@ describe('DependenciesActions component', () => {
       localVue,
       store,
       sync: false,
+      propsData: { ...props },
     });
   };
 
   beforeEach(() => {
-    factory();
-    store.state.endpoint = `${TEST_HOST}/dependencies`;
+    factory({ namespace: listType });
+    store.state[listType].endpoint = `${TEST_HOST}/dependencies`;
     return wrapper.vm.$nextTick();
   });
 
@@ -46,21 +49,23 @@ describe('DependenciesActions component', () => {
     });
 
     expect(store.dispatch.mock.calls).toEqual(
-      expect.arrayContaining(Object.keys(SORT_FIELDS).map(field => ['setSortField', field])),
+      expect.arrayContaining(
+        Object.keys(SORT_FIELDS).map(field => [`${listType}/setSortField`, field]),
+      ),
     );
   });
 
   it('dispatches the toggleSortOrder action on clicking the sort order button', () => {
     const sortButton = wrapper.find('.js-sort-order');
     sortButton.vm.$emit('click');
-    expect(store.dispatch).toHaveBeenCalledWith('toggleSortOrder');
+    expect(store.dispatch).toHaveBeenCalledWith(`${listType}/toggleSortOrder`);
   });
 
   it('has a button to export the dependency list', () => {
     const download = wrapper.find('.js-download');
     expect(download.attributes()).toEqual(
       expect.objectContaining({
-        href: store.getters.downloadEndpoint,
+        href: store.getters[`${listType}/downloadEndpoint`],
         download: expect.any(String),
       }),
     );

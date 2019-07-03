@@ -4,7 +4,7 @@ import ReportSection from '~/reports/components/report_section.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import SetLicenseApprovalModal from 'ee/vue_shared/license_management/components/set_approval_status_modal.vue';
-import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
+import { componentNames } from 'ee/reports/components/issue_body';
 
 import createStore from './store';
 

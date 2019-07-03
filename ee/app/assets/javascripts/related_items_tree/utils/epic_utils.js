@@ -61,4 +61,4 @@ export const extractChildIssues = issues =>
  * @param {Object} responseRoot
  */
 export const processQueryResponse = ({ epic }) =>
-  [].concat(extractChildIssues(epic.issues), extractChildEpics(epic.children));
+  [].concat(extractChildEpics(epic.children), extractChildIssues(epic.issues));

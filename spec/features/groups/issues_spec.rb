@@ -102,9 +102,15 @@ describe 'Group issues page' do
   end
 
   context 'manual ordering' do
-    let!(:issue1) { create(:issue, project: project, title: 'Issue #1') }
-    let!(:issue2) { create(:issue, project: project, title: 'Issue #2') }
-    let!(:issue3) { create(:issue, project: project, title: 'Issue #3') }
+    let(:user_in_group) { create(:group_member, :maintainer, user: create(:user), group: group ).user }
+
+    let!(:issue1) { create(:issue, project: project, title: 'Issue #1', relative_position: 1) }
+    let!(:issue2) { create(:issue, project: project, title: 'Issue #2', relative_position: 2) }
+    let!(:issue3) { create(:issue, project: project, title: 'Issue #3', relative_position: 3) }
+
+    before do
+      sign_in(user_in_group)
+    end
 
     it 'displays all issues' do
       visit issues_group_path(group, sort: 'relative_position')
@@ -132,16 +138,42 @@ describe 'Group issues page' do
       visit issues_group_path(group, sort: 'relative_position')
 
       drag_to(selector: '.manual-ordering',
-        scrollable: '#board-app',
-        list_from_index: 0,
         from_index: 0,
-        to_index: 2,
-        list_to_index: 0)
+        to_index: 2)
 
+      wait_for_requests
+
+      check_issue_order
+
+      visit issues_group_path(group, sort: 'relative_position')
+
+      check_issue_order
+    end
+
+    it 'issues should not be draggable when user is not logged in', :js do
+      sign_out(user_in_group)
+
+      visit issues_group_path(group, sort: 'relative_position')
+
+      drag_to(selector: '.manual-ordering',
+        from_index: 0,
+        to_index: 2)
+
+      wait_for_requests
+
+      # Issue order should remain the same
+      page.within('.manual-ordering') do
+        expect(find('.issue:nth-child(1) .title')).to have_content('Issue #1')
+        expect(find('.issue:nth-child(2) .title')).to have_content('Issue #2')
+        expect(find('.issue:nth-child(3) .title')).to have_content('Issue #3')
+      end
+    end
+
+    def check_issue_order
       page.within('.manual-ordering') do
         expect(find('.issue:nth-child(1) .title')).to have_content('Issue #2')
-        expect(find('.issue:nth-child(2) .title')).to have_content('Issue #1')
-        expect(find('.issue:nth-child(3) .title')).to have_content('Issue #3')
+        expect(find('.issue:nth-child(2) .title')).to have_content('Issue #3')
+        expect(find('.issue:nth-child(3) .title')).to have_content('Issue #1')
       end
     end
   end

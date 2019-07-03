@@ -46,8 +46,11 @@ export default {
   [types.SET_ACTIVE_PAGE](state, pageData) {
     state.activePage = pageData;
   },
-  [types.SET_CHART_DATA](state, chartData) {
-    state.chartData = chartData;
+  [types.INIT_CHART_DATA](state, keys) {
+    state.chartData = keys.reduce((acc, key) => {
+      acc[key] = {};
+      return acc;
+    }, {});
   },
   [types.SET_PAGE_LOADING](state, pageLoading) {
     state.pageLoading = pageLoading;

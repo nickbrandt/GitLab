@@ -1,0 +1,4 @@
+- if @project.feature_available?(:issuable_default_templates)
+  %p= s_('ProjectSettings|Choose your merge method, merge options, merge checks, and set up a default description template for merge requests.')
+- else
+  %p= s_('ProjectSettings|Choose your merge method, merge options, and merge checks.')

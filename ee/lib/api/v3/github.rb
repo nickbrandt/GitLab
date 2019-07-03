@@ -13,10 +13,10 @@ module API
       NAMESPACE_ENDPOINT_REQUIREMENTS = { namespace: NO_SLASH_URL_PART_REGEX }.freeze
       PROJECT_ENDPOINT_REQUIREMENTS = NAMESPACE_ENDPOINT_REQUIREMENTS.merge(project: NO_SLASH_URL_PART_REGEX).freeze
 
-      # Used to differentiate JIRA cloud requests from JIRA server requests
-      # JIRA cloud user agent format: JIRA DVCS Connector Vertigo/version
-      # JIRA server user agent format: JIRA DVCS Connector/version
-      JIRA_DVCS_CLOUD_USER_AGENT = 'JIRA DVCS Connector Vertigo'.freeze
+      # Used to differentiate Jira Cloud requests from Jira Server requests
+      # Jira Cloud user agent format: Jira DVCS Connector Vertigo/version
+      # Jira Server user agent format: Jira DVCS Connector/version
+      JIRA_DVCS_CLOUD_USER_AGENT = 'Jira DVCS Connector Vertigo'.freeze
 
       include PaginationParams
 

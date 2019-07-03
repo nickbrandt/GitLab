@@ -61,24 +61,32 @@ describe('RelatedItemsTree', () => {
       });
 
       describe(types.SET_ITEM_CHILDREN, () => {
-        it('should set provided `data.children` to `state.children` with reference key as present in `data.parentItem`', () => {
-          const data = {
-            parentItem: { reference: '&1' },
-            children: [
-              {
-                reference: 'frontend&1',
-              },
-              {
-                reference: 'frontend&2',
-              },
-            ],
-          };
+        const data = {
+          parentItem: { reference: '&1' },
+          children: [
+            {
+              reference: 'frontend&1',
+            },
+            {
+              reference: 'frontend&2',
+            },
+          ],
+        };
 
+        it('should set provided children to parent in the state', () => {
           mutations[types.SET_ITEM_CHILDREN](state, data);
 
           expect(state.children[data.parentItem.reference]).toEqual(
             expect.arrayContaining(data.children),
           );
+        });
+
+        it('should append provided children to parent in the state when `append` param is `true`', () => {
+          mutations[types.SET_ITEM_CHILDREN](state, data);
+          data.append = true;
+          mutations[types.SET_ITEM_CHILDREN](state, data);
+
+          expect(state.children[data.parentItem.reference].length).toEqual(4);
         });
       });
 
@@ -111,6 +119,50 @@ describe('RelatedItemsTree', () => {
               }),
             );
           });
+        });
+      });
+
+      describe(types.SET_EPIC_PAGE_INFO, () => {
+        it('should set `epicEndCursor` and `hasMoreEpics` to `state.childrenFlags`', () => {
+          const data = {
+            parentItem: { reference: '&1' },
+            pageInfo: {
+              endCursor: 'abc',
+              hasNextPage: true,
+            },
+          };
+          state.childrenFlags[data.parentItem.reference] = {};
+
+          mutations[types.SET_EPIC_PAGE_INFO](state, data);
+
+          expect(state.childrenFlags[data.parentItem.reference].epicEndCursor).toEqual(
+            data.pageInfo.endCursor,
+          );
+          expect(state.childrenFlags[data.parentItem.reference].hasMoreEpics).toEqual(
+            data.pageInfo.hasNextPage,
+          );
+        });
+      });
+
+      describe(types.SET_ISSUE_PAGE_INFO, () => {
+        it('should set `issueEndCursor` and `hasMoreIssues` to `state.childrenFlags`', () => {
+          const data = {
+            parentItem: { reference: '&1' },
+            pageInfo: {
+              endCursor: 'abc',
+              hasNextPage: true,
+            },
+          };
+          state.childrenFlags[data.parentItem.reference] = {};
+
+          mutations[types.SET_ISSUE_PAGE_INFO](state, data);
+
+          expect(state.childrenFlags[data.parentItem.reference].issueEndCursor).toEqual(
+            data.pageInfo.endCursor,
+          );
+          expect(state.childrenFlags[data.parentItem.reference].hasMoreIssues).toEqual(
+            data.pageInfo.hasNextPage,
+          );
         });
       });
 

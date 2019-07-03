@@ -3,6 +3,7 @@ import axios from '~/lib/utils/axios_utils';
 import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
+import downloadPatchHelper from './utils/download_patch_helper';
 
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 
@@ -375,6 +376,20 @@ export const createMergeRequest = ({ state, dispatch }) => {
         s__('ciReport|There was an error creating the merge request. Please try again.'),
       );
     });
+};
+
+export const downloadPatch = ({ state }) => {
+  /* 
+    This action doesn't actually mutate the Vuex state and is a dirty
+    workaround to modifying the dom. We do this because gl-split-button 
+    relies on a old version of vue-bootstrap and it doesn't allow us to 
+    set a href for a file download. 
+
+    https://gitlab.com/gitlab-org/gitlab-ui/issues/188#note_165808493
+  */
+  const { vulnerability } = state.modal;
+  downloadPatchHelper(vulnerability.remediations[0].diff);
+  $('#modal-mrwidget-security-issue').modal('hide');
 };
 
 export const requestCreateMergeRequest = ({ commit }) => {

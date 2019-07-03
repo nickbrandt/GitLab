@@ -98,6 +98,12 @@ describe 'Project settings > [EE] Merge Requests', :js do
 
       expect(page).not_to have_selector('#project_merge_requests_template')
     end
+
+    it "does not mention the merge request template in the section's description text" do
+      visit edit_project_path(project)
+
+      expect(page).to have_content('Choose your merge method, merge options, and merge checks.')
+    end
   end
 
   context 'issuable default templates feature is available' do
@@ -105,10 +111,16 @@ describe 'Project settings > [EE] Merge Requests', :js do
       stub_licensed_features(issuable_default_templates: true)
     end
 
-    it 'input to configure merge request template is not shown' do
+    it 'input to configure merge request template is shown' do
       visit edit_project_path(project)
 
       expect(page).to have_selector('#project_merge_requests_template')
+    end
+
+    it "mentions the merge request template in the section's description text" do
+      visit edit_project_path(project)
+
+      expect(page).to have_content('Choose your merge method, merge options, merge checks, and set up a default description template for merge requests.')
     end
   end
 

@@ -19,8 +19,8 @@ describe 'Admin updates EE-only settings' do
           click_button 'Save changes'
         end
 
-        expect(Gitlab::CurrentSettings.geo_status_timeout).to eq(15)
-        expect(Gitlab::CurrentSettings.geo_node_allowed_ips).to eq('192.34.34.34')
+        expect(current_settings.geo_status_timeout).to eq(15)
+        expect(current_settings.geo_node_allowed_ips).to eq('192.34.34.34')
         expect(page).to have_content "Application settings saved successfully"
       end
     end
@@ -63,10 +63,10 @@ describe 'Admin updates EE-only settings' do
       end
 
       aggregate_failures do
-        expect(Gitlab::CurrentSettings.elasticsearch_indexing).to be_truthy
-        expect(Gitlab::CurrentSettings.elasticsearch_search).to be_truthy
-        expect(Gitlab::CurrentSettings.elasticsearch_shards).to eq(120)
-        expect(Gitlab::CurrentSettings.elasticsearch_replicas).to eq(2)
+        expect(current_settings.elasticsearch_indexing).to be_truthy
+        expect(current_settings.elasticsearch_search).to be_truthy
+        expect(current_settings.elasticsearch_shards).to eq(120)
+        expect(current_settings.elasticsearch_replicas).to eq(2)
         expect(page).to have_content "Application settings saved successfully"
       end
     end
@@ -111,7 +111,7 @@ describe 'Admin updates EE-only settings' do
 
       wait_for_all_requests
 
-      expect(Gitlab::CurrentSettings.elasticsearch_limit_indexing).to be_truthy
+      expect(current_settings.elasticsearch_limit_indexing).to be_truthy
       expect(ElasticsearchIndexedNamespace.exists?(namespace_id: namespace.id)).to be_truthy
       expect(ElasticsearchIndexedProject.exists?(project_id: project.id)).to be_truthy
       expect(page).to have_content "Application settings saved successfully"
@@ -203,5 +203,9 @@ describe 'Admin updates EE-only settings' do
         expect(page).not_to have_css('#application_setting_allow_group_owners_to_manage_ldap')
       end
     end
+  end
+
+  def current_settings
+    ApplicationSetting.current_without_cache
   end
 end

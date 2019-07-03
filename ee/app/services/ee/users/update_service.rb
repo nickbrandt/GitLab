@@ -40,6 +40,11 @@ module EE
         end
       end
 
+      override :provider_attributes
+      def provider_attributes
+        super.push(:saml_provider_id)
+      end
+
       override :identity_attributes
       def identity_attributes
         super.push(:saml_provider_id)

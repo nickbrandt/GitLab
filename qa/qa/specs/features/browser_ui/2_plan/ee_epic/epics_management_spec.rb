@@ -44,15 +44,15 @@ module QA
           EE::Page::Group::Epic::Show.perform do |show_page|
             show_page.add_issue_to_epic(issue.web_url)
 
-            expect(show_page).to have_content('added issue')
+            expect(show_page).to have_related_issuable_item
 
             show_page.remove_issue_from_epic
 
-            expect(show_page).to have_content('removed issue')
+            expect(show_page).to have_no_related_issuable_item
           end
         end
 
-        it 'comments on epic', :quarantine do
+        it 'comments on epic' do
           epic.visit!
 
           comment = 'My Epic Comment'
@@ -75,7 +75,7 @@ module QA
           expect(page).to have_content('Open')
         end
 
-        it 'adds/removes issue to/from epic using quick actions', :quarantine do
+        it 'adds/removes issue to/from epic using quick actions' do
           issue.visit!
 
           Page::Project::Issue::Show.perform do |show_page|
@@ -97,7 +97,6 @@ module QA
 
         def create_issue_resource
           Resource::Issue.fabricate_via_api! do |issue|
-            issue.labels = ''
             issue.title = 'Issue created via API'
           end
         end

@@ -62,7 +62,7 @@ module EE
         end
 
         after_transition started: :finished do |state, _|
-          if ::Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
+          if state.project.use_elasticsearch?
             state.run_after_commit do
               last_indexed_commit = state.project.index_status&.last_commit
               ElasticCommitIndexerWorker.perform_async(state.project_id, last_indexed_commit)

@@ -8,7 +8,7 @@ module Geo
       FILE_SERVICE_OBJECT_TYPE = :lfs
 
       def registry_finder
-        @registry_finder ||= Geo::LfsObjectRegistryFinder.new(current_node: Gitlab::Geo.current_node)
+        @registry_finder ||= Geo::LfsObjectRegistryFinder.new(current_node_id: Gitlab::Geo.current_node.id)
       end
     end
   end

@@ -12,12 +12,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Begin of the /-/ scope.
       # Use this scope for all new project routes.
       scope '-' do
-        resources :boards, only: [:create, :update, :destroy] do
-          collection do
-            get :recent
-          end
-        end
-
         resources :packages, only: [:index, :show, :destroy], module: :packages
         resources :package_files, only: [], module: :packages do
           member do

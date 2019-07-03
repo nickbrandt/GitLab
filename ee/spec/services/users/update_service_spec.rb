@@ -47,19 +47,31 @@ describe Users::UpdateService do
       context 'allowed params' do
         context 'with identity' do
           let(:provider) { create(:saml_provider) }
-          let(:identity_params) { { extern_uid: 'uid', provider: 'group_saml', saml_group_id: provider.group.id } }
+          let(:identity_params) { { extern_uid: 'uid', provider: 'group_saml', group_id_for_saml: provider.group.id } }
 
           before do
             params.merge!(identity_params)
           end
 
-          it 'successfully adds identity to user' do
-            result = update_user(user, { extern_uid: 'uid', provider: 'group_saml', saml_provider_id: provider.id })
+          it 'adds identity to user' do
+            result = update_user(user, params)
 
             expect(result).to be true
             expect(user.identities.last.saml_provider_id).to eq(provider.id)
             expect(user.identities.last.extern_uid).to eq('uid')
             expect(user.identities.last.provider).to eq('group_saml')
+          end
+
+          it 'adds two different identities to user' do
+            second_provider = create(:saml_provider)
+            result_one = update_user(user, { extern_uid: 'uid', provider: 'group_saml', saml_provider_id: provider.id })
+            result_two = update_user(user, { extern_uid: 'uid2', provider: 'group_saml', group_id_for_saml: second_provider.group.id } )
+
+            expect(result_one).to be true
+            expect(result_two).to be true
+            expect(user.identities.count).to eq(2)
+            expect(user.identities.map(&:extern_uid)).to match_array(%w(uid uid2))
+            expect(user.identities.map(&:saml_provider_id)).to match_array([provider.id, second_provider.id])
           end
         end
       end

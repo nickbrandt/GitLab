@@ -3,6 +3,8 @@
 module EE
   module ApplicationHelper
     extend ::Gitlab::Utils::Override
+    include ::OnboardingExperimentHelper
+
     DB_LAG_SHOW_THRESHOLD = 60 # seconds
     LOG_CURSOR_CHECK_TIME = ::Gitlab::Geo::LogCursor::Daemon::SECONDARY_CHECK_INTERVAL
     EVENT_PROCESSING_TIME = 60.seconds
@@ -118,7 +120,7 @@ module EE
     end
 
     def user_onboarding_enabled?
-      ::Gitlab.com? && ::Feature.enabled?(:user_onboarding)
+      allow_access_to_onboarding?
     end
 
     private

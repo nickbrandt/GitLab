@@ -369,15 +369,15 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def attachments_finder
-    @attachments_finder ||= Geo::AttachmentRegistryFinder.new(current_node: geo_node)
+    @attachments_finder ||= Geo::AttachmentRegistryFinder.new(current_node_id: geo_node.id)
   end
 
   def lfs_objects_finder
-    @lfs_objects_finder ||= Geo::LfsObjectRegistryFinder.new(current_node: geo_node)
+    @lfs_objects_finder ||= Geo::LfsObjectRegistryFinder.new(current_node_id: geo_node.id)
   end
 
   def job_artifacts_finder
-    @job_artifacts_finder ||= Geo::JobArtifactRegistryFinder.new(current_node: geo_node)
+    @job_artifacts_finder ||= Geo::JobArtifactRegistryFinder.new(current_node_id: geo_node.id)
   end
 
   def registries_for_synced_projects(type)

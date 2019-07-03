@@ -470,7 +470,7 @@ describe 'Scoped issue boards', :js do
   end
 
   def create_board_weight(weight)
-    create_board_scope('weight', weight)
+    create_board_scope('weight', weight.to_s)
   end
 
   def create_board_assignee(assignee_name)
@@ -492,7 +492,7 @@ describe 'Scoped issue boards', :js do
   end
 
   def update_board_weight(weight)
-    update_board_scope('weight', weight)
+    update_board_scope('weight', weight.to_s)
   end
 
   def create_board_scope(filter, value)

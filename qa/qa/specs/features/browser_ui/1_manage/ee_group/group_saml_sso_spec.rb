@@ -2,8 +2,7 @@
 
 module QA
   context 'Manage', :orchestrated, :group_saml do
-    # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/110
-    describe 'Group SAML SSO', :quarantine do
+    describe 'Group SAML SSO' do
       include Support::Api
 
       before(:all) do
@@ -79,6 +78,8 @@ module QA
 
           add_user_to_group_via_api(user.username, @group, '30')
 
+          @group.visit!
+
           EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
           EE::Page::Group::Settings::SamlSSO.perform do |page|
@@ -105,8 +106,9 @@ module QA
           end
         end
       end
+
       after(:all) do
-        remove_group(@group)
+        remove_group(@group) unless @group.nil?
       end
     end
 

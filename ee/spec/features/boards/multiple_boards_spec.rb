@@ -146,9 +146,9 @@ describe 'Multiple Issue Boards', :js do
     end
   end
 
+  # todo: remove these when frontend part is done
   context 'with multiple issue boards disabled' do
     before do
-      stub_licensed_features(multiple_project_issue_boards: false)
       project.add_maintainer(user)
 
       login_as(user)
@@ -161,8 +161,8 @@ describe 'Multiple Issue Boards', :js do
       click_button board.name
 
       page.within(dropdown_selector) do
-        expect(page).not_to have_content('Create new board')
-        expect(page).not_to have_content('Delete board')
+        expect(page).to have_content('Create new board')
+        expect(page).to have_content('Delete board')
       end
 
       expect(page).to have_content('Edit board')
@@ -176,7 +176,7 @@ describe 'Multiple Issue Boards', :js do
 
       click_button board.name
 
-      expect(page).to have_content('Some of your boards are hidden, activate a license to see them again.')
+      expect(page).not_to have_content('Some of your boards are hidden, activate a license to see them again.')
     end
   end
 

@@ -31,6 +31,7 @@ module EE
         mount ::API::ProjectApprovals
         mount ::API::Vulnerabilities
         mount ::API::MergeRequestApprovals
+        mount ::API::ProjectAliases
 
         version 'v3', using: :path do
           # Although the following endpoints are kept behind V3 namespace,

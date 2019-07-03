@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
+import { componentNames } from 'ee/reports/components/issue_body';
 import SmartVirtualList from '~/vue_shared/components/smart_virtual_list.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';

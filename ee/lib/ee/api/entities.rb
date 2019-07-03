@@ -729,6 +729,10 @@ module EE
       class ManagedLicense < Grape::Entity
         expose :id, :name, :approval_status
       end
+
+      class ProjectAlias < Grape::Entity
+        expose :id, :project_id, :name
+      end
     end
   end
 end

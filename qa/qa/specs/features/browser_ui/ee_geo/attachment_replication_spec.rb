@@ -26,7 +26,6 @@ module QA
           @issue = Resource::Issue.fabricate! do |issue|
             issue.title = 'My geo issue'
             issue.project = @project
-            issue.labels = ''
           end
 
           @issue.visit!

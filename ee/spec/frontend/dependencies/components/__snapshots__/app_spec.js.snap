@@ -22,7 +22,9 @@ exports[`DependenciesApp component on creation given a dependency list which is 
       </glbadge-stub>
     </h4>
      
-    <dependenciesactions-stub />
+    <dependenciesactions-stub
+      namespace="allDependencies"
+    />
   </div>
    
   <dependenciestable-stub
@@ -55,7 +57,9 @@ exports[`DependenciesApp component on creation given a fetch error matches the s
       <!---->
     </h4>
      
-    <dependenciesactions-stub />
+    <dependenciesactions-stub
+      namespace="allDependencies"
+    />
   </div>
    
   <dependenciestable-stub
@@ -88,7 +92,9 @@ exports[`DependenciesApp component on creation given a list of dependencies and 
       </glbadge-stub>
     </h4>
      
-    <dependenciesactions-stub />
+    <dependenciesactions-stub
+      namespace="allDependencies"
+    />
   </div>
    
   <dependenciestable-stub
@@ -123,7 +129,9 @@ exports[`DependenciesApp component on creation given the dependency list job fai
       <!---->
     </h4>
      
-    <dependenciesactions-stub />
+    <dependenciesactions-stub
+      namespace="allDependencies"
+    />
   </div>
    
   <dependenciestable-stub

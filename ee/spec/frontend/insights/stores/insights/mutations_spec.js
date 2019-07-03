@@ -162,13 +162,13 @@ describe('Insights mutations', () => {
     });
   });
 
-  describe(types.SET_CHART_DATA, () => {
-    const chartData = { a: { data: 'data' } };
+  describe(types.INIT_CHART_DATA, () => {
+    const keys = ['a', 'b'];
 
     it('sets chartData state', () => {
-      mutations[types.SET_CHART_DATA](state, chartData);
+      mutations[types.INIT_CHART_DATA](state, keys);
 
-      expect(state.chartData).toBe(chartData);
+      expect(state.chartData).toEqual({ a: {}, b: {} });
     });
   });
 

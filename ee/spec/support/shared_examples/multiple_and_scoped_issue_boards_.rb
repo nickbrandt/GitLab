@@ -4,7 +4,7 @@ shared_examples_for 'multiple and scoped issue boards' do |route_definition|
   context 'multiple issue boards' do
     before do
       board_parent.add_reporter(user)
-      stub_licensed_features(multiple_group_issue_boards: true, multiple_project_issue_boards: true)
+      stub_licensed_features(multiple_group_issue_boards: true)
     end
 
     describe "POST #{route_definition}" do

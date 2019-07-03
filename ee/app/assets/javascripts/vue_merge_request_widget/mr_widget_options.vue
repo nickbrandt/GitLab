@@ -3,7 +3,7 @@ import ReportSection from '~/reports/components/report_section.vue';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
-import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
+import { componentNames } from 'ee/reports/components/issue_body';
 import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license_report.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
 

@@ -296,6 +296,9 @@ msgid_plural "%{strong_start}%{tag_count}%{strong_end} Tags"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%{tabname} changed"
+msgstr ""
+
 msgid "%{text} %{files}"
 msgid_plural "%{text} %{files} files"
 msgstr[0] ""
@@ -317,6 +320,9 @@ msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what infor
 msgstr ""
 
 msgid "%{user_name} profile page"
+msgstr ""
+
+msgid "%{username}'s avatar"
 msgstr ""
 
 msgid "%{verb} %{time_spent_value} spent time."
@@ -450,9 +456,6 @@ msgstr ""
 msgid "2FA"
 msgstr ""
 
-msgid "2FA enabled"
-msgstr ""
-
 msgid "2FADevice|Registered On"
 msgstr ""
 
@@ -499,6 +502,9 @@ msgid "<code>\"johnsmith@example.com\": \"johnsmith@example.com\"</code> will ad
 msgstr ""
 
 msgid "<no name set>"
+msgstr ""
+
+msgid "<no scopes selected>"
 msgstr ""
 
 msgid "<strong>%{changedFilesLength} unstaged</strong> and <strong>%{stagedFilesLength} staged</strong> changes"
@@ -636,6 +642,54 @@ msgstr ""
 msgid "AccessDropdown|Users"
 msgstr ""
 
+msgid "AccessTokens|Access Tokens"
+msgstr ""
+
+msgid "AccessTokens|Are you sure? Any RSS or calendar URLs currently in use will stop working."
+msgstr ""
+
+msgid "AccessTokens|Are you sure? Any issue email addresses currently in use will stop working."
+msgstr ""
+
+msgid "AccessTokens|Created"
+msgstr ""
+
+msgid "AccessTokens|Feed token"
+msgstr ""
+
+msgid "AccessTokens|Incoming email token"
+msgstr ""
+
+msgid "AccessTokens|It cannot be used to access any other data."
+msgstr ""
+
+msgid "AccessTokens|Keep this token secret. Anyone who gets ahold of it can create issues as if they were you. You should %{link_reset_it} if that ever happens."
+msgstr ""
+
+msgid "AccessTokens|Keep this token secret. Anyone who gets ahold of it can read activity and issue RSS feeds or your calendar feed as if they were you. You should %{link_reset_it} if that ever happens."
+msgstr ""
+
+msgid "AccessTokens|Personal Access Tokens"
+msgstr ""
+
+msgid "AccessTokens|They are the only accepted password when you have Two-Factor Authentication (2FA) enabled."
+msgstr ""
+
+msgid "AccessTokens|You can also use personal access tokens to authenticate against Git over HTTP."
+msgstr ""
+
+msgid "AccessTokens|You can generate a personal access token for each application you use that needs access to the GitLab API."
+msgstr ""
+
+msgid "AccessTokens|Your feed token is used to authenticate you when your RSS reader loads a personalized RSS feed or when your calendar application loads a personalized calendar, and is included in those feed URLs."
+msgstr ""
+
+msgid "AccessTokens|Your incoming email token is used to authenticate you when you create a new issue by email, and is included in your personal project-specific email addresses."
+msgstr ""
+
+msgid "AccessTokens|reset it"
+msgstr ""
+
 msgid "Account"
 msgstr ""
 
@@ -654,6 +708,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Active %{type} Tokens (%{token_length})"
+msgstr ""
+
 msgid "Active Sessions"
 msgstr ""
 
@@ -662,6 +719,11 @@ msgstr ""
 
 msgid "Add"
 msgstr ""
+
+msgid "Add %d issue"
+msgid_plural "Add %d issues"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Add CHANGELOG"
 msgstr ""
@@ -679,6 +741,9 @@ msgid "Add Kubernetes cluster"
 msgstr ""
 
 msgid "Add README"
+msgstr ""
+
+msgid "Add a %{type} token"
 msgstr ""
 
 msgid "Add a GPG key"
@@ -736,6 +801,9 @@ msgid "Add header and footer to emails. Please note that color settings will onl
 msgstr ""
 
 msgid "Add image comment"
+msgstr ""
+
+msgid "Add issues"
 msgstr ""
 
 msgid "Add italic text"
@@ -1316,6 +1384,9 @@ msgstr ""
 msgid "An error occurred. Please try again."
 msgstr ""
 
+msgid "An issue can be a bug, a todo or a feature request that needs to be discussed in a project. Besides, issues are searchable and filterable."
+msgstr ""
+
 msgid "An unexpected error occurred while checking the project environment."
 msgstr ""
 
@@ -1532,6 +1603,9 @@ msgid "Are you sure you want to reset the SCIM token? SCIM provisioning will sto
 msgstr ""
 
 msgid "Are you sure you want to reset the health check token?"
+msgstr ""
+
+msgid "Are you sure you want to revoke this %{type} Token? This action cannot be undone."
 msgstr ""
 
 msgid "Are you sure you want to revoke this nickname?"
@@ -2014,10 +2088,28 @@ msgstr ""
 msgid "Blue helpers indicate an action to be taken."
 msgstr ""
 
+msgid "BoardBlankState|Add default lists"
+msgstr ""
+
+msgid "BoardBlankState|Add the following default lists to your Issue Board with one click:"
+msgstr ""
+
+msgid "BoardBlankState|Nevermind, I'll use my own"
+msgstr ""
+
+msgid "BoardBlankState|Starting out with the default set of lists will get you right on the way to making the most of your board."
+msgstr ""
+
 msgid "Boards"
 msgstr ""
 
+msgid "Boards|Collapse"
+msgstr ""
+
 msgid "Boards|Edit board"
+msgstr ""
+
+msgid "Boards|Expand"
 msgstr ""
 
 msgid "Boards|View scope"
@@ -2332,6 +2424,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Cancel running"
+msgstr ""
+
 msgid "Cancel this job"
 msgstr ""
 
@@ -2512,9 +2607,6 @@ msgstr ""
 msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
-msgid "Choose your merge method, options, checks, and set up a default merge request description template."
-msgstr ""
-
 msgid "CiStatusLabel|canceled"
 msgstr ""
 
@@ -2659,6 +2751,9 @@ msgstr ""
 msgid "Clear input"
 msgstr ""
 
+msgid "Clear recent searches"
+msgstr ""
+
 msgid "Clear search"
 msgstr ""
 
@@ -2728,6 +2823,9 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+msgid "Close %{tabname}"
+msgstr ""
+
 msgid "Close epic"
 msgstr ""
 
@@ -2789,6 +2887,9 @@ msgid "ClusterIntegration|Adding an integration will share the cluster across al
 msgstr ""
 
 msgid "ClusterIntegration|Advanced options on this Kubernetes cluster's integration"
+msgstr ""
+
+msgid "ClusterIntegration|All data not committed to GitLab will be deleted and cannot be restored."
 msgstr ""
 
 msgid "ClusterIntegration|All data will be deleted and cannot be restored."
@@ -3522,25 +3623,19 @@ msgstr ""
 msgid "Container registry images"
 msgstr ""
 
-msgid "ContainerRegistry|First log in to GitLab&rsquo;s Container Registry using your GitLab username and password. If you have %{link_2fa} you need to use a %{link_token}:"
+msgid "ContainerRegistry|Container Registry"
 msgstr ""
 
-msgid "ContainerRegistry|GitLab supports up to 3 levels of image names. The following examples of images are valid for your project:"
-msgstr ""
-
-msgid "ContainerRegistry|How to use the Container Registry"
+msgid "ContainerRegistry|Docker connection error"
 msgstr ""
 
 msgid "ContainerRegistry|Last Updated"
 msgstr ""
 
-msgid "ContainerRegistry|Learn more about"
-msgstr ""
-
 msgid "ContainerRegistry|No tags in Container Registry for this container image."
 msgstr ""
 
-msgid "ContainerRegistry|Once you log in, you&rsquo;re free to create and upload a container image using the common %{build} and %{push} commands"
+msgid "ContainerRegistry|Quick Start"
 msgstr ""
 
 msgid "ContainerRegistry|Remove image"
@@ -3561,10 +3656,16 @@ msgstr ""
 msgid "ContainerRegistry|Tag ID"
 msgstr ""
 
-msgid "ContainerRegistry|Use different image names"
+msgid "ContainerRegistry|There are no container images stored for this project"
 msgstr ""
 
-msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images."
+msgid "ContainerRegistry|We are having trouble connecting to Docker, which could be due to an issue with your project name or path. For more information, please review the %{docLinkStart}Container Registry documentation%{docLinkEnd}."
+msgstr ""
+
+msgid "ContainerRegistry|With the Container Registry, every project can have its own space to store its Docker images. Learn more about the %{docLinkStart}Container Registry%{docLinkEnd}."
+msgstr ""
+
+msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images. Learn more about the %{docLinkStart}Container Registry%{docLinkEnd}."
 msgstr ""
 
 msgid "ContainerRegistry|You are about to delete the image <b>%{title}</b>. This will delete the image and all tags pointing to this image."
@@ -3573,7 +3674,7 @@ msgstr ""
 msgid "ContainerRegistry|You are about to remove repository <b>%{title}</b>. Once you confirm, this repository will be permanently deleted."
 msgstr ""
 
-msgid "ContainerRegistry|You can also use a %{deploy_token} for read-only access to the registry images."
+msgid "ContainerRegistry|You can add an image to this registry with the following commands:"
 msgstr ""
 
 msgid "Contains %{count} blobs of images (%{size})"
@@ -3681,6 +3782,9 @@ msgstr ""
 msgid "Copy link"
 msgstr ""
 
+msgid "Copy personal access token to clipboard"
+msgstr ""
+
 msgid "Copy reference to clipboard"
 msgstr ""
 
@@ -3730,6 +3834,9 @@ msgid "Coverage"
 msgstr ""
 
 msgid "Create"
+msgstr ""
+
+msgid "Create %{type} token"
 msgstr ""
 
 msgid "Create New Directory"
@@ -4035,6 +4142,9 @@ msgstr ""
 msgid "Default description template for issues"
 msgstr ""
 
+msgid "Default description template for merge requests"
+msgstr ""
+
 msgid "Default first day of the week"
 msgstr ""
 
@@ -4193,6 +4303,9 @@ msgstr ""
 msgid "Deploy key was successfully updated."
 msgstr ""
 
+msgid "Deploy to..."
+msgstr ""
+
 msgid "DeployBoard|Matching on the %{appLabel} label has been removed for deploy boards. To see all instances on your board, you must update your chart and redeploy."
 msgstr ""
 
@@ -4268,6 +4381,9 @@ msgstr ""
 msgid "DeployTokens|Created"
 msgstr ""
 
+msgid "DeployTokens|Default format is \"gitlab+deploy-token-{n}\". Enter custom username if you want to change it."
+msgstr ""
+
 msgid "DeployTokens|Deploy Tokens"
 msgstr ""
 
@@ -4341,6 +4457,9 @@ msgid "Description templates allow you to define context-specific templates for 
 msgstr ""
 
 msgid "Description:"
+msgstr ""
+
+msgid "Deselect all"
 msgstr ""
 
 msgid "DesignManagement|%{current_design} of %{designs_count}"
@@ -4506,6 +4625,9 @@ msgid "Dockerfile"
 msgstr ""
 
 msgid "Documentation for popular identity providers"
+msgstr ""
+
+msgid "Doing"
 msgstr ""
 
 msgid "Domain"
@@ -4733,9 +4855,6 @@ msgstr ""
 msgid "Enable SAML authentication for this group"
 msgstr ""
 
-msgid "Enable Sentry for error reporting and logging."
-msgstr ""
-
 msgid "Enable access to the Performance Bar for a given group."
 msgstr ""
 
@@ -4749,6 +4868,9 @@ msgid "Enable classification control using an external service"
 msgstr ""
 
 msgid "Enable error tracking"
+msgstr ""
+
+msgid "Enable feature to choose access level"
 msgstr ""
 
 msgid "Enable for this project"
@@ -5042,6 +5164,9 @@ msgstr ""
 msgid "Epics|Remove issue"
 msgstr ""
 
+msgid "Epics|Show more"
+msgstr ""
+
 msgid "Epics|Something went wrong while creating child epics."
 msgstr ""
 
@@ -5066,9 +5191,6 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-msgid "Error Reporting and Logging"
-msgstr ""
-
 msgid "Error Tracking"
 msgstr ""
 
@@ -5082,6 +5204,9 @@ msgid "Error deleting  %{issuableType}"
 msgstr ""
 
 msgid "Error fetching contributors data."
+msgstr ""
+
+msgid "Error fetching diverging counts for branches. Please try again."
 msgstr ""
 
 msgid "Error fetching labels."
@@ -5160,6 +5285,9 @@ msgid "Error rendering markdown preview"
 msgstr ""
 
 msgid "Error saving label update."
+msgstr ""
+
+msgid "Error setting up editor. Please try again."
 msgstr ""
 
 msgid "Error updating %{issuableType}"
@@ -5261,6 +5389,9 @@ msgstr ""
 msgid "Everyone"
 msgstr ""
 
+msgid "Everyone With Access"
+msgstr ""
+
 msgid "Everyone can contribute"
 msgstr ""
 
@@ -5307,6 +5438,12 @@ msgid "Expired"
 msgstr ""
 
 msgid "Expired %{expiredOn}"
+msgstr ""
+
+msgid "Expires"
+msgstr ""
+
+msgid "Expires at"
 msgstr ""
 
 msgid "Expires in %{expires_at}"
@@ -6430,6 +6567,9 @@ msgstr ""
 msgid "Go back"
 msgstr ""
 
+msgid "Go back to %{startTag}Open issues%{endTag} and select some issues to add to your board."
+msgstr ""
+
 msgid "Go full screen"
 msgstr ""
 
@@ -7313,6 +7453,9 @@ msgstr ""
 msgid "Invite member"
 msgstr ""
 
+msgid "Invocations"
+msgstr ""
+
 msgid "Invoke Count"
 msgstr ""
 
@@ -7365,6 +7508,21 @@ msgid "IssueBoards|Some of your boards are hidden, activate a license to see the
 msgstr ""
 
 msgid "IssueBoards|Switch board"
+msgstr ""
+
+msgid "IssueTracker|Bugzilla issue tracker"
+msgstr ""
+
+msgid "IssueTracker|Custom issue tracker"
+msgstr ""
+
+msgid "IssueTracker|GitLab issue tracker"
+msgstr ""
+
+msgid "IssueTracker|Redmine issue tracker"
+msgstr ""
+
+msgid "IssueTracker|YouTrack issue tracker"
 msgstr ""
 
 msgid "Issues"
@@ -7427,13 +7585,13 @@ msgstr ""
 msgid "JiraService|If different from Web URL"
 msgstr ""
 
-msgid "JiraService|JIRA API URL"
+msgid "JiraService|Jira API URL"
 msgstr ""
 
-msgid "JiraService|JIRA comments will be created when an issue gets referenced in a commit."
+msgid "JiraService|Jira comments will be created when an issue gets referenced in a commit."
 msgstr ""
 
-msgid "JiraService|JIRA comments will be created when an issue gets referenced in a merge request."
+msgid "JiraService|Jira comments will be created when an issue gets referenced in a merge request."
 msgstr ""
 
 msgid "JiraService|Jira issue tracker"
@@ -7950,6 +8108,9 @@ msgstr ""
 msgid "Loading functions timed out. Please reload the page to try again."
 msgstr ""
 
+msgid "Loading issues"
+msgstr ""
+
 msgid "Loading the GitLab IDE..."
 msgstr ""
 
@@ -7987,6 +8148,9 @@ msgid "Locked"
 msgstr ""
 
 msgid "Locked Files"
+msgstr ""
+
+msgid "Locked by %{fileLockUserName}"
 msgstr ""
 
 msgid "Locked to current projects"
@@ -8029,6 +8193,9 @@ msgid "Make everyone on your team more productive regardless of their location. 
 msgstr ""
 
 msgid "Make issue confidential."
+msgstr ""
+
+msgid "Make sure you save it - you won't be able to access it again."
 msgstr ""
 
 msgid "Make sure you're logged into the account that owns the projects you'd like to import."
@@ -8109,6 +8276,9 @@ msgstr ""
 msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
+msgid "Mark this issue as related to another issue"
+msgstr ""
+
 msgid "Mark todo as done"
 msgstr ""
 
@@ -8122,6 +8292,9 @@ msgid "Markdown enabled"
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
+msgstr ""
+
+msgid "Marks this issue as related to %{issue_ref}."
 msgstr ""
 
 msgid "Marks todo as done."
@@ -8822,6 +8995,9 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No %{header} for this request."
+msgstr ""
+
 msgid "No %{providerTitle} repositories available to import"
 msgstr ""
 
@@ -8853,9 +9029,6 @@ msgid "No changes between %{ref_start}%{source_branch}%{ref_end} and %{ref_start
 msgstr ""
 
 msgid "No connection could be made to a Gitaly Server, please check your logs!"
-msgstr ""
-
-msgid "No container images stored for this project. Add one by following the instructions above."
 msgstr ""
 
 msgid "No contributions"
@@ -9184,6 +9357,9 @@ msgstr ""
 msgid "One or more of your dependency files are not supported, and the dependency list may be incomplete. Below is a list of supported file types."
 msgstr ""
 
+msgid "Only Project Members"
+msgstr ""
+
 msgid "Only admins"
 msgstr ""
 
@@ -9224,6 +9400,12 @@ msgid "Open errors"
 msgstr ""
 
 msgid "Open in Xcode"
+msgstr ""
+
+msgid "Open in file view"
+msgstr ""
+
+msgid "Open issues"
 msgstr ""
 
 msgid "Open projects"
@@ -9448,6 +9630,18 @@ msgstr ""
 msgid "Performance optimization"
 msgstr ""
 
+msgid "PerformanceBar|Gitaly calls"
+msgstr ""
+
+msgid "PerformanceBar|SQL queries"
+msgstr ""
+
+msgid "PerformanceBar|profile"
+msgstr ""
+
+msgid "PerformanceBar|trace"
+msgstr ""
+
 msgid "Permissions"
 msgstr ""
 
@@ -9473,6 +9667,9 @@ msgid "Phabricator Tasks"
 msgstr ""
 
 msgid "Pick a name"
+msgstr ""
+
+msgid "Pick a name for the application, and we'll give you a unique %{type} token."
 msgstr ""
 
 msgid "Pin code"
@@ -10069,6 +10266,9 @@ msgstr ""
 msgid "Profiles|Full name"
 msgstr ""
 
+msgid "Profiles|Impersonation"
+msgstr ""
+
 msgid "Profiles|Include private contributions on my profile"
 msgstr ""
 
@@ -10109,6 +10309,9 @@ msgid "Profiles|Organization"
 msgstr ""
 
 msgid "Profiles|Path"
+msgstr ""
+
+msgid "Profiles|Personal Access"
 msgstr ""
 
 msgid "Profiles|Position and size your new avatar"
@@ -10244,6 +10447,12 @@ msgid "Profiles|Your status"
 msgstr ""
 
 msgid "Profiles|e.g. My MacBook key"
+msgstr ""
+
+msgid "Profiles|impersonation"
+msgstr ""
+
+msgid "Profiles|personal access"
 msgstr ""
 
 msgid "Profiles|username"
@@ -10427,6 +10636,12 @@ msgid "ProjectSettings|Automatically resolve merge request diff discussions when
 msgstr ""
 
 msgid "ProjectSettings|Badges"
+msgstr ""
+
+msgid "ProjectSettings|Choose your merge method, merge options, and merge checks."
+msgstr ""
+
+msgid "ProjectSettings|Choose your merge method, merge options, merge checks, and set up a default description template for merge requests."
 msgstr ""
 
 msgid "ProjectSettings|Contact an admin to change this setting."
@@ -11091,6 +11306,9 @@ msgstr ""
 msgid "Remove fork relationship"
 msgstr ""
 
+msgid "Remove from board"
+msgstr ""
+
 msgid "Remove group"
 msgstr ""
 
@@ -11595,6 +11813,9 @@ msgstr ""
 msgid "Save variables"
 msgstr ""
 
+msgid "Saving"
+msgstr ""
+
 msgid "Saving project."
 msgstr ""
 
@@ -11623,6 +11844,9 @@ msgid "Scoped issue boards"
 msgstr ""
 
 msgid "Scoped label"
+msgstr ""
+
+msgid "Scopes"
 msgstr ""
 
 msgid "Scroll down to <strong>Google Code Project Hosting</strong> and enable the switch on the right."
@@ -11838,6 +12062,9 @@ msgstr ""
 msgid "Select a new namespace"
 msgstr ""
 
+msgid "Select a project"
+msgstr ""
+
 msgid "Select a project to read Insights configuration file"
 msgstr ""
 
@@ -11848,6 +12075,9 @@ msgid "Select a template repository"
 msgstr ""
 
 msgid "Select a timezone"
+msgstr ""
+
+msgid "Select all"
 msgstr ""
 
 msgid "Select an existing Kubernetes cluster or create a new one"
@@ -11946,6 +12176,9 @@ msgstr ""
 msgid "ServerlessDetails|More information"
 msgstr ""
 
+msgid "ServerlessDetails|No pods loaded at this time."
+msgstr ""
+
 msgid "ServerlessDetails|Number of Kubernetes pods in use over time based on necessity."
 msgstr ""
 
@@ -11976,7 +12209,19 @@ msgstr ""
 msgid "Serverless|No functions available"
 msgstr ""
 
+msgid "Serverless|The deploy job has not finished."
+msgstr ""
+
+msgid "Serverless|The functions listed in the %{startTag}serverless.yml%{endTag} file don't match the namespace of your cluster."
+msgstr ""
+
 msgid "Serverless|There is currently no function data available from Knative. This could be for a variety of reasons including:"
+msgstr ""
+
+msgid "Serverless|Your %{startTag}.gitlab-ci.yml%{endTag} file is not properly configured."
+msgstr ""
+
+msgid "Serverless|Your repository does not have a corresponding %{startTag}serverless.yml%{endTag} file."
 msgstr ""
 
 msgid "Service"
@@ -12187,6 +12432,9 @@ msgid "Showing %d event"
 msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Showing all issues"
+msgstr ""
 
 msgid "Showing last %{size} of log -"
 msgstr ""
@@ -12750,6 +12998,9 @@ msgid "Submit as spam"
 msgstr ""
 
 msgid "Submit feedback"
+msgstr ""
+
+msgid "Submit issue"
 msgstr ""
 
 msgid "Submit review"
@@ -13468,6 +13719,9 @@ msgstr ""
 msgid "There are no issues to show"
 msgstr ""
 
+msgid "There are no issues to show."
+msgstr ""
+
 msgid "There are no labels yet"
 msgstr ""
 
@@ -13642,6 +13896,9 @@ msgstr ""
 msgid "This environment has no deployments yet."
 msgstr ""
 
+msgid "This feature requires local storage to be enabled"
+msgstr ""
+
 msgid "This field is required."
 msgstr ""
 
@@ -13802,6 +14059,9 @@ msgid "This timeout will take precedence when lower than project-defined timeout
 msgstr ""
 
 msgid "This user cannot be unlocked manually from GitLab"
+msgstr ""
+
+msgid "This user has no active %{type} Tokens."
 msgstr ""
 
 msgid "This user has no identities"
@@ -14024,6 +14284,9 @@ msgstr ""
 msgid "To %{link_to_help} of your domain, add the above key to a TXT record within to your DNS configuration."
 msgstr ""
 
+msgid "To Do"
+msgstr ""
+
 msgid "To GitLab"
 msgstr ""
 
@@ -14097,6 +14360,9 @@ msgid "To preserve performance only <strong>%{display_size} of %{real_size}</str
 msgstr ""
 
 msgid "To receive alerts from manually configured Prometheus services, add the following URL and Authorization key to your Prometheus webhook config file. Learn more about %{linkStart}configuring Prometheus%{linkEnd} to send alerts to GitLab."
+msgstr ""
+
+msgid "To see all the user's personal access tokens you must impersonate them first."
 msgstr ""
 
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
@@ -14393,6 +14659,12 @@ msgstr ""
 msgid "Unfortunately, your email message to GitLab could not be processed."
 msgstr ""
 
+msgid "Uninstall"
+msgstr ""
+
+msgid "Uninstalling"
+msgstr ""
+
 msgid "Unknown"
 msgstr ""
 
@@ -14511,6 +14783,9 @@ msgid "Updated"
 msgstr ""
 
 msgid "Updated %{updated_at} by %{updated_by}"
+msgstr ""
+
+msgid "Updated to"
 msgstr ""
 
 msgid "Updating"
@@ -15646,6 +15921,9 @@ msgstr ""
 msgid "You don't have any deployments right now."
 msgstr ""
 
+msgid "You don't have any recent searches"
+msgstr ""
+
 msgid "You have been granted %{access_level} access to the %{source_link} %{source_type}."
 msgstr ""
 
@@ -15668,6 +15946,12 @@ msgid "You have not added any approvers. Start by adding users or groups."
 msgstr ""
 
 msgid "You have reached your project limit"
+msgstr ""
+
+msgid "You haven't added any issues to your project yet"
+msgstr ""
+
+msgid "You haven't selected any issues yet"
 msgstr ""
 
 msgid "You left the \"%{membershipable_human_name}\" %{source_type}."
@@ -15797,6 +16081,9 @@ msgid "Your GPG keys (%{count})"
 msgstr ""
 
 msgid "Your Groups"
+msgstr ""
+
+msgid "Your New Personal Access Token"
 msgstr ""
 
 msgid "Your Primary Email will be used for avatar detection."
@@ -16051,6 +16338,9 @@ msgstr ""
 msgid "ciReport|All severities"
 msgstr ""
 
+msgid "ciReport|Automatically apply the patch in a new branch"
+msgstr ""
+
 msgid "ciReport|Class"
 msgstr ""
 
@@ -16069,10 +16359,10 @@ msgstr ""
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
-msgid "ciReport|Create issue"
+msgid "ciReport|Create a merge request to implement this solution, or download and apply the patch manually."
 msgstr ""
 
-msgid "ciReport|Create merge request"
+msgid "ciReport|Create issue"
 msgstr ""
 
 msgid "ciReport|DAST"
@@ -16090,10 +16380,10 @@ msgstr ""
 msgid "ciReport|Description"
 msgstr ""
 
-msgid "ciReport|Download and apply the patch to fix this vulnerability."
+msgid "ciReport|Download patch to resolve"
 msgstr ""
 
-msgid "ciReport|Download patch"
+msgid "ciReport|Download the patch to apply it manually"
 msgstr ""
 
 msgid "ciReport|Dynamic Application Security Testing (DAST) detects known vulnerabilities in your web application."
@@ -16114,16 +16404,13 @@ msgstr ""
 msgid "ciReport|Image"
 msgstr ""
 
-msgid "ciReport|Implement this solution by creating a merge request"
-msgstr ""
-
 msgid "ciReport|Instances"
 msgstr ""
 
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
-msgid "ciReport|Learn more about interacting with security reports (Alpha)."
+msgid "ciReport|Learn more about interacting with security reports"
 msgstr ""
 
 msgid "ciReport|License management detected %d license for the source branch only"
@@ -16164,6 +16451,9 @@ msgid "ciReport|No changes to performance metrics"
 msgstr ""
 
 msgid "ciReport|Performance metrics"
+msgstr ""
+
+msgid "ciReport|Resolve with merge request"
 msgstr ""
 
 msgid "ciReport|SAST"
@@ -16279,9 +16569,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "deleted"
-msgstr ""
-
-msgid "deploy token"
 msgstr ""
 
 msgid "detached"
@@ -16731,6 +17018,9 @@ msgstr ""
 msgid "none"
 msgstr ""
 
+msgid "not found"
+msgstr ""
+
 msgid "notification emails"
 msgstr ""
 
@@ -16759,9 +17049,6 @@ msgstr[1] ""
 msgid "password"
 msgstr ""
 
-msgid "personal access token"
-msgstr ""
-
 msgid "point"
 msgid_plural "points"
 msgstr[0] ""
@@ -16785,6 +17072,9 @@ msgid "quick actions"
 msgstr ""
 
 msgid "register"
+msgstr ""
+
+msgid "released %{time}"
 msgstr ""
 
 msgid "remaining"
@@ -16891,6 +17181,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "to help your contributors communicate effectively!"
+msgstr ""
+
+msgid "to list"
 msgstr ""
 
 msgid "triggered"

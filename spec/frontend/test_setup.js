@@ -1,9 +1,16 @@
 import Vue from 'vue';
 import * as jqueryMatchers from 'custom-jquery-matchers';
+import $ from 'jquery';
 import Translate from '~/vue_shared/translate';
 import axios from '~/lib/utils/axios_utils';
+import { config as testUtilsConfig } from '@vue/test-utils';
 import { initializeTestTimeout } from './helpers/timeout';
 import { loadHTMLFixture, setHTMLFixture } from './helpers/fixtures';
+
+// Expose jQuery so specs using jQuery plugins can be imported nicely.
+// Here is an issue to explore better alternatives:
+// https://gitlab.com/gitlab-org/gitlab-ee/issues/12448
+window.jQuery = $;
 
 process.on('unhandledRejection', global.promiseRejectionHandler);
 
@@ -54,9 +61,21 @@ Object.assign(global, {
   preloadFixtures() {},
 });
 
+Object.assign(global, {
+  MutationObserver() {
+    return {
+      disconnect() {},
+      observe() {},
+    };
+  },
+});
+
 // custom-jquery-matchers was written for an old Jest version, we need to make it compatible
 Object.entries(jqueryMatchers).forEach(([matcherName, matcherFactory]) => {
   expect.extend({
     [matcherName]: matcherFactory().compare,
   });
 });
+
+// Tech debt issue TBD
+testUtilsConfig.logModifiedComponents = false;
