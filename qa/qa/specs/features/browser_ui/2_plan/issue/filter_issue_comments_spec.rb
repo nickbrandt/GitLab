@@ -18,21 +18,24 @@ module QA
         expect(page).to have_content(issue_title)
 
         Page::Project::Issue::Show.perform do |show_page|
-          show_page.comment('/confidential', filter: :comments_only)
-          show_page.comment('My own comment', filter: :comments_only)
+          my_own_comment = "My own comment"
+          made_the_issue_confidential = "made the issue confidential"
 
-          expect(show_page).not_to have_content("made the issue confidential")
-          expect(show_page).to have_content("My own comment")
+          show_page.comment('/confidential', filter: :comments_only)
+          show_page.comment(my_own_comment, filter: :comments_only)
+
+          expect(show_page).not_to have_content(made_the_issue_confidential)
+          expect(show_page).to have_content(my_own_comment)
 
           show_page.select_all_activities_filter
 
-          expect(show_page).to have_content("made the issue confidential")
-          expect(show_page).to have_content("My own comment")
+          expect(show_page).to have_content(made_the_issue_confidential)
+          expect(show_page).to have_content(my_own_comment)
 
           show_page.select_history_only_filter
 
-          expect(show_page).to have_content("made the issue confidential")
-          expect(show_page).not_to have_content("My own comment")
+          expect(show_page).to have_content(made_the_issue_confidential)
+          expect(show_page).not_to have_content(my_own_comment)
         end
       end
     end
