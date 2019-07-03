@@ -7,6 +7,7 @@ import {
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  ROLLOUT_STRATEGY_USER_ID,
   PERCENT_ROLLOUT_GROUP_ID,
   INTERNAL_ID_PREFIX,
   DEFAULT_PERCENT_ROLLOUT,
@@ -29,6 +30,12 @@ describe('feature flags helpers spec', () => {
                 percentage: '56',
               },
             },
+            {
+              name: ROLLOUT_STRATEGY_USER_ID,
+              parameters: {
+                userIds: '123,234',
+              },
+            },
           ],
 
           _destroy: true,
@@ -44,6 +51,7 @@ describe('feature flags helpers spec', () => {
           protected: true,
           rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
           rolloutPercentage: '56',
+          rolloutUserIds: ['123', '234'],
           shouldBeDestroyed: true,
         },
       ];
@@ -94,6 +102,7 @@ describe('feature flags helpers spec', () => {
             shouldBeDestroyed: true,
             rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
             rolloutPercentage: '48',
+            rolloutUserIds: ['123', '234'],
           },
         ],
       };
@@ -116,6 +125,12 @@ describe('feature flags helpers spec', () => {
                   parameters: {
                     groupId: PERCENT_ROLLOUT_GROUP_ID,
                     percentage: '48',
+                  },
+                },
+                {
+                  name: ROLLOUT_STRATEGY_USER_ID,
+                  parameters: {
+                    userIds: '123,234',
                   },
                 },
               ],
@@ -164,6 +179,7 @@ describe('feature flags helpers spec', () => {
         id: expect.stringContaining(INTERNAL_ID_PREFIX),
         rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
         rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+        rolloutUserIds: [],
       };
 
       const actual = createNewEnvironmentScope();
@@ -183,6 +199,7 @@ describe('feature flags helpers spec', () => {
         id: expect.stringContaining(INTERNAL_ID_PREFIX),
         rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
         rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+        rolloutUserIds: [],
       };
 
       const actual = createNewEnvironmentScope(overrides);

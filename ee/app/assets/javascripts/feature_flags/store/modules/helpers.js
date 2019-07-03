@@ -2,9 +2,12 @@ import _ from 'underscore';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  ROLLOUT_STRATEGY_USER_ID,
   INTERNAL_ID_PREFIX,
   DEFAULT_PERCENT_ROLLOUT,
   PERCENT_ROLLOUT_GROUP_ID,
+  fetchPercentageParams,
+  fetchUserIdParams,
 } from '../../constants';
 
 /**
@@ -14,14 +17,19 @@ import {
  */
 export const mapToScopesViewModel = scopesFromRails =>
   (scopesFromRails || []).map(s => {
-    const [strategy] = s.strategies || [];
+    const percentStrategy = (s.strategies || []).find(
+      strat => strat.name === ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+    );
 
-    const rolloutStrategy = strategy ? strategy.name : ROLLOUT_STRATEGY_ALL_USERS;
+    const rolloutStrategy = percentStrategy ? percentStrategy.name : ROLLOUT_STRATEGY_ALL_USERS;
 
-    let rolloutPercentage = DEFAULT_PERCENT_ROLLOUT;
-    if (strategy && strategy.parameters && strategy.parameters.percentage) {
-      rolloutPercentage = strategy.parameters.percentage;
-    }
+    const rolloutPercentage = fetchPercentageParams(percentStrategy) || DEFAULT_PERCENT_ROLLOUT;
+
+    const userStrategy = (s.strategies || []).find(
+      strat => strat.name === ROLLOUT_STRATEGY_USER_ID,
+    );
+
+    const rolloutUserIds = (fetchUserIdParams(userStrategy) || '').split(',').filter(id => id);
 
     return {
       id: s.id,
@@ -31,12 +39,12 @@ export const mapToScopesViewModel = scopesFromRails =>
       protected: Boolean(s.protected),
       rolloutStrategy,
       rolloutPercentage,
+      rolloutUserIds,
 
       // eslint-disable-next-line no-underscore-dangle
       shouldBeDestroyed: Boolean(s._destroy),
     };
   });
-
 /**
  * Converts the parameters emitted by the Vue component into
  * the shape that the Rails API expects.
@@ -44,14 +52,30 @@ export const mapToScopesViewModel = scopesFromRails =>
  */
 export const mapFromScopesViewModel = params => {
   const scopes = (params.scopes || []).map(s => {
-    const parameters = {};
+    const percentParameters = {};
     if (s.rolloutStrategy === ROLLOUT_STRATEGY_PERCENT_ROLLOUT) {
-      parameters.groupId = PERCENT_ROLLOUT_GROUP_ID;
-      parameters.percentage = s.rolloutPercentage;
+      percentParameters.groupId = PERCENT_ROLLOUT_GROUP_ID;
+      percentParameters.percentage = s.rolloutPercentage;
+    }
+
+    const userIdParameters = {};
+    if (Array.isArray(s.rolloutUserIds) && s.rolloutUserIds.length > 0) {
+      userIdParameters.userIds = s.rolloutUserIds.join(',');
     }
 
     // Strip out any internal IDs
     const id = _.isString(s.id) && s.id.startsWith(INTERNAL_ID_PREFIX) ? undefined : s.id;
+
+    const strategies = [
+      {
+        name: s.rolloutStrategy,
+        parameters: percentParameters,
+      },
+    ];
+
+    if (!_.isEmpty(userIdParameters)) {
+      strategies.push({ name: ROLLOUT_STRATEGY_USER_ID, parameters: userIdParameters });
+    }
 
     return {
       id,
@@ -60,12 +84,7 @@ export const mapFromScopesViewModel = params => {
       can_update: s.canUpdate,
       protected: s.protected,
       _destroy: s.shouldBeDestroyed,
-      strategies: [
-        {
-          name: s.rolloutStrategy,
-          parameters,
-        },
-      ],
+      strategies,
     };
   });
 
@@ -94,6 +113,7 @@ export const createNewEnvironmentScope = (overrides = {}) => {
     id: _.uniqueId(INTERNAL_ID_PREFIX),
     rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
     rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+    rolloutUserIds: [],
   };
 
   const newScope = {
