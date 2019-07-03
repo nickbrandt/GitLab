@@ -1,5 +1,3 @@
-import { CLUSTER_TYPE } from '~/clusters/constants';
-
 /**
  * Deploy boards are EE only.
  *
@@ -9,11 +7,7 @@ import { CLUSTER_TYPE } from '~/clusters/constants';
 // eslint-disable-next-line import/prefer-default-export
 export const setDeployBoard = (oldEnvironmentState, environment) => {
   let parsedEnvironment = environment;
-  if (
-    environment.size === 1 &&
-    environment.rollout_status &&
-    environment.cluster_type !== CLUSTER_TYPE.GROUP
-  ) {
+  if (environment.size === 1 && environment.rollout_status) {
     parsedEnvironment = Object.assign({}, environment, {
       hasDeployBoard: true,
       isDeployBoardVisible:
