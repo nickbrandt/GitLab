@@ -123,59 +123,6 @@ Example response:
 ]
 ```
 
-Users on GitLab [Premium, Silver, or higher](https://about.gitlab.com/pricing/) will see
-different parameters, due to the ability to have multiple group boards. Refer to the table
-above to see what enpoint(s) belong to each tier.
-
-Example response:
-
-```json
-[
-  {
-    "id": 1,
-    "name:": "group issue board",
-    "group": {
-      "id": 5,
-      "name": "Documentcloud",
-      "web_url": "http://example.com/groups/documentcloud"
-    },
-    "milestone":   {
-      "id": 12
-      "title": "10.0"
-    },
-    "lists" : [
-      {
-        "id" : 1,
-        "label" : {
-          "name" : "Testing",
-          "color" : "#F0AD4E",
-          "description" : null
-        },
-        "position" : 1
-      },
-      {
-        "id" : 2,
-        "label" : {
-          "name" : "Ready",
-          "color" : "#FF0000",
-          "description" : null
-        },
-        "position" : 2
-      },
-      {
-        "id" : 3,
-        "label" : {
-          "name" : "Production",
-          "color" : "#FF5F00",
-          "description" : null
-        },
-        "position" : 3
-      }
-    ]
-  }
-]
-```
-
 ## Single board
 
 Gets a single board.
