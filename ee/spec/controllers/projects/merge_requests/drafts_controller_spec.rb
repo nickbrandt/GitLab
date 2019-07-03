@@ -90,7 +90,7 @@ describe Projects::MergeRequests::DraftsController do
       expect(json_response['references']['users']).to include(user2.username)
     end
 
-    context 'in a discussion' do
+    context 'in a thread' do
       let(:discussion) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project).discussion }
 
       it 'creates draft note as a reply' do
@@ -104,7 +104,7 @@ describe Projects::MergeRequests::DraftsController do
         expect(draft_note.discussion_id).to eq(discussion.reply_id)
       end
 
-      it 'creates a draft note that will resolve a discussion' do
+      it 'creates a draft note that will resolve a thread' do
         expect do
           create_draft_note(
             overrides: { in_reply_to_discussion_id: discussion.reply_id },
@@ -119,7 +119,7 @@ describe Projects::MergeRequests::DraftsController do
         expect(draft_note.resolve_discussion).to eq(true)
       end
 
-      it 'cannot create more than one draft note per discussion' do
+      it 'cannot create more than one draft note per thread' do
         expect do
           create_draft_note(
             overrides: { in_reply_to_discussion_id: discussion.reply_id },
@@ -283,7 +283,7 @@ describe Projects::MergeRequests::DraftsController do
         .and change { DraftNote.count }.by(-1)
     end
 
-    context 'when publishing drafts in a discussion' do
+    context 'when publishing drafts in a thread' do
       let(:note) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project) }
 
       def create_reply(discussion_id, resolves: false)
@@ -295,7 +295,7 @@ describe Projects::MergeRequests::DraftsController do
               )
       end
 
-      it 'resolves a discussion if the draft note resolves it' do
+      it 'resolves a thread if the draft note resolves it' do
         draft_reply = create_reply(note.discussion_id, resolves: true)
 
         post :publish, params: params
@@ -307,7 +307,7 @@ describe Projects::MergeRequests::DraftsController do
         expect(discussion.resolved_by.id).to eq(user.id)
       end
 
-      it 'unresolves a discussion if the draft note unresolves it' do
+      it 'unresolves a thread if the draft note unresolves it' do
         note.discussion.resolve!(user)
         expect(note.discussion.resolved?).to eq(true)
 

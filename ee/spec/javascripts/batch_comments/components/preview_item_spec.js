@@ -99,7 +99,7 @@ describe('Batch comments draft preview item component', () => {
     });
   });
 
-  describe('for discussion', () => {
+  describe('for thread', () => {
     beforeEach(() => {
       createComponent(false, { discussion_id: '1', resolve_discussion: true }, store => {
         store.state.notes.discussions.push({
@@ -117,13 +117,13 @@ describe('Batch comments draft preview item component', () => {
 
     it('renders title', () => {
       expect(vm.$el.querySelector('.review-preview-item-header-text').textContent).toContain(
-        "Author Name's discussion",
+        "Author Name's thread",
       );
     });
 
-    it('it renders discussion resolved text', () => {
+    it('it renders thread resolved text', () => {
       expect(vm.$el.querySelector('.draft-note-resolution').textContent).toContain(
-        'Discussion will be resolved',
+        'Thread will be resolved',
       );
     });
   });

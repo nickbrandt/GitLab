@@ -23,11 +23,11 @@ describe DraftNotes::CreateService do
   it 'cannot resolve when there is nothing to resolve' do
     draft = create_draft(note: 'Not a reply!', resolve_discussion: true)
 
-    expect(draft.errors[:base]).to include('User is not allowed to resolve discussion')
+    expect(draft.errors[:base]).to include('User is not allowed to resolve thread')
     expect(draft).not_to be_persisted
   end
 
-  context 'in a discussion' do
+  context 'in a thread' do
     it 'creates a draft note with discussion_id' do
       discussion = create(:discussion_note_on_merge_request, noteable: merge_request, project: project).discussion
 
@@ -38,7 +38,7 @@ describe DraftNotes::CreateService do
       expect(draft.resolve_discussion).to be_falsey
     end
 
-    it 'creates a draft that resolves the discussion' do
+    it 'creates a draft that resolves the thread' do
       discussion = create(:discussion_note_on_merge_request, noteable: merge_request, project: project).discussion
 
       draft = create_draft(note: 'A reply!', in_reply_to_discussion_id: discussion.reply_id, resolve_discussion: true)
