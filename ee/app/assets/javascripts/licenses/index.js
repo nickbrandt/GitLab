@@ -7,7 +7,8 @@ export default function mountInstanceLicenseApp(mountElement) {
   if (!mountElement) return undefined;
 
   const {
-    currentActiveUserCount,
+    activeUserCount,
+    guestUserCount,
     licensesPath,
     deleteLicensePath,
     newLicensePath,
@@ -23,7 +24,8 @@ export default function mountInstanceLicenseApp(mountElement) {
         deleteLicensePath,
         newLicensePath,
         downloadLicensePath,
-        currentActiveUserCount: parseInt(currentActiveUserCount, 10),
+        activeUserCount: parseInt(activeUserCount, 10),
+        guestUserCount: parseInt(guestUserCount, 10),
       });
 
       this.fetchLicenses();

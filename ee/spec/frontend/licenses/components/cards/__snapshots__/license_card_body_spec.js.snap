@@ -24,7 +24,7 @@ exports[`LicenseCardBody renders a license card body 1`] = `
       <infocell-stub
         popovercontent="Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
         title="Seats currently in use"
-        value="10"
+        value="2"
       />
        
       <infocell-stub
@@ -241,7 +241,7 @@ exports[`LicenseCardBody renders fallback licensee values 1`] = `
       <infocell-stub
         popovercontent="Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
         title="Seats currently in use"
-        value="10"
+        value="2"
       />
        
       <infocell-stub

@@ -35,7 +35,8 @@ exports[`LicenseCard renders license card with a delete button and license body 
   </div>
    
   <licensecardbody-stub
-    currentactiveusercount="10"
+    activeusercount="10"
+    guestusercount="8"
     license="[object Object]"
   />
 </div>

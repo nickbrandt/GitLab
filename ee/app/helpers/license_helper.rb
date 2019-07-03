@@ -6,8 +6,12 @@ module LicenseHelper
 
   delegate :new_admin_license_path, to: 'Gitlab::Routing.url_helpers'
 
-  def current_active_user_count
+  def active_user_count
     User.active.count
+  end
+
+  def guest_user_count
+    active_user_count - User.active.excluding_guests.count
   end
 
   def max_historical_user_count
@@ -111,7 +115,8 @@ module LicenseHelper
   end
 
   def license_app_data
-    { data: { current_active_user_count: current_active_user_count,
+    { data: { active_user_count: active_user_count,
+              guest_user_count: guest_user_count,
               licenses_path: api_licenses_url,
               delete_license_path: api_license_url(id: ':id'),
               new_license_path: new_admin_license_path, download_license_path: download_admin_license_path } }
