@@ -136,14 +136,14 @@ describe Snippet, :elastic do
       'visibility_level'
     ).merge({ 'type' => snippet.es_type })
 
-    expect(snippet.as_indexed_json).to eq(expected_hash)
+    expect(snippet.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it 'uses same index for Snippet subclasses' do
     Snippet.subclasses.each do |snippet_class|
       expect(snippet_class.index_name).to eq(Snippet.index_name)
       expect(snippet_class.document_type).to eq(Snippet.document_type)
-      expect(snippet_class.mappings.to_hash).to eq(Snippet.mappings.to_hash)
+      expect(snippet_class.__elasticsearch__.mappings.to_hash).to eq(Snippet.__elasticsearch__.mappings.to_hash)
     end
   end
 end
