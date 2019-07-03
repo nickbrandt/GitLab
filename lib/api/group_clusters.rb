@@ -16,6 +16,8 @@ module API
       end
     end
 
+    prepend EE::API::GroupClusters # rubocop: disable Cop/InjectEnterpriseEditionModule
+
     params do
       requires :id, type: String, desc: 'The ID of the group'
     end
