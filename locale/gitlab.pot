@@ -10020,9 +10020,6 @@ msgstr ""
 msgid "Please wait while we import the repository for you. Refresh at will."
 msgstr ""
 
-msgid "Pre-release"
-msgstr ""
-
 msgid "Preferences"
 msgstr ""
 
@@ -12886,6 +12883,9 @@ msgstr ""
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
+msgid "Start a new discussion..."
+msgstr ""
+
 msgid "Start a new merge request"
 msgstr ""
 
@@ -14738,6 +14738,9 @@ msgid "Up to date"
 msgstr ""
 
 msgid "Upcoming"
+msgstr ""
+
+msgid "Upcoming Release"
 msgstr ""
 
 msgid "Update"
