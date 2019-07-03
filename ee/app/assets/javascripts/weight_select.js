@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow-callback, one-var, no-var, object-shorthand, no-shadow, no-unused-vars, no-else-return, func-names */
 
 import $ from 'jquery';
+import '~/gl_dropdown';
 
 function WeightSelect(els, options = {}) {
   const $els = $(els || '.js-weight-select');

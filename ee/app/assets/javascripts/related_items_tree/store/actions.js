@@ -42,11 +42,15 @@ export const setChildrenCount = ({ commit, state }, { children, isRemoved = fals
 export const expandItem = ({ commit }, data) => commit(types.EXPAND_ITEM, data);
 export const collapseItem = ({ commit }, data) => commit(types.COLLAPSE_ITEM, data);
 
-export const setItemChildren = ({ commit, dispatch }, { parentItem, children, isSubItem }) => {
+export const setItemChildren = (
+  { commit, dispatch },
+  { parentItem, children, isSubItem, append = false },
+) => {
   commit(types.SET_ITEM_CHILDREN, {
     parentItem,
     children,
     isSubItem,
+    append,
   });
 
   dispatch('setChildrenCount', { children });
@@ -60,6 +64,9 @@ export const setItemChildren = ({ commit, dispatch }, { parentItem, children, is
 export const setItemChildrenFlags = ({ commit }, data) =>
   commit(types.SET_ITEM_CHILDREN_FLAGS, data);
 
+export const setEpicPageInfo = ({ commit }, data) => commit(types.SET_EPIC_PAGE_INFO, data);
+export const setIssuePageInfo = ({ commit }, data) => commit(types.SET_ISSUE_PAGE_INFO, data);
+
 export const requestItems = ({ commit }, data) => commit(types.REQUEST_ITEMS, data);
 export const receiveItemsSuccess = ({ commit }, data) => commit(types.RECEIVE_ITEMS_SUCCESS, data);
 export const receiveItemsFailure = ({ commit }, data) => {
@@ -67,6 +74,8 @@ export const receiveItemsFailure = ({ commit }, data) => {
   commit(types.RECEIVE_ITEMS_FAILURE, data);
 };
 export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
+  const { iid, fullPath } = parentItem;
+
   dispatch('requestItems', {
     parentItem,
     isSubItem,
@@ -75,7 +84,7 @@ export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
   gqClient
     .query({
       query: epicChildren,
-      variables: { iid: parentItem.iid, fullPath: parentItem.fullPath },
+      variables: { iid, fullPath },
     })
     .then(({ data }) => {
       const children = processQueryResponse(data.group);
@@ -96,11 +105,84 @@ export const fetchItems = ({ dispatch }, { parentItem, isSubItem = false }) => {
         children,
         isSubItem,
       });
+
+      dispatch('setEpicPageInfo', {
+        parentItem,
+        pageInfo: data.group.epic.children.pageInfo,
+      });
+
+      dispatch('setIssuePageInfo', {
+        parentItem,
+        pageInfo: data.group.epic.issues.pageInfo,
+      });
     })
     .catch(() => {
       dispatch('receiveItemsFailure', {
         parentItem,
         isSubItem,
+      });
+    });
+};
+
+export const receiveNextPageItemsFailure = () => {
+  flash(s__('Epics|Something went wrong while fetching child epics.'));
+};
+export const fetchNextPageItems = ({ dispatch, state }, { parentItem, isSubItem = false }) => {
+  const { iid, fullPath } = parentItem;
+  const parentItemFlags = state.childrenFlags[parentItem.reference];
+  const variables = { iid, fullPath };
+
+  if (parentItemFlags.hasMoreEpics) {
+    variables.epicEndCursor = parentItemFlags.epicEndCursor;
+  }
+
+  if (parentItemFlags.hasMoreIssues) {
+    variables.issueEndCursor = parentItemFlags.issueEndCursor;
+  }
+
+  return gqClient
+    .query({
+      query: epicChildren,
+      variables,
+    })
+    .then(({ data }) => {
+      const { epic } = data.group;
+      const emptyChildren = { edges: [], pageInfo: epic.children.pageInfo };
+      const emptyIssues = { edges: [], pageInfo: epic.issues.pageInfo };
+
+      // Ensure we don't re-render already existing items
+      const children = processQueryResponse({
+        epic: {
+          children: parentItemFlags.hasMoreEpics ? epic.children : emptyChildren,
+          issues: parentItemFlags.hasMoreIssues ? epic.issues : emptyIssues,
+        },
+      });
+
+      dispatch('setItemChildren', {
+        parentItem,
+        children,
+        isSubItem,
+        append: true,
+      });
+
+      dispatch('setItemChildrenFlags', {
+        children,
+        isSubItem: false,
+      });
+
+      dispatch('setEpicPageInfo', {
+        parentItem,
+        pageInfo: data.group.epic.children.pageInfo,
+      });
+
+      dispatch('setIssuePageInfo', {
+        parentItem,
+        pageInfo: data.group.epic.issues.pageInfo,
+      });
+    })
+    .catch(() => {
+      dispatch('receiveNextPageItemsFailure', {
+        parentItem,
       });
     });
 };

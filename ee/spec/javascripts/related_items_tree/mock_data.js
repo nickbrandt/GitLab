@@ -136,6 +136,10 @@ export const mockQueryResponse = {
               node: mockEpic2,
             },
           ],
+          pageInfo: {
+            endCursor: 'abc',
+            hasNextPage: true,
+          },
         },
         issues: {
           edges: [
@@ -146,6 +150,10 @@ export const mockQueryResponse = {
               node: mockIssue2,
             },
           ],
+          pageInfo: {
+            endCursor: 'def',
+            hasNextPage: true,
+          },
         },
       },
     },

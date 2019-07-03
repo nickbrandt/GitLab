@@ -1,6 +1,6 @@
 # Notification settings API
 
->**Note:** This feature was [introduced][ce-5632] in GitLab 8.12.
+>**Note:** This feature was [introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5632) in GitLab 8.12.
 
 **Valid notification levels**
 
@@ -17,23 +17,22 @@ custom
 
 If the `custom` level is used, specific email events can be controlled. Available events are returned by `NotificationSetting.email_events`. Currently, these events are recognized:
 
-```
-new_note
-new_issue
-reopen_issue
-close_issue
-reassign_issue
-issue_due
-new_merge_request
-push_to_merge_request
-reopen_merge_request
-close_merge_request
-reassign_merge_request
-merge_merge_request
-failed_pipeline
-success_pipeline
-new_epic
-```
+- `new_note`
+- `new_issue`
+- `reopen_issue`
+- `close_issue`
+- `reassign_issue`
+- `issue_due`
+- `new_merge_request`
+- `push_to_merge_request`
+- `reopen_merge_request`
+- `close_merge_request`
+- `reassign_merge_request`
+- `merge_merge_request`
+- `failed_pipeline`
+- `success_pipeline`
+- `new_epic` **[ULTIMATE]**
+
 
 ## Global notification settings
 
@@ -86,7 +85,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
-| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626) in 11.3) **[ULTIMATE]** |
 
 Example response:
 
@@ -155,7 +154,7 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.
 | `merge_merge_request` | boolean | no | Enable/disable this notification |
 | `failed_pipeline` | boolean | no | Enable/disable this notification |
 | `success_pipeline` | boolean | no | Enable/disable this notification |
-| `new_epic` | boolean | no | Enable/disable this notification ([Introduced][ee-6626] in 11.3) |
+| `new_epic` | boolean | no | Enable/disable this notification ([Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626) in 11.3) **[ULTIMATE]** |
 
 Example responses:
 
@@ -186,5 +185,17 @@ Example responses:
 }
 ```
 
-[ce-5632]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5632
-[ee-6626]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6626
+Users on GitLab [Ultimate or Gold](https://about.gitlab.com/pricing/) will also see
+the `new_epic` parameter:
+
+```json
+{
+  "level": "custom",
+  "events": {
+    "new_note": true,
+    "new_issue": false,
+    "new_epic": false,
+    ...
+  }
+}
+```

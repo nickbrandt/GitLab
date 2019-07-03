@@ -263,6 +263,15 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Extracted EE specific lines for spec/javascripts/vue_mr_widget/mock_data.js. !11847
 
 
+## 11.10.8 (2019-06-27)
+
+- No changes.
+### Security (2 changes)
+
+- Gate MR head_pipeline behind read_pipeline ability.
+- Do not allow localhost urls in GitHub Integration.
+
+
 ## 11.10.7 (2019-06-26)
 
 ### Fixed (1 change)

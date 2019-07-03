@@ -211,34 +211,42 @@ describe ApplicationSetting do
 
       context 'namespaces' do
         let(:namespaces) { create_list(:namespace, 2) }
+        let!(:indexed_namespace) { create :elasticsearch_indexed_namespace, namespace: namespaces.last }
 
         it 'tells you if a namespace is allowed to be indexed' do
-          create :elasticsearch_indexed_namespace, namespace: namespaces.last
-
           expect(setting.elasticsearch_indexes_namespace?(namespaces.last)).to be_truthy
           expect(setting.elasticsearch_indexes_namespace?(namespaces.first)).to be_falsey
+        end
+
+        it 'returns namespaces that are allowed to be indexed' do
+          child_namespace = create(:namespace, parent: namespaces.first)
+          create :elasticsearch_indexed_namespace, namespace: child_namespace
+
+          child_namespace_indexed_through_parent = create(:namespace, parent: namespaces.last)
+
+          expect(setting.elasticsearch_limited_namespaces).to match_array(
+            [namespaces.last, child_namespace, child_namespace_indexed_through_parent])
+          expect(setting.elasticsearch_limited_namespaces(true)).to match_array(
+            [namespaces.last, child_namespace])
         end
       end
 
       context 'projects' do
         let(:projects) { create_list(:project, 2) }
+        let!(:indexed_project) { create :elasticsearch_indexed_project, project: projects.last }
 
         it 'tells you if a project is allowed to be indexed' do
-          create :elasticsearch_indexed_project, project: projects.last
-
-          expect(setting.elasticsearch_indexes_project?(projects.last)).to be_truthy
-          expect(setting.elasticsearch_indexes_project?(projects.first)).to be_falsey
+          expect(setting.elasticsearch_indexes_project?(projects.last)).to be(true)
+          expect(setting.elasticsearch_indexes_project?(projects.first)).to be(false)
         end
-      end
 
-      it 'returns projects that are allowed to be indexed' do
-        project1 = create(:project)
-        projects = create_list(:project, 3)
+        it 'returns projects that are allowed to be indexed' do
+          project_indexed_through_namespace = create(:project)
+          create :elasticsearch_indexed_namespace, namespace: project_indexed_through_namespace.namespace
 
-        create :elasticsearch_indexed_namespace, namespace: project1.namespace
-        projects.each { |project| create :elasticsearch_indexed_project, project: project }
-
-        expect(setting.elasticsearch_limited_projects).to match_array(projects << project1)
+          expect(setting.elasticsearch_limited_projects).to match_array(
+            [projects.last, project_indexed_through_namespace])
+        end
       end
     end
   end

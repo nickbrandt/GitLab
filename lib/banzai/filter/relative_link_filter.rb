@@ -56,10 +56,10 @@ module Banzai
       def process_link_to_upload_attr(html_attr)
         path_parts = [Addressable::URI.unescape(html_attr.value)]
 
-        if group
-          path_parts.unshift(relative_url_root, 'groups', group.full_path, '-')
-        elsif project
+        if project
           path_parts.unshift(relative_url_root, project.full_path)
+        elsif group
+          path_parts.unshift(relative_url_root, 'groups', group.full_path, '-')
         else
           path_parts.unshift(relative_url_root)
         end
@@ -102,7 +102,7 @@ module Banzai
       end
 
       def relative_file_path(uri)
-        path = Addressable::URI.unescape(uri.path)
+        path = Addressable::URI.unescape(uri.path).delete("\0")
         request_path = Addressable::URI.unescape(context[:requested_path])
         nested_path = build_relative_path(path, request_path)
         file_exists?(nested_path) ? nested_path : path
