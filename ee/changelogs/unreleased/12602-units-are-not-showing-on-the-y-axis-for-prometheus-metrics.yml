@@ -1,0 +1,5 @@
+---
+title: 'fix: updates label values to include units in metrics'
+merge_request: 14541
+author:
+type: fixed
