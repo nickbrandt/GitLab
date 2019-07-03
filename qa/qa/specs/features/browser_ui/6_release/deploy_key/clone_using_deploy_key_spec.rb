@@ -3,8 +3,7 @@
 require 'digest/sha1'
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/70
-  context 'Release', :docker, :quarantine do
+  context 'Release', :docker do
     describe 'Git clone using a deploy key' do
       def login
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
