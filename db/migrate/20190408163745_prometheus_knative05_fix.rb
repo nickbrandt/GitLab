@@ -9,7 +9,7 @@ class PrometheusKnative05Fix < ActiveRecord::Migration[5.0]
   DOWNTIME = false
 
   def up
-    Importers::CommonMetrics::Importer.new.execute
+    ::Gitlab::Importers::CommonMetrics::Importer.new.execute
   end
 
   def down

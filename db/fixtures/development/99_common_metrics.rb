@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-Importers::CommonMetrics::Importer.new.execute
+::Gitlab::Importers::CommonMetrics::Importer.new.execute

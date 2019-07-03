@@ -36,7 +36,7 @@ class ImportCommonMetrics < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up
-    Importers::CommonMetrics::Importer.new.execute
+    ::Gitlab::Importers::CommonMetrics::Importer.new.execute
   end
 
   def down
