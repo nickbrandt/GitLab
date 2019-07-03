@@ -171,13 +171,13 @@ describe 'Scoped issue boards', :js do
         it 'creates board filtering by "Any" weight' do
           create_board_weight('Any')
 
-          expect(page).to have_selector('.board-card', count: 4)
+          expect(page).to have_selector('.board-card', count: 5)
         end
 
         it 'creates board filtering by "None" weight' do
           create_board_weight('None')
 
-          expect(page).to have_selector('.board-card', count: 5)
+          expect(page).to have_selector('.board-card', count: 4)
         end
 
         it 'displays dot highlight and tooltip' do
