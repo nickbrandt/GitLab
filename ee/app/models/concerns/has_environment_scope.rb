@@ -23,6 +23,8 @@ module HasEnvironmentScope
     #     This is equivalent to using `#last` from SQL standpoint.
     #
     scope :on_environment, -> (environment_name, relevant_only: false) do
+      order_direction = relevant_only ? 'DESC' : 'ASC'
+
       where = <<~SQL
         environment_scope IN (:wildcard, :environment_name) OR
           :environment_name LIKE
@@ -34,7 +36,7 @@ module HasEnvironmentScope
           WHEN %{wildcard} THEN 0
           WHEN %{environment_name} THEN 2
           ELSE 1
-        END
+        END #{order_direction}
       SQL
 
       values = {
@@ -69,7 +71,7 @@ module HasEnvironmentScope
       relation = where(where, values)
         .order(order % quoted_values) # `order` cannot escape for us!
 
-      relation = relation.reverse_order.limit(1) if relevant_only
+      relation = relation.limit(1) if relevant_only
 
       relation
     end

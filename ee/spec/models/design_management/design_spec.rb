@@ -29,6 +29,26 @@ describe DesignManagement::Design do
     end
   end
 
+  describe 'scopes' do
+    describe '.visible_at_version' do
+      let!(:design1) { create(:design, :with_file, versions_count: 1) }
+      let!(:design2) { create(:design, :with_file, versions_count: 1) }
+      let(:first_version) { DesignManagement::Version.ordered.last }
+      let(:second_version) { DesignManagement::Version.ordered.first }
+
+      it 'returns just designs that existed at that version' do
+        expect(described_class.visible_at_version(first_version)).to eq([design1])
+        expect(described_class.visible_at_version(second_version)).to contain_exactly(design1, design2)
+      end
+
+      it 'can be passed either a DesignManagement::Version or an ID' do
+        [first_version, first_version.id].each do |arg|
+          expect(described_class.visible_at_version(arg)).to eq([design1])
+        end
+      end
+    end
+  end
+
   describe "#new_design?" do
     set(:versions) { create(:design_version) }
     set(:design) { create(:design, versions: [versions]) }

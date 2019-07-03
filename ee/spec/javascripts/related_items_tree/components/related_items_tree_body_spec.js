@@ -1,7 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
 import RelatedItemsBody from 'ee/related_items_tree/components/related_items_tree_body.vue';
-import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 
 import { mockParentItem } from '../mock_data';
 
@@ -11,7 +10,7 @@ const createComponent = (parentItem = mockParentItem, children = []) => {
   return shallowMount(RelatedItemsBody, {
     localVue,
     stubs: {
-      'tree-root': TreeRoot,
+      'tree-root': true,
     },
     propsData: {
       parentItem,
@@ -38,7 +37,7 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders tree-root component', () => {
-        expect(wrapper.find('.related-items-list.tree-root').isVisible()).toBe(true);
+        expect(wrapper.find('tree-root-stub').isVisible()).toBe(true);
       });
     });
   });

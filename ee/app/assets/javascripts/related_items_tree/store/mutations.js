@@ -23,8 +23,12 @@ export default {
     state.issuesCount = issuesCount;
   },
 
-  [types.SET_ITEM_CHILDREN](state, { parentItem, children }) {
-    Vue.set(state.children, parentItem.reference, children);
+  [types.SET_ITEM_CHILDREN](state, { parentItem, children, append }) {
+    if (append) {
+      state.children[parentItem.reference].push(...children);
+    } else {
+      Vue.set(state.children, parentItem.reference, children);
+    }
   },
 
   [types.SET_ITEM_CHILDREN_FLAGS](state, { children }) {
@@ -36,6 +40,20 @@ export default {
         itemHasChildren: item.hasChildren || item.hasIssues,
       });
     });
+  },
+
+  [types.SET_EPIC_PAGE_INFO](state, { parentItem, pageInfo }) {
+    const parentFlags = state.childrenFlags[parentItem.reference];
+
+    parentFlags.epicEndCursor = pageInfo.endCursor;
+    parentFlags.hasMoreEpics = pageInfo.hasNextPage;
+  },
+
+  [types.SET_ISSUE_PAGE_INFO](state, { parentItem, pageInfo }) {
+    const parentFlags = state.childrenFlags[parentItem.reference];
+
+    parentFlags.issueEndCursor = pageInfo.endCursor;
+    parentFlags.hasMoreIssues = pageInfo.hasNextPage;
   },
 
   [types.REQUEST_ITEMS](state, { parentItem, isSubItem }) {

@@ -9,6 +9,7 @@ module Types
 
       authorize :read_design
 
+      field :id, GraphQL::ID_TYPE, null: false
       field :sha, GraphQL::ID_TYPE, null: false
       field :designs,
             Types::DesignManagement::DesignType.connection_type,

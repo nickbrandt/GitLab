@@ -102,6 +102,23 @@ describe GroupsController, type: :request do
         end
       end
 
+      context 'with empty ip restriction param' do
+        let(:params) do
+          { group: { two_factor_grace_period: 42,
+                     ip_restriction_attributes: { range: "" } } }
+        end
+
+        it 'updates group setting' do
+          expect { subject }
+            .to change { group.reload.two_factor_grace_period }.from(48).to(42)
+          expect(response).to have_gitlab_http_status(302)
+        end
+
+        it 'does not create ip restriction' do
+          expect { subject }.not_to change { IpRestriction.count }
+        end
+      end
+
       context 'feature is disabled' do
         before do
           stub_licensed_features(group_ip_restriction: false)

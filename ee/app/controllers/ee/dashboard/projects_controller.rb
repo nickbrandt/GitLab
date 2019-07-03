@@ -5,23 +5,26 @@ module EE
     module ProjectsController
       extend ActiveSupport::Concern
       extend ::Gitlab::Utils::Override
+      include ::OnboardingExperimentHelper
 
       private
 
       override :render_projects
       def render_projects
-        if show_onboarding_welcome_page?
-          redirect_to explore_onboarding_index_path
-        else
-          super
-        end
+        return redirect_to explore_onboarding_index_path if show_onboarding_welcome_page?
+
+        super
       end
 
       def show_onboarding_welcome_page?
-        return false unless ::Gitlab.com?
-        return false if cookies['onboarding_dismissed'] == 'true'
+        return false if onboarding_cookie_set?
+        return false unless allow_access_to_onboarding?
 
-        ::Feature.enabled?(:user_onboarding) && !show_projects?(projects, params)
+        !show_projects?(projects, params)
+      end
+
+      def onboarding_cookie_set?
+        cookies['onboarding_dismissed'] == 'true'
       end
     end
   end
