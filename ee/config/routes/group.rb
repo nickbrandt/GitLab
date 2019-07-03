@@ -78,12 +78,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :merge_requests, only: [] do
-      collection do
-        post :bulk_update
-      end
-    end
-
     resources :todos, only: [:create]
     resources :boards, only: [:create, :update, :destroy] do
       collection do
