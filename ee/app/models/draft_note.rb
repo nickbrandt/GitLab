@@ -4,7 +4,7 @@ class DraftNote < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include Sortable
 
-  PUBLISH_ATTRS = %i(noteable_id noteable_type type note).freeze
+  PUBLISH_ATTRS = %i(noteable_id noteable_type type note commit_id).freeze
   DIFF_ATTRS = %i(position original_position change_position).freeze
 
   # Attribute used to store quick actions changes and users referenced.

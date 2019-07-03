@@ -1139,6 +1139,7 @@ ActiveRecord::Schema.define(version: 2019_07_31_084415) do
     t.index ["author_id"], name: "index_draft_notes_on_author_id"
     t.index ["discussion_id"], name: "index_draft_notes_on_discussion_id"
     t.index ["merge_request_id"], name: "index_draft_notes_on_merge_request_id"
+    t.string "commit_id"
   end
 
   create_table "elasticsearch_indexed_namespaces", id: false, force: :cascade do |t|

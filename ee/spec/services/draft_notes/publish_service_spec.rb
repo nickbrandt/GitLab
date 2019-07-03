@@ -11,7 +11,8 @@ describe DraftNotes::PublishService do
   end
 
   context 'single draft note' do
-    let!(:drafts) { create_list(:draft_note, 2, merge_request: merge_request, author: user) }
+    let(:commit_id) { nil }
+    let!(:drafts) { create_list(:draft_note, 2, merge_request: merge_request, author: user, commit_id: commit_id) }
 
     it 'publishes' do
       expect { publish(draft: drafts.first) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
@@ -28,12 +29,25 @@ describe DraftNotes::PublishService do
 
       expect(result[:status]).to eq(:success)
     end
+
+    context 'commit_id is set' do
+      let(:commit_id) { 'abc123' }
+
+      it 'creates note from draft with commit_id' do
+        result = publish(draft: drafts.first)
+
+        expect(result[:status]).to eq(:success)
+        expect(merge_request.notes.first.commit_id).to eq(commit_id)
+      end
+    end
   end
 
   context 'multiple draft notes' do
+    let(:commit_id) { nil }
+
     before do
-      create(:draft_note, merge_request: merge_request, author: user, note: 'first note')
-      create(:draft_note, merge_request: merge_request, author: user, note: 'second note')
+      create(:draft_note, merge_request: merge_request, author: user, note: 'first note', commit_id: commit_id)
+      create(:draft_note, merge_request: merge_request, author: user, note: 'second note', commit_id: commit_id)
     end
 
     context 'when review fails to create' do
@@ -76,6 +90,20 @@ describe DraftNotes::PublishService do
       end
 
       publish
+    end
+
+    context 'commit_id is set' do
+      let(:commit_id) { 'abc123' }
+
+      it 'creates note from draft with commit_id' do
+        result = publish
+
+        expect(result[:status]).to eq(:success)
+
+        merge_request.notes.each do |note|
+          expect(note.commit_id).to eq(commit_id)
+        end
+      end
     end
   end
 

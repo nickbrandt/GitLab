@@ -135,6 +135,28 @@ describe Projects::MergeRequests::DraftsController do
         end.to change { DraftNote.count }.by(0)
       end
     end
+
+    context 'commit_id is present' do
+      before do
+        create_draft_note(draft_overrides: { commit_id: commit_id })
+      end
+
+      context 'value is a commit sha' do
+        let(:commit_id) { 'abc123' }
+
+        it 'creates the draft note with commit ID' do
+          expect(DraftNote.last.commit_id).to eq(commit_id)
+        end
+      end
+
+      context 'value is "undefined"' do
+        let(:commit_id) { 'undefined' }
+
+        it 'creates the draft note with nil commit ID' do
+          expect(DraftNote.last.commit_id).to be_nil
+        end
+      end
+    end
   end
 
   describe 'PUT #update' do
