@@ -70,6 +70,59 @@ Example response:
 ]
 ```
 
+Users on GitLab [Premium, Silver, or higher](https://about.gitlab.com/pricing/) will see
+different parameters, due to the ability to have multiple group boards. Refer to the table
+above to see what enpoint(s) belong to each tier.
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "name:": "group issue board",
+    "group": {
+      "id": 5,
+      "name": "Documentcloud",
+      "web_url": "http://example.com/groups/documentcloud"
+    },
+    "milestone":   {
+      "id": 12
+      "title": "10.0"
+    },
+    "lists" : [
+      {
+        "id" : 1,
+        "label" : {
+          "name" : "Testing",
+          "color" : "#F0AD4E",
+          "description" : null
+        },
+        "position" : 1
+      },
+      {
+        "id" : 2,
+        "label" : {
+          "name" : "Ready",
+          "color" : "#FF0000",
+          "description" : null
+        },
+        "position" : 2
+      },
+      {
+        "id" : 3,
+        "label" : {
+          "name" : "Production",
+          "color" : "#FF5F00",
+          "description" : null
+        },
+        "position" : 3
+      }
+    ]
+  }
+]
+```
+
 ## Single board
 
 Gets a single board.
@@ -134,9 +187,59 @@ Example response:
   }
 ```
 
-## Create a board
+Users on GitLab [Premium, Silver, or higher](https://about.gitlab.com/pricing/) will see
+different parameters, due to the ability to have multiple group boards:
 
-Creates a board.
+Example response:
+
+```json
+  {
+    "id": 1,
+    "name:": "group issue board",
+    "group": {
+      "id": 5,
+      "name": "Documentcloud",
+      "web_url": "http://example.com/groups/documentcloud"
+    },
+    "milestone":   {
+      "id": 12
+      "title": "10.0"
+    },
+    "lists" : [
+      {
+        "id" : 1,
+        "label" : {
+          "name" : "Testing",
+          "color" : "#F0AD4E",
+          "description" : null
+        },
+        "position" : 1
+      },
+      {
+        "id" : 2,
+        "label" : {
+          "name" : "Ready",
+          "color" : "#FF0000",
+          "description" : null
+        },
+        "position" : 2
+      },
+      {
+        "id" : 3,
+        "label" : {
+          "name" : "Production",
+          "color" : "#FF5F00",
+          "description" : null
+        },
+        "position" : 3
+      }
+    ]
+  }
+```
+
+## Create a Group Issue Board **[PREMIUM]**
+
+Creates a Group Issue Board.
 
 ```
 POST /groups/:id/boards
@@ -198,11 +301,11 @@ Example response:
   }
 ```
 
-## Update a board
+## Update a Group Issue Board **[PREMIUM]**
 
 > [Introduced][ee-5954] in GitLab 11.1.
 
-Updates a board.
+Updates a Group Issue Board.
 
 ```
 PUT /groups/:id/boards/:board_id
@@ -267,9 +370,9 @@ Example response:
   }
 ```
 
-## Delete a board
+## Delete a Group Issue Board **[PREMIUM]**
 
-Deletes a board.
+Deletes a Group Issue Board.
 
 ```
 DELETE /groups/:id/boards/:board_id
