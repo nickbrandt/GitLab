@@ -9,9 +9,11 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
 
-        Resource::Issue.fabricate_via_browser_ui! do |issue|
+        issue = Resource::Issue.fabricate_via_api! do |issue|
           issue.title = issue_title
         end
+
+        issue.visit!
 
         expect(page).to have_content(issue_title)
 
