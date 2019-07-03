@@ -150,7 +150,6 @@ When the user is authenticated and `simple` is not set this returns something li
     "only_allow_merge_if_all_discussions_are_resolved": false,
     "request_access_enabled": false,
     "merge_method": "merge",
-    "approvals_before_merge": 0,
     "statistics": {
       "commit_count": 37,
       "storage_size": 1038090,
@@ -235,7 +234,6 @@ When the user is authenticated and `simple` is not set this returns something li
     "only_allow_merge_if_all_discussions_are_resolved": false,
     "request_access_enabled": false,
     "merge_method": "merge",
-    "approvals_before_merge": 0,
     "statistics": {
       "commit_count": 12,
       "storage_size": 2066080,
@@ -574,7 +572,6 @@ GET /projects/:id
   "printing_merge_requests_link_enabled": true,
   "request_access_enabled": false,
   "merge_method": "merge",
-  "approvals_before_merge": 0,
   "statistics": {
     "commit_count": 37,
     "storage_size": 1038090,

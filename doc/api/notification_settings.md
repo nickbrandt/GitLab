@@ -179,8 +179,7 @@ Example responses:
     "reassign_merge_request": false,
     "merge_merge_request": false,
     "failed_pipeline": false,
-    "success_pipeline": false,
-    "new_epic": false
+    "success_pipeline": false
   }
 }
 ```
