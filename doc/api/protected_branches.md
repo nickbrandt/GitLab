@@ -86,6 +86,36 @@ Example response:
 ]
 ```
 
+Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) will also see
+the `user_id` and `group_id` parameters:
+
+Example response:
+
+```json
+[
+  {
+    "name": "master",
+    "push_access_levels": [
+      {
+        "access_level": 40,
+        "user_id": null,
+        "group_id": null,
+        "access_level_description": "Maintainers"
+      }
+    ],
+    "merge_access_levels": [
+      {
+        "access_level": null,
+        "user_id": null,
+        "group_id": 1234,
+        "access_level_description": "Example Merge Group"
+      }
+    ]
+  },
+  ...
+]
+```
+
 ## Get a single protected branch or wildcard protected branch
 
 Gets a single protected branch or wildcard protected branch.
@@ -102,6 +132,33 @@ GET /projects/:id/protected_branches/:name
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" 'https://gitlab.example.com/api/v4/projects/5/protected_branches/master'
 ```
+
+Example response:
+
+```json
+{
+  "name": "master",
+  "push_access_levels": [
+    {
+      "access_level": 40,
+      "user_id": null,
+      "group_id": null,
+      "access_level_description": "Maintainers"
+    }
+  ],
+  "merge_access_levels": [
+    {
+      "access_level": null,
+      "user_id": null,
+      "group_id": 1234,
+      "access_level_description": "Example Merge Group"
+    }
+  ]
+}
+```
+
+Users on GitLab [Starter, Bronze, or higher](https://about.gitlab.com/pricing/) will also see
+the `user_id` and `group_id` parameters:
 
 Example response:
 
