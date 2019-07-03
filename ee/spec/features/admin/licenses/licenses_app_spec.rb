@@ -24,7 +24,13 @@ describe "Licenses app", :js do
     expect(seats_in_license).to have_content 'Seats in license'
     expect(seats_in_license).to have_content license.restrictions[:active_user_count]
     expect(seats_in_use).to have_content 'Seats currently in use'
-    expect(seats_in_use).to have_content User.active.count
+
+    if license.exclude_guests_from_active_count?
+      expect(seats_in_use).to have_content User.active.excluding_guests.count
+    else
+      expect(seats_in_use).to have_content User.active.count
+    end
+
     expect(historical_max).to have_content 'Max seats used'
     expect(historical_max).to have_content license.historical_max
     expect(overage).to have_content 'Users outside of license'

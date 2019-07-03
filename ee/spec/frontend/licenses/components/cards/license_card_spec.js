@@ -13,7 +13,8 @@ describe('LicenseCard', () => {
     isCurrentLicense: false,
   };
   const defaultState = {
-    currentActiveUserCount: 10,
+    activeUserCount: 10,
+    guestUserCount: 8,
     deleteQueue: [],
     downloadLicensePath: '/downloadLicensePath',
   };
