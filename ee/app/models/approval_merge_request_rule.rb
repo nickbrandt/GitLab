@@ -4,8 +4,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include ApprovalRuleLike
 
-  DEFAULT_NAME_FOR_CODE_OWNER = 'Code Owner'
-
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
 

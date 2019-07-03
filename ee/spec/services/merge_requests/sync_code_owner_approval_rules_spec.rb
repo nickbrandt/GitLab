@@ -54,17 +54,5 @@ describe MergeRequests::SyncCodeOwnerApprovalRules do
 
       expect(other_rule.reload.users).to eq(rb_owners)
     end
-
-    context 'when multiple code owner rules are disabled' do
-      before do
-        stub_feature_flags(multiple_code_owner_rules: false)
-      end
-
-      it 'calls the old sync method' do
-        expect(merge_request).to receive(:sync_code_owners_with_approvers)
-
-        service.execute
-      end
-    end
   end
 end

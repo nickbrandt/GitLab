@@ -87,34 +87,6 @@ describe MergeRequests::RefreshService do
 
           subject
         end
-
-        context 'when multiple code owner rules are disabled' do
-          let(:new_owners) { [owner] }
-
-          before do
-            stub_feature_flags(multiple_code_owner_rules: false)
-            relevant_merge_requests.each do |merge_request|
-              expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
-            end
-
-            [forked_merge_request].each do |merge_request|
-              expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request).with(merge_request)
-            end
-          end
-
-          it 'triggers syncing of code owners' do
-            relevant_merge_requests.each do |merge_request|
-              expect(merge_request.approval_rules.code_owner.exists?).to eq(false)
-            end
-
-            subject
-
-            relevant_merge_requests.each do |merge_request|
-              code_owner_rule = merge_request.approval_rules.code_owner.first
-              expect(code_owner_rule.users).to eq(new_owners)
-            end
-          end
-        end
       end
     end
 
@@ -146,7 +118,7 @@ describe MergeRequests::RefreshService do
         expect(merge_request.all_pipelines.last).to be_merge_request_pipeline
       end
 
-      context "when MergeRequestUpdateWorker is retried by an exception" do
+      context 'when MergeRequestUpdateWorker is retried by an exception' do
         it 'does not re-create a duplicate merge request pipeline' do
           expect do
             service.execute(oldrev, newrev, "refs/heads/#{source_branch}")

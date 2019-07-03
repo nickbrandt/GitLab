@@ -107,12 +107,6 @@ module EE
       end
     end
 
-    def code_owners
-      strong_memoize(:code_owners) do
-        ::Gitlab::CodeOwners.for_merge_request(self).freeze
-      end
-    end
-
     def has_license_management_reports?
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports)
     end
@@ -135,26 +129,6 @@ module EE
       end
 
       compare_reports(::Ci::CompareMetricsReportsService)
-    end
-
-    def sync_code_owners_with_approvers
-      return if merged?
-
-      owners = code_owners
-
-      if owners.present?
-        ApplicationRecord.transaction do
-          rule = approval_rules.code_owner.first
-          rule ||= ApprovalMergeRequestRule.find_or_create_code_owner_rule(
-            self,
-            ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER
-          )
-
-          rule.users = owners.uniq
-        end
-      else
-        approval_rules.code_owner.delete_all
-      end
     end
   end
 end
