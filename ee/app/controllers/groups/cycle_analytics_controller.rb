@@ -9,7 +9,6 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   before_action :whitelist_query_limiting, only: [:show]
   before_action :authorize_group_cycle_analytics!
 
-
   def show
     respond_to do |format|
       format.json { render json: cycle_analytics_json }
