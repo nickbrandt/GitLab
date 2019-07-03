@@ -571,22 +571,6 @@ entry.
 - Replaces CSS with BS4 utility class for pipeline schedules.
 - Creates a vendors folder for external CSS.
 
-
-## 11.10.8 (2019-06-27)
-
-- No changes.
-### Security (9 changes)
-
-- Add missing authorizations in GraphQL.
-- Fix DoS vulnerability in color validation regex.
-- Expose merge requests count based on user access.
-- Fix Denial of Service for comments when rendering issues/MR comments.
-- Persist tmp snippet uploads at users.
-- Prevent Billion Laughs attack.
-- Correctly check permissions when creating snippet notes.
-- Prevent the detection of merge request templates by unauthorized users.
-- Disable Rails SQL query cache when applying service templates.
-
 ### Performance (1 change)
 
 - Add improvements to global search of issues and merge requests. !27817
@@ -8932,4 +8916,3 @@ entry.
 ## 8.15.8 through 0.8.0
 
 - See [changelogs/archive.md](changelogs/archive.md)
-
