@@ -240,8 +240,6 @@ Example response:
   "full_path": "twitter",
   "file_template_project_id": 1,
   "parent_id": null,
-  "shared_runners_minutes_limit": 133,
-  "extra_shared_runners_minutes_limit": 133,
   "projects": [
     {
       "id": 7,

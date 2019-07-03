@@ -63,9 +63,7 @@ Example response:
    "performance_bar_allowed_group_id": 42,
    "instance_statistics_visibility_private": false,
    "user_show_add_ssh_key_message": true,
-   "file_template_project_id": 1,
-   "local_markdown_version": 0,
-   "geo_node_allowed_ips": "0.0.0.0/0, ::/0"
+   "local_markdown_version": 0
 }
 ```
 
@@ -121,10 +119,6 @@ Example response:
   "plantuml_url": null,
   "terminal_max_session_time": 0,
   "polling_interval_multiplier": 1.0,
-  "external_authorization_service_enabled": true,
-  "external_authorization_service_url": "https://authorize.me",
-  "external_authorization_service_default_label": "default",
-  "external_authorization_service_timeout": 0.5,
   "rsa_key_restriction": 0,
   "dsa_key_restriction": 0,
   "ecdsa_key_restriction": 0,
