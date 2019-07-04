@@ -3,6 +3,7 @@ import BoardService from 'ee/boards/services/board_service';
 import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import boardsStore from '~/boards/stores/boards_store';
 
 const throttleDuration = 1;
 
@@ -29,13 +30,14 @@ describe('BoardsSelector', () => {
     setFixtures('<div class="js-boards-selector"></div>');
     window.gl = window.gl || {};
 
-    window.gl.boardService = new BoardService({
+    boardsStore.setEndpoints({
       boardsEndpoint: '',
       recentBoardsEndpoint: '',
       listsEndpoint: '',
       bulkUpdatePath: '',
       boardId: '',
     });
+    window.gl.boardService = new BoardService();
 
     allBoardsResponse = Promise.resolve({
       data: boards,
