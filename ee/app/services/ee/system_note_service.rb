@@ -212,8 +212,8 @@ module EE
     end
 
     # Called when 'add to merge train when pipeline succeeds' is executed
-    def add_to_merge_train_when_pipeline_succeeds(noteable, project, author, last_commit)
-      body = "enabled automatic add to merge train when the pipeline for #{last_commit.to_reference(project)} succeeds"
+    def add_to_merge_train_when_pipeline_succeeds(noteable, project, author, sha)
+      body = "enabled automatic add to merge train when the pipeline for #{sha} succeeds"
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
