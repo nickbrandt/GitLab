@@ -96,13 +96,18 @@ describe Groups::AutocompleteService do
 
   describe '#commands' do
     context 'when target is an epic' do
+      let(:parent_epic) { create(:epic, group: group, author: user) }
+      let(:epic)        { create(:epic, group: group, author: user, parent: parent_epic) }
+
       before do
         stub_licensed_features(epics: true)
       end
 
       it 'returns available commands' do
         available_commands = [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close]
-        available_commands += [:child_epic, :remove_child_epic] if ::Epic.supports_nested_objects?
+        if ::Epic.supports_nested_objects?
+          available_commands += [:child_epic, :remove_child_epic, :parent_epic, :remove_parent_epic]
+        end
 
         expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
       end
