@@ -24,7 +24,7 @@ export default {
 
 <template>
   <div class="block issuable-sidebar-header">
-    <span class="issuable-header-text hide-collapsed float-left">{{ __('Todo') }}</span>
+    <span class="issuable-header-text hide-collapsed float-left">{{ __('To Do') }}</span>
     <toggle-sidebar
       :collapsed="sidebarCollapsed"
       css-classes="float-right"

@@ -38,7 +38,7 @@ describe('SidebarHeaderComponent', () => {
       const todoEl = vm.$el.querySelector('.issuable-header-text.hide-collapsed.float-left');
 
       expect(todoEl).not.toBeNull();
-      expect(todoEl.innerText.trim()).toBe('Todo');
+      expect(todoEl.innerText.trim()).toBe('To Do');
     });
 
     it('renders Todo toggle button element when sidebar is expanded', done => {
