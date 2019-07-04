@@ -1,0 +1,5 @@
+---
+title: Change epics reordering to not update timestamps
+merge_request: 14441
+author:
+type: changed
