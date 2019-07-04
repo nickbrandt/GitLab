@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Groups::SsoController < Groups::ApplicationController
+  include InternalRedirect
   skip_before_action :group
 
   before_action :authenticate_user!, only: [:unlink]
@@ -13,7 +14,8 @@ class Groups::SsoController < Groups::ApplicationController
   layout 'devise'
 
   def saml
-    @group_path = params[:group_id]
+    @redirect_path = safe_redirect_path(params[:redirect]) || group_path(unauthenticated_group)
+    @group_path = unauthenticated_group.path
     @group_name = unauthenticated_group.full_name
     @group_saml_identity = linked_identity
     @idp_url = unauthenticated_group.saml_provider.sso_url

@@ -20,7 +20,7 @@ describe 'SAML access enforcement' do
       visit group_path(group)
 
       expect(page).to have_content("SAML SSO Sign in to \"#{group.name}\"")
-      expect(current_url).to match(/groups\/#{group.to_param}\/-\/saml\/sso\?token=/)
+      expect(current_url).to match(/groups\/#{group.to_param}\/-\/saml\/sso\?redirect=.+&token=/)
     end
   end
 
