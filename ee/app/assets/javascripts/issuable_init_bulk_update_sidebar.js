@@ -1,4 +1,4 @@
-import IssuableBulkUpdateSidebar from '~/issuable_bulk_update_sidebar'
+import IssuableBulkUpdateSidebar from '~/issuable_bulk_update_sidebar';
 import issuableBulkUpdateActions from '~/issuable_bulk_update_actions';
 
 export default {
