@@ -12,7 +12,7 @@ describe CycleAnalytics::GroupLevel do
   let(:mr) { create_merge_request_closing_issue(user, project, issue, commit_message: "References #{issue.to_reference}") }
   let(:pipeline) { create(:ci_empty_pipeline, status: 'created', project: project, ref: mr.source_branch, sha: mr.source_branch_sha, head_pipeline_of: mr) }
 
-  subject { described_class.new(project: nil, options: { from: from_date, group: group }) }
+  subject { described_class.new(project: nil, options: { from: from_date, group: group, current_user: user }) }
 
   describe '#permissions' do
     it 'returns permissions' do
@@ -30,6 +30,17 @@ describe CycleAnalytics::GroupLevel do
 
     it 'returns medians for each stage for a specific group' do
       expect(subject.no_stats?).to eq(false)
+    end
+  end
+
+  describe '#summary' do
+    before do
+      create_cycle(user, project, issue, mr, milestone, pipeline)
+      deploy_master(user, project)
+    end
+
+    it 'returns medians for each stage for a specific group' do
+      expect(subject.summary.map { |summary| summary[:value] }).to contain_exactly(1, 1)
     end
   end
 end

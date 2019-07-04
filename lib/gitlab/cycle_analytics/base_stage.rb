@@ -4,6 +4,7 @@ module Gitlab
   module CycleAnalytics
     class BaseStage
       include BaseQuery
+      include BaseDataExtraction
 
       def initialize(project: nil, options:)
         @project = project
@@ -23,6 +24,8 @@ module Gitlab
       end
 
       def median
+        return if @project.nil?
+
         BatchLoader.for(@project.id).batch(key: name) do |project_ids, loader|
           if project_ids.one?
             loader.call(@project.id, median_query(project_ids))

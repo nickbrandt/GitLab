@@ -5,12 +5,12 @@ describe Gitlab::CycleAnalytics::StagingStage do
   let(:stage_name) { :staging }
 
   let(:project) { create(:project) }
-  let!(:issue_1) { create(:issue, project: project, created_at: 90.minutes.ago) }
-  let!(:issue_2) { create(:issue, project: project, created_at: 60.minutes.ago) }
-  let!(:issue_3) { create(:issue, project: project, created_at: 60.minutes.ago) }
-  let!(:mr_1) { create(:merge_request, :closed, source_project: project, created_at: 60.minutes.ago) }
-  let!(:mr_2) { create(:merge_request, :closed, source_project: project, created_at: 40.minutes.ago, source_branch: 'A') }
-  let!(:mr_3) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B') }
+  let(:issue_1) { create(:issue, project: project, created_at: 90.minutes.ago) }
+  let(:issue_2) { create(:issue, project: project, created_at: 60.minutes.ago) }
+  let(:issue_3) { create(:issue, project: project, created_at: 60.minutes.ago) }
+  let(:mr_1) { create(:merge_request, :closed, source_project: project, created_at: 60.minutes.ago) }
+  let(:mr_2) { create(:merge_request, :closed, source_project: project, created_at: 40.minutes.ago, source_branch: 'A') }
+  let(:mr_3) { create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'B') }
   let(:build_1) { create(:ci_build, project: project) }
   let(:build_2) { create(:ci_build, project: project) }
 
@@ -52,12 +52,12 @@ describe Gitlab::CycleAnalytics::StagingStage do
     let(:group) { create(:group) }
     let(:project_2) { create(:project, group: group) }
     let(:project_3) { create(:project, group: group) }
-    let!(:issue_2_1) { create(:issue, project: project_2, created_at: 90.minutes.ago) }
-    let!(:issue_2_2) { create(:issue, project: project_3, created_at: 60.minutes.ago) }
-    let!(:issue_2_3) { create(:issue, project: project_2, created_at: 60.minutes.ago) }
-    let!(:mr_1) { create(:merge_request, :closed, source_project: project_2, created_at: 60.minutes.ago) }
-    let!(:mr_2) { create(:merge_request, :closed, source_project: project_3, created_at: 40.minutes.ago, source_branch: 'A') }
-    let!(:mr_3) { create(:merge_request, source_project: project_2, created_at: 10.minutes.ago, source_branch: 'B') }
+    let(:issue_2_1) { create(:issue, project: project_2, created_at: 90.minutes.ago) }
+    let(:issue_2_2) { create(:issue, project: project_3, created_at: 60.minutes.ago) }
+    let(:issue_2_3) { create(:issue, project: project_2, created_at: 60.minutes.ago) }
+    let(:mr_1) { create(:merge_request, :closed, source_project: project_2, created_at: 60.minutes.ago) }
+    let(:mr_2) { create(:merge_request, :closed, source_project: project_3, created_at: 40.minutes.ago, source_branch: 'A') }
+    let(:mr_3) { create(:merge_request, source_project: project_2, created_at: 10.minutes.ago, source_branch: 'B') }
     let(:build_1) { create(:ci_build, project: project_2) }
     let(:build_2) { create(:ci_build, project: project_3) }
     let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: user, group: group }) }

@@ -10,11 +10,21 @@ module Gitlab
           end
 
           def value
-            @value ||= Deployment.joins(:project)
-              .where(projects: { namespace_id: @group.id })
+            @value ||= find_deployments
+          end
+
+          private
+
+          def find_deployments
+            deployments = Deployment.joins(:project)
+              .where(projects: { id: projects })
               .where("deployments.created_at > ?", @from)
-              .success
-              .count
+            deployments = deployments.where(projects: { name: @options[:projects] }) if @options[:projects]
+            deployments.success.count
+          end
+
+          def projects
+            Project.inside_path(@group.full_path).ids
           end
         end
       end

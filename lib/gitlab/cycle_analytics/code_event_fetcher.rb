@@ -12,7 +12,8 @@ module Gitlab
                         mr_table[:created_at],
                         mr_table[:state],
                         mr_table[:author_id],
-                        projects_table[:name]]
+                        projects_table[:name],
+                        routes_table[:path]]
         @order = mr_table[:created_at]
 
         super(*args)

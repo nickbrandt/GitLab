@@ -10,7 +10,8 @@ module CycleAnalytics
     def summary
       @summary ||= ::Gitlab::CycleAnalytics::GroupStageSummary.new(@options[:group],
                                                               from: @options[:from],
-                                                              current_user: @options[:current_user]).data
+                                                              current_user: @options[:current_user],
+                                                              options: @options).data
     end
 
     def permissions(user: nil)
@@ -19,10 +20,8 @@ module CycleAnalytics
       end
     end
 
-    private
-
-    def stats_per_stage
-      STAGES.map do |stage_name|
+    def stats
+      @stats ||= STAGES.map do |stage_name|
         self[stage_name].as_json(serializer: GroupAnalyticsStageSerializer)
       end
     end
