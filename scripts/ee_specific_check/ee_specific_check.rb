@@ -11,30 +11,7 @@ module EESpecificCheck
     '.gitlab-ci.yml',
     '.gitlab/ci/rails.gitlab-ci.yml',
     'db/schema.rb',
-    'locale/gitlab.pot',
-    ##
-    ## Below is a list of the remaining doc/* files to be ported to CE. This is
-    ## for the single codebase effort. Once an EE doc is moved to CE, remove the
-    ## relevant entry below.
-    ## See https://gitlab.com/groups/gitlab-org/-/epics/199#ee-specific-lines-check
-    ## for more information.
-    ##
-    'doc/api/project_level_variables.md',
-    'doc/api/issues.md',
-    'doc/api/projects.md',
-    'doc/api/groups.md',
-    'doc/api/users.md',
-    'doc/api/group_boards.md',
-    'doc/api/project_clusters.md',
-    'doc/api/merge_requests.md',
-    'doc/api/jobs.md',
-    'doc/api/protected_branches.md',
-    'doc/api/settings.md',
-    'doc/api/notification_settings.md',
-    'doc/api/namespaces.md',
-    'doc/api/search.md',
-    #  WARNING: Port this one last!
-    'doc/api/README.md'
+    'locale/gitlab.pot'
   ].freeze
 
   CompareBase = Struct.new(:ce_base, :ee_base, :ce_head, :ee_head)
