@@ -33,8 +33,7 @@ import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
 import { __ } from './locale';
 
-// EE-only scripts
-import 'ee/main';
+import 'ee_else_ce/main_ee';
 
 // expose jQuery as global (TODO: remove these)
 window.jQuery = jQuery;
