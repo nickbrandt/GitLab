@@ -96,7 +96,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     end
 
     resource :saml_providers, path: 'saml', only: [:show, :create, :update] do
-      post :callback, to: 'omniauth_callbacks#group_saml'
+      callback_methods = Rails.env.test? ? [:get, :post] : [:post]
+      match :callback, to: 'omniauth_callbacks#group_saml', via: callback_methods
       get :sso, to: 'sso#saml'
       delete :unlink, to: 'sso#unlink'
     end

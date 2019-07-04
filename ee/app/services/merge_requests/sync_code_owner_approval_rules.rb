@@ -8,18 +8,6 @@ module MergeRequests
     end
 
     def execute
-      if ::Feature.enabled?(:multiple_code_owner_rules, default_enabled: true)
-        sync_rules
-      else
-        merge_request.sync_code_owners_with_approvers
-      end
-    end
-
-    private
-
-    attr_reader :merge_request, :previous_diff
-
-    def sync_rules
       return if merge_request.merged?
 
       delete_outdated_code_owner_rules
@@ -31,9 +19,15 @@ module MergeRequests
         rule ||= create_rule(entry)
 
         rule.users = entry.users
+        rule.groups = entry.groups
+
         rule.save
       end
     end
+
+    private
+
+    attr_reader :merge_request, :previous_diff
 
     def create_rule(entry)
       ApprovalMergeRequestRule.find_or_create_code_owner_rule(merge_request, entry.pattern)

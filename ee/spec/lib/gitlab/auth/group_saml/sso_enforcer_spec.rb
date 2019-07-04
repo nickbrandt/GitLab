@@ -79,4 +79,45 @@ describe Gitlab::Auth::GroupSaml::SsoEnforcer do
       expect(subject).not_to be_access_restricted
     end
   end
+
+  describe '.group_access_restricted?' do
+    let(:root_group) { create(:group, saml_provider: create(:saml_provider, enabled: true, enforced_sso: true)) }
+
+    context 'is restricted' do
+      before do
+        stub_feature_flags(enforced_sso_requires_session: { enabled: true, thing: root_group })
+      end
+
+      it 'for a group' do
+        expect(described_class).to be_group_access_restricted(root_group)
+      end
+
+      it 'for a subgroup' do
+        sub_group = create(:group, parent: root_group)
+
+        expect(described_class).to be_group_access_restricted(sub_group)
+      end
+
+      it 'for a project' do
+        project = create(:project, group: root_group)
+
+        expect(described_class).to be_group_access_restricted(project)
+      end
+    end
+
+    context 'is not restricted' do
+      it 'for the group without configured saml_provider' do
+        group = create(:group)
+        stub_feature_flags(enforced_sso_requires_session: { enabled: true, thing: group })
+
+        expect(described_class).not_to be_group_access_restricted(group)
+      end
+
+      it 'for the group without the feature flag' do
+        stub_feature_flags(enforced_sso_requires_session: { enabled: false, thing: root_group })
+
+        expect(described_class).not_to be_group_access_restricted(root_group)
+      end
+    end
+  end
 end

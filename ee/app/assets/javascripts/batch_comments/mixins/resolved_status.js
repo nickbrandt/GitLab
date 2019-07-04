@@ -36,14 +36,14 @@ export default {
 
       if (discussionToBeResolved) {
         if (discussionResolved) {
-          message = s__('MergeRequests|Discussion stays resolved');
+          message = s__('MergeRequests|Thread stays resolved');
         } else {
-          message = s__('MergeRequests|Discussion will be resolved');
+          message = s__('MergeRequests|Thread will be resolved');
         }
       } else if (discussionResolved) {
-        message = s__('MergeRequests|Discussion will be unresolved');
+        message = s__('MergeRequests|Thread will be unresolved');
       } else if (this.$options.showStaysResolved) {
-        message = s__('MergeRequests|Discussion stays unresolved');
+        message = s__('MergeRequests|Thread stays unresolved');
       }
 
       return message;

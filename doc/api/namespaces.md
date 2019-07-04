@@ -37,11 +37,10 @@ Example response:
     "id": 2,
     "name": "group1",
     "path": "group1",
-    "kind": "group"
+    "kind": "group",
     "full_path": "group1",
     "parent_id": null,
-    "members_count_with_descendants": 2,
-    "plan": "bronze"
+    "members_count_with_descendants": 2
   },
   {
     "id": 3,
@@ -69,7 +68,7 @@ the `plan` parameter associated with a namespace:
 ]
 ```
 
-**Note**: Only group maintainers/owners are presented with `members_count_with_descendants`, as well as `plan` **[BRONZE ONLY]**.
+NOTE: **Note:** Only group maintainers/owners are presented with `members_count_with_descendants`, as well as `plan` **[BRONZE ONLY]**.
 
 ## Search for namespace
 

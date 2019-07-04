@@ -332,7 +332,7 @@ describe SystemNoteService do
       create(:merge_request, source_project: project, target_project: project)
     end
 
-    subject { described_class.merge_when_pipeline_succeeds(noteable, project, author, noteable.diff_head_commit) }
+    subject { described_class.merge_when_pipeline_succeeds(noteable, project, author, pipeline.sha) }
 
     it_behaves_like 'a system note' do
       let(:action) { 'merge' }
@@ -1148,7 +1148,7 @@ describe SystemNoteService do
     end
 
     it 'sets the note text' do
-      expect(subject.note).to eq 'resolved all discussions'
+      expect(subject.note).to eq 'resolved all threads'
     end
   end
 

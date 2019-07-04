@@ -146,7 +146,7 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
-msgid "%{authorsName}'s discussion"
+msgid "%{authorsName}'s thread"
 msgstr ""
 
 msgid "%{commit_author_link} authored %{commit_timeago}"
@@ -749,6 +749,9 @@ msgstr ""
 msgid "Add a GPG key"
 msgstr ""
 
+msgid "Add a Grafana button in the admin sidebar, monitoring section, to access a variety of statistics on the health and performance of GitLab."
+msgstr ""
+
 msgid "Add a bullet list"
 msgstr ""
 
@@ -1165,7 +1168,7 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occurred adding a draft to the discussion."
+msgid "An error occurred adding a draft to the thread."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
@@ -3408,10 +3411,10 @@ msgstr ""
 msgid "Comment & reopen %{noteable_name}"
 msgstr ""
 
-msgid "Comment & resolve discussion"
+msgid "Comment & resolve thread"
 msgstr ""
 
-msgid "Comment & unresolve discussion"
+msgid "Comment & unresolve thread"
 msgstr ""
 
 msgid "Comment form position"
@@ -4855,7 +4858,13 @@ msgstr ""
 msgid "Enable SAML authentication for this group"
 msgstr ""
 
+msgid "Enable access to Grafana"
+msgstr ""
+
 msgid "Enable access to the Performance Bar for a given group."
+msgstr ""
+
+msgid "Enable and configure Grafana."
 msgstr ""
 
 msgid "Enable and configure InfluxDB metrics."
@@ -4928,6 +4937,9 @@ msgid "Ends at (UTC)"
 msgstr ""
 
 msgid "Enforce DNS rebinding attack protection"
+msgstr ""
+
+msgid "Ensure connectivity is available from the GitLab server to the Prometheus server"
 msgstr ""
 
 msgid "Enter IP address range"
@@ -6604,6 +6616,9 @@ msgid "Got it"
 msgstr ""
 
 msgid "Got it!"
+msgstr ""
+
+msgid "Grafana URL"
 msgstr ""
 
 msgid "Grant access"
@@ -8435,18 +8450,6 @@ msgstr ""
 msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
-msgid "MergeRequests|Discussion stays resolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion stays unresolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion will be resolved"
-msgstr ""
-
-msgid "MergeRequests|Discussion will be unresolved"
-msgstr ""
-
 msgid "MergeRequests|Failed to squash. Should be done manually."
 msgstr ""
 
@@ -8456,13 +8459,25 @@ msgstr ""
 msgid "MergeRequests|Reply..."
 msgstr ""
 
-msgid "MergeRequests|Resolve this discussion in a new issue"
+msgid "MergeRequests|Resolve this thread in a new issue"
 msgstr ""
 
 msgid "MergeRequests|Saving the comment failed"
 msgstr ""
 
 msgid "MergeRequests|Squash task canceled: another squash is already in progress."
+msgstr ""
+
+msgid "MergeRequests|Thread stays resolved"
+msgstr ""
+
+msgid "MergeRequests|Thread stays unresolved"
+msgstr ""
+
+msgid "MergeRequests|Thread will be resolved"
+msgstr ""
+
+msgid "MergeRequests|Thread will be unresolved"
 msgstr ""
 
 msgid "MergeRequests|Toggle comments for this file"
@@ -8477,19 +8492,19 @@ msgstr ""
 msgid "MergeRequests|commented on commit %{commitLink}"
 msgstr ""
 
-msgid "MergeRequests|started a discussion"
+msgid "MergeRequests|started a thread"
 msgstr ""
 
-msgid "MergeRequests|started a discussion on %{linkStart}an old version of the diff%{linkEnd}"
+msgid "MergeRequests|started a thread on %{linkStart}an old version of the diff%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a discussion on %{linkStart}the diff%{linkEnd}"
+msgid "MergeRequests|started a thread on %{linkStart}the diff%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a discussion on an outdated change in commit %{linkStart}%{commitId}%{linkEnd}"
+msgid "MergeRequests|started a thread on an outdated change in commit %{linkStart}%{commitId}%{linkEnd}"
 msgstr ""
 
-msgid "MergeRequests|started a discussion on commit %{linkStart}%{commitId}%{linkEnd}"
+msgid "MergeRequests|started a thread on commit %{linkStart}%{commitId}%{linkEnd}"
 msgstr ""
 
 msgid "MergeRequest| %{paragraphStart}changed the description %{descriptionChangedTimes} times %{timeDifferenceMinutes}%{paragraphEnd}"
@@ -8525,10 +8540,16 @@ msgstr ""
 msgid "Metrics"
 msgstr ""
 
+msgid "Metrics - Grafana"
+msgstr ""
+
 msgid "Metrics - Influx"
 msgstr ""
 
 msgid "Metrics - Prometheus"
+msgstr ""
+
+msgid "Metrics Dashboard"
 msgstr ""
 
 msgid "Metrics and profiling"
@@ -10020,9 +10041,6 @@ msgstr ""
 msgid "Please wait while we import the repository for you. Refresh at will."
 msgstr ""
 
-msgid "Pre-release"
-msgstr ""
-
 msgid "Preferences"
 msgstr ""
 
@@ -10815,9 +10833,6 @@ msgstr ""
 msgid "ProjectsDropdown|This feature requires browser localStorage support"
 msgstr ""
 
-msgid "Prometheus server"
-msgstr ""
-
 msgid "PrometheusAlerts|Add alert"
 msgstr ""
 
@@ -11553,13 +11568,16 @@ msgstr ""
 msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
 msgstr ""
 
-msgid "Resolve all discussions in new issue"
+msgid "Resolve all threads in new issue"
 msgstr ""
 
 msgid "Resolve conflicts on source branch"
 msgstr ""
 
 msgid "Resolve discussion"
+msgstr ""
+
+msgid "Resolve thread"
 msgstr ""
 
 msgid "Resolved"
@@ -12889,6 +12907,9 @@ msgstr ""
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
+msgid "Start a new discussion..."
+msgstr ""
+
 msgid "Start a new merge request"
 msgstr ""
 
@@ -12904,15 +12925,6 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-msgid "Start discussion"
-msgstr ""
-
-msgid "Start discussion & close %{noteable_name}"
-msgstr ""
-
-msgid "Start discussion & reopen %{noteable_name}"
-msgstr ""
-
 msgid "Start merge train"
 msgstr ""
 
@@ -12920,6 +12932,15 @@ msgid "Start merge train when pipeline succeeds"
 msgstr ""
 
 msgid "Start the Runner!"
+msgstr ""
+
+msgid "Start thread"
+msgstr ""
+
+msgid "Start thread & close %{noteable_name}"
+msgstr ""
+
+msgid "Start thread & reopen %{noteable_name}"
 msgstr ""
 
 msgid "Start your trial"
@@ -14419,9 +14440,6 @@ msgstr ""
 msgid "Toggle commit list"
 msgstr ""
 
-msgid "Toggle discussion"
-msgstr ""
-
 msgid "Toggle emoji award"
 msgstr ""
 
@@ -14432,6 +14450,9 @@ msgid "Toggle project"
 msgstr ""
 
 msgid "Toggle sidebar"
+msgstr ""
+
+msgid "Toggle thread"
 msgstr ""
 
 msgid "ToggleButton|Toggle Status: OFF"
@@ -14698,6 +14719,9 @@ msgstr ""
 msgid "Unresolve discussion"
 msgstr ""
 
+msgid "Unresolve thread"
+msgstr ""
+
 msgid "Unschedule job"
 msgstr ""
 
@@ -14741,6 +14765,9 @@ msgid "Up to date"
 msgstr ""
 
 msgid "Upcoming"
+msgstr ""
+
+msgid "Upcoming Release"
 msgstr ""
 
 msgid "Update"
@@ -16577,11 +16604,6 @@ msgstr ""
 msgid "disabled"
 msgstr ""
 
-msgid "discussion resolved"
-msgid_plural "discussions resolved"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "done"
 msgstr ""
 
@@ -16963,7 +16985,7 @@ msgstr ""
 msgid "mrWidget|There are merge conflicts"
 msgstr ""
 
-msgid "mrWidget|There are unresolved discussions. Please resolve these discussions"
+msgid "mrWidget|There are unresolved threads. Please resolve these threads"
 msgstr ""
 
 msgid "mrWidget|This feature merges changes from the target branch to the source branch. You cannot use this feature since the source branch is protected."
@@ -17179,6 +17201,11 @@ msgstr ""
 
 msgid "this document"
 msgstr ""
+
+msgid "thread resolved"
+msgid_plural "threads resolved"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "to help your contributors communicate effectively!"
 msgstr ""

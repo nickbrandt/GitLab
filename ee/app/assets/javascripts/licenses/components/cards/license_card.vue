@@ -27,7 +27,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['currentActiveUserCount', 'deleteQueue', 'downloadLicensePath']),
+    ...mapState(['activeUserCount', 'guestUserCount', 'deleteQueue', 'downloadLicensePath']),
     isRemoving() {
       return this.deleteQueue.includes(this.license.id);
     },
@@ -76,7 +76,8 @@ export default {
     <license-card-body
       :license="license"
       :is-removing="isRemoving"
-      :current-active-user-count="currentActiveUserCount"
+      :active-user-count="activeUserCount"
+      :guest-user-count="guestUserCount"
     />
   </div>
 </template>

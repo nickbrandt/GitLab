@@ -221,8 +221,8 @@ module SystemNoteService
   end
 
   # Called when 'merge when pipeline succeeds' is executed
-  def merge_when_pipeline_succeeds(noteable, project, author, last_commit)
-    body = "enabled an automatic merge when the pipeline for #{last_commit.to_reference(project)} succeeds"
+  def merge_when_pipeline_succeeds(noteable, project, author, sha)
+    body = "enabled an automatic merge when the pipeline for #{sha} succeeds"
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
   end
@@ -249,7 +249,7 @@ module SystemNoteService
   end
 
   def resolve_all_discussions(merge_request, project, author)
-    body = "resolved all discussions"
+    body = "resolved all threads"
 
     create_note(NoteSummary.new(merge_request, project, author, body, action: 'discussion'))
   end

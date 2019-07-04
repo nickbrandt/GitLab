@@ -18,14 +18,9 @@ module Gitlab
     #   Find code owners entries at a particular MergeRequestDiff.
     #   Assumed to be the most recent one if not provided.
     def self.entries_for_merge_request(merge_request, merge_request_diff: nil)
+      return [] unless merge_request.project.feature_available?(:code_owners)
+
       loader_for_merge_request(merge_request, merge_request_diff)&.entries || []
-    end
-
-    def self.for_merge_request(merge_request, merge_request_diff: nil)
-      loader = loader_for_merge_request(merge_request, merge_request_diff)
-      return [] unless loader
-
-      loader.members.reject { |owner| owner == merge_request.author }
     end
 
     def self.loader_for_merge_request(merge_request, merge_request_diff)

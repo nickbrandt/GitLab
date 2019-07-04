@@ -186,7 +186,8 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
         let(:owners) { create_list(:user, 2) }
 
         before do
-          allow(::Gitlab::CodeOwners).to receive(:for_merge_request).and_return(owners)
+          entry = double('code owner entry', users: owners)
+          allow(::Gitlab::CodeOwners).to receive(:entries_for_merge_request).and_return([entry])
         end
 
         context 'when merge request is merged' do

@@ -22,6 +22,10 @@ module OmniAuth
         settings = Gitlab::Auth::GroupSaml::DynamicSettings.new(group_lookup.group).to_h
         env['omniauth.strategy'].options.merge!(settings)
 
+        if OmniAuth.config.test_mode && on_request_path?
+          emulate_relay_state
+        end
+
         super
       end
 
@@ -50,12 +54,29 @@ module OmniAuth
         end
       end
 
+      def emulate_relay_state
+        request.query_string.sub!('redirect_to', 'RelayState')
+      end
+
       def self.invalid_group!(path)
         raise ActionController::RoutingError, path
       end
 
       def self.callback?(env)
         env['PATH_INFO'] =~ Gitlab::PathRegex.saml_callback_regex
+      end
+
+      override :callback_path
+      def callback_path
+        @callback_path ||= begin
+          if options[:callback_path].call(env)
+            current_path
+          elsif group_lookup.path
+            "/groups/#{group_lookup.path}/-/saml/callback"
+          else
+            super
+          end
+        end
       end
 
       private

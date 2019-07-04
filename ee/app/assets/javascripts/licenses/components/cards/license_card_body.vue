@@ -29,7 +29,11 @@ export default {
       required: false,
       default: false,
     },
-    currentActiveUserCount: {
+    activeUserCount: {
+      type: Number,
+      required: true,
+    },
+    guestUserCount: {
       type: Number,
       required: true,
     },
@@ -50,6 +54,11 @@ export default {
   computed: {
     seatsInUseComponent() {
       return this.license.plan === 'ultimate' ? 'info-cell' : 'cell';
+    },
+    seatsInUseForThisLicense() {
+      return this.license.plan === 'ultimate'
+        ? this.activeUserCount - this.guestUserCount
+        : this.activeUserCount;
     },
   },
   methods: {
@@ -76,7 +85,7 @@ export default {
         <component
           :is="seatsInUseComponent"
           :title="__('Seats currently in use')"
-          :value="currentActiveUserCount"
+          :value="seatsInUseForThisLicense"
           :popover-content="info.currentActiveUserCount"
         />
         <info-cell

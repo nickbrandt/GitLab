@@ -13,6 +13,10 @@ describe 'SAML provider settings' do
     group.add_owner(user)
   end
 
+  around(:all) do |example|
+    with_omniauth_full_host { example.run }
+  end
+
   def submit
     click_button('Save changes')
   end
@@ -138,8 +142,7 @@ describe 'SAML provider settings' do
       let!(:saml_provider) { create(:saml_provider, group: group) }
 
       before do
-        sign_in(user)
-        allow_any_instance_of(OmniAuth::Strategies::GroupSaml).to receive(:callback_url) { callback_path }
+        mock_group_saml(uid: '123')
       end
 
       it 'POSTs to the SSO path for the group' do
@@ -147,7 +150,8 @@ describe 'SAML provider settings' do
 
         test_sso
 
-        expect(current_path).to eq callback_path
+        expect(current_path).to eq group_saml_providers_path(group)
+        expect(page).to have_content("SAML for #{group.name} was added to your connected accounts")
       end
     end
   end
@@ -177,10 +181,6 @@ describe 'SAML provider settings' do
     context 'with existing SAML provider' do
       let!(:saml_provider) { create(:saml_provider, group: group) }
 
-      before do
-        allow_any_instance_of(OmniAuth::Strategies::GroupSaml).to receive(:callback_url) { callback_path }
-      end
-
       context 'when not signed in' do
         it "shows the sso page so user can sign in" do
           visit sso_group_saml_providers_path(group)
@@ -205,16 +205,20 @@ describe 'SAML provider settings' do
         end
 
         it 'Authorize/link button redirects to auth flow' do
+          external_uid = '98765'
+          mock_group_saml(uid: external_uid)
           visit sso_group_saml_providers_path(group)
 
           click_link 'Authorize'
 
-          expect(current_path).to eq callback_path
+          expect(page).to have_content(/SAML for .* was added to your connected accounts/)
+          expect(user.identities.last.extern_uid).to eq external_uid
         end
 
         context 'with linked account' do
           before do
-            create(:group_saml_identity, saml_provider: saml_provider, user: user)
+            identity = create(:group_saml_identity, saml_provider: saml_provider, user: user)
+            mock_group_saml(uid: identity.extern_uid)
           end
 
           it 'Sign in button redirects to auth flow' do
@@ -222,7 +226,8 @@ describe 'SAML provider settings' do
 
             click_link 'Sign in with Single Sign-On'
 
-            expect(current_path).to eq callback_path
+            expect(current_path).to eq group_path(group)
+            expect(page).to have_content('Already signed in')
           end
         end
       end

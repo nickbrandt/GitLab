@@ -19,6 +19,13 @@ describe Groups::SsoController do
       expect(response).to have_gitlab_http_status(200)
     end
 
+    it 'malicious redirect parameter falls back to group_path' do
+      get :saml, params: { group_id: group, redirect: '///malicious-url' }
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(assigns[:redirect_path]).to eq(group_path(group))
+    end
+
     it 'passes group name to the view' do
       get :saml, params: { group_id: group }
 

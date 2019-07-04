@@ -56,4 +56,16 @@ describe LicenseHelper do
       expect(api_license_url(id: 1)).to eq('http://localhost/gitlab/api/v4/license/1')
     end
   end
+
+  describe '#active_user_count' do
+    it 'returns the number of active users' do
+      expect(active_user_count).to eq(User.active.count)
+    end
+  end
+
+  describe '#guest_user_count' do
+    it 'returns the number of active guest users' do
+      expect(guest_user_count).to eq(User.active.count - User.active.excluding_guests.count)
+    end
+  end
 end

@@ -20,7 +20,7 @@ module EE
       end
 
       def sso_redirect_url
-        sso_group_saml_providers_url(root_group, token: root_group.saml_discovery_token)
+        sso_group_saml_providers_url(root_group, url_params)
       end
 
       module ControllerActions
@@ -58,6 +58,13 @@ module EE
 
       def root_group
         @root_group ||= group.root_ancestor
+      end
+
+      def url_params
+        {
+          token: root_group.saml_discovery_token,
+          redirect: "/#{routable.full_path}"
+        }
       end
     end
   end

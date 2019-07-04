@@ -96,6 +96,7 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :c
       let(:project5_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
       let(:project6_both_verified) { create(:repository_state, :repository_verified, :wiki_verified).project }
 
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/12455
       it 'handles multiple batches of projects needing verification', :quarantine do
         reg1 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project1_repo_verified)
         reg2 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project2_repo_verified)
@@ -111,7 +112,8 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :c
         subject.perform(shard_name)
       end
 
-      it 'handles multiple batches of projects needing verification, skipping failed repos' do
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/12455
+      it 'handles multiple batches of projects needing verification, skipping failed repos', :quarantine do
         reg1 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project1_repo_verified)
         reg2 = create(:geo_project_registry, :synced, :repository_verification_outdated, project: project2_repo_verified)
         create(:geo_project_registry, :synced, :repository_verification_outdated, project: project3_repo_failed)

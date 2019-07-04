@@ -80,7 +80,7 @@ xdescribe 'Merge request > User approves', :js do
     end
   end
 
-  context 'when merge when discussions resolved is active' do
+  context 'when merge when threads resolved is active' do
     let(:project) do
       create(:project, :repository,
         approvals_before_merge: 1,

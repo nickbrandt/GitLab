@@ -137,25 +137,25 @@ describe 'Merge request > Batch comments', :js do
       end
     end
 
-    context 'discussion is unresolved' do
+    context 'thread is unresolved' do
       let!(:active_discussion) { create(:diff_note_on_merge_request, noteable: merge_request, project: project).to_discussion }
 
       before do
         visit_diffs
       end
 
-      it 'publishes comment right away and resolves the discussion' do
+      it 'publishes comment right away and resolves the thread' do
         expect(active_discussion.resolved?).to eq(false)
 
         write_reply_to_discussion(button_text: 'Add comment now', resolve: true)
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('1/1 discussion resolved')
+          expect(page).to have_content('1/1 thread resolved')
           expect(page).to have_selector('.line-resolve-btn.is-active')
         end
       end
 
-      it 'publishes review and resolves the discussion' do
+      it 'publishes review and resolves the thread' do
         expect(active_discussion.resolved?).to eq(false)
 
         write_reply_to_discussion(resolve: true)
@@ -168,15 +168,13 @@ describe 'Merge request > Batch comments', :js do
         wait_for_requests
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('1/1 discussion resolved')
+          expect(page).to have_content('1/1 thread resolved')
           expect(page).to have_selector('.line-resolve-btn.is-active')
         end
-
-        expect_empty_local_draft
       end
     end
 
-    context 'discussion is resolved' do
+    context 'thread is resolved' do
       let!(:active_discussion) { create(:diff_note_on_merge_request, :resolved, noteable: merge_request, project: project).to_discussion }
 
       before do
@@ -187,18 +185,18 @@ describe 'Merge request > Batch comments', :js do
         page.find('.js-diff-comment-avatar').click
       end
 
-      it 'publishes comment right away and unresolves the discussion' do
+      it 'publishes comment right away and unresolves the thread' do
         expect(active_discussion.resolved?).to eq(true)
 
         write_reply_to_discussion(button_text: 'Add comment now', unresolve: true)
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('0/1 discussion resolved')
+          expect(page).to have_content('0/1 thread resolved')
           expect(page).to have_selector('.line-resolve-btn.is-disabled')
         end
       end
 
-      it 'publishes review and unresolves the discussion' do
+      it 'publishes review and unresolves the thread' do
         expect(active_discussion.resolved?).to eq(true)
 
         wait_for_requests
@@ -213,11 +211,9 @@ describe 'Merge request > Batch comments', :js do
         wait_for_requests
 
         page.within '.line-resolve-all-container' do
-          expect(page).to have_content('0/1 discussion resolved')
+          expect(page).to have_content('0/1 thread resolved')
           expect(page).to have_selector('.line-resolve-btn.is-disabled')
         end
-
-        expect_empty_local_draft
       end
     end
   end
@@ -253,28 +249,21 @@ describe 'Merge request > Batch comments', :js do
 end
 
 def write_reply_to_discussion(button_text: 'Start a review', text: 'Line is wrong', resolve: false, unresolve: false)
-  page.within('.discussion-reply-holder') do
+  page.within(first('.diff-files-holder .discussion-reply-holder')) do
     click_button('Reply...')
 
     fill_in('note_note', with: text)
 
     if resolve
-      page.check('Resolve discussion')
+      page.check('Resolve thread')
     end
 
     if unresolve
-      page.check('Unresolve discussion')
+      page.check('Unresolve thread')
     end
 
     click_button(button_text)
   end
 
   wait_for_requests
-end
-
-def expect_empty_local_draft
-  page.within('.discussion-reply-holder') do
-    click_button('Reply...')
-    expect(find('#note_note').value).to eq('')
-  end
 end

@@ -21,7 +21,7 @@ describe Issues::BuildService do
     end
   end
 
-  context 'for a single discussion' do
+  context 'for a single thread' do
     describe '#execute' do
       let(:merge_request) { create(:merge_request, title: "Hello world", source_project: project) }
       let(:discussion) { create(:diff_note_on_merge_request, project: project, noteable: merge_request, note: "Almost done").to_discussion }
@@ -30,7 +30,7 @@ describe Issues::BuildService do
       context 'with an issue template' do
         let(:project) { create(:project, :repository, issues_template: 'Work hard, play hard!') }
 
-        it 'picks the discussion description over the issue template' do
+        it 'picks the thread description over the issue template' do
           issue = service.execute
 
           expect(issue.description).to include('Almost done')

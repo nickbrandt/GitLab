@@ -6,13 +6,18 @@ describe MergeRequests::SyncCodeOwnerApprovalRules do
   let(:merge_request) { create(:merge_request) }
   let(:rb_owners) { create_list(:user, 2) }
   let(:doc_owners) { create_list(:user, 2) }
-  let(:rb_entry) { build_entry('*.rb', rb_owners) }
-  let(:doc_entry) { build_entry('doc/*', doc_owners) }
+  let(:rb_group_owners) { create_list(:group, 2) }
+  let(:doc_group_owners) { create_list(:group, 2) }
+  let(:rb_entry) { build_entry('*.rb', rb_owners, rb_group_owners) }
+  let(:doc_entry) { build_entry('doc/*', doc_owners, doc_group_owners) }
   let(:entries) { [rb_entry, doc_entry] }
 
-  def build_entry(pattern, users)
-    entry = Gitlab::CodeOwners::Entry.new(pattern, users.map(&:to_reference).join(' '))
+  def build_entry(pattern, users, groups)
+    text = (users + groups).map(&:to_reference).join(' ')
+    entry = Gitlab::CodeOwners::Entry.new(pattern, text)
+
     entry.add_matching_users_from(users)
+    entry.add_matching_groups_from(groups)
 
     entry
   end
@@ -34,6 +39,9 @@ describe MergeRequests::SyncCodeOwnerApprovalRules do
 
       expect(rb_rule.users).to eq(rb_owners)
       expect(doc_rule.users).to eq(doc_owners)
+
+      expect(rb_rule.groups).to match_array(rb_group_owners)
+      expect(doc_rule.groups).to match_array(doc_group_owners)
     end
 
     it 'deletes rules that are not relevant anymore' do
@@ -48,23 +56,13 @@ describe MergeRequests::SyncCodeOwnerApprovalRules do
     it 'updates rules for which the users changed' do
       other_rule = create(:code_owner_rule, merge_request: merge_request, name: '*.rb')
       other_rule.users += doc_owners
+      other_rule.groups += doc_group_owners
       other_rule.save!
 
       service.execute
 
       expect(other_rule.reload.users).to eq(rb_owners)
-    end
-
-    context 'when multiple code owner rules are disabled' do
-      before do
-        stub_feature_flags(multiple_code_owner_rules: false)
-      end
-
-      it 'calls the old sync method' do
-        expect(merge_request).to receive(:sync_code_owners_with_approvers)
-
-        service.execute
-      end
+      expect(other_rule.reload.groups).to match_array(rb_group_owners)
     end
   end
 end

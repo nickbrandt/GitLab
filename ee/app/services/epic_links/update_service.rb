@@ -27,7 +27,7 @@ module EpicLinks
       after_epic = Epic.in_parents(epic.parent_id).find(params[:move_after_id]) if params[:move_after_id]
 
       epic.move_between(before_epic, after_epic)
-      epic.save!
+      epic.save!(touch: false)
     end
   end
 end

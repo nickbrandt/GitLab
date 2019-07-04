@@ -48,25 +48,6 @@ module EE
 
         results
       end
-
-      def create_approvers(merge_request, users)
-        return if users.empty?
-        return unless merge_request.approvers_overwritten?
-
-        now = Time.now
-
-        rows = users.map do |user|
-          {
-            target_id: merge_request.id,
-            target_type: merge_request.class.name,
-            user_id: user.id,
-            created_at: now,
-            updated_at: now
-          }
-        end
-
-        ::Gitlab::Database.bulk_insert(Approver.table_name, rows)
-      end
     end
   end
 end

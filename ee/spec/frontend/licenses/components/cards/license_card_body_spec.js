@@ -18,7 +18,8 @@ describe('LicenseCardBody', () => {
       },
     },
     isRemoving: false,
-    currentActiveUserCount: 10,
+    activeUserCount: 10,
+    guestUserCount: 8,
   };
 
   function createComponent(props = {}) {

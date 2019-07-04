@@ -52,9 +52,7 @@ describe('noteActions', () => {
       const resolveButton = wrapper.find({ ref: 'resolveButton' });
 
       expect(resolveButton.exists()).toBe(true);
-      expect(resolveButton.attributes('data-original-title')).toEqual(
-        'Discussion stays unresolved',
-      );
+      expect(resolveButton.attributes('data-original-title')).toEqual('Thread stays unresolved');
     });
   });
 });
