@@ -11377,6 +11377,9 @@ msgstr ""
 msgid "Remove milestone"
 msgstr ""
 
+msgid "Remove parent epic from an epic"
+msgstr ""
+
 msgid "Remove priority"
 msgstr ""
 
@@ -11408,6 +11411,9 @@ msgid "Removes %{milestone_reference} milestone."
 msgstr ""
 
 msgid "Removes all labels."
+msgstr ""
+
+msgid "Removes parent epic %{epic_ref}."
 msgstr ""
 
 msgid "Removes spent time."
@@ -12337,6 +12343,9 @@ msgstr ""
 msgid "Set notification email for abuse reports."
 msgstr ""
 
+msgid "Set parent epic to an epic"
+msgstr ""
+
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
 msgstr ""
 
@@ -12404,6 +12413,9 @@ msgid "SetStatusModal|Sorry, we weren't able to set your status. Please try agai
 msgstr ""
 
 msgid "SetStatusModal|What's your status?"
+msgstr ""
+
+msgid "Sets %{epic_ref} as parent epic."
 msgstr ""
 
 msgid "Sets the due date to %{due_date}."

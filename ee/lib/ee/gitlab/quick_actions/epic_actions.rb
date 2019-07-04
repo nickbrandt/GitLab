@@ -42,6 +42,37 @@ module EE
             end
           end
 
+          desc _('Set parent epic to an epic')
+          explanation do |epic_param|
+            parent_epic = extract_epic(epic_param)
+
+            _("Sets %{epic_ref} as parent epic.") % { epic_ref: parent_epic.to_reference(quick_action_target) } if parent_epic
+          end
+          types Epic
+          condition { action_allowed? }
+          params '<&epic | group&epic | Epic URL>'
+          command :parent_epic do |epic_param|
+            parent_epic = extract_epic(epic_param)
+
+            if parent_epic && !parent_epic.child?(quick_action_target.id)
+              EpicLinks::CreateService.new(parent_epic, current_user, { target_issuable: quick_action_target }).execute
+            end
+          end
+
+          desc _('Remove parent epic from an epic')
+          explanation do
+            parent_epic = quick_action_target.parent
+
+            _('Removes parent epic %{epic_ref}.') % { epic_ref: parent_epic.to_reference(quick_action_target) }
+          end
+          types Epic
+          condition do
+            action_allowed? && quick_action_target.parent.present?
+          end
+          command :remove_parent_epic do
+            EpicLinks::DestroyService.new(quick_action_target, current_user).execute
+          end
+
           private
 
           def extract_epic(params)
