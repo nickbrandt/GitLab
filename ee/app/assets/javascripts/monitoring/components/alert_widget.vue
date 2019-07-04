@@ -1,16 +1,19 @@
 <script>
+import { GlBadge, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
+import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
-import { GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 
 export default {
   components: {
     AlertWidgetForm,
+    GlBadge,
     GlLoadingIcon,
     GlModal,
+    Icon,
   },
   directives: {
     GlModal: GlModalDirective,
@@ -157,12 +160,7 @@ export default {
 </script>
 
 <template>
-  <div class="prometheus-alert-widget dropdown d-flex align-items-center">
-    <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
-    <span v-else class="alert-current-setting text-secondary">
-      <gl-loading-icon v-show="isLoading" :inline="true" />
-      {{ alertSummary }}
-    </span>
+  <div class="prometheus-alert-widget dropdown d-flex align-items-center align-self-center">
     <alert-widget-form
       ref="widgetForm"
       :disabled="formDisabled"
@@ -176,5 +174,14 @@ export default {
       @cancel="hideModal"
       @setAction="handleSetApiAction"
     />
+    <div class="text-right">
+      <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
+      <span v-else class="alert-current-setting d-flex-center">
+        <gl-loading-icon v-show="isLoading" :inline="true" />
+        <gl-badge v-if="alertSummary" variant="secondary" class="d-flex-center text-secondary"
+          ><icon name="notifications" class="s18 append-right-4" />{{ alertSummary }}</gl-badge
+        >
+      </span>
+    </div>
   </div>
 </template>

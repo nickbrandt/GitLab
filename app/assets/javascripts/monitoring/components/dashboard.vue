@@ -475,18 +475,10 @@ export default {
             :project-path="projectPath"
             group-id="monitor-time-series-chart"
           >
-            <div class="d-flex align-items-center">
-              <alert-widget
-                v-if="alertWidgetAvailable && graphData"
-                :modal-id="`alert-modal-${index}-${graphIndex}`"
-                :alerts-endpoint="alertsEndpoint"
-                :relevant-queries="graphData.queries"
-                :alerts-to-manage="getGraphAlerts(graphData.queries)"
-                @setAlerts="setAlerts"
-              />
+            <div class="d-flex flex-column prepend-right-32">
               <gl-dropdown
                 v-gl-tooltip
-                class="mx-2"
+                class="align-self-end"
                 toggle-class="btn btn-transparent border-0"
                 :right="true"
                 :no-caret="true"
@@ -514,6 +506,14 @@ export default {
                   {{ __('Alerts') }}
                 </gl-dropdown-item>
               </gl-dropdown>
+              <alert-widget
+                v-if="alertWidgetAvailable && graphData"
+                :modal-id="`alert-modal-${index}-${graphIndex}`"
+                :alerts-endpoint="alertsEndpoint"
+                :relevant-queries="graphData.queries"
+                :alerts-to-manage="getGraphAlerts(graphData.queries)"
+                @setAlerts="setAlerts"
+              />
             </div>
           </monitor-time-series-chart>
         </template>

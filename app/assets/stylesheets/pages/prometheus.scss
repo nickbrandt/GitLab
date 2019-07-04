@@ -36,9 +36,8 @@
 
 .prometheus-graph-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: $gl-padding-8;
+  height: 53px;
 
   h5 {
     font-size: $gl-font-size-large;
