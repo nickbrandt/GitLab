@@ -8,18 +8,19 @@ describe Gitlab::CodeOwners::Loader do
   set(:project) { create(:project, namespace: group) }
   subject(:loader) { described_class.new(project, 'with-codeowners', paths) }
 
+  let(:codeowner_content) do
+    <<~CODEOWNERS
+    docs/* @documentation-owner
+    docs/CODEOWNERS @owner-1 owner2@gitlab.org @owner-3 @documentation-owner
+    spec/* @test-owner @test-group @test-group/nested-group
+    CODEOWNERS
+  end
+
   let!(:owner_1) { create(:user, username: 'owner-1') }
   let!(:email_owner) { create(:user, username: 'owner-2') }
   let!(:owner_3) { create(:user, username: 'owner-3') }
   let!(:documentation_owner) { create(:user, username: 'documentation-owner') }
   let!(:test_owner) { create(:user, username: 'test-owner') }
-  let(:codeowner_content) do
-    <<~CODEOWNERS
-    docs/* @documentation-owner
-    docs/CODEOWNERS @owner-1 owner2@gitlab.org @owner-3 @documentation-owner
-    spec/* @test-owner
-    CODEOWNERS
-  end
   let(:codeowner_blob) { fake_blob(path: 'CODEOWNERS', data: codeowner_content) }
   let(:paths) { 'docs/CODEOWNERS' }
 
@@ -57,18 +58,48 @@ describe Gitlab::CodeOwners::Loader do
     end
 
     context 'for multiple paths' do
+      let(:project) { create(:project, :public, namespace: group) }
       let(:paths) { ['docs/CODEOWNERS', 'spec/loader_spec.rb', 'spec/entry_spec.rb'] }
 
       it 'loads 2 entries' do
-        other_entry = Gitlab::CodeOwners::Entry.new('spec/*', '@test-owner')
+        other_entry = Gitlab::CodeOwners::Entry.new('spec/*', '@test-owner @test-group @test-group/nested-group')
 
         expect(loader.entries).to contain_exactly(expected_entry, other_entry)
       end
 
-      it 'only performs 2 query for users' do
-        # One query for users, one for the emails to later divide them across the
-        # entries
-        expect { loader.entries }.not_to exceed_query_limit(2)
+      it 'only performs 3 query for users and groups' do
+        test_group = create(:group, path: 'test-group')
+        test_group.add_developer(create(:user))
+
+        another_group = create(:group, parent: test_group, path: 'nested-group')
+        another_group.add_developer(create(:user))
+
+        project.invited_groups << [test_group, another_group]
+
+        # One query for users, one for the emails to later divide them across the entries
+        # one for groups with joined routes and users
+        expect { loader.entries }.not_to exceed_query_limit(3)
+      end
+    end
+
+    context 'group as a code owner' do
+      let(:paths) { ['spec/loader_spec.rb'] }
+      let(:expected_entry) { Gitlab::CodeOwners::Entry.new('spec/*', '@test-owner @test-group @test-group/nested-group') }
+
+      it 'loads group members as code owners' do
+        test_group = create(:group, path: 'test-group')
+        project.invited_groups << test_group
+
+        group_user = create(:user)
+
+        test_group.add_developer(group_user)
+        test_group.add_developer(test_owner)
+
+        expect(loader.entries).to contain_exactly(expected_entry)
+        expect(loader.members).to contain_exactly(group_user, test_owner)
+
+        entry = loader.entries.first
+        expect(entry.groups).to contain_exactly(test_group)
       end
     end
 

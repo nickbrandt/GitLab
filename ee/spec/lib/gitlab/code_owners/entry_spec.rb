@@ -2,12 +2,19 @@
 require 'spec_helper'
 
 describe Gitlab::CodeOwners::Entry do
-  subject(:entry) { described_class.new('/**/file', '@user jane@gitlab.org') }
+  subject(:entry) { described_class.new('/**/file', '@user jane@gitlab.org @group @group/nested-group') }
+
   let(:user) { build(:user, username: 'user') }
+  let(:group_user) { create(:user) }
+  let(:group) do
+    group = create(:group, path: 'Group')
+    group.add_developer(group_user)
+    group
+  end
 
   it 'is uniq by the pattern and owner line' do
-    equal_entry = described_class.new('/**/file', '@user jane@gitlab.org')
-    other_entry = described_class.new('/**/other_file', '@user jane@gitlab.org')
+    equal_entry = described_class.new('/**/file', '@user jane@gitlab.org @group @group/nested-group')
+    other_entry = described_class.new('/**/other_file', '@user jane@gitlab.org @group')
 
     expect(equal_entry).to eq(entry)
     expect([entry, equal_entry, other_entry].uniq).to contain_exactly(entry, other_entry)
@@ -22,6 +29,47 @@ describe Gitlab::CodeOwners::Entry do
       entry.add_matching_users_from([user])
 
       expect(entry.users).to eq([user])
+    end
+  end
+
+  describe '#all_users' do
+    it 'raises an error if users have not been loaded for groups' do
+      entry.add_matching_groups_from([group])
+
+      expect { entry.all_users }.to raise_error(/not loaded/)
+    end
+
+    it 'returns users and users from groups' do
+      user.save!
+      group.add_reporter(user)
+
+      entry.add_matching_groups_from(Group.with_users)
+      entry.add_matching_users_from([user])
+
+      expect(entry.all_users).to contain_exactly(user, group_user)
+    end
+  end
+
+  describe '#groups' do
+    it 'raises an error if no groups have been added' do
+      expect { entry.groups }.to raise_error(/not loaded/)
+    end
+
+    it 'returns mentioned groups' do
+      entry.add_matching_groups_from([group])
+
+      expect(entry.groups).to eq([group])
+    end
+  end
+
+  describe '#add_matching_groups_from' do
+    it 'returns only mentioned groups, case-insensitively' do
+      group2 = create(:group, path: 'Group2')
+      nested_group = create(:group, path: 'nested-group', parent: group)
+
+      entry.add_matching_groups_from([group, group2, nested_group])
+
+      expect(entry.groups).to eq([group, nested_group])
     end
   end
 

@@ -19,6 +19,8 @@ module MergeRequests
         rule ||= create_rule(entry)
 
         rule.users = entry.users
+        rule.groups = entry.groups
+
         rule.save
       end
     end
