@@ -81,7 +81,9 @@ describe EE::RoutableActions::SsoEnforcementRedirect do
   describe '#sso_redirect_url' do
     shared_examples 'a routable SSO url' do
       it 'returns the SSO url for the root group' do
-        expect(subject.sso_redirect_url).to match(/groups\/#{root_group.to_param}\/-\/saml\/sso\?token=/)
+        redirect_url = CGI.escape("/#{subject.routable.full_path}")
+
+        expect(subject.sso_redirect_url).to match(/groups\/#{root_group.to_param}\/-\/saml\/sso\?redirect=#{redirect_url}&token=/)
       end
     end
 
