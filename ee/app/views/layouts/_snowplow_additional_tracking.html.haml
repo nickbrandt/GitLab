@@ -1,4 +1,4 @@
-- return unless Feature.enabled?(:additional_snowplow_tracking)
+- return unless Feature.enabled?(:additional_snowplow_tracking, @group)
 
 :javascript
   window.snowplow('enableFormTracking');
