@@ -23,6 +23,22 @@ describe EpicLinks::UpdateService do
   end
 
   describe '#execute' do
+    shared_examples 'updating timestamps' do
+      it 'does not update moved epic' do
+        updated_at = epic_to_move.updated_at
+        subject
+
+        expect(epic_to_move.reload.updated_at.change(usec: 0)).to eq(updated_at.change(usec: 0))
+      end
+
+      it 'does not update parent epic' do
+        updated_at = parent_epic.updated_at
+        subject
+
+        expect(parent_epic.reload.updated_at.change(usec: 0)).to eq(updated_at.change(usec: 0))
+      end
+    end
+
     context 'when params are nil' do
       let(:params) { { move_before_id: nil, move_after_id: nil } }
 
@@ -35,6 +51,8 @@ describe EpicLinks::UpdateService do
     context 'when moving to start' do
       let(:params) { { move_before_id: nil, move_after_id: child_epic1.id } }
 
+      it_behaves_like 'updating timestamps'
+
       it 'reorders child epics' do
         expect(subject).to include(status: :success)
         expect(ordered_epics).to eq([child_epic3, child_epic1, child_epic2, child_epic4])
@@ -44,6 +62,8 @@ describe EpicLinks::UpdateService do
     context 'when moving to end' do
       let(:params) { { move_before_id: child_epic4.id, move_after_id: nil } }
 
+      it_behaves_like 'updating timestamps'
+
       it 'reorders child epics' do
         expect(subject).to include(status: :success)
         expect(ordered_epics).to eq([child_epic1, child_epic2, child_epic4, child_epic3])
@@ -52,6 +72,8 @@ describe EpicLinks::UpdateService do
 
     context 'when moving between siblings' do
       let(:params) { { move_before_id: child_epic1.id, move_after_id: child_epic2.id } }
+
+      it_behaves_like 'updating timestamps'
 
       it 'reorders child epics' do
         expect(subject).to include(status: :success)
