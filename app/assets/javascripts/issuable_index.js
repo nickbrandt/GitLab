@@ -1,8 +1,8 @@
 import $ from 'jquery';
+import issuableInitBulkUpdateSidebar from 'ee/issuable_init_bulk_update_sidebar';
 import axios from './lib/utils/axios_utils';
 import flash from './flash';
 import { s__, __ } from './locale';
-import issuableInitBulkUpdateSidebar from './issuable_init_bulk_update_sidebar';
 
 export default class IssuableIndex {
   constructor(pagePrefix) {
