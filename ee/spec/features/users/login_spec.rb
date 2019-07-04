@@ -3,6 +3,7 @@ require 'spec_helper'
 describe 'Login' do
   include LdapHelpers
   include UserLoginHelper
+  include DeviseHelpers
 
   before do
     stub_licensed_features(extended_audit_events: true)
@@ -145,6 +146,41 @@ describe 'Login' do
         subject
 
         expect(page).to have_selector('#ldapmain_smartcard input[value="Sign in with smart card"]')
+      end
+    end
+  end
+
+  describe 'via Group SAML' do
+    let(:saml_provider) { create(:saml_provider) }
+    let(:group) { saml_provider.group }
+    let(:identity) { create(:group_saml_identity, user: user, saml_provider: saml_provider) }
+
+    before do
+      stub_licensed_features(group_saml: true)
+    end
+
+    around(:all) do |example|
+      with_omniauth_full_host { example.run }
+    end
+
+    context 'with U2F two factor', :js do
+      let(:user) { create(:user, :two_factor_via_u2f) }
+
+      before do
+        mock_group_saml(uid: identity.extern_uid)
+      end
+
+      it 'shows U2F prompt after SAML' do
+        visit sso_group_saml_providers_path(group, token: group.saml_discovery_token)
+
+        click_link 'Sign in with Single Sign-On'
+
+        expect(page).to have_content('Trying to communicate with your device')
+        expect(page).to have_link('Sign in via 2FA code')
+
+        fake_successful_u2f_authentication
+
+        expect(current_path).to eq root_path
       end
     end
   end
