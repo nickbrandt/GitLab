@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import MockAdaptor from 'axios-mock-adapter';
-import issuableInitBulkUpdateSidebar from 'ee/issuable_init_bulk_update_sidebar';
 import axios from '~/lib/utils/axios_utils';
 import IssuableIndex from '~/issuable_index';
+import issuableInitBulkUpdateSidebar from '~/issuable_init_bulk_update_sidebar';
 
 describe('Issuable', () => {
   describe('initBulkUpdate', () => {
