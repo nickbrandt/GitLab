@@ -74,9 +74,9 @@ export const requestEpicTodoToggleFailure = ({ commit, state }, data) => {
   commit(types.REQUEST_EPIC_TODO_TOGGLE_FAILURE, data);
 
   if (state.todoExists) {
-    flash(__('There was an error deleting the todo.'));
+    flash(__('There was an error deleting the To Do.'));
   } else {
-    flash(__('There was an error adding a todo.'));
+    flash(__('There was an error adding a To Do.'));
   }
 };
 export const triggerTodoToggleEvent = (_, { count }) => {
