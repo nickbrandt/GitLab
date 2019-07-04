@@ -3,6 +3,8 @@
 module Gitlab
   module CodeOwners
     class Loader
+      include ::Gitlab::Utils::StrongMemoize
+
       def initialize(project, ref, paths)
         @project, @ref, @paths = project, ref, Array(paths)
       end
@@ -10,11 +12,25 @@ module Gitlab
       def entries
         return [] if empty_code_owners?
 
-        @entries ||= load_entries
+        strong_memoize(:entries) do
+          entries = load_bare_entries_for_paths
+
+          # a single extractor is used here, since usernames and groupnames
+          # share the same pattern. This way we don't need to match it twice.
+          owner_lines = entries.map(&:owner_line)
+          extractor = Gitlab::CodeOwners::ReferenceExtractor.new(owner_lines)
+
+          UsersLoader.new(@project, extractor).load_to(entries)
+          GroupsLoader.new(@project, extractor).load_to(entries)
+
+          entries
+        end
       end
 
       def members
-        @members ||= entries.map(&:users).flatten.uniq
+        strong_memoize(:members) do
+          entries.flat_map(&:all_users).uniq
+        end
       end
 
       def empty_code_owners?
@@ -23,22 +39,12 @@ module Gitlab
 
       private
 
-      def load_entries
-        entries = @paths.map { |path| code_owners_file.entry_for_path(path) }.compact.uniq
-        members = all_members_for_entries(entries)
-
-        entries.each do |entry|
-          entry.add_matching_users_from(members)
+      def load_bare_entries_for_paths
+        entries = @paths.map do |path|
+          code_owners_file.entry_for_path(path)
         end
 
-        entries
-      end
-
-      def all_members_for_entries(entries)
-        owner_lines = entries.map(&:owner_line)
-        all_users = Gitlab::UserExtractor.new(owner_lines).users.with_emails
-
-        @project.members_among(all_users)
+        entries.compact.uniq
       end
 
       def code_owners_file

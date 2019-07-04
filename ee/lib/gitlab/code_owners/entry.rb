@@ -3,6 +3,8 @@
 module Gitlab
   module CodeOwners
     class Entry
+      include ::Gitlab::Utils::StrongMemoize
+
       Data = Struct.new(:pattern, :owner_line)
 
       attr_reader :data
@@ -14,10 +16,35 @@ module Gitlab
         @data = Data.new(pattern, owner_line)
       end
 
+      def all_users
+        strong_memoize(:all_users) do
+          group_members = groups.flat_map do |group|
+            raise "CodeOwners for #{group.full_path} not loaded" unless group.users.loaded?
+
+            group.users
+          end
+
+          (group_members + users).uniq
+        end
+      end
+
       def users
         raise "CodeOwners for #{owner_line} not loaded" unless defined?(@users)
 
         @users.to_a
+      end
+
+      def groups
+        raise "CodeOwners groups for #{owner_line} not loaded" unless defined?(@groups)
+
+        @groups.to_a
+      end
+
+      def add_matching_groups_from(new_groups)
+        @groups ||= Set.new
+
+        matching_groups = new_groups.select { |u| matching_group?(u) }
+        @groups.merge(matching_groups)
       end
 
       def add_matching_users_from(new_users)
@@ -37,19 +64,23 @@ module Gitlab
       private
 
       def extractor
-        @extractor ||= Gitlab::UserExtractor.new(owner_line)
+        @extractor ||= Gitlab::CodeOwners::ReferenceExtractor.new(owner_line)
       end
 
       def emails
         @emails ||= extractor.emails.map(&:downcase)
       end
 
-      def usernames
-        @usernames ||= extractor.usernames.map(&:downcase)
+      def names
+        @names ||= extractor.names.map(&:downcase)
+      end
+
+      def matching_group?(group)
+        names.include?(group.full_path.downcase)
       end
 
       def matching_user?(user)
-        usernames.include?(user.username.downcase) || matching_emails?(user)
+        names.include?(user.username.downcase) || matching_emails?(user)
       end
 
       def matching_emails?(user)
