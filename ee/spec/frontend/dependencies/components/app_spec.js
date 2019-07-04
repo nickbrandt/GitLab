@@ -4,10 +4,9 @@ import createStore from 'ee/dependencies/store';
 import { DEPENDENCY_LIST_TYPES } from 'ee/dependencies/store/constants';
 import { REPORT_STATUS } from 'ee/dependencies/store/modules/list/constants';
 import DependenciesApp from 'ee/dependencies/components/app.vue';
-import DependenciesTable from 'ee/dependencies/components/dependencies_table.vue';
 import DependencyListIncompleteAlert from 'ee/dependencies/components/dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from 'ee/dependencies/components/dependency_list_job_failed_alert.vue';
-import Pagination from '~/vue_shared/components/pagination_links.vue';
+import PaginatedDependenciesTable from 'ee/dependencies/components/paginated_dependencies_table.vue';
 
 describe('DependenciesApp component', () => {
   let store;
@@ -81,17 +80,9 @@ describe('DependenciesApp component', () => {
         expect(wrapper.element).toMatchSnapshot();
       });
 
-      it('passes the correct props to the dependencies table', () => {
-        expectComponentWithProps(DependenciesTable, {
-          dependencies,
-          isLoading: false,
-        });
-      });
-
-      it('passes the correct props to the pagination', () => {
-        expectComponentWithProps(Pagination, {
-          pageInfo: store.state[listType].pageInfo,
-          change: wrapper.vm.fetchPage,
+      it('passes the correct props to the paginated dependencies table', () => {
+        expectComponentWithProps(PaginatedDependenciesTable, {
+          namespace: listType,
         });
       });
     });
@@ -142,15 +133,10 @@ describe('DependenciesApp component', () => {
         });
       });
 
-      it('passes the correct props to the dependencies table', () => {
-        expectComponentWithProps(DependenciesTable, {
-          dependencies,
-          isLoading: false,
+      it('passes the correct props to the paginated dependencies table', () => {
+        expectComponentWithProps(PaginatedDependenciesTable, {
+          namespace: listType,
         });
-      });
-
-      it('does not show pagination', () => {
-        expect(wrapper.find(Pagination).exists()).toBe(false);
       });
 
       describe('when the job failure alert emits the close event', () => {
@@ -190,17 +176,9 @@ describe('DependenciesApp component', () => {
         expect(alert.isVisible()).toBe(true);
       });
 
-      it('passes the correct props to the dependencies table', () => {
-        expectComponentWithProps(DependenciesTable, {
-          dependencies,
-          isLoading: false,
-        });
-      });
-
-      it('passes the correct props to the pagination', () => {
-        expectComponentWithProps(Pagination, {
-          pageInfo: store.state[listType].pageInfo,
-          change: wrapper.vm.fetchPage,
+      it('passes the correct props to the paginated dependencies table', () => {
+        expectComponentWithProps(PaginatedDependenciesTable, {
+          namespace: listType,
         });
       });
 
@@ -235,15 +213,10 @@ describe('DependenciesApp component', () => {
         expect(wrapper.element).toMatchSnapshot();
       });
 
-      it('passes the correct props to the dependencies table', () => {
-        expectComponentWithProps(DependenciesTable, {
-          dependencies,
-          isLoading: false,
+      it('passes the correct props to the paginated dependencies table', () => {
+        expectComponentWithProps(PaginatedDependenciesTable, {
+          namespace: listType,
         });
-      });
-
-      it('does not show pagination', () => {
-        expect(wrapper.find(Pagination).exists()).toBe(false);
       });
     });
   });

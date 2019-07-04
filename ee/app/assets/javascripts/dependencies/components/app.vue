@@ -1,24 +1,22 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlBadge, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
-import Pagination from '~/vue_shared/components/pagination_links.vue';
 import DependenciesActions from './dependencies_actions.vue';
-import DependenciesTable from './dependencies_table.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
+import PaginatedDependenciesTable from './paginated_dependencies_table.vue';
 import { DEPENDENCY_LIST_TYPES } from '../store/constants';
 
 export default {
   name: 'DependenciesApp',
   components: {
     DependenciesActions,
-    DependenciesTable,
     GlBadge,
     GlEmptyState,
     GlLoadingIcon,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
-    Pagination,
+    PaginatedDependenciesTable,
   },
   props: {
     endpoint: {
@@ -48,17 +46,7 @@ export default {
   computed: {
     ...mapState(['currentList']),
     ...mapGetters(DEPENDENCY_LIST_TYPES.all, ['isJobNotSetUp', 'isJobFailed', 'isIncomplete']),
-    ...mapState(DEPENDENCY_LIST_TYPES.all, [
-      'initialized',
-      'isLoading',
-      'errorLoading',
-      'dependencies',
-      'pageInfo',
-      'reportInfo',
-    ]),
-    shouldShowPagination() {
-      return Boolean(!this.isLoading && !this.errorLoading && this.pageInfo && this.pageInfo.total);
-    },
+    ...mapState(DEPENDENCY_LIST_TYPES.all, ['initialized', 'pageInfo', 'reportInfo']),
   },
   created() {
     this.setDependenciesEndpoint(this.endpoint);
@@ -66,9 +54,6 @@ export default {
   },
   methods: {
     ...mapActions(DEPENDENCY_LIST_TYPES.all, ['setDependenciesEndpoint', 'fetchDependencies']),
-    fetchPage(page) {
-      this.fetchDependencies({ page });
-    },
     dismissIncompleteListAlert() {
       this.isIncompleteAlertDismissed = true;
     },
@@ -114,13 +99,6 @@ export default {
       <dependencies-actions :namespace="currentList" />
     </div>
 
-    <dependencies-table :dependencies="dependencies" :is-loading="isLoading" />
-
-    <pagination
-      v-if="shouldShowPagination"
-      :change="fetchPage"
-      :page-info="pageInfo"
-      class="justify-content-center prepend-top-default"
-    />
+    <paginated-dependencies-table :namespace="currentList" />
   </div>
 </template>

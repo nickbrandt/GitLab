@@ -27,14 +27,8 @@ exports[`DependenciesApp component on creation given a dependency list which is 
     />
   </div>
    
-  <dependenciestable-stub
-    dependencies="foo,bar"
-  />
-   
-  <pagination-stub
-    change="function () { [native code] }"
-    class="justify-content-center prepend-top-default"
-    pageinfo="[object Object]"
+  <paginateddependenciestable-stub
+    namespace="allDependencies"
   />
 </div>
 `;
@@ -62,11 +56,9 @@ exports[`DependenciesApp component on creation given a fetch error matches the s
     />
   </div>
    
-  <dependenciestable-stub
-    dependencies=""
+  <paginateddependenciestable-stub
+    namespace="allDependencies"
   />
-   
-  <!---->
 </div>
 `;
 
@@ -97,14 +89,8 @@ exports[`DependenciesApp component on creation given a list of dependencies and 
     />
   </div>
    
-  <dependenciestable-stub
-    dependencies="foo,bar"
-  />
-   
-  <pagination-stub
-    change="function () { [native code] }"
-    class="justify-content-center prepend-top-default"
-    pageinfo="[object Object]"
+  <paginateddependenciestable-stub
+    namespace="allDependencies"
   />
 </div>
 `;
@@ -134,11 +120,9 @@ exports[`DependenciesApp component on creation given the dependency list job fai
     />
   </div>
    
-  <dependenciestable-stub
-    dependencies=""
+  <paginateddependenciestable-stub
+    namespace="allDependencies"
   />
-   
-  <!---->
 </div>
 `;
 
