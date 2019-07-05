@@ -161,9 +161,6 @@ msgstr ""
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
-msgid "%{counter_repositories} repositories, %{counter_wikis} wikis, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS"
-msgstr ""
-
 msgid "%{count} approval required from %{name}"
 msgid_plural "%{count} approvals required from %{name}"
 msgstr[0] ""
@@ -11618,6 +11615,9 @@ msgid "Repository mirror"
 msgstr ""
 
 msgid "Repository storage"
+msgstr ""
+
+msgid "Repository: %{counter_repositories} / Wikis: %{counter_wikis} / Build Artifacts: %{counter_build_artifacts} / LFS: %{counter_lfs_objects}"
 msgstr ""
 
 msgid "RepositorySettingsAccessLevel|Select"
