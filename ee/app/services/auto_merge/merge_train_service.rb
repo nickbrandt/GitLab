@@ -18,15 +18,23 @@ module AutoMerge
       ::MergeTrains::RefreshMergeRequestsService.new(project, nil).execute(merge_request)
     end
 
-    def cancel(merge_request, reason: nil, refresh_next: true)
+    def cancel(merge_request)
       # Before dropping a merge request from a merge train, get the next
       # merge request in order to refresh it later.
-      next_merge_request = merge_request.merge_train&.next if refresh_next
+      next_merge_request = merge_request.merge_train&.next
 
-      super(merge_request) do
+      super do
         if merge_request.merge_train&.delete
-          SystemNoteService.cancel_merge_train(merge_request, project, current_user, reason: reason)
+          SystemNoteService.cancel_merge_train(merge_request, project, current_user)
           AutoMergeProcessWorker.perform_async(next_merge_request.id) if next_merge_request
+        end
+      end
+    end
+
+    def abort(merge_request, reason)
+      super do
+        if merge_request.merge_train&.destroy
+          SystemNoteService.abort_merge_train(merge_request, project, current_user, reason)
         end
       end
     end

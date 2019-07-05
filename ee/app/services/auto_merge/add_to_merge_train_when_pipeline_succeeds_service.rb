@@ -13,19 +13,20 @@ module AutoMerge
 
       merge_train_service = AutoMerge::MergeTrainService.new(project, merge_request.merge_user)
 
-      ##
-      # We are currently abusing `#cancel` method to cancel the auto merge when
-      # a system failure happens. We should split the interfaces into two
-      # for explicitly telling that the cancel action is not triggered by the merge user directly.
-      # https://gitlab.com/gitlab-org/gitlab-ee/issues/12134
-      return cancel(merge_request) unless merge_train_service.available_for?(merge_request)
+      return abort(merge_request) unless merge_train_service.available_for?(merge_request)
 
       merge_train_service.execute(merge_request)
     end
 
     def cancel(merge_request)
-      super(merge_request) do
+      super do
         SystemNoteService.cancel_add_to_merge_train_when_pipeline_succeeds(merge_request, project, current_user)
+      end
+    end
+
+    def abort(merge_request, reason)
+      super do
+        SystemNoteService.abort_add_to_merge_train_when_pipeline_succeeds(merge_request, project, current_user, reason)
       end
     end
 
