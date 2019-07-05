@@ -120,20 +120,9 @@ describe AutoMerge::MergeTrainService do
 
     it 'writes system note to the merge request' do
       expect(SystemNoteService)
-        .to receive(:cancel_merge_train).with(merge_request, project, user, anything)
+        .to receive(:cancel_merge_train).with(merge_request, project, user)
 
       subject
-    end
-
-    context 'when reason is specified' do
-      let(:params) { { reason: 'Pipeline failed' } }
-
-      it 'passes the reason to SystemNoteService' do
-        expect(SystemNoteService)
-          .to receive(:cancel_merge_train).with(any_args, reason: 'Pipeline failed')
-
-        subject
-      end
     end
 
     context 'when the other merge request is following the merge request' do
@@ -148,16 +137,36 @@ describe AutoMerge::MergeTrainService do
 
         subject
       end
+    end
+  end
 
-      context 'when refresh next is false' do
-        let(:params) { { refresh_next: false } }
+  describe '#abort' do
+    subject { service.abort(merge_request, 'an error') }
 
-        it 'does not process the next merge request on the train' do
-          expect(AutoMergeProcessWorker).not_to receive(:perform_async).with(merge_request_2.id)
+    let!(:merge_request) do
+      create(:merge_request, :on_train,
+        source_project: project, source_branch: 'feature',
+        target_project: project, target_branch: 'master')
+    end
 
-          subject
-        end
-      end
+    it 'aborts auto merge on the merge request' do
+      subject
+
+      merge_request.reload
+      expect(merge_request).not_to be_auto_merge_enabled
+      expect(merge_request.merge_user).to be_nil
+      expect(merge_request.merge_params).not_to include('should_remove_source_branch')
+      expect(merge_request.merge_params).not_to include('commit_message')
+      expect(merge_request.merge_params).not_to include('squash_commit_message')
+      expect(merge_request.merge_params).not_to include('auto_merge_strategy')
+      expect(merge_request.merge_train).not_to be_present
+    end
+
+    it 'writes system note to the merge request' do
+      expect(SystemNoteService)
+        .to receive(:abort_merge_train).with(merge_request, project, user, 'an error')
+
+      subject
     end
   end
 

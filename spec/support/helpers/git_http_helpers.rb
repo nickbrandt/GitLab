@@ -1,4 +1,6 @@
 module GitHttpHelpers
+  include WorkhorseHelpers
+
   def clone_get(project, options = {})
     get "/#{project}/info/refs", params: { service: 'git-upload-pack' }, headers: auth_env(*options.values_at(:user, :password, :spnego_request_token))
   end

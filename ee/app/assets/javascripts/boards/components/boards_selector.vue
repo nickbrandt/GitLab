@@ -1,5 +1,4 @@
 <script>
-import $ from 'jquery';
 import { throttle } from 'underscore';
 import {
   GlLoadingIcon,
@@ -13,8 +12,6 @@ import {
 import Icon from '~/vue_shared/components/icon.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
-import AssigneeList from './assignees_list_slector';
-import MilestoneList from './milestone_list_selector';
 import httpStatusCodes from '~/lib/utils/http_status';
 
 const MIN_BOARDS_TO_VIEW_RECENT = 10;
@@ -95,8 +92,6 @@ export default {
     return {
       loading: true,
       hasScrollFade: false,
-      hasAssigneesListMounted: false,
-      hasMilestoneListMounted: false,
       scrollFadeInitialized: false,
       boards: [],
       recentBoards: [],
@@ -162,8 +157,6 @@ export default {
   },
   created() {
     boardsStore.setCurrentBoard(this.currentBoard);
-    $('#js-add-list').on('hide.bs.dropdown', this.handleDropdownHide);
-    $('.js-new-board-list-tabs').on('click', this.handleDropdownTabClick);
   },
   methods: {
     showPage(page) {
@@ -224,26 +217,6 @@ export default {
       if (!this.scrollFadeInitialized) this.initScrollFade();
 
       this.hasScrollFade = this.isScrolledUp();
-    },
-    handleDropdownHide(e) {
-      const $currTarget = $(e.currentTarget);
-      if ($currTarget.data('preventClose')) {
-        e.preventDefault();
-      }
-      $currTarget.removeData('preventClose');
-    },
-    handleDropdownTabClick(e) {
-      const $addListEl = $('#js-add-list');
-      $addListEl.data('preventClose', true);
-      if (e.target.dataset.action === 'tab-assignees' && !this.hasAssigneesListMounted) {
-        this.assigneeList = AssigneeList();
-        this.hasAssigneesListMounted = true;
-      }
-
-      if (e.target.dataset.action === 'tab-milestones' && !this.hasMilestoneListMounted) {
-        this.milstoneList = MilestoneList();
-        this.hasMilestoneListMounted = true;
-      }
     },
   },
 };

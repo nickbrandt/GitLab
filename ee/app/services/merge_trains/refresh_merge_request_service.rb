@@ -99,7 +99,7 @@ module MergeTrains
 
     def drop(error)
       AutoMerge::MergeTrainService.new(project, merge_user)
-        .cancel(merge_request, reason: error.message, refresh_next: false)
+        .abort(merge_request, error.message)
 
       error(error.message)
     end

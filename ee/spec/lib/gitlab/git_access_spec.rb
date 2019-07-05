@@ -613,6 +613,61 @@ describe Gitlab::GitAccess do
     end
   end
 
+  describe '#check_smartcard_access!' do
+    before do
+      stub_licensed_features(smartcard_auth: true)
+      stub_smartcard_setting(enabled: true, required_for_git_access: true)
+
+      project.add_developer(user)
+    end
+
+    context 'user with a smartcard session', :clean_gitlab_redis_shared_state do
+      let(:session_id) { '42' }
+      let(:stored_session) do
+        { 'smartcard_signins' => { 'last_signin_at' => 5.minutes.ago } }
+      end
+
+      before do
+        Gitlab::Redis::SharedState.with do |redis|
+          redis.set("session:gitlab:#{session_id}", Marshal.dump(stored_session))
+          redis.sadd("session:lookup:user:gitlab:#{user.id}", [session_id])
+        end
+      end
+
+      it 'allows pull changes' do
+        expect { pull_changes }.not_to raise_error
+      end
+
+      it 'allows push changes' do
+        expect { push_changes }.not_to raise_error
+      end
+    end
+
+    context 'user without a smartcard session' do
+      it 'does not allow pull changes' do
+        expect { pull_changes }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+      end
+
+      it 'does not allow push changes' do
+        expect { push_changes }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+      end
+    end
+
+    context 'with the setting off' do
+      before do
+        stub_smartcard_setting(required_for_git_access: false)
+      end
+
+      it 'allows pull changes' do
+        expect { pull_changes }.not_to raise_error
+      end
+
+      it 'allows push changes' do
+        expect { push_changes }.not_to raise_error
+      end
+    end
+  end
+
   private
 
   def access

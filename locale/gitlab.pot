@@ -31,6 +31,12 @@ msgstr ""
 msgid " and"
 msgstr ""
 
+msgid " and "
+msgstr ""
+
+msgid " and %{sliced}"
+msgstr ""
+
 msgid " degraded on %d point"
 msgid_plural " degraded on %d points"
 msgstr[0] ""
@@ -149,6 +155,9 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
+msgid "%{canMergeCount}/%{assigneesCount} can merge"
+msgstr ""
+
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -225,6 +234,9 @@ msgid "%{level_name} visibility has been restricted by the administrator."
 msgstr ""
 
 msgid "%{link_start}Read more%{link_end} about role permissions"
+msgstr ""
+
+msgid "%{listToShow}, and %{awardsListLength} more."
 msgstr ""
 
 msgid "%{loadingIcon} Started"
@@ -319,6 +331,9 @@ msgstr ""
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
+msgid "%{userName}'s avatar"
+msgstr ""
+
 msgid "%{user_name} profile page"
 msgstr ""
 
@@ -355,6 +370,9 @@ msgid "+ %{count} more"
 msgstr ""
 
 msgid "+ %{moreCount} more"
+msgstr ""
+
+msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
 
 msgid "+%{extraOptionCount} more"
@@ -752,7 +770,13 @@ msgstr ""
 msgid "Add a Grafana button in the admin sidebar, monitoring section, to access a variety of statistics on the health and performance of GitLab."
 msgstr ""
 
+msgid "Add a To Do"
+msgstr ""
+
 msgid "Add a bullet list"
+msgstr ""
+
+msgid "Add a general comment to this %{noteableDisplayName}."
 msgstr ""
 
 msgid "Add a general comment to this %{noteable_name}."
@@ -843,9 +867,6 @@ msgid "Add to project"
 msgstr ""
 
 msgid "Add to review"
-msgstr ""
-
-msgid "Add todo"
 msgstr ""
 
 msgid "Add user(s) to the group:"
@@ -1085,9 +1106,6 @@ msgid "All merge conflicts were resolved. The merge request can now be merged."
 msgstr ""
 
 msgid "All projects"
-msgstr ""
-
-msgid "All todos were marked as done."
 msgstr ""
 
 msgid "All users"
@@ -1566,6 +1584,9 @@ msgstr ""
 msgid "Are you sure you want to cancel editing this comment?"
 msgstr ""
 
+msgid "Are you sure you want to delete this %{typeOfComment}?"
+msgstr ""
+
 msgid "Are you sure you want to delete this device? This action cannot be undone."
 msgstr ""
 
@@ -1702,7 +1723,9 @@ msgid "Assigned to me"
 msgstr ""
 
 msgid "Assignee"
-msgstr ""
+msgid_plural "%d Assignees"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Assignee lists not available with your current license"
 msgstr ""
@@ -2440,6 +2463,9 @@ msgid "Cannot create the abuse report. The user has been deleted."
 msgstr ""
 
 msgid "Cannot create the abuse report. This user has been blocked."
+msgstr ""
+
+msgid "Cannot merge"
 msgstr ""
 
 msgid "Cannot modify managed Kubernetes cluster"
@@ -4591,6 +4617,12 @@ msgstr ""
 msgid "Discuss a specific suggestion or question that needs to be resolved"
 msgstr ""
 
+msgid "Discuss a specific suggestion or question that needs to be resolved."
+msgstr ""
+
+msgid "Discuss a specific suggestion or question."
+msgstr ""
+
 msgid "Discussion"
 msgstr ""
 
@@ -5221,6 +5253,9 @@ msgstr ""
 msgid "Error fetching diverging counts for branches. Please try again."
 msgstr ""
 
+msgid "Error fetching forked projects. Please try again."
+msgstr ""
+
 msgid "Error fetching labels."
 msgstr ""
 
@@ -5278,6 +5313,9 @@ msgstr ""
 msgid "Error occurred when fetching sidebar data"
 msgstr ""
 
+msgid "Error occurred when saving assignees"
+msgstr ""
+
 msgid "Error occurred when toggling the notification subscription"
 msgstr ""
 
@@ -5305,10 +5343,10 @@ msgstr ""
 msgid "Error updating %{issuableType}"
 msgstr ""
 
-msgid "Error updating status for all todos."
+msgid "Error updating status for all to-do items."
 msgstr ""
 
-msgid "Error updating todo status."
+msgid "Error updating status of to-do item."
 msgstr ""
 
 msgid "Error uploading file"
@@ -5405,6 +5443,9 @@ msgid "Everyone With Access"
 msgstr ""
 
 msgid "Everyone can contribute"
+msgstr ""
+
+msgid "Everything on your to-do list is marked as done."
 msgstr ""
 
 msgid "Everything you need to create a GitLab Pages site using GitBook."
@@ -8282,6 +8323,9 @@ msgstr ""
 msgid "March"
 msgstr ""
 
+msgid "Mark as done"
+msgstr ""
+
 msgid "Mark as resolved"
 msgstr ""
 
@@ -8294,7 +8338,7 @@ msgstr ""
 msgid "Mark this issue as related to another issue"
 msgstr ""
 
-msgid "Mark todo as done"
+msgid "Mark to do as done"
 msgstr ""
 
 msgid "Markdown"
@@ -8312,7 +8356,7 @@ msgstr ""
 msgid "Marks this issue as related to %{issue_ref}."
 msgstr ""
 
-msgid "Marks todo as done."
+msgid "Marks to do as done."
 msgstr ""
 
 msgid "Match not found; try refining your search query."
@@ -9088,6 +9132,9 @@ msgstr ""
 msgid "No files found."
 msgstr ""
 
+msgid "No forks available to you."
+msgstr ""
+
 msgid "No issues for the selected time period."
 msgstr ""
 
@@ -9116,6 +9163,9 @@ msgid "No messages were logged"
 msgstr ""
 
 msgid "No milestones to show"
+msgstr ""
+
+msgid "No one can merge"
 msgstr ""
 
 msgid "No other labels with such name or description"
@@ -9200,6 +9250,9 @@ msgid "Not ready yet. Try again later."
 msgstr ""
 
 msgid "Not started"
+msgstr ""
+
+msgid "Note"
 msgstr ""
 
 msgid "Note that this invitation was sent to %{mail_to_invite_email}, but you are signed in as %{link_to_current_user} with email %{mail_to_current_user}."
@@ -9934,6 +9987,9 @@ msgid "Play all manual"
 msgstr ""
 
 msgid "Please %{link_to_register} or %{link_to_sign_in} to comment"
+msgstr ""
+
+msgid "Please %{startTagRegister}register%{endRegisterTag} or %{startTagSignIn}sign in%{endSignInTag} to reply"
 msgstr ""
 
 msgid "Please accept the Terms of Service before continuing."
@@ -11330,6 +11386,9 @@ msgstr ""
 msgid "Remove milestone"
 msgstr ""
 
+msgid "Remove parent epic from an epic"
+msgstr ""
+
 msgid "Remove priority"
 msgstr ""
 
@@ -11361,6 +11420,9 @@ msgid "Removes %{milestone_reference} milestone."
 msgstr ""
 
 msgid "Removes all labels."
+msgstr ""
+
+msgid "Removes parent epic %{epic_ref}."
 msgstr ""
 
 msgid "Removes spent time."
@@ -12107,9 +12169,16 @@ msgstr ""
 msgid "Select members to invite"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Select milestone"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "Select private project"
+msgstr ""
+
+>>>>>>> ea18cbc1c4f0c73c83c7b1e2031257f3c8daa1ed
 msgid "Select project"
 msgstr ""
 
@@ -12293,6 +12362,9 @@ msgstr ""
 msgid "Set notification email for abuse reports."
 msgstr ""
 
+msgid "Set parent epic to an epic"
+msgstr ""
+
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
 msgstr ""
 
@@ -12360,6 +12432,9 @@ msgid "SetStatusModal|Sorry, we weren't able to set your status. Please try agai
 msgstr ""
 
 msgid "SetStatusModal|What's your status?"
+msgstr ""
+
+msgid "Sets %{epic_ref} as parent epic."
 msgstr ""
 
 msgid "Sets the due date to %{due_date}."
@@ -12616,6 +12691,9 @@ msgstr ""
 msgid "Something went wrong while adding your award. Please try again."
 msgstr ""
 
+msgid "Something went wrong while adding your comment. Please try again."
+msgstr ""
+
 msgid "Something went wrong while applying the suggestion. Please try again."
 msgstr ""
 
@@ -12623,6 +12701,12 @@ msgid "Something went wrong while closing the %{issuable}. Please try again late
 msgstr ""
 
 msgid "Something went wrong while deleting the source branch. Please try again."
+msgstr ""
+
+msgid "Something went wrong while deleting your note. Please try again."
+msgstr ""
+
+msgid "Something went wrong while editing your comment. Please try again."
 msgstr ""
 
 msgid "Something went wrong while fetching %{listType} list"
@@ -13776,13 +13860,13 @@ msgstr ""
 msgid "There was an error %{message} todo."
 msgstr ""
 
-msgid "There was an error adding a todo."
+msgid "There was an error adding a To Do."
 msgstr ""
 
 msgid "There was an error creating the issue"
 msgstr ""
 
-msgid "There was an error deleting the todo."
+msgid "There was an error deleting the To Do."
 msgstr ""
 
 msgid "There was an error fetching configuration for charts"
@@ -13870,6 +13954,9 @@ msgid "This branch has changed since you started editing. Would you like to crea
 msgstr ""
 
 msgid "This chart could not be displayed"
+msgstr ""
+
+msgid "This comment has changed since you started editing, please review the %{startTag}updated comment%{endTag} to ensure information is not lost."
 msgstr ""
 
 msgid "This commit is part of merge request %{link_to_merge_request}. Comments created here will be created in the context of that merge request."
@@ -14022,6 +14109,9 @@ msgstr ""
 msgid "This job will automatically run after its timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
 msgstr ""
 
+msgid "This may expose confidential information as the selected fork is in another namespace that can have other members."
+msgstr ""
+
 msgid "This means you can not push code until you create an empty repository or import existing one."
 msgstr ""
 
@@ -14145,10 +14235,19 @@ msgstr ""
 msgid "TimeTrackingEstimated|Est"
 msgstr ""
 
+msgid "TimeTracking|%{startTag}Spent: %{endTag}%{timeSpentHumanReadable}"
+msgstr ""
+
 msgid "TimeTracking|Estimated:"
 msgstr ""
 
+msgid "TimeTracking|Over by %{timeRemainingHumanReadable}"
+msgstr ""
+
 msgid "TimeTracking|Spent"
+msgstr ""
+
+msgid "TimeTracking|Time remaining: %{timeRemainingHumanReadable}"
 msgstr ""
 
 msgid "Timeago|%s days ago"
@@ -14380,6 +14479,12 @@ msgstr ""
 msgid "To preserve performance only <strong>%{display_size} of %{real_size}</strong> files are displayed."
 msgstr ""
 
+msgid "To protect this issues confidentiality, %{link_start}fork the project%{link_end} and set the forks visiblity to private."
+msgstr ""
+
+msgid "To protect this issues confidentiality, a private fork of this project was selected."
+msgstr ""
+
 msgid "To receive alerts from manually configured Prometheus services, add the following URL and Authorization key to your Prometheus webhook config file. Learn more about %{linkStart}configuring Prometheus%{linkEnd} to send alerts to GitLab."
 msgstr ""
 
@@ -14413,16 +14518,13 @@ msgstr ""
 msgid "To widen your search, change or remove filters."
 msgstr ""
 
+msgid "To-Do List"
+msgstr ""
+
+msgid "To-do item successfully marked as done."
+msgstr ""
+
 msgid "Today"
-msgstr ""
-
-msgid "Todo"
-msgstr ""
-
-msgid "Todo was successfully marked as done."
-msgstr ""
-
-msgid "Todos"
 msgstr ""
 
 msgid "Toggle Sidebar"
@@ -14600,6 +14702,12 @@ msgid "Trying to communicate with your device. Plug it in (if you haven't alread
 msgstr ""
 
 msgid "Tuesday"
+msgstr ""
+
+msgid "Turn Off"
+msgstr ""
+
+msgid "Turn On"
 msgstr ""
 
 msgid "Turn on Service Desk"
@@ -16128,7 +16236,7 @@ msgstr ""
 msgid "Your SSH keys (%{count})"
 msgstr ""
 
-msgid "Your Todos"
+msgid "Your To-Do List"
 msgstr ""
 
 msgid "Your U2F device did not send a valid JSON response."
@@ -16231,6 +16339,9 @@ msgid "already shared with this group"
 msgstr ""
 
 msgid "among other things"
+msgstr ""
+
+msgid "assign yourself"
 msgstr ""
 
 msgid "attach a new file"
@@ -16540,6 +16651,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "ciReport|View full report"
+msgstr ""
+
+msgid "comment"
 msgstr ""
 
 msgid "commented on %{link_to_project}"
@@ -17074,6 +17188,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "password"
+msgstr ""
+
+msgid "pending comment"
 msgstr ""
 
 msgid "point"

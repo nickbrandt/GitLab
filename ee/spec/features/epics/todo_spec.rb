@@ -14,9 +14,9 @@ describe 'Manually create a todo item from epic', :js do
 
   it 'creates todo when clicking button' do
     page.within '.issuable-sidebar' do
-      click_button 'Add todo'
+      click_button 'Add a To Do'
 
-      expect(page).to have_content 'Mark todo as done'
+      expect(page).to have_content 'Mark as done'
     end
 
     page.within '.header-content .todos-count' do
@@ -26,7 +26,7 @@ describe 'Manually create a todo item from epic', :js do
 
   it 'marks a todo as done' do
     page.within '.issuable-sidebar' do
-      click_button 'Add todo'
+      click_button 'Add a To Do'
     end
 
     expect(page).to have_selector('.todos-count', visible: true)
@@ -35,7 +35,7 @@ describe 'Manually create a todo item from epic', :js do
     end
 
     page.within '.issuable-sidebar' do
-      click_button 'Mark todo as done'
+      click_button 'Mark as done'
     end
 
     expect(page).to have_selector('.todos-count', visible: false)

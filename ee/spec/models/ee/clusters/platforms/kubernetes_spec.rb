@@ -4,34 +4,111 @@ describe Clusters::Platforms::Kubernetes do
   include KubernetesHelpers
 
   describe '#rollout_status' do
+    let(:deployments) { [] }
+    let(:pods) { [] }
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
-    let(:environment) { create(:environment) }
+    let!(:cluster) { create(:cluster, :project, enabled: true, platform_kubernetes: service) }
+    let(:project) { cluster.project }
+    let(:environment) { build(:environment, project: project, name: "env", slug: "env-000000") }
     let(:cache_data) { Hash(deployments: deployments, pods: pods) }
-    let(:pods) { [kube_pod] }
-    let(:deployments) { [kube_deployment] }
-    let(:legacy_deployments) { [kube_deployment] }
 
-    subject { service.rollout_status(environment, cache_data) }
+    subject(:rollout_status) { service.rollout_status(environment, cache_data) }
 
-    before do
-      allow(service).to receive(:filter_by_project_environment).with(pods, any_args).and_return(pods)
-      allow(service).to receive(:filter_by_project_environment).with(deployments, any_args).and_return(deployments)
-      allow(service).to receive(:filter_by_legacy_label).with(deployments, any_args).and_return(legacy_deployments)
+    context 'legacy deployments based on app label' do
+      let(:legacy_deployment) do
+        kube_deployment(name: 'legacy-deployment').tap do |deployment|
+          deployment['metadata']['annotations'].delete('app.gitlab.com/env')
+          deployment['metadata']['annotations'].delete('app.gitlab.com/app')
+          deployment['metadata']['labels']['app'] = environment.slug
+        end
+      end
+
+      let(:legacy_pod) do
+        kube_pod(name: 'legacy-pod').tap do |pod|
+          pod['metadata']['annotations'].delete('app.gitlab.com/env')
+          pod['metadata']['annotations'].delete('app.gitlab.com/app')
+          pod['metadata']['labels']['app'] = environment.slug
+        end
+      end
+
+      context 'only legacy deployments' do
+        let(:deployments) { [legacy_deployment] }
+        let(:pods) { [legacy_pod] }
+
+        it 'contains nothing' do
+          expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+
+          expect(rollout_status.deployments).to eq([])
+        end
+
+        it 'has the has_legacy_app_label flag' do
+          expect(rollout_status).to be_has_legacy_app_label
+        end
+      end
+
+      context 'new deployment based on annotations' do
+        let(:matched_deployment) { kube_deployment(name: 'matched-deployment', environment_slug: environment.slug, project_slug: project.full_path_slug) }
+        let(:matched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+        let(:deployments) { [matched_deployment, legacy_deployment] }
+        let(:pods) { [matched_pod, legacy_pod] }
+
+        it 'contains only matching deployments' do
+          expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+
+          expect(rollout_status.deployments.map(&:name)).to contain_exactly('matched-deployment')
+        end
+
+        it 'does have the has_legacy_app_label flag' do
+          expect(rollout_status).to be_has_legacy_app_label
+        end
+      end
+
+      context 'deployment with app label not matching the environment' do
+        let(:other_deployment) do
+          kube_deployment(name: 'other-deployment').tap do |deployment|
+            deployment['metadata']['annotations'].delete('app.gitlab.com/env')
+            deployment['metadata']['annotations'].delete('app.gitlab.com/app')
+            deployment['metadata']['labels']['app'] = 'helm-app-label'
+          end
+        end
+
+        let(:other_pod) do
+          kube_pod(name: 'other-pod').tap do |pod|
+            pod['metadata']['annotations'].delete('app.gitlab.com/env')
+            pod['metadata']['annotations'].delete('app.gitlab.com/app')
+            pod['metadata']['labels']['app'] = environment.slug
+          end
+        end
+
+        let(:deployments) { [other_deployment] }
+        let(:pods) { [other_pod] }
+
+        it 'does not have the has_legacy_app_label flag' do
+          expect(rollout_status).not_to be_has_legacy_app_label
+        end
+      end
     end
 
-    it 'requests the rollout status' do
-      expect(::Gitlab::Kubernetes::RolloutStatus).to receive(:from_deployments).with(*deployments, pods: pods, legacy_deployments: legacy_deployments)
+    context 'with valid deployments' do
+      let(:matched_deployment) { kube_deployment(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+      let(:unmatched_deployment) { kube_deployment }
+      let(:matched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug) }
+      let(:unmatched_pod) { kube_pod(environment_slug: environment.slug, project_slug: project.full_path_slug, status: 'Pending') }
+      let(:deployments) { [matched_deployment, unmatched_deployment] }
+      let(:pods) { [matched_pod, unmatched_pod] }
 
-      subject
+      it 'creates a matching RolloutStatus' do
+        expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+        expect(rollout_status.deployments.map(&:annotations)).to eq([
+          { 'app.gitlab.com/app' => project.full_path_slug, 'app.gitlab.com/env' => 'env-000000' }
+        ])
+      end
     end
 
-    context 'no pod data provided' do
-      let(:pods) { [] }
-
-      it 'requests the rollout status without pod information' do
-        expect(::Gitlab::Kubernetes::RolloutStatus).to receive(:from_deployments).with(*deployments, pods: nil, legacy_deployments: legacy_deployments)
-
-        subject
+    context 'with empty list of deployments' do
+      it 'creates a matching RolloutStatus' do
+        expect(rollout_status).to be_kind_of(::Gitlab::Kubernetes::RolloutStatus)
+        expect(rollout_status).to be_not_found
       end
     end
   end

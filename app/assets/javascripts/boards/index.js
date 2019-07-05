@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
 
+import mountMultipleBoardsSwitcher from 'ee_else_ce/boards/mount_multiple_boards_switcher';
 import Flash from '~/flash';
 import { s__, __ } from '~/locale';
 import './models/label';
@@ -17,7 +18,7 @@ import modalMixin from './mixins/modal_mixins';
 import './filters/due_date_filters';
 import Board from 'ee/boards/components/board';
 import BoardSidebar from 'ee/boards/components/board_sidebar';
-import initNewListDropdown from './components/new_list_dropdown';
+import initNewListDropdown from 'ee_else_ce/boards/components/new_list_dropdown';
 import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
 import {
@@ -30,7 +31,6 @@ import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
 import 'ee/boards/models/project';
 import BoardService from 'ee/boards/services/board_service';
-import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -85,13 +85,14 @@ export default () => {
       },
     },
     created() {
-      gl.boardService = new BoardService({
+      boardsStore.setEndpoints({
         boardsEndpoint: this.boardsEndpoint,
         recentBoardsEndpoint: this.recentBoardsEndpoint,
         listsEndpoint: this.listsEndpoint,
         bulkUpdatePath: this.bulkUpdatePath,
         boardId: this.boardId,
       });
+      gl.boardService = new BoardService();
       boardsStore.rootPath = this.boardsEndpoint;
 
       eventHub.$on('updateTokens', this.updateTokens);
@@ -381,34 +382,5 @@ export default () => {
     `,
   });
 
-  const boardsSwitcherElement = document.getElementById('js-multiple-boards-switcher');
-  // eslint-disable-next-line no-new
-  new Vue({
-    el: boardsSwitcherElement,
-    components: {
-      BoardsSelector,
-    },
-    data() {
-      const { dataset } = boardsSwitcherElement;
-
-      const boardsSelectorProps = {
-        ...dataset,
-        currentBoard: JSON.parse(dataset.currentBoard),
-        hasMissingBoards: parseBoolean(dataset.hasMissingBoards),
-        canAdminBoard: parseBoolean(dataset.canAdminBoard),
-        multipleIssueBoardsAvailable: parseBoolean(dataset.multipleIssueBoardsAvailable),
-        projectId: Number(dataset.projectId),
-        groupId: Number(dataset.groupId),
-        scopedIssueBoardFeatureEnabled: parseBoolean(dataset.scopedIssueBoardFeatureEnabled),
-        weights: JSON.parse(dataset.weights),
-      };
-
-      return { boardsSelectorProps };
-    },
-    render(createElement) {
-      return createElement(BoardsSelector, {
-        props: this.boardsSelectorProps,
-      });
-    },
-  });
+  mountMultipleBoardsSwitcher();
 };

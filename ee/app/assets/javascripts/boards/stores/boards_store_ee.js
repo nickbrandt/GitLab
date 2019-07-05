@@ -2,7 +2,6 @@
 import _ from 'underscore';
 import Cookies from 'js-cookie';
 import { __, sprintf } from '~/locale';
-import BoardService from 'ee/boards/services/board_service';
 import sidebarEventHub from '~/sidebar/event_hub';
 import createFlash from '~/flash';
 import { parseBoolean } from '~/lib/utils/common_utils';
@@ -66,6 +65,48 @@ class BoardsStoreEE {
     };
 
     sidebarEventHub.$on('updateWeight', this.updateWeight.bind(this));
+
+    Object.assign(this.store, {
+      allBoards() {
+        return axios.get(this.generateBoardsPath());
+      },
+
+      recentBoards() {
+        return axios.get(this.state.endpoints.recentBoardsEndpoint);
+      },
+
+      createBoard(board) {
+        const boardPayload = { ...board };
+        boardPayload.label_ids = (board.labels || []).map(b => b.id);
+
+        if (boardPayload.label_ids.length === 0) {
+          boardPayload.label_ids = [''];
+        }
+
+        if (boardPayload.assignee) {
+          boardPayload.assignee_id = boardPayload.assignee.id;
+        }
+
+        if (boardPayload.milestone) {
+          boardPayload.milestone_id = boardPayload.milestone.id;
+        }
+
+        if (boardPayload.id) {
+          return axios.put(this.generateBoardsPath(boardPayload.id), { board: boardPayload });
+        }
+        return axios.post(this.generateBoardsPath(), { board: boardPayload });
+      },
+
+      deleteBoard({ id }) {
+        return axios.delete(this.generateBoardsPath(id));
+      },
+
+      updateWeight(endpoint, weight = null) {
+        return axios.put(endpoint, {
+          weight,
+        });
+      },
+    });
   }
 
   initBoardFilters() {
@@ -170,7 +211,8 @@ class BoardsStoreEE {
     const { issue } = this.store.detail;
     if (issue.id === id && issue.sidebarInfoEndpoint) {
       issue.setLoadingState('weight', true);
-      BoardService.updateWeight(issue.sidebarInfoEndpoint, newWeight)
+      this.store
+        .updateWeight(issue.sidebarInfoEndpoint, newWeight)
         .then(res => res.data)
         .then(data => {
           const lists = issue.getLists();

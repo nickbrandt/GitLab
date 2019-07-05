@@ -349,7 +349,7 @@ describe SystemNoteService do
   end
 
   describe '.cancel_merge_train' do
-    subject { described_class.cancel_merge_train(noteable, project, author, reason: reason) }
+    subject { described_class.cancel_merge_train(noteable, project, author) }
 
     let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
     let(:reason) { }
@@ -361,13 +361,20 @@ describe SystemNoteService do
     it "posts the 'merge train' system note" do
       expect(subject.note).to eq('removed this merge request from the merge train')
     end
+  end
 
-    context 'when reason is specified' do
-      let(:reason) { 'merge request is not mergeable' }
+  describe '.abort_merge_train' do
+    subject { described_class.abort_merge_train(noteable, project, author, 'source branch was updated') }
 
-      it "posts the 'merge train' system note" do
-        expect(subject.note).to eq('removed this merge request from the merge train because merge request is not mergeable')
-      end
+    let(:noteable) { create(:merge_request, :on_train, source_project: project, target_project: project) }
+    let(:reason) { }
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'merge' }
+    end
+
+    it "posts the 'merge train' system note" do
+      expect(subject.note).to eq('removed this merge request from the merge train because source branch was updated')
     end
   end
 
@@ -402,6 +409,22 @@ describe SystemNoteService do
 
     it "posts the 'add to merge train when pipeline succeeds' system note" do
       expect(subject.note).to eq 'cancelled automatic add to merge train'
+    end
+  end
+
+  describe '.abort_add_to_merge_train_when_pipeline_succeeds' do
+    subject { described_class.abort_add_to_merge_train_when_pipeline_succeeds(noteable, project, author, 'target branch was changed') }
+
+    let(:noteable) do
+      create(:merge_request, source_project: project, target_project: project)
+    end
+
+    it_behaves_like 'a system note' do
+      let(:action) { 'merge' }
+    end
+
+    it "posts the 'add to merge train when pipeline succeeds' system note" do
+      expect(subject.note).to eq 'aborted automatic add to merge train because target branch was changed'
     end
   end
 end

@@ -519,7 +519,7 @@ describe QuickActions::InterpretService do
             end
           end
 
-          context 'when child and paretn epics are in different groups' do
+          context 'when child and parent epics are in different groups' do
             let(:child_epic) { create(:epic, group: group, parent: epic) }
             context 'when child epic is in a parent group of the parent epic' do
               before do
@@ -591,7 +591,7 @@ describe QuickActions::InterpretService do
         end
 
         context 'when a user does not have permissions to label an epic' do
-          it 'does not populate any lables' do
+          it 'does not populate any labels' do
             _, updates = service.execute(content, epic)
 
             expect(updates).to be_empty
@@ -600,7 +600,7 @@ describe QuickActions::InterpretService do
       end
 
       context 'when epics are disabled' do
-        it 'does not populate any lables' do
+        it 'does not populate any labels' do
           group.add_developer(current_user)
 
           _, updates = service.execute(content, epic)
@@ -913,20 +913,46 @@ describe QuickActions::InterpretService do
 
     context 'epic commands' do
       let(:epic) { create(:epic, group: group) }
-      let(:child_epic) { create(:epic, group: group) }
+      let(:epic2) { create(:epic, group: group) }
 
       before do
         stub_licensed_features(epics: true)
         group.add_developer(current_user)
       end
 
-      context 'child_epic command', :nested_groups do
+      shared_examples 'adds epic relation' do |relation|
         context 'when correct epic reference' do
-          let(:content) { "/child_epic #{child_epic&.to_reference(epic)}" }
+          let(:content) { "/#{relation}_epic #{epic2&.to_reference(epic)}" }
+          let(:action) { relation == :child ? 'Adds' : 'Sets'}
 
           it 'returns message with epic reference' do
             _, explanations = service.explain(content, epic)
-            expect(explanations).to eq(["Adds #{child_epic.group.name}&#{child_epic.iid} as child epic."])
+            expect(explanations)
+              .to eq(["#{action} #{epic2.group.name}&#{epic2.iid} as #{relation} epic."])
+          end
+        end
+
+        context 'when epic reference is wrong' do |relation|
+          let(:content) { "/#{relation}_epic qwe" }
+
+          it 'returns empty explain message' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq([])
+          end
+        end
+      end
+
+      context 'child_epic command' do
+        it_behaves_like 'adds epic relation', :child
+      end
+
+      context 'remove_child_epic command' do
+        context 'when correct epic reference' do
+          let(:content) { "/remove_child_epic #{epic2&.to_reference(epic)}" }
+
+          it 'returns message with epic reference' do
+            _, explanations = service.explain(content, epic)
+            expect(explanations).to eq(["Removes #{epic2.group.name}&#{epic2.iid} from child epics."])
           end
         end
 
@@ -940,21 +966,29 @@ describe QuickActions::InterpretService do
         end
       end
 
-      context 'remove_child_epic command', :nested_groups do
-        context 'when correct epic reference' do
-          let(:content) { "/remove_child_epic #{child_epic&.to_reference(epic)}" }
+      context 'parent_epic command' do
+        it_behaves_like 'adds epic relation', :parent
+      end
+
+      context 'remove_parent_epic command' do
+        context 'when parent is present' do
+          before do
+            epic.parent = epic2
+          end
 
           it 'returns message with epic reference' do
-            _, explanations = service.explain(content, epic)
-            expect(explanations).to eq(["Removes #{child_epic.group.name}&#{child_epic.iid} from child epics."])
+            _, explanations = service.explain("/remove_parent_epic", epic)
+            expect(explanations).to eq(["Removes parent epic #{epic2.group.name}&#{epic2.iid}."])
           end
         end
 
-        context 'when epic reference is wrong' do
-          let(:content) { "/child_epic qwe" }
+        context 'when parent is not present' do
+          before do
+            epic.parent = nil
+          end
 
           it 'returns empty explain message' do
-            _, explanations = service.explain(content, epic)
+            _, explanations = service.explain("/remove_parent_epic", epic)
             expect(explanations).to eq([])
           end
         end

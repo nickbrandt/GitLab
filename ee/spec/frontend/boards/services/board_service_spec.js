@@ -5,6 +5,7 @@ import { TEST_HOST } from 'helpers/test_constants';
 import AxiosMockAdapter from 'axios-mock-adapter';
 
 import axios from '~/lib/utils/axios_utils';
+import boardsStore from '~/boards/stores/boards_store';
 
 describe('BoardService', () => {
   const dummyResponse = 'just another response in the network';
@@ -24,10 +25,12 @@ describe('BoardService', () => {
   beforeEach(() => {
     axiosMock = new AxiosMockAdapter(axios);
 
-    service = new BoardServiceEE({
+    boardsStore.setEndpoints({
       ...endpoints,
       boardId,
     });
+
+    service = new BoardServiceEE();
   });
 
   describe('allBoards', () => {

@@ -60,8 +60,8 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
           allow(AutoMerge::MergeTrainService).to receive(:new) { train_service }
         end
 
-        it 'cancels auto merge' do
-          expect(service).to receive(:cancel).once
+        it 'aborts auto merge' do
+          expect(service).to receive(:abort).once
 
           subject
         end
@@ -86,6 +86,22 @@ describe AutoMerge::AddToMergeTrainWhenPipelineSucceedsService do
       expect(SystemNoteService)
         .to receive(:cancel_add_to_merge_train_when_pipeline_succeeds)
         .with(merge_request, project, user)
+
+      subject
+
+      expect(merge_request).not_to be_auto_merge_enabled
+    end
+  end
+
+  describe '#abort' do
+    subject { service.abort(merge_request, 'an error') }
+
+    let(:merge_request) { create(:merge_request, :add_to_merge_train_when_pipeline_succeeds, merge_user: user) }
+
+    it 'aborts auto merge' do
+      expect(SystemNoteService)
+        .to receive(:abort_add_to_merge_train_when_pipeline_succeeds)
+        .with(merge_request, project, user, 'an error')
 
       subject
 

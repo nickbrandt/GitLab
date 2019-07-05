@@ -192,4 +192,4 @@ module Clusters
   end
 end
 
-Clusters::Platforms::Kubernetes.prepend(EE::KubernetesService)
+Clusters::Platforms::Kubernetes.prepend(EE::Clusters::Platforms::Kubernetes)
