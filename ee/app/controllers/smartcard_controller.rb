@@ -28,6 +28,7 @@ class SmartcardController < ApplicationController
       return
     end
 
+    store_active_session
     log_audit_event(user, with: certificate.auth_method)
     sign_in_and_redirect(user)
   end
@@ -41,6 +42,10 @@ class SmartcardController < ApplicationController
     unless certificate_header.present?
       access_denied!(_('Smartcard authentication failed: client certificate header is missing.'), 401)
     end
+  end
+
+  def store_active_session
+    Gitlab::Auth::Smartcard::SessionEnforcer.new.update_session
   end
 
   def log_audit_event(user, options = {})

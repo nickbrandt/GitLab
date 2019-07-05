@@ -11,6 +11,7 @@ module EE
       override :check
       def check(cmd, changes)
         check_geo_license!
+        check_smartcard_access!
 
         super
       end
@@ -62,6 +63,18 @@ module EE
         if ::Gitlab::Geo.secondary? && !::Gitlab::Geo.license_allows?
           raise ::Gitlab::GitAccess::UnauthorizedError, 'Your current license does not have GitLab Geo add-on enabled.'
         end
+      end
+
+      def check_smartcard_access!
+        unless can_access_without_new_smartcard_login?
+          raise ::Gitlab::GitAccess::UnauthorizedError, 'Project requires smartcard login. Please login to GitLab using a smartcard.'
+        end
+      end
+
+      def can_access_without_new_smartcard_login?
+        return true unless user
+
+        !::Gitlab::Auth::Smartcard::SessionEnforcer.new.access_restricted?(user)
       end
 
       def geo?
