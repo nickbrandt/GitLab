@@ -157,15 +157,17 @@ describe API::Namespaces do
       end
     end
 
-    context 'when namespace has a value for last_ci_minutes_notification_at' do
-      before do
-        group1.update_attribute(:last_ci_minutes_notification_at, Time.now)
-      end
+    [:last_ci_minutes_notification_at, :last_ci_minutes_usage_notification_level].each do |attr|
+      context "when namespace has a value for #{attr}" do
+        before do
+          group1.update_attribute(attr, Time.now)
+        end
 
-      it 'resets that value when assigning extra CI minutes' do
-        expect do
-          put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
-        end.to change { group1.reload.last_ci_minutes_notification_at }.to(nil)
+        it 'resets that value when assigning extra CI minutes' do
+          expect do
+            put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
+          end.to change { group1.reload.send(attr) }.to(nil)
+        end
       end
     end
   end

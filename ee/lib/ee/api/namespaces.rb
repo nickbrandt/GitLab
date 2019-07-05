@@ -25,6 +25,7 @@ module EE
             # Reset last_ci_minutes_notification_at if customer purchased extra CI minutes.
             if params[:extra_shared_runners_minutes_limit].present?
               update_attrs[:last_ci_minutes_notification_at] = nil
+              update_attrs[:last_ci_minutes_usage_notification_level] = nil
             end
 
             namespace.update(update_attrs)

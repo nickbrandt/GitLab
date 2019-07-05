@@ -27,6 +27,24 @@ describe 'CI shared runner limits' do
     end
 
     context 'when limit is defined' do
+      before do
+        stub_const("EE::Namespace::CI_USAGE_ALERT_LEVELS", [30, 5])
+      end
+
+      context 'when usage has reached a notification level' do
+        let(:group) { create(:group, :with_build_minutes_limit, last_ci_minutes_usage_notification_level: 30) }
+
+        it 'displays a warning message on pipelines page' do
+          visit_project_pipelines
+          expect_quota_exceeded_alert("#{group.name} has less than 30% of CI minutes available.")
+        end
+
+        it 'displays a warning message on project homepage' do
+          visit_project_home
+          expect_quota_exceeded_alert("#{group.name} has less than 30% of CI minutes available.")
+        end
+      end
+
       context 'when limit is exceeded' do
         let(:group) { create(:group, :with_used_build_minutes_limit) }
 
