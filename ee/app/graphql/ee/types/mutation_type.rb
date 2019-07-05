@@ -6,7 +6,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
-        mount_mutation ::Mutations::DesignManagement::Upload
+        mount_mutation ::Mutations::DesignManagement::Upload, calls_gitaly: true
       end
     end
   end
