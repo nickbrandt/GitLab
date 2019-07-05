@@ -12169,16 +12169,12 @@ msgstr ""
 msgid "Select members to invite"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Select milestone"
 msgstr ""
 
-||||||| merged common ancestors
-=======
 msgid "Select private project"
 msgstr ""
 
->>>>>>> ea18cbc1c4f0c73c83c7b1e2031257f3c8daa1ed
 msgid "Select project"
 msgstr ""
 
