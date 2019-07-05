@@ -5,11 +5,11 @@ import { FILTERED_SEARCH } from '~/pages/constants';
 import IssuableFilteredSearchTokenKeys from 'ee_else_ce/filtered_search/issuable_filtered_search_token_keys';
 import initManualOrdering from '~/manual_ordering';
 
+const ISSUE_BULK_UPDATE_PREFIX = 'issue_';
+
 document.addEventListener('DOMContentLoaded', () => {
   IssuableFilteredSearchTokenKeys.addExtraTokensForIssues();
-
-  // FIXME: Hardcoded prefix
-  issuableInitBulkUpdateSidebar.init('issue_');
+  issuableInitBulkUpdateSidebar.init(ISSUE_BULK_UPDATE_PREFIX);
 
   initFilteredSearch({
     page: FILTERED_SEARCH.ISSUES,
