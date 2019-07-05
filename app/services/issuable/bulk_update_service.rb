@@ -1,10 +1,13 @@
-# Language: Ruby, Level: Level 3
 # frozen_string_literal: true
 
 module Issuable
-  class BulkUpdateService < IssuableBaseService
-    def initialize(parent, user = nil, params = {})
-      super
+  class BulkUpdateService
+    include Gitlab::Allowable
+
+    attr_accessor :current_user, :params
+
+    def initialize(user = nil, params = {})
+      @current_user, @params = user, params.dup
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

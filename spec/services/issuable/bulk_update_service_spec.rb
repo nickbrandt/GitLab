@@ -11,7 +11,7 @@ describe Issuable::BulkUpdateService do
       .reverse_merge(issuable_ids: Array(issuables).map(&:id).join(','))
 
     type = Array(issuables).first.model_name.param_key
-    Issuable::BulkUpdateService.new(parent, user, bulk_update_params).execute(type)
+    Issuable::BulkUpdateService.new(user, bulk_update_params).execute(type)
   end
 
   shared_examples 'updates milestones' do
@@ -32,8 +32,6 @@ describe Issuable::BulkUpdateService do
   end
 
   context 'when parent is a project' do
-    let(:parent) { project }
-
     describe 'close issues' do
       let(:issues) { create_list(:issue, 2, project: project) }
 
@@ -363,8 +361,7 @@ describe Issuable::BulkUpdateService do
   end
 
   context 'when parent is a group' do
-    let(:group)     { create(:group) }
-    let(:parent)    { group }
+    let(:group) { create(:group) }
 
     context 'updating milestone' do
       let(:milestone) { create(:milestone, group: group) }
