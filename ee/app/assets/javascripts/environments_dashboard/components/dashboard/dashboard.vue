@@ -94,6 +94,7 @@ export default {
       'clearSearchResults',
       'toggleSelectedProject',
       'setSearchQuery',
+      'removeProject',
     ]),
     addProjects() {
       this.addProjectsToDashboard();
@@ -153,7 +154,7 @@ export default {
     <div class="prepend-top-default">
       <div v-if="projects.length" class="dashboard-cards">
         <div v-for="project in projects" :key="project.id" class="column prepend-top-default">
-          <project-header :project="project" />
+          <project-header :project="project" @remove="removeProject" />
           <div class="row">
             <environment
               v-for="environment in project.environments"
