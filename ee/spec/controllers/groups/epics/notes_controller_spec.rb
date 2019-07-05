@@ -73,6 +73,30 @@ describe Groups::Epics::NotesController do
       expect(response).to have_gitlab_http_status(200)
       expect(parsed_response[:id]).not_to be_nil
     end
+
+    context "when epic was promoted from issue" do
+      let(:project) { create(:project, group: group) }
+      let(:issue) { create(:issue, project: project) }
+      let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
+
+      let(:epic) { Epics::IssuePromoteService.new(project, user).execute(issue) }
+      let(:request_params) do
+        {
+          note: { note: 'reply note', noteable_id: epic.id, noteable_type: 'Epic' },
+          group_id: epic.group,
+          epic_id: epic.iid,
+          in_reply_to_discussion_id: epic.discussions.first.id,
+          format: 'json'
+        }
+      end
+
+      it "creates reply note for discussion" do
+        post :create, params: request_params
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(parsed_response[:errors]).to be_nil
+      end
+    end
   end
 
   describe 'PUT update' do
