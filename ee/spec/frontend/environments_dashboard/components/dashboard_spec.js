@@ -26,6 +26,7 @@ describe('dashboard', () => {
       clearSearchResults: jest.fn(),
       setSearchQuery: jest.fn(),
       fetchSearchResults: jest.fn(),
+      removeProject: jest.fn(),
       toggleSelectedProject: jest.fn(),
     };
     propsData = {
@@ -88,6 +89,12 @@ describe('dashboard', () => {
       it('should have one project header per project', () => {
         const headers = wrapper.findAll(ProjectHeader);
         expect(headers.length).toBe(2);
+      });
+
+      it('should remove a project if it emits `remove`', () => {
+        const header = wrapper.find(ProjectHeader);
+        header.vm.$emit('remove');
+        expect(actionSpies.removeProject).toHaveBeenCalled();
       });
     });
 

@@ -90,6 +90,22 @@ describe ClearSharedRunnersMinutesWorker do
           end
         end
       end
+
+      [:last_ci_minutes_notification_at, :last_ci_minutes_usage_notification_level].each do |attr|
+        context "when #{attr} is present" do
+          before do
+            namespace.update_attribute(attr, Time.now)
+          end
+
+          it 'nullifies the field' do
+            expect(namespace.send(attr)).to be_present
+
+            subject
+
+            expect(namespace.reload.send(attr)).not_to be_present
+          end
+        end
+      end
     end
   end
 end

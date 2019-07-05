@@ -150,7 +150,7 @@ module EE
     def force_import_job!
       return if mirror_update_due? || updating_mirror?
 
-      set_next_execution_to_now
+      set_next_execution_to_now(prioritized: true)
       reset_retry_count if hard_failed?
 
       save!
@@ -158,10 +158,10 @@ module EE
       UpdateAllMirrorsWorker.perform_async
     end
 
-    def set_next_execution_to_now
+    def set_next_execution_to_now(prioritized: false)
       return unless mirror?
 
-      self.next_execution_timestamp = Time.now
+      self.next_execution_timestamp = prioritized ? 5.minutes.ago : Time.now
     end
 
     def retry_limit_exceeded?

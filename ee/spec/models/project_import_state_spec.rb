@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe ProjectImportState, type: :model do
@@ -441,14 +443,14 @@ describe ProjectImportState, type: :model do
       expect(import_state.force_import_job!).to be_nil
     end
 
-    it 'sets next execution timestamp to now and schedules UpdateAllMirrorsWorker' do
-      timestamp = 1.second.from_now.change(usec: 0)
+    it 'sets next execution timestamp to 5 minutes ago and schedules UpdateAllMirrorsWorker' do
+      timestamp = Time.now
       import_state = create(:import_state, :mirror)
 
       expect(UpdateAllMirrorsWorker).to receive(:perform_async)
 
       Timecop.freeze(timestamp) do
-        expect { import_state.force_import_job! }.to change(import_state, :next_execution_timestamp).to(timestamp)
+        expect { import_state.force_import_job! }.to change(import_state, :next_execution_timestamp).to(5.minutes.ago)
       end
     end
 
@@ -461,7 +463,7 @@ describe ProjectImportState, type: :model do
 
         Timecop.freeze(timestamp) do
           expect { import_state.force_import_job! }.to change(import_state, :retry_count).to(0)
-          expect(import_state.next_execution_timestamp).to be_like_time(timestamp)
+          expect(import_state.next_execution_timestamp).to be_like_time(5.minutes.ago)
         end
       end
     end

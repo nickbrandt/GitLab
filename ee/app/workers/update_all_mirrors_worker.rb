@@ -7,17 +7,18 @@ class UpdateAllMirrorsWorker
   LEASE_TIMEOUT = 5.minutes
   SCHEDULE_WAIT_TIMEOUT = 4.minutes
   LEASE_KEY = 'update_all_mirrors'.freeze
-  RESCHEDULE_WAIT = 10.seconds
+  RESCHEDULE_WAIT = 1.second
 
   def perform
     return if Gitlab::Database.read_only?
 
-    scheduling_ran = with_lease do
-      schedule_mirrors!
+    scheduled = 0
+    with_lease do
+      scheduled = schedule_mirrors!
     end
 
-    # If we didn't get the lease, exit early
-    return unless scheduling_ran
+    # If we didn't get the lease, or no updates were scheduled, exit early
+    return unless scheduled > 0
 
     # Wait to give some jobs a chance to complete
     Kernel.sleep(RESCHEDULE_WAIT)
@@ -26,7 +27,7 @@ class UpdateAllMirrorsWorker
     # reschedule this job to enqueue more work.
     #
     # This is in addition to the regular (cron-like) scheduling of this job.
-    reschedule_if_capacity_left
+    UpdateAllMirrorsWorker.perform_async if Gitlab::Mirror.reschedule_immediately?
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
@@ -37,7 +38,7 @@ class UpdateAllMirrorsWorker
     # can't end up in an infinite loop
     now = Time.now
     last = nil
-    all_project_ids = []
+    scheduled = 0
 
     while capacity > 0
       batch_size = [capacity * 2, 500].min
@@ -47,7 +48,8 @@ class UpdateAllMirrorsWorker
       project_ids = projects.lazy.select(&:mirror?).take(capacity).map(&:id).force
       capacity -= project_ids.length
 
-      all_project_ids.concat(project_ids)
+      ProjectImportScheduleWorker.bulk_perform_async(project_ids.map { |id| [id] })
+      scheduled += project_ids.length
 
       # If fewer than `batch_size` projects were returned, we don't need to query again
       break if projects.length < batch_size
@@ -55,17 +57,17 @@ class UpdateAllMirrorsWorker
       last = projects.last.import_state.next_execution_timestamp
     end
 
-    ProjectImportScheduleWorker.bulk_perform_and_wait(all_project_ids.map { |id| [id] }, timeout: SCHEDULE_WAIT_TIMEOUT.to_i)
+    if scheduled > 0
+      # Wait for all ProjectImportScheduleWorker jobs to complete
+      deadline = Time.now + SCHEDULE_WAIT_TIMEOUT
+      sleep 1 while ProjectImportScheduleWorker.queue_size > 0 && Time.now < deadline
+    end
+
+    scheduled
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
-
-  def reschedule_if_capacity_left
-    return unless Gitlab::Mirror.reschedule_immediately?
-
-    UpdateAllMirrorsWorker.perform_async
-  end
 
   def with_lease
     if lease_uuid = try_obtain_lease

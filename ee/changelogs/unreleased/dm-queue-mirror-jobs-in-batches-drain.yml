@@ -1,0 +1,5 @@
+---
+title: Increase rate at which UpdateAllMirrorsWorker schedules jobs and reschedules itself
+merge_request: 14573
+author:
+type: other
