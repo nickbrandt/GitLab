@@ -100,7 +100,7 @@ describe CiMinutesUsageNotifyService do
 
           it 'sends the email to all the owners' do
             expect(CiMinutesUsageMailer).to receive(:notify)
-              .with(namespace.name, [user_2.email, user.email])
+              .with(namespace.name, match_array([user_2.email, user.email]))
               .and_return(spy)
 
             subject
