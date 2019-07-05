@@ -84,7 +84,7 @@ describe Projects::EnvironmentsController do
              environment_scope: '*', projects: [project])
       create(:deployment, :success, environment: environment)
 
-      allow_any_instance_of(EE::KubernetesService).to receive(:read_pod_logs)
+      allow_any_instance_of(EE::Clusters::Platforms::Kubernetes).to receive(:read_pod_logs)
         .with(pod_name, environment.deployment_namespace).and_return(kube_logs_body)
       allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances)
         .and_return([{ pod_name: pod_name }])
