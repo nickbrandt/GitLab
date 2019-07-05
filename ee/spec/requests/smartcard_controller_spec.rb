@@ -8,6 +8,7 @@ describe SmartcardController, type: :request do
   let(:certificate_headers) { { 'X-SSL-CLIENT-CERTIFICATE': 'certificate' } }
   let(:openssl_certificate_store) { instance_double(OpenSSL::X509::Store) }
   let(:audit_event_service) { instance_double(AuditEventService) }
+  let(:session_enforcer) { instance_double(Gitlab::Auth::Smartcard::SessionEnforcer) }
 
   shared_examples 'a client certificate authentication' do |auth_method|
     context 'with smartcard_auth enabled' do
@@ -29,6 +30,14 @@ describe SmartcardController, type: :request do
             .with(instance_of(User), instance_of(User), with: auth_method)
             .and_return(audit_event_service))
         expect(audit_event_service).to receive_message_chain(:for_authentication, :security_event)
+
+        subject
+      end
+
+      it 'stores active session' do
+        expect(::Gitlab::Auth::Smartcard::SessionEnforcer).to(
+          receive(:new).and_return(session_enforcer))
+        expect(session_enforcer).to receive(:update_session)
 
         subject
       end
