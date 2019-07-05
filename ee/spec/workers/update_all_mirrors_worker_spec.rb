@@ -26,31 +26,58 @@ describe UpdateAllMirrorsWorker do
     end
 
     it 'schedules mirrors' do
-      expect(worker).to receive(:schedule_mirrors!)
+      expect(worker).to receive(:schedule_mirrors!).and_call_original
 
       worker.perform
     end
 
-    it 'sleeps a bit after scheduling mirrors' do
-      expect(Kernel).to receive(:sleep).with(described_class::RESCHEDULE_WAIT)
+    context 'when updates were scheduled' do
+      before do
+        allow(worker).to receive(:schedule_mirrors!).and_return(1)
+      end
 
-      worker.perform
+      it 'sleeps a bit after scheduling mirrors' do
+        expect(Kernel).to receive(:sleep).with(described_class::RESCHEDULE_WAIT)
+
+        worker.perform
+      end
+
+      context 'if capacity is available' do
+        before do
+          allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(true)
+        end
+
+        it 'reschedules the job' do
+          expect(described_class).to receive(:perform_async)
+
+          worker.perform
+        end
+      end
+
+      context 'if no capacity is available' do
+        before do
+          allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
+        end
+
+        it 'does not reschedule the job' do
+          expect(described_class).not_to receive(:perform_async)
+
+          worker.perform
+        end
+      end
     end
 
-    it 'reschedules the job if capacity is left' do
-      allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(true)
+    context 'when no updates were scheduled' do
+      before do
+        allow(worker).to receive(:schedule_mirrors!).and_return(0)
+        allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
+      end
 
-      expect(described_class).to receive(:perform_async)
+      it 'does not reschedule the job' do
+        expect(described_class).not_to receive(:perform_async)
 
-      worker.perform
-    end
-
-    it 'does not reschedule the job if no capacity left' do
-      allow(Gitlab::Mirror).to receive(:reschedule_immediately?).and_return(false)
-
-      expect(described_class).not_to receive(:perform_async)
-
-      worker.perform
+        worker.perform
+      end
     end
   end
 
