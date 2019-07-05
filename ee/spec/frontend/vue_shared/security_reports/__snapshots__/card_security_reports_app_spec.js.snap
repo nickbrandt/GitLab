@@ -2,6 +2,7 @@
 
 exports[`Card security reports app Empty State renders correctly renders empty state component with correct props 1`] = `
 Object {
+  "compact": false,
   "description": "The security dashboard displays the latest security report. Use it to find and fix vulnerabilities.",
   "primaryButtonLink": "http://test.host/help_dashboard",
   "primaryButtonText": "Learn more",
