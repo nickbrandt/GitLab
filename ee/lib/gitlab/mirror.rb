@@ -33,15 +33,7 @@ module Gitlab
       end
 
       def reschedule_immediately?
-        available_spots = available_capacity
-        return false if available_spots < capacity_threshold
-
-        # Only reschedule if we are able to completely fill up the available spots.
-        mirrors_ready_to_sync_count(available_spots) >= available_spots
-      end
-
-      def mirrors_ready_to_sync_count(up_to = nil)
-        Project.mirrors_to_sync(Time.now, limit: up_to).count
+        available_capacity >= capacity_threshold
       end
 
       def available_capacity
