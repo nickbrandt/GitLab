@@ -16,26 +16,26 @@ describe CiMinutesUsageNotifyService do
   shared_examples 'namespace with all CI minutes used' do
     context 'when usage is over the quote' do
       it 'sends the email to the owner' do
-        expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace.name, user.email).and_return(spy)
+        expect(CiMinutesUsageMailer).to receive(:notify).once.with(namespace.name, [user.email]).and_return(spy)
 
         subject
       end
     end
   end
 
+  let(:project) { create(:project, namespace: namespace) }
+  let(:user) { create(:user) }
+  let(:user_2) { create(:user) }
+
+  let(:ci_minutes_used) { 0 }
+  let!(:namespace_statistics) do
+    create(:namespace_statistics, namespace: namespace, shared_runners_seconds: ci_minutes_used * 60)
+  end
+
   describe '#execute' do
     let(:extra_ci_minutes) { 0 }
     let(:namespace) do
       create(:namespace, shared_runners_minutes_limit: 2000, extra_shared_runners_minutes_limit: extra_ci_minutes)
-    end
-
-    let(:project) { create(:project, namespace: namespace) }
-    let(:user) { create(:user) }
-    let(:user_2) { create(:user) }
-
-    let(:ci_minutes_used) { 0 }
-    let!(:namespace_statistics) do
-      create(:namespace_statistics, namespace: namespace, shared_runners_seconds: ci_minutes_used * 60)
     end
 
     subject { described_class.new(project).execute }
@@ -99,8 +99,9 @@ describe CiMinutesUsageNotifyService do
           let(:ci_minutes_used) { 2001 }
 
           it 'sends the email to all the owners' do
-            expect(CiMinutesUsageMailer).to receive(:notify).with(namespace.name, user.email).and_return(spy)
-            expect(CiMinutesUsageMailer).to receive(:notify).with(namespace.name, user_2.email).and_return(spy)
+            expect(CiMinutesUsageMailer).to receive(:notify)
+              .with(namespace.name, [user_2.email, user.email])
+              .and_return(spy)
 
             subject
           end
@@ -118,6 +119,74 @@ describe CiMinutesUsageNotifyService do
           end
         end
       end
+    end
+  end
+
+  describe 'CI usage limit approaching' do
+    let(:namespace) { create(:group, shared_runners_minutes_limit: 2000) }
+
+    def notify_owners
+      described_class.new(project).execute
+    end
+
+    shared_examples 'no notification is sent' do
+      it 'does not notify owners' do
+        expect(CiMinutesUsageMailer).not_to receive(:notify_limit)
+
+        notify_owners
+      end
+    end
+
+    shared_examples 'notification for custom level is sent' do |minutes_used, expected_level|
+      before do
+        namespace_statistics.update_attribute(:shared_runners_seconds, minutes_used * 60)
+      end
+
+      it 'notifies the the owners about it' do
+        expect(CiMinutesUsageMailer).to receive(:notify_limit)
+          .with(namespace.name, array_including(user_2.email, user.email), expected_level)
+          .and_call_original
+
+        notify_owners
+      end
+    end
+
+    before do
+      stub_const("EE::Namespace::CI_USAGE_ALERT_LEVELS", [30, 5])
+
+      namespace.add_owner(user)
+      namespace.add_owner(user_2)
+    end
+
+    context 'when available minutes are above notification levels' do
+      let(:ci_minutes_used) { 1000 }
+
+      it_behaves_like 'no notification is sent'
+    end
+
+    context 'when available minutes have reached the first level of alert' do
+      it_behaves_like 'notification for custom level is sent', 1500, 30
+
+      context 'when other Pipeline has finished but second level of alert has not been reached' do
+        before do
+          namespace_statistics.update_attribute(:shared_runners_seconds, 1500 * 60)
+          notify_owners
+
+          namespace_statistics.update_attribute(:shared_runners_seconds, 1600 * 60)
+        end
+
+        it_behaves_like 'no notification is sent'
+      end
+    end
+
+    context 'when available minutes have reached the second level of alert' do
+      it_behaves_like 'notification for custom level is sent', 1500, 30
+
+      it_behaves_like 'notification for custom level is sent', 1980, 5
+    end
+
+    context 'when there are not available minutes to use' do
+      include_examples 'no notification is sent'
     end
   end
 end

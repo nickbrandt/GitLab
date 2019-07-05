@@ -9848,6 +9848,12 @@ msgstr ""
 msgid "Pipelines| to purchase more minutes."
 msgstr ""
 
+msgid "Pipelines|%{namespace_name} has exceeded its pipeline minutes quota."
+msgstr ""
+
+msgid "Pipelines|%{namespace_name} has less than %{notification_level}%% of CI minutes available."
+msgstr ""
+
 msgid "Pipelines|API"
 msgstr ""
 

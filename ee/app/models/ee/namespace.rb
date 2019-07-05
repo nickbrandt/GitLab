@@ -27,6 +27,8 @@ module EE
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
     PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.keys.freeze
 
+    CI_USAGE_ALERT_LEVELS = [30, 5].freeze
+
     prepended do
       include EachBatch
 
