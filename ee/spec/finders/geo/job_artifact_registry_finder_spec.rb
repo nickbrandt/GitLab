@@ -20,7 +20,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
     stub_artifacts_object_storage
   end
 
-  shared_examples 'counts all the things' do
+  context 'counts all the things' do
     describe '#count_syncable' do
       let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
       let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
@@ -399,7 +399,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
     end
   end
 
-  shared_examples 'finds all the things' do
+  context 'finds all the things' do
     describe '#find_unsynced' do
       let!(:job_artifact_1) { create(:ci_job_artifact, project: synced_project) }
       let!(:job_artifact_2) { create(:ci_job_artifact, project: unsynced_project) }
