@@ -17,7 +17,4 @@ shared_examples_for 'a file registry finder' do
       expect(subject).to respond_to(method)
     end
   end
-
-  include_examples 'counts all the things'
-  include_examples 'finds all the things'
 end

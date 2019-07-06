@@ -31,7 +31,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
     stub_lfs_object_storage
   end
 
-  shared_examples 'counts all the things' do
+  context 'counts all the things' do
     describe '#count_syncable' do
       before do
         allow_any_instance_of(LfsObjectsProject).to receive(:update_project_statistics).and_return(nil)
@@ -361,7 +361,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
     end
   end
 
-  shared_examples 'finds all the things' do
+  context 'finds all the things' do
     describe '#find_unsynced' do
       it 'returns LFS objects without an entry on the tracking database' do
         create(:geo_file_registry, :lfs, file_id: lfs_object_1.id)
