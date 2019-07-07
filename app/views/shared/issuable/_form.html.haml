@@ -15,7 +15,8 @@
 = render 'shared/issuable/form/branch_chooser', issuable: issuable, form: form
 
 .form-group.row
-  = form.label :title, class: 'col-form-label col-sm-2'
+  .col-sm-2.col-form-label
+    = form.label :title
 
   = render 'shared/issuable/form/title', issuable: issuable, form: form, has_wip_commits: commits && commits.detect(&:work_in_progress?)
 #js-suggestions{ data: { project_path: @project.full_path } }

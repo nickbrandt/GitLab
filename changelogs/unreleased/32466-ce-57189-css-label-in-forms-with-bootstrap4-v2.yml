@@ -1,0 +1,5 @@
+---
+title: Fix more UI breaking on forms on Bootstrap Grid system
+merge_request: 17409
+author: Takuya Noguchi
+type: fixed

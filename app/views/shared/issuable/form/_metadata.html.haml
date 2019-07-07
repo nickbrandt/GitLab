@@ -21,13 +21,15 @@
 
     - if issuable.supports_milestone?
       .form-group.row.issue-milestone
-        = form.label :milestone_id, "Milestone", class: "col-form-label #{has_due_date ? "col-md-2 col-lg-4" : "col-sm-2"}"
+        .col-form-label{ class: has_due_date ? "col-md-2 col-lg-4" : "col-sm-2" }
+          = form.label :milestone_id, "Milestone"
         .col-sm-10{ class: ("col-md-8" if has_due_date) }
           .issuable-form-select-holder
             = render "shared/issuable/milestone_dropdown", selected: issuable.milestone, name: "#{issuable.class.model_name.param_key}[milestone_id]", show_any: false, show_upcoming: false, show_started: false, extra_class: "qa-issuable-milestone-dropdown js-issuable-form-dropdown js-dropdown-keep-input", dropdown_title: "Select milestone"
 
     .form-group.row
-      = form.label :label_ids, "Labels", class: "col-form-label #{has_due_date ? "col-md-2 col-lg-4" : "col-sm-2"}"
+      .col-form-label{ class: has_due_date ? "col-md-2 col-lg-4" : "col-sm-2" }
+        = form.label :label_ids, "Labels"
       = form.hidden_field :label_ids, multiple: true, value: ''
       .col-sm-10{ class: "#{"col-md-8" if has_due_date}" }
         .issuable-form-select-holder
@@ -39,7 +41,8 @@
     .col-lg-6
       = render_if_exists "shared/issuable/form/weight", issuable: issuable, form: form
       .form-group.row
-        = form.label :due_date, "Due date", class: "col-form-label col-md-2 col-lg-4"
+        .col-md-2.col-lg-4.col-form-label
+          = form.label :due_date, "Due date"
         .col-8
           .issuable-form-select-holder
             = form.text_field :due_date, id: "issuable-due-date", class: "datepicker form-control", placeholder: "Select due date", autocomplete: 'off'
