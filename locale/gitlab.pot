@@ -4794,6 +4794,15 @@ msgstr ""
 msgid "Edit public deploy key"
 msgstr ""
 
+msgid "Editor|%{key1} and %{key2} to indent."
+msgstr ""
+
+msgid "Editor|%{mdLinkStart}Markdown is supported.%{mdLinkEnd}"
+msgstr ""
+
+msgid "Editor|%{mdLinkStart}Markdown%{mdLinkEnd} and %{actionsLinkStart}quick actions%{actionsLinkEnd} are supported."
+msgstr ""
+
 msgid "Elasticsearch"
 msgstr ""
 
@@ -8371,16 +8380,10 @@ msgstr ""
 msgid "Mark to do as done"
 msgstr ""
 
-msgid "Markdown"
-msgstr ""
-
 msgid "Markdown Help"
 msgstr ""
 
 msgid "Markdown enabled"
-msgstr ""
-
-msgid "Markdown is supported"
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
@@ -17290,12 +17293,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "project avatar"
-msgstr ""
-
-msgid "project avatar"
-msgstr ""
-
-msgid "quick actions"
 msgstr ""
 
 msgid "register"

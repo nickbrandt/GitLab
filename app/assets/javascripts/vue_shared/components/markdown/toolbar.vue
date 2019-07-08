@@ -1,5 +1,6 @@
 <script>
 import { GlLink } from '@gitlab/ui';
+import { s__, sprintf } from '~/locale';
 import { getPlatformLeaderKeyHTML } from '~/lib/utils/common_utils';
 
 export default {
@@ -28,11 +29,35 @@ export default {
     },
   },
   computed: {
-    hasQuickActionsDocsPath() {
-      return this.quickActionsDocsPath !== '';
+    indentHelpHtml() {
+      const leader = getPlatformLeaderKeyHTML();
+      const key1 = `<code>${leader}+[</code>`;
+      const key2 = `<code>${leader}+]</code>`;
+      return sprintf(s__('Editor|%{key1} and %{key2} to indent.'), { key1, key2 }, false);
     },
-    leaderKeyHTML() {
-      return getPlatformLeaderKeyHTML();
+    toolbarHelpHtml() {
+      const mdLinkStart = `<a href="${this.markdownDocsPath}" target="_blank" tabindex="-1">`;
+      const mdLinkEnd = '</a>';
+      const actionsLinkStart = `<a href="${this.quickActionsDocsPath}" target="_blank" tabindex="-1">`;
+      const actionsLinkEnd = '</a>';
+
+      if (this.markdownDocsPath && !this.quickActionsDocsPath) {
+        return sprintf(
+          s__('Editor|%{mdLinkStart}Markdown is supported.%{mdLinkEnd}'),
+          { mdLinkStart, mdLinkEnd },
+          false,
+        );
+      } else if (this.markdownDocsPath && this.quickActionsDocsPath) {
+        return sprintf(
+          s__(
+            'Editor|%{mdLinkStart}Markdown%{mdLinkEnd} and %{actionsLinkStart}quick actions%{actionsLinkEnd} are supported.',
+          ),
+          { mdLinkStart, mdLinkEnd, actionsLinkStart, actionsLinkEnd },
+          false,
+        );
+      }
+
+      return null;
     },
   },
 };
@@ -41,20 +66,8 @@ export default {
 <template>
   <div class="comment-toolbar clearfix">
     <div class="toolbar-text">
-      <template v-if="!hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1"
-          >Markdown is supported.</gl-link
-        >
-      </template>
-      <template v-if="hasQuickActionsDocsPath && markdownDocsPath">
-        <gl-link :href="markdownDocsPath" target="_blank" tabindex="-1">Markdown</gl-link> and
-        <gl-link :href="quickActionsDocsPath" target="_blank" tabindex="-1">quick actions</gl-link>
-        are supported.
-      </template>
-      <template v-if="canIndent">
-        <code><span v-html="leaderKeyHTML"></span>+[</code>
-        and <code><span v-html="leaderKeyHTML"></span>+]</code> to indent.
-      </template>
+      <span v-html="toolbarHelpHtml"></span>
+      <span v-if="canIndent" v-html="indentHelpHtml"></span>
     </div>
     <span v-if="canAttachFile" class="uploading-container">
       <span class="uploading-progress-container hide">
