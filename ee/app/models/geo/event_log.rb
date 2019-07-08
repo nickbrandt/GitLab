@@ -16,7 +16,8 @@ module Geo
                        Geo::HashedStorageAttachmentsEvent
                        Geo::LfsObjectDeletedEvent
                        Geo::JobArtifactDeletedEvent
-                       Geo::UploadDeletedEvent].freeze
+                       Geo::UploadDeletedEvent
+                       Geo::ContainerRepositoryUpdatedEvent].freeze
 
     belongs_to :cache_invalidation_event,
       class_name: 'Geo::CacheInvalidationEvent',
@@ -66,6 +67,10 @@ module Geo
       class_name: 'Geo::ResetChecksumEvent',
       foreign_key: :reset_checksum_event_id
 
+    belongs_to :container_repository_updated_event,
+      class_name: 'Geo::ContainerRepositoryUpdatedEvent',
+      foreign_key: :container_repository_updated_event_id
+
     def self.latest_event
       order(id: :desc).first
     end
@@ -97,7 +102,8 @@ module Geo
         job_artifact_deleted_event ||
         upload_deleted_event ||
         reset_checksum_event ||
-        cache_invalidation_event
+        cache_invalidation_event ||
+        container_repository_updated_event
     end
 
     def project_id
