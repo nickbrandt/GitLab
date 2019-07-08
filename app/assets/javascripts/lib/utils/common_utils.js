@@ -229,6 +229,10 @@ export const isPlatformLeaderKey = e => {
 /**
  * Tests if a KeyboardEvent corresponds exactly to a keystroke.
  *
+ * This function avoids hacking around an old version of Mousetrap, which we ship at the moment. It should be removed after we upgrade to the newest Mousetrap. See:
+ * - https://gitlab.com/gitlab-org/gitlab-ce/issues/63182
+ * - https://gitlab.com/gitlab-org/gitlab-ce/issues/64246
+ *
  * @example
  *     // Matches the enter key with exactly zero modifiers
  *     keystroke(event, 13)
