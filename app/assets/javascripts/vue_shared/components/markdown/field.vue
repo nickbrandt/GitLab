@@ -42,11 +42,6 @@ export default {
       required: false,
       default: true,
     },
-    canIndent: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     enableAutocomplete: {
       type: Boolean,
       required: false,
@@ -235,7 +230,6 @@ export default {
           :markdown-docs-path="markdownDocsPath"
           :quick-actions-docs-path="quickActionsDocsPath"
           :can-attach-file="canAttachFile"
-          :can-indent="canIndent"
         />
       </div>
     </div>

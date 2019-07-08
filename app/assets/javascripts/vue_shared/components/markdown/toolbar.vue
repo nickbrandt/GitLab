@@ -22,11 +22,6 @@ export default {
       required: false,
       default: true,
     },
-    canIndent: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   computed: {
     indentHelpHtml() {
@@ -67,7 +62,7 @@ export default {
   <div class="comment-toolbar clearfix">
     <div class="toolbar-text">
       <span v-html="toolbarHelpHtml"></span>
-      <span v-if="canIndent" v-html="indentHelpHtml"></span>
+      <span v-html="indentHelpHtml"></span>
     </div>
     <span v-if="canAttachFile" class="uploading-container">
       <span class="uploading-progress-container hide">
