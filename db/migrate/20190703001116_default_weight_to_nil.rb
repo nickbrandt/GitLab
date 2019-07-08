@@ -3,7 +3,7 @@
 # See http://doc.gitlab.com/ce/development/migration_style_guide.html
 # for more information on how to write migrations for GitLab.
 
-class DefaultWeightMilestoneToNil < ActiveRecord::Migration[5.1]
+class DefaultWeightToNil < ActiveRecord::Migration[5.1]
   include Gitlab::Database::MigrationHelpers
 
   # Set this constant to true if this migration requires downtime.
@@ -27,16 +27,23 @@ class DefaultWeightMilestoneToNil < ActiveRecord::Migration[5.1]
   # comments:
   # disable_ddl_transaction!
 
-  def change
+  def up
     update_board_weights_from_none_to_any
-    update_board_milestone_from_none_to_any
   end
+
+  def down
+    update_board_weights_from_any_to_none
+  end
+
+  # up method
 
   def update_board_weights_from_none_to_any
     execute("UPDATE boards SET weight = null WHERE weight = -1")
   end
 
-  def update_board_milestone_from_none_to_any
-    execute("UPDATE boards SET milestone_id = null WHERE milestone_id = -1")
+  # down method
+
+  def update_board_weights_from_any_to_none
+    execute("UPDATE boards SET weight = -1 WHERE weight = null")
   end
 end
