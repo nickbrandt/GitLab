@@ -215,6 +215,9 @@ msgstr ""
 msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
 msgstr ""
 
+msgid "%{icon}You are about to add %{usersTag} people to the discussion. Proceed with caution."
+msgstr ""
+
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
@@ -2456,6 +2459,9 @@ msgstr ""
 msgid "Cancel this job"
 msgstr ""
 
+msgid "Cancelling Preview"
+msgstr ""
+
 msgid "Cannot be merged automatically"
 msgstr ""
 
@@ -4464,6 +4470,9 @@ msgstr ""
 msgid "Deployed"
 msgstr ""
 
+msgid "Deployed %{deployedSince}"
+msgstr ""
+
 msgid "Deployed to"
 msgstr ""
 
@@ -5001,6 +5010,9 @@ msgstr ""
 msgid "Enter the merge request title"
 msgstr ""
 
+msgid "Enter zen mode"
+msgstr ""
+
 msgid "EnviornmentDashboard|You are looking at the last updated environment"
 msgstr ""
 
@@ -5482,6 +5494,9 @@ msgid "Expand all"
 msgstr ""
 
 msgid "Expand approvers"
+msgstr ""
+
+msgid "Expand dropdown"
 msgstr ""
 
 msgid "Expand sidebar"
@@ -6057,6 +6072,9 @@ msgid "Free Trial of GitLab.com Gold"
 msgstr ""
 
 msgid "Friday"
+msgstr ""
+
+msgid "From"
 msgstr ""
 
 msgid "From %{providerTitle}"
@@ -7193,6 +7211,12 @@ msgid "ImageDiffViewer|Onion skin"
 msgstr ""
 
 msgid "ImageDiffViewer|Swipe"
+msgstr ""
+
+msgid "ImageViewerDimensions|H"
+msgstr ""
+
+msgid "ImageViewerDimensions|W"
 msgstr ""
 
 msgid "Impersonation has been disabled"
@@ -8354,6 +8378,9 @@ msgid "Markdown Help"
 msgstr ""
 
 msgid "Markdown enabled"
+msgstr ""
+
+msgid "Markdown is supported"
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
@@ -14069,6 +14096,9 @@ msgstr ""
 msgid "This is your current session"
 msgstr ""
 
+msgid "This issue is %{confidentialLinkStart}confidential%{linkEnd} and %{lockedLinkStart}locked%{linkEnd}."
+msgstr ""
+
 msgid "This issue is confidential"
 msgstr ""
 
@@ -14769,6 +14799,9 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
+msgid "Unable to apply suggestions to a deleted line."
+msgstr ""
+
 msgid "Unable to connect to Prometheus server"
 msgstr ""
 
@@ -14890,6 +14923,9 @@ msgid "Unsubscribe at project level"
 msgstr ""
 
 msgid "Unsubscribe from %{type}"
+msgstr ""
+
+msgid "Until"
 msgstr ""
 
 msgid "Unverified"
@@ -16721,6 +16757,9 @@ msgstr ""
 msgid "could not read private key, is the passphrase correct?"
 msgstr ""
 
+msgid "created"
+msgstr ""
+
 msgid "customize"
 msgstr ""
 
@@ -17250,6 +17289,9 @@ msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "project avatar"
+msgstr ""
+
 msgid "quick actions"
 msgstr ""
 
@@ -17368,10 +17410,19 @@ msgstr ""
 msgid "to list"
 msgstr ""
 
+msgid "toggle collapse"
+msgstr ""
+
+msgid "toggle dropdown"
+msgstr ""
+
 msgid "triggered"
 msgstr ""
 
 msgid "updated"
+msgstr ""
+
+msgid "user avatar"
 msgstr ""
 
 msgid "username"
