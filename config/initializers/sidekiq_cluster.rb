@@ -1,4 +1,4 @@
-if ENV['ENABLE_SIDEKIQ_CLUSTER']
+if ENV['ENABLE_SIDEKIQ_CLUSTER'] && Gitlab.ee?
   Thread.new do
     Thread.current.abort_on_exception = true
 
