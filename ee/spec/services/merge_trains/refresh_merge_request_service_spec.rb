@@ -114,11 +114,12 @@ describe MergeTrains::RefreshMergeRequestService do
 
       context 'when the merge request is the first queue' do
         it 'merges the merge request' do
+          expect(merge_request).to receive(:cleanup_refs).with(only: :train)
           expect_next_instance_of(MergeRequests::MergeService, project, maintainer, anything) do |service|
             expect(service).to receive(:execute).with(merge_request)
           end
 
-          subject
+          expect { subject }.to change { MergeTrain.count }.by(-1)
         end
 
         context 'when it failed to merge the merge request' do

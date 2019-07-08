@@ -22,12 +22,13 @@ module MergeTrains
     end
 
     def create_merge_ref(merge_request)
-      ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user).execute(merge_request)
+      ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user, target_ref: merge_request.train_ref_path)
+                                        .execute(merge_request)
     end
 
     def create_pipeline(merge_request, merge_status)
       pipeline = ::Ci::CreatePipelineService.new(merge_request.source_project, merge_request.merge_user,
-        ref: merge_request.merge_ref_path,
+        ref: merge_request.train_ref_path,
         checkout_sha: merge_status[:commit_id],
         target_sha: merge_status[:target_id],
         source_sha: merge_status[:source_id])
