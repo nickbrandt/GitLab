@@ -41,6 +41,20 @@ export const shouldRenderParallelDraftRow = (state, getters) => (diffFileSha, li
   return draftsForFile ? Boolean(draftsForFile[lkey] || draftsForFile[rkey]) : false;
 };
 
+export const hasParallelDraftLeft = (state, getters) => (diffFileSha, line) => {
+  const draftsForFile = getters.draftsPerFileHashAndLine[diffFileSha];
+  const lkey = parallelLineKey(line, 'left');
+
+  return draftsForFile ? Boolean(draftsForFile[lkey]) : false;
+};
+
+export const hasParallelDraftRight = (state, getters) => (diffFileSha, line) => {
+  const draftsForFile = getters.draftsPerFileHashAndLine[diffFileSha];
+  const rkey = parallelLineKey(line, 'left');
+
+  return draftsForFile ? Boolean(draftsForFile[rkey]) : false;
+};
+
 export const shouldRenderDraftRowInDiscussion = (state, getters) => discussionId =>
   typeof getters.draftsPerDiscussionId[discussionId] !== 'undefined';
 
