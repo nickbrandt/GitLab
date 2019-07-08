@@ -31,7 +31,7 @@ describe Issuable::BulkUpdateService do
     end
   end
 
-  context 'when parent is a project' do
+  context 'with project issues' do
     describe 'close issues' do
       let(:issues) { create_list(:issue, 2, project: project) }
 
@@ -360,7 +360,7 @@ describe Issuable::BulkUpdateService do
     end
   end
 
-  context 'when parent is a group' do
+  context 'with group issues' do
     let(:group) { create(:group) }
 
     context 'updating milestone' do
