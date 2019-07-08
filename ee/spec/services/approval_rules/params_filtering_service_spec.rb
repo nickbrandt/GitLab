@@ -18,20 +18,39 @@ describe ApprovalRules::ParamsFilteringService do
         project.add_reporter(project_member)
 
         accessible_group.add_developer(user)
+
+        allow(Ability).to receive(:allowed?).and_call_original
+
+        allow(Ability)
+          .to receive(:allowed?)
+          .with(user, :update_approvers, merge_request)
+          .and_return(can_update_approvers?)
       end
 
-      it 'only assigns eligible users and groups' do
-        params = service.execute
+      context 'user can update approvers' do
+        let(:can_update_approvers?) { true }
 
-        rule1 = params[:approval_rules_attributes].first
+        it 'only assigns eligible users and groups' do
+          params = service.execute
 
-        expect(rule1[:user_ids]).to contain_exactly(project_member.id)
+          rule1 = params[:approval_rules_attributes].first
 
-        rule2 = params[:approval_rules_attributes].last
-        expected_group_ids = expected_groups.map(&:id)
+          expect(rule1[:user_ids]).to contain_exactly(project_member.id)
 
-        expect(rule2[:user_ids]).to be_empty
-        expect(rule2[:group_ids]).to contain_exactly(*expected_group_ids)
+          rule2 = params[:approval_rules_attributes].last
+          expected_group_ids = expected_groups.map(&:id)
+
+          expect(rule2[:user_ids]).to be_empty
+          expect(rule2[:group_ids]).to contain_exactly(*expected_group_ids)
+        end
+      end
+
+      context 'user cannot update approvers' do
+        let(:can_update_approvers?) { false }
+
+        it 'deletes the approval_rules_attributes from params' do
+          expect(service.execute).not_to have_key(:approval_rules_attributes)
+        end
       end
     end
 
