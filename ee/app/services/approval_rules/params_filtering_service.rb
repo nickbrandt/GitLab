@@ -21,6 +21,8 @@ module ApprovalRules
     end
 
     def execute
+      params.delete(:approval_rules_attributes) unless current_user.can?(:update_approvers, target)
+
       return params unless params.key?(:approval_rules_attributes)
 
       params[:approval_rules_attributes].each do |rule_attributes|
