@@ -181,7 +181,7 @@ module IssuableActions
   end
 
   def authorize_admin_issuable!
-    unless can?(current_user, :"admin_#{resource_name}", parent) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+    unless can?(current_user, :"admin_#{resource_name}", parent)
       return access_denied!
     end
   end
