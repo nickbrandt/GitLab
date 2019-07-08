@@ -6820,7 +6820,13 @@ msgstr ""
 msgid "Geo|Choose which groups you wish to synchronize to this secondary node."
 msgstr ""
 
+msgid "Geo|Container repositories sync capacity"
+msgstr ""
+
 msgid "Geo|Control the maximum concurrency of LFS/attachment backfill for this secondary node"
+msgstr ""
+
+msgid "Geo|Control the maximum concurrency of container repository operations for this Geo node"
 msgstr ""
 
 msgid "Geo|Control the maximum concurrency of verification operations for this Geo node"

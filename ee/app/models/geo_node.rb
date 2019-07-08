@@ -35,6 +35,7 @@ class GeoNode < ApplicationRecord
   validates :repos_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :files_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :verification_max_capacity, numericality: { greater_than_or_equal_to: 0 }
+  validates :container_repositories_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :minimum_reverification_interval, numericality: { greater_than_or_equal_to: 1 }
 
   validate :require_current_node_to_be_primary, if: :secondary?

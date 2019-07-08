@@ -29,6 +29,7 @@ describe GeoNode, :geo, type: :model do
     it { is_expected.to validate_numericality_of(:repos_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:files_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:verification_max_capacity).is_greater_than_or_equal_to(0) }
+    it { is_expected.to validate_numericality_of(:container_repositories_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:url) }
@@ -114,8 +115,9 @@ describe GeoNode, :geo, type: :model do
 
   context 'default values' do
     where(:attribute, :value) do
-      :repos_max_capacity | 25
-      :files_max_capacity | 10
+      :repos_max_capacity                  | 25
+      :files_max_capacity                  | 10
+      :container_repositories_max_capacity | 10
     end
 
     with_them do

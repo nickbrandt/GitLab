@@ -484,6 +484,7 @@ module EE
         expose :files_max_capacity
         expose :repos_max_capacity
         expose :verification_max_capacity
+        expose :container_repositories_max_capacity, if: ->(_, _) { ::Feature.enabled?(:geo_registry_replication) }
 
         # Retained for backwards compatibility. Remove in API v5
         expose :clone_protocol do |_record, _options|
