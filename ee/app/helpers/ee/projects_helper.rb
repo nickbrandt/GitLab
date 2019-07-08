@@ -4,11 +4,17 @@ module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
 
+    # override - if only in EE?
+    def sidebar_security_paths
+      %w[
+        projects/security/dashboard#show
+        projects/dependencies#show
+      ]
+    end
+
     override :sidebar_projects_paths
     def sidebar_projects_paths
       super + %w[
-        projects/dependencies#show
-        projects/security/dashboard#show
         projects/insights#show
       ]
     end

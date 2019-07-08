@@ -1,0 +1,27 @@
+- if project_nav_tab? :security
+  = nav_link(path: sidebar_security_paths) do
+    -#@TODO: find out what the class does
+    = link_to project_security_dashboard_path(@project), title: _('Security Dashboard'), class: 'shortcuts-project-security-dashboard' do
+      .nav-icon-container
+        = sprite_icon('shield')
+      %span.nav-item-name
+        = _('Security & Compliance')
+    %ul.sidebar-sub-level-items
+      = nav_link(path: sidebar_security_paths, html_options: { class: "fly-out-top-item" } ) do
+        = link_to project_security_dashboard_path(@project) do
+          %strong.fly-out-top-item-name
+            = _('Security & Compliance')
+            
+      %li.divider.fly-out-top-item
+
+      = nav_link(path: 'projects/security/dashboard#show') do
+        = link_to project_security_dashboard_path(@project), title: _('Security Dashboard'), class: 'shortcuts-project-security-dashboard' do
+          %span= _('Security Dashboard')
+
+      -#@TODO: Is this check still necessary? And are permissions for viewing the security dashboard and dependency-list
+      -# always tied together? (Currently the top level item (dashboard) will determine the rendering of all)
+      -#= render_if_exists 'projects/sidebar/dependencies'
+      - if @project.feature_available?(:dependency_list)
+        = nav_link(path: 'projects/dependencies#show') do
+          = link_to project_dependencies_path(@project), title: _('Dependency List'), class: 'shortcuts-project-dependencies' do
+            %span= _('Dependency List')

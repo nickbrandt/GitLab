@@ -377,6 +377,11 @@ module ProjectsHelper
       nav_tabs << :operations
     end
 
+    # @TODO: Confirm this logic
+    if can?(current_user, :read_project_security_dashboard, @project)
+      nav_tabs << :security
+    end
+
     tab_ability_map.each do |tab, ability|
       if can?(current_user, ability, project)
         nav_tabs << tab
