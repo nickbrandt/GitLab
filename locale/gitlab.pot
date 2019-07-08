@@ -4689,6 +4689,9 @@ msgstr ""
 msgid "Download artifacts"
 msgstr ""
 
+msgid "Download as"
+msgstr ""
+
 msgid "Download asset"
 msgstr ""
 
@@ -5701,6 +5704,9 @@ msgid "Failed to upload object map file"
 msgstr ""
 
 msgid "Failure"
+msgstr ""
+
+msgid "Fast-forward merge is not possible. Rebase the source branch onto the target branch or merge target branch into source branch to allow this merge request to be merged."
 msgstr ""
 
 msgid "Fast-forward merge without a merge commit"
@@ -9752,6 +9758,12 @@ msgstr ""
 msgid "Pipeline"
 msgstr ""
 
+msgid "Pipeline %{label}"
+msgstr ""
+
+msgid "Pipeline %{label} for \"%{dataTitle}\""
+msgstr ""
+
 msgid "Pipeline Schedule"
 msgstr ""
 
@@ -11234,6 +11246,12 @@ msgstr ""
 msgid "Real-time features"
 msgstr ""
 
+msgid "Rebase"
+msgstr ""
+
+msgid "Rebase in progress"
+msgstr ""
+
 msgid "Receive alerts from manually configured Prometheus servers."
 msgstr ""
 
@@ -12175,6 +12193,9 @@ msgstr ""
 msgid "Select members to invite"
 msgstr ""
 
+msgid "Select merge moment"
+msgstr ""
+
 msgid "Select private project"
 msgstr ""
 
@@ -12739,6 +12760,9 @@ msgid "Something went wrong while reopening the %{issuable}. Please try again la
 msgstr ""
 
 msgid "Something went wrong while resolving this discussion. Please try again."
+msgstr ""
+
+msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 
 msgid "Something went wrong, unable to add %{project} to dashboard"
@@ -14019,6 +14043,9 @@ msgid "This group, including all subgroups, projects and git repositories, will 
 msgstr ""
 
 msgid "This is a \"Ghost User\", created to hold all issues authored by users that have since been deleted. This user cannot be removed."
+msgstr ""
+
+msgid "This is a Work in Progress"
 msgstr ""
 
 msgid "This is a confidential issue."
@@ -16888,6 +16915,15 @@ msgstr ""
 msgid "mrWidgetCommitsAdded|1 merge commit"
 msgstr ""
 
+msgid "mrWidgetNothingToMerge|Currently there are no changes in this merge request's source branch. Please push new commits or use a different branch."
+msgstr ""
+
+msgid "mrWidgetNothingToMerge|Interested parties can even contribute by pushing commits if they want to."
+msgstr ""
+
+msgid "mrWidgetNothingToMerge|Merge requests are a place to propose changes you have made to a project and discuss those changes with others."
+msgstr ""
+
 msgid "mrWidget| Please restore it or use a different %{missingBranchName} branch"
 msgstr ""
 
@@ -17044,6 +17080,9 @@ msgstr ""
 msgid "mrWidget|Request to merge"
 msgstr ""
 
+msgid "mrWidget|Resolve WIP status"
+msgstr ""
+
 msgid "mrWidget|Resolve conflicts"
 msgstr ""
 
@@ -17108,6 +17147,9 @@ msgid "mrWidget|This merge request is in the process of being merged"
 msgstr ""
 
 msgid "mrWidget|This project is archived, write access has been disabled"
+msgstr ""
+
+msgid "mrWidget|When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged"
 msgstr ""
 
 msgid "mrWidget|You are not allowed to edit this project directly. Please fork to make changes."
