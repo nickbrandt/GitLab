@@ -2,8 +2,7 @@
 
 module AuditEventsHelper
   def human_text(details)
-    # replace '_' with " " to achive identical behavior with Audit::Details
-    return details[:custom_message].tr('_', ' ') if details[:custom_message]
+    return custom_message_for(details) if details[:custom_message]
 
     details.map { |key, value| select_keys(key, value) }.join(" ").humanize
   end
@@ -14,5 +13,11 @@ module AuditEventsHelper
     else
       "#{key} <strong>#{value}</strong>"
     end
+  end
+
+  def custom_message_for(details)
+    target_type = details[:target_type].constantize
+    val = details[:custom_message]
+    target_type == Operations::FeatureFlag ? val : val.tr('_', ' ')
   end
 end

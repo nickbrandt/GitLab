@@ -2,11 +2,12 @@ require 'spec_helper'
 
 describe AuditEventsHelper do
   describe '#human_text' do
+    let(:target_type) { 'User' }
     let(:details) do
       {
         author_name: 'John Doe',
         target_id: 1,
-        target_type: 'User',
+        target_type: target_type,
         target_details: 'Michael'
       }
     end
@@ -30,11 +31,27 @@ describe AuditEventsHelper do
         expect(subject).to eq(custom_message)
       end
 
-      context 'when custom message contains "_"' do
-        let(:custom_message) { "message_with_spaces" }
+      context 'when the target_type is Operations::FeatureFlag' do
+        let(:target_type) { 'Operations::FeatureFlag' }
 
-        it 'replace them with spaces' do
-          expect(subject).to eq("message with spaces")
+        context 'when custom message contains "_"' do
+          let(:custom_message) { "message_with_spaces" }
+
+          it 'does not replace them with spaces' do
+            expect(subject).to eq("message_with_spaces")
+          end
+        end
+      end
+
+      context 'when the target_type is not Operations::FeatureFlag' do
+        let(:target_type) { 'User' }
+
+        context 'when custom message contains "_"' do
+          let(:custom_message) { "message_with_spaces" }
+
+          it 'replaces them with spaces' do
+            expect(subject).to eq("message with spaces")
+          end
         end
       end
     end
