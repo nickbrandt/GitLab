@@ -23,7 +23,7 @@
         %a#discussion-tab.active{ href: '#discussion', data: { toggle: 'tab' } }
           = _('Discussion')
           %span.badge.badge-pill= @epic.notes.user.count
-      - if Feature.enabled?(:epic_trees)
+      - if Feature.enabled?(:epic_trees, @group)
         %li.tree-tab
           %a#tree-tab{ href: '#tree', data: { toggle: 'tab' } }
             = _('Tree')
@@ -41,7 +41,7 @@
         %script.js-notes-data{ type: "application/json" }= initial_notes_data(true).to_json.html_safe
         .issuable-discussion
           = render 'discussion'
-  - if Feature.enabled?(:epic_trees)
+  - if Feature.enabled?(:epic_trees, @group)
     #tree.tab-pane
       .row
         %section.col-md-12
