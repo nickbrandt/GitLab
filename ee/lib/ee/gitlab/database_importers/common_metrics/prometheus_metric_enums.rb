@@ -2,7 +2,7 @@
 
 module EE
   module Gitlab
-    module Importers
+    module DatabaseImporters
       module CommonMetrics
         module PrometheusMetricEnums
           extend ActiveSupport::Concern

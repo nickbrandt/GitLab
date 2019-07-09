@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module Importers
+  module DatabaseImporters
     module CommonMetrics
       module PrometheusMetricEnums
         def self.groups
@@ -39,4 +39,4 @@ module Gitlab
   end
 end
 
-::Gitlab::Importers::CommonMetrics::PrometheusMetricEnums.prepend EE::Gitlab::Importers::CommonMetrics::PrometheusMetricEnums
+::Gitlab::DatabaseImporters::CommonMetrics::PrometheusMetricEnums.prepend EE::Gitlab::DatabaseImporters::CommonMetrics::PrometheusMetricEnums

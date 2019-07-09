@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module Importers
+  module DatabaseImporters
     module CommonMetrics
       class Importer
         MissingQueryId = Class.new(StandardError)
@@ -58,14 +58,12 @@ module Gitlab
           yield(metric_details['id'], attributes)
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def find_or_build_metric!(id)
           raise MissingQueryId unless id
 
           CommonMetrics::PrometheusMetric.common.find_by(identifier: id) ||
             CommonMetrics::PrometheusMetric.new(common: true, identifier: id)
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def find_group_title_key(title)
           CommonMetrics::PrometheusMetricEnums.groups[find_group_title(title)]
