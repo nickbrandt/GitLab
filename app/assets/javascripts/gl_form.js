@@ -5,16 +5,8 @@ import dropzoneInput from './dropzone_input';
 import { addMarkdownListeners, removeMarkdownListeners } from './lib/utils/text_markdown';
 import IndentHelper from './helpers/indent_helper';
 import { getPlatformLeaderKeyHTML, keystroke } from './lib/utils/common_utils';
+import * as keys from './lib/utils/keycodes';
 import UndoStack from './lib/utils/undo_stack';
-
-// Keycodes
-const CODE_BACKSPACE = 8;
-const CODE_ENTER = 13;
-const CODE_SPACE = 32;
-const CODE_Y = 89;
-const CODE_Z = 90;
-const CODE_LEFT_BRACKET = 219;
-const CODE_RIGHT_BRACKET = 221;
 
 export default class GLForm {
   constructor(form, enableGFM = {}) {
@@ -119,13 +111,12 @@ export default class GLForm {
     this.textarea[0].setSelectionRange(selection[0], selection[1]);
   }
 
+  /*
+   Handle keypresses for a custom undo/redo stack.
+   We need this because the toolbar buttons and indentation helpers mess with the browser's
+   native undo/redo capability.
+   */
   handleUndo(event) {
-    /*
-      Custom undo/redo stack.
-      We need this because the toolbar buttons and indentation helpers mess with
-      the browser's native undo/redo capability.
-     */
-
     const content = this.textarea.val();
     const { selectionStart, selectionEnd } = this.textarea[0];
     const stack = this.undoStack;
@@ -135,27 +126,28 @@ export default class GLForm {
       stack.save(content);
     }
 
-    if (keystroke(event, CODE_Z, 'l')) {
+    if (keystroke(event, keys.Z_KEY_CODE, 'l')) {
       // ==== Undo ====
       event.preventDefault();
       stack.save(content);
       if (stack.canUndo()) {
         this.setState(stack.undo());
       }
-    } else if (keystroke(event, CODE_Z, 'ls') || keystroke(event, CODE_Y, 'l')) {
+    } else if (keystroke(event, keys.Z_KEY_CODE, 'ls') || keystroke(event, keys.Y_KEY_CODE, 'l')) {
       // ==== Redo ====
       event.preventDefault();
       if (stack.canRedo()) {
         this.setState(stack.redo());
       }
-    } else if (keystroke(event, CODE_SPACE) || keystroke(event, CODE_ENTER)) {
-      // ==== Save after finishing a word ====
-      stack.save(content);
-    } else if (selectionStart !== selectionEnd) {
-      // ==== Save if killing a large selection ====
+    } else if (
+      keystroke(event, keys.SPACE_KEY_CODE) ||
+      keystroke(event, keys.ENTER_KEY_CODE) ||
+      selectionStart !== selectionEnd
+    ) {
+      // ==== Save after finishing a word or before deleting a large selection ====
       stack.save(content);
     } else if (content === '') {
-      // ==== Save if deleting everything ====
+      // ==== Save after deleting everything ====
       stack.save('');
     } else {
       // ==== Save after 1 second of inactivity ====
@@ -164,19 +156,19 @@ export default class GLForm {
   }
 
   handleIndent(event) {
-    if (keystroke(event, CODE_LEFT_BRACKET, 'l')) {
+    if (keystroke(event, keys.LEFT_BRACKET_KEY_CODE, 'l')) {
       // ==== Unindent selected lines ====
       event.preventDefault();
       this.indentHelper.unindent();
-    } else if (keystroke(event, CODE_RIGHT_BRACKET, 'l')) {
+    } else if (keystroke(event, keys.RIGHT_BRACKET_KEY_CODE, 'l')) {
       // ==== Indent selected lines ====
       event.preventDefault();
       this.indentHelper.indent();
-    } else if (keystroke(event, CODE_ENTER)) {
+    } else if (keystroke(event, keys.ENTER_KEY_CODE)) {
       // ==== Auto-indent new lines ====
       event.preventDefault();
       this.indentHelper.newline();
-    } else if (keystroke(event, CODE_BACKSPACE)) {
+    } else if (keystroke(event, keys.BACKSPACE_KEY_CODE)) {
       // ==== Auto-delete indents at the beginning of the line ====
       this.indentHelper.backspace(event);
     }

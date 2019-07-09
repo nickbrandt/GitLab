@@ -10,8 +10,8 @@
       = s_('Editor|%{mdLinkStart}Markdown is supported.%{mdLinkEnd}').html_safe % { mdLinkStart: md_link_start, mdLinkEnd: link_end }
 
     %span.hidden.js-indent-help-message
-      - key1 = '<code><span class="js-leader-key"></span>+[</code>'.html_safe
-      - key2 = '<code><span class="js-leader-key"></span>+]</code>'.html_safe
+      - key1 = '<kbd><span class="js-leader-key"></span>+[</kbd>'.html_safe
+      - key2 = '<kbd><span class="js-leader-key"></span>+]</kbd>'.html_safe
       = s_('Editor|%{key1} and %{key2} to indent.').html_safe % { key1: key1, key2: key2 }
 
   %span.uploading-container

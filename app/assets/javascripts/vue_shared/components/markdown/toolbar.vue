@@ -26,20 +26,19 @@ export default {
   computed: {
     indentHelpHtml() {
       const leader = getPlatformLeaderKeyHTML();
-      const key1 = `<code>${leader}+[</code>`;
-      const key2 = `<code>${leader}+]</code>`;
+      const key1 = `<kbd>${leader}+[</kbd>`;
+      const key2 = `<kbd>${leader}+]</kbd>`;
       return sprintf(s__('Editor|%{key1} and %{key2} to indent.'), { key1, key2 }, false);
     },
     toolbarHelpHtml() {
       const mdLinkStart = `<a href="${this.markdownDocsPath}" target="_blank" tabindex="-1">`;
-      const mdLinkEnd = '</a>';
       const actionsLinkStart = `<a href="${this.quickActionsDocsPath}" target="_blank" tabindex="-1">`;
-      const actionsLinkEnd = '</a>';
+      const linkEnd = '</a>';
 
       if (this.markdownDocsPath && !this.quickActionsDocsPath) {
         return sprintf(
           s__('Editor|%{mdLinkStart}Markdown is supported.%{mdLinkEnd}'),
-          { mdLinkStart, mdLinkEnd },
+          { mdLinkStart, mdLinkEnd: linkEnd },
           false,
         );
       } else if (this.markdownDocsPath && this.quickActionsDocsPath) {
@@ -47,7 +46,7 @@ export default {
           s__(
             'Editor|%{mdLinkStart}Markdown%{mdLinkEnd} and %{actionsLinkStart}quick actions%{actionsLinkEnd} are supported.',
           ),
-          { mdLinkStart, mdLinkEnd, actionsLinkStart, actionsLinkEnd },
+          { mdLinkStart, mdLinkEnd: linkEnd, actionsLinkStart, actionsLinkEnd: linkEnd },
           false,
         );
       }
