@@ -12,10 +12,9 @@
     %li.nav-item
       %a.nav-link#pipelines-quota{ data: { toggle: "tab", action: '#pipelines-quota-tab' }, href: '#pipelines-quota-tab', 'aria-controls': '#pipelines-quota-tab', 'aria-selected': true }
         = s_('UsageQuota|Pipelines')
-    - if Gitlab::Graphql.enabled?
-      %li.nav-item
-        %a.nav-link#storage-quota{ data: { toggle: "tab", action: '#storage-quota-tab' }, href: '#storage-quota-tab', 'aria-controls': '#storage-quota-tab', 'aria-selected': false }
-          = s_('UsageQuota|Storage')
+    %li.nav-item
+      %a.nav-link#storage-quota{ data: { toggle: "tab", action: '#storage-quota-tab' }, href: '#storage-quota-tab', 'aria-controls': '#storage-quota-tab', 'aria-selected': false }
+        = s_('UsageQuota|Storage')
   .nav-controls
     = link_to s_('UsageQuota|Buy additional minutes'), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', class: 'btn btn-inverted btn-success float-right'
 
@@ -24,6 +23,5 @@
     = render "namespaces/pipelines_quota/list",
       locals: { namespace: @group, projects: @projects }
   .tab-pane#storage-quota-tab
-    - if Gitlab::Graphql.enabled?
-      #js-storage-counter-app{ data: { namespace_path: @group.full_path } }
+    #js-storage-counter-app{ data: { namespace_path: @group.full_path } }
 
