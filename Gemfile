@@ -438,7 +438,7 @@ gem 'sys-filesystem', '~> 1.1.6'
 gem 'net-ntp'
 
 # SSH host key support
-gem 'net-ssh', '~> 5.0'
+gem 'net-ssh', '~> 5.2'
 gem 'sshkey', '~> 2.0'
 
 # Required for ED25519 SSH host key support
