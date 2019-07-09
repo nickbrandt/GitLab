@@ -55,16 +55,22 @@ class Groups::CycleAnalytics::EventsController < Groups::ApplicationController
   def events_params
     return {} unless params[:events].present?
 
-    params[:events].permit(:start_date, :branch_name, :group_id)
+    params[:events].permit(:start_date, :branch_name, :project_ids)
   end
 
   def cycle_analytics_events
-    ::CycleAnalytics::GroupLevel.new(options: options(events_params).merge(group: group))
+    ::CycleAnalytics::GroupLevel.new(options: options(events_params).merge(group_cycle_analytics_params))
   end
 
   def authorize_group_cycle_analytics!
     unless can?(current_user, :read_group_cycle_analytics, group)
       render_403
     end
+  end
+
+  def group_cycle_analytics_params
+    params = { group: group }
+    params.merge(projects: cycle_analytics_params[:project_ids]) if cycle_analytics_params[:project_ids]
+    params
   end
 end

@@ -4,7 +4,7 @@ module Gitlab
   module CycleAnalytics
     module Summary
       module Group
-        class Deploy < Base
+        class Deploy < Group::Base
           def title
             n_('Deploy', 'Deploys', value)
           end

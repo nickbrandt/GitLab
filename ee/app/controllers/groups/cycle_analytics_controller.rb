@@ -20,7 +20,7 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   def cycle_analytics_params
     return {} unless params[:cycle_analytics].present?
 
-    params[:cycle_analytics].permit(:start_date)
+    params[:cycle_analytics].permit(:start_date, project_ids: [])
   end
 
   def cycle_analytics_json
@@ -33,7 +33,7 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   end
 
   def cycle_analytics_stats
-    ::CycleAnalytics::GroupLevel.new(options: options(cycle_analytics_params).merge(group: group))
+    ::CycleAnalytics::GroupLevel.new(options: options(cycle_analytics_params).merge(group_cycle_analytics_params))
   end
 
   def whitelist_query_limiting
@@ -44,5 +44,12 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
     unless can?(current_user, :read_group_cycle_analytics, group)
       render_403
     end
+  end
+
+  def group_cycle_analytics_params
+    params = { group: group }
+
+    params.merge!(projects: cycle_analytics_params[:project_ids]) if cycle_analytics_params[:project_ids]
+    params
   end
 end

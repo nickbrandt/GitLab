@@ -4,7 +4,7 @@ module Gitlab
   module CycleAnalytics
     module Summary
       module Group
-        class Issue < Base
+        class Issue < Group::Base
           def initialize(group:, from:, current_user:, options:)
             @group = group
             @from = from
