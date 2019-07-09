@@ -613,6 +613,88 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_dependencies' do
+    context 'when dependency list feature available' do
+      before do
+        stub_licensed_features(dependency_list: true)
+      end
+
+      context 'with public project' do
+        let(:current_user) { create(:user) }
+
+        context 'with public access to repository' do
+          let(:project) { create(:project, :public) }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with limited access to repository' do
+          let(:project) { create(:project, :public, :repository_private) }
+
+          it { is_expected.not_to be_allowed(:read_dependencies) }
+        end
+      end
+
+      context 'with private project' do
+        let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+        context 'with admin' do
+          let(:current_user) { admin }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with owner' do
+          let(:current_user) { owner }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with maintainer' do
+          let(:current_user) { maintainer }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with developer' do
+          let(:current_user) { developer }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with reporter' do
+          let(:current_user) { reporter }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with guest' do
+          let(:current_user) { guest }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+
+        context 'with not member' do
+          let(:current_user) { create(:user) }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+
+        context 'with anonymous' do
+          let(:current_user) { nil }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+      end
+    end
+
+    context 'when dependency list feature not available' do
+      let(:current_user) { admin }
+
+      it { is_expected.not_to be_allowed(:read_dependencies) }
+    end
+  end
+
   describe 'create_web_ide_terminal' do
     before do
       stub_licensed_features(web_ide_terminal: true)
