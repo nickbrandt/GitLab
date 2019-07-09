@@ -50,10 +50,10 @@ describe 'Group Dependency Proxy' do
         it 'hides the proxy URL when feature is disabled' do
           page.within('.edit_dependency_proxy_group_setting') do
             find('.js-project-feature-toggle').click
-            click_button 'Save changes'
           end
 
           expect(page).not_to have_css('.js-dependency-proxy-url')
+          expect(find('.js-project-feature-toggle-input', visible: false).value).to eq('false')
         end
       end
 

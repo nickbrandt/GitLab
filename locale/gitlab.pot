@@ -3781,6 +3781,9 @@ msgstr ""
 msgid "Copy %{protocol} clone URL"
 msgstr ""
 
+msgid "Copy %{proxy_url} to clipboard"
+msgstr ""
+
 msgid "Copy ID to clipboard"
 msgstr ""
 
@@ -4942,6 +4945,9 @@ msgid "Enable or disable the Pseudonymizer data collection."
 msgstr ""
 
 msgid "Enable or disable version check and usage ping."
+msgstr ""
+
+msgid "Enable proxy"
 msgstr ""
 
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
