@@ -47,6 +47,7 @@ describe Audit::Details do
       let(:user_member) { create(:user) }
       let(:group) { create(:group) }
       let(:member) { create(:group_member, group: group, user: user_member) }
+      let(:target_type) { 'User' }
       let(:member_access_action) do
         {
           change: 'access_level',
@@ -54,15 +55,26 @@ describe Audit::Details do
           to: member.human_access,
           author_name: user.name,
           target_id: member.id,
-          target_type: 'User',
+          target_type: target_type,
           target_details: member.user.name
         }
       end
 
-      it 'humanizes add group member access action' do
-        string = described_class.humanize(member_access_action)
+      context 'when the target_type is not Operations::FeatureFlag' do
+        it 'humanizes add group member access action' do
+          string = described_class.humanize(member_access_action)
 
-        expect(string).to eq('Changed access level from Guest to Owner')
+          expect(string).to eq('Changed access level from Guest to Owner')
+        end
+      end
+
+      context 'when the target_type is Operations::FeatureFlag' do
+        let(:target_type) { 'Operations::FeatureFlag' }
+        it 'leaves access_level as it is' do
+          string = described_class.humanize(member_access_action)
+
+          expect(string).to eq('Changed access_level from Guest to Owner')
+        end
       end
     end
 

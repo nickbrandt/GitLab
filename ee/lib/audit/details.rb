@@ -24,7 +24,6 @@ module Audit
 
     def action_text
       action = @details.slice(*ACTIONS)
-      value = @details.values.first.tr('_', ' ')
 
       case action.keys.first
       when :add
@@ -47,6 +46,12 @@ module Audit
       changed << "to #{@details[:to]}" if @details[:to]
 
       changed.join(' ')
+    end
+
+    def value
+      target_type = @details[:target_type].constantize
+      val = @details.values.first
+      target_type == Operations::FeatureFlag ? val : val.tr('_', ' ')
     end
   end
 end
