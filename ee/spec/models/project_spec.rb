@@ -1833,21 +1833,22 @@ describe Project do
 
   describe "#design_management_enabled?" do
     let(:project) { build(:project) }
-    where(:feature_enabled, :license_enabled, :graphql, :lfs, :expected) do
-      false | false | false | false | false
-      true  | false | false | false | false
-      false | true  | false | false | false
-      false | false | true  | false | false
-      false | false | false | true | false
-      true  | true  | true | true | true
-    end
+
+    where(
+      feature_enabled: [false, true],
+      license_enabled: [false, true],
+      lfs_enabled: [false, true]
+    )
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management: feature_enabled, graphql: graphql)
-        expect(project).to receive(:lfs_enabled?).and_return(lfs)
+        stub_feature_flags(design_management: feature_enabled)
+        expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
       end
+
+      # Design management is only available if all dependencies are enabled
+      let(:expected) { feature_enabled && license_enabled && lfs_enabled }
 
       it "knows if design management is available" do
         expect(project.design_management_enabled?).to be(expected)

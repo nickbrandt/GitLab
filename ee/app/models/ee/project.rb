@@ -571,12 +571,12 @@ module EE
     end
 
     def design_management_enabled?
-      # LFS and GraphQL are required for using Design Management
+      # LFS is required for using Design Management
       #
       # Checking both feature availability on the license, as well as the feature
       # flag, because we don't want to enable design_management by default on
       # on prem installs yet.
-      lfs_enabled? && ::Gitlab::Graphql.enabled? &&
+      lfs_enabled? &&
         feature_available?(:design_management) &&
         ::Feature.enabled?(:design_management, self)
     end
