@@ -27,6 +27,15 @@ describe Security::DependencyListService do
     end
 
     context 'with params' do
+      context 'filtered by package_managers' do
+        let(:params) { { package_manager: 'bundler' } }
+
+        it 'returns filtered items' do
+          expect(subject.size).to eq(2)
+          expect(subject.first[:packager]).to eq('Ruby (Bundler)')
+        end
+      end
+
       context 'sorted desc by packagers' do
         let(:params) do
           {

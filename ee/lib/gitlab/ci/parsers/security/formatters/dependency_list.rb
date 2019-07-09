@@ -14,6 +14,7 @@ module Gitlab
               {
                 name:     dependency['package']['name'],
                 packager: packager(package_manager),
+                package_manager: package_manager,
                 location: {
                   blob_path: blob_path(file_path),
                   path:      file_path

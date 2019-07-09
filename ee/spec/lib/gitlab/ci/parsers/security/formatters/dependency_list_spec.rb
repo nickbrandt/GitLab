@@ -26,6 +26,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
 
       expect(data[:name]).to eq('mini_portile2')
       expect(data[:packager]).to eq('Ruby (Bundler)')
+      expect(data[:package_manager]).to eq('bundler')
       expect(data[:location][:blob_path]).to eq(blob_path)
       expect(data[:location][:path]).to eq('rails/Gemfile.lock')
       expect(data[:version]).to eq('2.2.0')
