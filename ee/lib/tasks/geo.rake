@@ -248,6 +248,11 @@ namespace :geo do
       puts current_node_status.health_status.color(:red)
     end
 
+    unless current_node_status.healthy?
+      print 'Health Status Summary: '.rjust(GEO_STATUS_COLUMN_WIDTH)
+      puts current_node_status.health.color(:red)
+    end
+
     print 'Repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.repositories_failed_count)
     print "#{current_node_status.repositories_synced_count}/#{current_node_status.projects_count} "
