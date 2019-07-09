@@ -15,7 +15,7 @@ module Gitlab
 
       def extract_projects(options)
         projects = Project.inside_path(group.full_path)
-        projects = projects.where(name: options[:projects]) if options[:projects]
+        projects = projects.where(id: options[:projects]) if options[:projects]
         projects
       end
     end

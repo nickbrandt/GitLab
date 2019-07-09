@@ -24,7 +24,7 @@ module Gitlab
 
           def find_issues
             issues = IssuesFinder.new(@current_user, group_id: @group.id, include_subgroups: true).execute
-            issues = issues.where(projects: { name: @options[:projects] }) if @options[:projects]
+            issues = issues.where(projects: { id: @options[:projects] }) if @options[:projects]
             issues.created_after(@from).count
           end
         end

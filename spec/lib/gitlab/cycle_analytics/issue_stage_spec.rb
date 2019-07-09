@@ -72,7 +72,7 @@ describe Gitlab::CycleAnalytics::IssueStage do
     end
 
     context 'when only part of projects is chosen' do
-      let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: user, group: group, projects: [project_2.name] }) }
+      let(:stage) { described_class.new(options: { from: 2.days.ago, current_user: user, group: group, projects: [project_2.id] }) }
 
       describe '#group_median' do
         around do |example|

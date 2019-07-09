@@ -19,7 +19,7 @@ module Gitlab
             deployments = Deployment.joins(:project)
               .where(projects: { id: projects })
               .where("deployments.created_at > ?", @from)
-            deployments = deployments.where(projects: { name: @options[:projects] }) if @options[:projects]
+            deployments = deployments.where(projects: { id: @options[:projects] }) if @options[:projects]
             deployments.success.count
           end
 
