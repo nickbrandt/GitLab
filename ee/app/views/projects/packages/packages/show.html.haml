@@ -8,7 +8,7 @@
     = @package.version
 
   - if can?(current_user, :destroy_package, @project)
-    = link_to project_package_path(@project, @package), method: :delete, data: { confirm: _("Are you sure?") }, class: "btn btn-grouped btn-inverted btn-remove", title: _('Delete Package') do
+    = link_to project_package_path(@project, @package), method: :delete, data: { confirm: _("Are you sure?") }, class: "btn btn-grouped btn-remove", title: _('Delete Package') do
       = _('Delete')
 .row.prepend-top-default
   .col-sm-6
