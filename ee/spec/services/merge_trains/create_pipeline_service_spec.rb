@@ -78,8 +78,14 @@ describe MergeTrains::CreatePipelineService do
           stub_ci_pipeline_yaml_file(YAML.dump(ci_yaml))
         end
 
-        it 'calls Ci::CreatePipelineService' do
-          expect_next_instance_of(Ci::CreatePipelineService, project, maintainer, any_args) do |pipeline_service|
+        it 'creates train ref' do
+          expect { subject }
+            .to change { merge_request.project.repository.ref_exists?(merge_request.train_ref_path) }
+            .from(false).to(true)
+        end
+
+        it 'calls Ci::CreatePipelineService for creating pipeline on train ref' do
+          expect_next_instance_of(Ci::CreatePipelineService, project, maintainer, hash_including(ref: merge_request.train_ref_path)) do |pipeline_service|
             expect(pipeline_service).to receive(:execute)
               .with(:merge_request_event, hash_including(merge_request: merge_request)).and_call_original
           end

@@ -20,7 +20,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approval_rules, class_name: 'ApprovalMergeRequestRule', inverse_of: :merge_request
       has_many :draft_notes
-      has_one :merge_train
+      has_one :merge_train, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
       has_many :blocks_as_blocker,
                class_name: 'MergeRequestBlock',

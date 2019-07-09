@@ -324,7 +324,7 @@ group :metrics do
   gem 'influxdb', '~> 0.2', require: false
 
   # Prometheus
-  gem 'prometheus-client-mmap', '~> 0.9.6'
+  gem 'prometheus-client-mmap', '~> 0.9.8'
   gem 'raindrops', '~> 0.18'
 end
 
@@ -383,6 +383,7 @@ group :development, :test do
   gem 'haml_lint', '~> 0.31.0', require: false
   gem 'simplecov', '~> 0.16.1', require: false
   gem 'bundler-audit', '~> 0.5.0', require: false
+  gem 'mdl', '~> 0.5.0', require: false
 
   gem 'benchmark-ips', '~> 2.3.0', require: false
 

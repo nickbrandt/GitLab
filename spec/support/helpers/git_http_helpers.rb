@@ -1,3 +1,5 @@
+require_relative 'workhorse_helpers'
+
 module GitHttpHelpers
   include WorkhorseHelpers
 
