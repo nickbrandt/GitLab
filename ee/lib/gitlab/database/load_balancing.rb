@@ -69,11 +69,13 @@ module Gitlab
         }
       end
 
+      # rubocop:disable Gitlab/RailsLogger
       def self.log(level, message)
         Rails.logger.tagged(LOG_TAG) do
           Rails.logger.send(level, message)
         end
       end
+      # rubocop:enable Gitlab/RailsLogger
 
       def self.pool_size
         ActiveRecord::Base.configurations[Rails.env]['pool']

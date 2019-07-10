@@ -212,7 +212,7 @@ class GeoNode < ApplicationRecord
     # be called in an initializer and we don't want other callbacks
     # to mess with uninitialized dependencies.
     if clone_url_prefix_changed?
-      Rails.logger.info "Geo: modified clone_url_prefix to #{clone_url_prefix}"
+      Rails.logger.info "Geo: modified clone_url_prefix to #{clone_url_prefix}" # rubocop:disable Gitlab/RailsLogger
       update_column(:clone_url_prefix, clone_url_prefix)
     end
   end

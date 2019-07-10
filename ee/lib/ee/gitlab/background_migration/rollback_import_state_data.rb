@@ -8,7 +8,7 @@ module EE
 
         override :move_attributes_data_to_project
         def move_attributes_data_to_project(start_id, end_id)
-          Rails.logger.info("#{self.class.name} - Moving import attributes data to projects table: #{start_id} - #{end_id}")
+          Rails.logger.info("#{self.class.name} - Moving import attributes data to projects table: #{start_id} - #{end_id}") # rubocop:disable Gitlab/RailsLogger
 
           if ::Gitlab::Database.mysql?
             ActiveRecord::Base.connection.execute <<~SQL
