@@ -15,7 +15,9 @@ module Types
       field :project, Types::ProjectType, null: false
       field :issue, Types::IssueType, null: false
       field :filename, GraphQL::STRING_TYPE, null: false
+      field :full_path, GraphQL::STRING_TYPE, null: false
       field :image, GraphQL::STRING_TYPE, null: false, extras: [:parent]
+      field :diff_refs, Types::DiffRefsType, null: false, calls_gitaly: true
       field :versions,
             Types::DesignManagement::VersionType.connection_type,
             resolver: Resolvers::DesignManagement::VersionResolver,
