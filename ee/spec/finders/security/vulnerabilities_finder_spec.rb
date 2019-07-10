@@ -15,7 +15,7 @@ describe Security::VulnerabilitiesFinder do
     set(:vulnerability3) { create(:vulnerabilities_occurrence, report_type: :sast, severity: :low, pipelines: [pipeline2], project: project2) }
     set(:vulnerability4) { create(:vulnerabilities_occurrence, report_type: :dast, severity: :medium, pipelines: [pipeline1], project: project1) }
 
-    subject { described_class.new(group: group, params: params).execute }
+    subject { described_class.new(group, params: params).execute }
 
     context 'by report type' do
       context 'when sast' do
