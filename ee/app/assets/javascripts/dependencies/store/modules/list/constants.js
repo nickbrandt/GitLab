@@ -5,6 +5,11 @@ export const SORT_FIELDS = {
   packager: s__('Dependencies|Packager'),
 };
 
+export const SORT_FIELDS_WITH_SEVERITY = {
+  ...SORT_FIELDS,
+  severity: s__('Vulnerability|Severity'),
+};
+
 export const SORT_ORDER = {
   ascending: 'asc',
   descending: 'desc',
