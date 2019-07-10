@@ -1548,6 +1548,9 @@ msgstr ""
 msgid "Approvals"
 msgstr ""
 
+msgid "Approve"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -5033,6 +5036,9 @@ msgid "Enter the merge request description"
 msgstr ""
 
 msgid "Enter the merge request title"
+msgstr ""
+
+msgid "Enter your password to approve"
 msgstr ""
 
 msgid "Enter zen mode"
@@ -17276,6 +17282,9 @@ msgstr ""
 msgid "mrWidget|This project is archived, write access has been disabled"
 msgstr ""
 
+msgid "mrWidget|To approve this merge request, please enter your password. This project requires all approvals to be authenticated."
+msgstr ""
+
 msgid "mrWidget|When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged"
 msgstr ""
 
@@ -17286,6 +17295,9 @@ msgid "mrWidget|You can delete the source branch now"
 msgstr ""
 
 msgid "mrWidget|You can merge this merge request manually using the"
+msgstr ""
+
+msgid "mrWidget|Your password"
 msgstr ""
 
 msgid "mrWidget|branch does not exist."
