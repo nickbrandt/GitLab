@@ -65,7 +65,7 @@ describe 'User updates feature flag', :js do
       visit(project_audit_events_path(project))
 
       expect(page).to(
-        have_text("Updated feature flag ci live trace. Updated rule review/* active state from true to false.")
+        have_text("Updated feature flag ci_live_trace. Updated rule review/* active state from true to false.")
       )
     end
   end
@@ -96,7 +96,7 @@ describe 'User updates feature flag', :js do
       visit(project_audit_events_path(project))
 
       expect(page).to(
-        have_text("Updated feature flag ci live trace")
+        have_text("Updated feature flag ci_live_trace")
       )
     end
   end
@@ -124,7 +124,7 @@ describe 'User updates feature flag', :js do
       visit(project_audit_events_path(project))
 
       expect(page).to(
-        have_text("Updated feature flag ci live trace")
+        have_text("Updated feature flag ci_live_trace")
       )
     end
   end

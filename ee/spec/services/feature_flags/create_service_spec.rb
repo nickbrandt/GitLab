@@ -47,7 +47,7 @@ describe FeatureFlags::CreateService do
       end
 
       it 'creates audit event' do
-        expected_message = "Created feature flag <strong>feature flag</strong> "\
+        expected_message = "Created feature flag <strong>feature_flag</strong> "\
                            "with description <strong>\"description\"</strong>. "\
                            "Created rule <strong>*</strong> and set it as <strong>active</strong>. "\
                            "Created rule <strong>production</strong> and set it as <strong>inactive</strong>."
