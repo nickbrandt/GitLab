@@ -4282,6 +4282,16 @@ msgstr ""
 msgid "Dependencies"
 msgstr ""
 
+msgid "Dependencies|%d additional vulnerability not shown"
+msgid_plural "Dependencies|%d additional vulnerabilities not shown"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Dependencies|%d vulnerability"
+msgid_plural "Dependencies|%d vulnerabilities"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Dependencies|Component"
 msgstr ""
 
@@ -4298,6 +4308,12 @@ msgid "Dependencies|Location"
 msgstr ""
 
 msgid "Dependencies|Packager"
+msgstr ""
+
+msgid "Dependencies|Safe"
+msgstr ""
+
+msgid "Dependencies|Status"
 msgstr ""
 
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
