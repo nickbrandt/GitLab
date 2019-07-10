@@ -44,11 +44,12 @@ describe ResourceEvents::MergeIntoNotesService do
 
       notes = described_class.new(resource, user).execute
 
+      added_scoped_labels_refs = [scoped_label_group1_2, scoped_label_group2_1, scoped_label_group3_1].map(&:to_reference).sort.join(' ')
+      removed_scoped_labels_refs = [scoped_label_group1_1, scoped_label_group2_2].map(&:to_reference).sort.join(' ')
+
       expected = [
-        "added #{scoped_label_group1_2.to_reference} #{scoped_label_group2_1.to_reference} " \
-          "#{scoped_label_group3_1.to_reference} scoped labels " \
-          "and automatically removed " \
-          "#{scoped_label_group1_1.to_reference} #{scoped_label_group2_2.to_reference} labels",
+        "added #{added_scoped_labels_refs} scoped labels " \
+          "and automatically removed #{removed_scoped_labels_refs} labels",
         "added #{label.to_reference} label and removed #{label2.to_reference} label",
         "added #{label.to_reference} label",
         "added #{label2.to_reference} label"
