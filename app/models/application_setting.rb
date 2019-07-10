@@ -99,6 +99,10 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :plantuml_enabled
 
+  validates :sourcegraph_url,
+            presence: true,
+            if: :sourcegraph_enabled
+
   validates :snowplow_collector_hostname,
             presence: true,
             hostname: true,

@@ -259,6 +259,8 @@ module ApplicationSettingsHelper
       :shared_runners_text,
       :sign_in_text,
       :signup_enabled,
+      :sourcegraph_enabled,
+      :sourcegraph_url,
       :terminal_max_session_time,
       :terms,
       :throttle_authenticated_api_enabled,

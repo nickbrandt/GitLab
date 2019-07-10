@@ -352,6 +352,8 @@ ActiveRecord::Schema.define(version: 2019_11_12_232338) do
     t.string "snowplow_app_id"
     t.datetime_with_timezone "productivity_analytics_start_date"
     t.string "default_ci_config_path", limit: 255
+    t.boolean "sourcegraph_enabled", default: false, null: false
+    t.string "sourcegraph_url", limit: 255
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
