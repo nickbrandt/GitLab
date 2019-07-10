@@ -21,7 +21,7 @@ class FetchSubscriptionPlansService
 
     JSON.parse(response.body).map { |plan| Hashie::Mash.new(plan) }
   rescue => e
-    Rails.logger.info "Unable to connect to GitLab Customers App #{e}"
+    Rails.logger.info "Unable to connect to GitLab Customers App #{e}" # rubocop:disable Gitlab/RailsLogger
 
     nil
   end

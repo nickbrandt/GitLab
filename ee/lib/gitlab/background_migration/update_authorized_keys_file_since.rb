@@ -30,7 +30,7 @@ module Gitlab
 
       # Not added to Gitlab::Shell because I don't expect this to be used again
       def batch_add_keys_in_db_starting_from(start_id)
-        Rails.logger.info("Adding all keys starting from ID: #{start_id}")
+        Rails.logger.info("Adding all keys starting from ID: #{start_id}") # rubocop:disable Gitlab/RailsLogger
 
         ::Key.find_in_batches(start: start_id, batch_size: 1000) do |keys|
           gitlab_shell.batch_add_keys(keys)
