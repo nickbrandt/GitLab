@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-shared_examples ::EE::VulnerabilitiesActions do
+shared_examples VulnerabilitiesActions do
   include ApiHelpers
 
   let(:user) { create(:user) }
