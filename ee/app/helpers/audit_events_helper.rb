@@ -16,8 +16,8 @@ module AuditEventsHelper
   end
 
   def custom_message_for(details)
-    target_type = details[:target_type].constantize
+    target_type = details[:target_type]
     val = details[:custom_message]
-    target_type == Operations::FeatureFlag ? val : val.tr('_', ' ')
+    target_type == 'Operations::FeatureFlag' ? val : val.tr('_', ' ')
   end
 end
