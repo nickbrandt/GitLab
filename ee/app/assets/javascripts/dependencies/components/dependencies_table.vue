@@ -7,6 +7,12 @@ export default {
   components: {
     DependenciesTableRow,
   },
+  inject: {
+    dependencyListVulnerabilities: {
+      from: 'dependencyListVulnerabilities',
+      default: false,
+    },
+  },
   props: {
     dependencies: {
       type: Array,
@@ -18,14 +24,18 @@ export default {
     },
   },
   data() {
-    return {
-      tableSections: [
-        { className: 'section-20', label: s__('Dependencies|Component') },
-        { className: 'section-15', label: s__('Dependencies|Version') },
-        { className: 'section-20', label: s__('Dependencies|Packager') },
-        { className: 'flex-grow-1', label: s__('Dependencies|Location') },
-      ],
-    };
+    const tableSections = [
+      { className: 'section-20', label: s__('Dependencies|Component') },
+      { className: 'section-15', label: s__('Dependencies|Version') },
+      { className: 'section-20', label: s__('Dependencies|Packager') },
+      { className: 'flex-grow-1', label: s__('Dependencies|Location') },
+    ];
+
+    if (this.dependencyListVulnerabilities) {
+      tableSections.unshift({ className: 'section-15', label: s__('Dependencies|Status') });
+    }
+
+    return { tableSections };
   },
 };
 </script>
