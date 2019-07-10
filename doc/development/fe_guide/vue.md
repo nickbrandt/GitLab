@@ -104,6 +104,49 @@ document.addEventListener('DOMContentLoaded', () => new Vue({
 }));
 ```
 
+#### Accessing feature flags
+
+Use Vue's [provide/inject](https://vuejs.org/v2/api/#provide-inject) mechanism
+to make feature flags available to any descendant components in a Vue
+application:
+
+```javascript
+// application entry point
+document.addEventListener('DOMContentLoaded', () => new Vue({
+  el: '.js-vue-app',
+  provide: {
+    aFeatureFlag: gon.features.aFeatureFlag,
+  },
+  render(createElement) {
+    return createElement('my-component');
+  },
+}));
+
+// An arbitrary descendant component
+export default {
+  ...
+  inject: {
+    aFeatureFlag: {
+      from: 'aFeatureFlag',
+      default: false,
+    },
+  },
+  ...
+}
+```
+
+This approach has several benefits:
+
+- Arbitrarily deeply nested components can opt-in and access the flag without
+  intermediate components being aware of it (c.f. passing the flag down via
+  props).
+- Components can use a different local name for the flag if necessary.
+- A default value can be declared in case the flag is not provided.
+- Good testability, since the flag can be provided to `mount`/`shallowMount`
+  from `vue-test-utils` as easily as a prop.
+- No need to access a global variable, except in the application's
+  [entry point](#accessing-the-gl-object).
+
 ### A folder for Components
 
 This folder holds all components that are specific of this new feature.
