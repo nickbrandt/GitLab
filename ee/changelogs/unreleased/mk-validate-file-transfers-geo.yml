@@ -1,0 +1,5 @@
+---
+title: 'Geo: Validate file transfers (attachments, LFS objects, artifacts)'
+merge_request: 14477
+author:
+type: added
