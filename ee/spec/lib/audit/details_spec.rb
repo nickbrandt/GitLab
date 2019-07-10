@@ -67,14 +67,21 @@ describe Audit::Details do
           expect(string).to eq('Changed access level from Guest to Owner')
         end
       end
+    end
 
-      context 'when the target_type is Operations::FeatureFlag' do
-        let(:target_type) { 'Operations::FeatureFlag' }
-        it 'leaves access_level as it is' do
-          string = described_class.humanize(member_access_action)
+    context 'feature flag' do
+      let(:feature_flag) do
+        {
+          remove: 'feature_flag',
+          target_type: 'Operations::FeatureFlag'
+        }
+      end
+      let(:custom_message) { "Removed feature_flag" }
 
-          expect(string).to eq('Changed access_level from Guest to Owner')
-        end
+      it 'shows message as is' do
+        string = described_class.humanize(feature_flag)
+
+        expect(string).to eq(custom_message)
       end
     end
 

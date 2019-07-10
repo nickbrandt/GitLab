@@ -31,15 +31,12 @@ describe AuditEventsHelper do
         expect(subject).to eq(custom_message)
       end
 
-      context 'when the target_type is Operations::FeatureFlag' do
+      context 'when message relates to feature flags' do
+        let(:custom_message) { "Feature flag my_feature_flag was updated" }
         let(:target_type) { 'Operations::FeatureFlag' }
 
-        context 'when custom message contains "_"' do
-          let(:custom_message) { "message_with_spaces" }
-
-          it 'does not replace them with spaces' do
-            expect(subject).to eq("message_with_spaces")
-          end
+        it 'shows message as is' do
+          is_expected.to eq(custom_message)
         end
       end
 
