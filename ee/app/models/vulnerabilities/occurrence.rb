@@ -119,14 +119,15 @@ module Vulnerabilities
       }
 
       BatchLoader.for(params).batch do |items, loader|
-        project_ids = items.group_by { |i| i[:project_id] }
-        categories = items.group_by { |i| i[:category] }
-        fingerprints = items.group_by { |i| i[:project_fingerprint] }
+        project_ids = items.map { |i| i[:project_id] }
+        categories = items.map { |i| i[:category] }
+        fingerprints = items.map { |i| i[:project_fingerprint] }
 
         Vulnerabilities::Feedback.all_preloaded.where(
-          project_id: project_ids.keys,
-          category: categories.keys,
-          project_fingerprint: fingerprints.keys).find_each do |feedback|
+          project_id: project_ids.uniq,
+          category: categories.uniq,
+          project_fingerprint: fingerprints.uniq
+        ).each do |feedback|
           loaded_params = {
             project_id: feedback.project_id,
             category: feedback.category,
