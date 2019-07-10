@@ -109,7 +109,7 @@ describe API::V3::Github do
     end
 
     it 'returns an empty Array for events' do
-      jira_get v3_api("/repos/-/jira/events", user)
+      jira_get v3_api('/repos/-/jira/events', user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response).to eq([])
@@ -278,7 +278,7 @@ describe API::V3::Github do
 
         raise "Project #{project.full_path} not present in response" if hash.nil?
 
-        expect(hash['owner']['login']).to eq(namespace.name)
+        expect(hash['owner']['login']).to eq(namespace.path)
       end
       expect(json_response.size).to eq(projects.size)
     end
@@ -351,7 +351,7 @@ describe API::V3::Github do
 
     context 'unauthenticated' do
       it 'returns 401' do
-        jira_get v3_api("/users/foo/repos", nil)
+        jira_get v3_api('/users/foo/repos', nil)
 
         expect(response).to have_gitlab_http_status(401)
       end
@@ -374,7 +374,7 @@ describe API::V3::Github do
       it 'responds with not found status' do
         stub_licensed_features(jira_dev_panel_integration: true)
 
-        jira_get v3_api("/users/noo/repos", user)
+        jira_get v3_api('/users/noo/repos', user)
 
         expect(response).to have_gitlab_http_status(404)
       end

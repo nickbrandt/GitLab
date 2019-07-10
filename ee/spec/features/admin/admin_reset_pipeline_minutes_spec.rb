@@ -21,7 +21,7 @@ describe 'Reset namespace pipeline minutes' do
         end
 
         expect(page).to have_selector('.flash-notice')
-        expect(current_path).to include(namespace.name)
+        expect(current_path).to include(namespace.path)
 
         expect(namespace.namespace_statistics.reload.shared_runners_seconds).to eq(0)
         expect(namespace.namespace_statistics.reload.shared_runners_seconds_last_reset).to be_like_time(time)
@@ -38,7 +38,7 @@ describe 'Reset namespace pipeline minutes' do
       it 'renders edit page with an error' do
         click_link 'Reset pipeline minutes'
 
-        expect(current_path).to include(namespace.name)
+        expect(current_path).to include(namespace.path)
         expect(page).to have_selector('.flash-error')
       end
     end
@@ -57,15 +57,15 @@ describe 'Reset namespace pipeline minutes' do
       expect(page).to have_link('Reset pipeline minutes', href: reset_runners_minutes_admin_user_path(user))
     end
 
-    include_examples "resetting pipeline minutes"
-    include_examples "rendering error"
+    include_examples 'resetting pipeline minutes'
+    include_examples 'rendering error'
   end
 
   describe 'when creating a new group' do
     before do
       visit admin_groups_path
       page.within '#content-body' do
-        click_link "New group"
+        click_link 'New group'
       end
     end
 
@@ -87,7 +87,7 @@ describe 'Reset namespace pipeline minutes' do
       expect(page).to have_link('Reset pipeline minutes', href: admin_group_reset_runners_minutes_path(group))
     end
 
-    include_examples "resetting pipeline minutes"
-    include_examples "rendering error"
+    include_examples 'resetting pipeline minutes'
+    include_examples 'rendering error'
   end
 end
