@@ -29,7 +29,7 @@ describe Elastic::IndexRecordService, :elastic do
         end
 
         expect do
-          subject.execute(object, true)
+          expect(subject.execute(object, true)).to eq(true)
           Gitlab::Elastic::Helper.refresh_index
         end.to change { Elasticsearch::Model.search('*').records.size }.by(1)
       end
@@ -39,12 +39,12 @@ describe Elastic::IndexRecordService, :elastic do
 
         Sidekiq::Testing.disable! do
           object = create(type)
-          subject.execute(object, true)
+          expect(subject.execute(object, true)).to eq(true)
           object.update(attribute => "new")
         end
 
         expect do
-          subject.execute(object, false)
+          expect(subject.execute(object, false)).to eq(true)
           Gitlab::Elastic::Helper.refresh_index
         end.to change { Elasticsearch::Model.search('new').records.size }.by(1)
       end
@@ -72,7 +72,7 @@ describe Elastic::IndexRecordService, :elastic do
       expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true).and_call_original
 
       Sidekiq::Testing.inline! do
-        subject.execute(project, true)
+        expect(subject.execute(project, true)).to eq(true)
       end
       Gitlab::Elastic::Helper.refresh_index
 
@@ -87,13 +87,163 @@ describe Elastic::IndexRecordService, :elastic do
       expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(other_project.id, nil, nil, true).and_call_original
 
       Sidekiq::Testing.inline! do
-        subject.execute(other_project, true)
+        expect(subject.execute(other_project, true)).to eq(true)
       end
       Gitlab::Elastic::Helper.refresh_index
 
       # Only the project itself should be in the index
       expect(Elasticsearch::Model.search('*').total_count).to be 1
       expect(Project.elastic_search('*').records).to contain_exactly(other_project)
+    end
+
+    context 'retry indexing record' do
+      let(:failure_response) do
+        {
+          "_shards" => {
+            "total" => 2,
+            "failed" => 2,
+            "successful" => 0
+          },
+          "_index" => "foo",
+          "_type" => "_doc",
+          "_id" => "project_1",
+          "_version" => 1,
+          "created" => false,
+          "result" => ""
+        }
+      end
+
+      before do
+        allow(ElasticCommitIndexerWorker).to receive(:perform_async)
+      end
+
+      it 'does not retry if successful' do
+        expect(project.__elasticsearch__).to receive(:index_document).once.and_call_original
+
+        expect(subject.execute(project, true)).to eq(true)
+      end
+
+      it 'retries, and raises error if all retries fail' do
+        expect(project.__elasticsearch__).to receive(:index_document)
+          .exactly(described_class::IMPORT_RETRY_COUNT).times
+          .and_return(failure_response)
+
+        expect { subject.execute(project, true) }.to raise_error(described_class::ImportError)
+      end
+
+      it 'retries, and returns true if a retry is successful' do
+        expect(project.__elasticsearch__).to receive(:index_document).and_wrap_original do |m, *args|
+          allow(project.__elasticsearch__).to receive(:index_document).and_call_original
+
+          m.call(*args)
+        end
+
+        expect(subject.execute(project, true)).to eq(true)
+      end
+    end
+
+    context 'retry importing associations' do
+      let(:issues) { Issue.all.to_a }
+      let(:failure_response) do
+        {
+          "took" => 30,
+          "errors" => true,
+          "items" => [
+            {
+              "index" => {
+                "error" => 'FAILED',
+                "_index" => "test",
+                "_type" => "_doc",
+                "_id" => issues.first.es_id,
+                "_version" => 1,
+                "result" => "created",
+                "_shards" => {
+                  "total" => 2,
+                  "successful" => 1,
+                  "failed" => 0
+                },
+                "status" => 400
+              }
+            },
+            {
+              "index" => {
+                "_index" => "test",
+                "_type" => "_doc",
+                "_id" => issues.last.es_id,
+                "_version" => 1,
+                "result" => "created",
+                "_shards" => {
+                  "total" => 2,
+                  "successful" => 1,
+                  "failed" => 0
+                },
+                "status" => 201
+              }
+            }
+          ]
+        }
+      end
+
+      let(:success_response) do
+        {
+          "took" => 30,
+          "errors" => false,
+          "items" => [
+            {
+              "index" => {
+                "_index" => "test",
+                "_type" => "_doc",
+                "_id" => issues.first.es_id,
+                "_version" => 1,
+                "result" => "created",
+                "_shards" => {
+                  "total" => 2,
+                  "successful" => 1,
+                  "failed" => 0
+                },
+                "status" => 201
+              }
+            }
+          ]
+        }
+      end
+
+      before do
+        allow(ElasticCommitIndexerWorker).to receive(:perform_async)
+      end
+
+      def expect_indexing(issue_ids, response, unstub: false)
+        expect(Issue.__elasticsearch__.client).to receive(:bulk) do |args|
+          actual_ids = args[:body].map { |job| job[:index][:_id] }
+          expected_ids = issue_ids.map { |id| "issue_#{id}" }
+
+          expect(actual_ids).to eq(expected_ids)
+
+          allow(Issue.__elasticsearch__.client).to receive(:bulk).and_call_original if unstub
+
+          response
+        end
+      end
+
+      it 'does not retry if successful' do
+        expect_indexing(issues.map(&:id), success_response, unstub: true)
+
+        expect(subject.execute(project, true)).to eq(true)
+      end
+
+      it 'retries, and raises error if all retries fail' do
+        expect_indexing(issues.map(&:id), failure_response)
+        expect_indexing([issues.first.id], failure_response).exactly(described_class::IMPORT_RETRY_COUNT).times # Retry
+
+        expect { subject.execute(project, true) }.to raise_error(described_class::ImportError)
+      end
+
+      it 'retries, and returns true if a retry is successful' do
+        expect_indexing(issues.map(&:id), failure_response)
+        expect_indexing([issues.first.id], success_response, unstub: true) # Retry
+
+        expect(subject.execute(project, true)).to eq(true)
+      end
     end
   end
 
@@ -119,7 +269,7 @@ describe Elastic::IndexRecordService, :elastic do
     expect(Note.elastic_search('note_3', options: options).present?).to eq(false)
 
     Sidekiq::Testing.inline! do
-      subject.execute(project, true)
+      expect(subject.execute(project, true)).to eq(true)
       Gitlab::Elastic::Helper.refresh_index
     end
 
@@ -138,7 +288,7 @@ describe Elastic::IndexRecordService, :elastic do
     expect(project).to receive(:use_elasticsearch?).and_return(false)
 
     Sidekiq::Testing.inline! do
-      subject.execute(project, true)
+      expect(subject.execute(project, true)).to eq(true)
       Gitlab::Elastic::Helper.refresh_index
     end
 
