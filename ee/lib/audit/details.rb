@@ -33,7 +33,7 @@ module Audit
       when :failed_login
         "Failed to login with #{oath_label} authentication"
       when :custom_message
-        detail_value
+        detail_value_with_space
       else
         text_for_change(target_detail_value)
       end
@@ -49,7 +49,11 @@ module Audit
     end
 
     def target_detail_value
-      @details[:target_type] == 'Operations::FeatureFlag' ? detail_value : detail_value.tr('_', ' ')
+      @details[:target_type] == 'Operations::FeatureFlag' ? detail_value : detail_value_with_space
+    end
+
+    def detail_value_with_space
+      detail_value.tr('_', ' ')
     end
 
     def detail_value

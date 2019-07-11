@@ -20,7 +20,7 @@ shared_examples 'audit event contains custom message' do
     visit audit_events_url
   end
 
-  it 'user sess this message' do
+  it 'user sees this message' do
     expect(page).to have_content('Message with spaces')
   end
 
