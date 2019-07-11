@@ -320,7 +320,7 @@ describe EE::NotificationService, :mailer do
     end
 
     context 'epic notes' do
-      set(:note) { create(:note, project: nil, noteable: epic, note: '@mention referenced, @unsubscribed_mentioned and @outsider also') }
+      let(:note) { create(:note, project: nil, noteable: epic, note: '@mention referenced, @unsubscribed_mentioned and @outsider also') }
 
       before do
         build_group_members(group)
