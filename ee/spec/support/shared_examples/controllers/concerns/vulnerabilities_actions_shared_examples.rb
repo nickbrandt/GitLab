@@ -5,6 +5,7 @@ require 'spec_helper'
 shared_examples VulnerabilitiesActions do
   include ApiHelpers
 
+  let(:params) { vulnerable_params }
   let(:user) { create(:user) }
   let(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
@@ -22,7 +23,7 @@ shared_examples VulnerabilitiesActions do
   end
 
   describe 'GET index.json' do
-    subject { get :index, params: vulnerable_params, format: :json }
+    subject { get :index, params: params, format: :json }
 
     it 'returns an ordered list of vulnerabilities' do
       critical_vulnerability = create(
@@ -42,10 +43,12 @@ shared_examples VulnerabilitiesActions do
     end
 
     context 'when a specific page is requested' do
+      let(:params) { vulnerable_params.merge(page: 2) }
+
       it 'returns the list of vulnerabilities that are on the requested page' do
         create_list(:vulnerabilities_occurrence, 35, pipelines: [pipeline], project: project)
 
-        get :index, params: vulnerable_params.merge(page: 2), format: :json
+        subject
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response.length).to eq 15
@@ -53,8 +56,6 @@ shared_examples VulnerabilitiesActions do
     end
 
     context 'when the vulnerabilities have feedback' do
-      subject { get :index, params: vulnerable_params, format: :json }
-
       it 'avoids N+1 queries', :with_request_store do
         vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, report_type: :sast)
         create(:vulnerability_feedback,
@@ -87,25 +88,35 @@ shared_examples VulnerabilitiesActions do
         create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, report_type: :dependency_scanning)
       end
 
-      it 'returns a list of vulnerabilities for sast only if filter is enabled' do
-        get :index, params: vulnerable_params.merge(report_type: ['sast']), format: :json
+      context 'with a single report filter' do
+        let(:params) { vulnerable_params.merge(report_type: ['sast']) }
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response.length).to eq 1
-        expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast')
-        expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
+        it 'returns a list of vulnerabilities for that reporty type only' do
+          subject
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response.length).to eq 1
+          expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast')
+          expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
+        end
       end
 
-      it "returns a list of vulnerabilities of all types with multi filter" do
-        get :index, params: vulnerable_params.merge(report_type: %w[sast dependency_scanning]), format: :json
+      context 'with multiple report filters' do
+        let(:params) { vulnerable_params.merge(report_type: %w[sast dependency_scanning]) }
 
-        expect(json_response.length).to eq 2
-        expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
+        it 'returns a list of vulnerabilities for all filtered upon types' do
+          subject
+
+          expect(json_response.length).to eq 2
+          expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
+        end
       end
     end
   end
 
   describe 'GET summary.json' do
+    subject { get :summary, params: params, format: :json }
+
     before do
       create_list(:vulnerabilities_occurrence, 3,
         pipelines: [pipeline], project: project, report_type: :sast, severity: :high)
@@ -118,7 +129,7 @@ shared_examples VulnerabilitiesActions do
     end
 
     it 'returns vulnerabilities counts for all report types' do
-      get :summary, params: vulnerable_params, format: :json
+      subject
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['high']).to eq(3)
@@ -128,8 +139,9 @@ shared_examples VulnerabilitiesActions do
     end
 
     context 'with enabled filters' do
+      let(:params) { vulnerable_params.merge(report_type: %w[sast dast], severity: %[high low]) }
       it 'returns counts for filtered vulnerabilities' do
-        get :summary, params: vulnerable_params.merge(report_type: %w[sast dast], severity: %[high low]), format: :json
+        subject
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['high']).to eq(3)
@@ -141,7 +153,7 @@ shared_examples VulnerabilitiesActions do
   end
 
   describe 'GET history.json' do
-    subject { get :history, params: vulnerable_params, format: :json }
+    subject { get :history, params: params, format: :json }
 
     before do
       travel_to(Time.zone.parse('2018-11-10')) do
@@ -204,16 +216,20 @@ shared_examples VulnerabilitiesActions do
       expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
     end
 
-    it 'returns filtered history if filters are enabled' do
-      travel_to(Time.zone.parse('2019-02-11')) do
-        get :history, params: vulnerable_params.merge(report_type: %w[sast]), format: :json
-      end
+    context 'with a report type filter' do
+      let(:params) { vulnerable_params.merge(report_type: %w[sast]) }
 
-      expect(response).to have_gitlab_http_status(200)
-      expect(json_response['total']).to eq({ '2018-11-12' => 1 })
-      expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
-      expect(json_response['low']).to eq({})
-      expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+      it 'returns filtered history if filters are enabled' do
+        travel_to(Time.zone.parse('2019-02-11')) do
+          subject
+        end
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['total']).to eq({ '2018-11-12' => 1 })
+        expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
+        expect(json_response['low']).to eq({})
+        expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+      end
     end
   end
 end
