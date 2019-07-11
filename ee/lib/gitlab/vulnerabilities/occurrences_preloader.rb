@@ -9,8 +9,15 @@ module Gitlab
     class OccurrencesPreloader
       def self.preload!(occurrences)
         occurrences.all_preloaded.tap do |occurrences|
-          occurrences.each(&:issue_feedback)
-          occurrences.each(&:dismissal_feedback)
+          preload_feedback!(occurrences)
+        end
+      end
+
+      def self.preload_feedback!(occurrences)
+        occurrences.each do |occurrence|
+          occurrence.dismissal_feedback
+          occurrence.issue_feedback
+          occurrence.merge_request_feedback
         end
       end
     end
