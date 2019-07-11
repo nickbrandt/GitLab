@@ -3,7 +3,6 @@
 // It's dangerous to go alone! take this
 // https://zaengle.com/blog/using-v-model-on-nested-vue-components
 
-import { s__ } from '~/locale';
 import { GlFormTextarea } from '@gitlab/ui';
 
 export default {
@@ -12,6 +11,11 @@ export default {
     GlFormTextarea,
   },
   props: {
+    placeholder: {
+      type: String,
+      required: false,
+      default: '',
+    },
     value: {
       type: String,
       required: false,
@@ -23,9 +27,6 @@ export default {
       default: '',
     },
   },
-  data: () => ({
-    placeholder: s__('vulnerability|Add a comment or reason for dismissal'),
-  }),
   computed: {
     localComment: {
       get() {
@@ -59,10 +60,10 @@ export default {
 
 <template>
   <div>
-    <hr />
     <gl-form-textarea
       ref="dismissalComment"
       v-model="localComment"
+      rows="3"
       :state="textAreaState"
       :placeholder="placeholder"
       @keydown.native="handleKeyPress"

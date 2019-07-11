@@ -6,6 +6,15 @@ import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 
+/**
+ * A lot of this file has duplicate actions in
+ * ee/app/assets/javascripts/vue_shared/security_reports/store/actions.js
+ * This is being addressed in the following issues:
+ *
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8146
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8519
+ */
+
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
 
 export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
@@ -180,6 +189,41 @@ export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => 
       document.querySelector('.ci-table'),
     );
   }
+};
+
+export const addDismissalComment = ({ dispatch }, { vulnerability, comment }) => {
+  dispatch('requestAddDismissalComment');
+
+  const { dismissal_feedback } = vulnerability;
+  const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${dismissal_feedback.id}`;
+
+  axios
+    .patch(url, {
+      project_id: dismissal_feedback.project_id,
+      id: dismissal_feedback.id,
+      comment,
+    })
+    .then(({ data }) => {
+      const { id } = vulnerability;
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveAddDismissalCommentSuccess', { id, data });
+    })
+    .catch(() => {
+      dispatch('receiveAddDismissalCommentError');
+    });
+};
+
+export const requestAddDismissalComment = ({ commit }) => {
+  commit(types.REQUEST_ADD_DISMISSAL_COMMENT);
+};
+
+export const receiveAddDismissalCommentSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, payload);
+  hideModal();
+};
+
+export const receiveAddDismissalCommentError = ({ commit }) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR);
 };
 
 export const undoDismiss = ({ dispatch }, { vulnerability, flashError }) => {

@@ -50,7 +50,7 @@ export default {
       :loading="isDismissing"
       :disabled="isDismissing"
       :label="buttonText"
-      container-class="js-dismiss-btn btn btn-close m-0"
+      container-class="js-dismiss-btn btn btn-close"
       @click="handleDismissClick"
     />
     <gl-button
@@ -58,7 +58,8 @@ export default {
       v-gl-tooltip.hover
       v-gl-tooltip.focus
       :title="s__('vulnerability|Add comment & dismiss')"
-      class="js-dismiss-with-comment btn-close m-0"
+      variant="close"
+      class="js-dismiss-with-comment "
       @click="$emit('openDismissalCommentBox')"
     >
       <icon name="comment" />

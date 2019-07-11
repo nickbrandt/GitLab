@@ -12206,6 +12206,9 @@ msgstr ""
 msgid "Security Reports|Oops, something doesn't seem right."
 msgstr ""
 
+msgid "Security Reports|There was an error adding the comment."
+msgstr ""
+
 msgid "Security Reports|There was an error creating the issue."
 msgstr ""
 
@@ -17559,6 +17562,9 @@ msgid "view the blob"
 msgstr ""
 
 msgid "vulnerability|Add a comment or reason for dismissal"
+msgstr ""
+
+msgid "vulnerability|Add comment"
 msgstr ""
 
 msgid "vulnerability|Add comment & dismiss"

@@ -237,6 +237,7 @@ export default {
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
       'downloadPatch',
+      'addDismissalComment',
     ]),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {
@@ -327,6 +328,7 @@ export default {
       @openDismissalCommentBox="openDismissalCommentBox()"
       @revertDismissVulnerability="revertDismissVulnerability"
       @downloadPatch="downloadPatch"
+      @addDismissalComment="addDismissalComment({ comment: $event })"
     />
   </div>
 </template>

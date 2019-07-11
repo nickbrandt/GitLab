@@ -257,6 +257,7 @@ export default {
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
       'downloadPatch',
+      'addDismissalComment',
     ]),
   },
 };
@@ -363,6 +364,7 @@ export default {
         @openDismissalCommentBox="openDismissalCommentBox()"
         @revertDismissVulnerability="revertDismissVulnerability"
         @downloadPatch="downloadPatch"
+        @addDismissalComment="addDismissalComment({ comment: $event })"
       />
     </div>
   </report-section>
