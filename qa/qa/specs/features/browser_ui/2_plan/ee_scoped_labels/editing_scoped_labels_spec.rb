@@ -29,7 +29,7 @@ module QA
           issue_page.select_labels_and_refresh [@new_label_same_scope, @new_label_different_scope]
 
           expect(page).to have_content("added #{@initial_label}")
-          expect(page).to have_content("added #{@new_label_same_scope} #{@new_label_different_scope} labels and removed #{@initial_label}")
+          expect(page).to have_content("added #{@new_label_same_scope} #{@new_label_different_scope} scoped labels and automatically removed #{@initial_label}")
           expect(issue_page.text_of_labels_block).to have_content(@new_label_same_scope)
           expect(issue_page.text_of_labels_block).to have_content(@new_label_different_scope)
           expect(issue_page.text_of_labels_block).not_to have_content(@initial_label)
