@@ -1,0 +1,5 @@
+---
+title: Cache Geo checks for a certain time period instead of per request
+merge_request: 14513
+author:
+type: performance

@@ -1548,6 +1548,9 @@ msgstr ""
 msgid "Approvals"
 msgstr ""
 
+msgid "Approve"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -2871,6 +2874,9 @@ msgid "Closed"
 msgstr ""
 
 msgid "Closed issues"
+msgstr ""
+
+msgid "Cluster Health"
 msgstr ""
 
 msgid "ClusterIntegration| %{custom_domain_start}More information%{custom_domain_end}."
@@ -5030,6 +5036,9 @@ msgid "Enter the merge request description"
 msgstr ""
 
 msgid "Enter the merge request title"
+msgstr ""
+
+msgid "Enter your password to approve"
 msgstr ""
 
 msgid "Enter zen mode"
@@ -8053,6 +8062,9 @@ msgid "Learn more about signing commits"
 msgstr ""
 
 msgid "Learn more about the dependency list"
+msgstr ""
+
+msgid "Learn more about vulnerability check"
 msgstr ""
 
 msgid "Learn more in the"
@@ -13896,7 +13908,7 @@ msgstr ""
 msgid "The time taken by each data entry gathered by that stage."
 msgstr ""
 
-msgid "The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url`"
+msgid "The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url` with a trailing slash"
 msgstr ""
 
 msgid "The update action will time out after %{number_of_minutes} minutes. For big repositories, use a clone/push combination."
@@ -15709,6 +15721,9 @@ msgstr ""
 msgid "Vulnerability List"
 msgstr ""
 
+msgid "Vulnerability-Check requires one or more merge request approvals only if high or critical security vulnerabilities are detected."
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -16927,6 +16942,9 @@ msgstr ""
 msgid "has already been taken"
 msgstr ""
 
+msgid "help"
+msgstr ""
+
 msgid "here"
 msgstr ""
 
@@ -17273,6 +17291,9 @@ msgstr ""
 msgid "mrWidget|This project is archived, write access has been disabled"
 msgstr ""
 
+msgid "mrWidget|To approve this merge request, please enter your password. This project requires all approvals to be authenticated."
+msgstr ""
+
 msgid "mrWidget|When this merge request is ready, remove the WIP: prefix from the title to allow it to be merged"
 msgstr ""
 
@@ -17283,6 +17304,9 @@ msgid "mrWidget|You can delete the source branch now"
 msgstr ""
 
 msgid "mrWidget|You can merge this merge request manually using the"
+msgstr ""
+
+msgid "mrWidget|Your password"
 msgstr ""
 
 msgid "mrWidget|branch does not exist."

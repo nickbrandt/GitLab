@@ -7,6 +7,7 @@ describe API::Vulnerabilities do
   set(:user) { create(:user) }
 
   let(:pipeline) { create(:ci_empty_pipeline, status: :created, project: project) }
+  let(:pipeline_without_vulnerabilities) { create(:ci_pipeline_without_jobs, status: :created, project: project) }
 
   let(:build_ds) { create(:ci_build, :success, name: 'ds_job', pipeline: pipeline, project: project) }
   let(:build_sast) { create(:ci_build, :success, name: 'sast_job', pipeline: pipeline, project: project) }
@@ -104,6 +105,34 @@ describe API::Vulnerabilities do
           expect(response).to have_gitlab_http_status(200)
 
           expect(json_response.map { |v| v['confidence'] }.uniq).to eq %w[high]
+        end
+
+        context 'when pipeline_id is supplied' do
+          it 'returns vulnerabilities from supplied pipeline' do
+            occurrence_count = (sast_report.occurrences.count + ds_report.occurrences.count - 1).to_s
+
+            get api("/projects/#{project.id}/vulnerabilities", user), params: { per_page: 40, pipeline_id: pipeline.id }
+
+            expect(response).to have_gitlab_http_status(200)
+
+            expect(response.headers['X-Total']).to eq occurrence_count
+          end
+
+          context 'pipeline has no reports' do
+            it 'returns empty results' do
+              get api("/projects/#{project.id}/vulnerabilities", user), params: { per_page: 40, pipeline_id: pipeline_without_vulnerabilities.id }
+
+              expect(json_response).to eq []
+            end
+          end
+
+          context 'with unknown pipeline' do
+            it 'returns empty results' do
+              get api("/projects/#{project.id}/vulnerabilities", user), params: { per_page: 40, pipeline_id: 0 }
+
+              expect(json_response).to eq []
+            end
+          end
         end
       end
     end

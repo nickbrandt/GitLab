@@ -5,6 +5,7 @@ module API
     prefix 'api/scim'
     version 'v2'
     content_type :json, 'application/scim+json'
+    USER_ID_REQUIREMENTS = { id: /.+/ }.freeze
 
     namespace 'groups/:group' do
       params do
@@ -107,7 +108,7 @@ module API
         desc 'Get a SAML user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
-        get ':id' do
+        get ':id', requirements: USER_ID_REQUIREMENTS do
           group = find_and_authenticate_group!(params[:group])
 
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: params[:id])
@@ -142,7 +143,7 @@ module API
         desc 'Updates a SAML user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
-        patch ':id' do
+        patch ':id', requirements: USER_ID_REQUIREMENTS do
           scim_error!(message: 'Missing ID') unless params[:id]
 
           group = find_and_authenticate_group!(params[:group])
@@ -164,7 +165,7 @@ module API
         desc 'Removes a SAML user' do
           detail 'This feature was introduced in GitLab 11.10.'
         end
-        delete ":id" do
+        delete ':id', requirements: USER_ID_REQUIREMENTS do
           scim_error!(message: 'Missing ID') unless params[:id]
 
           group = find_and_authenticate_group!(params[:group])

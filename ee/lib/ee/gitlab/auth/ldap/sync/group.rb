@@ -15,7 +15,7 @@ module EE
 
                 begin
                   group.start_ldap_sync
-                  Rails.logger.debug { "Started syncing all providers for '#{group.name}' group" }
+                  Rails.logger.debug { "Started syncing all providers for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
 
                   # Shuffle providers to prevent a scenario where sync fails after a time
                   # and only the first provider or two get synced. This shuffles the order
@@ -28,9 +28,9 @@ module EE
                   end
 
                   group.finish_ldap_sync
-                  Rails.logger.debug { "Finished syncing all providers for '#{group.name}' group" }
+                  Rails.logger.debug { "Finished syncing all providers for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
                 rescue ::Gitlab::Auth::LDAP::LDAPConnectionError
-                  Rails.logger.warn("Error syncing all providers for '#{group.name}' group")
+                  Rails.logger.warn("Error syncing all providers for '#{group.name}' group") # rubocop:disable Gitlab/RailsLogger
                   group.fail_ldap_sync
                 end
               end
@@ -41,15 +41,15 @@ module EE
 
                 begin
                   group.start_ldap_sync
-                  Rails.logger.debug { "Started syncing '#{proxy.provider}' provider for '#{group.name}' group" }
+                  Rails.logger.debug { "Started syncing '#{proxy.provider}' provider for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
 
                   sync_group = new(group, proxy)
                   sync_group.update_permissions
 
                   group.finish_ldap_sync
-                  Rails.logger.debug { "Finished syncing '#{proxy.provider}' provider for '#{group.name}' group" }
+                  Rails.logger.debug { "Finished syncing '#{proxy.provider}' provider for '#{group.name}' group" } # rubocop:disable Gitlab/RailsLogger
                 rescue ::Gitlab::Auth::LDAP::LDAPConnectionError
-                  Rails.logger.warn("Error syncing '#{proxy.provider}' provider for '#{group.name}' group")
+                  Rails.logger.warn("Error syncing '#{proxy.provider}' provider for '#{group.name}' group") # rubocop:disable Gitlab/RailsLogger
                   group.fail_ldap_sync
                 end
               end
@@ -59,7 +59,7 @@ module EE
 
                 return true unless group.ldap_sync_started?
 
-                Rails.logger.warn "Group '#{group.name}' is not ready for LDAP sync. Skipping"
+                Rails.logger.warn "Group '#{group.name}' is not ready for LDAP sync. Skipping" # rubocop:disable Gitlab/RailsLogger
                 false
               end
 
@@ -253,7 +253,7 @@ module EE
             # rubocop: enable CodeReuse/ActiveRecord
 
             def logger
-              Rails.logger
+              Rails.logger # rubocop:disable Gitlab/RailsLogger
             end
 
             def config

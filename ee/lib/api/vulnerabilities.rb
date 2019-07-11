@@ -6,7 +6,11 @@ module API
 
     helpers do
       def vulnerability_occurrences_by(params)
-        pipeline = params[:project].latest_pipeline_with_security_reports
+        pipeline = if params[:pipeline_id]
+                     params[:project].ci_pipelines.find_by(id: params[:pipeline_id]) # rubocop:disable CodeReuse/ActiveRecord
+                   else
+                     params[:project].latest_pipeline_with_security_reports
+                   end
 
         return [] unless pipeline
 
@@ -38,6 +42,7 @@ module API
                  type: Array[String],
                  desc: 'Returns vulnerabilities belonging to specified confidence level: `undefined`, `ignore`, `unknown`, `experimental`, `low`, `medium`, `high`, or `confirmed`. Defaults to all',
                  default: ::Vulnerabilities::Occurrence.confidences.keys
+        optional :pipeline_id, type: String, desc: 'The ID of the pipeline'
 
         use :pagination
       end

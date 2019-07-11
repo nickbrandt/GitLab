@@ -62,19 +62,60 @@ describe 'geo rake tasks', :geo do
   end
 
   describe 'status task', :geo_fdw do
-    let!(:current_node) { create(:geo_node) }
-    let!(:primary_node) { create(:geo_node, :primary) }
-    let!(:geo_event_log) { create(:geo_event_log) }
+    context 'without a valid license' do
+      before do
+        stub_licensed_features(geo: false)
+      end
 
-    before do
-      expect(Gitlab::Geo).to receive(:license_allows?).and_return(true).at_least(:once)
-      expect(GeoNodeStatus).to receive(:current_node_status).and_call_original
-
-      stub_current_geo_node(current_node)
+      it 'runs with an error' do
+        expect { run_rake_task('geo:status') }.to raise_error("GitLab Geo is not supported with this license. Please contact the sales team: https://about.gitlab.com/sales.")
+      end
     end
 
-    it 'runs with no error' do
-      expect { run_rake_task('geo:status') }.to output(/Sync Settings: Full/).to_stdout
+    context 'with a valid license' do
+      let!(:current_node) { create(:geo_node) }
+      let!(:primary_node) { create(:geo_node, :primary) }
+      let!(:geo_event_log) { create(:geo_event_log) }
+      let!(:geo_node_status) { build(:geo_node_status, :healthy, geo_node: current_node) }
+
+      before do
+        stub_licensed_features(geo: true)
+        stub_current_geo_node(current_node)
+
+        allow(GeoNodeStatus).to receive(:current_node_status).once.and_return(geo_node_status)
+      end
+
+      it 'runs with no error' do
+        expect { run_rake_task('geo:status') }.not_to raise_error
+      end
+
+      context 'with a healthy node' do
+        before do
+          geo_node_status.status_message = nil
+        end
+
+        it 'shows status as healthy' do
+          expect { run_rake_task('geo:status') }.to output(/Health Status: Healthy/).to_stdout
+        end
+
+        it 'does not show health status summary' do
+          expect { run_rake_task('geo:status') }.not_to output(/Health Status Summary/).to_stdout
+        end
+      end
+
+      context 'with an unhealthy node' do
+        before do
+          geo_node_status.status_message = 'Something went wrong'
+        end
+
+        it 'shows status as unhealthy' do
+          expect { run_rake_task('geo:status') }.to output(/Health Status: Unhealthy/).to_stdout
+        end
+
+        it 'shows health status summary' do
+          expect { run_rake_task('geo:status') }.to output(/Health Status Summary: Something went wrong/).to_stdout
+        end
+      end
     end
   end
 end

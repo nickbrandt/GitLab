@@ -15,6 +15,7 @@ module Banzai
       def self.internal_link_filters
         [
           Filter::RedactorFilter,
+          Filter::InlineMetricsRedactorFilter,
           Filter::RelativeLinkFilter,
           Filter::IssuableStateFilter,
           Filter::SuggestionFilter

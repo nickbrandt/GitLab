@@ -191,6 +191,11 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
     context 'backoff time' do
       let(:cache_key) { "#{described_class.name.underscore}:shard:#{shard_name}:skip" }
 
+      before do
+        allow(Rails.cache).to receive(:read).and_call_original
+        allow(Rails.cache).to receive(:write).and_call_original
+      end
+
       it 'sets the back off time when there are no pending items' do
         expect(Rails.cache).to receive(:write).with(cache_key, true, expires_in: 300.seconds).once
 

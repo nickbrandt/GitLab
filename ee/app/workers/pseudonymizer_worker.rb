@@ -16,7 +16,7 @@ class PseudonymizerWorker
     uploader = Pseudonymizer::Uploader.new(options, progress_output: File.open(File::NULL, "w"))
 
     unless uploader.available?
-      Rails.logger.error("The pseudonymizer object storage must be configured.")
+      Rails.logger.error("The pseudonymizer object storage must be configured.") # rubocop:disable Gitlab/RailsLogger
       return
     end
 

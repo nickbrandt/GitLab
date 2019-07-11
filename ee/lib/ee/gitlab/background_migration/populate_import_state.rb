@@ -8,7 +8,7 @@ module EE
 
         override :move_attributes_data_to_import_state
         def move_attributes_data_to_import_state(start_id, end_id)
-          Rails.logger.info("#{self.class.name} - Moving import attributes data to project mirror data table: #{start_id} - #{end_id}")
+          Rails.logger.info("#{self.class.name} - Moving import attributes data to project mirror data table: #{start_id} - #{end_id}") # rubocop:disable Gitlab/RailsLogger
 
           ActiveRecord::Base.connection.execute <<~SQL
             INSERT INTO project_mirror_data (project_id, status, jid, last_update_at, last_successful_update_at, last_error)
