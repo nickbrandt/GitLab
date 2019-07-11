@@ -52,4 +52,28 @@ describe Groups::Security::VulnerabilitiesController do
       end
     end
   end
+
+  describe 'GET index.json' do
+    it 'returns vulnerabilities for all projects in the group' do
+      stub_licensed_features(security_dashboard: true)
+      group.add_developer(user)
+
+      # create projects for the group
+      2.times do
+        project = create(:project, namespace: group)
+        pipeline = create(:ci_pipeline, :success, project: project)
+
+        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+      end
+
+      # create an ungrouped project to ensure we don't include it
+      project = create(:project)
+      pipeline = create(:ci_pipeline, :success, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high)
+
+      get :index, params: { group_id: group }, format: :json
+
+      expect(json_response.count).to be(2)
+    end
+  end
 end
