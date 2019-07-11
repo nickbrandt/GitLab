@@ -52,6 +52,10 @@ import actions, {
   updateDependencyScanningIssue,
   updateContainerScanningIssue,
   updateDastIssue,
+  addDismissalComment,
+  receiveAddDismissalCommentError,
+  receiveAddDismissalCommentSuccess,
+  requestAddDismissalComment,
 } from 'ee/vue_shared/security_reports/store/actions';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
@@ -1297,6 +1301,108 @@ describe('security reports actions', () => {
         ],
         done,
       );
+    });
+  });
+
+  describe('addDismissalComment', () => {
+    const vulnerability = {
+      id: 0,
+      vulnerability_feedback_dismissal_path: 'foo',
+      dismissalFeedback: { id: 1 },
+    };
+    const data = { vulnerability };
+    const url = `${state.createVulnerabilityFeedbackDismissalPath}/${vulnerability.dismissalFeedback.id}`;
+    const comment = 'Well, we’re back in the car again.';
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          addDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestAddDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveAddDismissalCommentSuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(404);
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          addDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestAddDismissalComment' },
+            {
+              type: 'receiveAddDismissalCommentError',
+              payload: 'There was an error adding the comment.',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('receiveAddDismissalCommentSuccess', () => {
+      it('should commit the success mutation', done => {
+        testAction(
+          receiveAddDismissalCommentSuccess,
+          { data },
+          state,
+          [{ type: types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, payload: { data } }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('receiveAddDismissalCommentError', () => {
+      it('should commit the error mutation', done => {
+        testAction(
+          receiveAddDismissalCommentError,
+          {},
+          state,
+          [
+            {
+              type: types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR,
+              payload: {},
+            },
+          ],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('requestAddDismissalComment', () => {
+      it('should commit the request mutation', done => {
+        testAction(
+          requestAddDismissalComment,
+          {},
+          state,
+          [{ type: types.REQUEST_ADD_DISMISSAL_COMMENT }],
+          [],
+          done,
+        );
+      });
     });
   });
 

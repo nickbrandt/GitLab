@@ -309,13 +309,37 @@ export default {
   },
 
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
-    Vue.set(state.modal, 'isDismissingIssue', true);
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
     // reset error in case previous state was error
     Vue.set(state.modal, 'error', null);
   },
 
   [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state) {
-    Vue.set(state.modal, 'isDismissingIssue', false);
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+  },
+
+  [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
+    Vue.set(state.modal, 'error', error);
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+  },
+
+  [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
+    state.isDismissingVulnerability = true;
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    Vue.set(state.modal, 'error', null);
+  },
+
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal.vulnerability, 'isDismissed', true);
+    Vue.set(state.modal.vulnerability, 'dismissalFeedback', payload.data);
+  },
+
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state, error) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal, 'error', error);
   },
 
   [types.UPDATE_SAST_ISSUE](state, issue) {
@@ -388,11 +412,6 @@ export default {
     if (resolvedIssuesIndex !== -1) {
       state.dast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
     }
-  },
-
-  [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
-    Vue.set(state.modal, 'error', error);
-    Vue.set(state.modal, 'isDismissingIssue', false);
   },
 
   [types.REQUEST_CREATE_ISSUE](state) {

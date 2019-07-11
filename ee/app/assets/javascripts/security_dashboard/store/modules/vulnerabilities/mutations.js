@@ -179,6 +179,26 @@ export default {
       s__('Security Reports|There was an error dismissing the vulnerability.'),
     );
   },
+  [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
+    state.isDismissingVulnerability = true;
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    Vue.set(state.modal, 'error', null);
+  },
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
+    const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
+    if (!vulnerability) {
+      return;
+    }
+    vulnerability.dismissal_feedback = payload.data;
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal.vulnerability, 'isDismissed', true);
+  },
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal, 'error', s__('Security Reports|There was an error adding the comment.'));
+  },
   [types.REQUEST_REVERT_DISMISSAL](state) {
     state.isDismissingVulnerability = true;
     Vue.set(state.modal, 'isDismissingVulnerability', true);

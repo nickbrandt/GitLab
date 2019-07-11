@@ -139,7 +139,7 @@ export default () => ({
     },
 
     isCreatingNewIssue: false,
-    isDismissingIssue: false,
+    isDismissingVulnerability: false,
 
     error: null,
   },

@@ -435,7 +435,7 @@ describe('security reports mutations', () => {
       expect(stateCopy.modal.vulnerability.hasIssue).toEqual(false);
 
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(false);
-      expect(stateCopy.modal.isDismissingIssue).toEqual(false);
+      expect(stateCopy.modal.isDismissingVulnerability).toEqual(false);
 
       expect(stateCopy.modal.title).toEqual(null);
       expect(stateCopy.modal.learnMoreUrl).toEqual(null);
@@ -505,28 +505,91 @@ describe('security reports mutations', () => {
   });
 
   describe('REQUEST_DISMISS_VULNERABILITY', () => {
-    it('sets isDismissingIssue prop to true and resets error', () => {
+    it('sets isDismissingVulnerability prop to true and resets error', () => {
       mutations[types.REQUEST_DISMISS_VULNERABILITY](stateCopy);
 
-      expect(stateCopy.modal.isDismissingIssue).toEqual(true);
+      expect(stateCopy.modal.isDismissingVulnerability).toEqual(true);
       expect(stateCopy.modal.error).toBeNull();
     });
   });
 
   describe('RECEIVE_DISMISS_VULNERABILITY_SUCCESS', () => {
-    it('sets isDismissingIssue prop to false', () => {
+    it('sets isDismissingVulnerability prop to false', () => {
       mutations[types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](stateCopy);
 
-      expect(stateCopy.modal.isDismissingIssue).toEqual(false);
+      expect(stateCopy.modal.isDismissingVulnerability).toEqual(false);
     });
   });
 
   describe('RECEIVE_DISMISS_VULNERABILITY_ERROR', () => {
-    it('sets isDismissingIssue prop to false and sets error', () => {
+    it('sets isDismissingVulnerability prop to false and sets error', () => {
       mutations[types.RECEIVE_DISMISS_VULNERABILITY_ERROR](stateCopy, 'error');
 
-      expect(stateCopy.modal.isDismissingIssue).toEqual(false);
+      expect(stateCopy.modal.isDismissingVulnerability).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');
+    });
+  });
+
+  describe(types.REQUEST_ADD_DISMISSAL_COMMENT, () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_ADD_DISMISSAL_COMMENT](stateCopy);
+    });
+
+    it('should set isDismissingVulnerability to true', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to true', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should nullify the error state on the modal', () => {
+      expect(stateCopy.modal.error).toBeNull();
+    });
+  });
+
+  describe(types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, () => {
+    let payload;
+    let vulnerability;
+    let data;
+
+    beforeEach(() => {
+      vulnerability = { id: 1 };
+      data = { name: 'dismissal feedback' };
+      payload = { id: vulnerability.id, data };
+      mutations[types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](stateCopy, payload);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability on the modal to false', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('shoulfd set isDissmissed on the modal vulnerability to be true', () => {
+      expect(stateCopy.modal.vulnerability.isDismissed).toBe(true);
+    });
+  });
+
+  describe(types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR, () => {
+    const error = 'There was an error adding the comment.';
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](stateCopy, error);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to false', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set the error state on the modal', () => {
+      expect(stateCopy.modal.error).toEqual(error);
     });
   });
 

@@ -5,6 +5,17 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
 
+/**
+ * A lot of this file has duplicate actions to
+ * ee/app/assets/javascripts/security_dashboard/store/modules/vulnerabilities/actions.js
+ * This is being addressed in the following issues:
+ *
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8146
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8519
+ */
+
+const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
+
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 
 export const setBaseBlobPath = ({ commit }, blobPath) => commit(types.SET_BASE_BLOB_PATH, blobPath);
@@ -267,7 +278,7 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
         default:
       }
 
-      $('#modal-mrwidget-security-issue').modal('hide');
+      hideModal();
     })
     .catch(() => {
       dispatch(
@@ -275,6 +286,44 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
         s__('ciReport|There was an error dismissing the vulnerability. Please try again.'),
       );
     });
+};
+
+export const addDismissalComment = ({ state, dispatch }, { comment }) => {
+  dispatch('requestAddDismissalComment');
+
+  const { vulnerability } = state.modal;
+  const { dismissalFeedback } = vulnerability;
+  const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
+
+  axios
+    .patch(url, {
+      project_id: dismissalFeedback.project_id,
+      id: dismissalFeedback.id,
+      comment,
+    })
+    .then(({ data }) => {
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveAddDismissalCommentSuccess', { data });
+    })
+    .catch(() => {
+      dispatch(
+        'receiveAddDismissalCommentError',
+        s__('Security Reports|There was an error adding the comment.'),
+      );
+    });
+};
+
+export const requestAddDismissalComment = ({ commit }) => {
+  commit(types.REQUEST_ADD_DISMISSAL_COMMENT);
+};
+
+export const receiveAddDismissalCommentSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, payload);
+  hideModal();
+};
+
+export const receiveAddDismissalCommentError = ({ commit }, error) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR, error);
 };
 
 export const revertDismissVulnerability = ({ state, dispatch }) => {
@@ -309,7 +358,7 @@ export const revertDismissVulnerability = ({ state, dispatch }) => {
         default:
       }
 
-      $('#modal-mrwidget-security-issue').modal('hide');
+      hideModal();
     })
     .catch(() =>
       dispatch(

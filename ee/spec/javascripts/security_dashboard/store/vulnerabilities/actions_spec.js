@@ -680,7 +680,7 @@ describe('vulnerability dismissal', () => {
           [],
           [
             { type: 'requestDismissVulnerability' },
-            { type: 'receiveDismissVulnerabilityError', payload: { flashError: false } },
+            { type: 'receiveDismissVulnerabilityError', payload: { flashError } },
           ],
           done,
         );
@@ -740,6 +740,115 @@ describe('vulnerability dismissal', () => {
   });
 });
 
+describe('add vulnerability dismissal comment', () => {
+  describe('addDismissalComment', () => {
+    const vulnerability = mockDataVulnerabilities[2];
+    const data = { vulnerability };
+    const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${vulnerability.dismissal_feedback.id}`;
+    const comment = 'Well, we’re back in the car again.';
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        const checkPassedData = () => {
+          const { project_id, id } = vulnerability.dismissal_feedback;
+          const expected = { project_id, id, comment };
+
+          expect(mock.history.patch[0].data).toBe(JSON.stringify(expected));
+          done();
+        };
+
+        testAction(
+          actions.addDismissalComment,
+          { vulnerability, comment },
+          {},
+          [],
+          [
+            { type: 'requestAddDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            { type: 'receiveAddDismissalCommentSuccess', payload: { data, id: vulnerability.id } },
+          ],
+          checkPassedData,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(404);
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          actions.addDismissalComment,
+          { vulnerability, comment },
+          {},
+          [],
+          [{ type: 'requestAddDismissalComment' }, { type: 'receiveAddDismissalCommentError' }],
+          done,
+        );
+      });
+    });
+
+    describe('receiveAddDismissalCommentSuccess', () => {
+      it('should commit the success mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.receiveAddDismissalCommentSuccess,
+          { data },
+          state,
+          [{ type: types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, payload: { data } }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('receiveAddDismissalCommentError', () => {
+      it('should commit the error mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.receiveAddDismissalCommentError,
+          {},
+          state,
+          [{ type: types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('requestAddDismissalComment', () => {
+      it('should commit the request mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.requestAddDismissalComment,
+          {},
+          state,
+          [{ type: types.REQUEST_ADD_DISMISSAL_COMMENT }],
+          [],
+          done,
+        );
+      });
+    });
+  });
+});
+
 describe('revert vulnerability dismissal', () => {
   describe('undoDismiss', () => {
     const vulnerability = mockDataVulnerabilities[2];
@@ -789,7 +898,7 @@ describe('revert vulnerability dismissal', () => {
           [],
           [
             { type: 'requestUndoDismiss' },
-            { type: 'receiveUndoDismissError', payload: { flashError: false } },
+            { type: 'receiveUndoDismissError', payload: { flashError } },
           ],
           done,
         );
