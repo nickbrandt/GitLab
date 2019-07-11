@@ -29,7 +29,7 @@ module Gitlab
     end
 
     def self.connected?
-      Gitlab::Database.postgresql? && GeoNode.connected? && GeoNode.table_exists?
+      GeoNode.connected? && GeoNode.table_exists?
     end
 
     def self.enabled?

@@ -138,12 +138,6 @@ describe Gitlab::Geo, :geo, :request_store do
 
         expect(described_class.connected?).to be_falsey
       end
-
-      it 'returns false when MySQL is in use' do
-        allow(Gitlab::Database).to receive(:postgresql?) { false }
-
-        expect(described_class.connected?).to be_falsey
-      end
     end
   end
 
