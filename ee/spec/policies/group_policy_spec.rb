@@ -374,14 +374,4 @@ describe GroupPolicy do
       end
     end
   end
-
-  it_behaves_like 'ee clusterable policies' do
-    let(:clusterable) { create(:group) }
-    let(:cluster) do
-      create(:cluster,
-             :provided_by_gcp,
-             :group,
-             groups: [clusterable])
-    end
-  end
 end
