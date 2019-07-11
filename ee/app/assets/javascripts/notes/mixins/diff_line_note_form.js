@@ -14,6 +14,7 @@ export default {
     }),
     ...mapGetters('diffs', ['getDiffFileByHash']),
     ...mapGetters('batchComments', ['shouldRenderDraftRowInDiscussion', 'draftForDiscussion']),
+    ...mapState('diffs', ['commit']),
   },
   methods: {
     ...mapActions('diffs', ['cancelCommentForm']),
@@ -60,6 +61,13 @@ export default {
         positionType,
         ...this.diffFileCommentForm,
       });
+
+      postData.data.note.commit_id = null;
+
+      if (this.commit) {
+        postData.data.note.commit_id =
+          (this.diffFile && this.diffFile.diff_refs && this.diffFile.diff_refs.head_sha) || null;
+      }
 
       return this.saveDraft(postData)
         .then(() => {
