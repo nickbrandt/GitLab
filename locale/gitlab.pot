@@ -11504,6 +11504,9 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove card"
+msgstr ""
+
 msgid "Remove child epic from an epic"
 msgstr ""
 

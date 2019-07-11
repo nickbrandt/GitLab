@@ -2,6 +2,7 @@
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import { __ } from '~/locale';
 
 export default {
   components: {
@@ -30,6 +31,9 @@ export default {
     },
   },
   computed: {
+    title() {
+      return __('Remove card');
+    },
     headerClasses() {
       return {
         'dashboard-card-header-warning': this.hasErrors,
@@ -63,7 +67,7 @@ export default {
     <gl-button
       v-gl-tooltip
       class="remove-button bg-transparent border-0 p-0 text-secondary"
-      title="Remove Card"
+      title="title"
       @click="onRemove"
     >
       <icon name="remove" />
