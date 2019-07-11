@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# The VulnerabilitiesActions concern contains actions that are used to populate vulnerabilities
+# on security dashboards.
+#
+# Note: Consumers of this module will need to define a `def vulnerable` method, which must return
+# an object with an interface that matches the one provided by the Vulnerable model concern.
+
 module VulnerabilitiesActions
   extend ActiveSupport::Concern
 
@@ -46,6 +52,6 @@ module VulnerabilitiesActions
   end
 
   def found_vulnerabilities(collection = :latest)
-    ::Security::VulnerabilitiesFinder.new(group, params: filter_params).execute(collection)
+    ::Security::VulnerabilitiesFinder.new(vulnerable, params: filter_params).execute(collection)
   end
 end
