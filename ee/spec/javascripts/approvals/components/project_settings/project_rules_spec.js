@@ -98,4 +98,54 @@ describe('Approvals ProjectRules', () => {
       );
     });
   });
+
+  describe('when the Vulnerability-Check group is used', () => {
+    let rows;
+
+    beforeEach(() => {
+      const rules = createProjectRules();
+      rules[0].name = 'Vulnerability-Check';
+      store.modules.approvals.state.rules = rules;
+      store.state.settings.allowMultiRule = true;
+    });
+
+    describe('when the `reportApproverRules` feature flag is enabled', () => {
+      beforeEach(() => {
+        gon.features = { reportApproverRules: true };
+
+        factory();
+        rows = wrapper.findAll('tbody tr');
+      });
+
+      it('should render the popover for the Vulnerability-Check group', () => {
+        const firstRow = rows.at(0);
+        const nameCell = findCell(firstRow, 'name');
+
+        expect(nameCell.find('.js-help').exists()).toBeTruthy();
+      });
+
+      it('should not render the popover for a standard approval group', () => {
+        const secondRow = rows.at(1);
+        const nameCell = findCell(secondRow, 'name');
+
+        expect(nameCell.find('.js-help').exists()).toBeFalsy();
+      });
+    });
+
+    describe('when the `reportApproverRules` feature flag is disabled', () => {
+      beforeEach(() => {
+        gon.features = { reportApproverRules: false };
+
+        factory();
+        rows = wrapper.findAll('tbody tr');
+      });
+
+      it('should not render the popover for the Vulnerability-Check group', () => {
+        const firstRow = rows.at(0);
+        const nameCell = findCell(firstRow, 'name');
+
+        expect(nameCell.find('.js-help').exists()).toBeFalsy();
+      });
+    });
+  });
 });

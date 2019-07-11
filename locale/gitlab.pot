@@ -8064,6 +8064,9 @@ msgstr ""
 msgid "Learn more about the dependency list"
 msgstr ""
 
+msgid "Learn more about vulnerability check"
+msgstr ""
+
 msgid "Learn more in the"
 msgstr ""
 
@@ -15718,6 +15721,9 @@ msgstr ""
 msgid "Vulnerability List"
 msgstr ""
 
+msgid "Vulnerability-Check requires one or more merge request approvals only if high or critical security vulnerabilities are detected."
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -16934,6 +16940,9 @@ msgid "group"
 msgstr ""
 
 msgid "has already been taken"
+msgstr ""
+
+msgid "help"
 msgstr ""
 
 msgid "here"
