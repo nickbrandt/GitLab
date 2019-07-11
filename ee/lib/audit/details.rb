@@ -27,15 +27,15 @@ module Audit
 
       case action.keys.first
       when :add
-        "Added #{target_type_value}#{@details[:as] ? " as #{@details[:as]}" : ''}"
+        "Added #{target_detail_value}#{@details[:as] ? " as #{@details[:as]}" : ''}"
       when :remove
-        "Removed #{target_type_value}"
+        "Removed #{target_detail_value}"
       when :failed_login
-        "Failed to login with #{Gitlab::Auth::OAuth::Provider.label_for(target_type_value).upcase} authentication"
+        "Failed to login with #{oath_label} authentication"
       when :custom_message
-        target_type_value
+        detail_value
       else
-        text_for_change(target_type_value)
+        text_for_change(target_detail_value)
       end
     end
 
@@ -48,10 +48,16 @@ module Audit
       changed.join(' ')
     end
 
-    def target_type_value
-      target_type = @details[:target_type]
-      val = @details.values.first
-      target_type == 'Operations::FeatureFlag' ? val : val.tr('_', ' ')
+    def target_detail_value
+      @details[:target_type] == 'Operations::FeatureFlag' ? detail_value : detail_value.tr('_', ' ')
+    end
+
+    def detail_value
+      @details.values.first
+    end
+
+    def oath_label
+      Gitlab::Auth::OAuth::Provider.label_for(detail_value).upcase
     end
   end
 end

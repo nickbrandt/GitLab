@@ -83,6 +83,22 @@ describe Audit::Details do
 
         expect(string).to eq(custom_message)
       end
+
+      context 'failed_login' do
+        let(:feature_flag) do
+          {
+            failed_login: 'google_oauth2',
+            target_type: 'Operations::FeatureFlag'
+          }
+        end
+        let(:message) { 'Failed to login with GOOGLE authentication' }
+
+        it 'shows the correct failed login meessage' do
+          string = described_class.humanize(feature_flag)
+
+          expect(string).to eq message
+        end
+      end
     end
 
     context 'deploy key' do
