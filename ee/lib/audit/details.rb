@@ -33,7 +33,7 @@ module Audit
       when :failed_login
         "Failed to login with #{oath_label} authentication"
       when :custom_message
-        target_detail_value
+        detail_value
       else
         text_for_change(target_detail_value)
       end

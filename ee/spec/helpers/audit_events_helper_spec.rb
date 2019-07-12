@@ -39,18 +39,6 @@ describe AuditEventsHelper do
           is_expected.to eq(custom_message)
         end
       end
-
-      context 'when the target_type is not Operations::FeatureFlag' do
-        let(:target_type) { 'User' }
-
-        context 'when custom message contains "_"' do
-          let(:custom_message) { "message_with_spaces" }
-
-          it 'replaces them with spaces' do
-            expect(subject).to eq("message with spaces")
-          end
-        end
-      end
     end
   end
 
