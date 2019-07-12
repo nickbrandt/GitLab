@@ -4,10 +4,17 @@
 
 .billing-plan-header.content-block.center
   .billing-plan-logo
-    - if Namespace::PLANS.include?(plan.code)
-      = render "shared/billings/plans/#{plan.code}.svg"
-    - elsif plan.free?
-      = render "shared/billings/plans/free.svg"
+    - if namespace == current_user.namespace
+      - if Namespace::PLANS.include?(plan.code)
+        = render "shared/billings/plans/#{plan.code}.svg"
+      - elsif plan.free?
+        = render "shared/billings/plans/free.svg"
+    - else
+      - if !@group.avatar_url.nil?
+        = group_icon(@group, class: 'border rounded mb-3 mt-1', width: 96, height: 96, alt: @group.name)
+      - else
+        .avatar-container.rect-avatar.s96.home-panel-avatar.append-right-default.float-none.mr-auto.ml-auto.mb-4.mb-1.rounded.border
+          = group_icon(@group, class: 'avatar avatar-tile s96', width: 96, height: 96, alt: @group.name)
 
   %h4
     - plan_link = plan.about_page_href ? link_to(plan.name, plan.about_page_href) : plan.name
