@@ -1705,3 +1705,4 @@ API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities:
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
 API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)
 API::Entities.prepend_entity(::API::Entities::Identity, with: EE::API::Entities::Identity)
+API::Entities.prepend_entity(::API::Entities::UserWithAdmin, with: EE::API::Entities::UserWithAdmin)

@@ -30,6 +30,14 @@ module EE
         end
       end
 
+      module UserWithAdmin
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :note
+        end
+      end
+
       module Project
         extend ActiveSupport::Concern
 
