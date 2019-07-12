@@ -56,7 +56,7 @@ module SystemCheck
       end
 
       def tables_present?
-        Gitlab::Geo::DatabaseTasks.with_geo_db { !ActiveRecord::Migrator.needs_migration? }
+        Gitlab::Geo::DatabaseTasks.with_geo_db { !ActiveRecord::Base.connection.migration_context.needs_migration? }
       end
     end
   end

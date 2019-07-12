@@ -4,12 +4,12 @@ require 'spec_helper'
 
 describe Namespace do
   shared_examples 'plan helper' do |namespace_plan|
-    let(:namespace) { described_class.new(plan: plan) }
+    let(:namespace) { create(:namespace, plan: "#{plan_name}_plan") }
 
     subject { namespace.public_send("#{namespace_plan}_plan?") }
 
     context "for a #{namespace_plan} plan" do
-      let(:plan) { Plan.create(name: namespace_plan) }
+      let(:plan_name) { namespace_plan }
 
       it { is_expected.to eq(true) }
     end
@@ -18,8 +18,6 @@ describe Namespace do
       where(plan_name: described_class::PLANS - [namespace_plan])
 
       with_them do
-        let(:plan) { Plan.create(name: plan_name) }
-
         it { is_expected.to eq(false) }
       end
     end
