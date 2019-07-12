@@ -1,12 +1,8 @@
 const INDENT_SEQUENCE = '    ';
 
 function countLeftSpaces(text) {
-  for (let i = 0; i < text.length; i += 1) {
-    if (text.charAt(i) !== ' ') {
-      return i;
-    }
-  }
-  return text.length;
+  const i = text.split('').findIndex(c => c !== ' ');
+  return i === -1 ? text.length : i;
 }
 
 /**
