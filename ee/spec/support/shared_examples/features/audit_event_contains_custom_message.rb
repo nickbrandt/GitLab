@@ -21,7 +21,7 @@ shared_examples 'audit event contains custom message' do
   end
 
   it 'user sees this message' do
-    expect(page).to have_content('Message with spaces')
+    expect(page).to have_content('Message_with_spaces')
   end
 
   context 'when it contains tags' do
