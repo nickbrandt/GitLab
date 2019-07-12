@@ -5,6 +5,8 @@ module EE
     module Bridge
       extend ActiveSupport::Concern
 
+      InvalidBridgeTypeError = Class.new(StandardError)
+
       prepended do
         include ::Ci::Metadatable
 
@@ -35,10 +37,14 @@ module EE
       end
 
       def schedule_downstream_pipeline!
+        raise InvalidBridgeTypeError unless downstream_project
+
         ::Ci::CreateCrossProjectPipelineWorker.perform_async(self.id)
       end
 
       def subscribe_to_upstream!
+        raise InvalidBridgeTypeError unless upstream_project
+
         ::Ci::SubscribeBridgeService.new(self.project, self.user).execute(self)
       end
 
