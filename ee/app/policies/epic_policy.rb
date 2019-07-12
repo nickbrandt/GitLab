@@ -13,4 +13,6 @@ class EpicPolicy < BasePolicy
   end
 
   rule { can?(:create_note) }.enable :award_emoji
+
+  rule { can?(:owner_access) | can?(:maintainer_access) }.enable :admin_note
 end

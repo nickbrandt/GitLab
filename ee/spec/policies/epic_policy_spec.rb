@@ -16,6 +16,14 @@ describe EpicPolicy do
     it { is_expected.to be_disallowed(:create_note, :award_emoji) }
   end
 
+  shared_examples 'can edit epic comments' do
+    it { is_expected.to be_allowed(:admin_note) }
+  end
+
+  shared_examples 'cannot edit epic comments' do
+    it { is_expected.to be_disallowed(:admin_note) }
+  end
+
   shared_examples 'can only read epics' do
     it do
       is_expected.to be_allowed(:read_epic, :read_epic_iid)
@@ -39,6 +47,7 @@ describe EpicPolicy do
 
       it_behaves_like 'can only read epics'
       it_behaves_like 'can comment on epics'
+      it_behaves_like 'cannot edit epic comments'
     end
 
     context 'reporter group member' do
@@ -48,6 +57,21 @@ describe EpicPolicy do
 
       it_behaves_like 'can manage epics'
       it_behaves_like 'can comment on epics'
+      it_behaves_like 'cannot edit epic comments'
+
+      it 'cannot destroy epics' do
+        is_expected.to be_disallowed(:destroy_epic)
+      end
+    end
+
+    context 'group maintainer' do
+      before do
+        group.add_maintainer(user)
+      end
+
+      it_behaves_like 'can manage epics'
+      it_behaves_like 'can comment on epics'
+      it_behaves_like 'can edit epic comments'
 
       it 'cannot destroy epics' do
         is_expected.to be_disallowed(:destroy_epic)
@@ -61,6 +85,7 @@ describe EpicPolicy do
 
       it_behaves_like 'can manage epics'
       it_behaves_like 'can comment on epics'
+      it_behaves_like 'can edit epic comments'
 
       it 'can destroy epics' do
         is_expected.to be_allowed(:destroy_epic)
