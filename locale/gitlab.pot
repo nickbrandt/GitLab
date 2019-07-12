@@ -884,6 +884,9 @@ msgstr ""
 msgid "Add reaction"
 msgstr ""
 
+msgid "Add to epic"
+msgstr ""
+
 msgid "Add to merge train"
 msgstr ""
 
@@ -914,10 +917,16 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
+msgid "Added %{epic_ref} as child epic."
+msgstr ""
+
 msgid "Added %{label_references} %{label_text}."
 msgstr ""
 
 msgid "Added a todo."
+msgstr ""
+
+msgid "Added an issue to an epic."
 msgstr ""
 
 msgid "Added at"
@@ -942,6 +951,9 @@ msgid "Adds %{labels} %{label_text}."
 msgstr ""
 
 msgid "Adds a todo."
+msgstr ""
+
+msgid "Adds an issue to an epic."
 msgstr ""
 
 msgid "Admin Area"
@@ -1594,6 +1606,15 @@ msgid "Approvals"
 msgstr ""
 
 msgid "Approve"
+msgstr ""
+
+msgid "Approve a merge request"
+msgstr ""
+
+msgid "Approve the current merge request."
+msgstr ""
+
+msgid "Approved the current merge request."
 msgstr ""
 
 msgid "Apr"
@@ -2609,6 +2630,9 @@ msgstr ""
 msgid "ChangeTypeAction|This will create a new commit in order to revert the existing changes."
 msgstr ""
 
+msgid "Changed assignee(s)."
+msgstr ""
+
 msgid "Changed the title to \"%{title_param}\"."
 msgstr ""
 
@@ -2928,6 +2952,9 @@ msgid "Clear templates search input"
 msgstr ""
 
 msgid "Clear weight"
+msgstr ""
+
+msgid "Cleared weight."
 msgstr ""
 
 msgid "Clears weight."
@@ -8641,6 +8668,9 @@ msgstr ""
 msgid "Marked this issue as a duplicate of %{duplicate_param}."
 msgstr ""
 
+msgid "Marked this issue as related to %{issue_ref}."
+msgstr ""
+
 msgid "Marked to do as done."
 msgstr ""
 
@@ -11399,6 +11429,12 @@ msgstr ""
 msgid "Promote"
 msgstr ""
 
+msgid "Promote issue to an epic"
+msgstr ""
+
+msgid "Promote issue to an epic."
+msgstr ""
+
 msgid "Promote these project milestones into a group milestone."
 msgstr ""
 
@@ -11415,6 +11451,9 @@ msgid "PromoteMilestone|Project does not belong to a group."
 msgstr ""
 
 msgid "PromoteMilestone|Promotion failed - %{message}"
+msgstr ""
+
+msgid "Promoted issue to an epic."
 msgstr ""
 
 msgid "Promotions|Don't show me this again"
@@ -11788,6 +11827,9 @@ msgstr ""
 msgid "Remove from board"
 msgstr ""
 
+msgid "Remove from epic"
+msgstr ""
+
 msgid "Remove group"
 msgstr ""
 
@@ -11815,6 +11857,9 @@ msgstr ""
 msgid "Removed %{assignee_text} %{assignee_references}."
 msgstr ""
 
+msgid "Removed %{epic_ref} from child epics."
+msgstr ""
+
 msgid "Removed %{label_references} %{label_text}."
 msgstr ""
 
@@ -11827,7 +11872,13 @@ msgstr ""
 msgid "Removed all labels."
 msgstr ""
 
+msgid "Removed an issue from an epic."
+msgstr ""
+
 msgid "Removed group can not be restored!"
+msgstr ""
+
+msgid "Removed parent epic %{epic_ref}."
 msgstr ""
 
 msgid "Removed projects cannot be restored!"
@@ -11855,6 +11906,9 @@ msgid "Removes %{milestone_reference} milestone."
 msgstr ""
 
 msgid "Removes all labels."
+msgstr ""
+
+msgid "Removes an issue from an epic."
 msgstr ""
 
 msgid "Removes parent epic %{epic_ref}."
@@ -12805,6 +12859,9 @@ msgstr ""
 msgid "Session expiration, projects limit and attachment size."
 msgstr ""
 
+msgid "Set %{epic_ref} as parent epic."
+msgstr ""
+
 msgid "Set a default template for issue descriptions."
 msgstr ""
 
@@ -12896,6 +12953,9 @@ msgid "Set up your project to automatically push and/or pull changes to/from ano
 msgstr ""
 
 msgid "Set weight"
+msgstr ""
+
+msgid "Set weight to %{weight}."
 msgstr ""
 
 msgid "SetPasswordToCloneLink|set a password"
@@ -17481,6 +17541,9 @@ msgid "locked by %{path_lock_user_name} %{created_at}"
 msgstr ""
 
 msgid "manual"
+msgstr ""
+
+msgid "may expose confidential information"
 msgstr ""
 
 msgid "merge request"

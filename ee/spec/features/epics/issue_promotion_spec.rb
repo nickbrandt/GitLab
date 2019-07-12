@@ -18,7 +18,7 @@ describe 'Issue promotion', :js do
     it 'does not promote the issue' do
       visit project_issue_path(project, issue)
 
-      expect(page).not_to have_content 'Commands applied'
+      expect(page).not_to have_content 'Promoted issue to an epic.'
 
       expect(issue.reload).to be_open
       expect(Epic.count).to be_zero
@@ -36,7 +36,7 @@ describe 'Issue promotion', :js do
       end
 
       it 'does not promote the issue' do
-        expect(page).not_to have_content 'Commands applied'
+        expect(page).not_to have_content 'Promoted issue to an epic.'
 
         expect(issue.reload).to be_open
         expect(Epic.count).to be_zero
@@ -56,7 +56,7 @@ describe 'Issue promotion', :js do
 
         epic = Epic.last
 
-        expect(page).to have_content 'Commands applied'
+        expect(page).to have_content 'Promoted issue to an epic.'
         expect(issue.reload).to be_closed
         expect(epic.title).to eq(issue.title)
         expect(epic.description).to eq(issue.description)

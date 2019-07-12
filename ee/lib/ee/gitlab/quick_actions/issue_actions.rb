@@ -8,8 +8,9 @@ module EE
         include ::Gitlab::QuickActions::Dsl
 
         included do
-          desc 'Add to epic'
-          explanation 'Adds an issue to an epic.'
+          desc _('Add to epic')
+          explanation _('Adds an issue to an epic.')
+          execution_message _('Added an issue to an epic.')
           types Issue
           condition do
             quick_action_target.project.group&.feature_available?(:epics) &&
@@ -20,8 +21,9 @@ module EE
             @updates[:epic] = extract_epic(epic_param)
           end
 
-          desc 'Remove from epic'
-          explanation 'Removes an issue from an epic.'
+          desc _('Remove from epic')
+          explanation _('Removes an issue from an epic.')
+          execution_message _('Removed an issue from an epic.')
           types Issue
           condition do
             quick_action_target.persisted? &&
@@ -32,9 +34,9 @@ module EE
             @updates[:epic] = nil
           end
 
-          desc 'Promote issue to an epic'
-          explanation 'Promote issue to an epic.'
-          warning 'may expose confidential information'
+          desc _('Promote issue to an epic')
+          explanation _('Promote issue to an epic.')
+          warning _('may expose confidential information')
           types Issue
           condition do
             quick_action_target.persisted? &&
@@ -43,6 +45,7 @@ module EE
           end
           command :promote do
             Epics::IssuePromoteService.new(quick_action_target.project, current_user).execute(quick_action_target)
+            @execution_message[:promote] = _('Promoted issue to an epic.')
           end
 
           def extract_epic(params)
