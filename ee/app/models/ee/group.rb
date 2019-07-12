@@ -217,9 +217,9 @@ module EE
 
     def custom_project_templates_group_allowed
       return if custom_project_templates_group_id.blank?
-      return if descendants.exists?(id: custom_project_templates_group_id)
+      return if children.exists?(id: custom_project_templates_group_id)
 
-      errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
+      errors.add(:custom_project_templates_group_id, "has to be a subgroup of the group")
     end
   end
 end

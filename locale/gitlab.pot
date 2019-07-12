@@ -16992,13 +16992,13 @@ msgstr ""
 msgid "is invalid because there is upstream lock"
 msgstr ""
 
+msgid "is not a descendant of the Group owning the template"
+msgstr ""
+
 msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is not an email you own"
-msgstr ""
-
-msgid "is out of the hierarchy of the Group owning the template"
 msgstr ""
 
 msgid "issue"
