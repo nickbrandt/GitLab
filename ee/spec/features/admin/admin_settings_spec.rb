@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Admin updates EE-only settings' do
@@ -21,7 +23,7 @@ describe 'Admin updates EE-only settings' do
 
         expect(current_settings.geo_status_timeout).to eq(15)
         expect(current_settings.geo_node_allowed_ips).to eq('192.34.34.34')
-        expect(page).to have_content "Application settings saved successfully"
+        expect(page).to have_content 'Application settings saved successfully'
       end
     end
 
@@ -31,7 +33,7 @@ describe 'Admin updates EE-only settings' do
 
         visit geo_admin_application_settings_path
 
-        expect(page).to have_content "Discover GitLab Geo"
+        expect(page).to have_content 'Discover GitLab Geo'
       end
     end
   end
@@ -44,7 +46,7 @@ describe 'Admin updates EE-only settings' do
       click_button 'Save changes'
     end
 
-    expect(page).to have_content "Application settings saved successfully"
+    expect(page).to have_content 'Application settings saved successfully'
   end
 
   context 'Elasticsearch settings' do
@@ -67,7 +69,7 @@ describe 'Admin updates EE-only settings' do
         expect(current_settings.elasticsearch_search).to be_truthy
         expect(current_settings.elasticsearch_shards).to eq(120)
         expect(current_settings.elasticsearch_replicas).to eq(2)
-        expect(page).to have_content "Application settings saved successfully"
+        expect(page).to have_content 'Application settings saved successfully'
       end
     end
 
@@ -114,7 +116,7 @@ describe 'Admin updates EE-only settings' do
       expect(current_settings.elasticsearch_limit_indexing).to be_truthy
       expect(ElasticsearchIndexedNamespace.exists?(namespace_id: namespace.id)).to be_truthy
       expect(ElasticsearchIndexedProject.exists?(project_id: project.id)).to be_truthy
-      expect(page).to have_content "Application settings saved successfully"
+      expect(page).to have_content 'Application settings saved successfully'
     end
 
     it 'Allows removing all namespaces and projects', :js do
@@ -131,13 +133,13 @@ describe 'Admin updates EE-only settings' do
       page.within('.as-elasticsearch') do
         expect(page).to have_content('Namespaces to index')
         expect(page).to have_content('Projects to index')
-        expect(page).to have_content(namespace.full_path)
+        expect(page).to have_content(namespace.full_name)
         expect(page).to have_content(project.full_name)
 
         find('.js-limit-namespaces .select2-search-choice-close').click
         find('.js-limit-projects .select2-search-choice-close').click
 
-        expect(page).not_to have_content(namespace.full_path)
+        expect(page).not_to have_content(namespace.full_name)
         expect(page).not_to have_content(project.full_name)
 
         click_button 'Save changes'
@@ -145,7 +147,7 @@ describe 'Admin updates EE-only settings' do
 
       expect(ElasticsearchIndexedNamespace.count).to eq(0)
       expect(ElasticsearchIndexedProject.count).to eq(0)
-      expect(page).to have_content "Application settings saved successfully"
+      expect(page).to have_content 'Application settings saved successfully'
     end
   end
 
@@ -159,7 +161,7 @@ describe 'Admin updates EE-only settings' do
       click_button 'Save changes'
     end
 
-    expect(page).to have_content "Application settings saved successfully"
+    expect(page).to have_content 'Application settings saved successfully'
   end
 
   context 'Templates page' do
@@ -169,13 +171,13 @@ describe 'Admin updates EE-only settings' do
 
     it 'Render "Templates" section' do
       page.within('.as-visibility-access') do
-        expect(page).to have_content "Templates"
+        expect(page).to have_content 'Templates'
       end
     end
 
     it 'Render "Custom project templates" section' do
       page.within('.as-custom-project-templates') do
-        expect(page).to have_content "Custom project templates"
+        expect(page).to have_content 'Custom project templates'
       end
     end
   end
