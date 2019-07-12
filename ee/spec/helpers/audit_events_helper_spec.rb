@@ -30,15 +30,6 @@ describe AuditEventsHelper do
       it 'returns custom message' do
         expect(subject).to eq(custom_message)
       end
-
-      context 'when message relates to feature flags' do
-        let(:custom_message) { "Feature flag my_feature_flag was updated" }
-        let(:target_type) { 'Operations::FeatureFlag' }
-
-        it 'shows message as is' do
-          is_expected.to eq(custom_message)
-        end
-      end
     end
   end
 
