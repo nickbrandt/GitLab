@@ -44,6 +44,10 @@ class Groups::Epics::NotesController < Groups::ApplicationController
     EpicNoteSerializer.new(project: nil, noteable: noteable, current_user: current_user)
   end
 
+  def discussion_serializer
+    DiscussionSerializer.new(project: nil, noteable: noteable, current_user: current_user, note_entity: EpicNoteEntity)
+  end
+
   override :create_note_params
   def create_note_params
     params[:target_type] = 'Epic'
