@@ -3,9 +3,6 @@
 class EpicPolicy < BasePolicy
   delegate { @subject.group }
 
-  condition(:maintainer) { @subject.group.has_maintainer?(@user) }
-  condition(:owner) { @subject.group.has_owner?(@user) }
-
   rule { can?(:read_epic) }.policy do
     enable :read_epic_iid
     enable :read_note
@@ -17,5 +14,5 @@ class EpicPolicy < BasePolicy
 
   rule { can?(:create_note) }.enable :award_emoji
 
-  rule { maintainer | owner }.enable :admin_note
+  rule { can?(:owner_access) | can?(:maintainer_access) }.enable :admin_note
 end
