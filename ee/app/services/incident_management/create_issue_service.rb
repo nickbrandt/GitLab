@@ -41,24 +41,12 @@ module IncidentManagement
     end
 
     def alert_summary
-      <<~MARKDOWN
-        ## Summary
-
-        #{annotation_list}
-      MARKDOWN
-    end
-
-    def annotation_list
-      strong_memoize(:annotation_list) do
-        alert.annotations
-          .map { |annotation| "* #{annotation.label}: #{annotation.value}" }
-          .join("\n")
-      end
+      alert.issue_summary_markdown
     end
 
     def alert
       strong_memoize(:alert) do
-        Gitlab::Alerting::Alert.new(project: project, payload: params)
+        Gitlab::Alerting::Alert.new(project: project, payload: params).present
       end
     end
 
