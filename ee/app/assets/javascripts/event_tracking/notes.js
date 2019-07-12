@@ -2,8 +2,8 @@ import Stats from 'ee/stats';
 
 export default () => {
   document.querySelector('.main-notes-list').addEventListener('click', event => {
-    const isReplyButtonClick = event.path.find(
-      el => el.classList && el.classList.contains('js-reply-button'),
+    const isReplyButtonClick = event.target.parentElement.classList.contains(
+      'js-note-action-reply',
     );
 
     if (isReplyButtonClick) {
