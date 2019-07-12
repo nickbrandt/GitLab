@@ -4,6 +4,7 @@ module EE
   module Ci
     module Bridge
       extend ActiveSupport::Concern
+      include ::Gitlab::Utils::StrongMemoize
 
       InvalidBridgeTypeError = Class.new(StandardError)
 
@@ -57,11 +58,15 @@ module EE
       end
 
       def downstream_project
-        options&.dig(:trigger, :project)
+        strong_memoize(:downstream_project) do
+          options&.dig(:trigger, :project)
+        end
       end
 
       def upstream_project
-        options&.dig(:needs, :pipeline)
+        strong_memoize(:upstream_project) do
+          options&.dig(:needs, :pipeline)
+        end
       end
 
       def target_ref

@@ -21,7 +21,7 @@ module Ci
 
       bridge_updates = { upstream_pipeline: upstream_pipeline }
 
-      if upstream_pipeline.complete? || upstream_pipeline.blocked?
+      if ::Ci::Pipeline.bridgeable_statuses.include?(upstream_pipeline.status.to_sym)
         bridge_updates[:status] = upstream_pipeline.status
       end
 

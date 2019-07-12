@@ -97,7 +97,7 @@ module EE
             end
           end
 
-          after_transition any => ::Ci::Pipeline.completed_statuses + ::Ci::Pipeline.blocked_statuses do |pipeline|
+          after_transition any => ::Ci::Pipeline.bridgeable_statuses do |pipeline|
             next unless pipeline.downstream_bridges.any?
 
             pipeline.run_after_commit do

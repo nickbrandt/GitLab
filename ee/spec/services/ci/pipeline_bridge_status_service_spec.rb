@@ -17,6 +17,14 @@ describe Ci::PipelineBridgeStatusService do
         pipeline.downstream_bridges << bridge
       end
 
+      context 'when pipeline starts running' do
+        let(:status) { :running }
+
+        it 'updates the bridge status with the pipeline status' do
+          expect { subject }.to change { bridge.status }.from('pending').to('running')
+        end
+      end
+
       context 'when pipeline succeeds' do
         let(:status) { :success }
 

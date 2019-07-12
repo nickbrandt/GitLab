@@ -2,6 +2,8 @@
 
 module Ci
   class PipelineBridgeStatusService < ::BaseService
+    InvalidUpstreamStatusError = Class.new(StandardError)
+
     def execute(pipeline)
       pipeline.downstream_bridges.each do |bridge|
         process_bridge(pipeline.status, bridge)
@@ -18,10 +20,14 @@ module Ci
         bridge.cancel!
       when 'skipped'
         bridge.skip!
+      when 'running'
+        bridge.run!
       when 'manual'
         bridge.update(status: 'manual')
       when 'scheduled'
-        bridge.schedule!
+        bridge.update(status: 'scheduled')
+      else
+        raise InvalidUpstreamStatusError
       end
     end
   end

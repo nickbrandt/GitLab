@@ -73,8 +73,8 @@ module HasStatus
       COMPLETED_STATUSES.map(&:to_sym)
     end
 
-    def blocked_statuses
-      BLOCKED_STATUS.map(&:to_sym)
+    def all_statuses
+      AVAILABLE_STATUSES.map(&:to_sym)
     end
   end
 
