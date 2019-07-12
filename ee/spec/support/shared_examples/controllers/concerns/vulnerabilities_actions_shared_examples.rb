@@ -45,17 +45,19 @@ shared_examples VulnerabilitiesActions do
     context 'when a specific page is requested' do
       let(:params) { vulnerable_params.merge(page: 2) }
 
-      it 'returns the list of vulnerabilities that are on the requested page' do
+      before do
         create_list(:vulnerabilities_occurrence, 35, pipelines: [pipeline], project: project)
 
         subject
+      end
 
+      it 'returns the list of vulnerabilities that are on the requested page' do
         expect(json_response.length).to eq 15
       end
     end
 
     context 'when the vulnerabilities have feedback' do
-      it 'avoids N+1 queries', :with_request_store do
+      before do
         vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, report_type: :sast)
         create(:vulnerability_feedback,
                 :sast,
@@ -64,7 +66,9 @@ shared_examples VulnerabilitiesActions do
                 issue: create(:issue, project: project),
                 project: project,
                 project_fingerprint: vulnerability.project_fingerprint)
+      end
 
+      it 'avoids N+1 queries', :with_request_store do
         control_count = ActiveRecord::QueryRecorder.new { subject }
 
         vulnerability = create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, report_type: :sast)
@@ -209,11 +213,13 @@ shared_examples VulnerabilitiesActions do
     context 'with a report type filter' do
       let(:params) { vulnerable_params.merge(report_type: %w[sast]) }
 
-      it 'returns filtered history if filters are enabled' do
+      before do
         travel_to(Time.zone.parse('2019-02-11')) do
           subject
         end
+      end
 
+      it 'returns filtered history if filters are enabled' do
         expect(json_response['total']).to eq({ '2018-11-12' => 1 })
         expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
         expect(json_response['low']).to eq({})
