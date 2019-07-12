@@ -149,28 +149,21 @@ class GeoNodeStatus < ApplicationRecord
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
     self.last_successful_status_check_at = Time.now
+
     self.storage_shards = StorageShard.all
     self.storage_configuration_digest = StorageShard.build_digest
 
     self.version = Gitlab::VERSION
     self.revision = Gitlab.revision
 
-    # Geo::PruneEventLogWorker might remove old events, so log maximum id
-    self.event_log_max_id = Geo::EventLog.maximum(:id)
-    self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
-    self.repository_updated_max_id = Geo::RepositoryUpdatedEvent.maximum(:id)
-    self.repository_deleted_max_id = Geo::RepositoryDeletedEvent.maximum(:id)
-    self.repository_renamed_max_id = Geo::RepositoryRenamedEvent.maximum(:id)
-    self.repositories_changed_max_id = Geo::RepositoriesChangedEvent.maximum(:id)
-    self.lfs_object_deleted_max_id = Geo::LfsObjectDeletedEvent.maximum(:id)
-    self.job_artifact_deleted_max_id = Geo::JobArtifactDeletedEvent.maximum(:id)
-    self.hashed_storage_migrated_max_id = Geo::HashedStorageMigratedEvent.maximum(:id)
-    self.hashed_storage_attachments_max_id = Geo::HashedStorageAttachmentsEvent.maximum(:id)
     self.projects_count = geo_node.projects.count
 
     load_status_message
+    load_event_data
     load_primary_data
     load_secondary_data
+    load_repository_check_data
+    load_verification_data
 
     self
   end
@@ -184,6 +177,19 @@ class GeoNodeStatus < ApplicationRecord
       end
   end
 
+  def load_event_data
+    self.event_log_max_id = Geo::EventLog.maximum(:id)
+    self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
+    self.repository_updated_max_id = Geo::RepositoryUpdatedEvent.maximum(:id)
+    self.repository_deleted_max_id = Geo::RepositoryDeletedEvent.maximum(:id)
+    self.repository_renamed_max_id = Geo::RepositoryRenamedEvent.maximum(:id)
+    self.repositories_changed_max_id = Geo::RepositoriesChangedEvent.maximum(:id)
+    self.lfs_object_deleted_max_id = Geo::LfsObjectDeletedEvent.maximum(:id)
+    self.job_artifact_deleted_max_id = Geo::JobArtifactDeletedEvent.maximum(:id)
+    self.hashed_storage_migrated_max_id = Geo::HashedStorageMigratedEvent.maximum(:id)
+    self.hashed_storage_attachments_max_id = Geo::HashedStorageAttachmentsEvent.maximum(:id)
+  end
+
   def load_primary_data
     return unless Gitlab::Geo.primary?
 
@@ -194,18 +200,9 @@ class GeoNodeStatus < ApplicationRecord
     self.replication_slots_count = geo_node.replication_slots_count
     self.replication_slots_used_count = geo_node.replication_slots_used_count
     self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
-
-    if repository_verification_enabled
-      self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
-      self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
-      self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
-      self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
-    end
   end
 
-
-
-  def load_secondary_data # rubocop:disable Metrics/AbcSize
+  def load_secondary_data
     return unless Gitlab::Geo.secondary?
 
     self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
@@ -230,8 +227,10 @@ class GeoNodeStatus < ApplicationRecord
     self.attachments_failed_count = attachments_finder.count_failed
     self.attachments_registry_count = attachments_finder.count_registry
     self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
+  end
 
-    load_verification_data
+  def load_repository_check_data
+    return unless Gitlab::Geo.secondary?
 
     self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
     self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
@@ -240,14 +239,21 @@ class GeoNodeStatus < ApplicationRecord
   def load_verification_data
     return unless repository_verification_enabled
 
-    self.repositories_verified_count = registries_for_verified_projects(:repository).count
-    self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
-    self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
-    self.wikis_verified_count = registries_for_verified_projects(:wiki).count
-    self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
-    self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
-    self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
-    self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
+    if Gitlab::Geo.primary?
+      self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
+      self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
+      self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
+      self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
+    elsif Gitlab::Geo.secondary?
+      self.repositories_verified_count = registries_for_verified_projects(:repository).count
+      self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
+      self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
+      self.wikis_verified_count = registries_for_verified_projects(:wiki).count
+      self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
+      self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
+      self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
+      self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
+    end
   end
 
   def current_cursor_last_event_id
