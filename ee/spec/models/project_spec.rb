@@ -1843,7 +1843,7 @@ describe Project do
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management: feature_enabled)
+        stub_feature_flags(design_management_flag: feature_enabled)
         expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
       end
 
