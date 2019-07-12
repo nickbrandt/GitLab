@@ -5,14 +5,15 @@ module Gitlab
     class Transfer
       include LogHelpers
 
-      attr_reader :file_type, :file_id, :filename, :request_data
+      attr_reader :file_type, :file_id, :filename, :expected_checksum, :request_data
 
       TEMP_PREFIX = 'tmp_'.freeze
 
-      def initialize(file_type, file_id, filename, request_data)
+      def initialize(file_type, file_id, filename, expected_checksum, request_data)
         @file_type = file_type
         @file_id = file_id
         @filename = filename
+        @expected_checksum = expected_checksum
         @request_data = request_data
       end
 
@@ -45,8 +46,8 @@ module Gitlab
 
       private
 
-      def failure(primary_missing_file: false)
-        Result.new(success: false, bytes_downloaded: 0, primary_missing_file: primary_missing_file)
+      def failure(bytes_downloaded: 0, primary_missing_file: false)
+        Result.new(success: false, bytes_downloaded: bytes_downloaded, primary_missing_file: primary_missing_file)
       end
 
       def ensure_path_exists
@@ -90,9 +91,15 @@ module Gitlab
             return failure
           end
 
+          file_size = File.stat(temp_file.path).size
+
+          if checksum_mismatch?(temp_file.path)
+            log_error("Downloaded file checksum mismatch", expected_checksum: expected_checksum, actual_checksum: @actual_checksum, file_size_bytes: file_size)
+            return failure(bytes_downloaded: file_size)
+          end
+
           FileUtils.mv(temp_file.path, filename)
 
-          file_size = File.stat(filename).size
           log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
         rescue StandardError, Gitlab::HTTP::Error => e
           log_error("Error downloading file", error: e, filename: filename, url: url)
@@ -132,6 +139,21 @@ module Gitlab
       rescue StandardError => e
         log_error("Error creating temporary file", error: e)
         nil
+      end
+
+      def checksum_mismatch?(file_path)
+        # Skip checksum check if primary didn't generate one because, for
+        # example, large attachments are checksummed asynchronously, and most
+        # types of artifacts are not checksummed at all at the moment.
+        return false if expected_checksum.blank?
+
+        return false unless Feature.enabled?(:geo_file_transfer_validation, default_enabled: true)
+
+        expected_checksum != actual_checksum(file_path)
+      end
+
+      def actual_checksum(file_path)
+        @actual_checksum = Digest::SHA256.file(file_path).hexdigest
       end
     end
   end
