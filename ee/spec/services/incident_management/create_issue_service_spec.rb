@@ -5,9 +5,19 @@ require 'spec_helper'
 describe IncidentManagement::CreateIssueService do
   let(:project) { create(:project, :repository) }
   let(:service) { described_class.new(project, nil, alert_payload) }
+  let(:alert_starts_at) { Time.now }
   let(:alert_title) { 'TITLE' }
+  let(:alert_annotations) { { title: alert_title } }
+
   let(:alert_payload) do
-    build_alert_payload(annotations: { title: alert_title })
+    build_alert_payload(
+      annotations: alert_annotations,
+      starts_at: alert_starts_at
+    )
+  end
+
+  let(:alert_presenter) do
+    Gitlab::Alerting::Alert.new(project: project, payload: alert_payload).present
   end
 
   let!(:setting) do
@@ -30,8 +40,7 @@ describe IncidentManagement::CreateIssueService do
 
         expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
-        expect(issue.description).to include('Summary')
-        expect(issue.description).to include(alert_title)
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
         expect(issue.description).not_to include(summary_separator)
       end
     end
@@ -48,8 +57,7 @@ describe IncidentManagement::CreateIssueService do
         it 'creates an issue appending issue template' do
           expect(subject).to include(status: :success)
 
-          expect(issue.description).to include('Summary')
-          expect(issue.description).to include(alert_title)
+          expect(issue.description).to include(alert_presenter.issue_summary_markdown)
           expect(issue.description).to include(summary_separator)
           expect(issue.description).to include(issue_template_content)
         end
@@ -93,15 +101,27 @@ describe IncidentManagement::CreateIssueService do
       end
     end
 
-    context 'with an invalid alert payload' do
-      let(:alert_payload) { build_alert_payload(annotations: {}) }
+    describe 'with invalid alert payload' do
+      shared_examples 'invalid alert' do
+        it 'does not create an issue' do
+          expect(service)
+            .to receive(:log_error)
+            .with(error_message('invalid alert'))
 
-      it 'does not create an issue' do
-        expect(service)
-          .to receive(:log_error)
-          .with(error_message('invalid alert'))
+          expect(subject).to eq(status: :error, message: 'invalid alert')
+        end
+      end
 
-        expect(subject).to eq(status: :error, message: 'invalid alert')
+      context 'without title' do
+        let(:alert_annotations) { {} }
+
+        it_behaves_like 'invalid alert'
+      end
+
+      context 'without startsAt' do
+        let(:alert_starts_at) { nil }
+
+        it_behaves_like 'invalid alert'
       end
     end
   end
@@ -122,8 +142,12 @@ describe IncidentManagement::CreateIssueService do
 
   private
 
-  def build_alert_payload(annotations: {})
-    { 'annotations' => annotations.stringify_keys }
+  def build_alert_payload(annotations: {}, starts_at: Time.now)
+    {
+      'annotations' => annotations.stringify_keys
+    }.tap do |payload|
+      payload['startsAt'] = starts_at.rfc3339 if starts_at
+    end
   end
 
   def error_message(message)
