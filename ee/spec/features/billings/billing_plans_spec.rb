@@ -115,9 +115,9 @@ describe 'Billing plan pages', :feature do
 
       it 'displays plan header' do
         page.within('.billing-plan-header') do
-          expect(page).to have_content("You are currently on the Bronze")
+          expect(page).to have_content("@#{user.username} you are currently on the Bronze")
 
-          expect(page).to have_css('.billing-plan-logo svg')
+          expect(page).to have_css('.billing-plan-logo img')
         end
       end
     end
