@@ -6,6 +6,6 @@ class AddCommitIdToDraftNotes < ActiveRecord::Migration[5.1]
   DOWNTIME = false
 
   def change
-    add_column :draft_notes, :commit_id, :string
+    add_column :draft_notes, :commit_id, :binary
   end
 end

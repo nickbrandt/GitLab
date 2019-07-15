@@ -3,9 +3,12 @@ class DraftNote < ApplicationRecord
   include DiffPositionableNote
   include Gitlab::Utils::StrongMemoize
   include Sortable
+  include ShaAttribute
 
   PUBLISH_ATTRS = %i(noteable_id noteable_type type note commit_id).freeze
   DIFF_ATTRS = %i(position original_position change_position).freeze
+
+  sha_attribute :commit_id
 
   # Attribute used to store quick actions changes and users referenced.
   attr_accessor :commands_changes
