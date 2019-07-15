@@ -18,7 +18,7 @@ module EE
     end
 
     def scoped_labels_event?
-      events.first.label.scoped_label?
+      events.first.label&.scoped_label?
     end
   end
 end
