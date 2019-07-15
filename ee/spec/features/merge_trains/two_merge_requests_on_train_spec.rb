@@ -31,7 +31,7 @@ describe 'Two merge requests on a merge train' do
     project.add_maintainer(maintainer_1)
     project.add_maintainer(maintainer_2)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
-    project.update!(merge_pipelines_enabled: true, merge_trains_enabled: true)
+    project.update!(merge_pipelines_enabled: true)
     stub_ci_pipeline_yaml_file(YAML.dump(ci_yaml))
 
     head_pipeline = double('Ci::Pipeline')
@@ -239,30 +239,6 @@ describe 'Two merge requests on a merge train' do
           expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
         end
       end
-    end
-  end
-
-  context 'when merge trains option is disabled' do
-    before do
-      project.update!(merge_trains_enabled: false)
-      merge_request_1.merge_train.pipeline.succeed!
-
-      merge_request_1.reload
-      merge_request_2.reload
-    end
-
-    it 'drops merge request 1 from the merge train' do
-      expect(merge_request_1.merge_train).to be_nil
-      expect(merge_request_1.notes.last.note).to eq('removed this merge request from the merge train because project disabled merge trains')
-    end
-
-    it 'drops merge request 2 from the merge train' do
-      expect(merge_request_2.merge_train).to be_nil
-      expect(merge_request_2.notes.last.note).to eq('removed this merge request from the merge train because project disabled merge trains')
-    end
-
-    after do
-      project.update!(merge_trains_enabled: true)
     end
   end
 end

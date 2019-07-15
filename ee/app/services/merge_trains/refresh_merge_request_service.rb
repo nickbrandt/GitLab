@@ -26,7 +26,7 @@ module MergeTrains
     private
 
     def validate!
-      unless project.merge_trains_enabled? && project.merge_pipelines_enabled?
+      unless project.merge_trains_enabled?
         raise ProcessError, 'project disabled merge trains'
       end
 

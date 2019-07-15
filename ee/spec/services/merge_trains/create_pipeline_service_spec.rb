@@ -35,15 +35,11 @@ describe MergeTrains::CreatePipelineService do
 
     context 'when merge trains option is disabled' do
       before do
-        project.update!(merge_trains_enabled: false)
+        stub_feature_flags(merge_trains_enabled: false)
       end
 
       it_behaves_like 'returns an error' do
         let(:expected_reason) { 'merge trains is disabled' }
-      end
-
-      after do
-        project.update!(merge_trains_enabled: true)
       end
     end
 

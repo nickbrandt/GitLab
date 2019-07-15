@@ -51,8 +51,6 @@ module EE
         attrs << %i[merge_pipelines_enabled]
       end
 
-      attrs << %i[merge_trains_enabled] if allow_merge_trains_params?
-
       if allow_mirror_params?
         attrs + mirror_params
       else
@@ -78,10 +76,6 @@ module EE
 
     def allow_merge_pipelines_params?
       project&.feature_available?(:merge_pipelines)
-    end
-
-    def allow_merge_trains_params?
-      project&.feature_available?(:merge_trains)
     end
   end
 end

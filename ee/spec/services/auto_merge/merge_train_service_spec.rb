@@ -204,14 +204,10 @@ describe AutoMerge::MergeTrainService do
 
     context 'when merge trains project option is disabled' do
       before do
-        project.update!(merge_trains_enabled: false)
+        stub_feature_flags(merge_trains_enabled: false)
       end
 
       it { is_expected.to be_falsy }
-
-      after do
-        project.update!(merge_trains_enabled: true)
-      end
     end
 
     context 'when merge request is not mergeable' do
