@@ -3398,7 +3398,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_130053) do
     t.integer "theme_id", limit: 2
     t.integer "accepted_term_id"
     t.string "feed_token"
-    t.boolean "private_profile"
+    t.boolean "private_profile", default: false
     t.integer "roadmap_layout", limit: 2
     t.boolean "include_private_contributions"
     t.string "commit_email"
