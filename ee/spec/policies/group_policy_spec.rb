@@ -368,8 +368,13 @@ describe GroupPolicy do
     context 'auditor' do
       let(:current_user) { create(:user, :auditor) }
 
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
+
       it do
         expect_allowed(:read_group)
+        expect_allowed(:read_group_security_dashboard)
         expect_disallowed(:upload_file)
         expect_disallowed(*reporter_permissions)
         expect_disallowed(*developer_permissions)
