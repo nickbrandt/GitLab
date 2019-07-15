@@ -7,15 +7,19 @@ import { TEST_HOST } from 'helpers/test_constants';
 jest.mock('~/flash');
 
 describe('BoardsStoreEE', () => {
+  let setCurrentBoard;
   let axiosMock;
 
   beforeEach(() => {
     axiosMock = new AxiosMockAdapter(axios);
 
+    setCurrentBoard = jest.fn();
+
     // mock CE store
     const storeMock = {
       state: {},
       create() {},
+      setCurrentBoard,
     };
 
     BoardsStoreEE.initEESpecific(storeMock);
@@ -60,20 +64,17 @@ describe('BoardsStoreEE', () => {
   describe('setCurrentBoard', () => {
     const dummyBoard = 'skateboard';
 
-    it('sets the current board', () => {
-      const { state } = BoardsStoreEE.store;
-      state.currentBoard = null;
+    it('calls setCurrentBoard() of the base store', () => {
+      BoardsStoreEE.store.setCurrentBoard(dummyBoard);
 
-      BoardsStoreEE.setCurrentBoard(dummyBoard);
-
-      expect(state.currentBoard).toEqual(dummyBoard);
+      expect(setCurrentBoard).toHaveBeenCalledWith(dummyBoard);
     });
 
     it('resets assignees', () => {
       const { state } = BoardsStoreEE.store;
       state.assignees = 'some assignees';
 
-      BoardsStoreEE.setCurrentBoard(dummyBoard);
+      BoardsStoreEE.store.setCurrentBoard(dummyBoard);
 
       expect(state.assignees).toEqual([]);
     });
@@ -82,7 +83,7 @@ describe('BoardsStoreEE', () => {
       const { state } = BoardsStoreEE.store;
       state.milestones = 'some milestones';
 
-      BoardsStoreEE.setCurrentBoard(dummyBoard);
+      BoardsStoreEE.store.setCurrentBoard(dummyBoard);
 
       expect(state.milestones).toEqual([]);
     });
