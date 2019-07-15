@@ -27,15 +27,15 @@ module Audit
 
       case action.keys.first
       when :add
-        "Added #{target_detail_value}#{@details[:as] ? " as #{@details[:as]}" : ''}"
+        "Added #{target_name}#{@details[:as] ? " as #{@details[:as]}" : ''}"
       when :remove
-        "Removed #{target_detail_value}"
+        "Removed #{target_name}"
       when :failed_login
         "Failed to login with #{oath_label} authentication"
       when :custom_message
         detail_value
       else
-        text_for_change(target_detail_value)
+        text_for_change(target_name)
       end
     end
 
@@ -48,11 +48,11 @@ module Audit
       changed.join(' ')
     end
 
-    def target_detail_value
-      @details[:target_type] == 'Operations::FeatureFlag' ? detail_value : detail_value_with_space
+    def target_name
+      @details[:target_type] == 'Operations::FeatureFlag' ? detail_value : target_name_with_space
     end
 
-    def detail_value_with_space
+    def target_name_with_space
       detail_value.tr('_', ' ')
     end
 

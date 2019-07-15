@@ -69,35 +69,21 @@ describe Audit::Details do
       end
     end
 
-    context 'feature flag' do
+    context 'failed_login' do
       let(:feature_flag) do
         {
-          remove: 'feature_flag',
-          target_type: 'Operations::FeatureFlag'
+          failed_login: 'google_oauth2',
+          author_name: 'username',
+          target_details: 'testuser',
+          ip_address: '127.0.0.1'
         }
       end
-      let(:custom_message) { "Removed feature_flag" }
+      let(:message) { 'Failed to login with GOOGLE authentication' }
 
-      it 'shows message as is' do
+      it 'shows the correct failed login meessage' do
         string = described_class.humanize(feature_flag)
 
-        expect(string).to eq(custom_message)
-      end
-
-      context 'failed_login' do
-        let(:feature_flag) do
-          {
-            failed_login: 'google_oauth2',
-            target_type: 'Operations::FeatureFlag'
-          }
-        end
-        let(:message) { 'Failed to login with GOOGLE authentication' }
-
-        it 'shows the correct failed login meessage' do
-          string = described_class.humanize(feature_flag)
-
-          expect(string).to eq message
-        end
+        expect(string).to eq message
       end
     end
 
