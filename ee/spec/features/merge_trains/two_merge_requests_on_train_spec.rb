@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe 'Two merge requests on a merge train' do
+  include RepoHelpers
+
   let(:project) { create(:project, :repository) }
   set(:maintainer_1) { create(:user) }
   set(:maintainer_2) { create(:user) }
@@ -49,15 +51,72 @@ describe 'Two merge requests on a merge train' do
   it 'creates a pipeline for merge request 1' do
     expect(merge_request_1.merge_train.pipeline).to be_merge_request_pipeline
     expect(merge_request_1.merge_train.pipeline.user).to eq(maintainer_1)
+    expect(merge_request_1.merge_train.pipeline.ref).to eq(merge_request_1.train_ref_path)
+    expect(merge_request_1.merge_train.pipeline.target_sha)
+      .to eq(project.repository.commit('refs/heads/master').sha)
   end
 
-  it 'does not create a pipeline for merge request 2' do
-    expect(merge_request_2.merge_train.pipeline).to be_nil
+  it 'creates a pipeline for merge request 2' do
+    expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
+    expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
+    expect(merge_request_2.merge_train.pipeline.ref).to eq(merge_request_2.train_ref_path)
+    expect(merge_request_2.merge_train.pipeline.target_sha)
+      .to eq(project.repository.commit(merge_request_1.train_ref_path).sha)
   end
 
   it 'does not merge anything yet' do
     expect(merge_request_1).to be_opened
     expect(merge_request_2).to be_opened
+  end
+
+  shared_examples_for 'drops merge request 1 from the merge train' do
+    it 'drops merge request 1 from the merge train' do
+      expect(merge_request_1).to be_opened
+      expect(merge_request_1.merge_train).to be_nil
+      expect(merge_request_1.notes.last.note).to eq(system_note)
+    end
+  end
+
+  shared_examples_for 'has an intact pipeline for merge request 2' do
+    it 'does not create a new pipeline for merge request 2' do
+      expect(merge_request_2.all_pipelines.count).to eq(1)
+    end
+
+    context 'when the pipeline for merge request 2 succeeded' do
+      before do
+        merge_request_2.merge_train.pipeline.succeed!
+
+        merge_request_2.reload
+      end
+
+      it 'merges merge request 2' do
+        expect(merge_request_2).to be_merged
+        expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
+        expect(merge_request_2.merge_train).to be_nil
+      end
+    end
+  end
+
+  shared_examples_for 're-creates a pipeline for merge request 2' do
+    it 'has recreated pipeline' do
+      expect(merge_request_2.all_pipelines.count).to eq(2)
+      expect(merge_request_2.merge_train.pipeline.target_sha)
+        .to eq(target_branch_sha)
+    end
+
+    context 'when the pipeline for merge request 2 succeeded' do
+      before do
+        merge_request_2.merge_train.pipeline.succeed!
+
+        merge_request_2.reload
+      end
+
+      it 'merges merge request 2' do
+        expect(merge_request_2).to be_merged
+        expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
+        expect(merge_request_2.merge_train).to be_nil
+      end
+    end
   end
 
   context 'when the pipeline for merge request 1 succeeded' do
@@ -71,33 +130,10 @@ describe 'Two merge requests on a merge train' do
     it 'merges merge request 1' do
       expect(merge_request_1).to be_merged
       expect(merge_request_1.metrics.merged_by).to eq(maintainer_1)
-    end
-
-    it 'removes merge request 1 from the merge train' do
       expect(merge_request_1.merge_train).to be_nil
     end
 
-    it 'creates a pipeline for merge request 2' do
-      expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
-      expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
-    end
-
-    context 'when the pipeline for merge request 2 succeeded' do
-      before do
-        merge_request_2.merge_train.pipeline.succeed!
-
-        merge_request_2.reload
-      end
-
-      it 'merges merge request 2' do
-        expect(merge_request_2).to be_merged
-        expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
-      end
-
-      it 'removes merge request 2 from the merge train' do
-        expect(merge_request_2.merge_train).to be_nil
-      end
-    end
+    it_behaves_like 'has an intact pipeline for merge request 2'
   end
 
   context 'when the pipeline for merge request 1 failed' do
@@ -108,18 +144,14 @@ describe 'Two merge requests on a merge train' do
       merge_request_2.reload
     end
 
-    it 'does not merges merge request 1' do
-      expect(merge_request_1).to be_opened
+    it_behaves_like 'drops merge request 1 from the merge train' do
+      let(:system_note) do
+        'removed this merge request from the merge train because pipeline did not succeed'
+      end
     end
 
-    it 'drops merge request 1 from the merge train' do
-      expect(merge_request_1.merge_train).to be_nil
-      expect(merge_request_1.notes.last.note).to eq('removed this merge request from the merge train because pipeline did not succeed')
-    end
-
-    it 'creates a pipeline for merge request 2' do
-      expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
-      expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
+    it_behaves_like 're-creates a pipeline for merge request 2' do
+      let(:target_branch_sha) { project.repository.commit('refs/heads/master').sha }
     end
   end
 
@@ -131,14 +163,14 @@ describe 'Two merge requests on a merge train' do
       merge_request_2.reload
     end
 
-    it 'drops merge request 1 from the merge train' do
-      expect(merge_request_1.merge_train).to be_nil
-      expect(merge_request_1.notes.last.note).to eq('removed this merge request from the merge train')
+    it_behaves_like 'drops merge request 1 from the merge train' do
+      let(:system_note) do
+        'removed this merge request from the merge train'
+      end
     end
 
-    it 'creates a pipeline for merge request 2' do
-      expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
-      expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
+    it_behaves_like 're-creates a pipeline for merge request 2' do
+      let(:target_branch_sha) { project.repository.commit('refs/heads/master').sha }
     end
   end
 
@@ -151,14 +183,62 @@ describe 'Two merge requests on a merge train' do
       merge_request_2.reload
     end
 
-    it 'drops merge request 1 from the merge train' do
-      expect(merge_request_1.merge_train).to be_nil
-      expect(merge_request_1.notes.last.note).to eq('removed this merge request from the merge train because merge request is not mergeable')
+    it_behaves_like 'drops merge request 1 from the merge train' do
+      let(:system_note) do
+        'removed this merge request from the merge train because merge request is not mergeable'
+      end
     end
 
-    it 'creates a pipeline for merge request 2' do
-      expect(merge_request_2.merge_train.pipeline).to be_merge_request_pipeline
-      expect(merge_request_2.merge_train.pipeline.user).to eq(maintainer_2)
+    it_behaves_like 're-creates a pipeline for merge request 2' do
+      let(:target_branch_sha) { project.repository.commit('refs/heads/master').sha }
+    end
+  end
+
+  context 'when master got a new commit and pipeline for merge request 1 finished' do
+    before do
+      create_file_in_repo(project, 'master', 'master', 'test.txt', 'This is test')
+
+      merge_request_1.merge_train.pipeline.succeed!
+      merge_request_1.reload
+      merge_request_2.reload
+    end
+
+    it 're-creates a pipeline for merge request 1' do
+      expect(merge_request_1.all_pipelines.count).to eq(2)
+      expect(merge_request_1.merge_train.pipeline.target_sha)
+        .to eq(merge_request_1.target_branch_sha)
+    end
+
+    it 're-creates a pipeline for merge request 2' do
+      expect(merge_request_2.all_pipelines.count).to eq(2)
+      expect(merge_request_2.merge_train.pipeline.target_sha)
+        .to eq(project.repository.commit(merge_request_1.train_ref_path).sha)
+    end
+
+    context 'when the pipeline for merge request 1 succeeded' do
+      before do
+        merge_request_1.merge_train.pipeline.succeed!
+
+        merge_request_1.reload
+      end
+
+      it 'merges merge request 1' do
+        expect(merge_request_1).to be_merged
+        expect(merge_request_1.metrics.merged_by).to eq(maintainer_1)
+      end
+
+      context 'when the pipeline for merge request 2 succeeded' do
+        before do
+          merge_request_2.merge_train.pipeline.succeed!
+
+          merge_request_2.reload
+        end
+
+        it 'merges merge request 2' do
+          expect(merge_request_2).to be_merged
+          expect(merge_request_2.metrics.merged_by).to eq(maintainer_2)
+        end
+      end
     end
   end
 

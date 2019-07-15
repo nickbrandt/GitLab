@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 module MergeTrains
   class CreatePipelineService < BaseService
-    def execute(merge_request)
+    def execute(merge_request, previous_ref)
       validation_status = validate(merge_request)
       return validation_status unless validation_status[:status] == :success
 
-      merge_status = create_merge_ref(merge_request)
+      merge_status = create_train_ref(merge_request, previous_ref)
       return error(merge_status[:message]) unless merge_status[:status] == :success
 
       create_pipeline(merge_request, merge_status)
@@ -21,9 +21,21 @@ module MergeTrains
       success
     end
 
-    def create_merge_ref(merge_request)
-      ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user, target_ref: merge_request.train_ref_path)
+    def create_train_ref(merge_request, previous_ref)
+      return error('previous ref is not specified') unless previous_ref
+
+      commit_message = commit_message(merge_request, previous_ref)
+
+      ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user,
+                                             target_ref: merge_request.train_ref_path,
+                                             first_parent_ref: previous_ref,
+                                             commit_message: commit_message)
                                         .execute(merge_request)
+    end
+
+    def commit_message(merge_request, previous_ref)
+      "Merge branch #{merge_request.source_branch} with #{previous_ref} " \
+      "into #{merge_request.train_ref_path}"
     end
 
     def create_pipeline(merge_request, merge_status)
