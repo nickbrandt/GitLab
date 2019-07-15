@@ -209,4 +209,28 @@ describe 'Global elastic search', :elastic do
       expect(page).to have_content(expected_message)
     end
   end
+
+  describe 'I search globally', :js do
+    before do
+      create(:issue, project: project, title: 'project issue')
+      Gitlab::Elastic::Helper.refresh_index
+
+      visit dashboard_projects_path
+
+      fill_in('search', with: 'project')
+      find('#search').send_keys(:enter)
+    end
+
+    it 'displays result counts for all categories' do
+      expect(page).to have_content('Projects 1')
+      expect(page).to have_content('Issues 1')
+      expect(page).to have_content('Merge requests 0')
+      expect(page).to have_content('Milestones 0')
+      expect(page).to have_content('Comments 0')
+      expect(page).to have_content('Code 0')
+      expect(page).to have_content('Commits 0')
+      expect(page).to have_content('Wiki 0')
+      expect(page).to have_content('Users 0')
+    end
+  end
 end

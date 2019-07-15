@@ -25,6 +25,36 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     end
   end
 
+  describe '#formatted_count' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+
+    where(:scope, :count_method, :expected) do
+      'projects'       | :projects_count       | '1234'
+      'notes'          | :notes_count          | '1234'
+      'blobs'          | :blobs_count          | '1234'
+      'wiki_blobs'     | :wiki_blobs_count     | '1234'
+      'commits'        | :commits_count        | '1234'
+      'issues'         | :issues_count         | '1234'
+      'merge_requests' | :merge_requests_count | '1234'
+      'milestones'     | :milestones_count     | '1234'
+      'unknown'        | nil                   | nil
+    end
+
+    with_them do
+      it 'returns the expected formatted count' do
+        expect(results).to receive(count_method).and_return(1234) if count_method
+        expect(results.formatted_count(scope)).to eq(expected)
+      end
+    end
+
+    it 'delegates to generic_search_results for users' do
+      expect(results.generic_search_results).to receive(:formatted_count).with('users').and_return('1000+')
+      expect(results.formatted_count('users')).to eq('1000+')
+    end
+  end
+
   shared_examples_for 'a paginated object' do |object_type|
     let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
 

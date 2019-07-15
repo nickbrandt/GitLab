@@ -1,21 +1,5 @@
 - if search_service.use_elasticsearch?
-  %li{ class: active_when(@scope == 'notes') }
-    = link_to search_filter_path(scope: 'notes') do
-      = _("Comments")
-      %span.badge.badge-pill
-        = limited_count(@search_results.notes_count)
-  %li{ class: active_when(@scope == 'blobs'), data: { qa_selector: 'code_tab' } }
-    = link_to search_filter_path(scope: 'blobs') do
-      = _("Code")
-      %span.badge.badge-pill
-        = limited_count(@search_results.blobs_count)
-  %li{ class: active_when(@scope == 'commits') }
-    = link_to search_filter_path(scope: 'commits') do
-      = _("Commits")
-      %span.badge.badge-pill
-        = limited_count(@search_results.commits_count)
-  %li{ class: active_when(@scope == 'wiki_blobs') }
-    = link_to search_filter_path(scope: 'wiki_blobs') do
-      = _("Wiki")
-      %span.badge.badge-pill
-        = limited_count(@search_results.wiki_blobs_count)
+  = search_filter_link 'notes', _("Comments")
+  = search_filter_link 'blobs', _("Code"), data: { qa_selector: 'code_tab' }
+  = search_filter_link 'commits', _("Commits")
+  = search_filter_link 'wiki_blobs', _("Wiki")
