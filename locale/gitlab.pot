@@ -10788,9 +10788,6 @@ msgstr ""
 msgid "ProjectSettings|All discussions must be resolved"
 msgstr ""
 
-msgid "ProjectSettings|Allow merge trains"
-msgstr ""
-
 msgid "ProjectSettings|Automatically resolve merge request diff discussions when they become outdated"
 msgstr ""
 
