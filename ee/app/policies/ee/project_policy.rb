@@ -188,6 +188,7 @@ module EE
         enable :read_environment
         enable :read_deployment
         enable :read_pages
+        enable :read_project_security_dashboard
       end
 
       rule { auditor & ~guest }.policy do
