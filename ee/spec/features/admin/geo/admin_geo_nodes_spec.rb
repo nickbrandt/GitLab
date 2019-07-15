@@ -89,16 +89,48 @@ describe 'admin Geo Nodes', :js, :geo do
       end
     end
 
-    it 'changes re-verification interval field visibility based on primary node checkbox' do
-      expect(page).not_to have_field('Re-verification interval')
+    it 'toggles the visibility of secondary only params based on primary node checkbox' do
+      primary_only_fields = [
+        'Internal URL (optional)',
+        'Re-verification interval'
+      ]
+
+      secondary_only_fields = [
+        'Selective synchronization',
+        'Repository sync capacity',
+        'File sync capacity',
+        'Object Storage replication'
+      ]
+
+      expect(page).to have_unchecked_field('This is a primary node')
+
+      primary_only_fields.each do |field|
+        expect(page).to have_field(field, visible: false)
+      end
+
+      secondary_only_fields.each do |field|
+        expect(page).to have_field(field)
+      end
 
       check 'This is a primary node'
 
-      expect(page).to have_field('Re-verification interval')
+      primary_only_fields.each do |field|
+        expect(page).to have_field(field)
+      end
+
+      secondary_only_fields.each do |field|
+        expect(page).to have_field(field, visible: false)
+      end
 
       uncheck 'This is a primary node'
 
-      expect(page).not_to have_field('Re-verification interval')
+      primary_only_fields.each do |field|
+        expect(page).to have_field(field, visible: false)
+      end
+
+      secondary_only_fields.each do |field|
+        expect(page).to have_field(field)
+      end
     end
 
     it 'returns an error message when a duplicate primary is added' do

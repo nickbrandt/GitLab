@@ -22,7 +22,7 @@ export default function geoNodeForm() {
   const $container = $('.js-geo-node-form');
   const $namespaces = $('.js-hide-if-geo-primary', $container);
   const $reverification = $('.js-hide-if-geo-secondary', $container);
-  const $primaryCheckbox = $('input[type="checkbox"]', $container);
+  const $primaryCheckbox = $('input#geo_node_primary', $container);
   const $selectiveSyncTypeSelect = $('.js-geo-node-selective-sync-type', $container);
   const $select2Dropdown = $('.js-geo-node-namespaces', $container);
   const $syncByNamespaces = $('.js-sync-by-namespace', $container);

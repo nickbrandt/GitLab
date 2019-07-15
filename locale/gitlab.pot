@@ -6814,6 +6814,9 @@ msgstr ""
 msgid "Geo|All projects are being scheduled for re-verify"
 msgstr ""
 
+msgid "Geo|Allow GitLab to replicate content on Object Storage"
+msgstr ""
+
 msgid "Geo|Batch operations"
 msgstr ""
 
@@ -6851,6 +6854,9 @@ msgid "Geo|Geo Status"
 msgstr ""
 
 msgid "Geo|Groups to synchronize"
+msgstr ""
+
+msgid "Geo|If enabled, GitLab will perform Object Storage replication using Geo"
 msgstr ""
 
 msgid "Geo|In sync"
@@ -10104,6 +10110,9 @@ msgid "Number of files touched"
 msgstr ""
 
 msgid "OK"
+msgstr ""
+
+msgid "Object Storage replication"
 msgstr ""
 
 msgid "Object does not exist on the server or you don't have permissions to access it"
