@@ -91,3 +91,5 @@ module Projects
     end
   end
 end
+
+Projects::ImportExport::ExportService.prepend_if_ee('EE::Projects::ImportExport::ExportService')

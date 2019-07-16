@@ -65,3 +65,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::ImportExport.prepend_if_ee('EE::Gitlab::ImportExport')

@@ -133,3 +133,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::ImportExport::Importer.prepend_if_ee('EE::Gitlab::ImportExport::Importer')
