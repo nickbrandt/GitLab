@@ -8906,9 +8906,6 @@ msgstr ""
 msgid "More Information"
 msgstr ""
 
-msgid "More actions"
-msgstr ""
-
 msgid "More info"
 msgstr ""
 
@@ -11508,6 +11505,9 @@ msgid "Remove assignee"
 msgstr ""
 
 msgid "Remove avatar"
+msgstr ""
+
+msgid "Remove card"
 msgstr ""
 
 msgid "Remove child epic from an epic"
