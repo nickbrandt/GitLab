@@ -23,10 +23,8 @@ describe Groups::BoardsController do
 
         list_boards format: :json
 
-        parsed_response = JSON.parse(response.body)
-
         expect(response).to match_response_schema('boards')
-        expect(parsed_response.length).to eq 2
+        expect(json_response.length).to eq 2
       end
 
       context 'with unauthorized user' do

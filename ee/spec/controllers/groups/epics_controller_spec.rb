@@ -375,7 +375,7 @@ describe Groups::EpicsController do
         subject
 
         expect(response.content_type).to eq 'application/json'
-        expect(JSON.parse(response.body)).to include('title_text', 'title', 'description', 'description_text')
+        expect(json_response).to include('title_text', 'title', 'description', 'description_text')
       end
 
       context 'with unauthorized user' do
@@ -421,7 +421,7 @@ describe Groups::EpicsController do
           it 'returns the correct json' do
             subject
 
-            expect(JSON.parse(response.body)).to eq({ 'web_url' => group_epic_path(group, Epic.last) })
+            expect(json_response).to eq({ 'web_url' => group_epic_path(group, Epic.last) })
           end
 
           it_behaves_like 'disabled when using an external authorization service'

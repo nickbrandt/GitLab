@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 shared_examples 'approvals' do
-  def json_response
-    JSON.parse(response.body)
-  end
-
   let!(:approver) { create(:user) }
   let!(:approval_rule) { create(:approval_project_rule, project: project, users: [approver, user], approvals_required: 2) }
 

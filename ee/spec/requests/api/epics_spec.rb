@@ -44,7 +44,7 @@ describe API::Epics do
       it 'returns epic with extra date fields' do
         get api(url, user), params: params
 
-        expect(Array.wrap(JSON.parse(response.body))).to all(exclude(*extra_date_fields))
+        expect(Array.wrap(json_response)).to all(exclude(*extra_date_fields))
       end
     end
 
@@ -56,7 +56,7 @@ describe API::Epics do
       it 'returns epic with extra date fields' do
         get api(url, user), params: params
 
-        expect(Array.wrap(JSON.parse(response.body))).to all(include(*extra_date_fields))
+        expect(Array.wrap(json_response)).to all(include(*extra_date_fields))
       end
     end
   end

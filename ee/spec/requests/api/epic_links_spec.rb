@@ -53,7 +53,7 @@ describe API::EpicLinks do
       it 'returns 200 status' do
         subject
 
-        epics = JSON.parse(response.body)
+        epics = json_response
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
