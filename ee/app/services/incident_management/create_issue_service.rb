@@ -33,15 +33,21 @@ module IncidentManagement
     end
 
     def issue_description
-      return alert_summary unless issue_template_content
-
       horizontal_line = "\n---\n\n"
 
-      alert_summary + horizontal_line + issue_template_content
+      [
+        alert_summary,
+        alert_markdown,
+        issue_template_content
+      ].compact.join(horizontal_line)
     end
 
     def alert_summary
       alert.issue_summary_markdown
+    end
+
+    def alert_markdown
+      alert.alert_markdown
     end
 
     def alert
