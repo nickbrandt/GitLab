@@ -4,7 +4,7 @@ import GfmAutoComplete, { defaultAutocompleteConfig } from 'ee_else_ce/gfm_auto_
 import dropzoneInput from './dropzone_input';
 import { addMarkdownListeners, removeMarkdownListeners } from './lib/utils/text_markdown';
 import IndentHelper from './helpers/indent_helper';
-import { getPlatformLeaderKeyHTML, keystroke } from './lib/utils/common_utils';
+import { keystroke } from './lib/utils/common_utils';
 import * as keys from './lib/utils/keycodes';
 import UndoStack from './lib/utils/undo_stack';
 

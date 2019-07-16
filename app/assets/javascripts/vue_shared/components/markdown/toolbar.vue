@@ -1,7 +1,6 @@
 <script>
 import { GlLink } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
-import { getPlatformLeaderKeyHTML } from '~/lib/utils/common_utils';
 
 export default {
   components: {
