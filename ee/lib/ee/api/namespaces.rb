@@ -26,6 +26,7 @@ module EE
             if params[:extra_shared_runners_minutes_limit].present?
               update_attrs[:last_ci_minutes_notification_at] = nil
               update_attrs[:last_ci_minutes_usage_notification_level] = nil
+              ::Ci::Runner.instance_type.each(&:tick_runner_queue)
             end
 
             namespace.update(update_attrs)

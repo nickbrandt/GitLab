@@ -170,6 +170,16 @@ describe API::Namespaces do
         end
       end
     end
+
+    context "when customer purchases extra CI minutes" do
+      it "ticks instance runners" do
+        runners = Ci::Runner.instance_type
+
+        put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', extra_shared_runners_minutes_limit: 1000 }
+
+        expect(runners).to all(receive(:tick_runner_queue))
+      end
+    end
   end
 
   describe 'POST :id/gitlab_subscription' do
