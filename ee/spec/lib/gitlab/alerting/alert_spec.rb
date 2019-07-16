@@ -189,6 +189,12 @@ describe Gitlab::Alerting::Alert do
     end
   end
 
+  describe '#alert_markdown' do
+    subject { alert.alert_markdown }
+
+    it_behaves_like 'parse payload', 'annotations/gitlab_incident_markdown'
+  end
+
   describe '#valid?' do
     before do
       payload.update(

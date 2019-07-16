@@ -42,10 +42,6 @@ module Projects
         MARKDOWN
       end
 
-      def alert_markdown
-        annotations.find { |annotation| annotation.label == 'gitlab_incident_markdown' }&.value
-      end
-
       private
 
       def alert_title
