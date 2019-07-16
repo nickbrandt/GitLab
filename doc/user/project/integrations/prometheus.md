@@ -264,8 +264,9 @@ Once enabled, an issue will be opened automatically when an alert is triggered w
   - `starts_at`: Alert start time via `startsAt`
   - `full_query`: Alert query extracted from `generatorURL`
   - Optional list of attached annotations extracted from `annotations/*`
+- Alert [GFM](https://docs.gitlab.com/ee/user/markdown.html#gitlab-flavored-markdown-gfm): Gitlab Flavored Markdown from `annotations/gitlab_incident_markdown`
 
-To further customize the issue, you can add labels, mentions, or any other supported [quick action](../quick_actions.md) in the selected issue template.
+To further customize the issue, you can add labels, mentions, or any other supported [quick action](../quick_actions.md) in the selected issue template, which will apply to all incidents. To limit quick actions or other information to only specific types of alerts, use the `annotations/gitlab_incident_markdown` field.
 
 If the metric exceeds the threshold of the alert for over 5 minutes, an email will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
