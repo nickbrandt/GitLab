@@ -27,11 +27,6 @@ export default class GLForm {
     this.undoStack = new UndoStack();
     this.indentHelper = new IndentHelper(this.textarea[0]);
 
-    // This shows the indent help text in the Wiki editor, since it's still a
-    // HAML component
-    $('.js-leader-key').html(getPlatformLeaderKeyHTML());
-    $('.js-indent-help-message').removeClass('hidden');
-
     // Before we start, we should clean up any previous data for this form
     this.destroy();
     // Set up the form

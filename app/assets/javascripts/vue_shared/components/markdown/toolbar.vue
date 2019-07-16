@@ -24,12 +24,6 @@ export default {
     },
   },
   computed: {
-    indentHelpHtml() {
-      const leader = getPlatformLeaderKeyHTML();
-      const key1 = `<kbd>${leader}+[</kbd>`;
-      const key2 = `<kbd>${leader}+]</kbd>`;
-      return sprintf(s__('Editor|%{key1} and %{key2} to indent.'), { key1, key2 }, false);
-    },
     toolbarHelpHtml() {
       const mdLinkStart = `<a href="${this.markdownDocsPath}" target="_blank" tabindex="-1">`;
       const actionsLinkStart = `<a href="${this.quickActionsDocsPath}" target="_blank" tabindex="-1">`;
@@ -37,14 +31,14 @@ export default {
 
       if (this.markdownDocsPath && !this.quickActionsDocsPath) {
         return sprintf(
-          s__('Editor|%{mdLinkStart}Markdown is supported.%{mdLinkEnd}'),
+          s__('Editor|%{mdLinkStart}Markdown is supported%{mdLinkEnd}'),
           { mdLinkStart, mdLinkEnd: linkEnd },
           false,
         );
       } else if (this.markdownDocsPath && this.quickActionsDocsPath) {
         return sprintf(
           s__(
-            'Editor|%{mdLinkStart}Markdown%{mdLinkEnd} and %{actionsLinkStart}quick actions%{actionsLinkEnd} are supported.',
+            'Editor|%{mdLinkStart}Markdown%{mdLinkEnd} and %{actionsLinkStart}quick actions%{actionsLinkEnd} are supported',
           ),
           { mdLinkStart, mdLinkEnd: linkEnd, actionsLinkStart, actionsLinkEnd: linkEnd },
           false,
@@ -61,7 +55,6 @@ export default {
   <div class="comment-toolbar clearfix">
     <div class="toolbar-text">
       <span v-html="toolbarHelpHtml"></span>
-      <span v-html="indentHelpHtml"></span>
     </div>
     <span v-if="canAttachFile" class="uploading-container">
       <span class="uploading-progress-container hide">
