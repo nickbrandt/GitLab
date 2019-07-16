@@ -427,6 +427,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      Gitlab.ee do
+        namespace :v2 do
+          resource :cycle_analytics, only: [:show] do
+            get 'median/:stage_id' => 'cycle_analytics#median'
+            resources :stages, controller: 'cycle_analytics_stages', only: [:create, :update, :destroy]
+          end
+        end
+      end
+
       resource :cycle_analytics, only: [:show]
 
       namespace :cycle_analytics do

@@ -79,6 +79,8 @@ module EE
 
       has_many :project_aliases
 
+      has_many :cycle_analytics_stages, class_name: 'CycleAnalytics::ProjectStage'
+
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
       scope :mirror, -> { where(mirror: true) }

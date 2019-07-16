@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+module Gitlab
+  module CycleAnalytics
+    module StageEvents
+      class MergeRequestCreated < SimpleStageEvent
+        def self.identifier
+          :merge_request_created
+        end
+
+        def object_type
+          MergeRequest
+        end
+
+        def timestamp_projection
+          mr_table[:created_at]
+        end
+      end
+    end
+  end
+end

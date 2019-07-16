@@ -1033,6 +1033,44 @@ ActiveRecord::Schema.define(version: 2019_07_31_084415) do
     t.float "percentage_service_desk_issues", default: 0.0, null: false
   end
 
+  create_table "cycle_analytics_group_stages", force: :cascade do |t|
+    t.bigint "group_id", null: false
+    t.string "name", null: false
+    t.boolean "hidden", default: false, null: false
+    t.boolean "custom", default: true, null: false
+    t.integer "relative_position"
+    t.integer "start_event_identifier", null: false
+    t.integer "end_event_identifier", null: false
+    t.bigint "start_event_label_id"
+    t.bigint "end_event_label_id"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["end_event_label_id"], name: "index_cycle_analytics_group_stages_on_end_event_label_id"
+    t.index ["group_id", "name"], name: "index_cycle_analytics_stages_on_group_id_and_name", unique: true
+    t.index ["group_id"], name: "index_cycle_analytics_group_stages_on_group_id"
+    t.index ["relative_position"], name: "index_cycle_analytics_group_stages_on_relative_position"
+    t.index ["start_event_label_id"], name: "index_cycle_analytics_group_stages_on_start_event_label_id"
+  end
+
+  create_table "cycle_analytics_project_stages", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.string "name", null: false
+    t.boolean "hidden", default: false, null: false
+    t.boolean "custom", default: true, null: false
+    t.integer "relative_position"
+    t.integer "start_event_identifier", null: false
+    t.integer "end_event_identifier", null: false
+    t.bigint "start_event_label_id"
+    t.bigint "end_event_label_id"
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["end_event_label_id"], name: "index_cycle_analytics_project_stages_on_end_event_label_id"
+    t.index ["project_id", "name"], name: "index_cycle_analytics_stages_on_project_id_and_name", unique: true
+    t.index ["project_id"], name: "index_cycle_analytics_project_stages_on_project_id"
+    t.index ["relative_position"], name: "index_cycle_analytics_project_stages_on_relative_position"
+    t.index ["start_event_label_id"], name: "index_cycle_analytics_project_stages_on_start_event_label_id"
+  end
+
   create_table "dependency_proxy_blobs", id: :serial, force: :cascade do |t|
     t.integer "group_id", null: false
     t.datetime_with_timezone "created_at", null: false
@@ -3705,6 +3743,12 @@ ActiveRecord::Schema.define(version: 2019_07_31_084415) do
   add_foreign_key "clusters_kubernetes_namespaces", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "projects", on_delete: :nullify
   add_foreign_key "container_repositories", "projects"
+  add_foreign_key "cycle_analytics_group_stages", "labels", column: "end_event_label_id", on_delete: :cascade
+  add_foreign_key "cycle_analytics_group_stages", "labels", column: "start_event_label_id", on_delete: :cascade
+  add_foreign_key "cycle_analytics_group_stages", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "cycle_analytics_project_stages", "labels", column: "end_event_label_id", on_delete: :cascade
+  add_foreign_key "cycle_analytics_project_stages", "labels", column: "start_event_label_id", on_delete: :cascade
+  add_foreign_key "cycle_analytics_project_stages", "projects", on_delete: :cascade
   add_foreign_key "dependency_proxy_blobs", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "dependency_proxy_group_settings", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade

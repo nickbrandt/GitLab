@@ -41,6 +41,8 @@ module EE
 
       belongs_to :file_template_project, class_name: "Project"
 
+      has_many :cycle_analytics_stages, class_name: 'CycleAnalytics::GroupStage'
+
       # Use +checked_file_template_project+ instead, which implements important
       # visibility checks
       private :file_template_project

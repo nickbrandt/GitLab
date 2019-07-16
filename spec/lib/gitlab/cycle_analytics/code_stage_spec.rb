@@ -33,6 +33,14 @@ describe Gitlab::CycleAnalytics::CodeStage do
     it 'counts median from issues with metrics' do
       expect(stage.project_median).to eq(ISSUES_MEDIAN)
     end
+
+    it 'works for persisted stages' do
+      stage = CycleAnalytics::ProjectStage.new(
+        Gitlab::CycleAnalytics::DefaultStages.params_for_code_stage.merge(project: project)
+      )
+      dc = Gitlab::CycleAnalytics::DataCollector.new(stage, 2.days.ago)
+      expect(dc.median.seconds).to eq(ISSUES_MEDIAN)
+    end
   end
 
   describe '#events' do
