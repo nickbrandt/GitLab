@@ -25,11 +25,10 @@ module EE
     # rubocop: disable CodeReuse/ActiveRecord
     def by_weight(items)
       return items unless weights?
+      return items if filter_by_any_weight?
 
       if filter_by_no_weight?
         items.where(weight: nil)
-      elsif filter_by_any_weight?
-        items
       else
         items.where(weight: params[:weight])
       end

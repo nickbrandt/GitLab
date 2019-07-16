@@ -125,7 +125,7 @@ describe('WeightSelect', () => {
 
       setTimeout(() => {
         expect(activeDropdownItem()).toEqual('2');
-        expect(board.weight).toEqual('2');
+        expect(board.weight).toEqual(2);
         done();
       });
     });

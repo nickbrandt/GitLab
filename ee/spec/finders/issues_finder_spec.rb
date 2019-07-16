@@ -36,6 +36,14 @@ describe IssuesFinder do
             expect(issues).to contain_exactly(issue_with_weight_42)
           end
         end
+
+        context 'filter issues with a specific weight with no issues' do
+          let(:params) { { weight: 7 } }
+
+          it 'returns no issues' do
+            expect(issues).to be_empty
+          end
+        end
       end
 
       context 'filtering by assignee IDs' do

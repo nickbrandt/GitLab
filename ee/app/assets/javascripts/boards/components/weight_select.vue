@@ -2,14 +2,25 @@
 import WeightSelect from 'ee/weight_select';
 import { GlLoadingIcon } from '@gitlab/ui';
 
-const ANY_WEIGHT_LABEL = 'Any Weight';
-const NO_WEIGHT_LABEL = 'No Weight';
+const ANY_WEIGHT = {
+  LABEL: 'Any Weight',
+  STRING: 'Any',
+  VALUE: null,
+};
 
-const NO_WEIGHT_STR_VALUE = 'None';
-const ANY_WEIGHT_STR_VALUE = 'Any';
+const NO_WEIGHT = {
+  LABEL: 'No Weight',
+  STRING: 'None',
+  VALUE: -1,
+};
 
-const NO_WEIGHT_INT_VALUE = -1;
-const ANY_WEIGHT_INT_VALUE = null;
+function getWeightValue(weight) {
+  if (Number.isNaN(Number(weight))) {
+    return weight === NO_WEIGHT.STRING ? NO_WEIGHT.VALUE : ANY_WEIGHT.VALUE;
+  }
+
+  return parseInt(weight, 10);
+}
 
 export default {
   components: {
@@ -23,7 +34,7 @@ export default {
     value: {
       type: [Number, String],
       required: false,
-      default: ANY_WEIGHT_INT_VALUE,
+      default: ANY_WEIGHT.VALUE,
     },
     canEdit: {
       type: Boolean,
@@ -42,14 +53,14 @@ export default {
   },
   computed: {
     valueClass() {
-      if (this.value === ANY_WEIGHT_INT_VALUE) {
+      if (this.value === ANY_WEIGHT.VALUE) {
         return 'text-secondary';
       }
       return 'bold';
     },
     valueText() {
-      if (this.value === NO_WEIGHT_INT_VALUE) return NO_WEIGHT_LABEL;
-      if (this.value === ANY_WEIGHT_INT_VALUE) return ANY_WEIGHT_LABEL;
+      if (this.value === NO_WEIGHT.VALUE) return NO_WEIGHT.LABEL;
+      if (this.value === ANY_WEIGHT.VALUE) return ANY_WEIGHT.LABEL;
       return this.value;
     },
   },
@@ -62,29 +73,18 @@ export default {
   },
   methods: {
     isSelected(weight) {
-      if (this.value === NO_WEIGHT_INT_VALUE) {
-        return weight === NO_WEIGHT_STR_VALUE;
+      if (this.value === NO_WEIGHT.VALUE) {
+        return weight === NO_WEIGHT.STRING;
       }
 
-      if (this.value === ANY_WEIGHT_INT_VALUE) {
-        return weight === ANY_WEIGHT_STR_VALUE;
+      if (this.value === ANY_WEIGHT.VALUE) {
+        return weight === ANY_WEIGHT.STRING;
       }
 
       return this.value === weight;
     },
     selectWeight(weight) {
-      this.board.weight = this.weightInt(weight);
-    },
-    weightInt(weight) {
-      if (weight === NO_WEIGHT_STR_VALUE) {
-        return NO_WEIGHT_INT_VALUE;
-      }
-
-      if (weight === ANY_WEIGHT_STR_VALUE) {
-        return ANY_WEIGHT_INT_VALUE;
-      }
-
-      return weight;
+      this.board.weight = getWeightValue(weight);
     },
   },
 };
