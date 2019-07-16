@@ -23,9 +23,9 @@ describe FeatureFlags::UpdateService do
 
       expect { subject }.to change { AuditEvent.count }.by(1)
       expect(audit_event_message).to(
-        eq("Updated feature flag <strong>new name</strong>. "\
-           "Updated name from <strong>\"#{name_was.tr('_', ' ')}\"</strong> "\
-           "to <strong>\"new name\"</strong>.")
+        eq("Updated feature flag <strong>new_name</strong>. "\
+           "Updated name from <strong>\"#{name_was}\"</strong> "\
+           "to <strong>\"new_name\"</strong>.")
       )
     end
 
