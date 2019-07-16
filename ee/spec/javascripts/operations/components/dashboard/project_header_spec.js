@@ -43,11 +43,11 @@ describe('project header component', () => {
 
   describe('remove button', () => {
     it('renders removal button icon', () => {
-      expect(wrapper.contains('.remove-button')).toBe(true);
+      expect(wrapper.contains('.js-remove-button')).toBe(true);
     });
 
     it('emits project removal link on click', () => {
-      wrapper.find('.remove-button').vm.$emit('click');
+      wrapper.find('.js-remove-button').vm.$emit('click');
 
       expect(wrapper.emittedByOrder()).toEqual([
         { name: 'remove', args: [mockOneProject.remove_path] },
