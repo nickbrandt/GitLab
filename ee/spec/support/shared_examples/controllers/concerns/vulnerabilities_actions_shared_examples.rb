@@ -46,13 +46,23 @@ shared_examples VulnerabilitiesActions do
       let(:params) { vulnerable_params.merge(page: 2) }
 
       before do
-        create_list(:vulnerabilities_occurrence, 35, pipelines: [pipeline], project: project)
+        class Vulnerabilities::Occurrence
+          paginates_per 2
+        end
+
+        create_list(:vulnerabilities_occurrence, 3, pipelines: [pipeline], project: project)
 
         subject
       end
 
+      after do
+        class Vulnerabilities::Occurrence
+          paginates_per 20
+        end
+      end
+
       it 'returns the list of vulnerabilities that are on the requested page' do
-        expect(json_response.length).to eq 15
+        expect(json_response.length).to eq 1
       end
     end
 
