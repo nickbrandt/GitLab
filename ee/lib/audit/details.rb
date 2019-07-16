@@ -31,7 +31,7 @@ module Audit
       when :remove
         "Removed #{target_name}"
       when :failed_login
-        "Failed to login with #{oath_label} authentication"
+        "Failed to login with #{oauth_label} authentication"
       when :custom_message
         detail_value
       else
@@ -60,7 +60,7 @@ module Audit
       @details.values.first
     end
 
-    def oath_label
+    def oauth_label
       Gitlab::Auth::OAuth::Provider.label_for(detail_value).upcase
     end
   end
