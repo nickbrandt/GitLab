@@ -58,7 +58,7 @@ describe Groups::IssuesAnalyticsController do
 
           get :show, params: { group_id: group.to_param }, format: :json
 
-          expect(JSON.parse(response.body)).to include(expected_result)
+          expect(json_response).to include(expected_result)
         end
 
         context 'when user cannot view issues' do
@@ -74,7 +74,7 @@ describe Groups::IssuesAnalyticsController do
 
             get :show, params: { group_id: group.to_param }, format: :json
 
-            expect(JSON.parse(response.body)).to include(expected_result)
+            expect(json_response).to include(expected_result)
           end
         end
       end

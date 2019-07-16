@@ -5,7 +5,7 @@ describe Groups::Epics::NotesController do
   let(:group) { create(:group) }
   let(:epic) { create(:epic, group: group) }
   let(:note) { create(:note, noteable: epic) }
-  let(:parsed_response) { JSON.parse(response.body).with_indifferent_access }
+  let(:parsed_response) { json_response.with_indifferent_access }
 
   before do
     stub_licensed_features(epics: true)
