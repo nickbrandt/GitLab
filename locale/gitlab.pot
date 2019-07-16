@@ -7971,6 +7971,9 @@ msgid_plural "Last %d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Last %{days} days"
+msgstr ""
+
 msgid "Last Pipeline"
 msgstr ""
 
@@ -12351,6 +12354,9 @@ msgid "Select the branch you want to set as the default for this project. All me
 msgstr ""
 
 msgid "Select the custom project template source group."
+msgstr ""
+
+msgid "Select timeframe"
 msgstr ""
 
 msgid "Selected levels cannot be used by non-admin users for groups, projects or snippets. If the public level is restricted, user profiles are only visible to logged in users."
