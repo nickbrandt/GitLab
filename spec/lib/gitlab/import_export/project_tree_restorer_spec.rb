@@ -14,7 +14,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       RSpec::Mocks.with_temporary_scope do
         @project = create(:project, :builds_enabled, :issues_disabled, name: 'project', path: 'project')
         @shared = @project.import_export_shared
-        allow(@shared).to receive(:export_path).and_return('spec/lib/gitlab/import_export/')
+        allow(@shared).to receive(:export_path).and_return('spec/fixtures/lib/gitlab/import_export/')
 
         allow_any_instance_of(Repository).to receive(:fetch_source_branch!).and_return(true)
         allow_any_instance_of(Gitlab::Git::Repository).to receive(:branch_exists?).and_return(false)
@@ -328,12 +328,12 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     let(:restored_project_json) { project_tree_restorer.restore }
 
     before do
-      allow(shared).to receive(:export_path).and_return('spec/lib/gitlab/import_export/')
+      allow(shared).to receive(:export_path).and_return('spec/fixtures/lib/gitlab/import_export/')
     end
 
     context 'with a simple project' do
       before do
-        project_tree_restorer.instance_variable_set(:@path, "spec/lib/gitlab/import_export/project.light.json")
+        project_tree_restorer.instance_variable_set(:@path, "spec/fixtures/lib/gitlab/import_export/project.light.json")
 
         restored_project_json
       end
@@ -430,7 +430,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       end
 
       before do
-        project_tree_restorer.instance_variable_set(:@path, "spec/lib/gitlab/import_export/project.group.json")
+        project_tree_restorer.instance_variable_set(:@path, "spec/fixtures/lib/gitlab/import_export/project.group.json")
 
         restored_project_json
       end
@@ -459,7 +459,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       end
 
       before do
-        project_tree_restorer.instance_variable_set(:@path, "spec/lib/gitlab/import_export/project.light.json")
+        project_tree_restorer.instance_variable_set(:@path, "spec/fixtures/lib/gitlab/import_export/project.light.json")
       end
 
       it 'does not import any templated services' do
@@ -501,7 +501,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       end
 
       it 'preserves the project milestone IID' do
-        project_tree_restorer.instance_variable_set(:@path, "spec/lib/gitlab/import_export/project.milestone-iid.json")
+        project_tree_restorer.instance_variable_set(:@path, "spec/fixtures/lib/gitlab/import_export/project.milestone-iid.json")
 
         expect_any_instance_of(Gitlab::ImportExport::Shared).not_to receive(:error)
 
