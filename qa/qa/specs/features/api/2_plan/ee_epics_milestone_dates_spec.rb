@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/62
-  context 'Plan', :quarantine do
+  context 'Plan' do
     describe 'Epics milestone dates API' do
       before(:context) do
         @api_client = Runtime::API::Client.new(:gitlab)
