@@ -129,3 +129,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::ImportExport::GroupProjectObjectBuilder.prepend_if_ee('EE::Gitlab::ImportExport::GroupProjectObjectBuilder')
