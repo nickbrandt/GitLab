@@ -44,7 +44,7 @@ module QA
 
         def sign_in_using_credentials(user = nil)
           # Don't try to log-in if we're already logged-in
-          return if Page::Main::Menu.act { has_personal_area?(wait: 0) }
+          return if Page::Main::Menu.perform { |menu| menu.has_personal_area?(wait: 0) }
 
           using_wait_time 0 do
             set_initial_password_if_present
@@ -90,7 +90,7 @@ module QA
             click_element :sign_in_button
           end
 
-          Page::Main::Menu.act { has_personal_area? }
+          Page::Main::Menu.perform(&:has_personal_area?)
         end
 
         def self.path
