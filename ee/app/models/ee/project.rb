@@ -19,6 +19,7 @@ module EE
       include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
+      include IgnorableColumn
 
       ignore_column :mirror_last_update_at,
         :mirror_last_successful_update_at,
