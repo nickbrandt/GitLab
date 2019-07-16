@@ -17,16 +17,28 @@ describe('EE Sidebar store', () => {
     CESidebarStore.singleton = null;
   });
 
-  it('sets weight data', () => {
-    expect(store.weight).toEqual(null);
-
-    const weight = 3;
-    store.setWeightData({
-      weight,
+  describe('setWeightData', () => {
+    beforeEach(() => {
+      expect(store.weight).toEqual(null);
     });
 
-    expect(store.isFetching.weight).toEqual(false);
-    expect(store.weight).toEqual(weight);
+    it('sets weight data', () => {
+      const weight = 3;
+      store.setWeightData({
+        weight,
+      });
+
+      expect(store.isFetching.weight).toEqual(false);
+      expect(store.weight).toEqual(weight);
+    });
+
+    it('supports 0 weight', () => {
+      store.setWeightData({
+        weight: 0,
+      });
+
+      expect(store.weight).toBe(0);
+    });
   });
 
   it('set weight', () => {
