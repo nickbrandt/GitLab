@@ -586,6 +586,14 @@ module EE
       @design_repository ||= DesignManagement::Repository.new(self)
     end
 
+    def package_already_taken?(package_name)
+      namespace.root_ancestor.all_projects
+        .joins(:packages)
+        .where.not(id: id)
+        .merge(Packages::Package.with_name(package_name))
+        .exists?
+    end
+
     private
 
     def set_override_pull_mirror_available
