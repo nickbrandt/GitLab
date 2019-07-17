@@ -5,6 +5,7 @@ module EE
     module Helpers
       module ProjectsHelpers
         extend ActiveSupport::Concern
+        extend ::Gitlab::Utils::Override
 
         prepended do
           params :optional_project_params_ee do
@@ -12,6 +13,7 @@ module EE
             optional :approvals_before_merge, type: Integer, desc: 'How many approvers should approve merge request by default'
             optional :mirror, type: Grape::API::Boolean, desc: 'Enables pull mirroring in a project'
             optional :mirror_trigger_builds, type: Grape::API::Boolean, desc: 'Pull mirroring triggers builds'
+            optional :external_authorization_classification_label, type: String, desc: 'The classification label for the project'
           end
 
           params :optional_filter_params_ee do
@@ -44,8 +46,18 @@ module EE
               :external_authorization_classification_label,
               :import_url,
               :packages_enabled,
-              :fallback_approvals_required
+              :fallback_approvals_required,
+              :external_authorization_classification_label
             ]
+          end
+        end
+
+        override :filter_attributes_using_license!
+        def filter_attributes_using_license!(attrs)
+          super
+
+          unless ::License.feature_available?(:external_authorization_service_api_management)
+            attrs.delete(:external_authorization_classification_label)
           end
         end
       end

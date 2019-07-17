@@ -69,6 +69,7 @@ class License < ApplicationRecord
     variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
+    external_authorization_service_api_management
     ci_cd_projects
     default_project_deletion_protection
     protected_environments
@@ -190,6 +191,7 @@ class License < ApplicationRecord
     multiple_ldap_servers
     object_storage
     repository_size_limit
+    external_authorization_service_api_management
     custom_project_templates
     usage_quotas
     required_ci_templates
