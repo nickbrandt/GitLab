@@ -74,6 +74,7 @@ class Burndown
       Event
         .where(target: milestone_issues, action: [Event::CLOSED, Event::REOPENED])
         .where('created_at <= ?', end_date.end_of_day)
+        .order(:created_at)
         .group_by(&:target_id)
     end
   end
@@ -88,9 +89,19 @@ class Burndown
     events_for_issue = milestone_events_per_issue[issue.id]
     return [] unless events_for_issue
 
+    previous_action = nil
     events_for_issue.map do |event|
+      # It's possible that an event (we filter only closed or reopened actions)
+      # is followed by another event with the same action - typically if both
+      # commit and merge request closes an issue, then 'close' event may be
+      # created for both of them. We can ignore these "duplicit" events because
+      # if an event is already closed, another close action doesn't change its
+      # state.
+      next if event.action == previous_action
+
+      previous_action = event.action
       build_burndown_event(event.created_at, issue.weight, Event::ACTIONS.key(event.action).to_s)
-    end
+    end.compact
   end
 
   # If issue is closed but has no closed events, treat it as though closed on milestone start date
