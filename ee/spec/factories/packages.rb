@@ -21,7 +21,7 @@ FactoryBot.define do
     end
 
     factory :npm_package do
-      name 'foo'
+      sequence(:name) { |n| "@#{project.root_namespace.path}/package-#{n}"}
       version '1.0.0'
       package_type 'npm'
 
