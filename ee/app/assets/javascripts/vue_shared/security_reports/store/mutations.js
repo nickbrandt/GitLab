@@ -3,12 +3,12 @@ import * as types from './mutation_types';
 import {
   parseSastIssues,
   parseDependencyScanningIssues,
-  filterByKey,
   getDastSite,
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
 } from './utils';
+import filterByKey from './utils/filter_by_key';
 import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 

@@ -6,12 +6,12 @@ import {
   parseDependencyScanningIssues,
   getDastSite,
   parseDastIssues,
-  filterByKey,
   getUnapprovedVulnerabilities,
   groupedTextBuilder,
   statusIcon,
   countIssues,
 } from 'ee/vue_shared/security_reports/store/utils';
+import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import {
   formatContainerScanningDescription,
   formatContainerScanningMessage,

@@ -1,6 +1,6 @@
 import CEMergeRequestStore from '~/vue_merge_request_widget/stores/mr_widget_store';
-import { filterByKey } from 'ee/vue_shared/security_reports/store/utils';
 import { mapApprovalsResponse, mapApprovalRulesResponse } from '../mappers';
+import CodeQualityComparisonWorker from '../workers/code_quality_comparison_worker';
 
 export default class MergeRequestStore extends CEMergeRequestStore {
   constructor(data) {
@@ -94,19 +94,27 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     };
   }
 
+  static doCodeClimateComparison(headIssues, baseIssues) {
+    // Do these comparisons in worker threads to avoid blocking the main thread
+    return new Promise(resolve => {
+      const worker = new CodeQualityComparisonWorker();
+      worker.addEventListener('message', ({ data }) => resolve(data));
+      worker.postMessage({
+        headIssues,
+        baseIssues,
+      });
+    });
+  }
+
   compareCodeclimateMetrics(headIssues, baseIssues, headBlobPath, baseBlobPath) {
     const parsedHeadIssues = MergeRequestStore.parseCodeclimateMetrics(headIssues, headBlobPath);
     const parsedBaseIssues = MergeRequestStore.parseCodeclimateMetrics(baseIssues, baseBlobPath);
 
-    this.codeclimateMetrics.newIssues = filterByKey(
-      parsedHeadIssues,
-      parsedBaseIssues,
-      'fingerprint',
-    );
-    this.codeclimateMetrics.resolvedIssues = filterByKey(
-      parsedBaseIssues,
-      parsedHeadIssues,
-      'fingerprint',
+    return MergeRequestStore.doCodeClimateComparison(parsedHeadIssues, parsedBaseIssues).then(
+      response => {
+        this.codeclimateMetrics.newIssues = response.newIssues;
+        this.codeclimateMetrics.resolvedIssues = response.resolvedIssues;
+      },
     );
   }
 

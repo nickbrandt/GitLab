@@ -4,6 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import mrWidgetOptions from 'ee/vue_merge_request_widget/mr_widget_options.vue';
 import MRWidgetService from 'ee/vue_merge_request_widget/services/mr_widget_service';
 import MRWidgetStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
+import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -14,6 +15,8 @@ import mockData, {
   headIssues,
   basePerformance,
   headPerformance,
+  parsedBaseIssues,
+  parsedHeadIssues,
 } from 'ee_spec/vue_mr_widget/mock_data';
 
 import {
@@ -322,6 +325,14 @@ describe('ee merge request widget options', () => {
         mock.onGet('head.json').reply(200, headIssues);
         mock.onGet('base.json').reply(200, baseIssues);
         vm = mountComponent(Component);
+
+        // mock worker response
+        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
+          Promise.resolve({
+            newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
+            resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
+          }),
+        );
       });
 
       it('should render provided data', done => {
@@ -372,6 +383,14 @@ describe('ee merge request widget options', () => {
         mock.onGet('head.json').reply(200, []);
         mock.onGet('base.json').reply(200, []);
         vm = mountComponent(Component);
+
+        // mock worker response
+        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() =>
+          Promise.resolve({
+            newIssues: filterByKey([], [], 'fingerprint'),
+            resolvedIssues: filterByKey([], [], 'fingerprint'),
+          }),
+        );
       });
 
       afterEach(() => {
@@ -385,6 +404,28 @@ describe('ee merge request widget options', () => {
               vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
             ),
           ).toEqual('No changes to code quality');
+          done();
+        }, 0);
+      });
+    });
+
+    describe('with codeclimate comparison worker rejection', () => {
+      beforeEach(() => {
+        mock.onGet('head.json').reply(200, headIssues);
+        mock.onGet('base.json').reply(200, baseIssues);
+        vm = mountComponent(Component);
+
+        // mock worker rejection
+        spyOn(MRWidgetStore, 'doCodeClimateComparison').and.callFake(() => Promise.reject());
+      });
+
+      it('should render error indicator', done => {
+        setTimeout(() => {
+          expect(
+            removeBreakLine(
+              vm.$el.querySelector('.js-codequality-widget .js-code-text').textContent,
+            ),
+          ).toEqual('Failed to load codeclimate report');
           done();
         }, 0);
       });
