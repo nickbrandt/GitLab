@@ -1,6 +1,7 @@
 - parent = board.parent
 - milestone_filter_opts = { format: :json }
 - milestone_filter_opts = milestone_filter_opts.merge(only_group_milestones: true) if board.group_board?
+- weights = Gitlab.ee? ? ([Issue::WEIGHT_ANY] + Issue.weight_options) : []
 
 #js-multiple-boards-switcher.inline.boards-switcher{ data: { current_board: current_board_json.to_json,
     milestone_path: milestones_filter_path(milestone_filter_opts),
@@ -11,5 +12,5 @@
     labels_path: labels_filter_path_with_defaults(only_group_labels: true, include_descendant_groups: true),
     project_id: @project&.id,
     group_id: @group&.id,
-    scoped_issue_board_feature_enabled: parent.feature_available?(:scoped_issue_board) ? 'true' : 'false',
-    weights: ([Issue::WEIGHT_ANY] + Issue.weight_options).to_json } }
+    scoped_issue_board_feature_enabled: Gitlab.ee? && parent.feature_available?(:scoped_issue_board) ? 'true' : 'false',
+    weights: weights.to_json } }

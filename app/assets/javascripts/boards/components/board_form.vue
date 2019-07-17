@@ -1,7 +1,6 @@
 <script>
 import Flash from '~/flash';
 import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
-import BoardScope from './board_scope.vue';
 import { visitUrl } from '~/lib/utils/url_utility';
 import boardsStore from '~/boards/stores/boards_store';
 
@@ -17,7 +16,7 @@ const boardDefaults = {
 
 export default {
   components: {
-    BoardScope,
+    BoardScope: () => import('ee_component/boards/components/board_scope.vue'),
     DeprecatedModal,
   },
   props: {
