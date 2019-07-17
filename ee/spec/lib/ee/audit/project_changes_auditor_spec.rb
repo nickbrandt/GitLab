@@ -7,6 +7,7 @@ describe EE::Audit::ProjectChangesAuditor do
     let(:foo_instance) { described_class.new(user, project) }
 
     before do
+      project.reload
       stub_licensed_features(extended_audit_events: true)
     end
 
