@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe IncidentManagement::CreateIssueService do
-  set(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :repository) }
   let(:service) { described_class.new(project, nil, alert_payload) }
   let(:alert_starts_at) { Time.now }
   let(:alert_title) { 'TITLE' }
@@ -20,7 +20,7 @@ describe IncidentManagement::CreateIssueService do
     Gitlab::Alerting::Alert.new(project: project, payload: alert_payload).present
   end
 
-  set(:setting) do
+  let!(:setting) do
     create(:project_incident_management_setting, project: project)
   end
 
@@ -113,7 +113,7 @@ describe IncidentManagement::CreateIssueService do
           expect(issue.description).to include(alert_presenter.issue_summary_markdown)
           expect(issue.description).to include(template_content)
           expect(issue.description).to include(alt_template)
-          expect(issue.description.count(summary_separator)).to eq(2)
+          expect(issue.description.scan(summary_separator).size).to eq(2)
         end
       end
 
