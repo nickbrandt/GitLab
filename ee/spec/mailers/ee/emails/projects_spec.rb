@@ -46,7 +46,7 @@ describe EE::Emails::Projects do
       it_behaves_like 'a user cannot unsubscribe through footer link'
 
       it 'has expected subject' do
-        is_expected.to have_subject("#{project.name} | Alert: #{environment.name} #{title} for 5 minutes")
+        is_expected.to have_subject("#{project.name} | Alert: #{environment.name}: #{title} for 5 minutes")
       end
 
       it 'has expected content' do

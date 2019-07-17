@@ -3,8 +3,8 @@
 module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
-      def email_subject
-        [environment_name, alert_title].compact.join(' ')
+      def full_title
+        [environment_name, alert_title].compact.join(': ')
       end
 
       def project_full_path

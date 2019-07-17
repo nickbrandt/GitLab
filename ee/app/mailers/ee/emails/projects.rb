@@ -26,7 +26,7 @@ module EE
           .present
         return unless @alert.valid?
 
-        subject_text = "Alert: #{@alert.email_subject}"
+        subject_text = "Alert: #{@alert.full_title}"
         mail(to: recipient(user_id, @project.group), subject: subject(subject_text))
       end
     end
