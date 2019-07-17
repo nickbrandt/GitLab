@@ -10,6 +10,8 @@ class DiscussionSerializer < BaseSerializer
   private
 
   def with_additional_opts(opts)
+    return opts unless @request.project
+
     additional_opts = {
       submodule_links: Gitlab::SubmoduleLinks.new(@request.project.repository)
     }
