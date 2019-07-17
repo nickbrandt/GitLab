@@ -1,4 +1,5 @@
 import MergeRequestStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
+import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
 import mockData, {
   headIssues,
@@ -16,7 +17,15 @@ describe('MergeRequestStore', () => {
 
   describe('compareCodeclimateMetrics', () => {
     beforeEach(() => {
-      store.compareCodeclimateMetrics(headIssues, baseIssues, 'headPath', 'basePath');
+      // mock worker response
+      spyOn(MergeRequestStore, 'doCodeClimateComparison').and.callFake(() =>
+        Promise.resolve({
+          newIssues: filterByKey(parsedHeadIssues, parsedBaseIssues, 'fingerprint'),
+          resolvedIssues: filterByKey(parsedBaseIssues, parsedHeadIssues, 'fingerprint'),
+        }),
+      );
+
+      return store.compareCodeclimateMetrics(headIssues, baseIssues, 'headPath', 'basePath');
     });
 
     it('should return the new issues', () => {
