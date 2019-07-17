@@ -1,7 +1,4 @@
-import Vue from 'vue';
-import base from '~/boards/components/modal/footer.vue';
-
-export default Vue.extend(base, {
+export default {
   methods: {
     buildUpdateRequest(list) {
       const { currentBoard } = this.state;
@@ -16,4 +13,4 @@ export default Vue.extend(base, {
       };
     },
   },
-});
+};
