@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import BoardService from 'ee/boards/services/board_service';
-import BoardsSelector from 'ee/boards/components/boards_selector.vue';
+import BoardService from '~/boards/services/board_service';
+import BoardsSelector from '~/boards/components/boards_selector.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import boardsStore from '~/boards/stores/boards_store';

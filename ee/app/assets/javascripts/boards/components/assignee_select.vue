@@ -48,7 +48,8 @@ export default {
     },
     selected: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => null,
     },
     wrapperClass: {
       type: String,
@@ -58,7 +59,7 @@ export default {
   },
   computed: {
     hasValue() {
-      return this.selected.id > 0;
+      return this.selected && this.selected.id > 0;
     },
     selectedId() {
       return this.selected ? this.selected.id : null;

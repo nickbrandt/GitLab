@@ -10,9 +10,9 @@ import {
 } from '@gitlab/ui';
 
 import Icon from '~/vue_shared/components/icon.vue';
-import boardsStore from '~/boards/stores/boards_store';
-import BoardForm from './board_form.vue';
 import httpStatusCodes from '~/lib/utils/http_status';
+import boardsStore from '../stores/boards_store';
+import BoardForm from './board_form.vue';
 
 const MIN_BOARDS_TO_VIEW_RECENT = 10;
 
