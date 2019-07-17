@@ -3,6 +3,22 @@
 require 'spec_helper'
 
 describe EE::Issuable do
+  describe "Validation" do
+    context 'general validations' do
+      subject { build(:epic) }
+
+      before do
+        allow(InternalId).to receive(:generate_next).and_return(nil)
+      end
+
+      it { is_expected.to validate_presence_of(:iid) }
+      it { is_expected.to validate_presence_of(:author) }
+      it { is_expected.to validate_presence_of(:title) }
+      it { is_expected.to validate_length_of(:title).is_at_most(255) }
+      it { is_expected.to validate_length_of(:description).is_at_most(1_000_000) }
+    end
+  end
+
   describe '.labels_hash' do
     let(:feature_label) { create(:label, title: 'Feature') }
     let(:second_label) { create(:label, title: 'Second Label') }
@@ -48,6 +64,14 @@ describe EE::Issuable do
       it 'returns false' do
         expect(epic.supports_milestone?).to be_falsy
       end
+    end
+  end
+
+  describe '#matches_cross_reference_regex?' do
+    context "epic description with long path string" do
+      let(:mentionable) { build(:epic, description: "/a" * 50000) }
+
+      it_behaves_like 'matches_cross_reference_regex? fails fast'
     end
   end
 end
