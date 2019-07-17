@@ -18,8 +18,7 @@ module EE
         task: "gitlab:indexer:install[#{indexer_args}]"
       )
 
-      ENV['PATH'] = # rubocop:disable RSpec/EnvAssignment
-        [indexer_bin_path, ENV['PATH']].join(File::PATH_SEPARATOR)
+      Settings.elasticsearch['indexer_path'] = indexer_bin_path
     end
 
     def indexer_path
@@ -27,7 +26,7 @@ module EE
     end
 
     def indexer_bin_path
-      @indexer_bin_path ||= File.join(indexer_path, 'bin')
+      @indexer_bin_path ||= File.join(indexer_path, 'bin', 'gitlab-elasticsearch-indexer')
     end
 
     def indexer_version
