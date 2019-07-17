@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_15_114644) do
+ActiveRecord::Schema.define(version: 20190715114644) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -282,7 +282,9 @@ ActiveRecord::Schema.define(version: 2019_07_15_114644) do
     t.integer "project_id", null: false
     t.integer "approvals_required", limit: 2, default: 0, null: false
     t.string "name", null: false
+    t.integer "rule_type", limit: 2, default: 0, null: false
     t.index ["project_id"], name: "index_approval_project_rules_on_project_id", using: :btree
+    t.index ["rule_type"], name: "index_approval_project_rules_on_rule_type", using: :btree
   end
 
   create_table "approval_project_rules_groups", force: :cascade do |t|
