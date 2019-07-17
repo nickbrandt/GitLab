@@ -50,11 +50,15 @@ module API
       get ':id/vulnerabilities' do
         authorize! :read_project_security_dashboard, user_project
 
-        vulnerability_occurrences = Kaminari.paginate_array(
-          vulnerability_occurrences_by(declared_params.merge(project: user_project))
+        vulnerability_occurrences = paginate(
+          Kaminari.paginate_array(
+            vulnerability_occurrences_by(declared_params.merge(project: user_project))
+          )
         )
 
-        present paginate(vulnerability_occurrences),
+        Gitlab::Vulnerabilities::OccurrencesPreloader.preload_feedback!(vulnerability_occurrences)
+
+        present vulnerability_occurrences,
           with: ::Vulnerabilities::OccurrenceEntity,
           request: GrapeRequestProxy.new(request, current_user)
       end
