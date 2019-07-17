@@ -32,6 +32,11 @@ module QA
                 element :review_preview_toggle
               end
 
+              view 'ee/app/views/projects/merge_requests/_code_owner_approval_rules.html.haml' do
+                element :approver
+                element :approver_list
+              end
+
               def start_review
                 click_element :start_review
               end
@@ -61,6 +66,12 @@ module QA
 
               def unresolve_review_discussion
                 check_element :unresolve_review_discussion
+              end
+
+              def approvers
+                within_element :approver_list do
+                  all_elements(:approver).map { |item| item.find('img')['title'] }
+                end
               end
             end
           end
