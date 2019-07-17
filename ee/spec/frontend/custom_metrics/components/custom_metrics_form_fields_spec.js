@@ -38,11 +38,11 @@ describe('custom metrics form fields component', () => {
   };
 
   beforeEach(() => {
-    jest.spyOn(axios, 'post').mockImplementation();
-    axios.post.mockResolvedValue(validQueryResponse);
+    jest.spyOn(axios, 'post').mockResolvedValue(validQueryResponse);
   });
 
   afterEach(() => {
+    axios.post.mockRestore();
     component.destroy();
   });
 
