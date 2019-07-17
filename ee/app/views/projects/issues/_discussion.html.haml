@@ -12,6 +12,6 @@
     #discussion-tab.tab-pane.show.active{ role: 'tabpanel', 'aria-labelledby': 'discussion' }
       = render_ce 'projects/issues/discussion'
     #designs-tab.tab-pane{ role: 'tabpanel', 'aria-labelledby': 'designs' }
-      #js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid } }
+      #js-design-management{ data: { project_path: @project.full_path, issue_iid: @issue.iid, issue_path: project_issue_path(@project, @issue) } }
 - else
   = render_ce 'projects/issues/discussion'
