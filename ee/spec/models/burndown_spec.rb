@@ -18,7 +18,7 @@ describe Burndown do
 
     subject { described_class.new(milestone, user).as_json }
 
-    it 'generates an array of issues with with date, issue weight and action' do
+    it 'generates an array of issues with date, issue weight and action' do
       expect(subject).to match_array([
         { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'created' },
         { created_at: Date.new(2017, 2, 28).beginning_of_day, weight: 2, action: 'closed' },
@@ -98,7 +98,16 @@ describe Burndown do
       end
     end
 
-    context "when all closed issues does not have closed events" do
+    it "ignores follow-up events with the same action" do
+      create(:event, target: milestone.issues.first, created_at: milestone.start_date + 1.minute, action: Event::REOPENED)
+      event1 = create(:closed_issue_event, target: milestone.issues.first, created_at: milestone.start_date + 2.minutes)
+      event2 = create(:closed_issue_event, target: milestone.issues.first, created_at: milestone.start_date + 3.minutes)
+
+      expect(closed_at_time(subject, event1.created_at).size).to eq(1)
+      expect(closed_at_time(subject, event2.created_at).size).to eq(0)
+    end
+
+    context "when all closed issues do not have closed events" do
       before do
         Event.where(target: milestone.issues, action: Event::CLOSED).destroy_all # rubocop: disable DestroyAll
       end
@@ -253,5 +262,11 @@ describe Burndown do
   # facilitate comparison in specs
   def adjust_issue_event_creation_time(event)
     event.update!(created_at: event.created_at.beginning_of_day)
+  end
+
+  def closed_at_time(events, time)
+    events.select do |hash|
+      hash[:created_at] == time && hash[:action] == 'closed'
+    end
   end
 end
