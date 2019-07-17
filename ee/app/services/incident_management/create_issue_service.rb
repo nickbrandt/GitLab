@@ -29,7 +29,7 @@ module IncidentManagement
     end
 
     def issue_title
-      alert.title
+      alert.full_title
     end
 
     def issue_description

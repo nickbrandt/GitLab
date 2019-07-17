@@ -101,6 +101,30 @@ describe IncidentManagement::CreateIssueService do
       end
     end
 
+    context 'with gitlab alert' do
+      let(:gitlab_alert) { create(:prometheus_alert, project: project) }
+
+      before do
+        alert_payload['labels'] = {
+          'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s
+        }
+      end
+
+      it 'creates an issue' do
+        query_title = "#{gitlab_alert.title} #{gitlab_alert.computed_operator} #{gitlab_alert.threshold}"
+
+        expect(subject).to include(status: :success)
+
+        expect(issue.author).to eq(User.alert_bot)
+        expect(issue.title).to eq(alert_presenter.full_title)
+        expect(issue.title).to include(gitlab_alert.environment.name)
+        expect(issue.title).to include(query_title)
+        expect(issue.title).to include('for 5 minutes')
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+        expect(issue.description).not_to include(summary_separator)
+      end
+    end
+
     describe 'with invalid alert payload' do
       shared_examples 'invalid alert' do
         it 'does not create an issue' do
