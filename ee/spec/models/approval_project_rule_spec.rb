@@ -6,8 +6,9 @@ describe ApprovalProjectRule do
   subject { create(:approval_project_rule) }
 
   describe '.regular' do
-    it 'returns all records' do
+    it 'returns non-report_approver records' do
       rules = create_list(:approval_project_rule, 2)
+      create(:approval_project_rule, :security_report)
 
       expect(described_class.regular).to contain_exactly(*rules)
     end
@@ -21,23 +22,43 @@ describe ApprovalProjectRule do
     end
   end
 
-  describe '#regular' do
-    it 'returns true' do
-      expect(subject.regular).to eq(true)
+  describe '#regular?' do
+    let(:security_approver_rule) { build(:approval_project_rule, :security_report) }
+
+    it 'returns true for regular rules' do
       expect(subject.regular?).to eq(true)
+    end
+
+    it 'returns false for report_approver rules' do
+      expect(security_approver_rule.regular?). to eq(false)
     end
   end
 
-  describe '#code_owner' do
+  describe '#code_owner?' do
     it 'returns false' do
-      expect(subject.code_owner).to eq(false)
       expect(subject.code_owner?).to eq(false)
     end
   end
 
+  describe '#report_approver?' do
+    let(:security_approver_rule) { build(:approval_project_rule, :security_report) }
+
+    it 'returns false for regular rules' do
+      expect(subject.report_approver?).to eq(false)
+    end
+
+    it 'returns true for report_approver rules' do
+      expect(security_approver_rule.report_approver?). to eq(true)
+    end
+  end
+
   describe '#rule_type' do
-    it 'returns the correct type' do
+    it 'returns the regular type for regular rules' do
       expect(build(:approval_project_rule).rule_type).to eq('regular')
+    end
+
+    it 'returns the report_approver type for security report approvers rules' do
+      expect(build(:approval_project_rule, :security_report).rule_type).to eq('report_approver')
     end
   end
 end

@@ -346,7 +346,7 @@ module EE
 
       # Decorates Project
       class ProjectApprovalRules < Grape::Entity
-        expose :visible_regular_approval_rules, as: :rules, using: ApprovalRule
+        expose :visible_approval_rules, as: :rules, using: ApprovalRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
       end
 

@@ -90,7 +90,7 @@ module EE
       local_project_rule_ids.compact!
 
       invalid = if new_record?
-                  local_project_rule_ids.to_set != project.approval_rule_ids.to_set
+                  local_project_rule_ids.to_set != project.visible_regular_approval_rules.pluck(:id).to_set
                 else
                   (local_project_rule_ids - project.approval_rule_ids).present?
                 end

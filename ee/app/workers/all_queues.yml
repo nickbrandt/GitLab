@@ -43,6 +43,7 @@
 - geo:geo_scheduler_secondary_scheduler
 
 - pipeline_default:store_security_reports
+- pipeline_default:sync_security_reports_to_report_approval_rules
 - pipeline_default:ci_create_cross_project_pipeline
 - pipeline_default:ci_pipeline_bridge_status
 

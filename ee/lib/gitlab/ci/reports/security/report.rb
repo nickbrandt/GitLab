@@ -5,6 +5,8 @@ module Gitlab
     module Reports
       module Security
         class Report
+          UNSAFE_SEVERITIES = %w[unknown high critical].freeze
+
           attr_reader :type
           attr_reader :commit_sha
           attr_reader :occurrences
@@ -49,6 +51,10 @@ module Gitlab
 
           def merge!(other)
             replace_with!(::Security::MergeReportsService.new(self, other).execute)
+          end
+
+          def unsafe_severity?
+            occurrences.any? { |occurrence| UNSAFE_SEVERITIES.include?(occurrence.severity) }
           end
         end
       end
