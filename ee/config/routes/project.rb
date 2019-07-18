@@ -72,13 +72,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :issues, only: [], constraints: { id: /\d+/ } do
-        member do
-          get :designs, action: 'show'
-          get 'designs/*vueroute', action: 'show', format: false
-        end
-      end
-
       resource :insights, only: [:show] do
         collection do
           post :query
