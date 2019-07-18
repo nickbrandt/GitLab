@@ -24,6 +24,13 @@ class GeoNodeStatus < ApplicationRecord
   sha_attribute :storage_configuration_digest
 
   alias_attribute :repositories_count, :projects_count
+  alias_attribute :wikis_count, :projects_count
+
+  attribute_method_suffix '_timestamp', '_timestamp='
+
+  alias_attribute :last_successful_status_check_timestamp, :last_successful_status_check_at_timestamp
+  alias_attribute :last_event_timestamp, :last_event_date_timestamp
+  alias_attribute :cursor_last_event_timestamp, :cursor_last_event_date_timestamp
 
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
@@ -164,9 +171,83 @@ class GeoNodeStatus < ApplicationRecord
     load_secondary_data
     load_repository_check_data
     load_verification_data
-
-    self
   end
+
+  def current_cursor_last_event_id
+    return unless Gitlab::Geo.secondary?
+
+    min_gap_id = ::Gitlab::Geo::EventGapTracking.min_gap_id
+    last_processed_id = Geo::EventLogState.last_processed&.event_id
+
+    [min_gap_id, last_processed_id].compact.min
+  end
+
+  def healthy?
+    !outdated? && status_message_healthy?
+  end
+
+  def health
+    if outdated?
+      return "Status has not been updated in the past #{EXPIRATION_IN_MINUTES} minutes"
+    end
+
+    status_message
+  end
+
+  def health_status
+    healthy? ? HEALTHY_STATUS : UNHEALTHY_STATUS
+  end
+
+  def outdated?
+    return false unless updated_at
+
+    updated_at < EXPIRATION_IN_MINUTES.minutes.ago
+  end
+
+  def status_message_healthy?
+    status_message.blank? || status_message == HEALTHY_STATUS
+  end
+
+  def attribute_timestamp(attr)
+    self[attr].to_i
+  end
+
+  def attribute_timestamp=(attr, value)
+    self[attr] = Time.at(value)
+  end
+
+  def self.attr_in_percentage(attr_name, count, total)
+    define_method("#{attr_name}_in_percentage") do
+      return 0 if read_attribute(total).to_i.zero?
+
+      (read_attribute(count).to_f / read_attribute(total).to_f) * 100.0
+    end
+  end
+
+  attr_in_percentage :repositories_synced,       :repositories_synced_count,       :repositories_count
+  attr_in_percentage :repositories_checksummed,  :repositories_checksummed_count,  :repositories_count
+  attr_in_percentage :repositories_verified,     :repositories_verified_count,     :repositories_count
+  attr_in_percentage :repositories_checked,      :repositories_checked_count,      :repositories_count
+  attr_in_percentage :wikis_synced,              :wikis_synced_count,              :wikis_count
+  attr_in_percentage :wikis_checksummed,         :wikis_checksummed_count,         :wikis_count
+  attr_in_percentage :wikis_verified,            :wikis_verified_count,            :wikis_count
+  attr_in_percentage :lfs_objects_synced,        :lfs_objects_synced_count,        :lfs_objects_count
+  attr_in_percentage :job_artifacts_synced,      :job_artifacts_synced_count,      :job_artifacts_count
+  attr_in_percentage :attachments_synced,        :attachments_synced_count,        :attachments_count
+  attr_in_percentage :replication_slots_used,    :replication_slots_used_count,    :replication_slots_count
+
+  def storage_shards_match?
+    return true if geo_node.primary?
+    return false unless storage_configuration_digest && primary_storage_digest
+
+    storage_configuration_digest == primary_storage_digest
+  end
+
+  def [](key)
+    public_send(key) # rubocop:disable GitlabSecurity/PublicSend
+  end
+
+  private
 
   def load_status_message
     self.status_message =
@@ -230,10 +311,13 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_repository_check_data
-    return unless Gitlab::Geo.secondary?
-
-    self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
-    self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
+    if Gitlab::Geo.primary?
+      self.repositories_checked_count = Project.where.not(last_repository_check_at: nil).count
+      self.repositories_checked_failed_count = Project.where(last_repository_check_failed: true).count
+    elsif Gitlab::Geo.secondary?
+      self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
+      self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
+    end
   end
 
   def load_verification_data
@@ -255,98 +339,6 @@ class GeoNodeStatus < ApplicationRecord
       self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
     end
   end
-
-  def current_cursor_last_event_id
-    return unless Gitlab::Geo.secondary?
-
-    min_gap_id = ::Gitlab::Geo::EventGapTracking.min_gap_id
-    last_processed_id = Geo::EventLogState.last_processed&.event_id
-
-    [min_gap_id, last_processed_id].compact.min
-  end
-
-  def healthy?
-    !outdated? && status_message_healthy?
-  end
-
-  def health
-    if outdated?
-      return "Status has not been updated in the past #{EXPIRATION_IN_MINUTES} minutes"
-    end
-
-    status_message
-  end
-
-  def health_status
-    healthy? ? HEALTHY_STATUS : UNHEALTHY_STATUS
-  end
-
-  def outdated?
-    return false unless updated_at
-
-    updated_at < EXPIRATION_IN_MINUTES.minutes.ago
-  end
-
-  def status_message_healthy?
-    status_message.blank? || status_message == HEALTHY_STATUS
-  end
-
-  def last_successful_status_check_timestamp
-    self.last_successful_status_check_at.to_i
-  end
-
-  def last_successful_status_check_timestamp=(value)
-    self.last_successful_status_check_at = Time.at(value)
-  end
-
-  def last_event_timestamp
-    self.last_event_date.to_i
-  end
-
-  def last_event_timestamp=(value)
-    self.last_event_date = Time.at(value)
-  end
-
-  def cursor_last_event_timestamp
-    self.cursor_last_event_date.to_i
-  end
-
-  def cursor_last_event_timestamp=(value)
-    self.cursor_last_event_date = Time.at(value)
-  end
-
-  def self.attr_in_percentage(attr_name, count, total)
-    define_method("#{attr_name}_in_percentage") do
-      return 0 if read_attribute(total)&.zero?
-
-      (read_attribute(count).to_f / read_attribute(total).to_f) * 100.0
-    end
-  end
-
-  attr_in_percentage :repositories_synced,       :repositories_synced_count,       :repositories_count
-  attr_in_percentage :repositories_checksummed,  :repositories_checksummed_count,  :repositories_count
-  attr_in_percentage :repositories_verified,     :repositories_verified_count,     :repositories_count
-  attr_in_percentage :repositories_checked,      :repositories_checked_count,      :repositories_count
-  attr_in_percentage :wikis_synced,              :wikis_synced_count,              :wiki_count
-  attr_in_percentage :wikis_checksummed,         :wikis_checksummed_count,         :wiki_count
-  attr_in_percentage :wikis_verified,            :wikis_verified_count,            :wiki_count
-  attr_in_percentage :lfs_objects_synced,        :lfs_objects_synced_count,        :lfs_objects_count
-  attr_in_percentage :job_artifacts_synced,      :job_artifacts_synced_count,      :job_artifacts_count
-  attr_in_percentage :attachments_synced,        :attachments_synced_count,        :attachments_count
-  attr_in_percentage :replication_slots_used,    :replication_slots_used_count,    :replication_slots_count
-
-  def storage_shards_match?
-    return true if geo_node.primary?
-    return false unless storage_configuration_digest && primary_storage_digest
-
-    storage_configuration_digest == primary_storage_digest
-  end
-
-  def [](key)
-    attribute(key)
-  end
-
-  private
 
   def primary_storage_digest
     @primary_storage_digest ||= Gitlab::Geo.primary_node.find_or_build_status.storage_configuration_digest

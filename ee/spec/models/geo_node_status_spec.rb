@@ -483,15 +483,15 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
 
     it 'returns 0 when replication slot count is unknown' do
-      allow(subject).to receive(:replication_slot_count).and_return(nil)
+      subject.replication_slots_count = nil
 
       expect(subject.replication_slots_used_in_percentage).to eq(0)
     end
 
     it 'returns the right percentage' do
       stub_current_geo_node(primary)
-      allow(subject).to receive(:replication_slots_count).and_return(2)
-      allow(subject).to receive(:replication_slots_used_count).and_return(1)
+      subject.replication_slots_count = 2
+      subject.replication_slots_used_count = 1
 
       expect(subject.replication_slots_used_in_percentage).to be_within(0.0001).of(50)
     end
