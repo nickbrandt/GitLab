@@ -1,0 +1,5 @@
+---
+title: Fix suggested namespace in deploy boards help text
+merge_request: 14739
+author:
+type: fixed
