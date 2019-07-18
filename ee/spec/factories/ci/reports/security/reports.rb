@@ -7,9 +7,13 @@ FactoryBot.define do
 
     transient do
       occurrences []
+      scanners []
+      identifiers []
     end
 
     after :build do |report, evaluator|
+      evaluator.scanners.each { |s| report.add_scanner(s) }
+      evaluator.identifiers.each { |id| report.add_identifier(id) }
       evaluator.occurrences.each { |o| report.add_occurrence(o) }
     end
 

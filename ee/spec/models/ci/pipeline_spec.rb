@@ -137,13 +137,17 @@ describe Ci::Pipeline do
       let(:build_sast_1) { create(:ci_build, :success, name: 'sast_1', pipeline: pipeline, project: project) }
       let(:build_sast_2) { create(:ci_build, :success, name: 'sast_2', pipeline: pipeline, project: project) }
       let(:build_ds_1) { create(:ci_build, :success, name: 'ds_1', pipeline: pipeline, project: project) }
+      let(:build_ds_2) { create(:ci_build, :success, name: 'ds_2', pipeline: pipeline, project: project) }
       let(:build_cs_1) { create(:ci_build, :success, name: 'cs_1', pipeline: pipeline, project: project) }
+      let(:build_cs_2) { create(:ci_build, :success, name: 'cs_2', pipeline: pipeline, project: project) }
 
       before do
         create(:ee_ci_job_artifact, :sast, job: build_sast_1, project: project)
         create(:ee_ci_job_artifact, :sast, job: build_sast_2, project: project)
         create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_1, project: project)
+        create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_2, project: project)
         create(:ee_ci_job_artifact, :container_scanning, job: build_cs_1, project: project)
+        create(:ee_ci_job_artifact, :container_scanning, job: build_cs_2, project: project)
       end
 
       it 'assigns pipeline commit_sha to the reports' do
@@ -153,7 +157,9 @@ describe Ci::Pipeline do
 
       it 'returns security reports with collected data grouped as expected' do
         expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning', 'container_scanning')
-        expect(subject.get_report('sast').occurrences.size).to eq(66)
+
+        # for each of report categories, we have merged 2 reports with the same data (fixture)
+        expect(subject.get_report('sast').occurrences.size).to eq(33)
         expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
         expect(subject.get_report('container_scanning').occurrences.size).to eq(8)
       end

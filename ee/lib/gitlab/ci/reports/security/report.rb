@@ -36,6 +36,20 @@ module Gitlab
           def add_occurrence(occurrence)
             occurrences << occurrence
           end
+
+          def clone_as_blank
+            Report.new(type, commit_sha)
+          end
+
+          def replace_with!(other)
+            instance_variables.each do |ivar|
+              instance_variable_set(ivar, other.public_send(ivar.to_s[1..-1])) # rubocop:disable GitlabSecurity/PublicSend
+            end
+          end
+
+          def merge!(other)
+            replace_with!(::Security::MergeReportsService.new(self, other).execute)
+          end
         end
       end
     end
