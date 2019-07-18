@@ -46,9 +46,7 @@ shared_examples VulnerabilitiesActions do
       let(:params) { vulnerable_params.merge(page: 2) }
 
       before do
-        class Vulnerabilities::Occurrence
-          paginates_per 2
-        end
+        Vulnerabilities::Occurrence.paginates_per 2
 
         create_list(:vulnerabilities_occurrence, 3, pipelines: [pipeline], project: project)
 
@@ -56,9 +54,7 @@ shared_examples VulnerabilitiesActions do
       end
 
       after do
-        class Vulnerabilities::Occurrence
-          paginates_per 20
-        end
+        Vulnerabilities::Occurrence.paginates_per Vulnerabilities::Occurrence::OCCURRENCES_PER_PAGE
       end
 
       it 'returns the list of vulnerabilities that are on the requested page' do
