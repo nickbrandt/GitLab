@@ -110,6 +110,7 @@ class License < ApplicationRecord
     insights
     web_ide_terminal
     incident_management
+    report_approver_rules
     group_ip_restriction
   ]
   EEU_FEATURES.freeze

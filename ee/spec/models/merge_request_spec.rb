@@ -51,6 +51,10 @@ describe MergeRequest do
   end
 
   describe 'approval_rules' do
+    before do
+      stub_licensed_features(multiple_approval_rules: true)
+    end
+
     context 'when project contains approval_rules' do
       let!(:project_rule1) {  project.approval_rules.create(name: 'p1') }
       let!(:project_rule2) {  project.approval_rules.create(name: 'p2') }

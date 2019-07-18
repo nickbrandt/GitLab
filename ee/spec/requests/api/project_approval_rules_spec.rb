@@ -71,6 +71,21 @@ describe API::ProjectApprovalRules do
           expect(rule['groups'].size).to eq(1)
         end
       end
+
+      context 'report_approver rules' do
+        let!(:report_approver_rule) do
+          create(:approval_project_rule, :security_report, project: project)
+        end
+
+        it 'includes report_approver rules' do
+          get api(url, developer)
+
+          json = json_response
+
+          expect(json['rules'].size).to eq(2)
+          expect(json['rules'].map { |rule| rule['name'] }).to contain_exactly(rule.name, report_approver_rule.name)
+        end
+      end
     end
   end
 

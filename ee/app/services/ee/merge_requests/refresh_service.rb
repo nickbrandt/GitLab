@@ -38,12 +38,11 @@ module EE
       end
 
       def update_approvers
-        return yield unless project.feature_available?(:code_owners)
-
         results = yield
 
         merge_requests_for_source_branch.each do |merge_request|
-          ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute
+          ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute if project.feature_available?(:code_owners)
+          ::MergeRequests::SyncReportApproverApprovalRules.new(merge_request).execute if project.beta_feature_available?(:report_approver_rules)
         end
 
         results

@@ -23,5 +23,11 @@ FactoryBot.define do
   factory :approval_project_rule do
     project
     name ApprovalRuleLike::DEFAULT_NAME
+    rule_type :regular
+
+    trait :security_report do
+      rule_type :report_approver
+      name ApprovalRuleLike::DEFAULT_NAME_FOR_SECURITY_REPORT
+    end
   end
 end

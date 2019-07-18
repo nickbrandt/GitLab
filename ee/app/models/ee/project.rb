@@ -322,6 +322,12 @@ module EE
       super
     end
 
+    def visible_approval_rules
+      strong_memoize(:visible_approval_rules) do
+        visible_regular_approval_rules + approval_rules.report_approver
+      end
+    end
+
     def visible_regular_approval_rules
       strong_memoize(:visible_regular_approval_rules) do
         regular_rules = approval_rules.regular.order(:id)

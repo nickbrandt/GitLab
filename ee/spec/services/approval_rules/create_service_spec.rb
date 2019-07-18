@@ -82,6 +82,22 @@ describe ApprovalRules::CreateService do
     let(:target) { project }
 
     it_behaves_like "creatable"
+
+    context 'when name matches default for security reports' do
+      it 'sets rule_type as report_approver' do
+        result = described_class.new(target, user, {
+          name: ApprovalProjectRule::DEFAULT_NAME_FOR_SECURITY_REPORT,
+          approvals_required: 1
+        }).execute
+
+        expect(result[:status]).to eq(:success)
+
+        rule = result[:rule]
+
+        expect(rule.approvals_required).to eq(1)
+        expect(rule.rule_type).to eq('report_approver')
+      end
+    end
   end
 
   context 'when target is merge request' do

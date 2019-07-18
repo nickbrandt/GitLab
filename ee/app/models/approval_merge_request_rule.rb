@@ -7,6 +7,22 @@ class ApprovalMergeRequestRule < ApplicationRecord
   scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
   scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
 
+  scope :from_project_rule, -> (project_rule) do
+    joins(:approval_merge_request_rule_source)
+    .where(
+      approval_merge_request_rule_sources: { approval_project_rule_id: project_rule.id }
+    )
+  end
+  scope :for_unmerged_merge_requests, -> (merge_requests = nil) do
+    query = joins(:merge_request).where.not(merge_requests: { state: 'merged' })
+
+    if merge_requests
+      query.where(merge_request_id: merge_requests)
+    else
+      query
+    end
+  end
+
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
   validates :report_type, presence: true, if: :report_approver?
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
@@ -22,7 +38,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
   alias_method :source_rule, :approval_project_rule
 
-  validate :validate_approvals_required
+  validate :validate_approvals_required, unless: :report_approver?
 
   enum rule_type: {
     regular: 1,
@@ -37,6 +53,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   # Deprecated scope until code_owner column has been migrated to rule_type
   # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
   scope :code_owner, -> { where(code_owner: true).or(where(rule_type: :code_owner)) }
+  scope :security_report, -> { report_approver.where(report_type: :security) }
 
   def self.find_or_create_code_owner_rule(merge_request, pattern)
     merge_request.approval_rules.code_owner.where(name: pattern).first_or_create do |rule|
@@ -55,7 +72,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   # Temporary override to handle legacy records that have not yet been migrated
   # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
   def regular?
-    read_attribute(:rule_type) == 'regular' || code_owner == false
+    read_attribute(:rule_type) == 'regular' || (!report_approver? && !code_owner)
   end
   alias_method :regular, :regular?
 

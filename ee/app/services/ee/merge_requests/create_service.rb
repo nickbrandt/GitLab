@@ -10,6 +10,13 @@ module EE
         super
 
         ::MergeRequests::SyncCodeOwnerApprovalRules.new(issuable).execute
+        ::MergeRequests::SyncReportApproverApprovalRules.new(issuable).execute
+
+        # Attempt to sync reports if pipeline has finished before MR has been created
+        pipeline = issuable.find_actual_head_pipeline
+        if pipeline
+          ::SyncSecurityReportsToReportApprovalRulesWorker.perform_async(pipeline.id)
+        end
       end
     end
   end

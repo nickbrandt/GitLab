@@ -5,6 +5,10 @@ module EE
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
+    prepended do
+      before_action :set_report_approver_rules_feature_flag, only: [:edit]
+    end
+
     override :project_params_attributes
     def project_params_attributes
       super + project_params_ee
@@ -76,6 +80,10 @@ module EE
 
     def allow_merge_pipelines_params?
       project&.feature_available?(:merge_pipelines)
+    end
+
+    def set_report_approver_rules_feature_flag
+      push_frontend_feature_flag(:report_approver_rules, default_enabled: false)
     end
   end
 end
