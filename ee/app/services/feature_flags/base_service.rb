@@ -34,7 +34,8 @@ module FeatureFlags
 
     def created_scope_message(scope)
       "Created rule <strong>#{scope.environment_scope}</strong> "\
-      "and set it as <strong>#{scope.active ? "active" : "inactive"}</strong>."
+      "and set it as <strong>#{scope.active ? "active" : "inactive"}</strong> "\
+      "with strategies <strong>#{scope.strategies}</strong>."
     end
   end
 end
