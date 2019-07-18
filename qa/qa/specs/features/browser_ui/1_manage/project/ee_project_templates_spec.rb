@@ -2,7 +2,8 @@
 require 'securerandom'
 
 module QA
-  context :manage do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
+  context :manage, :quarantine do
     describe 'Project templates' do
       before(:all) do
         @files = [
