@@ -2,9 +2,22 @@
 require 'spec_helper'
 
 describe DraftNotes::PublishService do
+  include RepoHelpers
+
   let(:merge_request) { create(:merge_request) }
   let(:project) { merge_request.target_project }
   let(:user) { merge_request.author }
+  let(:commit) { project.commit(sample_commit.id) }
+
+  let(:position) do
+    Gitlab::Diff::Position.new(
+      old_path: "files/ruby/popen.rb",
+      new_path: "files/ruby/popen.rb",
+      old_line: nil,
+      new_line: 14,
+      diff_refs: commit.diff_refs
+    )
+  end
 
   def publish(draft: nil)
     DraftNotes::PublishService.new(merge_request, user).execute(draft)
@@ -12,7 +25,7 @@ describe DraftNotes::PublishService do
 
   context 'single draft note' do
     let(:commit_id) { nil }
-    let!(:drafts) { create_list(:draft_note, 2, merge_request: merge_request, author: user, commit_id: commit_id) }
+    let!(:drafts) { create_list(:draft_note, 2, merge_request: merge_request, author: user, commit_id: commit_id, position: position) }
 
     it 'publishes' do
       expect { publish(draft: drafts.first) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
@@ -31,7 +44,7 @@ describe DraftNotes::PublishService do
     end
 
     context 'commit_id is set' do
-      let(:commit_id) { 'abc123' }
+      let(:commit_id) { commit.id }
 
       it 'creates note from draft with commit_id' do
         result = publish(draft: drafts.first)
@@ -46,8 +59,8 @@ describe DraftNotes::PublishService do
     let(:commit_id) { nil }
 
     before do
-      create(:draft_note, merge_request: merge_request, author: user, note: 'first note', commit_id: commit_id)
-      create(:draft_note, merge_request: merge_request, author: user, note: 'second note', commit_id: commit_id)
+      create(:draft_note, merge_request: merge_request, author: user, note: 'first note', commit_id: commit_id, position: position)
+      create(:draft_note, merge_request: merge_request, author: user, note: 'second note', commit_id: commit_id, position: position)
     end
 
     context 'when review fails to create' do
@@ -93,7 +106,7 @@ describe DraftNotes::PublishService do
     end
 
     context 'commit_id is set' do
-      let(:commit_id) { 'abc123' }
+      let(:commit_id) { commit.id }
 
       it 'creates note from draft with commit_id' do
         result = publish
