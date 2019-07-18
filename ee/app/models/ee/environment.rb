@@ -46,6 +46,8 @@ module EE
     end
 
     def rollout_status
+      return unless has_terminals?
+
       result = with_reactive_cache do |data|
         deployment_platform.rollout_status(self, data)
       end

@@ -47,7 +47,7 @@ describe Groups::EpicIssuesController do
         end
 
         it 'returns the correct json' do
-          expect(JSON.parse(response.body)).to match_schema('related_issues', dir: 'ee')
+          expect(json_response).to match_schema('related_issues', dir: 'ee')
         end
       end
 

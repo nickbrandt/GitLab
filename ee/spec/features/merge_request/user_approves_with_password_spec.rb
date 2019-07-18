@@ -38,8 +38,9 @@ describe 'Merge request > User approves with password', :js do
     page.within('.js-mr-approvals-modal') do
       expect(page).to have_text('Approval password is invalid.')
       click_button 'Cancel'
-      expect(page).not_to have_text('Approved by')
     end
+
+    expect(page).not_to have_text('Approved by')
   end
 end
 

@@ -48,6 +48,163 @@ describe Operations::FeatureFlagScope do
         expect { default_scope.destroy! }.to raise_error(ActiveRecord::ReadOnlyRecord)
       end
     end
+
+    describe 'strategy validations' do
+      it 'handles null strategies which can occur while adding the column during migration' do
+        scope = create(:operations_feature_flag_scope, active: true)
+        allow(scope).to receive(:strategies).and_return(nil)
+
+        scope.active = false
+        scope.save
+
+        expect(scope.errors[:strategies]).to be_empty
+      end
+
+      it 'validates multiple strategies' do
+        feature_flag = create(:operations_feature_flag)
+        scope = described_class.create(feature_flag: feature_flag,
+                                       strategies: [{ name: "default", parameters: {} },
+                                                    { name: "invalid", parameters: {} }])
+
+        expect(scope.errors[:strategies]).not_to be_empty
+      end
+
+      where(:invalid_value) do
+        [{}, 600, "bad", [{ name: 'default', parameters: {} }, 300]]
+      end
+      with_them do
+        it 'must be an array of strategy hashes' do
+          scope = create(:operations_feature_flag_scope)
+
+          scope.strategies = invalid_value
+          scope.save
+
+          expect(scope.errors[:strategies]).to eq(['must be an array of strategy hashes'])
+        end
+      end
+
+      describe 'name' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:name, :params, :expected) do
+          'default' | {} | []
+          'gradualRolloutUserId' | { groupId: 'mygroup', percentage: '50' } | []
+          5                      | nil                                      | ['strategy name is invalid']
+          nil                    | nil                                      | ['strategy name is invalid']
+          "nothing"              | nil                                      | ['strategy name is invalid']
+          ""                     | nil                                      | ['strategy name is invalid']
+          40.0                   | nil                                      | ['strategy name is invalid']
+          {}                     | nil                                      | ['strategy name is invalid']
+          []                     | nil                                      | ['strategy name is invalid']
+        end
+        with_them do
+          it 'must be one of "default" or "gradualRolloutUserId"' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: name, parameters: params }])
+
+            expect(scope.errors[:strategies]).to eq(expected)
+          end
+        end
+      end
+
+      describe 'parameters' do
+        context 'when the strategy name is gradualRolloutUserId' do
+          describe 'percentage' do
+            where(:invalid_value) do
+              [50, 40.0, { key: "value" }, "garbage", "00", "01", "101", "-1", "-10", "0100",
+               "1000", "10.0", "5%", "25%", "100hi", "e100", "30m", " ", "\r\n", "\n", "\t",
+               "\n10", "20\n", "\n100", "100\n", "\n  ", nil]
+            end
+            with_them do
+              it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'gradualRolloutUserId',
+                                                              parameters: { groupId: 'mygroup', percentage: invalid_value } }])
+
+                expect(scope.errors[:strategies]).to eq(['percentage must be a string between 0 and 100 inclusive'])
+              end
+            end
+
+            where(:valid_value) do
+              %w[0 1 10 38 100 93]
+            end
+            with_them do
+              it 'must be a string value between 0 and 100 inclusive and without a percentage sign' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'gradualRolloutUserId',
+                                                              parameters: { groupId: 'mygroup', percentage: valid_value } }])
+
+                expect(scope.errors[:strategies]).to eq([])
+              end
+            end
+          end
+
+          describe 'groupId' do
+            where(:invalid_value) do
+              [nil, 4, 50.0, {}, 'spaces bad', 'bad$', '%bad', '<bad', 'bad>', '!bad',
+               '.bad', 'Bad', 'bad1', "", " ", "b" * 33, "ba_d", "ba\nd"]
+            end
+            with_them do
+              it 'must be a string value of up to 32 lowercase characters' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'gradualRolloutUserId',
+                                                              parameters: { groupId: invalid_value, percentage: '40' } }])
+
+                expect(scope.errors[:strategies]).to eq(['groupId parameter is invalid'])
+              end
+            end
+
+            where(:valid_value) do
+              ["somegroup", "anothergroup", "okay", "g", "a" * 32]
+            end
+            with_them do
+              it 'must be a string value of up to 32 lowercase characters' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'gradualRolloutUserId',
+                                                                                          parameters: { groupId: valid_value, percentage: '40' } }])
+
+                expect(scope.errors[:strategies]).to eq([])
+              end
+            end
+          end
+
+          it 'must have parameters' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'gradualRolloutUserId' }])
+            expect(scope.errors[:strategies]).to include('groupId parameter is invalid')
+            expect(scope.errors[:strategies]).to include('percentage must be a string between 0 and 100 inclusive')
+          end
+        end
+
+        context 'when the strategy name is default' do
+          where(:invalid_value) do
+            [{ groupId: "hi", percentage: "7" }, "", "nothing", 7, nil]
+          end
+          with_them do
+            it 'must be empty' do
+              feature_flag = create(:operations_feature_flag)
+              scope = described_class.create(feature_flag: feature_flag,
+                                             strategies: [{ name: 'default',
+                                                            parameters: invalid_value }])
+
+              expect(scope.errors[:strategies]).to eq(['parameters must be empty for default strategy'])
+            end
+          end
+
+          it 'must be empty' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag,
+                                           strategies: [{ name: 'default',
+                                                          parameters: {} }])
+
+            expect(scope.errors[:strategies]).to eq([])
+          end
+        end
+      end
+    end
   end
 
   describe '.enabled' do
@@ -95,6 +252,30 @@ describe Operations::FeatureFlagScope do
       it 'returns the scope' do
         is_expected.to include(feature_flag_scope)
       end
+    end
+  end
+
+  describe '.for_unleash_client' do
+    it 'returns scopes for the specified project' do
+      project1 = create(:project)
+      project2 = create(:project)
+      expected_feature_flag = create(:operations_feature_flag, project: project1)
+      create(:operations_feature_flag, project: project2)
+
+      scopes = described_class.for_unleash_client(project1, 'sandbox').to_a
+
+      expect(scopes).to contain_exactly(*expected_feature_flag.scopes)
+    end
+
+    it 'returns a scope that matches exactly over a match with a wild card' do
+      project = create(:project)
+      feature_flag = create(:operations_feature_flag, project: project)
+      create(:operations_feature_flag_scope, feature_flag: feature_flag, environment_scope: 'production*')
+      expected_scope = create(:operations_feature_flag_scope, feature_flag: feature_flag, environment_scope: 'production')
+
+      scopes = described_class.for_unleash_client(project, 'production').to_a
+
+      expect(scopes).to contain_exactly(expected_scope)
     end
   end
 end

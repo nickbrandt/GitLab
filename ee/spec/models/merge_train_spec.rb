@@ -142,6 +142,28 @@ describe MergeTrain do
     end
   end
 
+  describe '#all_prev' do
+    subject { merge_train.all_prev }
+
+    let(:merge_train) { merge_request.merge_train }
+    let!(:merge_request) { create_merge_request_on_train }
+
+    context 'when the merge request is at first on the train' do
+      it 'returns nil' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when the merge request is at last on the train' do
+      let(:merge_train) { merge_request_2.merge_train }
+      let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+
+      it 'returns the previous merge requests' do
+        is_expected.to eq([merge_request])
+      end
+    end
+  end
+
   describe '#next' do
     subject { merge_train.next }
 
@@ -159,6 +181,28 @@ describe MergeTrain do
 
       it 'returns the next merge request' do
         is_expected.to eq(merge_request_2)
+      end
+    end
+  end
+
+  describe '#prev' do
+    subject { merge_train.prev }
+
+    let(:merge_train) { merge_request.merge_train }
+    let!(:merge_request) { create_merge_request_on_train }
+
+    context 'when the merge request is at first on the train' do
+      it 'returns nil' do
+        is_expected.to be_nil
+      end
+    end
+
+    context 'when the merge request is at last on the train' do
+      let(:merge_train) { merge_request_2.merge_train }
+      let!(:merge_request_2) { create_merge_request_on_train(source_branch: 'improve/awesome') }
+
+      it 'returns the next merge request' do
+        is_expected.to eq(merge_request)
       end
     end
   end

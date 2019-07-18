@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import Vue from 'vue';
 
-import mountMultipleBoardsSwitcher from 'ee_else_ce/boards/mount_multiple_boards_switcher';
 import Flash from '~/flash';
 import { __ } from '~/locale';
 import './models/label';
@@ -22,7 +21,7 @@ import '~/boards/filters/due_date_filters';
 import Board from 'ee_else_ce/boards/components/board';
 import BoardSidebar from 'ee_else_ce/boards/components/board_sidebar';
 import initNewListDropdown from 'ee_else_ce/boards/components/new_list_dropdown';
-import BoardAddIssuesModal from 'ee/boards/components/modal/index';
+import BoardAddIssuesModal from '~/boards/components/modal/index.vue';
 import '~/vue_shared/vue_resource_interceptor';
 import {
   NavigationType,
@@ -31,6 +30,7 @@ import {
 } from '~/lib/utils/common_utils';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
 import toggleFocusMode from 'ee_else_ce/boards/toggle_focus';
+import mountMultipleBoardsSwitcher from './mount_multiple_boards_switcher';
 
 let issueBoardsApp;
 

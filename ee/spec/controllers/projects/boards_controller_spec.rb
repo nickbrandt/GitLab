@@ -18,10 +18,8 @@ describe Projects::BoardsController do
 
       list_boards
 
-      parsed_response = JSON.parse(response.body)
-
       expect(response).to match_response_schema('boards')
-      expect(parsed_response.length).to eq 2
+      expect(json_response.length).to eq 2
     end
 
     it_behaves_like 'redirects to last visited board'

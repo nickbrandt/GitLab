@@ -72,8 +72,7 @@ module API
       def feature_flags
         return [] unless unleash_app_name.present?
 
-        project.operations_feature_flags.for_environment(unleash_app_name)
-                                        .ordered
+        Operations::FeatureFlagScope.for_unleash_client(project, unleash_app_name)
       end
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_03_130053) do
+ActiveRecord::Schema.define(version: 2019_07_15_114644) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -282,7 +282,9 @@ ActiveRecord::Schema.define(version: 2019_07_03_130053) do
     t.integer "project_id", null: false
     t.integer "approvals_required", limit: 2, default: 0, null: false
     t.string "name", null: false
+    t.integer "rule_type", limit: 2, default: 0, null: false
     t.index ["project_id"], name: "index_approval_project_rules_on_project_id", using: :btree
+    t.index ["rule_type"], name: "index_approval_project_rules_on_rule_type", using: :btree
   end
 
   create_table "approval_project_rules_groups", force: :cascade do |t|
@@ -2507,7 +2509,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_130053) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "repository_access_level", default: 20, null: false
-    t.integer "pages_access_level", default: 20, null: false
+    t.integer "pages_access_level", null: false
     t.index ["project_id"], name: "index_project_features_on_project_id", unique: true, using: :btree
   end
 
@@ -3398,7 +3400,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_130053) do
     t.integer "theme_id", limit: 2
     t.integer "accepted_term_id"
     t.string "feed_token"
-    t.boolean "private_profile"
+    t.boolean "private_profile", default: false
     t.integer "roadmap_layout", limit: 2
     t.boolean "include_private_contributions"
     t.string "commit_email"

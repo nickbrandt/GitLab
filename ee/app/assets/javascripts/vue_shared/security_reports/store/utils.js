@@ -254,17 +254,6 @@ export const parseDastIssues = (issues = [], feedback = []) =>
     };
   });
 
-/**
- * Compares two arrays by the given key and returns the difference
- *
- * @param {Array} firstArray
- * @param {Array} secondArray
- * @param {String} key
- * @returns {Array}
- */
-export const filterByKey = (firstArray = [], secondArray = [], key = '') =>
-  firstArray.filter(item => !secondArray.find(el => el[key] === item[key]));
-
 export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
   issues.filter(item => unapproved.find(el => el === item.vulnerability));
 

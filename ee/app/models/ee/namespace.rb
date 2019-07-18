@@ -112,6 +112,7 @@ module EE
     # Checks features (i.e. https://about.gitlab.com/pricing/) availabily
     # for a given Namespace plan. This method should consider ancestor groups
     # being licensed.
+    override :feature_available?
     def feature_available?(feature)
       # This feature might not be behind a feature flag at all, so default to true
       return false unless ::Feature.enabled?(feature, default_enabled: true)

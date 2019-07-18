@@ -2,6 +2,10 @@
 module MergeTrains
   class RefreshMergeRequestsService < BaseService
     include ::Gitlab::ExclusiveLeaseHelpers
+    include ::Gitlab::Utils::StrongMemoize
+
+    DEFAULT_MAX_CONCURRENCY = 4
+    ONE_AT_A_TIME_STRATEGY = 1
 
     ##
     # merge_request ... A merge request pointer in a merge train.
@@ -39,10 +43,17 @@ module MergeTrains
     end
 
     def unsafe_refresh(merge_request)
+      require_next_recreate = false
+
       following_merge_requests_from(merge_request).each do |merge_request|
-        MergeTrains::RefreshMergeRequestService
-          .new(merge_request.project, merge_request.merge_user)
+        break if merge_request.merge_train.index >= max_concurrency
+
+        result = MergeTrains::RefreshMergeRequestService
+          .new(merge_request.project, merge_request.merge_user,
+               require_recreate: require_next_recreate)
           .execute(merge_request)
+
+        require_next_recreate = (result[:status] == :error || result[:pipeline_created])
       end
     end
 
@@ -52,6 +63,16 @@ module MergeTrains
 
     def queue_id(merge_request)
       "#{merge_request.target_project_id}:#{merge_request.target_branch}"
+    end
+
+    def max_concurrency
+      strong_memoize(:max_concurrency) do
+        if Feature.enabled?(:merge_trains_parallel_pipelines, project, default_enabled: true)
+          DEFAULT_MAX_CONCURRENCY
+        else
+          ONE_AT_A_TIME_STRATEGY
+        end
+      end
     end
   end
 end

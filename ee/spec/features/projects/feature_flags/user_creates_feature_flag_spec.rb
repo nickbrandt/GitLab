@@ -38,7 +38,7 @@ describe 'User creates feature flag', :js do
     it 'records audit event' do
       visit(project_audit_events_path(project))
 
-      expect(page).to have_text("Created feature flag ci live trace with description \"For live trace\".")
+      expect(page).to have_text("Created feature flag ci_live_trace with description \"For live trace\".")
     end
   end
 

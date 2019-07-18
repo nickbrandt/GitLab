@@ -6,7 +6,6 @@ describe OperationsController do
   include Rails.application.routes.url_helpers
 
   let(:user) { create(:user) }
-  let(:json_response) { JSON.parse(response.body) }
 
   shared_examples 'unlicensed' do |http_method, action|
     before do

@@ -30,6 +30,14 @@ module EE
         end
       end
 
+      module UserWithAdmin
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :note
+        end
+      end
+
       module Project
         extend ActiveSupport::Concern
 
@@ -41,6 +49,8 @@ module EE
           expose :mirror_trigger_builds, if: ->(project, _) { project.mirror? }
           expose :only_mirror_protected_branches, if: ->(project, _) { project.mirror? }
           expose :mirror_overwrites_diverged_branches, if: ->(project, _) { project.mirror? }
+          expose :external_authorization_classification_label,
+                 if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
         end
       end
@@ -705,6 +715,13 @@ module EE
 
       class ProjectAlias < Grape::Entity
         expose :id, :project_id, :name
+      end
+
+      class Dependency < Grape::Entity
+        expose :name, :version, :package_manager, :dependency_file_path
+        expose :dependency_file_path do |dependency|
+          dependency[:location][:path]
+        end
       end
     end
   end

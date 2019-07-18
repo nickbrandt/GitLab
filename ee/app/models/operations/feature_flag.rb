@@ -43,26 +43,12 @@ module Operations
       where('NOT EXISTS (?)', join_enabled_scopes)
     end
 
-    scope :for_environment, -> (environment) do
-      select("operations_feature_flags.*" \
-             ", (#{actual_active_sql(environment)}) AS active")
-    end
-
     scope :for_list, -> do
       select("operations_feature_flags.*" \
              ", COALESCE((#{join_enabled_scopes.to_sql}), FALSE) AS active")
     end
 
     class << self
-      def actual_active_sql(environment)
-        Operations::FeatureFlagScope
-          .where('operations_feature_flag_scopes.feature_flag_id = ' \
-                 'operations_feature_flags.id')
-          .on_environment(environment, relevant_only: true)
-          .select('active')
-          .to_sql
-      end
-
       def join_enabled_scopes
         Operations::FeatureFlagScope
           .where('operations_feature_flags.id = feature_flag_id')
@@ -72,12 +58,6 @@ module Operations
       def preload_relations
         preload(:scopes)
       end
-    end
-
-    def strategies
-      [
-        { name: 'default' }
-      ]
     end
 
     private

@@ -135,10 +135,6 @@ module EE
         merge_request.target_project.merge_pipelines_enabled?
       end
 
-      expose :merge_trains_enabled?, as: :merge_trains_enabled do |merge_request|
-        merge_trains_enabled?
-      end
-
       expose :merge_trains_count, if: -> (*) { merge_trains_enabled? } do |merge_request|
         MergeTrain.total_count_in_train(merge_request)
       end

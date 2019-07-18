@@ -54,7 +54,7 @@ def instrument_classes(instrumentation)
   instrumentation.instrument_methods(Banzai::Querying)
 
   instrumentation.instrument_instance_methods(Banzai::ObjectRenderer)
-  instrumentation.instrument_instance_methods(Banzai::Redactor)
+  instrumentation.instrument_instance_methods(Banzai::ReferenceRedactor)
 
   [Issuable, Mentionable, Participable].each do |klass|
     instrumentation.instrument_instance_methods(klass)
@@ -87,32 +87,34 @@ def instrument_classes(instrumentation)
   instrumentation.instrument_methods(Gitlab::Highlight)
   instrumentation.instrument_instance_methods(Gitlab::Highlight)
 
-  instrumentation.instrument_methods(Elasticsearch::Git::Repository)
-  instrumentation.instrument_instance_methods(Elasticsearch::Git::Repository)
+  Gitlab.ee do
+    instrumentation.instrument_methods(Elasticsearch::Git::Repository)
+    instrumentation.instrument_instance_methods(Elasticsearch::Git::Repository)
 
-  instrumentation.instrument_instance_methods(Search::GlobalService)
-  instrumentation.instrument_instance_methods(Search::ProjectService)
+    instrumentation.instrument_instance_methods(Search::GlobalService)
+    instrumentation.instrument_instance_methods(Search::ProjectService)
 
-  instrumentation.instrument_instance_methods(Gitlab::Elastic::SearchResults)
-  instrumentation.instrument_instance_methods(Gitlab::Elastic::ProjectSearchResults)
-  instrumentation.instrument_instance_methods(Gitlab::Elastic::Indexer)
-  instrumentation.instrument_instance_methods(Gitlab::Elastic::SnippetSearchResults)
-  instrumentation.instrument_methods(Gitlab::Elastic::Helper)
+    instrumentation.instrument_instance_methods(Gitlab::Elastic::SearchResults)
+    instrumentation.instrument_instance_methods(Gitlab::Elastic::ProjectSearchResults)
+    instrumentation.instrument_instance_methods(Gitlab::Elastic::Indexer)
+    instrumentation.instrument_instance_methods(Gitlab::Elastic::SnippetSearchResults)
+    instrumentation.instrument_methods(Gitlab::Elastic::Helper)
 
-  instrumentation.instrument_instance_methods(Elastic::ApplicationSearch)
-  instrumentation.instrument_instance_methods(Elastic::IssuesSearch)
-  instrumentation.instrument_instance_methods(Elastic::MergeRequestsSearch)
-  instrumentation.instrument_instance_methods(Elastic::MilestonesSearch)
-  instrumentation.instrument_instance_methods(Elastic::NotesSearch)
-  instrumentation.instrument_instance_methods(Elastic::ProjectsSearch)
-  instrumentation.instrument_instance_methods(Elastic::RepositoriesSearch)
-  instrumentation.instrument_instance_methods(Elastic::SnippetsSearch)
-  instrumentation.instrument_instance_methods(Elastic::WikiRepositoriesSearch)
+    instrumentation.instrument_instance_methods(Elastic::ApplicationSearch)
+    instrumentation.instrument_instance_methods(Elastic::IssuesSearch)
+    instrumentation.instrument_instance_methods(Elastic::MergeRequestsSearch)
+    instrumentation.instrument_instance_methods(Elastic::MilestonesSearch)
+    instrumentation.instrument_instance_methods(Elastic::NotesSearch)
+    instrumentation.instrument_instance_methods(Elastic::ProjectsSearch)
+    instrumentation.instrument_instance_methods(Elastic::RepositoriesSearch)
+    instrumentation.instrument_instance_methods(Elastic::SnippetsSearch)
+    instrumentation.instrument_instance_methods(Elastic::WikiRepositoriesSearch)
 
-  instrumentation.instrument_instance_methods(Gitlab::BitbucketImport::Importer)
-  instrumentation.instrument_instance_methods(Bitbucket::Connection)
+    instrumentation.instrument_instance_methods(Gitlab::BitbucketImport::Importer)
+    instrumentation.instrument_instance_methods(Bitbucket::Connection)
 
-  instrumentation.instrument_instance_methods(Geo::RepositorySyncWorker)
+    instrumentation.instrument_instance_methods(Geo::RepositorySyncWorker)
+  end
 
   # This is a Rails scope so we have to instrument it manually.
   instrumentation.instrument_method(Project, :visible_to_user)

@@ -75,16 +75,16 @@ describe Projects::Prometheus::AlertPresenter do
       create(:alerting_alert, project: project, metric_id: metric_id)
     end
 
-    describe '#email_subject' do
+    describe '#full_title' do
       let(:query_title) do
         "#{gitlab_alert.title} #{gitlab_alert.computed_operator} #{gitlab_alert.threshold} for 5 minutes"
       end
 
       let(:expected_subject) do
-        "#{alert.environment.name} #{query_title}"
+        "#{alert.environment.name}: #{query_title}"
       end
 
-      subject { presenter.email_subject }
+      subject { presenter.full_title }
 
       it { is_expected.to eq(expected_subject) }
     end
@@ -114,10 +114,22 @@ describe Projects::Prometheus::AlertPresenter do
   end
 
   context 'without gitlab alert' do
-    describe '#email_subject' do
-      subject { presenter.email_subject }
+    describe '#full_title' do
+      subject { presenter.full_title }
 
-      it { is_expected.to eq('') }
+      context 'with title' do
+        let(:title) { 'some title' }
+
+        before do
+          expect(alert).to receive(:title).and_return(title)
+        end
+
+        it { is_expected.to eq(title) }
+      end
+
+      context 'without title' do
+        it { is_expected.to eq('') }
+      end
     end
 
     describe '#metric_query' do

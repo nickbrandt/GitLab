@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/quality/staging/issues/39
-  context 'Create', :quarantine do
+  context 'Create' do
     describe 'Codeowners' do
       it 'merge request assigns code owners as approvers' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
@@ -25,6 +24,15 @@ module QA
           members_page.add_member(non_approver.username)
         end
 
+        Page::Project::Menu.perform(&:go_to_general_settings)
+
+        Page::Project::Settings::Main.perform do |settings|
+          settings.expand_request_approval_settings do |page|
+            page.click_require_code_owners_approval_checkbox
+            page.click_save_merge_request_approval_button
+          end
+        end
+
         # Push CODEOWNERS to master
         project_push = Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = project
@@ -36,16 +44,18 @@ module QA
         end
 
         # Push a new CODEOWNERS file and create a merge request
-        Resource::MergeRequest.fabricate! do |merge_request|
+        merge_request = Resource::MergeRequest.fabricate! do |merge_request|
           merge_request.title = 'This is a merge request'
           merge_request.description = 'Change code owners'
           merge_request.project = project_push.project
           merge_request.file_name = 'CODEOWNERS'
+          merge_request.target_new_branch = false
           merge_request.file_content = <<~CONTENT
             CODEOWNERS @#{non_approver.username}
           CONTENT
         end
 
+        merge_request.visit!
         # Check that the merge request assigns the original code owner as an
         # approver (because the current CODEOWNERS file in the master branch
         # doesn't have the new owner yet)

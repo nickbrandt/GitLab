@@ -294,7 +294,6 @@ module API
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: -> (project, options) {
         options[:statistics] && Ability.allowed?(options[:current_user], :read_statistics, project)
       }
-      expose :external_authorization_classification_label
       expose :auto_devops_enabled?, as: :auto_devops_enabled
       expose :auto_devops_deploy_strategy do |project, options|
         project.auto_devops.nil? ? 'continuous' : project.auto_devops.deploy_strategy
@@ -1709,3 +1708,4 @@ API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities:
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
 API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)
 API::Entities.prepend_entity(::API::Entities::Identity, with: EE::API::Entities::Identity)
+API::Entities.prepend_entity(::API::Entities::UserWithAdmin, with: EE::API::Entities::UserWithAdmin)

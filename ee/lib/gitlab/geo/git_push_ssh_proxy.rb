@@ -3,7 +3,7 @@
 module Gitlab
   module Geo
     class GitPushSSHProxy
-      HTTP_READ_TIMEOUT = 10
+      HTTP_READ_TIMEOUT = 60
 
       INFO_REFS_CONTENT_TYPE = 'application/x-git-upload-pack-request'.freeze
       PUSH_CONTENT_TYPE = 'application/x-git-receive-pack-request'.freeze

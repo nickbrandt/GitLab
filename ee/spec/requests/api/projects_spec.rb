@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe API::Projects do
+  include ExternalAuthorizationServiceHelpers
+
   let(:user) { create(:user) }
   let(:project) { create(:project, namespace: user.namespace) }
 
@@ -50,6 +52,56 @@ describe API::Projects do
   end
 
   describe 'GET /projects/:id' do
+    context 'with external authorization' do
+      let(:project) do
+        create(:project,
+               namespace: user.namespace,
+               external_authorization_classification_label: 'the-label')
+      end
+
+      before do
+        stub_licensed_features(external_authorization_service_api_management: true)
+      end
+
+      context 'when the user has access to the project' do
+        before do
+          external_service_allow_access(user, project)
+        end
+
+        it 'includes the label in the response' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['external_authorization_classification_label']).to eq('the-label')
+        end
+      end
+
+      context 'when the external service denies access' do
+        before do
+          external_service_deny_access(user, project)
+        end
+
+        it 'returns a 404' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'it does not return the label when the feature is not available' do
+        before do
+          stub_licensed_features(external_authorization_service_api_management: false)
+        end
+
+        it 'does not include the label in the response' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['external_authorization_classification_label']).to be_nil
+        end
+      end
+    end
+
     describe 'packages_enabled attribute' do
       it 'exposed when the feature is available' do
         stub_licensed_features(packages: true)
@@ -160,6 +212,20 @@ describe API::Projects do
 
   describe 'PUT /projects/:id' do
     let(:project) { create(:project, namespace: user.namespace) }
+
+    context 'when updating external classification' do
+      before do
+        enable_external_authorization_service_check
+        stub_licensed_features(external_authorization_service_api_management: true)
+      end
+
+      it 'updates the classification label' do
+        put(api("/projects/#{project.id}", user), params: { external_authorization_classification_label: 'new label' })
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(project.reload.external_authorization_classification_label).to eq('new label')
+      end
+    end
 
     context 'when updating repository storage' do
       let(:unknown_storage) { 'new-storage' }

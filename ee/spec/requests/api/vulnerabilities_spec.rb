@@ -52,6 +52,14 @@ describe API::Vulnerabilities do
         expect(json_response.map { |v| v['report_type'] }.uniq).to match_array %w[dependency_scanning sast]
       end
 
+      it 'does not have N+1 queries' do
+        control_count = ActiveRecord::QueryRecorder.new do
+          get api("/projects/#{project.id}/vulnerabilities", user), params: { report_type: 'dependency_scanning' }
+        end.count
+
+        expect { get api("/projects/#{project.id}/vulnerabilities", user) }.not_to exceed_query_limit(control_count)
+      end
+
       describe 'filtering' do
         it 'returns vulnerabilities with sast report_type' do
           occurrence_count = (sast_report.occurrences.count - 1).to_s
