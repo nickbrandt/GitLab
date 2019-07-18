@@ -3,7 +3,7 @@
 module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
-      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown)
+      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
 
       def full_title
         [environment_name, alert_title].compact.join(': ')
