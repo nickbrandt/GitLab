@@ -8,7 +8,9 @@ module Vulnerabilities
 
     self.table_name = "vulnerability_occurrences"
 
-    paginates_per 20
+    OCCURRENCES_PER_PAGE = 20
+
+    paginates_per OCCURRENCES_PER_PAGE
 
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
