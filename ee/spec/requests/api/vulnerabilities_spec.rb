@@ -72,7 +72,9 @@ describe API::Vulnerabilities do
 
           expect(json_response.map { |v| v['report_type'] }.uniq).to match_array %w[sast]
 
-          expect(json_response.first['name']).to eq 'Predictable pseudorandom number generator'
+          # occurrences are implicitly sorted by Security::MergeReportsService,
+          # occurrences order differs from what is present in fixture file
+          expect(json_response.first['name']).to eq 'ECB mode is insecure'
         end
 
         it 'returns vulnerabilities with dependency_scanning report_type' do
@@ -86,7 +88,9 @@ describe API::Vulnerabilities do
 
           expect(json_response.map { |v| v['report_type'] }.uniq).to match_array %w[dependency_scanning]
 
-          expect(json_response.first['name']).to eq 'DoS by CPU exhaustion when using malicious SSL packets'
+          # occurrences are implicitly sorted by Security::MergeReportsService,
+          # occurrences order differs from what is present in fixture file
+          expect(json_response.first['name']).to eq 'ruby-ffi DDL loading issue on Windows OS'
         end
 
         it 'returns dismissed vulnerabilities with `all` scope' do

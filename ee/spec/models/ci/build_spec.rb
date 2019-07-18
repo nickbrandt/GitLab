@@ -141,7 +141,7 @@ describe Ci::Build do
         end
       end
 
-      context 'when there are multiple report' do
+      context 'when there are multiple reports' do
         before do
           create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
           create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
@@ -149,7 +149,7 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :dast, job: job, project: job.project)
         end
 
-        it 'parses blobs and add the results to the reports' do
+        it 'parses blobs and adds the results to the reports' do
           subject
 
           expect(security_reports.get_report('sast').occurrences.size).to eq(33)
