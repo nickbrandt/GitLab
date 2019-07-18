@@ -24,6 +24,17 @@ module EE
 
     private
 
+    override :log_impersonation_event
+    def log_impersonation_event
+      super
+
+      log_audit_event
+    end
+
+    def log_audit_event
+      AuditEvents::ImpersonationAuditEventService.new(impersonator, request.remote_ip, 'Stopped Impersonation').for_user(impersonated_user.username).security_event
+    end
+
     def set_current_ip_address(&block)
       ::Gitlab::IpAddressState.with(request.ip, &block) # rubocop: disable CodeReuse/ActiveRecord
     end
