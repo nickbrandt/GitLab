@@ -316,6 +316,7 @@ module TestEnv
   # These are directories that should be preserved at cleanup time
   def test_dirs
     @test_dirs ||= %w[
+      frontend
       gitaly
       gitlab-shell
       gitlab-test
