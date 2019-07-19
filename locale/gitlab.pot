@@ -1830,6 +1830,9 @@ msgstr ""
 msgid "Assign custom color like #FF0000"
 msgstr ""
 
+msgid "Assign epic"
+msgstr ""
+
 msgid "Assign labels"
 msgstr ""
 
@@ -5689,10 +5692,19 @@ msgstr ""
 msgid "Epics|Show more"
 msgstr ""
 
+msgid "Epics|Something went wrong while assigning issue to epic."
+msgstr ""
+
 msgid "Epics|Something went wrong while creating child epics."
 msgstr ""
 
 msgid "Epics|Something went wrong while fetching child epics."
+msgstr ""
+
+msgid "Epics|Something went wrong while fetching group epics."
+msgstr ""
+
+msgid "Epics|Something went wrong while removing issue from epic."
 msgstr ""
 
 msgid "Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely."
@@ -9900,6 +9912,9 @@ msgid "No %{header} for this request."
 msgstr ""
 
 msgid "No %{providerTitle} repositories available to import"
+msgstr ""
+
+msgid "No Epic"
 msgstr ""
 
 msgid "No Label"
