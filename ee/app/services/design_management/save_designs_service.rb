@@ -34,16 +34,22 @@ module DesignManagement
     def create_and_commit_designs!
       repository.create_if_not_exists
 
-      repository_actions = files.map do |file|
-        design = collection.find_or_create_design!(filename: file.original_filename)
+      # Do not inline `build_repository_action` here!
+      # We have to do this as two *separate* calls to #map so that the call
+      # to `new_file?` does not accidentally cache the wrong data half-way
+      # through the operation.
+      corresponding_designs = files.map do |file|
+        collection.find_or_create_design!(filename: file.original_filename)
+      end
 
+      actions = files.zip(corresponding_designs).map do |(file, design)|
         build_repository_action(file, design)
       end
 
       repository.multi_action(current_user,
                               branch_name: target_branch,
                               message: commit_message,
-                              actions: repository_actions)
+                              actions: actions)
     end
 
     def build_repository_action(file, design)

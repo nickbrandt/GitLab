@@ -1,0 +1,4 @@
+---
+title: 'Fixes #12780 by avoiding incorrect cached values'
+merge_request: 14651
+type: fixed
