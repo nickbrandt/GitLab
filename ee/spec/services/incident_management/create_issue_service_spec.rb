@@ -28,7 +28,7 @@ describe IncidentManagement::CreateIssueService do
 
   context 'when create_issue enabled' do
     let(:issue) { subject[:issue] }
-    let(:summary_separator) { "---\n\n" }
+    let(:summary_separator) { "\n---\n\n" }
 
     before do
       setting.update!(create_issue: true)
@@ -41,7 +41,7 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-        expect(issue.description).not_to include(summary_separator)
+        expect(separator_count(issue.description)).to eq 0
       end
     end
 
@@ -53,7 +53,7 @@ describe IncidentManagement::CreateIssueService do
           expect(subject).to include(status: :success)
 
           expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-          expect(issue.description).to include(summary_separator)
+          expect(separator_count(issue.description)).to eq 1
           expect(issue.description).to include(template_content)
         end
       end
@@ -113,7 +113,7 @@ describe IncidentManagement::CreateIssueService do
           expect(issue.description).to include(alert_presenter.issue_summary_markdown)
           expect(issue.description).to include(template_content)
           expect(issue.description).to include(alt_template)
-          expect(issue.description.scan(summary_separator).size).to eq(2)
+          expect(separator_count(issue.description)).to eq 2
         end
       end
 
@@ -150,7 +150,7 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.title).to include(query_title)
         expect(issue.title).to include('for 5 minutes')
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-        expect(issue.description).not_to include(summary_separator)
+        expect(separator_count(issue.description)).to eq 0
       end
     end
 
@@ -205,5 +205,9 @@ describe IncidentManagement::CreateIssueService do
 
   def error_message(message)
     %{Cannot create incident issue for "#{project.full_name}": #{message}}
+  end
+
+  def separator_count(text)
+    text.scan(summary_separator).size
   end
 end
