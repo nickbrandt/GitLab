@@ -49,7 +49,7 @@ describe Gitlab::Elastic::Indexer do
 
       expect_popen.with(
         [
-          'gitlab-elasticsearch-indexer',
+          'tmp/tests/gitlab-elasticsearch-indexer/bin/gitlab-elasticsearch-indexer',
           '--blob-type=wiki_blob',
           '--skip-commits',
           project.id.to_s,
@@ -149,6 +149,26 @@ describe Gitlab::Elastic::Indexer do
       stub_ee_application_setting(elasticsearch_experimental_indexer: true)
     end
 
+    describe '.experimental_indexer_present?' do
+      it 'returns true for an executable path' do
+        stub_elasticsearch_setting(indexer_path: 'tmp/tests/gitlab-elasticsearch-indexer/bin/gitlab-elasticsearch-indexer')
+
+        expect(described_class.experimental_indexer_present?).to eq(true)
+      end
+
+      it 'returns false for a non-executable path' do
+        stub_elasticsearch_setting(indexer_path: '/foo/bar')
+
+        expect(described_class.experimental_indexer_present?).to eq(false)
+      end
+
+      it 'returns false for a blank path' do
+        stub_elasticsearch_setting(indexer_path: '')
+
+        expect(described_class.experimental_indexer_present?).to eq(false)
+      end
+    end
+
     it 'uses the normal indexer when not present' do
       expect(described_class).to receive(:experimental_indexer_present?).and_return(false)
       expect_popen.with([Rails.root.join('bin/elastic_repo_indexer').to_s, anything, anything], anything, anything).and_return(popen_success)
@@ -158,7 +178,13 @@ describe Gitlab::Elastic::Indexer do
 
     it 'uses the experimental indexer when present' do
       expect(described_class).to receive(:experimental_indexer_present?).and_return(true)
-      expect_popen.with(['gitlab-elasticsearch-indexer', anything, anything], anything, anything).and_return(popen_success)
+      expect_popen.with(
+        [
+          'tmp/tests/gitlab-elasticsearch-indexer/bin/gitlab-elasticsearch-indexer',
+          anything, anything
+        ],
+        anything, anything
+      ).and_return(popen_success)
 
       indexer.run
     end
@@ -174,7 +200,7 @@ describe Gitlab::Elastic::Indexer do
 
         expect_popen.with(
           [
-            'gitlab-elasticsearch-indexer',
+            'tmp/tests/gitlab-elasticsearch-indexer/bin/gitlab-elasticsearch-indexer',
             project.id.to_s,
             "#{project.repository.disk_path}.git"
           ],
