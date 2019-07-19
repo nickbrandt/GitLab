@@ -104,7 +104,7 @@ export default {
 </script>
 
 <template>
-  <div class="card-slim sortable-row flex-grow-1">
+  <div class="card card-slim sortable-row flex-grow-1">
     <div class="item-body card-body d-flex align-items-center p-2 p-xl-1 pl-xl-3">
       <div class="item-contents d-flex align-items-center flex-wrap flex-grow-1 flex-xl-nowrap">
         <div class="item-title d-flex align-items-center mb-1 mb-xl-0">

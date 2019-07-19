@@ -161,7 +161,7 @@ export default {
 
 <template>
   <div class="related-issues-block">
-    <div class="card-slim">
+    <div class="card card-slim">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
         <h3 class="card-title mt-0 mb-0 h5">
           {{ title }}
@@ -237,7 +237,7 @@ export default {
             :class="{
               'user-can-drag': canReorder,
               'sortable-row': canReorder,
-              'card-slim': canReorder,
+              'card card-slim': canReorder,
             }"
             :data-key="issue.id"
             :data-ordering-id="issuableOrderingId(issue)"
