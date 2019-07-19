@@ -140,6 +140,10 @@ describe DesignManagement::SaveDesignsService do
             ]
           end
 
+          it 'returns information about both designs in the response' do
+            expect(service.execute).to include(designs: have_attributes(size: 2), status: :success)
+          end
+
           it "creates 2 designs with a single version" do
             expect { service.execute }.to change { issue.designs.count }.from(0).to(2)
             expect(DesignManagement::Version.for_designs(issue.designs).size).to eq(1)
