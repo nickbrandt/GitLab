@@ -12,5 +12,3 @@ class ProjectSnippet < Snippet
   participant :author
   participant :notes_with_associations
 end
-
-ProjectSnippet.prepend_if_ee('EE::ProjectSnippet')
