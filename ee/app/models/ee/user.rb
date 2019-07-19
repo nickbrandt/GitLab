@@ -18,8 +18,6 @@ module EE
     prepended do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
 
-      self.ignored_columns += %i[support_bot]
-
       # We aren't using the `auditor?` method for the `if` condition here
       # because `auditor?` returns `false` when the `auditor` column is `true`
       # and the auditor add-on absent. We want to run this validation
