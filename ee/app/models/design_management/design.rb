@@ -35,8 +35,6 @@ module DesignManagement
     end
 
     def diff_refs
-      return if new_design?
-
       @diff_refs ||= repository.commit(head_version.sha).diff_refs
     end
 
