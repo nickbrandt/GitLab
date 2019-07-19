@@ -102,7 +102,7 @@ describe IncidentManagement::CreateIssueService do
 
       context 'and gitlab_incident_markdown' do
         let(:template_content) { 'plain text'}
-        let(:alt_template) { 'alernate text' }
+        let(:alt_template) { 'alternate text' }
         let(:alert_annotations) do
           { title: alert_title, gitlab_incident_markdown: alt_template }
         end
