@@ -24,6 +24,13 @@ class GeoNodeStatus < ApplicationRecord
   sha_attribute :storage_configuration_digest
 
   alias_attribute :repositories_count, :projects_count
+  alias_attribute :wikis_count, :projects_count
+
+  attribute_method_suffix '_timestamp', '_timestamp='
+
+  alias_attribute :last_successful_status_check_timestamp, :last_successful_status_check_at_timestamp
+  alias_attribute :last_event_timestamp, :last_event_date_timestamp
+  alias_attribute :cursor_last_event_timestamp, :cursor_last_event_date_timestamp
 
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
@@ -145,107 +152,25 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_data_from_current_node
-    self.status_message =
-      begin
-        HealthCheck::Utils.process_checks(['geo'])
-      rescue NotImplementedError => e
-        e.to_s
-      end
-
     latest_event = Geo::EventLog.latest_event
     self.last_event_id = latest_event&.id
     self.last_event_date = latest_event&.created_at
     self.last_successful_status_check_at = Time.now
+
     self.storage_shards = StorageShard.all
     self.storage_configuration_digest = StorageShard.build_digest
 
     self.version = Gitlab::VERSION
     self.revision = Gitlab.revision
 
-    # Geo::PruneEventLogWorker might remove old events, so log maximum id
-    self.event_log_max_id = Geo::EventLog.maximum(:id)
-    self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
-    self.repository_updated_max_id = Geo::RepositoryUpdatedEvent.maximum(:id)
-    self.repository_deleted_max_id = Geo::RepositoryDeletedEvent.maximum(:id)
-    self.repository_renamed_max_id = Geo::RepositoryRenamedEvent.maximum(:id)
-    self.repositories_changed_max_id = Geo::RepositoriesChangedEvent.maximum(:id)
-    self.lfs_object_deleted_max_id = Geo::LfsObjectDeletedEvent.maximum(:id)
-    self.job_artifact_deleted_max_id = Geo::JobArtifactDeletedEvent.maximum(:id)
-    self.hashed_storage_migrated_max_id = Geo::HashedStorageMigratedEvent.maximum(:id)
-    self.hashed_storage_attachments_max_id = Geo::HashedStorageAttachmentsEvent.maximum(:id)
     self.projects_count = geo_node.projects.count
 
+    load_status_message
+    load_event_data
     load_primary_data
     load_secondary_data
-
-    self
-  end
-
-  def load_primary_data
-    if Gitlab::Geo.primary?
-      self.lfs_objects_count = LfsObject.syncable.count
-      self.job_artifacts_count = Ci::JobArtifact.syncable.count
-      self.attachments_count = Upload.syncable.count
-
-      self.replication_slots_count = geo_node.replication_slots_count
-      self.replication_slots_used_count = geo_node.replication_slots_used_count
-      self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
-
-      if repository_verification_enabled
-        self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
-        self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
-        self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
-        self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
-      end
-
-      self.repositories_checked_count = Project.where.not(last_repository_check_at: nil).count
-      self.repositories_checked_failed_count = Project.where(last_repository_check_failed: true).count
-    end
-  end
-
-  def load_secondary_data # rubocop:disable Metrics/AbcSize
-    if Gitlab::Geo.secondary?
-      self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
-      self.cursor_last_event_id = current_cursor_last_event_id
-      self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
-      self.repositories_synced_count = registries_for_synced_projects(:repository).count
-      self.repositories_failed_count = registries_for_failed_projects(:repository).count
-      self.wikis_synced_count = registries_for_synced_projects(:wiki).count
-      self.wikis_failed_count = registries_for_failed_projects(:wiki).count
-      self.lfs_objects_count = lfs_objects_finder.count_syncable
-      self.lfs_objects_synced_count = lfs_objects_finder.count_synced
-      self.lfs_objects_failed_count = lfs_objects_finder.count_failed
-      self.lfs_objects_registry_count = lfs_objects_finder.count_registry
-      self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
-      self.job_artifacts_count = job_artifacts_finder.count_syncable
-      self.job_artifacts_synced_count = job_artifacts_finder.count_synced
-      self.job_artifacts_failed_count = job_artifacts_finder.count_failed
-      self.job_artifacts_registry_count = job_artifacts_finder.count_registry
-      self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
-      self.attachments_count = attachments_finder.count_syncable
-      self.attachments_synced_count = attachments_finder.count_synced
-      self.attachments_failed_count = attachments_finder.count_failed
-      self.attachments_registry_count = attachments_finder.count_registry
-      self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
-
-      load_verification_data
-
-      self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
-      self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
-    end
-  end
-
-  def load_verification_data
-    if repository_verification_enabled
-      self.repositories_verified_count = registries_for_verified_projects(:repository).count
-      self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
-      self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
-      self.wikis_verified_count = registries_for_verified_projects(:wiki).count
-      self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
-      self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
-      self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
-      self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
-    end
+    load_repository_check_data
+    load_verification_data
   end
 
   def current_cursor_last_event_id
@@ -283,73 +208,33 @@ class GeoNodeStatus < ApplicationRecord
     status_message.blank? || status_message == HEALTHY_STATUS
   end
 
-  def last_successful_status_check_timestamp
-    self.last_successful_status_check_at.to_i
+  def attribute_timestamp(attr)
+    self[attr].to_i
   end
 
-  def last_successful_status_check_timestamp=(value)
-    self.last_successful_status_check_at = Time.at(value)
+  def attribute_timestamp=(attr, value)
+    self[attr] = Time.at(value)
   end
 
-  def last_event_timestamp
-    self.last_event_date.to_i
+  def self.attr_in_percentage(attr_name, count, total)
+    define_method("#{attr_name}_in_percentage") do
+      return 0 if read_attribute(total).to_i.zero?
+
+      (read_attribute(count).to_f / read_attribute(total).to_f) * 100.0
+    end
   end
 
-  def last_event_timestamp=(value)
-    self.last_event_date = Time.at(value)
-  end
-
-  def cursor_last_event_timestamp
-    self.cursor_last_event_date.to_i
-  end
-
-  def cursor_last_event_timestamp=(value)
-    self.cursor_last_event_date = Time.at(value)
-  end
-
-  def repositories_synced_in_percentage
-    calc_percentage(projects_count, repositories_synced_count)
-  end
-
-  def wikis_synced_in_percentage
-    calc_percentage(projects_count, wikis_synced_count)
-  end
-
-  def repositories_checksummed_in_percentage
-    calc_percentage(projects_count, repositories_checksummed_count)
-  end
-
-  def wikis_checksummed_in_percentage
-    calc_percentage(projects_count, wikis_checksummed_count)
-  end
-
-  def repositories_verified_in_percentage
-    calc_percentage(projects_count, repositories_verified_count)
-  end
-
-  def wikis_verified_in_percentage
-    calc_percentage(projects_count, wikis_verified_count)
-  end
-
-  def repositories_checked_in_percentage
-    calc_percentage(projects_count, repositories_checked_count)
-  end
-
-  def lfs_objects_synced_in_percentage
-    calc_percentage(lfs_objects_count, lfs_objects_synced_count)
-  end
-
-  def job_artifacts_synced_in_percentage
-    calc_percentage(job_artifacts_count, job_artifacts_synced_count)
-  end
-
-  def attachments_synced_in_percentage
-    calc_percentage(attachments_count, attachments_synced_count)
-  end
-
-  def replication_slots_used_in_percentage
-    calc_percentage(replication_slots_count, replication_slots_used_count)
-  end
+  attr_in_percentage :repositories_synced,       :repositories_synced_count,       :repositories_count
+  attr_in_percentage :repositories_checksummed,  :repositories_checksummed_count,  :repositories_count
+  attr_in_percentage :repositories_verified,     :repositories_verified_count,     :repositories_count
+  attr_in_percentage :repositories_checked,      :repositories_checked_count,      :repositories_count
+  attr_in_percentage :wikis_synced,              :wikis_synced_count,              :wikis_count
+  attr_in_percentage :wikis_checksummed,         :wikis_checksummed_count,         :wikis_count
+  attr_in_percentage :wikis_verified,            :wikis_verified_count,            :wikis_count
+  attr_in_percentage :lfs_objects_synced,        :lfs_objects_synced_count,        :lfs_objects_count
+  attr_in_percentage :job_artifacts_synced,      :job_artifacts_synced_count,      :job_artifacts_count
+  attr_in_percentage :attachments_synced,        :attachments_synced_count,        :attachments_count
+  attr_in_percentage :replication_slots_used,    :replication_slots_used_count,    :replication_slots_count
 
   def storage_shards_match?
     return true if geo_node.primary?
@@ -363,6 +248,97 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   private
+
+  def load_status_message
+    self.status_message =
+      begin
+        HealthCheck::Utils.process_checks(['geo'])
+      rescue NotImplementedError => e
+        e.to_s
+      end
+  end
+
+  def load_event_data
+    self.event_log_max_id = Geo::EventLog.maximum(:id)
+    self.repository_created_max_id = Geo::RepositoryCreatedEvent.maximum(:id)
+    self.repository_updated_max_id = Geo::RepositoryUpdatedEvent.maximum(:id)
+    self.repository_deleted_max_id = Geo::RepositoryDeletedEvent.maximum(:id)
+    self.repository_renamed_max_id = Geo::RepositoryRenamedEvent.maximum(:id)
+    self.repositories_changed_max_id = Geo::RepositoriesChangedEvent.maximum(:id)
+    self.lfs_object_deleted_max_id = Geo::LfsObjectDeletedEvent.maximum(:id)
+    self.job_artifact_deleted_max_id = Geo::JobArtifactDeletedEvent.maximum(:id)
+    self.hashed_storage_migrated_max_id = Geo::HashedStorageMigratedEvent.maximum(:id)
+    self.hashed_storage_attachments_max_id = Geo::HashedStorageAttachmentsEvent.maximum(:id)
+  end
+
+  def load_primary_data
+    return unless Gitlab::Geo.primary?
+
+    self.lfs_objects_count = LfsObject.syncable.count
+    self.job_artifacts_count = Ci::JobArtifact.syncable.count
+    self.attachments_count = Upload.syncable.count
+
+    self.replication_slots_count = geo_node.replication_slots_count
+    self.replication_slots_used_count = geo_node.replication_slots_used_count
+    self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
+  end
+
+  def load_secondary_data
+    return unless Gitlab::Geo.secondary?
+
+    self.db_replication_lag_seconds = Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
+    self.cursor_last_event_id = current_cursor_last_event_id
+    self.cursor_last_event_date = Geo::EventLog.find_by(id: self.cursor_last_event_id)&.created_at
+    self.repositories_synced_count = registries_for_synced_projects(:repository).count
+    self.repositories_failed_count = registries_for_failed_projects(:repository).count
+    self.wikis_synced_count = registries_for_synced_projects(:wiki).count
+    self.wikis_failed_count = registries_for_failed_projects(:wiki).count
+    self.lfs_objects_count = lfs_objects_finder.count_syncable
+    self.lfs_objects_synced_count = lfs_objects_finder.count_synced
+    self.lfs_objects_failed_count = lfs_objects_finder.count_failed
+    self.lfs_objects_registry_count = lfs_objects_finder.count_registry
+    self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
+    self.job_artifacts_count = job_artifacts_finder.count_syncable
+    self.job_artifacts_synced_count = job_artifacts_finder.count_synced
+    self.job_artifacts_failed_count = job_artifacts_finder.count_failed
+    self.job_artifacts_registry_count = job_artifacts_finder.count_registry
+    self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
+    self.attachments_count = attachments_finder.count_syncable
+    self.attachments_synced_count = attachments_finder.count_synced
+    self.attachments_failed_count = attachments_finder.count_failed
+    self.attachments_registry_count = attachments_finder.count_registry
+    self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
+  end
+
+  def load_repository_check_data
+    if Gitlab::Geo.primary?
+      self.repositories_checked_count = Project.where.not(last_repository_check_at: nil).count
+      self.repositories_checked_failed_count = Project.where(last_repository_check_failed: true).count
+    elsif Gitlab::Geo.secondary?
+      self.repositories_checked_count = Geo::ProjectRegistry.where.not(last_repository_check_at: nil).count
+      self.repositories_checked_failed_count = Geo::ProjectRegistry.where(last_repository_check_failed: true).count
+    end
+  end
+
+  def load_verification_data
+    return unless repository_verification_enabled
+
+    if Gitlab::Geo.primary?
+      self.repositories_checksummed_count = repository_verification_finder.count_verified_repositories
+      self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
+      self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
+      self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
+    elsif Gitlab::Geo.secondary?
+      self.repositories_verified_count = registries_for_verified_projects(:repository).count
+      self.repositories_verification_failed_count = registries_for_verification_failed_projects(:repository).count
+      self.repositories_checksum_mismatch_count = registries_for_mismatch_projects(:repository).count
+      self.wikis_verified_count = registries_for_verified_projects(:wiki).count
+      self.wikis_verification_failed_count = registries_for_verification_failed_projects(:wiki).count
+      self.wikis_checksum_mismatch_count = registries_for_mismatch_projects(:wiki).count
+      self.repositories_retrying_verification_count = registries_retrying_verification(:repository).count
+      self.wikis_retrying_verification_count = registries_retrying_verification(:wiki).count
+    end
+  end
 
   def primary_storage_digest
     @primary_storage_digest ||= Gitlab::Geo.primary_node.find_or_build_status.storage_configuration_digest
@@ -418,11 +394,5 @@ class GeoNodeStatus < ApplicationRecord
 
   def repository_verification_finder
     @repository_verification_finder ||= Geo::RepositoryVerificationFinder.new
-  end
-
-  def calc_percentage(total, count)
-    return 0 if !total.present? || total.zero?
-
-    (count.to_f / total.to_f) * 100.0
   end
 end
