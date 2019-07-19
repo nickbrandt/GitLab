@@ -30,6 +30,13 @@ import {
 } from '~/lib/utils/common_utils';
 import boardConfigToggle from 'ee_else_ce/boards/config_toggle';
 import toggleFocusMode from 'ee_else_ce/boards/toggle_focus';
+import {
+  setPromotionState,
+  setWeigthFetchingState,
+  setEpicFetchingState,
+  getMilestoneTitle,
+  getBoardsModalData,
+} from 'ee_else_ce/boards/ee_functions';
 import mountMultipleBoardsSwitcher from './mount_multiple_boards_switcher';
 
 let issueBoardsApp;
@@ -129,7 +136,7 @@ export default () => {
           });
 
           boardsStore.addBlankState();
-          boardsStore.addPromotionState();
+          setPromotionState(boardsStore);
           this.loading = false;
         })
         .catch(() => {
@@ -144,8 +151,8 @@ export default () => {
         const { sidebarInfoEndpoint } = newIssue;
         if (sidebarInfoEndpoint && newIssue.subscribed === undefined) {
           newIssue.setFetchingState('subscriptions', true);
-          newIssue.setFetchingState('weight', true);
-          newIssue.setFetchingState('epic', true);
+          setWeigthFetchingState(newIssue, true);
+          setEpicFetchingState(newIssue, true);
           BoardService.getIssueInfo(sidebarInfoEndpoint)
             .then(res => res.data)
             .then(data => {
@@ -160,8 +167,8 @@ export default () => {
               } = convertObjectPropsToCamelCase(data);
 
               newIssue.setFetchingState('subscriptions', false);
-              newIssue.setFetchingState('weight', false);
-              newIssue.setFetchingState('epic', false);
+              setWeigthFetchingState(newIssue, false);
+              setEpicFetchingState(newIssue, false);
               newIssue.updateData({
                 humanTimeSpent: humanTotalTimeSpent,
                 timeSpent: totalTimeSpent,
@@ -174,7 +181,7 @@ export default () => {
             })
             .catch(() => {
               newIssue.setFetchingState('subscriptions', false);
-              newIssue.setFetchingState('weight', false);
+              setWeigthFetchingState(newIssue, false);
               Flash(__('An error occurred while fetching sidebar data'));
             });
         }
@@ -209,7 +216,7 @@ export default () => {
     el: document.getElementById('js-add-list'),
     data: {
       filters: boardsStore.state.filters,
-      milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
+      ...getMilestoneTitle($boardApp),
     },
     mounted() {
       initNewListDropdown();
@@ -229,8 +236,7 @@ export default () => {
         return {
           modal: ModalStore.store,
           store: boardsStore.state,
-          isFullscreen: false,
-          focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
+          ...getBoardsModalData($boardApp),
           canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
         };
       },
