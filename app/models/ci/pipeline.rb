@@ -329,7 +329,7 @@ module Ci
     end
 
     def self.bridgeable_statuses
-      ::Ci::Pipeline.all_statuses - [:created, :preparing, :pending]
+      ::Ci::Pipeline::AVAILABLE_STATUSES - %w[created preparing pending]
     end
 
     def stages_count

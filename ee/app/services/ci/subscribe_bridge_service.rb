@@ -19,13 +19,13 @@ module Ci
 
       return unless upstream_pipeline
 
-      bridge_updates = { upstream_pipeline: upstream_pipeline }
+      bridge.upstream_pipeline = upstream_pipeline
 
-      if ::Ci::Pipeline.bridgeable_statuses.include?(upstream_pipeline.status.to_sym)
-        bridge_updates[:status] = upstream_pipeline.status
+      if ::Ci::Pipeline.bridgeable_statuses.include?(upstream_pipeline.status)
+        ::Ci::PipelineBridgeStatusService.process_bridge(upstream_pipeline.status, bridge)
       end
 
-      bridge.update!(bridge_updates)
+      bridge.save!
     end
 
     private

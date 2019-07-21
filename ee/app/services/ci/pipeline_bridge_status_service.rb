@@ -6,26 +6,13 @@ module Ci
 
     def execute(pipeline)
       pipeline.downstream_bridges.each do |bridge|
-        process_bridge(pipeline.status, bridge)
+        bridge.save! if self.class.process_bridge(pipeline.status, bridge)
       end
     end
 
-    def process_bridge(status, bridge)
-      case status
-      when 'success'
-        bridge.success!
-      when 'failed'
-        bridge.drop!
-      when 'canceled'
-        bridge.cancel!
-      when 'skipped'
-        bridge.skip!
-      when 'running'
-        bridge.run!
-      when 'manual'
-        bridge.update(status: 'manual')
-      when 'scheduled'
-        bridge.update(status: 'scheduled')
+    def self.process_bridge(status, bridge)
+      if ::Ci::Pipeline.bridgeable_statuses.include?(status)
+        bridge.status = status
       else
         raise InvalidUpstreamStatusError
       end
