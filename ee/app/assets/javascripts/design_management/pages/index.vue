@@ -6,10 +6,10 @@ import { s__, sprintf } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import EmptyState from '../components/empty_state.vue';
-import allDesignsQuery from '../queries/allDesigns.graphql';
 import uploadDesignMutation from '../queries/uploadDesign.graphql';
 import permissionsQuery from '../queries/permissions.graphql';
 import allDesignsMixin from '../mixins/all_designs';
+import projectQuery from '../queries/project.query.graphql';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -32,6 +32,16 @@ export default {
       },
       update: data => data.project.issue.userPermissions,
     },
+    allVersions: {
+      query: projectQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+          iid: this.issueIid,
+        };
+      },
+      update: data => data.project.issue.designs.versions.edges,
+    },
   },
   data() {
     return {
@@ -39,6 +49,7 @@ export default {
         createDesign: false,
       },
       isSaving: false,
+      allVersions: [],
     };
   },
   computed: {
@@ -53,6 +64,9 @@ export default {
     },
     hasDesigns() {
       return this.designs.length > 0;
+    },
+    hasVersion() {
+      return this.hasValidVersion();
     },
   },
   methods: {
@@ -79,6 +93,17 @@ export default {
         id: -_.uniqueId(),
         image: '',
         filename: file.name,
+        versions: {
+          __typename: 'DesignVersionConnection',
+          edges: {
+            __typename: 'DesignVersionEdge',
+            node: {
+              __typename: 'DesignVersion',
+              id: -_.uniqueId(),
+              sha: -_.uniqueId(),
+            },
+          },
+        },
       }));
 
       this.isSaving = true;
@@ -96,9 +121,10 @@ export default {
           },
           update: (store, { data: { designManagementUpload } }) => {
             const data = store.readQuery({
-              query: allDesignsQuery,
+              query: projectQuery,
               variables: { fullPath: this.projectPath, iid: this.issueIid },
             });
+
             const newDesigns = data.project.issue.designs.designs.edges.reduce((acc, design) => {
               if (!acc.find(d => d.filename === design.node.filename)) {
                 acc.push(design.node);
@@ -106,9 +132,27 @@ export default {
 
               return acc;
             }, designManagementUpload.designs);
+
+            let newVersionNode;
+            const findNewVersions = designManagementUpload.designs.find(design => design.versions);
+
+            if (findNewVersions) {
+              const findNewVersionsEdges = findNewVersions.versions.edges;
+
+              if (findNewVersionsEdges && findNewVersionsEdges.length) {
+                newVersionNode = [findNewVersionsEdges[0]];
+              }
+            }
+
+            const newVersions = [
+              ...(newVersionNode || []),
+              ...data.project.issue.designs.versions.edges,
+            ];
+
             const newQueryData = {
               project: {
                 __typename: 'Project',
+                id: '',
                 issue: {
                   __typename: 'Issue',
                   designs: {
@@ -120,13 +164,17 @@ export default {
                         node: design,
                       })),
                     },
+                    versions: {
+                      __typename: 'DesignVersionConnection',
+                      edges: newVersions,
+                    },
                   },
                 },
               },
             };
 
             store.writeQuery({
-              query: allDesignsQuery,
+              query: projectQuery,
               variables: { fullPath: this.projectPath, iid: this.issueIid },
               data: newQueryData,
             });
@@ -141,6 +189,7 @@ export default {
         })
         .then(() => {
           this.isSaving = false;
+          this.$router.push('/designs');
         })
         .catch(e => {
           this.isSaving = false;
@@ -160,6 +209,7 @@ export default {
       v-if="showUploadForm"
       :can-upload-design="canCreateDesign"
       :is-saving="isSaving"
+      :all-versions="allVersions"
       @upload="onUploadDesign"
     />
     <div class="mt-4">
@@ -167,6 +217,7 @@ export default {
       <div v-else-if="error" class="alert alert-danger">
         {{ __('An error occurred while loading designs. Please try again.') }}
       </div>
+      <design-list v-else-if="hasVersion" :designs="versionDesigns" />
       <design-list v-else-if="hasDesigns" :designs="designs" />
       <empty-state
         v-else
