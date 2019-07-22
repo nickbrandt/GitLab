@@ -313,4 +313,24 @@ describe ProjectsController do
       end
     end
   end
+
+  describe '#download_export' do
+    let(:request) { get :download_export, params: { namespace_id: project.namespace, id: project } }
+
+    context 'when project export is enabled' do
+      it 'logs the audit event' do
+        expect { request }.to change { SecurityEvent.count }.by(1)
+      end
+    end
+
+    context 'when project export is disabled' do
+      before do
+        stub_application_setting(project_export_enabled?: false)
+      end
+
+      it 'does not log an audit event' do
+        expect { request }.not_to change { SecurityEvent.count }
+      end
+    end
+  end
 end

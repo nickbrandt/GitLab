@@ -6,9 +6,11 @@ class AuditEventPresenter < Gitlab::View::Presenter::Simple
   def author_name
     user = audit_event.user
 
-    return unless user
-
-    link_to(user.name, user_path(user))
+    if user
+      link_to(user.name, user_path(user))
+    else
+      audit_event.author_name
+    end
   end
 
   def target

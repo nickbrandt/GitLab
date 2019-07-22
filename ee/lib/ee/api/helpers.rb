@@ -109,6 +109,17 @@ module EE
 
       private
 
+      override :send_git_archive
+      def send_git_archive(repository, **kwargs)
+        AuditEvents::RepositoryDownloadStartedAuditEventService.new(
+          current_user,
+          repository.project,
+          ip_address
+        ).for_project.security_event
+
+        super
+      end
+
       def private_token
         params[::APIGuard::PRIVATE_TOKEN_PARAM] || env[::APIGuard::PRIVATE_TOKEN_HEADER]
       end

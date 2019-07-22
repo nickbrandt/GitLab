@@ -40,3 +40,5 @@ class Projects::RepositoriesController < Projects::ApplicationController
     render_404
   end
 end
+
+Projects::RepositoriesController.prepend(EE::Projects::RepositoriesController)
