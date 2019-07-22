@@ -68,6 +68,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resources :merge_requests, only: [], constraints: { id: /\d+/ } do
         member do
           get :metrics_reports
+          get :license_management_reports
         end
       end
 
