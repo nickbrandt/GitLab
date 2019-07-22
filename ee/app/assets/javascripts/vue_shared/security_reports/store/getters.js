@@ -1,28 +1,7 @@
 import { s__, sprintf } from '~/locale';
-import { countIssues, groupedTextBuilder, statusIcon } from './utils';
+import { countIssues, groupedTextBuilder, statusIcon, groupedReportText } from './utils';
 import { LOADING, ERROR, SUCCESS } from './constants';
 import messages from './messages';
-
-const groupedReportText = (report, reportType, errorMessage, loadingMessage) => {
-  const { paths } = report;
-
-  if (report.hasError) {
-    return errorMessage;
-  }
-
-  if (report.isLoading) {
-    return loadingMessage;
-  }
-
-  return groupedTextBuilder({
-    ...countIssues(report),
-    reportType,
-    paths,
-  });
-};
-
-export const groupedSastText = ({ sast }) =>
-  groupedReportText(sast, messages.SAST, messages.SAST_HAS_ERROR, messages.SAST_IS_LOADING);
 
 export const groupedSastContainerText = ({ sastContainer }) =>
   groupedReportText(
@@ -101,9 +80,6 @@ export const summaryStatus = (state, getters) => {
 
   return SUCCESS;
 };
-
-export const sastStatusIcon = ({ sast }) =>
-  statusIcon(sast.isLoading, sast.hasError, sast.newIssues.length);
 
 export const sastContainerStatusIcon = ({ sastContainer }) =>
   statusIcon(sastContainer.isLoading, sastContainer.hasError, sastContainer.newIssues.length);

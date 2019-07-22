@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import {
-  parseSastIssues,
   parseDependencyScanningIssues,
   getDastSite,
   parseDastIssues,
@@ -55,61 +54,6 @@ export default {
 
   [types.SET_CAN_CREATE_FEEDBACK_PERMISSION](state, permission) {
     state.canCreateFeedbackPermission = permission;
-  },
-
-  // SAST
-  [types.SET_SAST_HEAD_PATH](state, path) {
-    Vue.set(state.sast.paths, 'head', path);
-  },
-
-  [types.SET_SAST_BASE_PATH](state, path) {
-    Vue.set(state.sast.paths, 'base', path);
-  },
-
-  [types.REQUEST_SAST_REPORTS](state) {
-    Vue.set(state.sast, 'isLoading', true);
-  },
-
-  /**
-   * Compares sast results and returns the formatted report
-   *
-   * Sast has 3 types of issues: newIssues, resolvedIssues and allIssues.
-   *
-   * When we have both base and head:
-   * - newIssues = head - base
-   * - resolvedIssues = base - head
-   * - allIssues = head - newIssues - resolvedIssues
-   *
-   * When we only have head
-   * - newIssues = head
-   * - resolvedIssues = 0
-   * - allIssues = 0
-   */
-  [types.RECEIVE_SAST_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const filterKey = 'cve';
-      const parsedHead = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
-      const parsedBase = parseSastIssues(reports.base, reports.enrichData, state.blobPath.base);
-
-      const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
-      const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
-      const allIssues = filterByKey(parsedHead, newIssues.concat(resolvedIssues), filterKey);
-
-      Vue.set(state.sast, 'newIssues', newIssues);
-      Vue.set(state.sast, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.sast, 'allIssues', allIssues);
-      Vue.set(state.sast, 'isLoading', false);
-    } else if (reports.head && !reports.base) {
-      const newIssues = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
-
-      Vue.set(state.sast, 'newIssues', newIssues);
-      Vue.set(state.sast, 'isLoading', false);
-    }
-  },
-
-  [types.RECEIVE_SAST_REPORTS_ERROR](state) {
-    Vue.set(state.sast, 'isLoading', false);
-    Vue.set(state.sast, 'hasError', true);
   },
 
   // SAST CONTAINER
@@ -340,27 +284,6 @@ export default {
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', error);
-  },
-
-  [types.UPDATE_SAST_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.sast.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.sast.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.sast.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.sast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-      return;
-    }
-
-    const allIssuesIndex = findIssueIndex(state.sast.allIssues, issue);
-    if (allIssuesIndex !== -1) {
-      state.sast.allIssues.splice(allIssuesIndex, 1, issue);
-    }
   },
 
   [types.UPDATE_DEPENDENCY_SCANNING_ISSUE](state, issue) {

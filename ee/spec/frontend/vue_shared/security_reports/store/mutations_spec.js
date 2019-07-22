@@ -2,11 +2,6 @@ import state from 'ee/vue_shared/security_reports/store/state';
 import mutations from 'ee/vue_shared/security_reports/store/mutations';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import {
-  sastIssues,
-  sastIssuesBase,
-  parsedSastIssuesHead,
-  parsedSastBaseStore,
-  parsedSastIssuesStore,
   dependencyScanningIssuesOld,
   dependencyScanningIssuesBase,
   parsedDependencyScanningIssuesHead,
@@ -88,69 +83,6 @@ describe('security reports mutations', () => {
       mutations[types.SET_CAN_CREATE_FEEDBACK_PERMISSION](stateCopy, true);
 
       expect(stateCopy.canCreateFeedbackPermission).toEqual(true);
-    });
-  });
-
-  describe('SET_SAST_HEAD_PATH', () => {
-    it('should set sast head path', () => {
-      mutations[types.SET_SAST_HEAD_PATH](stateCopy, 'sast_head_path');
-
-      expect(stateCopy.sast.paths.head).toEqual('sast_head_path');
-    });
-  });
-
-  describe('SET_SAST_BASE_PATH', () => {
-    it('sets sast base path', () => {
-      mutations[types.SET_SAST_BASE_PATH](stateCopy, 'sast_base_path');
-
-      expect(stateCopy.sast.paths.base).toEqual('sast_base_path');
-    });
-  });
-
-  describe('REQUEST_SAST_REPORTS', () => {
-    it('should set sast loading flag to true', () => {
-      mutations[types.REQUEST_SAST_REPORTS](stateCopy);
-
-      expect(stateCopy.sast.isLoading).toEqual(true);
-    });
-  });
-
-  describe('RECEIVE_SAST_REPORTS', () => {
-    describe('with head and base', () => {
-      it('should set new, fixed and all issues', () => {
-        mutations[types.SET_BASE_BLOB_PATH](stateCopy, 'path');
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-
-        mutations[types.RECEIVE_SAST_REPORTS](stateCopy, {
-          head: sastIssues,
-          base: sastIssuesBase,
-        });
-
-        expect(stateCopy.sast.isLoading).toEqual(false);
-        expect(stateCopy.sast.newIssues).toEqual(parsedSastIssuesHead);
-        expect(stateCopy.sast.resolvedIssues).toEqual(parsedSastBaseStore);
-      });
-    });
-
-    describe('with head', () => {
-      it('should set new issues', () => {
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-        mutations[types.RECEIVE_SAST_REPORTS](stateCopy, {
-          head: sastIssues,
-        });
-
-        expect(stateCopy.sast.isLoading).toEqual(false);
-        expect(stateCopy.sast.newIssues).toEqual(parsedSastIssuesStore);
-      });
-    });
-  });
-
-  describe('RECEIVE_SAST_REPORTS_ERROR', () => {
-    it('should set loading flag to false and error flag to true for sast', () => {
-      mutations[types.RECEIVE_SAST_REPORTS_ERROR](stateCopy);
-
-      expect(stateCopy.sast.isLoading).toEqual(false);
-      expect(stateCopy.sast.hasError).toEqual(true);
     });
   });
 
@@ -643,50 +575,6 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.modal.isCreatingMergeRequest).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');
-    });
-  });
-
-  describe('UPDATE_SAST_ISSUE', () => {
-    it('updates issue in the new issues list', () => {
-      stateCopy.sast.newIssues = parsedSastIssuesHead;
-      stateCopy.sast.resolvedIssues = [];
-      stateCopy.sast.allIssues = [];
-      const updatedIssue = {
-        ...parsedSastIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.sast.newIssues[0]).toEqual(updatedIssue);
-    });
-
-    it('updates issue in the resolved issues list', () => {
-      stateCopy.sast.newIssues = [];
-      stateCopy.sast.resolvedIssues = parsedSastIssuesHead;
-      stateCopy.sast.allIssues = [];
-      const updatedIssue = {
-        ...parsedSastIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.sast.resolvedIssues[0]).toEqual(updatedIssue);
-    });
-
-    it('updates issue in the all issues list', () => {
-      stateCopy.sast.newIssues = [];
-      stateCopy.sast.resolvedIssues = [];
-      stateCopy.sast.allIssues = parsedSastIssuesHead;
-      const updatedIssue = {
-        ...parsedSastIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.sast.allIssues[0]).toEqual(updatedIssue);
     });
   });
 
