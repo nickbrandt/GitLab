@@ -34,7 +34,7 @@ describe ElasticIndexerWorker, :elastic do
         object = create(type)
 
         expect_next_instance_of(Elastic::IndexRecordService) do |service|
-          expect(service).to receive(:execute).with(object, true, {})
+          expect(service).to receive(:execute).with(object, true, {}).and_return(true)
         end
 
         subject.perform("index", name, object.id, object.es_id)
@@ -88,5 +88,17 @@ describe ElasticIndexerWorker, :elastic do
     Gitlab::Elastic::Helper.refresh_index
 
     expect(Elasticsearch::Model.search('*').total_count).to be(0)
+  end
+
+  it 'retries if index raises error' do
+    object = create(:project)
+
+    expect_next_instance_of(Elastic::IndexRecordService) do |service|
+      allow(service).to receive(:execute).and_raise(Elastic::IndexRecordService::ImportError)
+    end
+
+    expect do
+      subject.perform("index", 'Project', object.id, object.es_id)
+    end.to raise_error
   end
 end

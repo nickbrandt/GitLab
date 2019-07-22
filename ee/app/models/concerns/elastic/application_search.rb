@@ -319,7 +319,7 @@ module Elastic
         { fields: es_fields }
       end
 
-      def es_import(options = {})
+      def es_import(**options)
         transform = lambda do |r|
           { index: { _id: r.es_id, data: r.__elasticsearch__.as_indexed_json } }.tap do |data|
             data[:index][:routing] = r.es_parent if r.es_parent
