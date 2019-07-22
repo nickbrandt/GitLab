@@ -21,12 +21,21 @@ export default {
       required: false,
       default: false,
     },
+    isEditingExistingFeedback: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     submitLabel() {
-      return this.isDismissed
-        ? s__('vulnerability|Add comment')
-        : s__('vulnerability|Add comment & dismiss');
+      if (this.isEditingExistingFeedback) {
+        return s__('vulnerability|Save comment');
+      }
+      if (this.isDismissed) {
+        return s__('vulnerability|Add comment');
+      }
+      return s__('vulnerability|Add comment & dismiss');
     },
   },
   methods: {
@@ -35,7 +44,12 @@ export default {
       this.$emit('addCommentAndDismiss');
     },
     addDismissalComment() {
-      Tracking.event(document.body.dataset.page, 'click_add_comment');
+      if (this.isEditingExistingFeedback) {
+        Tracking.event(document.body.dataset.page, 'click_edit_comment');
+      } else {
+        Tracking.event(document.body.dataset.page, 'click_add_comment');
+      }
+
       this.$emit('addDismissalComment');
     },
     handleSubmit() {

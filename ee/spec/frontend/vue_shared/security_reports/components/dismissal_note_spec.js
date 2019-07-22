@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import component from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 
@@ -114,29 +114,53 @@ describe('dismissal note', () => {
     };
     let commentItem;
 
-    beforeEach(() => {
-      wrapper = shallowMount(component, {
-        propsData: {
-          feedback: {
-            ...feedback,
-            comment_details: commentDetails,
+    describe('without confirm deletion buttons', () => {
+      beforeEach(() => {
+        wrapper = shallowMount(component, {
+          propsData: {
+            feedback: {
+              ...feedback,
+              comment_details: commentDetails,
+            },
+            project,
           },
-          project,
-        },
+        });
+        commentItem = wrapper.findAll(EventItem).at(1);
       });
-      commentItem = wrapper.findAll(EventItem).at(1);
+
+      it('should render the comment', () => {
+        expect(commentItem.text()).toBe(commentDetails.comment);
+      });
+
+      it('should render the comment author', () => {
+        expect(commentItem.props().author).toBe(commentDetails.comment_author);
+      });
+
+      it('should render the comment timestamp', () => {
+        expect(commentItem.props().createdAt).toBe(commentDetails.comment_timestamp);
+      });
     });
 
-    it('should render the comment', () => {
-      expect(commentItem.text()).toBe(commentDetails.comment);
-    });
+    describe('with confirm deletion buttons', () => {
+      beforeEach(() => {
+        wrapper = mount(component, {
+          propsData: {
+            feedback: {
+              ...feedback,
+              comment_details: commentDetails,
+            },
+            project,
+            isShowingDeleteButtons: true,
+          },
+        });
+        commentItem = wrapper.findAll(EventItem).at(1);
+      });
 
-    it('should render the comment author', () => {
-      expect(commentItem.props().author).toBe(commentDetails.comment_author);
-    });
-
-    it('should render the comment timestamp', () => {
-      expect(commentItem.props().createdAt).toBe(commentDetails.comment_timestamp);
+      it('should render deletion buttons slot', () => {
+        const buttons = commentItem.findAll('button');
+        expect(buttons.at(1).text()).toEqual('Cancel');
+        expect(buttons.at(0).text()).toEqual('Delete comment');
+      });
     });
   });
 });

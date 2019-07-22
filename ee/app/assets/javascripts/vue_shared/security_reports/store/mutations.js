@@ -282,7 +282,28 @@ export default {
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', error);
   },
-
+  [types.REQUEST_DELETE_DISMISSAL_COMMENT](state) {
+    state.isDismissingVulnerability = true;
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    Vue.set(state.modal, 'error', null);
+  },
+  [types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](state, payload) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal.vulnerability, 'isDismissed', true);
+    Vue.set(state.modal.vulnerability, 'dismissalFeedback', payload.data);
+  },
+  [types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](state, error) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal, 'error', error);
+  },
+  [types.SHOW_DISMISSAL_DELETE_BUTTONS](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', true);
+  },
+  [types.HIDE_DISMISSAL_DELETE_BUTTONS](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', false);
+  },
   [types.UPDATE_DEPENDENCY_SCANNING_ISSUE](state, issue) {
     // Find issue in the correct list and update it
 
@@ -367,6 +388,7 @@ export default {
     Vue.set(state.modal, 'isCommentingOnDismissal', true);
   },
   [types.CLOSE_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', false);
     Vue.set(state.modal, 'isCommentingOnDismissal', false);
   },
 };

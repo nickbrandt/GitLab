@@ -46,22 +46,45 @@ describe('DismissalCommentModalFooter', () => {
   });
 
   describe('with an already dismissed vulnerability', () => {
-    beforeEach(() => {
-      const propsData = {
-        isDismissed: true,
-      };
-      wrapper = mount(component, { propsData });
+    describe('and adding a comment', () => {
+      beforeEach(() => {
+        const propsData = {
+          isDismissed: true,
+        };
+        wrapper = mount(component, { propsData });
+      });
+
+      it('should render the "Add comment and dismiss" button', () => {
+        expect(wrapper.find(LoadingButton).text()).toBe('Add comment');
+      });
+
+      it('should emit the "addCommentAndDismiss" event when clicked', () => {
+        wrapper.find(LoadingButton).trigger('click');
+
+        expect(wrapper.emitted().addDismissalComment).toBeTruthy();
+        expect(Tracking.event).toHaveBeenCalledWith('_track_category_', 'click_add_comment');
+      });
     });
 
-    it('should render the "Add comment and dismiss" button', () => {
-      expect(wrapper.find(LoadingButton).text()).toBe('Add comment');
-    });
+    describe('and editing a comment', () => {
+      beforeEach(() => {
+        const propsData = {
+          isDismissed: true,
+          isEditingExistingFeedback: true,
+        };
+        wrapper = mount(component, { propsData });
+      });
 
-    it('should emit the "addCommentAndDismiss" event when clicked', () => {
-      wrapper.find(LoadingButton).trigger('click');
+      it('should render the "Save comment" button', () => {
+        expect(wrapper.find(LoadingButton).text()).toBe('Save comment');
+      });
 
-      expect(wrapper.emitted().addDismissalComment).toBeTruthy();
-      expect(Tracking.event).toHaveBeenCalledWith('_track_category_', 'click_add_comment');
+      it('should emit the "addCommentAndDismiss" event when clicked', () => {
+        wrapper.find(LoadingButton).trigger('click');
+
+        expect(wrapper.emitted().addDismissalComment).toBeTruthy();
+        expect(Tracking.event).toHaveBeenCalledWith('_track_category_', 'click_edit_comment');
+      });
     });
   });
 });

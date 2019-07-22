@@ -186,18 +186,36 @@ export default {
   },
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
     const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
-    if (!vulnerability) {
-      return;
+    if (vulnerability) {
+      vulnerability.dismissal_feedback = payload.data;
+      state.isDismissingVulnerability = false;
+      Vue.set(state.modal, 'isDismissingVulnerability', false);
+      Vue.set(state.modal.vulnerability, 'isDismissed', true);
     }
-    vulnerability.dismissal_feedback = payload.data;
-    state.isDismissingVulnerability = false;
-    Vue.set(state.modal, 'isDismissingVulnerability', false);
-    Vue.set(state.modal.vulnerability, 'isDismissed', true);
   },
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state) {
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', s__('Security Reports|There was an error adding the comment.'));
+  },
+  [types.REQUEST_DELETE_DISMISSAL_COMMENT](state) {
+    state.isDismissingVulnerability = true;
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    Vue.set(state.modal, 'error', null);
+  },
+  [types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](state, payload) {
+    const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
+    if (vulnerability) {
+      vulnerability.dismissal_feedback = payload.data;
+      state.isDismissingVulnerability = false;
+      Vue.set(state.modal, 'isDismissingVulnerability', false);
+      Vue.set(state.modal.vulnerability, 'isDismissed', true);
+    }
+  },
+  [types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](state) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal, 'error', s__('Security Reports|There was an error deleting the comment.'));
   },
   [types.REQUEST_REVERT_DISMISSAL](state) {
     state.isDismissingVulnerability = true;
@@ -219,6 +237,12 @@ export default {
       'error',
       s__('Security Reports|There was an error reverting the dismissal.'),
     );
+  },
+  [types.SHOW_DISMISSAL_DELETE_BUTTONS](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', true);
+  },
+  [types.HIDE_DISMISSAL_DELETE_BUTTONS](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', false);
   },
   [types.REQUEST_CREATE_MERGE_REQUEST](state) {
     state.isCreatingMergeRequest = true;
@@ -242,6 +266,8 @@ export default {
     Vue.set(state.modal, 'isCommentingOnDismissal', true);
   },
   [types.CLOSE_DISMISSAL_COMMENT_BOX](state) {
+    Vue.set(state.modal, 'isShowingDeleteButtons', false);
     Vue.set(state.modal, 'isCommentingOnDismissal', false);
+    Vue.set(state.modal, 'isShowingDeleteButtons', false);
   },
 };

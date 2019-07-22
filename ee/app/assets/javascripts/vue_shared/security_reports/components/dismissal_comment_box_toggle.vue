@@ -21,6 +21,11 @@ export default {
       required: false,
       default: '',
     },
+    dismissalComment: {
+      type: String,
+      required: false,
+      default: '',
+    },
     errorMessage: {
       type: String,
       required: false,
@@ -52,6 +57,7 @@ export default {
     <dismissal-comment-box
       v-if="isActive"
       v-model="localComment"
+      :dismissal-comment="dismissalComment"
       :error-message="errorMessage"
       :placeholder="$options.PLACEHOLDER"
       @submit="$emit('submit')"

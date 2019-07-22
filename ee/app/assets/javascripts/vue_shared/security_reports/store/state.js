@@ -127,7 +127,8 @@ export default () => ({
 
     isCreatingNewIssue: false,
     isDismissingVulnerability: false,
-
+    isShowingDeleteButtons: false,
+    isCommentingOnDismissal: false,
     error: null,
   },
 });

@@ -254,6 +254,43 @@ export const addDismissalComment = ({ state, dispatch }, { comment }) => {
     });
 };
 
+export const deleteDismissalComment = ({ state, dispatch }) => {
+  dispatch('requestDeleteDismissalComment');
+
+  const { vulnerability } = state.modal;
+  const { dismissalFeedback } = vulnerability;
+  const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
+
+  axios
+    .patch(url, {
+      project_id: dismissalFeedback.project_id,
+      comment: '',
+    })
+    .then(({ data }) => {
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveDeleteDismissalCommentSuccess', { data });
+    })
+    .catch(() => {
+      dispatch(
+        'receiveDeleteDismissalCommentError',
+        s__('Security Reports|There was an error deleting the comment.'),
+      );
+    });
+};
+
+export const requestDeleteDismissalComment = ({ commit }) => {
+  commit(types.REQUEST_DELETE_DISMISSAL_COMMENT);
+};
+
+export const receiveDeleteDismissalCommentSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS, payload);
+  hideModal();
+};
+
+export const receiveDeleteDismissalCommentError = ({ commit }, error) => {
+  commit(types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR, error);
+};
+
 export const requestAddDismissalComment = ({ commit }) => {
   commit(types.REQUEST_ADD_DISMISSAL_COMMENT);
 };
@@ -291,6 +328,14 @@ export const revertDismissVulnerability = ({ state, dispatch }) => {
         s__('ciReport|There was an error reverting the dismissal. Please try again.'),
       ),
     );
+};
+
+export const showDismissalDeleteButtons = ({ commit }) => {
+  commit(types.SHOW_DISMISSAL_DELETE_BUTTONS);
+};
+
+export const hideDismissalDeleteButtons = ({ commit }) => {
+  commit(types.HIDE_DISMISSAL_DELETE_BUTTONS);
 };
 
 export const requestCreateIssue = ({ commit }) => commit(types.REQUEST_CREATE_ISSUE);

@@ -542,7 +542,107 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('REQUEST_DISMISSAL_COMMENT', () => {
+  describe('REQUEST_DELETE_DISMISSAL_COMMENT', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.REQUEST_DELETE_DISMISSAL_COMMENT](state);
+    });
+
+    it('should set isDismissingVulnerability to true', () => {
+      expect(state.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to true', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should nullify the error state on the modal', () => {
+      expect(state.modal.error).toBeNull();
+    });
+  });
+
+  describe('RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS', () => {
+    let state;
+    let payload;
+    let vulnerability;
+    let data;
+
+    beforeEach(() => {
+      state = createState();
+      state.vulnerabilities = mockData;
+      [vulnerability] = mockData;
+      data = { name: '' };
+      payload = { id: vulnerability.id, data };
+      mutations[types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](state, payload);
+    });
+
+    it('should set the dismissal feedback on the passed vulnerability to an empty string', () => {
+      expect(state.vulnerabilities[0].dismissal_feedback).toEqual({ name: '' });
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(state.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability on the modal to false', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDissmissed on the modal vulnerability to be true', () => {
+      expect(state.modal.vulnerability.isDismissed).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](state);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(state.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to false', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set the error state on the modal', () => {
+      expect(state.modal.error).toEqual('There was an error deleting the comment.');
+    });
+  });
+
+  describe(types.SHOW_DISMISSAL_DELETE_BUTTONS, () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.SHOW_DISMISSAL_DELETE_BUTTONS](state);
+    });
+
+    it('should set isShowingDeleteButtonsto to true', () => {
+      expect(state.modal.isShowingDeleteButtons).toBe(true);
+    });
+  });
+
+  describe(types.HIDE_DISMISSAL_DELETE_BUTTONS, () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.HIDE_DISMISSAL_DELETE_BUTTONS](state);
+    });
+
+    it('should set isShowingDeleteButtons to false', () => {
+      expect(state.modal.isShowingDeleteButtons).toBe(false);
+    });
+  });
+
+  describe('REQUEST_ADD_DISMISSAL_COMMENT', () => {
     let state;
 
     beforeEach(() => {
@@ -563,7 +663,7 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_DISMISSAL_COMMENT_SUCCESS', () => {
+  describe('RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS', () => {
     let state;
     let payload;
     let vulnerability;
@@ -595,7 +695,7 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_DISMISSAL_COMMENT_ERROR', () => {
+  describe('RECEIVE_ADD_DISMISSAL_COMMENT_ERROR', () => {
     let state;
 
     beforeEach(() => {
@@ -689,20 +789,32 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('OPEN_DISMISSAL_COMMENT_BOX', () => {
-    it('should set isCommentingOnDismissal to true', () => {
-      const state = createState();
-      mutations[types.OPEN_DISMISSAL_COMMENT_BOX](state);
+    let state;
 
+    beforeEach(() => {
+      state = createState();
+      mutations[types.OPEN_DISMISSAL_COMMENT_BOX](state);
+    });
+
+    it('should set isCommentingOnDismissal to true', () => {
       expect(state.modal.isCommentingOnDismissal).toBe(true);
     });
   });
 
   describe('CLOSE_DISMISSAL_COMMENT_BOX', () => {
-    it('should set isCommentingOnDismissal to false', () => {
-      const state = createState();
-      mutations[types.CLOSE_DISMISSAL_COMMENT_BOX](state);
+    let state;
 
+    beforeEach(() => {
+      state = createState();
+      mutations[types.CLOSE_DISMISSAL_COMMENT_BOX](state);
+    });
+
+    it('should set isCommentingOnDismissal to false', () => {
       expect(state.modal.isCommentingOnDismissal).toBe(false);
+    });
+
+    it('should set isShowingDeleteButtons to false', () => {
+      expect(state.modal.isShowingDeleteButtons).toBe(false);
     });
   });
 });

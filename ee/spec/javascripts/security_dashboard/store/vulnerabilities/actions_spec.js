@@ -847,6 +847,157 @@ describe('add vulnerability dismissal comment', () => {
       });
     });
   });
+
+  describe('deleteDismissalComment', () => {
+    const vulnerability = mockDataVulnerabilities[2];
+    const data = { vulnerability };
+    const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${vulnerability.dismissal_feedback.id}`;
+    const comment = '';
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        const checkPassedData = () => {
+          const { project_id } = vulnerability.dismissal_feedback;
+          const expected = { project_id, comment };
+
+          expect(mock.history.patch[0].data).toBe(JSON.stringify(expected));
+          done();
+        };
+
+        testAction(
+          actions.deleteDismissalComment,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDeleteDismissalCommentSuccess',
+              payload: { data, id: vulnerability.id },
+            },
+          ],
+          checkPassedData,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(404);
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          actions.deleteDismissalComment,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            { type: 'receiveDeleteDismissalCommentError' },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('receiveDeleteDismissalCommentSuccess', () => {
+      it('should commit the success mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.receiveDeleteDismissalCommentSuccess,
+          { data },
+          state,
+          [{ type: types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS, payload: { data } }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('receiveDeleteDismissalCommentError', () => {
+      it('should commit the error mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.receiveDeleteDismissalCommentError,
+          {},
+          state,
+          [{ type: types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('requestDeleteDismissalComment', () => {
+      it('should commit the request mutation', done => {
+        const state = initialState;
+
+        testAction(
+          actions.requestDeleteDismissalComment,
+          {},
+          state,
+          [{ type: types.REQUEST_DELETE_DISMISSAL_COMMENT }],
+          [],
+          done,
+        );
+      });
+    });
+  });
+});
+
+describe('showDismissalDeleteButtons', () => {
+  it('commits show dismissal delete buttons', done => {
+    const state = initialState;
+
+    testAction(
+      actions.showDismissalDeleteButtons,
+      null,
+      state,
+      [
+        {
+          type: types.SHOW_DISMISSAL_DELETE_BUTTONS,
+        },
+      ],
+      [],
+      done,
+    );
+  });
+});
+
+describe('hideDismissalDeleteButtons', () => {
+  it('commits hide dismissal delete buttons', done => {
+    const state = initialState;
+
+    testAction(
+      actions.hideDismissalDeleteButtons,
+      null,
+      state,
+      [
+        {
+          type: types.HIDE_DISMISSAL_DELETE_BUTTONS,
+        },
+      ],
+      [],
+      done,
+    );
+  });
 });
 
 describe('revert vulnerability dismissal', () => {
@@ -1128,12 +1279,12 @@ describe('vulnerabilities history actions', () => {
   });
 
   describe('openDismissalCommentBox', () => {
-    it('should commit the open comment mutation', done => {
+    it('should commit the open comment mutation with a default payload', done => {
       const state = initialState();
 
       testAction(
         actions.openDismissalCommentBox,
-        {},
+        undefined,
         state,
         [{ type: types.OPEN_DISMISSAL_COMMENT_BOX }],
         [],

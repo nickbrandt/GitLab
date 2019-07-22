@@ -43,6 +43,11 @@ export default {
       required: false,
       default: false,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     actionButtons() {
@@ -85,7 +90,7 @@ export default {
 
 <template>
   <div>
-    <gl-button data-dismiss="modal">
+    <gl-button data-dismiss="modal" :disabled="disabled">
       {{ __('Cancel') }}
     </gl-button>
 
@@ -93,6 +98,7 @@ export default {
       v-if="canDismissVulnerability"
       :is-dismissing="modal.isDismissingVulnerability"
       :is-dismissed="isDismissed"
+      :disabled="disabled"
       @dismissVulnerability="$emit('dismissVulnerability')"
       @openDismissalCommentBox="$emit('openDismissalCommentBox')"
       @revertDismissVulnerability="$emit('revertDismissVulnerability')"
@@ -103,6 +109,7 @@ export default {
       :buttons="actionButtons"
       class="js-split-button"
       data-qa-selector="resolve_split_button"
+      :disabled="disabled"
       @createMergeRequest="$emit('createMergeRequest')"
       @createNewIssue="$emit('createNewIssue')"
       @downloadPatch="$emit('downloadPatch')"
@@ -111,7 +118,7 @@ export default {
     <loading-button
       v-else-if="actionButtons.length > 0"
       :loading="actionButtons[0].isLoading"
-      :disabled="actionButtons[0].isLoading"
+      :disabled="actionButtons[0].isLoading || disabled"
       :label="actionButtons[0].name"
       container-class="btn btn-success btn-inverted"
       class="js-action-button"

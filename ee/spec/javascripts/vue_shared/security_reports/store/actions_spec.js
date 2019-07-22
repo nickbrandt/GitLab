@@ -49,6 +49,12 @@ import actions, {
   receiveAddDismissalCommentError,
   receiveAddDismissalCommentSuccess,
   requestAddDismissalComment,
+  deleteDismissalComment,
+  receiveDeleteDismissalCommentError,
+  receiveDeleteDismissalCommentSuccess,
+  requestDeleteDismissalComment,
+  showDismissalDeleteButtons,
+  hideDismissalDeleteButtons,
 } from 'ee/vue_shared/security_reports/store/actions';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
@@ -1092,6 +1098,142 @@ describe('security reports actions', () => {
           done,
         );
       });
+    });
+  });
+
+  describe('deleteDismissalComment', () => {
+    const vulnerability = {
+      id: 0,
+      vulnerability_feedback_dismissal_path: 'foo',
+      dismissalFeedback: { id: 1 },
+    };
+    const data = { vulnerability };
+    const url = `${state.createVulnerabilityFeedbackDismissalPath}/${vulnerability.dismissalFeedback.id}`;
+    const comment = '';
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          deleteDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDeleteDismissalCommentSuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPatch(url).replyOnce(404);
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          deleteDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            {
+              type: 'receiveDeleteDismissalCommentError',
+              payload: 'There was an error deleting the comment.',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('receiveDeleteDismissalCommentSuccess', () => {
+      it('should commit the success mutation', done => {
+        testAction(
+          receiveDeleteDismissalCommentSuccess,
+          { data },
+          state,
+          [{ type: types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS, payload: { data } }],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('receiveDeleteDismissalCommentError', () => {
+      it('should commit the error mutation', done => {
+        testAction(
+          receiveDeleteDismissalCommentError,
+          {},
+          state,
+          [
+            {
+              type: types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR,
+              payload: {},
+            },
+          ],
+          [],
+          done,
+        );
+      });
+    });
+
+    describe('requestDeleteDismissalComment', () => {
+      it('should commit the request mutation', done => {
+        testAction(
+          requestDeleteDismissalComment,
+          {},
+          state,
+          [{ type: types.REQUEST_DELETE_DISMISSAL_COMMENT }],
+          [],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('showDismissalDeleteButtons', () => {
+    it('commits show dismissal delete buttons', done => {
+      testAction(
+        showDismissalDeleteButtons,
+        null,
+        mockedState,
+        [
+          {
+            type: types.SHOW_DISMISSAL_DELETE_BUTTONS,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('hideDismissalDeleteButtons', () => {
+    it('commits hide dismissal delete buttons', done => {
+      testAction(
+        hideDismissalDeleteButtons,
+        null,
+        mockedState,
+        [
+          {
+            type: types.HIDE_DISMISSAL_DELETE_BUTTONS,
+          },
+        ],
+        [],
+        done,
+      );
     });
   });
 

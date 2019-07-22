@@ -21,6 +21,11 @@ export default {
       required: false,
       default: '',
     },
+    dismissalComment: {
+      type: String,
+      required: false,
+      default: '',
+    },
     errorMessage: {
       type: String,
       required: false,
@@ -44,7 +49,8 @@ export default {
     },
   },
   mounted() {
-    this.$emit('input', '');
+    this.$emit('input', this.dismissalComment);
+
     this.$emit('clearError');
     this.$refs.dismissalComment.$el.focus();
   },

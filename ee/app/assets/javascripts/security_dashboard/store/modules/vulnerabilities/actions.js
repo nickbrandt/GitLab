@@ -213,6 +213,27 @@ export const addDismissalComment = ({ dispatch }, { vulnerability, comment }) =>
     });
 };
 
+export const deleteDismissalComment = ({ dispatch }, { vulnerability }) => {
+  dispatch('requestDeleteDismissalComment');
+
+  const { dismissal_feedback } = vulnerability;
+  const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${dismissal_feedback.id}`;
+
+  axios
+    .patch(url, {
+      project_id: dismissal_feedback.project_id,
+      comment: '',
+    })
+    .then(({ data }) => {
+      const { id } = vulnerability;
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveDeleteDismissalCommentSuccess', { id, data });
+    })
+    .catch(() => {
+      dispatch('receiveDeleteDismissalCommentError');
+    });
+};
+
 export const requestAddDismissalComment = ({ commit }) => {
   commit(types.REQUEST_ADD_DISMISSAL_COMMENT);
 };
@@ -224,6 +245,27 @@ export const receiveAddDismissalCommentSuccess = ({ commit }, payload) => {
 
 export const receiveAddDismissalCommentError = ({ commit }) => {
   commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR);
+};
+
+export const requestDeleteDismissalComment = ({ commit }) => {
+  commit(types.REQUEST_DELETE_DISMISSAL_COMMENT);
+};
+
+export const receiveDeleteDismissalCommentSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS, payload);
+  hideModal();
+};
+
+export const receiveDeleteDismissalCommentError = ({ commit }) => {
+  commit(types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR);
+};
+
+export const showDismissalDeleteButtons = ({ commit }) => {
+  commit(types.SHOW_DISMISSAL_DELETE_BUTTONS);
+};
+
+export const hideDismissalDeleteButtons = ({ commit }) => {
+  commit(types.HIDE_DISMISSAL_DELETE_BUTTONS);
 };
 
 export const undoDismiss = ({ dispatch }, { vulnerability, flashError }) => {
