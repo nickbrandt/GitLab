@@ -3,7 +3,11 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import component from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
+import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
+import sastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
+import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { waitForMutation } from 'spec/helpers/vue_test_utils_helper';
 import { trimText } from 'spec/helpers/text_helper';
 import {
   sastIssues,
@@ -24,13 +28,16 @@ describe('Grouped security reports app', () => {
   });
 
   afterEach(() => {
-    vm.$store.replaceState(state());
+    vm.$store.replaceState({
+      ...state(),
+      sast: sastState(),
+    });
     vm.$destroy();
     mock.restore();
   });
 
   describe('with error', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       mock.onGet('sast_head.json').reply(500);
       mock.onGet('sast_base.json').reply(500);
       mock.onGet('dast_head.json').reply(500);
@@ -63,26 +70,32 @@ describe('Grouped security reports app', () => {
         canCreateMergeRequest: true,
         canDismissVulnerability: true,
       });
+
+      Promise.all([
+        waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS_ERROR}`),
+        waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_ERROR),
+        waitForMutation(vm.$store, types.RECEIVE_DAST_ERROR),
+        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_ERROR),
+      ])
+        .then(done)
+        .catch();
     });
 
-    it('renders loading state', done => {
-      setTimeout(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
-        expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning failed loading any results',
-        );
+    it('renders error state', () => {
+      expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+      expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+        'Security scanning failed loading any results',
+      );
 
-        expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
+      expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
-        expect(trimText(vm.$el.textContent)).toContain('SAST: Loading resulted in an error');
-        expect(trimText(vm.$el.textContent)).toContain(
-          'Dependency scanning: Loading resulted in an error',
-        );
+      expect(trimText(vm.$el.textContent)).toContain('SAST: Loading resulted in an error');
+      expect(trimText(vm.$el.textContent)).toContain(
+        'Dependency scanning: Loading resulted in an error',
+      );
 
-        expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
-        expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
-        done();
-      }, 0);
+      expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
+      expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
     });
   });
 
@@ -122,7 +135,7 @@ describe('Grouped security reports app', () => {
       });
     });
 
-    it('renders loading summary text + spinner', done => {
+    it('renders loading summary text + spinner', () => {
       expect(vm.$el.querySelector('.spinner')).not.toBeNull();
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning is loading',
@@ -134,15 +147,11 @@ describe('Grouped security reports app', () => {
       expect(vm.$el.textContent).toContain('Dependency scanning is loading');
       expect(vm.$el.textContent).toContain('Container scanning is loading');
       expect(vm.$el.textContent).toContain('DAST is loading');
-
-      setTimeout(() => {
-        done();
-      }, 0);
     });
   });
 
   describe('with all reports', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       mock.onGet('sast_head.json').reply(200, sastIssues);
       mock.onGet('sast_base.json').reply(200, sastIssuesBase);
       mock.onGet('dast_head.json').reply(200, dast);
@@ -175,40 +184,46 @@ describe('Grouped security reports app', () => {
         canCreateMergeRequest: true,
         canDismissVulnerability: true,
       });
+
+      Promise.all([
+        waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS}`),
+        waitForMutation(vm.$store, types.RECEIVE_DAST_REPORTS),
+        waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_REPORTS),
+        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_REPORTS),
+      ])
+        .then(done)
+        .catch();
     });
 
-    it('renders reports', done => {
-      setTimeout(() => {
-        // It's not loading
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+    it('renders reports', () => {
+      // It's not loading
+      expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
 
-        // Renders the summary text
-        expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 6 new, and 3 fixed vulnerabilities',
-        );
+      // Renders the summary text
+      expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
+        'Security scanning detected 6 new, and 3 fixed vulnerabilities',
+      );
 
-        // Renders the expand button
-        expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
+      // Renders the expand button
+      expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
-        // Renders Sast result
-        expect(trimText(vm.$el.textContent)).toContain(
-          'SAST detected 2 new, and 1 fixed vulnerabilities',
-        );
+      // Renders Sast result
+      expect(trimText(vm.$el.textContent)).toContain(
+        'SAST detected 2 new, and 1 fixed vulnerabilities',
+      );
 
-        // Renders DSS result
-        expect(trimText(vm.$el.textContent)).toContain(
-          'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
-        );
+      // Renders DSS result
+      expect(trimText(vm.$el.textContent)).toContain(
+        'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
+      );
 
-        // Renders container scanning result
-        expect(vm.$el.textContent).toContain(
-          'Container scanning detected 1 new, and 1 fixed vulnerabilities',
-        );
+      // Renders container scanning result
+      expect(vm.$el.textContent).toContain(
+        'Container scanning detected 1 new, and 1 fixed vulnerabilities',
+      );
 
-        // Renders DAST result
-        expect(vm.$el.textContent).toContain('DAST detected 1 new vulnerability');
-        done();
-      }, 0);
+      // Renders DAST result
+      expect(vm.$el.textContent).toContain('DAST detected 1 new vulnerability');
     });
 
     it('opens modal with more information', done => {

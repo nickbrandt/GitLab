@@ -46,49 +46,6 @@ export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
 
 /**
- * SAST
- */
-export const setSastHeadPath = ({ commit }, path) => commit(types.SET_SAST_HEAD_PATH, path);
-
-export const setSastBasePath = ({ commit }, path) => commit(types.SET_SAST_BASE_PATH, path);
-
-export const requestSastReports = ({ commit }) => commit(types.REQUEST_SAST_REPORTS);
-
-export const receiveSastReports = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_REPORTS, response);
-
-export const receiveSastError = ({ commit }, error) =>
-  commit(types.RECEIVE_SAST_REPORTS_ERROR, error);
-
-export const fetchSastReports = ({ state, dispatch }) => {
-  const { base, head } = state.sast.paths;
-
-  dispatch('requestSastReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'sast',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveSastReports', {
-        head: values && values[0] ? values[0].data : null,
-        base: values && values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveSastError');
-    });
-};
-
-export const updateSastIssue = ({ commit }, issue) => commit(types.UPDATE_SAST_ISSUE, issue);
-
-/**
  * SAST CONTAINER
  */
 export const setSastContainerHeadPath = ({ commit }, path) =>
@@ -233,8 +190,8 @@ export const openModal = ({ dispatch }, payload) => {
 export const setModalData = ({ commit }, payload) => commit(types.SET_ISSUE_MODAL_DATA, payload);
 export const requestDismissVulnerability = ({ commit }) =>
   commit(types.REQUEST_DISMISS_VULNERABILITY);
-export const receiveDismissVulnerability = ({ commit }) =>
-  commit(types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS);
+export const receiveDismissVulnerability = ({ commit }, payload) =>
+  commit(types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS, payload);
 export const receiveDismissVulnerabilityError = ({ commit }, error) =>
   commit(types.RECEIVE_DISMISS_VULNERABILITY_ERROR, error);
 
@@ -253,30 +210,14 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
       },
     })
     .then(({ data }) => {
-      dispatch('closeDismissalCommentBox');
-      dispatch('receiveDismissVulnerability');
-
-      // Update the issue with the created dismissal feedback applied
       const updatedIssue = {
         ...state.modal.vulnerability,
         isDismissed: true,
         dismissalFeedback: data,
       };
-      switch (updatedIssue.category) {
-        case 'sast':
-          dispatch('updateSastIssue', updatedIssue);
-          break;
-        case 'dependency_scanning':
-          dispatch('updateDependencyScanningIssue', updatedIssue);
-          break;
-        case 'container_scanning':
-          dispatch('updateContainerScanningIssue', updatedIssue);
-          break;
-        case 'dast':
-          dispatch('updateDastIssue', updatedIssue);
-          break;
-        default:
-      }
+
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveDismissVulnerability', updatedIssue);
 
       hideModal();
     })
@@ -334,29 +275,13 @@ export const revertDismissVulnerability = ({ state, dispatch }) => {
       state.modal.vulnerability.dismissalFeedback.destroy_vulnerability_feedback_dismissal_path,
     )
     .then(() => {
-      dispatch('receiveDismissVulnerability');
-
-      // Update the issue with the reverted dismissal feedback applied
       const updatedIssue = {
         ...state.modal.vulnerability,
         isDismissed: false,
         dismissalFeedback: null,
       };
-      switch (updatedIssue.category) {
-        case 'sast':
-          dispatch('updateSastIssue', updatedIssue);
-          break;
-        case 'dependency_scanning':
-          dispatch('updateDependencyScanningIssue', updatedIssue);
-          break;
-        case 'container_scanning':
-          dispatch('updateContainerScanningIssue', updatedIssue);
-          break;
-        case 'dast':
-          dispatch('updateDastIssue', updatedIssue);
-          break;
-        default:
-      }
+
+      dispatch('receiveDismissVulnerability', updatedIssue);
 
       hideModal();
     })

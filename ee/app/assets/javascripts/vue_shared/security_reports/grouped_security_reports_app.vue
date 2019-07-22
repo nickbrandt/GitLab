@@ -155,17 +155,16 @@ export default {
       'canCreateFeedbackPermission',
     ]),
     ...mapGetters([
-      'groupedSastText',
       'groupedSummaryText',
       'summaryStatus',
       'groupedSastContainerText',
       'groupedDastText',
       'groupedDependencyText',
-      'sastStatusIcon',
       'sastContainerStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
     ]),
+    ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
@@ -230,15 +229,12 @@ export default {
       'setHeadBlobPath',
       'setBaseBlobPath',
       'setSourceBranch',
-      'setSastHeadPath',
-      'setSastBasePath',
       'setSastContainerHeadPath',
       'setSastContainerBasePath',
       'setDastHeadPath',
       'setDastBasePath',
       'setDependencyScanningHeadPath',
       'setDependencyScanningBasePath',
-      'fetchSastReports',
       'fetchSastContainerReports',
       'fetchDastReports',
       'fetchDependencyScanningReports',
@@ -259,6 +255,11 @@ export default {
       'downloadPatch',
       'addDismissalComment',
     ]),
+    ...mapActions('sast', {
+      setSastHeadPath: 'setHeadPath',
+      setSastBasePath: 'setBasePath',
+      fetchSastReports: 'fetchReports',
+    }),
   },
 };
 </script>
