@@ -60,7 +60,7 @@ module QA
         end
 
         def set_visibility(visibility)
-          choose visibility
+          choose visibility.capitalize
         end
 
         def click_github_link
