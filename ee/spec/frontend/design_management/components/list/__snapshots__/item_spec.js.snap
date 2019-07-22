@@ -2,7 +2,7 @@
 
 exports[`Design management list item component hides comment count 1`] = `
 <router-link-stub
-  class="card cursor-pointer text-plain js-design-list-item"
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
 >
   <div
@@ -48,7 +48,7 @@ exports[`Design management list item component hides comment count 1`] = `
 
 exports[`Design management list item component renders item with multiple comments 1`] = `
 <router-link-stub
-  class="card cursor-pointer text-plain js-design-list-item"
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
 >
   <div
@@ -112,7 +112,7 @@ exports[`Design management list item component renders item with multiple commen
 
 exports[`Design management list item component renders item with single comment 1`] = `
 <router-link-stub
-  class="card cursor-pointer text-plain js-design-list-item"
+  class="card cursor-pointer text-plain js-design-list-item design-list-item"
   to="[object Object]"
 >
   <div

@@ -4543,6 +4543,9 @@ msgstr ""
 msgid "DesignManagement|%{current_design} of %{designs_count}"
 msgstr ""
 
+msgid "DesignManagement|Add designs"
+msgstr ""
+
 msgid "DesignManagement|Could not find design, please try again."
 msgstr ""
 
@@ -4565,9 +4568,6 @@ msgid "DesignManagement|The one place for your designs"
 msgstr ""
 
 msgid "DesignManagement|Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
-msgstr ""
-
-msgid "DesignManagement|Upload designs"
 msgstr ""
 
 msgid "Designs"
@@ -12693,6 +12693,12 @@ msgid "Showing %d event"
 msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Showing Latest Version"
+msgstr ""
+
+msgid "Showing Version #%{versionNumber}"
+msgstr ""
 
 msgid "Showing all issues"
 msgstr ""
