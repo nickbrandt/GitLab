@@ -74,7 +74,10 @@ module EE
         prevent :destroy_epic
       end
 
-      rule { auditor }.enable :read_group
+      rule { auditor }.policy do
+        enable :read_group
+        enable :read_group_security_dashboard
+      end
 
       rule { admin | owner }.enable :admin_group_saml
 
