@@ -100,9 +100,8 @@ module EE
       # override
       def sort_by_attribute(method, excluded_labels: [])
         case method.to_s
-        when 'weight'        then order_weight_asc
-        when 'weight_asc'    then order_weight_asc
-        when 'weight_desc'   then order_weight_desc
+        when 'weight', 'weight_asc' then order_weight_asc.with_order_id_desc
+        when 'weight_desc'          then order_weight_desc.with_order_id_desc
         else
           super
         end
