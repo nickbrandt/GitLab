@@ -17,6 +17,10 @@ module EE
         if pipeline
           ::SyncSecurityReportsToReportApprovalRulesWorker.perform_async(pipeline.id)
         end
+
+        ::MergeRequests::UpdateBlocksService
+          .new(issuable, current_user, blocking_merge_requests_params)
+          .execute
       end
     end
   end

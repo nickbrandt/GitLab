@@ -60,4 +60,45 @@ describe MergeRequestBlock do
       expect(new_block).not_to be_valid
     end
   end
+
+  describe '.bulk_insert' do
+    let(:mrs) { create_list(:merge_request, 4) }
+
+    it 'inserts multiple blocks specified as a Hash' do
+      described_class.bulk_insert(
+        mrs[0].id => mrs[1].id,
+        mrs[2].id => mrs[3].id
+      )
+
+      expect(described_class.all).to contain_exactly(
+        having_attributes(blocking_merge_request_id: mrs[0].id, blocked_merge_request_id: mrs[1].id),
+        having_attributes(blocking_merge_request_id: mrs[2].id, blocked_merge_request_id: mrs[3].id)
+      )
+    end
+
+    it 'inserts multiple blocks specified as an Array' do
+      described_class.bulk_insert([[mrs[0].id, mrs[1].id], [mrs[2].id, mrs[3].id]])
+
+      expect(described_class.all).to contain_exactly(
+        having_attributes(blocking_merge_request_id: mrs[0].id, blocked_merge_request_id: mrs[1].id),
+        having_attributes(blocking_merge_request_id: mrs[2].id, blocked_merge_request_id: mrs[3].id)
+      )
+    end
+  end
+
+  describe '.with_blocking_mr_ids' do
+    let!(:block) { create(:merge_request_block) }
+    let!(:other_block) { create(:merge_request_block) }
+
+    subject(:result) { described_class.with_blocking_mr_ids([block.blocking_merge_request_id]) }
+
+    it 'returns blocks with a matching blocking_merge_request_id' do
+      is_expected.to contain_exactly(block)
+    end
+
+    it 'eager-loads the blocking MRs' do
+      association = result.first.association(:blocking_merge_request)
+      expect(association.loaded?).to be(true)
+    end
+  end
 end
