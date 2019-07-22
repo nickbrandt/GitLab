@@ -1,5 +1,0 @@
----
-title: Ensure U2F javascript runs on GroupSAML callback
-merge_request: 14262
-author:
-type: fixed

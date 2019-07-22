@@ -1,6 +1,0 @@
----
-title: Removes support for matching on app label for Kubernetes deploy boards,
-  terminals, and pod logs
-merge_request: 14020
-author:
-type: removed

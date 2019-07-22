@@ -1,5 +1,0 @@
----
-title: Fix on_environment scope to not re-order whole query
-merge_request: 14481
-author:
-type: fixed

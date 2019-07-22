@@ -1,5 +1,0 @@
----
-title: Fix race condition of `refs/merge` competing overwrite
-merge_request: 14495
-author:
-type: fixed

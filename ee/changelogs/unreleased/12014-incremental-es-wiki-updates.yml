@@ -1,5 +1,0 @@
----
-title: Enable incremental elasticsearch index updates for wikis
-merge_request: 14057
-author:
-type: fixed

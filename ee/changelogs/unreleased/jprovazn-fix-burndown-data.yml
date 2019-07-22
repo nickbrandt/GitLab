@@ -1,5 +1,0 @@
----
-title: Fix negative values in burndown charts.
-merge_request: 14632
-author:
-type: fixed

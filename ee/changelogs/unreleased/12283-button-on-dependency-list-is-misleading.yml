@@ -1,6 +1,0 @@
----
-title: Add anchor to learn-more-button on the dependency list page so it links to
-  the right location in the docs
-merge_request: 14316
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Fix displaying feature flag names in the audit log
-merge_request: 14621
-author:
-type: fixed
