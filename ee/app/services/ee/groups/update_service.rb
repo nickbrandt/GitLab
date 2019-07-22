@@ -34,6 +34,8 @@ module EE
           params.delete(:shared_runners_minutes_limit)
           params.delete(:extra_shared_runners_minutes_limit)
         end
+
+        super
       end
 
       def changes_file_template_project_id?
