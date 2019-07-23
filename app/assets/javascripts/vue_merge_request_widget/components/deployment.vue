@@ -78,15 +78,13 @@ export default {
       return this.deployment.external_url;
     },
     hasExternalUrls() {
-      return true;
-      // return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
+      return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
     },
     hasDeploymentTime() {
       return Boolean(this.deployment.deployed_at && this.deployment.deployed_at_formatted);
     },
     hasDeploymentMeta() {
-      return true;
-      // return Boolean(this.deployment.url && this.deployment.name);
+      return Boolean(this.deployment.url && this.deployment.name);
     },
     hasMetrics() {
       return Boolean(this.deployment.metrics_url);

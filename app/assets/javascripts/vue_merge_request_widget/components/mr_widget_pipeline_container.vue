@@ -40,16 +40,7 @@ export default {
       return this.isPostMerge ? this.mr.targetBranch : this.mr.sourceBranchLink;
     },
     deployments() {
-      return [{
-      	id: 56789,
-      	name: 'What a cool mocked deployment',
-      	url: 'https://sarahghp.gitlab.io/review-app-tester/',
-      	external_url: 'https://sarahghp.gitlab.io/review-app-tester/',
-      	deployed_at_formatted: '',
-      	metrics_url: '',
-      	metrics_monitoring_url: '',
-      }]
-      // return this.isPostMerge ? this.mr.postMergeDeployments : this.mr.deployments;
+      return this.isPostMerge ? this.mr.postMergeDeployments : this.mr.deployments;
     },
     deploymentClass() {
       return this.isPostMerge ? 'js-post-deployment' : 'js-pre-deployment';
@@ -69,8 +60,7 @@ export default {
       return this.isPostMerge ? this.mr.mergePipeline : this.mr.pipeline;
     },
     showVisualReviewAppLink() {
-      return true;
-      // return Boolean(this.mr.visualReviewFF && this.mr.visualReviewAppAvailable);
+      return Boolean(this.mr.visualReviewFF && this.mr.visualReviewAppAvailable);
     },
     showMergeTrainInfo() {
       return _.isNumber(this.mr.mergeTrainIndex);
