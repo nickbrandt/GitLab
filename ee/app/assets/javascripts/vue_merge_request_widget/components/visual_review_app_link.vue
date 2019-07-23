@@ -37,8 +37,8 @@ export default {
   computed: {
     copyToClipboard() {
       return {
-        script: s__('VisualReviewApp|Copy script'),
-        mrId: s__('VisualReviewApp|Copy ID number'),
+        script: s__('VisualReviewApp|Copy script to clipboard'),
+        mrId: s__('VisualReviewApp|Copy merge request ID to clipboard'),
       }
     },
     copyString() {
@@ -47,7 +47,7 @@ export default {
         script: `<script defer
   data-project-id='${this.appMetadata.sourceProjectId}'
   data-project-path='${this.appMetadata.sourceProjectPath}'
-  <!-- Remove the following line to use the same script for multiple MRs -->
+  <!-- Remove the following line to use the same script for multiple merge requests -->
   data-merge-request-id='${this.appMetadata.mergeRequestId}'
   data-mr-url='${this.appMetadata.appUrl}'
   id='review-app-toolbar-script'
