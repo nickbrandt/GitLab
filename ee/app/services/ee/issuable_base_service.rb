@@ -48,13 +48,13 @@ module EE
 
       label_sets = ScopedLabelSet.from_label_ids(ids)
 
-      label_sets.map do |set|
+      label_sets.flat_map do |set|
         if set.valid? || !set.contains_any?(added_label_ids)
           set.label_ids
         else
           set.last_id_by_order(label_ids_ordered_by_selection)
         end
-      end.flatten
+      end
     end
   end
 end
