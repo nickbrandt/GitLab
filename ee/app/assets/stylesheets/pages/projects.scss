@@ -5,10 +5,6 @@
   }
 }
 
-.protected-environments-list {
-  @extend .protected-branches-list;
-}
-
 .project-mirror-settings {
   .fingerprint-verified {
     color: $green-500;

@@ -5,7 +5,7 @@ import ProtectedEnvironmentEdit from './protected_environment_edit';
 
 export default class ProtectedEnvironmentEditList {
   constructor() {
-    this.$wrap = $('.protected-environments-list');
+    this.$wrap = $('.protected-branches-list');
     this.initEditForm();
   }
 
