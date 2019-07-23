@@ -49,6 +49,12 @@ module Gitlab
         end
       end
 
+      def alert_markdown
+        strong_memoize(:alert_markdown) do
+          parse_alert_markdown_from_payload
+        end
+      end
+
       def valid?
         project && title && starts_at
       end
@@ -104,6 +110,10 @@ module Gitlab
 
         Rack::Utils.parse_query(uri.query).fetch('g0.expr')
       rescue URI::InvalidURIError, KeyError
+      end
+
+      def parse_alert_markdown_from_payload
+        payload&.dig('annotations', 'gitlab_incident_markdown')
       end
     end
   end

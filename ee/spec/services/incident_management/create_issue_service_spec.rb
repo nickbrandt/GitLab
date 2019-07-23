@@ -28,7 +28,7 @@ describe IncidentManagement::CreateIssueService do
 
   context 'when create_issue enabled' do
     let(:issue) { subject[:issue] }
-    let(:summary_separator) { "---\n\n" }
+    let(:summary_separator) { "\n---\n\n" }
 
     before do
       setting.update!(create_issue: true)
@@ -41,25 +41,20 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-        expect(issue.description).not_to include(summary_separator)
+        expect(separator_count(issue.description)).to eq 0
       end
     end
 
-    context 'with issue_template_content' do
-      before do
-        create_issue_template('bug', issue_template_content)
-        setting.update!(issue_template_key: 'bug')
-      end
-
+    shared_examples 'GFM template' do
       context 'plain content' do
-        let(:issue_template_content) { 'some content' }
+        let(:template_content) { 'some content' }
 
         it 'creates an issue appending issue template' do
           expect(subject).to include(status: :success)
 
           expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-          expect(issue.description).to include(summary_separator)
-          expect(issue.description).to include(issue_template_content)
+          expect(separator_count(issue.description)).to eq 1
+          expect(issue.description).to include(template_content)
         end
       end
 
@@ -67,7 +62,7 @@ describe IncidentManagement::CreateIssueService do
         let(:user) { create(:user) }
         let(:plain_text) { 'some content' }
 
-        let(:issue_template_content) do
+        let(:template_content) do
           <<~CONTENT
             #{plain_text}
             /due tomorrow
@@ -85,6 +80,40 @@ describe IncidentManagement::CreateIssueService do
           expect(issue.description).to include(plain_text)
           expect(issue.due_date).to be_present
           expect(issue.assignees).to eq([user])
+        end
+      end
+    end
+
+    context 'with gitlab_incident_markdown' do
+      let(:alert_annotations) do
+        { title: alert_title, gitlab_incident_markdown: template_content }
+      end
+
+      it_behaves_like 'GFM template'
+    end
+
+    context 'with issue_template_content' do
+      before do
+        create_issue_template('bug', template_content)
+        setting.update!(issue_template_key: 'bug')
+      end
+
+      it_behaves_like 'GFM template'
+
+      context 'and gitlab_incident_markdown' do
+        let(:template_content) { 'plain text'}
+        let(:alt_template) { 'alternate text' }
+        let(:alert_annotations) do
+          { title: alert_title, gitlab_incident_markdown: alt_template }
+        end
+
+        it 'includes both templates' do
+          expect(subject).to include(status: :success)
+
+          expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+          expect(issue.description).to include(template_content)
+          expect(issue.description).to include(alt_template)
+          expect(separator_count(issue.description)).to eq 2
         end
       end
 
@@ -121,7 +150,7 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.title).to include(query_title)
         expect(issue.title).to include('for 5 minutes')
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
-        expect(issue.description).not_to include(summary_separator)
+        expect(separator_count(issue.description)).to eq 0
       end
     end
 
@@ -176,5 +205,9 @@ describe IncidentManagement::CreateIssueService do
 
   def error_message(message)
     %{Cannot create incident issue for "#{project.full_name}": #{message}}
+  end
+
+  def separator_count(text)
+    text.scan(summary_separator).size
   end
 end

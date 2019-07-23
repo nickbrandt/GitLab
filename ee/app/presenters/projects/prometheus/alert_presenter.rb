@@ -3,6 +3,8 @@
 module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
+      RESERVED_ANNOTATIONS = %w(gitlab_incident_markdown).freeze
+
       def full_title
         [environment_name, alert_title].compact.join(': ')
       end
@@ -64,6 +66,7 @@ module Projects
       def annotation_list
         strong_memoize(:annotation_list) do
           annotations
+            .reject { |annotation| RESERVED_ANNOTATIONS.include?(annotation.label) }
             .map { |annotation| bullet(annotation.label, annotation.value) }
             .join("\n")
         end
