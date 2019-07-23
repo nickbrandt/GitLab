@@ -97,6 +97,7 @@ module EE
 
       rule { developer }.policy do
         enable :read_group_security_dashboard
+        enable :admin_merge_request
       end
 
       rule { security_dashboard_feature_disabled }.policy do
