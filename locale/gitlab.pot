@@ -16968,6 +16968,15 @@ msgstr ""
 msgid "encrypted: needs to be a :required, :optional or :migrating!"
 msgstr ""
 
+msgid "entries cannot be blank"
+msgstr ""
+
+msgid "entries cannot be larger than 255 characters"
+msgstr ""
+
+msgid "entries cannot contain HTML tags"
+msgstr ""
+
 msgid "epic"
 msgstr ""
 
@@ -17597,6 +17606,9 @@ msgid "toggle dropdown"
 msgstr ""
 
 msgid "triggered"
+msgstr ""
+
+msgid "unicode domains should use IDNA encoding"
 msgstr ""
 
 msgid "updated"
