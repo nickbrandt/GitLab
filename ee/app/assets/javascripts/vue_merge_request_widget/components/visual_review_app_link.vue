@@ -39,7 +39,7 @@ export default {
       return {
         script: s__('VisualReviewApp|Copy script to clipboard'),
         mrId: s__('VisualReviewApp|Copy merge request ID to clipboard'),
-      }
+      };
     },
     copyString() {
       /* eslint-disable no-useless-escape */
@@ -58,8 +58,12 @@ export default {
     instructionText() {
       return {
         intro: {
-          p1: s__('VisualReviewApp|Follow the steps below to enable Visual Reviews inside your application.'),
-          p2: s__('VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4, and 5 are performed by the reviewer each time they perform a review.'),
+          p1: s__(
+            'VisualReviewApp|Follow the steps below to enable Visual Reviews inside your application.',
+          ),
+          p2: s__(
+            'VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4, and 5 are performed by the reviewer each time they perform a review.',
+          ),
         },
         step1: sprintf(
           s__('VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:'),
@@ -93,23 +97,21 @@ export default {
           },
           false,
         ),
-        step4:
-          sprintf(
-            s__(
-              `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}${this.appMetadata.mergeRequestId}%{stepStart}.`,
-            ),
-            {
-              stepStart: '<strong>',
-              stepEnd: '</strong>',
-              linkStart: '<a href="https://docs.gitlab.com/ee/ci/review_apps/#configuring-visual-reviews">',
-              linkEnd: '</a>'
-            },
-            false,
-          ),
-        step5: sprintf(
+        step4: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App.',
+            `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}${this.appMetadata.mergeRequestId}%{stepStart}.`,
           ),
+          {
+            stepStart: '<strong>',
+            stepEnd: '</strong>',
+            linkStart:
+              '<a href="https://docs.gitlab.com/ee/ci/review_apps/#configuring-visual-reviews">',
+            linkEnd: '</a>',
+          },
+          false,
+        ),
+        step5: sprintf(
+          s__('VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App.'),
           {
             stepStart: '<strong>',
             stepEnd: '</strong>',
