@@ -267,7 +267,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     end
 
     it 'has label priorities' do
-      expect(project.labels.first.priorities).not_to be_empty
+      expect(project.labels.find_by(title: 'A project label').priorities).not_to be_empty
     end
 
     it 'has milestones' do
@@ -320,7 +320,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
 
       it_behaves_like 'restores project correctly',
                       issues: 1,
-                      labels: 1,
+                      labels: 2,
                       milestones: 1,
                       first_issue_labels: 1,
                       services: 1
@@ -397,7 +397,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       it_behaves_like 'restores project successfully'
       it_behaves_like 'restores project correctly',
                       issues: 2,
-                      labels: 1,
+                      labels: 2,
                       milestones: 2,
                       first_issue_labels: 1
 
