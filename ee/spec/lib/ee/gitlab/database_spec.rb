@@ -35,28 +35,16 @@ describe Gitlab::Database do
   end
 
   describe '.healthy?' do
-    it 'returns true when using MySQL' do
-      allow(described_class).to receive(:postgresql?).and_return(false)
+    it 'returns true when replication lag is not too great' do
+      allow(Postgresql::ReplicationSlot).to receive(:lag_too_great?).and_return(false)
 
       expect(described_class.healthy?).to be_truthy
     end
 
-    context 'when using PostgreSQL' do
-      before do
-        allow(described_class).to receive(:postgresql?).and_return(true)
-      end
+    it 'returns false when replication lag is too great' do
+      allow(Postgresql::ReplicationSlot).to receive(:lag_too_great?).and_return(true)
 
-      it 'returns true when replication lag is not too great' do
-        allow(Postgresql::ReplicationSlot).to receive(:lag_too_great?).and_return(false)
-
-        expect(described_class.healthy?).to be_truthy
-      end
-
-      it 'returns false when replication lag is too great' do
-        allow(Postgresql::ReplicationSlot).to receive(:lag_too_great?).and_return(true)
-
-        expect(described_class.healthy?).to be_falsey
-      end
+      expect(described_class.healthy?).to be_falsey
     end
   end
 

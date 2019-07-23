@@ -14,8 +14,6 @@ module EE
         end
 
         def healthy?
-          return true unless postgresql?
-
           !Postgresql::ReplicationSlot.lag_too_great?
         end
 

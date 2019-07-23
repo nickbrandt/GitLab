@@ -10,14 +10,11 @@ class ClearSharedRunnersMinutesWorker
   def perform
     return unless try_obtain_lease
 
-    if Gitlab::Database.postgresql?
-      # Using UPDATE with a joined table is not supported in MySql
-      Namespace.with_shared_runners_minutes_limit
-        .with_extra_shared_runners_minutes_limit
-        .where('namespace_statistics.namespace_id = namespaces.id')
-        .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
-        .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
-    end
+    Namespace.with_shared_runners_minutes_limit
+      .with_extra_shared_runners_minutes_limit
+      .where('namespace_statistics.namespace_id = namespaces.id')
+      .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
+      .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
 
     Namespace.where('last_ci_minutes_notification_at IS NOT NULL OR last_ci_minutes_usage_notification_level IS NOT NULL')
       .each_batch do |relation|
