@@ -35,7 +35,7 @@ module QA
           push.project = @project
           push.directory = Pathname
             .new(__dir__)
-            .join('../../../../ee/fixtures/secure_premade_reports')
+            .join('../../../../../ee/fixtures/secure_premade_reports')
           push.commit_message = 'Create Secure compatible application to serve premade reports'
         end
 
