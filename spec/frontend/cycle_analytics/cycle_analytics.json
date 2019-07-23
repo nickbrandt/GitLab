@@ -1,0 +1,209 @@
+{
+  "apiResponse": {
+    "events": [
+      {
+        "name": "Issue created",
+        "identifier": "issue_created",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["issue_stage_end"]
+      },
+      {
+        "name": "Issue first mentioned in a commit",
+        "identifier": "issue_first_mentioned_in_commit",
+        "type": "simple",
+        "can_be_start_event": false,
+        "allowed_end_events": []
+      },
+      {
+        "name": "Merge request created",
+        "identifier": "merge_request_created",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["merge_request_merged"]
+      },
+
+      {
+        "name": "Merge request first deployed to production",
+        "identifier": "merge_request_first_deployed_to_production",
+        "type": "simple",
+        "can_be_start_event": false,
+        "allowed_end_events": []
+      },
+      {
+        "name": "Merge request last build finish time",
+        "identifier": "merge_request_last_build_finished",
+        "type": "simple",
+        "can_be_start_event": false,
+        "allowed_end_events": []
+      },
+      {
+        "name": "Merge request last build start time",
+        "identifier": "merge_request_last_build_started",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["merge_request_last_build_finished"]
+      },
+      {
+        "name": "Merge request merged",
+        "identifier": "merge_request_merged",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["merge_request_first_deployed_to_production"]
+      },
+      {
+        "name": "Issue first mentioned in a commit",
+        "identifier": "code_stage_start",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["merge_request_created"]
+      },
+      {
+        "name": "Issue first associated with a milestone or issue first added to a board",
+        "identifier": "issue_stage_end",
+        "type": "simple",
+        "can_be_start_event": false,
+        "allowed_end_events": []
+      },
+      {
+        "name": "Issue first associated with a milestone or issue first added to a board",
+        "identifier": "plan_stage_start",
+        "type": "simple",
+        "can_be_start_event": true,
+        "allowed_end_events": ["issue_first_mentioned_in_commit"]
+      }
+    ],
+    "stages": [
+      {
+        "name": "issue",
+        "legend": "Related Issues",
+        "description": "Time before an issue gets scheduled",
+        "id": "issue",
+        "position": 1,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "issue_created",
+        "end_event_identifier": "issue_stage_end"
+      },
+      {
+        "name": "plan",
+        "legend": "Related Issues",
+        "description": "Time before an issue starts implementation",
+        "id": "plan",
+        "position": 2,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "plan_stage_start",
+        "end_event_identifier": "issue_first_mentioned_in_commit"
+      },
+      {
+        "name": "code",
+        "legend": "Related Merged Requests",
+        "description": "Time until first merge request",
+        "id": "code",
+        "position": 3,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "code_stage_start",
+        "end_event_identifier": "merge_request_created"
+      },
+      {
+        "name": "test",
+        "legend": "Related Merged Requests",
+        "description": "Total test time for all commits/merges",
+        "id": "test",
+        "position": 4,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "merge_request_last_build_started",
+        "end_event_identifier": "merge_request_last_build_finished"
+      },
+      {
+        "name": "review",
+        "legend": "Related Merged Requests",
+        "description": "Time between merge request creation and merge/close",
+        "id": "review",
+        "position": 5,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "merge_request_created",
+        "end_event_identifier": "merge_request_merged"
+      },
+      {
+        "name": "staging",
+        "legend": "Related Merged Requests",
+        "description": "From merge request merge until deploy to production",
+        "id": "staging",
+        "position": 6,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "merge_request_merged",
+        "end_event_identifier": "merge_request_first_deployed_to_production"
+      },
+      {
+        "name": "production",
+        "legend": "Related Merged Requests",
+        "description": "From issue creation until deploy to production",
+        "id": "production",
+        "position": 7,
+        "hidden": false,
+        "custom": false,
+        "start_event_identifier": "merge_request_merged",
+        "end_event_identifier": "merge_request_first_deployed_to_production"
+      }
+    ],
+    "summary": [
+      {
+        "value": 2,
+        "title": "New Issues"
+      },
+      {
+        "value": 0,
+        "title": "Commits"
+      },
+      {
+        "value": 0,
+        "title": "Deploys"
+      }
+    ],
+    "permissions": {
+      "issue": true,
+      "plan": true,
+      "code": true,
+      "test": true,
+      "review": true,
+      "staging": true,
+      "production": true
+    }
+  },
+  "rawEvents": [
+    {
+      "name": "Issue created",
+      "identifier": "issue_created",
+      "type": "simple",
+      "can_be_start_event": true,
+      "allowed_end_events": ["issue_closed", "issue_merged"]
+    },
+    {
+      "name": "Merge request closed",
+      "identifier": "merge_request_closed",
+      "type": "simple",
+      "can_be_start_event": false,
+      "allowed_end_events": []
+    },
+    {
+      "name": "Issue closed",
+      "identifier": "issue_closed",
+      "type": "simple",
+      "can_be_start_event": false,
+      "allowed_end_events": []
+    },
+    {
+      "name": "Issue merged",
+      "identifier": "issue_merged",
+      "type": "simple",
+      "can_be_start_event": false,
+      "allowed_end_events": []
+    }
+  ]
+}

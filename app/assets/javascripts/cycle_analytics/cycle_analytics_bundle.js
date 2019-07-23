@@ -8,6 +8,7 @@ import Flash from '../flash';
 import { __ } from '~/locale';
 import Translate from '../vue_shared/translate';
 import banner from './components/banner.vue';
+// TODO: should the be capitalized?
 import stageCodeComponent from './components/stage_code_component.vue';
 import stageComponent from './components/stage_component.vue';
 import stageReviewComponent from './components/stage_review_component.vue';

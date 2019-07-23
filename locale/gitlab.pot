@@ -4535,7 +4535,40 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add a stage"
 msgstr ""
 
+msgid "CustomCycleAnalytics|Add stage"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Choose which object types will trigger this stage"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Enter a name for the stage"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Name"
+msgstr ""
+
 msgid "CustomCycleAnalytics|New stage"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Object type"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Please select a start event first"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Select one or more objects"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Select start event"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Select stop event"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Start event"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Stop event"
 msgstr ""
 
 msgid "Customize colors"
