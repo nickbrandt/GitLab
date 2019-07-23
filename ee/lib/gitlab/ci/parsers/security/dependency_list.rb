@@ -11,10 +11,12 @@ module Gitlab
 
           def parse!(json_data, report)
             report_data = JSON.parse!(json_data)
-
             report_data.fetch('dependency_files', []).each do |file|
               file['dependencies'].each do |dependency|
-                report.add_dependency(formatter.format(dependency, file['package_manager'], file['path']))
+                report.add_dependency(formatter.format(dependency,
+                                                       file['package_manager'],
+                                                       file['path'],
+                                                       report_data['vulnerabilities']))
               end
             end
           end

@@ -30,6 +30,19 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
         expect(report.dependencies[0][:location][:path]).to eq('rails/Gemfile.lock')
         expect(report.dependencies[12][:location][:blob_path]).to eq(blob_path)
       end
+
+      it 'merge vulnerabilities data' do
+        vuln_nokogiri = report.dependencies[1][:vulnerabilities]
+        vuln_debug = report.dependencies[4][:vulnerabilities]
+        vuln_async = report.dependencies[3][:vulnerabilities]
+
+        expect(vuln_nokogiri.size).to eq(4)
+        expect(vuln_nokogiri[0]['name']).to eq('Vulnerabilities in libxml2')
+        expect(vuln_nokogiri[0]['severity']).to eq('Unknown')
+        expect(vuln_debug.size).to eq(1)
+        expect(vuln_debug[0]['name']).to eq('Regular Expression Denial of Service')
+        expect(vuln_async.size).to eq(0)
+      end
     end
 
     context 'with old dependency scanning artifact' do
