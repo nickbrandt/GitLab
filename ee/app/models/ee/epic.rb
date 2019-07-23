@@ -144,8 +144,11 @@ module EE
         ::Group
       end
 
-      # Column name used by RelativePositioning for scoping. This is not related to `parent_class` above.
-      def parent_column
+      def relative_positioning_query_base(epic)
+        in_parents(epic.parent_ids)
+      end
+
+      def relative_positioning_parent_column
         :parent_id
       end
 
