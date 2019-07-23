@@ -71,7 +71,7 @@ export default {
         ),
         step2: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} tags of every page of your application. ',
+            'VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} tags of every page of your application, ensuring the merge request ID is set or not set as required. ',
           ),
           {
             stepStart: '<strong>',
