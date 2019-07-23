@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/quality/nightly/issues/109
-  context 'Geo', :orchestrated, :geo, :quarantine do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo attachment replication' do
       let(:file_to_attach) { File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif')) }
 
