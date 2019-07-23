@@ -6,8 +6,8 @@
 - ci_warning_message = ci_usage_warning_message(namespace, project)
 
 - if cookies[:hide_shared_runner_quota_message].blank? && has_limit && can_see_status && ci_warning_message.present?
-  .shared-runner-quota-message.alert.d-none.d-sm-block{ class: ci_usage_warning_class(namespace), data: { scope: scope } }
+  .bs-callout.shared-runner-quota-message.d-none.d-sm-block{ class: ci_usage_warning_class(namespace), data: { scope: scope } }
+    %button.close.js-close.hide-shared-runner-limit-message{ type: "button" }  &times;
     = ci_warning_message
-
-    .float-right
-      = link_to 'Remind later', '#', class: 'hide-shared-runner-limit-message alert-link'
+    %br
+    = link_to 'Purchase more minutes', 'https://customers.gitlab.com/subscriptions/new?plan_id=2c92a0086a07f4a8016a2c0a1f7b4b4c', class: 'btn btn-close mt-3'

@@ -17,9 +17,9 @@ module EE
 
     def ci_usage_warning_class(namespace)
       if EE::Namespace::CI_USAGE_ALERT_LEVELS.min == namespace.last_ci_minutes_usage_notification_level
-        'alert-danger'
+        'bs-callout-danger'
       else
-        'alert-warning'
+        'bs-callout-warning'
       end
     end
 
