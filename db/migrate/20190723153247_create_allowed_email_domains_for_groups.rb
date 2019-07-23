@@ -9,7 +9,7 @@ class CreateAllowedEmailDomainsForGroups < ActiveRecord::Migration[5.2]
   # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
 
-  def change
+  def up
     create_table :allowed_email_domains do |t|
       t.references :group, references: :namespace,
         column: :group_id,
