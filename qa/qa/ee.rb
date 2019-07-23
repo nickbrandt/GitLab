@@ -72,6 +72,12 @@ module QA
           autoload :MergeRequestApproval, 'qa/ee/page/project/settings/merge_request_approval'
         end
 
+        module Operations
+          module Kubernetes
+            autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
+          end
+        end
+
         module Pipeline
           autoload :Show, 'qa/ee/page/project/pipeline/show'
         end
