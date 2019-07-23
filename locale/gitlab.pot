@@ -4535,6 +4535,9 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add a stage"
 msgstr ""
 
+msgid "CustomCycleAnalytics|New stage"
+msgstr ""
+
 msgid "Customize colors"
 msgstr ""
 

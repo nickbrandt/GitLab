@@ -172,6 +172,20 @@
         color: $gl-text-color-secondary;
       }
     }
+
+    // EE-specific start
+    .stage-ghost {
+      border: dashed 1px $border-color;
+
+      &:hover,
+      &.active {
+        font-weight: bold;
+        background: $blue-50;
+        border-color: solid 1px $blue-300;
+        box-shadow: inset 4px 0 0 0 $blue-500;
+      }
+    }
+    // EE-specific end
   }
 
   .stage-panel-container {
