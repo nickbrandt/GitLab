@@ -96,7 +96,7 @@ export default {
         step4:
           sprintf(
             s__(
-              `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}automated%{linkEnd} by the developer, provide the ID of the merge request you want to give feedback against. The ID of this merge request is %{stepStart}${this.appMetadata.mergeRequestId}%{stepStart}.`,
+              `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}${this.appMetadata.mergeRequestId}%{stepStart}.`,
             ),
             {
               stepStart: '<strong>',
