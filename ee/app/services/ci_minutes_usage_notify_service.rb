@@ -3,6 +3,7 @@
 class CiMinutesUsageNotifyService < BaseService
   def execute
     return unless ::Gitlab.com?
+    return unless namespace.shared_runners_minutes_limit_enabled?
 
     notify_on_total_usage
     notify_on_partial_usage
