@@ -11,6 +11,8 @@ describe Projects::MergeRequests::CreationsController do
   end
 
   describe 'POST #create' do
+    let(:created_merge_request) { assigns(:merge_request) }
+
     def create_merge_request(overrides = {})
       params = {
         namespace_id: project.namespace.to_param,
@@ -27,8 +29,6 @@ describe Projects::MergeRequests::CreationsController do
     end
 
     context 'the approvals_before_merge param' do
-      let(:created_merge_request) { assigns(:merge_request) }
-
       before do
         project.update(approvals_before_merge: 2)
       end
@@ -94,6 +94,46 @@ describe Projects::MergeRequests::CreationsController do
         it 'creates the merge request' do
           expect(created_merge_request).to be_valid
           expect(response).to redirect_to(project_merge_request_path(project, created_merge_request))
+        end
+      end
+    end
+
+    context 'overriding approvers per MR' do
+      let(:new_approver) { create(:user) }
+
+      before do
+        project.add_developer(new_approver)
+        project.update(disable_overriding_approvers_per_merge_request: disable_overriding_approvers_per_merge_request)
+
+        create_merge_request(
+          approval_rules_attributes: [
+            {
+              name: 'Test',
+              user_ids: [new_approver.id],
+              approvals_required: 1
+            }
+          ]
+        )
+      end
+
+      context 'enabled' do
+        let(:disable_overriding_approvers_per_merge_request) { false }
+
+        it 'does create approval rules' do
+          approval_rules = created_merge_request.reload.approval_rules
+
+          expect(approval_rules.count).to eq(1)
+          expect(approval_rules.first.name).to eq('Test')
+          expect(approval_rules.first.user_ids).to eq([new_approver.id])
+          expect(approval_rules.first.approvals_required).to eq(1)
+        end
+      end
+
+      context 'disabled' do
+        let(:disable_overriding_approvers_per_merge_request) { true }
+
+        it 'does not create approval rules' do
+          expect(created_merge_request.reload.approval_rules).to be_empty
         end
       end
     end
