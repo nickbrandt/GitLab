@@ -1,5 +1,0 @@
----
-title: Don't send CI usage email notifications for self-hosted instances
-merge_request: 14809
-author:
-type: fixed

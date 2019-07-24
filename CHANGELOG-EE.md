@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.1
+
+### Fixed (1 change)
+
+- Don't send CI usage email notifications for self-hosted instances. !14809
+
+
 ## 12.1.0
 
 ### Security (2 changes)
