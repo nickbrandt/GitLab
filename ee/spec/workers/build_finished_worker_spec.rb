@@ -22,6 +22,7 @@ describe BuildFinishedWorker do
 
   describe '#perform' do
     before do
+      allow(Gitlab).to receive(:com?).and_return(true)
       allow_any_instance_of(EE::Project).to receive(:shared_runners_minutes_limit_enabled?).and_return(true)
     end
 
