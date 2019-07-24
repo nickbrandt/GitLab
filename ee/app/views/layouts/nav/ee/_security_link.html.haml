@@ -1,0 +1,12 @@
+- if @group.feature_available?(:security_dashboard)
+  = nav_link(path: 'groups/security/dashboard#show') do
+    = link_to group_security_dashboard_path(@group), title: _('Security') do
+      .nav-icon-container
+        = sprite_icon('shield')
+      %span.nav-item-name
+        = _('Security')
+    %ul.sidebar-sub-level-items.is-fly-out-only
+      = nav_link(path: 'groups/security/dashboard#show') do
+        = link_to group_security_dashboard_path(@group), title: _('Security') do
+          %strong.fly-out-top-item-name
+            = _('Security')
