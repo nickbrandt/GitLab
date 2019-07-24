@@ -2,6 +2,8 @@
 
 class CiMinutesUsageNotifyService < BaseService
   def execute
+    return unless ::Gitlab.com?
+
     notify_on_total_usage
     notify_on_partial_usage
   end
