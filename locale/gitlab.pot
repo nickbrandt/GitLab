@@ -12232,6 +12232,9 @@ msgstr ""
 msgid "Security"
 msgstr ""
 
+msgid "Security & Compliance"
+msgstr ""
+
 msgid "Security Dashboard"
 msgstr ""
 
