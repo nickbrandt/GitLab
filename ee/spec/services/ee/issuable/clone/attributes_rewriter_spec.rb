@@ -9,33 +9,35 @@ describe Issuable::Clone::AttributesRewriter do
   let(:original_issue) { create(:issue, project: project) }
 
   context 'when a new object is a group entity' do
-    let(:new_epic) { create(:epic, group: group) }
+    context 'when entity is an epic' do
+      let(:new_epic) { create(:epic, group: group) }
 
-    subject { described_class.new(user, original_issue, new_epic) }
+      subject { described_class.new(user, original_issue, new_epic) }
 
-    context 'setting labels' do
-      let!(:project_label1) { create(:label, title: 'label1', project: project) }
-      let!(:project_label2) { create(:label, title: 'label2', project: project) }
-      let!(:group_label1) { create(:group_label, title: 'group_label', group: group) }
-      let!(:group_label2) { create(:group_label, title: 'label2', group: group) }
+      context 'setting labels' do
+        let(:project_label1) { create(:label, title: 'label1', project: project) }
+        let!(:project_label2) { create(:label, title: 'label2', project: project) }
+        let(:group_label1) { create(:group_label, title: 'group_label', group: group) }
+        let!(:group_label2) { create(:group_label, title: 'label2', group: group) }
 
-      it 'keeps group labels and merges project labels where possible' do
-        original_issue.update(labels: [project_label1, project_label2, group_label1])
+        it 'keeps group labels and merges project labels where possible' do
+          original_issue.update(labels: [project_label1, project_label2, group_label1])
 
-        subject.execute
+          subject.execute
 
-        expect(new_epic.reload.labels).to match_array([group_label1, group_label2])
+          expect(new_epic.reload.labels).to match_array([group_label1, group_label2])
+        end
       end
-    end
 
-    context 'setting milestones' do
-      it 'sets milestone to nil when old issue milestone is not a group milestone' do
-        milestone = create(:milestone, title: 'milestone', project: project)
-        original_issue.update(milestone: milestone)
+      context 'setting milestones' do
+        it 'sets milestone attribute as nil' do
+          milestone = create(:milestone, title: 'milestone', group: group)
+          original_issue.update(milestone: milestone)
 
-        subject.execute
+          expect(new_epic).to receive(:update).with(labels: [], milestone: nil)
 
-        expect(new_epic.reload.milestone).to be_nil
+          subject.execute
+        end
       end
     end
   end

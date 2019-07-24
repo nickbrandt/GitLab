@@ -4,7 +4,7 @@ import Modal from '~/vue_shared/components/gl_modal.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 
 import DismissalNote from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
-import DismissalCommentBox from 'ee/vue_shared/security_reports/components/dismissal_comment_box.vue';
+import DismissalCommentBoxToggle from 'ee/vue_shared/security_reports/components/dismissal_comment_box_toggle.vue';
 import DismissalCommentModalFooter from 'ee/vue_shared/security_reports/components/dismissal_comment_modal_footer.vue';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
@@ -16,7 +16,7 @@ import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vuln
 export default {
   components: {
     DismissalNote,
-    DismissalCommentBox,
+    DismissalCommentBoxToggle,
     DismissalCommentModalFooter,
     EventItem,
     ExpandButton,
@@ -88,9 +88,9 @@ export default {
         this.vulnerability && this.vulnerability.remediations && this.vulnerability.remediations[0]
       );
     },
-    /**
-     * The slot for the footer should be rendered if any of the conditions is true.
-     */
+    renderSolutionCard() {
+      return this.solution || this.remediation;
+    },
     shouldRenderFooterSection() {
       return !this.modal.isResolved && (this.canCreateIssue || this.canDismissVulnerability);
     },
@@ -155,12 +155,29 @@ export default {
     },
   },
   methods: {
-    dismissVulnerabilityWithComment() {
+    handleDismissalCommentSubmission() {
+      if (this.dismissalFeedback) {
+        this.addDismissalComment();
+      } else {
+        this.addCommentAndDismiss();
+      }
+    },
+    addCommentAndDismiss() {
       if (this.localDismissalComment.length) {
         this.$emit('dismissVulnerability', this.localDismissalComment);
       } else {
-        this.dismissalCommentErrorMessage = __('Please add a comment in the text area above');
+        this.addDismissalError();
       }
+    },
+    addDismissalComment() {
+      if (this.localDismissalComment.length) {
+        this.$emit('addDismissalComment', this.localDismissalComment);
+      } else {
+        this.addDismissalError();
+      }
+    },
+    addDismissalError() {
+      this.dismissalCommentErrorMessage = __('Please add a comment in the text area above');
     },
     clearDismissalError() {
       this.dismissalCommentErrorMessage = '';
@@ -203,11 +220,13 @@ export default {
       <div v-if="dismissalFeedback || modal.isCommentingOnDismissal" class="card my-4">
         <div class="card-body">
           <dismissal-note :feedback="dismissalFeedbackObject" :project="project" />
-          <dismissal-comment-box
-            v-if="modal.isCommentingOnDismissal"
+          <dismissal-comment-box-toggle
+            v-if="!dismissalFeedback || !dismissalFeedback.comment_details"
             v-model="localDismissalComment"
+            :is-active="modal.isCommentingOnDismissal"
             :error-message="dismissalCommentErrorMessage"
-            @submit="dismissVulnerabilityWithComment"
+            @openDismissalCommentBox="$emit('openDismissalCommentBox')"
+            @submit="handleDismissalCommentSubmission"
             @clearError="clearDismissalError"
           />
         </div>
@@ -218,7 +237,9 @@ export default {
     <div slot="footer">
       <dismissal-comment-modal-footer
         v-if="modal.isCommentingOnDismissal"
-        @dismissVulnerability="dismissVulnerabilityWithComment"
+        :is-dismissed="vulnerability.isDismissed"
+        @addCommentAndDismiss="addCommentAndDismiss"
+        @addDismissalComment="addDismissalComment"
         @cancel="$emit('closeDismissalCommentBox')"
       />
       <modal-footer

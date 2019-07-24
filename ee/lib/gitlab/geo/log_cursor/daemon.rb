@@ -132,7 +132,7 @@ module Gitlab
         end
 
         def log_level
-          options[:debug] ? :debug : Rails.logger.level
+          options[:debug] ? :debug : Rails.logger.level # rubocop:disable Gitlab/RailsLogger
         end
 
         def event_data(event_log)

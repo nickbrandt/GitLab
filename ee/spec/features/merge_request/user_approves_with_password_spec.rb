@@ -16,9 +16,9 @@ describe 'Merge request > User approves with password', :js do
   end
 
   it 'works, when user approves and enters correct password' do
-    page.within('.js-mr-approvals') do
-      approve_with_password '12345678'
+    approve_with_password '12345678'
 
+    page.within('.js-mr-approvals') do
       expect(page).not_to have_button('Approve')
       expect(page).to have_text('Approved by')
     end
@@ -33,21 +33,27 @@ describe 'Merge request > User approves with password', :js do
   end
 
   it 'shows error, when user approves and enters incorrect password' do
-    page.within('.js-mr-approvals') do
-      approve_with_password 'nottherightpassword'
+    approve_with_password 'nottherightpassword'
 
+    page.within('.js-mr-approvals-modal') do
       expect(page).to have_text('Approval password is invalid.')
       click_button 'Cancel'
-      expect(page).not_to have_text('Approved by')
     end
+
+    expect(page).not_to have_text('Approved by')
   end
 end
 
 def approve_with_password(password)
-  click_button('Approve')
-  fill_in(type: 'password', with: password)
-  click_button('Confirm')
-  wait_for_requests
+  page.within('.js-mr-approvals') do
+    click_button('Approve')
+  end
+
+  page.within('#approvals-auth') do
+    fill_in(type: 'password', with: password)
+    click_button('Approve')
+    wait_for_requests
+  end
 end
 
 def unapprove

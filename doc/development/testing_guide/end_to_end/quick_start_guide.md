@@ -101,7 +101,7 @@ it 'replaces an existing label if it has the same key' do
   page.find('#content-body').click
   page.refresh
 
-  labels_block = page.find('.qa-labels-block')
+  labels_block = page.find(%q([data-qa-selector="labels_block"]))
 
   expect(labels_block).to have_content('animal::dolphin')
   expect(labels_block).not_to have_content('animal::fox')
@@ -116,9 +116,9 @@ end
 Below are the steps that the test covers:
 
 1. The test finds the 'Edit' link for the labels and clicks on it.
-2. Then it fills in the 'Assign labels' input field with the value 'animal::dolphin' and press enters.
-3. Then it clicks in the content body to apply the label and refreshes the page.
-4. Finally, the expectations check that the previous scoped label was removed and that the new one was added.
+1. Then it fills in the 'Assign labels' input field with the value 'animal::dolphin' and press enters.
+1. Then it clicks in the content body to apply the label and refreshes the page.
+1. Finally, the expectations check that the previous scoped label was removed and that the new one was added.
 
 Let's now see how the second test case would look.
 
@@ -130,7 +130,7 @@ it 'keeps both scoped labels when adding a label with a different key' do
   page.find('#content-body').click
   page.refresh
 
-  labels_block = page.find('.qa-labels-block')
+  labels_block = page.find(%q([data-qa-selector="labels_block"]))
 
   expect(labels_block).to have_content('animal::fox')
   expect(labels_block).to have_content('plant::orchid')
@@ -139,14 +139,14 @@ it 'keeps both scoped labels when adding a label with a different key' do
 end
 ```
 
-> Note that elements are always located using CSS selectors, and a good practice is to add test-specific selectors (this is called adding testability to the application and we will talk more about it later.) For example, the `labels_block` element uses the selector `.qa-labels-block`, which was added specifically for testing purposes.
+> Note that elements are always located using CSS selectors, and a good practice is to add test-specific selectors (this is called "testability"). For example, the `labels_block` element uses the CSS selector [`data-qa-selector="labels_block"`](page_objects.md#data-qa-selector-vs-qa-selector), which was added specifically for testing purposes.
 
 Below are the steps that the test covers:
 
 1. The test finds the 'Edit' link for the labels and clicks on it.
-2. Then it fills in the 'Assign labels' input field with the value 'plant::orchid' and press enters.
-3. Then it clicks in the content body to apply the label and refreshes the page.
-4. Finally, the expectations check that both scoped labels are present.
+1. Then it fills in the 'Assign labels' input field with the value 'plant::orchid' and press enters.
+1. Then it clicks in the content body to apply the label and refreshes the page.
+1. Finally, the expectations check that both scoped labels are present.
 
 > Similar to the previous test, this one is also very straightforward, but there is some code duplication. Let's address it.
 
@@ -168,7 +168,7 @@ end
 it 'replaces an existing label if it has the same key' do
   select_label_and_refresh @new_label_same_scope
 
-  labels_block = page.find('.qa-labels-block')
+  labels_block = page.find(%q([data-qa-selector="labels_block"]))
 
   expect(labels_block).to have_content(@new_label_same_scope)
   expect(labels_block).not_to have_content(@initial_label)
@@ -179,7 +179,7 @@ end
 it 'keeps both scoped label when adding a label with a different key' do
   select_label_and_refresh @new_label_different_scope
 
-  labels_block = page.find('.qa-labels-block')
+  labels_block = page.find(%q([data-qa-selector="labels_block"]))
 
   expect(labels_blocks).to have_content(@new_label_different_scope)
   expect(labels_blocks).to have_content(@initial_label)
@@ -222,7 +222,7 @@ As the pre-conditions for our test suite, the things that needs to happen before
 - A project being created with an issue and labels already set;
 - The issue page being opened with only one scoped label applied to it.
 
-> When running end-to-end tests as part of the GitLab's continuous integration process [a license is already set as an environment variable](https://gitlab.com/gitlab-org/gitlab-ee/blob/1a60d926740db10e3b5724713285780a4f470531/qa/qa/ee/strategy.rb#L20). For running tests locally you can set up such license by following the document [what tests can be run?](https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/what_tests_can_be_run.md#supported-remote-grid-environment-variables), based on the [supported GitLab environment variables](https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/what_tests_can_be_run.md#supported-gitlab-environment-variables).
+> When running end-to-end tests as part of the GitLab's continuous integration process [a license is already set as an environment variable](https://gitlab.com/gitlab-org/gitlab-ee/blob/1a60d926740db10e3b5724713285780a4f470531/qa/qa/ee/strategy.rb#L20). For running tests locally you can set up such license by following the document [what tests can be run?](https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/what_tests_can_be_run.md), based on the [supported GitLab environment variables](https://gitlab.com/gitlab-org/gitlab-qa/blob/master/docs/what_tests_can_be_run.md#supported-gitlab-environment-variables).
 
 #### Implementation
 
@@ -290,7 +290,7 @@ As already mentioned in the [best practices](best_practices.md) document, end-to
 Some improvements that we could make in our test suite to optimize its time to run are:
 
 1. Having a single test case (an `it` block) that exercises both scenarios to avoid "wasting" time in the tests' pre-conditions, instead of having two different test cases.
-2. Making the selection of labels more performant by allowing for the selection of more than one label in the same reusable method.
+1. Making the selection of labels more performant by allowing for the selection of more than one label in the same reusable method.
 
 Let's look at a suggestion that addresses the above points, one by one:
 
@@ -305,7 +305,7 @@ module QA
         it 'correctly applies scoped labels depending on if they are from the same or a different scope' do
           select_labels_and_refresh [@new_label_same_scope, @new_label_different_scope]
 
-          labels_block = page.all('.qa-labels-block')
+          labels_block = page.all(%q([data-qa-selector="labels_block"]))
 
           expect(labels_block).to have_content(@new_label_same_scope)
           expect(labels_block).to have_content(@new_label_different_scope)
@@ -332,8 +332,8 @@ To address point 1, we changed the test implementation from two `it` blocks into
 > Notice that the implementation of the new and unique `it` block had to change a little bit. Below we describe in details what it does.
 
 1. It selects two scoped labels simultaneously, one from the same scope of the one already applied in the issue during the setup phase (in the `before` block), and another one from a different scope.
-2. It asserts that the correct labels are visible in the `labels_block`, and that the labels were correctly added and removed;
-3. Finally, the `select_label_and_refresh` method is changed to `select_labels_and_refresh`, which accepts an array of labels instead of a single label, and it iterates on them for faster label selection (this is what is used in step 1 explained above.)
+1. It asserts that the correct labels are visible in the `labels_block`, and that the labels were correctly added and removed;
+1. Finally, the `select_label_and_refresh` method is changed to `select_labels_and_refresh`, which accepts an array of labels instead of a single label, and it iterates on them for faster label selection (this is what is used in step 1 explained above.)
 
 ### 7. Resources
 
@@ -542,9 +542,9 @@ end
 Notice that we have not only moved the `select_labels_and_refresh` method, but we have also changed its implementation to:
 
 1. Click the `:edit_link_labels` element previously defined, instead of using `find('.block.labels .edit-link').click`
-2. Use `within_element(:dropdown_menu_labels, text: label)`, and inside of it, we call `send_keys_to_element(:dropdown_input_field, [label, :enter])`, which is a method that we will implement in the `QA::Page::Base` class to replace `find('.dropdown-menu-labels .dropdown-input-field').send_keys [label, :enter]`
-3. Use `click_body` after iterating on each label, instead of using `find('#content-body').click`
-4. Iterate on every label again, and then we use `has_element?(:labels_block, text: label)` after clicking the page body (which applies the labels), and before refreshing the page, to avoid test flakiness due to refreshing too fast.
+1. Use `within_element(:dropdown_menu_labels, text: label)`, and inside of it, we call `send_keys_to_element(:dropdown_input_field, [label, :enter])`, which is a method that we will implement in the `QA::Page::Base` class to replace `find('.dropdown-menu-labels .dropdown-input-field').send_keys [label, :enter]`
+1. Use `click_body` after iterating on each label, instead of using `find('#content-body').click`
+1. Iterate on every label again, and then we use `has_element?(:labels_block, text: label)` after clicking the page body (which applies the labels), and before refreshing the page, to avoid test flakiness due to refreshing too fast.
 
 ##### Details of `text_of_labels_block`
 
@@ -552,37 +552,36 @@ The `text_of_labels_block` method is a simple method that returns the `:labels_b
 
 #### Updates in the view (*.html.haml) and `dropdowns_helper.rb` files
 
-Now let's change the view and the `dropdowns_helper` files to add the selectors that relate to the Page Object.
+Now let's change the view and the `dropdowns_helper` files to add the selectors that relate to the [Page Objects].
 
-In the [app/views/shared/issuable/_sidebar.html.haml](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/app/views/shared/issuable/_sidebar.html.haml) file, on [line 105 ](https://gitlab.com/gitlab-org/gitlab-ee/blob/84043fa72ca7f83ae9cde48ad670e6d5d16501a3/app/views/shared/issuable/_sidebar.html.haml#L105), add an extra class `qa-edit-link-labels`.
-
-The code should look like this:
-
-```haml
-= link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right qa-edit-link-labels'
-```
-
-In the same file, on [line 121](https://gitlab.com/gitlab-org/gitlab-ee/blob/84043fa72ca7f83ae9cde48ad670e6d5d16501a3/app/views/shared/issuable/_sidebar.html.haml#L121), add an extra class `.qa-dropdown-menu-labels`.
+In  [`app/views/shared/issuable/_sidebar.html.haml:105`](https://gitlab.com/gitlab-org/gitlab-ee/blob/7ca12defc7a965987b162a6ebef302f95dc8867f/app/views/shared/issuable/_sidebar.html.haml#L105), add a `data: { qa_selector: 'edit_link_labels' }` data attribute.
 
 The code should look like this:
 
 ```haml
-.dropdown-menu.dropdown-select.dropdown-menu-paging.dropdown-menu-labels.dropdown-menu-selectable.qa-dropdown-menu-labels
+= link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right', data: { qa_selector: 'edit_link_labels' }
 ```
 
-In the [`dropdowns_helper.rb`](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/app/helpers/dropdowns_helper.rb) file, on [line 94](https://gitlab.com/gitlab-org/gitlab-ee/blob/99e51a374f2c20bee0989cac802e4b5621f72714/app/helpers/dropdowns_helper.rb#L94), add an extra class `qa-dropdown-input-field`.
+In the same file, on [line 121](https://gitlab.com/gitlab-org/gitlab-ee/blob/7ca12defc7a965987b162a6ebef302f95dc8867f/app/views/shared/issuable/_sidebar.html.haml#L121), add a `data: { qa_selector: 'dropdown_menu_labels' }` data attribute.
+
+The code should look like this:
+
+```haml
+.dropdown-menu.dropdown-select.dropdown-menu-paging.dropdown-menu-labels.dropdown-menu-selectable.dropdown-extended-height{ data: { qa_selector: 'dropdown_menu_labels' } }
+```
+
+In [`app/helpers/dropdowns_helper.rb:94`](https://gitlab.com/gitlab-org/gitlab-ee/blob/7ca12defc7a965987b162a6ebef302f95dc8867f/app/helpers/dropdowns_helper.rb#L94), add a `data: { qa_selector: 'dropdown_input_field' }` data attribute.
 
 The code should look like this:
 
 ```ruby
-filter_output = search_field_tag search_id, nil, class: "dropdown-input-field qa-dropdown-input-field", placeholder: placeholder, autocomplete: 'off'
+filter_output = search_field_tag search_id, nil, class: "dropdown-input-field", placeholder: placeholder, autocomplete: 'off', data: { qa_selector: 'dropdown_input_field' }
 ```
 
-> Classes starting with `qa-` are used for testing purposes only, and by defining such classes in the elements we add **testability** in the application.
+> `data-qa-*` data attributes and CSS classes starting with `qa-` are used solely for the purpose of QA and testing.
+> By defining these, we add **testability** to the application.
 
-> When defining a class like `qa-labels-block`, it is transformed into `:labels_block` for usage in the Page Objects. So, `qa-edit-link-labels` is transformed into `:edit_link_labels`, `qa-dropdown-menu-labels` is transformed into `:dropdown_menu_labels`, and `qa-dropdown-input-field` is transformed into `:dropdown_input_field`. Also, we use a [sanity test](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/qa/page#how-did-we-solve-fragile-tests-problem) to check that defined elements have their respective `qa-` selectors in the specified views.
-
-> We did not define the `qa-labels-block` class in the `app/views/shared/issuable/_sidebar.html.haml` file because it was already there to be used.
+> When defining a data attribute like: `qa_selector: 'labels_block'`, it should match the element definition: `element :labels_block`. We use a [sanity test](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/qa/qa/page#how-did-we-solve-fragile-tests-problem) to check that defined elements have their respective selectors in the specified views.
 
 #### Updates in the `QA::Page::Base` class
 

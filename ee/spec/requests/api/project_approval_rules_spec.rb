@@ -71,6 +71,21 @@ describe API::ProjectApprovalRules do
           expect(rule['groups'].size).to eq(1)
         end
       end
+
+      context 'report_approver rules' do
+        let!(:report_approver_rule) do
+          create(:approval_project_rule, :security_report, project: project)
+        end
+
+        it 'includes report_approver rules' do
+          get api(url, developer)
+
+          json = json_response
+
+          expect(json['rules'].size).to eq(2)
+          expect(json['rules'].map { |rule| rule['name'] }).to contain_exactly(rule.name, report_approver_rule.name)
+        end
+      end
     end
   end
 
@@ -117,6 +132,14 @@ describe API::ProjectApprovalRules do
         post api(url, current_user), params: params
 
         expect(json_response.symbolize_keys).to include(params)
+      end
+
+      it 'sets rule_type as report_approver if name matches default name for security reports' do
+        expect do
+          post api(url, current_user), params: params.merge(name: ApprovalProjectRule::DEFAULT_NAME_FOR_SECURITY_REPORT)
+        end.to change { ApprovalProjectRule.report_approver.count }.from(0).to(1)
+
+        expect(response).to have_gitlab_http_status(201)
       end
     end
   end

@@ -44,11 +44,13 @@ describe MergeRequests::RefreshService do
       let(:current_user) { merge_request.author }
       let(:service) { described_class.new(project, current_user) }
       let(:enable_code_owner) { true }
+      let(:enable_report_approver_rules) { true }
       let(:todo_service) { double(:todo_service) }
       let(:notification_service) { double(:notification_service) }
 
       before do
         stub_licensed_features(code_owners: enable_code_owner)
+        stub_licensed_features(report_approver_rules: enable_report_approver_rules)
 
         allow(service).to receive(:mark_pending_todos_done)
         allow(service).to receive(:notify_about_push)
@@ -83,6 +85,20 @@ describe MergeRequests::RefreshService do
             expect(::MergeRequests::SyncCodeOwnerApprovalRules)
               .to receive(:new).with(merge_request).and_return(fake_refresh_service)
             expect(fake_refresh_service).to receive(:execute)
+          end
+
+          subject
+        end
+      end
+
+      context 'when report_approver_rules enabled, with approval_rule enabled' do
+        let(:relevant_merge_requests) { [merge_request, another_merge_request] }
+
+        it 'refreshes the report_approver rules for all relevant merge requests' do
+          relevant_merge_requests.each do |merge_request|
+            expect_next_instance_of(::MergeRequests::SyncReportApproverApprovalRules, merge_request) do |service|
+              expect(service).to receive(:execute)
+            end
           end
 
           subject

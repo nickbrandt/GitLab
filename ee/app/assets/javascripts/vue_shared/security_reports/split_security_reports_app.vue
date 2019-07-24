@@ -214,11 +214,9 @@ export default {
     ...mapActions([
       'setHeadBlobPath',
       'setSourceBranch',
-      'setSastHeadPath',
       'setDependencyScanningHeadPath',
       'setSastContainerHeadPath',
       'setDastHeadPath',
-      'fetchSastReports',
       'fetchDependencyScanningReports',
       'fetchSastContainerReports',
       'fetchDastReports',
@@ -237,7 +235,12 @@ export default {
       'openDismissalCommentBox',
       'closeDismissalCommentBox',
       'downloadPatch',
+      'addDismissalComment',
     ]),
+    ...mapActions('sast', {
+      setSastHeadPath: 'setHeadPath',
+      fetchSastReports: 'fetchReports',
+    }),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {
         return sprintf(s__('ciReport|%{reportType} detected no vulnerabilities'), {
@@ -327,6 +330,7 @@ export default {
       @openDismissalCommentBox="openDismissalCommentBox()"
       @revertDismissVulnerability="revertDismissVulnerability"
       @downloadPatch="downloadPatch"
+      @addDismissalComment="addDismissalComment({ comment: $event })"
     />
   </div>
 </template>

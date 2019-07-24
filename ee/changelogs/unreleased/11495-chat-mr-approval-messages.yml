@@ -1,0 +1,5 @@
+---
+title: Add support for partial approval in chat message merge request event handler
+merge_request:
+author:
+type: fixed

@@ -1,0 +1,5 @@
+---
+title: Build cascading train refs for parallel execution of Pipelines for merge trains
+merge_request: 14296
+author:
+type: added

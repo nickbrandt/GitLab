@@ -55,7 +55,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
     server['tls_options'] ||= {}
 
     if server['ssl_version'] || server['ca_file']
-      Rails.logger.warn 'DEPRECATED: LDAP options `ssl_version` and `ca_file` should be nested within `tls_options`'
+      Rails.logger.warn 'DEPRECATED: LDAP options `ssl_version` and `ca_file` should be nested within `tls_options`' # rubocop:disable Gitlab/RailsLogger
     end
 
     if server['ssl_version']
@@ -217,6 +217,7 @@ Gitlab.ee do
   Settings['elasticsearch'] ||= Settingslogic.new({})
   Settings.elasticsearch['enabled'] = false if Settings.elasticsearch['enabled'].nil?
   Settings.elasticsearch['url'] = ENV['ELASTIC_URL'] || "http://localhost:9200"
+  Settings.elasticsearch['indexer_path'] ||= Gitlab::Utils.which('gitlab-elasticsearch-indexer')
 end
 
 #

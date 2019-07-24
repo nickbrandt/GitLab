@@ -542,6 +542,80 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('REQUEST_DISMISSAL_COMMENT', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.REQUEST_ADD_DISMISSAL_COMMENT](state);
+    });
+
+    it('should set isDismissingVulnerability to true', () => {
+      expect(state.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to true', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should nullify the error state on the modal', () => {
+      expect(state.modal.error).toBeNull();
+    });
+  });
+
+  describe('RECEIVE_DISMISSAL_COMMENT_SUCCESS', () => {
+    let state;
+    let payload;
+    let vulnerability;
+    let data;
+
+    beforeEach(() => {
+      state = createState();
+      state.vulnerabilities = mockData;
+      [vulnerability] = mockData;
+      data = { name: 'dismissal feedback' };
+      payload = { id: vulnerability.id, data };
+      mutations[types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload);
+    });
+
+    it('should set the dismissal feedback on the passed vulnerability', () => {
+      expect(state.vulnerabilities[0].dismissal_feedback).toEqual(data);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(state.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability on the modal to false', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDissmissed on the modal vulnerability to be true', () => {
+      expect(state.modal.vulnerability.isDismissed).toBe(true);
+    });
+  });
+
+  describe('RECEIVE_DISMISSAL_COMMENT_ERROR', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(state.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to false', () => {
+      expect(state.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set the error state on the modal', () => {
+      expect(state.modal.error).toEqual('There was an error adding the comment.');
+    });
+  });
+
   describe('REQUEST_REVERT_DISMISSAL', () => {
     let state;
 

@@ -114,7 +114,7 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
         redis.sadd("session:lookup:user:gitlab:#{user.id}", session_ids)
       end
 
-      expect(ActiveSession.session_ids_for_user(user)).to eq(session_ids)
+      expect(ActiveSession.session_ids_for_user(user.id)).to eq(session_ids)
     end
   end
 
@@ -131,6 +131,19 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
       expect(Gitlab::Redis::SharedState).not_to receive(:with)
 
       expect(ActiveSession.sessions_from_ids([])).to eq([])
+    end
+
+    it 'uses redis lookup in batches' do
+      stub_const('ActiveSession::SESSION_BATCH_SIZE', 1)
+
+      redis = double(:redis)
+      expect(Gitlab::Redis::SharedState).to receive(:with).and_yield(redis)
+
+      sessions = ['session-a', 'session-b']
+      mget_responses = sessions.map { |session| [Marshal.dump(session)]}
+      expect(redis).to receive(:mget).twice.and_return(*mget_responses)
+
+      expect(ActiveSession.sessions_from_ids([1, 2])).to eql(sessions)
     end
   end
 

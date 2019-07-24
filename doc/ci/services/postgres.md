@@ -25,6 +25,13 @@ variables:
   POSTGRES_PASSWORD: ""
 ```
 
+NOTE: **Note:**
+The `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` variables can't be set in
+the GitLab UI. To set them, assign them to a variable
+[in the UI](../variables/README.md#via-the-ui), and then assign that
+variable to the `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` variables in
+your `.gitlab-ci.yml`.
+
 And then configure your application to use the database, for example:
 
 ```yaml
@@ -70,7 +77,7 @@ template1=# CREATE USER runner WITH PASSWORD '$password' CREATEDB;
 ```
 
 *__Note:__ Notice that we created the user with the privilege to be able to
-create databases (`CREATEDB`). In the following steps we will create a database 
+create databases (`CREATEDB`). In the following steps we will create a database
 explicitly for that user but having that privilege can be useful if in your
 testing framework you have tools that drop and create databases.*
 

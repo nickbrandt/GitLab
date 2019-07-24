@@ -118,7 +118,7 @@ module Projects
         def compare_token(expected, actual)
           return unless expected && actual
 
-          ActiveSupport::SecurityUtils.variable_size_secure_compare(expected, actual)
+          ActiveSupport::SecurityUtils.secure_compare(expected, actual)
         end
 
         def send_alert_email

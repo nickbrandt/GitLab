@@ -52,7 +52,7 @@ function delete() {
 function get_pod() {
   local app_name="${1}"
   local status="${2-Running}"
-  get_pod_cmd="kubectl get pods -n ${KUBE_NAMESPACE} --field-selector=status.phase=${status} -lapp=${app_name},release=${CI_ENVIRONMENT_SLUG} --no-headers -o=custom-columns=NAME:.metadata.name"
+  get_pod_cmd="kubectl get pods -n ${KUBE_NAMESPACE} --field-selector=status.phase=${status} -lapp=${app_name},release=${CI_ENVIRONMENT_SLUG} --no-headers -o=custom-columns=NAME:.metadata.name | tail -n 1"
   echoinfo "Waiting till '${app_name}' pod is ready" true
   echoinfo "Running '${get_pod_cmd}'"
 
@@ -132,13 +132,14 @@ function install_external_dns() {
     echoinfo "Installing external-dns Helm chart"
     helm repo update
     # Default requested: CPU => 0, memory => 0
-    helm install stable/external-dns \
+    helm install stable/external-dns --version '^2.2.1' \
       -n "${release_name}" \
       --namespace "${KUBE_NAMESPACE}" \
       --set provider="aws" \
-      --set aws.secretKey="${REVIEW_APPS_AWS_SECRET_KEY}" \
-      --set aws.accessKey="${REVIEW_APPS_AWS_ACCESS_KEY}" \
+      --set aws.credentials.secretKey="${REVIEW_APPS_AWS_SECRET_KEY}" \
+      --set aws.credentials.accessKey="${REVIEW_APPS_AWS_ACCESS_KEY}" \
       --set aws.zoneType="public" \
+      --set aws.batchChangeSize=400 \
       --set domainFilters[0]="${domain}" \
       --set txtOwnerId="${KUBE_NAMESPACE}" \
       --set rbac.create="true" \

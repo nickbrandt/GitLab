@@ -5,10 +5,6 @@
   }
 }
 
-.protected-environments-list {
-  @extend .protected-branches-list;
-}
-
 .project-mirror-settings {
   .fingerprint-verified {
     color: $green-500;
@@ -91,18 +87,11 @@
     .user-avatar-link {
       color: $gl-text-color;
       font-weight: $gl-font-weight-bold;
-
-      .avatar {
-        margin-right: $gl-padding-4;
-      }
-    }
-
-    svg {
-      vertical-align: sub;
     }
 
     .avatar {
       float: none;
+      margin-right: $gl-padding-4;
     }
   }
 
@@ -120,13 +109,14 @@
     min-width: $gl-padding-8 * 15;
   }
 
-  .dropdown-item svg {
-    vertical-align: sub;
-  }
-
   .btn-blank {
     padding: 6px 10px;
   }
+}
+
+.security-dashboard .card-header svg,
+.license-management .dropdown-item svg {
+  vertical-align: sub;
 }
 
 .project-template {
@@ -146,19 +136,6 @@
   }
 
   .template-group-options {
-    .options-expanded-icon {
-      display: none;
-    }
-
-    .template-option {
-      display: none;
-      background: $gray-light;
-
-      .avatar-container {
-        margin-left: 34px;
-      }
-    }
-
     &.expanded {
       .template-option {
         display: flex;
@@ -167,22 +144,30 @@
       .options-expanded-icon {
         display: block;
       }
+    }
 
-      .options-collapsed-icon {
-        display: none;
-      }
+    .options-expanded-icon,
+    &.expanded .options-collapsed-icon {
+      display: none;
+    }
+  }
+
+  .template-option {
+    display: none;
+    background: $gray-light;
+
+    .avatar-container {
+      margin-left: 34px;
     }
   }
 
   .template-input-group {
-    .selected-icon {
-      .avatar {
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        font-size: $gl-font-size;
-        margin-right: 0;
-      }
+    .avatar {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      font-size: $gl-font-size;
+      margin-right: 0;
     }
   }
 }

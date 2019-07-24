@@ -7,6 +7,7 @@ namespace :geo do
   include ActionView::Helpers::NumberHelper
 
   GEO_LICENSE_ERROR_TEXT = 'GitLab Geo is not supported with this license. Please contact the sales team: https://about.gitlab.com/sales.'.freeze
+  GEO_STATUS_COLUMN_WIDTH = 40
 
   namespace :db do |ns|
     desc 'Drops the Geo tracking database from config/database_geo.yml for the current RAILS_ENV.'
@@ -207,7 +208,6 @@ namespace :geo do
   task status: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
 
-    COLUMN_WIDTH = 40
     current_node_status = GeoNodeStatus.current_node_status
     geo_node = current_node_status.geo_node
 
@@ -227,10 +227,10 @@ namespace :geo do
       puts
     end
 
-    print 'GitLab Version: '.rjust(COLUMN_WIDTH)
+    print 'GitLab Version: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     puts Gitlab::VERSION
 
-    print 'Geo Role: '.rjust(COLUMN_WIDTH)
+    print 'Geo Role: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     role =
       if Gitlab::Geo.primary?
         'Primary'
@@ -240,7 +240,7 @@ namespace :geo do
 
     puts role
 
-    print 'Health Status: '.rjust(COLUMN_WIDTH)
+    print 'Health Status: '.rjust(GEO_STATUS_COLUMN_WIDTH)
 
     if current_node_status.healthy?
       puts current_node_status.health_status
@@ -248,65 +248,71 @@ namespace :geo do
       puts current_node_status.health_status.color(:red)
     end
 
-    print 'Repositories: '.rjust(COLUMN_WIDTH)
+    unless current_node_status.healthy?
+      print 'Health Status Summary: '.rjust(GEO_STATUS_COLUMN_WIDTH)
+      puts current_node_status.health.color(:red)
+    end
+
+    print 'Repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.repositories_failed_count)
     print "#{current_node_status.repositories_synced_count}/#{current_node_status.projects_count} "
     puts using_percentage(current_node_status.repositories_synced_in_percentage)
 
     if Gitlab::Geo.repository_verification_enabled?
-      print 'Verified Repositories: '.rjust(COLUMN_WIDTH)
+      print 'Verified Repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
       show_failed_value(current_node_status.repositories_verification_failed_count)
       print "#{current_node_status.repositories_verified_count}/#{current_node_status.projects_count} "
       puts using_percentage(current_node_status.repositories_verified_in_percentage)
     end
 
-    print 'Wikis: '.rjust(COLUMN_WIDTH)
+    print 'Wikis: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.wikis_failed_count)
     print "#{current_node_status.wikis_synced_count}/#{current_node_status.projects_count} "
     puts using_percentage(current_node_status.wikis_synced_in_percentage)
 
     if Gitlab::Geo.repository_verification_enabled?
-      print 'Verified Wikis: '.rjust(COLUMN_WIDTH)
+      print 'Verified Wikis: '.rjust(GEO_STATUS_COLUMN_WIDTH)
       show_failed_value(current_node_status.wikis_verification_failed_count)
       print "#{current_node_status.wikis_verified_count}/#{current_node_status.projects_count} "
       puts using_percentage(current_node_status.wikis_verified_in_percentage)
     end
 
-    print 'LFS Objects: '.rjust(COLUMN_WIDTH)
+    print 'LFS Objects: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.lfs_objects_failed_count)
     print "#{current_node_status.lfs_objects_synced_count}/#{current_node_status.lfs_objects_count} "
     puts using_percentage(current_node_status.lfs_objects_synced_in_percentage)
 
-    print 'Attachments: '.rjust(COLUMN_WIDTH)
+    print 'Attachments: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.attachments_failed_count)
     print "#{current_node_status.attachments_synced_count}/#{current_node_status.attachments_count} "
     puts using_percentage(current_node_status.attachments_synced_in_percentage)
 
-    print 'CI job artifacts: '.rjust(COLUMN_WIDTH)
+    print 'CI job artifacts: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     show_failed_value(current_node_status.job_artifacts_failed_count)
     print "#{current_node_status.job_artifacts_synced_count}/#{current_node_status.job_artifacts_count} "
     puts using_percentage(current_node_status.job_artifacts_synced_in_percentage)
 
     if Gitlab::CurrentSettings.repository_checks_enabled
-      print 'Repositories Checked: '.rjust(COLUMN_WIDTH)
+      print 'Repositories Checked: '.rjust(GEO_STATUS_COLUMN_WIDTH)
       show_failed_value(current_node_status.repositories_checked_failed_count)
       print "#{current_node_status.repositories_checked_count}/#{current_node_status.projects_count} "
       puts using_percentage(current_node_status.repositories_checked_in_percentage)
     end
 
-    print 'Sync Settings: '.rjust(COLUMN_WIDTH)
+    print 'Sync Settings: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     puts  geo_node.namespaces.any? ? 'Selective' : 'Full'
 
-    print 'Database replication lag: '.rjust(COLUMN_WIDTH)
+    print 'Database replication lag: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     puts "#{Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds} seconds"
 
-    print 'Last event ID seen from primary: '.rjust(COLUMN_WIDTH)
+    print 'Last event ID seen from primary: '.rjust(GEO_STATUS_COLUMN_WIDTH)
     last_event = Geo::EventLog.last
+
     if last_event
       print last_event&.id
       puts " (#{time_ago_in_words(last_event&.created_at)} ago)"
 
-      print 'Last event ID processed by cursor: '.rjust(COLUMN_WIDTH)
+      print 'Last event ID processed by cursor: '.rjust(GEO_STATUS_COLUMN_WIDTH)
       cursor_last_event_id = Geo::EventLogState.last_processed&.event_id
 
       if cursor_last_event_id
@@ -321,7 +327,7 @@ namespace :geo do
       puts 'N/A'
     end
 
-    print 'Last status report was: '.rjust(COLUMN_WIDTH)
+    print 'Last status report was: '.rjust(GEO_STATUS_COLUMN_WIDTH)
 
     if current_node_status.updated_at
       puts "#{time_ago_in_words(current_node_status.updated_at)} ago"

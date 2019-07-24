@@ -19,6 +19,7 @@ module EE
       include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
+      include IgnorableColumn
 
       ignore_column :mirror_last_update_at,
         :mirror_last_successful_update_at,
@@ -321,6 +322,12 @@ module EE
       super
     end
 
+    def visible_approval_rules
+      strong_memoize(:visible_approval_rules) do
+        visible_regular_approval_rules + approval_rules.report_approver
+      end
+    end
+
     def visible_regular_approval_rules
       strong_memoize(:visible_regular_approval_rules) do
         regular_rules = approval_rules.regular.order(:id)
@@ -571,18 +578,26 @@ module EE
     end
 
     def design_management_enabled?
-      # LFS and GraphQL are required for using Design Management
+      # LFS is required for using Design Management
       #
       # Checking both feature availability on the license, as well as the feature
       # flag, because we don't want to enable design_management by default on
       # on prem installs yet.
-      lfs_enabled? && ::Gitlab::Graphql.enabled? &&
+      lfs_enabled? &&
         feature_available?(:design_management) &&
-        ::Feature.enabled?(:design_management, self)
+        ::Feature.enabled?(:design_management_flag, self) # Named to avoid the bug: https://gitlab.com/gitlab-org/gitlab-ce/issues/64468
     end
 
     def design_repository
       @design_repository ||= DesignManagement::Repository.new(self)
+    end
+
+    def package_already_taken?(package_name)
+      namespace.root_ancestor.all_projects
+        .joins(:packages)
+        .where.not(id: id)
+        .merge(Packages::Package.with_name(package_name))
+        .exists?
     end
 
     private

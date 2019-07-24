@@ -1,0 +1,5 @@
+---
+title: Support feature flag gradualRolloutUserId strategy on backend
+merge_request: 14515
+author:
+type: added

@@ -13,9 +13,9 @@ export default class SidebarStore extends CESidebarStore {
     this.epic = {};
   }
 
-  setWeightData(data) {
+  setWeightData({ weight }) {
     this.isFetching.weight = false;
-    this.weight = data.weight || null;
+    this.weight = typeof weight === 'number' ? Number(weight) : null;
   }
 
   setWeight(newWeight) {

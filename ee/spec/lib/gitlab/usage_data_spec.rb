@@ -3,16 +3,16 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
-  before do
-    projects.last.creator.block # to get at least one non-active User
-  end
-
-  # using Array.new to create a different creator User for each of the projects
-  let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
-  let!(:board) { create(:board, project: projects[0]) }
-
   describe '#data' do
+    # using Array.new to create a different creator User for each of the projects
+    let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
+    let(:count_data) { subject[:counts] }
+
+    let!(:board) { create(:board, project: projects[0]) }
+
     before do
+      projects.last.creator.block # to get at least one non-active User
+
       pipeline = create(:ci_pipeline, project: projects[0])
       create(:ci_build, name: 'container_scanning', pipeline: pipeline)
       create(:ci_build, name: 'dast', pipeline: pipeline)
@@ -34,13 +34,11 @@ describe Gitlab::UsageData do
       # for group_view testing
       create(:user) # user with group_view = NULL (should be counted as having default value 'details')
       create(:user, group_view: :details)
-
-      create(:issue, project: projects[0], author: User.alert_bot)
     end
 
     subject { described_class.data }
 
-    it "gathers usage data" do
+    it 'gathers usage data' do
       expect(subject.keys).to include(*%i(
         historical_max_users
         license_add_ons
@@ -57,9 +55,7 @@ describe Gitlab::UsageData do
       ))
     end
 
-    it "gathers usage counts" do
-      count_data = subject[:counts]
-
+    it 'gathers usage counts' do
       expect(count_data[:boards]).to eq(1)
       expect(count_data[:projects]).to eq(3)
 
@@ -71,7 +67,6 @@ describe Gitlab::UsageData do
         epics
         feature_flags
         geo_nodes
-        incident_issues
         ldap_group_links
         ldap_keys
         ldap_users
@@ -91,18 +86,13 @@ describe Gitlab::UsageData do
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
       expect(count_data[:feature_flags]).to eq(1)
-      expect(count_data[:incident_issues]).to eq(1)
     end
 
     it 'gathers deepest epic relationship level', :postgresql do
-      count_data = subject[:counts]
-
       expect(count_data.keys).to include(:epics_deepest_relationship_level)
     end
 
     it 'gathers security products usage data' do
-      count_data = subject[:counts]
-
       expect(count_data[:container_scanning_jobs]).to eq(1)
       expect(count_data[:dast_jobs]).to eq(1)
       expect(count_data[:dependency_scanning_jobs]).to eq(1)
@@ -138,7 +128,7 @@ describe Gitlab::UsageData do
     let(:starter) { create(:license, plan: 'starter') }
     let(:old) { create(:license, plan: 'other') }
 
-    it "have expected values" do
+    it 'have expected values' do
       expect(ultimate.edition).to eq('EEU')
       expect(premium.edition).to eq('EEP')
       expect(starter.edition).to eq('EES')
@@ -149,7 +139,7 @@ describe Gitlab::UsageData do
   describe '#license_usage_data' do
     subject { described_class.license_usage_data }
 
-    it "gathers license data" do
+    it 'gathers license data' do
       license = ::License.current
 
       expect(subject[:license_md5]).to eq(Digest::MD5.hexdigest(license.data))
@@ -188,14 +178,16 @@ describe Gitlab::UsageData do
     end
 
     context 'when Service Desk is enabled' do
+      let(:project) { create(:project) }
+
       it 'gathers Service Desk data' do
-        create_list(:issue, 3, confidential: true, author: User.support_bot, project: projects[0])
+        create_list(:issue, 2, confidential: true, author: User.support_bot, project: project)
 
         stub_licensed_features(service_desk: true)
         allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(anything).and_return(true)
 
-        expect(subject).to eq(service_desk_enabled_projects: 3,
-                              service_desk_issues: 3)
+        expect(subject).to eq(service_desk_enabled_projects: 1,
+                              service_desk_issues: 2)
       end
     end
   end
@@ -235,6 +227,46 @@ describe Gitlab::UsageData do
     it 'bases counts on active users' do
       expect(subject[:default_dashboard]).to eq(1)
       expect(subject[:users_with_projects_added]).to eq(2)
+    end
+  end
+
+  describe 'count incident_issues' do
+    let(:project) { create(:project) }
+
+    subject { described_class.data.dig(:counts, :incident_issues) }
+
+    before do
+      create(:issue, project: project) # non incident issue
+    end
+
+    context 'when incident_management feature is available' do
+      before do
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'with incident issues' do
+        before do
+          create_list(:issue, 2, project: project, author: User.alert_bot)
+        end
+
+        it { is_expected.to eq(2) }
+      end
+
+      context 'without incident_issues' do
+        it { is_expected.to eq(0) }
+
+        it { expect { subject }.to change(User, :count).by(1) }
+      end
+    end
+
+    context 'when incident_management feature is not available' do
+      before do
+        stub_licensed_features(incident_management: false)
+      end
+
+      it { is_expected.to eq(0) }
+
+      it { expect { subject }.not_to change(User, :count) }
     end
   end
 end

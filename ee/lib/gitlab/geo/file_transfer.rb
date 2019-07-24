@@ -8,23 +8,26 @@ module Gitlab
     #   * Returning a detailed Result object
     class FileTransfer < Transfer
       def initialize(file_type, upload)
-        @file_type = file_type
-        @file_id = upload.id
-        @filename = upload.absolute_path
-        @request_data = build_request_data(upload)
+        super(
+          file_type,
+          upload.id,
+          upload.absolute_path,
+          upload.checksum,
+          build_request_data(file_type, upload)
+        )
       rescue ObjectStorage::RemoteStoreError
         ::Gitlab::Geo::Logger.warn "Cannot transfer a remote object."
       end
 
       private
 
-      def build_request_data(upload)
+      def build_request_data(file_type, upload)
         {
           id: upload.model_id,
           type: upload.model_type,
           checksum: upload.checksum,
-          file_type: @file_type,
-          file_id:  @file_id
+          file_type: file_type,
+          file_id: upload.id
         }
       end
     end

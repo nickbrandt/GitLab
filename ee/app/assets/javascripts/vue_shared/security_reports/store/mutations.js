@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import {
-  parseSastIssues,
   parseDependencyScanningIssues,
-  filterByKey,
   getDastSite,
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
 } from './utils';
+import filterByKey from './utils/filter_by_key';
 import { parseSastContainer } from './utils/container_scanning';
 import { visitUrl } from '~/lib/utils/url_utility';
 
@@ -55,61 +54,6 @@ export default {
 
   [types.SET_CAN_CREATE_FEEDBACK_PERMISSION](state, permission) {
     state.canCreateFeedbackPermission = permission;
-  },
-
-  // SAST
-  [types.SET_SAST_HEAD_PATH](state, path) {
-    Vue.set(state.sast.paths, 'head', path);
-  },
-
-  [types.SET_SAST_BASE_PATH](state, path) {
-    Vue.set(state.sast.paths, 'base', path);
-  },
-
-  [types.REQUEST_SAST_REPORTS](state) {
-    Vue.set(state.sast, 'isLoading', true);
-  },
-
-  /**
-   * Compares sast results and returns the formatted report
-   *
-   * Sast has 3 types of issues: newIssues, resolvedIssues and allIssues.
-   *
-   * When we have both base and head:
-   * - newIssues = head - base
-   * - resolvedIssues = base - head
-   * - allIssues = head - newIssues - resolvedIssues
-   *
-   * When we only have head
-   * - newIssues = head
-   * - resolvedIssues = 0
-   * - allIssues = 0
-   */
-  [types.RECEIVE_SAST_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const filterKey = 'cve';
-      const parsedHead = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
-      const parsedBase = parseSastIssues(reports.base, reports.enrichData, state.blobPath.base);
-
-      const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
-      const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
-      const allIssues = filterByKey(parsedHead, newIssues.concat(resolvedIssues), filterKey);
-
-      Vue.set(state.sast, 'newIssues', newIssues);
-      Vue.set(state.sast, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.sast, 'allIssues', allIssues);
-      Vue.set(state.sast, 'isLoading', false);
-    } else if (reports.head && !reports.base) {
-      const newIssues = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
-
-      Vue.set(state.sast, 'newIssues', newIssues);
-      Vue.set(state.sast, 'isLoading', false);
-    }
-  },
-
-  [types.RECEIVE_SAST_REPORTS_ERROR](state) {
-    Vue.set(state.sast, 'isLoading', false);
-    Vue.set(state.sast, 'hasError', true);
   },
 
   // SAST CONTAINER
@@ -309,34 +253,37 @@ export default {
   },
 
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
-    Vue.set(state.modal, 'isDismissingIssue', true);
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
     // reset error in case previous state was error
     Vue.set(state.modal, 'error', null);
   },
 
   [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state) {
-    Vue.set(state.modal, 'isDismissingIssue', false);
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
   },
 
-  [types.UPDATE_SAST_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
+  [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
+    Vue.set(state.modal, 'error', error);
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+  },
 
-    const newIssuesIndex = findIssueIndex(state.sast.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.sast.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
+  [types.REQUEST_ADD_DISMISSAL_COMMENT](state) {
+    state.isDismissingVulnerability = true;
+    Vue.set(state.modal, 'isDismissingVulnerability', true);
+    Vue.set(state.modal, 'error', null);
+  },
 
-    const resolvedIssuesIndex = findIssueIndex(state.sast.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.sast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-      return;
-    }
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal.vulnerability, 'isDismissed', true);
+    Vue.set(state.modal.vulnerability, 'dismissalFeedback', payload.data);
+  },
 
-    const allIssuesIndex = findIssueIndex(state.sast.allIssues, issue);
-    if (allIssuesIndex !== -1) {
-      state.sast.allIssues.splice(allIssuesIndex, 1, issue);
-    }
+  [types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR](state, error) {
+    state.isDismissingVulnerability = false;
+    Vue.set(state.modal, 'isDismissingVulnerability', false);
+    Vue.set(state.modal, 'error', error);
   },
 
   [types.UPDATE_DEPENDENCY_SCANNING_ISSUE](state, issue) {
@@ -388,11 +335,6 @@ export default {
     if (resolvedIssuesIndex !== -1) {
       state.dast.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
     }
-  },
-
-  [types.RECEIVE_DISMISS_VULNERABILITY_ERROR](state, error) {
-    Vue.set(state.modal, 'error', error);
-    Vue.set(state.modal, 'isDismissingIssue', false);
   },
 
   [types.REQUEST_CREATE_ISSUE](state) {

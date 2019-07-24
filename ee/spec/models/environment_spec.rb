@@ -124,6 +124,14 @@ describe Environment, :use_clean_rails_memory_store_caching do
 
     subject { environment.rollout_status }
 
+    context 'environment does not have a deployment board available' do
+      before do
+        allow(environment).to receive(:has_terminals?).and_return(false)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
     context 'cached rollout status is present' do
       let(:pods) { %w(pod1 pod2) }
       let(:deployments) { %w(deployment1 deployment2) }
@@ -141,7 +149,7 @@ describe Environment, :use_clean_rails_memory_store_caching do
       end
     end
 
-    context 'cached rollout status is not present' do
+    context 'cached rollout status is not present yet' do
       before do
         stub_reactive_cache(environment, nil)
       end

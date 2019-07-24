@@ -7,8 +7,6 @@ module EE
     override :sidebar_projects_paths
     def sidebar_projects_paths
       super + %w[
-        projects/dependencies#show
-        projects/security/dashboard#show
         projects/insights#show
       ]
     end
@@ -37,6 +35,10 @@ module EE
     override :get_project_nav_tabs
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
+
+      if can?(current_user, :read_project_security_dashboard, @project)
+        nav_tabs << :security
+      end
 
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
@@ -128,6 +130,13 @@ module EE
       @project.feature_available?(:merge_trains)
     end
 
+    def sidebar_security_paths
+      %w[
+        projects/security/dashboard#show
+        projects/dependencies#show
+      ]
+    end
+
     def size_limit_message(project)
       show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
 
@@ -157,7 +166,7 @@ module EE
       if pipeline.nil?
         {
           empty_state_illustration_path: image_path('illustrations/security-dashboard_empty.svg'),
-          security_dashboard_help_path: help_page_path("user/project/security_dashboard"),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard'),
           has_pipeline_data: "false"
         }
       else
@@ -169,6 +178,7 @@ module EE
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard'),
           pipeline_id: pipeline.id,
           user_path: user_url(pipeline.user),
           user_avatar_path: pipeline.user.avatar_url,

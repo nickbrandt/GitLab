@@ -9,8 +9,10 @@
     "id": { "type": "integer" },
     "environment_scope": { "type": "string" },
     "active": { "type": "boolean" },
+    "percentage": { "type": ["integer", "null"] },
     "created_at": { "type": "date" },
-    "updated_at": { "type": "date" }
+    "updated_at": { "type": "date" },
+    "strategies": { "type": "array", "items": { "$ref": "feature_flag_strategy.json" } }
   },
   "additionalProperties": false
 }

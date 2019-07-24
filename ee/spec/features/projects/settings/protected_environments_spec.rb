@@ -44,7 +44,7 @@ describe 'Protected Environments' do
     end
 
     it 'allows seeing a list of protected environments' do
-      within('.protected-environments-list') do
+      within('.protected-branches-list') do
         expect(page).to have_content('production')
         expect(page).to have_content('removed environment')
       end
@@ -60,31 +60,31 @@ describe 'Protected Environments' do
 
       wait_for_requests
 
-      within('.protected-environments-list') do
+      within('.protected-branches-list') do
         expect(page).to have_content('staging')
       end
     end
 
     it 'allows updating access to a protected environment', :js, :quarantine do
-      within('.protected-environments-list tr', text: 'production') do
+      within('.protected-branches-list tr', text: 'production') do
         set_allowed_to_deploy('Developers + Maintainers')
       end
 
       visit project_settings_ci_cd_path(project)
 
-      within('.protected-environments-list') do
+      within('.protected-branches-list') do
         expect(page).to have_content('1 role, 1 user')
       end
     end
 
     it 'allows unprotecting an environment', :js do
-      within('.protected-environments-list tr', text: 'production') do
+      within('.protected-branches-list tr', text: 'production') do
         accept_alert { click_on('Unprotect') }
       end
 
       wait_for_requests
 
-      within('.protected-environments-list') do
+      within('.protected-branches-list') do
         expect(page).not_to have_content('production')
       end
     end

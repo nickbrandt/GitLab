@@ -144,6 +144,12 @@ class Group < Namespace
     notification_settings(hierarchy_order: hierarchy_order).where(user: user)
   end
 
+  def notification_email_for(user)
+    # Finds the closest notification_setting with a `notification_email`
+    notification_settings = notification_settings_for(user, hierarchy_order: :asc)
+    notification_settings.find { |n| n.notification_email.present? }&.notification_email
+  end
+
   def to_reference(_from = nil, full: nil)
     "#{self.class.reference_prefix}#{full_path}"
   end
@@ -414,6 +420,10 @@ class Group < Namespace
 
   def project_creation_level
     super || ::Gitlab::CurrentSettings.default_project_creation
+  end
+
+  def subgroup_creation_level
+    super || ::Gitlab::Access::OWNER_SUBGROUP_ACCESS
   end
 
   private

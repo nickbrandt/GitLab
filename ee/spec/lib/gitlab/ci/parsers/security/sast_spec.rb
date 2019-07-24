@@ -22,7 +22,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
 
       it "parses all identifiers and occurrences" do
         expect(report.occurrences.length).to eq(33)
-        expect(report.identifiers.length).to eq(14)
+        expect(report.identifiers.length).to eq(17)
         expect(report.scanners.length).to eq(3)
       end
 

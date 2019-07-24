@@ -52,6 +52,9 @@ When you create a project in GitLab, you'll have access to a large number of
   templates for issue and merge request description fields for your project
 - [Slash commands (quick actions)](quick_actions.md): Textual shortcuts for
   common actions on issues or merge requests
+- [Autocomplete characters](autocomplete_characters.md): Autocomplete
+  references to users, groups, issues, merge requests, and other GitLab
+  elements.
 - [Web IDE](web_ide/index.md)
 
 **GitLab CI/CD:**
@@ -63,15 +66,15 @@ When you create a project in GitLab, you'll have access to a large number of
   to automatically set up your app's deployment
   - [Enable and disable GitLab CI](../../ci/enable_or_disable_ci.md)
   - [Pipelines](../../ci/pipelines.md): Configure and visualize
-  your GitLab CI/CD pipelines from the UI
-     - [Scheduled Pipelines](pipelines/schedules.md): Schedule a pipeline
-     to start at a chosen time
-     - [Pipeline Graphs](../../ci/pipelines.md#visualizing-pipelines): View your
-     entire pipeline from the UI
-     - [Job artifacts](pipelines/job_artifacts.md): Define,
-     browse, and download job artifacts
-     - [Pipeline settings](pipelines/settings.md): Set up Git strategy (choose the default way your repository is fetched from GitLab in a job),
-     timeout (defines the maximum amount of time in minutes that a job is able run), custom path for `.gitlab-ci.yml`, test coverage parsing, pipeline's visibility, and much more
+    your GitLab CI/CD pipelines from the UI
+    - [Scheduled Pipelines](pipelines/schedules.md): Schedule a pipeline
+      to start at a chosen time
+    - [Pipeline Graphs](../../ci/pipelines.md#visualizing-pipelines): View your
+      entire pipeline from the UI
+    - [Job artifacts](pipelines/job_artifacts.md): Define,
+      browse, and download job artifacts
+    - [Pipeline settings](pipelines/settings.md): Set up Git strategy (choose the default way your repository is fetched from GitLab in a job),
+      timeout (defines the maximum amount of time in minutes that a job is able run), custom path for `.gitlab-ci.yml`, test coverage parsing, pipeline's visibility, and much more
   - [Kubernetes cluster integration](clusters/index.md): Connecting your GitLab project
     with a Kubernetes cluster
   - [Feature Flags](operations/feature_flags.md): Feature flags allow you to ship a project in
@@ -221,7 +224,7 @@ There are numerous [APIs](../../api/README.md) to use with your projects:
 
 - [Badges](../../api/project_badges.md)
 - [Clusters](../../api/project_clusters.md)
-- [Discussions](../../api/discussions.md)
+- [Threads](../../api/discussions.md)
 - [General](../../api/projects.md)
 - [Import/export](../../api/project_import_export.md)
 - [Issue Board](../../api/boards.md)

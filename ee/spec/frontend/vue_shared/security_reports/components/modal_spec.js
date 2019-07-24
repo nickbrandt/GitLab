@@ -7,10 +7,6 @@ describe('Security Reports modal', () => {
   const Component = Vue.extend(component);
   let wrapper;
 
-  afterEach(() => {
-    wrapper.destroy();
-  });
-
   describe('with permissions', () => {
     describe('with dismissed issue', () => {
       beforeEach(() => {
@@ -30,6 +26,10 @@ describe('Security Reports modal', () => {
         expect(wrapper.text().trim()).toContain('John Smith');
         expect(wrapper.text().trim()).toContain('@jsmith');
         expect(wrapper.text().trim()).toContain('#123');
+      });
+
+      it('renders the dismissal comment placeholder', () => {
+        expect(wrapper.find('.js-comment-placeholder')).not.toBeNull();
       });
     });
 
@@ -223,6 +223,75 @@ describe('Security Reports modal', () => {
 
       expect(solutionCard.exists()).toBe(true);
       expect(wrapper.contains('hr')).toBe(false);
+    });
+  });
+
+  describe('add dismissal comment', () => {
+    const comment = "Pirates don't eat the tourists";
+    let propsData;
+
+    beforeEach(() => {
+      propsData = {
+        modal: createState().modal,
+      };
+
+      propsData.modal.isCommentingOnDismissal = true;
+    });
+
+    beforeAll(() => {
+      // https://github.com/vuejs/vue-test-utils/issues/532#issuecomment-398449786
+      Vue.config.silent = true;
+    });
+
+    afterAll(() => {
+      Vue.config.silent = false;
+    });
+
+    describe('with a non-dismissed vulnerability', () => {
+      beforeEach(() => {
+        wrapper = mount(Component, { propsData });
+      });
+
+      it('creates an error when an empty comment is submitted', () => {
+        const { vm } = wrapper;
+        vm.handleDismissalCommentSubmission();
+
+        expect(vm.dismissalCommentErrorMessage).toBe('Please add a comment in the text area above');
+      });
+
+      it('submits the comment and dismisses the vulnerability if text has been entered', () => {
+        const { vm } = wrapper;
+        vm.addCommentAndDismiss = jasmine.createSpy();
+        vm.localDismissalComment = comment;
+        vm.handleDismissalCommentSubmission();
+
+        expect(vm.addCommentAndDismiss).toHaveBeenCalled();
+        expect(vm.dismissalCommentErrorMessage).toBe('');
+      });
+    });
+
+    describe('with a dismissed vulnerability', () => {
+      beforeEach(() => {
+        propsData.modal.vulnerability.dismissal_feedback = { author: {} };
+        wrapper = mount(Component, { propsData });
+      });
+
+      it('creates an error when an empty comment is submitted', () => {
+        const { vm } = wrapper;
+        vm.handleDismissalCommentSubmission();
+
+        expect(vm.dismissalCommentErrorMessage).toBe('Please add a comment in the text area above');
+      });
+
+      it('submits the comment if text is entered and the vulnerability is already dismissed', () => {
+        const { vm } = wrapper;
+        vm.addDismissalComment = jasmine.createSpy();
+        vm.localDismissalComment = comment;
+        vm.handleDismissalCommentSubmission();
+
+        expect(vm.addDismissalComment).toHaveBeenCalled();
+        expect(vm.dismissalCommentErrorMessage).toBe('');
+      });
     });
   });
 });

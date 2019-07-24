@@ -17,10 +17,10 @@ ce_updated_base =
   end
 
 new_files_in_this_branch_not_at_the_ee_top_level =
-  run_git_command("diff #{ee_fetch_base}...HEAD --name-status --diff-filter=A -- ./ ':!ee' | cut -f2").lines.map(&:strip)
+  run_git_command("diff #{ee_fetch_base}...HEAD --name-status --diff-filter=A -- ./ ':!ee' ':!qa/qa/ee' ':!qa/qa/specs/features/ee' | cut -f2").lines.map(&:strip)
 
 ee_specific_files_in_ce_master_not_at_the_ee_top_level =
-  run_git_command("diff #{ce_updated_base}..HEAD --name-status --diff-filter=A -- ./ ':!ee' | cut -f2").lines.map(&:strip)
+  run_git_command("diff #{ce_updated_base}..HEAD --name-status --diff-filter=A -- ./ ':!ee' ':!qa/qa/ee' ':!qa/qa/specs/features/ee' | cut -f2").lines.map(&:strip)
 
 new_ee_specific_files_not_at_the_ee_top_level =
   new_files_in_this_branch_not_at_the_ee_top_level & ee_specific_files_in_ce_master_not_at_the_ee_top_level

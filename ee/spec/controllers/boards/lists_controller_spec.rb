@@ -24,10 +24,8 @@ describe Boards::ListsController do
 
       read_board_list user: user, board: board
 
-      parsed_response = JSON.parse(response.body)
-
       expect(response).to match_response_schema('lists', dir: 'ee')
-      expect(parsed_response.length).to eq 3
+      expect(json_response.length).to eq 3
     end
 
     context 'with unauthorized user' do

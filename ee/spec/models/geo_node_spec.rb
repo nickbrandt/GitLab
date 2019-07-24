@@ -379,6 +379,46 @@ describe GeoNode, :geo, type: :model do
     end
   end
 
+  describe '#name' do
+    it 'adds a trailing forward slash when name looks like url field missing slash' do
+      subject = build(:geo_node, url: 'https://foo.com', name: 'https://foo.com')
+
+      expect(subject.name).to eq('https://foo.com/')
+    end
+
+    it 'does not add a trailing forward slash when name does not looks like url field' do
+      subject = build(:geo_node, url: 'https://foo.com', name: 'https://bar.com')
+
+      expect(subject.name).to eq('https://bar.com')
+    end
+
+    it 'does not add a trailing forward slash when name is nil' do
+      subject = build(:geo_node, name: nil)
+
+      expect(subject.name).to be_nil
+    end
+
+    it 'does not add a trailing forward slash when name is an empty string' do
+      subject = build(:geo_node, name: '')
+
+      expect(subject.name).to be_empty
+    end
+  end
+
+  describe '#name=' do
+    it 'adds a trailing forward slash when name looks like url field missing slash' do
+      subject = create(:geo_node, url: 'https://foo.com', name: 'https://foo.com')
+
+      expect(subject.read_attribute(:name)).to eq('https://foo.com/')
+    end
+
+    it 'does not add a trailing forward slash when name does not looks like url field' do
+      subject = create(:geo_node, url: 'https://foo.com', name: 'https://bar.com')
+
+      expect(subject.read_attribute(:name)).to eq('https://bar.com')
+    end
+  end
+
   describe '#url' do
     it 'returns a string' do
       expect(new_node.url).to be_a String

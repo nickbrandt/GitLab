@@ -91,6 +91,7 @@ Here is a configuration example with S3.
 | `aws_access_key_id` | AWS credentials, or compatible | `ABC123DEF456` |
 | `aws_secret_access_key` | AWS credentials, or compatible | `ABC123DEF456ABC123DEF456ABC123DEF456` |
 | `aws_signature_version` | AWS signature version to use. 2 or 4 are valid options. Digital Ocean Spaces and other providers may need 2. | 4 |
+| `enable_signature_v4_streaming` | Set to true to enable HTTP chunked transfers with AWS v4 signatures (https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-streaming.html). Oracle Cloud S3 needs this to be false | true
 | `region` | AWS region | us-east-1 |
 | `host` | S3 compatible host for when not using AWS, e.g. `localhost` or `storage.example.com` | s3.amazonaws.com |
 | `endpoint` | Can be used when configuring an S3 compatible service such as [Minio](https://www.minio.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
@@ -148,20 +149,20 @@ On Omnibus installations, the settings are prefixed by `lfs_object_store_`:
 1. Edit `/etc/gitlab/gitlab.rb` and add the following lines by replacing with
    the values you want:
 
-	```ruby
-	gitlab_rails['lfs_object_store_enabled'] = true
-	gitlab_rails['lfs_object_store_remote_directory'] = "lfs-objects"
-	gitlab_rails['lfs_object_store_connection'] = {
-	  'provider' => 'AWS',
-	  'region' => 'eu-central-1',
-	  'aws_access_key_id' => '1ABCD2EFGHI34JKLM567N',
-	  'aws_secret_access_key' => 'abcdefhijklmnopQRSTUVwxyz0123456789ABCDE',
-	  # The below options configure an S3 compatible host instead of AWS
-	  'host' => 'localhost',
-	  'endpoint' => 'http://127.0.0.1:9000',
-	  'path_style' => true
-	}
-	```
+   ```ruby
+   gitlab_rails['lfs_object_store_enabled'] = true
+   gitlab_rails['lfs_object_store_remote_directory'] = "lfs-objects"
+   gitlab_rails['lfs_object_store_connection'] = {
+     'provider' => 'AWS',
+     'region' => 'eu-central-1',
+     'aws_access_key_id' => '1ABCD2EFGHI34JKLM567N',
+     'aws_secret_access_key' => 'abcdefhijklmnopQRSTUVwxyz0123456789ABCDE',
+     # The below options configure an S3 compatible host instead of AWS
+     'host' => 'localhost',
+     'endpoint' => 'http://127.0.0.1:9000',
+     'path_style' => true
+   }
+   ```
 
 1. Save the file and [reconfigure GitLab]s for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:
@@ -182,22 +183,22 @@ For source installations the settings are nested under `lfs:` and then
 1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following
    lines:
 
-	```yaml
-	lfs:
-	enabled: true
-	object_store:
-	  enabled: false
-	  remote_directory: lfs-objects # Bucket name
-	  connection:
-	    provider: AWS
-	    aws_access_key_id: 1ABCD2EFGHI34JKLM567N
-	    aws_secret_access_key: abcdefhijklmnopQRSTUVwxyz0123456789ABCDE
-	    region: eu-central-1
-	    # Use the following options to configure an AWS compatible host such as Minio
-	    host: 'localhost'
-	    endpoint: 'http://127.0.0.1:9000'
-	    path_style: true
-	```
+   ```yaml
+   lfs:
+   enabled: true
+   object_store:
+     enabled: false
+     remote_directory: lfs-objects # Bucket name
+     connection:
+       provider: AWS
+       aws_access_key_id: 1ABCD2EFGHI34JKLM567N
+       aws_secret_access_key: abcdefhijklmnopQRSTUVwxyz0123456789ABCDE
+       region: eu-central-1
+       # Use the following options to configure an AWS compatible host such as Minio
+       host: 'localhost'
+       endpoint: 'http://127.0.0.1:9000'
+       path_style: true
+   ```
 
 1. Save the file and [restart GitLab][] for the changes to take effect.
 1. Migrate any existing local LFS objects to the object storage:

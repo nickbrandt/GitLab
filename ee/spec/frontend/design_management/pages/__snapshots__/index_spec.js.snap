@@ -3,6 +3,7 @@
 exports[`Design management index page designs renders designs list 1`] = `
 <div>
   <uploadform-stub
+    all-versions=""
     canuploaddesign="true"
   />
    

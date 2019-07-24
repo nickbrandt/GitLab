@@ -1,0 +1,5 @@
+---
+title: Resolve Snowplow tracking for notes does not work in Firefox
+merge_request: 12578
+author:
+type: fixed

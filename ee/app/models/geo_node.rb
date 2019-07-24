@@ -126,6 +126,24 @@ class GeoNode < ApplicationRecord
     secondary? && clone_protocol == 'ssh'
   end
 
+  def name
+    value = read_attribute(:name)
+
+    if looks_like_url_field_missing_slash?(value)
+      add_ending_slash(value)
+    else
+      value
+    end
+  end
+
+  def name=(value)
+    if looks_like_url_field_missing_slash?(value)
+      write_with_ending_slash(:name, value)
+    else
+      write_attribute(:name, value)
+    end
+  end
+
   def url
     read_with_ending_slash(:url)
   end
@@ -194,7 +212,7 @@ class GeoNode < ApplicationRecord
     # be called in an initializer and we don't want other callbacks
     # to mess with uninitialized dependencies.
     if clone_url_prefix_changed?
-      Rails.logger.info "Geo: modified clone_url_prefix to #{clone_url_prefix}"
+      Rails.logger.info "Geo: modified clone_url_prefix to #{clone_url_prefix}" # rubocop:disable Gitlab/RailsLogger
       update_column(:clone_url_prefix, clone_url_prefix)
     end
   end
@@ -315,6 +333,14 @@ class GeoNode < ApplicationRecord
 
   def expire_cache!
     Gitlab::Geo.expire_cache!
+  end
+
+  # This method is required for backward compatibility. If it
+  # returns true,  then we can be fairly confident they did not
+  # set gitlab_rails['geo_node_name']. But if it returns false,
+  # then we aren't sure, so we shouldn't touch the name value.
+  def looks_like_url_field_missing_slash?(value)
+    add_ending_slash(value) == url
   end
 
   def read_with_ending_slash(attribute)

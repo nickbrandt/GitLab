@@ -89,7 +89,7 @@ Key actions for Issues include:
 ![Issue view](img/issues_main_view.png)
 
 On an issue's page, you can view [all aspects of the issue](issue_data_and_actions.md),
-and modify them if you you have the necessary [permissions](../../permissions.md).
+and modify them if you have the necessary [permissions](../../permissions.md).
 
 ### Issues list
 
@@ -104,7 +104,8 @@ view, you can also make certain changes [in bulk](../bulk_editing.md) to the dis
 For more information, see the [Issue Data and Actions](issue_data_and_actions.md) page
 for a rundown of all the fields and information in an issue.
 
-For sorting by issue priority, see [Label Priority](../labels.md#label-priority).
+You can sort a list of issues several ways, including by issue creation date, milestone due date,
+etc. For more information, see the [Sorting and Ordering Issue Lists](sorting_issue_lists.md) page.
 
 ### Issue boards
 

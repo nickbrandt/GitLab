@@ -30,6 +30,14 @@ module EE
         end
       end
 
+      module UserWithAdmin
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :note
+        end
+      end
+
       module Project
         extend ActiveSupport::Concern
 
@@ -41,6 +49,8 @@ module EE
           expose :mirror_trigger_builds, if: ->(project, _) { project.mirror? }
           expose :only_mirror_protected_branches, if: ->(project, _) { project.mirror? }
           expose :mirror_overwrites_diverged_branches, if: ->(project, _) { project.mirror? }
+          expose :external_authorization_classification_label,
+                 if: ->(_, _) { License.feature_available?(:external_authorization_service_api_management) }
           expose :packages_enabled, if: ->(project, _) { project.feature_available?(:packages) }
         end
       end
@@ -336,7 +346,7 @@ module EE
 
       # Decorates Project
       class ProjectApprovalRules < Grape::Entity
-        expose :visible_regular_approval_rules, as: :rules, using: ApprovalRule
+        expose :visible_approval_rules, as: :rules, using: ApprovalRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
       end
 
@@ -363,35 +373,8 @@ module EE
         expose :user, using: ::API::Entities::UserBasic
       end
 
-      # @deprecated, replaced with ApprovalState
-      class MergeRequestApprovals < ::API::Entities::ProjectEntity
-        def initialize(merge_request, options = {})
-          presenter = merge_request.present(current_user: options[:current_user])
-
-          super(presenter, options)
-        end
-
-        expose :merge_status
-        expose :approvals_required
-        expose :approvals_left
-        expose :approvals, as: :approved_by, using: EE::API::Entities::Approvals
-        expose :approvers_left, as: :suggested_approvers, using: ::API::Entities::UserBasic
-        # @deprecated
-        expose :approvers, using: EE::API::Entities::Approver
-        # @deprecated
-        expose :approver_groups, using: EE::API::Entities::ApproverGroup
-
-        expose :user_has_approved do |merge_request, options|
-          merge_request.has_approved?(options[:current_user])
-        end
-
-        expose :user_can_approve do |merge_request, options|
-          merge_request.can_approve?(options[:current_user])
-        end
-      end
-
       class ApprovalState < Grape::Entity
-        expose :merge_request, merge: true, using: ::API::Entities::ProjectEntity
+        expose :merge_request, merge: true, using: ::API::Entities::IssuableEntity
         expose(:merge_status) { |approval_state| approval_state.merge_request.merge_status }
 
         expose :approved?, as: :approved
@@ -732,6 +715,13 @@ module EE
 
       class ProjectAlias < Grape::Entity
         expose :id, :project_id, :name
+      end
+
+      class Dependency < Grape::Entity
+        expose :name, :version, :package_manager, :dependency_file_path
+        expose :dependency_file_path do |dependency|
+          dependency[:location][:path]
+        end
       end
     end
   end

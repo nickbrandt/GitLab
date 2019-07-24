@@ -186,6 +186,12 @@ describe Gitlab::Git::Repository, :seed_helper do
     it { is_expected.to be < 2 }
   end
 
+  describe '#to_s' do
+    subject { repository.to_s }
+
+    it { is_expected.to eq("<Gitlab::Git::Repository: group/project>") }
+  end
+
   describe '#object_directory_size' do
     before do
       allow(repository.gitaly_repository_client)
@@ -253,6 +259,22 @@ describe Gitlab::Git::Repository, :seed_helper do
       let(:ref) { '6d39438' }
 
       it { expect(submodule_url('six')).to eq(nil) }
+    end
+  end
+
+  describe '#submodule_urls_for' do
+    let(:ref) { 'master' }
+
+    it 'returns url mappings for submodules' do
+      urls = repository.submodule_urls_for(ref)
+
+      expect(urls).to eq({
+        "deeper/nested/six" => "git://github.com/randx/six.git",
+               "gitlab-grack" => "https://gitlab.com/gitlab-org/gitlab-grack.git",
+       "gitlab-shell" => "https://github.com/gitlabhq/gitlab-shell.git",
+        "nested/six" => "git://github.com/randx/six.git",
+        "six" => "git://github.com/randx/six.git"
+      })
     end
   end
 

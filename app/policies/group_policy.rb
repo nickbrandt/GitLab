@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class GroupPolicy < BasePolicy
-  include ClusterableActions
-
   desc "Group is public"
   with_options scope: :subject, score: 0
   condition(:public_group) { @subject.public? }
@@ -29,9 +27,6 @@ class GroupPolicy < BasePolicy
     GroupProjectsFinder.new(group: @subject, current_user: @user, options: { include_subgroups: true, only_owned: true }).execute.any?
   end
 
-  condition(:has_clusters, scope: :subject) { clusterable_has_clusters? }
-  condition(:can_have_multiple_clusters) { multiple_clusters_available? }
-
   with_options scope: :subject, score: 0
   condition(:request_access_enabled) { @subject.request_access_enabled }
 
@@ -41,6 +36,10 @@ class GroupPolicy < BasePolicy
 
   condition(:developer_maintainer_access) do
     @subject.project_creation_level == ::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS
+  end
+
+  condition(:maintainer_can_create_group) do
+    @subject.subgroup_creation_level == ::Gitlab::Access::MAINTAINER_SUBGROUP_ACCESS
   end
 
   rule { public_group }.policy do
@@ -110,6 +109,7 @@ class GroupPolicy < BasePolicy
   end
 
   rule { owner & nested_groups_supported }.enable :create_subgroup
+  rule { maintainer & maintainer_can_create_group & nested_groups_supported }.enable :create_subgroup
 
   rule { public_group | logged_in_viewable }.enable :view_globally
 
@@ -120,8 +120,6 @@ class GroupPolicy < BasePolicy
   rule { has_access }.prevent              :request_access
 
   rule { owner & (~share_with_group_locked | ~has_parent | ~parent_share_with_group_locked | can_change_parent_share_with_group_lock) }.enable :change_share_with_group_lock
-
-  rule { ~can_have_multiple_clusters & has_clusters }.prevent :add_cluster
 
   rule { developer & developer_maintainer_access }.enable :create_projects
   rule { create_projects_disabled }.prevent :create_projects

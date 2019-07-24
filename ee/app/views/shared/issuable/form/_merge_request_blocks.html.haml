@@ -1,0 +1,17 @@
+- merge_request = local_assigns.fetch(:issuable)
+
+- return unless merge_request.is_a?(MergeRequest)
+
+- form = local_assigns.fetch(:form)
+- project = merge_request.target_project
+
+- return unless project&.feature_available?(:blocking_merge_requests)
+
+.form-group.row.blocking-merge-requests
+  = form.label :blocking_merge_request_references, _('Blocking merge requests'), class: 'col-form-label col-sm-2'
+  .col-sm-10
+    = text_field_tag 'blocking_merge_request_refs', nil,
+                     class: "form-control ",
+                     id: "js-blocking-merge-requests-input",
+                     data: { hidden_blocking_mrs_count: merge_request.hidden_blocking_merge_requests_count(current_user),
+                             visible_blocking_mr_refs: merge_request.visible_blocking_merge_request_refs(current_user) }

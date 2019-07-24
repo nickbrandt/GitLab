@@ -44,9 +44,9 @@ Include any media types/sources if the content is relevant to readers. You can f
 In the software industry, it is a best practice to organize documentatioin in different types. For example, [Divio recommends](https://www.divio.com/blog/documentation/):
 
 1. Tutorials
-2. How-to guides
-3. Explanation
-4. Reference (for example, a glossary)
+1. How-to guides
+1. Explanation
+1. Reference (for example, a glossary)
 
 At GitLab, we have so many product changes in our monthly releases that we can't afford to continually update multiple types of information.
 If we have multiple types, the information will become outdated. Therefore, we have a [single template](structure.md) for documentation.
@@ -107,6 +107,22 @@ Hard-coded HTML is valid, although it's discouraged to be used while we have `/h
 - Special styling is required.
 - Reviewed and approved by a technical writer.
 
+### Markdown Rules
+
+GitLab ensures that the Markdown used across all documentation is consistent, as
+well as easy to review and maintain, by testing documentation changes with
+[Markdownlint (mdl)](https://github.com/markdownlint/markdownlint). This lint test
+checks many common problems with Markdown, and fails when any document has an issue
+with Markdown formatting that may cause the page to render incorrectly within GitLab.
+It will also fail when a document is using non-standard Markdown (which may render
+correctly, but is not the current standard in GitLab documentation).
+
+Each formatting issue that mdl checks has an associated [rule](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md),
+and the rules that are currently enabled for GitLab documentation are listed in the
+[`.mdlrc.style`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.mdlrc.style) file.
+Configuration options are set in the [`.mdlrc`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.mdlrc.style)
+file.
+
 ## Structure
 
 ### Organize by topic, not by type
@@ -142,9 +158,9 @@ The table below shows what kind of documentation goes where.
 ### Working with directories and files
 
 1. When you create a new directory, always start with an `index.md` file.
-  Do not use another file name and **do not** create `README.md` files.
+   Do not use another file name and **do not** create `README.md` files.
 1. **Do not** use special characters and spaces, or capital letters in file names,
-  directory names, branch names, and anything that generates a path.
+   directory names, branch names, and anything that generates a path.
 1. When creating a new document and it has more than one word in its name,
    make sure to use underscores instead of spaces or dashes (`-`). For example,
    a proper naming would be `import_projects_from_github.md`. The same rule
@@ -340,7 +356,7 @@ For other punctuation rules, please refer to the
   links shift too, which eventually leads to dead links. If you think it is
   compelling to add numbers in headings, make sure to at least discuss it with
   someone in the Merge Request.
-- [Avoid using symbols and special chars](https://gitlab.com/gitlab-com/gitlab-docs/issues/84)
+- [Avoid using symbols and special chars](https://gitlab.com/gitlab-org/gitlab-docs/issues/84)
   in headers. Whenever possible, they should be plain and short text.
 - Avoid adding things that show ephemeral statuses. For example, if a feature is
   considered beta or experimental, put this info in a note, not in the heading.
@@ -488,7 +504,7 @@ You can link any up-to-date video that is useful to the GitLab user.
 
 ### Embed videos
 
-> [Introduced](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/472) in GitLab 12.1.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/472) in GitLab 12.1.
 
 GitLab docs (docs.gitlab.com) support embedded videos.
 
@@ -801,7 +817,7 @@ GitLab.com Free, and all higher tiers.
 
 ### How it works
 
-Introduced by [!244](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/244),
+Introduced by [!244](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/244),
 the special markup `**(STARTER)**` will generate a `span` element to trigger the
 badges and tooltips (`<span class="badge-trigger starter">`). When the keyword
 "only" is added, the corresponding GitLab.com badge will not be displayed.

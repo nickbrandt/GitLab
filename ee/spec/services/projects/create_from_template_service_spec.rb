@@ -1,5 +1,18 @@
 require 'spec_helper'
 
+# Group Hierarchy:
+
+# Group
+#   Subgroup 1
+#     Subgroup 1_1
+#      Subgroup 1_1_1
+#     Subgroup 1_2 (the group with the template)
+#       project_template
+#       Subgroup_1_2_1
+#   Subgroup 2
+#     Subgroup 2_1
+# Group 2
+
 describe Projects::CreateFromTemplateService do
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }
@@ -9,7 +22,12 @@ describe Projects::CreateFromTemplateService do
 
   let(:subgroup_1) { create(:group, parent: group) }
   let(:subgroup_1_1) { create(:group, parent: subgroup_1) }
-  let(:project_template) { create(:project, :public, namespace: subgroup_1) }
+  let(:subgroup_1_1_1) { create(:group, parent: subgroup_1_1) }
+  let(:subgroup_1_2) { create(:group, parent: subgroup_1) }
+  let(:subgroup_1_2_1) { create(:group, parent: subgroup_1_2) }
+  let(:subgroup_2) { create(:group, parent: group) }
+  let(:subgroup_2_1) { create(:group, parent: subgroup_2) }
+  let(:project_template) { create(:project, :public, namespace: subgroup_1_2) }
   let(:namespace_id) { nil }
   let(:group_with_project_templates_id) { nil }
 
@@ -97,23 +115,13 @@ describe Projects::CreateFromTemplateService do
 
     describe 'creating project from a Group project template', :postgresql do
       let(:project_name) { project_template.name }
-      let(:group_with_project_templates_id) { subgroup_1.id }
+      let(:group_with_project_templates_id) { subgroup_1_2.id }
       let(:group2) { create(:group) }
 
       before do
+        subgroup_1.update!(custom_project_templates_group_id: subgroup_1_2.id)
         group.add_maintainer(user)
         group2.add_maintainer(user)
-      end
-
-      context "when the namespace is out of the hierarchy of the Group's owning the template" do
-        let(:namespace_id) { group2.id }
-
-        it "isn't persisted" do
-          project = subject.execute
-
-          expect(project).not_to be_saved
-          expect(project.repository.empty?).to eq(true)
-        end
       end
 
       shared_examples 'a persisted project' do
@@ -125,22 +133,65 @@ describe Projects::CreateFromTemplateService do
         end
       end
 
-      context 'when project is created under a top level group' do
-        let(:namespace_id) { group.id }
+      shared_examples 'a project that isn\'t persisted' do
+        it "isn't persisted" do
+          project = subject.execute
 
-        it_behaves_like 'a persisted project'
+          expect(project).not_to be_saved
+          expect(project.repository.empty?).to eq(true)
+        end
       end
 
-      context 'when project is created under a subgroup' do
-        let(:namespace_id) { subgroup_1.id }
+      context 'when the namespace is not a descendant of the Group owning the template' do
+        context 'when project is created under a group that is outside the hierarchy its root ancestor group' do
+          let(:namespace_id) { group2.id }
 
-        it_behaves_like 'a persisted project'
+          it_behaves_like 'a project that isn\'t persisted'
+        end
+
+        context 'when project is created under a group that is a descendant of its root ancestor group' do
+          let(:namespace_id) { subgroup_2.id }
+
+          it_behaves_like 'a project that isn\'t persisted'
+        end
+
+        context 'when project is created under a subgroup that is a descendant of its root ancestor group' do
+          let(:namespace_id) { subgroup_2_1.id }
+
+          it_behaves_like 'a project that isn\'t persisted'
+        end
       end
 
-      context 'when project is created under a nested subgroup' do
-        let(:namespace_id) { subgroup_1_1.id }
+      context 'when the namespace is inside the hierarchy of the Group owning the template' do
+        context 'when project is created under its parent group' do
+          let(:namespace_id) { subgroup_1.id }
 
-        it_behaves_like 'a persisted project'
+          it_behaves_like 'a persisted project'
+        end
+
+        context 'when project is created under the same group' do
+          let(:namespace_id) { subgroup_1_2.id }
+
+          it_behaves_like 'a persisted project'
+        end
+
+        context 'when project is created under its descendant group' do
+          let(:namespace_id) { subgroup_1_2_1.id }
+
+          it_behaves_like 'a persisted project'
+        end
+
+        context 'when project is created under a group that is a descendant of its parent group' do
+          let(:namespace_id) { subgroup_1_1.id }
+
+          it_behaves_like 'a persisted project'
+        end
+
+        context 'when project is created under a subgroup that is a descendant of its parent group' do
+          let(:namespace_id) { subgroup_1_1_1.id }
+
+          it_behaves_like 'a persisted project'
+        end
       end
     end
   end

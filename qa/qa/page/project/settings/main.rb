@@ -5,6 +5,8 @@ module QA
     module Project
       module Settings
         class Main < Page::Base
+          prepend QA::EE::Page::Project::Settings::Main
+
           include Common
           include Component::Select2
           include SubMenus::Project

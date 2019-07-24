@@ -60,7 +60,7 @@ module Projects
         def validate_date(date)
           return unless date
 
-          Time.parse(date)
+          Time.rfc3339(date)
           date
         rescue ArgumentError
         end

@@ -4,8 +4,6 @@
 module EESpecificCheck
   WHITELIST = [
     'CHANGELOG-EE.md',
-    'config/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/4946
-    'qa/**/*', # https://gitlab.com/gitlab-org/gitlab-ee/issues/4997#note_59764702
     'scripts/**/*',
     'vendor/assets/javascripts/jasmine-jquery.js',
     '.gitlab-ci.yml',
@@ -253,7 +251,7 @@ module EESpecificCheck
 
   def updated_diff_numstat(from, to)
     scan_diff_numstat(
-      run_git_command("diff #{from}..#{to} --numstat -- . ':!ee'"))
+      run_git_command("diff #{from}..#{to} --numstat -- . ':!ee' ':!qa/qa/ee' ':!qa/qa/ee.rb' ':!qa/qa/specs/features/ee'"))
   end
 
   def find_remote_ce_branch

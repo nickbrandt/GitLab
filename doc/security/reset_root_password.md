@@ -1,6 +1,7 @@
 ---
 type: howto
 ---
+
 # How to reset your root password
 
 To reset your root password, first log into your server with root privileges.
@@ -22,7 +23,7 @@ user = User.where(id: 1).first
 or
 
 ```bash
-user = User.find_by(email: 'admin@local.host')
+user = User.find_by(email: 'admin@example.com')
 ```
 
 Now you can change your password:

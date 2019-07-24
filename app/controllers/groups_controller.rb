@@ -8,7 +8,7 @@ class GroupsController < Groups::ApplicationController
   include RecordUserLastActivity
 
   before_action do
-    push_frontend_feature_flag(:manual_sorting)
+    push_frontend_feature_flag(:manual_sorting, default_enabled: true)
   end
 
   respond_to :html
@@ -107,7 +107,7 @@ class GroupsController < Groups::ApplicationController
     if Groups::UpdateService.new(@group, current_user, group_params).execute
       redirect_to edit_group_path(@group, anchor: params[:update_section]), notice: "Group '#{@group.name}' was successfully updated."
     else
-      @group.restore_path!
+      @group.path = @group.path_before_last_save || @group.path_was
 
       render action: "edit"
     end
@@ -192,7 +192,8 @@ class GroupsController < Groups::ApplicationController
       :chat_team_name,
       :require_two_factor_authentication,
       :two_factor_grace_period,
-      :project_creation_level
+      :project_creation_level,
+      :subgroup_creation_level
     ]
   end
 

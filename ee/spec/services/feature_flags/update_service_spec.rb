@@ -23,9 +23,9 @@ describe FeatureFlags::UpdateService do
 
       expect { subject }.to change { AuditEvent.count }.by(1)
       expect(audit_event_message).to(
-        eq("Updated feature flag <strong>new name</strong>. "\
-           "Updated name from <strong>\"#{name_was.tr('_', ' ')}\"</strong> "\
-           "to <strong>\"new name\"</strong>.")
+        eq("Updated feature flag <strong>new_name</strong>. "\
+           "Updated name from <strong>\"#{name_was}\"</strong> "\
+           "to <strong>\"new_name\"</strong>.")
       )
     end
 
@@ -159,10 +159,12 @@ describe FeatureFlags::UpdateService do
       end
 
       it 'creates audit event with new scope' do
+        expected = 'Created rule <strong>review</strong> and set it as <strong>active</strong> '\
+                   'with strategies <strong>[{"name"=>"default", "parameters"=>{}}]</strong>.'
+
         subject
-        expect(audit_event_message).to(
-          include("Created rule <strong>review</strong> and set it as <strong>active</strong>.")
-        )
+
+        expect(audit_event_message).to include(expected)
       end
 
       context 'when scope can not be created' do
@@ -179,6 +181,38 @@ describe FeatureFlags::UpdateService do
         it 'does not create audit event' do
           expect { subject }.not_to change { AuditEvent.count }
         end
+      end
+    end
+
+    context 'when the strategy is changed' do
+      let(:scope) do
+        create(:operations_feature_flag_scope,
+               feature_flag: feature_flag,
+               environment_scope: 'sandbox',
+               strategies: [{ name: "default", parameters: {} }])
+      end
+
+      let(:params) do
+        {
+          scopes_attributes: [{
+            id: scope.id,
+            environment_scope: 'sandbox',
+            strategies: [{
+              name: 'gradualRolloutUserId',
+              parameters: {
+                groupId: 'mygroup',
+                percentage: "40"
+              }
+            }]
+          }]
+        }
+      end
+
+      it 'creates an audit event' do
+        expected = %r{Updated rule <strong>sandbox</strong> strategies from <strong>.*</strong> to <strong>.*</strong>.}
+
+        expect { subject }.to change { AuditEvent.count }.by(1)
+        expect(audit_event_message).to match(expected)
       end
     end
   end

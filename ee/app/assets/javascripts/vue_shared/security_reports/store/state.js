@@ -16,19 +16,6 @@ export default () => ({
   canCreateIssuePermission: false,
   canCreateFeedbackPermission: false,
 
-  sast: {
-    paths: {
-      head: null,
-      base: null,
-    },
-
-    isLoading: false,
-    hasError: false,
-
-    newIssues: [],
-    resolvedIssues: [],
-    allIssues: [],
-  },
   sastContainer: {
     paths: {
       head: null,
@@ -139,7 +126,7 @@ export default () => ({
     },
 
     isCreatingNewIssue: false,
-    isDismissingIssue: false,
+    isDismissingVulnerability: false,
 
     error: null,
   },

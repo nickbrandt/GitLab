@@ -84,6 +84,22 @@ describe Epics::IssuePromoteService do
             expect(issue).to be_closed
           end
         end
+
+        context 'when promoted issue has notes' do
+          let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
+
+          before do
+            allow(Gitlab::SnowplowTracker).to receive(:track_event).with('epics', 'promote', an_instance_of(Hash))
+            issue.reload
+          end
+
+          it 'creates a new epic with all notes' do
+            epic = subject.execute(issue)
+            expect(epic.notes.count).to eq(issue.notes.count)
+            expect(epic.notes.where(discussion_id: discussion.discussion_id).count).to eq(0)
+            expect(issue.notes.where(discussion_id: discussion.discussion_id).count).to eq(1)
+          end
+        end
       end
     end
   end

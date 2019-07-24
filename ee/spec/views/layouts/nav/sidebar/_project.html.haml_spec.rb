@@ -10,7 +10,7 @@ describe 'layouts/nav/sidebar/_project' do
     assign(:repository, project.repository)
     allow(view).to receive(:current_ref).and_return('master')
 
-    stub_licensed_features(tracing: true)
+    stub_licensed_features(tracing: true, packages: true)
   end
 
   describe 'issue boards' do
@@ -118,6 +118,93 @@ describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Tracing', href: project_tracing_path(project))
+      end
+    end
+  end
+
+  describe 'Packages' do
+    let(:user) { create(:user) }
+
+    before do
+      project.team.add_developer(user)
+      sign_in(user)
+      stub_container_registry_config(enabled: true)
+    end
+
+    context 'when packages is enabled' do
+      it 'packages link is visible' do
+        render
+
+        expect(rendered).to have_link('Packages', href: project_packages_path(project))
+      end
+
+      it 'packages list link is visible' do
+        render
+
+        expect(rendered).to have_link('List', href: project_packages_path(project))
+      end
+
+      it 'container registry link is visible' do
+        render
+
+        expect(rendered).to have_link('Container Registry', href: project_container_registry_index_path(project))
+      end
+    end
+
+    context 'when packages are disabled' do
+      before do
+        stub_licensed_features(packages: false)
+      end
+
+      it 'packages list link is not visible' do
+        render
+
+        expect(rendered).not_to have_link('List', href: project_packages_path(project))
+      end
+
+      it 'top level packages link links to container registry' do
+        render
+
+        expect(rendered).to have_link('Packages', href: project_container_registry_index_path(project))
+      end
+
+      it 'packages top level and container registry links are visible' do
+        render
+
+        expect(rendered).to have_link('Packages', href: project_container_registry_index_path(project))
+        expect(rendered).to have_link('Container Registry', href: project_container_registry_index_path(project))
+      end
+    end
+
+    context 'when container registry is disabled' do
+      before do
+        stub_container_registry_config(enabled: false)
+      end
+
+      it 'packages top level and list link are visible' do
+        render
+
+        expect(rendered).to have_link('Packages', href: project_packages_path(project))
+        expect(rendered).to have_link('List', href: project_packages_path(project))
+      end
+
+      it 'container registry link is not visible' do
+        render
+
+        expect(rendered).not_to have_link('Container Registry', href: project_container_registry_index_path(project))
+      end
+    end
+
+    context 'when both packages and container registry are disabled' do
+      before do
+        stub_licensed_features(packages: false)
+        stub_container_registry_config(enabled: false)
+      end
+
+      it 'packages top level item is not visible' do
+        render
+
+        expect(rendered).not_to have_link('Packages', href: project_packages_path(project))
       end
     end
   end

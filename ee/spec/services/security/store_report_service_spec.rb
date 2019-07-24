@@ -18,7 +18,7 @@ describe Security::StoreReportService, '#execute' do
     using RSpec::Parameterized::TableSyntax
 
     where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
-      'with SAST report'                | :sast                | 3 | 14 | 33 | 35 | 33
+      'with SAST report'                | :sast                | 3 | 17 | 33 | 39 | 33
       'with Dependency Scanning report' | :dependency_scanning | 2 | 7  | 4  | 7  | 4
       'with Container Scanning report'  | :container_scanning  | 1 | 8  | 8  | 8  | 8
     end
@@ -72,7 +72,7 @@ describe Security::StoreReportService, '#execute' do
     end
 
     it 'inserts only new identifiers and reuse existing ones' do
-      expect { subject }.to change { Vulnerabilities::Identifier.count }.by(13)
+      expect { subject }.to change { Vulnerabilities::Identifier.count }.by(16)
     end
 
     it 'inserts only new occurrences and reuse existing ones' do

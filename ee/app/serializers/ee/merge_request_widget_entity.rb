@@ -135,10 +135,6 @@ module EE
         merge_request.target_project.merge_pipelines_enabled?
       end
 
-      expose :merge_trains_enabled?, as: :merge_trains_enabled do |merge_request|
-        merge_trains_enabled?
-      end
-
       expose :merge_trains_count, if: -> (*) { merge_trains_enabled? } do |merge_request|
         MergeTrain.total_count_in_train(merge_request)
       end
@@ -177,21 +173,14 @@ module EE
       private
 
       def blocking_merge_requests
-        visible_mrs_by_state = Hash.new { |h, k| h[k] = [] }
-        visible_count = 0
-        hidden_blocking_count = 0
-
-        object.blocking_merge_requests.each do |mr|
-          if can?(current_user, :read_merge_request, mr)
-            visible_mrs_by_state[mr.state_name] << represent_blocking_mr(mr)
-            visible_count += 1
-          elsif !mr.merged? # Ignore merged hidden MRs to make display simpler
-            hidden_blocking_count += 1
-          end
-        end
+        hidden_blocking_count = object.hidden_blocking_merge_requests_count(current_user)
+        visible_mrs = object.visible_blocking_merge_requests(current_user)
+        visible_mrs_by_state = visible_mrs
+          .map { |mr| represent_blocking_mr(mr) }
+          .group_by { |blocking_mr| blocking_mr.object.state_name }
 
         {
-          total_count: visible_count + hidden_blocking_count,
+          total_count: visible_mrs.count + hidden_blocking_count,
           hidden_count: hidden_blocking_count,
           visible_merge_requests: visible_mrs_by_state
         }

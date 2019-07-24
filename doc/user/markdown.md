@@ -40,7 +40,7 @@ repositories are also processed with CommonMark. As of 11.8, the [Redcarpet Ruby
 has been removed and all issues and comments, including those from pre-11.1, are now processed
 using the [CommonMark Ruby Library](https://github.com/gjtorikian/commonmarker).
 
-The documentation website had its [markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-com/gitlab-docs/merge_requests/108)
+The documentation website had its [markdown engine migrated from Redcarpet to Kramdown](https://gitlab.com/gitlab-org/gitlab-docs/merge_requests/108)
 in October 2018.
 
 You may have older issues, merge requests, or Markdown documents in your
@@ -556,7 +556,7 @@ Inline `code` has `back-ticks around` it.
 
 Similarly, a whole block of code can be fenced with triple backticks ```` ``` ````,
 triple tildes (`~~~`), or indended 4 or more spaces to achieve a similar effect for
-a larger body of code. test.
+a larger body of code.
 
 ~~~
 ```
@@ -586,9 +586,11 @@ def function():
     print s
 ```
 
-    Using 4 spaces
-    is like using
-    3-backtick fences.
+```
+Using 4 spaces
+is like using
+3-backtick fences.
+```
 
 ~~~
 Tildes are OK too.
@@ -1158,13 +1160,15 @@ Examples:
 + Or pluses
 ```
 
+<!-- The "2." and "4." in the example above are changed to "1." below, only to match the standards on docs.gitlab.com -->
+
 1. First ordered list item
-2. Another item
+1. Another item
    - Unordered sub-list.
 1. Actual numbers don't matter, just that it's a number
    1. Ordered sub-list
    1. Next ordered sub-list item
-4. And another item.
+1. And another item.
 
 * Unordered lists can use asterisks
 - Or minuses
@@ -1182,14 +1186,14 @@ Example:
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
    Second paragraph of first item.
 
-2. Another item
+1. Another item
 
 ---
 
@@ -1203,14 +1207,14 @@ Example:
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 ```
 
 1. First ordered list item
 
   Paragraph of first item.
 
-2. Another item
+1. Another item
 
 ### Superscripts / Subscripts
 

@@ -46,12 +46,13 @@ class ApprovalState
 
       result = use_fallback? ? [fallback_rule] : regular_rules
       result += code_owner_rules
+      result += report_approver_rules
       result
     end
   end
 
   def has_non_fallback_rules?
-    has_regular_rule_with_approvers? || code_owner_rules.present?
+    has_regular_rule_with_approvers? || code_owner_rules.present? || report_approver_rules.present?
   end
 
   # Use the fallback rule if regular rules are empty
@@ -110,12 +111,14 @@ class ApprovalState
 
   # @param regular [Boolean]
   # @param code_owner [Boolean]
+  # @param report_approver [Boolean]
   # @param target [:approvers, :users]
   # @param unactioned [Boolean]
-  def filtered_approvers(regular: true, code_owner: true, target: :approvers, unactioned: false)
+  def filtered_approvers(regular: true, code_owner: true, report_approver: true, target: :approvers, unactioned: false)
     rules = []
     rules.concat(regular_rules) if regular
     rules.concat(code_owner_rules) if code_owner
+    rules.concat(report_approver_rules) if report_approver
 
     users = rules.flat_map(&target)
     users.uniq!
@@ -199,6 +202,12 @@ class ApprovalState
   def code_owner_rules
     strong_memoize(:code_owner_rules) do
       wrap_rules(merge_request.approval_rules.select(&:code_owner?))
+    end
+  end
+
+  def report_approver_rules
+    strong_memoize(:report_approver_rules) do
+      wrap_rules(merge_request.approval_rules.select(&:report_approver?))
     end
   end
 

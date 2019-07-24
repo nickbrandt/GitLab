@@ -21,7 +21,7 @@ describe FeatureFlags::DestroyService do
 
     it 'creates audit log' do
       expect { subject }.to change { AuditEvent.count }.by(1)
-      expect(audit_event_message).to eq("Deleted feature flag <strong>#{feature_flag.name.tr('_', ' ')}</strong>.")
+      expect(audit_event_message).to eq("Deleted feature flag <strong>#{feature_flag.name}</strong>.")
     end
 
     context 'when feature flag can not be destroyed' do

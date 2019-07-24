@@ -29,11 +29,13 @@ RSpec.configure do |config|
 
   config.around(:each, :geo_fdw) do |example|
     if Gitlab::Geo::Fdw.enabled? && Gitlab::Geo.geo_database_configured?
-      # Disable transactions via :delete method because a foreign table
-      # can't see changes inside a transaction of a different connection.
-      example.metadata[:delete] = true
+      # Disable transactions because a foreign table can't see changes
+      # inside a transaction of a different connection.
+      self.class.use_transactional_tests = false
 
       example.run
+
+      delete_from_all_tables!(except: deletion_except_tables)
     end
   end
 end

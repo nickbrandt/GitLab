@@ -315,8 +315,6 @@ if you see `411 Length Required` errors after attempting to upload, you may
 need to downgrade the `aws_signature_version` value from the default value to
 2 [due to this issue](https://github.com/fog/fog-aws/issues/428).
 
----
-
 For installations from source:
 
 1. Edit `home/git/gitlab/config/gitlab.yml`:
@@ -428,8 +426,6 @@ For Omnibus GitLab packages:
 
 1. [Reconfigure GitLab] for the changes to take effect
 
----
-
 For installations from source:
 
 1. Edit `home/git/gitlab/config/gitlab.yml`:
@@ -490,8 +486,6 @@ For Omnibus GitLab packages:
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
----
-
 For installations from source:
 
 1. Edit `home/git/gitlab/config/gitlab.yml`:
@@ -526,8 +520,6 @@ For Omnibus GitLab packages:
    ```
 
 1. [Reconfigure GitLab] for the changes to take effect.
-
----
 
 For installations from source:
 
@@ -579,8 +571,6 @@ There, add the following line to schedule the backup for everyday at 2 AM:
 
 You may also want to set a limited lifetime for backups to prevent regular
 backups using all your disk space.
-
----
 
 For installations from source:
 
@@ -741,9 +731,10 @@ sudo gitlab-rake gitlab:backup:restore BACKUP=1493107454_2018_04_25_10.6.4-ce
 
 Next, restore `/etc/gitlab/gitlab-secrets.json` if necessary as mentioned above.
 
-Restart and check GitLab:
+Reconfigure, restart and check GitLab:
 
 ```shell
+sudo gitlab-ctl reconfigure
 sudo gitlab-ctl restart
 sudo gitlab-rake gitlab:check SANITIZE=true
 ```
@@ -814,6 +805,7 @@ will have all your repositories, but not any other data.
 ## Troubleshooting
 
 ### Restoring database backup using omnibus packages outputs warnings
+
 If you are using backup restore procedures you might encounter the following warnings:
 
 ```
@@ -842,7 +834,7 @@ including (but not restricted to):
 
 - [CI/CD variables](../ci/variables/README.md)
 - [Kubernetes / GCP integration](../user/project/clusters/index.md)
-- [Custom Pages domains](../user/project/pages/getting_started_part_three.md)
+- [Custom Pages domains](../user/project/pages/custom_domains_ssl_tls_certification/index.md)
 - [Project error tracking](../user/project/operations/error_tracking.md)
 - [Runner authentication](../ci/runners/README.md)
 - [Project mirroring](../workflow/repository_mirroring.md)

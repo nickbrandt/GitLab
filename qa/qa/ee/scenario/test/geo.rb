@@ -34,6 +34,7 @@ module QA
 
               Geo::Secondary.act do
                 replicate_database
+                reconfigure
                 wait_for_services
                 authorize
               end
@@ -106,19 +107,6 @@ module QA
               @name = QA::Runtime::Scenario.geo_secondary_name
             end
 
-            def authorize
-              # Provide OAuth authorization now so that tests don't have to
-              QA::Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
-                QA::Page::Main::Login.perform(&:sign_in_using_credentials)
-                QA::Page::Main::OAuth.perform do |oauth|
-                  oauth.authorize! if oauth.needs_authorization?
-                end
-
-                # Log out so that tests are in an initially unauthenticated state
-                QA::Page::Main::Menu.perform(&:sign_out)
-              end
-            end
-
             def replicate_database
               puts 'Starting Geo replication on secondary node ...'
 
@@ -130,6 +118,17 @@ module QA
 
                 gitlab_ctl "replicate-geo-database --host=#{host} --slot-name=#{slot} " \
                            "--sslmode=disable --no-wait --force", input: 'echo mypass'
+              end
+            end
+
+            def reconfigure
+              # Without this step, the /var/opt/gitlab/postgresql/data/pg_hba.conf
+              # that is left behind from 'gitlab_ctl "replicate-geo-database ..'
+              # does not allow FDW to work.
+              puts 'Reconfiguring ...'
+
+              QA::Service::Omnibus.new(@name).act do
+                gitlab_ctl 'reconfigure'
               end
             end
 
@@ -154,6 +153,19 @@ module QA
                 end
 
                 raise "Secondary node did not start correctly in #{Time.now - start} seconds!"
+              end
+            end
+
+            def authorize
+              # Provide OAuth authorization now so that tests don't have to
+              QA::Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
+                QA::Page::Main::Login.perform(&:sign_in_using_credentials)
+                QA::Page::Main::OAuth.perform do |oauth|
+                  oauth.authorize! if oauth.needs_authorization?
+                end
+
+                # Log out so that tests are in an initially unauthenticated state
+                QA::Page::Main::Menu.perform(&:sign_out)
               end
             end
           end

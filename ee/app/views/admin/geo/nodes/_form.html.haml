@@ -3,7 +3,7 @@
   .form-group.col-sm-6
     = form.label :name, _('Name'), class: 'font-weight-bold'
     = form.text_field :name, class: 'form-control qa-node-name-field'
-    .form-text.text-muted= _('The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url`')
+    .form-text.text-muted= _('The unique identifier for the Geo node. Must match `geo_node_name` if it is set in gitlab.rb, otherwise it must match `external_url` with a trailing slash')
 
   .form-group.col-sm-6
     = form.label :url, s_('Geo|URL'), class: 'font-weight-bold'

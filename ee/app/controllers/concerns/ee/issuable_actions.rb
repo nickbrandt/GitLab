@@ -6,7 +6,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     EE_PERMITTED_KEYS = %w[
-        weight
+      weight
     ].freeze
 
     override :permitted_keys

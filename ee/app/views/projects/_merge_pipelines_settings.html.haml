@@ -10,8 +10,3 @@
         help_page_path('ci/merge_request_pipelines/index.md',
         anchor: 'pipelines-for-merge-requests'),
         target: '_blank'
-    - if merge_trains_available?
-      .form-check.mb-2
-        = form.check_box :merge_trains_enabled, class: 'form-check-input js-merge-options-merge-trains'
-        = form.label :merge_trains_enabled, class: 'form-check-label' do
-          = s_('ProjectSettings|Allow merge trains')

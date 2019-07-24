@@ -1,0 +1,5 @@
+---
+title: Un-block UI interactions while Code Quality MR widget is loading
+merge_request: 14323
+author:
+type: fixed

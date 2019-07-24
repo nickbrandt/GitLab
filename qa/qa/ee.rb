@@ -68,6 +68,14 @@ module QA
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
+          autoload :Main, 'qa/ee/page/project/settings/main'
+          autoload :MergeRequestApproval, 'qa/ee/page/project/settings/merge_request_approval'
+        end
+
+        module Operations
+          module Kubernetes
+            autoload :Show, 'qa/ee/page/project/operations/kubernetes/show'
+          end
         end
 
         module Pipeline

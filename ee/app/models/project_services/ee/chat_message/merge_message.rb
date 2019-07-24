@@ -18,7 +18,16 @@ module EE
 
       override :state_or_action_text
       def state_or_action_text
-        action == 'approved' ? action : super
+        case action
+        when 'approved', 'unapproved'
+          action
+        when 'approval'
+          'added their approval to'
+        when 'unapproval'
+          'removed their approval from'
+        else
+          super
+        end
       end
     end
   end

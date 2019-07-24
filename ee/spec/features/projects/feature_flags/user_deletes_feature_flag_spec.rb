@@ -33,6 +33,6 @@ describe 'User deletes feature flag', :js do
   it 'records audit event' do
     visit(project_audit_events_path(project))
 
-    expect(page).to have_text("Deleted feature flag ci live trace.")
+    expect(page).to have_text("Deleted feature flag ci_live_trace.")
   end
 end

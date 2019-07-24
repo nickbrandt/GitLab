@@ -113,6 +113,31 @@ describe Issue do
         expect(issues).to eq([issue2, issue3, issue4, issue])
       end
     end
+
+    context 'when weight is the same' do
+      subject { project.issues.sort_by_attribute(sorting_param) }
+
+      let!(:issue)  { create(:issue, project: project) }
+      let!(:issue2) { create(:issue, weight: 1, project: project) }
+      let!(:issue3) { create(:issue, weight: 1, project: project) }
+      let!(:issue4) { create(:issue, weight: 1, project: project) }
+
+      context 'sorting by asc' do
+        let(:sorting_param) { 'weight_asc' }
+
+        it 'arranges issues with the same weight by their ids' do
+          is_expected.to eq([issue4, issue3, issue2, issue])
+        end
+      end
+
+      context 'sorting by desc' do
+        let(:sorting_param) { 'weight_desc' }
+
+        it 'arranges issues with the same weight by their ids' do
+          is_expected.to eq([issue4, issue3, issue2, issue])
+        end
+      end
+    end
   end
 
   describe '#weight' do

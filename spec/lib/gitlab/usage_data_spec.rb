@@ -8,7 +8,7 @@ describe Gitlab::UsageData do
     before do
       create(:jira_service, project: projects[0])
       create(:jira_service, project: projects[1])
-      create(:jira_cloud_service, project: projects[2])
+      create(:jira_service, :jira_cloud_service, project: projects[2])
       create(:prometheus_service, project: projects[1])
       create(:service, project: projects[0], type: 'SlackSlashCommandsService', active: true)
       create(:service, project: projects[1], type: 'SlackService', active: true)
@@ -57,10 +57,18 @@ describe Gitlab::UsageData do
         gitaly
         database
         avg_cycle_analytics
-        web_ide_commits
         influxdb_metrics_enabled
         prometheus_metrics_enabled
       ))
+
+      expect(subject).to include(
+        wiki_pages_create: a_kind_of(Integer),
+        wiki_pages_update: a_kind_of(Integer),
+        wiki_pages_delete: a_kind_of(Integer),
+        web_ide_views: a_kind_of(Integer),
+        web_ide_commits: a_kind_of(Integer),
+        web_ide_merge_requests: a_kind_of(Integer)
+      )
     end
 
     it "gathers usage counts" do
@@ -179,6 +187,28 @@ describe Gitlab::UsageData do
         .to receive(:count).and_raise(ActiveRecord::StatementInvalid.new(''))
 
       expect { subject }.not_to raise_error
+    end
+  end
+
+  describe '#usage_data_counters' do
+    subject { described_class.usage_data_counters }
+
+    it { is_expected.to all(respond_to :totals) }
+
+    describe 'the results of calling #totals on all objects in the array' do
+      subject { described_class.usage_data_counters.map(&:totals) }
+
+      it do
+        is_expected
+          .to all(be_a Hash)
+          .and all(have_attributes(keys: all(be_a Symbol), values: all(be_a Integer)))
+      end
+    end
+
+    it 'does not have any conflicts' do
+      all_keys = subject.flat_map { |counter| counter.totals.keys }
+
+      expect(all_keys.size).to eq all_keys.to_set.size
     end
   end
 

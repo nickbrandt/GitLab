@@ -20,13 +20,13 @@ describe EE::Emails::Projects do
       Notify.prometheus_alert_fired_email(project.id, user.id, alert_params)
     end
 
-    context 'with an alert' do
-      let(:alert_params) do
-        {
-          'labels' => {
-            'gitlab_alert_id' => alert.prometheus_metric_id.to_s
-          }
-        }
+    let(:alert_params) do
+      { 'startsAt' => Time.now.rfc3339 }
+    end
+
+    context 'with a gitlab alert' do
+      before do
+        alert_params['labels'] = { 'gitlab_alert_id' => alert.prometheus_metric_id.to_s }
       end
 
       let(:title) do
@@ -46,7 +46,7 @@ describe EE::Emails::Projects do
       it_behaves_like 'a user cannot unsubscribe through footer link'
 
       it 'has expected subject' do
-        is_expected.to have_subject("#{project.name} | Alert: #{environment.name} #{title} for 5 minutes")
+        is_expected.to have_subject("#{project.name} | Alert: #{environment.name}: #{title} for 5 minutes")
       end
 
       it 'has expected content' do
@@ -60,19 +60,15 @@ describe EE::Emails::Projects do
       end
     end
 
-    context 'without an alert' do
+    context 'with no payload' do
       let(:alert_params) { {} }
 
       it_behaves_like 'no email'
     end
 
     context 'with an unknown alert' do
-      let(:alert_params) do
-        {
-          'labels' => {
-            'gitlab_alert_id' => 'unknown'
-          }
-        }
+      before do
+        alert_params['labels'] = { 'gitlab_alert_id' => 'unknown' }
       end
 
       it_behaves_like 'no email'
@@ -85,12 +81,8 @@ describe EE::Emails::Projects do
         metrics_project_environments_url(project)
       end
 
-      let(:alert_params) do
-        {
-          'annotations' => {
-            'title' => title
-          }
-        }
+      before do
+        alert_params['annotations'] = { 'title' => title }
       end
 
       it_behaves_like 'an email sent from GitLab'

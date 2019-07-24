@@ -15,7 +15,12 @@ describe DependencyListSerializer do
        location: {
          blob_path: '/some_project/path/Gemfile.lock',
          path:      'Gemfile.lock'
-       }
+       },
+       vulnerabilities:
+         [{
+            name:     'XSS',
+            severity: 'low'
+          }]
      }]
   end
 

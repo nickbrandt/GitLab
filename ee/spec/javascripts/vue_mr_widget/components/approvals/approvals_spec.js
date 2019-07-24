@@ -296,18 +296,10 @@ describe('EE MRWidget approvals', () => {
           waitForTick(done);
         });
 
-        it('does not initially show approvals auth component', () => {
-          expect(wrapper.find(ApprovalsAuth).exists()).toBe(false);
-        });
-
         describe('when approve is clicked', () => {
           beforeEach(done => {
             findAction().vm.$emit('click');
             waitForTick(done);
-          });
-
-          it('shows approvals auth component', () => {
-            expect(wrapper.find(ApprovalsAuth).exists()).toBe(true);
           });
 
           describe('when emits approve', () => {

@@ -77,7 +77,7 @@ describe API::ProjectApprovals do
 
           post api(url, current_user), params: settings
 
-          expect(JSON.parse(response.body).symbolize_keys).to include(settings)
+          expect(json_response.symbolize_keys).to include(settings)
         end
 
         it 'only shows approver groups that are visible to the current user' do

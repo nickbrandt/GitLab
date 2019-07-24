@@ -1,10 +1,10 @@
 import ListIssue from '~/boards/models/issue';
-import IssueProjectEE from './project';
+import IssueProject from '~/boards/models/project';
 
 class ListIssueEE extends ListIssue {
   constructor(obj, defaultAvatar) {
     super(obj, defaultAvatar, {
-      IssueProject: IssueProjectEE,
+      IssueProject,
     });
 
     this.isFetching.weight = true;
@@ -12,7 +12,7 @@ class ListIssueEE extends ListIssue {
     this.weight = obj.weight;
 
     if (obj.project) {
-      this.project = new IssueProjectEE(obj.project);
+      this.project = new IssueProject(obj.project);
     }
   }
 }

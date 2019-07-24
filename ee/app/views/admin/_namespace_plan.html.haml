@@ -2,7 +2,8 @@
 - return unless Gitlab::CurrentSettings.should_check_namespace_plan?
 
 .form-group.row
-  = f.label :plan, class: 'col-form-label col-sm-2'
+  .col-sm-2.col-form-label
+    = f.label :plan
   .col-sm-10
     = f.fields_for :gitlab_subscription do |f|
       = f.select :hosted_plan_id, Plan.pluck(:title, :id),

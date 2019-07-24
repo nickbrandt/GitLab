@@ -3,22 +3,26 @@ import { __ } from '~/locale';
 export const issuableTypesMap = {
   ISSUE: 'issue',
   EPIC: 'epic',
+  MERGE_REQUEST: 'merge_request',
 };
 
 export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
     [issuableTypesMap.EPIC]: __(' or <#epic id>'),
+    [issuableTypesMap.MERGE_REQUEST]: __(' or <#merge request id>'),
   },
   false: {
     [issuableTypesMap.ISSUE]: '',
     [issuableTypesMap.EPIC]: '',
+    [issuableTypesMap.MERGE_REQUEST]: '',
   },
 };
 
 export const inputPlaceholderTextMap = {
   [issuableTypesMap.ISSUE]: __('Paste issue link'),
   [issuableTypesMap.EPIC]: __('Paste epic link'),
+  [issuableTypesMap.MERGE_REQUEST]: __('Paste a merge request link'),
 };
 
 export const relatedIssuesRemoveErrorMap = {

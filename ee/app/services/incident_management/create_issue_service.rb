@@ -29,36 +29,30 @@ module IncidentManagement
     end
 
     def issue_title
-      alert.title
+      alert.full_title
     end
 
     def issue_description
-      return alert_summary unless issue_template_content
-
       horizontal_line = "\n---\n\n"
 
-      alert_summary + horizontal_line + issue_template_content
+      [
+        alert_summary,
+        alert_markdown,
+        issue_template_content
+      ].compact.join(horizontal_line)
     end
 
     def alert_summary
-      <<~MARKDOWN
-        ## Summary
-
-        #{annotation_list}
-      MARKDOWN
+      alert.issue_summary_markdown
     end
 
-    def annotation_list
-      strong_memoize(:annotation_list) do
-        alert.annotations
-          .map { |annotation| "* #{annotation.label}: #{annotation.value}" }
-          .join("\n")
-      end
+    def alert_markdown
+      alert.alert_markdown
     end
 
     def alert
       strong_memoize(:alert) do
-        Gitlab::Alerting::Alert.new(project: project, payload: params)
+        Gitlab::Alerting::Alert.new(project: project, payload: params).present
       end
     end
 

@@ -52,10 +52,7 @@ module EE
       scope :inc_group, -> { includes(:group) }
 
       scope :order_start_or_end_date_asc, -> do
-        # mysql returns null values first in opposite to postgres which
-        # returns them last by default
-        nulls_first = ::Gitlab::Database.postgresql? ? 'NULLS FIRST' : ''
-        reorder("COALESCE(start_date, end_date) ASC #{nulls_first}")
+        reorder("COALESCE(start_date, end_date) ASC NULLS FIRST")
       end
 
       scope :order_start_date_asc, -> do
@@ -170,9 +167,6 @@ module EE
       end
 
       def update_start_and_due_dates(epics)
-        # In MySQL, we cannot use a subquery that references the table being updated
-        epics = epics.pluck(:id) if ::Gitlab::Database.mysql? && epics.is_a?(ActiveRecord::Relation)
-
         self.where(id: epics).update_all(
           [
             %{

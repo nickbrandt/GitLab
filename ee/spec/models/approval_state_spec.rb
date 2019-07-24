@@ -6,7 +6,12 @@ describe ApprovalState do
   def create_rule(additional_params = {})
     default_approver = create(:user)
     params = additional_params.reverse_merge(merge_request: merge_request, users: [default_approver])
-    factory = params.delete(:code_owner) ? :code_owner_rule : :approval_merge_request_rule
+    factory =
+      case params.delete(:rule_type)
+      when :code_owner then :code_owner_rule
+      when :report_approver then :report_approver_rule
+      else :approval_merge_request_rule
+      end
 
     create(factory, params)
   end
@@ -265,7 +270,16 @@ describe ApprovalState do
 
       context 'when only code owner rules present' do
         before do
-          2.times { create_rule(users: [create(:user)], code_owner: true) }
+          2.times { create_rule(users: [create(:user)], rule_type: :code_owner) }
+        end
+
+        it_behaves_like 'when rules are present'
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when only report approver rules present' do
+        before do
+          2.times { create_rule(users: [create(:user)], rule_type: :report_approver) }
         end
 
         it_behaves_like 'when rules are present'
@@ -380,13 +394,16 @@ describe ApprovalState do
     end
 
     describe '#filtered_approvers' do
-      describe 'only direct users, without code owners' do
+      describe 'only direct users, without code owners or report_approvers' do
         it 'includes only rule user members' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+          create_rule(users: [approver3], rule_type: :report_approver)
 
-          expect(subject.filtered_approvers(code_owner: false, target: :users)).to contain_exactly(approver1)
+          expect(
+            subject.filtered_approvers(code_owner: false, report_approver: false, target: :users)
+          ).to contain_exactly(approver1)
         end
       end
 
@@ -394,7 +411,17 @@ describe ApprovalState do
         it 'includes only code owners' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+
+          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
+        end
+      end
+
+      describe 'only report approvers' do
+        it 'includes only report approvers' do
+          create_rule(users: [approver1])
+          create_rule(users: [approver1], groups: [group1])
+          create_rule(users: [approver2], rule_type: :report_approver)
 
           expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
         end
@@ -404,11 +431,12 @@ describe ApprovalState do
         it 'excludes approved approvers' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+          create_rule(users: [approver3], rule_type: :report_approver)
 
           create(:approval, merge_request: merge_request, user: approver1)
 
-          expect(subject.filtered_approvers(unactioned: true)).to contain_exactly(approver2, group_approver1)
+          expect(subject.filtered_approvers(unactioned: true)).to contain_exactly(approver2, approver3, group_approver1)
         end
       end
 
@@ -889,11 +917,13 @@ describe ApprovalState do
       rule1
       rule2
       code_owner_rule
+      report_approver_rule
     end
 
     let(:rule1) { create_unapproved_rule }
     let(:rule2) { create_unapproved_rule }
-    let(:code_owner_rule) { create_unapproved_rule(code_owner: true, approvals_required: 0) }
+    let(:code_owner_rule) { create_unapproved_rule(rule_type: :code_owner, approvals_required: 0) }
+    let(:report_approver_rule) { create_unapproved_rule(rule_type: :report_approver, approvals_required: 0) }
 
     before do
       stub_licensed_features multiple_approval_rules: false
@@ -907,7 +937,7 @@ describe ApprovalState do
           expect(rule.is_a?(ApprovalWrappedRule)).to eq(true)
         end
 
-        expect(subject.wrapped_approval_rules.size).to eq(2)
+        expect(subject.wrapped_approval_rules.size).to eq(3)
       end
     end
 
@@ -1021,7 +1051,16 @@ describe ApprovalState do
       context 'when only code owner rules present' do
         before do
           # setting approvals required to 0 since we don't want to block on them now
-          2.times { create_rule(users: [create(:user)], code_owner: true, approvals_required: 0) }
+          2.times { create_rule(users: [create(:user)], rule_type: :code_owner, approvals_required: 0) }
+        end
+
+        it_behaves_like 'when rules are present'
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when only report approver rules present' do
+        before do
+          2.times { create_rule(users: [create(:user)], rule_type: :report_approver) }
         end
 
         it_behaves_like 'when rules are present'
@@ -1114,11 +1153,12 @@ describe ApprovalState do
     end
 
     describe '#approvers' do
-      let(:code_owner_rule) { create_rule(code_owner: true, groups: [group1]) }
+      let(:code_owner_rule) { create_rule(rule_type: :code_owner, groups: [group1]) }
+      let(:report_approver_rule) { create_rule(rule_type: :report_approver, users: [approver2]) }
 
-      it 'includes approvers from first rule and code owner rule' do
+      it 'includes approvers from first rule, code owner rule, and report approver rule' do
         create_rules
-        approvers = rule1.users + code_owner_rule.users + [group_approver1]
+        approvers = rule1.users + code_owner_rule.users + [group_approver1, approver2]
 
         expect(subject.approvers).to contain_exactly(*approvers)
       end
@@ -1129,13 +1169,16 @@ describe ApprovalState do
     end
 
     describe '#filtered_approvers' do
-      describe 'only direct users, without code owners' do
+      describe 'only direct users, without code owners or report approvers' do
         it 'includes only rule user members' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+          create_rule(users: [approver3], rule_type: :report_approver)
 
-          expect(subject.filtered_approvers(code_owner: false, target: :users)).to contain_exactly(approver1)
+          expect(
+            subject.filtered_approvers(code_owner: false, report_approver: false, target: :users)
+          ).to contain_exactly(approver1)
         end
       end
 
@@ -1143,7 +1186,15 @@ describe ApprovalState do
         it 'includes only code owners' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+
+          expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
+        end
+
+        it 'includes only report approvers' do
+          create_rule(users: [approver1])
+          create_rule(users: [approver1], groups: [group1])
+          create_rule(users: [approver2], rule_type: :report_approver)
 
           expect(subject.filtered_approvers(regular: false)).to contain_exactly(approver2)
         end
@@ -1153,11 +1204,12 @@ describe ApprovalState do
         it 'excludes approved approvers' do
           create_rule(users: [approver1])
           create_rule(users: [approver1], groups: [group1])
-          create_rule(users: [approver2], code_owner: true)
+          create_rule(users: [approver2], rule_type: :code_owner)
+          create_rule(users: [approver3], rule_type: :report_approver)
 
           create(:approval, merge_request: merge_request, user: approver1)
 
-          expect(subject.filtered_approvers(unactioned: true)).to contain_exactly(approver2)
+          expect(subject.filtered_approvers(unactioned: true)).to contain_exactly(approver2, approver3)
         end
       end
 

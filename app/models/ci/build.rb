@@ -266,7 +266,7 @@ module Ci
           begin
             Ci::Build.retry(build, build.user)
           rescue Gitlab::Access::AccessDeniedError => ex
-            Rails.logger.error "Unable to auto-retry job #{build.id}: #{ex}"
+            Rails.logger.error "Unable to auto-retry job #{build.id}: #{ex}" # rubocop:disable Gitlab/RailsLogger
           end
         end
       end
@@ -531,6 +531,14 @@ module Ci
       trace.exist?
     end
 
+    def has_live_trace?
+      trace.live_trace_exist?
+    end
+
+    def has_archived_trace?
+      trace.archived_trace_exist?
+    end
+
     def artifacts_file
       job_artifacts_archive&.file
     end
@@ -578,7 +586,7 @@ module Ci
     end
 
     def valid_token?(token)
-      self.token && ActiveSupport::SecurityUtils.variable_size_secure_compare(token, self.token)
+      self.token && ActiveSupport::SecurityUtils.secure_compare(token, self.token)
     end
 
     def has_tags?

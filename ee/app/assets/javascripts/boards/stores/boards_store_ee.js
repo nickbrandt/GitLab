@@ -15,9 +15,15 @@ class BoardsStoreEE {
       this.addPromotion();
     };
     this.store.loadList = (listPath, listType) => this.loadList(listPath, listType);
-    this.store.setCurrentBoard = board => this.setCurrentBoard(board);
     this.store.removePromotionState = () => {
       this.removePromotion();
+    };
+
+    const superSetCurrentBoard = this.store.setCurrentBoard.bind(this.store);
+    this.store.setCurrentBoard = board => {
+      superSetCurrentBoard(board);
+      this.store.state.assignees = [];
+      this.store.state.milestones = [];
     };
 
     const baseCreate = this.store.create.bind(this.store);
@@ -67,40 +73,6 @@ class BoardsStoreEE {
     sidebarEventHub.$on('updateWeight', this.updateWeight.bind(this));
 
     Object.assign(this.store, {
-      allBoards() {
-        return axios.get(this.generateBoardsPath());
-      },
-
-      recentBoards() {
-        return axios.get(this.state.endpoints.recentBoardsEndpoint);
-      },
-
-      createBoard(board) {
-        const boardPayload = { ...board };
-        boardPayload.label_ids = (board.labels || []).map(b => b.id);
-
-        if (boardPayload.label_ids.length === 0) {
-          boardPayload.label_ids = [''];
-        }
-
-        if (boardPayload.assignee) {
-          boardPayload.assignee_id = boardPayload.assignee.id;
-        }
-
-        if (boardPayload.milestone) {
-          boardPayload.milestone_id = boardPayload.milestone.id;
-        }
-
-        if (boardPayload.id) {
-          return axios.put(this.generateBoardsPath(boardPayload.id), { board: boardPayload });
-        }
-        return axios.post(this.generateBoardsPath(), { board: boardPayload });
-      },
-
-      deleteBoard({ id }) {
-        return axios.delete(this.generateBoardsPath(id));
-      },
-
       updateWeight(endpoint, weight = null) {
         return axios.put(endpoint, {
           weight,
@@ -198,13 +170,6 @@ class BoardsStoreEE {
 
   promotionIsHidden() {
     return parseBoolean(Cookies.get('promotion_issue_board_hidden'));
-  }
-
-  setCurrentBoard(board) {
-    const { state } = this.store;
-    state.currentBoard = board;
-    state.assignees = [];
-    state.milestones = [];
   }
 
   updateWeight(newWeight, id) {

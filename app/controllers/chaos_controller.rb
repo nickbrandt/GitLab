@@ -1,56 +1,83 @@
 # frozen_string_literal: true
 
 class ChaosController < ActionController::Base
-  before_action :validate_request
+  before_action :validate_chaos_secret, unless: :development_or_test?
 
   def leakmem
-    memory_mb = (params[:memory_mb]&.to_i || 100)
-    duration_s = (params[:duration_s]&.to_i || 30).seconds
-
-    start = Time.now
-    retainer = []
-    # Add `n` 1mb chunks of memory to the retainer array
-    memory_mb.times { retainer << "x" * 1.megabyte }
-
-    duration_taken = (Time.now - start).seconds
-    Kernel.sleep duration_s - duration_taken if duration_s > duration_taken
-
-    render plain: "OK"
+    do_chaos :leak_mem, Chaos::LeakMemWorker, memory_mb, duration_s
   end
 
-  def cpuspin
-    duration_s = (params[:duration_s]&.to_i || 30).seconds
-    end_time = Time.now + duration_s.seconds
+  def cpu_spin
+    do_chaos :cpu_spin, Chaos::CpuSpinWorker, duration_s
+  end
 
-    rand while Time.now < end_time
-
-    render plain: "OK"
+  def db_spin
+    do_chaos :db_spin, Chaos::DbSpinWorker, duration_s, interval_s
   end
 
   def sleep
-    duration_s = (params[:duration_s]&.to_i || 30).seconds
-    Kernel.sleep duration_s
-
-    render plain: "OK"
+    do_chaos :sleep, Chaos::SleepWorker, duration_s
   end
 
   def kill
-    Process.kill("KILL", Process.pid)
+    do_chaos :kill, Chaos::KillWorker
   end
 
   private
 
-  def validate_request
-    secret = ENV['GITLAB_CHAOS_SECRET']
-    # GITLAB_CHAOS_SECRET is required unless you're running in Development mode
-    if !secret && !Rails.env.development?
-      render plain: "chaos misconfigured: please configure GITLAB_CHAOS_SECRET when using GITLAB_ENABLE_CHAOS_ENDPOINTS outside of a development environment", status: :internal_server_error
+  def do_chaos(method, worker, *args)
+    if async
+      worker.perform_async(*args)
+    else
+      Gitlab::Chaos.public_send(method, *args) # rubocop: disable GitlabSecurity/PublicSend
     end
 
-    return unless secret
+    render plain: "OK"
+  end
 
-    unless request.headers["HTTP_X_CHAOS_SECRET"] == secret
-      render plain: "To experience chaos, please set X-Chaos-Secret header", status: :unauthorized
+  def validate_chaos_secret
+    unless chaos_secret_configured
+      render plain: "chaos misconfigured: please configure GITLAB_CHAOS_SECRET",
+             status: :internal_server_error
+      return
     end
+
+    unless Devise.secure_compare(chaos_secret_configured, chaos_secret_request)
+      render plain: "To experience chaos, please set a valid `X-Chaos-Secret` header or `token` param",
+             status: :unauthorized
+      return
+    end
+  end
+
+  def chaos_secret_configured
+    ENV['GITLAB_CHAOS_SECRET']
+  end
+
+  def chaos_secret_request
+    request.headers["HTTP_X_CHAOS_SECRET"] || params[:token]
+  end
+
+  def interval_s
+    interval_s = params[:interval_s] || 1
+    interval_s.to_f.seconds
+  end
+
+  def duration_s
+    duration_s = params[:duration_s] || 30
+    duration_s.to_i.seconds
+  end
+
+  def memory_mb
+    memory_mb = params[:memory_mb] || 100
+    memory_mb.to_i
+  end
+
+  def async
+    async = params[:async] || false
+    Gitlab::Utils.to_boolean(async)
+  end
+
+  def development_or_test?
+    Rails.env.development? || Rails.env.test?
   end
 end

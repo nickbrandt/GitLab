@@ -81,7 +81,7 @@ describe 'layouts/nav/sidebar/_group' do
       it 'is visible' do
         render
 
-        expect(rendered).to have_link 'Security Dashboard'
+        expect(rendered).to have_link 'Security'
       end
     end
 
@@ -91,7 +91,7 @@ describe 'layouts/nav/sidebar/_group' do
       it 'is not visible' do
         render
 
-        expect(rendered).not_to have_link 'Security Dashboard'
+        expect(rendered).not_to have_link 'Security'
       end
     end
   end

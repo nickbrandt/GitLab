@@ -5,7 +5,7 @@
 # Used to filter Vulnerabilities::Occurrences  by set of params for Security Dashboard
 #
 # Arguments:
-#   group - object to filter vulnerabilities
+#   vulnerable - object to filter vulnerabilities
 #   params:
 #     severity: Array<String>
 #     confidence: Array<String>
@@ -15,10 +15,10 @@
 module Security
   class VulnerabilitiesFinder
     attr_accessor :params
-    attr_reader :group
+    attr_reader :vulnerable
 
-    def initialize(group:, params: {})
-      @group = group
+    def initialize(vulnerable, params: {})
+      @vulnerable = vulnerable
       @params = params
     end
 
@@ -65,11 +65,11 @@ module Security
 
     def init_collection(scope)
       if scope == :all
-        group.all_vulnerabilities
+        vulnerable.all_vulnerabilities
       elsif scope == :with_sha
-        group.latest_vulnerabilities_with_sha
+        vulnerable.latest_vulnerabilities_with_sha
       else
-        group.latest_vulnerabilities
+        vulnerable.latest_vulnerabilities
       end
     end
   end

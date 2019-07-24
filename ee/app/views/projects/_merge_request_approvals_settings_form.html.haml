@@ -14,7 +14,7 @@
 - if project.code_owner_approval_required_available?
   .form-group.require-code-owner-approval
     .form-check
-      = form.check_box(:merge_requests_require_code_owner_approval, class: 'form-check-input')
+      = form.check_box(:merge_requests_require_code_owner_approval, class: 'form-check-input qa-require-code-owners-approval-checkbox')
       = form.label :merge_requests_require_code_owner_approval, class: 'form-check-label' do
         %span= _('Require approval from code owners')
         = link_to icon('question-circle'), help_page_path('user/project/merge_requests/merge_request_approvals', anchor: 'editing-approvals-premium'), target: '_blank'

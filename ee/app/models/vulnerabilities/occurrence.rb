@@ -8,7 +8,9 @@ module Vulnerabilities
 
     self.table_name = "vulnerability_occurrences"
 
-    paginates_per 20
+    OCCURRENCES_PER_PAGE = 20
+
+    paginates_per OCCURRENCES_PER_PAGE
 
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
@@ -73,7 +75,7 @@ module Vulnerabilities
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
 
-    scope :report_type, -> (type) { where(report_type: self.report_types[type]) }
+    scope :report_type, -> (type) { where(report_type: report_types[type]) }
     scope :ordered, -> { order("severity desc", :id) }
 
     scope :by_report_types, -> (values) { where(report_type: values) }
@@ -119,14 +121,15 @@ module Vulnerabilities
       }
 
       BatchLoader.for(params).batch do |items, loader|
-        project_ids = items.group_by { |i| i[:project_id] }
-        categories = items.group_by { |i| i[:category] }
-        fingerprints = items.group_by { |i| i[:project_fingerprint] }
+        project_ids = items.map { |i| i[:project_id] }
+        categories = items.map { |i| i[:category] }
+        fingerprints = items.map { |i| i[:project_fingerprint] }
 
         Vulnerabilities::Feedback.all_preloaded.where(
-          project_id: project_ids.keys,
-          category: categories.keys,
-          project_fingerprint: fingerprints.keys).find_each do |feedback|
+          project_id: project_ids.uniq,
+          category: categories.uniq,
+          project_fingerprint: fingerprints.uniq
+        ).each do |feedback|
           loaded_params = {
             project_id: feedback.project_id,
             category: feedback.category,

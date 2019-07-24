@@ -5,9 +5,19 @@ require 'spec_helper'
 describe IncidentManagement::CreateIssueService do
   let(:project) { create(:project, :repository) }
   let(:service) { described_class.new(project, nil, alert_payload) }
+  let(:alert_starts_at) { Time.now }
   let(:alert_title) { 'TITLE' }
+  let(:alert_annotations) { { title: alert_title } }
+
   let(:alert_payload) do
-    build_alert_payload(annotations: { title: alert_title })
+    build_alert_payload(
+      annotations: alert_annotations,
+      starts_at: alert_starts_at
+    )
+  end
+
+  let(:alert_presenter) do
+    Gitlab::Alerting::Alert.new(project: project, payload: alert_payload).present
   end
 
   let!(:setting) do
@@ -18,7 +28,7 @@ describe IncidentManagement::CreateIssueService do
 
   context 'when create_issue enabled' do
     let(:issue) { subject[:issue] }
-    let(:summary_separator) { "---\n\n" }
+    let(:summary_separator) { "\n---\n\n" }
 
     before do
       setting.update!(create_issue: true)
@@ -30,28 +40,21 @@ describe IncidentManagement::CreateIssueService do
 
         expect(issue.author).to eq(User.alert_bot)
         expect(issue.title).to eq(alert_title)
-        expect(issue.description).to include('Summary')
-        expect(issue.description).to include(alert_title)
-        expect(issue.description).not_to include(summary_separator)
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+        expect(separator_count(issue.description)).to eq 0
       end
     end
 
-    context 'with issue_template_content' do
-      before do
-        create_issue_template('bug', issue_template_content)
-        setting.update!(issue_template_key: 'bug')
-      end
-
+    shared_examples 'GFM template' do
       context 'plain content' do
-        let(:issue_template_content) { 'some content' }
+        let(:template_content) { 'some content' }
 
         it 'creates an issue appending issue template' do
           expect(subject).to include(status: :success)
 
-          expect(issue.description).to include('Summary')
-          expect(issue.description).to include(alert_title)
-          expect(issue.description).to include(summary_separator)
-          expect(issue.description).to include(issue_template_content)
+          expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+          expect(separator_count(issue.description)).to eq 1
+          expect(issue.description).to include(template_content)
         end
       end
 
@@ -59,7 +62,7 @@ describe IncidentManagement::CreateIssueService do
         let(:user) { create(:user) }
         let(:plain_text) { 'some content' }
 
-        let(:issue_template_content) do
+        let(:template_content) do
           <<~CONTENT
             #{plain_text}
             /due tomorrow
@@ -79,6 +82,40 @@ describe IncidentManagement::CreateIssueService do
           expect(issue.assignees).to eq([user])
         end
       end
+    end
+
+    context 'with gitlab_incident_markdown' do
+      let(:alert_annotations) do
+        { title: alert_title, gitlab_incident_markdown: template_content }
+      end
+
+      it_behaves_like 'GFM template'
+    end
+
+    context 'with issue_template_content' do
+      before do
+        create_issue_template('bug', template_content)
+        setting.update!(issue_template_key: 'bug')
+      end
+
+      it_behaves_like 'GFM template'
+
+      context 'and gitlab_incident_markdown' do
+        let(:template_content) { 'plain text'}
+        let(:alt_template) { 'alternate text' }
+        let(:alert_annotations) do
+          { title: alert_title, gitlab_incident_markdown: alt_template }
+        end
+
+        it 'includes both templates' do
+          expect(subject).to include(status: :success)
+
+          expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+          expect(issue.description).to include(template_content)
+          expect(issue.description).to include(alt_template)
+          expect(separator_count(issue.description)).to eq 2
+        end
+      end
 
       private
 
@@ -93,15 +130,51 @@ describe IncidentManagement::CreateIssueService do
       end
     end
 
-    context 'with an invalid alert payload' do
-      let(:alert_payload) { build_alert_payload(annotations: {}) }
+    context 'with gitlab alert' do
+      let(:gitlab_alert) { create(:prometheus_alert, project: project) }
 
-      it 'does not create an issue' do
-        expect(service)
-          .to receive(:log_error)
-          .with(error_message('invalid alert'))
+      before do
+        alert_payload['labels'] = {
+          'gitlab_alert_id' => gitlab_alert.prometheus_metric_id.to_s
+        }
+      end
 
-        expect(subject).to eq(status: :error, message: 'invalid alert')
+      it 'creates an issue' do
+        query_title = "#{gitlab_alert.title} #{gitlab_alert.computed_operator} #{gitlab_alert.threshold}"
+
+        expect(subject).to include(status: :success)
+
+        expect(issue.author).to eq(User.alert_bot)
+        expect(issue.title).to eq(alert_presenter.full_title)
+        expect(issue.title).to include(gitlab_alert.environment.name)
+        expect(issue.title).to include(query_title)
+        expect(issue.title).to include('for 5 minutes')
+        expect(issue.description).to include(alert_presenter.issue_summary_markdown)
+        expect(separator_count(issue.description)).to eq 0
+      end
+    end
+
+    describe 'with invalid alert payload' do
+      shared_examples 'invalid alert' do
+        it 'does not create an issue' do
+          expect(service)
+            .to receive(:log_error)
+            .with(error_message('invalid alert'))
+
+          expect(subject).to eq(status: :error, message: 'invalid alert')
+        end
+      end
+
+      context 'without title' do
+        let(:alert_annotations) { {} }
+
+        it_behaves_like 'invalid alert'
+      end
+
+      context 'without startsAt' do
+        let(:alert_starts_at) { nil }
+
+        it_behaves_like 'invalid alert'
       end
     end
   end
@@ -122,11 +195,19 @@ describe IncidentManagement::CreateIssueService do
 
   private
 
-  def build_alert_payload(annotations: {})
-    { 'annotations' => annotations.stringify_keys }
+  def build_alert_payload(annotations: {}, starts_at: Time.now)
+    {
+      'annotations' => annotations.stringify_keys
+    }.tap do |payload|
+      payload['startsAt'] = starts_at.rfc3339 if starts_at
+    end
   end
 
   def error_message(message)
     %{Cannot create incident issue for "#{project.full_name}": #{message}}
+  end
+
+  def separator_count(text)
+    text.scan(summary_separator).size
   end
 end

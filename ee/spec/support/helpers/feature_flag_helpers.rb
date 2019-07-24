@@ -6,11 +6,12 @@ module FeatureFlagHelpers
                                      description: description, project: project)
   end
 
-  def create_scope(feature_flag, environment_scope, active)
+  def create_scope(feature_flag, environment_scope, active, strategies = [{ name: "default", parameters: {} }])
     create(:operations_feature_flag_scope,
       feature_flag: feature_flag,
       environment_scope: environment_scope,
-      active: active)
+      active: active,
+      strategies: strategies)
   end
 
   def within_feature_flag_row(index)

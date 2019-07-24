@@ -2,7 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { removeWhitespace } from 'spec/helpers/text_helper';
-import { mockOneProject, mockText } from '../../mock_data';
+import { mockOneProject } from '../../mock_data';
 
 const localVue = createLocalVue();
 
@@ -41,6 +41,21 @@ describe('project header component', () => {
     expect(wrapper.find('.js-project-link').attributes('href')).toBe(path);
   });
 
+  describe('remove button', () => {
+    it('renders removal button icon', () => {
+      expect(wrapper.contains('.js-remove-button')).toBe(true);
+    });
+
+    it('emits project removal link on click', () => {
+      wrapper.find('.js-remove-button').vm.$emit('click');
+
+      expect(wrapper.emittedByOrder()).toContain({
+        name: 'remove',
+        args: [mockOneProject.remove_path],
+      });
+    });
+  });
+
   describe('wrapped components', () => {
     describe('project avatar', () => {
       it('renders', () => {
@@ -50,25 +65,6 @@ describe('project header component', () => {
       it('binds project', () => {
         expect(wrapper.find(ProjectAvatar).props('project')).toEqual(mockOneProject);
       });
-    });
-  });
-
-  describe('dropdown menu', () => {
-    it('renders removal button', () => {
-      expect(
-        wrapper
-          .find('.js-remove-button')
-          .text()
-          .trim(),
-      ).toBe(mockText.REMOVE_PROJECT);
-    });
-
-    it('emits project removal link on click', () => {
-      wrapper.find('.js-remove-button').vm.$emit('click');
-
-      expect(wrapper.emittedByOrder()).toEqual([
-        { name: 'remove', args: [mockOneProject.remove_path] },
-      ]);
     });
   });
 });

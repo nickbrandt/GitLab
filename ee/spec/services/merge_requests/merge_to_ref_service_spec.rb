@@ -18,15 +18,25 @@ describe MergeRequests::MergeToRefService do
         allow(project).to receive(:above_size_limit?).and_return(true)
       end
 
-      it 'returns the correct error message' do
+      it 'bypasses the repository limit check' do
         result = service.execute(merge_request)
 
-        expected_error =
-          'This merge request cannot be merged, because this repository ' \
-          'has exceeded its size limit'
+        expect(result[:status]).to eq(:success)
+      end
+    end
 
-        expect(result[:status]).to eq(:error)
-        expect(result[:message]).to start_with(expected_error)
+    context 'when no commit message is explicitly given and push rule is set' do
+      before do
+        create(:push_rule, :commit_message, project: project)
+      end
+
+      let(:service) { described_class.new(project, user) }
+
+      it 'uses the default commit message' do
+        result = service.execute(merge_request)
+
+        expect(result[:status]).to eq(:success)
+        expect(project.commit(result[:commit_id]).message).to eq(merge_request.default_merge_commit_message)
       end
     end
   end

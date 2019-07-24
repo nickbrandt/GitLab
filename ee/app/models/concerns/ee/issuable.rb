@@ -25,6 +25,11 @@ module EE
       super
     end
 
+    override :supports_milestone?
+    def supports_milestone?
+      super && !is_a?(Epic)
+    end
+
     def supports_epic?
       is_a?(Issue) && project.group
     end

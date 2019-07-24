@@ -1,0 +1,5 @@
+---
+title: Add the ability to publish and install NPM packages from groups and subgroups
+merge_request: 13986
+author:
+type: added

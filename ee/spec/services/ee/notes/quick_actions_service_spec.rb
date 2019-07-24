@@ -179,7 +179,7 @@ describe Notes::QuickActionsService do
 
       context 'when epics are not enabled' do
         it 'does not add a label to the epic' do
-          expect { execute(note) }.not_to change { epic.reload.labels }
+          expect { execute(note) }.not_to change(epic.labels, :count)
         end
       end
 
@@ -212,7 +212,7 @@ describe Notes::QuickActionsService do
 
       context 'when epics are not enabled' do
         it 'does not remove any label' do
-          expect { execute(note) }.not_to change { epic.reload.labels }
+          expect { execute(note) }.not_to change(epic.labels, :count)
         end
       end
 

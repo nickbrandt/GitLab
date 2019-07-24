@@ -1,0 +1,5 @@
+---
+title: Allow subgroups to use their parent group's custom project templates
+merge_request: 14499
+author:
+type: fixed

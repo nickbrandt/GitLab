@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 shared_examples 'approvals' do
-  def json_response
-    JSON.parse(response.body)
-  end
-
   let!(:approver) { create(:user) }
   let!(:approval_rule) { create(:approval_project_rule, project: project, users: [approver, user], approvals_required: 2) }
 
@@ -380,6 +376,91 @@ describe Projects::MergeRequestsController do
       end
 
       it_behaves_like 'approvals'
+    end
+  end
+
+  describe 'GET #license_management_reports' do
+    let(:merge_request) { create(:ee_merge_request, :with_license_management_reports, source_project: project, author: create(:user)) }
+    let(:params) do
+      {
+        namespace_id: project.namespace.to_param,
+        project_id: project,
+        id: merge_request.iid
+      }
+    end
+
+    subject { get :license_management_reports, params: params, format: :json }
+
+    before do
+      allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
+        .with(::Ci::CompareLicenseManagementReportsService).and_return(comparison_status)
+    end
+
+    context 'when comparison is being processed' do
+      let(:comparison_status) { { status: :parsing } }
+
+      it 'sends polling interval' do
+        expect(::Gitlab::PollingInterval).to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 204 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:no_content)
+      end
+    end
+
+    context 'when comparison is done' do
+      let(:comparison_status) { { status: :parsed, data: { new_licenses: [], existing_licenses: [], removed_licenses: [] } } }
+
+      it 'does not send polling interval' do
+        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 200 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to eq({ "new_licenses" => [], "existing_licenses" => [], "removed_licenses" => [] })
+      end
+    end
+
+    context 'when user created corrupted test reports' do
+      let(:comparison_status) { { status: :error, status_reason: 'Failed to parse license management reports' } }
+
+      it 'does not send polling interval' do
+        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 400 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response).to eq({ 'status_reason' => 'Failed to parse license management reports' })
+      end
+    end
+
+    context 'when something went wrong on our system' do
+      let(:comparison_status) { {} }
+
+      it 'does not send polling interval' do
+        expect(::Gitlab::PollingInterval).not_to receive(:set_header)
+
+        subject
+      end
+
+      it 'returns 500 HTTP status' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:internal_server_error)
+        expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
+      end
     end
   end
 

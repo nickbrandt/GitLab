@@ -53,24 +53,33 @@ describe PagesDomain do
       end
 
       let(:pages_domain) do
-        build(:pages_domain, certificate: certificate, key: key).tap do |pd|
+        build(:pages_domain, certificate: certificate, key: key,
+              auto_ssl_enabled: auto_ssl_enabled).tap do |pd|
           allow(pd).to receive(:project).and_return(project)
           pd.valid?
         end
       end
 
-      where(:pages_https_only, :certificate, :key, :errors_on) do
+      where(:pages_https_only, :certificate, :key, :auto_ssl_enabled, :errors_on) do
         attributes = attributes_for(:pages_domain)
         cert, key = attributes.fetch_values(:certificate, :key)
 
-        true  | nil  | nil | %i(certificate key)
-        true  | cert | nil | %i(key)
-        true  | nil  | key | %i(certificate key)
-        true  | cert | key | []
-        false | nil  | nil | []
-        false | cert | nil | %i(key)
-        false | nil  | key | %i(key)
-        false | cert | key | []
+        true  | nil  | nil | false | %i(certificate key)
+        true  | nil  | nil | true  | []
+        true  | cert | nil | false | %i(key)
+        true  | cert | nil | true  | %i(key)
+        true  | nil  | key | false | %i(certificate key)
+        true  | nil  | key | true  | %i(key)
+        true  | cert | key | false | []
+        true  | cert | key | true  | []
+        false | nil  | nil | false | []
+        false | nil  | nil | true  | []
+        false | cert | nil | false | %i(key)
+        false | cert | nil | true  | %i(key)
+        false | nil  | key | false | %i(key)
+        false | nil  | key | true  | %i(key)
+        false | cert | key | false | []
+        false | cert | key | true  | []
       end
 
       with_them do
@@ -117,6 +126,30 @@ describe PagesDomain do
       let(:domain) { build(:pages_domain, :with_missing_chain) }
 
       it { is_expected.not_to be_valid }
+    end
+
+    context 'when certificate is expired' do
+      let(:domain) do
+        build(:pages_domain, :with_trusted_expired_chain)
+      end
+
+      context 'when certificate is being changed' do
+        it "adds error to certificate" do
+          domain.valid?
+
+          expect(domain.errors.keys).to contain_exactly(:key, :certificate)
+        end
+      end
+
+      context 'when certificate is already saved' do
+        it "doesn't add error to certificate" do
+          domain.save(validate: false)
+
+          domain.valid?
+
+          expect(domain.errors.keys).to contain_exactly(:key)
+        end
+      end
     end
   end
 

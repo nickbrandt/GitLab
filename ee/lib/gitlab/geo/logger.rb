@@ -8,7 +8,7 @@ module Gitlab
       end
 
       def self.build
-        super.tap { |logger| logger.level = Rails.logger.level }
+        super.tap { |logger| logger.level = Rails.logger.level } # rubocop:disable Gitlab/RailsLogger
       end
     end
   end

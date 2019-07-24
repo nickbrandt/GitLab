@@ -121,7 +121,7 @@ describe('dashboard component', () => {
           mockAxios.onDelete(projects[0].remove_path).reply(200);
           mockAxios.onGet(mockListEndpoint).replyOnce(200, { projects: [] });
 
-          wrapper.find('.js-remove-button').vm.$emit('click');
+          wrapper.find('button.js-remove-button').vm.$emit('click');
 
           timeoutPromise()
             .then(() => {

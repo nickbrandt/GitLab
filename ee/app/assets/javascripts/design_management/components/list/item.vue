@@ -43,7 +43,7 @@ export default {
 <template>
   <router-link
     :to="{ name: 'design', params: { id: name } }"
-    class="card cursor-pointer text-plain js-design-list-item"
+    class="card cursor-pointer text-plain js-design-list-item design-list-item"
   >
     <div class="card-body p-0">
       <img :src="image" :alt="name" class="block ml-auto mr-auto mw-100 design-img" height="230" />
@@ -64,9 +64,3 @@ export default {
     </div>
   </router-link>
 </template>
-
-<style scoped>
-.card:hover {
-  text-decoration: none;
-}
-</style>

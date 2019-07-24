@@ -4,6 +4,7 @@ module ApprovalRuleLike
   extend ActiveSupport::Concern
 
   DEFAULT_NAME = 'Default'
+  DEFAULT_NAME_FOR_SECURITY_REPORT = 'Vulnerability-Check'
   APPROVALS_REQUIRED_MAX = 100
 
   included do

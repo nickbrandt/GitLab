@@ -29,6 +29,7 @@ module API
           params do
             requires :name, type: String, desc: 'The name of the approval rule'
             requires :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
+            optional :rule_type, type: String, desc: 'The type of approval rule'
             optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
             optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'
           end
@@ -81,9 +82,10 @@ module API
               authorize! :admin_project, user_project
 
               approval_rule = user_project.approval_rules.find(params[:approval_rule_id])
-              destroy_conditionally!(approval_rule)
 
-              no_content!
+              destroy_conditionally!(approval_rule) do |rule|
+                ::ApprovalRules::ProjectRuleDestroyService.new(rule).execute
+              end
             end
           end
         end

@@ -159,13 +159,15 @@ export default {
       this.isLoadingCodequality = true;
 
       Promise.all([this.service.fetchReport(head_path), this.service.fetchReport(base_path)])
-        .then(values => {
+        .then(values =>
           this.mr.compareCodeclimateMetrics(
             values[0],
             values[1],
             this.mr.headBlobPath,
             this.mr.baseBlobPath,
-          );
+          ),
+        )
+        .then(() => {
           this.isLoadingCodequality = false;
         })
         .catch(() => {

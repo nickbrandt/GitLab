@@ -96,4 +96,36 @@ describe ProjectsHelper do
       end
     end
   end
+
+  describe '#project_security_dashboard_config' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group).tap { |g| g.add_owner(user) } }
+    let(:project) { create(:project, :repository, group: group) }
+    let(:pipeline) do
+      create(:ee_ci_pipeline,
+      :with_sast_report,
+      user: user,
+      project: project,
+      ref: project.default_branch,
+      sha: project.commit.sha)
+    end
+
+    context 'project without pipeline' do
+      subject { helper.project_security_dashboard_config(project, nil) }
+
+      it 'returns simple config' do
+        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard'
+        expect(subject[:has_pipeline_data]).to eq 'false'
+      end
+    end
+
+    context 'project with pipeline' do
+      subject { helper.project_security_dashboard_config(project, pipeline) }
+
+      it 'returns config containing pipeline details' do
+        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard'
+        expect(subject[:has_pipeline_data]).to eq 'true'
+      end
+    end
+  end
 end

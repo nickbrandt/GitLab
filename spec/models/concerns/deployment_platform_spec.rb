@@ -5,7 +5,7 @@ require 'rails_helper'
 describe DeploymentPlatform do
   let(:project) { create(:project) }
 
-  shared_examples '#deployment_platform' do
+  describe '#deployment_platform' do
     subject { project.deployment_platform }
 
     context 'with no Kubernetes configuration on CI/CD, no Kubernetes Service' do
@@ -46,12 +46,11 @@ describe DeploymentPlatform do
       end
 
       context 'when child group has configured kubernetes cluster', :nested_groups do
-        let!(:child_group1_cluster) { create(:cluster, :provided_by_gcp, :group) }
-        let(:child_group1) { child_group1_cluster.group }
+        let(:child_group1) { create(:group, parent: group) }
+        let!(:child_group1_cluster) { create(:cluster_for_group, groups: [child_group1]) }
 
         before do
           project.update!(group: child_group1)
-          child_group1.update!(parent: group)
         end
 
         it 'returns the Kubernetes platform for the child group' do
@@ -59,11 +58,10 @@ describe DeploymentPlatform do
         end
 
         context 'deeply nested group' do
-          let!(:child_group2_cluster) { create(:cluster, :provided_by_gcp, :group) }
-          let(:child_group2) { child_group2_cluster.group }
+          let(:child_group2) { create(:group, parent: child_group1) }
+          let!(:child_group2_cluster) { create(:cluster_for_group, groups: [child_group2]) }
 
           before do
-            child_group2.update!(parent: child_group1)
             project.update!(group: child_group2)
           end
 
@@ -83,21 +81,5 @@ describe DeploymentPlatform do
         end
       end
     end
-  end
-
-  context 'legacy implementation' do
-    before do
-      stub_feature_flags(clusters_cte: false)
-    end
-
-    include_examples '#deployment_platform'
-  end
-
-  context 'CTE implementation' do
-    before do
-      stub_feature_flags(clusters_cte: true)
-    end
-
-    include_examples '#deployment_platform'
   end
 end

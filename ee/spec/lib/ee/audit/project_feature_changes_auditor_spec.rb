@@ -5,7 +5,7 @@ require 'spec_helper'
 describe EE::Audit::ProjectFeatureChangesAuditor do
   describe '#execute' do
     let!(:user) { create(:user) }
-    let!(:project) { create(:project, visibility_level: 0) }
+    let!(:project) { create(:project, :pages_enabled, visibility_level: 0) }
     let(:features) { project.project_feature }
     let(:foo_instance) { described_class.new(user, features, project) }
 

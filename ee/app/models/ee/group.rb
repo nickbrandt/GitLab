@@ -10,6 +10,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
+      include Vulnerable
       include TokenAuthenticatable
       include InsightsFeature
 
@@ -106,21 +107,6 @@ module EE
           group.save
         end
       end
-    end
-
-    def latest_vulnerabilities
-      Vulnerabilities::Occurrence
-        .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
-    end
-
-    def latest_vulnerabilities_with_sha
-      Vulnerabilities::Occurrence
-        .for_pipelines_with_sha(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
-    end
-
-    def all_vulnerabilities
-      Vulnerabilities::Occurrence
-        .for_pipelines(all_pipelines.with_vulnerabilities.success)
     end
 
     def human_ldap_access
@@ -231,9 +217,9 @@ module EE
 
     def custom_project_templates_group_allowed
       return if custom_project_templates_group_id.blank?
-      return if descendants.exists?(id: custom_project_templates_group_id)
+      return if children.exists?(id: custom_project_templates_group_id)
 
-      errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
+      errors.add(:custom_project_templates_group_id, "has to be a subgroup of the group")
     end
   end
 end

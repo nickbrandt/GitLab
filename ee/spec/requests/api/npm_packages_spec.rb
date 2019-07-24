@@ -27,7 +27,7 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/packages/npm/*package_name' do
-    let(:package) { create(:npm_package, project: project, name: "@#{project.full_path}") }
+    let(:package) { create(:npm_package, project: project) }
 
     context 'a public project' do
       it 'returns the package info without oauth token' do
@@ -80,16 +80,6 @@ describe API::NpmPackages do
       expect(response).to have_gitlab_http_status(403)
     end
 
-    context 'project name is different from a package name' do
-      let(:package) { create(:npm_package, project: project) }
-
-      it 'rejects request' do
-        get_package(package)
-
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
     def get_package(package, params = {})
       get api("/packages/npm/#{package.name}"), params: params
     end
@@ -100,7 +90,7 @@ describe API::NpmPackages do
   end
 
   describe 'GET /api/v4/projects/:id/packages/npm/*package_name/-/*file_name' do
-    let(:package) { create(:npm_package, project: project, name: "@#{project.full_path}") }
+    let(:package) { create(:npm_package, project: project) }
     let(:package_file) { package.package_files.first }
 
     context 'a public project' do
@@ -159,20 +149,34 @@ describe API::NpmPackages do
 
   describe 'PUT /api/v4/projects/:id/packages/npm/:package_name' do
     context 'when params are correct' do
-      context 'unscoped package' do
-        let(:package_name) { project.path }
-        let(:params) { upload_params(package_name) }
+      context 'invalid package record' do
+        context 'unscoped package' do
+          let(:package_name) { 'my_unscoped_package' }
+          let(:params) { upload_params(package_name) }
 
-        it 'denies the request with 400 error' do
-          expect { upload_package_with_token(package_name, params) }
-            .not_to change { project.packages.count }
+          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
+            expect { upload_package_with_token(package_name, params) }
+              .not_to change { project.packages.count }
 
-          expect(response).to have_gitlab_http_status(400)
+            expect(response).to have_gitlab_http_status(400)
+          end
+        end
+
+        context 'invalid package name' do
+          let(:package_name) { "@#{group.path}/my_inv@lid_package_name" }
+          let(:params) { upload_params(package_name) }
+
+          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
+            expect { upload_package_with_token(package_name, params) }
+              .not_to change { project.packages.count }
+
+            expect(response).to have_gitlab_http_status(400)
+          end
         end
       end
 
       context 'scoped package' do
-        let(:package_name) { "@#{project.full_path}" }
+        let(:package_name) { "@#{group.path}/my_package_name" }
         let(:params) { upload_params(package_name) }
 
         it 'creates npm package with file' do
@@ -181,6 +185,19 @@ describe API::NpmPackages do
             .and change { Packages::PackageFile.count }.by(1)
 
           expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'package creation fails' do
+        let(:package_name) { "@#{group.path}/my_package_name" }
+        let(:params) { upload_params(package_name) }
+
+        it 'returns an error if the package already exists' do
+          create(:npm_package, project: project, version: '1.0.1', name: "@#{group.path}/my_package_name")
+          expect { upload_package_with_token(package_name, params) }
+            .not_to change { project.packages.count }
+
+          expect(response).to have_gitlab_http_status(403)
         end
       end
     end

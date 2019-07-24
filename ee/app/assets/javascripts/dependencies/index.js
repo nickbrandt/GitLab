@@ -15,13 +15,15 @@ export default () => {
     components: {
       DependenciesApp,
     },
+    provide: {
+      dependencyListVulnerabilities,
+    },
     render(createElement) {
       return createElement(DependenciesApp, {
         props: {
           endpoint,
           emptyStateSvgPath,
           documentationPath,
-          dependencyListVulnerabilities,
         },
       });
     },

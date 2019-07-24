@@ -1,0 +1,26 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "name",
+      "version",
+      "package_manager",
+      "dependency_file_path"
+    ],
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "package_manager": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "dependency_file_path": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -3,9 +3,10 @@
 require 'spec_helper'
 
 describe MergeTrains::CreatePipelineService do
-  set(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :repository) }
   set(:maintainer) { create(:user) }
   let(:service) { described_class.new(project, maintainer) }
+  let(:previous_ref) { 'refs/heads/master' }
 
   before do
     project.add_maintainer(maintainer)
@@ -14,7 +15,7 @@ describe MergeTrains::CreatePipelineService do
   end
 
   describe '#execute' do
-    subject { service.execute(merge_request) }
+    subject { service.execute(merge_request, previous_ref) }
 
     let!(:merge_request) do
       create(:merge_request, :on_train, train_creator: maintainer,
@@ -34,15 +35,11 @@ describe MergeTrains::CreatePipelineService do
 
     context 'when merge trains option is disabled' do
       before do
-        project.update!(merge_trains_enabled: false)
+        stub_feature_flags(merge_trains_enabled: false)
       end
 
       it_behaves_like 'returns an error' do
         let(:expected_reason) { 'merge trains is disabled' }
-      end
-
-      after do
-        project.update!(merge_trains_enabled: true)
       end
     end
 
@@ -82,6 +79,10 @@ describe MergeTrains::CreatePipelineService do
           expect { subject }
             .to change { merge_request.project.repository.ref_exists?(merge_request.train_ref_path) }
             .from(false).to(true)
+
+          expect(project.repository.commit(merge_request.train_ref_path).message)
+            .to eq("Merge branch #{merge_request.source_branch} with #{previous_ref} " \
+                   "into #{merge_request.train_ref_path}")
         end
 
         it 'calls Ci::CreatePipelineService for creating pipeline on train ref' do
@@ -91,6 +92,39 @@ describe MergeTrains::CreatePipelineService do
           end
 
           subject
+        end
+
+        context 'when previous_ref is a train ref' do
+          let(:previous_ref) { 'refs/merge-requests/999/train' }
+          let(:previous_ref_sha) { project.repository.commit('refs/merge-requests/999/train').sha }
+
+          context 'when previous_ref exists' do
+            before do
+              project.repository.create_ref('master', previous_ref)
+            end
+
+            it 'creates train ref with the specified ref' do
+              subject
+
+              commit = project.repository.commit(merge_request.train_ref_path)
+              expect(commit.parent_ids[1]).to eq(merge_request.diff_head_sha)
+              expect(commit.parent_ids[0]).to eq(previous_ref_sha)
+            end
+          end
+
+          context 'when previous_ref does not exist' do
+            it_behaves_like 'returns an error' do
+              let(:expected_reason) { '3:Invalid merge source' }
+            end
+          end
+        end
+
+        context 'when previous_ref is nil' do
+          let(:previous_ref) { nil }
+
+          it_behaves_like 'returns an error' do
+            let(:expected_reason) { 'previous ref is not specified' }
+          end
         end
       end
 

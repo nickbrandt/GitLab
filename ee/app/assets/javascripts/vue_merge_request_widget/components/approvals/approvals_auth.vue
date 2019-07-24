@@ -1,10 +1,11 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlModal } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
     GlLoadingIcon,
+    GlModal,
   },
   props: {
     isApproving: {
@@ -17,63 +18,77 @@ export default {
       default: false,
       required: false,
     },
+    modalId: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       approvalPassword: '',
     };
   },
-  mounted() {
-    this.$nextTick(() => this.$refs.approvalPassword.focus());
-  },
   methods: {
-    approve() {
+    approve(event) {
+      event.preventDefault();
       this.$emit('approve', this.approvalPassword);
     },
-    cancel() {
-      this.$emit('cancel');
+    onHide() {
+      this.approvalPassword = '';
+      this.$emit('hide');
+    },
+    onShow() {
+      setTimeout(() => {
+        this.$refs.approvalPasswordInput.focus();
+      }, 0);
     },
   },
 };
 </script>
 <template>
-  <form class="form-inline align-items-center" @submit.prevent="approve">
-    <div class="form-group mb-2 mr-2 mb-sm-0">
-      <input
-        ref="approvalPassword"
-        v-model="approvalPassword"
-        type="password"
-        class="form-control"
-        :class="{ 'is-invalid': hasError }"
-        autocomplete="new-password"
-        :placeholder="s__('Password')"
-      />
-    </div>
-    <div class="form-group mb-2 mr-2 mb-sm-0">
-      <gl-button
-        variant="primary"
-        :disabled="isApproving"
-        size="sm"
-        class="mr-1 js-confirm"
-        @click="approve"
-      >
-        <gl-loading-icon v-if="isApproving" inline />
-        {{ s__('Confirm') }}
-      </gl-button>
-      <gl-button
-        variant="default"
-        :disabled="isApproving"
-        size="sm"
-        class="js-cancel"
-        @click="cancel"
-      >
-        {{ s__('Cancel') }}
-      </gl-button>
-    </div>
-    <div v-if="hasError">
-      <span class="gl-field-error">
-        {{ s__('mrWidget|Approval password is invalid.') }}
-      </span>
-    </div>
-  </form>
+  <gl-modal
+    :modal-id="modalId"
+    :ok-disabled="isApproving"
+    :title="s__('Enter your password to approve')"
+    ok-variant="success"
+    modal-class="js-mr-approvals-modal"
+    @ok="approve"
+    @hide="onHide"
+    @show="onShow"
+  >
+    <form @submit.prevent="approve">
+      <p>
+        {{
+          s__(
+            'mrWidget|To approve this merge request, please enter your password. This project requires all approvals to be authenticated.',
+          )
+        }}
+      </p>
+      <div class="form-group mb-0">
+        <label class="mb-1" for="approvalPasswordInput">{{ s__('mrWidget|Your password') }}</label>
+        <div>
+          <input
+            id="approvalPasswordInput"
+            ref="approvalPasswordInput"
+            v-model="approvalPassword"
+            type="password"
+            class="form-control"
+            :class="{ 'is-invalid': hasError }"
+            autocomplete="new-password"
+            :placeholder="s__('Password')"
+          />
+        </div>
+      </div>
+      <div v-if="hasError">
+        <span class="gl-field-error">{{ s__('mrWidget|Approval password is invalid.') }}</span>
+      </div>
+    </form>
+
+    <template slot="modal-cancel">{{ s__('Cancel') }}</template>
+
+    <template slot="modal-ok">
+      <gl-loading-icon v-if="isApproving" inline />
+      {{ s__('Approve') }}
+    </template>
+  </gl-modal>
 </template>

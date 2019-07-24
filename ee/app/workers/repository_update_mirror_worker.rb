@@ -35,6 +35,7 @@ class RepositoryUpdateMirrorWorker
 
   private
 
+  # rubocop:disable Gitlab/RailsLogger
   def start_mirror(project)
     import_state = project.import_state
 
@@ -48,18 +49,19 @@ class RepositoryUpdateMirrorWorker
       false
     end
   end
+  # rubocop:enable Gitlab/RailsLogger
 
   def fail_mirror(project, message)
     project.import_state.mark_as_failed(message)
 
-    Rails.logger.error("Mirror update for #{project.full_path} failed with the following message: #{message}")
+    Rails.logger.error("Mirror update for #{project.full_path} failed with the following message: #{message}") # rubocop:disable Gitlab/RailsLogger
   end
 
   def finish_mirror(project)
     import_state = project.import_state
     import_state.finish
 
-    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{import_state.mirror_update_duration}}.")
+    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{import_state.mirror_update_duration}}.") # rubocop:disable Gitlab/RailsLogger
     metric_mirror_update_duration_seconds.observe({}, import_state.mirror_update_duration)
   end
 

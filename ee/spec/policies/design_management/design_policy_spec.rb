@@ -97,7 +97,7 @@ describe DesignManagement::DesignPolicy do
   context "when the feature flag is off" do
     before do
       stub_licensed_features(design_management: true)
-      stub_feature_flags(design_management: false)
+      stub_feature_flags(design_management_flag: false)
       allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
     end
 
@@ -107,7 +107,7 @@ describe DesignManagement::DesignPolicy do
   context "when the license does not include the feature" do
     before do
       stub_licensed_features(design_management: false)
-      stub_feature_flags(design_management: true)
+      stub_feature_flags(design_management_flag: true)
       allow(Gitlab.config.lfs).to receive(:enabled).and_return(true)
     end
 
@@ -117,7 +117,7 @@ describe DesignManagement::DesignPolicy do
   context "when LFS is not enabled" do
     before do
       stub_licensed_features(design_management: true)
-      stub_feature_flags(design_management: true)
+      stub_feature_flags(design_management_flag: true)
       allow(Gitlab.config.lfs).to receive(:enabled).and_return(false)
     end
 

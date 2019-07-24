@@ -8,8 +8,8 @@
 - can_update_approvers = can?(current_user, :update_approvers, issuable)
 
 .form-group.row
-  = form.label :approver_ids, class: 'col-form-label col-sm-2' do
-    Approvers
+  .col-sm-2.col-form-label
+    = form.label :approver_ids, "Approvers"
   .col-sm-10
     #js-mr-approvals-input{ data: { 'project_id': @target_project.id,
       'can_edit': can?(current_user, :update_approvers, issuable).to_s,

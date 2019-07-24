@@ -1,0 +1,5 @@
+---
+title: Fix cluster health charts on instance level
+merge_request: 14440
+author:
+type: fixed

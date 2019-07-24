@@ -31,4 +31,10 @@ describe('DismissalCommentBox', () => {
     wrapper.setProps({ errorMessage });
     expect(wrapper.find('.js-error').text()).toBe(errorMessage);
   });
+
+  it('should render the placeholder', () => {
+    const placeholder = 'Please type into the box';
+    wrapper.setProps({ placeholder });
+    expect(wrapper.find(GlFormTextarea).attributes('placeholder')).toBe(placeholder);
+  });
 });

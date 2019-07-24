@@ -8,7 +8,8 @@ describe 'CycleAnalytics#test' do
   let(:project) { create(:project, :repository) }
   let(:from_date) { 10.days.ago }
   let(:user) { create(:user, :admin) }
-  subject { CycleAnalytics.new(project, from: from_date) }
+
+  subject { CycleAnalytics::ProjectLevel.new(project, options: { from: from_date }) }
 
   generate_cycle_analytics_spec(
     phase: :test,
@@ -35,7 +36,7 @@ describe 'CycleAnalytics#test' do
 
       merge_merge_requests_closing_issue(user, project, issue)
 
-      expect(subject[:test].median).to be_nil
+      expect(subject[:test].project_median).to be_nil
     end
   end
 
@@ -46,7 +47,7 @@ describe 'CycleAnalytics#test' do
       pipeline.run!
       pipeline.succeed!
 
-      expect(subject[:test].median).to be_nil
+      expect(subject[:test].project_median).to be_nil
     end
   end
 
@@ -61,7 +62,7 @@ describe 'CycleAnalytics#test' do
 
       merge_merge_requests_closing_issue(user, project, issue)
 
-      expect(subject[:test].median).to be_nil
+      expect(subject[:test].project_median).to be_nil
     end
   end
 
@@ -76,7 +77,7 @@ describe 'CycleAnalytics#test' do
 
       merge_merge_requests_closing_issue(user, project, issue)
 
-      expect(subject[:test].median).to be_nil
+      expect(subject[:test].project_median).to be_nil
     end
   end
 end

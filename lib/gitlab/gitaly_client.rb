@@ -67,7 +67,7 @@ module Gitlab
         File.read(cert_file).scan(PEM_REGEX).map do |cert|
           OpenSSL::X509::Certificate.new(cert).to_pem
         rescue OpenSSL::OpenSSLError => e
-          Rails.logger.error "Could not load certificate #{cert_file} #{e}"
+          Rails.logger.error "Could not load certificate #{cert_file} #{e}" # rubocop:disable Gitlab/RailsLogger
           Gitlab::Sentry.track_exception(e, extra: { cert_file: cert_file })
           nil
         end.compact
@@ -211,8 +211,7 @@ module Gitlab
       metadata['call_site'] = feature.to_s if feature
       metadata['gitaly-servers'] = address_metadata(remote_storage) if remote_storage
       metadata['x-gitlab-correlation-id'] = Labkit::Correlation::CorrelationId.current_id if Labkit::Correlation::CorrelationId.current_id
-      metadata['gitaly-session-id'] = session_id if Feature::Gitaly.enabled?(Feature::Gitaly::CATFILE_CACHE)
-
+      metadata['gitaly-session-id'] = session_id
       metadata.merge!(Feature::Gitaly.server_feature_flags)
 
       result = { metadata: metadata }
@@ -414,7 +413,7 @@ module Gitlab
       metadata_file = File.read(storage_metadata_file_path(storage))
       metadata_hash = JSON.parse(metadata_file)
       metadata_hash['gitaly_filesystem_id']
-    rescue Errno::ENOENT, JSON::ParserError
+    rescue Errno::ENOENT, Errno::ACCESS, JSON::ParserError
       nil
     end
 

@@ -144,7 +144,7 @@ module EE
             # rubocop: enable CodeReuse/ActiveRecord
 
             def logger
-              Rails.logger
+              Rails.logger # rubocop:disable Gitlab/RailsLogger
             end
           end
         end

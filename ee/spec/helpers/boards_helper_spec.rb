@@ -16,8 +16,8 @@ describe BoardsHelper do
     end
   end
 
-  describe '#current_board' do
-    let(:board_json) { helper.current_board }
+  describe '#current_board_json' do
+    let(:board_json) { helper.current_board_json }
     let(:user) { create(:user) }
     let(:label1) { create(:label, name: "feijoa") }
     let(:label2) { create(:label, name: "pineapple") }
@@ -25,13 +25,6 @@ describe BoardsHelper do
 
     it 'serializes with child object attributes' do
       board = create(:board, project: project, milestone: milestone, assignee: user, labels: [label1, label2])
-      assign(:board, board)
-
-      expect(board_json).to match_schema('current-board', dir: 'ee')
-    end
-
-    it 'can serialise with a basic set of attributes' do
-      board = create(:board, project: project)
       assign(:board, board)
 
       expect(board_json).to match_schema('current-board', dir: 'ee')

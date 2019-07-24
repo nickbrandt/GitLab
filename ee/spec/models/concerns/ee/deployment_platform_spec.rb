@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe EE::DeploymentPlatform do
-  shared_examples '#deployment_platform' do
+  describe '#deployment_platform' do
     let(:group) { create(:group) }
     let(:project) { create(:project, group: group) }
 
@@ -264,21 +264,5 @@ describe EE::DeploymentPlatform do
         expect(project.deployment_platform(environment: environment_2)).to eq(cluster_2.platform_kubernetes)
       end
     end
-  end
-
-  context 'legacy implementation' do
-    before do
-      stub_feature_flags(clusters_cte: false)
-    end
-
-    include_examples '#deployment_platform'
-  end
-
-  context 'CTE implementation' do
-    before do
-      stub_feature_flags(clusters_cte: true)
-    end
-
-    include_examples '#deployment_platform'
   end
 end

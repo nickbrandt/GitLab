@@ -109,10 +109,10 @@ To make full use of Auto DevOps, you will need:
    To enable deployments, you will need Kubernetes 1.5+. You need a [Kubernetes cluster][kubernetes-clusters]
    for the project, or a Kubernetes [default service template](../../user/project/integrations/services_templates.md)
    for the entire GitLab installation.
-    1. **A load balancer** - You can use NGINX ingress by deploying it to your
-       Kubernetes cluster using the
-       [`nginx-ingress`](https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress)
-       Helm chart.
+   1. **A load balancer** - You can use NGINX ingress by deploying it to your
+      Kubernetes cluster using the
+      [`nginx-ingress`](https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress)
+      Helm chart.
 1. **Prometheus** (needed for Auto Monitoring) - To enable Auto Monitoring, you
    will need Prometheus installed somewhere (inside or outside your cluster) and
    configured to scrape your Kubernetes cluster. To get response metrics
@@ -168,7 +168,6 @@ From GitLab 11.8, `KUBE_INGRESS_BASE_DOMAIN` replaces `AUTO_DEVOPS_DOMAIN`.
 Support for `AUTO_DEVOPS_DOMAIN` was [removed in GitLab
 12.0](https://gitlab.com/gitlab-org/gitlab-ce/issues/56959).
 
-
 ## Using multiple Kubernetes clusters **(PREMIUM)**
 
 When using Auto DevOps, you may want to deploy different environments to
@@ -202,7 +201,7 @@ To add a different cluster for each environment:
 1. Navigate to your project's **Operations > Kubernetes** and create the Kubernetes clusters
    with their respective environment scope as described from the table above.
 
-    ![Auto DevOps multiple clusters](img/autodevops_multiple_clusters.png)
+   ![Auto DevOps multiple clusters](img/autodevops_multiple_clusters.png)
 
 1. After the clusters are created, navigate to each one and install Helm Tiller
    and Ingress. Wait for the Ingress IP address to be assigned.
@@ -223,7 +222,7 @@ full use of Auto DevOps are available. If this is your fist time, we recommend y
 [quick start guide](quick_start_guide.md).
 
 GitLab.com users can enable/disable Auto DevOps at the project-level only. Self-managed users
-can enable/disable Auto DevOps at either the project-level or instance-level.
+can enable/disable Auto DevOps at the project-level, group-level or instance-level.
 
 ### Enabling/disabling Auto DevOps at the instance-level (Administrators only)
 
@@ -316,7 +315,7 @@ If a project's repository contains a `Dockerfile`, Auto Build will use
 If you are also using Auto Review Apps and Auto Deploy and choose to provide
 your own `Dockerfile`, make sure you expose your application to port
 `5000` as this is the port assumed by the
-[default Helm chart](https://gitlab.com/gitlab-org/charts/auto-deploy-app).
+[default Helm chart](https://gitlab.com/gitlab-org/charts/auto-deploy-app). Alternatively you can override the default values by [customizing the Auto Deploy helm chart](#custom-helm-chart)
 
 #### Auto Build using Heroku buildpacks
 
@@ -452,7 +451,7 @@ be deleted.
 
 Review apps are deployed using the
 [auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
-Helm. The app will be deployed into the [Kubernetes
+Helm, which can be [customized](#custom-helm-chart). The app will be deployed into the [Kubernetes
 namespace](../../user/project/clusters/index.md#deployment-variables)
 for the environment.
 
@@ -514,7 +513,7 @@ Auto Deploy doesn't include deployments to staging or canary by default, but the
 enable them.
 
 You can make use of [environment variables](#environment-variables) to automatically
-scale your pod replicas.
+scale your pod replicas and to apply custom arguments to the Auto DevOps `helm upgrade` commands. This is an easy way to [customize the Auto Deploy helm chart](#custom-helm-chart).
 
 Apps are deployed using the
 [auto-deploy-app](https://gitlab.com/gitlab-org/charts/auto-deploy-app) chart with
@@ -655,6 +654,9 @@ repo or by specifying a project variable:
 - **Project variable** - Create a [project variable](../../ci/variables/README.md#gitlab-cicd-environment-variables)
   `AUTO_DEVOPS_CHART` with the URL of a custom chart to use or create two project variables `AUTO_DEVOPS_CHART_REPOSITORY` with the URL of a custom chart repository and `AUTO_DEVOPS_CHART` with the path to the chart.
 
+You can also make use of the `HELM_UPGRADE_EXTRA_ARGS` environment variable to override the default values in the `values.yaml` file in the [default Helm chart](https://gitlab.com/gitlab-org/charts/auto-deploy-app).
+To apply your own `values.yaml` file to all Helm upgrade commands in Auto Deploy set `HELM_UPGRADE_EXTRA_ARGS` to `--values my-values.yaml`.
+
 ### Custom Helm chart per environment **(PREMIUM)**
 
 You can specify the use of a custom Helm chart per environment by scoping the environment variable
@@ -761,7 +763,8 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 | `KUBE_INGRESS_BASE_DOMAIN`   | From GitLab 11.8, this variable can be used to set a domain per cluster. See [cluster domains](../../user/project/clusters/index.md#base-domain) for more information. |
 | `ROLLOUT_RESOURCE_TYPE`     | From GitLab 11.9, this variable allows specification of the resource type being deployed when using a custom helm chart. Default value is `deployment`. |
 | `ROLLOUT_STATUS_DISABLED`   | From GitLab 12.0, this variable allows to disable rollout status check because it doesn't support all resource types, for example, `cronjob`. |
-| `HELM_UPGRADE_EXTRA_ARGS`   | From GitLab 11.11, this variable allows extra arguments in `helm` commands when deploying the application. Note that using quotes will not prevent word splitting. |
+| `HELM_UPGRADE_EXTRA_ARGS`   | From GitLab 11.11, this variable allows extra arguments in `helm` commands when deploying the application. Note that using quotes will not prevent word splitting. **Tip:** you can use this variable to [customize the Auto Deploy helm chart](https://docs.gitlab.com/ee/topics/autodevops/index.html#custom-helm-chart) by applying custom override values with `--values my-values.yaml`. |
+| `HELM_RELEASE_NAME`   | From GitLab 12.1, this variable allows the `helm` release name to be overridden, this can be used to assign unique release names when deploying multiple projects to a single namespace  |
 
 TIP: **Tip:**
 Set up the replica variables using a
@@ -787,11 +790,11 @@ To configure your application variables:
 1. Go to your project's **Settings > CI/CD**, then expand the section
    called **Variables**.
 
-2. Create a CI Variable, ensuring the key is prefixed with
+1. Create a CI Variable, ensuring the key is prefixed with
    `K8S_SECRET_`. For example, you can create a variable with key
 `K8S_SECRET_RAILS_MASTER_KEY`.
 
-3. Run an Auto Devops pipeline either by manually creating a new
+1. Run an Auto Devops pipeline either by manually creating a new
    pipeline or by pushing a code change to GitLab.
 
 Auto DevOps pipelines will take your application secret variables to

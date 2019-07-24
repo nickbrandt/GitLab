@@ -29,7 +29,7 @@ module Gitlab
     end
 
     def self.connected?
-      Gitlab::Database.postgresql? && GeoNode.connected? && GeoNode.table_exists?
+      GeoNode.connected? && GeoNode.table_exists?
     end
 
     def self.enabled?
@@ -81,29 +81,26 @@ module Gitlab
       end
     end
 
-    def self.cache
-      @cache ||= Gitlab::JsonCache.new(namespace: :geo)
+    def self.l1_cache
+      SafeRequestStore[:geo_l1_cache] ||=
+        Gitlab::JsonCache.new(namespace: :geo, backend: ::Gitlab::ThreadMemoryCache.cache_backend)
     end
 
-    def self.request_store_cache
-      Gitlab::SafeRequestStore
+    def self.l2_cache
+      SafeRequestStore[:geo_l2_cache] ||= Gitlab::JsonCache.new(namespace: :geo)
     end
 
     def self.cache_value(raw_key, as: nil, &block)
-      return yield unless request_store_cache.active?
-
-      request_store_cache.fetch(cache.cache_key(raw_key)) do
-        # We need a short expire time as we can't manually expire on a secondary node
-        cache.fetch(raw_key, as: as, expires_in: 15.seconds) { yield }
+      # We need a short expire time as we can't manually expire on a secondary node
+      l1_cache.fetch(raw_key, as: as, expires_in: 1.minute) do
+        l2_cache.fetch(raw_key, as: as, expires_in: 2.minutes) { yield }
       end
     end
 
     def self.expire_cache!
-      return true unless request_store_cache.active?
-
       CACHE_KEYS.each do |raw_key|
-        cache.expire(raw_key)
-        request_store_cache.delete(cache.cache_key(raw_key))
+        l1_cache.expire(raw_key)
+        l2_cache.expire(raw_key)
       end
 
       true

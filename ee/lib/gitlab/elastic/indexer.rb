@@ -8,13 +8,12 @@ module Gitlab
     class Indexer
       include Gitlab::Utils::StrongMemoize
 
-      EXPERIMENTAL_INDEXER = 'gitlab-elasticsearch-indexer'.freeze
-
       Error = Class.new(StandardError)
 
       class << self
         def experimental_indexer_present?
-          Gitlab::Utils.which(EXPERIMENTAL_INDEXER).present?
+          path = Gitlab.config.elasticsearch.indexer_path
+          path.present? && File.executable?(path)
         end
 
         def experimental_indexer_version
@@ -73,7 +72,7 @@ module Gitlab
 
       def path_to_indexer
         if use_experimental_indexer?
-          EXPERIMENTAL_INDEXER
+          Gitlab.config.elasticsearch.indexer_path
         else
           Rails.root.join('bin', 'elastic_repo_indexer').to_s
         end

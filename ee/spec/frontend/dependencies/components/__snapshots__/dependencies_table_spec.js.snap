@@ -142,3 +142,170 @@ exports[`DependenciesTable component given an empty list of dependencies matches
    
 </div>
 `;
+
+exports[`DependenciesTable component given the dependencyListVulnerabilities flag is enabled given a list of dependencies (loaded) matches the snapshot 1`] = `
+<div>
+  <div
+    class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2"
+    role="row"
+  >
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Status
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Component
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Version
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Packager
+    
+    </div>
+    <div
+      class="table-section flex-grow-1"
+      role="rowheader"
+    >
+      
+      Location
+    
+    </div>
+  </div>
+   
+  <dependenciestablerow-stub
+    dependency="[object Object]"
+  />
+  <dependenciestablerow-stub
+    dependency="[object Object]"
+  />
+</div>
+`;
+
+exports[`DependenciesTable component given the dependencyListVulnerabilities flag is enabled given a list of dependencies (loading) matches the snapshot 1`] = `
+<div>
+  <div
+    class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2"
+    role="row"
+  >
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Status
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Component
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Version
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Packager
+    
+    </div>
+    <div
+      class="table-section flex-grow-1"
+      role="rowheader"
+    >
+      
+      Location
+    
+    </div>
+  </div>
+   
+  <dependenciestablerow-stub
+    dependency="[object Object]"
+    isloading="true"
+  />
+  <dependenciestablerow-stub
+    dependency="[object Object]"
+    isloading="true"
+  />
+</div>
+`;
+
+exports[`DependenciesTable component given the dependencyListVulnerabilities flag is enabled given an empty list of dependencies matches the snapshot 1`] = `
+<div>
+  <div
+    class="gl-responsive-table-row table-row-header text-2 bg-secondary-50 px-2"
+    role="row"
+  >
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Status
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Component
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      Version
+    
+    </div>
+    <div
+      class="table-section section-20"
+      role="rowheader"
+    >
+      
+      Packager
+    
+    </div>
+    <div
+      class="table-section flex-grow-1"
+      role="rowheader"
+    >
+      
+      Location
+    
+    </div>
+  </div>
+   
+</div>
+`;

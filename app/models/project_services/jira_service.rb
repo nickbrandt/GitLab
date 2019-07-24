@@ -54,7 +54,7 @@ class JiraService < IssueTrackerService
       username: self.username,
       password: self.password,
       site: URI.join(url, '/').to_s, # Intended to find the root
-      context_path: url.path.chomp('/'),
+      context_path: url.path,
       auth_type: :basic,
       read_timeout: 120,
       use_cookies: true,
@@ -101,6 +101,12 @@ class JiraService < IssueTrackerService
 
   def new_issue_url
     "#{url}/secure/CreateIssue.jspa"
+  end
+
+  alias_method :original_url, :url
+
+  def url
+    original_url&.chomp('/')
   end
 
   def execute(push)
@@ -250,7 +256,7 @@ class JiraService < IssueTrackerService
       end
 
       log_info("Successfully posted", client_url: client_url)
-      "SUCCESS: Successfully posted to http://jira.example.net."
+      "SUCCESS: Successfully posted to #{client_url}."
     end
   end
 

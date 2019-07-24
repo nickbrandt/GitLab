@@ -254,17 +254,6 @@ export const parseDastIssues = (issues = [], feedback = []) =>
     };
   });
 
-/**
- * Compares two arrays by the given key and returns the difference
- *
- * @param {Array} firstArray
- * @param {Array} secondArray
- * @param {String} key
- * @returns {Array}
- */
-export const filterByKey = (firstArray = [], secondArray = [], key = '') =>
-  firstArray.filter(item => !secondArray.find(el => el[key] === item[key]));
-
 export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
   issues.filter(item => unapproved.find(el => el === item.vulnerability));
 
@@ -397,4 +386,31 @@ export const countIssues = ({ newIssues = [], resolvedIssues = [], allIssues = [
     existing: allIssues.length,
     fixed: resolvedIssues.length,
   };
+};
+
+/**
+ * Generates a report message based on some of the report parameters and supplied messages.
+ *
+ * @param {Object} report The report to generate the text for
+ * @param {String} reportType The report type. e.g. SAST
+ * @param {String} errorMessage The message to show if there's an error in the report
+ * @param {String} loadingMessage The message to show if the report is still loading
+ * @returns {String}
+ */
+export const groupedReportText = (report, reportType, errorMessage, loadingMessage) => {
+  const { paths } = report;
+
+  if (report.hasError) {
+    return errorMessage;
+  }
+
+  if (report.isLoading) {
+    return loadingMessage;
+  }
+
+  return groupedTextBuilder({
+    ...countIssues(report),
+    reportType,
+    paths,
+  });
 };

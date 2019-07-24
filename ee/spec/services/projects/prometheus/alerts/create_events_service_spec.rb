@@ -267,7 +267,7 @@ describe Projects::Prometheus::Alerts::CreateEventsService do
 
   # Example: 2018-09-27T18:25:31.079079416Z
   def utc_rfc3339(date)
-    date.utc.strftime("%FT%T.%9NZ")
+    date.utc.rfc3339
   rescue
     date
   end

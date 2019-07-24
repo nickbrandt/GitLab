@@ -91,7 +91,7 @@ export default {
 
     <dismiss-button
       v-if="canDismissVulnerability"
-      :is-dismissing="modal.isDismissingIssue"
+      :is-dismissing="modal.isDismissingVulnerability"
       :is-dismissed="isDismissed"
       @dismissVulnerability="$emit('dismissVulnerability')"
       @openDismissalCommentBox="$emit('openDismissalCommentBox')"

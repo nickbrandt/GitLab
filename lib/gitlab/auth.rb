@@ -96,6 +96,7 @@ module Gitlab
         end
       end
 
+      # rubocop:disable Gitlab/RailsLogger
       def rate_limit!(ip, success:, login:)
         rate_limiter = Gitlab::Auth::IpRateLimiter.new(ip)
         return unless rate_limiter.enabled?
@@ -116,6 +117,7 @@ module Gitlab
           end
         end
       end
+      # rubocop:enable Gitlab/RailsLogger
 
       private
 

@@ -1,6 +1,6 @@
-import state from 'ee/vue_shared/security_reports/store/state';
+import createState from 'ee/vue_shared/security_reports/store/state';
+import createSastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
 import {
-  groupedSastText,
   groupedSastContainerText,
   groupedDastText,
   groupedDependencyText,
@@ -8,7 +8,6 @@ import {
   allReportsHaveError,
   noBaseInAllReports,
   areReportsLoading,
-  sastStatusIcon,
   sastContainerStatusIcon,
   dastStatusIcon,
   dependencyScanningStatusIcon,
@@ -24,116 +23,20 @@ describe('Security reports getters', () => {
     return data.replace(/\r?\n|\r/g, '').replace(/\s\s+/g, ' ');
   }
 
-  describe('groupedSastText', () => {
-    describe('with no issues', () => {
-      it('returns no issues text', () => {
-        const newState = state();
-        newState.sast.paths.head = HEAD_PATH;
-        newState.sast.paths.base = BASE_PATH;
+  let state;
 
-        expect(groupedSastText(newState)).toEqual('SAST detected no vulnerabilities');
-      });
-    });
-
-    describe('with only `all` issues', () => {
-      it('returns no new issues text', () => {
-        const newState = state();
-        newState.sast.paths.head = HEAD_PATH;
-        newState.sast.paths.base = BASE_PATH;
-        newState.sast.allIssues = [{}];
-
-        expect(groupedSastText(newState)).toEqual('SAST detected no new vulnerabilities');
-      });
-    });
-
-    describe('with new issues and without base', () => {
-      it('returns unable to compare text', () => {
-        const newState = state();
-        newState.sast.paths.head = HEAD_PATH;
-        newState.sast.newIssues = [{}];
-
-        expect(groupedSastText(newState)).toEqual(
-          'SAST detected 1 vulnerability for the source branch only',
-        );
-      });
-    });
-
-    describe('with base and head', () => {
-      describe('with only new issues', () => {
-        it('returns new issues text', () => {
-          const newState = state();
-          newState.sast.paths.head = HEAD_PATH;
-          newState.sast.paths.base = BASE_PATH;
-          newState.sast.newIssues = [{}];
-
-          expect(groupedSastText(newState)).toEqual('SAST detected 1 new vulnerability');
-        });
-      });
-
-      describe('with only dismissed issues', () => {
-        it('returns dismissed issues text', () => {
-          const newState = state();
-          newState.sast.paths.head = HEAD_PATH;
-          newState.sast.paths.base = BASE_PATH;
-          newState.sast.newIssues = [{ isDismissed: true }];
-
-          expect(groupedSastText(newState)).toEqual('SAST detected 1 dismissed vulnerability');
-        });
-      });
-
-      describe('with new and resolved issues', () => {
-        it('returns new and fixed issues text', () => {
-          const newState = state();
-          newState.sast.paths.head = HEAD_PATH;
-          newState.sast.paths.base = BASE_PATH;
-          newState.sast.newIssues = [{}];
-          newState.sast.resolvedIssues = [{}];
-
-          expect(removeBreakLine(groupedSastText(newState))).toEqual(
-            'SAST detected 1 new, and 1 fixed vulnerabilities',
-          );
-        });
-      });
-
-      describe('with only resolved issues', () => {
-        it('returns fixed issues text', () => {
-          const newState = state();
-          newState.sast.paths.head = HEAD_PATH;
-          newState.sast.paths.base = BASE_PATH;
-          newState.sast.resolvedIssues = [{}];
-
-          expect(groupedSastText(newState)).toEqual('SAST detected 1 fixed vulnerability');
-        });
-      });
-
-      describe('with error', () => {
-        it('returns error text', () => {
-          const newState = state();
-          newState.sast.hasError = true;
-
-          expect(groupedSastText(newState)).toEqual('SAST: Loading resulted in an error');
-        });
-      });
-
-      describe('while loading', () => {
-        it('returns loading text', () => {
-          const newState = state();
-          newState.sast.isLoading = true;
-
-          expect(groupedSastText(newState)).toEqual('SAST is loading');
-        });
-      });
-    });
+  beforeEach(() => {
+    state = createState();
+    state.sast = createSastState();
   });
 
   describe('groupedSastContainerText', () => {
     describe('with no issues', () => {
       it('returns no issues text', () => {
-        const newState = state();
-        newState.sastContainer.paths.head = HEAD_PATH;
-        newState.sastContainer.paths.base = BASE_PATH;
+        state.sastContainer.paths.head = HEAD_PATH;
+        state.sastContainer.paths.base = BASE_PATH;
 
-        expect(groupedSastContainerText(newState)).toEqual(
+        expect(groupedSastContainerText(state)).toEqual(
           'Container scanning detected no vulnerabilities',
         );
       });
@@ -141,11 +44,10 @@ describe('Security reports getters', () => {
 
     describe('with new issues and without base', () => {
       it('returns unable to compare text', () => {
-        const newState = state();
-        newState.sastContainer.paths.head = HEAD_PATH;
-        newState.sastContainer.newIssues = [{}];
+        state.sastContainer.paths.head = HEAD_PATH;
+        state.sastContainer.newIssues = [{}];
 
-        expect(groupedSastContainerText(newState)).toEqual(
+        expect(groupedSastContainerText(state)).toEqual(
           'Container scanning detected 1 vulnerability for the source branch only',
         );
       });
@@ -154,12 +56,11 @@ describe('Security reports getters', () => {
     describe('with base and head', () => {
       describe('with only new issues', () => {
         it('returns new issues text', () => {
-          const newState = state();
-          newState.sastContainer.paths.head = HEAD_PATH;
-          newState.sastContainer.paths.base = BASE_PATH;
-          newState.sastContainer.newIssues = [{}];
+          state.sastContainer.paths.head = HEAD_PATH;
+          state.sastContainer.paths.base = BASE_PATH;
+          state.sastContainer.newIssues = [{}];
 
-          expect(groupedSastContainerText(newState)).toEqual(
+          expect(groupedSastContainerText(state)).toEqual(
             'Container scanning detected 1 new vulnerability',
           );
         });
@@ -167,12 +68,11 @@ describe('Security reports getters', () => {
 
       describe('with only dismissed issues', () => {
         it('returns dismissed issues text', () => {
-          const newState = state();
-          newState.sastContainer.paths.head = HEAD_PATH;
-          newState.sastContainer.paths.base = BASE_PATH;
-          newState.sastContainer.newIssues = [{ isDismissed: true }];
+          state.sastContainer.paths.head = HEAD_PATH;
+          state.sastContainer.paths.base = BASE_PATH;
+          state.sastContainer.newIssues = [{ isDismissed: true }];
 
-          expect(groupedSastContainerText(newState)).toEqual(
+          expect(groupedSastContainerText(state)).toEqual(
             'Container scanning detected 1 dismissed vulnerability',
           );
         });
@@ -180,13 +80,12 @@ describe('Security reports getters', () => {
 
       describe('with new and resolved issues', () => {
         it('returns new and fixed issues text', () => {
-          const newState = state();
-          newState.sastContainer.paths.head = HEAD_PATH;
-          newState.sastContainer.paths.base = BASE_PATH;
-          newState.sastContainer.newIssues = [{}];
-          newState.sastContainer.resolvedIssues = [{}];
+          state.sastContainer.paths.head = HEAD_PATH;
+          state.sastContainer.paths.base = BASE_PATH;
+          state.sastContainer.newIssues = [{}];
+          state.sastContainer.resolvedIssues = [{}];
 
-          expect(removeBreakLine(groupedSastContainerText(newState))).toEqual(
+          expect(removeBreakLine(groupedSastContainerText(state))).toEqual(
             'Container scanning detected 1 new, and 1 fixed vulnerabilities',
           );
         });
@@ -194,12 +93,11 @@ describe('Security reports getters', () => {
 
       describe('with only resolved issues', () => {
         it('returns fixed issues text', () => {
-          const newState = state();
-          newState.sastContainer.paths.head = HEAD_PATH;
-          newState.sastContainer.paths.base = BASE_PATH;
-          newState.sastContainer.resolvedIssues = [{}];
+          state.sastContainer.paths.head = HEAD_PATH;
+          state.sastContainer.paths.base = BASE_PATH;
+          state.sastContainer.resolvedIssues = [{}];
 
-          expect(groupedSastContainerText(newState)).toEqual(
+          expect(groupedSastContainerText(state)).toEqual(
             'Container scanning detected 1 fixed vulnerability',
           );
         });
@@ -210,21 +108,19 @@ describe('Security reports getters', () => {
   describe('groupedDastText', () => {
     describe('with no issues', () => {
       it('returns no issues text', () => {
-        const newState = state();
-        newState.dast.paths.head = HEAD_PATH;
-        newState.dast.paths.base = BASE_PATH;
+        state.dast.paths.head = HEAD_PATH;
+        state.dast.paths.base = BASE_PATH;
 
-        expect(groupedDastText(newState)).toEqual('DAST detected no vulnerabilities');
+        expect(groupedDastText(state)).toEqual('DAST detected no vulnerabilities');
       });
     });
 
     describe('with new issues and without base', () => {
       it('returns unable to compare text', () => {
-        const newState = state();
-        newState.dast.paths.head = HEAD_PATH;
-        newState.dast.newIssues = [{}];
+        state.dast.paths.head = HEAD_PATH;
+        state.dast.newIssues = [{}];
 
-        expect(groupedDastText(newState)).toEqual(
+        expect(groupedDastText(state)).toEqual(
           'DAST detected 1 vulnerability for the source branch only',
         );
       });
@@ -233,35 +129,32 @@ describe('Security reports getters', () => {
     describe('with base and head', () => {
       describe('with only new issues', () => {
         it('returns new issues text', () => {
-          const newState = state();
-          newState.dast.paths.head = HEAD_PATH;
-          newState.dast.paths.base = BASE_PATH;
-          newState.dast.newIssues = [{}];
+          state.dast.paths.head = HEAD_PATH;
+          state.dast.paths.base = BASE_PATH;
+          state.dast.newIssues = [{}];
 
-          expect(groupedDastText(newState)).toEqual('DAST detected 1 new vulnerability');
+          expect(groupedDastText(state)).toEqual('DAST detected 1 new vulnerability');
         });
       });
 
       describe('with only dismissed issues', () => {
         it('returns dismissed issues text', () => {
-          const newState = state();
-          newState.dast.paths.head = HEAD_PATH;
-          newState.dast.paths.base = BASE_PATH;
-          newState.dast.newIssues = [{ isDismissed: true }];
+          state.dast.paths.head = HEAD_PATH;
+          state.dast.paths.base = BASE_PATH;
+          state.dast.newIssues = [{ isDismissed: true }];
 
-          expect(groupedDastText(newState)).toEqual('DAST detected 1 dismissed vulnerability');
+          expect(groupedDastText(state)).toEqual('DAST detected 1 dismissed vulnerability');
         });
       });
 
       describe('with new and resolved issues', () => {
         it('returns new and fixed issues text', () => {
-          const newState = state();
-          newState.dast.paths.head = HEAD_PATH;
-          newState.dast.paths.base = BASE_PATH;
-          newState.dast.newIssues = [{}];
-          newState.dast.resolvedIssues = [{}];
+          state.dast.paths.head = HEAD_PATH;
+          state.dast.paths.base = BASE_PATH;
+          state.dast.newIssues = [{}];
+          state.dast.resolvedIssues = [{}];
 
-          expect(removeBreakLine(groupedDastText(newState))).toEqual(
+          expect(removeBreakLine(groupedDastText(state))).toEqual(
             'DAST detected 1 new, and 1 fixed vulnerabilities',
           );
         });
@@ -269,12 +162,11 @@ describe('Security reports getters', () => {
 
       describe('with only resolved issues', () => {
         it('returns fixed issues text', () => {
-          const newState = state();
-          newState.dast.paths.head = HEAD_PATH;
-          newState.dast.paths.base = BASE_PATH;
-          newState.dast.resolvedIssues = [{}];
+          state.dast.paths.head = HEAD_PATH;
+          state.dast.paths.base = BASE_PATH;
+          state.dast.resolvedIssues = [{}];
 
-          expect(groupedDastText(newState)).toEqual('DAST detected 1 fixed vulnerability');
+          expect(groupedDastText(state)).toEqual('DAST detected 1 fixed vulnerability');
         });
       });
     });
@@ -283,11 +175,10 @@ describe('Security reports getters', () => {
   describe('groupedDependencyText', () => {
     describe('with no issues', () => {
       it('returns no issues text', () => {
-        const newState = state();
-        newState.dependencyScanning.paths.head = HEAD_PATH;
-        newState.dependencyScanning.paths.base = BASE_PATH;
+        state.dependencyScanning.paths.head = HEAD_PATH;
+        state.dependencyScanning.paths.base = BASE_PATH;
 
-        expect(groupedDependencyText(newState)).toEqual(
+        expect(groupedDependencyText(state)).toEqual(
           'Dependency scanning detected no vulnerabilities',
         );
       });
@@ -295,11 +186,10 @@ describe('Security reports getters', () => {
 
     describe('with new issues and without base', () => {
       it('returns unable to compare text', () => {
-        const newState = state();
-        newState.dependencyScanning.paths.head = HEAD_PATH;
-        newState.dependencyScanning.newIssues = [{}];
+        state.dependencyScanning.paths.head = HEAD_PATH;
+        state.dependencyScanning.newIssues = [{}];
 
-        expect(groupedDependencyText(newState)).toEqual(
+        expect(groupedDependencyText(state)).toEqual(
           'Dependency scanning detected 1 vulnerability for the source branch only',
         );
       });
@@ -308,12 +198,11 @@ describe('Security reports getters', () => {
     describe('with base and head', () => {
       describe('with only new issues', () => {
         it('returns new issues text', () => {
-          const newState = state();
-          newState.dependencyScanning.paths.head = HEAD_PATH;
-          newState.dependencyScanning.paths.base = BASE_PATH;
-          newState.dependencyScanning.newIssues = [{}];
+          state.dependencyScanning.paths.head = HEAD_PATH;
+          state.dependencyScanning.paths.base = BASE_PATH;
+          state.dependencyScanning.newIssues = [{}];
 
-          expect(groupedDependencyText(newState)).toEqual(
+          expect(groupedDependencyText(state)).toEqual(
             'Dependency scanning detected 1 new vulnerability',
           );
         });
@@ -321,12 +210,11 @@ describe('Security reports getters', () => {
 
       describe('with only dismissed issues', () => {
         it('returns dismissed issues text', () => {
-          const newState = state();
-          newState.dependencyScanning.paths.head = HEAD_PATH;
-          newState.dependencyScanning.paths.base = BASE_PATH;
-          newState.dependencyScanning.newIssues = [{ isDismissed: true }];
+          state.dependencyScanning.paths.head = HEAD_PATH;
+          state.dependencyScanning.paths.base = BASE_PATH;
+          state.dependencyScanning.newIssues = [{ isDismissed: true }];
 
-          expect(groupedDependencyText(newState)).toEqual(
+          expect(groupedDependencyText(state)).toEqual(
             'Dependency scanning detected 1 dismissed vulnerability',
           );
         });
@@ -334,13 +222,12 @@ describe('Security reports getters', () => {
 
       describe('with new and resolved issues', () => {
         it('returns new and fixed issues text', () => {
-          const newState = state();
-          newState.dependencyScanning.paths.head = HEAD_PATH;
-          newState.dependencyScanning.paths.base = BASE_PATH;
-          newState.dependencyScanning.newIssues = [{}];
-          newState.dependencyScanning.resolvedIssues = [{}];
+          state.dependencyScanning.paths.head = HEAD_PATH;
+          state.dependencyScanning.paths.base = BASE_PATH;
+          state.dependencyScanning.newIssues = [{}];
+          state.dependencyScanning.resolvedIssues = [{}];
 
-          expect(removeBreakLine(groupedDependencyText(newState))).toEqual(
+          expect(removeBreakLine(groupedDependencyText(state))).toEqual(
             'Dependency scanning detected 1 new, and 1 fixed vulnerabilities',
           );
         });
@@ -348,13 +235,12 @@ describe('Security reports getters', () => {
 
       describe('with only resolved issues', () => {
         it('returns fixed issues text', () => {
-          const newState = state();
-          newState.dependencyScanning.paths.head = HEAD_PATH;
-          newState.dependencyScanning.paths.base = BASE_PATH;
+          state.dependencyScanning.paths.head = HEAD_PATH;
+          state.dependencyScanning.paths.base = BASE_PATH;
 
-          newState.dependencyScanning.resolvedIssues = [{}];
+          state.dependencyScanning.resolvedIssues = [{}];
 
-          expect(groupedDependencyText(newState)).toEqual(
+          expect(groupedDependencyText(state)).toEqual(
             'Dependency scanning detected 1 fixed vulnerability',
           );
         });
@@ -364,9 +250,7 @@ describe('Security reports getters', () => {
 
   describe('summaryCounts', () => {
     it('returns 0 count for empty state', () => {
-      const newState = state();
-
-      expect(summaryCounts(newState)).toEqual({
+      expect(summaryCounts(state)).toEqual({
         added: 0,
         dismissed: 0,
         existing: 0,
@@ -376,30 +260,25 @@ describe('Security reports getters', () => {
 
     describe('combines all reports', () => {
       it('of the same type', () => {
-        const newState = state();
+        state.sastContainer.resolvedIssues = [{}];
+        state.dast.resolvedIssues = [{}];
+        state.dependencyScanning.resolvedIssues = [{}];
 
-        newState.sast.resolvedIssues = [{}];
-        newState.sastContainer.resolvedIssues = [{}];
-        newState.dast.resolvedIssues = [{}];
-        newState.dependencyScanning.resolvedIssues = [{}];
-
-        expect(summaryCounts(newState)).toEqual({
+        expect(summaryCounts(state)).toEqual({
           added: 0,
           dismissed: 0,
           existing: 0,
-          fixed: 4,
+          fixed: 3,
         });
       });
 
       it('of the different types', () => {
-        const newState = state();
+        state.sastContainer.resolvedIssues = [{}];
+        state.dast.allIssues = [{}];
+        state.dast.newIssues = [{ isDismissed: true }];
+        state.dependencyScanning.newIssues = [{ isDismissed: false }];
 
-        newState.sast.allIssues = [{}];
-        newState.sastContainer.resolvedIssues = [{}];
-        newState.dast.newIssues = [{ isDismissed: true }];
-        newState.dependencyScanning.newIssues = [{ isDismissed: false }];
-
-        expect(summaryCounts(newState)).toEqual({
+        expect(summaryCounts(state)).toEqual({
           added: 1,
           dismissed: 1,
           existing: 1,
@@ -412,7 +291,7 @@ describe('Security reports getters', () => {
   describe('groupedSummaryText', () => {
     it('returns failed text', () => {
       expect(
-        groupedSummaryText(state(), {
+        groupedSummaryText(state, {
           allReportsHaveError: true,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -423,7 +302,7 @@ describe('Security reports getters', () => {
 
     it('returns no compare text', () => {
       expect(
-        groupedSummaryText(state(), {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: true,
           areReportsLoading: false,
@@ -434,7 +313,7 @@ describe('Security reports getters', () => {
 
     it('returns is loading text', () => {
       expect(
-        groupedSummaryText(state(), {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: true,
@@ -444,10 +323,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns added and fixed text', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -461,10 +338,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns added text', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -477,10 +352,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns fixed text', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -493,10 +366,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns dismissed text', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -508,10 +379,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns added and fixed while loading text', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: true,
@@ -525,10 +394,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns no new text if there are existing ones', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -540,10 +407,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns no text if there are existing ones', () => {
-      const newState = state();
-
       expect(
-        groupedSummaryText(newState, {
+        groupedSummaryText(state, {
           allReportsHaveError: false,
           noBaseInAllReports: false,
           areReportsLoading: false,
@@ -553,148 +418,116 @@ describe('Security reports getters', () => {
     });
   });
 
-  describe('sastStatusIcon', () => {
-    it('returns warning with new issues', () => {
-      const newState = state();
-      newState.sast.newIssues = [{}];
-
-      expect(sastStatusIcon(newState)).toEqual('warning');
-    });
-
-    it('returns warning with failed report', () => {
-      const newState = state();
-      newState.sast.hasError = true;
-
-      expect(sastStatusIcon(newState)).toEqual('warning');
-    });
-
-    it('returns success with no new issues or failed report', () => {
-      expect(sastStatusIcon(state())).toEqual('success');
-    });
-  });
-
   describe('dastStatusIcon', () => {
     it('returns warning with new issues', () => {
-      const newState = state();
-      newState.dast.newIssues = [{}];
+      state.dast.newIssues = [{}];
 
-      expect(dastStatusIcon(newState)).toEqual('warning');
+      expect(dastStatusIcon(state)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
-      const newState = state();
-      newState.dast.hasError = true;
+      state.dast.hasError = true;
 
-      expect(dastStatusIcon(newState)).toEqual('warning');
+      expect(dastStatusIcon(state)).toEqual('warning');
     });
 
     it('returns success with no new issues or failed report', () => {
-      expect(dastStatusIcon(state())).toEqual('success');
+      expect(dastStatusIcon(state)).toEqual('success');
     });
   });
 
   describe('sastContainerStatusIcon', () => {
     it('returns warning with new issues', () => {
-      const newState = state();
-      newState.sastContainer.newIssues = [{}];
+      state.sastContainer.newIssues = [{}];
 
-      expect(sastContainerStatusIcon(newState)).toEqual('warning');
+      expect(sastContainerStatusIcon(state)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
-      const newState = state();
-      newState.sastContainer.hasError = true;
+      state.sastContainer.hasError = true;
 
-      expect(sastContainerStatusIcon(newState)).toEqual('warning');
+      expect(sastContainerStatusIcon(state)).toEqual('warning');
     });
 
     it('returns success with no new issues or failed report', () => {
-      expect(sastContainerStatusIcon(state())).toEqual('success');
+      expect(sastContainerStatusIcon(state)).toEqual('success');
     });
   });
 
   describe('dependencyScanningStatusIcon', () => {
     it('returns warning with new issues', () => {
-      const newState = state();
-      newState.dependencyScanning.newIssues = [{}];
+      state.dependencyScanning.newIssues = [{}];
 
-      expect(dependencyScanningStatusIcon(newState)).toEqual('warning');
+      expect(dependencyScanningStatusIcon(state)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
-      const newState = state();
-      newState.dependencyScanning.hasError = true;
+      state.dependencyScanning.hasError = true;
 
-      expect(dependencyScanningStatusIcon(newState)).toEqual('warning');
+      expect(dependencyScanningStatusIcon(state)).toEqual('warning');
     });
 
     it('returns success with no new issues or failed report', () => {
-      expect(dependencyScanningStatusIcon(state())).toEqual('success');
+      expect(dependencyScanningStatusIcon(state)).toEqual('success');
     });
   });
 
   describe('areReportsLoading', () => {
     it('returns true when any report is loading', () => {
-      const newState = state();
-      newState.sast.isLoading = true;
+      state.dast.isLoading = true;
 
-      expect(areReportsLoading(newState)).toEqual(true);
+      expect(areReportsLoading(state)).toEqual(true);
     });
 
     it('returns false when none of the reports are loading', () => {
-      expect(areReportsLoading(state())).toEqual(false);
+      expect(areReportsLoading(state)).toEqual(false);
     });
   });
 
   describe('allReportsHaveError', () => {
     it('returns true when all reports have error', () => {
-      const newState = state();
-      newState.sast.hasError = true;
-      newState.dast.hasError = true;
-      newState.sastContainer.hasError = true;
-      newState.dependencyScanning.hasError = true;
+      state.sast.hasError = true;
+      state.dast.hasError = true;
+      state.sastContainer.hasError = true;
+      state.dependencyScanning.hasError = true;
 
-      expect(allReportsHaveError(newState)).toEqual(true);
+      expect(allReportsHaveError(state)).toEqual(true);
     });
 
     it('returns false when none of the reports have error', () => {
-      expect(allReportsHaveError(state())).toEqual(false);
+      expect(allReportsHaveError(state)).toEqual(false);
     });
 
     it('returns false when one of the reports does not have error', () => {
-      const newState = state();
-      newState.sast.hasError = false;
-      newState.dast.hasError = true;
-      newState.sastContainer.hasError = true;
-      newState.dependencyScanning.hasError = true;
+      state.dast.hasError = false;
+      state.sastContainer.hasError = true;
+      state.dependencyScanning.hasError = true;
 
-      expect(allReportsHaveError(newState)).toEqual(false);
+      expect(allReportsHaveError(state)).toEqual(false);
     });
   });
 
   describe('anyReportHasError', () => {
     it('returns true when any of the reports has error', () => {
-      const newState = state();
-      newState.sast.hasError = true;
+      state.dast.hasError = true;
 
-      expect(anyReportHasError(newState)).toEqual(true);
+      expect(anyReportHasError(state)).toEqual(true);
     });
 
     it('returns false when none of the reports has error', () => {
-      expect(anyReportHasError(state())).toEqual(false);
+      expect(anyReportHasError(state)).toEqual(false);
     });
   });
 
   describe('noBaseInAllReports', () => {
     it('returns true when none reports have base', () => {
-      expect(noBaseInAllReports(state())).toEqual(true);
+      expect(noBaseInAllReports(state)).toEqual(true);
     });
 
     it('returns false when any of the reports has base', () => {
-      const newState = state();
-      newState.sast.paths.base = BASE_PATH;
+      state.dast.paths.base = BASE_PATH;
 
-      expect(noBaseInAllReports(newState)).toEqual(false);
+      expect(noBaseInAllReports(state)).toEqual(false);
     });
   });
 });

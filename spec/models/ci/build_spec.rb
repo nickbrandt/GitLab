@@ -692,6 +692,34 @@ describe Ci::Build do
     end
   end
 
+  describe '#has_live_trace?' do
+    subject { build.has_live_trace? }
+
+    let(:build) { create(:ci_build, :trace_live) }
+
+    it { is_expected.to be_truthy }
+
+    context 'when build does not have live trace' do
+      let(:build) { create(:ci_build) }
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
+  describe '#has_archived_trace?' do
+    subject { build.has_archived_trace? }
+
+    let(:build) { create(:ci_build, :trace_artifact) }
+
+    it { is_expected.to be_truthy }
+
+    context 'when build does not have archived trace' do
+      let(:build) { create(:ci_build) }
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
   describe '#has_job_artifacts?' do
     subject { build.has_job_artifacts? }
 
@@ -2013,6 +2041,7 @@ describe Ci::Build do
           { key: 'CI', value: 'true', public: true, masked: false },
           { key: 'GITLAB_CI', value: 'true', public: true, masked: false },
           { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true, masked: false },
+          { key: 'CI_SERVER_HOST', value: Gitlab.config.gitlab.host, public: true, masked: false },
           { key: 'CI_SERVER_NAME', value: 'GitLab', public: true, masked: false },
           { key: 'CI_SERVER_VERSION', value: Gitlab::VERSION, public: true, masked: false },
           { key: 'CI_SERVER_VERSION_MAJOR', value: Gitlab.version_info.major.to_s, public: true, masked: false },

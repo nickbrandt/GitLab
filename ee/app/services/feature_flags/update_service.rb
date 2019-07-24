@@ -4,7 +4,8 @@ module FeatureFlags
   class UpdateService < FeatureFlags::BaseService
     AUDITABLE_SCOPE_ATTRIBUTES_HUMAN_NAMES = {
       'active' => 'active state',
-      'environment_scope' => 'environment scope'
+      'environment_scope' => 'environment scope',
+      'strategies' => 'strategies'
     }.freeze
 
     def execute(feature_flag)

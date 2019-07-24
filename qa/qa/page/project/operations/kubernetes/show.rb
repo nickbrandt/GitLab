@@ -21,10 +21,6 @@ module QA
               element :save_domain
             end
 
-            view 'ee/app/views/projects/clusters/_prometheus_graphs.html.haml' do
-              element :cluster_health_section
-            end
-
             def install!(application_name)
               within(".js-cluster-application-row-#{application_name}") do
                 page.has_button?('Install', wait: 30)
@@ -32,14 +28,10 @@ module QA
               end
             end
 
-            def await_installed(application_name, button_text: 'Installed')
+            def await_installed(application_name)
               within(".js-cluster-application-row-#{application_name}") do
-                page.has_text?(button_text, wait: 300)
+                page.has_text?(/Installed|Uninstall/, wait: 300)
               end
-            end
-
-            def await_uninstallable(application_name)
-              await_installed(application_name, button_text: 'Uninstall')
             end
 
             def ingress_ip
@@ -55,33 +47,11 @@ module QA
             def save_domain
               click_element :save_domain
             end
-
-            def wait_for_cluster_health
-              wait(max: 120, interval: 3, reload: true) do
-                has_cluster_health_graphs?
-              end
-            end
-
-            def has_cluster_health_title?
-              within_cluster_health_section do
-                has_text?('Cluster health')
-              end
-            end
-
-            def has_cluster_health_graphs?
-              within_cluster_health_section do
-                has_text?('CPU Usage')
-              end
-            end
-
-            def within_cluster_health_section
-              within_element :cluster_health_section do
-                yield
-              end
-            end
           end
         end
       end
     end
   end
 end
+
+QA::Page::Project::Operations::Kubernetes::Show.prepend(QA::EE::Page::Project::Operations::Kubernetes::Show)

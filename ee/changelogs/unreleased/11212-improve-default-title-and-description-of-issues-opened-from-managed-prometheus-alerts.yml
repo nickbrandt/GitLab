@@ -1,0 +1,5 @@
+---
+title: Improve default title and description of issues opened from managed Prometheus alerts
+merge_request: 14614
+author:
+type: changed

@@ -72,7 +72,7 @@ describe Gitlab::Geo::DatabaseTasks do
 
       it 'calls ActiveRecord::Migrator.run' do
         stub_env('VERSION', '19700101120000')
-        expect(ActiveRecord::Migrator).to receive(:run).with(:up, any_args)
+        expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:run).with(:up, any_args)
 
         subject.up
       end
@@ -87,7 +87,7 @@ describe Gitlab::Geo::DatabaseTasks do
 
       it 'calls ActiveRecord::Migrator.run' do
         stub_env('VERSION', '19700101120000')
-        expect(ActiveRecord::Migrator).to receive(:run).with(:down, any_args)
+        expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:run).with(:down, any_args)
 
         subject.down
       end

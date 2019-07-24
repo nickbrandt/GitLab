@@ -6,12 +6,13 @@ import {
   parseDependencyScanningIssues,
   getDastSite,
   parseDastIssues,
-  filterByKey,
   getUnapprovedVulnerabilities,
   groupedTextBuilder,
   statusIcon,
   countIssues,
+  groupedReportText,
 } from 'ee/vue_shared/security_reports/store/utils';
+import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
 import {
   formatContainerScanningDescription,
   formatContainerScanningMessage,
@@ -591,6 +592,34 @@ describe('security reports utils', () => {
         existing: 1,
         fixed: 1,
       });
+    });
+  });
+
+  describe('groupedReportText', () => {
+    const reportType = 'dummyReport';
+    const errorMessage = 'Something went wrong';
+    const loadingMessage = 'The report is still loading';
+    const baseReport = { paths: [] };
+
+    it("should return the error message when there's an error", () => {
+      const report = { ...baseReport, hasError: true };
+      const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
+
+      expect(result).toBe(errorMessage);
+    });
+
+    it("should return the loading message when it's loading", () => {
+      const report = { ...baseReport, isLoading: true };
+      const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
+
+      expect(result).toBe(loadingMessage);
+    });
+
+    it("should call groupedTextBuilder if it isn't loading and doesn't have an error", () => {
+      const report = { ...baseReport };
+      const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
+
+      expect(result).toBe(`${reportType} detected no vulnerabilities for the source branch only`);
     });
   });
 });

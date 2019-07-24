@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Group do
   let(:group) { create(:group) }
 
+  it_behaves_like Vulnerable do
+    let(:vulnerable) { group }
+  end
+
   it { is_expected.to include_module(EE::Group) }
 
   describe 'associations' do
@@ -45,25 +49,24 @@ describe Group do
     context 'validates if custom_project_templates_group_id is allowed' do
       let(:subgroup_1) { create(:group, parent: group) }
 
-      it 'rejects change if the assigned group is not a descendant' do
+      it 'rejects change if the assigned group is not a subgroup' do
         group.custom_project_templates_group_id = create(:group).id
 
         expect(group).not_to be_valid
-        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a descendant of the group']
+        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a subgroup of the group']
       end
 
-      it 'allows value if the current group is a top parent and the value is from a descendant' do
-        subgroup = create(:group, parent: group)
-        group.custom_project_templates_group_id = subgroup.id
+      it 'allows value if the assigned value is from a subgroup' do
+        group.custom_project_templates_group_id = subgroup_1.id
 
         expect(group).to be_valid
       end
 
-      it 'allows value if the current group is a subgroup and the value is from a descendant' do
+      it 'rejects change if the assigned value is from a subgroup\'s descendant group' do
         subgroup_1_1 = create(:group, parent: subgroup_1)
-        subgroup_1.custom_project_templates_group_id = subgroup_1_1.id
+        group.custom_project_templates_group_id = subgroup_1_1.id
 
-        expect(group).to be_valid
+        expect(group).not_to be_valid
       end
 
       it 'allows value when it is blank' do
@@ -286,91 +289,6 @@ describe Group do
           group.file_template_project = valid_project
 
           is_expected.to be_nil
-        end
-      end
-    end
-  end
-
-  describe 'Vulnerabilities::Occurrence collection methods' do
-    describe 'vulnerabilities finder methods' do
-      let(:project) { create(:project, namespace: group) }
-      let(:external_project) { create(:project) }
-      let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
-
-      let!(:old_vuln) { create_vulnerability(project) }
-      let!(:new_vuln) { create_vulnerability(project) }
-      let!(:external_vuln) { create_vulnerability(external_project) }
-      let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
-
-      before do
-        pipeline_ran_against_new_sha = create(:ci_pipeline, :success, project: project, sha: '123')
-        new_vuln.pipelines << pipeline_ran_against_new_sha
-      end
-
-      def create_vulnerability(project, pipeline = nil)
-        pipeline ||= create(:ci_pipeline, :success, project: project)
-        create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
-      end
-
-      describe '#latest_vulnerabilities' do
-        subject { group.latest_vulnerabilities }
-
-        it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
-          is_expected.to contain_exactly(new_vuln)
-        end
-
-        context 'with vulnerabilities from other branches' do
-          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
-
-          # TODO: This should actually fail and we must scope vulns
-          # per branch as soon as we store them for other branches
-          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-          it 'includes vulnerabilities from all branches' do
-            is_expected.to contain_exactly(branch_vuln)
-          end
-        end
-      end
-
-      describe '#latest_vulnerabilities_with_sha' do
-        subject { group.latest_vulnerabilities_with_sha }
-
-        it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
-          is_expected.to contain_exactly(new_vuln)
-        end
-
-        it { is_expected.to all(respond_to(:sha)) }
-
-        context 'with vulnerabilities from other branches' do
-          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
-
-          # TODO: This should actually fail and we must scope vulns
-          # per branch as soon as we store them for other branches
-          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-          it 'includes vulnerabilities from all branches' do
-            is_expected.to contain_exactly(branch_vuln)
-          end
-        end
-      end
-
-      describe '#all_vulnerabilities' do
-        subject { group.all_vulnerabilities }
-
-        it 'returns vulns for all successful pipelines of projects belonging to the group' do
-          is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln)
-        end
-
-        context 'with vulnerabilities from other branches' do
-          let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-          let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
-
-          # TODO: This should actually fail and we must scope vulns
-          # per branch as soon as we store them for other branches
-          # Dependent on https://gitlab.com/gitlab-org/gitlab-ee/issues/9524
-          it 'includes vulnerabilities from all branches' do
-            is_expected.to contain_exactly(old_vuln, new_vuln, new_vuln, branch_vuln)
-          end
         end
       end
     end

@@ -15,7 +15,7 @@ describe 'User adds to merge train when pipeline succeeds', :js do
   before do
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.add_maintainer(user)
-    project.update!(merge_pipelines_enabled: true, merge_trains_enabled: true)
+    project.update!(merge_pipelines_enabled: true)
     merge_request.update_head_pipeline
 
     sign_in(user)

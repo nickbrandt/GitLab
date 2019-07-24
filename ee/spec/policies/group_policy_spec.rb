@@ -68,6 +68,10 @@ describe GroupPolicy do
           end
         end
 
+        before do
+          group.root_ancestor.reload
+        end
+
         it 'prevents access without a SAML session' do
           is_expected.not_to be_allowed(:read_group)
         end
@@ -364,24 +368,19 @@ describe GroupPolicy do
     context 'auditor' do
       let(:current_user) { create(:user, :auditor) }
 
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
+
       it do
         expect_allowed(:read_group)
+        expect_allowed(:read_group_security_dashboard)
         expect_disallowed(:upload_file)
         expect_disallowed(*reporter_permissions)
         expect_disallowed(*developer_permissions)
         expect_disallowed(*maintainer_permissions)
         expect_disallowed(*owner_permissions)
       end
-    end
-  end
-
-  it_behaves_like 'ee clusterable policies' do
-    let(:clusterable) { create(:group) }
-    let(:cluster) do
-      create(:cluster,
-             :provided_by_gcp,
-             :group,
-             groups: [clusterable])
     end
   end
 end

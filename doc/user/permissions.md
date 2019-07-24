@@ -60,7 +60,7 @@ The following table depicts the various user permission levels in a project.
 | View confidential issues                          | (*2*)   | ✓          | ✓           | ✓        | ✓      |
 | Assign issues                                     |         | ✓          | ✓           | ✓        | ✓      |
 | Label issues                                      |         | ✓          | ✓           | ✓        | ✓      |
-| Lock issue discussions                            |         | ✓          | ✓           | ✓        | ✓      |
+| Lock issue threads                                |         | ✓          | ✓           | ✓        | ✓      |
 | Manage issue tracker                              |         | ✓          | ✓           | ✓        | ✓      |
 | Manage related issues **(STARTER)**               |         | ✓          | ✓           | ✓        | ✓      |
 | Create issue from vulnerability **(ULTIMATE)**    |         | ✓          | ✓           | ✓        | ✓      |
@@ -81,7 +81,7 @@ The following table depicts the various user permission levels in a project.
 | Create new merge request                          |         |            | ✓           | ✓        | ✓      |
 | Assign merge requests                             |         |            | ✓           | ✓        | ✓      |
 | Label merge requests                              |         |            | ✓           | ✓        | ✓      |
-| Lock merge request discussions                    |         |            | ✓           | ✓        | ✓      |
+| Lock merge request threads                        |         |            | ✓           | ✓        | ✓      |
 | Manage/Accept merge requests                      |         |            | ✓           | ✓        | ✓      |
 | Create new environments                           |         |            | ✓           | ✓        | ✓      |
 | Stop environments                                 |         |            | ✓           | ✓        | ✓      |
@@ -209,12 +209,15 @@ group.
 | Create project in group                         |       |          | ✓         | ✓          | ✓     |
 | Create/edit/delete group milestones             |       |          | ✓         | ✓          | ✓     |
 | Enable/disable a dependency proxy **(PREMIUM)** |       |          | ✓         | ✓          | ✓     |
+| Create subgroup                                 |       |          |           | ✓ (1)        | ✓     |
 | Edit group                                      |       |          |           |            | ✓     |
-| Create subgroup                                 |       |          |           |            | ✓     |
 | Manage group members                            |       |          |           |            | ✓     |
 | Remove group                                    |       |          |           |            | ✓     |
 | Delete group epic **(ULTIMATE)**                |       |          |           |            | ✓     |
 | View group Audit Events                         |       |          |           |            | ✓     |
+
+- (1): Groups can be set to [allow either Owners or Owners and
+  Maintainers to create subgroups](group/subgroups/index.md#creating-a-subgroup)
 
 ### Subgroup permissions
 

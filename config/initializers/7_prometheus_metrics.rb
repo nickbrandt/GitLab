@@ -1,5 +1,4 @@
 require 'prometheus/client'
-require 'prometheus/client/support/unicorn'
 
 # Keep separate directories for separate processes
 def prometheus_default_multiproc_dir
@@ -17,13 +16,13 @@ def prometheus_default_multiproc_dir
 end
 
 Prometheus::Client.configure do |config|
-  config.logger = Rails.logger
+  config.logger = Rails.logger # rubocop:disable Gitlab/RailsLogger
 
   config.initial_mmap_file_size = 4 * 1024
 
   config.multiprocess_files_dir = ENV['prometheus_multiproc_dir'] || prometheus_default_multiproc_dir
 
-  config.pid_provider = Prometheus::Client::Support::Unicorn.method(:worker_pid_provider)
+  config.pid_provider = Prometheus::PidProvider.method(:worker_id)
 end
 
 Gitlab::Application.configure do |config|

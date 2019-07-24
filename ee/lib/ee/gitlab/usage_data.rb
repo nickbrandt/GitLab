@@ -124,7 +124,7 @@ module EE
             epics: count(::Epic),
             feature_flags: count(Operations::FeatureFlag),
             geo_nodes: count(::GeoNode),
-            incident_issues: count(::Issue.authored(::User.alert_bot)),
+            incident_issues: count_incident_issues,
             ldap_group_links: count(::LdapGroupLink),
             ldap_keys: count(::LDAPKey),
             ldap_users: count(::User.ldap),
@@ -156,6 +156,12 @@ module EE
 
         def epics_deepest_relationship_level
           { epics_deepest_relationship_level: ::Epic.deepest_relationship_level }
+        end
+
+        def count_incident_issues
+          return 0 unless License.feature_available?(:incident_management)
+
+          count(::Issue.authored(::User.alert_bot))
         end
       end
     end

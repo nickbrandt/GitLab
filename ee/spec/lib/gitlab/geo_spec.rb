@@ -11,10 +11,10 @@ describe Gitlab::Geo, :geo, :request_store do
     it 'includes GitLab version and Rails.version in the cache key' do
       expanded_key = "geo:#{key}:#{Gitlab::VERSION}:#{Rails.version}"
 
-      expect(Gitlab::SafeRequestStore).to receive(:fetch)
-        .with(expanded_key).and_call_original
+      expect(Gitlab::ThreadMemoryCache.cache_backend).to receive(:write)
+        .with(expanded_key, an_instance_of(String), expires_in: 1.minute).and_call_original
       expect(Rails.cache).to receive(:write)
-        .with(expanded_key, an_instance_of(String), expires_in: 15.seconds)
+        .with(expanded_key, an_instance_of(String), expires_in: 2.minutes)
 
       described_class.public_send(method)
     end
@@ -114,16 +114,6 @@ describe Gitlab::Geo, :geo, :request_store do
         expect(described_class.enabled?).to be_falsey
       end
     end
-
-    context 'with RequestStore enabled', :request_store do
-      it 'return false when no GeoNode exists' do
-        GeoNode.delete_all
-
-        expect(GeoNode).to receive(:exists?).once.and_call_original
-
-        2.times { expect(described_class.enabled?).to be_falsey }
-      end
-    end
   end
 
   describe '.oauth_authentication' do
@@ -145,12 +135,6 @@ describe Gitlab::Geo, :geo, :request_store do
 
       it 'returns false when the table does not exist' do
         allow(GeoNode).to receive(:table_exists?) { false }
-
-        expect(described_class.connected?).to be_falsey
-      end
-
-      it 'returns false when MySQL is in use' do
-        allow(Gitlab::Database).to receive(:postgresql?) { false }
 
         expect(described_class.connected?).to be_falsey
       end
@@ -177,8 +161,8 @@ describe Gitlab::Geo, :geo, :request_store do
       described_class::CACHE_KEYS.each do |raw_key|
         expanded_key = "geo:#{raw_key}:#{Gitlab::VERSION}:#{Rails.version}"
 
-        expect(Rails.cache).to receive(:delete).with(expanded_key)
-        expect(Gitlab::SafeRequestStore).to receive(:delete).with(expanded_key)
+        expect(Rails.cache).to receive(:delete).with(expanded_key).and_call_original
+        expect(Gitlab::ThreadMemoryCache.cache_backend).to receive(:delete).with(expanded_key).and_call_original
       end
 
       described_class.expire_cache!

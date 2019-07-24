@@ -1,0 +1,3 @@
+- type = local_assigns.fetch(:type)
+
+= button_tag _("Edit %{issuable}") % {issuable: type.to_s.humanize(capitalize: false)}, class: 'btn btn-default append-right-10 js-bulk-update-toggle'

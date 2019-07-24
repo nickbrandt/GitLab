@@ -12,15 +12,17 @@ class PagesDomain < ApplicationRecord
 
   validates :domain, hostname: { allow_numeric_hostname: true }
   validates :domain, uniqueness: { case_sensitive: false }
-  validates :certificate, presence: { message: 'must be present if HTTPS-only is enabled' }, if: ->(domain) { domain.project&.pages_https_only? }
+  validates :certificate, presence: { message: 'must be present if HTTPS-only is enabled' },
+            if: :certificate_should_be_present?
   validates :certificate, certificate: true, if: ->(domain) { domain.certificate.present? }
-  validates :key, presence: { message: 'must be present if HTTPS-only is enabled' }, if: ->(domain) { domain.project&.pages_https_only? }
+  validates :key, presence: { message: 'must be present if HTTPS-only is enabled' },
+            if: :certificate_should_be_present?
   validates :key, certificate_key: true, if: ->(domain) { domain.key.present? }
   validates :verification_code, presence: true, allow_blank: false
 
   validate :validate_pages_domain
   validate :validate_matching_key, if: ->(domain) { domain.certificate.present? || domain.key.present? }
-  validate :validate_intermediates, if: ->(domain) { domain.certificate.present? }
+  validate :validate_intermediates, if: ->(domain) { domain.certificate.present? && domain.certificate_changed? }
 
   attr_encrypted :key,
     mode: :per_attribute_iv_and_salt,
@@ -248,5 +250,9 @@ class PagesDomain < ApplicationRecord
     @pkey ||= OpenSSL::PKey::RSA.new(key)
   rescue OpenSSL::PKey::PKeyError, OpenSSL::Cipher::CipherError
     nil
+  end
+
+  def certificate_should_be_present?
+    !auto_ssl_enabled? && project&.pages_https_only?
   end
 end

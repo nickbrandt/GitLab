@@ -146,6 +146,9 @@ describe Geo::MigratedLocalFilesCleanUpWorker, :geo, :geo_fdw do
 
     before do
       stub_uploads_object_storage(AvatarUploader)
+
+      allow(Rails.cache).to receive(:read).and_call_original
+      allow(Rails.cache).to receive(:write).and_call_original
     end
 
     it 'sets the back off time when there are no pending items' do

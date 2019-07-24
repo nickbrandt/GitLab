@@ -15,6 +15,7 @@ class License < ApplicationRecord
     contribution_analytics
     elastic_search
     export_issues
+    group_bulk_edit
     group_burndown_charts
     group_webhooks
     issuable_default_templates
@@ -68,6 +69,7 @@ class License < ApplicationRecord
     variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
+    external_authorization_service_api_management
     ci_cd_projects
     default_project_deletion_protection
     protected_environments
@@ -108,6 +110,7 @@ class License < ApplicationRecord
     insights
     web_ide_terminal
     incident_management
+    report_approver_rules
     group_ip_restriction
   ]
   EEU_FEATURES.freeze
@@ -189,6 +192,7 @@ class License < ApplicationRecord
     multiple_ldap_servers
     object_storage
     repository_size_limit
+    external_authorization_service_api_management
     custom_project_templates
     usage_quotas
     required_ci_templates

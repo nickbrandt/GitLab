@@ -20,11 +20,9 @@ describe Boards::MilestonesController do
 
           expect(response).to have_gitlab_http_status(200)
 
-          parsed_response = JSON.parse(response.body)
-
           expect(response.content_type).to eq('application/json')
-          expect(parsed_response).to all(match_schema('entities/milestone', dir: 'ee'))
-          expect(parsed_response.size).to eq(1)
+          expect(json_response).to all(match_schema('entities/milestone', dir: 'ee'))
+          expect(json_response.size).to eq(1)
         end
       end
 

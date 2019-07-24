@@ -9,6 +9,9 @@ describe('Design management upload form component', () => {
       propsData: {
         isSaving,
         canUploadDesign,
+        projectPath: '',
+        issueIid: '',
+        allVersions: [],
       },
     });
   }

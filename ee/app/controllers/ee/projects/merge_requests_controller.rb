@@ -42,6 +42,10 @@ module EE
         render_approvals_json
       end
 
+      def license_management_reports
+        reports_response(merge_request.compare_license_management_reports)
+      end
+
       def metrics_reports
         reports_response(merge_request.compare_metrics_reports)
       end

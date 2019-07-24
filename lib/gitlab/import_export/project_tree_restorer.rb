@@ -20,7 +20,7 @@ module Gitlab
           json = IO.read(@path)
           @tree_hash = ActiveSupport::JSON.decode(json)
         rescue => e
-          Rails.logger.error("Import/Export error: #{e.message}")
+          Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
           raise Gitlab::ImportExport::Error.new('Incorrect JSON format')
         end
 
@@ -130,6 +130,7 @@ module Gitlab
       def visibility_level
         level = override_params['visibility_level'] || json_params['visibility_level'] || @project.visibility_level
         level = @project.group.visibility_level if @project.group && level.to_i > @project.group.visibility_level
+        level = Gitlab::VisibilityLevel::PRIVATE if level == Gitlab::VisibilityLevel::INTERNAL && Gitlab::CurrentSettings.restricted_visibility_levels.include?(level)
 
         { 'visibility_level' => level }
       end

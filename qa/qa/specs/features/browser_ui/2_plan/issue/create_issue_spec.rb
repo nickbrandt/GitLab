@@ -5,23 +5,35 @@ module QA
     describe 'Issue creation' do
       let(:issue_title) { 'issue title' }
 
-      it 'user creates an issue' do
-        create_issue
+      before do
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
+      end
 
-        Page::Project::Menu.act { click_issues }
+      it 'user creates an issue' do
+        Resource::Issue.fabricate_via_browser_ui! do |issue|
+          issue.title = issue_title
+        end
+
+        Page::Project::Menu.perform(&:click_issues)
 
         expect(page).to have_content(issue_title)
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/101
-      context 'when using attachments in comments', :object_storage, :quarantine do
+      context 'when using attachments in comments', :object_storage do
         let(:file_to_attach) do
           File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif'))
         end
 
-        it 'user comments on an issue with an attachment' do
-          create_issue
+        before do
+          issue = Resource::Issue.fabricate_via_api! do |issue|
+            issue.title = issue_title
+          end
 
+          issue.visit!
+        end
+
+        it 'user comments on an issue with an attachment' do
           Page::Project::Issue::Show.perform do |show|
             show.comment('See attached banana for scale', attachment: file_to_attach)
 
@@ -35,15 +47,6 @@ module QA
 
             expect(found).to be_truthy
           end
-        end
-      end
-
-      def create_issue
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.act { sign_in_using_credentials }
-
-        Resource::Issue.fabricate_via_browser_ui! do |issue|
-          issue.title = issue_title
         end
       end
     end

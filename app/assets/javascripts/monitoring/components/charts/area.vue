@@ -8,6 +8,7 @@ import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import Icon from '~/vue_shared/components/icon.vue';
 import { chartHeight, graphTypes, lineTypes } from '../../constants';
 import { makeDataSeries } from '~/helpers/monitor_helper';
+import { graphDataValidatorForValues } from '../../utils';
 
 let debouncedResize;
 
@@ -23,19 +24,7 @@ export default {
     graphData: {
       type: Object,
       required: true,
-      validator(data) {
-        return (
-          Array.isArray(data.queries) &&
-          data.queries.filter(query => {
-            if (Array.isArray(query.result)) {
-              return (
-                query.result.filter(res => Array.isArray(res.values)).length === query.result.length
-              );
-            }
-            return false;
-          }).length === data.queries.length
-        );
-      },
+      validator: graphDataValidatorForValues.bind(null, false),
     },
     containerWidth: {
       type: Number,
@@ -48,7 +37,13 @@ export default {
     },
     projectPath: {
       type: String,
-      required: true,
+      required: false,
+      default: () => '',
+    },
+    showBorder: {
+      type: Boolean,
+      required: false,
+      default: () => false,
     },
     thresholds: {
       type: Array,
@@ -245,52 +240,54 @@ export default {
 </script>
 
 <template>
-  <div class="prometheus-graph col-12 col-lg-6">
-    <div class="prometheus-graph-header">
-      <h5 ref="graphTitle" class="prometheus-graph-title">{{ graphData.title }}</h5>
-      <div ref="graphWidgets" class="prometheus-graph-widgets"><slot></slot></div>
-    </div>
-    <gl-area-chart
-      ref="areaChart"
-      v-bind="$attrs"
-      :data="chartData"
-      :option="chartOptions"
-      :format-tooltip-text="formatTooltipText"
-      :thresholds="thresholds"
-      :width="width"
-      :height="height"
-      @updated="onChartUpdated"
-    >
-      <template v-if="tooltip.isDeployment">
-        <template slot="tooltipTitle">
-          {{ __('Deployed') }}
-        </template>
-        <div slot="tooltipContent" class="d-flex align-items-center">
-          <icon name="commit" class="mr-2" />
-          <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
-        </div>
-      </template>
-      <template v-else>
-        <template slot="tooltipTitle">
-          <div class="text-nowrap">
-            {{ tooltip.title }}
+  <div class="col-12 col-lg-6" :class="[showBorder ? 'p-2' : 'p-0']">
+    <div class="prometheus-graph" :class="{ 'prometheus-graph-embed w-100 p-3': showBorder }">
+      <div class="prometheus-graph-header">
+        <h5 ref="graphTitle" class="prometheus-graph-title">{{ graphData.title }}</h5>
+        <div ref="graphWidgets" class="prometheus-graph-widgets"><slot></slot></div>
+      </div>
+      <gl-area-chart
+        ref="areaChart"
+        v-bind="$attrs"
+        :data="chartData"
+        :option="chartOptions"
+        :format-tooltip-text="formatTooltipText"
+        :thresholds="thresholds"
+        :width="width"
+        :height="height"
+        @updated="onChartUpdated"
+      >
+        <template v-if="tooltip.isDeployment">
+          <template slot="tooltipTitle">
+            {{ __('Deployed') }}
+          </template>
+          <div slot="tooltipContent" class="d-flex align-items-center">
+            <icon name="commit" class="mr-2" />
+            <gl-link :href="tooltip.commitUrl">{{ tooltip.sha }}</gl-link>
           </div>
         </template>
-        <template slot="tooltipContent">
-          <div
-            v-for="(content, key) in tooltip.content"
-            :key="key"
-            class="d-flex justify-content-between"
-          >
-            <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
-              {{ content.name }}
-            </gl-chart-series-label>
-            <div class="prepend-left-32">
-              {{ content.value }}
+        <template v-else>
+          <template slot="tooltipTitle">
+            <div class="text-nowrap">
+              {{ tooltip.title }}
             </div>
-          </div>
+          </template>
+          <template slot="tooltipContent">
+            <div
+              v-for="(content, key) in tooltip.content"
+              :key="key"
+              class="d-flex justify-content-between"
+            >
+              <gl-chart-series-label :color="isMultiSeries ? content.color : ''">
+                {{ content.name }}
+              </gl-chart-series-label>
+              <div class="prepend-left-32">
+                {{ content.value }}
+              </div>
+            </div>
+          </template>
         </template>
-      </template>
-    </gl-area-chart>
+      </gl-area-chart>
+    </div>
   </div>
 </template>

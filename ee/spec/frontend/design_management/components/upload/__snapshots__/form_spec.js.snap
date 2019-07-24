@@ -3,8 +3,16 @@
 exports[`Design management upload form component hides button if cant upload 1`] = `
 <header
   class="row-content-block border-top-0 p-2 d-flex"
+  issueiid=""
+  projectpath=""
 >
-  <div>
+  <div
+    class="d-flex justify-content-between align-items-center w-100"
+  >
+    <designversiondropdown-stub
+      all-versions=""
+    />
+     
     <!---->
   </div>
 </header>
@@ -13,11 +21,17 @@ exports[`Design management upload form component hides button if cant upload 1`]
 exports[`Design management upload form component renders upload design button 1`] = `
 <header
   class="row-content-block border-top-0 p-2 d-flex"
+  issueiid=""
+  projectpath=""
 >
-  <div>
-    <uploadbutton-stub
-      isinverted="true"
+  <div
+    class="d-flex justify-content-between align-items-center w-100"
+  >
+    <designversiondropdown-stub
+      all-versions=""
     />
+     
+    <uploadbutton-stub />
   </div>
 </header>
 `;

@@ -13,8 +13,6 @@ if you want to know how to disable it.
 
 To disable artifacts site-wide, follow the steps below.
 
----
-
 **In Omnibus installations:**
 
 1. Edit `/etc/gitlab/gitlab.rb` and add the following line:
@@ -24,8 +22,6 @@ To disable artifacts site-wide, follow the steps below.
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-
----
 
 **In installations from source:**
 
@@ -49,8 +45,6 @@ this is done when the job succeeds, but can also be done on failure, or always, 
 To change the location where the artifacts are stored locally, follow the steps
 below.
 
----
-
 **In Omnibus installations:**
 
 _The artifacts are stored by default in
@@ -64,8 +58,6 @@ _The artifacts are stored by default in
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-
----
 
 **In installations from source:**
 
@@ -123,6 +115,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 | `aws_access_key_id` | AWS credentials, or compatible | |
 | `aws_secret_access_key` | AWS credentials, or compatible | |
 | `aws_signature_version` | AWS signature version to use. 2 or 4 are valid options. Digital Ocean Spaces and other providers may need 2. | 4 |
+| `enable_signature_v4_streaming` | Set to true to enable HTTP chunked transfers with AWS v4 signatures (https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-streaming.html). Oracle Cloud S3 needs this to be false | true
 | `region` | AWS region | us-east-1 |
 | `host` | S3 compatible host for when not using AWS, e.g. `localhost` or `storage.example.com` | s3.amazonaws.com |
 | `endpoint` | Can be used when configuring an S3 compatible service such as [Minio](https://www.minio.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
@@ -167,8 +160,6 @@ _The artifacts are stored by default in
    gitlab-rake gitlab:artifacts:migrate
    ```
 
----
-
 **In installations from source:**
 
 _The artifacts are stored by default in
@@ -207,8 +198,6 @@ right after that date passes. Artifacts are cleaned up by the
 To change the default schedule on which the artifacts are expired, follow the
 steps below.
 
----
-
 **In Omnibus installations:**
 
 1. Edit `/etc/gitlab/gitlab.rb` and comment out or add the following line
@@ -218,8 +207,6 @@ steps below.
    ```
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
-
----
 
 **In installations from source:**
 
@@ -240,8 +227,6 @@ steps below.
 To disable [the dependencies validation](../ci/yaml/README.md#when-a-dependent-job-will-fail),
 you can flip the feature flag from a Rails console.
 
----
-
 **In Omnibus installations:**
 
 1. Enter the Rails console:
@@ -255,8 +240,6 @@ you can flip the feature flag from a Rails console.
    ```ruby
    Feature.enable('ci_disable_validates_dependencies')
    ```
-
----
 
 **In installations from source:**
 

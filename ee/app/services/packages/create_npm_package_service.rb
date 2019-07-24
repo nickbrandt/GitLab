@@ -6,6 +6,10 @@ module Packages
       version = params[:versions].keys.first
       version_data = params[:versions][version]
 
+      existing_package = project.packages.npm.with_name(name).with_version(version)
+
+      return error('Package already exists.', 403) if existing_package.exists?
+
       package = project.packages.create!(
         name: name,
         version: version,

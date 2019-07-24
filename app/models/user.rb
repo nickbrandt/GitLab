@@ -185,6 +185,7 @@ class User < ApplicationRecord
   before_validation :set_notification_email, if: :new_record?
   before_validation :set_public_email, if: :public_email_changed?
   before_validation :set_commit_email, if: :commit_email_changed?
+  before_save :default_private_profile_to_false
   before_save :set_public_email, if: :public_email_changed? # in case validation is skipped
   before_save :set_commit_email, if: :commit_email_changed? # in case validation is skipped
   before_save :ensure_incoming_email_token
@@ -1117,9 +1118,10 @@ class User < ApplicationRecord
 
   def ensure_namespace_correct
     if namespace
-      namespace.path = namespace.name = username if username_changed?
+      namespace.path = username if username_changed?
+      namespace.name = name if name_changed?
     else
-      build_namespace(path: username, name: username)
+      build_namespace(path: username, name: name)
     end
   end
 
@@ -1255,6 +1257,11 @@ class User < ApplicationRecord
 
       Ci::Runner.from_union([project_runners, group_runners])
     end
+  end
+
+  def notification_email_for(notification_group)
+    # Return group-specific email address if present, otherwise return global notification email address
+    notification_group&.notification_email_for(self) || notification_email
   end
 
   def notification_settings_for(source)
@@ -1489,6 +1496,12 @@ class User < ApplicationRecord
   end
 
   private
+
+  def default_private_profile_to_false
+    return unless private_profile_changed? && private_profile.nil?
+
+    self.private_profile = false
+  end
 
   def has_current_license?
     false

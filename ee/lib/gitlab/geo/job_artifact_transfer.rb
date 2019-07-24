@@ -8,19 +8,22 @@ module Gitlab
     #   * Returning a detailed Result object
     class JobArtifactTransfer < Transfer
       def initialize(job_artifact)
-        @file_type = :job_artifact
-        @file_id = job_artifact.id
-        @filename = job_artifact.file.path
-        @request_data = job_artifact_request_data(job_artifact)
+        super(
+          :job_artifact,
+          job_artifact.id,
+          job_artifact.file.path,
+          job_artifact.file_sha256,
+          job_artifact_request_data(job_artifact)
+        )
       end
 
       private
 
       def job_artifact_request_data(job_artifact)
         {
-          id: @file_id,
-          file_type: @file_type,
-          file_id: @file_id
+          id: job_artifact.id,
+          file_type: :job_artifact,
+          file_id: job_artifact.id
         }
       end
     end

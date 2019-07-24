@@ -62,7 +62,7 @@ describe Groups::ParticipantsService do
       service.instance_variable_set(:@noteable, epic)
       result = service.group_members
 
-      expected_users = (group.self_and_hierarchy.map(&:users).flatten + subproject.users)
+      expected_users = (group.self_and_hierarchy.flat_map(&:users) + subproject.users)
                        .map(&method(:user_to_autocompletable))
 
       expect(expected_users.count).to eq(5)

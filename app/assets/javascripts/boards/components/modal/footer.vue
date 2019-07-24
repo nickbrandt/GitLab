@@ -1,4 +1,5 @@
 <script>
+import footerEEMixin from 'ee_else_ce/boards/mixins/modal_footer';
 import Flash from '../../../flash';
 import { __, n__ } from '../../../locale';
 import ListsDropdown from './lists_dropdown.vue';
@@ -10,7 +11,7 @@ export default {
   components: {
     ListsDropdown,
   },
-  mixins: [modalMixin],
+  mixins: [modalMixin, footerEEMixin],
   data() {
     return {
       modal: ModalStore.store,
@@ -41,7 +42,7 @@ export default {
       const req = this.buildUpdateRequest(list);
 
       // Post the data to the backend
-      gl.boardService.bulkUpdate(issueIds, req).catch(() => {
+      boardsStore.bulkUpdate(issueIds, req).catch(() => {
         Flash(__('Failed to update issues, please try again.'));
 
         selectedIssues.forEach(issue => {

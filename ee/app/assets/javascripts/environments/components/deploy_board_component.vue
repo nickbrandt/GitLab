@@ -90,9 +90,6 @@ export default {
     instanceTitle() {
       return n__('Instance', 'Instances', this.instanceCount);
     },
-    projectName() {
-      return '<projectname>';
-    },
     deployBoardSvg() {
       return deployBoardSvg;
     },
@@ -169,9 +166,8 @@ export default {
         <section class="deploy-board-empty-state-text">
           <span class="deploy-board-empty-state-title d-flex">Kubernetes deployment not found</span>
           <span>
-            To see deployment progress for your environments, make sure your deployments are in
-            Kubernetes namespace <code>{{ projectName }}</code
-            >, and annotated with
+            To see deployment progress for your environments, make sure you are deploying to
+            <code>$KUBE_NAMESPACE</code> and annotating with
             <code>app.gitlab.com/app=$CI_PROJECT_PATH_SLUG</code>
             and <code>app.gitlab.com/env=$CI_ENVIRONMENT_SLUG</code>.
           </span>

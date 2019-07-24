@@ -17,11 +17,23 @@ module Operations
       if: :default_scope?, on: :update,
       inclusion: { in: %w(*), message: 'cannot be changed from default scope' }
 
+    validates :strategies, feature_flag_strategies: true
+
     before_destroy :prevent_destroy_default_scope, if: :default_scope?
 
     scope :ordered, -> { order(:id) }
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
+
+    delegate :name, :description, to: :feature_flag
+
+    def self.for_unleash_client(project, environment)
+      select('DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.*')
+        .where(feature_flag_id: project.operations_feature_flags.select(:id))
+        .order(:feature_flag_id)
+        .on_environment(environment)
+        .reverse_order
+    end
 
     private
 

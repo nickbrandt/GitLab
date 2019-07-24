@@ -179,7 +179,7 @@ describe Issues::UpdateService, :mailer do
         it 'sends email to user2 about assign of new issue and email to user3 about issue unassignment' do
           deliveries = ActionMailer::Base.deliveries
           email = deliveries.last
-          recipients = deliveries.last(2).map(&:to).flatten
+          recipients = deliveries.last(2).flat_map(&:to)
           expect(recipients).to include(user2.email, user3.email)
           expect(email.subject).to include(issue.title)
         end
@@ -478,6 +478,22 @@ describe Issues::UpdateService, :mailer do
       context 'when tasks are marked as completed' do
         before do
           update_issue(description: "- [x] Task 1\n- [X] Task 2")
+        end
+
+        it 'does not check for spam on task status change' do
+          params = {
+            update_task: {
+              index: 1,
+              checked: false,
+              line_source: '- [x] Task 1',
+              line_number: 1
+            }
+          }
+          service = described_class.new(project, user, params)
+
+          expect(service).not_to receive(:spam_check)
+
+          service.execute(issue)
         end
 
         it 'creates system note about task status change' do

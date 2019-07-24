@@ -32,28 +32,36 @@ RSpec.describe Packages::Package, type: :model do
     end
   end
 
-  describe '.last_of_each_version' do
+  context 'version scopes' do
     let!(:package1) { create(:npm_package, version: '1.0.0') }
     let!(:package2) { create(:npm_package, version: '1.0.1') }
     let!(:package3) { create(:npm_package, version: '1.0.1') }
 
-    subject { described_class.last_of_each_version }
+    describe '.last_of_each_version' do
+      subject { described_class.last_of_each_version }
 
-    it 'includes only latest package per version' do
-      is_expected.to include(package1, package3)
-      is_expected.not_to include(package2)
+      it 'includes only latest package per version' do
+        is_expected.to include(package1, package3)
+        is_expected.not_to include(package2)
+      end
     end
-  end
 
-  describe '.has_version' do
-    let!(:package1) { create(:npm_package, version: '1.0.0') }
-    let!(:package2) { create(:npm_package, version: nil) }
-    let!(:package3) { create(:npm_package, version: '1.0.1') }
+    describe '.has_version' do
+      let!(:package4) { create(:npm_package, version: nil) }
 
-    subject { described_class.has_version }
+      subject { described_class.has_version }
 
-    it 'includes only packages with version attribute' do
-      is_expected.to match_array([package1, package3])
+      it 'includes only packages with version attribute' do
+        is_expected.to match_array([package1, package2, package3])
+      end
+    end
+
+    describe '.with_version' do
+      subject { described_class.with_version('1.0.1') }
+
+      it 'includes only packages with specified version' do
+        is_expected.to match_array([package2, package3])
+      end
     end
   end
 end

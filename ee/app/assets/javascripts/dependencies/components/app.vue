@@ -31,11 +31,6 @@ export default {
       type: String,
       required: true,
     },
-    dependencyListVulnerabilities: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {

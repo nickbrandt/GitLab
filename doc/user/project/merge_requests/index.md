@@ -18,7 +18,7 @@ It is as simple as the name implies: a _request_ to _merge_ one branch into anot
 With GitLab merge requests, you can:
 
 - Compare the changes between two [branches](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell#_git_branching)
-- [Review and discuss](../../discussions/index.md#discussions) the proposed modifications inline
+- [Review and discuss](../../discussions/index.md#threads) the proposed modifications inline
 - Live preview the changes when [Review Apps](../../../ci/review_apps/index.md) is configured for your project
 - Build, test, and deploy your code in a per-branch basis with built-in [GitLab CI/CD](../../../ci/README.md)
 - Prevent the merge request from being merged before it's ready with [WIP MRs](#work-in-progress-merge-requests)
@@ -47,6 +47,7 @@ With **[GitLab Enterprise Edition][ee]**, you can also:
 - Analyze your dependencies for vulnerabilities with [Dependency Scanning](../../application_security/dependency_scanning/index.md) **(ULTIMATE)**
 - Analyze your Docker images for vulnerabilities with [Container Scanning](../../application_security/container_scanning/index.md) **(ULTIMATE)**
 - Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing-premium) **(PREMIUM)**
+- Specify merge order dependencies with [Blocking Merge Requests](#blocking-merge-requests-premium) **(PREMIUM)**
 
 ## Use cases
 
@@ -155,13 +156,13 @@ and remember to merge the request manually.
 
 [Learn more about merging when pipeline succeeds.](merge_when_pipeline_succeeds.md)
 
-## Resolve discussion comments in merge requests reviews
+## Resolve threads in merge requests reviews
 
 Keep track of the progress during a code review with resolving comments.
 Resolving comments prevents you from forgetting to address feedback and lets
-you hide discussions that are no longer relevant.
+you hide threads that are no longer relevant.
 
-[Read more about resolving discussion comments in merge requests reviews.](../../discussions/index.md)
+[Read more about resolving threads in merge requests reviews.](../../discussions/index.md)
 
 ## Commenting on any file line in merge requests
 
@@ -192,7 +193,7 @@ commit when merging, to allow for a neater commit history.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/18008) in GitLab 11.6.
 
 As a reviewer, you can add suggestions to change the content in
-merge request discussions, and users with appropriate [permission](../../permissions.md)
+merge request threads, and users with appropriate [permission](../../permissions.md)
 can easily apply them to the codebase directly from the UI. Read
 through the documentation on [Suggest changes](../../discussions/index.md#suggest-changes)
 to learn more.
@@ -274,7 +275,8 @@ branch already exists, the patches will be applied on top of it.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/26752) in GitLab 11.10.
 
 NOTE: **Note:**
-Git push options are only available with Git 2.10 or newer.
+Git push options are only available with Git 2.10 or newer. With Git older than 2.18
+`git push --push-option=...` should be used instead of `git push -o ...`.
 
 GitLab supports using
 [Git push options](https://git-scm.com/docs/git-push#Documentation/git-push.txt--oltoptiongt)
@@ -284,6 +286,7 @@ as pushing changes:
 - Create a new merge request for the pushed branch.
 - Set the target of the merge request to a particular branch.
 - Set the merge request to merge when its pipeline succeeds.
+- Set the merge request to remove the source branch when it's merged.
 
 ### Create a new merge request using git push options
 
@@ -327,6 +330,19 @@ pipeline succeeds at the same time using a `-o` flag per push option:
 git push -o merge_request.create -o merge_request.merge_when_pipeline_succeeds
 ```
 
+### Set removing the source branch using git push options
+
+To set an existing merge request to remove the source branch when the
+merge request is merged, the
+`merge_request.remove_source_branch` push option can be used:
+
+```sh
+git push -o merge_request.remove_source_branch
+```
+
+You can also use this push option in addition to the
+`merge_request.create` push option.
+
 ## Find the merge request that introduced a change
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/2383) in GitLab 10.5.
@@ -364,6 +380,11 @@ have been marked as a **Work In Progress**.
 
 [Learn more about setting a merge request as "Work In Progress".](work_in_progress_merge_requests.md)
 
+## Merge Requests for Confidential Issues
+
+Create [merge requests to resolve confidential issues](../issues/confidential_issues.md#merge-requests-for-confidential-issues)
+for preventing leakage or early release of sentive data through regular merge requests.
+
 ## Merge request approvals **(STARTER)**
 
 > Included in [GitLab Starter][products].
@@ -385,6 +406,17 @@ can show the Code Climate report right in the merge request widget area.
 
 [Read more about Code Quality reports.](code_quality.md)
 
+## Metrics Reports **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9788) in [GitLab Premium][products] 11.10.
+Requires GitLab Runner 11.10 and above.
+
+If you are using [GitLab CI][ci], you can configure your job to output custom
+metrics and GitLab will display the Metrics Report on the merge request so
+that it's fast and easy to identify changes to important metrics.
+
+[Read more about Metrics Report](../../../ci/metrics_reports.md).
+
 ## Browser Performance Testing **(PREMIUM)**
 
 > Introduced in [GitLab Premium][products] 10.3.
@@ -394,6 +426,21 @@ If your application offers a web interface and you are using [GitLab CI/CD][ci],
 GitLab runs the [Sitespeed.io container][sitespeed-container] and displays the difference in overall performance scores between the source and target branches.
 
 [Read more about Browser Performance Testing.](browser_performance_testing.md)
+
+## Blocking Merge Requests **(PREMIUM)**
+
+> Introduced in [GitLab Premium][products] 12.2.
+
+A single logical change may be split across several merge requests, and perhaps
+even across several projects. When this happens, the order in which MRs are
+merged is important.
+
+GitLab allows you to specify that a merge request is blocked by other MRs. With
+this relationship in place, the merge request cannot be merged until all of its
+blockers have also been merged, helping to maintain the consistency of a single
+logical change.
+
+[Read more about Blocking Merge Requests.](blocking_merge_requests.md)
 
 ## Security reports **(ULTIMATE)**
 

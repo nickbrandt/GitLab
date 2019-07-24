@@ -31,6 +31,10 @@ module EE
           notification_service.add_merge_request_approvers(merge_request, new_approvers, current_user)
         end
 
+        ::MergeRequests::UpdateBlocksService
+          .new(merge_request, current_user, blocking_merge_requests_params)
+          .execute
+
         merge_request
       end
 

@@ -10,6 +10,27 @@ class MergeRequestBlock < ApplicationRecord
 
   validate :check_block_constraints
 
+  scope :with_blocking_mr_ids, -> (ids) do
+    where(blocking_merge_request_id: ids).includes(:blocking_merge_request)
+  end
+
+  # Add a number of blocks at once. Pass a hash of blocking_id => blocked_id, or
+  # an Array of [blocking_id, blocked_id] tuples
+  def self.bulk_insert(pairs)
+    now = Time.current
+
+    rows = pairs.map do |blocking, blocked|
+      {
+        blocking_merge_request_id: blocking,
+        blocked_merge_request_id: blocked,
+        created_at: now,
+        updated_at: now
+      }
+    end
+
+    ::Gitlab::Database.bulk_insert(table_name, rows)
+  end
+
   private
 
   def check_block_constraints

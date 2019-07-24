@@ -6,12 +6,65 @@ describe Projects::Prometheus::AlertPresenter do
   set(:project) { create(:project) }
 
   let(:presenter) { described_class.new(alert) }
-  let(:alert) { create(:alerting_alert, project: project) }
+  let(:payload) { {} }
+  let(:alert) { create(:alerting_alert, project: project, payload: payload) }
 
   describe '#project_full_path' do
     subject { presenter.project_full_path }
 
     it { is_expected.to eq(project.full_path) }
+  end
+
+  describe '#starts_at' do
+    subject { presenter.starts_at }
+
+    before do
+      payload['startsAt'] = starts_at
+    end
+
+    context 'with valid datetime' do
+      let(:datetime) { Time.now }
+      let(:starts_at) { datetime.rfc3339 }
+
+      it { is_expected.to eq(datetime.rfc3339) }
+    end
+
+    context 'with invalid datetime' do
+      let(:starts_at) { 'invalid' }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#issue_summary_markdown' do
+    subject { presenter.issue_summary_markdown }
+
+    context 'without default payload' do
+      it do
+        is_expected.to include('## Summary')
+        is_expected.to include('* starts_at:')
+        is_expected.not_to include('* full_query:')
+      end
+    end
+
+    context 'with annotations' do
+      before do
+        payload['annotations'] = { 'foo' => 'value1', 'bar' => 'value2' }
+      end
+
+      it do
+        is_expected.to include('* foo: value1')
+        is_expected.to include('* bar: value2')
+      end
+    end
+
+    context 'with full query' do
+      before do
+        payload['generatorURL'] = 'http://host?g0.expr=query'
+      end
+
+      it { is_expected.to include('* full_query: `query`') }
+    end
   end
 
   context 'with gitlab alert' do
@@ -22,16 +75,16 @@ describe Projects::Prometheus::AlertPresenter do
       create(:alerting_alert, project: project, metric_id: metric_id)
     end
 
-    describe '#email_subject' do
+    describe '#full_title' do
       let(:query_title) do
         "#{gitlab_alert.title} #{gitlab_alert.computed_operator} #{gitlab_alert.threshold} for 5 minutes"
       end
 
       let(:expected_subject) do
-        "#{alert.environment.name} #{query_title}"
+        "#{alert.environment.name}: #{query_title}"
       end
 
-      subject { presenter.email_subject }
+      subject { presenter.full_title }
 
       it { is_expected.to eq(expected_subject) }
     end
@@ -49,10 +102,6 @@ describe Projects::Prometheus::AlertPresenter do
     end
 
     describe '#performance_dashboard_link' do
-      before do
-        gitlab_alert.save!
-      end
-
       let(:expected_link) do
         Gitlab::Routing.url_helpers
           .metrics_project_environment_url(project, alert.environment)
@@ -65,10 +114,22 @@ describe Projects::Prometheus::AlertPresenter do
   end
 
   context 'without gitlab alert' do
-    describe '#email_subject' do
-      subject { presenter.email_subject }
+    describe '#full_title' do
+      subject { presenter.full_title }
 
-      it { is_expected.to eq('') }
+      context 'with title' do
+        let(:title) { 'some title' }
+
+        before do
+          expect(alert).to receive(:title).and_return(title)
+        end
+
+        it { is_expected.to eq(title) }
+      end
+
+      context 'without title' do
+        it { is_expected.to eq('') }
+      end
     end
 
     describe '#metric_query' do

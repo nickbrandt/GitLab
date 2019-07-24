@@ -396,7 +396,7 @@ describe Projects::ManagedLicensesController do
           subject
 
           expect(response).to match_response_schema('software_license_policy', dir: 'ee')
-          expect(JSON.parse(response.body)).to eq(modified_software_license_policy_attributes.with_indifferent_access)
+          expect(json_response).to eq(modified_software_license_policy_attributes.with_indifferent_access)
         end
       end
     end

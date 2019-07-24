@@ -175,12 +175,6 @@ module QA
           click_element :edit_button
         end
 
-        def approvers
-          within_element :approver_list do
-            all_elements(:approver).map(&:text)
-          end
-        end
-
         def view_email_patches
           click_element :dropdown_toggle
           visit_link_in_element(:download_email_patches)

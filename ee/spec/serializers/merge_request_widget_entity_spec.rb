@@ -203,18 +203,17 @@ describe MergeRequestWidgetEntity do
 
     before do
       stub_licensed_features(merge_pipelines: true, merge_trains: true)
-      project.update!(merge_trains_enabled: true, merge_pipelines_enabled: true)
+      project.update!(merge_pipelines_enabled: true)
     end
 
     it 'has merge train entity' do
-      expect(subject.as_json).to include(:merge_trains_enabled)
       expect(subject.as_json).to include(:merge_trains_count)
       expect(subject.as_json).to include(:merge_train_index)
     end
 
     context 'when the merge train feature is disabled' do
       before do
-        project.update!(merge_trains_enabled: false)
+        stub_feature_flags(merge_trains_enabled: false)
       end
 
       it 'does not have merge trains count' do

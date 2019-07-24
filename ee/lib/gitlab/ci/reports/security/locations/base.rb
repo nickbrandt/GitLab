@@ -18,6 +18,12 @@ module Gitlab
               end
             end
 
+            def as_json(options = nil)
+              fingerprint # side-effect call to initialize the ivar for serialization
+
+              super
+            end
+
             private
 
             def fingerprint_data

@@ -39,6 +39,7 @@ describe ProjectPolicy do
         read_pipeline read_build read_commit_status read_container_image
         read_environment read_deployment read_merge_request read_pages
         create_merge_request_in award_emoji
+        read_project_security_dashboard
         read_vulnerability_feedback read_software_license_policy
       ]
     end
@@ -53,6 +54,10 @@ describe ProjectPolicy do
 
     context 'auditor' do
       let(:current_user) { create(:user, :auditor) }
+
+      before do
+        stub_licensed_features(security_dashboard: true, license_management: true)
+      end
 
       context 'who is not a team member' do
         it do
@@ -613,6 +618,88 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_dependencies' do
+    context 'when dependency list feature available' do
+      before do
+        stub_licensed_features(dependency_list: true)
+      end
+
+      context 'with public project' do
+        let(:current_user) { create(:user) }
+
+        context 'with public access to repository' do
+          let(:project) { create(:project, :public) }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with limited access to repository' do
+          let(:project) { create(:project, :public, :repository_private) }
+
+          it { is_expected.not_to be_allowed(:read_dependencies) }
+        end
+      end
+
+      context 'with private project' do
+        let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+        context 'with admin' do
+          let(:current_user) { admin }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with owner' do
+          let(:current_user) { owner }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with maintainer' do
+          let(:current_user) { maintainer }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with developer' do
+          let(:current_user) { developer }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with reporter' do
+          let(:current_user) { reporter }
+
+          it { is_expected.to be_allowed(:read_dependencies) }
+        end
+
+        context 'with guest' do
+          let(:current_user) { guest }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+
+        context 'with not member' do
+          let(:current_user) { create(:user) }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+
+        context 'with anonymous' do
+          let(:current_user) { nil }
+
+          it { is_expected.to be_disallowed(:read_dependencies) }
+        end
+      end
+    end
+
+    context 'when dependency list feature not available' do
+      let(:current_user) { admin }
+
+      it { is_expected.not_to be_allowed(:read_dependencies) }
+    end
+  end
+
   describe 'create_web_ide_terminal' do
     before do
       stub_licensed_features(web_ide_terminal: true)
@@ -734,17 +821,6 @@ describe ProjectPolicy do
       let(:current_user) { admin }
 
       it { is_expected.to be_disallowed(:read_prometheus_alerts) }
-    end
-  end
-
-  it_behaves_like 'ee clusterable policies' do
-    let(:clusterable) { create(:project, :repository) }
-
-    let(:cluster) do
-      create(:cluster,
-             :provided_by_gcp,
-             :project,
-             projects: [clusterable])
     end
   end
 

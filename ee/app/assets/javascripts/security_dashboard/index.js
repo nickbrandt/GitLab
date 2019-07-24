@@ -1,20 +1,33 @@
 import Vue from 'vue';
 import GroupSecurityDashboardApp from './components/app.vue';
+import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import router from './store/router';
 
-export default () => {
+export default function() {
   const el = document.getElementById('js-group-security-dashboard');
+  const { isUnavailable, dashboardDocumentation, emptyStateSvgPath } = el.dataset;
+
+  if (isUnavailable) {
+    return new Vue({
+      el,
+      render(createElement) {
+        return createElement(UnavailableState, {
+          props: {
+            link: dashboardDocumentation,
+            svgPath: emptyStateSvgPath,
+          },
+        });
+      },
+    });
+  }
 
   const store = createStore();
-
   return new Vue({
     el,
     store,
     router,
-    components: {
-      GroupSecurityDashboardApp,
-    },
+    components: { GroupSecurityDashboardApp },
     render(createElement) {
       return createElement('group-security-dashboard-app', {
         props: {
@@ -29,4 +42,4 @@ export default () => {
       });
     },
   });
-};
+}

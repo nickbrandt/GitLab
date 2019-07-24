@@ -5,6 +5,10 @@ module API
       package_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
 
+    rescue_from ActiveRecord::RecordInvalid do |e|
+      render_api_error!(e.message, 400)
+    end
+
     before do
       require_packages_enabled!
       authenticate_non_get!
@@ -14,15 +18,7 @@ module API
 
     helpers do
       def find_project_by_package_name(name)
-        Project.find_by_full_path(name.sub('@', ''))
-      end
-
-      def project_package_name_match?
-        "@#{user_project.full_path}" == params[:package_name]
-      end
-
-      def ensure_project_package_match!
-        bad_request!(:package_name) unless project_package_name_match?
+        ::Packages::Package.npm.with_name(name).first&.project
       end
     end
 
@@ -35,7 +31,6 @@ module API
     get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
-      # To avoid name collision we require project path and project package be the same.
       project = find_project_by_package_name(package_name)
 
       authorize!(:read_package, project)
@@ -54,7 +49,6 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_packages_feature!
-        ensure_project_package_match!
       end
 
       desc 'Download the NPM tarball' do
@@ -86,8 +80,14 @@ module API
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 
-        ::Packages::CreateNpmPackageService
+        created_package = ::Packages::CreateNpmPackageService
           .new(user_project, current_user, params).execute
+
+        if created_package[:status] == :error
+          render_api_error!(created_package[:message], created_package[:http_status])
+        else
+          created_package
+        end
       end
     end
   end

@@ -5,12 +5,13 @@
 
   %p
     - link_start = '<a href="%{url}">'.html_safe % { url: help_page_path('PLACEHOLDER') }
-    = s_('Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
+    = _('Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies.').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
 
 - if @group.public?
   - if can?(current_user, :admin_dependency_proxy, @group)
     = form_for(@dependency_proxy, method: :put, url: group_dependency_proxy_path(@group)) do |f|
       .form-group
+        %h5.prepend-top-20= _('Enable proxy')
         .js-dependency-proxy-toggle-area
           %button{ type: 'button',
             class: "js-project-feature-toggle project-feature-toggle #{'is-checked' if @dependency_proxy.enabled?}",
@@ -22,9 +23,6 @@
 
       - if @dependency_proxy.enabled
         = render 'groups/dependency_proxies/url'
-
-      .prepend-top-20
-        = f.submit 'Save changes', class: 'btn btn-success'
 
   - else
     - if @dependency_proxy.enabled

@@ -29,6 +29,7 @@ The following API resources are available in the project context:
 | [Commits](commits.md)                                               | `/projects/:id/repository/commits`, `/projects/:id/statuses`                                                                                                                                          |
 | [Container Registry](container_registry.md)                         | `/projects/:id/registry/repositories`                                                                                                                                                                 |
 | [Custom attributes](custom_attributes.md)                           | `/projects/:id/custom_attributes` (also available for groups and users)                                                                                                                               |
+| [Dependencies](dependencies.md) **[ULTIMATE]**                      | `/projects/:id/dependencies`
 | [Deploy keys](deploy_keys.md)                                       | `/projects/:id/deploy_keys` (also available standalone)                                                                                                                                               |
 | [Deployments](deployments.md)                                       | `/projects/:id/deployments`                                                                                                                                                                           |
 | [Discussions](discussions.md) (threaded comments)                   | `/projects/:id/issues/.../discussions`, `/projects/:id/snippets/.../discussions`, `/projects/:id/merge_requests/.../discussions`, `/projects/:id/commits/.../discussions` (also available for groups) |
@@ -154,9 +155,10 @@ the `/Users` endpoint. The base URL is: `/api/scim/v2/groups/:group_path/Users/`
 
 ## Road to GraphQL
 
-Going forward, we will start on moving to
-[GraphQL](graphql/index.md) and deprecate the use of
-controller-specific endpoints. GraphQL has a number of benefits:
+[GraphQL](graphql/index.md) is available in GitLab, which will
+allow deprecation of controller-specific endpoints.
+
+GraphQL has a number of benefits:
 
 1. We avoid having to maintain two different APIs.
 1. Callers of the API can request only what they need.
@@ -270,6 +272,12 @@ Example of using the personal access token in a header:
 curl --header "Private-Token: <your_access_token>" https://gitlab.example.com/api/v4/projects
 ```
 
+You can also use personal access tokens with OAuth-compliant headers:
+
+```shell
+curl --header "Authorization: Bearer <your_access_token>" https://gitlab.example.com/api/v4/projects
+```
+
 Read more about [personal access tokens][pat].
 
 ### Session cookie
@@ -319,8 +327,6 @@ By default, impersonation is enabled. To disable impersonation:
    GitLab for the changes to take effect.
 
 To re-enable impersonation, remove this configuration and reconfigure GitLab.
-
----
 
 **For installations from source**
 
@@ -379,8 +385,6 @@ returned with status code `404`:
   "message": "404 User with ID or username '123' Not Found"
 }
 ```
-
----
 
 Example of a valid API call and a request using cURL with sudo request,
 providing a username:

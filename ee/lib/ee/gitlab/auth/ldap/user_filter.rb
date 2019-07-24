@@ -37,7 +37,7 @@ module EE
           end
 
           def logger
-            Rails.logger
+            Rails.logger # rubocop:disable Gitlab/RailsLogger
           end
         end
       end

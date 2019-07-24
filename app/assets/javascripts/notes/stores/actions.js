@@ -62,7 +62,7 @@ export const updateDiscussion = ({ commit, state }, discussion) => {
 };
 
 export const deleteNote = ({ commit, dispatch, state }, note) =>
-  service.deleteNote(note.path).then(() => {
+  axios.delete(note.path).then(() => {
     const discussion = state.discussions.find(({ id }) => id === note.discussion_id);
 
     commit(types.DELETE_NOTE, note);
@@ -357,11 +357,11 @@ export const poll = ({ commit, state, getters, dispatch }) => {
 };
 
 export const stopPolling = () => {
-  eTagPoll.stop();
+  if (eTagPoll) eTagPoll.stop();
 };
 
 export const restartPolling = () => {
-  eTagPoll.restart();
+  if (eTagPoll) eTagPoll.restart();
 };
 
 export const fetchData = ({ commit, state, getters }) => {
@@ -384,12 +384,9 @@ export const toggleAward = ({ commit, getters }, { awardName, noteId }) => {
 export const toggleAwardRequest = ({ dispatch }, data) => {
   const { endpoint, awardName } = data;
 
-  return service
-    .toggleAward(endpoint, { name: awardName })
-    .then(res => res.json())
-    .then(() => {
-      dispatch('toggleAward', data);
-    });
+  return axios.post(endpoint, { name: awardName }).then(() => {
+    dispatch('toggleAward', data);
+  });
 };
 
 export const scrollToNoteIfNeeded = (context, el) => {

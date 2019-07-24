@@ -2,6 +2,7 @@ require 'rspec/mocks'
 require 'toml-rb'
 
 module TestEnv
+  extend ActiveSupport::Concern
   extend self
 
   ComponentFailedToInstallError = Class.new(StandardError)
@@ -108,6 +109,12 @@ module TestEnv
     setup_forked_repo
   end
 
+  included do |config|
+    config.append_before do
+      set_current_example_group
+    end
+  end
+
   def disable_mailer
     allow_any_instance_of(NotificationService).to receive(:mailer)
       .and_return(double.as_null_object)
@@ -132,14 +139,6 @@ module TestEnv
     FileUtils.mkdir_p(backup_path)
     FileUtils.mkdir_p(pages_path)
     FileUtils.mkdir_p(artifacts_path)
-  end
-
-  def clean_gitlab_test_path
-    Dir[TMP_TEST_PATH].each do |entry|
-      unless test_dirs.include?(File.basename(entry))
-        FileUtils.rm_rf(entry)
-      end
-    end
   end
 
   def setup_gitlab_shell
@@ -297,11 +296,27 @@ module TestEnv
     FileUtils.rm_rf(path)
   end
 
+  def current_example_group
+    Thread.current[:current_example_group]
+  end
+
+  # looking for a top-level `describe`
+  def topmost_example_group
+    example_group = current_example_group
+    example_group = example_group[:parent_example_group] until example_group[:parent_example_group].nil?
+    example_group
+  end
+
   private
+
+  def set_current_example_group
+    Thread.current[:current_example_group] = ::RSpec.current_example.metadata[:example_group]
+  end
 
   # These are directories that should be preserved at cleanup time
   def test_dirs
     @test_dirs ||= %w[
+      frontend
       gitaly
       gitlab-shell
       gitlab-test
@@ -346,10 +361,7 @@ module TestEnv
     # Try to reset without fetching to avoid using the network.
     unless reset.call
       raise 'Could not fetch test seed repository.' unless system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} fetch origin))
-
-      # Before we used Git clone's --mirror option, bare repos could end up
-      # with missing refs, clearing them and retrying should fix the issue.
-      clean_gitlab_test_path && init unless reset.call
+      raise "Could not update test seed repository, please delete #{repo_path} and try again" unless reset.call
     end
   end
 

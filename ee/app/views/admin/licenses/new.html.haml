@@ -27,12 +27,14 @@
             Enter license key
 
   .form-group.row.license-file
-    = f.label :data_file, "License file", class: 'col-form-label col-sm-2'
+    .col-sm-2.col-form-label
+      = f.label :data_file, "License file"
     .col-sm-10
       = f.file_field :data_file, accept: ".gitlab-license,.gitlab_license,.txt", class: "form-control"
 
   .form-group.row.license-key
-    = f.label :data, "License key", class: 'col-form-label col-sm-2'
+    .col-sm-2.col-form-label
+      = f.label :data, "License key"
     .col-sm-10
       = f.text_area :data, class: "form-control license-key-field", rows: 20
 

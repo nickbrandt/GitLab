@@ -1,7 +1,12 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
 import UploadForm from 'ee/design_management/components/upload/form.vue';
 import uploadDesignQuery from 'ee/design_management/queries/uploadDesign.graphql';
+
+const localVue = createLocalVue();
+localVue.use(VueRouter);
+const router = new VueRouter();
 
 describe('Design management index page', () => {
   let mutate;
@@ -24,6 +29,8 @@ describe('Design management index page', () => {
     vm = shallowMount(Index, {
       mocks: { $apollo },
       stubs: ['router-view'],
+      localVue,
+      router,
     });
 
     vm.setData({
@@ -112,6 +119,17 @@ describe('Design management index page', () => {
                     id: expect.anything(),
                     image: '',
                     filename: 'test',
+                    versions: {
+                      __typename: 'DesignVersionConnection',
+                      edges: {
+                        __typename: 'DesignVersionEdge',
+                        node: {
+                          __typename: 'DesignVersion',
+                          id: expect.anything(),
+                          sha: expect.anything(),
+                        },
+                      },
+                    },
                   },
                 ],
               },

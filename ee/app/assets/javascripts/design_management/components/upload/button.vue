@@ -11,11 +11,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    isInverted: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   methods: {
     openFileUpload() {
@@ -30,15 +25,8 @@ export default {
 
 <template>
   <div>
-    <gl-button
-      :disabled="isSaving"
-      :class="{
-        'btn-inverted': isInverted,
-      }"
-      variant="primary"
-      @click="openFileUpload"
-    >
-      {{ s__('DesignManagement|Upload designs') }}
+    <gl-button :disabled="isSaving" variant="primary" @click="openFileUpload">
+      {{ s__('DesignManagement|Add designs') }}
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
     </gl-button>
     <input

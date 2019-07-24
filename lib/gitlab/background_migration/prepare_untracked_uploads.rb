@@ -111,7 +111,7 @@ module Gitlab
         cmd = %W[#{ionice} -c Idle] + cmd if ionice
 
         log_msg = "PrepareUntrackedUploads find command: \"#{cmd.join(' ')}\""
-        Rails.logger.info log_msg
+        Rails.logger.info log_msg # rubocop:disable Gitlab/RailsLogger
 
         cmd
       end
@@ -133,12 +133,9 @@ module Gitlab
       def insert_sql(file_paths)
         if postgresql_pre_9_5?
           "INSERT INTO #{table_columns_and_values_for_insert(file_paths)};"
-        elsif postgresql?
+        else
           "INSERT INTO #{table_columns_and_values_for_insert(file_paths)}"\
             " ON CONFLICT DO NOTHING;"
-        else # MySQL
-          "INSERT IGNORE INTO"\
-            " #{table_columns_and_values_for_insert(file_paths)};"
         end
       end
 

@@ -61,7 +61,7 @@ module EE
           security_reports.get_report(file_type).tap do |security_report|
             next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
 
-            ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
+            parse_security_artifact_blob(security_report, blob)
           rescue => e
             security_report.error = e
           end
@@ -106,6 +106,12 @@ module EE
 
       def name_in?(names)
         name.in?(Array(names))
+      end
+
+      def parse_security_artifact_blob(security_report, blob)
+        report_clone = security_report.clone_as_blank
+        ::Gitlab::Ci::Parsers.fabricate!(security_report.type).parse!(blob, report_clone)
+        security_report.merge!(report_clone)
       end
     end
   end

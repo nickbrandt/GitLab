@@ -3,21 +3,28 @@ import { mapState } from 'vuex';
 import { n__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import VulnerabilityCheckPopover from '../vulnerability_check_popover.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
+
+const VULNERABILITY_CHECK_NAME = 'Vulnerability-Check';
 
 export default {
   components: {
     Icon,
-    UserAvatarList,
-    Rules,
     RuleControls,
+    Rules,
+    UserAvatarList,
+    VulnerabilityCheckPopover,
   },
   computed: {
     ...mapState(['settings']),
     ...mapState({
       rules: state => state.approvals.rules,
     }),
+    reportApproverRulesAreEnabled() {
+      return Boolean(gon && gon.features && gon.features.reportApproverRules);
+    },
   },
   methods: {
     summaryText(rule) {
@@ -54,6 +61,9 @@ export default {
         { name: rule.name, count: rule.approvalsRequired },
       );
     },
+    showVulnerabilityCheckPopover(rule) {
+      return this.reportApproverRulesAreEnabled && rule.name === VULNERABILITY_CHECK_NAME;
+    },
   },
 };
 </script>
@@ -72,6 +82,7 @@ export default {
       <td class="d-table-cell d-sm-none js-summary">{{ summaryText(rule) }}</td>
       <td v-if="settings.allowMultiRule" class="d-none d-sm-table-cell js-name">
         {{ rule.name }}
+        <vulnerability-check-popover v-if="showVulnerabilityCheckPopover(rule)" />
       </td>
       <td class="d-none d-sm-table-cell js-members">
         <user-avatar-list :items="rule.approvers" :img-size="24" />

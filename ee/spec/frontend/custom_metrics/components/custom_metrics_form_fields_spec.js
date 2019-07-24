@@ -3,8 +3,6 @@ import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'helpers/test_constants';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 
-jest.mock('~/lib/utils/axios_utils');
-
 describe('custom metrics form fields component', () => {
   let component;
   const getNamedInput = name => component.element.querySelector(`input[name="${name}"]`);
@@ -40,11 +38,11 @@ describe('custom metrics form fields component', () => {
   };
 
   beforeEach(() => {
-    axios.post.mockRestore();
-    axios.post.mockResolvedValue(validQueryResponse);
+    jest.spyOn(axios, 'post').mockResolvedValue(validQueryResponse);
   });
 
   afterEach(() => {
+    axios.post.mockRestore();
     component.destroy();
   });
 

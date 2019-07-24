@@ -37,7 +37,7 @@
                 %span.project-name<
                   = project.name
 
-          %span.metadata-info.visibility-icon.append-right-10.prepend-top-8.has-tooltip{ data: { container: 'body', placement: 'top' }, title: visibility_icon_description(project) }
+          %span.metadata-info.visibility-icon.append-right-10.prepend-top-8.text-secondary.has-tooltip{ data: { container: 'body', placement: 'top' }, title: visibility_icon_description(project) }
             = visibility_level_icon(project.visibility_level, fw: true)
 
           - if explore_projects_tab? && project.repository.license
@@ -58,7 +58,7 @@
           .description.d-none.d-sm-block.append-right-default
             = markdown_field(project, :description)
 
-      .controls.d-flex.flex-sm-column.align-items-center.align-items-sm-end.flex-wrap.flex-shrink-0{ class: css_controls_class }
+      .controls.d-flex.flex-sm-column.align-items-center.align-items-sm-end.flex-wrap.flex-shrink-0.text-secondary{ class: css_controls_class }
         .icon-container.d-flex.align-items-center
           - if project.archived
             %span.d-flex.icon-wrapper.badge.badge-warning archived
@@ -89,4 +89,4 @@
             %span.icon-wrapper.pipeline-status
               = render 'ci/status/icon', status: project.commit.last_pipeline.detailed_status(current_user), type: 'commit', tooltip_placement: 'top', path: pipeline_path
         .updated-note
-          %span Updated #{updated_tooltip}
+          %span #{_('Updated')} #{updated_tooltip}

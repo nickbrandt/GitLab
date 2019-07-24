@@ -3,7 +3,6 @@
 module Mutations
   module DesignManagement
     class Base < ::Mutations::BaseMutation
-      include Gitlab::Graphql::Authorize::AuthorizeResource
       include Mutations::ResolvesProject
 
       argument :project_path, GraphQL::ID_TYPE,

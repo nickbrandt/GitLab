@@ -7,6 +7,7 @@ module Geo
 
       STORE_COLUMN = :file_store
 
+      self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('lfs_objects')
 
       has_many :lfs_objects_projects, class_name: 'Geo::Fdw::LfsObjectsProject'

@@ -9,7 +9,7 @@ describe 'CycleAnalytics#staging' do
   let(:from_date) { 10.days.ago }
   let(:user) { create(:user, :admin) }
 
-  subject { CycleAnalytics.new(project, from: from_date) }
+  subject { CycleAnalytics::ProjectLevel.new(project, options: { from: from_date }) }
 
   generate_cycle_analytics_spec(
     phase: :staging,
@@ -45,7 +45,7 @@ describe 'CycleAnalytics#staging' do
       MergeRequests::MergeService.new(project, user).execute(merge_request)
       deploy_master(user, project)
 
-      expect(subject[:staging].median).to be_nil
+      expect(subject[:staging].project_median).to be_nil
     end
   end
 
@@ -56,7 +56,7 @@ describe 'CycleAnalytics#staging' do
       MergeRequests::MergeService.new(project, user).execute(merge_request)
       deploy_master(user, project, environment: 'staging')
 
-      expect(subject[:staging].median).to be_nil
+      expect(subject[:staging].project_median).to be_nil
     end
   end
 end

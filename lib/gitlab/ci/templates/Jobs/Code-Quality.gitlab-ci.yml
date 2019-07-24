@@ -6,6 +6,7 @@ code_quality:
     - docker:stable-dind
   variables:
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   script:
     - |
       if ! docker info &>/dev/null; then
@@ -22,6 +23,7 @@ code_quality:
     reports:
       codequality: gl-code-quality-report.json
     expire_in: 1 week
+  dependencies: []
   only:
     - branches
     - tags

@@ -22,12 +22,10 @@ describe Boards::UsersController do
                     },
                     format: :json
 
-        parsed_response = JSON.parse(response.body)
-
         expect(response).to have_gitlab_http_status(200)
         expect(response.content_type).to eq 'application/json'
-        expect(parsed_response).to all(match_schema('entities/user'))
-        expect(parsed_response.length).to eq 2
+        expect(json_response).to all(match_schema('entities/user'))
+        expect(json_response.length).to eq 2
       end
     end
 

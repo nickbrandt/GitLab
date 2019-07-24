@@ -34,6 +34,7 @@ FactoryBot.define do
       wikis_checksum_mismatch_count 10
       repositories_retrying_verification_count 25
       wikis_retrying_verification_count 3
+      repositories_checked_failed_count 1
       last_event_id 2
       last_event_timestamp { Time.now.to_i }
       cursor_last_event_id 1

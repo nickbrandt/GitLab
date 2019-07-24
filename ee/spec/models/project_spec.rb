@@ -1833,21 +1833,22 @@ describe Project do
 
   describe "#design_management_enabled?" do
     let(:project) { build(:project) }
-    where(:feature_enabled, :license_enabled, :graphql, :lfs, :expected) do
-      false | false | false | false | false
-      true  | false | false | false | false
-      false | true  | false | false | false
-      false | false | true  | false | false
-      false | false | false | true | false
-      true  | true  | true | true | true
-    end
+
+    where(
+      feature_enabled: [false, true],
+      license_enabled: [false, true],
+      lfs_enabled: [false, true]
+    )
 
     with_them do
       before do
         stub_licensed_features(design_management: license_enabled)
-        stub_feature_flags(design_management: feature_enabled, graphql: graphql)
-        expect(project).to receive(:lfs_enabled?).and_return(lfs)
+        stub_feature_flags(design_management_flag: feature_enabled)
+        expect(project).to receive(:lfs_enabled?).and_return(lfs_enabled)
       end
+
+      # Design management is only available if all dependencies are enabled
+      let(:expected) { feature_enabled && license_enabled && lfs_enabled }
 
       it "knows if design management is available" do
         expect(project.design_management_enabled?).to be(expected)
@@ -2141,5 +2142,32 @@ describe Project do
     allow(Rails.application.routes)
       .to receive(:default_url_options)
       .and_return(host: host)
+  end
+
+  describe '#package_already_taken?' do
+    let(:namespace) { create(:namespace) }
+    let(:project) { create(:project, :public, namespace: namespace) }
+    let!(:package) { create(:npm_package, project: project, name: "@#{namespace.path}/foo") }
+
+    context 'no package exists with the same name' do
+      it 'returns false' do
+        result = project.package_already_taken?("@#{namespace.path}/bar")
+        expect(result).to be false
+      end
+
+      it 'returns false if it is the project that the package belongs to' do
+        result = project.package_already_taken?("@#{namespace.path}/foo")
+        expect(result).to be false
+      end
+    end
+
+    context 'a package already exists with the same name' do
+      let(:alt_project) { create(:project, :public, namespace: namespace) }
+
+      it 'returns true' do
+        result = alt_project.package_already_taken?("@#{namespace.path}/foo")
+        expect(result).to be true
+      end
+    end
   end
 end

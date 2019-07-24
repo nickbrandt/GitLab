@@ -5,7 +5,8 @@ require 'spec_helper'
 describe MergeTrains::RefreshMergeRequestService do
   set(:project) { create(:project, :repository) }
   set(:maintainer) { create(:user) }
-  let(:service) { described_class.new(project, maintainer) }
+  let(:service) { described_class.new(project, maintainer, require_recreate: require_recreate) }
+  let(:require_recreate) { false }
 
   before do
     project.add_maintainer(maintainer)
@@ -31,6 +32,31 @@ describe MergeTrains::RefreshMergeRequestService do
         end
 
         subject
+      end
+    end
+
+    shared_examples_for 'creates a pipeline for merge train' do
+      let(:previous_ref) { 'refs/heads/master' }
+
+      it do
+        expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
+          allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: pipeline } }
+          expect(pipeline_service).to receive(:execute).with(merge_request, previous_ref)
+        end
+
+        result = subject
+        expect(result[:status]).to eq(:success)
+        expect(result[:pipeline_created]).to eq(true)
+      end
+    end
+
+    shared_examples_for 'does not create a pipeline' do
+      it do
+        expect(service).not_to receive(:create_pipeline!)
+
+        result = subject
+        expect(result[:status]).to eq(:success)
+        expect(result[:pipeline_created]).to be_falsy
       end
     end
 
@@ -70,15 +96,33 @@ describe MergeTrains::RefreshMergeRequestService do
       end
     end
 
+    context 'when merge request is to be squashed' do
+      before do
+        merge_request.update!(squash: true)
+      end
+
+      it_behaves_like 'drops the merge request from the merge train' do
+        let(:expected_reason) { 'merge train does not support squash merge' }
+      end
+    end
+
+    context 'when previous ref is not found' do
+      let(:previous_ref) { 'refs/tmp/test' }
+
+      before do
+        allow(service).to receive(:previous_ref) { previous_ref }
+      end
+
+      it_behaves_like 'drops the merge request from the merge train' do
+        let(:expected_reason) { 'previous ref does not exist' }
+      end
+    end
+
     context 'when pipeline has not been created yet' do
       context 'when the merge request is the first queue' do
-        it 'creates a pipeline for merge train' do
-          expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
-            expect(pipeline_service).to receive(:execute).with(merge_request).and_call_original
-          end
+        let(:pipeline) { create(:ci_pipeline) }
 
-          subject
-        end
+        it_behaves_like 'creates a pipeline for merge train'
 
         context 'when it failed to create a pipeline' do
           before do
@@ -90,25 +134,38 @@ describe MergeTrains::RefreshMergeRequestService do
           end
         end
       end
+    end
 
-      context 'when the merge request is not the first queue' do
-        before do
-          allow(merge_request.merge_train).to receive(:first_in_train?) { false }
-        end
+    context 'when pipeline for merge train is running' do
+      let(:pipeline) { create(:ci_pipeline, :running, target_sha: previous_ref_sha, source_sha: merge_request.diff_head_sha) }
+      let(:previous_ref_sha) { project.repository.commit('refs/heads/master').sha }
 
-        it 'does not create a pipeline for merge train' do
-          expect(MergeTrains::CreatePipelineService).not_to receive(:new)
+      before do
+        merge_request.merge_train.update!(pipeline: pipeline)
+      end
 
-          subject
-        end
+      context 'when the pipeline is not stale' do
+        it_behaves_like 'does not create a pipeline'
+      end
+
+      context 'when the pipeline is stale' do
+        let(:previous_ref_sha) { project.repository.commits('refs/heads/master', limit: 2).last.sha }
+
+        it_behaves_like 'creates a pipeline for merge train'
+      end
+
+      context 'when the pipeline is reuired to be recreated' do
+        let(:require_recreate) { true }
+
+        it_behaves_like 'creates a pipeline for merge train'
       end
     end
 
     context 'when pipeline for merge train succeeded' do
-      let(:pipeline) { create(:ci_pipeline, :success) }
+      let(:pipeline) { create(:ci_pipeline, :success, target_sha: previous_ref_sha, source_sha: merge_request.diff_head_sha) }
+      let(:previous_ref_sha) { project.repository.commit('refs/heads/master').sha }
 
       before do
-        allow(pipeline).to receive(:latest_merge_request_pipeline?) { true }
         merge_request.merge_train.update!(pipeline: pipeline)
       end
 

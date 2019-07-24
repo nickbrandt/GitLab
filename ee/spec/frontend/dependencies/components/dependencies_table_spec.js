@@ -1,18 +1,19 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import DependenciesTable from 'ee/dependencies/components/dependencies_table.vue';
 import DependenciesTableRow from 'ee/dependencies/components/dependencies_table_row.vue';
-import { makeDependency } from './utils';
+import { makeDependency, provideEnabledFeatureFlag } from './utils';
 
 describe('DependenciesTable component', () => {
   let wrapper;
 
-  const factory = (props = {}) => {
+  const factory = ({ propsData, ...options } = {}) => {
     const localVue = createLocalVue();
 
     wrapper = shallowMount(localVue.extend(DependenciesTable), {
+      ...options,
       localVue,
       sync: false,
-      propsData: { ...props },
+      propsData: { ...propsData },
     });
   };
 
@@ -23,8 +24,10 @@ describe('DependenciesTable component', () => {
   describe('given an empty list of dependencies', () => {
     beforeEach(() => {
       factory({
-        dependencies: [],
-        isLoading: false,
+        propsData: {
+          dependencies: [],
+          isLoading: false,
+        },
       });
     });
 
@@ -39,8 +42,10 @@ describe('DependenciesTable component', () => {
       beforeEach(() => {
         dependencies = [makeDependency(), makeDependency({ name: 'foo' })];
         factory({
-          dependencies,
-          isLoading,
+          propsData: {
+            dependencies,
+            isLoading,
+          },
         });
       });
 
@@ -57,6 +62,56 @@ describe('DependenciesTable component', () => {
               isLoading,
             }),
           );
+        });
+      });
+    });
+  });
+
+  describe('given the dependencyListVulnerabilities flag is enabled', () => {
+    describe('given an empty list of dependencies', () => {
+      beforeEach(() => {
+        factory({
+          ...provideEnabledFeatureFlag(),
+          propsData: {
+            dependencies: [],
+            isLoading: false,
+          },
+        });
+      });
+
+      it('matches the snapshot', () => {
+        expect(wrapper.element).toMatchSnapshot();
+      });
+    });
+
+    [true, false].forEach(isLoading => {
+      describe(`given a list of dependencies (${isLoading ? 'loading' : 'loaded'})`, () => {
+        let dependencies;
+        beforeEach(() => {
+          dependencies = [makeDependency(), makeDependency({ name: 'foo' })];
+          factory({
+            ...provideEnabledFeatureFlag(),
+            propsData: {
+              dependencies,
+              isLoading,
+            },
+          });
+        });
+
+        it('matches the snapshot', () => {
+          expect(wrapper.element).toMatchSnapshot();
+        });
+
+        it('passes the correct props to the table rows', () => {
+          const rows = wrapper.findAll(DependenciesTableRow).wrappers;
+          rows.forEach((row, index) => {
+            expect(row.props()).toEqual(
+              expect.objectContaining({
+                dependency: dependencies[index],
+                isLoading,
+              }),
+            );
+          });
         });
       });
     });

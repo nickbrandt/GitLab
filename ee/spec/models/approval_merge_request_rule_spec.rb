@@ -76,6 +76,7 @@ describe ApprovalMergeRequestRule do
     set(:js_rule) { create(:code_owner_rule, name: '*.js') }
     set(:css_rule) { create(:code_owner_rule, name: '*.css') }
     set(:approval_rule) { create(:approval_merge_request_rule) }
+    set(:report_approver_rule) { create(:report_approver_rule) }
 
     describe '.not_matching_pattern' do
       it 'returns the correct rules' do
@@ -95,6 +96,13 @@ describe ApprovalMergeRequestRule do
       it 'returns the correct rules' do
         expect(described_class.code_owner)
           .to contain_exactly(rb_rule, js_rule, css_rule)
+      end
+    end
+
+    describe '.security_report' do
+      it 'returns the correct rules' do
+        expect(described_class.security_report)
+          .to contain_exactly(report_approver_rule)
       end
     end
   end
@@ -122,8 +130,8 @@ describe ApprovalMergeRequestRule do
     end
 
     it 'retries when a record was created between the find and the create' do
-      expect(described_class).to receive(:where).and_raise(ActiveRecord::RecordNotUnique)
-      allow(described_class).to receive(:where).and_call_original
+      expect(described_class).to receive(:code_owner).and_raise(ActiveRecord::RecordNotUnique)
+      allow(described_class).to receive(:code_owner).and_call_original
 
       expect(described_class.find_or_create_code_owner_rule(merge_request, '*.js')).not_to be_nil
     end
@@ -241,7 +249,7 @@ describe ApprovalMergeRequestRule do
     describe 'approvals_required' do
       subject { build(:approval_merge_request_rule, merge_request: merge_request) }
 
-      it 'is a natual number' do
+      it 'is a natural number' do
         subject.assign_attributes(approvals_required: 2)
         expect(subject).to be_valid
 
@@ -260,6 +268,22 @@ describe ApprovalMergeRequestRule do
           subject.valid?
 
           expect(subject.errors[:approvals_required]).to include("must be greater than or equal to 3")
+        end
+
+        context 'when report_approver rule' do
+          subject do
+            build(:report_approver_rule, merge_request: merge_request, approvals_required: 1).tap do |rule|
+              rule.approval_project_rule = project_rule
+            end
+          end
+
+          it 'skips validation' do
+            expect(subject).to be_valid
+
+            subject.approvals_required = 0
+
+            expect(subject).to be_valid
+          end
         end
       end
     end

@@ -213,7 +213,7 @@ describe Project do
         .only_integer
         .is_greater_than_or_equal_to(10.minutes)
         .is_less_than(1.month)
-        .with_message('needs to be beetween 10 minutes and 1 month')
+        .with_message('needs to be between 10 minutes and 1 month')
     end
 
     it 'does not allow new projects beyond user limits' do
@@ -1190,12 +1190,32 @@ describe Project do
       subject { project.pipeline_for('master', pipeline.sha) }
 
       it_behaves_like 'giving the correct pipeline'
+
+      context 'with supplied id' do
+        let!(:other_pipeline) { create_pipeline(project) }
+
+        subject { project.pipeline_for('master', pipeline.sha, other_pipeline.id) }
+
+        it { is_expected.to eq(other_pipeline) }
+      end
     end
 
     context 'with implicit sha' do
       subject { project.pipeline_for('master') }
 
       it_behaves_like 'giving the correct pipeline'
+    end
+  end
+
+  describe '#pipelines_for' do
+    let(:project) { create(:project, :repository) }
+    let!(:pipeline) { create_pipeline(project) }
+    let!(:other_pipeline) { create_pipeline(project) }
+
+    context 'with implicit sha' do
+      subject { project.pipelines_for('master') }
+
+      it { is_expected.to contain_exactly(pipeline, other_pipeline) }
     end
   end
 
@@ -1672,26 +1692,6 @@ describe Project do
       relation = described_class.where(id: project.id)
 
       expect(relation.optionally_search).to eq(relation)
-    end
-  end
-
-  describe '.paginate_in_descending_order_using_id' do
-    let!(:project1) { create(:project) }
-    let!(:project2) { create(:project) }
-
-    it 'orders the relation in descending order' do
-      expect(described_class.paginate_in_descending_order_using_id)
-        .to eq([project2, project1])
-    end
-
-    it 'applies a limit to the relation' do
-      expect(described_class.paginate_in_descending_order_using_id(limit: 1))
-        .to eq([project2])
-    end
-
-    it 'limits projects by and ID when given' do
-      expect(described_class.paginate_in_descending_order_using_id(before: project2.id))
-        .to eq([project1])
     end
   end
 

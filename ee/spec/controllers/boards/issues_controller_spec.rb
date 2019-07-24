@@ -43,10 +43,8 @@ describe Boards::IssuesController do
 
           list_issues user: user, board: board, list: list2
 
-          parsed_response = JSON.parse(response.body)
-
           expect(response).to match_response_schema('issues')
-          expect(parsed_response['issues'].length).to eq 2
+          expect(json_response['issues'].length).to eq 2
           expect(development.issues.map(&:relative_position)).not_to include(nil)
         end
       end
@@ -70,10 +68,8 @@ describe Boards::IssuesController do
 
         list_issues user: user, board: board
 
-        parsed_response = JSON.parse(response.body)
-
         expect(response).to match_response_schema('issues')
-        expect(parsed_response['issues'].length).to eq 2
+        expect(json_response['issues'].length).to eq 2
       end
     end
 

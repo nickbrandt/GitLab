@@ -530,6 +530,17 @@ describe User do
   end
 
   describe 'before save hook' do
+    context '#default_private_profile_to_false' do
+      let(:user) { create(:user, private_profile: true) }
+
+      it 'converts nil to false' do
+        user.private_profile = nil
+        user.save!
+
+        expect(user.private_profile).to eq false
+      end
+    end
+
     context 'when saving an external user' do
       let(:user)          { create(:user) }
       let(:external_user) { create(:user, external: true) }
@@ -1127,6 +1138,7 @@ describe User do
         expect(user.can_create_group).to eq(Gitlab.config.gitlab.default_can_create_group)
         expect(user.theme_id).to eq(Gitlab.config.gitlab.default_theme)
         expect(user.external).to be_falsey
+        expect(user.private_profile).to eq false
       end
     end
 
@@ -2931,7 +2943,7 @@ describe User do
       let(:user) { create(:user, username: username) }
 
       context 'when the user is updated' do
-        context 'when the username is changed' do
+        context 'when the username or name is changed' do
           let(:new_username) { 'bar' }
 
           it 'changes the namespace (just to compare to when username is not changed)' do
@@ -2942,16 +2954,24 @@ describe User do
             end.to change { user.namespace.updated_at }
           end
 
-          it 'updates the namespace name' do
-            user.update!(username: new_username)
-
-            expect(user.namespace.name).to eq(new_username)
-          end
-
-          it 'updates the namespace path' do
+          it 'updates the namespace path when the username was changed' do
             user.update!(username: new_username)
 
             expect(user.namespace.path).to eq(new_username)
+          end
+
+          it 'updates the namespace name if the name was changed' do
+            user.update!(name: 'New name')
+
+            expect(user.namespace.name).to eq('New name')
+          end
+
+          it 'updates nested routes for the namespace if the name was changed' do
+            project = create(:project, namespace: user.namespace)
+
+            user.update!(name: 'New name')
+
+            expect(project.route.reload.name).to include('New name')
           end
 
           context 'when there is a validation error (namespace name taken) while updating namespace' do
@@ -3482,6 +3502,39 @@ describe User do
       user2 = create(:user, name: 'B')
 
       expect(described_class.reorder_by_name).to eq([user1, user2])
+    end
+  end
+
+  describe '#notification_email_for' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+
+    subject { user.notification_email_for(group) }
+
+    context 'when group is nil' do
+      let(:group) { nil }
+
+      it 'returns global notification email' do
+        is_expected.to eq(user.notification_email)
+      end
+    end
+
+    context 'when group has no notification email set' do
+      it 'returns global notification email' do
+        create(:notification_setting, user: user, source: group, notification_email: '')
+
+        is_expected.to eq(user.notification_email)
+      end
+    end
+
+    context 'when group has notification email set' do
+      it 'returns group notification email' do
+        group_notification_email = 'user+group@example.com'
+
+        create(:notification_setting, user: user, source: group, notification_email: group_notification_email)
+
+        is_expected.to eq(group_notification_email)
+      end
     end
   end
 end

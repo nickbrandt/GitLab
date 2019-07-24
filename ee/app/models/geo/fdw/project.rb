@@ -5,6 +5,7 @@ module Geo
     class Project < ::Geo::BaseFdw
       include Gitlab::SQL::Pattern
 
+      self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('projects')
 
       has_many :job_artifacts, class_name: 'Geo::Fdw::Ci::JobArtifact'

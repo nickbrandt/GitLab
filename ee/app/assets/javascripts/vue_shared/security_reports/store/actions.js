@@ -5,6 +5,17 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
 
+/**
+ * A lot of this file has duplicate actions to
+ * ee/app/assets/javascripts/security_dashboard/store/modules/vulnerabilities/actions.js
+ * This is being addressed in the following issues:
+ *
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8146
+ * https://gitlab.com/gitlab-org/gitlab-ee/issues/8519
+ */
+
+const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
+
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 
 export const setBaseBlobPath = ({ commit }, blobPath) => commit(types.SET_BASE_BLOB_PATH, blobPath);
@@ -33,49 +44,6 @@ export const setCanCreateIssuePermission = ({ commit }, permission) =>
 
 export const setCanCreateFeedbackPermission = ({ commit }, permission) =>
   commit(types.SET_CAN_CREATE_FEEDBACK_PERMISSION, permission);
-
-/**
- * SAST
- */
-export const setSastHeadPath = ({ commit }, path) => commit(types.SET_SAST_HEAD_PATH, path);
-
-export const setSastBasePath = ({ commit }, path) => commit(types.SET_SAST_BASE_PATH, path);
-
-export const requestSastReports = ({ commit }) => commit(types.REQUEST_SAST_REPORTS);
-
-export const receiveSastReports = ({ commit }, response) =>
-  commit(types.RECEIVE_SAST_REPORTS, response);
-
-export const receiveSastError = ({ commit }, error) =>
-  commit(types.RECEIVE_SAST_REPORTS_ERROR, error);
-
-export const fetchSastReports = ({ state, dispatch }) => {
-  const { base, head } = state.sast.paths;
-
-  dispatch('requestSastReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'sast',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveSastReports', {
-        head: values && values[0] ? values[0].data : null,
-        base: values && values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveSastError');
-    });
-};
-
-export const updateSastIssue = ({ commit }, issue) => commit(types.UPDATE_SAST_ISSUE, issue);
 
 /**
  * SAST CONTAINER
@@ -222,8 +190,8 @@ export const openModal = ({ dispatch }, payload) => {
 export const setModalData = ({ commit }, payload) => commit(types.SET_ISSUE_MODAL_DATA, payload);
 export const requestDismissVulnerability = ({ commit }) =>
   commit(types.REQUEST_DISMISS_VULNERABILITY);
-export const receiveDismissVulnerability = ({ commit }) =>
-  commit(types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS);
+export const receiveDismissVulnerability = ({ commit }, payload) =>
+  commit(types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS, payload);
 export const receiveDismissVulnerabilityError = ({ commit }, error) =>
   commit(types.RECEIVE_DISMISS_VULNERABILITY_ERROR, error);
 
@@ -242,32 +210,16 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
       },
     })
     .then(({ data }) => {
-      dispatch('closeDismissalCommentBox');
-      dispatch('receiveDismissVulnerability');
-
-      // Update the issue with the created dismissal feedback applied
       const updatedIssue = {
         ...state.modal.vulnerability,
         isDismissed: true,
         dismissalFeedback: data,
       };
-      switch (updatedIssue.category) {
-        case 'sast':
-          dispatch('updateSastIssue', updatedIssue);
-          break;
-        case 'dependency_scanning':
-          dispatch('updateDependencyScanningIssue', updatedIssue);
-          break;
-        case 'container_scanning':
-          dispatch('updateContainerScanningIssue', updatedIssue);
-          break;
-        case 'dast':
-          dispatch('updateDastIssue', updatedIssue);
-          break;
-        default:
-      }
 
-      $('#modal-mrwidget-security-issue').modal('hide');
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveDismissVulnerability', updatedIssue);
+
+      hideModal();
     })
     .catch(() => {
       dispatch(
@@ -275,6 +227,44 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
         s__('ciReport|There was an error dismissing the vulnerability. Please try again.'),
       );
     });
+};
+
+export const addDismissalComment = ({ state, dispatch }, { comment }) => {
+  dispatch('requestAddDismissalComment');
+
+  const { vulnerability } = state.modal;
+  const { dismissalFeedback } = vulnerability;
+  const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
+
+  axios
+    .patch(url, {
+      project_id: dismissalFeedback.project_id,
+      id: dismissalFeedback.id,
+      comment,
+    })
+    .then(({ data }) => {
+      dispatch('closeDismissalCommentBox');
+      dispatch('receiveAddDismissalCommentSuccess', { data });
+    })
+    .catch(() => {
+      dispatch(
+        'receiveAddDismissalCommentError',
+        s__('Security Reports|There was an error adding the comment.'),
+      );
+    });
+};
+
+export const requestAddDismissalComment = ({ commit }) => {
+  commit(types.REQUEST_ADD_DISMISSAL_COMMENT);
+};
+
+export const receiveAddDismissalCommentSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS, payload);
+  hideModal();
+};
+
+export const receiveAddDismissalCommentError = ({ commit }, error) => {
+  commit(types.RECEIVE_ADD_DISMISSAL_COMMENT_ERROR, error);
 };
 
 export const revertDismissVulnerability = ({ state, dispatch }) => {
@@ -285,31 +275,15 @@ export const revertDismissVulnerability = ({ state, dispatch }) => {
       state.modal.vulnerability.dismissalFeedback.destroy_vulnerability_feedback_dismissal_path,
     )
     .then(() => {
-      dispatch('receiveDismissVulnerability');
-
-      // Update the issue with the reverted dismissal feedback applied
       const updatedIssue = {
         ...state.modal.vulnerability,
         isDismissed: false,
         dismissalFeedback: null,
       };
-      switch (updatedIssue.category) {
-        case 'sast':
-          dispatch('updateSastIssue', updatedIssue);
-          break;
-        case 'dependency_scanning':
-          dispatch('updateDependencyScanningIssue', updatedIssue);
-          break;
-        case 'container_scanning':
-          dispatch('updateContainerScanningIssue', updatedIssue);
-          break;
-        case 'dast':
-          dispatch('updateDastIssue', updatedIssue);
-          break;
-        default:
-      }
 
-      $('#modal-mrwidget-security-issue').modal('hide');
+      dispatch('receiveDismissVulnerability', updatedIssue);
+
+      hideModal();
     })
     .catch(() =>
       dispatch(

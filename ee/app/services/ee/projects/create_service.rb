@@ -65,17 +65,17 @@ module EE
       end
 
       # When using a project template from a Group, the new project can only be created
-      # under the top level group or any subgroup
+      # under the template owner's group or subgroups
       def validate_namespace_used_with_template(project, group_with_project_templates_id)
         return unless project.group
 
         subgroup_with_templates_id = group_with_project_templates_id || params[:group_with_project_templates_id]
         return if subgroup_with_templates_id.blank?
 
-        templates_owner = ::Group.find(subgroup_with_templates_id)
+        templates_owner = ::Group.find(subgroup_with_templates_id).parent
 
-        unless templates_owner.self_and_hierarchy.exists?(id: project.namespace_id)
-          project.errors.add(:namespace, _("is out of the hierarchy of the Group owning the template"))
+        unless templates_owner.self_and_descendants.exists?(id: project.namespace_id)
+          project.errors.add(:namespace, _("is not a descendant of the Group owning the template"))
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord

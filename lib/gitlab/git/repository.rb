@@ -55,6 +55,10 @@ module Gitlab
         @name = @relative_path.split("/").last
       end
 
+      def to_s
+        "<#{self.class.name}: #{self.gl_project_path}>"
+      end
+
       def ==(other)
         other.is_a?(self.class) && [storage, relative_path] == [other.storage, other.relative_path]
       end
@@ -464,6 +468,18 @@ module Gitlab
         end
       end
 
+      # Returns path to url mappings for submodules
+      #
+      # Ex.
+      #   @repository.submodule_urls_for('master')
+      #   # => { 'rack' => 'git@localhost:rack.git' }
+      #
+      def submodule_urls_for(ref)
+        wrapped_gitaly_errors do
+          gitaly_submodule_urls_for(ref)
+        end
+      end
+
       # Return total commits count accessible from passed ref
       def commit_count(ref)
         wrapped_gitaly_errors do
@@ -861,13 +877,13 @@ module Gitlab
       def multi_action(
         user, branch_name:, message:, actions:,
         author_email: nil, author_name: nil,
-        start_branch_name: nil, start_repository: self,
+        start_branch_name: nil, start_sha: nil, start_repository: self,
         force: false)
 
         wrapped_gitaly_errors do
           gitaly_operation_client.user_commit_files(user, branch_name,
               message, actions, author_email, author_name,
-              start_branch_name, start_repository, force)
+              start_branch_name, start_repository, force, start_sha)
         end
       end
       # rubocop:enable Metrics/ParameterLists
@@ -936,7 +952,7 @@ module Gitlab
           gitaly_repository_client.cleanup if exists?
         end
       rescue Gitlab::Git::CommandError => e # Don't fail if we can't cleanup
-        Rails.logger.error("Unable to clean repository on storage #{storage} with relative path #{relative_path}: #{e.message}")
+        Rails.logger.error("Unable to clean repository on storage #{storage} with relative path #{relative_path}: #{e.message}") # rubocop:disable Gitlab/RailsLogger
         Gitlab::Metrics.counter(
           :failed_repository_cleanup_total,
           'Number of failed repository cleanup events'
@@ -1059,12 +1075,16 @@ module Gitlab
 
         return unless commit_object && commit_object.type == :COMMIT
 
+        urls = gitaly_submodule_urls_for(ref)
+        urls && urls[path]
+      end
+
+      def gitaly_submodule_urls_for(ref)
         gitmodules = gitaly_commit_client.tree_entry(ref, '.gitmodules', Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
         return unless gitmodules
 
-        found_module = GitmodulesParser.new(gitmodules.data).parse[path]
-
-        found_module && found_module['url']
+        submodules = GitmodulesParser.new(gitmodules.data).parse
+        submodules.transform_values { |submodule| submodule['url'] }
       end
 
       # Returns true if the given ref name exists

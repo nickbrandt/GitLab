@@ -19,8 +19,8 @@ This namespace:
 To see a list of available applications to install:
 
 1. For a:
-    - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
-    - Group-level cluster, navigate to your group's **Kubernetes** page.
+   - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
+   - Group-level cluster, navigate to your group's **Kubernetes** page.
 
 Install Helm first as it's used to install other applications.
 
@@ -232,8 +232,8 @@ The applications below can be upgraded.
 To upgrade an application:
 
 1. For a:
-    - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
-    - Group-level cluster, navigate to your group's **Kubernetes** page.
+   - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
+   - Group-level cluster, navigate to your group's **Kubernetes** page.
 1. Select your cluster.
 1. If an upgrade is available, the **Upgrade** button is displayed. Click the button to upgrade.
 
@@ -251,6 +251,7 @@ The applications below can be uninstalled.
 
 | Application | GitLab version | Notes |
 | ----------- | -------------- | ----- |
+| GitLab Runner  | 12.2+         | Any running pipelines will be canceled. |
 | Ingress  | 12.1+         | The associated load balancer and IP will be deleted and cannot be restored. Furthermore, it can only be uninstalled if JupyterHub is not installed. |
 | JupyterHub  | 12.1+         | All data not committed to GitLab will be deleted and cannot be restored. |
 | Prometheus  | 11.11+         | All data will be deleted and cannot be restored. |
@@ -258,8 +259,8 @@ The applications below can be uninstalled.
 To uninstall an application:
 
 1. For a:
-    - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
-    - Group-level cluster, navigate to your group's **Kubernetes** page.
+   - Project-level cluster, navigate to your project's **Operations > Kubernetes**.
+   - Group-level cluster, navigate to your group's **Kubernetes** page.
 1. Select your cluster.
 1. Click the **Uninstall** button for the application.
 

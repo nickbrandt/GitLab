@@ -41,8 +41,8 @@ export default {
       isApproving: false,
       isExpanded: false,
       isLoadingRules: false,
-      showApprovalAuth: false,
       hasApprovalAuthError: false,
+      modalId: 'approvals-auth',
     };
   },
   computed: {
@@ -151,7 +151,7 @@ export default {
     },
     approve() {
       if (this.requirePasswordToApprove) {
-        this.showApprovalAuth = true;
+        this.$root.$emit('bv::show::modal', this.modalId);
         return;
       }
       this.updateApproval(
@@ -184,17 +184,13 @@ export default {
         .then(data => {
           this.mr.setApprovals(data);
           eventHub.$emit('MRWidgetUpdateRequested');
-          this.showApprovalAuth = false;
+          this.$root.$emit('bv::hide::modal', this.modalId);
         })
         .catch(errFn)
         .then(() => {
           this.isApproving = false;
           this.refreshRules();
         });
-    },
-    onApprovalAuthCancel() {
-      this.showApprovalAuth = false;
-      this.clearError();
     },
   },
   FETCH_LOADING,
@@ -207,37 +203,35 @@ export default {
       <div v-if="fetchingApprovals">{{ $options.FETCH_LOADING }}</div>
       <template v-else>
         <approvals-auth
-          v-if="showApprovalAuth"
           :is-approving="isApproving"
           :has-error="hasApprovalAuthError"
+          :modal-id="modalId"
           @approve="approveWithAuth"
-          @cancel="onApprovalAuthCancel"
+          @hide="clearError"
         />
-        <template v-else>
-          <gl-button
-            v-if="action"
-            :variant="action.variant"
-            :class="{ 'btn-inverted': action.inverted }"
-            size="sm"
-            class="mr-3"
-            @click="action.action"
-          >
-            <gl-loading-icon v-if="isApproving" inline />
-            {{ action.text }}
-          </gl-button>
-          <approvals-summary-optional
-            v-if="isOptional"
-            :can-approve="hasAction"
-            :help-path="mr.approvalsHelpPath"
-          />
-          <approvals-summary
-            v-else
-            :approved="isApproved"
-            :approvals-left="approvals.approvals_left"
-            :rules-left="approvals.approvalRuleNamesLeft"
-            :approvers="approvedBy"
-          />
-        </template>
+        <gl-button
+          v-if="action"
+          :variant="action.variant"
+          :class="{ 'btn-inverted': action.inverted }"
+          size="sm"
+          class="mr-3"
+          @click="action.action"
+        >
+          <gl-loading-icon v-if="isApproving" inline />
+          {{ action.text }}
+        </gl-button>
+        <approvals-summary-optional
+          v-if="isOptional"
+          :can-approve="hasAction"
+          :help-path="mr.approvalsHelpPath"
+        />
+        <approvals-summary
+          v-else
+          :approved="isApproved"
+          :approvals-left="approvals.approvals_left"
+          :rules-left="approvals.approvalRuleNamesLeft"
+          :approvers="approvedBy"
+        />
       </template>
     </div>
     <approvals-footer

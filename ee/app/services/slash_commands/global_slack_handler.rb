@@ -37,7 +37,7 @@ module SlashCommands
     private
 
     def valid_token?
-      ActiveSupport::SecurityUtils.variable_size_secure_compare(
+      ActiveSupport::SecurityUtils.secure_compare(
         Gitlab::CurrentSettings.current_application_settings
           .slack_app_verification_token,
         params[:token]

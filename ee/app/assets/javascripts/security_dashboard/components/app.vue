@@ -96,6 +96,7 @@ export default {
   },
   methods: {
     ...mapActions('vulnerabilities', [
+      'addDismissalComment',
       'closeDismissalCommentBox',
       'createIssue',
       'createMergeRequest',
@@ -136,6 +137,7 @@ export default {
       :can-create-issue="canCreateIssue"
       :can-create-merge-request="canCreateMergeRequest"
       :can-dismiss-vulnerability="canDismissVulnerability"
+      @addDismissalComment="addDismissalComment({ vulnerability, comment: $event })"
       @closeDismissalCommentBox="closeDismissalCommentBox()"
       @createMergeRequest="createMergeRequest({ vulnerability })"
       @createNewIssue="createIssue({ vulnerability })"

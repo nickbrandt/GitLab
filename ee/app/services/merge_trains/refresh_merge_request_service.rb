@@ -15,10 +15,10 @@ module MergeTrains
 
       validate!
 
-      create_pipeline! if should_create_pipeline?
+      pipeline_created = create_pipeline! if should_create_pipeline?
       merge! if should_merge?
 
-      success
+      success(pipeline_created: pipeline_created.present?)
     rescue ProcessError => e
       drop(e)
     end
@@ -26,7 +26,7 @@ module MergeTrains
     private
 
     def validate!
-      unless project.merge_trains_enabled? && project.merge_pipelines_enabled?
+      unless project.merge_trains_enabled?
         raise ProcessError, 'project disabled merge trains'
       end
 
@@ -34,8 +34,16 @@ module MergeTrains
         raise ProcessError, 'merge request is not on a merge train'
       end
 
+      if merge_request.squash?
+        raise ProcessError, 'merge train does not support squash merge'
+      end
+
       unless merge_request.mergeable_state?(skip_ci_check: true)
         raise ProcessError, 'merge request is not mergeable'
+      end
+
+      unless previous_ref_exist?
+        raise ProcessError, 'previous ref does not exist'
       end
 
       if pipeline_for_merge_train
@@ -45,13 +53,16 @@ module MergeTrains
       end
     end
 
+    # Since `stale_pipeline?` is expensive process which requires multiple Gitaly calls,
+    # each refresh service relays `require_recreate` flag whether the next
+    # merge request obviously requires to re-create pipeline for merge train.
     def should_create_pipeline?
-      first_in_train? && (pipeline_absent? || stale_pipeline?)
+      pipeline_absent? || require_recreate? || stale_pipeline?
     end
 
     def create_pipeline!
       result = MergeTrains::CreatePipelineService.new(merge_request.project, merge_user)
-        .execute(merge_request)
+        .execute(merge_request, previous_ref)
 
       raise ProcessError, result[:message] unless result[:status] == :success
 
@@ -71,8 +82,23 @@ module MergeTrains
       merge_train.destroy
     end
 
+    # NOTE: This method works for both no-ff-merge and ff-merge, however,
+    #       it doesn't work for squash and merge option.
     def stale_pipeline?
-      pipeline_for_merge_train && !pipeline_for_merge_train.latest_merge_request_pipeline?
+      return true unless pipeline_for_merge_train.source_sha == merge_request.diff_head_sha
+      return false if pipeline_for_merge_train.target_sha == previous_ref_sha
+
+      ##
+      # Now `pipeline.target_sha` and `previous_ref_sha` are different. This case
+      # happens in the following cases:
+      # 1. Previous sha has a completely different history from the pipeline.target_sha.
+      #    e.g. Previous merge request was dropped from the merge train.
+      # 2. Previous sha has exactly the same history with the pipeline.target_sha.
+      #    e.g. Previous merge request was merged into target branch with no-ff option.
+      #
+      # We distinguish these two cases by comparing parent commits.
+      commits = merge_request.project.commits_by(oids: [pipeline_for_merge_train.target_sha, previous_ref_sha])
+      commits[0].parent_ids != commits[1].parent_ids
     end
 
     def pipeline_absent?
@@ -95,6 +121,30 @@ module MergeTrains
       strong_memoize(:is_first_in_train) do
         merge_train.first_in_train?
       end
+    end
+
+    def previous_ref_sha
+      strong_memoize(:previous_ref_sha) do
+        merge_request.project.repository.commit(previous_ref)&.sha
+      end
+    end
+
+    def previous_ref
+      previous_merge_request&.train_ref_path || merge_request.target_branch_ref
+    end
+
+    def previous_ref_exist?
+      previous_ref_sha.present?
+    end
+
+    def previous_merge_request
+      strong_memoize(:previous_merge_request) do
+        merge_request.merge_train.prev
+      end
+    end
+
+    def require_recreate?
+      params[:require_recreate]
     end
 
     def drop(error)

@@ -16,20 +16,31 @@ describe HasEnvironmentScope do
 
   describe '.on_environment' do
     let(:project) { create(:project) }
-    let!(:cluster1) { create(:cluster, projects: [project], environment_scope: '*') }
-    let!(:cluster2) { create(:cluster, projects: [project], environment_scope: 'product/*') }
-    let!(:cluster3) { create(:cluster, projects: [project], environment_scope: 'staging/*') }
-    let(:environment_name) { 'product/canary-1' }
 
     it 'returns scoped objects' do
-      expect(project.clusters.on_environment(environment_name)).to eq([cluster1, cluster2])
+      cluster1 = create(:cluster, projects: [project], environment_scope: '*')
+      cluster2 = create(:cluster, projects: [project], environment_scope: 'product/*')
+      create(:cluster, projects: [project], environment_scope: 'staging/*')
+
+      expect(project.clusters.on_environment('product/canary-1')).to eq([cluster1, cluster2])
     end
 
-    context 'when relevant_only option is specified' do
-      it 'returns only one relevant object' do
-        expect(project.clusters.on_environment(environment_name, relevant_only: true))
-          .to eq([cluster2])
-      end
+    it 'returns only the most relevant object if relevant_only is true' do
+      create(:cluster, projects: [project], environment_scope: '*')
+      cluster2 = create(:cluster, projects: [project], environment_scope: 'product/*')
+      create(:cluster, projects: [project], environment_scope: 'staging/*')
+
+      expect(project.clusters.on_environment('product/canary-1', relevant_only: true)).to eq([cluster2])
+    end
+
+    it 'returns scopes ordered by lowest precedence first' do
+      create(:cluster, projects: [project], environment_scope: '*')
+      create(:cluster, projects: [project], environment_scope: 'production*')
+      create(:cluster, projects: [project], environment_scope: 'production')
+
+      result = project.clusters.on_environment('production').map(&:environment_scope)
+
+      expect(result).to eq(['*', 'production*', 'production'])
     end
   end
 

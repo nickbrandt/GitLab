@@ -103,10 +103,6 @@ describe 'Admin::AuditLogs', :js do
 
         expect(page).to have_content('Removed user access')
       end
-
-      it_behaves_like 'audit event contains custom message' do
-        let(:audit_events_url) { admin_audit_logs_path }
-      end
     end
   end
 

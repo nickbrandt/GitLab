@@ -1,21 +1,18 @@
 # Uploads administration
 
->**Notes:**
 Uploads represent all user data that may be sent to GitLab as a single file. As an example, avatars and notes' attachments are uploads. Uploads are integral to GitLab functionality, and therefore cannot be disabled.
 
 ## Using local storage
 
->**Notes:**
+NOTE: **Note:**
 This is the default configuration
 
 To change the location where the uploads are stored locally, follow the steps
 below.
 
----
-
 **In Omnibus installations:**
 
->**Notes:**
+NOTE: **Note:**
 For historical reasons, uploads are stored into a base directory, which by default is `uploads/-/system`. It is strongly discouraged to change this configuration option on an existing GitLab installation.
 
 _The uploads are stored by default in `/var/opt/gitlab/gitlab-rails/uploads`._
@@ -30,8 +27,6 @@ _The uploads are stored by default in `/var/opt/gitlab/gitlab-rails/uploads`._
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
 
----
-
 **In installations from source:**
 
 _The uploads are stored by default in
@@ -42,8 +37,8 @@ _The uploads are stored by default in
 
    ```yaml
    uploads:
-   storage_path: /mnt/storage
-   base_dir: uploads
+     storage_path: /mnt/storage
+     base_dir: uploads
    ```
 
 1. Save the file and [restart GitLab][] for the changes to take effect.
@@ -83,6 +78,7 @@ The connection settings match those provided by [Fog](https://github.com/fog), a
 | `aws_access_key_id` | AWS credentials, or compatible | |
 | `aws_secret_access_key` | AWS credentials, or compatible | |
 | `aws_signature_version` | AWS signature version to use. 2 or 4 are valid options. Digital Ocean Spaces and other providers may need 2. | 4 |
+| `enable_signature_v4_streaming` | Set to true to enable HTTP chunked transfers with AWS v4 signatures (https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-streaming.html). Oracle Cloud S3 needs this to be false | true
 | `region` | AWS region | us-east-1 |
 | `host` | S3 compatible host for when not using AWS, e.g. `localhost` or `storage.example.com` | s3.amazonaws.com |
 | `endpoint` | Can be used when configuring an S3 compatible service such as [Minio](https://www.minio.io), by entering a URL such as `http://127.0.0.1:9000` | (optional) |
@@ -108,8 +104,8 @@ _The uploads are stored by default in
    }
    ```
 
-   >**Note:**
-   >If you are using AWS IAM profiles, be sure to omit the AWS access key and secret access key/value pairs.
+   NOTE: **Note:**
+   If you are using AWS IAM profiles, be sure to omit the AWS access key and secret access key/value pairs.
 
    ```ruby
    gitlab_rails['uploads_object_store_connection'] = {
@@ -121,8 +117,6 @@ _The uploads are stored by default in
 
 1. Save the file and [reconfigure GitLab][] for the changes to take effect.
 1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
-
----
 
 **In installations from source:**
 
@@ -145,6 +139,91 @@ _The uploads are stored by default in
    ```
 
 1. Save the file and [restart GitLab][] for the changes to take effect.
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+
+### Oracle Cloud S3 connection settings
+
+Note that Oracle Cloud S3 must be sure to use the following settings:
+
+| Setting | Value |
+|---------|-------|
+| `enable_signature_v4_streaming` | false |
+| `path_style` | true |
+
+If `enable_signature_v4_streaming` is set to `true`, you may see the
+following error:
+
+```
+STREAMING-AWS4-HMAC-SHA256-PAYLOAD is not supported
+```
+
+### OpenStack compatible connection settings
+
+The connection settings match those provided by [Fog](https://github.com/fog), and are as follows:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `provider` | Always `OpenStack` for compatible hosts | OpenStack |
+| `openstack_username` | OpenStack username | |
+| `openstack_api_key` | OpenStack api key  | |
+| `openstack_temp_url_key` | OpenStack key for generating temporary urls | |
+| `openstack_auth_url` | OpenStack authentication endpont | |
+| `openstack_region` | OpenStack region | |
+| `openstack_tenant` | OpenStack tenant ID |
+
+**In Omnibus installations:**
+
+_The uploads are stored by default in
+`/var/opt/gitlab/gitlab-rails/public/uploads/-/system`._
+
+1. Edit `/etc/gitlab/gitlab.rb` and add the following lines by replacing with
+   the values you want:
+
+   ```ruby
+   gitlab_rails['uploads_object_store_remote_directory'] = "OPENSTACK_OBJECT_CONTAINER_NAME"
+   gitlab_rails['uploads_object_store_connection'] = {
+    'provider' => 'OpenStack',
+    'openstack_username' => 'OPENSTACK_USERNAME',
+    'openstack_api_key' => 'OPENSTACK_PASSWORD',
+    'openstack_temp_url_key' => 'OPENSTACK_TEMP_URL_KEY',
+    'openstack_auth_url' => 'https://auth.cloud.ovh.net/v2.0/',
+    'openstack_region' => 'DE1',
+    'openstack_tenant' => 'TENANT_ID',
+   }
+   ```
+
+1. Save the file and [reconfigure GitLab][] for the changes to take effect.
+1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
+
+---
+
+**In installations from source:**
+
+_The uploads are stored by default in
+`/home/git/gitlab/public/uploads/-/system`._
+
+1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following
+   lines:
+
+   ```yaml
+   uploads:
+     object_store:
+       enabled: true
+       direct_upload: false
+       background_upload: true
+       proxy_download: false
+       remote_directory: OPENSTACK_OBJECT_CONTAINER_NAME
+       connection:
+         provider: OpenStack
+         openstack_username: OPENSTACK_USERNAME
+         openstack_api_key: OPENSTACK_PASSWORD
+         openstack_temp_url_key: OPENSTACK_TEMP_URL_KEY
+         openstack_auth_url: 'https://auth.cloud.ovh.net/v2.0/'
+         openstack_region: DE1
+         openstack_tenant: 'TENANT_ID' 
+   ```
+
+1. Save the file and [reconfigure GitLab][] for the changes to take effect.
 1. Migrate any existing local uploads to the object storage using [`gitlab:uploads:migrate` rake task](raketasks/uploads/migrate.md).
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"

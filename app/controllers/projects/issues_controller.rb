@@ -11,7 +11,7 @@ class Projects::IssuesController < Projects::ApplicationController
   include RecordUserLastActivity
 
   before_action do
-    push_frontend_feature_flag(:manual_sorting)
+    push_frontend_feature_flag(:manual_sorting, default_enabled: true)
   end
 
   def issue_except_actions
@@ -44,8 +44,6 @@ class Projects::IssuesController < Projects::ApplicationController
 
   before_action :authorize_import_issues!, only: [:import_csv]
   before_action :authorize_download_code!, only: [:related_branches]
-
-  before_action :set_suggested_issues_feature_flags, only: [:new]
 
   respond_to :html
 
@@ -284,10 +282,6 @@ class Projects::IssuesController < Projects::ApplicationController
     # 2. https://gitlab.com/gitlab-org/gitlab-ce/issues/42424
     # 3. https://gitlab.com/gitlab-org/gitlab-ce/issues/42426
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42422')
-  end
-
-  def set_suggested_issues_feature_flags
-    push_frontend_feature_flag(:graphql, default_enabled: true)
   end
 end
 

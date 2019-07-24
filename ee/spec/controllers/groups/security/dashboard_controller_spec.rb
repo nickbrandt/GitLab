@@ -27,12 +27,14 @@ describe Groups::Security::DashboardController do
       end
 
       context 'when user is not allowed to access group security dashboard' do
-        it { is_expected.to have_gitlab_http_status(403) }
+        it { is_expected.to have_gitlab_http_status(200) }
+        it { is_expected.to render_template(:unavailable) }
       end
     end
 
     context 'when security dashboard feature is disabled' do
-      it { is_expected.to have_gitlab_http_status(404) }
+      it { is_expected.to have_gitlab_http_status(200) }
+      it { is_expected.to render_template(:unavailable) }
     end
   end
 end

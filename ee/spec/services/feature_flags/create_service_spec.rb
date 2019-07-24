@@ -47,10 +47,12 @@ describe FeatureFlags::CreateService do
       end
 
       it 'creates audit event' do
-        expected_message = "Created feature flag <strong>feature flag</strong> "\
-                           "with description <strong>\"description\"</strong>. "\
-                           "Created rule <strong>*</strong> and set it as <strong>active</strong>. "\
-                           "Created rule <strong>production</strong> and set it as <strong>inactive</strong>."
+        expected_message = 'Created feature flag <strong>feature_flag</strong> '\
+                           'with description <strong>"description"</strong>. '\
+                           'Created rule <strong>*</strong> and set it as <strong>active</strong> '\
+                           'with strategies <strong>[{"name"=>"default", "parameters"=>{}}]</strong>. '\
+                           'Created rule <strong>production</strong> and set it as <strong>inactive</strong> '\
+                           'with strategies <strong>[{"name"=>"default", "parameters"=>{}}]</strong>.'
 
         expect { subject }.to change { AuditEvent.count }.by(1)
         expect(AuditEvent.last.present.action).to eq(expected_message)

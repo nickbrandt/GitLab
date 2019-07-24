@@ -8,12 +8,9 @@ class Namespace < ApplicationRecord
   include AfterCommitQueue
   include Storage::LegacyNamespace
   include Gitlab::SQL::Pattern
-  include IgnorableColumn
   include FeatureGate
   include FromUnion
   include Gitlab::Utils::StrongMemoize
-
-  ignore_column :deleted_at
 
   # Prevent users from creating unreasonably deep level of nesting.
   # The number 20 was taken based on maximum nesting level of
@@ -41,8 +38,7 @@ class Namespace < ApplicationRecord
   validates :owner, presence: true, unless: ->(n) { n.type == "Group" }
   validates :name,
     presence: true,
-    length: { maximum: 255 },
-    namespace_name: true
+    length: { maximum: 255 }
 
   validates :description, length: { maximum: 255 }
   validates :path,
@@ -261,6 +257,11 @@ class Namespace < ApplicationRecord
 
   # Overridden on EE module
   def multiple_issue_boards_available?
+    false
+  end
+
+  # Overridden in EE::Namespace
+  def feature_available?(_feature)
     false
   end
 

@@ -6,6 +6,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     include ::Approvable
+    include ::Gitlab::Allowable
     include ::Gitlab::Utils::StrongMemoize
     include FromUnion
 
@@ -76,12 +77,33 @@ module EE
     end
 
     def allows_multiple_assignees?
-      project.multiple_mr_assignees_enabled? &&
-        project.feature_available?(:multiple_merge_request_assignees)
+      project.feature_available?(:multiple_merge_request_assignees)
     end
 
     def supports_weight?
       false
+    end
+
+    def visible_blocking_merge_requests(user)
+      Ability.merge_requests_readable_by_user(blocking_merge_requests, user)
+    end
+
+    def visible_blocking_merge_request_refs(user)
+      visible_blocking_merge_requests(user).map do |mr|
+        mr.to_reference(target_project)
+      end
+    end
+
+    # Unlike +visible_blocking_merge_requests+, this method doesn't include
+    # blocking MRs that have been merged. This simplifies output, since we don't
+    # need to tell the user that there are X hidden blocking MRs, of which only
+    # Y are an obstacle. Pass include_merged: true to override this behaviour.
+    def hidden_blocking_merge_requests_count(user, include_merged: false)
+      hidden = blocking_merge_requests - visible_blocking_merge_requests(user)
+
+      hidden.delete_if(&:merged?) unless include_merged
+
+      hidden.count
     end
 
     def validate_approval_rule_source
@@ -91,7 +113,7 @@ module EE
       local_project_rule_ids.compact!
 
       invalid = if new_record?
-                  local_project_rule_ids.to_set != project.approval_rule_ids.to_set
+                  local_project_rule_ids.to_set != project.visible_regular_approval_rules.pluck(:id).to_set
                 else
                   (local_project_rule_ids - project.approval_rule_ids).present?
                 end

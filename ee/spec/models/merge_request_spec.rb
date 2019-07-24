@@ -48,18 +48,13 @@ describe MergeRequest do
 
       expect(merge_request.allows_multiple_assignees?).to be(true)
     end
-
-    it 'does not allows multiple assignees when licensed and feature flag is disabled' do
-      stub_licensed_features(multiple_merge_request_assignees: true)
-      stub_feature_flags(multiple_merge_request_assignees: false)
-
-      merge_request = build(:merge_request)
-
-      expect(merge_request.allows_multiple_assignees?).to be(false)
-    end
   end
 
   describe 'approval_rules' do
+    before do
+      stub_licensed_features(multiple_approval_rules: true)
+    end
+
     context 'when project contains approval_rules' do
       let!(:project_rule1) {  project.approval_rules.create(name: 'p1') }
       let!(:project_rule2) {  project.approval_rules.create(name: 'p2') }
