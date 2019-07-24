@@ -4,7 +4,8 @@
     "name",
     "packager",
     "version",
-    "location"
+    "location",
+    "vulnerabilities"
   ],
   "properties": {
     "name": {
@@ -22,6 +23,17 @@
       },
       "path": {
         "type": "string"
+      }
+    },
+    "vulnerabilities": {
+      "type": "array",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string"
+        }
       }
     }
   },
