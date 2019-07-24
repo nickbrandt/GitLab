@@ -32,7 +32,7 @@ entry.
 - Remove depreated /u/:username routing. !30044
 - Remove support for legacy pipeline triggers. !30133
 
-### Fixed (83 changes, 14 of them are from the community)
+### Fixed (84 changes, 14 of them are from the community)
 
 - Update a user's routes after updating their name. !23272
 - Show poper panel when validation error occurs in admin settings panels. !25434
@@ -72,6 +72,7 @@ entry.
 - Fix Jupyter-Git integration. !30020 (Amit Rathi)
 - Update Mermaid to 8.1.0. !30036
 - Fix background migrations failing with unused replication slot. !30042
+- Disable Rails SQL query cache when applying service templates. !30060
 - Set higher TTL for write lock of trace to prevent concurrent archiving. !30064
 - Fix charts on Cluster health page. !30073
 - Display boards filter bar on mobile. !30120
