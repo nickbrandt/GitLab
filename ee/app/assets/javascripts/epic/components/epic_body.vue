@@ -25,7 +25,6 @@ export default {
       'canUpdate',
       'canDestroy',
       'canAdmin',
-      'subepicsSupported',
       'initialTitleHtml',
       'initialTitleText',
       'initialDescriptionHtml',
@@ -64,7 +63,7 @@ export default {
       />
     </div>
     <related-items
-      v-if="subepicsSupported && !isEpicTreeEnabled"
+      v-if="!isEpicTreeEnabled"
       :endpoint="epicLinksEndpoint"
       :can-admin="canAdmin"
       :can-reorder="canAdmin"

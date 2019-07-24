@@ -298,7 +298,7 @@ describe QuickActions::InterpretService do
       end
     end
 
-    context 'child_epic command', :nested_groups do
+    context 'child_epic command' do
       let(:subgroup) { create(:group, parent: group) }
       let(:another_group) { create(:group) }
       let(:merge_request) { create(:merge_request, source_project: project) }
@@ -427,7 +427,7 @@ describe QuickActions::InterpretService do
       end
     end
 
-    context 'remove_child_epic command', :nested_groups do
+    context 'remove_child_epic command' do
       let(:subgroup) { create(:group, parent: group) }
       let(:another_group) { create(:group) }
       let(:merge_request) { create(:merge_request, source_project: project) }

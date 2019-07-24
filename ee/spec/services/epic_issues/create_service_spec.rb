@@ -152,7 +152,7 @@ describe EpicIssues::CreateService do
             include_examples 'returns success'
           end
 
-          context 'when a link of an issue in a subgroup is given', :nested_groups do
+          context 'when a link of an issue in a subgroup is given' do
             let(:subgroup) { create(:group, parent: group) }
             let(:project2) { create(:project, group: subgroup) }
             let(:issue) { create(:issue, project: project2) }

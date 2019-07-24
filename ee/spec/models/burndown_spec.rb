@@ -169,7 +169,7 @@ describe Burndown do
     let(:parent_group_milestone) { create(:milestone, project: nil, group: parent_group, start_date: start_date, due_date: due_date) }
     let(:group_milestone) { create(:milestone, group: group, start_date: start_date, due_date: due_date) }
 
-    context 'when nested group milestone', :nested_groups do
+    context 'when nested group milestone' do
       before do
         parent_group.add_developer(user)
       end

@@ -104,7 +104,7 @@ describe 'Project > Members > Invite group and members', :js do
       end
     end
 
-    context 'for a project in a subgroup', :nested_groups do
+    context 'for a project in a subgroup' do
       let(:root_group) { create(:group) }
       let(:subgroup) { create(:group, parent: root_group) }
       let(:project) { create(:project, namespace: subgroup) }

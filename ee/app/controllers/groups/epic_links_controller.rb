@@ -3,8 +3,6 @@
 class Groups::EpicLinksController < Groups::ApplicationController
   include EpicRelations
 
-  before_action :check_nested_support!
-
   def update
     result = EpicLinks::UpdateService.new(child_epic, current_user, params[:epic]).execute
 
@@ -29,9 +27,5 @@ class Groups::EpicLinksController < Groups::ApplicationController
 
   def child_epic
     @child_epic ||= Epic.find(params[:id])
-  end
-
-  def check_nested_support!
-    render_404 unless Epic.supports_nested_objects?
   end
 end

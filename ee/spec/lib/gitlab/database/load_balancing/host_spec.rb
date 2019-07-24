@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Database::LoadBalancing::Host, :postgresql do
+describe Gitlab::Database::LoadBalancing::Host do
   let(:load_balancer) do
     Gitlab::Database::LoadBalancing::LoadBalancer.new(%w[localhost])
   end

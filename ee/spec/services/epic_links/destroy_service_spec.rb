@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicLinks::DestroyService, :postgresql do
+describe EpicLinks::DestroyService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:user) { create(:user) }

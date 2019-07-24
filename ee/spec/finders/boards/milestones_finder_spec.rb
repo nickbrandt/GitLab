@@ -18,7 +18,7 @@ describe Boards::MilestonesFinder do
     let(:user) { create(:user) }
     let(:finder) { described_class.new(board, user) }
 
-    context 'when project board', :nested_groups do
+    context 'when project board' do
       let(:board) { create(:board, project: nested_group_project, group: nil) }
 
       it 'returns milestones from board project and ancestors groups' do
@@ -32,7 +32,7 @@ describe Boards::MilestonesFinder do
       end
     end
 
-    context 'when group board', :nested_groups do
+    context 'when group board' do
       let(:board) { create(:board, project: nil, group: nested_group) }
 
       it 'returns milestones from board group and its ancestors' do

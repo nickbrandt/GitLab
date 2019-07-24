@@ -31,7 +31,7 @@ shared_examples_for 'member validations' do
           expect(member.errors.messages[:user]).to eq(['is not linked to a SAML account'])
         end
 
-        context 'subgroups', :nested_groups do
+        context 'subgroups' do
           let!(:subgroup) { create(:group, parent: group) }
 
           before do

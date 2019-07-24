@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicLinks::CreateService, :postgresql do
+describe EpicLinks::CreateService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:user) { create(:user) }

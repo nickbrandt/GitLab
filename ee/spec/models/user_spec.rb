@@ -329,7 +329,7 @@ describe User do
     end
   end
 
-  describe '#available_subgroups_with_custom_project_templates', :postgresql do
+  describe '#available_subgroups_with_custom_project_templates' do
     let(:user) { create(:user) }
 
     context 'without Groups with custom project templates' do

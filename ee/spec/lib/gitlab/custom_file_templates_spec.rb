@@ -83,7 +83,7 @@ describe Gitlab::CustomFileTemplates do
           end
         end
 
-        context 'in a subgroup', :nested_groups do
+        context 'in a subgroup' do
           set(:subgroup) { create(:group, parent: group) }
           set(:subproject) { create(:project, namespace: subgroup) }
           set(:subgroup_template_project) { create(:project, :custom_repo, namespace: subgroup, files: template_files('subgroup')) }
@@ -151,7 +151,7 @@ describe Gitlab::CustomFileTemplates do
           end
         end
 
-        context 'in a subgroup', :nested_groups do
+        context 'in a subgroup' do
           let(:subgroup) { create(:group, parent: group) }
           let(:subproject) { create(:project, namespace: subgroup) }
           let(:subgroup_template_project) { create(:project, :custom_repo, namespace: subgroup, files: template_files('subgroup')) }

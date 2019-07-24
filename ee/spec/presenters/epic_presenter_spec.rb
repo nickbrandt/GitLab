@@ -29,7 +29,7 @@ describe EpicPresenter do
       expect(presenter.show_data.keys).to match_array([:initial, :meta])
     end
 
-    it 'has correct ancestors', :nested_groups do
+    it 'has correct ancestors' do
       metadata     = JSON.parse(presenter.show_data[:meta])
       ancestor_url = metadata['ancestors'].first['url']
 
@@ -48,7 +48,7 @@ describe EpicPresenter do
       expect(data[:meta]).to match_schema('epic_meta_data', dir: 'ee')
     end
 
-    it 'avoids N+1 database queries', :nested_groups do
+    it 'avoids N+1 database queries' do
       group1 = create(:group)
       group2 = create(:group, parent: group1)
       epic1 = create(:epic, group: group1)

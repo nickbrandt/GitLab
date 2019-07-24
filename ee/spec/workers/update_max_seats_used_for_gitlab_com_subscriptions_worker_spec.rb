@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker, :postgresql do
+describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
   subject { described_class.new }
 
   let!(:user)                { create(:user) }

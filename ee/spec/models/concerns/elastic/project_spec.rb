@@ -74,7 +74,7 @@ describe Project, :elastic do
         end
       end
 
-      it 'indexes only projects under the group', :nested_groups do
+      it 'indexes only projects under the group' do
         Sidekiq::Testing.inline! do
           create :project, name: 'test1', group: create(:group, parent: group)
           create :project, name: 'test2', description: 'awesome project'

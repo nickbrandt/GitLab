@@ -54,7 +54,7 @@ describe Groups::AutocompleteService do
     end
   end
 
-  describe '#issues', :nested_groups do
+  describe '#issues' do
     let(:project) { create(:project, group: group) }
     let(:sub_group_project) { create(:project, group: sub_group) }
 
@@ -67,7 +67,7 @@ describe Groups::AutocompleteService do
     end
   end
 
-  describe '#merge_requests', :nested_groups do
+  describe '#merge_requests' do
     let(:project) { create(:project, :repository, group: group) }
     let(:sub_group_project) { create(:project, :repository, group: sub_group) }
 
@@ -104,10 +104,10 @@ describe Groups::AutocompleteService do
       end
 
       it 'returns available commands' do
-        available_commands = [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close]
-        if ::Epic.supports_nested_objects?
-          available_commands += [:child_epic, :remove_child_epic, :parent_epic, :remove_parent_epic]
-        end
+        available_commands = [
+          :todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close,
+          :child_epic, :remove_child_epic, :parent_epic, :remove_parent_epic
+        ]
 
         expect(subject.commands(epic).map { |c| c[:name] }).to match_array(available_commands)
       end
@@ -131,7 +131,7 @@ describe Groups::AutocompleteService do
         subgroup_milestone.update(group: public_subgroup)
       end
 
-      it 'returns milestones from groups and subgroups', :nested_groups do
+      it 'returns milestones from groups and subgroups' do
         subject = described_class.new(public_subgroup, user)
 
         expect(subject.milestones.map(&:iid)).to contain_exactly(group_milestone.iid, subgroup_milestone.iid)
@@ -144,14 +144,14 @@ describe Groups::AutocompleteService do
       expect(subject.milestones.map(&:title)).to contain_exactly(group_milestone.title)
     end
 
-    it 'returns milestones from groups and subgroups', :nested_groups do
+    it 'returns milestones from groups and subgroups' do
       milestones = described_class.new(sub_group, user).milestones
 
       expect(milestones.map(&:iid)).to contain_exactly(group_milestone.iid, subgroup_milestone.iid)
       expect(milestones.map(&:title)).to contain_exactly(group_milestone.title, subgroup_milestone.title)
     end
 
-    it 'returns only milestones that user can read', :nested_groups do
+    it 'returns only milestones that user can read' do
       user = create(:user)
       sub_group.add_guest(user)
 

@@ -82,7 +82,7 @@ module EE
           end
 
           def action_allowed?
-            ::Epic.supports_nested_objects? && quick_action_target.group&.feature_available?(:epics) &&
+            quick_action_target.group&.feature_available?(:epics) &&
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
           end
         end
