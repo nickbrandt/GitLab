@@ -32,6 +32,12 @@ describe CiMinutesUsageNotifyService do
     create(:namespace_statistics, namespace: namespace, shared_runners_seconds: ci_minutes_used * 60)
   end
 
+  let(:gitlab_dot_com) { true }
+
+  before do
+    allow(Gitlab).to receive(:com?).and_return(gitlab_dot_com)
+  end
+
   describe '#execute' do
     let(:extra_ci_minutes) { 0 }
     let(:namespace) do
@@ -39,6 +45,17 @@ describe CiMinutesUsageNotifyService do
     end
 
     subject { described_class.new(project).execute }
+
+    context 'when it is not GitLab.com' do
+      let(:gitlab_dot_com) { false }
+      let(:ci_minutes_used) { 2500 }
+
+      it 'does not send the email to all the owners' do
+        expect(CiMinutesUsageMailer).not_to receive(:notify)
+
+        subject
+      end
+    end
 
     context 'with a personal namespace' do
       before do
@@ -165,6 +182,13 @@ describe CiMinutesUsageNotifyService do
     end
 
     context 'when available minutes have reached the first level of alert' do
+      context 'when it is not GitLab.com' do
+        let(:gitlab_dot_com) { false }
+        let(:ci_minutes_used) { 1500 }
+
+        it_behaves_like 'no notification is sent'
+      end
+
       it_behaves_like 'notification for custom level is sent', 1500, 30
 
       context 'when other Pipeline has finished but second level of alert has not been reached' do
