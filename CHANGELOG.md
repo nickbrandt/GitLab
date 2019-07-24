@@ -5,17 +5,18 @@ entry.
 ## 11.11.5 (2019-06-27)
 
 - No changes.
-### Security (9 changes)
+### Security (10 changes)
 
-- Persist tmp snippet uploads at users.
+- Disable Rails SQL query cache when applying service templates. !30060
+- Add missing authorizations in GraphQL.
 - Fix DoS vulnerability in color validation regex.
 - Expose merge requests count based on user access.
 - Fix Denial of Service for comments when rendering issues/MR comments.
-- Add missing authorizations in GraphQL.
+- Gate MR head_pipeline behind read_pipeline ability.
 - Prevent Billion Laughs attack.
 - Correctly check permissions when creating snippet notes.
 - Prevent the detection of merge request templates by unauthorized users.
-- Disable Rails SQL query cache when applying service templates.
+- Persist tmp snippet uploads at users.
 
 
 ## 11.11.4 (2019-06-26)
