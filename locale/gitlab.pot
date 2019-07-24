@@ -7611,12 +7611,6 @@ msgstr ""
 msgid "Invocations"
 msgstr ""
 
-msgid "Invoke Count"
-msgstr ""
-
-msgid "Invoke Time"
-msgstr ""
-
 msgid "Is using license seat:"
 msgstr ""
 
