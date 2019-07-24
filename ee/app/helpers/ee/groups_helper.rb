@@ -7,7 +7,6 @@ module EE
     override :group_overview_nav_link_paths
     def group_overview_nav_link_paths
       super + %w[
-        groups/security/dashboard#show
         groups/insights#show
       ]
     end
