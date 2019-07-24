@@ -89,10 +89,6 @@
       font-weight: $gl-font-weight-bold;
     }
 
-    svg {
-      vertical-align: sub;
-    }
-
     .avatar {
       float: none;
       margin-right: $gl-padding-4;
@@ -113,13 +109,14 @@
     min-width: $gl-padding-8 * 15;
   }
 
-  .dropdown-item svg {
-    vertical-align: sub;
-  }
-
   .btn-blank {
     padding: 6px 10px;
   }
+}
+
+.security-dashboard .card-header svg,
+.license-management .dropdown-item svg {
+  vertical-align: sub;
 }
 
 .project-template {
@@ -139,10 +136,6 @@
   }
 
   .template-group-options {
-    .options-expanded-icon {
-      display: none;
-    }
-
     &.expanded {
       .template-option {
         display: flex;
@@ -151,10 +144,11 @@
       .options-expanded-icon {
         display: block;
       }
+    }
 
-      .options-collapsed-icon {
-        display: none;
-      }
+    .options-expanded-icon,
+    &.expanded .options-collapsed-icon {
+      display: none;
     }
   }
 
