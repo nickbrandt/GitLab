@@ -124,14 +124,12 @@ describe Gitlab::Database::LoadBalancing::Host do
         expect(host).not_to be_online
       end
 
-      if Gitlab::Database.postgresql?
-        it 'returns false when PG::Error is raised' do
-          allow(host)
-            .to receive(:check_replica_status?)
-            .and_raise(PG::Error)
+      it 'returns false when PG::Error is raised' do
+        allow(host)
+          .to receive(:check_replica_status?)
+          .and_raise(PG::Error)
 
-          expect(host).not_to be_online
-        end
+        expect(host).not_to be_online
       end
     end
   end

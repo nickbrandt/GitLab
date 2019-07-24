@@ -6,7 +6,6 @@ class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform
-    return unless ::Gitlab::Database.postgresql?
     return if ::Gitlab::Database.read_only?
     return unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
 
