@@ -7,8 +7,6 @@ module EE
     override :sidebar_projects_paths
     def sidebar_projects_paths
       super + %w[
-        projects/dependencies#show
-        projects/security/dashboard#show
         projects/insights#show
       ]
     end
@@ -37,6 +35,10 @@ module EE
     override :get_project_nav_tabs
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
+
+      if can?(current_user, :read_project_security_dashboard, @project)
+        nav_tabs << :security
+      end
 
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
@@ -126,6 +128,13 @@ module EE
       return false unless @project.builds_enabled?
 
       @project.feature_available?(:merge_trains)
+    end
+
+    def sidebar_security_paths
+      %w[
+        projects/security/dashboard#show
+        projects/dependencies#show
+      ]
     end
 
     def size_limit_message(project)
