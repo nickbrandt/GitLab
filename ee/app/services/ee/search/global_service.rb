@@ -43,7 +43,7 @@ module EE
       def allowed_scopes
         strong_memoize(:ee_allowed_scopes) do
           super.tap do |ce_scopes|
-            ce_scopes.concat(%w[wiki_blobs blobs commits]) if ::Gitlab::CurrentSettings.elasticsearch_search?
+            ce_scopes.concat(%w[notes wiki_blobs blobs commits]) if ::Gitlab::CurrentSettings.elasticsearch_search?
           end
         end
       end

@@ -1,4 +1,9 @@
 - if search_service.use_elasticsearch?
+  %li{ class: active_when(@scope == 'notes') }
+    = link_to search_filter_path(scope: 'notes') do
+      = _("Comments")
+      %span.badge.badge-pill
+        = limited_count(@search_results.notes_count)
   %li{ class: active_when(@scope == 'blobs') }
     = link_to search_filter_path(scope: 'blobs') do
       = _("Code")
