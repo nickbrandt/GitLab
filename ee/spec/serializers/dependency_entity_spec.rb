@@ -12,7 +12,16 @@ describe DependencyEntity do
         location: {
           blob_path: '/some_project/path/Gemfile.lock',
           path:      'Gemfile.lock'
-        }
+        },
+        vulnerabilities:
+          [{
+             name:     'DDoS',
+             severity: 'high'
+           },
+           {
+             name:     'XSS vulnerability',
+             severity: 'low'
+           }]
       }
     end
 
