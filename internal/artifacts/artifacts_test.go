@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )

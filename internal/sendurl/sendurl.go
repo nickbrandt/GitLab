@@ -10,10 +10,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
 	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
@@ -100,10 +101,10 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	log.WithFields(r.Context(), log.Fields{
-		"url":  helper.ScrubURLParams(params.URL),
+	log.WithContextFields(r.Context(), log.Fields{
+		"url":  mask.URL(params.URL),
 		"path": r.URL.Path,
-	}).Print("SendURL: sending")
+	}).Info("SendURL: sending")
 
 	if params.URL == "" {
 		sendURLRequestsInvalidData.Inc()

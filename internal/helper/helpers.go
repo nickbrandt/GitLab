@@ -10,13 +10,12 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"syscall"
 
 	"github.com/sebest/xff"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
 )
 
 const NginxResponseBufferHeader = "X-Accel-Buffering"
@@ -44,12 +43,12 @@ func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
 
 func printError(r *http.Request, err error) {
 	if r != nil {
-		log.WithFields(r.Context(), log.Fields{
+		log.WithContextFields(r.Context(), log.Fields{
 			"method": r.Method,
-			"uri":    ScrubURLParams(r.RequestURI),
+			"uri":    mask.URL(r.RequestURI),
 		}).WithError(err).Error("error")
 	} else {
-		log.NoContext().WithError(err).Error("unknown error")
+		log.WithError(err).Error("unknown error")
 	}
 }
 
@@ -92,7 +91,7 @@ func OpenFile(path string) (file *os.File, fi os.FileInfo, err error) {
 func URLMustParse(s string) *url.URL {
 	u, err := url.Parse(s)
 	if err != nil {
-		log.NoContext().WithField("url", s).WithError(err).Fatal("urlMustParse")
+		log.WithError(err).WithField("url", s).Fatal("urlMustParse")
 	}
 	return u
 }
@@ -201,85 +200,4 @@ func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
 	newReq.Header = HeaderClone(r.Header)
 	newReq.ContentLength = int64(len(body))
 	return &newReq
-}
-
-// Based on https://stackoverflow.com/a/52965552/474597
-// ScrubURLParams replaces the content of any sensitive query string parameters
-// in an URL with `[FILTERED]`
-func ScrubURLParams(originalURL string) string {
-	u, err := url.Parse(originalURL)
-	if err != nil {
-		return "<invalid URL>"
-	}
-
-	buf := bytes.NewBuffer(make([]byte, 0, len(originalURL)))
-
-	for i, queryPart := range bytes.Split([]byte(u.RawQuery), []byte("&")) {
-		if i != 0 {
-			buf.WriteByte(byte('&'))
-		}
-
-		splitParam := bytes.SplitN(queryPart, []byte("="), 2)
-
-		if len(splitParam) == 2 {
-			buf.Write(splitParam[0])
-			buf.WriteByte(byte('='))
-
-			if isParamSensitive(splitParam[0]) {
-				buf.Write([]byte("[FILTERED]"))
-			} else {
-				buf.Write(splitParam[1])
-			}
-		} else {
-			buf.Write(queryPart)
-		}
-	}
-	u.RawQuery = buf.String()
-	return u.String()
-}
-
-// Remember to keep in sync with Rails' filter_parameters
-
-var sensitiveRegexps = []*regexp.Regexp{
-	regexp.MustCompile(`token$`),
-	regexp.MustCompile(`key$`),
-	regexp.MustCompile(`(?i)(?:X\-AMZ\-)?Signature`),
-}
-
-// Not in regexp due to SA6004.
-// Not in string for performance.
-var sensitivePartialMatch = [][]byte{
-	[]byte("password"),
-	[]byte("secret"),
-}
-
-var sensitiveExactMatch = []string{
-	"certificate",
-	"hook",
-	"import_url",
-	"otp_attempt",
-	"sentry_dsn",
-	"trace",
-	"variables",
-	"content",
-	"sharedSecret",
-}
-
-func isParamSensitive(name []byte) bool {
-	for _, s := range sensitiveExactMatch {
-		if string(name) == s {
-			return true
-		}
-	}
-	for _, r := range sensitiveRegexps {
-		if r.Match(name) {
-			return true
-		}
-	}
-	for _, s := range sensitivePartialMatch {
-		if bytes.Contains(name, s) {
-			return true
-		}
-	}
-	return false
 }

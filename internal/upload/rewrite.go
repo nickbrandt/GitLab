@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload/exif"
 )
 
@@ -117,7 +117,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 
 	var inputReader io.Reader
 	if exif.IsExifFile(filename) {
-		log.WithFields(ctx, log.Fields{
+		log.WithContextFields(ctx, log.Fields{
 			"filename": filename,
 		}).Print("running exiftool to remove any metadata")
 

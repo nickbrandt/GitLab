@@ -10,9 +10,8 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/mask"
 	"gitlab.com/gitlab-org/labkit/tracing"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 // httpTransport defines a http.Transport with values
@@ -63,7 +62,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 		if metrics {
 			objectStorageUploadRequestsRequestFailed.Inc()
 		}
-		return nil, fmt.Errorf("PUT %q: %v", helper.ScrubURLParams(putURL), err)
+		return nil, fmt.Errorf("PUT %q: %v", mask.URL(putURL), err)
 	}
 	req.ContentLength = size
 
@@ -111,7 +110,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 			if metrics {
 				objectStorageUploadRequestsRequestFailed.Inc()
 			}
-			o.uploadError = fmt.Errorf("PUT request %q: %v", helper.ScrubURLParams(o.PutURL), err)
+			o.uploadError = fmt.Errorf("PUT request %q: %v", mask.URL(o.PutURL), err)
 			return
 		}
 		defer resp.Body.Close()
@@ -120,7 +119,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 			if metrics {
 				objectStorageUploadRequestsInvalidStatus.Inc()
 			}
-			o.uploadError = StatusCodeError(fmt.Errorf("PUT request %v returned: %s", helper.ScrubURLParams(o.PutURL), resp.Status))
+			o.uploadError = StatusCodeError(fmt.Errorf("PUT request %v returned: %s", mask.URL(o.PutURL), resp.Status))
 			return
 		}
 

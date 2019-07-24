@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"regexp"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
+	"gitlab.com/gitlab-org/labkit/log"
 )
 
 var ErrRemovingExif = errors.New("error while removing EXIF")
@@ -40,7 +40,7 @@ func (c *cleaner) Read(p []byte) (int, error) {
 	n, err := c.stdout.Read(p)
 	if err == io.EOF {
 		if waitErr := c.wait(); waitErr != nil {
-			log.WithFields(c.ctx, log.Fields{
+			log.WithContextFields(c.ctx, log.Fields{
 				"command": c.cmd.Args,
 				"stderr":  c.stderr.String(),
 				"error":   waitErr.Error(),

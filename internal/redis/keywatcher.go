@@ -9,7 +9,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/jpillora/backoff"
 	"github.com/prometheus/client_golang/prometheus"
-	log "github.com/sirupsen/logrus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
@@ -103,7 +103,7 @@ func dialPubSub(dialer redisDialerFunc) (redis.Conn, error) {
 //
 // NOTE: There Can Only Be One!
 func Process() {
-	log.Print("keywatcher: starting process loop")
+	log.Info("keywatcher: starting process loop")
 	for {
 		conn, err := dialPubSub(workerDialFunc)
 		if err != nil {

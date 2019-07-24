@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	log "github.com/sirupsen/logrus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 )
@@ -172,10 +172,16 @@ func startWebsocketServer(subprotocols ...string) (chan connWithReq, *httptest.S
 
 	connCh := make(chan connWithReq, 1)
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("WEBSOCKET", r.Method, r.URL, r.Header)
+		logEntry := log.WithFields(log.Fields{
+			"method":  r.Method,
+			"url":     r.URL,
+			"headers": r.Header,
+		})
+
+		logEntry.Info("WEBSOCKET")
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println("WEBSOCKET", r.Method, r.URL, "Upgrade failed", err)
+			logEntry.WithError(err).Error("WEBSOCKET Upgrade failed")
 			return
 		}
 		connCh <- connWithReq{conn, r}

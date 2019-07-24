@@ -1,38 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	goLog "log"
 	"os"
-	"os/signal"
-	"syscall"
 
-	"github.com/client9/reopen"
 	log "github.com/sirupsen/logrus"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	logkit "gitlab.com/gitlab-org/labkit/log"
 )
-
-func reopenLogWriter(l reopen.WriteCloser, sighup chan os.Signal) {
-	for range sighup {
-		log.Print("Reopening log file")
-		l.Reopen()
-	}
-}
-
-func prepareLoggingFile(logFile string) *reopen.FileWriter {
-	file, err := reopen.NewFileWriter(logFile)
-	if err != nil {
-		goLog.Fatalf("Unable to set output log: %s", err)
-	}
-
-	sighup := make(chan os.Signal, 1)
-	signal.Notify(sighup, syscall.SIGHUP)
-
-	go reopenLogWriter(file, sighup)
-	return file
-}
 
 const (
 	jsonLogFormat    = "json"
@@ -46,43 +23,57 @@ type logConfiguration struct {
 	logFormat string
 }
 
-func startLogging(config logConfiguration) {
-	var accessLogEntry *log.Entry
-	var logOutputWriter io.Writer
+func startLogging(config logConfiguration) (io.Closer, error) {
+	// Golog always goes to stderr
+	goLog.SetOutput(os.Stderr)
 
-	if config.logFile != "" {
-		logOutputWriter = prepareLoggingFile(config.logFile)
-	} else {
-		logOutputWriter = os.Stderr
+	logFile := config.logFile
+	if logFile == "" {
+		logFile = "stderr"
 	}
 
 	switch config.logFormat {
 	case noneLogType:
-		accessLogEntry = nil
-		logOutputWriter = ioutil.Discard
+		return logkit.Initialize(logkit.WithWriter(ioutil.Discard))
 	case jsonLogFormat:
-		accessLogEntry = log.WithField("system", "http")
-		log.SetFormatter(&log.JSONFormatter{})
+		return logkit.Initialize(
+			logkit.WithOutputName(logFile),
+			logkit.WithFormatter("json"),
+		)
 	case textLogFormat:
-		accessLogger := log.New()
-		accessLogger.Formatter = helper.NewAccessLogFormatter()
-		accessLogger.Out = logOutputWriter
-		accessLogger.SetLevel(log.InfoLevel)
-		accessLogEntry = accessLogger.WithField("system", "http")
-
-		log.SetFormatter(&log.TextFormatter{})
+		// In this mode, default (non-access) logs will always go to stderr
+		return logkit.Initialize(
+			logkit.WithOutputName("stderr"),
+			logkit.WithFormatter("text"),
+		)
 	case structuredFormat:
-		formatter := &log.TextFormatter{ForceColors: true, EnvironmentOverrideColors: true}
-		log.SetFormatter(formatter)
-		accessLogEntry = log.WithField("system", "http")
-	default:
-		log.WithField("logFormat", config.logFormat).Fatal("Unknown logFormat configured")
+		return logkit.Initialize(
+			logkit.WithOutputName(logFile),
+			logkit.WithFormatter("color"),
+		)
 	}
 
-	helper.SetAccessLoggerEntry(accessLogEntry)
-	log.SetOutput(logOutputWriter)
+	return nil, fmt.Errorf("unknown logFormat: %v", config.logFormat)
+}
 
-	// Golog always goes to stderr
-	goLog.SetOutput(os.Stderr)
+// In text format, we use a separate logger for access logs
+func getAccessLogger(config logConfiguration) (*log.Logger, io.Closer, error) {
+	if config.logFormat != "text" {
+		return log.StandardLogger(), nil, nil
+	}
 
+	logFile := config.logFile
+	if logFile == "" {
+		logFile = "stderr"
+	}
+
+	accessLogger := log.New()
+	accessLogger.SetLevel(log.InfoLevel)
+	closer, err := logkit.Initialize(
+		logkit.WithLogger(accessLogger),  // Configure `accessLogger`
+		logkit.WithFormatter("combined"), // Use the combined formatter
+		logkit.WithOutputName(logFile),
+	)
+
+	return accessLogger, closer, err
 }

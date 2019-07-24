@@ -14,9 +14,8 @@ import (
 	"github.com/jfbus/httprs"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/mask"
 	"gitlab.com/gitlab-org/labkit/tracing"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 // ErrNotAZip will be used when the file is not a zip archive
@@ -56,7 +55,7 @@ func isURL(path string) bool {
 }
 
 func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, error) {
-	scrubbedArchivePath := helper.ScrubURLParams(archivePath)
+	scrubbedArchivePath := mask.URL(archivePath)
 	req, err := http.NewRequest(http.MethodGet, archivePath, nil)
 	if err != nil {
 		return nil, fmt.Errorf("can't create HTTP GET %q: %v", scrubbedArchivePath, err)

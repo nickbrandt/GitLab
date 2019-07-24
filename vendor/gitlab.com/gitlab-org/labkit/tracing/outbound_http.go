@@ -2,13 +2,13 @@ package tracing
 
 import (
 	"crypto/tls"
-	"log"
 	"net/http"
 	"net/http/httptrace"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	otlog "github.com/opentracing/opentracing-go/log"
+	logkit "gitlab.com/gitlab-org/labkit/log"
 )
 
 type tracingRoundTripper struct {
@@ -52,7 +52,7 @@ func (c tracingRoundTripper) RoundTrip(req *http.Request) (res *http.Response, e
 	err := span.Tracer().Inject(span.Context(), opentracing.HTTPHeaders, carrier)
 
 	if err != nil {
-		log.Printf("tracing span injection failed: %v", err)
+		logkit.ContextLogger(ctx).WithError(err).Error("tracing span injection failed")
 	}
 
 	response, err := c.delegate.RoundTrip(req)
