@@ -154,4 +154,8 @@ FactoryBot.define do
   factory :geo_cache_invalidation_event, class: Geo::CacheInvalidationEvent do
     sequence(:key) { |n| "cache-key-#{n}" }
   end
+
+  factory :geo_container_repository_updated_event, class: Geo::ContainerRepositoryUpdatedEvent do
+    container_repository
+  end
 end
