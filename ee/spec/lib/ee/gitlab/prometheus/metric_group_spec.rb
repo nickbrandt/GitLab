@@ -9,7 +9,7 @@ describe Gitlab::Prometheus::MetricGroup do
 
     subject do
       described_class.for_project(project)
-        .map(&:metrics).flatten
+        .flat_map(&:metrics)
         .map(&:id)
     end
 
