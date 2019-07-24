@@ -62,12 +62,10 @@ export default {
         ...this.diffFileCommentForm,
       });
 
-      postData.data.note.commit_id = null;
+      const diffFileHeadSha =
+        this.commit && this.diffFile && this.diffFile.diff_refs && this.diffFile.diff_refs.head_sha;
 
-      if (this.commit) {
-        postData.data.note.commit_id =
-          (this.diffFile && this.diffFile.diff_refs && this.diffFile.diff_refs.head_sha) || null;
-      }
+      postData.data.note.commit_id = diffFileHeadSha || null;
 
       return this.saveDraft(postData)
         .then(() => {

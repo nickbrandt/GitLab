@@ -1,81 +1,107 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import DiffLineNoteForm from '~/diffs/components/diff_line_note_form.vue';
+import NoteForm from '~/notes/components/note_form.vue';
 import diffFileMockData from '../mock_data/diff_file';
-import note from '../mock_data/note';
+import note from '../../notes/mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('DiffLineNoteForm', () => {
-  describe('methods', () => {
-    describe('addToReview', () => {
-      const state = {
-        notes: {
-          notesData: { draftsPath: null },
-          noteableData: {},
-        },
-      };
-      const getters = {
-        getUserData: jest.fn(),
-        isLoggedIn: jest.fn(),
-        noteableType: jest.fn(),
-      };
-      const saveDraft = jest.fn();
-      const modules = {
+describe('EE DiffLineNoteForm', () => {
+  let storeOptions;
+  let saveDraft;
+  let wrapper;
+
+  const createStoreOptions = headSha => {
+    const state = {
+      notes: {
+        notesData: { draftsPath: null },
+        noteableData: {},
+      },
+    };
+    const getters = {
+      getUserData: jest.fn(),
+      isLoggedIn: jest.fn(),
+      noteableType: jest.fn(),
+    };
+
+    return {
+      state,
+      getters,
+      modules: {
         diffs: {
           namespaced: true,
-          state: {
-            commit: null,
-          },
+          state: { commit: headSha || null },
           getters: {
             getDiffFileByHash: jest.fn().mockReturnValue(() => ({
               diff_refs: {
-                head_sha: 'abc123',
+                head_sha: headSha || null,
               },
             })),
           },
         },
         batchComments: {
           namespaced: true,
-          actions: {
-            saveDraft,
-          },
+          actions: { saveDraft },
         },
-      };
-      const getDiffFileMock = () => Object.assign({}, diffFileMockData);
-      const diffFile = getDiffFileMock();
-      const diffLines = diffFile.highlighted_diff_lines;
-      const propsData = {
+      },
+    };
+  };
+
+  const createComponent = (props = {}) => {
+    const store = new Vuex.Store(storeOptions);
+
+    // deep clone the mock data
+    const diffFile = JSON.parse(JSON.stringify(diffFileMockData));
+    const diffLines = diffFile.highlighted_diff_lines;
+
+    wrapper = shallowMount(DiffLineNoteForm, {
+      propsData: {
         diffFileHash: diffFile.file_hash,
         diffLines,
         line: diffLines[0],
         noteTargetLine: diffLines[0],
-      };
-      it('should call saveDraft action with commit_id === null', () => {
-        const store = new Vuex.Store({ state, getters, modules });
-        const wrapper = shallowMount(DiffLineNoteForm, {
-          store,
-          localVue,
-          propsData,
-        });
-        wrapper.vm.addToReview(note);
-        const postData = saveDraft.mock.calls[0][1];
-        expect(postData.data.note.commit_id).toBe(null);
-      });
+        ...props,
+      },
+      store,
+      sync: false,
+      localVue,
+    });
+  };
 
-      it('should call saveDraft action with commit_id !== null', () => {
-        modules.diffs.state.commit = 'abc123';
-        const store = new Vuex.Store({ state, getters, modules });
-        const wrapper = shallowMount(DiffLineNoteForm, {
-          store,
-          localVue,
-          propsData,
-        });
-        wrapper.vm.addToReview(note);
-        const postData = saveDraft.mock.calls[1][1];
-        expect(postData.data.note.commit_id).not.toBe(null);
-      });
+  beforeEach(() => {
+    saveDraft = jest.fn();
+    storeOptions = createStoreOptions();
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+  });
+
+  const submitNoteAddToReview = () =>
+    wrapper.find(NoteForm).vm.$emit('handleFormUpdateAddToReview', note);
+  const saveDraftCommitId = () => saveDraft.mock.calls[0][1].data.note.commit_id;
+
+  describe('when user submits note to review', () => {
+    it('should call saveDraft action with commit_id === null when store has no commit', () => {
+      createComponent();
+
+      submitNoteAddToReview();
+
+      expect(saveDraft).toHaveBeenCalledTimes(1);
+      expect(saveDraftCommitId()).toBe(null);
+    });
+
+    it('should call saveDraft action with commit_id when store has commit', () => {
+      const HEAD_SHA = 'abc123';
+      storeOptions = createStoreOptions(HEAD_SHA);
+      createComponent();
+
+      submitNoteAddToReview();
+
+      expect(saveDraft).toHaveBeenCalledTimes(1);
+      expect(saveDraftCommitId()).toBe(HEAD_SHA);
     });
   });
 });
