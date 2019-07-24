@@ -99,7 +99,7 @@ export default {
         ),
         step4: sprintf(
           s__(
-            `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}${this.appMetadata.mergeRequestId}%{stepStart}.`,
+            `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}.`,
           ),
           {
             stepStart: '<strong>',
@@ -107,6 +107,7 @@ export default {
             linkStart:
               '<a href="https://docs.gitlab.com/ee/ci/review_apps/#configuring-visual-reviews">',
             linkEnd: '</a>',
+            mrId: this.appMetadata.mergeRequestId,
           },
           false,
         ),
