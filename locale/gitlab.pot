@@ -1339,9 +1339,6 @@ msgstr ""
 msgid "An error occurred while removing issues."
 msgstr ""
 
-msgid "An error occurred while rendering KaTeX"
-msgstr ""
-
 msgid "An error occurred while rendering preview broadcast message"
 msgstr ""
 
@@ -17065,6 +17062,12 @@ msgid "locked by %{path_lock_user_name} %{created_at}"
 msgstr ""
 
 msgid "manual"
+msgstr ""
+
+msgid "math|The math in this entry is taking too long to render and may not be displayed as expected. For performance reasons, math blocks are also limited to %{maxChars} characters. Consider splitting up large formulae, splitting math blocks among multiple entries, or using an image instead."
+msgstr ""
+
+msgid "math|There was an error rendering this math block"
 msgstr ""
 
 msgid "merge request"
