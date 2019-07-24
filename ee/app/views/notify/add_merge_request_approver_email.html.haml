@@ -2,7 +2,7 @@
   %div
     #{link_to @updated_by.name, user_url(@updated_by)} added you as an approver for:
 %p.details
-  != merge_path_description(@merge_request, '&rarr;')
+  = merge_path_description(@merge_request, '→')
 
 - if @merge_request.assignees.any?
   %p
