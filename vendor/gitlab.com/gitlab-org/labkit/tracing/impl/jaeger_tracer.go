@@ -5,10 +5,10 @@ package impl
 import (
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 
 	opentracing "github.com/opentracing/opentracing-go"
+	log "github.com/sirupsen/logrus"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
 	jaegerlog "github.com/uber/jaeger-client-go/log"
 )

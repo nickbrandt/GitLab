@@ -7,8 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
@@ -70,12 +72,13 @@ func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoun
 			w.Header().Set("Expires", cacheUntil)
 		}
 
-		log.WithFields(r.Context(), log.Fields{
+		log.WithContextFields(r.Context(), log.Fields{
 			"file":     file,
 			"encoding": w.Header().Get("Content-Encoding"),
 			"method":   r.Method,
-			"uri":      helper.ScrubURLParams(r.RequestURI),
-		}).Printf("Send static file")
+			"uri":      mask.URL(r.RequestURI),
+		}).Info("Send static file")
+
 		http.ServeContent(w, r, filepath.Base(file), fi.ModTime(), content)
 	})
 }

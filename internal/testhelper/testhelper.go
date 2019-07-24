@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
@@ -109,14 +109,20 @@ func assertHeaderExists(t *testing.T, header string, actual, expected []string) 
 
 func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logEntry := log.WithFields(log.Fields{
+			"method": r.Method,
+			"url":    r.URL,
+			"action": "DENY",
+		})
+
 		if url != nil && !url.MatchString(r.URL.Path) {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			logEntry.Info("UPSTREAM")
 			w.WriteHeader(404)
 			return
 		}
 
 		if version := r.Header.Get("Gitlab-Workhorse"); version == "" {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			logEntry.Info("UPSTREAM")
 			w.WriteHeader(403)
 			return
 		}

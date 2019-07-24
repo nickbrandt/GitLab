@@ -15,9 +15,11 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/headers"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 var (
@@ -105,10 +107,10 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 }
 
 func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
-	log.WithFields(r.Context(), log.Fields{
+	log.WithContextFields(r.Context(), log.Fields{
 		"file":   file,
 		"method": r.Method,
-		"uri":    helper.ScrubURLParams(r.RequestURI),
+		"uri":    mask.URL(r.RequestURI),
 	}).Print("Send file")
 
 	contentTypeHeaderPresent := false

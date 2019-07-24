@@ -2,11 +2,13 @@ package helper
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -142,45 +144,69 @@ func TestFail500WorksWithNils(t *testing.T) {
 	assert.Equal(t, "Internal server error\n", body.String())
 }
 
-func TestScrubURLParams(t *testing.T) {
-	for before, expected := range map[string]string{
-		"http://example.com":                                                "http://example.com",
-		"http://example.com?foo=1":                                          "http://example.com?foo=1",
-		"http://example.com?title=token":                                    "http://example.com?title=token",
-		"http://example.com?authenticity_token=1":                           "http://example.com?authenticity_token=[FILTERED]",
-		"http://example.com?private_token=1":                                "http://example.com?private_token=[FILTERED]",
-		"http://example.com?rss_token=1":                                    "http://example.com?rss_token=[FILTERED]",
-		"http://example.com?access_token=1":                                 "http://example.com?access_token=[FILTERED]",
-		"http://example.com?refresh_token=1":                                "http://example.com?refresh_token=[FILTERED]",
-		"http://example.com?foo&authenticity_token=blahblah&bar":            "http://example.com?foo&authenticity_token=[FILTERED]&bar",
-		"http://example.com?private-token=1":                                "http://example.com?private-token=[FILTERED]",
-		"http://example.com?foo&private-token=blahblah&bar":                 "http://example.com?foo&private-token=[FILTERED]&bar",
-		"http://example.com?private-token=foo&authenticity_token=bar":       "http://example.com?private-token=[FILTERED]&authenticity_token=[FILTERED]",
-		"https://example.com:8080?private-token=foo&authenticity_token=bar": "https://example.com:8080?private-token=[FILTERED]&authenticity_token=[FILTERED]",
-		"/?private-token=foo&authenticity_token=bar":                        "/?private-token=[FILTERED]&authenticity_token=[FILTERED]",
-		"?private-token=&authenticity_token=&bar":                           "?private-token=[FILTERED]&authenticity_token=[FILTERED]&bar",
-		"?private-token=foo&authenticity_token=bar":                         "?private-token=[FILTERED]&authenticity_token=[FILTERED]",
-		"?private_token=foo&authenticity-token=bar":                         "?private_token=[FILTERED]&authenticity-token=[FILTERED]",
-		"?X-AMZ-Signature=foo":                                              "?X-AMZ-Signature=[FILTERED]",
-		"?x-amz-signature=foo":                                              "?x-amz-signature=[FILTERED]",
-		"?Signature=foo":                                                    "?Signature=[FILTERED]",
-		"?confirmation_password=foo":                                        "?confirmation_password=[FILTERED]",
-		"?pos_secret_number=foo":                                            "?pos_secret_number=[FILTERED]",
-		"?sharedSecret=foo":                                                 "?sharedSecret=[FILTERED]",
-		"?book_key=foo":                                                     "?book_key=[FILTERED]",
-		"?certificate=foo":                                                  "?certificate=[FILTERED]",
-		"?hook=foo":                                                         "?hook=[FILTERED]",
-		"?import_url=foo":                                                   "?import_url=[FILTERED]",
-		"?otp_attempt=foo":                                                  "?otp_attempt=[FILTERED]",
-		"?sentry_dsn=foo":                                                   "?sentry_dsn=[FILTERED]",
-		"?trace=foo":                                                        "?trace=[FILTERED]",
-		"?variables=foo":                                                    "?variables=[FILTERED]",
-		"?content=foo":                                                      "?content=[FILTERED]",
-		"?content=e=mc2":                                                    "?content=[FILTERED]",
-		"?formula=e=mc2":                                                    "?formula=e=mc2",
-		"http://%41:8080/":                                                  "<invalid URL>",
-	} {
-		after := ScrubURLParams(before)
-		assert.Equal(t, expected, after, "Scrubbing %q", before)
+func TestLogError(t *testing.T) {
+	tests := []struct {
+		name        string
+		method      string
+		uri         string
+		err         error
+		logMatchers []string
+	}{
+		{
+			name: "nil_request",
+			err:  fmt.Errorf("crash"),
+			logMatchers: []string{
+				`level=error msg="unknown error" error=crash`,
+			},
+		},
+		{
+			name: "nil_request_nil_error",
+			err:  nil,
+			logMatchers: []string{
+				`level=error msg="unknown error" error="<nil>"`,
+			},
+		},
+		{
+			name:   "basic_url",
+			method: "GET",
+			uri:    "http://localhost:3000/",
+			err:    fmt.Errorf("error"),
+			logMatchers: []string{
+				`level=error msg=error correlation_id= error=error method=GET uri="http://localhost:3000/"`,
+			},
+		},
+		{
+			name:   "secret_url",
+			method: "GET",
+			uri:    "http://localhost:3000/path?certificate=123&sharedSecret=123&import_url=the_url&my_password_string=password",
+			err:    fmt.Errorf("error"),
+			logMatchers: []string{
+				`level=error msg=error correlation_id= error=error method=GET uri="http://localhost:3000/path\?certificate=\[FILTERED\]&sharedSecret=\[FILTERED\]&import_url=\[FILTERED\]&my_password_string=\[FILTERED\]"`,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := &bytes.Buffer{}
+
+			oldOut := logrus.StandardLogger().Out
+			logrus.StandardLogger().Out = buf
+			defer func() {
+				logrus.StandardLogger().Out = oldOut
+			}()
+
+			var r *http.Request
+			if tt.uri != "" {
+				r = httptest.NewRequest(tt.method, tt.uri, nil)
+			}
+
+			LogError(r, tt.err)
+
+			logString := buf.String()
+			for _, v := range tt.logMatchers {
+				require.Regexp(t, v, logString)
+			}
+		})
 	}
 }

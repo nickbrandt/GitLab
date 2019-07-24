@@ -8,9 +8,8 @@ import (
 	"io"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
 )
 
 // Upload represents an upload to an ObjectStorage provider
@@ -76,7 +75,7 @@ func (u *uploader) syncAndDelete(url string) {
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		log.WithError(err).WithField("object", helper.ScrubURLParams(url)).Warning("Delete failed")
+		log.WithError(err).WithField("object", mask.URL(url)).Warning("Delete failed")
 		return
 	}
 	// TODO: consider adding the context to the outgoing request for better instrumentation
@@ -84,7 +83,7 @@ func (u *uploader) syncAndDelete(url string) {
 	// here we are not using u.ctx because we must perform cleanup regardless of parent context
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		log.WithError(err).WithField("object", helper.ScrubURLParams(url)).Warning("Delete failed")
+		log.WithError(err).WithField("object", mask.URL(url)).Warning("Delete failed")
 		return
 	}
 	resp.Body.Close()

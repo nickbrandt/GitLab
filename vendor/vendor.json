@@ -601,58 +601,74 @@
 			"versionExact": "v0.71.0"
 		},
 		{
-			"checksumSHA1": "WMOuBgCyclqy+Mqunb0NbykaC4Y=",
+			"checksumSHA1": "86VccaJApU9EEq4KKen8DX9gMUM=",
 			"path": "gitlab.com/gitlab-org/labkit/correlation",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
 			"checksumSHA1": "UFBFulprWZHuL9GHhjCKoHXm+Ww=",
 			"path": "gitlab.com/gitlab-org/labkit/correlation/grpc",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
-			"checksumSHA1": "YyeJ2t/STDZj3X4xetPzTC0I9hU=",
+			"checksumSHA1": "jg7lyicpIcxuznj6pg+Wg0MKm7o=",
 			"path": "gitlab.com/gitlab-org/labkit/correlation/raven",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
-			"checksumSHA1": "27mCUL3y0j+3NB/+YLWxQLTiSIU=",
+			"checksumSHA1": "3/0keVU4UZOoFSNajbtnexV6Ou4=",
+			"path": "gitlab.com/gitlab-org/labkit/log",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
+			"version": "master",
+			"versionExact": "master"
+		},
+		{
+			"checksumSHA1": "yWZietMQ0YjAXj4NEVrQAypOIBU=",
+			"path": "gitlab.com/gitlab-org/labkit/mask",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
+			"version": "master",
+			"versionExact": "master"
+		},
+		{
+			"checksumSHA1": "ZxaskgDxW6muJqpq1qihus7rzGU=",
 			"path": "gitlab.com/gitlab-org/labkit/tracing",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
 			"checksumSHA1": "uIvjqXAsMQK/Y5FgWRaGydYGbYs=",
 			"path": "gitlab.com/gitlab-org/labkit/tracing/connstr",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
 			"checksumSHA1": "IE38In/zPKpmKqvWAAThyaufQak=",
 			"path": "gitlab.com/gitlab-org/labkit/tracing/grpc",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},
 		{
-			"checksumSHA1": "hB59Es/WTWfBPLSAheQaRyHGSXA=",
+			"checksumSHA1": "8KqfTzukh6BKKnDa7AlpeHNW8A4=",
 			"path": "gitlab.com/gitlab-org/labkit/tracing/impl",
-			"revision": "4b0e4d5df664c0f0680f3479ce7cc3378f04d40e",
-			"revisionTime": "2019-02-11T18:00:21Z",
+			"revision": "503c162155664d5a8d6d84a7dac51960dc0119ec",
+			"revisionTime": "2019-07-12T13:09:19Z",
 			"version": "master",
 			"versionExact": "master"
 		},

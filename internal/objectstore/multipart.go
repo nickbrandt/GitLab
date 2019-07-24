@@ -12,9 +12,8 @@ import (
 	"os"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/labkit/log"
+	"gitlab.com/gitlab-org/labkit/mask"
 )
 
 // ErrNotEnoughParts will be used when writing more than size * len(partURLs)
@@ -133,12 +132,12 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("CompleteMultipartUpload request %q: %v", helper.ScrubURLParams(m.CompleteURL), err)
+		return fmt.Errorf("CompleteMultipartUpload request %q: %v", mask.URL(m.CompleteURL), err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("CompleteMultipartUpload request %v returned: %s", helper.ScrubURLParams(m.CompleteURL), resp.Status)
+		return fmt.Errorf("CompleteMultipartUpload request %v returned: %s", mask.URL(m.CompleteURL), resp.Status)
 	}
 
 	result := &compoundCompleteMultipartUploadResult{}

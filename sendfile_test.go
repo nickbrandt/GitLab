@@ -10,8 +10,8 @@ import (
 	"path"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"gitlab.com/gitlab-org/labkit/log"
 )
 
 func TestDeniedLfsDownload(t *testing.T) {
@@ -36,7 +36,8 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath str
 
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("UPSTREAM", r.Method, r.URL)
+		log.WithFields(log.Fields{"method": r.Method, "url": r.URL}).Info("UPSTREAM")
+
 		require.Equal(t, "X-Sendfile", r.Header.Get("X-Sendfile-Type"))
 
 		w.Header().Set("X-Sendfile", contentPath)
@@ -69,7 +70,8 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath stri
 
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("UPSTREAM", r.Method, r.URL)
+		log.WithFields(log.Fields{"method": r.Method, "url": r.URL}).Info("UPSTREAM")
+
 		require.Equal(t, "X-Sendfile", r.Header.Get("X-Sendfile-Type"))
 
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))

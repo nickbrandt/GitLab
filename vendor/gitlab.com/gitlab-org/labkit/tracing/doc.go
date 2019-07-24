@@ -1,5 +1,5 @@
 /*
-Package `tracing` is the primary entrypoint into LabKit's distributed tracing functionality.
+Package tracing is the primary entrypoint into LabKit's distributed tracing functionality.
 
 (This documentation assumes some minimal knowledge of Distributed Tracing, and uses
 tracing terminology without providing definitions. Please review
@@ -82,5 +82,17 @@ headers is implementation specific.
 
 It is important to ensure that the context is passed into the outgoing request, using `req.WithContext(ctx)`
 so that the correct span information can be injected into the request headers.
+
+*Propagating tracing information to child processes*
+
+Sometimes we want a trace to continue from a parent process to a spawned child process. For this,
+the tracing package provides `tracing.NewEnvInjector()` and `tracing.ExtractFromEnv()`, for the
+parent and child processes respectively.
+
+NewEnvInjector() will configure a []string array of environment variables, ensuring they have the
+correct tracing configuration and any trace and span identifiers. NewEnvInjector() should be called
+in the child process and will extract the trace and span information from the environment.
+
+Please review the examples in the godocs for details of how to implement both approaches.
 */
 package tracing

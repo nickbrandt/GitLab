@@ -8,7 +8,8 @@ import (
 	"io"
 	"os"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/labkit/mask"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
@@ -37,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	scrubbedArchivePath := helper.ScrubURLParams(archivePath)
+	scrubbedArchivePath := mask.URL(archivePath)
 
 	fileName, err := zipartifacts.DecodeFileEntry(encodedFileName)
 	if err != nil {

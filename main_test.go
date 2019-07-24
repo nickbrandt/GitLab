@@ -17,11 +17,11 @@ import (
 	"testing"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
 	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -43,7 +43,7 @@ var cacheDir = path.Join(scratchDir, "cache")
 
 func TestMain(m *testing.M) {
 	if _, err := os.Stat(path.Join(testRepoRoot, testRepo)); os.IsNotExist(err) {
-		log.Fatal("cannot find test repository. Please run 'make prepare-tests'")
+		log.WithError(err).Fatal("cannot find test repository. Please run 'make prepare-tests'")
 	}
 
 	if err := testhelper.BuildExecutables(); err != nil {
@@ -162,7 +162,7 @@ func TestStaticFileRelativeURL(t *testing.T) {
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), http.HandlerFunc(http.NotFound))
 	defer ts.Close()
 	backendURLString := ts.URL + "/my-relative-url"
-	log.Print(backendURLString)
+	log.Info(backendURLString)
 	ws := startWorkhorseServer(backendURLString)
 	defer ws.Close()
 
@@ -496,11 +496,17 @@ func testAuthServer(url *regexp.Regexp, params url.Values, code int, body interf
 	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", api.ResponseContentType)
 
+		logEntry := log.WithFields(log.Fields{
+			"method": r.Method,
+			"url":    r.URL,
+		})
+		logEntryWithCode := logEntry.WithField("code", code)
+
 		if params != nil {
 			currentParams := r.URL.Query()
 			for key := range params {
 				if currentParams.Get(key) != params.Get(key) {
-					log.Println("UPSTREAM", r.Method, r.URL, "DENY", "invalid auth server params")
+					logEntry.Info("UPSTREAM", "DENY", "invalid auth server params")
 					w.WriteHeader(http.StatusForbidden)
 					return
 				}
@@ -509,7 +515,8 @@ func testAuthServer(url *regexp.Regexp, params url.Values, code int, body interf
 
 		// Write pure string
 		if data, ok := body.(string); ok {
-			log.Println("UPSTREAM", r.Method, r.URL, code)
+			logEntryWithCode.Info("UPSTREAM")
+
 			w.WriteHeader(code)
 			fmt.Fprint(w, data)
 			return
@@ -518,13 +525,15 @@ func testAuthServer(url *regexp.Regexp, params url.Values, code int, body interf
 		// Write json string
 		data, err := json.Marshal(body)
 		if err != nil {
-			log.Println("UPSTREAM", r.Method, r.URL, "FAILURE", err)
+			logEntry.WithError(err).Error("UPSTREAM")
+
 			w.WriteHeader(503)
 			fmt.Fprint(w, err)
 			return
 		}
 
-		log.Println("UPSTREAM", r.Method, r.URL, code)
+		logEntryWithCode.Info("UPSTREAM")
+
 		w.WriteHeader(code)
 		w.Write(data)
 	})
@@ -544,7 +553,7 @@ func startWorkhorseServer(authBackend string) *httptest.Server {
 
 func startWorkhorseServerWithConfig(cfg *config.Config) *httptest.Server {
 	testhelper.ConfigureSecret()
-	u := upstream.NewUpstream(*cfg)
+	u := upstream.NewUpstream(*cfg, logrus.StandardLogger())
 
 	return httptest.NewServer(u)
 }

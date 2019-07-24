@@ -25,12 +25,12 @@ func InjectCorrelationID(h http.Handler, opts ...InboundHandlerOption) http.Hand
 			correlationID = generateRandomCorrelationIDWithFallback(r)
 		}
 
+		ctx := ContextWithCorrelation(parent, correlationID)
+		h.ServeHTTP(w, r.WithContext(ctx))
+
 		if config.sendResponseHeader {
 			setResponseHeader(w, correlationID)
 		}
-
-		ctx := ContextWithCorrelation(parent, correlationID)
-		h.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
@@ -38,6 +38,12 @@ func extractFromRequest(r *http.Request) string {
 	return r.Header.Get(propagationHeader)
 }
 
+// setResponseHeader will set the response header, if it has not already
+// been set by an downstream response
 func setResponseHeader(w http.ResponseWriter, correlationID string) {
-	w.Header().Set(propagationHeader, correlationID)
+	header := w.Header()
+	_, exists := header[http.CanonicalHeaderKey(propagationHeader)]
+	if !exists {
+		header.Set(propagationHeader, correlationID)
+	}
 }

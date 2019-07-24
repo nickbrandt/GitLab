@@ -8,10 +8,13 @@ package upstream
 
 import (
 	"fmt"
+
 	"net/http"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -34,7 +37,7 @@ type upstream struct {
 	RoundTripper http.RoundTripper
 }
 
-func NewUpstream(cfg config.Config) http.Handler {
+func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
 	up := upstream{
 		Config: cfg,
 	}
@@ -45,7 +48,9 @@ func NewUpstream(cfg config.Config) http.Handler {
 	up.configureURLPrefix()
 	up.configureRoutes()
 
-	return correlation.InjectCorrelationID(&up)
+	handler := log.AccessLogger(&up, log.WithAccessLogger(accessLogger))
+	handler = correlation.InjectCorrelationID(handler)
+	return handler
 }
 
 func (u *upstream) configureURLPrefix() {
@@ -56,11 +61,8 @@ func (u *upstream) configureURLPrefix() {
 	u.URLPrefix = urlprefix.Prefix(relativeURLRoot)
 }
 
-func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
+func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	helper.FixRemoteAddr(r)
-
-	w := helper.NewStatsCollectingResponseWriter(ow)
-	defer w.RequestFinished(r)
 
 	helper.DisableResponseBuffering(w)
 

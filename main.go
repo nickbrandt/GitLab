@@ -24,11 +24,10 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-
+	"gitlab.com/gitlab-org/labkit/log"
 	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
@@ -78,22 +77,25 @@ func main() {
 		os.Exit(0)
 	}
 
-	startLogging(logConfig)
-	logger := log.NoContext()
+	closer, err := startLogging(logConfig)
+	if err != nil {
+		log.WithError(err).Fatal("Unable to configure logger")
+	}
+	defer closer.Close()
 
 	tracing.Initialize(tracing.WithServiceName("gitlab-workhorse"))
 
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {
-		logger.WithError(err).Fatal("invalid authBackend")
+		log.WithError(err).Fatal("Invalid authBackend")
 	}
 
-	logger.WithField("version", version).Print("Starting")
+	log.WithField("version", version).Print("Starting")
 
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
 		if err := os.Remove(*listenAddr); err != nil && !os.IsNotExist(err) {
-			logger.Fatal(err)
+			log.WithError(err).Fatal("Failed to remove socket")
 		}
 	}
 
@@ -102,7 +104,7 @@ func main() {
 	listener, err := net.Listen(*listenNetwork, *listenAddr)
 	syscall.Umask(oldUmask)
 	if err != nil {
-		logger.Fatal(err)
+		log.WithError(err).Fatal("Failed to listen")
 	}
 
 	// The profiler will only be activated by HTTP requests. HTTP
@@ -111,7 +113,10 @@ func main() {
 	// effectively disabled by default.
 	if *pprofListenAddr != "" {
 		go func() {
-			logger.Print(http.ListenAndServe(*pprofListenAddr, nil))
+			err := http.ListenAndServe(*pprofListenAddr, nil)
+			if err != nil {
+				log.WithError(err).Error("Failed to start pprof listener")
+			}
 		}()
 	}
 
@@ -119,7 +124,10 @@ func main() {
 		promMux := http.NewServeMux()
 		promMux.Handle("/metrics", promhttp.Handler())
 		go func() {
-			logger.Print(http.ListenAndServe(*prometheusListenAddr, promMux))
+			err := http.ListenAndServe(*prometheusListenAddr, promMux)
+			if err != nil {
+				log.WithError(err).Error("Failed to start prometheus listener")
+			}
 		}()
 	}
 
@@ -140,7 +148,7 @@ func main() {
 	if *configFile != "" {
 		cfgFromFile, err := config.LoadConfig(*configFile)
 		if err != nil {
-			logger.WithField("configFile", *configFile).WithError(err).Fatal("Can not load config file")
+			log.WithField("configFile", *configFile).WithError(err).Fatal("Can not load config file")
 		}
 
 		cfg.Redis = cfgFromFile.Redis
@@ -151,7 +159,18 @@ func main() {
 		}
 	}
 
-	up := wrapRaven(upstream.NewUpstream(cfg))
+	accessLogger, accessCloser, err := getAccessLogger(logConfig)
+	if err != nil {
+		log.WithError(err).Fatal("Unable to configure access logger")
+	}
+	if accessCloser != nil {
+		defer accessCloser.Close()
+	}
 
-	logger.Fatal(http.Serve(listener, up))
+	up := wrapRaven(upstream.NewUpstream(cfg, accessLogger))
+
+	err = http.Serve(listener, up)
+	if err != nil {
+		log.WithError(err).Fatal("Unable to serve")
+	}
 }

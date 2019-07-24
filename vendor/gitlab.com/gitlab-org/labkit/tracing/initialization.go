@@ -2,9 +2,9 @@ package tracing
 
 import (
 	"io"
-	"log"
 
 	opentracing "github.com/opentracing/opentracing-go"
+	log "github.com/sirupsen/logrus"
 	"gitlab.com/gitlab-org/labkit/tracing/connstr"
 	"gitlab.com/gitlab-org/labkit/tracing/impl"
 )
@@ -25,7 +25,7 @@ func Initialize(opts ...InitializationOption) io.Closer {
 
 	driverName, options, err := connstr.Parse(config.connectionString)
 	if err != nil {
-		log.Printf("unable to parse connection: %v", err)
+		log.WithError(err).Infoln("unable to parse connection")
 		return &nopCloser{}
 	}
 
@@ -35,14 +35,14 @@ func Initialize(opts ...InitializationOption) io.Closer {
 
 	tracer, closer, err := impl.New(driverName, options)
 	if err != nil {
-		log.Printf("skipping tracing configuration step: %v", err)
+		log.WithError(err).Warn("skipping tracing configuration step")
 		return &nopCloser{}
 	}
 
 	if tracer == nil {
-		log.Printf("no tracer provided, tracing will be disabled")
+		log.Warn("no tracer provided, tracing will be disabled")
 	} else {
-		log.Printf("Tracing enabled")
+		log.Info("Tracing enabled")
 		opentracing.SetGlobalTracer(tracer)
 	}
 

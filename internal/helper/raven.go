@@ -23,6 +23,7 @@ func captureRavenError(r *http.Request, err error) {
 		CleanHeadersForRaven(r)
 		interfaces = append(interfaces, raven.NewHttp(r))
 
+		//lint:ignore SA1019 this was recently deprecated. Update workhorse to use labkit errortracking package.
 		extra = correlation.SetExtra(r.Context(), extra)
 	}
 

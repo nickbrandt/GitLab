@@ -6,10 +6,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 
 	lightstep "github.com/lightstep/lightstep-tracer-go"
 	opentracing "github.com/opentracing/opentracing-go"
+	log "github.com/sirupsen/logrus"
 )
 
 type lightstepCloser struct {
