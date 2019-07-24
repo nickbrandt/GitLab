@@ -6675,6 +6675,9 @@ msgstr ""
 msgid "Gitlab CI/CD"
 msgstr ""
 
+msgid "Gitlab Pages"
+msgstr ""
+
 msgid "Given access %{time_ago}"
 msgstr ""
 
@@ -6736,6 +6739,9 @@ msgid "Grant access"
 msgstr ""
 
 msgid "Graph"
+msgstr ""
+
+msgid "Gravatar"
 msgstr ""
 
 msgid "Gravatar enabled"
@@ -7898,6 +7904,9 @@ msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
 msgid "Kubernetes service integration has been disabled. Fields on this page are not used by GitLab, you can configure your Kubernetes clusters using the new <a href=\"%{url}\"/>Kubernetes Clusters</a> page"
+msgstr ""
+
+msgid "LDAP"
 msgstr ""
 
 msgid "LDAP settings"
@@ -9485,6 +9494,9 @@ msgid "OfSearchInADropdown|Filter"
 msgstr ""
 
 msgid "Ok let's go"
+msgstr ""
+
+msgid "OmniAuth"
 msgstr ""
 
 msgid "Onboarding"
@@ -11621,6 +11633,9 @@ msgstr ""
 msgid "Replace all label(s)"
 msgstr ""
 
+msgid "Reply by email"
+msgstr ""
+
 msgid "Reply to comment"
 msgstr ""
 
@@ -12740,6 +12755,9 @@ msgid "Sign out"
 msgstr ""
 
 msgid "Sign out & Register"
+msgstr ""
+
+msgid "Sign up"
 msgstr ""
 
 msgid "Sign up was successful! Please confirm your email to sign in."
