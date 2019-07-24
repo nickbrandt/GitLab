@@ -89,6 +89,7 @@ class License < ApplicationRecord
     required_ci_templates
     project_aliases
     cycle_analytics_for_groups
+    cycle_analytics_duration_chart
   ]
   EEP_FEATURES.freeze
 

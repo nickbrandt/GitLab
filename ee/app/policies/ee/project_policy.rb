@@ -32,6 +32,11 @@ module EE
       with_scope :subject
       condition(:packages_disabled) { !@subject.packages_enabled }
 
+      with_scope :subject
+      condition(:cycle_analytics_project_duration_chart_available) do
+        @subject.feature_available?(:cycle_analytics_duration_chart)
+      end
+
       with_scope :global
       condition(:is_development) { Rails.env.development? }
 
@@ -88,6 +93,9 @@ module EE
       condition(:design_management_disabled) do
         !@subject.design_management_enabled?
       end
+
+      rule { reporter & cycle_analytics_project_duration_chart_available }
+        .enable :read_project_cycle_analytics_duration_chart
 
       rule { admin }.enable :change_repository_storage
 

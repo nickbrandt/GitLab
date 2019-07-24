@@ -6,12 +6,20 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   include CycleAnalyticsParams
 
   before_action :whitelist_query_limiting, only: [:show]
-  before_action :authorize_group_cycle_analytics!
+  before_action :authorize_group_cycle_analytics!, only: [:show]
+  before_action :authorize_cycle_analytics_duration_chart, only: [:duration_chart]
 
   def show
     respond_to do |format|
       format.json { render json: cycle_analytics_json }
     end
+  end
+
+  def duration_chart
+    stage_class = ::Gitlab::CycleAnalytics::Stage[params[:stage_id]]
+    stage = stage_class.new(options: options(cycle_analytics_params).merge(group: group))
+
+    render json: stage.data_for_duration_chart
   end
 
   private
@@ -40,6 +48,12 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
 
   def authorize_group_cycle_analytics!
     unless can?(current_user, :read_group_cycle_analytics, group)
+      render_403
+    end
+  end
+
+  def authorize_cycle_analytics_duration_chart
+    unless can?(current_user, :read_group_cycle_analytics_duration_chart, group)
       render_403
     end
   end

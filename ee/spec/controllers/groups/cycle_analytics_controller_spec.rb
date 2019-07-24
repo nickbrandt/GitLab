@@ -18,6 +18,18 @@ describe Groups::CycleAnalyticsController do
     sign_in(user)
   end
 
+  it_behaves_like 'cycle analytics duration chart endpoint' do
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+    let(:subgroup) { create(:group, parent: group) }
+    let(:project) { create(:project, group: subgroup) }
+    let(:request_params) { { group_id: group.name } }
+
+    before do
+      group.add_owner(user)
+    end
+  end
+
   describe 'cycle analytics' do
     context 'with proper permission' do
       before do
@@ -36,7 +48,7 @@ describe Groups::CycleAnalyticsController do
             },
             format: :json)
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'calls service with specific params' do
@@ -56,7 +68,7 @@ describe Groups::CycleAnalyticsController do
             },
             format: :json)
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 

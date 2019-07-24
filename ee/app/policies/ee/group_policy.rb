@@ -17,6 +17,10 @@ module EE
         @subject.feature_available?(:cycle_analytics_for_groups)
       end
 
+      condition(:cycle_analytics_duration_chart_available) do
+        @subject.feature_available?(:cycle_analytics_duration_chart)
+      end
+
       condition(:can_owners_manage_ldap, scope: :global) do
         ::Gitlab::CurrentSettings.allow_group_owners_to_manage_ldap?
       end
@@ -60,6 +64,9 @@ module EE
 
       rule { reporter & cycle_analytics_available }
         .enable :read_group_cycle_analytics
+
+      rule { reporter & cycle_analytics_duration_chart_available }
+        .enable :read_group_cycle_analytics_duration_chart
 
       rule { can?(:read_group) & dependency_proxy_available }
         .enable :read_dependency_proxy

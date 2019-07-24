@@ -81,3 +81,4 @@ module Gitlab
     end
   end
 end
+Gitlab::CycleAnalytics::BaseStage.prepend_if_ee('EE::Gitlab::CycleAnalytics::BaseStage')

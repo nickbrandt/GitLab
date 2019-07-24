@@ -39,3 +39,4 @@ class Projects::CycleAnalyticsController < Projects::ApplicationController
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42671')
   end
 end
+Projects::CycleAnalyticsController.prepend_if_ee('EE::Projects::CycleAnalyticsController')
