@@ -1,5 +1,17 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.2
+
+### Security (6 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Queries for Upload should be scoped by model.
+- Fix bypass email verification when SCIM user is created via API.
+- Prevent an XSS vector in the add approver email.
+- Make vulnerability feedback invisible if limited access to repo.
+
+
 ## 12.1.1
 
 ### Fixed (1 change)
