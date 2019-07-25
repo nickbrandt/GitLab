@@ -828,6 +828,12 @@ describe ProjectPolicy do
     let(:current_user) { User.alert_bot }
 
     it { is_expected.to be_allowed(:reporter_access) }
+
+    context 'within a private project' do
+      let(:project) { create(:project, :private) }
+
+      it { is_expected.to be_allowed(:admin_issue) }
+    end
   end
 
   context 'commit_committer_check is not enabled by the current license' do
