@@ -785,4 +785,11 @@ describe Epic do
       epic.create_new_cross_references!(epic.author)
     end
   end
+
+  context "relative positioning" do
+    it_behaves_like "a class that supports relative positioning" do
+      let(:factory) { :epic }
+      let(:default_params) { {} }
+    end
+  end
 end
