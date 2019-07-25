@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.6
+
+### Security (4 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Prevent an XSS vector in the add approver email.
+- Make vulnerability feedback invisible if limited access to repo.
+
+
 ## 11.11.5 (2019-06-27)
 
 - No changes.
