@@ -303,6 +303,34 @@ describe TodoService do
     end
   end
 
+  describe 'Designs' do
+    let(:project) { create(:project) }
+    let(:issue) { create(:issue, project: project) }
+    let(:design) { create(:design, issue: issue) }
+
+    before do
+      project.add_guest(author)
+      project.add_developer(john_doe)
+    end
+
+    let(:note) do
+      build(:diff_note_on_design,
+             project: project,
+             noteable: design,
+             author: author,
+             note: "Hey #{john_doe.to_reference}")
+    end
+
+    it 'creates a todo for mentioned user on new diff note' do
+      service.new_note(note, author)
+
+      should_create_todo(user: john_doe,
+                         target: design,
+                         action: Todo::MENTIONED,
+                         note: note)
+    end
+  end
+
   def should_create_todo(attributes = {})
     attributes.reverse_merge!(
       project: project,
