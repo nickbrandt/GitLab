@@ -9,6 +9,7 @@ module DesignManagement
 
       @issue = params.fetch(:issue)
       @files = params.fetch(:files)
+      @success_callbacks = []
     end
 
     def execute
@@ -18,7 +19,7 @@ module DesignManagement
       save_designs!
 
       success({ designs: updated_designs })
-    rescue Gitlab::Git::BaseError, ActiveRecord::RecordInvalid => e
+    rescue ::Gitlab::Git::BaseError, ::ActiveRecord::RecordInvalid => e
       error(e.message)
     end
 
@@ -26,9 +27,21 @@ module DesignManagement
 
     attr_reader :files, :issue
 
+    def success(*_)
+      while cb = @success_callbacks.pop
+        cb.call
+      end
+
+      super
+    end
+
+    def on_success(&block)
+      @success_callbacks.push(block)
+    end
+
     def save_designs!
       commit_sha = create_and_commit_designs!
-      DesignManagement::Version.create_for_designs(updated_designs, commit_sha)
+      ::DesignManagement::Version.create_for_designs(updated_designs, commit_sha)
     end
 
     def create_and_commit_designs!
@@ -53,8 +66,11 @@ module DesignManagement
     end
 
     def build_repository_action(file, design)
+      action = new_file?(design) ? :create : :update
+      on_success { ::EE::Gitlab::UsageCounters::DesignsCounter.count(action) }
+
       {
-        action: new_file?(design) ? :create : :update,
+        action: action,
         file_path: design.full_path,
         content: file_content(file, design.full_path)
       }
@@ -105,9 +121,9 @@ module DesignManagement
     end
 
     def file_content(file, full_path)
-      return file.to_io if Feature.disabled?(:store_designs_in_lfs, default_enabled: true)
+      return file.to_io if ::Feature.disabled?(:store_designs_in_lfs, default_enabled: true)
 
-      transformer = Lfs::FileTransformer.new(project, repository, target_branch)
+      transformer = ::Lfs::FileTransformer.new(project, repository, target_branch)
       transformer.new_file(full_path, file.to_io).content
     end
 
