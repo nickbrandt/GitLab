@@ -7,7 +7,7 @@
 = f.fields_for :allowed_email_domain do |allowed_email_domain_form|
   .form-group
     - if read_only
-      = allowed_email_domain_form.text_field :domain, value: group.root_ancestor_allowed_email_domain.domain, class: 'form-control', disabled: true, placeholder: _('Enter domain')
+      = allowed_email_domain_form.text_field :domain, value: group.root_ancestor_allowed_email_domain&.domain, class: 'form-control', disabled: true, placeholder: _('No value set by top-level parent group.')
       .form-text.text-muted
         = _('Email domain is not editable in subgroups. Value inherited from top-level parent group.')
     - else

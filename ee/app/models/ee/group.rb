@@ -32,6 +32,7 @@ module EE
       has_many :dependency_proxy_blobs, class_name: 'DependencyProxy::Blob'
 
       has_one :allowed_email_domain
+      accepts_nested_attributes_for :allowed_email_domain, allow_destroy: true, reject_if: :all_blank
 
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.

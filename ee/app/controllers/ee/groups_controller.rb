@@ -7,6 +7,7 @@ module EE
 
     prepended do
       before_action :set_ip_restriction, only: [:edit]
+      before_action :set_allowed_domain, only: [:edit]
     end
 
     override :render_show_html
@@ -33,6 +34,7 @@ module EE
         params_ee << :file_template_project_id if current_group&.feature_available?(:custom_file_templates_for_namespace)
         params_ee << :custom_project_templates_group_id if current_group&.group_project_template_available?
         params_ee << { ip_restriction_attributes: [:id, :range] } if current_group&.feature_available?(:group_ip_restriction)
+        params_ee << { allowed_email_domain_attributes: [:id, :domain] } if current_group&.feature_available?(:group_allowed_email_domains)
       end
     end
 
@@ -63,6 +65,12 @@ module EE
       return if group.ip_restriction.present?
 
       group.build_ip_restriction
+    end
+
+    def set_allowed_domain
+      return if group.allowed_email_domain.present?
+
+      group.build_allowed_email_domain
     end
   end
 end

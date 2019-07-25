@@ -99,6 +99,26 @@ module EE
         true
       end
 
+      def handle_allowed_domain_deletion
+        return unless allowed_domain_editable?
+
+        return unless group.allowed_email_domain.present?
+
+        allowed_domain_params = params[:allowed_email_domain_attributes]
+
+        return unless allowed_domain_params
+
+        if allowed_domain_params[:domain]&.blank?
+          allowed_domain_params[:_destroy] = 1
+        end
+      end
+
+      def allowed_domain_editable?
+        return false if group.parent_id.present?
+
+        true
+      end
+
       def log_audit_event
         EE::Audit::GroupChangesAuditor.new(current_user, group).execute
       end
