@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe IncidentManagement::CreateIssueService do
-  let(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :repository, :private) }
   let(:service) { described_class.new(project, nil, alert_payload) }
   let(:alert_starts_at) { Time.now }
   let(:alert_title) { 'TITLE' }
@@ -42,6 +42,26 @@ describe IncidentManagement::CreateIssueService do
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
         expect(separator_count(issue.description)).to eq 0
+      end
+    end
+
+    context 'with erroneous issue service' do
+      let(:invalid_issue) do
+        build(:issue, project: project, title: nil).tap(&:valid?)
+      end
+
+      let(:issue_error) { invalid_issue.errors.full_messages.to_sentence }
+
+      it 'returns and logs the issue error' do
+        expect_next_instance_of(Issues::CreateService) do |issue_service|
+          expect(issue_service).to receive(:execute).and_return(invalid_issue)
+        end
+
+        expect(service)
+          .to receive(:log_error)
+          .with(error_message(issue_error))
+
+        expect(subject).to include(status: :error, message: issue_error)
       end
     end
 
@@ -175,6 +195,83 @@ describe IncidentManagement::CreateIssueService do
         let(:alert_starts_at) { nil }
 
         it_behaves_like 'invalid alert'
+      end
+    end
+
+    describe "label `incident`" do
+      let(:title) { 'incident' }
+      let(:color) { '#CC0033' }
+      let(:description) do
+        <<~DESCRIPTION.chomp
+          Denotes a disruption to IT services and \
+          the associated issues require immediate attention
+        DESCRIPTION
+      end
+
+      shared_examples 'existing label' do
+        it 'adds the existing label' do
+          expect { subject }.not_to change(Label, :count)
+
+          expect(issue.labels).to eq([label])
+        end
+      end
+
+      shared_examples 'new label' do
+        it 'adds newly created label' do
+          expect { subject }.to change(Label, :count).by(1)
+
+          label = project.reload.labels.last
+          expect(issue.labels).to eq([label])
+          expect(label.title).to eq(title)
+          expect(label.color).to eq(color)
+          expect(label.description).to eq(description)
+        end
+      end
+
+      context 'with predefined project label' do
+        it_behaves_like 'existing label' do
+          let!(:label) { create(:label, project: project, title: title) }
+        end
+      end
+
+      context 'with predefined group label' do
+        let(:project) { create(:project, group: group) }
+        let(:group) { create(:group) }
+
+        it_behaves_like 'existing label' do
+          let!(:label) { create(:group_label, group: group, title: title) }
+        end
+      end
+
+      context 'without label' do
+        it_behaves_like 'new label'
+      end
+
+      context 'with duplicate labels', issue: 'https://gitlab.com/gitlab-org/gitlab-ce/issues/65042' do
+        before do
+          # Replicate race condition to create duplicates
+          build(:label, project: project, title: title).save!(validate: false)
+          build(:label, project: project, title: title).save!(validate: false)
+        end
+
+        it 'create an issue without labels' do
+          # Verify we have duplicates
+          expect(project.labels.size).to eq(2)
+          expect(project.labels.map(&:title)).to all(eq(title))
+
+          message = <<~MESSAGE.chomp
+            Cannot create incident issue with labels ["#{title}"] for \
+            "#{project.full_name}": Labels is invalid.
+            Retrying without labels.
+          MESSAGE
+
+          expect(service)
+            .to receive(:log_info)
+            .with(message)
+
+          expect(subject).to include(status: :success)
+          expect(issue.labels).to be_empty
+        end
       end
     end
   end
