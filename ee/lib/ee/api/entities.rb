@@ -260,6 +260,12 @@ module EE
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
         expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
         expose :state
+        expose :web_edit_url do |epic|
+          ::Gitlab::Routing.url_helpers.group_epic_path(epic.group, epic)
+        end
+        expose :reference do |epic|
+          epic.to_reference(epic.parent&.group)
+        end
         expose :created_at
         expose :updated_at
         expose :labels do |epic|
