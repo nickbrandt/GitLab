@@ -24,8 +24,8 @@ export default {
   },
   computed: {
     toolbarHelpHtml() {
-      const mdLinkStart = `<a href="${this.markdownDocsPath}" target="_blank" tabindex="-1">`;
-      const actionsLinkStart = `<a href="${this.quickActionsDocsPath}" target="_blank" tabindex="-1">`;
+      const mdLinkStart = `<a href="${this.markdownDocsPath}" target="_blank" rel="noopener noreferrer" tabindex="-1">`;
+      const actionsLinkStart = `<a href="${this.quickActionsDocsPath}" target="_blank" rel="noopener noreferrer" tabindex="-1">`;
       const linkEnd = '</a>';
 
       if (this.markdownDocsPath && !this.quickActionsDocsPath) {
