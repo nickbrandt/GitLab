@@ -13,10 +13,6 @@ module BillingPlansHelper
     plan.purchase_link&.action == 'current_plan'
   end
 
-  def has_plan_purchase_link?(plans_data)
-    plans_data.any? { |plan| plan.purchase_link&.href }
-  end
-
   def plan_purchase_link(href, link_text)
     if href
       link_to link_text, href, class: 'btn btn-primary btn-inverted'

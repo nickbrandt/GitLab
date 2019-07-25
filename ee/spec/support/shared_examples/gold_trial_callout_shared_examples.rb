@@ -60,11 +60,13 @@ end
 
 shared_examples 'billings gold trial callout' do
   context 'on a free plan' do
-    let(:plan) { nil }
+    let(:plan) { 'free' }
+
+    let!(:subscription) do
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: nil, seats: 15)
+    end
 
     before do
-      allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
-
       visit page_path
     end
 
@@ -80,11 +82,13 @@ shared_examples 'billings gold trial callout' do
     where(case_names: ->(plan_type) {"like #{plan_type}"}, plan_type: [:bronze, :silver])
 
     with_them do
-      let(:plan) { plans[plan_type] }
+      let(:plan) { plan_type }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: plans[plan_type], seats: 15)
+      end
 
       before do
-        allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
-
         visit page_path
       end
 
@@ -99,11 +103,13 @@ shared_examples 'billings gold trial callout' do
   end
 
   context 'on a gold plan' do
-    set(:plan) { create(:gold_plan) }
+    let(:plan) { gold_plan.name }
+
+    let!(:subscription) do
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan, seats: 15)
+    end
 
     before do
-      allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(plan)
-
       visit page_path
     end
 

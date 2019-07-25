@@ -1,102 +1,31 @@
 require 'spec_helper'
 
 describe 'Billing plan pages', :feature do
+  include StubRequests
+
   let(:user) { create(:user) }
+  let(:namespace) { user.namespace }
+  let(:free_plan) { create(:free_plan) }
   let(:bronze_plan) { create(:bronze_plan) }
+  let(:gold_plan) { create(:gold_plan) }
   let(:plans_data) do
-    [
-      {
-        name: "Free",
-        price_per_month: 0,
-        free: true,
-        code: "free",
-        price_per_year: 0,
-        purchase_link: {
-          action: "downgrade",
-          href: nil
-        },
-        features: []
-      },
-      {
-        name: "Bronze",
-        price_per_month: 4,
-        free: false,
-        code: "bronze",
-        price_per_year: 48,
-        purchase_link: {
-          action: "current_plan",
-          href: nil
-        },
-        features: []
-      },
-      {
-        name: "Silver",
-        price_per_month: 19,
-        free: false,
-        code: "silver",
-        price_per_year: 228,
-        purchase_link: {
-          action: "upgrade",
-          href: nil
-        },
-        features: []
-      },
-      {
-        name: "Gold",
-        price_per_month: 99,
-        free: false,
-        code: "gold",
-        price_per_year: 1188,
-        purchase_link: {
-          action: "upgrade",
-          href: nil
-        },
-        features: []
-      }
-    ]
-  end
-
-  shared_examples 'displays all plans and correct actions' do
-    it 'displays all plans' do
-      page.within('.billing-plans') do
-        panels = page.all('.card')
-
-        expect(panels.length).to eq(plans_data.length)
-
-        plans_data.each.with_index do |data, index|
-          expect(panels[index].find('.card-header')).to have_content(data[:name])
-        end
-      end
-    end
-
-    it 'displays correct plan actions' do
-      expected_actions = plans_data.map { |data| data.fetch(:purchase_link).fetch(:action) }
-      plan_actions = page.all('.billing-plans .card .plan-action')
-      expect(plan_actions.length).to eq(expected_actions.length)
-
-      expected_actions.each_with_index do |expected_action, index|
-        action = plan_actions[index]
-
-        case expected_action
-        when 'downgrade'
-          expect(action).to have_content('Downgrade')
-          expect(action).to have_css('.disabled')
-        when 'current_plan'
-          expect(action).to have_content('Current plan')
-          expect(action).to have_css('.disabled')
-        when 'upgrade'
-          expect(action).to have_content('Upgrade')
-          expect(action).to have_css('.disabled')
-        end
-      end
+    JSON.parse(File.read(Rails.root.join('ee/spec/fixtures/gitlab_com_plans.json'))).map do |data|
+      data.deep_symbolize_keys
     end
   end
 
   before do
-    expect(Gitlab::HTTP).to receive(:get).and_return(double(body: plans_data.to_json))
+    stub_full_request("https://customers.gitlab.com/gitlab_plans?plan=#{plan}")
+      .to_return(status: 200, body: plans_data.to_json)
     stub_application_setting(check_namespace_plan: true)
     allow(Gitlab).to receive(:com?) { true }
     gitlab_sign_in(user)
+  end
+
+  def external_upgrade_url(namespace, plan)
+    if Plan::PAID_HOSTED_PLANS.include?(plan.name)
+      "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{namespace.id}/upgrade/#{plan.name}-external-id"
+    end
   end
 
   context 'users profile billing page' do
@@ -104,51 +33,131 @@ describe 'Billing plan pages', :feature do
 
     it_behaves_like 'billings gold trial callout'
 
-    context 'on bronze' do
-      before do
-        allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(bronze_plan)
+    context 'on free' do
+      let(:plan) { free_plan.name }
 
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: nil, seats: 15)
+      end
+
+      before do
         visit page_path
       end
 
-      include_examples 'displays all plans and correct actions'
+      it 'displays all plans' do
+        page.within('.billing-plans') do
+          panels = page.all('.card')
 
-      it 'displays plan header' do
+          expect(panels.length).to eq(plans_data.length)
+
+          plans_data.each.with_index do |data, index|
+            expect(panels[index].find('.card-header')).to have_content(data[:name])
+          end
+        end
+      end
+
+      it 'displays correct plan actions' do
+        expected_actions = plans_data.map { |data| data.fetch(:purchase_link).fetch(:action) }
+        plan_actions = page.all('.billing-plans .card .plan-action')
+        expect(plan_actions.length).to eq(expected_actions.length)
+
+        expected_actions.each_with_index do |expected_action, index|
+          action = plan_actions[index]
+
+          case expected_action
+          when 'downgrade'
+            expect(action).to have_content('Downgrade')
+            expect(action).to have_css('.disabled')
+          when 'current_plan'
+            expect(action).to have_content('Current plan')
+            expect(action).to have_css('.disabled')
+          when 'upgrade'
+            expect(action).to have_content('Upgrade')
+            expect(action).not_to have_css('.disabled')
+          end
+        end
+      end
+    end
+
+    context 'on bronze' do
+      let(:plan) { bronze_plan.name }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+      end
+
+      before do
+        visit page_path
+      end
+
+      it 'displays header and actions' do
         page.within('.billing-plan-header') do
-          expect(page).to have_content("@#{user.username} you are currently on the Bronze")
+          expect(page).to have_content('You are currently using the Bronze plan.')
 
           expect(page).to have_css('.billing-plan-logo img')
+        end
+
+        page.within('.content') do
+          expect(page).to have_link('Upgrade plan', href: external_upgrade_url(namespace, bronze_plan))
+          expect(page).to have_content('downgrade your plan')
+          expect(page).to have_link('Contact Support', href: 'https://support.gitlab.com')
+        end
+      end
+    end
+
+    context 'on gold' do
+      let(:plan) { gold_plan.name }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan, seats: 15)
+      end
+
+      before do
+        visit page_path
+      end
+
+      it 'displays header and actions' do
+        page.within('.billing-plan-header') do
+          expect(page).to have_content('You are currently using the Gold plan.')
+
+          expect(page).to have_css('.billing-plan-logo img')
+        end
+
+        page.within('.content') do
+          expect(page).not_to have_link('Upgrade plan')
+          expect(page).to have_content('downgrade your plan')
+          expect(page).to have_link('Contact Support', href: 'https://support.gitlab.com')
         end
       end
     end
   end
 
   context 'group billing page' do
-    let(:group) { create(:group) }
-    let!(:group_member) { create(:group_member, :owner, group: group, user: user) }
+    let(:namespace) { create(:group) }
+    let!(:group_member) { create(:group_member, :owner, group: namespace, user: user) }
 
     context 'top-most group' do
-      let(:page_path) { group_billings_path(group) }
+      let(:page_path) { group_billings_path(namespace) }
 
       it_behaves_like 'billings gold trial callout'
 
       context 'on bronze' do
-        before do
-          expect_any_instance_of(EE::Group).to receive(:plan).at_least(:once).and_return(bronze_plan)
+        let(:plan) { bronze_plan.name }
 
+        let!(:subscription) do
+          create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+        end
+
+        before do
           visit page_path
         end
 
         it 'displays plan header' do
           page.within('.billing-plan-header') do
-            expect(page).to have_content("#{group.name} is currently using the Bronze plan")
+            expect(page).to have_content("#{namespace.name} is currently using the Bronze plan")
 
             expect(page).to have_css('.billing-plan-logo .identicon')
           end
-        end
-
-        it 'does not display the billing plans table' do
-          expect(page).not_to have_css('.billing-plans')
         end
 
         it 'displays subscription table', :js do
@@ -168,10 +177,17 @@ describe 'Billing plan pages', :feature do
     let(:subgroup2) { create(:group, parent: subgroup1) }
     let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
     let(:page_path) { group_billings_path(subgroup2) }
+    let(:namespace) { group }
 
     it_behaves_like 'billings gold trial callout'
 
     context 'on bronze' do
+      let(:plan) { bronze_plan.name }
+
+      let!(:subscription) do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: bronze_plan, seats: 15)
+      end
+
       before do
         visit page_path
       end
@@ -182,13 +198,13 @@ describe 'Billing plan pages', :feature do
           expect(page).to have_css('.billing-plan-logo .identicon')
           expect(page.find('.btn-success')).to have_content('Manage plan')
         end
-
-        expect(page).not_to have_css('.billing-plans')
       end
     end
   end
 
   context 'with unexpected JSON' do
+    let(:plan) { 'free' }
+
     let(:plans_data) do
       [
         {
@@ -213,16 +229,6 @@ describe 'Billing plan pages', :feature do
 
     it 'renders no header for missing plan' do
       expect(page).not_to have_css('.billing-plan-header')
-    end
-
-    it 'displays all plans' do
-      page.within('.billing-plans') do
-        panels = page.all('.card')
-        expect(panels.length).to eq(plans_data.length)
-        plans_data.each_with_index do |data, index|
-          expect(panels[index].find('.card-header')).to have_content(data[:name])
-        end
-      end
     end
   end
 end
