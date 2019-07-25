@@ -1,25 +1,58 @@
 <script>
+import _ from 'underscore';
 import WeightSelect from 'ee/weight_select';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 
 const ANY_WEIGHT = {
-  LABEL: 'Any Weight',
-  STRING: 'Any',
-  VALUE: null,
+  label: __('Any Weight'),
+  selectValue: 'Any',
+  value: null,
+  valueClass: 'text-secondary',
 };
 
 const NO_WEIGHT = {
-  LABEL: 'No Weight',
-  STRING: 'None',
-  VALUE: -1,
+  label: __('No Weight'),
+  selectValue: 'None',
+  value: -1,
 };
 
-function getWeightValue(weight) {
-  if (Number.isNaN(Number(weight))) {
-    return weight === NO_WEIGHT.STRING ? NO_WEIGHT.VALUE : ANY_WEIGHT.VALUE;
+function unstringifyValue(value) {
+  if (!_.isString(value)) {
+    return value;
   }
+  const numValue = Number(value);
+  return Number.isNaN(numValue) ? null : numValue;
+}
 
-  return parseInt(weight, 10);
+function getWeightValueFromSelect(selectValue) {
+  switch (selectValue) {
+    case ANY_WEIGHT.selectValue:
+      return ANY_WEIGHT.value;
+    case NO_WEIGHT.selectValue:
+      return NO_WEIGHT.value;
+    case null:
+    case undefined:
+      return ANY_WEIGHT.value;
+    default:
+      return Number(selectValue);
+  }
+}
+
+function getWeightFromValue(strValue) {
+  const value = unstringifyValue(strValue);
+  switch (value) {
+    case ANY_WEIGHT.value:
+      return ANY_WEIGHT;
+    case NO_WEIGHT.value:
+      return NO_WEIGHT;
+    default:
+      return {
+        label: String(value),
+        selectValue: value,
+        value,
+      };
+  }
 }
 
 export default {
@@ -34,7 +67,7 @@ export default {
     value: {
       type: [Number, String],
       required: false,
-      default: ANY_WEIGHT.VALUE,
+      default: ANY_WEIGHT.value,
     },
     canEdit: {
       type: Boolean,
@@ -52,16 +85,15 @@ export default {
     };
   },
   computed: {
+    selectedWeight() {
+      return getWeightFromValue(this.value);
+    },
+
     valueClass() {
-      if (this.value === ANY_WEIGHT.VALUE) {
-        return 'text-secondary';
-      }
-      return 'bold';
+      return this.selectedWeight.valueClass || 'bold';
     },
     valueText() {
-      if (this.value === NO_WEIGHT.VALUE) return NO_WEIGHT.LABEL;
-      if (this.value === ANY_WEIGHT.VALUE) return ANY_WEIGHT.LABEL;
-      return this.value;
+      return this.selectedWeight.label;
     },
   },
   mounted() {
@@ -73,18 +105,10 @@ export default {
   },
   methods: {
     isSelected(weight) {
-      if (this.value === NO_WEIGHT.VALUE) {
-        return weight === NO_WEIGHT.STRING;
-      }
-
-      if (this.value === ANY_WEIGHT.VALUE) {
-        return weight === ANY_WEIGHT.STRING;
-      }
-
-      return this.value === weight;
+      return this.selectedWeight.selectValue === weight;
     },
     selectWeight(weight) {
-      this.board.weight = getWeightValue(weight);
+      this.board.weight = getWeightValueFromSelect(weight);
     },
   },
 };

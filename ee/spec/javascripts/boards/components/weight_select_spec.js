@@ -21,12 +21,16 @@ function activeDropdownItem() {
   return vm.$el.querySelector('.is-active').innerText.trim();
 }
 
+function findDropdownItem(text) {
+  return Array.from(vm.$el.querySelectorAll('li a')).find(({ innerText }) => innerText === text);
+}
+
 describe('WeightSelect', () => {
   beforeEach(done => {
     setFixtures('<div class="test-container"></div>');
 
     board = {
-      weight: 0,
+      weight: -1,
       labels: [],
     };
 
@@ -118,10 +122,9 @@ describe('WeightSelect', () => {
     it('sets value', done => {
       vm.$el.querySelector('.edit-link').click();
 
-      const dropdownItem = vm.$el.querySelectorAll('li a')[4];
-
-      expect(dropdownItem.innerText).toBe('2');
-      dropdownItem.click();
+      setTimeout(() => {
+        findDropdownItem('2').click();
+      });
 
       setTimeout(() => {
         expect(activeDropdownItem()).toEqual('2');
@@ -135,11 +138,25 @@ describe('WeightSelect', () => {
       vm.$el.querySelector('.edit-link').click();
 
       setTimeout(() => {
-        vm.$el.querySelectorAll('li a')[0].click();
+        findDropdownItem('Any').click();
       });
 
       setTimeout(() => {
         expect(activeDropdownItem()).toEqual(expectedDropdownValues.anyWeight);
+        expect(board.weight).toEqual(null);
+        done();
+      });
+    });
+
+    it('sets Any Weight if it is already selected', done => {
+      vm.value = null;
+      vm.$el.querySelector('.edit-link').click();
+
+      setTimeout(() => {
+        findDropdownItem('Any').click();
+      });
+
+      setTimeout(() => {
         expect(board.weight).toEqual(null);
         done();
       });
@@ -150,11 +167,25 @@ describe('WeightSelect', () => {
       vm.$el.querySelector('.edit-link').click();
 
       setTimeout(() => {
-        vm.$el.querySelectorAll('li a')[1].click();
+        findDropdownItem('None').click();
       });
 
       setTimeout(() => {
         expect(activeDropdownItem()).toEqual(expectedDropdownValues.noWeight);
+        expect(board.weight).toEqual(-1);
+        done();
+      });
+    });
+
+    it('sets No Weight if it is already selected', done => {
+      vm.value = -1;
+      vm.$el.querySelector('.edit-link').click();
+
+      setTimeout(() => {
+        findDropdownItem('None').click();
+      });
+
+      setTimeout(() => {
         expect(board.weight).toEqual(-1);
         done();
       });

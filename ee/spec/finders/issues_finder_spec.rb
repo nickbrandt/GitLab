@@ -16,7 +16,7 @@ describe IssuesFinder do
         context 'filter issues with no weight' do
           let(:params) { { weight: Issue::WEIGHT_NONE } }
 
-          it 'returns all issues with nil weight' do
+          it 'returns all issues with no weight' do
             expect(issues).to contain_exactly(issue_with_no_weight, issue1, issue2, issue3, issue4)
           end
         end

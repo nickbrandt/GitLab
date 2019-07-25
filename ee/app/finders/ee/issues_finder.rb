@@ -24,7 +24,7 @@ module EE
 
     # rubocop: disable CodeReuse/ActiveRecord
     def by_weight(items)
-      return items unless weights?
+      return items unless filtered_by_weight?
       return items if filter_by_any_weight?
 
       if filter_by_no_weight?
@@ -35,7 +35,7 @@ module EE
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def weights?
+    def filtered_by_weight?
       params[:weight].present? && params[:weight] != ::Issue::WEIGHT_ALL
     end
 
