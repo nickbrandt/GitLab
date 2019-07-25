@@ -8,7 +8,18 @@ module Atlassian
         @shared_secret = shared_secret
       end
 
-      def store_dev_info(dev_info_json)
+      def store_dev_info(project:, commits: nil, branches: nil, merge_requests: nil)
+        dev_info_json = {
+          repositories: [
+            Serializers::RepositoryEntity.represent(
+              project,
+              commits: commits,
+              branches: branches,
+              merge_requests: merge_requests
+            )
+          ]
+        }.to_json
+
         uri = URI.join(@base_uri, '/rest/devinfo/0.10/bulk')
 
         headers = {
