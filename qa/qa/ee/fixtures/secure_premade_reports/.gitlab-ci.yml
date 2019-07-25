@@ -1,7 +1,7 @@
 include:
   template: Dependency-Scanning.gitlab-ci.yml
 
-dependency-scanning:
+dependency_scanning:
   tags:
     - qa
     - test

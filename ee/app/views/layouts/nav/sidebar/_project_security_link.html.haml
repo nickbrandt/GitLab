@@ -1,6 +1,6 @@
 - if project_nav_tab?(:security)
   = nav_link(path: sidebar_security_paths) do
-    = link_to project_security_dashboard_path(@project), title: _('Security Dashboard') do
+    = link_to project_security_dashboard_path(@project), title: _('Security Dashboard'), data: { qa_selector: 'link_security_dashboard' } do
       .nav-icon-container
         = sprite_icon('shield')
       %span.nav-item-name

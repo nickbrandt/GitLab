@@ -60,6 +60,10 @@ module QA
         autoload :New, 'qa/ee/page/project/new'
         autoload :Show, 'qa/ee/page/project/show'
 
+        module SubMenus
+          autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
+        end
+
         module Issue
           autoload :Index, 'qa/ee/page/project/issue/index'
           autoload :Show, 'qa/ee/page/project/issue/show'
@@ -80,6 +84,10 @@ module QA
 
         module Pipeline
           autoload :Show, 'qa/ee/page/project/pipeline/show'
+        end
+
+        module Secure
+          autoload :Show, 'qa/ee/page/project/secure/show'
         end
       end
 
