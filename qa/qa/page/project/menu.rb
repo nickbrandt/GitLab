@@ -6,11 +6,13 @@ module QA
       class Menu < Page::Base
         include SubMenus::Common
 
+        include SubMenus::Project
         include SubMenus::CiCd
         include SubMenus::Issues
         include SubMenus::Operations
         include SubMenus::Repository
         include SubMenus::Settings
+        include EE::Page::Project::SubMenus::SecurityCompliance # rubocop: disable Cop/InjectEnterpriseEditionModule
 
         view 'app/views/layouts/nav/sidebar/_project.html.haml' do
           element :activity_link

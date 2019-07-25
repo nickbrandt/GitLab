@@ -13,11 +13,11 @@ class EpicIssue < ApplicationRecord
 
   scope :in_epic, ->(epic_id) { where(epic_id: epic_id) }
 
-  class << self
-    alias_method :in_parents, :in_epic
+  def self.relative_positioning_query_base(epic_issue)
+    in_epic(epic_issue.parent_ids)
+  end
 
-    def parent_column
-      :epic_id
-    end
+  def self.relative_positioning_parent_column
+    :epic_id
   end
 end

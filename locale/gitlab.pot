@@ -137,8 +137,18 @@ msgid_plural "%d metrics"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d more comment"
 msgid_plural "%d more comments"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d second"
+msgid_plural "%d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -7135,6 +7145,9 @@ msgstr[1] ""
 msgid "Hide values"
 msgstr ""
 
+msgid "Highest number of requests per minute for each raw path, default to 300. To disable throttling set to 0."
+msgstr ""
+
 msgid "Highest role:"
 msgstr ""
 
@@ -7615,12 +7628,6 @@ msgid "Invite member"
 msgstr ""
 
 msgid "Invocations"
-msgstr ""
-
-msgid "Invoke Count"
-msgstr ""
-
-msgid "Invoke Time"
 msgstr ""
 
 msgid "Is using license seat:"
@@ -11399,6 +11406,9 @@ msgstr ""
 msgid "Rake Tasks Help"
 msgstr ""
 
+msgid "Raw blob request rate limit per minute"
+msgstr ""
+
 msgid "Read more"
 msgstr ""
 
@@ -11771,6 +11781,9 @@ msgid "Requested %{time_ago}"
 msgstr ""
 
 msgid "Requests Profiles"
+msgstr ""
+
+msgid "Requests to these domain(s)/address(es) on the local network will be allowed when local requests from hooks and services are disabled. IP ranges such as 1:0:0:0:0:0:0:0/124 or 127.0.0.0/28 are supported. Domain wildcards are not supported currently. Use comma, semicolon, or newline to separate multiple entries. The whitelist can hold a maximum of 4000 entries. Domains should use IDNA encoding. Ex: domain.com, 192.168.1.1, 127.0.0.0/28."
 msgstr ""
 
 msgid "Require all users in this group to setup Two-factor authentication"
@@ -15953,6 +15966,9 @@ msgstr ""
 msgid "White helpers give contextual information."
 msgstr ""
 
+msgid "Whitelist to allow requests to the local network from hooks and services"
+msgstr ""
+
 msgid "Who can see this group?"
 msgstr ""
 
@@ -16257,6 +16273,9 @@ msgid "You can specify notification level per group or per project."
 msgstr ""
 
 msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
+msgstr ""
+
+msgid "You cannot access the raw file. Please wait a minute."
 msgstr ""
 
 msgid "You cannot impersonate a blocked user"
@@ -17103,6 +17122,9 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is not an email you own"
+msgstr ""
+
+msgid "is too long (maximum is 1000 entries)"
 msgstr ""
 
 msgid "issue"

@@ -13,6 +13,7 @@ RSpec.describe Geo::EventLog, type: :model do
     it { is_expected.to belong_to(:hashed_storage_attachments_event).class_name('Geo::HashedStorageAttachmentsEvent').with_foreign_key('hashed_storage_attachments_event_id') }
     it { is_expected.to belong_to(:lfs_object_deleted_event).class_name('Geo::LfsObjectDeletedEvent').with_foreign_key('lfs_object_deleted_event_id') }
     it { is_expected.to belong_to(:job_artifact_deleted_event).class_name('Geo::JobArtifactDeletedEvent').with_foreign_key('job_artifact_deleted_event_id') }
+    it { is_expected.to belong_to(:container_repository_updated_event).class_name('Geo::ContainerRepositoryUpdatedEvent').with_foreign_key('container_repository_updated_event_id') }
   end
 
   describe '.next_unprocessed_event' do
