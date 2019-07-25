@@ -1,5 +1,0 @@
----
-title: Fix bypass email verification when SCIM user is created via API
-merge_request:
-author:
-type: security
