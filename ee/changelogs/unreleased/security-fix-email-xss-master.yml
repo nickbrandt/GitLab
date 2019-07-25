@@ -1,5 +1,0 @@
----
-title: Prevent an XSS vector in the add approver email
-merge_request:
-author:
-type: security
