@@ -440,6 +440,30 @@ describe Projects::FeatureFlagsController do
       end
     end
 
+    context 'when creates additional scope with a userWithId strategy' do
+      it 'creates a strategy for the scope' do
+        params = view_params.merge({
+          operations_feature_flag: {
+            name: 'my_feature_flag',
+            active: true,
+            scopes_attributes: [{ environment_scope: '*', active: true },
+                                { environment_scope: 'production', active: false,
+                                  strategies: [{ name: 'userWithId',
+                                                 parameters: { userIds: '123,4,6722' } }] }]
+          }
+        })
+
+        post(:create, params: params, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        production_strategies_json = json_response['scopes'].second['strategies']
+        expect(production_strategies_json).to eq([{
+          'name' => 'userWithId',
+          'parameters' => { "userIds" => "123,4,6722" }
+        }])
+      end
+    end
+
     context 'when creates an additional scope without a strategy' do
       it 'creates a default strategy' do
         params = view_params.merge({
@@ -774,6 +798,22 @@ describe Projects::FeatureFlagsController do
         }])
       end
 
+      it 'creates a userWithId strategy' do
+        scope = create_scope(feature_flag, 'production', true, [{ name: 'default', parameters: {} }])
+        params = request_params(scope, [{ name: 'userWithId', parameters: { userIds: 'sam,fred' } }])
+
+        put(:update, params: params, format: :json, as: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        scope_json = json_response['scopes'].select do |s|
+          s['environment_scope'] == 'production'
+        end.first
+        expect(scope_json['strategies']).to eq([{
+          "name" => "userWithId",
+          "parameters" => { "userIds" => "sam,fred" }
+        }])
+      end
+
       it 'updates an existing strategy' do
         scope = create_scope(feature_flag, 'production', true, [{ name: 'default', parameters: {} }])
         params = request_params(scope, [{ name: 'gradualRolloutUserId',
@@ -805,6 +845,30 @@ describe Projects::FeatureFlagsController do
           s['environment_scope'] == 'production'
         end.first
         expect(scope_json['strategies']).to eq([])
+      end
+
+      it 'accepts multiple strategies' do
+        scope = create_scope(feature_flag, 'production', true, [{ name: 'default', parameters: {} }])
+        params = request_params(scope, [
+          { name: 'gradualRolloutUserId', parameters: { groupId: 'mygroup', percentage: '55' } },
+          { name: 'userWithId', parameters: { userIds: 'joe' } }
+        ])
+
+        put(:update, params: params, format: :json, as: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        scope_json = json_response['scopes'].select do |s|
+          s['environment_scope'] == 'production'
+        end.first
+        expect(scope_json['strategies'].length).to eq(2)
+        expect(scope_json['strategies']).to include({
+          "name" => "gradualRolloutUserId",
+          "parameters" => { "groupId" => "mygroup", "percentage" => "55" }
+        })
+        expect(scope_json['strategies']).to include({
+          "name" => "userWithId",
+          "parameters" => { "userIds" => "joe" }
+        })
       end
 
       it 'does not modify strategies when there is no strategies key in the params' do
@@ -852,6 +916,16 @@ describe Projects::FeatureFlagsController do
           "name" => "gradualRolloutUserId",
           "parameters" => { "groupId" => "default", "percentage" => "10" }
         }])
+      end
+
+      it 'does not accept extra parameters in the strategy params' do
+        scope = create_scope(feature_flag, 'production', true, [{ name: 'default', parameters: {} }])
+        params = request_params(scope, [{ name: 'userWithId', parameters: { userIds: 'joe', groupId: 'default' } }])
+
+        put(:update, params: params, format: :json, as: :json)
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+        expect(json_response['message']).to eq(["Scopes strategies parameters are invalid"])
       end
     end
   end
