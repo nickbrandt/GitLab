@@ -302,6 +302,9 @@ msgstr ""
 msgid "%{percent}%% complete"
 msgstr ""
 
+msgid "%{prefix}: %{planName} %{suffix}"
+msgstr ""
+
 msgid "%{service_title} activated."
 msgstr ""
 

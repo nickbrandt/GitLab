@@ -1,0 +1,9 @@
+{
+  "plan": { "code": "bronze", "name": "Bronze", "trial": null, "upgradable": true },
+  "usage": { "seats_in_subscription": 0, "seats_in_use": 1, "max_seats_used": 0, "seats_owed": 0 },
+  "billing": {
+    "subscription_start_date": "2019-07-31",
+    "subscription_end_date": null,
+    "trial_ends_on": null
+  }
+}
