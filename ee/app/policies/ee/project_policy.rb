@@ -97,8 +97,6 @@ module EE
         prevent :read_project
       end
 
-      rule { alert_bot }.enable :reporter_access
-
       rule { license_block }.policy do
         prevent :create_issue
         prevent :create_merge_request_in
@@ -266,7 +264,8 @@ module EE
 
     override :lookup_access_level!
     def lookup_access_level!
-      return ::GroupMember::NO_ACCESS if needs_new_sso_session?
+      return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
+      return ::Gitlab::Access::REPORTER if alert_bot?
 
       super
     end
