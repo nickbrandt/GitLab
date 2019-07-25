@@ -8,6 +8,11 @@ module EE
       class_methods do
         extend ::Gitlab::Utils::Override
 
+        override :usage_data_counters
+        def usage_data_counters
+          super + [::EE::Gitlab::UsageCounters::DesignsCounter]
+        end
+
         override :features_usage_data
         def features_usage_data
           super.merge(features_usage_data_ee)

@@ -5,9 +5,16 @@ describe DesignManagement::SaveDesignsService do
   let(:issue) { create(:issue, project: project) }
   let(:project) { create(:project) }
   let(:user) { project.owner }
-  let(:files) { [fixture_file_upload("spec/fixtures/rails_sample.jpg")] }
+  let(:files) { [rails_sample] }
   let(:design_repository) { EE::Gitlab::GlRepository::DESIGN.repository_accessor.call(project) }
   let(:design_collection) { DesignManagement::DesignCollection.new(issue) }
+  let(:rails_sample_name) { 'rails_sample.jpg' }
+  let(:rails_sample) { sample_image(rails_sample_name) }
+  let(:dk_png) { sample_image('dk.png') }
+
+  def sample_image(filename)
+    fixture_file_upload("spec/fixtures/#{filename}")
+  end
 
   subject(:service) { described_class.new(project, user, issue: issue, files: files) }
 
@@ -50,6 +57,11 @@ describe DesignManagement::SaveDesignsService do
           expect { service.execute }.to change { repository_exists.call }.from(false).to(true)
         end
 
+        it "updates the creation count" do
+          counter = EE::Gitlab::UsageCounters::DesignsCounter
+          expect { service.execute }.to change { counter.read(:create) }.by(1)
+        end
+
         it "creates a nice commit in the repository" do
           service.execute
 
@@ -57,7 +69,7 @@ describe DesignManagement::SaveDesignsService do
 
           expect(commit).not_to be_nil
           expect(commit.author).to eq(user)
-          expect(commit.message).to include("rails_sample.jpg")
+          expect(commit.message).to include(rails_sample_name)
         end
 
         it "creates a design & a version for the filename if it did not exist" do
@@ -104,7 +116,7 @@ describe DesignManagement::SaveDesignsService do
         context "when a design already exists" do
           before do
             # This makes sure the file is created in the repository.
-            # otherwise we"d have a database & repository that are not in sync.
+            # otherwise we'd have a database & repository that are not in sync.
             service.execute
           end
 
@@ -118,11 +130,16 @@ describe DesignManagement::SaveDesignsService do
             expect(updated_designs.first.versions.size).to eq(2)
           end
 
+          it 'increments the update counter' do
+            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            expect { service.execute }.to change { counter.read(:update) }.by 1
+          end
+
           context "when uploading a new design" do
             it "does not link the new version to the existing design" do
               existing_design = issue.designs.first
 
-              updated_designs = described_class.new(project, user, issue: issue, files: [fixture_file_upload("spec/fixtures/dk.png")])
+              updated_designs = described_class.new(project, user, issue: issue, files: [dk_png])
                                   .execute[:designs]
 
               expect(existing_design.versions.reload.size).to eq(1)
@@ -132,13 +149,33 @@ describe DesignManagement::SaveDesignsService do
           end
         end
 
-        context "when uploading multiple files" do
-          let(:files) do
-            [
-              fixture_file_upload("spec/fixtures/rails_sample.jpg"),
-              fixture_file_upload("spec/fixtures/dk.png")
-            ]
+        context 'when doing a mixture of updates and creations' do
+          let(:files) { [rails_sample, dk_png] }
+
+          before do
+            # Create just the first one, which we will later update.
+            described_class.new(project, user, issue: issue, files: [files.first]).execute
           end
+
+          it 'counts one creation and one update' do
+            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            expect { service.execute }
+              .to change { counter.read(:create) }.by(1)
+              .and change { counter.read(:update) }.by(1)
+          end
+
+          it 'creates a single commit' do
+            commit_count = -> do
+              design_repository.expire_all_method_caches
+              design_repository.commit_count
+            end
+
+            expect { service.execute }.to change { commit_count.call }.by(1)
+          end
+        end
+
+        context "when uploading multiple files" do
+          let(:files) { [rails_sample, dk_png] }
 
           it 'returns information about both designs in the response' do
             expect(service.execute).to include(designs: have_attributes(size: 2), status: :success)
@@ -147,6 +184,11 @@ describe DesignManagement::SaveDesignsService do
           it "creates 2 designs with a single version" do
             expect { service.execute }.to change { issue.designs.count }.from(0).to(2)
             expect(DesignManagement::Version.for_designs(issue.designs).size).to eq(1)
+          end
+
+          it 'increments the creation count by 2' do
+            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            expect { service.execute }.to change { counter.read(:create) }.by 2
           end
 
           it "creates a single commit" do
@@ -169,7 +211,7 @@ describe DesignManagement::SaveDesignsService do
           end
 
           context "when uploading too many files" do
-            let(:files) { Array.new(DesignManagement::SaveDesignsService::MAX_FILES + 1) { fixture_file_upload("spec/fixtures/dk.png") } }
+            let(:files) { Array.new(DesignManagement::SaveDesignsService::MAX_FILES + 1) { dk_png } }
 
             it "returns the correct error" do
               expect(service.execute[:message]).to match(/only \d+ files are allowed simultaneously/i)
@@ -200,8 +242,9 @@ describe DesignManagement::SaveDesignsService do
         end
 
         context "when a design already existed in the repo but we didn't know about it in the database" do
+          let(:filename) { rails_sample_name }
           before do
-            path = File.join(build(:design, issue: issue, filename: "rails_sample.jpg").full_path)
+            path = File.join(build(:design, issue: issue, filename: filename).full_path)
             design_repository.create_if_not_exists
             design_repository.create_file(user, path, "something fake",
                                           branch_name: "master",
@@ -211,7 +254,7 @@ describe DesignManagement::SaveDesignsService do
           it "creates the design and a new version for it" do
             first_updated_design = service.execute[:designs].first
 
-            expect(first_updated_design.filename).to eq("rails_sample.jpg")
+            expect(first_updated_design.filename).to eq(filename)
             expect(first_updated_design.versions.size).to eq(1)
           end
         end

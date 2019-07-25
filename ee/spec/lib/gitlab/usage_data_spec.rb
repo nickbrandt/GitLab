@@ -55,6 +55,12 @@ describe Gitlab::UsageData do
       ))
     end
 
+    it do
+      is_expected.to include(design_management_designs_create: a_kind_of(Integer),
+                             design_management_designs_update: a_kind_of(Integer),
+                             design_management_designs_delete: a_kind_of(Integer))
+    end
+
     it 'gathers usage counts' do
       expect(count_data[:boards]).to eq(1)
       expect(count_data[:projects]).to eq(3)
