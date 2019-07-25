@@ -213,6 +213,36 @@ describe API::Unleash do
         strategies = json_response['features'].first['strategies']
         expect(strategies).to eq([{ "name" => "default", "parameters" => {} }])
       end
+
+      it 'returns multiple strategies for a feature flag' do
+        client = create(:operations_feature_flags_client, project: project)
+        feature_flag = create(:operations_feature_flag, project: project, name: 'feature1', active: true)
+        create(:operations_feature_flag_scope,
+               feature_flag: feature_flag,
+               environment_scope: 'staging',
+               active: true,
+               strategies: [{ name: "userWithId", parameters: { userIds: "max,fred" } },
+                            { name: "gradualRolloutUserId",
+                              parameters: { groupId: "default", percentage: "50" } }])
+        headers = { "UNLEASH-INSTANCEID" => client.token, "UNLEASH-APPNAME" => "staging" }
+
+        get api(features_url), headers: headers
+
+        expect(response).to have_gitlab_http_status(:ok)
+        strategies = json_response['features'].first['strategies'].sort_by { |s| s['name'] }
+        expect(strategies).to eq([{
+          "name" => "gradualRolloutUserId",
+          "parameters" => {
+            "percentage" => "50",
+            "groupId" => "default"
+          }
+        }, {
+          "name" => "userWithId",
+          "parameters" => {
+            "userIds" => "max,fred"
+          }
+        }])
+      end
     end
   end
 

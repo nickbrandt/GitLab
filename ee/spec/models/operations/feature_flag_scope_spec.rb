@@ -87,8 +87,9 @@ describe Operations::FeatureFlagScope do
         using RSpec::Parameterized::TableSyntax
 
         where(:name, :params, :expected) do
-          'default' | {} | []
+          'default'              | {}                                       | []
           'gradualRolloutUserId' | { groupId: 'mygroup', percentage: '50' } | []
+          'userWithId'           | { userIds: 'sam' }                       | []
           5                      | nil                                      | ['strategy name is invalid']
           nil                    | nil                                      | ['strategy name is invalid']
           "nothing"              | nil                                      | ['strategy name is invalid']
@@ -98,7 +99,7 @@ describe Operations::FeatureFlagScope do
           []                     | nil                                      | ['strategy name is invalid']
         end
         with_them do
-          it 'must be one of "default" or "gradualRolloutUserId"' do
+          it 'must be one of "default", "gradualRolloutUserId", or "userWithId"' do
             feature_flag = create(:operations_feature_flag)
             scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: name, parameters: params }])
 
@@ -109,6 +110,38 @@ describe Operations::FeatureFlagScope do
 
       describe 'parameters' do
         context 'when the strategy name is gradualRolloutUserId' do
+          it 'must have parameters' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag,
+                                           strategies: [{ name: 'gradualRolloutUserId' }])
+
+            expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
+          end
+
+          where(:invalid_parameters) do
+            [nil, {}, { percentage: '40', groupId: 'mygroup', userIds: '4' }, { percentage: '40' },
+             { percentage: '40', groupId: 'mygroup', extra: nil }, { groupId: 'mygroup' }]
+          end
+          with_them do
+            it 'must have valid parameters for the strategy' do
+              feature_flag = create(:operations_feature_flag)
+              scope = described_class.create(feature_flag: feature_flag,
+                                             strategies: [{ name: 'gradualRolloutUserId',
+                                                            parameters: invalid_parameters }])
+
+              expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
+            end
+          end
+
+          it 'allows the parameters in any order' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag,
+                                           strategies: [{ name: 'gradualRolloutUserId',
+                                                          parameters: { percentage: '10', groupId: 'mygroup' } }])
+
+            expect(scope.errors[:strategies]).to be_empty
+          end
+
           describe 'percentage' do
             where(:invalid_value) do
               [50, 40.0, { key: "value" }, "garbage", "00", "01", "101", "-1", "-10", "0100",
@@ -163,25 +196,83 @@ describe Operations::FeatureFlagScope do
             with_them do
               it 'must be a string value of up to 32 lowercase characters' do
                 feature_flag = create(:operations_feature_flag)
-                scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'gradualRolloutUserId',
-                                                                                          parameters: { groupId: valid_value, percentage: '40' } }])
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'gradualRolloutUserId',
+                                                              parameters: { groupId: valid_value, percentage: '40' } }])
 
                 expect(scope.errors[:strategies]).to eq([])
               end
             end
           end
+        end
 
+        context 'when the strategy name is userWithId' do
           it 'must have parameters' do
             feature_flag = create(:operations_feature_flag)
-            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'gradualRolloutUserId' }])
-            expect(scope.errors[:strategies]).to include('groupId parameter is invalid')
-            expect(scope.errors[:strategies]).to include('percentage must be a string between 0 and 100 inclusive')
+            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'userWithId' }])
+
+            expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
+          end
+
+          where(:invalid_parameters) do
+            [nil, { userIds: 'sam', percentage: '40' }, { userIds: 'sam', some: 'param' }, { percentage: '40' }, {}]
+          end
+          with_them do
+            it 'must have valid parameters for the strategy' do
+              feature_flag = create(:operations_feature_flag)
+              scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'userWithId',
+                                                                                        parameters: invalid_parameters }])
+
+              expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
+            end
+          end
+
+          describe 'userIds' do
+            where(:valid_value) do
+              ["", "sam", "1", "a", "uuid-of-some-kind", "sam,fred,tom,jane,joe,mike",
+               "gitlab@example.com", "123,4", "UPPER,Case,charActeRS", "0",
+               "$valid$email#2345#$%..{}+=-)?\\/@example.com", "spaces allowed",
+               "a" * 256, "a,#{'b' * 256},ccc", "many    spaces"]
+            end
+            with_them do
+              it 'is valid with a string of comma separated values' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'userWithId', parameters: { userIds: valid_value } }])
+
+                expect(scope.errors[:strategies]).to be_empty
+              end
+            end
+
+            where(:invalid_value) do
+              [1, 2.5, {}, [], nil, "123\n456", "1,2,3,12\t3", "\n", "\n\r",
+               "joe\r,sam", "1,2,2", "1,,2", "1,2,,,,", "b" * 257, "1, ,2", "tim,    ,7", " ",
+               "    ", " ,1", "1,  ", " leading,1", "1,trailing  ", "1, both ,2"]
+            end
+            with_them do
+              it 'is invalid' do
+                feature_flag = create(:operations_feature_flag)
+                scope = described_class.create(feature_flag: feature_flag,
+                                               strategies: [{ name: 'userWithId', parameters: { userIds: invalid_value } }])
+
+                expect(scope.errors[:strategies]).to include(
+                  'userIds must be a string of unique comma separated values each 256 characters or less'
+                )
+              end
+            end
           end
         end
 
         context 'when the strategy name is default' do
+          it 'must have parameters' do
+            feature_flag = create(:operations_feature_flag)
+            scope = described_class.create(feature_flag: feature_flag, strategies: [{ name: 'default' }])
+
+            expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
+          end
+
           where(:invalid_value) do
-            [{ groupId: "hi", percentage: "7" }, "", "nothing", 7, nil]
+            [{ groupId: "hi", percentage: "7" }, "", "nothing", 7, nil, [], 2.5]
           end
           with_them do
             it 'must be empty' do
@@ -190,7 +281,7 @@ describe Operations::FeatureFlagScope do
                                              strategies: [{ name: 'default',
                                                             parameters: invalid_value }])
 
-              expect(scope.errors[:strategies]).to eq(['parameters must be empty for default strategy'])
+              expect(scope.errors[:strategies]).to eq(['parameters are invalid'])
             end
           end
 
@@ -200,7 +291,7 @@ describe Operations::FeatureFlagScope do
                                            strategies: [{ name: 'default',
                                                           parameters: {} }])
 
-            expect(scope.errors[:strategies]).to eq([])
+            expect(scope.errors[:strategies]).to be_empty
           end
         end
       end
