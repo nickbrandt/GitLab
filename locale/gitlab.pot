@@ -176,9 +176,6 @@ msgstr ""
 msgid "%{authorsName}'s thread"
 msgstr ""
 
-msgid "%{canMergeCount}/%{assigneesCount} can merge"
-msgstr ""
-
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -281,6 +278,9 @@ msgstr ""
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
+msgid "%{mergeLength}/%{usersLength} can merge"
+msgstr ""
+
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
@@ -367,6 +367,9 @@ msgstr ""
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
+msgid "%{userName} (cannot merge)"
+msgstr ""
+
 msgid "%{userName}'s avatar"
 msgstr ""
 
@@ -406,6 +409,9 @@ msgid "(check progress)"
 msgstr ""
 
 msgid "(external source)"
+msgstr ""
+
+msgid "+ %{amount} more"
 msgstr ""
 
 msgid "+ %{count} more"
@@ -9986,9 +9992,6 @@ msgstr ""
 msgid "No milestones to show"
 msgstr ""
 
-msgid "No one can merge"
-msgstr ""
-
 msgid "No other labels with such name or description"
 msgstr ""
 
@@ -17689,6 +17692,9 @@ msgstr ""
 msgid "cannot itself be blocked"
 msgstr ""
 
+msgid "cannot merge"
+msgstr ""
+
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
 msgstr ""
 
@@ -18513,6 +18519,9 @@ msgid "new merge request"
 msgstr ""
 
 msgid "no contributions"
+msgstr ""
+
+msgid "no one can merge"
 msgstr ""
 
 msgid "none"
