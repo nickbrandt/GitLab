@@ -82,7 +82,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('renders error state', () => {
-      expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+      expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning failed loading any results',
       );
@@ -136,7 +136,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('renders loading summary text + spinner', () => {
-      expect(vm.$el.querySelector('.spinner')).not.toBeNull();
+      expect(vm.$el.querySelector('.gl-spinner')).not.toBeNull();
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning is loading',
       );
@@ -197,7 +197,7 @@ describe('Grouped security reports app', () => {
 
     it('renders reports', () => {
       // It's not loading
-      expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+      expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
 
       // Renders the summary text
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(

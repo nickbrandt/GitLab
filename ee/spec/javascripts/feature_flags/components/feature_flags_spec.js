@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { trimText } from 'spec/helpers/text_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { getRequestData } from '../mock_data';
 
@@ -244,7 +245,7 @@ describe('Feature Flags', () => {
     });
 
     it('should render error state', () => {
-      expect(component.$el.querySelector('.empty-state').textContent.trim()).toContain(
+      expect(trimText(component.$el.querySelector('.empty-state').textContent)).toContain(
         'There was an error fetching the feature flags. Try again in a few moments or contact your support team.',
       );
     });
