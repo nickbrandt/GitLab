@@ -30,7 +30,7 @@ rake gitlab:ldap:check[50]
 
 ## Run a Group Sync
 
-The following task will run a [group sync](../auth/ldap-ee.md) immediately. This is valuable
+The following task will run a [group sync](../auth/ldap-ee.md#group-sync) immediately. This is valuable
 when you'd like to update all the group memberships against LDAP without
 waiting for the next scheduled group sync to be run.
 
