@@ -40,7 +40,7 @@ module Projects
       end
 
       def pipeline
-        @pipeline ||= project.all_pipelines.latest_successful_for(project.default_branch)
+        @pipeline ||= project.all_pipelines.latest_successful_for_ref(project.default_branch)
       end
 
       def query_params
