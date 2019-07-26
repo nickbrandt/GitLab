@@ -34,6 +34,12 @@ module EE
           params.delete(:shared_runners_minutes_limit)
           params.delete(:extra_shared_runners_minutes_limit)
         end
+
+        insight_project_id = params.dig(:insight_attributes, :project_id)
+        if insight_project_id
+          group_projects = GroupProjectsFinder.new(group: group, current_user: current_user, options: { only_owned: true, include_subgroups: true }).execute
+          params.delete(:insight_attributes) unless group_projects.exists?(insight_project_id) # rubocop:disable CodeReuse/ActiveRecord
+        end
       end
 
       def changes_file_template_project_id?

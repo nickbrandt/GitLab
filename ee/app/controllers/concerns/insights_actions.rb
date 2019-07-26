@@ -44,7 +44,7 @@ module InsightsActions
   end
 
   def query_param
-    @query_param ||= params[:query]
+    @query_param ||= params[:query] || {}
   end
 
   def period_param
