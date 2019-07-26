@@ -8,6 +8,12 @@ module API
 
     helpers ::API::Helpers::PackagesHelpers
 
+    helpers do
+      def jwt_secret
+        ::Settings.attr_encrypted_db_key_base_32
+      end
+    end
+
     namespace 'packages/conan/v1/users/' do
       format :txt
 
@@ -21,7 +27,10 @@ module API
 
         authenticate!
 
-        token
+        jwt = JSONWebToken::HMACToken.new(jwt_secret)
+        jwt['pat'] = access_token.id
+        jwt.expire_time = jwt.issued_at + 1.hour
+        jwt.encoded
       end
     end
 
@@ -32,10 +41,13 @@ module API
 
       helpers do
         def require_conan_authentication!
-          token = headers['Authorization'].to_s.split('Bearer ', 2).second
-          request.env['HTTP_PRIVATE_TOKEN'] = token
+          jwt = headers['Authorization'].to_s.split('Bearer ', 2).second
+          payload = JSONWebToken::HMACToken.decode(jwt, jwt_secret).first
+          @access_token = PersonalAccessToken.find_by_id(payload['pat'])
 
           authenticate!
+        rescue JWT::DecodeError
+          unauthorized!
         end
       end
 
