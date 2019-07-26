@@ -30,7 +30,7 @@ describe('GroupsDropdownFilter component', () => {
     const $el = $('<a></a>').data(group);
     const e = new Event('click');
 
-    it('should emit the "setSelectedGroup" event', () => {
+    it('should emit the "selected" event', () => {
       jest.spyOn(vm, '$emit');
 
       vm.onClick({ $el, e });

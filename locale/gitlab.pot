@@ -4180,6 +4180,11 @@ msgstr ""
 msgid "CycleAnalyticsStage|Test"
 msgstr ""
 
+msgid "CycleAnalytics|%{projectName}"
+msgid_plural "CycleAnalytics|%d projects selected"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "DNS"
 msgstr ""
 
@@ -12453,6 +12458,9 @@ msgid "Select project and zone to choose machine type"
 msgstr ""
 
 msgid "Select project to choose zone"
+msgstr ""
+
+msgid "Select projects"
 msgstr ""
 
 msgid "Select projects you want to import."

@@ -1,5 +1,5 @@
 <script>
-import { __ } from '~/locale';
+import { sprintf, n__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -18,16 +18,33 @@ export default {
       type: Number,
       required: true,
     },
+    multiSelect: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       loading: true,
-      selectedProject: {},
+      selectedProjects: [],
     };
   },
   computed: {
-    selectedProjectName() {
-      return this.selectedProject.name || __('Select a project');
+    selectedProjectsLabel() {
+      return this.selectedProjects.length
+        ? sprintf(
+            n__(
+              'CycleAnalytics|%{projectName}',
+              'CycleAnalytics|%d projects selected',
+              this.selectedProjects.length,
+            ),
+            { projectName: this.selectedProjects[0].name },
+          )
+        : this.selectedProjectsPlaceholder;
+    },
+    selectedProjectsPlaceholder() {
+      return this.multiSelect ? __('Select projects') : __('Select a project');
     },
   },
   mounted() {
@@ -36,24 +53,31 @@ export default {
       filterable: true,
       filterRemote: true,
       fieldName: 'project_id',
+      multiSelect: this.multiSelect,
       search: {
         fields: ['name'],
       },
-      clicked: this.onClick,
-      data: this.fetchData,
+      clicked: this.onClick.bind(this),
+      data: this.fetchData.bind(this),
       renderRow: group => this.rowTemplate(group),
       text: project => project.name,
     });
   },
   methods: {
-    onClick({ $el, e }) {
+    getSelectedProjects(selectedProject, isMarking) {
+      return isMarking
+        ? this.selectedProjects.concat([selectedProject])
+        : this.selectedProjects.filter(project => project.id !== selectedProject.id);
+    },
+    setSelectedProjects(selectedObj, isMarking) {
+      this.selectedProjects = this.multiSelect
+        ? this.getSelectedProjects(selectedObj, isMarking)
+        : [selectedObj];
+    },
+    onClick({ selectedObj, e, isMarking }) {
       e.preventDefault();
-      this.selectedProject = {
-        id: $el.data('id'),
-        name: $el.data('name'),
-        path: $el.data('path'),
-      };
-      this.$emit('selected', this.selectedProject);
+      this.setSelectedProjects(selectedObj, isMarking);
+      this.$emit('selected', this.selectedProjects);
     },
     fetchData(term, callback) {
       this.loading = true;
@@ -65,9 +89,7 @@ export default {
     rowTemplate(project) {
       return `
           <li>
-            <a href='#' class='dropdown-menu-link' data-id="${project.id}" data-name="${
-        project.name
-      }" data-path="${project.path_with_namespace}">
+            <a href='#' class='dropdown-menu-link'>
               ${_.escape(project.name)}
             </a>
           </li>
@@ -86,7 +108,8 @@ export default {
         data-toggle="dropdown"
         aria-expanded="false"
       >
-        {{ selectedProjectName }} <icon name="chevron-down" />
+        {{ selectedProjectsLabel }}
+        <icon name="chevron-down" />
       </gl-button>
       <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
         <div class="dropdown-title">{{ __('Projects') }}</div>
@@ -95,7 +118,7 @@ export default {
           <icon name="search" class="dropdown-input-search" data-hidden="true" />
         </div>
         <div class="dropdown-content"></div>
-        <div class="dropdown-loading"><gl-loading-icon /></div>
+        <gl-loading-icon class="dropdown-loading" />
       </div>
     </div>
   </div>
