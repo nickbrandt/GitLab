@@ -10,7 +10,7 @@ namespace :gitlab do
           EE::Gitlab::Auth::LDAP::Sync::Groups.execute
           $stdout.puts 'Finished GroupSync.'
         rescue => exception
-          $stderr.puts "The GroupSync failed with the following error: #{exception}"
+          warn "The GroupSync failed with the following error: #{exception}"
         end
 
       else
