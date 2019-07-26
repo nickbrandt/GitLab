@@ -7,6 +7,7 @@
 - sast_container_endpoint = pipeline.downloadable_path_for_report_type(:container_scanning)
 - blob_path = project_blob_path(project, pipeline.sha)
 - license_management_settings_path = can?(current_user, :admin_software_license_policy, project) ? license_management_settings_path(project) : nil
+- licenses_api_path = licenses_project_pipeline_path(project, pipeline) if project.feature_available?(:license_management)
 
 - if pipeline.expose_security_dashboard?
   #js-tab-security.build-security.tab-pane
@@ -32,4 +33,5 @@
     #js-licenses-app{ data: { license_head_path: pipeline.downloadable_path_for_report_type(:license_management),
     api_url: license_management_api_url(project),
     license_management_settings_path: license_management_settings_path,
+    licenses_api_path: licenses_api_path,
     can_manage_licenses: can?(current_user, :admin_software_license_policy, project).to_s } }

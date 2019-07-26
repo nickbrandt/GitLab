@@ -19,7 +19,6 @@ describe Projects::PipelinesController do
     set(:source_of_source_pipeline) { create_pipeline(source_project) }
     set(:target_pipeline) { create_pipeline(target_project) }
     set(:target_of_target_pipeline) { create_pipeline(target_project) }
-
     before do
       create_link(source_of_source_pipeline, source_pipeline)
       create_link(source_pipeline, root_pipeline)
@@ -253,6 +252,10 @@ describe Projects::PipelinesController do
   end
 
   describe 'GET licenses' do
+    let(:licenses_with_html) {get :licenses, format: :html, params: { namespace_id: project.namespace, project_id: project, id: pipeline }}
+    let(:licenses_with_json) {get :licenses, format: :json, params: { namespace_id: project.namespace, project_id: project, id: pipeline }}
+    let(:payload) { JSON.parse(licenses_with_json.body) }
+
     context 'with a license management artifact' do
       before do
         build = create(:ci_build, pipeline: pipeline)
@@ -262,8 +265,7 @@ describe Projects::PipelinesController do
       context 'with feature enabled' do
         before do
           stub_licensed_features(license_management: true)
-
-          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
+          licenses_with_html
         end
 
         it do
@@ -272,13 +274,34 @@ describe Projects::PipelinesController do
         end
       end
 
+      context 'with feature enabled json' do
+        before do
+          stub_licensed_features(license_management: true)
+        end
+
+        it 'will return license management report in json format' do
+          expect(payload.size).to eq(pipeline.license_management_report.licenses.size)
+          expect(payload.first.keys).to eq(%w(name dependencies count))
+        end
+      end
+
       context 'with feature disabled' do
         before do
-          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
+          licenses_with_html
         end
 
         it do
           expect(response).to redirect_to(pipeline_path(pipeline))
+        end
+      end
+
+      context 'with feature disabled json' do
+        before do
+          licenses_with_json
+        end
+
+        it 'will not return report' do
+          expect(response).to have_gitlab_http_status(404)
         end
       end
     end
@@ -287,8 +310,7 @@ describe Projects::PipelinesController do
       context 'with feature enabled' do
         before do
           stub_licensed_features(license_management: true)
-
-          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
+          licenses_with_html
         end
 
         it do
@@ -296,13 +318,34 @@ describe Projects::PipelinesController do
         end
       end
 
+      context 'with feature enabled json' do
+        before do
+          stub_licensed_features(license_management: true)
+          licenses_with_json
+        end
+
+        it 'will return 404'  do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
       context 'with feature disabled' do
         before do
-          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
+          licenses_with_html
         end
 
         it do
           expect(response).to redirect_to(pipeline_path(pipeline))
+        end
+      end
+
+      context 'with feature disabled json' do
+        before do
+          licenses_with_json
+        end
+
+        it 'will return 404' do
+          expect(response).to have_gitlab_http_status(404)
         end
       end
     end
