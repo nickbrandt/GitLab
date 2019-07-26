@@ -1,0 +1,5 @@
+---
+title: Add a rake task to run a LDAP group sync
+merge_request: 14735
+author: Harish Ramachandran and Cindy Pallares
+type: added
