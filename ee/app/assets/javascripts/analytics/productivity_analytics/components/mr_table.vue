@@ -1,0 +1,80 @@
+<script>
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import MergeRequestTableRow from './mr_table_row.vue';
+
+export default {
+  components: {
+    GlDropdown,
+    GlDropdownItem,
+    MergeRequestTableRow,
+  },
+  props: {
+    mergeRequests: {
+      type: Array,
+      required: true,
+    },
+    columnOptions: {
+      type: Object,
+      required: true,
+    },
+    metricType: {
+      type: String,
+      required: true,
+    },
+    metricLabel: {
+      type: String,
+      required: true,
+    },
+  },
+  computed: {
+    metricDropdownLabel() {
+      return this.columnOptions[this.metricType];
+    },
+  },
+};
+</script>
+
+<template>
+  <div class="mr-table">
+    <div class="card">
+      <div class="card-header border-bottom-0">
+        <div role="row" class="gl-responsive-table-row table-row-header d-flex py-0">
+          <div role="rowheader" class="table-section section-50 d-none d-md-flex">
+            {{ __('Title') }}
+          </div>
+          <div role="rowheader" class="table-section section-50">
+            <div class="d-flex">
+              <span class="d-none d-md-flex metric-col">{{ __('Time to merge') }}</span>
+
+              <gl-dropdown
+                class="w-100 metric-col"
+                toggle-class="dropdown-menu-toggle w-100"
+                menu-class="w-100 mw-100"
+                :text="metricDropdownLabel"
+              >
+                <gl-dropdown-item
+                  v-for="(value, key) in columnOptions"
+                  :key="key"
+                  active-class="is-active"
+                  class="w-100"
+                  @click="$emit('columnMetricChange', key)"
+                >
+                  {{ value }}
+                </gl-dropdown-item>
+              </gl-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body py-0">
+        <merge-request-table-row
+          v-for="model in mergeRequests"
+          :key="model.id"
+          :merge-request="model"
+          :metric-type="metricType"
+          :metric-label="metricLabel"
+        />
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MergeRequestTable component matches the snapshot 1`] = `
+<div
+  class="mr-table"
+>
+  <div
+    class="card"
+  >
+    <div
+      class="card-header border-bottom-0"
+    >
+      <div
+        class="gl-responsive-table-row table-row-header d-flex py-0"
+        role="row"
+      >
+        <div
+          class="table-section section-50 d-none d-md-flex"
+          role="rowheader"
+        >
+          
+          Title
+        
+        </div>
+         
+        <div
+          class="table-section section-50"
+          role="rowheader"
+        >
+          <div
+            class="d-flex"
+          >
+            <span
+              class="d-none d-md-flex metric-col"
+            >
+              Time to merge
+            </span>
+             
+            <gldropdown-stub
+              class="w-100 metric-col"
+              menu-class="w-100 mw-100"
+              text="Time from first comment to last commit"
+              toggle-class="dropdown-menu-toggle w-100"
+            >
+              <gldropdownitem-stub
+                active-class="is-active"
+                class="w-100"
+              >
+                
+                Time from first commit until first comment
+              
+              </gldropdownitem-stub>
+              <gldropdownitem-stub
+                active-class="is-active"
+                class="w-100"
+              >
+                
+                Time from first comment to last commit
+              
+              </gldropdownitem-stub>
+              <gldropdownitem-stub
+                active-class="is-active"
+                class="w-100"
+              >
+                
+                Time from last commit to merge
+              
+              </gldropdownitem-stub>
+            </gldropdown-stub>
+          </div>
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="card-body py-0"
+    >
+      <mergerequesttablerow-stub
+        mergerequest="[object Object]"
+        metriclabel="Time from first comment to last commit"
+        metrictype="time_to_last_commit"
+      />
+      <mergerequesttablerow-stub
+        mergerequest="[object Object]"
+        metriclabel="Time from first comment to last commit"
+        metrictype="time_to_last_commit"
+      />
+    </div>
+  </div>
+</div>
+`;

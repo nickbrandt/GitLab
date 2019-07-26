@@ -179,12 +179,18 @@ msgstr ""
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
+msgid "%{count} LOC/commit"
+msgstr ""
+
 msgid "%{count} approval required from %{name}"
 msgid_plural "%{count} approvals required from %{name}"
 msgstr[0] ""
 msgstr[1] ""
 
 msgid "%{count} approvals from %{name}"
+msgstr ""
+
+msgid "%{count} files touched"
 msgstr ""
 
 msgid "%{count} more"
@@ -14521,6 +14527,9 @@ msgid "Time remaining"
 msgstr ""
 
 msgid "Time spent"
+msgstr ""
+
+msgid "Time to merge"
 msgstr ""
 
 msgid "Time tracking"
