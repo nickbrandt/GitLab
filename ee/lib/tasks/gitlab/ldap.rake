@@ -2,7 +2,7 @@ namespace :gitlab do
   namespace :ldap do
     desc 'GitLab | LDAP | Run a GroupSync'
     task group_sync: :gitlab_environment do
-      if !Gitlab::Auth::LDAP::Config.group_sync_enabled?
+      unless Gitlab::Auth::LDAP::Config.group_sync_enabled?
         $stdout.puts 'LDAP GroupSync is not enabled.'
         exit 1
       end
