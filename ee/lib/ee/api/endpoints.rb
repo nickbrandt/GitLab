@@ -41,7 +41,9 @@ module EE
           # they're not deprecated neither should be removed when V3 get
           # removed.  They're needed as a layer to integrate with Jira
           # Development Panel.
-          mount ::API::V3::Github
+          namespace '/', requirements: ::API::V3::Github::ENDPOINT_REQUIREMENTS do
+            mount ::API::V3::Github
+          end
         end
       end
     end
