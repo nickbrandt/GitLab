@@ -86,7 +86,7 @@ describe Ci::RegisterJobService do
         end
       end
 
-      context 'when group is subgroup', :nested_groups do
+      context 'when group is subgroup' do
         let!(:root_ancestor) { create(:group) }
         let!(:group) { create(:group, parent: root_ancestor) }
         let!(:project) { create :project, shared_runners_enabled: true, group: group }

@@ -158,7 +158,7 @@ describe 'Billing plan pages', :feature do
     end
   end
 
-  context 'on sub-group', :nested_groups do
+  context 'on sub-group' do
     let(:user2) { create(:user) }
     let(:user3) { create(:user) }
     let(:group) { create(:group, plan: :bronze_plan) }

@@ -96,7 +96,7 @@ describe Groups::SamlProvidersController do
         expect(assigns(:scim_token_url)).to eq("http://localhost/api/scim/v2/groups/#{group.full_path}")
       end
 
-      context 'not on a top level group', :nested_groups do
+      context 'not on a top level group' do
         let(:group) { create(:group, :nested) }
 
         it_behaves_like '404 status'

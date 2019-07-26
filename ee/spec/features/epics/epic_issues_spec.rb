@@ -55,7 +55,7 @@ describe 'Epic Issues', :js do
       expect(page).not_to have_selector('.related-items-tree-container .js-add-issues-button')
     end
 
-    it 'user cannot add new epics to the epic', :postgresql do
+    it 'user cannot add new epics to the epic' do
       expect(page).not_to have_selector('.related-items-tree-container .js-add-epics-button')
     end
   end
@@ -109,7 +109,7 @@ describe 'Epic Issues', :js do
       end
     end
 
-    it 'user can see all epics of the group and delete the associations', :postgresql do
+    it 'user can see all epics of the group and delete the associations' do
       within('.related-items-tree-container ul.related-items-list') do
         expect(page).to have_selector('li.js-item-type-epic', count: 2)
         expect(page).to have_content(nested_epics[0].title)
@@ -146,7 +146,7 @@ describe 'Epic Issues', :js do
       end
     end
 
-    it 'user can add new epics to the epic', :postgresql do
+    it 'user can add new epics to the epic' do
       references = "#{epic_to_add.to_reference(full: true)}"
       add_epics(references)
 

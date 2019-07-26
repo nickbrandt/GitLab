@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe Admin::Geo::NodesController, :postgresql do
+describe Admin::Geo::NodesController do
   shared_examples 'unlicensed geo action' do
     it 'redirects to the license page' do
       expect(response).to redirect_to(admin_license_path)

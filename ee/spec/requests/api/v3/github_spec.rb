@@ -308,7 +308,7 @@ describe API::V3::Github do
       end
     end
 
-    context 'nested group namespace', :nested_groups do
+    context 'nested group namespace' do
       let(:group) { create(:group, :nested) }
       let!(:parent_group_project) { create(:project, group: group.parent, name: 'parent_group_project') }
       let!(:child_group_project) { create(:project, group: group, name: 'child_group_project') }

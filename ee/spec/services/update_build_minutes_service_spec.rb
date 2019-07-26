@@ -43,7 +43,7 @@ describe UpdateBuildMinutesService do
         end
       end
 
-      context 'when namespace is subgroup', :nested_groups do
+      context 'when namespace is subgroup' do
         let(:root_ancestor) { create(:group, shared_runners_minutes_limit: 100) }
         let(:namespace) { create(:namespace, parent: root_ancestor) }
 

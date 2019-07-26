@@ -598,7 +598,7 @@ describe Project do
 
     subject { project.root_namespace }
 
-    context 'when namespace has parent group', :nested_groups do
+    context 'when namespace has parent group' do
       let(:root_ancestor) { create(:group) }
       let(:parent) { create(:group, parent: root_ancestor) }
 
@@ -616,7 +616,7 @@ describe Project do
     end
   end
 
-  describe '#shared_runners_limit_namespace', :nested_groups do
+  describe '#shared_runners_limit_namespace' do
     set(:root_ancestor) { create(:group) }
     set(:group) { create(:group, parent: root_ancestor) }
     let(:project) { create(:project, namespace: group) }

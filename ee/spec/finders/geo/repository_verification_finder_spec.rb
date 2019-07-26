@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositoryVerificationFinder, :postgresql do
+describe Geo::RepositoryVerificationFinder do
   set(:project) { create(:project) }
 
   describe '#find_failed_repositories' do

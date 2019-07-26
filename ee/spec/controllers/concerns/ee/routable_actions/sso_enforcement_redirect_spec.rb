@@ -93,7 +93,7 @@ describe EE::RoutableActions::SsoEnforcementRedirect do
       it_behaves_like 'a routable SSO url'
     end
 
-    context 'with a nested group', :nested_groups do
+    context 'with a nested group' do
       subject { described_class.new(nested_group) }
 
       it_behaves_like 'a routable SSO url'
@@ -105,7 +105,7 @@ describe EE::RoutableActions::SsoEnforcementRedirect do
       it_behaves_like 'a routable SSO url'
     end
 
-    context 'with a nested project', :nested_groups do
+    context 'with a nested project' do
       subject { described_class.new(nested_project) }
 
       it_behaves_like 'a routable SSO url'

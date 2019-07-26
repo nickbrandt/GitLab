@@ -48,7 +48,7 @@ describe ClearSharedRunnersMinutesWorker do
       end
     end
 
-    context 'when namespace has extra shared runner minutes', :postgresql do
+    context 'when namespace has extra shared runner minutes' do
       let!(:namespace) do
         create(:namespace, shared_runners_minutes_limit: 100, extra_shared_runners_minutes_limit: 10 )
       end

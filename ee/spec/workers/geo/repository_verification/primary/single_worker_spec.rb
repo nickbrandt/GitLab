@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositoryVerification::Primary::SingleWorker, :postgresql, :clean_gitlab_redis_cache do
+describe Geo::RepositoryVerification::Primary::SingleWorker, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

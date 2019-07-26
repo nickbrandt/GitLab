@@ -244,7 +244,7 @@ describe API::Geo do
     end
   end
 
-  describe 'POST /geo/status', :postgresql do
+  describe 'POST /geo/status' do
     let(:geo_base_request) { Gitlab::Geo::BaseRequest.new(scope: ::Gitlab::Geo::API_SCOPE) }
 
     let(:data) do

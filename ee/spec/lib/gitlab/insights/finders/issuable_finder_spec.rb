@@ -166,7 +166,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       end
     end
 
-    context 'for a group with subgroups', :nested_groups do
+    context 'for a group with subgroups' do
       include_examples 'group tests' do
         let(:project) { create(:project, :public, group: create(:group, parent: entity)) }
       end

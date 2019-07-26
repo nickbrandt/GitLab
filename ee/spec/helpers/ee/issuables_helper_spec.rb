@@ -35,8 +35,7 @@ describe IssuablesHelper do
         initialTitleText: epic.title,
         initialDescriptionHtml: '<p dir="auto">epic text</p>',
         initialDescriptionText: 'epic text',
-        initialTaskStatus: '0 of 0 tasks completed',
-        subepicsSupported: Gitlab::Database.postgresql?
+        initialTaskStatus: '0 of 0 tasks completed'
       }
       expect(helper.issuable_initial_data(epic)).to eq(expected_data)
     end

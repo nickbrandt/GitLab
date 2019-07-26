@@ -108,7 +108,7 @@ describe Groups::UpdateService, '#execute' do
         expect(group.errors[:file_template_project_id]).to include('is invalid')
       end
 
-      context 'in a subgroup', :nested_groups do
+      context 'in a subgroup' do
         let(:parent_group) { create(:group) }
         let(:hidden_project) { create(:project, :private, namespace: parent_group) }
         let(:group) { create(:group, parent: parent_group) }

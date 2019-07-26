@@ -118,7 +118,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when level is too deep', :nested_groups do
+      it 'returns false when level is too deep' do
         epic1 = create(:epic, group: group)
         epic2 = create(:epic, group: group, parent: epic1)
         epic3 = create(:epic, group: group, parent: epic2)
@@ -142,7 +142,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_truthy
       end
 
-      it 'returns false when total depth after adding would exceed limit', :nested_groups do
+      it 'returns false when total depth after adding would exceed limit' do
         child_epic2 = create(:epic, group: group, parent: child_epic1)
         child_epic3 = create(:epic, group: group, parent: child_epic2)
         child_epic4 = create(:epic, group: group, parent: child_epic3)
@@ -166,7 +166,7 @@ describe Epic do
         expect(epic.valid_parent?).to be_truthy
       end
 
-      it 'returns false when total depth after adding would exceed limit', :nested_groups do
+      it 'returns false when total depth after adding would exceed limit' do
         root_epic.update(parent: create(:epic, group: group))
         create(:epic, group: group, parent: child_epic1)
 
@@ -185,14 +185,14 @@ describe Epic do
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when child epic is parent of the given parent', :nested_groups do
+      it 'returns false when child epic is parent of the given parent' do
         epic1 = create(:epic, group: group, parent: epic)
         epic.parent = epic1
 
         expect(epic.valid_parent?).to be_falsey
       end
 
-      it 'returns false when child epic is an ancestor of the given parent', :nested_groups do
+      it 'returns false when child epic is an ancestor of the given parent' do
         epic1 = create(:epic, group: group, parent: epic)
         epic2 = create(:epic, group: group, parent: epic1)
         epic.parent = epic2
@@ -207,7 +207,7 @@ describe Epic do
     let(:epic2) { create(:epic, group: group, parent: epic1) }
     let(:epic3) { create(:epic, group: group, parent: epic2) }
 
-    describe '#ancestors', :nested_groups do
+    describe '#ancestors' do
       it 'returns all ancestors for an epic' do
         expect(epic3.ancestors).to eq [epic2, epic1]
       end
@@ -217,7 +217,7 @@ describe Epic do
       end
     end
 
-    describe '#descendants', :nested_groups do
+    describe '#descendants' do
       it 'returns all descendants for an epic' do
         expect(epic1.descendants).to match_array([epic2, epic3])
       end
@@ -576,7 +576,7 @@ describe Epic do
     end
   end
 
-  describe '.deepest_relationship_level', :postgresql do
+  describe '.deepest_relationship_level' do
     context 'when there are no epics' do
       it 'returns nil' do
         expect(described_class.deepest_relationship_level).to be_nil

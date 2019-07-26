@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe PgReplicationSlot, :postgresql do
+describe PgReplicationSlot do
   if Gitlab::Database.replication_slots_supported?
     describe 'with replication slot support' do
       it '#max_replication_slots' do
         expect(described_class.max_replication_slots).to be >= 0
       end
 
-      skip_examples = PgReplicationSlot.max_replication_slots <= PgReplicationSlot.count
+      skip_examples = described_class.max_replication_slots <= described_class.count
       context 'with enough slots available' do
         before(:all) do
           skip('max_replication_slots too small') if skip_examples
@@ -37,11 +37,11 @@ describe PgReplicationSlot, :postgresql do
         end
 
         it '#max_retained_wal' do
-          expect(PgReplicationSlot.max_retained_wal).not_to be_nil
+          expect(described_class.max_retained_wal).not_to be_nil
         end
 
         it '#slots_retained_bytes' do
-          slot = PgReplicationSlot.slots_retained_bytes.find {|x| x['slot_name'] == 'test_slot' }
+          slot = described_class.slots_retained_bytes.find {|x| x['slot_name'] == 'test_slot' }
 
           expect(slot).not_to be_nil
           expect(slot['retained_bytes']).to be_nil

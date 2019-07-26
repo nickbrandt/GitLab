@@ -91,7 +91,7 @@ describe GroupsController, type: :request do
         end
       end
 
-      context 'subgroup', :nested_groups do
+      context 'subgroup' do
         let(:group) { create(:group, :nested) }
 
         it 'does not create ip restriction' do

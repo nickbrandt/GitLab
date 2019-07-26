@@ -47,7 +47,7 @@ describe Groups::ParticipantsService do
     end
   end
 
-  describe '#group_members', :nested_groups do
+  describe '#group_members' do
     let(:parent_group) { create(:group) }
     let(:group) { create(:group, parent: parent_group) }
     let(:subgroup) { create(:group_with_members, parent: group) }

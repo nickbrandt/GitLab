@@ -348,7 +348,7 @@ describe GroupPolicy do
     end
   end
 
-  describe 'private nested group use the highest access level from the group and inherited permissions', :nested_groups do
+  describe 'private nested group use the highest access level from the group and inherited permissions' do
     let(:nested_group) { create(:group, :private, parent: group) }
 
     before do

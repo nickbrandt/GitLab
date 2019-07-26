@@ -177,7 +177,7 @@ describe 'New project' do
     end
   end
 
-  context 'Group-level project templates', :js, :postgresql do
+  context 'Group-level project templates', :js do
     def visit_create_from_group_template_tab
       visit url
       click_link 'Create from template'
