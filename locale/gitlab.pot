@@ -17575,9 +17575,6 @@ msgstr[1] ""
 msgid "project avatar"
 msgstr ""
 
-msgid "quick actions"
-msgstr ""
-
 msgid "register"
 msgstr ""
 
