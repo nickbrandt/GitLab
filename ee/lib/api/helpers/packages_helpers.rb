@@ -23,6 +23,12 @@ module API
       def authorize_destroy_package!
         authorize!(:destroy_package, user_project)
       end
+
+      def require_conan_authentication!
+        # TODO: implement Conan server authentication
+        # To be implemented in https://gitlab.com/gitlab-org/gitlab-ee/issues/12568
+        unauthorized!
+      end
     end
   end
 end
