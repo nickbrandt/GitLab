@@ -2,6 +2,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 12.1.2
 
+### Security (1 change)
+
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+
 ### Security (6 changes)
 
 - Don't override approval rules if not allowed.
