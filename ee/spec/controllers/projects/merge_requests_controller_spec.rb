@@ -190,6 +190,20 @@ describe Projects::MergeRequestsController do
 
           expect(merge_request.reload.approver_group_ids).to be_empty
         end
+
+        it 'does not create approval rules' do
+          update_merge_request(
+            approval_rules_attributes: [
+              {
+                name: 'Test',
+                user_ids: [new_approver.id],
+                approvals_required: 1
+              }
+            ]
+          )
+
+          expect(merge_request.reload.approval_rules).to be_empty
+        end
       end
     end
 
