@@ -10,32 +10,32 @@ module InsightsFeature
     feature_available?(:insights)
   end
 
-  def insights_config(follow_group: true)
-    case self
-    when Group
-      # When there's a config file, we use it regardless it's valid or not
-      if insight&.project&.project_insights_config_yaml
-        insight.project.insights_config(follow_group: false)
-      else # When there's nothing, then we use the default
-        default_insights_config
-      end
-    when Project
-      yaml = project_insights_config_yaml
-
-      # When there's a config file, we use it regardless it's valid or not
-      if yaml
-        strong_memoize(:insights_config) do
-          ::Gitlab::Config::Loader::Yaml.new(yaml).load!
-        rescue Gitlab::Config::Loader::FormatError
-          nil
+  def insights_config_project
+    strong_memoize(:insights_config_project) do
+      case self
+      when Group
+        insight&.project
+      when Project
+        if insights_config_yaml
+          self
+        else
+          group&.insights_config_project
         end
-      # When we're following the group and there's a group then we use it
-      elsif follow_group && group
-        group.insights_config
-      # A project might not have a group, then we just use the default
+      end
+    end
+  end
+
+  def insights_config
+    strong_memoize(:insights_config) do
+      yaml = insights_config_project&.insights_config_yaml
+
+      if yaml
+        ::Gitlab::Config::Loader::Yaml.new(yaml).load!
       else
         default_insights_config
       end
+    rescue Gitlab::Config::Loader::FormatError
+      nil
     end
   end
 
@@ -50,8 +50,10 @@ module InsightsFeature
 
   protected
 
-  def project_insights_config_yaml
-    strong_memoize(:project_insights_config_yaml) do
+  def insights_config_yaml
+    raise NotImplementedError unless is_a?(Project)
+
+    strong_memoize(:insights_config_yaml) do
       next if repository.empty?
 
       repository.insights_config_for(repository.root_ref)
