@@ -22,8 +22,8 @@ module QA
               end
 
               view 'app/assets/javascripts/notes/components/note_form.vue' do
-                element :unresolve_review_discussion
-                element :resolve_review_discussion
+                element :unresolve_review_discussion_checkbox
+                element :resolve_review_discussion_checkbox
                 element :start_review
                 element :comment_now
               end
@@ -61,11 +61,11 @@ module QA
 
               def resolve_review_discussion
                 scroll_to_element :start_review
-                check_element :resolve_review_discussion
+                check_element :resolve_review_discussion_checkbox
               end
 
               def unresolve_review_discussion
-                check_element :unresolve_review_discussion
+                check_element :unresolve_review_discussion_checkbox
               end
 
               def approvers

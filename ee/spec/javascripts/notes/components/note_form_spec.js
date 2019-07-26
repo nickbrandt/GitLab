@@ -38,7 +38,9 @@ describe('issue_note_form component', () => {
 
   describe('without batch comments', () => {
     it('does not show resolve checkbox', () => {
-      expect(vm.$el.querySelector('.qa-resolve-review-discussion')).toBe(null);
+      expect(vm.$el.querySelector('[data-qa-selector="resolve_review_discussion_checkbox"]')).toBe(
+        null,
+      );
     });
 
     describe('on enter', () => {
@@ -70,7 +72,9 @@ describe('issue_note_form component', () => {
     });
 
     it('shows resolve checkbox', () => {
-      expect(vm.$el.querySelector('.qa-resolve-review-discussion')).not.toBe(null);
+      expect(
+        vm.$el.querySelector('[data-qa-selector="resolve_review_discussion_checkbox"]'),
+      ).not.toBe(null);
     });
 
     it('hides actions for commits', done => {
