@@ -50,7 +50,7 @@ module EE
         end
 
         def error_response(errors: nil)
-          errors ||= [user, identity, member].compact.map { |obj| obj.errors.full_messages }.flatten
+          errors ||= [user, identity, member].compact.flat_map { |obj| obj.errors.full_messages }
           conflict = errors.any? { |error| error.include?('has already been taken') }
 
           ProvisioningResponse.new(status: conflict ? :conflict : :error, message: errors.to_sentence)
