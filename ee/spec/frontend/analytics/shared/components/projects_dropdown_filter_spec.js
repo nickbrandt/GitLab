@@ -1,44 +1,155 @@
+import { shallowMount } from '@vue/test-utils';
 import $ from 'jquery';
-import Vue from 'vue';
-import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
+import 'bootstrap';
+import '~/gl_dropdown';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import Api from '~/api';
+
+jest.mock('~/api', () => ({
+  groupProjects: jest.fn(),
+}));
+
+const projects = [
+  {
+    id: 1,
+    name: 'foo',
+  },
+  {
+    id: 2,
+    name: 'foobar',
+  },
+  {
+    id: 3,
+    name: 'foooooooo',
+  },
+];
 
 describe('ProjectsDropdownFilter component', () => {
-  const Component = Vue.extend(ProjectsDropdownFilter);
-  const props = {
-    groupId: 1,
+  let wrapper;
+
+  const createComponent = (props = {}) => {
+    wrapper = shallowMount(ProjectsDropdownFilter, {
+      sync: false,
+      propsData: {
+        groupId: 1,
+        ...props,
+      },
+    });
   };
-  let vm;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   beforeEach(() => {
     jest.spyOn($.fn, 'glDropdown');
-    vm = mountComponent(Component, props);
+    Api.groupProjects.mockImplementation((groupId, term, options, callback) => {
+      callback(projects);
+    });
   });
 
-  it('should call glDropdown', () => {
-    expect($.fn.glDropdown).toHaveBeenCalled();
+  const findDropdown = () => wrapper.find('.dropdown');
+  const openDropdown = () => {
+    $(findDropdown().element)
+      .parent()
+      .trigger('shown.bs.dropdown');
+  };
+  const findDropdownItems = () => findDropdown().findAll('a');
+
+  describe('when multiSelect is false', () => {
+    beforeEach(() => {
+      createComponent({ multiSelect: false });
+    });
+
+    it('should call glDropdown', () => {
+      expect($.fn.glDropdown).toHaveBeenCalled();
+    });
+
+    describe('on project click', () => {
+      beforeEach(() => {
+        openDropdown();
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('should emit the "selected" event with the selected project', () => {
+        findDropdownItems()
+          .at(0)
+          .trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[0]]],
+          },
+        ]);
+      });
+
+      it('should change selection when new project is clicked', () => {
+        findDropdownItems()
+          .at(1)
+          .trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[1]]],
+          },
+        ]);
+      });
+    });
   });
 
-  describe('onClick', () => {
-    const project = {
-      id: 1,
-      name: 'foo',
-      path: 'bar',
-    };
-    const $el = $('<a></a>').data(project);
-    const e = new Event('click');
+  describe('when multiSelect is true', () => {
+    beforeEach(() => {
+      createComponent({ multiSelect: true });
+    });
 
-    it('should emit the "setSelectedGroup" event', () => {
-      jest.spyOn(vm, '$emit');
+    describe('on project click', () => {
+      beforeEach(() => {
+        openDropdown();
 
-      vm.onClick({ $el, e });
+        return wrapper.vm.$nextTick();
+      });
 
-      expect(vm.$emit).toHaveBeenCalledWith('selected', project);
+      it('should add to selection when new project is clicked', () => {
+        findDropdownItems()
+          .at(0)
+          .trigger('click');
+
+        findDropdownItems()
+          .at(1)
+          .trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[0]]],
+          },
+          {
+            name: 'selected',
+            args: [[projects[0], projects[1]]],
+          },
+        ]);
+      });
+
+      it('should remove from selection when clicked again', () => {
+        const item = findDropdownItems().at(0);
+
+        item.trigger('click');
+        item.trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[0]]],
+          },
+          {
+            name: 'selected',
+            args: [[]],
+          },
+        ]);
+      });
     });
   });
 });
