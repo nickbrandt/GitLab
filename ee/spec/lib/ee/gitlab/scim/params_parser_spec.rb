@@ -28,6 +28,12 @@ describe EE::Gitlab::Scim::ParamsParser do
       expect(described_class.new(Operations: operations).result).to eq({})
     end
 
+    it 'can update name from displayName' do
+      operations = [{ 'op': 'Replace', 'path': 'displayName', 'value': 'My Name Is' }]
+
+      expect(described_class.new(Operations: operations).result).to include(name: 'My Name Is')
+    end
+
     it 'returns a parsed hash for POST params' do
       params = {
         externalId: 'test',
@@ -37,14 +43,27 @@ describe EE::Gitlab::Scim::ParamsParser do
           { primary: nil, type: 'work', value: 'work@example.com' },
           { primary: nil, type: 'home', value: 'home@example.com' }
         ],
-        name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' },
+        name: { formatted: 'Test A. Name', familyName: 'Name', givenName: 'Test' },
+        displayName: 'Test A',
         extra: true
       }
 
       expect(described_class.new(params).result).to eq(email: 'work@example.com',
                                                        extern_uid: 'test',
-                                                       name: 'Test Name',
+                                                       name: 'Test A. Name',
                                                        username: 'username')
+    end
+
+    it 'can construct a name from givenName and familyName' do
+      params = { name: { givenName: 'Fred', familyName: 'Nurk' } }
+
+      expect(described_class.new(params).result).to include(name: 'Fred Nurk')
+    end
+
+    it 'falls back to displayName when other names are missing' do
+      params = { displayName: 'My Name' }
+
+      expect(described_class.new(params).result).to include(name: 'My Name')
     end
   end
 
