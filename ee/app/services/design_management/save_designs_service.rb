@@ -67,7 +67,7 @@ module DesignManagement
 
     def build_repository_action(file, design)
       action = new_file?(design) ? :create : :update
-      on_success { ::EE::Gitlab::UsageCounters::DesignsCounter.count(action) }
+      on_success { ::Gitlab::UsageCounters::DesignsCounter.count(action) }
 
       {
         action: action,

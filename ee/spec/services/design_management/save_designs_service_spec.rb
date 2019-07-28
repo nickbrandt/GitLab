@@ -58,7 +58,7 @@ describe DesignManagement::SaveDesignsService do
         end
 
         it "updates the creation count" do
-          counter = EE::Gitlab::UsageCounters::DesignsCounter
+          counter = Gitlab::UsageCounters::DesignsCounter
           expect { service.execute }.to change { counter.read(:create) }.by(1)
         end
 
@@ -131,7 +131,7 @@ describe DesignManagement::SaveDesignsService do
           end
 
           it 'increments the update counter' do
-            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            counter = Gitlab::UsageCounters::DesignsCounter
             expect { service.execute }.to change { counter.read(:update) }.by 1
           end
 
@@ -158,7 +158,7 @@ describe DesignManagement::SaveDesignsService do
           end
 
           it 'counts one creation and one update' do
-            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            counter = Gitlab::UsageCounters::DesignsCounter
             expect { service.execute }
               .to change { counter.read(:create) }.by(1)
               .and change { counter.read(:update) }.by(1)
@@ -187,7 +187,7 @@ describe DesignManagement::SaveDesignsService do
           end
 
           it 'increments the creation count by 2' do
-            counter = EE::Gitlab::UsageCounters::DesignsCounter
+            counter = Gitlab::UsageCounters::DesignsCounter
             expect { service.execute }.to change { counter.read(:create) }.by 2
           end
 

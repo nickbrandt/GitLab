@@ -10,7 +10,7 @@ module EE
 
         override :usage_data_counters
         def usage_data_counters
-          super + [::EE::Gitlab::UsageCounters::DesignsCounter]
+          super + [::Gitlab::UsageCounters::DesignsCounter]
         end
 
         override :features_usage_data
