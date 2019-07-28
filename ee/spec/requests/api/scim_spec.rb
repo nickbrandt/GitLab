@@ -37,6 +37,14 @@ describe API::Scim do
           expect(json_response['Resources']).not_to be_empty
           expect(json_response['totalResults']).to eq(1)
         end
+
+        it 'sets default values as required by the specification' do
+          get scim_api(%{scim/v2/groups/#{group.full_path}/Users?filter=id eq "#{identity.extern_uid}"})
+
+          expect(json_response['schemas']).to eq(['urn:ietf:params:scim:api:messages:2.0:ListResponse'])
+          expect(json_response['itemsPerPage']).to eq(20)
+          expect(json_response['startIndex']).to eq(1)
+        end
       end
 
       context 'no user' do
