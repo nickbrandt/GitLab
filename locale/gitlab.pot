@@ -15765,6 +15765,9 @@ msgstr ""
 msgid "VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the Review App and provide a %{linkStart}personal access token%{linkEnd}."
 msgstr ""
 
+msgid "VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}."
+msgstr ""
+
 msgid "VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App."
 msgstr ""
 
