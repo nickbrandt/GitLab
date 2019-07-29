@@ -7,6 +7,7 @@ module EE
 
     prepended do
       before_action :set_report_approver_rules_feature_flag, only: [:edit]
+      before_action :log_audit_event, only: [:download_export]
     end
 
     override :project_params_attributes
@@ -84,6 +85,15 @@ module EE
 
     def set_report_approver_rules_feature_flag
       push_frontend_feature_flag(:report_approver_rules, default_enabled: false)
+    end
+
+    def log_audit_event
+      AuditEvents::CustomAuditEventService.new(
+        current_user,
+        project,
+        request.remote_ip,
+        'Export file download started'
+      ).for_project.security_event
     end
   end
 end
