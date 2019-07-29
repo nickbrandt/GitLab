@@ -83,4 +83,4 @@ module Gitlab
   end
 end
 
-Gitlab::Ci::Config.prepend(EE::Gitlab::Ci::ConfigEE)
+Gitlab::Ci::Config.prepend_if_ee('EE::Gitlab::Ci::ConfigEE')

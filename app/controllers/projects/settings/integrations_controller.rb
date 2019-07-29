@@ -26,4 +26,4 @@ module Projects
   end
 end
 
-Projects::Settings::IntegrationsController.prepend(EE::Projects::Settings::IntegrationsController)
+Projects::Settings::IntegrationsController.prepend_if_ee('EE::Projects::Settings::IntegrationsController')

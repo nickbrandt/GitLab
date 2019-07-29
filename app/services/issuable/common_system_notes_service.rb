@@ -104,4 +104,4 @@ module Issuable
   end
 end
 
-Issuable::CommonSystemNotesService.prepend(EE::Issuable::CommonSystemNotesService)
+Issuable::CommonSystemNotesService.prepend_if_ee('EE::Issuable::CommonSystemNotesService')

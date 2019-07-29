@@ -1627,4 +1627,4 @@ class User < ApplicationRecord
   end
 end
 
-User.prepend(EE::User)
+User.prepend_if_ee('EE::User')

@@ -39,4 +39,4 @@ module Ci
   end
 end
 
-Ci::PipelineEnums.prepend(EE::Ci::PipelineEnums)
+Ci::PipelineEnums.prepend_if_ee('EE::Ci::PipelineEnums')

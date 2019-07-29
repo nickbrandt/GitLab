@@ -16,4 +16,4 @@ module EE
   end
 end
 
-::IdeHelper.prepend(::EE::IdeHelper)
+::IdeHelper.prepend_if_ee('::EE::IdeHelper')

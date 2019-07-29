@@ -605,4 +605,4 @@ class NotificationService
   end
 end
 
-NotificationService.prepend(EE::NotificationService)
+NotificationService.prepend_if_ee('EE::NotificationService')

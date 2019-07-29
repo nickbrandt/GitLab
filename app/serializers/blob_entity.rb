@@ -16,4 +16,4 @@ class BlobEntity < Grape::Entity
   end
 end
 
-BlobEntity.prepend(EE::BlobEntity)
+BlobEntity.prepend_if_ee('EE::BlobEntity')

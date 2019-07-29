@@ -35,4 +35,4 @@ module Mentionable
   end
 end
 
-Mentionable::ReferenceRegexes.prepend(EE::Mentionable::ReferenceRegexes)
+Mentionable::ReferenceRegexes.prepend_if_ee('EE::Mentionable::ReferenceRegexes')

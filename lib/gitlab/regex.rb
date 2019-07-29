@@ -106,4 +106,4 @@ module Gitlab
   end
 end
 
-Gitlab::Regex.prepend(EE::Gitlab::Regex)
+Gitlab::Regex.prepend_if_ee('EE::Gitlab::Regex')

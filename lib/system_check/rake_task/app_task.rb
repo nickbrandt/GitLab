@@ -37,4 +37,4 @@ module SystemCheck
   end
 end
 
-SystemCheck::RakeTask::AppTask.prepend(EE::SystemCheck::RakeTask::AppTask)
+SystemCheck::RakeTask::AppTask.prepend_if_ee('EE::SystemCheck::RakeTask::AppTask')

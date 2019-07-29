@@ -146,4 +146,4 @@ class IssuesFinder < IssuableFinder
   end
 end
 
-IssuesFinder.prepend(EE::IssuesFinder)
+IssuesFinder.prepend_if_ee('EE::IssuesFinder')

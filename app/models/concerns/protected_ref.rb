@@ -72,4 +72,4 @@ end
 # since these are defined in a ClassMethods constant. As such, we prepend the
 # module directly into ProtectedRef::ClassMethods, instead of prepending it into
 # ProtectedRef.
-ProtectedRef::ClassMethods.prepend(EE::ProtectedRef)
+ProtectedRef::ClassMethods.prepend_if_ee('EE::ProtectedRef')

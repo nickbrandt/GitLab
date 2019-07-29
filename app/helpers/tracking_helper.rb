@@ -6,4 +6,4 @@ module TrackingHelper
   end
 end
 
-TrackingHelper.prepend(EE::TrackingHelper)
+TrackingHelper.prepend_if_ee('EE::TrackingHelper')

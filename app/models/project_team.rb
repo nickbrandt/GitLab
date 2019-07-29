@@ -205,4 +205,4 @@ class ProjectTeam
   end
 end
 
-ProjectTeam.prepend(EE::ProjectTeam)
+ProjectTeam.prepend_if_ee('EE::ProjectTeam')

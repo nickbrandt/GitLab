@@ -267,4 +267,4 @@ class Label < ApplicationRecord
   end
 end
 
-Label.prepend(EE::Label)
+Label.prepend_if_ee('EE::Label')

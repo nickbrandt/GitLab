@@ -89,4 +89,4 @@ module NamespacesHelper
   end
 end
 
-NamespacesHelper.include(EE::NamespacesHelper)
+NamespacesHelper.include_if_ee('EE::NamespacesHelper')

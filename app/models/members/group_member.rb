@@ -77,4 +77,4 @@ class GroupMember < Member
   end
 end
 
-GroupMember.prepend(EE::GroupMember)
+GroupMember.prepend_if_ee('EE::GroupMember')

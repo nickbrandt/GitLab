@@ -307,4 +307,4 @@ module ApplicationHelper
   end
 end
 
-ApplicationHelper.prepend(EE::ApplicationHelper)
+ApplicationHelper.prepend_if_ee('EE::ApplicationHelper')

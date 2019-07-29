@@ -5,4 +5,4 @@ class IssueSidebarBasicEntity < IssuableSidebarBasicEntity
   expose :confidential
 end
 
-IssueSidebarBasicEntity.prepend(EE::IssueSidebarBasicEntity)
+IssueSidebarBasicEntity.prepend_if_ee('EE::IssueSidebarBasicEntity')

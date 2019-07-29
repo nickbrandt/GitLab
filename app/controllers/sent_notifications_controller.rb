@@ -37,4 +37,4 @@ class SentNotificationsController < ApplicationController
   end
 end
 
-SentNotificationsController.prepend(EE::SentNotificationsController)
+SentNotificationsController.prepend_if_ee('EE::SentNotificationsController')

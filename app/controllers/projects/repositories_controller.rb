@@ -87,4 +87,4 @@ class Projects::RepositoriesController < Projects::ApplicationController
   end
 end
 
-Projects::RepositoriesController.prepend(EE::Projects::RepositoriesController)
+Projects::RepositoriesController.prepend_if_ee('EE::Projects::RepositoriesController')

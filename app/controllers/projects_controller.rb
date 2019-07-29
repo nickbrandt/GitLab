@@ -467,4 +467,4 @@ class ProjectsController < Projects::ApplicationController
   end
 end
 
-ProjectsController.prepend(EE::ProjectsController)
+ProjectsController.prepend_if_ee('EE::ProjectsController')

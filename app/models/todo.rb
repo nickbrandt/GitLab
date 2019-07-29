@@ -207,4 +207,4 @@ class Todo < ApplicationRecord
   end
 end
 
-Todo.prepend(EE::Todo)
+Todo.prepend_if_ee('EE::Todo')

@@ -48,4 +48,4 @@ class AuditEventService
   end
 end
 
-AuditEventService.prepend(EE::AuditEventService)
+AuditEventService.prepend_if_ee('EE::AuditEventService')

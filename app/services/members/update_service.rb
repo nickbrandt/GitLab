@@ -26,4 +26,4 @@ module Members
   end
 end
 
-Members::UpdateService.prepend(EE::Members::UpdateService)
+Members::UpdateService.prepend_if_ee('EE::Members::UpdateService')

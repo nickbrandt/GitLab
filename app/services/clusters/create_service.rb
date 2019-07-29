@@ -55,4 +55,4 @@ module Clusters
   end
 end
 
-Clusters::CreateService.prepend(EE::Clusters::CreateService)
+Clusters::CreateService.prepend_if_ee('EE::Clusters::CreateService')

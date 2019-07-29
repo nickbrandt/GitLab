@@ -136,4 +136,4 @@ class RegistrationsController < Devise::RegistrationsController
   end
 end
 
-RegistrationsController.prepend(EE::RegistrationsController)
+RegistrationsController.prepend_if_ee('EE::RegistrationsController')

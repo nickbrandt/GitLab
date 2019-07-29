@@ -516,4 +516,4 @@ class ProjectPolicy < BasePolicy
   end
 end
 
-ProjectPolicy.prepend(EE::ProjectPolicy)
+ProjectPolicy.prepend_if_ee('EE::ProjectPolicy')

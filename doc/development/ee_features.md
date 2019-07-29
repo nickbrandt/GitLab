@@ -136,7 +136,7 @@ class User < ActiveRecord::Base
   # ... lots of code here ...
 end
 
-User.prepend(EE::User)
+User.prepend_if_ee('EE::User')
 ```
 
 Since the module would require an `EE` namespace, the file should also be
@@ -255,7 +255,7 @@ class ApplicationController < ActionController::Base
   # ...
 end
 
-ApplicationController.prepend(EE::ApplicationController)
+ApplicationController.prepend_if_ee('EE::ApplicationController')
 ```
 
 And create a new file in the `ee/` sub-directory with the altered
@@ -583,7 +583,7 @@ module API
   end
 end
 
-API::Helpers::ProjectsHelpers.prepend(EE::API::Helpers::ProjectsHelpers)
+API::Helpers::ProjectsHelpers.prepend_if_ee('EE::API::Helpers::ProjectsHelpers')
 ```
 
 We could override it in EE module:
@@ -624,7 +624,7 @@ module API
   end
 end
 
-API::JobArtifacts.prepend(EE::API::JobArtifacts)
+API::JobArtifacts.prepend_if_ee('EE::API::JobArtifacts')
 ```
 
 And then we can follow regular object-oriented practices to override it:
@@ -677,7 +677,7 @@ module API
   end
 end
 
-API::MergeRequests.prepend(EE::API::MergeRequests)
+API::MergeRequests.prepend_if_ee('EE::API::MergeRequests')
 ```
 
 Note that `update_merge_request_ee` doesn't do anything in CE, but
@@ -739,7 +739,7 @@ module API
   end
 end
 
-API::MergeRequests::Parameters.prepend(EE::API::MergeRequests::Parameters)
+API::MergeRequests::Parameters.prepend_if_ee('EE::API::MergeRequests::Parameters')
 
 # api/merge_requests.rb
 module API
@@ -841,7 +841,7 @@ class Identity < ActiveRecord::Base
   end
 end
 
-Identity::UniquenessScopes.prepend(EE::Identity::UniquenessScopes)
+Identity::UniquenessScopes.prepend_if_ee('EE::Identity::UniquenessScopes')
 
 # app/models/identity.rb
 class Identity < ActiveRecord::Base

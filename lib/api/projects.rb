@@ -502,4 +502,4 @@ module API
   end
 end
 
-API::Projects.prepend(EE::API::Projects)
+API::Projects.prepend_if_ee('EE::API::Projects')

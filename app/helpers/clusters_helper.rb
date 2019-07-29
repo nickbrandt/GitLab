@@ -22,4 +22,4 @@ module ClustersHelper
   end
 end
 
-ClustersHelper.prepend(EE::ClustersHelper)
+ClustersHelper.prepend_if_ee('EE::ClustersHelper')

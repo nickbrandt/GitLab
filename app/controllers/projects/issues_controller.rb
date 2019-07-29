@@ -285,4 +285,4 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 end
 
-Projects::IssuesController.prepend(EE::Projects::IssuesController)
+Projects::IssuesController.prepend_if_ee('EE::Projects::IssuesController')

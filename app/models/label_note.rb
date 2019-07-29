@@ -104,4 +104,4 @@ class LabelNote < Note
   end
 end
 
-LabelNote.prepend(EE::LabelNote)
+LabelNote.prepend_if_ee('EE::LabelNote')

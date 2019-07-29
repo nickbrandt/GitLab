@@ -294,4 +294,4 @@ class Issue < ApplicationRecord
   end
 end
 
-Issue.prepend(EE::Issue)
+Issue.prepend_if_ee('EE::Issue')

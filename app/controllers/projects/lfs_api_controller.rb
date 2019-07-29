@@ -124,4 +124,4 @@ class Projects::LfsApiController < Projects::GitHttpClientController
   end
 end
 
-Projects::LfsApiController.prepend(EE::Projects::LfsApiController)
+Projects::LfsApiController.prepend_if_ee('EE::Projects::LfsApiController')

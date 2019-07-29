@@ -1695,7 +1695,7 @@ module API
   end
 end
 
-API::Entities.prepend(EE::API::Entities::Entities) # rubocop: disable Cop/InjectEnterpriseEditionModule
+API::Entities.prepend_if_ee('EE::API::Entities::Entities') # rubocop: disable Cop/InjectEnterpriseEditionModule
 API::Entities.prepend_entity(::API::Entities::ApplicationSetting, with: EE::API::Entities::ApplicationSetting)
 API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Board)
 API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)

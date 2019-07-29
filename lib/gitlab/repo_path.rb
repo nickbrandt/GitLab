@@ -39,4 +39,4 @@ module Gitlab
   end
 end
 
-Gitlab::RepoPath.singleton_class.prepend(EE::Gitlab::RepoPath::ClassMethods)
+Gitlab::RepoPath.singleton_class.prepend_if_ee('EE::Gitlab::RepoPath::ClassMethods')

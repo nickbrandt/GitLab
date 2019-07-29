@@ -126,4 +126,4 @@ class Upload < ApplicationRecord
   end
 end
 
-Upload.prepend(EE::Upload)
+Upload.prepend_if_ee('EE::Upload')

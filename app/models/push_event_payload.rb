@@ -23,4 +23,4 @@ class PushEventPayload < ApplicationRecord
   }
 end
 
-PushEventPayload.prepend(EE::PushEventPayload)
+PushEventPayload.prepend_if_ee('EE::PushEventPayload')

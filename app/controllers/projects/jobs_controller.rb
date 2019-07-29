@@ -217,4 +217,4 @@ class Projects::JobsController < Projects::ApplicationController
   end
 end
 
-Projects::JobsController.prepend(EE::Projects::JobsController)
+Projects::JobsController.prepend_if_ee('EE::Projects::JobsController')

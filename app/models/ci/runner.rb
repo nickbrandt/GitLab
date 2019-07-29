@@ -325,4 +325,4 @@ module Ci
   end
 end
 
-Ci::Runner.prepend(EE::Ci::Runner)
+Ci::Runner.prepend_if_ee('EE::Ci::Runner')

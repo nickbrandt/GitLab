@@ -338,4 +338,4 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 end
 
-Projects::MergeRequestsController.prepend(EE::Projects::MergeRequestsController)
+Projects::MergeRequestsController.prepend_if_ee('EE::Projects::MergeRequestsController')

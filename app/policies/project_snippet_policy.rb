@@ -47,4 +47,4 @@ class ProjectSnippetPolicy < BasePolicy
   rule { ~can?(:read_project_snippet) }.prevent :create_note
 end
 
-ProjectSnippetPolicy.prepend(EE::ProjectSnippetPolicy)
+ProjectSnippetPolicy.prepend_if_ee('EE::ProjectSnippetPolicy')

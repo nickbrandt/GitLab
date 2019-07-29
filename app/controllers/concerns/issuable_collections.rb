@@ -215,4 +215,4 @@ module IssuableCollections
   # rubocop:enable Gitlab/ModuleWithInstanceVariables
 end
 
-IssuableCollections.prepend(EE::IssuableCollections)
+IssuableCollections.prepend_if_ee('EE::IssuableCollections')

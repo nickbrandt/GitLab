@@ -5,4 +5,4 @@ class CurrentBoardEntity < Grape::Entity
   expose :name
 end
 
-CurrentBoardEntity.prepend(EE::CurrentBoardEntity)
+CurrentBoardEntity.prepend_if_ee('EE::CurrentBoardEntity')

@@ -82,4 +82,4 @@ module Users
   end
 end
 
-Users::MigrateToGhostUserService.prepend(EE::Users::MigrateToGhostUserService)
+Users::MigrateToGhostUserService.prepend_if_ee('EE::Users::MigrateToGhostUserService')

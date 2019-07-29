@@ -37,4 +37,4 @@ class BasePolicy < DeclarativePolicy::Base
   rule { default }.enable :read_cross_project
 end
 
-BasePolicy.prepend(EE::BasePolicy)
+BasePolicy.prepend_if_ee('EE::BasePolicy')

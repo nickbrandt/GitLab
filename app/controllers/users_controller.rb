@@ -168,4 +168,4 @@ class UsersController < ApplicationController
   end
 end
 
-UsersController.prepend(EE::UsersController)
+UsersController.prepend_if_ee('EE::UsersController')

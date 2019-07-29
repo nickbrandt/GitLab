@@ -551,4 +551,4 @@ module API
   end
 end
 
-API::Helpers.prepend(EE::API::Helpers)
+API::Helpers.prepend_if_ee('EE::API::Helpers')

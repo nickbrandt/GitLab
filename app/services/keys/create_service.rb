@@ -10,4 +10,4 @@ module Keys
   end
 end
 
-Keys::CreateService.prepend(EE::Keys::CreateService)
+Keys::CreateService.prepend_if_ee('EE::Keys::CreateService')

@@ -48,4 +48,4 @@ module Projects
   end
 end
 
-Projects::Operations::UpdateService.prepend(::EE::Projects::Operations::UpdateService)
+Projects::Operations::UpdateService.prepend_if_ee('::EE::Projects::Operations::UpdateService')

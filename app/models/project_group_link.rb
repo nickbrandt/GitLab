@@ -53,4 +53,4 @@ class ProjectGroupLink < ApplicationRecord
   end
 end
 
-ProjectGroupLink.prepend(EE::ProjectGroupLink)
+ProjectGroupLink.prepend_if_ee('EE::ProjectGroupLink')

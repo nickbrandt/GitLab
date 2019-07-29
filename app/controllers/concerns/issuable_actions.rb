@@ -224,4 +224,4 @@ module IssuableActions
   end
 end
 
-IssuableActions.prepend(EE::IssuableActions)
+IssuableActions.prepend_if_ee('EE::IssuableActions')

@@ -85,4 +85,4 @@ class NotificationSetting < ApplicationRecord
   end
 end
 
-NotificationSetting.prepend(EE::NotificationSetting)
+NotificationSetting.prepend_if_ee('EE::NotificationSetting')

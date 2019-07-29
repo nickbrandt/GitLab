@@ -32,4 +32,4 @@ class Ldap::OmniauthCallbacksController < OmniauthCallbacksController
   end
 end
 
-Ldap::OmniauthCallbacksController.prepend(EE::Ldap::OmniauthCallbacksController)
+Ldap::OmniauthCallbacksController.prepend_if_ee('EE::Ldap::OmniauthCallbacksController')

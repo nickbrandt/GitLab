@@ -18,4 +18,4 @@ module API
   end
 end
 
-API::Helpers::SettingsHelpers.prepend(EE::API::Helpers::SettingsHelpers)
+API::Helpers::SettingsHelpers.prepend_if_ee('EE::API::Helpers::SettingsHelpers')

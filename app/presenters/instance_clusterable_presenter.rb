@@ -68,4 +68,4 @@ class InstanceClusterablePresenter < ClusterablePresenter
   end
 end
 
-InstanceClusterablePresenter.prepend EE::InstanceClusterablePresenter
+InstanceClusterablePresenter.prepend_if_ee('EE::InstanceClusterablePresenter')

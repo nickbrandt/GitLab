@@ -74,4 +74,4 @@ class Projects::ImportsController < Projects::ApplicationController
   end
 end
 
-Projects::ImportsController.prepend(EE::Projects::ImportsController)
+Projects::ImportsController.prepend_if_ee('EE::Projects::ImportsController')

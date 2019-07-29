@@ -88,4 +88,4 @@ module PreferencesHelper
   end
 end
 
-PreferencesHelper.prepend(EE::PreferencesHelper)
+PreferencesHelper.prepend_if_ee('EE::PreferencesHelper')

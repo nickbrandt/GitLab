@@ -173,4 +173,4 @@ module Mentionable
   end
 end
 
-Mentionable.prepend(EE::Mentionable)
+Mentionable.prepend_if_ee('EE::Mentionable')

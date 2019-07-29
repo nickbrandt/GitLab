@@ -42,4 +42,4 @@ class Projects::VariablesController < Projects::ApplicationController
   end
 end
 
-Projects::VariablesController.prepend(EE::Projects::VariablesController)
+Projects::VariablesController.prepend_if_ee('EE::Projects::VariablesController')

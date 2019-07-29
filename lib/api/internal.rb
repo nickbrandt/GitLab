@@ -292,4 +292,4 @@ module API
   end
 end
 
-API::Internal.prepend(EE::API::Internal)
+API::Internal.prepend_if_ee('EE::API::Internal')

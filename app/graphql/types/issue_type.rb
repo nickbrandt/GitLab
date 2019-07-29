@@ -58,4 +58,4 @@ module Types
   end
 end
 
-Types::IssueType.prepend(::EE::Types::IssueType)
+Types::IssueType.prepend_if_ee('::EE::Types::IssueType')

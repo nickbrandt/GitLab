@@ -163,4 +163,4 @@ module API
   end
 end
 
-API::Services.prepend(EE::API::Services)
+API::Services.prepend_if_ee('EE::API::Services')

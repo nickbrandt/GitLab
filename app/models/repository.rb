@@ -1157,4 +1157,4 @@ class Repository
   end
 end
 
-Repository.prepend(EE::Repository)
+Repository.prepend_if_ee('EE::Repository')

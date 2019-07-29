@@ -40,4 +40,4 @@ module RunnersHelper
   end
 end
 
-RunnersHelper.prepend(EE::RunnersHelper)
+RunnersHelper.prepend_if_ee('EE::RunnersHelper')

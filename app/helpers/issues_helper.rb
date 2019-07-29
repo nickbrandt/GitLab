@@ -156,4 +156,4 @@ module IssuesHelper
   module_function :url_for_tracker_issue
 end
 
-IssuesHelper.include(EE::IssuesHelper)
+IssuesHelper.include_if_ee('EE::IssuesHelper')

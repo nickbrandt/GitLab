@@ -135,4 +135,4 @@ module Projects
   end
 end
 
-Projects::UpdateService.prepend(EE::Projects::UpdateService)
+Projects::UpdateService.prepend_if_ee('EE::Projects::UpdateService')

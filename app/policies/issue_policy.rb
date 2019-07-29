@@ -26,4 +26,4 @@ class IssuePolicy < IssuablePolicy
   end
 end
 
-IssuePolicy.prepend(::EE::IssuePolicy)
+IssuePolicy.prepend_if_ee('::EE::IssuePolicy')

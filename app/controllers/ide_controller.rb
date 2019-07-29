@@ -8,4 +8,4 @@ class IdeController < ApplicationController
   end
 end
 
-IdeController.prepend(EE::IdeController)
+IdeController.prepend_if_ee('EE::IdeController')

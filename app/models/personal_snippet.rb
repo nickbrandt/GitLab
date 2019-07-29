@@ -4,4 +4,4 @@ class PersonalSnippet < Snippet
   include WithUploads
 end
 
-PersonalSnippet.prepend(EE::PersonalSnippet)
+PersonalSnippet.prepend_if_ee('EE::PersonalSnippet')

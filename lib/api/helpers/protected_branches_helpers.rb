@@ -12,4 +12,4 @@ module API
   end
 end
 
-API::Helpers::ProtectedBranchesHelpers.prepend(EE::API::Helpers::ProtectedBranchesHelpers)
+API::Helpers::ProtectedBranchesHelpers.prepend_if_ee('EE::API::Helpers::ProtectedBranchesHelpers')

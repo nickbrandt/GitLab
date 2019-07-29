@@ -33,4 +33,4 @@ class SystemNoteMetadata < ApplicationRecord
   end
 end
 
-SystemNoteMetadata.prepend(EE::SystemNoteMetadata)
+SystemNoteMetadata.prepend_if_ee('EE::SystemNoteMetadata')

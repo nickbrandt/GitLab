@@ -35,4 +35,4 @@ module Groups
   end
 end
 
-Groups::DestroyService.prepend(EE::Groups::DestroyService)
+Groups::DestroyService.prepend_if_ee('EE::Groups::DestroyService')
