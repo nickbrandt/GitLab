@@ -35,12 +35,19 @@ export default {
     };
   },
   computed: {
+    copyToClipboard() {
+      return {
+        script: s__('VisualReviewApp|Copy script to clipboard'),
+        mrId: s__('VisualReviewApp|Copy merge request ID to clipboard'),
+      };
+    },
     copyString() {
       /* eslint-disable no-useless-escape */
       return {
         script: `<script defer
   data-project-id='${this.appMetadata.sourceProjectId}'
   data-project-path='${this.appMetadata.sourceProjectPath}'
+  <!-- Remove the following line to use the same script for multiple merge requests -->
   data-merge-request-id='${this.appMetadata.mergeRequestId}'
   data-mr-url='${this.appMetadata.appUrl}'
   id='review-app-toolbar-script'
@@ -50,9 +57,14 @@ export default {
     },
     instructionText() {
       return {
-        intro: s__(
-          'VisualReviewApp|Adding the following script to your code makes it possible to directly leave feedback inside of the review app. Feedback given will get submitted automatically to this merge request’s discussion, including metadata.',
-        ),
+        intro: {
+          p1: s__(
+            'VisualReviewApp|Follow the steps below to enable Visual Reviews inside your application.',
+          ),
+          p2: s__(
+            'VisualReviewApp|Steps 1 and 2 (and sometimes 3) are performed once by the developer before requesting feedback. Steps 3 (if necessary), 4, and 5 are performed by the reviewer each time they perform a review.',
+          ),
+        },
         step1: sprintf(
           s__('VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:'),
           {
@@ -63,18 +75,18 @@ export default {
         ),
         step2: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} of every page of your application. ',
+            'VisualReviewApp|%{stepStart}Step 2%{stepEnd}. Add it to the %{headTags} tags of every page of your application, ensuring the merge request ID is set or not set as required. ',
           ),
           {
             stepStart: '<strong>',
             stepEnd: '</strong>',
-            headTags: `<code>&lt;head&gt;&lt;/head&gt;</code>`,
+            headTags: `<code>&lt;head&gt;</code>`,
           },
           false,
         ),
         step3: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the review app and provide a personal access token following %{linkStart}personal access token%{linkEnd}.',
+            'VisualReviewApp|%{stepStart}Step 3%{stepEnd}. Open the Review App and provide a %{linkStart}personal access token%{linkEnd}.',
           ),
           {
             stepStart: '<strong>',
@@ -87,8 +99,20 @@ export default {
         ),
         step4: sprintf(
           s__(
-            'VisualReviewApp|%{stepStart}Step 4%{stepEnd}. You are now able to leave feedback from within the review app.',
+            `VisualReviewApp|%{stepStart}Step 4%{stepEnd}. If not previously %{linkStart}configured%{linkEnd} by a developer, enter the merge request ID for the review when prompted. The ID of this merge request is %{stepStart}%{mrId}%{stepStart}.`,
           ),
+          {
+            stepStart: '<strong>',
+            stepEnd: '</strong>',
+            linkStart:
+              '<a href="https://docs.gitlab.com/ee/ci/review_apps/#configuring-visual-reviews">',
+            linkEnd: '</a>',
+            mrId: this.appMetadata.mergeRequestId,
+          },
+          false,
+        ),
+        step5: sprintf(
+          s__('VisualReviewApp|%{stepStart}Step 5%{stepEnd}. Leave feedback in the Review App.'),
           {
             stepStart: '<strong>',
             stepEnd: '</strong>',
@@ -98,7 +122,7 @@ export default {
       };
     },
     modalTitle() {
-      return s__('VisualReviewApp|Review and give feedback directly from within the review app');
+      return s__('VisualReviewApp|Enable Visual Reviews');
     },
   },
 };
@@ -126,13 +150,14 @@ export default {
           <icon css-classes="fwhite" name="external-link" />
         </a>
       </template>
-      <p v-html="instructionText.intro"></p>
+      <p v-html="instructionText.intro.p1"></p>
+      <p v-html="instructionText.intro.p2"></p>
       <div>
         <p v-html="instructionText.step1"></p>
         <div class="flex align-items-start">
           <pre> {{ copyString.script }} </pre>
           <modal-copy-button
-            title="Copy script"
+            :title="copyToClipboard.script"
             :text="copyString.script"
             :modal-id="modalId"
             css-classes="border-0"
@@ -141,7 +166,16 @@ export default {
       </div>
       <p v-html="instructionText.step2"></p>
       <p v-html="instructionText.step3"></p>
-      <p v-html="instructionText.step4"></p>
+      <p>
+        <span v-html="instructionText.step4"></span>
+        <modal-copy-button
+          :title="copyToClipboard.mrId"
+          :text="appMetadata.mergeRequestId.toString()"
+          :modal-id="modalId"
+          css-classes="border-0 gl-pt-0 gl-pr-0 gl-pl-1 gl-pb-0"
+        />
+      </p>
+      <p v-html="instructionText.step5"></p>
     </gl-modal>
   </div>
 </template>
