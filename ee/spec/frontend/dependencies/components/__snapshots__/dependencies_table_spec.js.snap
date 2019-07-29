@@ -15,7 +15,7 @@ exports[`DependenciesTable component given a list of dependencies (loaded) match
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -31,11 +31,19 @@ exports[`DependenciesTable component given a list of dependencies (loaded) match
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>
@@ -64,7 +72,7 @@ exports[`DependenciesTable component given a list of dependencies (loading) matc
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -80,11 +88,19 @@ exports[`DependenciesTable component given a list of dependencies (loading) matc
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>
@@ -115,7 +131,7 @@ exports[`DependenciesTable component given an empty list of dependencies matches
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -131,11 +147,19 @@ exports[`DependenciesTable component given an empty list of dependencies matches
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>
@@ -150,7 +174,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     role="row"
   >
     <div
-      class="table-section section-15"
+      class="table-section section-20"
       role="rowheader"
     >
       
@@ -166,7 +190,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -182,11 +206,19 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>
@@ -207,7 +239,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     role="row"
   >
     <div
-      class="table-section section-15"
+      class="table-section section-20"
       role="rowheader"
     >
       
@@ -223,7 +255,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -239,11 +271,19 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>
@@ -266,7 +306,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     role="row"
   >
     <div
-      class="table-section section-15"
+      class="table-section section-20"
       role="rowheader"
     >
       
@@ -282,7 +322,7 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section section-15"
+      class="table-section section-10"
       role="rowheader"
     >
       
@@ -298,11 +338,19 @@ exports[`DependenciesTable component given the dependencyListVulnerabilities fla
     
     </div>
     <div
-      class="table-section flex-grow-1"
+      class="table-section section-15"
       role="rowheader"
     >
       
       Location
+    
+    </div>
+    <div
+      class="table-section section-15"
+      role="rowheader"
+    >
+      
+      License
     
     </div>
   </div>

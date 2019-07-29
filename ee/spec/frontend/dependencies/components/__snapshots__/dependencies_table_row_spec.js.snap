@@ -8,7 +8,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     class="d-md-flex align-items-baseline"
   >
     <div
-      class="table-section section-15 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -36,7 +36,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-20 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -55,7 +55,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-15"
+      class="table-section section-10 pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -72,7 +72,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-20 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -89,7 +89,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section flex-grow-1 section-wrap"
+      class="table-section section-15 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -108,6 +108,26 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
         </a>
       </div>
     </div>
+     
+    <div
+      class="table-section section-15 section-wrap"
+    >
+      <div
+        class="table-mobile-header"
+        role="rowheader"
+      >
+        License
+      </div>
+       
+      <div
+        class="table-mobile-content"
+      >
+        <dependencylicenselinks-stub
+          licenses=""
+          title="left-pad"
+        />
+      </div>
+    </div>
   </div>
    
   <!---->
@@ -122,7 +142,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     class="d-md-flex align-items-baseline"
   >
     <div
-      class="table-section section-15 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -152,7 +172,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-20 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -171,7 +191,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-15"
+      class="table-section section-10 pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -188,7 +208,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section section-20 section-wrap"
+      class="table-section section-20 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -205,7 +225,7 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
     </div>
      
     <div
-      class="table-section flex-grow-1 section-wrap"
+      class="table-section section-15 section-wrap pr-md-3"
     >
       <div
         class="table-mobile-header"
@@ -222,6 +242,26 @@ exports[`DependenciesTableRow component given the dependencyListVulnerabilities 
         >
           yarn.lock
         </a>
+      </div>
+    </div>
+     
+    <div
+      class="table-section section-15 section-wrap"
+    >
+      <div
+        class="table-mobile-header"
+        role="rowheader"
+      >
+        License
+      </div>
+       
+      <div
+        class="table-mobile-content"
+      >
+        <dependencylicenselinks-stub
+          licenses=""
+          title="left-pad"
+        />
       </div>
     </div>
   </div>
@@ -261,7 +301,7 @@ exports[`DependenciesTableRow component when a dependency is loaded matches the 
   class="gl-responsive-table-row p-2"
 >
   <div
-    class="table-section section-20 section-wrap"
+    class="table-section section-20 section-wrap pr-md-3"
   >
     <div
       class="table-mobile-header"
@@ -278,7 +318,7 @@ exports[`DependenciesTableRow component when a dependency is loaded matches the 
   </div>
    
   <div
-    class="table-section section-15"
+    class="table-section section-10 pr-md-3"
   >
     <div
       class="table-mobile-header"
@@ -295,7 +335,7 @@ exports[`DependenciesTableRow component when a dependency is loaded matches the 
   </div>
    
   <div
-    class="table-section section-20 section-wrap"
+    class="table-section section-20 section-wrap pr-md-3"
   >
     <div
       class="table-mobile-header"
@@ -312,7 +352,7 @@ exports[`DependenciesTableRow component when a dependency is loaded matches the 
   </div>
    
   <div
-    class="table-section flex-grow-1 section-wrap"
+    class="table-section section-15 section-wrap pr-md-3"
   >
     <div
       class="table-mobile-header"
@@ -329,6 +369,26 @@ exports[`DependenciesTableRow component when a dependency is loaded matches the 
       >
         yarn.lock
       </a>
+    </div>
+  </div>
+   
+  <div
+    class="table-section section-15"
+  >
+    <div
+      class="table-mobile-header"
+      role="rowheader"
+    >
+      License
+    </div>
+     
+    <div
+      class="table-mobile-content"
+    >
+      <dependencylicenselinks-stub
+        licenses=""
+        title="left-pad"
+      />
     </div>
   </div>
 </div>
