@@ -166,6 +166,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove commit count from storage quotass.
 
 
+## 11.11.7
+
+### Security (5 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Prevent an XSS vector in the add approver email.
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+- Make vulnerability feedback invisible if limited access to repo.
+
+
 ## 11.11.4 (2019-06-26)
 
 ### Fixed (1 change)
