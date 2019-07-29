@@ -153,8 +153,8 @@ module EE
     end
 
     def latest_pipeline_with_security_reports
-      ci_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
-        ci_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+      all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
+        all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
