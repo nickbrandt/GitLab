@@ -67,7 +67,7 @@ export default {
     <gl-button
       v-gl-tooltip
       class="js-remove-button bg-transparent border-0 p-0 text-secondary"
-      title="title"
+      :title="title"
       @click="onRemove"
     >
       <icon name="remove" />
