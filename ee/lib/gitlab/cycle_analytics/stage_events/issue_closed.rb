@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class IssueClosed < SimpleStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Issue closed")
+        end
+
         def self.identifier
           :issue_closed
         end

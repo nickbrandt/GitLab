@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class IssueLabelAdded < LabelBasedStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Issue label was assigned")
+        end
+
         def self.identifier
           :issue_label_added
         end

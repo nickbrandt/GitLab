@@ -20,6 +20,8 @@ module CycleAnalytics
       @parent.cycle_analytics_stages = Gitlab::CycleAnalytics::DefaultStages.all.map do |params|
         @parent.cycle_analytics_stages.build(params)
       end
+      @parent.save!
+      @parent.cycle_analytics_stages
     end
   end
 end

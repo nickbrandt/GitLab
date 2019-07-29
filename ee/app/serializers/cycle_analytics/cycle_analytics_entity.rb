@@ -9,7 +9,7 @@ class CycleAnalytics::CycleAnalyticsEntity < Grape::Entity
   def events
     Gitlab::CycleAnalytics::StageEvents::EVENTS
   end
-  
+
   def stages
     object
   end

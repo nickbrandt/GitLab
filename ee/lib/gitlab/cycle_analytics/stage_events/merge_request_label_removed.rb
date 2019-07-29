@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class MergeRequestLabelRemoved < LabelBasedStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Merge request label was removed")
+        end
+
         def self.identifier
           :merge_request_label_removed
         end

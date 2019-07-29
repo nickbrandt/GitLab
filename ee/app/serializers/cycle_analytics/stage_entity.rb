@@ -2,6 +2,8 @@
 
 class CycleAnalytics::StageEntity < Grape::Entity
   expose :name
+  expose :legend
+  expose :description
   expose :id
   expose :relative_position, as: :position
   expose :hidden
@@ -11,5 +13,17 @@ class CycleAnalytics::StageEntity < Grape::Entity
   end
   expose :end_event, if: -> (stage) { stage.custom } do
     expose :end_event_identifier, as: :identifier
+  end
+
+  def legend
+    if object.model_to_query.eql?(Issue)
+      _("Related Issues")
+    elsif object.model_to_query.eql?(MergeRequest)
+      _("Related Merged Requests")
+    end
+  end
+
+  def description
+    ''
   end
 end

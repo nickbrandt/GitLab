@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class IssueCreated < SimpleStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Issue created")
+        end
+
         def self.identifier
           :issue_created
         end

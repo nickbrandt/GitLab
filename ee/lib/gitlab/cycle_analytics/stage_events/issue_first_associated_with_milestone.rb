@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class IssueFirstAssociatedWithMilestone < SimpleStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Issue first associated with a milestone")
+        end
+
         def self.identifier
           :issue_first_associated_with_milestone
         end

@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class MergeRequestLabelAdded < LabelBasedStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Merge request label was added")
+        end
+
         def self.identifier
           :merge_request_label_added
         end

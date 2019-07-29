@@ -10,6 +10,10 @@ module Gitlab
           @params = params
         end
 
+        def self.name
+          raise NotImplementedError
+        end
+
         def apply_query_customization(query)
           query
         end

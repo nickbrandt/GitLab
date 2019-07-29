@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class MergeRequestLastBuildStarted < SimpleStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Merge request last build started")
+        end
+
         def self.identifier
           :merge_request_last_build_started
         end

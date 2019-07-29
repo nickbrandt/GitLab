@@ -4,6 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageEvents
       class IssueFirstAddedToBoard < SimpleStageEvent
+        def self.name
+          s_("CycleAnalyticsEvent|Issue first added to a board")
+        end
+
         def self.identifier
           :issue_first_added_to_board
         end
