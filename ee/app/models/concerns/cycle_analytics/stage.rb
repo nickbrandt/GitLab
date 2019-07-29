@@ -22,6 +22,10 @@ module CycleAnalytics
       scope :ordered, -> { order(:relative_position) }
     end
 
+    def parent=(p)
+      raise NotImplementedError
+    end
+
     def parent
       raise NotImplementedError
     end

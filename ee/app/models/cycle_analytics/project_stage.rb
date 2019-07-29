@@ -6,16 +6,14 @@ module CycleAnalytics
 
     belongs_to :project
 
+    alias_attribute :parent, :project
+
     def self.relative_positioning_query_base(stage)
       where(project_id: stage.project_id)
     end
 
     def self.relative_positioning_parent_column
       :project_id
-    end
-
-    def parent
-      project
     end
   end
 end
