@@ -74,6 +74,7 @@ class GroupPolicy < BasePolicy
   end
 
   rule { maintainer }.policy do
+    enable :maintainer_access
     enable :create_projects
     enable :admin_pipeline
     enable :admin_build
@@ -85,6 +86,7 @@ class GroupPolicy < BasePolicy
   end
 
   rule { owner }.policy do
+    enable :owner_access
     enable :admin_group
     enable :admin_namespace
     enable :admin_group_member

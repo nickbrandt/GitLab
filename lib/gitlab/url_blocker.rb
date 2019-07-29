@@ -115,6 +115,15 @@ module Gitlab
           addr.ipv6_v4mapped? ? addr.ipv6_to_ipv4 : addr
         end
       rescue SocketError
+        # In the test suite we use a lot of mocked urls that are either invalid or
+        # don't exist. In order to avoid modifying a ton of tests and factories
+        # we allow invalid urls unless the environment variable RSPEC_ALLOW_INVALID_URLS
+        # is not true
+        return if Rails.env.test? && ENV['RSPEC_ALLOW_INVALID_URLS'] == 'true'
+
+        # If the addr can't be resolved or the url is invalid (i.e http://1.1.1.1.1)
+        # we block the url
+        raise BlockedUrlError, "Host cannot be resolved or invalid"
       end
 
       def validate_local_request(

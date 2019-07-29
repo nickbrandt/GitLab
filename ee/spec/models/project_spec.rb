@@ -1747,7 +1747,7 @@ describe Project do
 
         context 'when the group has an Insights config from another project' do
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
           end
 
           before do
@@ -1760,6 +1760,18 @@ describe Project do
             it 'returns the group config data from the other project' do
               expect(project.insights_config).to eq(config_project.insights_config)
               expect(project.insights_config).to eq(group.insights_config)
+            end
+
+            context 'when the project is inside a nested group' do
+              let(:nested_group) { create(:group, parent: group) }
+              let(:project) { create(:project, group: nested_group) }
+
+              # The following expectaction should be changed to
+              # expect(project.insights_config).to eq(config_project.insights_config)
+              # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+              it 'returns the project default config' do
+                expect(project.insights_config).to eq(project.default_insights_config)
+              end
             end
           end
 
@@ -1783,25 +1795,22 @@ describe Project do
         let(:insights_file_content) { 'key: monthlyBugsCreated' }
 
         it 'returns the insights config data' do
-          insights_config = project.insights_config
-
-          expect(insights_config).to eq(key: 'monthlyBugsCreated')
+          expect(project.insights_config).to eq(key: 'monthlyBugsCreated')
         end
 
         context 'when the project is inside a group having another config' do
+          let(:group) { create(:group) }
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => ': foo bar' })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => ': foo bar' })
           end
 
           before do
-            project.group = create(:group)
+            project.group = group
             project.group.create_insight!(project: config_project)
           end
 
           it 'returns the project insights config data' do
-            insights_config = project.insights_config
-
-            expect(insights_config).to eq(key: 'monthlyBugsCreated')
+            expect(project.insights_config).to eq(key: 'monthlyBugsCreated')
           end
         end
       end
@@ -1814,12 +1823,13 @@ describe Project do
         end
 
         context 'when the project is inside a group having another config' do
+          let(:group) { create(:group) }
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => 'key: monthlyBugsCreated' })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => 'key: monthlyBugsCreated' })
           end
 
           before do
-            project.group = create(:group)
+            project.group = group
             project.group.create_insight!(project: config_project)
           end
 

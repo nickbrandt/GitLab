@@ -204,6 +204,58 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'updating insight_attributes.project_id param' do
+    let(:attrs) { { insight_attributes: { project_id: private_project.id } } }
+
+    shared_examples 'successful update of the Insights project' do
+      it 'updates the Insights project' do
+        update_group(group, user, attrs)
+
+        expect(group.insight.project).to eq(private_project)
+      end
+    end
+
+    shared_examples 'ignorance of the Insights project ID' do
+      it 'ignores the Insights project ID' do
+        update_group(group, user, attrs)
+
+        expect(group.insight).to be_nil
+      end
+    end
+
+    context 'when project is not in the group' do
+      let(:private_project) { create(:project, :private) }
+
+      context 'when user can read the project' do
+        before do
+          private_project.add_maintainer(user)
+        end
+
+        it_behaves_like 'ignorance of the Insights project ID'
+      end
+
+      context 'when user cannot read the project' do
+        it_behaves_like 'ignorance of the Insights project ID'
+      end
+    end
+
+    context 'when project is in the group' do
+      let(:private_project) { create(:project, :private, group: group) }
+
+      context 'when user can read the project' do
+        before do
+          private_project.add_maintainer(user)
+        end
+
+        it_behaves_like 'successful update of the Insights project'
+      end
+
+      context 'when user cannot read the project' do
+        it_behaves_like 'ignorance of the Insights project ID'
+      end
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end

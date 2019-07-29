@@ -147,7 +147,7 @@ module EE
         prevent :read_project_security_dashboard
       end
 
-      rule { can?(:read_project) }.enable :read_vulnerability_feedback
+      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 
       rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
 

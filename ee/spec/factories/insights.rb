@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
+  factory :insight do
+    group
+    project
+  end
+
   factory :insights_issues_by_team, class: Hash do
     initialize_with do
       {

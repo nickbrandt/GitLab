@@ -1,5 +1,21 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.2
+
+### Security (1 change)
+
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+
+### Security (6 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Queries for Upload should be scoped by model.
+- Fix bypass email verification when SCIM user is created via API.
+- Prevent an XSS vector in the add approver email.
+- Make vulnerability feedback invisible if limited access to repo.
+
+
 ## 12.1.1
 
 ### Fixed (1 change)
@@ -148,6 +164,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Fix typos in i18n strings for onboarding tour. !14153
 - Externalize strings of chat page in user profile. !28632
 - Remove commit count from storage quotass.
+
+
+## 11.11.7
+
+### Security (5 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Prevent an XSS vector in the add approver email.
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+- Make vulnerability feedback invisible if limited access to repo.
 
 
 ## 11.11.4 (2019-06-26)
