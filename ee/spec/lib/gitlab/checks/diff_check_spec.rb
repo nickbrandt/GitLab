@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::Checks::DiffCheck do
+  include FakeBlobHelpers
+
   include_context 'push rules checks context'
 
   describe '#validate!' do
@@ -13,6 +15,88 @@ describe Gitlab::Checks::DiffCheck do
         expect(subject).not_to receive(:process_commits)
 
         subject.validate!
+      end
+    end
+
+    describe "#validate_code_owners" do
+      let!(:code_owner) { create(:user, username: "owner-1") }
+      let(:project) { create(:project, :repository) }
+      let(:codeowner_content) { "*.rb @#{code_owner.username}\ndocs/CODEOWNERS @owner-1" }
+      let(:codeowner_blob) { fake_blob(path: "CODEOWNERS", data: codeowner_content) }
+      let(:codeowner_blob_ref) { fake_blob(path: "CODEOWNERS", data: codeowner_content) }
+      let(:codeowner_lookup_ref) { merge_request.target_branch }
+      let(:merge_request) do
+        build(
+          :merge_request,
+          source_project: project,
+          source_branch: 'feature',
+          target_project: project,
+          target_branch: 'master'
+        )
+      end
+
+      before do
+        project.add_developer(code_owner)
+        allow(project.repository).to receive(:code_owners_blob)
+          .with(ref: codeowner_lookup_ref)
+          .and_return(codeowner_blob)
+      end
+
+      context "the MR contains a matching file path" do
+        it "return an error message" do
+          expect(subject.send(:validate_code_owners)
+            .call(["docs/CODEOWNERS", "README"])).not_to be_nil
+        end
+      end
+
+      context "the MR doesn't contain a matching file path" do
+        it "doesn't raise an exception" do
+          expect(subject.send(:validate_code_owners)
+            .call(["docs/SAFE_FILE_NAME", "README"])).to be_nil
+        end
+      end
+    end
+
+    describe "#path_validations" do
+      include_context 'change access checks context'
+
+      context "when the feature isn't enabled on the project" do
+        before do
+          expect(project).to receive(:branch_requires_code_owner_approval?)
+            .once.and_return(false)
+        end
+
+        it "returns an empty array" do
+          expect(subject.send(:path_validations)).to eq([])
+        end
+      end
+
+      context "when the feature is enabled on the project" do
+        context "updated_from_web? == false" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(false)
+            expect(project).to receive(:branch_requires_code_owner_approval?)
+              .once.and_return(true)
+          end
+
+          it "returns an array of Proc(s)" do
+            validations = subject.send(:path_validations)
+
+            expect(validations.any?).to be_truthy
+            expect(validations.any? { |v| !v.is_a? Proc }).to be_falsy
+          end
+        end
+
+        context "updated_from_web? == true" do
+          before do
+            expect(subject).to receive(:updated_from_web?).and_return(true)
+            expect(project).not_to receive(:branch_requires_code_owner_approval?)
+          end
+
+          it "returns an empty array" do
+            expect(subject.send(:path_validations)).to eq([])
+          end
+        end
       end
     end
 

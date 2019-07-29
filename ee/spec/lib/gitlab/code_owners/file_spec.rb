@@ -58,6 +58,22 @@ describe Gitlab::CodeOwners::File do
     end
   end
 
+  describe "#path" do
+    context "when the blob exists" do
+      it "returns the path to the file" do
+        expect(subject.path).to eq(blob.path)
+      end
+    end
+
+    context "when the blob is nil" do
+      let(:blob) { nil }
+
+      it "returns nil" do
+        expect(subject.path).to be_nil
+      end
+    end
+  end
+
   describe '#entry_for_path' do
     context 'for a path without matches' do
       let(:file_content) do

@@ -188,10 +188,44 @@ describe ApprovalWrappedRule do
                  users: create_list(:user, approver_count))
         end
 
-        it 'returns the correct number of approvals' do
-          allow(subject.project).to receive(:merge_requests_require_code_owner_approval?).and_return(feature_enabled)
+        let(:branch) { subject.project.repository.branches.find { |b| b.name == merge_request.target_branch } }
 
-          expect(subject.approvals_required).to eq(expected_required_approvals)
+        context "when project.code_owner_approval_required_available? is true" do
+          before do
+            allow(subject.project)
+              .to receive(:code_owner_approval_required_available?).and_return(true)
+          end
+
+          context "when no protected_branches require code owner approval" do
+            it 'returns the correct number of approvals' do
+              allow(subject.project)
+                .to receive(:merge_requests_require_code_owner_approval?).and_return(feature_enabled)
+              allow(subject.project)
+                .to receive(:branch_requires_code_owner_approval?).with(branch.name).and_return(false)
+
+              expect(subject.approvals_required).to eq(expected_required_approvals)
+            end
+          end
+
+          context "when the project doesn't require code owner approval on all MRs" do
+            it 'returns the expected number of approvals for protected_branches that do require approval' do
+              allow(subject.project)
+                .to receive(:merge_requests_require_code_owner_approval?).and_return(false)
+              allow(subject.project)
+                .to receive(:branch_requires_code_owner_approval?).with(branch.name).and_return(feature_enabled)
+
+              expect(subject.approvals_required).to eq(expected_required_approvals)
+            end
+          end
+        end
+
+        context "when project.code_owner_approval_required_available? is falsy" do
+          it "returns nil" do
+            allow(subject.project)
+              .to receive(:code_owner_approval_required_available?).and_return(false)
+
+            expect(subject.approvals_required).to eq(0)
+          end
         end
       end
     end

@@ -118,6 +118,32 @@ describe ProtectedBranch do
   it_behaves_like 'uniqueness validation', ProtectedBranch::MergeAccessLevel
   it_behaves_like 'uniqueness validation', ProtectedBranch::PushAccessLevel
 
+  describe "#code_owner_approval_required" do
+    context "when the attr code_owner_approval_required is true" do
+      let(:subject_branch) { create(:protected_branch, code_owner_approval_required: true) }
+
+      it "returns true" do
+        expect(subject_branch.project)
+          .to receive(:code_owner_approval_required_available?).once.and_return(true)
+        expect(subject_branch.code_owner_approval_required).to be_truthy
+      end
+
+      it "returns false when the project doesn't require approvals" do
+        expect(subject_branch.project)
+          .to receive(:code_owner_approval_required_available?).once.and_return(false)
+        expect(subject_branch.code_owner_approval_required).to be_falsy
+      end
+    end
+
+    context "when the attr code_owner_approval_required is false" do
+      let(:subject_branch) { create(:protected_branch, code_owner_approval_required: false) }
+
+      it "returns false" do
+        expect(subject_branch.code_owner_approval_required).to be_falsy
+      end
+    end
+  end
+
   describe '#can_unprotect?' do
     let(:admin) { create(:user, :admin) }
     let(:maintainer) do

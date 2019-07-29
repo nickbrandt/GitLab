@@ -111,6 +111,7 @@ module EE
 
         prepended do
           expose :unprotect_access_levels, using: ::API::Entities::ProtectedRefAccess
+          expose :code_owner_approval_required
         end
       end
 

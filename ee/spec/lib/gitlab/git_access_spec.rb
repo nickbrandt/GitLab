@@ -358,16 +358,19 @@ describe Gitlab::GitAccess do
       merge_into_protected_branch
     end
 
+    let(:start_sha) { '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9' }
+    let(:end_sha)   { '570e7b2abdd848b95f2f578043fc23bd6f6fd24d' }
+
     let(:changes) do
       { any: Gitlab::GitAccess::ANY,
-        push_new_branch: "#{Gitlab::Git::BLANK_SHA} 570e7b2ab refs/heads/wow",
-        push_master: '6f6d7e7ed 570e7b2ab refs/heads/master',
-        push_protected_branch: '6f6d7e7ed 570e7b2ab refs/heads/feature',
-        push_remove_protected_branch: "570e7b2ab #{Gitlab::Git::BLANK_SHA} "\
-                                      'refs/heads/feature',
-        push_tag: '6f6d7e7ed 570e7b2ab refs/tags/v1.0.0',
-        push_new_tag: "#{Gitlab::Git::BLANK_SHA} 570e7b2ab refs/tags/v7.8.9",
-        push_all: ['6f6d7e7ed 570e7b2ab refs/heads/master', '6f6d7e7ed 570e7b2ab refs/heads/feature'],
+        push_new_branch: "#{Gitlab::Git::BLANK_SHA} #{end_sha} refs/heads/wow",
+        push_master: "#{start_sha} #{end_sha} refs/heads/master",
+        push_protected_branch: "#{start_sha} #{end_sha} refs/heads/feature",
+        push_remove_protected_branch: "#{end_sha} #{Gitlab::Git::BLANK_SHA} "\
+                                      "refs/heads/feature",
+        push_tag: "#{start_sha} #{end_sha} refs/tags/v1.0.0",
+        push_new_tag: "#{Gitlab::Git::BLANK_SHA} #{end_sha} refs/tags/v7.8.9",
+        push_all: ["#{start_sha} #{end_sha} refs/heads/master", "#{start_sha} #{end_sha} refs/heads/feature"],
         merge_into_protected_branch: "0b4bc9a #{merge_into_protected_branch} refs/heads/feature" }
     end
 

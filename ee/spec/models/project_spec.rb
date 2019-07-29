@@ -921,6 +921,47 @@ describe Project do
     end
   end
 
+  describe '#branch_requires_code_owner_approval?' do
+    let(:protected_branch) { create(:protected_branch, code_owner_approval_required: false) }
+    let(:protected_branch_needing_approval) { create(:protected_branch, code_owner_approval_required: true) }
+
+    context "when feature is enabled" do
+      before do
+        stub_licensed_features(code_owner_approval_required: true)
+      end
+
+      it 'returns true when code owner approval is required' do
+        project = protected_branch_needing_approval.project
+
+        expect(project.branch_requires_code_owner_approval?(protected_branch_needing_approval.name)).to eq(true)
+      end
+
+      it 'returns false when code owner approval is not required' do
+        project = protected_branch.project
+
+        expect(project.branch_requires_code_owner_approval?(protected_branch.name)).to eq(false)
+      end
+    end
+
+    context "when feature is not enabled" do
+      before do
+        stub_licensed_features(code_owner_approval_required: false)
+      end
+
+      it 'returns true when code owner approval is required' do
+        project = protected_branch_needing_approval.project
+
+        expect(project.branch_requires_code_owner_approval?(protected_branch_needing_approval.name)).to eq(false)
+      end
+
+      it 'returns false when code owner approval is not required' do
+        project = protected_branch.project
+
+        expect(project.branch_requires_code_owner_approval?(protected_branch.name)).to eq(false)
+      end
+    end
+  end
+
   shared_examples 'project with disabled services' do
     it 'has some disabled services' do
       stub_const('License::ANY_PLAN_FEATURES', [])

@@ -9,6 +9,35 @@ module EE
 
         private
 
+        def path_validations
+          validations = [super].flatten
+
+          if !updated_from_web? && project.branch_requires_code_owner_approval?(branch_name)
+            validations << validate_code_owners
+          end
+
+          validations
+        end
+
+        def validate_code_owners
+          lambda do |paths|
+            loader = ::Gitlab::CodeOwners::Loader.new(project, branch_name, paths)
+
+            assemble_error_msg_for_codeowner_matches(loader) if loader.entries.any?
+          end
+        end
+
+        def assemble_error_msg_for_codeowner_matches(loader)
+          matched_rules = loader.entries.collect { |e| "- #{e.pattern}" }
+          code_owner_path = project.repository.code_owners_blob(ref: branch_name).path || "CODEOWNERS"
+
+          "Pushes to protected branches that contain changes to files that\n" \
+            "match patterns defined in `#{code_owner_path}` are disabled for\n" \
+            "this project. Please submit these changes via a merge request.\n\n" \
+            "The following pattern(s) from `#{code_owner_path}` were matched:\n" \
+            "#{matched_rules.join('\n')}\n"
+        end
+
         def validate_path_locks?
           strong_memoize(:validate_path_locks) do
             project.feature_available?(:file_locks) &&
