@@ -21,7 +21,7 @@ module IncidentManagement
 
     def create_issue(project, alert)
       IncidentManagement::CreateIssueService
-        .new(project, nil, alert)
+        .new(project, alert)
         .execute
     end
   end

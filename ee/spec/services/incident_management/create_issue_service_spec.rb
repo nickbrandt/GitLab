@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe IncidentManagement::CreateIssueService do
   let(:project) { create(:project, :repository, :private) }
-  let(:service) { described_class.new(project, nil, alert_payload) }
+  let(:user) { User.alert_bot }
+  let(:service) { described_class.new(project, alert_payload) }
   let(:alert_starts_at) { Time.now }
   let(:alert_title) { 'TITLE' }
   let(:alert_annotations) { { title: alert_title } }
@@ -38,7 +39,7 @@ describe IncidentManagement::CreateIssueService do
       it 'creates an issue with alert summary only' do
         expect(subject).to include(status: :success)
 
-        expect(issue.author).to eq(User.alert_bot)
+        expect(issue.author).to eq(user)
         expect(issue.title).to eq(alert_title)
         expect(issue.description).to include(alert_presenter.issue_summary_markdown)
         expect(separator_count(issue.description)).to eq 0
@@ -164,7 +165,7 @@ describe IncidentManagement::CreateIssueService do
 
         expect(subject).to include(status: :success)
 
-        expect(issue.author).to eq(User.alert_bot)
+        expect(issue.author).to eq(user)
         expect(issue.title).to eq(alert_presenter.full_title)
         expect(issue.title).to include(gitlab_alert.environment.name)
         expect(issue.title).to include(query_title)
