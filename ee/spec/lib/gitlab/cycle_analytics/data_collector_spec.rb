@@ -9,6 +9,10 @@ describe Gitlab::CycleAnalytics::DataCollector do
   end
 
   shared_examples 'custom cycle analytics stage' do
+    around do |example|
+      Timecop.freeze { example.run }
+    end
+
     before do
       # takes 10 days
       resource1 = Timecop.travel(Time.new(2019, 3, 5)) do
