@@ -12,6 +12,9 @@ module EE
           explanation do |related_reference|
             _('Marks this issue as related to %{issue_ref}.') % { issue_ref: related_reference }
           end
+          execution_message do |related_reference|
+            _('Marked this issue as related to %{issue_ref}.') % { issue_ref: related_reference }
+          end
           params '#issue'
           types Issue
           condition do

@@ -9,9 +9,8 @@ module EE
 
         included do
           desc _('Change assignee(s)')
-          explanation do
-            _('Change assignee(s).')
-          end
+          explanation _('Change assignee(s).')
+          execution_message _('Changed assignee(s).')
           params '@user1 @user2'
           types Issue, MergeRequest
           condition do
@@ -27,6 +26,7 @@ module EE
           explanation do |weight|
             _("Sets weight to %{weight}.") % { weight: weight } if weight
           end
+
           params "0, 1, 2, …"
           types Issue, MergeRequest
           condition do
@@ -37,11 +37,15 @@ module EE
             weight.to_i if weight.to_i >= 0
           end
           command :weight do |weight|
-            @updates[:weight] = weight if weight
+            if weight
+              @updates[:weight] = weight
+              @execution_message[:weight] = _("Set weight to %{weight}.") % { weight: weight }
+            end
           end
 
           desc _('Clear weight')
           explanation _('Clears weight.')
+          execution_message _('Cleared weight.')
           types Issue, MergeRequest
           condition do
             quick_action_target.persisted? &&
