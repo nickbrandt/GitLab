@@ -20,12 +20,7 @@ module Ci
       return unless upstream_pipeline
 
       bridge.upstream_pipeline = upstream_pipeline
-
-      if ::Ci::Pipeline.bridgeable_statuses.include?(upstream_pipeline.status)
-        ::Ci::PipelineBridgeStatusService.process_bridge(upstream_pipeline.status, bridge)
-      end
-
-      bridge.save!
+      bridge.inherit_status_from_upstream! || bridge.save
     end
 
     private

@@ -44,6 +44,12 @@ describe Ci::SubscribeBridgeService do
               expect { subject }.to change { bridge.status }.from('created').to(upstream_pipeline.status)
             end
           end
+
+          it 'persists the bridge' do
+            subject
+
+            expect(bridge).to be_persisted
+          end
         end
 
         context 'when the upstream project does not have a pipeline' do

@@ -56,6 +56,51 @@ describe Ci::Bridge do
     end
   end
 
+  describe '#inherit_status_from_upstream!' do
+    before do
+      bridge.status = 'pending'
+      bridge.upstream_pipeline = upstream_pipeline
+    end
+
+    subject { bridge.inherit_status_from_upstream! }
+
+    context 'when bridge does not have upstream pipeline' do
+      let(:upstream_pipeline) { nil }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when upstream pipeline has the same status as the bridge' do
+      let(:upstream_pipeline) { build(:ci_pipeline, status: bridge.status) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when status is not supported' do
+      let(:upstream_pipeline) { build(:ci_pipeline, status: 'preparing') }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when status is supported' do
+      ::Ci::Pipeline.bridgeable_statuses.each do |status|
+        context "when status is #{status}" do
+          let(:upstream_pipeline) { build(:ci_pipeline, status: status) }
+
+          it 'inherits the upstream status' do
+            expect { subject }.to change { bridge.status }.from('pending').to(status)
+          end
+
+          it 'persists the bridge' do
+            subject
+
+            expect(bridge).to be_persisted
+          end
+        end
+      end
+    end
+  end
+
   describe '#target_user' do
     it 'is the same as a user who created a pipeline' do
       expect(bridge.target_user).to eq bridge.user

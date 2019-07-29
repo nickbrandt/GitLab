@@ -34,6 +34,14 @@ module EE
 
             bridge.subscribe_to_upstream!
           end
+
+          event :manual do
+            transition all => :manual
+          end
+
+          event :scheduled do
+            transition all => :scheduled
+          end
         end
       end
 
@@ -47,6 +55,30 @@ module EE
         raise InvalidBridgeTypeError unless upstream_project
 
         ::Ci::SubscribeBridgeService.new(self.project, self.user).execute(self)
+      end
+
+      def inherit_status_from_upstream!
+        return false unless upstream_pipeline
+        return false if self.status == upstream_pipeline.status
+
+        case upstream_pipeline.status
+        when 'running'
+          self.run!
+        when 'success'
+          self.success!
+        when 'failed'
+          self.drop!
+        when 'canceled'
+          self.cancel!
+        when 'skipped'
+          self.skip!
+        when 'manual'
+          self.manual!
+        when 'scheduled'
+          self.scheduled!
+        else
+          false
+        end
       end
 
       def target_user
