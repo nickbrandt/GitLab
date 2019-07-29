@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
+class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
+  include SecurityDashboardsPermissions
   include VulnerabilitiesActions
 
-  private
-
-  def vulnerable
-    group
-  end
+  alias_method :vulnerable, :group
 end
