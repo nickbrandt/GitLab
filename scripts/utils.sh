@@ -30,8 +30,7 @@ function setup_db() {
         bundle exec rake add_limits_mysql
     fi
 
-    # EE-only
-    bundle exec rake geo:db:drop geo:db:create geo:db:schema:load geo:db:migrate
+    bundle exec rake gitlab:db:setup_ee
 }
 
 function install_api_client_dependencies_with_apk() {
