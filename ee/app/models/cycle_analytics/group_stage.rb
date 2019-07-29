@@ -6,7 +6,7 @@ module CycleAnalytics
 
     belongs_to :group
 
-    alias_attribute :parent, :project
+    alias_attribute :parent, :group
 
     def self.relative_positioning_query_base(stage)
       where(group_id: stage.group_id)
