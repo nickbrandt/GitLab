@@ -15,7 +15,7 @@ describe IncidentManagement::ProcessAlertWorker do
       expect(Project).to receive(:find_by_id).and_call_original
 
       expect(IncidentManagement::CreateIssueService)
-        .to receive(:new).with(project, nil, :alert)
+        .to receive(:new).with(project, :alert)
         .and_return(create_issue_service)
 
       expect(create_issue_service).to receive(:execute)
