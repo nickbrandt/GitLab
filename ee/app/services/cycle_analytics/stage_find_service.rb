@@ -8,8 +8,7 @@ module CycleAnalytics
     end
 
     def execute
-      @parent.cycle_analytics_stages.find(id)
+      @parent.cycle_analytics_stages.find(@id)
     end
   end
 end
-

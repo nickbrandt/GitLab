@@ -7,7 +7,7 @@ class Projects::V2::CycleAnalyticsStagesController < Projects::ApplicationContro
     stage = ::CycleAnalytics::StageCreateService.new(parent: project, params: allowed_params).execute
 
     if stage.valid?
-      render json: ::CycleAnalytics::StageEntity.new(stage)
+      render json: ::CycleAnalytics::StageEntity.new(stage), status: :created
     else
       render json: { message: stage.errors.messages }, status: :unprocessable_entity
     end

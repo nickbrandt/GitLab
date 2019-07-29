@@ -22,7 +22,7 @@ module CycleAnalytics
       scope :ordered, -> { order(:relative_position) }
     end
 
-    def parent=(p)
+    def parent=(_)
       raise NotImplementedError
     end
 
@@ -67,6 +67,5 @@ module CycleAnalytics
     def end_event_is_label_based?
       end_event.class.label_based?
     end
-
   end
 end

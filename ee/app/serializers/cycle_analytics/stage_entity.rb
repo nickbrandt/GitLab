@@ -10,9 +10,13 @@ class CycleAnalytics::StageEntity < Grape::Entity
   expose :custom
   expose :start_event, if: -> (stage) { stage.custom } do
     expose :start_event_identifier, as: :identifier
+    expose :start_event_label_id, as: :label_id
+    expose :start_event_label, as: :label, using: LabelEntity
   end
   expose :end_event, if: -> (stage) { stage.custom } do
     expose :end_event_identifier, as: :identifier
+    expose :end_event_label_id, as: :label_id
+    expose :end_event_label, as: :label, using: LabelEntity
   end
 
   def legend
