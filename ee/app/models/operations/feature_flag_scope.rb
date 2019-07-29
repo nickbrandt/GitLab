@@ -25,10 +25,14 @@ module Operations
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
 
-    delegate :name, :description, to: :feature_flag
+    def self.with_name_and_description
+      joins(:feature_flag)
+        .select(FeatureFlag.arel_table[:name], FeatureFlag.arel_table[:description])
+    end
 
     def self.for_unleash_client(project, environment)
       select('DISTINCT ON (operations_feature_flag_scopes.feature_flag_id) operations_feature_flag_scopes.*')
+        .with_name_and_description
         .where(feature_flag_id: project.operations_feature_flags.select(:id))
         .order(:feature_flag_id)
         .on_environment(environment)

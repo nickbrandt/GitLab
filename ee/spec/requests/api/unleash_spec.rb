@@ -69,9 +69,9 @@ describe API::Unleash do
   end
 
   shared_examples_for 'support multiple environments' do
-    let(:client) { create(:operations_feature_flags_client, project: project) }
-    let(:base_headers) { { "UNLEASH-INSTANCEID" => client.token } }
-    let(:headers) { base_headers.merge({ "UNLEASH-APPNAME" => "test" }) }
+    let!(:client) { create(:operations_feature_flags_client, project: project) }
+    let!(:base_headers) { { "UNLEASH-INSTANCEID" => client.token } }
+    let!(:headers) { base_headers.merge({ "UNLEASH-APPNAME" => "test" }) }
 
     let!(:feature_flag_1) do
       create(:operations_feature_flag, name: "feature_flag_1", project: project, active: true)
@@ -87,9 +87,11 @@ describe API::Unleash do
     end
 
     it 'does not have N+1 problem' do
-      recorded = ActiveRecord::QueryRecorder.new { subject }
+      control_count = ActiveRecord::QueryRecorder.new { get api(features_url), headers: headers }.count
 
-      expect(recorded.count).to be_within(8).of(10)
+      create(:operations_feature_flag, name: "feature_flag_3", project: project, active: true)
+
+      expect { get api(features_url), headers: headers }.not_to exceed_query_limit(control_count)
     end
 
     context 'when app name is staging' do
