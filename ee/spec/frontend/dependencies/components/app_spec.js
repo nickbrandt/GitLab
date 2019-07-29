@@ -291,10 +291,10 @@ describe('DependenciesApp component', () => {
 
       it('shows both dependencies tables with the correct props', expectDependenciesTables);
 
-      describe('when the job failure alert emits the close event', () => {
+      describe('when the job failure alert emits the dismiss event', () => {
         beforeEach(() => {
           const alertWrapper = findJobFailedAlert();
-          alertWrapper.vm.$emit('close');
+          alertWrapper.vm.$emit('dismiss');
           return wrapper.vm.$nextTick();
         });
 
@@ -317,10 +317,10 @@ describe('DependenciesApp component', () => {
 
       it('shows both dependencies tables with the correct props', expectDependenciesTables);
 
-      describe('when the incomplete-list alert emits the close event', () => {
+      describe('when the incomplete-list alert emits the dismiss event', () => {
         beforeEach(() => {
           const alertWrapper = findIncompleteListAlert();
-          alertWrapper.vm.$emit('close');
+          alertWrapper.vm.$emit('dismiss');
           return wrapper.vm.$nextTick();
         });
 
