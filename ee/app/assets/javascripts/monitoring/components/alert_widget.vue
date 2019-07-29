@@ -1,16 +1,21 @@
 <script>
 import { s__ } from '~/locale';
+import createFlash from '~/flash';
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 
 export default {
   components: {
     Icon,
     AlertWidgetForm,
     GlLoadingIcon,
+    GlModal,
+  },
+  directives: {
+    GlModal: GlModalDirective,
   },
   props: {
     alertsEndpoint: {
@@ -32,13 +37,16 @@ export default {
       required: true,
       validator: queriesValidator,
     },
+    modalId: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
       service: null,
       errorMessage: null,
       isLoading: false,
-      isOpen: false,
       apiAction: 'create',
     };
   },
@@ -56,11 +64,6 @@ export default {
         ? s__('PrometheusAlerts|Alert set')
         : s__('PrometheusAlerts|No alert set');
     },
-    dropdownTitle() {
-      return this.apiAction === 'create'
-        ? s__('PrometheusAlerts|Add alert')
-        : s__('PrometheusAlerts|Edit alert');
-    },
     hasAlerts() {
       return Boolean(Object.keys(this.alertsToManage).length);
     },
@@ -69,15 +72,6 @@ export default {
     },
     supportsComputedAlerts() {
       return gon.features && gon.features.prometheusComputedAlerts;
-    },
-  },
-  watch: {
-    isOpen(open) {
-      if (open) {
-        document.addEventListener('click', this.handleOutsideClick);
-      } else {
-        document.removeEventListener('click', this.handleOutsideClick);
-      }
     },
   },
   created() {
@@ -105,7 +99,7 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          this.errorMessage = s__('PrometheusAlerts|Error fetching alert');
+          createFlash(s__('PrometheusAlerts|Error fetching alert'));
           this.isLoading = false;
         });
     },
@@ -121,19 +115,8 @@ export default {
 
       return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
     },
-    handleDropdownToggle() {
-      this.isOpen = !this.isOpen;
-    },
-    handleDropdownClose() {
-      this.isOpen = false;
-    },
-    handleOutsideClick(event) {
-      if (
-        !this.$refs.dropdownMenu.contains(event.target) &&
-        !this.$refs.dropdownMenuToggle.contains(event.target)
-      ) {
-        this.isOpen = false;
-      }
+    hideModal() {
+      this.$root.$emit('bv::hide::modal', this.modalId);
     },
     handleSetApiAction(apiAction) {
       this.apiAction = apiAction;
@@ -146,7 +129,7 @@ export default {
         .then(alertAttributes => {
           this.setAlert(alertAttributes, prometheus_metric_id);
           this.isLoading = false;
-          this.handleDropdownClose();
+          this.hideModal();
         })
         .catch(() => {
           this.errorMessage = s__('PrometheusAlerts|Error creating alert');
@@ -161,7 +144,7 @@ export default {
         .then(alertAttributes => {
           this.setAlert(alertAttributes, this.alertsToManage[alert].metricId);
           this.isLoading = false;
-          this.handleDropdownClose();
+          this.hideModal();
         })
         .catch(() => {
           this.errorMessage = s__('PrometheusAlerts|Error saving alert');
@@ -175,7 +158,7 @@ export default {
         .then(() => {
           this.removeAlert(alert);
           this.isLoading = false;
-          this.handleDropdownClose();
+          this.hideModal();
         })
         .catch(() => {
           this.errorMessage = s__('PrometheusAlerts|Error deleting alert');
@@ -189,49 +172,32 @@ export default {
 <template>
   <div class="prometheus-alert-widget dropdown d-flex align-items-center">
     <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
-    <span v-else class="alert-current-setting">
+    <span v-else class="alert-current-setting text-secondary">
       <gl-loading-icon v-show="isLoading" :inline="true" />
       {{ alertSummary }}
     </span>
     <button
       ref="dropdownMenuToggle"
+      v-gl-modal="modalId"
       :aria-label="alertStatus"
-      class="btn btn-sm alert-dropdown-button"
+      class="btn btn-sm mx-2 alert-dropdown-button"
       type="button"
-      @click="handleDropdownToggle"
     >
       <icon :name="alertIcon" :size="16" aria-hidden="true" />
-      <icon :size="16" name="arrow-down" aria-hidden="true" class="chevron" />
     </button>
-    <div
-      ref="dropdownMenu"
-      :class="{ show: isOpen, 'h-auto': supportsComputedAlerts }"
-      class="dropdown-menu alert-dropdown-menu"
-    >
-      <div class="dropdown-title m0">
-        <span>{{ dropdownTitle }}</span>
-        <button
-          class="dropdown-title-button dropdown-menu-close"
-          type="button"
-          aria-label="Close"
-          @click="handleDropdownClose"
-        >
-          <icon :size="12" name="close" aria-hidden="true" />
-        </button>
-      </div>
-      <div :class="{ 'mh-100': supportsComputedAlerts }" class="dropdown-content">
-        <alert-widget-form
-          ref="widgetForm"
-          :disabled="formDisabled"
-          :alerts-to-manage="alertsToManage"
-          :relevant-queries="relevantQueries"
-          @create="handleCreate"
-          @update="handleUpdate"
-          @delete="handleDelete"
-          @cancel="handleDropdownClose"
-          @setAction="handleSetApiAction"
-        />
-      </div>
-    </div>
+
+    <alert-widget-form
+      ref="widgetForm"
+      :disabled="formDisabled"
+      :alerts-to-manage="alertsToManage"
+      :relevant-queries="relevantQueries"
+      :error-message="errorMessage"
+      :modal-id="modalId"
+      @create="handleCreate"
+      @update="handleUpdate"
+      @delete="handleDelete"
+      @cancel="hideModal"
+      @setAction="handleSetApiAction"
+    />
   </div>
 </template>
