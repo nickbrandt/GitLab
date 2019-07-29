@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EE::Gitlab::UsageCounters::DesignsCounter do
+describe Gitlab::UsageCounters::DesignsCounter do
   it_behaves_like 'a redis usage counter', 'Designs', :create
   it_behaves_like 'a redis usage counter', 'Designs', :update
   it_behaves_like 'a redis usage counter', 'Designs', :delete
