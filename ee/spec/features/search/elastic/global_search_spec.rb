@@ -88,6 +88,26 @@ describe 'Global elastic search', :elastic do
     end
   end
 
+  describe 'I search through the notes and I see pagination' do
+    before do
+      issue = create(:issue, project: project, title: 'initial')
+      create_list(:note, 21, noteable: issue, project: project, note: 'foo')
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    it "has a pagination" do
+      visit dashboard_projects_path
+
+      fill_in "search", with: "foo"
+      click_button "Go"
+
+      select_filter("Comments")
+
+      expect(page).to have_selector('.gl-pagination .js-pagination-page', count: 2)
+    end
+  end
+
   describe 'I search through the blobs' do
     let(:project_2) { create(:project, :repository, :wiki_repo) }
 

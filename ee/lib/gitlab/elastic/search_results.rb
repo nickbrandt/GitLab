@@ -34,6 +34,8 @@ module Gitlab
           eager_load(merge_requests, page, eager: { target_project: [:route, :namespace] })
         when 'milestones'
           eager_load(milestones, page, eager: { project: [:route, :namespace] })
+        when 'notes'
+          eager_load(notes, page, eager: { project: [:route, :namespace] })
         when 'blobs'
           blobs.page(page).per(per_page)
         when 'wiki_blobs'
@@ -55,6 +57,10 @@ module Gitlab
         @projects_count ||= projects.total_count
       end
       alias_method :limited_projects_count, :projects_count
+
+      def notes_count
+        @notes_count ||= notes.total_count
+      end
 
       def blobs_count
         @blobs_count ||= blobs.total_count
@@ -188,6 +194,12 @@ module Gitlab
         strong_memoize(:merge_requests) do
           options = base_options.merge(project_ids: non_guest_project_ids)
           MergeRequest.elastic_search(query, options: options)
+        end
+      end
+
+      def notes
+        strong_memoize(:notes) do
+          Note.elastic_search(query, options: base_options)
         end
       end
 
