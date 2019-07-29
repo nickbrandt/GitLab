@@ -4,6 +4,7 @@ module DesignManagement
   class Version < ApplicationRecord
     include ShaAttribute
 
+    belongs_to :issue
     has_many :design_versions
     has_many :designs,
              through: :design_versions,
@@ -12,7 +13,7 @@ module DesignManagement
              inverse_of: :versions
 
     validates :sha, presence: true
-    validates :sha, uniqueness: { case_sensitive: false }
+    validates :sha, uniqueness: { case_sensitive: false, scope: :issue_id }
 
     sha_attribute :sha
 
@@ -23,7 +24,9 @@ module DesignManagement
     scope :ordered, -> { order(id: :desc) }
 
     def self.create_for_designs(designs, sha)
-      version = safe_find_or_create_by!(sha: sha)
+      issue_id = designs.first.issue_id
+
+      version = safe_find_or_create_by!(sha: sha, issue_id: issue_id)
 
       rows = designs.map do |design|
         { design_id: design.id, version_id: version.id }
@@ -32,10 +35,6 @@ module DesignManagement
       Gitlab::Database.bulk_insert(DesignVersion.table_name, rows)
 
       version
-    end
-
-    def issue
-      designs.take.issue
     end
   end
 end
