@@ -29,7 +29,7 @@ describe DesignManagement::Version do
 
     it { is_expected.to be_valid }
     it { is_expected.to validate_presence_of(:sha) }
-    it { is_expected.to validate_uniqueness_of(:sha).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:sha).scoped_to(:issue_id).case_insensitive }
   end
 
   describe "scopes" do
@@ -68,15 +68,6 @@ describe DesignManagement::Version do
       version = described_class.create_for_designs(designs, "abc")
 
       expect(version.designs).to contain_exactly(*designs)
-    end
-  end
-
-  describe "#issue" do
-    it "gets the issue for the linked design" do
-      version = create(:design_version)
-      design = create(:design, versions: [version])
-
-      expect(version.issue).to eq(design.issue)
     end
   end
 end
