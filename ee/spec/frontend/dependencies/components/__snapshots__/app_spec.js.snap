@@ -13,8 +13,8 @@ exports[`DependenciesApp component on creation given a dependency list which is 
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <glbadge-stub
         pill=""
       >
@@ -46,8 +46,8 @@ exports[`DependenciesApp component on creation given a fetch error matches the s
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <!---->
     </h4>
      
@@ -75,8 +75,8 @@ exports[`DependenciesApp component on creation given a list of dependencies and 
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <glbadge-stub
         pill=""
       >
@@ -110,8 +110,8 @@ exports[`DependenciesApp component on creation given the dependency list job fai
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <!---->
     </h4>
      

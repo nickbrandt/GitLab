@@ -23,6 +23,11 @@ export const REPORT_STATUS = {
   incomplete: 'no_dependency_files',
 };
 
+export const FILTER = {
+  all: 'all',
+  vulnerable: 'vulnerable',
+};
+
 export const FETCH_ERROR_MESSAGE = __(
   'Error fetching the dependency list. Please check your network connection and try again.',
 );
