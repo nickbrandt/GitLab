@@ -23,4 +23,3 @@ module Gitlab
     end
   end
 end
-

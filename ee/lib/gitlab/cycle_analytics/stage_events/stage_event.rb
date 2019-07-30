@@ -3,7 +3,7 @@
 module Gitlab
   module CycleAnalytics
     module StageEvents
-      # Base class for expressing an event. 
+      # Base class for expressing an event.
       class StageEvent
         include Gitlab::CycleAnalytics::MetricsTables
 
@@ -74,7 +74,7 @@ module Gitlab
             Arel::Nodes::Over.new(
               Arel::Nodes::NamedFunction.new('row_number', []),
               Arel::Nodes::Window.new.partition(table[foreign_key])
-              .order(table[:created_at].public_send(order))).as('row_id')
+              .order(table[:created_at].public_send(order))).as('row_id') # rubocop:disable GitlabSecurity/PublicSend
           )
           query = query.where(table[:action].eq(action))
           query = query.where(table[:label_id].eq(label_id))

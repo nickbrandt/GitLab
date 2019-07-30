@@ -5,8 +5,8 @@ module Gitlab
     class RecordsFetcher
       FETCHER_CLASSES = {
         Issue => Gitlab::CycleAnalytics::IssueRecordsFetcher,
-        MergeRequest => Gitlab::CycleAnalytics::MergeRequestRecordsFetcher,
-      }
+        MergeRequest => Gitlab::CycleAnalytics::MergeRequestRecordsFetcher
+      }.freeze
 
       def initialize(stage:, query:)
         @stage = stage
