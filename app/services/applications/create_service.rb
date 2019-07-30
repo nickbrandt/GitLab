@@ -16,4 +16,4 @@ module Applications
   end
 end
 
-Applications::CreateService.prepend(EE::Applications::CreateService)
+Applications::CreateService.prepend_if_ee('EE::Applications::CreateService')

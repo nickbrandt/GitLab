@@ -90,4 +90,4 @@ class PostReceive
   end
 end
 
-PostReceive.prepend(EE::PostReceive)
+PostReceive.prepend_if_ee('EE::PostReceive')

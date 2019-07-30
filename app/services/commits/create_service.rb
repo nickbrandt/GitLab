@@ -101,4 +101,4 @@ module Commits
   end
 end
 
-Commits::CreateService.prepend(EE::Commits::CreateService)
+Commits::CreateService.prepend_if_ee('EE::Commits::CreateService')

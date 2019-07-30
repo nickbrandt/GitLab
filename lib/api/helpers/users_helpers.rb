@@ -15,4 +15,4 @@ module API
   end
 end
 
-API::Helpers::UsersHelpers.prepend(EE::API::Helpers::UsersHelpers)
+API::Helpers::UsersHelpers.prepend_if_ee('EE::API::Helpers::UsersHelpers')

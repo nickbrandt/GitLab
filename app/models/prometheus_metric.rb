@@ -64,4 +64,4 @@ class PrometheusMetric < ApplicationRecord
   end
 end
 
-PrometheusMetric.prepend(EE::PrometheusMetric)
+PrometheusMetric.prepend_if_ee('EE::PrometheusMetric')

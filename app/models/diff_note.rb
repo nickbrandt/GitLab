@@ -181,4 +181,4 @@ class DiffNote < Note
   end
 end
 
-DiffNote.prepend(::EE::DiffNote)
+DiffNote.prepend_if_ee('::EE::DiffNote')

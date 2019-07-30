@@ -61,4 +61,4 @@ module Gitlab
   end
 end
 
-Gitlab::Ci::Pipeline::Chain::Validate::Abilities.prepend(EE::Gitlab::Ci::Pipeline::Chain::Validate::Abilities)
+Gitlab::Ci::Pipeline::Chain::Validate::Abilities.prepend_if_ee('EE::Gitlab::Ci::Pipeline::Chain::Validate::Abilities')

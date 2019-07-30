@@ -115,4 +115,4 @@ class PoolRepository < ApplicationRecord
   end
 end
 
-PoolRepository.prepend(EE::PoolRepository)
+PoolRepository.prepend_if_ee('EE::PoolRepository')

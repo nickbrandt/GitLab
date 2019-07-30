@@ -7,4 +7,4 @@ module Gitlab
   end
 end
 
-Gitlab::DatabaseImporters::CommonMetrics.prepend(EE::Gitlab::DatabaseImporters::CommonMetrics)
+Gitlab::DatabaseImporters::CommonMetrics.prepend_if_ee('EE::Gitlab::DatabaseImporters::CommonMetrics')

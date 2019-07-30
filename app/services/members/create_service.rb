@@ -53,4 +53,4 @@ module Members
   end
 end
 
-Members::CreateService.prepend(EE::Members::CreateService)
+Members::CreateService.prepend_if_ee('EE::Members::CreateService')

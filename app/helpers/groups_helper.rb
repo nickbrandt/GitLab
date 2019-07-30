@@ -198,4 +198,4 @@ module GroupsHelper
   end
 end
 
-GroupsHelper.prepend(EE::GroupsHelper)
+GroupsHelper.prepend_if_ee('EE::GroupsHelper')

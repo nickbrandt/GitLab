@@ -293,8 +293,8 @@ module ApplicationSettingsHelper
   end
 end
 
-ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper) # rubocop: disable Cop/InjectEnterpriseEditionModule
+ApplicationSettingsHelper.prepend_if_ee('EE::ApplicationSettingsHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
 # The methods in `EE::ApplicationSettingsHelper` should be available as both
 # instance and class methods.
-ApplicationSettingsHelper.extend(EE::ApplicationSettingsHelper)
+ApplicationSettingsHelper.extend_if_ee('EE::ApplicationSettingsHelper')

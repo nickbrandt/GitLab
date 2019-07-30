@@ -319,4 +319,4 @@ module Clusters
   end
 end
 
-Clusters::Cluster.prepend(EE::Clusters::Cluster)
+Clusters::Cluster.prepend_if_ee('EE::Clusters::Cluster')

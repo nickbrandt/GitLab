@@ -160,4 +160,4 @@ module MergeRequestsHelper
   end
 end
 
-MergeRequestsHelper.prepend(EE::MergeRequestsHelper)
+MergeRequestsHelper.prepend_if_ee('EE::MergeRequestsHelper')

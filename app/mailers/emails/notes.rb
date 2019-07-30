@@ -69,4 +69,4 @@ module Emails
   end
 end
 
-Emails::Notes.prepend(EE::Emails::Notes)
+Emails::Notes.prepend_if_ee('EE::Emails::Notes')

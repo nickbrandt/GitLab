@@ -112,4 +112,4 @@ module Participable
   end
 end
 
-Participable.prepend(EE::Participable)
+Participable.prepend_if_ee('EE::Participable')

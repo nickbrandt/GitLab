@@ -20,4 +20,4 @@ class AuditEvent < ApplicationRecord
   end
 end
 
-AuditEvent.prepend(EE::AuditEvent)
+AuditEvent.prepend_if_ee('EE::AuditEvent')

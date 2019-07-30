@@ -105,4 +105,4 @@ class IssuableSidebarBasicEntity < Grape::Entity
   end
 end
 
-IssuableSidebarBasicEntity.prepend(EE::IssuableSidebarBasicEntity)
+IssuableSidebarBasicEntity.prepend_if_ee('EE::IssuableSidebarBasicEntity')

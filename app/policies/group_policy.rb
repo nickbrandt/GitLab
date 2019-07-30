@@ -135,4 +135,4 @@ class GroupPolicy < BasePolicy
   end
 end
 
-GroupPolicy.prepend(EE::GroupPolicy)
+GroupPolicy.prepend_if_ee('EE::GroupPolicy')

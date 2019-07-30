@@ -228,4 +228,4 @@ module Projects
   end
 end
 
-Projects::DestroyService.prepend(EE::Projects::DestroyService)
+Projects::DestroyService.prepend_if_ee('EE::Projects::DestroyService')

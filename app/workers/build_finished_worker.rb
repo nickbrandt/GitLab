@@ -35,4 +35,4 @@ class BuildFinishedWorker
   end
 end
 
-BuildFinishedWorker.prepend(EE::BuildFinishedWorker)
+BuildFinishedWorker.prepend_if_ee('EE::BuildFinishedWorker')

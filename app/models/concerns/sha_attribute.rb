@@ -48,4 +48,4 @@ module ShaAttribute
   end
 end
 
-ShaAttribute::ClassMethods.prepend(EE::ShaAttribute)
+ShaAttribute::ClassMethods.prepend_if_ee('EE::ShaAttribute')

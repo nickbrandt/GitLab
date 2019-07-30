@@ -195,4 +195,4 @@ module GitlabRoutingHelper
   end
 end
 
-GitlabRoutingHelper.include(EE::GitlabRoutingHelper)
+GitlabRoutingHelper.include_if_ee('EE::GitlabRoutingHelper')

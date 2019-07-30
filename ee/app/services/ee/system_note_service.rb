@@ -12,7 +12,7 @@ module EE
       # ::SystemNoteService wants the methods to be available as both class and
       # instance methods. This removes the need for having to both `include` and
       # `extend` this module everywhere it is used.
-      extend(EE::SystemNoteService) # rubocop: disable Cop/InjectEnterpriseEditionModule
+      extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
     #

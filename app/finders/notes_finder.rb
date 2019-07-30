@@ -154,4 +154,4 @@ class NotesFinder
   end
 end
 
-NotesFinder.prepend(EE::NotesFinder)
+NotesFinder.prepend_if_ee('EE::NotesFinder')

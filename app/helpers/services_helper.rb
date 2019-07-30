@@ -45,8 +45,8 @@ module ServicesHelper
   extend self
 end
 
-ServicesHelper.prepend(EE::ServicesHelper) # rubocop: disable Cop/InjectEnterpriseEditionModule
+ServicesHelper.prepend_if_ee('EE::ServicesHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
 # The methods in `EE::ServicesHelper` should be available as both instance and
 # class methods.
-ServicesHelper.extend(EE::ServicesHelper)
+ServicesHelper.extend_if_ee('EE::ServicesHelper')

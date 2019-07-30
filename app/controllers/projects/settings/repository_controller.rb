@@ -105,4 +105,4 @@ module Projects
   end
 end
 
-Projects::Settings::RepositoryController.prepend(EE::Projects::Settings::RepositoryController)
+Projects::Settings::RepositoryController.prepend_if_ee('EE::Projects::Settings::RepositoryController')

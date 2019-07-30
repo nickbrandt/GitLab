@@ -32,4 +32,4 @@ module UserCalloutsHelper
   end
 end
 
-UserCalloutsHelper.prepend(EE::UserCalloutsHelper)
+UserCalloutsHelper.prepend_if_ee('EE::UserCalloutsHelper')

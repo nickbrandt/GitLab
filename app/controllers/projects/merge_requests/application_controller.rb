@@ -60,4 +60,4 @@ class Projects::MergeRequests::ApplicationController < Projects::ApplicationCont
   end
 end
 
-Projects::MergeRequests::ApplicationController.prepend(EE::Projects::MergeRequests::ApplicationController)
+Projects::MergeRequests::ApplicationController.prepend_if_ee('EE::Projects::MergeRequests::ApplicationController')

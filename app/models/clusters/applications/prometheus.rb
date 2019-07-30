@@ -101,4 +101,4 @@ module Clusters
   end
 end
 
-Clusters::Applications::Prometheus.prepend(EE::Clusters::Applications::Prometheus)
+Clusters::Applications::Prometheus.prepend_if_ee('EE::Clusters::Applications::Prometheus')

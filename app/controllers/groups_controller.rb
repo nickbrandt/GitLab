@@ -233,4 +233,4 @@ class GroupsController < Groups::ApplicationController
   end
 end
 
-GroupsController.prepend(EE::GroupsController)
+GroupsController.prepend_if_ee('EE::GroupsController')

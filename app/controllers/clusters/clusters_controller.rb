@@ -235,4 +235,4 @@ class Clusters::ClustersController < Clusters::BaseController
   end
 end
 
-Clusters::ClustersController.prepend(EE::Clusters::ClustersController)
+Clusters::ClustersController.prepend_if_ee('EE::Clusters::ClustersController')

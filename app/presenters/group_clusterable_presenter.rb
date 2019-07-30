@@ -40,4 +40,4 @@ class GroupClusterablePresenter < ClusterablePresenter
   end
 end
 
-GroupClusterablePresenter.prepend EE::GroupClusterablePresenter
+GroupClusterablePresenter.prepend_if_ee('EE::GroupClusterablePresenter')

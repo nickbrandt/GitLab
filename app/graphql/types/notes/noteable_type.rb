@@ -24,4 +24,4 @@ module Types
   end
 end
 
-Types::Notes::NoteableType.extend(::EE::Types::Notes::NoteableType)
+Types::Notes::NoteableType.extend_if_ee('::EE::Types::Notes::NoteableType')

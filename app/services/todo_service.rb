@@ -336,4 +336,4 @@ class TodoService
   end
 end
 
-TodoService.prepend(EE::TodoService)
+TodoService.prepend_if_ee('EE::TodoService')

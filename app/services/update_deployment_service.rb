@@ -54,4 +54,4 @@ class UpdateDeploymentService
   end
 end
 
-UpdateDeploymentService.prepend(EE::UpdateDeploymentService)
+UpdateDeploymentService.prepend_if_ee('EE::UpdateDeploymentService')

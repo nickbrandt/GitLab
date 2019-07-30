@@ -20,4 +20,4 @@ module Types
   end
 end
 
-Types::GroupType.prepend(EE::Types::GroupType)
+Types::GroupType.prepend_if_ee('EE::Types::GroupType')

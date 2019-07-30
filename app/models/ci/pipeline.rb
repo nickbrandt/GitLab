@@ -858,4 +858,4 @@ module Ci
   end
 end
 
-Ci::Pipeline.prepend(EE::Ci::Pipeline)
+Ci::Pipeline.prepend_if_ee('EE::Ci::Pipeline')

@@ -141,4 +141,4 @@ class Key < ApplicationRecord
   end
 end
 
-Key.prepend(EE::Key)
+Key.prepend_if_ee('EE::Key')

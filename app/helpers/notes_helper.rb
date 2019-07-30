@@ -187,4 +187,4 @@ module NotesHelper
   end
 end
 
-NotesHelper.prepend(EE::NotesHelper)
+NotesHelper.prepend_if_ee('EE::NotesHelper')

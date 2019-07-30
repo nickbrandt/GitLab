@@ -195,4 +195,4 @@ module Projects
   end
 end
 
-Projects::CreateService.prepend(EE::Projects::CreateService)
+Projects::CreateService.prepend_if_ee('EE::Projects::CreateService')

@@ -79,4 +79,4 @@ module AppearancesHelper
   end
 end
 
-AppearancesHelper.prepend(EE::AppearancesHelper)
+AppearancesHelper.prepend_if_ee('EE::AppearancesHelper')

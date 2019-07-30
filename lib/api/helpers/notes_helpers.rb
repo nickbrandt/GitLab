@@ -127,4 +127,4 @@ module API
   end
 end
 
-API::Helpers::NotesHelpers.prepend(EE::API::Helpers::NotesHelpers)
+API::Helpers::NotesHelpers.prepend_if_ee('EE::API::Helpers::NotesHelpers')

@@ -6,4 +6,4 @@ module RecaptchaExperimentHelper
   end
 end
 
-RecaptchaExperimentHelper.prepend(EE::RecaptchaExperimentHelper)
+RecaptchaExperimentHelper.prepend_if_ee('EE::RecaptchaExperimentHelper')

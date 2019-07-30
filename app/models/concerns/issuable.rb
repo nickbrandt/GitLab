@@ -436,5 +436,5 @@ module Issuable
   end
 end
 
-Issuable.prepend(EE::Issuable) # rubocop: disable Cop/InjectEnterpriseEditionModule
-Issuable::ClassMethods.prepend(EE::Issuable::ClassMethods)
+Issuable.prepend_if_ee('EE::Issuable') # rubocop: disable Cop/InjectEnterpriseEditionModule
+Issuable::ClassMethods.prepend_if_ee('EE::Issuable::ClassMethods')

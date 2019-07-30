@@ -98,4 +98,4 @@ module ButtonHelper
   end
 end
 
-ButtonHelper.prepend(EE::ButtonHelper)
+ButtonHelper.prepend_if_ee('EE::ButtonHelper')

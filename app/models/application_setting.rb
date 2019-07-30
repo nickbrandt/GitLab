@@ -287,4 +287,4 @@ class ApplicationSetting < ApplicationRecord
   end
 end
 
-ApplicationSetting.prepend(EE::ApplicationSetting)
+ApplicationSetting.prepend_if_ee('EE::ApplicationSetting')

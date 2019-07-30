@@ -12,4 +12,4 @@ class Admin::HealthCheckController < Admin::ApplicationController
   end
 end
 
-Admin::HealthCheckController.prepend(EE::Admin::HealthCheckController)
+Admin::HealthCheckController.prepend_if_ee('EE::Admin::HealthCheckController')

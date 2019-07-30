@@ -8,4 +8,4 @@ module Boards
   end
 end
 
-Boards::UpdateService.prepend(EE::Boards::UpdateService)
+Boards::UpdateService.prepend_if_ee('EE::Boards::UpdateService')

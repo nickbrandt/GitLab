@@ -46,4 +46,4 @@ module InternalRedirect
   end
 end
 
-InternalRedirect.prepend(EE::InternalRedirect)
+InternalRedirect.prepend_if_ee('EE::InternalRedirect')

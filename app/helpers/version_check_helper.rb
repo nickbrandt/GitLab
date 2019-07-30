@@ -23,4 +23,4 @@ module VersionCheckHelper
   end
 end
 
-VersionCheckHelper.prepend(EE::VersionCheckHelper)
+VersionCheckHelper.prepend_if_ee('EE::VersionCheckHelper')

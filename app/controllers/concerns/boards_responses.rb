@@ -87,4 +87,4 @@ module BoardsResponses
   end
 end
 
-BoardsResponses.prepend(EE::BoardsResponses)
+BoardsResponses.prepend_if_ee('EE::BoardsResponses')

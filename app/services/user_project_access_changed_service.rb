@@ -16,4 +16,4 @@ class UserProjectAccessChangedService
   end
 end
 
-UserProjectAccessChangedService.prepend(EE::UserProjectAccessChangedService)
+UserProjectAccessChangedService.prepend_if_ee('EE::UserProjectAccessChangedService')

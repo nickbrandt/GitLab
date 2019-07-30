@@ -514,4 +514,4 @@ class Note < ApplicationRecord
   end
 end
 
-Note.prepend(EE::Note)
+Note.prepend_if_ee('EE::Note')

@@ -49,4 +49,4 @@ class RepositoryImportWorker
   end
 end
 
-RepositoryImportWorker.prepend(EE::RepositoryImportWorker)
+RepositoryImportWorker.prepend_if_ee('EE::RepositoryImportWorker')

@@ -18,4 +18,4 @@ module WikiPages
   end
 end
 
-WikiPages::BaseService.prepend(EE::WikiPages::BaseService)
+WikiPages::BaseService.prepend_if_ee('EE::WikiPages::BaseService')

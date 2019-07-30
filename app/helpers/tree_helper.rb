@@ -188,4 +188,4 @@ module TreeHelper
   end
 end
 
-TreeHelper.prepend(::EE::TreeHelper)
+TreeHelper.prepend_if_ee('::EE::TreeHelper')

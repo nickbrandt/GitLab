@@ -133,4 +133,4 @@ module Gitlab
   end
 end
 
-Gitlab::Access.prepend(EE::Gitlab::Access)
+Gitlab::Access.prepend_if_ee('EE::Gitlab::Access')

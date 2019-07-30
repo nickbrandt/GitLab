@@ -69,4 +69,4 @@ module PrometheusMetricEnums
   end
 end
 
-PrometheusMetricEnums.prepend(EE::PrometheusMetricEnums)
+PrometheusMetricEnums.prepend_if_ee('EE::PrometheusMetricEnums')

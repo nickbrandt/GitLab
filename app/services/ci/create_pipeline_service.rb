@@ -120,4 +120,4 @@ module Ci
   end
 end
 
-Ci::CreatePipelineService.prepend(EE::Ci::CreatePipelineService)
+Ci::CreatePipelineService.prepend_if_ee('EE::Ci::CreatePipelineService')

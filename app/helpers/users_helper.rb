@@ -110,4 +110,4 @@ module UsersHelper
   end
 end
 
-UsersHelper.prepend(EE::UsersHelper)
+UsersHelper.prepend_if_ee('EE::UsersHelper')

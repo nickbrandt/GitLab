@@ -3,4 +3,4 @@
 class IssueSidebarExtrasEntity < IssuableSidebarExtrasEntity
 end
 
-IssueSidebarExtrasEntity.prepend(EE::IssueSidebarExtrasEntity)
+IssueSidebarExtrasEntity.prepend_if_ee('EE::IssueSidebarExtrasEntity')

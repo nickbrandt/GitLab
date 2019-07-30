@@ -178,4 +178,4 @@ module TodosHelper
   end
 end
 
-TodosHelper.prepend(EE::NotesHelper)
+TodosHelper.prepend_if_ee('EE::NotesHelper')

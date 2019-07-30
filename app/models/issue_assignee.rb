@@ -5,4 +5,4 @@ class IssueAssignee < ApplicationRecord
   belongs_to :assignee, class_name: "User", foreign_key: :user_id
 end
 
-IssueAssignee.prepend(EE::IssueAssignee)
+IssueAssignee.prepend_if_ee('EE::IssueAssignee')

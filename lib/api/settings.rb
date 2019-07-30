@@ -169,4 +169,4 @@ module API
   end
 end
 
-API::Settings.prepend(EE::API::Settings)
+API::Settings.prepend_if_ee('EE::API::Settings')

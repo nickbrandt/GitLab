@@ -131,4 +131,4 @@ module SelfMonitoring
   end
 end
 
-SelfMonitoring::Project::CreateService.prepend(EE::SelfMonitoring::Project::CreateService)
+SelfMonitoring::Project::CreateService.prepend_if_ee('EE::SelfMonitoring::Project::CreateService')

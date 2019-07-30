@@ -35,4 +35,4 @@ class GroupMembersFinder < UnionFinder
   # rubocop: enable CodeReuse/ActiveRecord
 end
 
-GroupMembersFinder.prepend(EE::GroupMembersFinder)
+GroupMembersFinder.prepend_if_ee('EE::GroupMembersFinder')

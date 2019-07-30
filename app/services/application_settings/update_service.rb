@@ -53,4 +53,4 @@ module ApplicationSettings
   end
 end
 
-ApplicationSettings::UpdateService.prepend(EE::ApplicationSettings::UpdateService)
+ApplicationSettings::UpdateService.prepend_if_ee('EE::ApplicationSettings::UpdateService')

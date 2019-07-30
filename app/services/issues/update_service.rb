@@ -149,4 +149,4 @@ module Issues
   end
 end
 
-Issues::UpdateService.prepend(EE::Issues::UpdateService)
+Issues::UpdateService.prepend_if_ee('EE::Issues::UpdateService')

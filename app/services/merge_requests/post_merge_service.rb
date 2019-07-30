@@ -54,4 +54,4 @@ module MergeRequests
   end
 end
 
-MergeRequests::PostMergeService.prepend(EE::MergeRequests::PostMergeService)
+MergeRequests::PostMergeService.prepend_if_ee('EE::MergeRequests::PostMergeService')

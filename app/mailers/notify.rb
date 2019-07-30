@@ -218,4 +218,4 @@ class Notify < BaseMailer
   end
 end
 
-Notify.prepend(EE::Notify)
+Notify.prepend_if_ee('EE::Notify')

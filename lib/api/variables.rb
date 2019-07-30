@@ -124,4 +124,4 @@ module API
   end
 end
 
-API::Variables.prepend(EE::API::Variables)
+API::Variables.prepend_if_ee('EE::API::Variables')

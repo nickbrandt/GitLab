@@ -96,4 +96,4 @@ module API
   end
 end
 
-API::GroupMilestones.prepend(EE::API::GroupMilestones)
+API::GroupMilestones.prepend_if_ee('EE::API::GroupMilestones')

@@ -12,4 +12,4 @@ class PipelineDetailsEntity < PipelineEntity
   end
 end
 
-PipelineDetailsEntity.prepend(EE::PipelineDetailsEntity)
+PipelineDetailsEntity.prepend_if_ee('EE::PipelineDetailsEntity')

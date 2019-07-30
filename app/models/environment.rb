@@ -240,4 +240,4 @@ class Environment < ApplicationRecord
   end
 end
 
-Environment.prepend(EE::Environment)
+Environment.prepend_if_ee('EE::Environment')

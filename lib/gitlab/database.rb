@@ -305,4 +305,4 @@ module Gitlab
   end
 end
 
-Gitlab::Database.prepend(EE::Gitlab::Database)
+Gitlab::Database.prepend_if_ee('EE::Gitlab::Database')

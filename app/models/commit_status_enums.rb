@@ -20,4 +20,4 @@ module CommitStatusEnums
   end
 end
 
-CommitStatusEnums.prepend(EE::CommitStatusEnums)
+CommitStatusEnums.prepend_if_ee('EE::CommitStatusEnums')

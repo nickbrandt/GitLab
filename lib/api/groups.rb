@@ -264,4 +264,4 @@ module API
   end
 end
 
-API::Groups.prepend(EE::API::Groups)
+API::Groups.prepend_if_ee('EE::API::Groups')

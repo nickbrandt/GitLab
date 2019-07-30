@@ -48,4 +48,4 @@ class Identity < ApplicationRecord
   end
 end
 
-Identity.prepend(EE::Identity)
+Identity.prepend_if_ee('EE::Identity')

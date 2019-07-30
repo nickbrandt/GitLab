@@ -12,4 +12,4 @@ module API
   end
 end
 
-API::Helpers::ResourceLabelEventsHelpers.prepend(EE::API::Helpers::ResourceLabelEventsHelpers)
+API::Helpers::ResourceLabelEventsHelpers.prepend_if_ee('EE::API::Helpers::ResourceLabelEventsHelpers')

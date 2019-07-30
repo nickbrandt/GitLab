@@ -33,4 +33,4 @@ module Gitlab
   end
 end
 
-Gitlab::FakeApplicationSettings.prepend(EE::Gitlab::FakeApplicationSettings)
+Gitlab::FakeApplicationSettings.prepend_if_ee('EE::Gitlab::FakeApplicationSettings')

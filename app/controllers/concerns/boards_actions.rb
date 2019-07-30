@@ -45,4 +45,4 @@ module BoardsActions
   end
 end
 
-BoardsActions.prepend(EE::BoardsActions)
+BoardsActions.prepend_if_ee('EE::BoardsActions')

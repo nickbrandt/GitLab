@@ -26,4 +26,4 @@ module Search
   end
 end
 
-Search::GroupService.prepend(EE::Search::GroupService)
+Search::GroupService.prepend_if_ee('EE::Search::GroupService')

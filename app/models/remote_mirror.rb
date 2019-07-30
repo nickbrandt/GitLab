@@ -275,4 +275,4 @@ class RemoteMirror < ApplicationRecord
   end
 end
 
-RemoteMirror.prepend(EE::RemoteMirror)
+RemoteMirror.prepend_if_ee('EE::RemoteMirror')

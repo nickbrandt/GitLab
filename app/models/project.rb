@@ -2299,4 +2299,4 @@ class Project < ApplicationRecord
   end
 end
 
-Project.prepend(EE::Project)
+Project.prepend_if_ee('EE::Project')

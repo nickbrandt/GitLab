@@ -21,4 +21,4 @@ module API
   end
 end
 
-API::Helpers::SearchHelpers.prepend(EE::API::Helpers::SearchHelpers)
+API::Helpers::SearchHelpers.prepend_if_ee('EE::API::Helpers::SearchHelpers')

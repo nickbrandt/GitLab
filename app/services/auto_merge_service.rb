@@ -61,4 +61,4 @@ class AutoMergeService < BaseService
   end
 end
 
-AutoMergeService.prepend(EE::AutoMergeService)
+AutoMergeService.prepend_if_ee('EE::AutoMergeService')

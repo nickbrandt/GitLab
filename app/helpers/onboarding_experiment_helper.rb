@@ -6,4 +6,4 @@ module OnboardingExperimentHelper
   end
 end
 
-OnboardingExperimentHelper.prepend(EE::OnboardingExperimentHelper)
+OnboardingExperimentHelper.prepend_if_ee('EE::OnboardingExperimentHelper')

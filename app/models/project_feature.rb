@@ -177,4 +177,4 @@ class ProjectFeature < ApplicationRecord
   end
 end
 
-ProjectFeature.prepend(EE::ProjectFeature)
+ProjectFeature.prepend_if_ee('EE::ProjectFeature')

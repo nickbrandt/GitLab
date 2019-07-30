@@ -166,4 +166,4 @@ module Projects
   end
 end
 
-Projects::TransferService.prepend(EE::Projects::TransferService)
+Projects::TransferService.prepend_if_ee('EE::Projects::TransferService')

@@ -456,4 +456,4 @@ class Group < Namespace
   end
 end
 
-Group.prepend(EE::Group)
+Group.prepend_if_ee('EE::Group')

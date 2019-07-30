@@ -61,4 +61,4 @@ module Ci
   end
 end
 
-Ci::ExpirePipelineCacheService.prepend(EE::Ci::ExpirePipelineCacheService)
+Ci::ExpirePipelineCacheService.prepend_if_ee('EE::Ci::ExpirePipelineCacheService')

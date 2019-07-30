@@ -90,4 +90,4 @@ module SelectsHelper
   end
 end
 
-SelectsHelper.prepend(EE::SelectsHelper)
+SelectsHelper.prepend_if_ee('EE::SelectsHelper')

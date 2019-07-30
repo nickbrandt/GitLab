@@ -124,4 +124,4 @@ module API
   end
 end
 
-API::Search.prepend(EE::API::Search)
+API::Search.prepend_if_ee('EE::API::Search')

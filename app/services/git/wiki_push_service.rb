@@ -8,4 +8,4 @@ module Git
   end
 end
 
-Git::WikiPushService.prepend(EE::Git::WikiPushService)
+Git::WikiPushService.prepend_if_ee('EE::Git::WikiPushService')

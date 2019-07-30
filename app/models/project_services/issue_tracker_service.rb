@@ -147,4 +147,4 @@ class IssueTrackerService < Service
   end
 end
 
-IssueTrackerService.prepend(EE::IssueTrackerService)
+IssueTrackerService.prepend_if_ee('EE::IssueTrackerService')

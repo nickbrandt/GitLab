@@ -59,4 +59,4 @@ class PipelineSerializer < BaseSerializer
   end
 end
 
-PipelineSerializer.prepend(EE::PipelineSerializer)
+PipelineSerializer.prepend_if_ee('EE::PipelineSerializer')

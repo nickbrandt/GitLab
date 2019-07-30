@@ -86,4 +86,4 @@ module ServiceParams
   end
 end
 
-ServiceParams.prepend(EE::ServiceParams)
+ServiceParams.prepend_if_ee('EE::ServiceParams')

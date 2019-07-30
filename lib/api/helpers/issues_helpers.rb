@@ -63,4 +63,4 @@ module API
   end
 end
 
-API::Helpers::IssuesHelpers.prepend(EE::API::Helpers::IssuesHelpers)
+API::Helpers::IssuesHelpers.prepend_if_ee('EE::API::Helpers::IssuesHelpers')

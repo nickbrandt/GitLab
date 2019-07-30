@@ -348,4 +348,4 @@ class Namespace < ApplicationRecord
   end
 end
 
-Namespace.prepend(EE::Namespace)
+Namespace.prepend_if_ee('EE::Namespace')

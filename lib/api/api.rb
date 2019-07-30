@@ -180,4 +180,4 @@ module API
   end
 end
 
-API::API.prepend(::EE::API::Endpoints)
+API::API.prepend_if_ee('::EE::API::Endpoints')

@@ -145,4 +145,4 @@ module Git
   end
 end
 
-Git::BranchHooksService.prepend(::EE::Git::BranchHooksService)
+Git::BranchHooksService.prepend_if_ee('::EE::Git::BranchHooksService')
