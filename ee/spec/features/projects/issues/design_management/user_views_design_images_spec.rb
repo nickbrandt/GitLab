@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'Users views raw design image files' do
+  include DesignManagementTestHelpers
+
   let(:project) { create(:project, :public) }
   let(:issue) { create(:issue, project: project) }
   let(:design) { create(:design, :with_file, issue: issue, versions_count: 2) }
@@ -10,7 +12,7 @@ describe 'Users views raw design image files' do
   let(:oldest_version) { design.versions.ordered.last }
 
   before do
-    stub_licensed_features(design_management: true)
+    enable_design_management
   end
 
   it 'serves the latest design version when no ref is given' do
