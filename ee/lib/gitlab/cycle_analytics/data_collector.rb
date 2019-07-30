@@ -12,9 +12,9 @@ module Gitlab
       end
 
       def records
-        fetcher = Gitlab::CycleAnalytics.const_get("#{stage.model_to_query}RecordsFetcher")
-        fetcher.new(stage, query).records
+        RecordsFetcher.build(stage, query)
       end
+
 
       def with_end_date_and_duration_in_seconds
         q = query.project(stage.model_to_query.arel_table[:id].as('id'))
