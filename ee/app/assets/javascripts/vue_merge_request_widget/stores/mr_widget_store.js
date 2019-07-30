@@ -96,9 +96,11 @@ export default class MergeRequestStore extends CEMergeRequestStore {
 
   static doCodeClimateComparison(headIssues, baseIssues) {
     // Do these comparisons in worker threads to avoid blocking the main thread
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const worker = new CodeQualityComparisonWorker();
-      worker.addEventListener('message', ({ data }) => resolve(data));
+      worker.addEventListener('message', ({ data }) =>
+        data.newIssues && data.resolvedIssues ? resolve(data) : reject(data),
+      );
       worker.postMessage({
         headIssues,
         baseIssues,
