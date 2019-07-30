@@ -1,0 +1,5 @@
+---
+title: Fix max attachment size used in CSV export email messages
+merge_request: 14884
+author:
+type: fixed
