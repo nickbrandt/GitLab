@@ -4,8 +4,11 @@ describe 'Groups > Usage Quotas' do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let!(:project) { create(:project, namespace: group, shared_runners_enabled: true) }
+  let(:gitlab_dot_com) { true }
 
   before do
+    allow(Gitlab).to receive(:com?).and_return(gitlab_dot_com)
+
     group.add_owner(user)
     sign_in(user)
   end
@@ -111,8 +114,20 @@ describe 'Groups > Usage Quotas' do
 
     include_examples 'linked in group settings dropdown'
 
+    context 'when it is not GitLab.com' do
+      let(:gitlab_dot_com) { false }
+
+      it "does not show 'Buy additional minutes' button" do
+        visit_pipeline_quota_page
+
+        expect(page).not_to have_content('Buy additional minutes')
+      end
+    end
+
     it 'shows correct group quota and projects info' do
       visit_pipeline_quota_page
+
+      expect(page).to have_content('Buy additional minutes')
 
       page.within('.pipeline-quota') do
         expect(page).to have_content("1000 / 500 minutes")

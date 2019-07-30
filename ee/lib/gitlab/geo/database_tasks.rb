@@ -40,13 +40,13 @@ module Gitlab
       end
 
       def pending_migrations
-        migration_context.open.pending_migrations
+        with_geo_db do
+          migration_context.open.pending_migrations
+        end
       end
 
       def migration_context
-        with_geo_db do
-          ActiveRecord::MigrationContext.new(ActiveRecord::Migrator.migrations_paths)
-        end
+        ActiveRecord::MigrationContext.new(ActiveRecord::Migrator.migrations_paths)
       end
 
       def abort_if_no_geo_config!
@@ -79,14 +79,18 @@ module Gitlab
           version = ENV['VERSION'] ? ENV['VERSION'].to_i : nil
           raise 'VERSION is required' unless version
 
-          Gitlab::Geo::DatabaseTasks.migration_context.run(:up, version)
+          Gitlab::Geo::DatabaseTasks.with_geo_db do
+            Gitlab::Geo::DatabaseTasks.migration_context.run(:up, version)
+          end
         end
 
         def down
           version = ENV['VERSION'] ? ENV['VERSION'].to_i : nil
           raise 'VERSION is required - To go down one migration, run db:rollback' unless version
 
-          Gitlab::Geo::DatabaseTasks.migration_context.run(:down, version)
+          Gitlab::Geo::DatabaseTasks.with_geo_db do
+            Gitlab::Geo::DatabaseTasks.migration_context.run(:down, version)
+          end
         end
 
         def status
