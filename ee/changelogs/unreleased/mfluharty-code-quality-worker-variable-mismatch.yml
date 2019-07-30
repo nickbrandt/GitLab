@@ -1,0 +1,5 @@
+---
+title: Fix variable mismatch in code quality widget
+merge_request: 14829
+author:
+type: fixed
