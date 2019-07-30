@@ -3,6 +3,7 @@
 module Gitlab
   module CycleAnalytics
     module StageEvents
+      # Base class for expressing an event. 
       class StageEvent
         include Gitlab::CycleAnalytics::MetricsTables
 
@@ -14,6 +15,13 @@ module Gitlab
           raise NotImplementedError
         end
 
+        # Each StageEvent must expose a timestamp or a timestamp like expression in order to build a range query.
+        # Example: get me all the Issue records between start event end end event
+        def timestamp_projection
+          raise NotImplementedError
+        end
+
+        # Optionally a StageEvent may apply additional filtering or join other tables on the base query.
         def apply_query_customization(query)
           query
         end

@@ -40,14 +40,14 @@ describe Gitlab::CycleAnalytics::DataCollector do
       end
     end
 
-    it 'loads records for a given stage' do
+    it 'loads serialized records for a given stage' do
       data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020))
-      items = data_collector.records
+      items = data_collector.records_fetcher.serialized_records
 
       expect(items.size).to eq(3)
     end
 
-    it 'loads data for the charts' do
+    it 'loads data for the scatterplot chart' do
       data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020))
 
       items = data_collector.with_end_date_and_duration_in_seconds

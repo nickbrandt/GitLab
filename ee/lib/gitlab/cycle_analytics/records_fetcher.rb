@@ -3,6 +3,11 @@
 module Gitlab
   module CycleAnalytics
     class RecordsFetcher
+      FETCHER_CLASSES = {
+        Issue => Gitlab::CycleAnalytics::IssueRecordsFetcher,
+        MergeRequest => Gitlab::CycleAnalytics::MergeRequestRecordsFetcher,
+      }
+
       def initialize(stage:, query:)
         @stage = stage
         @query = query
@@ -21,7 +26,7 @@ module Gitlab
         if default_test_stage? || default_staging_stage?
           BuildRecordsFetcher
         else
-          Gitlab::CycleAnalytics.const_get("#{stage.model_to_query}RecordsFetcher")
+          FETCHER_CLASSES.fetch(stage.model_to_query)
         end
       end
 

@@ -4,13 +4,18 @@ module Gitlab
   module CycleAnalytics
     class DataFilter
       include Gitlab::CycleAnalytics::MetricsTables
+      include StageQueryHelpers
 
       def initialize(stage:, params: {})
         @stage = stage
       end
 
-      def apply(query)
-        filter_by_parent_model(query)
+      def apply
+        query = stage.model_to_query.arel_table
+        query = filter_by_parent_model(query)
+        query = stage.start_event.apply_query_customization(query)
+        query = stage.end_event.apply_query_customization(query)
+        query.where(duration.gt(zero_interval))
       end
 
       private

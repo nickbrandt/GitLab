@@ -21,7 +21,7 @@ describe Gitlab::CycleAnalytics::TestStage do
       mr_4 = create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'C')
       mr_5 = create(:merge_request, source_project: project, created_at: 10.minutes.ago, source_branch: 'D')
       mr_1.metrics.update!(pipeline_id: create(:ci_build).commit_id, latest_build_started_at: 32.minutes.ago, latest_build_finished_at: 2.minutes.ago)
-      mr_2.metrics.update!(pipeline_id: create(:ci_build).commit_id,latest_build_started_at: 62.minutes.ago, latest_build_finished_at: 32.minutes.ago)
+      mr_2.metrics.update!(pipeline_id: create(:ci_build).commit_id, latest_build_started_at: 62.minutes.ago, latest_build_finished_at: 32.minutes.ago)
       mr_3.metrics.update!(latest_build_started_at: nil, latest_build_finished_at: nil)
       mr_4.metrics.update!(latest_build_started_at: nil, latest_build_finished_at: nil)
       mr_5.metrics.update!(latest_build_started_at: nil, latest_build_finished_at: nil)

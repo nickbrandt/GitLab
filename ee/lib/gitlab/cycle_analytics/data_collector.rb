@@ -3,25 +3,18 @@
 module Gitlab
   module CycleAnalytics
     class DataCollector
-      include StageQueryHelpers
-
       def initialize(stage, from = nil, to = Time.now)
         @stage = stage
         @from = from
         @to = to
       end
 
-      def records
+      def records_fetcher
         RecordsFetcher.new(stage: stage, query: query)
       end
 
-
       def with_end_date_and_duration_in_seconds
-        q = query.project(stage.model_to_query.arel_table[:id].as('id'))
-        q = q.project(round_duration_to_seconds.as('duration_in_seconds'))
-        q = q.project(stage.end_event.timestamp_projection.as('finished_at'))
-
-        execute_query(q).to_a
+        DataForScatterplotChart.new(stage: stage, query: query).load
       end
 
       def median
@@ -33,10 +26,7 @@ module Gitlab
       attr_reader :stage, :from, :to
 
       def query
-        q = DataFilter.new(stage: stage).apply(stage.model_to_query.arel_table)
-        q = stage.start_event.apply_query_customization(q)
-        q = stage.end_event.apply_query_customization(q)
-        q.where(duration.gt(zero_interval))
+        DataFilter.new(stage: stage).apply
       end
     end
   end
