@@ -133,6 +133,21 @@ module EE
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports)
     end
 
+    def has_container_scanning_reports?
+      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.container_scanning_reports)
+    end
+
+    def compare_container_scanning_reports
+      unless has_container_scanning_reports?
+        return { status: :error, status_reason: 'This merge request does not have container scanning reports' }
+      end
+
+      head_report = actual_head_pipeline&.security_reports.get_report('container_scanning')
+      base_report = base_pipeline&.security_reports.get_report('container_scanning')
+
+      Security::CompareReportsContainerScanningService.new(head_report, base_report, Vulnerabilities::OccurrenceDiffSerializer).execute
+    end
+
     def compare_license_management_reports
       unless has_license_management_reports?
         return { status: :error, status_reason: 'This merge request does not have license management reports' }
