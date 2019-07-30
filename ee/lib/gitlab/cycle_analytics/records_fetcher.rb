@@ -31,19 +31,11 @@ module Gitlab
       end
 
       def default_test_stage?
-        test_stage = Gitlab::CycleAnalytics::DefaultStages.params_for_test_stage
-
-        stage.default_stage? &&
-          stage.start_event_identifier == test_stage[:start_event_identifier] &&
-          stage.end_event_identifier == test_stage[:end_event_identifier]
+        stage.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_test_stage)
       end
 
       def default_staging_stage?
-        staging_stage = Gitlab::CycleAnalytics::DefaultStages.params_for_staging_stage
-
-        stage.default_stage? &&
-          stage.start_event_identifier == staging_stage[:start_event_identifier] &&
-          stage.end_event_identifier == staging_stage[:end_event_identifier]
+        stage.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_staging_stage)
       end
     end
   end

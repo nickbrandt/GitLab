@@ -19,8 +19,15 @@ class CycleAnalytics::StageEntity < Grape::Entity
     expose :end_event_label, as: :label, using: LabelEntity
   end
 
+  DEFAULT_STAGE_DESCRIPTIONS = {
+  }
+
   def legend
-    if object.model_to_query.eql?(Issue)
+    if object.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_test_stage)
+      _("Related Jobs")
+    elsif object.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_staging_stage)
+      _("Related Deployed Jobs")
+    elsif object.model_to_query.eql?(Issue)
       _("Related Issues")
     elsif object.model_to_query.eql?(MergeRequest)
       _("Related Merged Requests")
