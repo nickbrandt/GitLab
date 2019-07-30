@@ -9,17 +9,17 @@ describe Projects::Security::DependenciesController do
     let(:params) { { namespace_id: project.namespace, project_id: project } }
 
     before do
-      project.add_developer(user)
+      sign_in(user)
     end
 
     context 'with authorized user' do
       before do
-        sign_in(user)
+        project.add_developer(user)
       end
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_list: true, security_dashboard: true)
         end
 
         it 'counts usage of the feature' do
@@ -135,6 +135,8 @@ describe Projects::Security::DependenciesController do
 
       context 'when feature is not available' do
         before do
+          stub_licensed_features(security_dashboard: true)
+
           get :index, params: params, format: :json
         end
 
@@ -146,11 +148,13 @@ describe Projects::Security::DependenciesController do
 
     context 'with unauthorized user' do
       before do
+        project.add_guest(user)
+
         get :index, params: params, format: :json
       end
 
-      it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
       end
     end
   end
