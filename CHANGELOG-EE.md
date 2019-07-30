@@ -1,5 +1,21 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.3
+
+### Fixed (3 changes)
+
+- Allow bulk editing group issues for reporter access level and higher. !14744
+- Initialize Application Table on Instance-wide Cluster Details. !14749
+- Hide "Buy additional minutes" button for self-managed installs. !14826
+
+### Added (4 changes)
+
+- Add Vulnerabilities API scoping: pipeline. !14376
+- Add policy for accessing dependencies. !14561
+- Add filtering by package manager for dependencies. !14562
+- Add dependency list public endpoint. !14612
+
+
 ## 12.1.2
 
 ### Security (1 change)
