@@ -49,6 +49,14 @@ describe EE::Gitlab::Auth::LDAP::Sync::Proxy do
         expect(sync_proxy.dns_for_group_cn('ldap_group1')).to match_array(dns)
       end
 
+      it 'returns normalized DNs' do
+        ldap_group = ldap_group_entry(['UID=JaneDoe,OU=Users,DC=Example,DC=com'])
+        stub_ldap_group_find_by_cn('ldap_group1', ldap_group, adapter)
+
+        expect(sync_proxy.dns_for_group_cn('ldap_group1'))
+          .to match_array(['uid=janedoe,ou=users,dc=example,dc=com'])
+      end
+
       it 'returns cached results after the first lookup' do
         ldap_group = ldap_group_entry(dns)
         stub_ldap_group_find_by_cn('ldap_group1', ldap_group, adapter)
@@ -123,13 +131,13 @@ describe EE::Gitlab::Auth::LDAP::Sync::Proxy do
 
     context 'when secondary_extern_uid is not stored in the database' do
       before do
-        ldap_user_entry = ldap_user_entry('jane_doe')
+        ldap_user_entry = Net::LDAP::Entry.new
+        ldap_user_entry['dn'] = 'UID=Jane_Doe,OU=Users,DC=Example,DC=com'
         stub_ldap_person_find_by_uid('jane_doe', ldap_user_entry)
       end
 
-      it 'returns the user DN' do
-        expect(sync_proxy.dn_for_uid('jane_doe'))
-          .to eq('uid=jane_doe,ou=users,dc=example,dc=com')
+      it 'returns the normalized user DN' do
+        expect(sync_proxy.dn_for_uid('jane_doe')).to eq('uid=jane_doe,ou=users,dc=example,dc=com')
       end
 
       it 'retrieves the user from LDAP' do
@@ -206,6 +214,36 @@ describe EE::Gitlab::Auth::LDAP::Sync::Proxy do
       it 'raises exception' do
         expect { sync_proxy.dns_for_group_cn('ldap_group1') }.to raise_error(::Gitlab::Auth::LDAP::LDAPConnectionError)
       end
+    end
+  end
+
+  describe '#dns_for_filter' do
+    let(:filter) { '(ou=people)' }
+
+    it 'returns DNs from an LDAP search' do
+      entry = ldap_user_entry('johndoe')
+
+      allow(adapter).to receive(:ldap_search).and_return([entry])
+
+      expect(sync_proxy.dns_for_filter(filter)).to eq(['uid=johndoe,ou=users,dc=example,dc=com'])
+    end
+
+    it 'normalizes DNs' do
+      entry = Net::LDAP::Entry.new
+      entry['dn'] = 'UID=JaneDoe,OU=Users,DC=Example,DC=com'
+
+      allow(adapter).to receive(:ldap_search).and_return([entry])
+
+      expect(sync_proxy.dns_for_filter(filter)).to eq(['uid=janedoe,ou=users,dc=example,dc=com'])
+    end
+
+    it 'returns cached results after the first lookup' do
+      allow(adapter).to receive(:ldap_search).and_return([]).once
+      sync_proxy.dns_for_filter(filter)
+
+      expect(sync_proxy).not_to receive(:dn_filter_search)
+
+      sync_proxy.dns_for_filter(filter)
     end
   end
 end
