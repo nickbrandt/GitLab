@@ -7,15 +7,22 @@ self.addEventListener('message', e => {
   const { data } = e;
 
   if (data === undefined) {
-    return;
+    return null;
+  }
+
+  const { headIssues, baseIssues } = data;
+
+  if (!headIssues || !baseIssues) {
+    // eslint-disable-next-line no-restricted-globals
+    return self.postMessage({});
   }
 
   // eslint-disable-next-line no-restricted-globals
   self.postMessage({
-    newIssues: filterByKey(data.parsedHeadIssues, data.parsedBaseIssues, keyToFilterBy),
-    resolvedIssues: filterByKey(data.parsedBaseIssues, data.parsedHeadIssues, keyToFilterBy),
+    newIssues: filterByKey(headIssues, baseIssues, keyToFilterBy),
+    resolvedIssues: filterByKey(baseIssues, headIssues, keyToFilterBy),
   });
 
   // eslint-disable-next-line no-restricted-globals
-  self.close();
+  return self.close();
 });
