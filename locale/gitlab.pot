@@ -1219,7 +1219,7 @@ msgstr ""
 msgid "Also called \"Relying party service URL\" or \"Reply URL\""
 msgstr ""
 
-msgid "Alternate support URL for help page"
+msgid "Alternate support URL for help page and help dropdown"
 msgstr ""
 
 msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to connect."
@@ -13888,6 +13888,9 @@ msgid "SuggestedColors|Very pale orange"
 msgstr ""
 
 msgid "Sunday"
+msgstr ""
+
+msgid "Support"
 msgstr ""
 
 msgid "Support for custom certificates is disabled. Ask your system's administrator to enable it."
