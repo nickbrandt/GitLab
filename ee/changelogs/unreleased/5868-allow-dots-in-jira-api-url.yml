@@ -1,0 +1,5 @@
+---
+title: Fix Jira DVCS integration not working when project name has dots
+merge_request: 14855
+author:
+type: fixed

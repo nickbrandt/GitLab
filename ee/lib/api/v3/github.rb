@@ -10,8 +10,11 @@ module API
     class Github < Grape::API
       JIRA_DEV_PANEL_FEATURE = :jira_dev_panel_integration.freeze
       NO_SLASH_URL_PART_REGEX = %r{[^/]+}.freeze
-      NAMESPACE_ENDPOINT_REQUIREMENTS = { namespace: NO_SLASH_URL_PART_REGEX }.freeze
-      PROJECT_ENDPOINT_REQUIREMENTS = NAMESPACE_ENDPOINT_REQUIREMENTS.merge(project: NO_SLASH_URL_PART_REGEX).freeze
+      ENDPOINT_REQUIREMENTS = {
+        namespace: NO_SLASH_URL_PART_REGEX,
+        project: NO_SLASH_URL_PART_REGEX,
+        username: NO_SLASH_URL_PART_REGEX
+      }.freeze
 
       # Used to differentiate Jira Cloud requests from Jira Server requests
       # Jira Cloud user agent format: Jira DVCS Connector Vertigo/version
@@ -90,7 +93,7 @@ module API
       end
 
       resource :orgs do
-        get ':namespace/repos', requirements: NAMESPACE_ENDPOINT_REQUIREMENTS do
+        get ':namespace/repos' do
           present []
         end
       end
@@ -106,7 +109,7 @@ module API
           use :pagination
         end
 
-        get ':namespace/repos', requirements: NAMESPACE_ENDPOINT_REQUIREMENTS do
+        get ':namespace/repos' do
           namespace = Namespace.find_by_full_path(params[:namespace])
           not_found!('Namespace') unless namespace
 
@@ -147,7 +150,7 @@ module API
         params do
           use :project_full_path
         end
-        get ':namespace/:project/pulls', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
+        get ':namespace/:project/pulls' do
           user_project = find_project_with_access(params)
 
           merge_requests = MergeRequestsFinder.new(current_user, authorized_only: true, project_id: user_project.id).execute
@@ -158,7 +161,7 @@ module API
         params do
           use :project_full_path
         end
-        get ':namespace/:project/pulls/:id', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
+        get ':namespace/:project/pulls/:id' do
           mr = find_merge_request_with_access(params[:id])
 
           present mr, with: ::API::Github::Entities::PullRequest
@@ -200,7 +203,7 @@ module API
           use :project_full_path
           use :pagination
         end
-        get ':namespace/:project/branches', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
+        get ':namespace/:project/branches' do
           user_project = find_project_with_access(params)
 
           update_project_feature_usage_for(user_project)
@@ -213,7 +216,7 @@ module API
         params do
           use :project_full_path
         end
-        get ':namespace/:project/commits/:sha', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
+        get ':namespace/:project/commits/:sha' do
           user_project = find_project_with_access(params)
 
           commit = user_project.commit(params[:sha])
