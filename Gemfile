@@ -309,7 +309,6 @@ gem 'batch-loader', '~> 1.4.0'
 # Perf bar
 gem 'peek', '~> 1.0.1'
 gem 'peek-gc', '~> 0.0.2'
-gem 'peek-rblineprof', '~> 0.2.0'
 
 # Snowplow events tracking
 gem 'snowplow-tracker', '~> 0.6.1'
