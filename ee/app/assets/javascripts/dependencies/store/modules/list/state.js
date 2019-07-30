@@ -1,4 +1,4 @@
-import { REPORT_STATUS, SORT_ORDER } from './constants';
+import { FILTER, REPORT_STATUS, SORT_ORDER } from './constants';
 
 export default () => ({
   endpoint: '',
@@ -6,11 +6,14 @@ export default () => ({
   isLoading: false,
   errorLoading: false,
   dependencies: [],
-  pageInfo: {},
+  pageInfo: {
+    total: 0,
+  },
   reportInfo: {
     status: REPORT_STATUS.ok,
     jobPath: '',
   },
+  filter: FILTER.all,
   sortField: 'name',
   sortOrder: SORT_ORDER.ascending,
 });

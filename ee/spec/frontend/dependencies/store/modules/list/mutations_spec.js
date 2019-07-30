@@ -19,6 +19,15 @@ describe('Dependencies mutations', () => {
     });
   });
 
+  describe(types.SET_INITIAL_STATE, () => {
+    it('correctly mutates the state', () => {
+      const filter = 'foo';
+      mutations[types.SET_INITIAL_STATE](state, { filter });
+
+      expect(state.filter).toBe(filter);
+    });
+  });
+
   describe(types.REQUEST_DEPENDENCIES, () => {
     beforeEach(() => {
       mutations[types.REQUEST_DEPENDENCIES](state);

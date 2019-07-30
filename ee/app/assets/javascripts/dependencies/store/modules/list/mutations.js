@@ -5,6 +5,9 @@ export default {
   [types.SET_DEPENDENCIES_ENDPOINT](state, payload) {
     state.endpoint = payload;
   },
+  [types.SET_INITIAL_STATE](state, payload) {
+    Object.assign(state, payload);
+  },
   [types.REQUEST_DEPENDENCIES](state) {
     state.isLoading = true;
     state.errorLoading = false;
