@@ -8,8 +8,8 @@ module Gitlab
         @query = query
       end
 
-      def serialized_records(stage, query)
-        fetcher_class.new(stage, query).serialize
+      def serialized_records
+        fetcher_class.new(stage, query).serialized_records
       end
 
       private
@@ -37,8 +37,8 @@ module Gitlab
         staging_stage = Gitlab::CycleAnalytics::DefaultStages.params_for_staging_stage
 
         stage.default_stage? &&
-          stage.start_event_identifier == test_stage[:start_event_identifier] &&
-          stage.end_event_identifier == test_stage[:end_event_identifier]
+          stage.start_event_identifier == staging_stage[:start_event_identifier] &&
+          stage.end_event_identifier == staging_stage[:end_event_identifier]
       end
     end
   end

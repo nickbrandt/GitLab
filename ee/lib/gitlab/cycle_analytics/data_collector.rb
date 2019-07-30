@@ -12,7 +12,7 @@ module Gitlab
       end
 
       def records
-        RecordsFetcher.build(stage, query)
+        RecordsFetcher.new(stage: stage, query: query)
       end
 
 

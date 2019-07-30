@@ -4,6 +4,7 @@ module Gitlab
   module CycleAnalytics
     class MergeRequestRecordsFetcher
       include StageQueryHelpers
+      include Gitlab::CycleAnalytics::MetricsTables
 
       attr_reader :stage
 
@@ -17,14 +18,20 @@ module Gitlab
         execute_query(q).to_a
       end
 
+      def serialized_records
+        records.map { |r| AnalyticsIssueSerializer.new.represent(r) }
+      end
+
       def projections
         [
-          MergeRequest.arel_table[:title],
-          MergeRequest.arel_table[:iid],
-          MergeRequest.arel_table[:id],
-          MergeRequest.arel_table[:created_at],
-          MergeRequest.arel_table[:state],
-          MergeRequest.arel_table[:author_id]
+          mr_table[:title],
+          mr_table[:iid],
+          mr_table[:id],
+          mr_table[:created_at],
+          mr_table[:state],
+          mr_table[:author_id],
+          projects_table[:name],
+          routes_table[:path]
         ]
       end
     end
