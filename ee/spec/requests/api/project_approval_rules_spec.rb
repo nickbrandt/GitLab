@@ -118,14 +118,6 @@ describe API::ProjectApprovalRules do
 
         expect(json_response.symbolize_keys).to include(params)
       end
-
-      it 'sets rule_type as report_approver if name matches default name for security reports' do
-        expect do
-          post api(url, current_user), params: params.merge(name: ApprovalProjectRule::DEFAULT_NAME_FOR_SECURITY_REPORT)
-        end.to change { ApprovalProjectRule.report_approver.count }.from(0).to(1)
-
-        expect(response).to have_gitlab_http_status(201)
-      end
     end
   end
 
