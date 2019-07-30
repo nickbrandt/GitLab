@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples_for 'cycle analytics stage' do 
+shared_examples_for 'cycle analytics stage' do
   let(:valid_params) do
     {
       name: 'My Stage',

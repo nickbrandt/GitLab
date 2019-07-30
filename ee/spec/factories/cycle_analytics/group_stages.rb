@@ -8,4 +8,3 @@ FactoryBot.define do
     end_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueClosed.identifier }
   end
 end
-

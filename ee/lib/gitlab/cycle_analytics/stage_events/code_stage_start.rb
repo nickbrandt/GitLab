@@ -21,7 +21,7 @@ module Gitlab
         end
 
         def apply_query_customization(query)
-          q = inner_join(mr_table, mr_closing_issues_table[:merge_request_id])
+          q = inner_join(query, mr_closing_issues_table[:merge_request_id])
           q = inner_join(q, issue_metrics_table[:issue_id], mr_closing_issues_table[:issue_id])
           q
         end
