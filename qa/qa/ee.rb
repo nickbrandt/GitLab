@@ -49,6 +49,11 @@ module QA
 
         module Settings
           autoload :Templates, 'qa/ee/page/admin/settings/templates'
+          autoload :Integration, 'qa/ee/page/admin/settings/integration'
+
+          module Component
+            autoload :Elasticsearch, 'qa/ee/page/admin/settings/component/elasticsearch'
+          end
         end
       end
 
@@ -111,6 +116,10 @@ module QA
       module Geo
         autoload :Node, 'qa/ee/resource/geo/node'
       end
+
+      module Settings
+        autoload :Elasticsearch, 'qa/ee/resource/settings/elasticsearch'
+      end
     end
 
     module Scenario
@@ -118,6 +127,7 @@ module QA
         autoload :Geo, 'qa/ee/scenario/test/geo'
         module Integration
           autoload :GroupSAML, 'qa/ee/scenario/test/integration/group_saml'
+          autoload :Elasticsearch, 'qa/ee/scenario/test/integration/elasticsearch'
         end
       end
     end
