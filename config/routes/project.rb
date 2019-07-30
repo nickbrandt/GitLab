@@ -431,6 +431,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         namespace :v2 do
           resource :cycle_analytics, only: [:show] do
             get 'median/:stage_id' => 'cycle_analytics#median'
+            get 'duration_chart/:stage_id' => 'cycle_analytics#duration_chart'
             resources :stages, controller: 'cycle_analytics_stages', only: [:create, :update, :destroy] do
               resources :records, controller: 'cycle_analytics_records', only: [:index]
             end
