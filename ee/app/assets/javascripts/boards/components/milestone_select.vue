@@ -1,9 +1,37 @@
 <script>
 import MilestoneSelect from '~/milestone_select';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 
-const ANY_MILESTONE = 'Any Milestone';
-const NO_MILESTONE = 'No Milestone';
+const ANY_MILESTONE = {
+  title: __('Any Milestone'),
+  titleClass: 'text-secondary',
+  name: 'Any',
+  id: null,
+};
+
+const NO_MILESTONE = {
+  title: __('No Milestone'),
+  name: 'None',
+  id: -1,
+};
+
+const DEFAULT_MILESTONE = {
+  title: ANY_MILESTONE.title,
+  titleClass: 'bold',
+  name: '',
+};
+
+function getMilestoneIdFromTitle({ title, id }) {
+  switch (title) {
+    case ANY_MILESTONE.title:
+      return ANY_MILESTONE.id;
+    case NO_MILESTONE.title:
+      return NO_MILESTONE.id;
+    default:
+      return id;
+  }
+}
 
 export default {
   components: {
@@ -26,22 +54,27 @@ export default {
   },
 
   computed: {
-    milestoneTitle() {
-      if (this.noMilestone) return NO_MILESTONE;
-      return this.board.milestone ? this.board.milestone.title : ANY_MILESTONE;
+    milestone() {
+      switch (this.milestoneId) {
+        case NO_MILESTONE.id:
+          return NO_MILESTONE;
+        case ANY_MILESTONE.id:
+          return ANY_MILESTONE;
+        default:
+          return this.board.milestone || DEFAULT_MILESTONE;
+      }
     },
-    noMilestone() {
-      return this.milestoneId === 0;
+    milestoneTitle() {
+      return this.milestone.title;
     },
     milestoneId() {
       return this.board.milestone_id;
     },
     milestoneTitleClass() {
-      return this.milestoneTitle === ANY_MILESTONE ? 'text-secondary' : 'bold';
+      return this.milestone.titleClass || DEFAULT_MILESTONE.titleClass;
     },
     selected() {
-      if (this.noMilestone) return NO_MILESTONE;
-      return this.board.milestone ? this.board.milestone.name : '';
+      return this.milestone.name;
     },
   },
   mounted() {
@@ -51,13 +84,7 @@ export default {
   },
   methods: {
     selectMilestone(milestone) {
-      let { id } = milestone;
-      // swap the IDs of 'Any' and 'No' milestone to what backend requires
-      if (milestone.title === ANY_MILESTONE) {
-        id = -1;
-      } else if (milestone.title === NO_MILESTONE) {
-        id = 0;
-      }
+      const id = getMilestoneIdFromTitle(milestone);
       this.board.milestone_id = id;
       this.board.milestone = {
         ...milestone,
