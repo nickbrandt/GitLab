@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import _ from 'underscore';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from './pages/index.vue';
@@ -42,7 +41,9 @@ export default function createRouter(base) {
               from,
               next,
             ) {
-              if (_.isString(id)) next();
+              if (typeof id === 'string') {
+                next();
+              }
             },
             props: ({ params: { id } }) => ({ id }),
           },
