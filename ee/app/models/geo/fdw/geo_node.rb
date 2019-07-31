@@ -100,16 +100,8 @@ module Geo
         Geo::Fdw::Project
       end
 
-      def projects_table
-        Geo::Fdw::Project.arel_table
-      end
-
       def uploads_model
         Geo::Fdw::Upload
-      end
-
-      def uploads_table
-        Geo::Fdw::Upload.arel_table
       end
     end
   end

@@ -29,7 +29,7 @@ module Geo
       if selective_sync?
         attachments
       else
-        Upload
+        local_storage_only? ? Upload.with_files_stored_locally : Upload
       end
     end
 
@@ -89,7 +89,7 @@ module Geo
     private
 
     def attachments
-      current_node.attachments
+      local_storage_only? ? current_node.attachments.with_files_stored_locally : current_node.attachments
     end
 
     def registries_for_attachments

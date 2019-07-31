@@ -128,13 +128,7 @@ module Geo::SelectiveSync
   end
 
   def attachments_for_model_type_with_id_in(model_type, model_ids)
-    # This query was intentionally converted to a raw one to get it work in Rails 5.0.
-    # In Rails 5.0 and 5.1 there's a bug: https://github.com/rails/arel/issues/531
-    # Please convert it back when on rails 5.2 as it works again as expected since 5.2.
-    column_name = "#{uploads_table.name}.#{uploads_table[:model_id].name}"
-    raw_sql = Arel::Nodes::SqlLiteral.new("#{column_name} IN (#{model_ids.to_sql})")
-
-    uploads_table[:model_type].eq(model_type).and(raw_sql)
+    uploads_table[:model_type].eq(model_type).and(uploads_table[:model_id].in(model_ids.arel))
   end
 
   # This concern doesn't define a geo_node_namespace_links relation. That's
@@ -165,8 +159,7 @@ module Geo::SelectiveSync
   end
 
   def projects_table
-    raise NotImplementedError,
-      "#{self.class} does not implement #{__method__}"
+    project_model.arel_table
   end
 
   def uploads_model
@@ -175,7 +168,6 @@ module Geo::SelectiveSync
   end
 
   def uploads_table
-    raise NotImplementedError,
-      "#{self.class} does not implement #{__method__}"
+    uploads_model.arel_table
   end
 end

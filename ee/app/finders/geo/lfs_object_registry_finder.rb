@@ -24,9 +24,9 @@ module Geo
 
     def syncable
       if selective_sync?
-        current_node.lfs_objects
+        lfs_objects
       else
-        LfsObject.syncable
+        local_storage_only? ? LfsObject.syncable.with_files_stored_locally : LfsObject.syncable
       end
     end
 
@@ -81,7 +81,7 @@ module Geo
     private
 
     def lfs_objects
-      current_node.lfs_objects
+      local_storage_only? ? current_node.lfs_objects.with_files_stored_locally : current_node.lfs_objects
     end
 
     def registries_for_lfs_objects

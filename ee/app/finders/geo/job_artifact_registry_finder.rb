@@ -26,7 +26,7 @@ module Geo
       if selective_sync?
         job_artifacts.not_expired
       else
-        Ci::JobArtifact.not_expired
+        local_storage_only? ? Ci::JobArtifact.not_expired.with_files_stored_locally : Ci::JobArtifact.not_expired
       end
     end
 
@@ -84,7 +84,7 @@ module Geo
     private
 
     def job_artifacts
-      current_node.job_artifacts
+      local_storage_only? ? current_node.job_artifacts.with_files_stored_locally : current_node.job_artifacts
     end
 
     def registries_for_job_artifacts
