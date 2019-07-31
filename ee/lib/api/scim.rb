@@ -62,7 +62,7 @@ module API
         # rubocop: disable CodeReuse/ActiveRecord
         def update_scim_user(identity)
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          parsed_hash = parser.result
+          parsed_hash = parser.update_params
 
           if parser.deprovision_user?
             destroy_identity(identity)
@@ -129,7 +129,7 @@ module API
         post do
           group = find_and_authenticate_group!(params[:group])
           parser = EE::Gitlab::Scim::ParamsParser.new(params)
-          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.result).execute
+          result = EE::Gitlab::Scim::ProvisioningService.new(group, parser.post_params).execute
 
           case result.status
           when :success
