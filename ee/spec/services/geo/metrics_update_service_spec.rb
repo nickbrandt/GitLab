@@ -28,6 +28,9 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       job_artifacts_synced_count: 50,
       job_artifacts_failed_count: 12,
       job_artifacts_synced_missing_on_primary_count: 5,
+      container_repositories_count: 100,
+      container_repositories_synced_count: 50,
+      container_repositories_failed_count: 12,
       attachments_count: 30,
       attachments_synced_count: 30,
       attachments_failed_count: 25,
@@ -56,6 +59,7 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       lfs_objects_count: 100,
       job_artifacts_count: 100,
       attachments_count: 30,
+      container_repositories_count: 100,
       last_event_id: 2,
       last_event_date: event_date,
       event_log_max_id: 555

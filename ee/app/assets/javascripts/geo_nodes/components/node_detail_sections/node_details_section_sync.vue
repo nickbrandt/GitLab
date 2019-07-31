@@ -57,6 +57,11 @@ export default {
           itemValueType: VALUE_TYPE.GRAPH,
         },
         {
+          itemTitle: s__('GeoNodes|Local container repositories'),
+          itemValue: this.nodeDetails.containerRepositories,
+          itemValueType: VALUE_TYPE.GRAPH,
+        },
+        {
           itemTitle: s__('GeoNodes|Data replication lag'),
           itemValue: this.dbReplicationLag(),
           itemValueType: VALUE_TYPE.PLAIN,

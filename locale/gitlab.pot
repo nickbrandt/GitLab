@@ -6604,6 +6604,9 @@ msgstr ""
 msgid "GeoNodes|Local attachments"
 msgstr ""
 
+msgid "GeoNodes|Local container repositories"
+msgstr ""
+
 msgid "GeoNodes|Local job artifacts"
 msgstr ""
 

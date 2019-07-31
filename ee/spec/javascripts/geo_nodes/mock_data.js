@@ -74,6 +74,10 @@ export const rawMockNodeDetails = {
   job_artifacts_synced_count: 0,
   job_artifacts_failed_count: 0,
   job_artifacts_synced_in_percentage: '0.00%',
+  container_repositories_count: 0,
+  container_repositories_synced_count: 0,
+  container_repositories_failed_count: 0,
+  container_repositories_synced_in_percentage: '0.00%',
   repositories_failed_count: 0,
   repositories_synced_count: 12,
   repositories_synced_in_percentage: '100.00%',
@@ -175,6 +179,11 @@ export const mockNodeDetails = {
     failureCount: 0,
   },
   jobArtifacts: {
+    totalCount: 0,
+    successCount: 0,
+    failureCount: 0,
+  },
+  containerRepositories: {
     totalCount: 0,
     successCount: 0,
     failureCount: 0,

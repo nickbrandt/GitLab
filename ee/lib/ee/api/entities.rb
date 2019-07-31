@@ -564,6 +564,13 @@ module EE
           number_to_percentage(node.job_artifacts_synced_in_percentage, precision: 2)
         end
 
+        expose :container_repositories_count
+        expose :container_repositories_synced_count
+        expose :container_repositories_failed_count
+        expose :container_repositories_synced_in_percentage do |node|
+          number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
+        end
+
         expose :projects_count
 
         expose :repositories_failed_count

@@ -637,6 +637,72 @@ describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#container_repositories_count' do
+    it 'counts all the repositories' do
+      create(:container_repository)
+      create(:container_repository)
+
+      expect(subject.container_repositories_count).to eq(2)
+    end
+  end
+
+  describe '#container_repositories_synced_count' do
+    it 'counts synced repositories' do
+      create(:container_repository_registry, :synced)
+      create(:container_repository_registry, :synced)
+      create(:container_repository_registry, :sync_failed)
+
+      expect(subject.container_repositories_synced_count).to eq(2)
+    end
+  end
+
+  describe '#container_repositories_failed_count' do
+    it 'counts failed to sync repositories' do
+      create(:container_repository_registry, :synced)
+      create(:container_repository_registry, :sync_failed)
+      create(:container_repository_registry, :sync_failed)
+
+      expect(subject.container_repositories_failed_count).to eq(2)
+    end
+  end
+
+  describe '#container_repositories_registry_count' do
+    it 'counts number of registries for repositories' do
+      create(:container_repository_registry, :synced)
+      create(:container_repository_registry, :sync_failed)
+      create(:container_repository_registry, :sync_failed)
+      create(:container_repository)
+
+      expect(subject.container_repositories_registry_count).to eq(3)
+    end
+  end
+
+  describe '#container_repositories_synced_in_percentage' do
+    let(:container_repository) { create(:container_repository, project: project_1) }
+
+    before do
+      create(:container_repository, project: project_1)
+      create_list(:container_repository, 2, project: project_3)
+    end
+
+    it 'returns 0 when no objects are available' do
+      expect(subject.container_repositories_synced_in_percentage).to eq(0)
+    end
+
+    it 'returns the right percentage with no group restrictions' do
+      create(:container_repository_registry, :synced, container_repository: container_repository)
+
+      expect(subject.container_repositories_synced_in_percentage).to be_within(0.0001).of(25)
+    end
+
+    it 'returns the right percentage with group restrictions' do
+      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
+      create(:container_repository_registry, :synced, container_repository: container_repository)
+
+      expect(subject.container_repositories_synced_in_percentage).to be_within(0.0001).of(50)
+    end
+  end
+
   describe '#repositories_verified_count' do
     before do
       stub_current_geo_node(secondary)
