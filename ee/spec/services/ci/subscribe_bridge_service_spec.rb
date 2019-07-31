@@ -64,10 +64,11 @@ describe Ci::SubscribeBridgeService do
       end
 
       context 'when the upstream project does not have a pipeline' do
-        it 'does not populate the pipeline project source' do
+        it 'skips the bridge' do
           subject
 
           expect(bridge.upstream_pipeline).to eq(nil)
+          expect(bridge.status).to eq('skipped')
         end
       end
     end

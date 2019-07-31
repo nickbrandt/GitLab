@@ -13,7 +13,9 @@ module Ci
         return bridge.drop!(:upstream_bridge_project_not_found)
       end
 
-      return unless upstream_pipeline
+      unless upstream_pipeline
+        return bridge.skip!
+      end
 
       unless can?(current_user, :read_pipeline, upstream_pipeline)
         return bridge.drop!(:insufficient_upstream_permissions)
