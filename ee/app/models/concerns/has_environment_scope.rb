@@ -33,8 +33,8 @@ module HasEnvironmentScope
 
       order = <<~SQL
         CASE environment_scope
-          WHEN %{wildcard} THEN 0
-          WHEN %{environment_name} THEN 2
+          WHEN :wildcard THEN 0
+          WHEN :environment_name THEN 2
           ELSE 1
         END #{order_direction}
       SQL
@@ -44,12 +44,7 @@ module HasEnvironmentScope
         environment_name: environment_name
       }
 
-      quoted_values = values.transform_values do |value|
-        # Note that the connection could be
-        # Gitlab::Database::LoadBalancing::ConnectionProxy
-        # which supports `quote` via `method_missing`
-        ApplicationRecord.connection.quote(value)
-      end
+      sanitized_order_sql = sanitize_sql_array([order, values])
 
       # The query is trying to find variables with scopes matching the
       # current environment name. Suppose the environment name is
@@ -69,7 +64,7 @@ module HasEnvironmentScope
       # the exact matched name, and put * last, and everything else in the
       # middle. So the order should be: D < C < B
       relation = where(where, values)
-        .order(order % quoted_values) # `order` cannot escape for us!
+        .order(Arel.sql(sanitized_order_sql)) # `order` cannot escape for us!
 
       relation = relation.limit(1) if relevant_only
 
