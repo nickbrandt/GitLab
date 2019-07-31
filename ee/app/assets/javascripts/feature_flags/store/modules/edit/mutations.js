@@ -1,4 +1,5 @@
 import * as types from './mutation_types';
+import { mapToScopesViewModel } from '../helpers';
 
 export default {
   [types.SET_ENDPOINT](state, endpoint) {
@@ -16,9 +17,7 @@ export default {
 
     state.name = response.name;
     state.description = response.description;
-
-    // When there aren't scopes BE sends `null`
-    state.scopes = response.scopes || [];
+    state.scopes = mapToScopesViewModel(response.scopes);
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {
     state.isLoading = false;

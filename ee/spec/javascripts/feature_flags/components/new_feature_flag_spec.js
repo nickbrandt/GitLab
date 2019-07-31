@@ -4,6 +4,7 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import newModule from 'ee/feature_flags/store/modules/new';
 import NewFeatureFlag from 'ee/feature_flags/components/new_feature_flag.vue';
+import { ROLLOUT_STRATEGY_ALL_USERS, DEFAULT_PERCENT_ROLLOUT } from 'ee/feature_flags/constants';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -60,8 +61,11 @@ describe('New feature flag form', () => {
   it('should render default * row', () => {
     expect(wrapper.vm.scopes).toEqual([
       {
-        environment_scope: '*',
+        id: jasmine.any(String),
+        environmentScope: '*',
         active: true,
+        rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+        rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
       },
     ]);
 

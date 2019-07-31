@@ -3,7 +3,13 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
-import { internalKeyID } from 'ee/feature_flags/store/modules/helpers';
+import {
+  ROLLOUT_STRATEGY_ALL_USERS,
+  ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  INTERNAL_ID_PREFIX,
+  DEFAULT_PERCENT_ROLLOUT,
+} from 'ee/feature_flags/constants';
+import { featureFlag } from '../mock_data';
 
 describe('feature flag form', () => {
   let wrapper;
@@ -76,7 +82,7 @@ describe('feature flag form', () => {
 
             expect(wrapper.vm.formScopes.length).toEqual(1);
             expect(wrapper.vm.formScopes[0].active).toEqual(true);
-            expect(wrapper.vm.formScopes[0].environment_scope).toEqual('');
+            expect(wrapper.vm.formScopes[0].environmentScope).toEqual('');
 
             expect(wrapper.vm.newScope).toEqual('');
           });
@@ -89,29 +95,26 @@ describe('feature flag form', () => {
     beforeEach(() => {
       factory({
         ...requiredProps,
-        name: 'feature_flag_1',
-        description: 'this is a feature flag',
+        name: featureFlag.name,
+        description: featureFlag.description,
         scopes: [
           {
-            environment_scope: 'production',
-            active: false,
-            can_update: true,
-            protected: true,
-            id: 2,
-          },
-          {
-            environment_scope: 'review',
+            id: 1,
             active: true,
-            can_update: true,
+            environmentScope: 'scope',
+            canUpdate: true,
             protected: false,
-            id: 4,
+            rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+            rolloutPercentage: '54',
           },
           {
-            environment_scope: 'staging',
+            id: 2,
             active: true,
-            can_update: false,
+            environmentScope: 'scope',
+            canUpdate: false,
             protected: true,
-            id: 5,
+            rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+            rolloutPercentage: '54',
           },
         ],
       });
@@ -129,33 +132,9 @@ describe('feature flag form', () => {
       describe('update scope', () => {
         describe('on click on toggle', () => {
           it('should update the scope', () => {
-            wrapper.find(ToggleButton).vm.$emit('change', true);
+            wrapper.find(ToggleButton).vm.$emit('change', false);
 
-            expect(wrapper.vm.formScopes).toEqual([
-              {
-                active: true,
-                environment_scope: 'production',
-                id: 2,
-                can_update: true,
-                protected: true,
-              },
-              {
-                active: true,
-                environment_scope: 'review',
-                id: 4,
-                can_update: true,
-                protected: false,
-              },
-              {
-                environment_scope: 'staging',
-                active: true,
-                can_update: false,
-                protected: true,
-                id: 5,
-              },
-            ]);
-
-            expect(wrapper.vm.newScope).toEqual('');
+            expect(_.first(wrapper.vm.formScopes).active).toBe(false);
           });
         });
       });
@@ -165,50 +144,12 @@ describe('feature flag form', () => {
           wrapper.find('.js-delete-scope').trigger('click');
         });
 
-        it('should add `_destroy` key the clicked scope', () => {
-          expect(wrapper.vm.formScopes).toEqual([
-            {
-              environment_scope: 'production',
-              active: false,
-              _destroy: true,
-              id: 2,
-              can_update: true,
-              protected: true,
-            },
-            {
-              active: true,
-              environment_scope: 'review',
-              id: 4,
-              can_update: true,
-              protected: false,
-            },
-            {
-              environment_scope: 'staging',
-              active: true,
-              can_update: false,
-              protected: true,
-              id: 5,
-            },
-          ]);
+        it('should add `shouldBeDestroyed` key the clicked scope', () => {
+          expect(_.first(wrapper.vm.formScopes).shouldBeDestroyed).toBe(true);
         });
 
         it('should not render deleted scopes', () => {
-          expect(wrapper.vm.filteredScopes).toEqual([
-            {
-              active: true,
-              environment_scope: 'review',
-              id: 4,
-              can_update: true,
-              protected: false,
-            },
-            {
-              environment_scope: 'staging',
-              active: true,
-              can_update: false,
-              protected: true,
-              id: 5,
-            },
-          ]);
+          expect(wrapper.vm.filteredScopes).toEqual([jasmine.objectContaining({ id: 2 })]);
         });
       });
 
@@ -220,11 +161,17 @@ describe('feature flag form', () => {
             description: 'this is a feature flag',
             scopes: [
               {
-                environment_scope: 'new_scope',
+                environmentScope: 'new_scope',
                 active: false,
-                id: _.uniqueId(internalKeyID),
-                can_update: true,
+                id: _.uniqueId(INTERNAL_ID_PREFIX),
+                canUpdate: true,
                 protected: false,
+                strategies: [
+                  {
+                    name: ROLLOUT_STRATEGY_ALL_USERS,
+                    parameters: {},
+                  },
+                ],
               },
             ],
           });
@@ -243,8 +190,11 @@ describe('feature flag form', () => {
             description: 'this is a feature flag',
             scopes: [
               {
-                environment_scope: '*',
+                environmentScope: '*',
                 active: false,
+                canUpdate: false,
+                rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
               },
             ],
           });
@@ -269,7 +219,7 @@ describe('feature flag form', () => {
         });
 
         it('should have the scope that cannot be updated be disabled', () => {
-          const row = wrapper.findAll('.gl-responsive-table-row').wrappers[3];
+          const row = wrapper.findAll('.gl-responsive-table-row').at(2);
 
           expect(row.find(EnvironmentsDropdown).vm.disabled).toBe(true);
           expect(row.find(ToggleButton).vm.disabledInput).toBe(true);
@@ -279,23 +229,37 @@ describe('feature flag form', () => {
     });
 
     describe('on submit', () => {
-      beforeEach(() => {
+      const selectFirstRolloutStrategyOption = dropdownIndex => {
+        wrapper
+          .findAll('select.js-rollout-strategy')
+          .at(dropdownIndex)
+          .findAll('option')
+          .at(1)
+          .setSelected();
+      };
+
+      beforeEach(done => {
         factory({
           ...requiredProps,
           name: 'feature_flag_1',
           description: 'this is a feature flag',
           scopes: [
             {
-              environment_scope: 'production',
-              can_update: true,
+              id: 1,
+              environmentScope: 'production',
+              canUpdate: true,
               protected: true,
               active: false,
+              rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+              rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
             },
           ],
         });
+
+        wrapper.vm.$nextTick(done, done.fail);
       });
 
-      it('should emit handleSubmit with the updated data', () => {
+      it('should emit handleSubmit with the updated data', done => {
         wrapper.find('#feature-flag-name').setValue('feature_flag_2');
 
         wrapper
@@ -308,19 +272,62 @@ describe('feature flag form', () => {
           .find(ToggleButton)
           .vm.$emit('change', true);
 
-        wrapper.vm.handleSubmit();
+        wrapper.find(ToggleButton).vm.$emit('change', true);
 
-        const data = wrapper.emitted().handleSubmit[0][0];
+        wrapper.vm
+          .$nextTick()
 
-        expect(data.name).toEqual('feature_flag_2');
-        expect(data.description).toEqual('this is a feature flag');
-        expect(data.scopes.length).toEqual(3);
-        expect(data.scopes[0]).toEqual({
-          active: false,
-          environment_scope: 'production',
-          can_update: true,
-          protected: true,
-        });
+          .then(() => {
+            selectFirstRolloutStrategyOption(0);
+            selectFirstRolloutStrategyOption(2);
+
+            return wrapper.vm.$nextTick();
+          })
+          .then(() => {
+            wrapper.find('.js-rollout-percentage').setValue('55');
+
+            return wrapper.vm.$nextTick();
+          })
+          .then(() => {
+            wrapper.find({ ref: 'submitButton' }).trigger('click');
+
+            const data = wrapper.emitted().handleSubmit[0][0];
+
+            expect(data.name).toEqual('feature_flag_2');
+            expect(data.description).toEqual('this is a feature flag');
+
+            expect(data.scopes).toEqual([
+              {
+                id: 1,
+                active: true,
+                environmentScope: 'production',
+                canUpdate: true,
+                protected: true,
+                rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                rolloutPercentage: '55',
+              },
+              {
+                id: jasmine.any(String),
+                active: false,
+                environmentScope: 'review',
+                canUpdate: true,
+                protected: false,
+                rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+              },
+              {
+                id: jasmine.any(String),
+                active: true,
+                environmentScope: '',
+                canUpdate: true,
+                protected: false,
+                rolloutStrategy: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                rolloutPercentage: DEFAULT_PERCENT_ROLLOUT,
+              },
+            ]);
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
   });

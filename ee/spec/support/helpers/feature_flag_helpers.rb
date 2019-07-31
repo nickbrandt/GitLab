@@ -45,7 +45,7 @@ module FeatureFlagHelpers
   end
 
   def within_delete
-    within '.table-section:nth-child(3)' do
+    within '.table-section:nth-child(4)' do
       yield
     end
   end
