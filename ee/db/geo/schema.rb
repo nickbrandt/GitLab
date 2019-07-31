@@ -10,12 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190314201959) do
+ActiveRecord::Schema.define(version: 2019_06_12_211021) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "event_log_states", primary_key: "event_id", id: :bigint, force: :cascade do |t|
+  create_table "container_repository_registry", id: :serial, force: :cascade do |t|
+    t.integer "container_repository_id", null: false
+    t.string "state"
+    t.integer "retry_count", default: 0
+    t.string "last_sync_failure"
+    t.datetime "retry_at"
+    t.datetime "last_synced_at"
+    t.datetime "created_at", null: false
+    t.index ["container_repository_id"], name: "index_container_repository_registry_on_repository_id", using: :btree
+    t.index ["retry_at"], name: "index_container_repository_registry_on_retry_at", using: :btree
+    t.index ["state"], name: "index_container_repository_registry_on_state", using: :btree
+  end
+
+  create_table "event_log_states", primary_key: "event_id", force: :cascade do |t|
   end
 
   create_table "file_registry", id: :serial, force: :cascade do |t|

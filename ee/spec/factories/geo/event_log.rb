@@ -43,6 +43,10 @@ FactoryBot.define do
     trait :cache_invalidation_event do
       cache_invalidation_event factory: :geo_cache_invalidation_event
     end
+
+    trait :container_repository_updated_event do
+      container_repository_updated_event factory: :geo_container_repository_updated_event
+    end
   end
 
   factory :geo_repository_created_event, class: Geo::RepositoryCreatedEvent do

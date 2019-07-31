@@ -36,7 +36,7 @@ describe API::ContainerRegistryEvent do
     end
 
     it 'returns 401 error status when feature is disabled' do
-      allow(Feature).to receive(:enabled?).with(:geo_registry_replication).and_return(false)
+      stub_feature_flags(geo_registry_replication: false)
 
       expect(::ContainerRegistry::EventHandler).not_to receive(:new)
 
