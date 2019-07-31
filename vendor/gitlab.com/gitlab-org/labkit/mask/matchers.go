@@ -12,7 +12,6 @@ var parameterMatches = []string{
 	`key$`,
 	`signature`,
 	`^authorization$`,
-	`^note$`,
 	`^certificate$`,
 	`^encrypted_key$`,
 	`^hook$`,
@@ -22,6 +21,11 @@ var parameterMatches = []string{
 	`^trace$`,
 	`^variables$`,
 	`^content$`,
+	`^body$`,
+	`^description$`,
+	`^note$`,
+	`^text$`,
+	`^title$`,
 }
 
 var headerMatches = []string{

@@ -6,6 +6,7 @@ import (
 
 	raven "github.com/getsentry/raven-go"
 
+	//lint:ignore SA1019 this was recently deprecated. Update workhorse to use labkit errortracking package.
 	correlation "gitlab.com/gitlab-org/labkit/correlation/raven"
 )
 
