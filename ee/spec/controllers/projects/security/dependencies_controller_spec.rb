@@ -58,23 +58,55 @@ describe Projects::Security::DependenciesController do
 
           context 'with params' do
             context 'with sorting params' do
+              context 'when sorted by packager' do
+                let(:params) do
+                  {
+                    namespace_id: project.namespace,
+                    project_id: project,
+                    sort_by: 'packager',
+                    sort: 'desc',
+                    page: 1
+                  }
+                end
+
+                it 'returns sorted list' do
+                  expect(json_response['dependencies'].first['packager']).to eq('Ruby (Bundler)')
+                  expect(json_response['dependencies'].last['packager']).to eq('JavaScript (Yarn)')
+                end
+
+                it 'return 20 dependencies' do
+                  expect(json_response['dependencies'].length).to eq(20)
+                end
+              end
+
+              context 'when sorted by severity' do
+                let(:params) do
+                  {
+                    namespace_id: project.namespace,
+                    project_id: project,
+                    sort_by: 'severity',
+                    page: 1
+                  }
+                end
+
+                it 'returns sorted list' do
+                  expect(json_response['dependencies'].first['name']).to eq('nokogiri')
+                  expect(json_response['dependencies'].second['name']).to eq('debug')
+                end
+              end
+            end
+
+            context 'with filter by vulnerable' do
               let(:params) do
                 {
                   namespace_id: project.namespace,
                   project_id: project,
-                  sort_by: 'packager',
-                  sort: 'desc',
-                  page: 1
+                  filter: 'vulnerable'
                 }
               end
 
-              it 'returns sorted list' do
-                expect(json_response['dependencies'].first['packager']).to eq('Ruby (Bundler)')
-                expect(json_response['dependencies'].last['packager']).to eq('JavaScript (Yarn)')
-              end
-
-              it 'return 20 dependencies' do
-                expect(json_response['dependencies'].length).to eq(20)
+              it 'return vulnerable dependencies' do
+                expect(json_response['dependencies'].length).to eq(3)
               end
             end
 

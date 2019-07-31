@@ -36,6 +36,15 @@ describe Security::DependencyListService do
         end
       end
 
+      context 'filtered by vulnerable' do
+        let(:params) { { filter: 'vulnerable' } }
+
+        it 'returns filtered items' do
+          expect(subject.size).to eq(3)
+          expect(subject.last[:vulnerabilities]).not_to be_empty
+        end
+      end
+
       context 'sorted desc by packagers' do
         let(:params) do
           {
@@ -75,6 +84,23 @@ describe Security::DependencyListService do
         it 'returns array of data properly sorted' do
           expect(subject.first[:name]).to eq('xpath.js')
           expect(subject.last[:name]).to eq('async')
+        end
+      end
+
+      context 'sorted by desc severity' do
+        let(:params) do
+          {
+            sort: 'desc',
+            sort_by: 'severity'
+          }
+        end
+
+        it 'returns array of data properly sorted' do
+          nokogiri_index = subject.find_index { |dep| dep[:name] == 'nokogiri' }
+          saml2js_index = subject.find_index { |dep| dep[:name] == 'saml2-js' }
+
+          expect(nokogiri_index).to be > saml2js_index
+          expect(subject).to end_with(subject[nokogiri_index])
         end
       end
     end

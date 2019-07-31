@@ -44,14 +44,19 @@ module Projects
         @dependencies ||= collect_dependencies
       end
 
+      def match_disallowed(param, value)
+        param == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
+          param == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES) ||
+          param == :filter && !value.in?(::Security::DependencyListService::FILTER_VALUES)
+      end
+
       def pipeline
         @pipeline ||= project.all_pipelines.latest_successful_for_ref(project.default_branch)
       end
 
       def query_params
-        params.permit(:sort, :sort_by).delete_if do |key, value|
-          key == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
-            key == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES)
+        params.permit(:sort, :sort_by, :filter).delete_if do |key, value|
+          match_disallowed(key, value)
         end
       end
 
