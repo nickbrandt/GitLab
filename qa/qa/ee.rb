@@ -93,6 +93,7 @@ module QA
 
         module Secure
           autoload :Show, 'qa/ee/page/project/secure/show'
+          autoload :DependencyList, 'qa/ee/page/project/secure/dependency_list'
         end
       end
 

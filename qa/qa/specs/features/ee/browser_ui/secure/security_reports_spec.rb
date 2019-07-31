@@ -57,7 +57,7 @@ module QA
         Page::Project::Pipeline::Show.perform do |pipeline|
           pipeline.click_on_security
           expect(pipeline).to have_dependency_report
-          expect(pipeline).to have_content("Dependency scanning detected 1")
+          expect(pipeline).to have_content("Dependency scanning detected 2")
           pipeline.expand_dependency_report
           expect(pipeline).to have_content("jQuery before 3.4.0")
         end
@@ -80,6 +80,12 @@ module QA
         EE::Page::Group::Secure::Show.perform do |dashboard|
           dashboard.filter_project(@project.name)
           expect(dashboard).to have_low_vulnerability_count_of "1"
+
+      it 'displays the Dependency List' do
+        Page::Project::Menu.perform(&:click_on_dependency_list)
+
+        EE::Page::Project::Secure::DependencyList.perform do |page|
+          expect(page).to have_dependency_count_of "1293"
         end
       end
     end

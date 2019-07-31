@@ -140,7 +140,9 @@ export default {
       <div class="d-sm-flex justify-content-between align-items-baseline my-2">
         <h3 class="h5">
           {{ __('Dependencies') }}
-          <gl-badge v-if="pageInfo.total" pill>{{ pageInfo.total }}</gl-badge>
+          <gl-badge v-if="pageInfo.total" pill data-qa-selector="dependency_list_total_content">{{
+            pageInfo.total
+          }}</gl-badge>
         </h3>
 
         <dependencies-actions :namespace="currentList" />
