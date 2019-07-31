@@ -21,6 +21,10 @@ module QA
             element :group_epics_link
           end
 
+          view 'ee/app/views/layouts/nav/ee/_security_link.html.haml' do
+            element :security_dashboard_link
+          end
+
           def go_to_saml_sso_group_settings
             hover_settings do
               within_submenu do
@@ -46,6 +50,12 @@ module QA
           def click_group_epics_link
             within_sidebar do
               click_element(:group_epics_link)
+            end
+          end
+
+          def click_group_security_link
+            within_sidebar do
+              click_element(:security_dashboard_link)
             end
           end
 

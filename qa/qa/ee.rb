@@ -106,6 +106,10 @@ module QA
           autoload :Show, 'qa/ee/page/group/epic/show'
           autoload :Edit, 'qa/ee/page/group/epic/edit'
         end
+
+        module Secure
+          autoload :Show, 'qa/ee/page/group/secure/show'
+        end
       end
     end
 
