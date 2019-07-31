@@ -7450,6 +7450,9 @@ msgstr ""
 msgid "IDE|Review"
 msgstr ""
 
+msgid "IDE|Successful commit"
+msgstr ""
+
 msgid "IP Address"
 msgstr ""
 
