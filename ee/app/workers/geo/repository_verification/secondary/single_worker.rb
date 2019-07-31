@@ -9,6 +9,8 @@ module Geo
         include ExclusiveLeaseGuard
         include Gitlab::Geo::ProjectLogHelpers
 
+        sidekiq_options retry: false
+
         LEASE_TIMEOUT = 1.hour.to_i
 
         attr_reader :registry

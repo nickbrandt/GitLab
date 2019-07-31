@@ -12,6 +12,14 @@ describe Geo::RepositoryVerification::Primary::SingleWorker, :clean_gitlab_redis
     stub_current_geo_node(primary)
   end
 
+  it 'disables retrying of failed jobs' do
+    expect(subject.sidekiq_options_hash).to eq(
+      'retry' => false,
+      'queue' => 'geo:geo_repository_verification_primary_single',
+      'queue_namespace' => :geo
+    )
+  end
+
   describe '#perform' do
     it 'does not calculate the checksum when not running on a primary' do
       allow(Gitlab::Geo).to receive(:primary?) { false }
