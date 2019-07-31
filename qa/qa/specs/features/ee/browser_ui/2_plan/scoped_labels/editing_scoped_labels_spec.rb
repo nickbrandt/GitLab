@@ -25,14 +25,14 @@ module QA
       end
 
       it 'correctly applies scoped labels depending on if they are from the same or a different scope' do
-        Page::Project::Issue::Show.perform do |issue_page|
-          issue_page.select_labels_and_refresh [@new_label_same_scope, @new_label_different_scope]
+        Page::Project::Issue::Show.perform do |show|
+          show.select_labels_and_refresh [@new_label_same_scope, @new_label_different_scope]
 
           expect(page).to have_content("added #{@initial_label}")
           expect(page).to have_content("added #{@new_label_same_scope} #{@new_label_different_scope} scoped labels and automatically removed #{@initial_label}")
-          expect(issue_page.text_of_labels_block).to have_content(@new_label_same_scope)
-          expect(issue_page.text_of_labels_block).to have_content(@new_label_different_scope)
-          expect(issue_page.text_of_labels_block).not_to have_content(@initial_label)
+          expect(show.text_of_labels_block).to have_content(@new_label_same_scope)
+          expect(show.text_of_labels_block).to have_content(@new_label_different_scope)
+          expect(show.text_of_labels_block).not_to have_content(@initial_label)
         end
       end
     end

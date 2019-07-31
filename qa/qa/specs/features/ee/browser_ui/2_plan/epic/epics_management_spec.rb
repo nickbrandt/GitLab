@@ -17,20 +17,20 @@ module QA
         expect(page).to have_content(epic_title)
 
         EE::Page::Group::Epic::Show.perform(&:click_edit_button)
-        EE::Page::Group::Epic::Edit.perform do |edit_page|
+        EE::Page::Group::Epic::Edit.perform do |edit|
           edited_title = 'Epic edited via GUI'
-          edit_page.set_title(edited_title)
-          edit_page.save_changes
+          edit.set_title(edited_title)
+          edit.save_changes
 
-          expect(edit_page).to have_content(edited_title)
+          expect(edit).to have_content(edited_title)
         end
 
         epic.visit!
         EE::Page::Group::Epic::Show.perform(&:click_edit_button)
-        EE::Page::Group::Epic::Edit.perform do |edit_page|
-          edit_page.delete_epic
+        EE::Page::Group::Epic::Edit.perform do |edit|
+          edit.delete_epic
 
-          expect(edit_page).to have_content('The epic was successfully deleted')
+          expect(edit).to have_content('The epic was successfully deleted')
         end
       end
 
@@ -41,14 +41,14 @@ module QA
         it 'adds/removes issue to/from epic' do
           epic.visit!
 
-          EE::Page::Group::Epic::Show.perform do |show_page|
-            show_page.add_issue_to_epic(issue.web_url)
+          EE::Page::Group::Epic::Show.perform do |show|
+            show.add_issue_to_epic(issue.web_url)
 
-            expect(show_page).to have_related_issuable_item
+            expect(show).to have_related_issuable_item
 
-            show_page.remove_issue_from_epic
+            show.remove_issue_from_epic
 
-            expect(show_page).to have_no_related_issuable_item
+            expect(show).to have_no_related_issuable_item
           end
         end
 
@@ -56,8 +56,8 @@ module QA
           epic.visit!
 
           comment = 'My Epic Comment'
-          EE::Page::Group::Epic::Show.perform do |show_page|
-            show_page.add_comment_to_epic(comment)
+          EE::Page::Group::Epic::Show.perform do |show|
+            show.add_comment_to_epic(comment)
           end
 
           expect(page).to have_content(comment)
@@ -78,15 +78,15 @@ module QA
         it 'adds/removes issue to/from epic using quick actions' do
           issue.visit!
 
-          Page::Project::Issue::Show.perform do |show_page|
-            show_page.wait_for_related_issues_to_load
-            show_page.comment("/epic #{issue.project.group.web_url}/-/epics/#{epic.iid}")
+          Page::Project::Issue::Show.perform do |show|
+            show.wait_for_related_issues_to_load
+            show.comment("/epic #{issue.project.group.web_url}/-/epics/#{epic.iid}")
 
-            expect(show_page).to have_content('added to epic')
+            expect(show).to have_content('added to epic')
 
-            show_page.comment("/remove_epic")
+            show.comment("/remove_epic")
 
-            expect(show_page).to have_content('removed from epic')
+            expect(show).to have_content('removed from epic')
           end
 
           epic.visit!
