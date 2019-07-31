@@ -80,6 +80,8 @@ module QA
         EE::Page::Group::Secure::Show.perform do |dashboard|
           dashboard.filter_project(@project.name)
           expect(dashboard).to have_low_vulnerability_count_of "1"
+        end
+      end
 
       it 'displays the Dependency List' do
         Page::Project::Menu.perform(&:click_on_dependency_list)
