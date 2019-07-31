@@ -17403,10 +17403,10 @@ msgstr ""
 msgid "encrypted: needs to be a :required, :optional or :migrating!"
 msgstr ""
 
-msgid "entries cannot be blank"
+msgid "entries cannot be larger than 255 characters"
 msgstr ""
 
-msgid "entries cannot be larger than 255 characters"
+msgid "entries cannot be nil"
 msgstr ""
 
 msgid "entries cannot contain HTML tags"
