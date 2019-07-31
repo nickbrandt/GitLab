@@ -32,7 +32,9 @@ module EE
           after_transition any => :pending do |bridge|
             next unless bridge.upstream_project
 
-            bridge.subscribe_to_upstream!
+            bridge.run_after_commit do
+              bridge.subscribe_to_upstream!
+            end
           end
 
           event :manual do

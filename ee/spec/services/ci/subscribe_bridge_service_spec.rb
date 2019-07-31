@@ -15,18 +15,18 @@ describe Ci::SubscribeBridgeService do
     context 'when the upstream project exists' do
       let(:upstream_project) { create(:project, :repository) }
 
-      context 'when the user has permissions' do
-        before do
-          upstream_project.add_developer(user)
+      context 'when the upstream project has a pipeline' do
+        let!(:upstream_pipeline) do
+          create(
+            :ci_pipeline, project: upstream_project,
+            ref: upstream_project.default_branch,
+            sha: upstream_project.commit.sha
+          )
         end
 
-        context 'when the upstream project has a pipeline' do
-          let!(:upstream_pipeline) do
-            create(
-              :ci_pipeline, project: upstream_project,
-              ref: upstream_project.default_branch,
-              sha: upstream_project.commit.sha
-            )
+        context 'when the user has permissions' do
+          before do
+            upstream_project.add_developer(user)
           end
 
           it 'populates the pipeline project source' do
@@ -52,22 +52,22 @@ describe Ci::SubscribeBridgeService do
           end
         end
 
-        context 'when the upstream project does not have a pipeline' do
-          it 'does not populate the pipeline project source' do
+        context 'when the user does not have permissions' do
+          it 'drops the bridge' do
             subject
 
             expect(bridge.upstream_pipeline).to eq(nil)
+            expect(bridge.status).to eq('failed')
+            expect(bridge.failure_reason).to eq('insufficient_upstream_permissions')
           end
         end
       end
 
-      context 'when the user does not have permissions' do
-        it 'drops the bridge' do
+      context 'when the upstream project does not have a pipeline' do
+        it 'does not populate the pipeline project source' do
           subject
 
           expect(bridge.upstream_pipeline).to eq(nil)
-          expect(bridge.status).to eq('failed')
-          expect(bridge.failure_reason).to eq('insufficient_upstream_permissions')
         end
       end
     end

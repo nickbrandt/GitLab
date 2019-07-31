@@ -13,14 +13,14 @@ module Ci
         return bridge.drop!(:upstream_bridge_project_not_found)
       end
 
-      unless can?(current_user, :read_pipeline, upstream_project)
+      return unless upstream_pipeline
+
+      unless can?(current_user, :read_pipeline, upstream_pipeline)
         return bridge.drop!(:insufficient_upstream_permissions)
       end
 
-      return unless upstream_pipeline
-
-      bridge.upstream_pipeline = upstream_pipeline
-      bridge.inherit_status_from_upstream! || bridge.save
+      bridge.update!(upstream_pipeline: upstream_pipeline)
+      bridge.inherit_status_from_upstream!
     end
 
     private
