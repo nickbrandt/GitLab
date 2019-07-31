@@ -13,7 +13,7 @@
 class LicenseTemplateFinder
   include Gitlab::Utils::StrongMemoize
 
-  prepend ::EE::LicenseTemplateFinder # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('::EE::LicenseTemplateFinder') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   attr_reader :project, :params
 

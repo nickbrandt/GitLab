@@ -140,4 +140,4 @@ module StubGitlabCalls
   end
 end
 
-StubGitlabCalls.prepend(EE::StubGitlabCalls)
+StubGitlabCalls.prepend_if_ee('EE::StubGitlabCalls')

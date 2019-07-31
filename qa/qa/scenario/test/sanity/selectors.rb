@@ -57,4 +57,4 @@ module QA
   end
 end
 
-QA::Scenario::Test::Sanity::Selectors.prepend(QA::EE::Scenario::Test::Sanity::Selectors)
+QA::Scenario::Test::Sanity::Selectors.prepend_if_ee('QA::EE::Scenario::Test::Sanity::Selectors')

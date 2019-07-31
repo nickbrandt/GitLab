@@ -5,7 +5,7 @@ module QA
     module Project
       module Settings
         class ProtectedBranches < Page::Base
-          prepend EE::Page::Project::Settings::ProtectedBranches # rubocop: disable Cop/InjectEnterpriseEditionModule
+          prepend_if_ee('QA::EE::Page::Project::Settings::ProtectedBranches')
 
           view 'app/views/projects/protected_branches/shared/_dropdown.html.haml' do
             element :protected_branch_select

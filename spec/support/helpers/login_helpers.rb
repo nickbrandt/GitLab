@@ -212,4 +212,4 @@ module LoginHelpers
   end
 end
 
-LoginHelpers.prepend(EE::LoginHelpers)
+LoginHelpers.prepend_if_ee('EE::LoginHelpers')

@@ -18,7 +18,7 @@ module Gitlab
     end
 
     module UserAuthFinders
-      prepend ::EE::Gitlab::Auth::UserAuthFinders # rubocop: disable Cop/InjectEnterpriseEditionModule
+      prepend_if_ee('::EE::Gitlab::Auth::UserAuthFinders') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       include Gitlab::Utils::StrongMemoize
 

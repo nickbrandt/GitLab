@@ -422,5 +422,5 @@ end
 
 require_relative '../../../ee/spec/support/helpers/ee/test_env'
 
-::TestEnv.prepend(::EE::TestEnv)
-::TestEnv.extend(::EE::TestEnv)
+::TestEnv.prepend_if_ee('::EE::TestEnv')
+::TestEnv.extend_if_ee('::EE::TestEnv')

@@ -3,7 +3,7 @@
 module Gitlab
   module Checks
     class BaseChecker
-      prepend EE::Gitlab::Checks::BaseChecker # rubocop: disable Cop/InjectEnterpriseEditionModule
+      prepend_if_ee('EE::Gitlab::Checks::BaseChecker') # rubocop: disable Cop/InjectEnterpriseEditionModule
       include Gitlab::Utils::StrongMemoize
 
       attr_reader :change_access
