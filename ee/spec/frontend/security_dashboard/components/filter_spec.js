@@ -66,7 +66,9 @@ describe('Filter component', () => {
     describe('when the dropdown is open', () => {
       beforeEach(done => {
         vm.$el.querySelector('.dropdown-toggle').click();
-        vm.$nextTick(done);
+        vm.$on('bv::dropdown::shown', () => {
+          done();
+        });
       });
 
       it('should keep the menu open after clicking on an item', done => {
