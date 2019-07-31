@@ -1,6 +1,6 @@
 - if @group.feature_available?(:security_dashboard)
   = nav_link(path: 'groups/security/dashboard#show') do
-    = link_to group_security_dashboard_path(@group), title: _('Security') do
+    = link_to group_security_dashboard_path(@group), title: _('Security'), data: { qa_selector: 'security_dashboard_link' } do
       .nav-icon-container
         = sprite_icon('shield')
       %span.nav-item-name

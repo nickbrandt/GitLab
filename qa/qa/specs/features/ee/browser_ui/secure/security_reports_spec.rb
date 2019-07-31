@@ -9,7 +9,7 @@ module QA
       Page::Main::Login.perform(&:sign_in_using_credentials)
     end
 
-    describe 'Security Reports in project security dashboard' do
+    describe 'Security Reports' do
       after do
         Service::Runner.new(@executor).remove!
       end
@@ -68,6 +68,17 @@ module QA
         Page::Project::Menu.perform(&:click_on_security_dashboard)
 
         EE::Page::Project::Secure::Show.perform do |dashboard|
+          expect(dashboard).to have_low_vulnerability_count_of "1"
+        end
+      end
+
+      it 'displays the Dependency Scanning report in the group security dashboard' do
+        Page::Main::Menu.perform { |page| page.go_to_groups }
+        Page::Dashboard::Groups.perform { |page| page.click_group(@project.group.path) }
+        EE::Page::Group::Menu.perform { |page| page.click_group_security_link }
+
+        EE::Page::Group::Secure::Show.perform do |dashboard|
+          dashboard.filter_project(@project.name)
           expect(dashboard).to have_low_vulnerability_count_of "1"
         end
       end
