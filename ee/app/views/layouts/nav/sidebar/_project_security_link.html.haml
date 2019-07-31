@@ -19,5 +19,5 @@
 
       - if @project.feature_available?(:dependency_list)
         = nav_link(path: 'projects/dependencies#show') do
-          = link_to project_dependencies_path(@project), title: _('Dependency List') do
+          = link_to project_dependencies_path(@project), title: _('Dependency List'), data: { qa_selector: 'dependency_list_link' } do
             %span= _('Dependency List')
