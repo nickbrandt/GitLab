@@ -12,6 +12,11 @@ import state from 'ee/feature_flags/store/modules/new/state';
 import * as types from 'ee/feature_flags/store/modules/new/mutation_types';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import {
+  ROLLOUT_STRATEGY_ALL_USERS,
+  ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+} from 'ee/feature_flags/constants';
+import { mapFromScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 
 describe('Feature flags New Module Actions', () => {
   let mockedState;
@@ -49,6 +54,23 @@ describe('Feature flags New Module Actions', () => {
   describe('createFeatureFlag', () => {
     let mock;
 
+    const actionParams = {
+      name: 'name',
+      description: 'description',
+      scopes: [
+        {
+          id: 1,
+          environmentScope: 'environmentScope',
+          active: true,
+          canUpdate: true,
+          protected: true,
+          shouldBeDestroyed: false,
+          rolloutStrategy: ROLLOUT_STRATEGY_ALL_USERS,
+          rolloutPercentage: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+        },
+      ],
+    };
+
     beforeEach(() => {
       mockedState.endpoint = `${TEST_HOST}/endpoint.json`;
       mock = new MockAdapter(axios);
@@ -61,23 +83,13 @@ describe('Feature flags New Module Actions', () => {
 
     describe('success', () => {
       it('dispatches requestCreateFeatureFlag and receiveCreateFeatureFlagSuccess ', done => {
-        mock
-          .onPost(`${TEST_HOST}/endpoint.json`, {
-            operations_feature_flag: {
-              name: 'feature_flag',
-              description: 'feature flag',
-              scopes_attributes: [{ environment_scope: '*', active: true }],
-            },
-          })
-          .replyOnce(200);
+        const convertedActionParams = mapFromScopesViewModel(actionParams);
+
+        mock.onPost(`${TEST_HOST}/endpoint.json`, convertedActionParams).replyOnce(200);
 
         testAction(
           createFeatureFlag,
-          {
-            name: 'feature_flag',
-            description: 'feature flag',
-            scopes: [{ environment_scope: '*', active: true }],
-          },
+          actionParams,
           mockedState,
           [],
           [
@@ -95,23 +107,15 @@ describe('Feature flags New Module Actions', () => {
 
     describe('error', () => {
       it('dispatches requestCreateFeatureFlag and receiveCreateFeatureFlagError ', done => {
+        const convertedActionParams = mapFromScopesViewModel(actionParams);
+
         mock
-          .onPost(`${TEST_HOST}/endpoint.json`, {
-            operations_feature_flag: {
-              name: 'feature_flag',
-              description: 'feature flag',
-              scopes_attributes: [{ environment_scope: '*', active: true }],
-            },
-          })
+          .onPost(`${TEST_HOST}/endpoint.json`, convertedActionParams)
           .replyOnce(500, { message: [] });
 
         testAction(
           createFeatureFlag,
-          {
-            name: 'feature_flag',
-            description: 'feature flag',
-            scopes: [{ environment_scope: '*', active: true }],
-          },
+          actionParams,
           mockedState,
           [],
           [

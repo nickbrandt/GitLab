@@ -6024,6 +6024,9 @@ msgstr ""
 msgid "FeatureFlags|Active"
 msgstr ""
 
+msgid "FeatureFlags|All users"
+msgstr ""
+
 msgid "FeatureFlags|Configure"
 msgstr ""
 
@@ -6096,7 +6099,22 @@ msgstr ""
 msgid "FeatureFlags|New Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Percent rollout (logged in users)"
+msgstr ""
+
+msgid "FeatureFlags|Percent rollout must be a whole number between 0 and 100"
+msgstr ""
+
 msgid "FeatureFlags|Protected"
+msgstr ""
+
+msgid "FeatureFlags|Remove"
+msgstr ""
+
+msgid "FeatureFlags|Rollout Percentage"
+msgstr ""
+
+msgid "FeatureFlags|Rollout Strategy"
 msgstr ""
 
 msgid "FeatureFlags|Status"

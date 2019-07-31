@@ -65,22 +65,14 @@ describe('Feature flags Edit Module actions', () => {
 
     describe('success', () => {
       it('dispatches requestUpdateFeatureFlag and receiveUpdateFeatureFlagSuccess ', done => {
-        mock
-          .onPut(mockedState.endpoint, {
-            operations_feature_flag: {
-              name: 'feature_flag',
-              description: 'feature flag',
-              scopes_attributes: [{ environment_scope: '*', active: true }],
-            },
-          })
-          .replyOnce(200);
+        mock.onPut(mockedState.endpoint).replyOnce(200);
 
         testAction(
           updateFeatureFlag,
           {
             name: 'feature_flag',
             description: 'feature flag',
-            scopes: [{ environment_scope: '*', active: true }],
+            scopes: [{ environmentScope: '*', active: true }],
           },
           mockedState,
           [],
@@ -99,15 +91,7 @@ describe('Feature flags Edit Module actions', () => {
 
     describe('error', () => {
       it('dispatches requestUpdateFeatureFlag and receiveUpdateFeatureFlagError ', done => {
-        mock
-          .onPut(`${TEST_HOST}/endpoint.json`, {
-            operations_feature_flag: {
-              name: 'feature_flag',
-              description: 'feature flag',
-              scopes_attributes: [{ environment_scope: '*', active: true }],
-            },
-          })
-          .replyOnce(500, { message: [] });
+        mock.onPut(`${TEST_HOST}/endpoint.json`).replyOnce(500, { message: [] });
 
         testAction(
           updateFeatureFlag,

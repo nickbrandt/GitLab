@@ -1,5 +1,6 @@
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import { mapToScopesViewModel } from '../helpers';
 
 export default {
   [types.SET_FEATURE_FLAGS_ENDPOINT](state, endpoint) {
@@ -20,8 +21,11 @@ export default {
   [types.RECEIVE_FEATURE_FLAGS_SUCCESS](state, response) {
     state.isLoading = false;
     state.hasError = false;
-    state.featureFlags = response.data.feature_flags;
     state.count = response.data.count;
+    state.featureFlags = (response.data.feature_flags || []).map(f => ({
+      ...f,
+      scopes: mapToScopesViewModel(f.scopes || []),
+    }));
 
     let paginationInfo;
     if (Object.keys(response.headers).length) {

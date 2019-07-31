@@ -2,6 +2,7 @@
 import { createNamespacedHelpers } from 'vuex';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
+import { createNewEnvironmentScope } from '../store/modules/helpers';
 
 const { mapState, mapActions } = createNamespacedHelpers('new');
 
@@ -28,10 +29,10 @@ export default {
     ...mapState(['error']),
     scopes() {
       return [
-        {
-          environment_scope: '*',
+        createNewEnvironmentScope({
+          environmentScope: '*',
           active: true,
-        },
+        }),
       ];
     },
   },

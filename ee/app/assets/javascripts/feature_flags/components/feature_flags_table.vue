@@ -3,6 +3,7 @@ import _ from 'underscore';
 import { GlButton, GlLink, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import { ROLLOUT_STRATEGY_PERCENT_ROLLOUT } from '../constants';
 
 export default {
   components: {
@@ -61,12 +62,22 @@ export default {
     scopeTooltipText(scope) {
       return !scope.active
         ? sprintf(s__('FeatureFlags|Inactive flag for %{scope}'), {
-            scope: scope.environment_scope,
+            scope: scope.environmentScope,
           })
         : '';
     },
-    scopeName(name) {
-      return name === '*' ? s__('FeatureFlags|* (All environments)') : name;
+    badgeText(scope) {
+      const displayName =
+        scope.environmentScope === '*'
+          ? s__('FeatureFlags|* (All environments)')
+          : scope.environmentScope;
+
+      const displayPercentage =
+        scope.rolloutStrategy === ROLLOUT_STRATEGY_PERCENT_ROLLOUT
+          ? `: ${scope.rolloutPercentage}%`
+          : '';
+
+      return `${displayName}${displayPercentage}`;
     },
     canDeleteFlag(flag) {
       return !this.permissions || (flag.scopes || []).every(scope => scope.can_update);
@@ -131,8 +142,11 @@ export default {
               :key="scope.id"
               v-gl-tooltip.hover="scopeTooltipText(scope)"
               class="badge append-right-8 prepend-top-2"
-              :class="{ 'badge-active': scope.active, 'badge-inactive': !scope.active }"
-              >{{ scopeName(scope.environment_scope) }}</span
+              :class="{
+                'badge-active': scope.active,
+                'badge-inactive': !scope.active,
+              }"
+              >{{ badgeText(scope) }}</span
             >
           </div>
         </div>
