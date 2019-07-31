@@ -34,7 +34,7 @@ module EE
     end
 
     def cluster_prometheus_adapter
-      @cluster_prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform).cluster_prometheus_adapter
+      @cluster_prometheus_adapter ||= Prometheus::AdapterService.new(project, deployment_platform: deployment_platform).cluster_prometheus_adapter
     end
 
     def protected?

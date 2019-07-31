@@ -31,14 +31,14 @@ module Projects
       end
 
       def invocation_metrics(environment_scope, name)
-        return unless prometheus_adapter&.can_query?
-
         cluster = @clusters.find do |c|
           environment_scope == c.environment_scope
         end
 
+        return unless prometheus_adapter(cluster)&.can_query?
+
         func = ::Serverless::Function.new(project, name, cluster.kubernetes_namespace_for(project))
-        prometheus_adapter.query(:knative_invocation, func)
+        prometheus_adapter(cluster).query(:knative_invocation, func)
       end
 
       def has_prometheus?(environment_scope)
@@ -87,8 +87,8 @@ module Projects
       end
 
       # rubocop: disable CodeReuse/ServiceClass
-      def prometheus_adapter
-        @prometheus_adapter ||= ::Prometheus::AdapterService.new(project).prometheus_adapter
+      def prometheus_adapter(cluster)
+        @prometheus_adapter ||= ::Prometheus::AdapterService.new(project, cluster: cluster).prometheus_adapter
       end
       # rubocop: enable CodeReuse/ServiceClass
     end

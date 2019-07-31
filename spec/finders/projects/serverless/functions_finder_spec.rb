@@ -103,12 +103,13 @@ describe Projects::Serverless::FunctionsFinder do
     end
 
     context 'has prometheus' do
-      let(:prometheus_adapter) { double('prometheus_adapter', can_query?: true) }
+      let(:prometheus_adapter) { ::Prometheus::AdapterService.new(project, cluster: cluster).prometheus_adapter }
       let!(:knative) { create(:clusters_applications_knative, :installed, cluster: cluster) }
       let!(:prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
       let(:finder) { described_class.new(project) }
 
       before do
+        stub_kubeclient_discover(service.api_url)
         allow(finder).to receive(:prometheus_adapter).and_return(prometheus_adapter)
         allow(prometheus_adapter).to receive(:query).and_return(prometheus_empty_body('matrix'))
       end
@@ -119,6 +120,14 @@ describe Projects::Serverless::FunctionsFinder do
 
       it 'has query data' do
         expect(finder.invocation_metrics("*", cluster.project.name)).not_to be_nil
+      end
+
+      context 'when cluster has non default environment scope' do
+        let(:cluster) { create(:cluster, :project, :provided_by_gcp, :production_environment) }
+
+        it 'has query data' do
+          expect(finder.invocation_metrics(cluster.environment_scope, cluster.project.name)).not_to be_nil
+        end
       end
     end
   end
