@@ -31,11 +31,14 @@ module Gitlab
 
       def initialize(stage:, params: {})
         @stage = stage
+        @params = params
       end
 
       def apply
-        query = stage.model_to_query.arel_table
+        query = model_arel_table
         query = filter_by_parent_model(query)
+        query = filter_by_time_range(query)
+        query = filter_by_project_ids(query)
         query = query.join(routes_table).on(projects_table[:namespace_id].eq(routes_table[:source_id]))
         query = stage.start_event.apply_query_customization(query)
         query = stage.end_event.apply_query_customization(query)
@@ -45,10 +48,30 @@ module Gitlab
 
       private
 
-      attr_reader :stage
+      attr_reader :stage, :params
 
       def filter_by_parent_model(query)
         instance_exec(query, &QUERY_RULES.fetch(stage.parent.class).fetch(stage.model_to_query))
+      end
+
+      def filter_by_time_range(query)
+        from = params.fetch(:from, 30.days.ago)
+        to = params.fetch(:to, nil)
+
+        query = query.where(model_arel_table[:created_at].gteq(from))
+        query = query.where(model_arel_table[:created_at].lteq(to)) if to
+        query
+      end
+
+      def filter_by_project_ids(query)
+        project_ids = params.fetch(:project_ids, [])
+
+        query = query.where(projects_table[:id].in(project_ids)) if Array(project_ids).any?
+        query
+      end
+
+      def model_arel_table
+        stage.model_to_query.arel_table
       end
     end
   end

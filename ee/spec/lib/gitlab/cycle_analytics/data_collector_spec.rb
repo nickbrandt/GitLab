@@ -298,35 +298,82 @@ describe Gitlab::CycleAnalytics::DataCollector do
   end
 
   describe 'for ProjectStage' do
-    let(:project) { create(:project, :empty_repo) }
-    let(:stage) do
-      CycleAnalytics::ProjectStage.new(
-        name: 'My Stage',
-        project: project,
-        start_event_identifier: start_event_identifier,
-        end_event_identifier: end_event_identifier
-      )
+    it_behaves_like 'stage pairs' do
+      let(:project) { create(:project, :empty_repo) }
+      let(:stage) do
+        CycleAnalytics::ProjectStage.new(
+          name: 'My Stage',
+          project: project,
+          start_event_identifier: start_event_identifier,
+          end_event_identifier: end_event_identifier
+        )
+      end
     end
 
-    it_behaves_like 'stage pairs'
+    it 'ignores items outside of the date range' do
+      project = create(:project, :empty_repo)
+      stage = CycleAnalytics::ProjectStage.new(
+        name: 'My Stage',
+        project: project,
+        start_event_identifier: :merge_request_created,
+        end_event_identifier: :merge_request_closed
+      )
+
+      Timecop.travel(Time.new(2018, 1, 1)) do
+        mr = create(:merge_request, source_project: project, allow_broken: true)
+        mr.metrics.update!(latest_closed_at: Time.now)
+      end
+
+      data_collector = described_class.new(stage, from: Time.new(2019, 1, 1))
+      items = data_collector.records_fetcher.serialized_records
+
+      expect(items).to be_empty
+    end
   end
 
   describe 'for GroupStage' do
-    let(:group) { create(:group) }
-    let(:project) { create(:project, :empty_repo, group: group) }
-    let(:stage) do
-      CycleAnalytics::GroupStage.new(
+    it_behaves_like 'stage pairs' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, :empty_repo, group: group) }
+      let(:stage) do
+        CycleAnalytics::GroupStage.new(
+          name: 'My Stage',
+          group: group,
+          start_event_identifier: start_event_identifier,
+          end_event_identifier: end_event_identifier
+        )
+      end
+
+      before do
+        group.add_user(project.creator, GroupMember::MAINTAINER)
+      end
+    end
+
+    it 'supports filtering project_ids within the group' do
+      group = create(:group)
+      project1 = create(:project, :empty_repo, group: group)
+      project2 = create(:project, :empty_repo, group: group)
+
+      stage = CycleAnalytics::GroupStage.new(
         name: 'My Stage',
         group: group,
-        start_event_identifier: start_event_identifier,
-        end_event_identifier: end_event_identifier
+        start_event_identifier: :merge_request_created,
+        end_event_identifier: :merge_request_closed
       )
-    end
 
-    before do
-      group.add_user(project.creator, GroupMember::MAINTAINER)
-    end
+      Timecop.travel(Time.new(2019, 6, 1)) do
+        mr = create(:merge_request, source_project: project1, allow_broken: true)
+        mr.metrics.update!(latest_closed_at: Time.now)
 
-    it_behaves_like 'stage pairs'
+        mr = create(:merge_request, source_project: project2, allow_broken: true)
+        mr.metrics.update!(latest_closed_at: Time.now)
+      end
+
+      data_collector = described_class.new(stage, from: Time.new(2019, 1, 1), project_ids: [project2.id])
+      items = data_collector.with_end_date_and_duration_in_seconds
+
+      expect(items.size).to eq(1)
+      expect(items.first["id"]).to eq(project2.merge_requests.first.id)
+    end
   end
 end

@@ -3,10 +3,9 @@
 module Gitlab
   module CycleAnalytics
     class DataCollector
-      def initialize(stage, from = nil, to = Time.now)
+      def initialize(stage, params = {})
         @stage = stage
-        @from = from
-        @to = to
+        @params = params
       end
 
       def records_fetcher
@@ -23,10 +22,10 @@ module Gitlab
 
       private
 
-      attr_reader :stage, :from, :to
+      attr_reader :stage, :params
 
       def query
-        DataFilter.new(stage: stage).apply
+        DataFilter.new(stage: stage, params: params).apply
       end
     end
   end
