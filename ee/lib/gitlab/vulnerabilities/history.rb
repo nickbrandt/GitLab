@@ -1,0 +1,62 @@
+# frozen_string_literal: true
+
+require 'vulnerabilities/history_serializer'
+
+module Gitlab
+  module Vulnerabilities
+    class History
+      attr_reader :group, :filters
+
+      HISTORY_RANGE = 3.months
+
+      def initialize(group, filters)
+        @group = group
+        @filters = filters
+      end
+
+      def vulnerabilities_counter
+        return cached_vulnerability_history if use_vulnerability_cache?
+
+        vulnerabilities = found_vulnerabilities.count_by_day_and_severity(HISTORY_RANGE)
+        ::Vulnerabilities::HistorySerializer.new.represent(vulnerabilities)
+      end
+
+      private
+
+      def found_vulnerabilities
+        ::Security::VulnerabilitiesFinder.new(group, params: filters).execute(:all)
+      end
+
+      def cached_vulnerability_history
+        history = { undefined: {}, info: {}, unknown: {}, low: {}, medium: {}, high: {}, critical: {}, total: {} }
+
+        project_ids_to_fetch.each do |project_id|
+          project_history = Gitlab::Vulnerabilities::HistoryCache.new(group, project_id).fetch(HISTORY_RANGE)
+          history_keys = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.map(&:to_sym)
+          history_keys << :total
+          history_keys.each do |key|
+            history[key].merge!(project_history[key]) { |k, aggregate, project_count| aggregate + project_count }
+          end
+        end
+
+        history[:total] = history[:total].sort_by { |date, count| date }.to_h
+        history
+      end
+
+      def use_vulnerability_cache?
+        Feature.enabled?(:cache_vulnerability_history, group) && !dynamic_filters_included?
+      end
+
+      def dynamic_filters_included?
+        dynamic_filters = [:report_type, :confidence, :severity]
+        filters.keys.any? { |key| dynamic_filters.include?(key.to_sym) }
+      end
+
+      def project_ids_to_fetch
+        return filters[:project_id] if filters.key?('project_id')
+
+        group.project_ids_with_security_reports
+      end
+    end
+  end
+end

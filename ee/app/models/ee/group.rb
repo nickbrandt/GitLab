@@ -169,6 +169,10 @@ module EE
       projects.detect { |project| !project.empty_repo? }
     end
 
+    def project_ids_with_security_reports
+      all_projects.where('EXISTS (?)', ::Vulnerabilities::Occurrence.select(1).where('vulnerability_occurrences.project_id = projects.id')).pluck_primary_key
+    end
+
     def root_ancestor_ip_restriction
       return ip_restriction if parent_id.nil?
 
