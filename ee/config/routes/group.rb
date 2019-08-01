@@ -18,6 +18,19 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     end
 
     resource :analytics, only: [:show]
+    resource :cycle_analytics, only: [:show]
+    namespace :cycle_analytics do
+      scope :events, controller: 'events' do
+        get :issue
+        get :plan
+        get :code
+        get :test
+        get :review
+        get :staging
+        get :production
+      end
+    end
+
     resource :ldap, only: [] do
       member do
         put :sync
