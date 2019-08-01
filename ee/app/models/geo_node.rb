@@ -223,6 +223,12 @@ class GeoNode < ApplicationRecord
     Ci::JobArtifact.project_id_in(projects)
   end
 
+  def container_repositories
+    return ContainerRepository.all unless selective_sync?
+
+    ContainerRepository.project_id_in(projects)
+  end
+
   def lfs_objects
     return LfsObject.all unless selective_sync?
 

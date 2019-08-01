@@ -12,6 +12,7 @@
 - cronjob:geo_scheduler_primary_per_shard_scheduler
 - cronjob:geo_scheduler_secondary_per_shard_scheduler
 - cronjob:geo_repository_verification_secondary_shard
+- cronjob:geo_container_repository_sync_dispatch
 - cronjob:historical_data
 - cronjob:ldap_all_groups_sync
 - cronjob:ldap_sync
@@ -30,6 +31,7 @@
 - geo:geo_hashed_storage_attachments_migration
 - geo:geo_hashed_storage_migration
 - geo:geo_project_sync
+- geo:geo_container_repository_sync
 - geo:geo_rename_repository
 - geo:geo_repositories_clean_up
 - geo:geo_repository_cleanup
