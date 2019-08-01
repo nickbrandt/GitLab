@@ -198,7 +198,7 @@ class MergeRequestDiff < ApplicationRecord
 
   def lines_count
     strong_memoize(:lines_count) do
-      diffs.diff_files.sum(&:line_count)
+      raw_diffs(limits: false).line_count
     end
   end
 
@@ -221,6 +221,10 @@ class MergeRequestDiff < ApplicationRecord
 
   def first_commit
     commits.last
+  end
+
+  def last_commit
+    commits.first
   end
 
   def base_commit

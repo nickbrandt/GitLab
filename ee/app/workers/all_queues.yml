@@ -55,6 +55,7 @@
 - jira_connect:jira_connect_sync_merge_request
 
 - admin_emails
+- analytics
 - create_github_webhook
 - elastic_batch_project_indexer
 - elastic_namespace_indexer

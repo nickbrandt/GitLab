@@ -489,7 +489,7 @@ describe MergeRequestDiff do
     subject { diff_with_commits }
 
     it 'returns sum of all changed lines count in diff files' do
-      expect(subject.lines_count).to eq 109
+      expect(subject.lines_count).to eq 189
     end
   end
 end

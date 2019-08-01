@@ -48,4 +48,14 @@ describe Note do
       expect(note).to be_for_design
     end
   end
+
+  describe '.by_humans' do
+    subject { described_class.by_humans }
+
+    let!(:user_note) { create(:note) }
+    let!(:system_note) { create(:system_note) }
+    let!(:bot_note) { create(:note, author: create(:user, :bot)) }
+
+    it { is_expected.to match_array([user_note]) }
+  end
 end
