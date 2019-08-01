@@ -329,8 +329,6 @@ To further customize the issue, you can add labels, mentions, or any other suppo
 
 Since [version 12.2](https://gitlab.com/gitlab-org/gitlab-ce/issues/63373), GitLab will tag each incident issue with the `incident` label automatically. If the label does not yet exist, it will be created automatically as well.
 
-Since [version 12.2](https://gitlab.com/gitlab-org/gitlab-ce/issues/63373), GitLab will tag each incident issue with the `incident` label automatically. If the label does not yet exist, it will be created automatically as well.
-
 If the metric exceeds the threshold of the alert for over 5 minutes, an email will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
 ## Determining the performance impact of a merge
