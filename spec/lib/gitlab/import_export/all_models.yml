@@ -478,3 +478,8 @@ boards:
 - board_assignee
 - assignee
 - labels
+lists:
+- user
+- milestone
+- board
+- label
