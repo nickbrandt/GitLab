@@ -1501,6 +1501,9 @@ msgstr ""
 msgid "Any Milestone"
 msgstr ""
 
+msgid "Any Weight"
+msgstr ""
+
 msgid "Any encrypted tokens"
 msgstr ""
 
@@ -9445,6 +9448,9 @@ msgid "No Milestone"
 msgstr ""
 
 msgid "No Tag"
+msgstr ""
+
+msgid "No Weight"
 msgstr ""
 
 msgid "No activities found"

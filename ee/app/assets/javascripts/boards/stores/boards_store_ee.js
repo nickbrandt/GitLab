@@ -110,13 +110,20 @@ class BoardsStoreEE {
     }
 
     let { weight } = this.store.boardConfig;
-    if (weight !== -1) {
-      if (weight === 0) {
-        /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
-        weight = 'No+Weight';
-      }
-      updateFilterPath('weight', weight);
+    if (weight === null) {
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      weight = 'Any';
+    } else if (weight === -1) {
+      /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
+      weight = 'None';
+    } else if (weight === 0) {
+      weight = '0';
     }
+    if (weight) {
+      updateFilterPath('weight', weight);
+      this.store.cantEdit.push('weight');
+    }
+
     updateFilterPath('assignee_username', this.store.boardConfig.assigneeUsername);
     if (this.store.boardConfig.assigneeUsername) {
       this.store.cantEdit.push('assignee');
