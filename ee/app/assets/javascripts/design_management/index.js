@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import Vue from 'vue';
-import router from './router';
+import createRouter from './router';
 import App from './components/app.vue';
 import apolloProvider from './graphql';
 import allDesigns from './queries/allDesigns.graphql';
@@ -8,7 +8,8 @@ import allDesigns from './queries/allDesigns.graphql';
 export default () => {
   const el = document.getElementById('js-design-management');
   const badge = document.querySelector('.js-designs-count');
-  const { issueIid, projectPath } = el.dataset;
+  const { issueIid, projectPath, issuePath } = el.dataset;
+  const router = createRouter(issuePath);
 
   $('.js-issue-tabs').on('shown.bs.tab', ({ target: { id } }) => {
     if (id === 'designs' && router.currentRoute.name === 'root') {
