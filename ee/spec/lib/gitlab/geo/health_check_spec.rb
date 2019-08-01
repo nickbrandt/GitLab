@@ -11,6 +11,14 @@ describe Gitlab::Geo::HealthCheck, :geo do
       stub_current_geo_node(secondary)
     end
 
+    context 'when an exception is raised' do
+      it 'catches the exception nicely and returns the message' do
+        allow(Gitlab::Geo).to receive(:secondary?).and_raise('Uh oh')
+
+        expect(subject.perform_checks).to eq('Uh oh')
+      end
+    end
+
     context 'with PostgreSQL' do
       context 'on the primary node' do
         it 'returns an empty string' do
