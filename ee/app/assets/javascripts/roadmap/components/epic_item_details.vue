@@ -65,7 +65,11 @@ export default {
         this.startDate.getFullYear() === this.endDate.getFullYear(),
       );
 
-      return `${startDateInWords} &ndash; ${dateInWords(this.endDate, true)}`;
+      const endDateInWords = dateInWords(this.endDate, true);
+      return sprintf(s__('GroupRoadmap|%{startDateInWords} &ndash; %{endDateInWords}'), {
+        startDateInWords,
+        endDateInWords,
+      });
     },
   },
 };

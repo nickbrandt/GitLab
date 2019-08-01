@@ -93,7 +93,7 @@ export default {
         <gl-loading-icon v-if="isSubmitting" ref="loadingIcon" :inline="true" />
       </button>
       <button type="button" class="btn btn-default float-right" @click="onFormCancel">
-        Cancel
+        {{ __('Cancel') }}
       </button>
     </div>
   </form>

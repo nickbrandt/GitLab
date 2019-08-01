@@ -99,7 +99,9 @@ export default {
   <div class="block milestone">
     <div class="title append-bottom-10">
       Milestone
-      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">
+        {{ __('Edit') }}
+      </button>
     </div>
     <div :class="milestoneTitleClass" class="value">{{ milestoneTitle }}</div>
     <div class="selectbox" style="display: none;">
@@ -125,7 +127,7 @@ export default {
             <input
               type="search"
               class="dropdown-input-field"
-              placeholder="Search milestones"
+              :placeholder="__('Search milestones')"
               autocomplete="off"
             />
             <i aria-hidden="true" data-hidden="true" class="fa fa-search dropdown-input-search">

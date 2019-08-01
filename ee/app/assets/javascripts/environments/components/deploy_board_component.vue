@@ -111,7 +111,7 @@ export default {
         <section class="deploy-board-status">
           <span v-tooltip :title="instanceIsCompletedText">
             <span class="percentage text-center text-plain">{{ deployBoardData.completion }}%</span>
-            <span class="text text-center text-secondary">Complete</span>
+            <span class="text text-center text-secondary">{{ __('Complete') }}</span>
           </span>
         </section>
 
@@ -145,18 +145,16 @@ export default {
             class="btn"
             data-method="post"
             rel="nofollow"
+            >{{ __('Rollback') }}</a
           >
-            Rollback
-          </a>
           <a
             v-if="deployBoardData.abort_url"
             :href="deployBoardData.abort_url"
             class="btn btn-red btn-inverted"
             data-method="post"
             rel="nofollow"
+            >{{ __('Abort') }}</a
           >
-            Abort
-          </a>
         </section>
       </div>
 
@@ -164,7 +162,9 @@ export default {
         <section class="deploy-board-empty-state-svg" v-html="deployBoardSvg"></section>
 
         <section class="deploy-board-empty-state-text">
-          <span class="deploy-board-empty-state-title d-flex">Kubernetes deployment not found</span>
+          <span class="deploy-board-empty-state-title d-flex">{{
+            __('Kubernetes deployment not found')
+          }}</span>
           <span>
             To see deployment progress for your environments, make sure you are deploying to
             <code>$KUBE_NAMESPACE</code> and annotating with

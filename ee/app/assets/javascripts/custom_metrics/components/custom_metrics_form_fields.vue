@@ -96,7 +96,7 @@ export default {
             this.errorMessage = valid ? '' : error;
             this.queryIsValid = valid;
           } else {
-            throw new Error('There was an error trying to validate your query');
+            throw new Error(__('There was an error trying to validate your query'));
           }
         })
         .catch(() => {

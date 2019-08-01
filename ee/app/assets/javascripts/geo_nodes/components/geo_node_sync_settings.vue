@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { sprintf, s__ } from '~/locale';
 import { timeIntervalInWords } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
@@ -88,7 +88,10 @@ export default {
     statusEventInfo(lastEventId, cursorLastEventId, lagInSeconds) {
       const timeAgoStr = timeIntervalInWords(lagInSeconds);
       const pendingEvents = lastEventId - cursorLastEventId;
-      return `${timeAgoStr} (${pendingEvents} events)`;
+      return sprintf(s__('GeoNodeStatusEvent|%{timeAgoStr} (%{pendingEvents} events)'), {
+        timeAgoStr,
+        pendingEvents,
+      });
     },
     statusTooltip(lagInSeconds) {
       if (this.eventTimestampEmpty || lagInSeconds <= TIME_DIFF.FIVE_MINS) {

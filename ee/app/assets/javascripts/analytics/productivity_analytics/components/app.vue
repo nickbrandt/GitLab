@@ -3,5 +3,5 @@ export default {};
 </script>
 
 <template>
-  <div>Productivity Analytics app goes here</div>
+  <div>{{ __('Productivity Analytics app goes here') }}</div>
 </template>

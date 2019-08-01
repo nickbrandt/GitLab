@@ -227,6 +227,9 @@ msgstr ""
 msgid "%{edit_in_new_fork_notice} Try to upload a file again."
 msgstr ""
 
+msgid "%{extra} more downstream pipelines"
+msgstr ""
+
 msgid "%{filePath} deleted"
 msgstr ""
 
@@ -633,6 +636,9 @@ msgstr ""
 msgid "API Token"
 msgstr ""
 
+msgid "Abort"
+msgstr ""
+
 msgid "About GitLab"
 msgstr ""
 
@@ -776,6 +782,9 @@ msgstr ""
 msgid "Add CONTRIBUTING"
 msgstr ""
 
+msgid "Add GitLab to Slack"
+msgstr ""
+
 msgid "Add Group Webhooks and GitLab Enterprise Edition."
 msgstr ""
 
@@ -882,6 +891,9 @@ msgid "Add or subtract spent time"
 msgstr ""
 
 msgid "Add reaction"
+msgstr ""
+
+msgid "Add to Slack"
 msgstr ""
 
 msgid "Add to epic"
@@ -1300,6 +1312,9 @@ msgstr ""
 msgid "An error occurred while fetching folder content."
 msgstr ""
 
+msgid "An error occurred while fetching issues."
+msgstr ""
+
 msgid "An error occurred while fetching label colors."
 msgstr ""
 
@@ -1391,6 +1406,9 @@ msgid "An error occurred while rendering KaTeX"
 msgstr ""
 
 msgid "An error occurred while rendering preview broadcast message"
+msgstr ""
+
+msgid "An error occurred while reordering issues."
 msgstr ""
 
 msgid "An error occurred while retrieving calendar activity"
@@ -1511,6 +1529,9 @@ msgid "Any encrypted tokens"
 msgstr ""
 
 msgid "Any namespace"
+msgstr ""
+
+msgid "Any user"
 msgstr ""
 
 msgid "Appearance"
@@ -2208,6 +2229,9 @@ msgid "Board name"
 msgstr ""
 
 msgid "Board scope"
+msgstr ""
+
+msgid "Board scope affects which issues are displayed for anyone who visits this board"
 msgstr ""
 
 msgid "BoardBlankState|Add default lists"
@@ -3748,6 +3772,9 @@ msgstr ""
 msgid "CompareBranches|There isn't anything to compare."
 msgstr ""
 
+msgid "Complete"
+msgstr ""
+
 msgid "Confidential"
 msgstr ""
 
@@ -4360,6 +4387,9 @@ msgid "Dashboard|Unable to add %{invalidProjects}. This dashboard is available f
 msgstr ""
 
 msgid "Data is still calculating..."
+msgstr ""
+
+msgid "Date"
 msgstr ""
 
 msgid "Date picker"
@@ -5256,6 +5286,9 @@ msgstr ""
 msgid "Enter IP address range"
 msgstr ""
 
+msgid "Enter a number"
+msgstr ""
+
 msgid "Enter at least three characters to search"
 msgstr ""
 
@@ -5605,6 +5638,9 @@ msgid "Error occurred when saving assignees"
 msgstr ""
 
 msgid "Error occurred when toggling the notification subscription"
+msgstr ""
+
+msgid "Error occurred while updating the issue weight"
 msgstr ""
 
 msgid "Error occurred. User was not blocked"
@@ -6443,6 +6479,9 @@ msgstr ""
 msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
 msgstr ""
 
+msgid "GeoNodeStatusEvent|%{timeAgoStr} (%{pendingEvents} events)"
+msgstr ""
+
 msgid "GeoNodeSyncStatus|Node is failing or broken."
 msgstr ""
 
@@ -6884,6 +6923,9 @@ msgstr ""
 msgid "GitLab allows you to continue using your license even if you exceed the number of seats you purchased. You will be required to pay for these seats when you renew your license."
 msgstr ""
 
+msgid "GitLab for Slack"
+msgstr ""
+
 msgid "GitLab metadata URL"
 msgstr ""
 
@@ -7062,6 +7104,9 @@ msgid "Group: %{group_name}"
 msgstr ""
 
 msgid "Group: %{name}"
+msgstr ""
+
+msgid "GroupRoadmap|%{startDateInWords} &ndash; %{endDateInWords}"
 msgstr ""
 
 msgid "GroupRoadmap|From %{dateWord}"
@@ -7393,6 +7438,9 @@ msgstr ""
 msgid "Housekeeping, export, path, transfer, remove, archive."
 msgstr ""
 
+msgid "How it works"
+msgstr ""
+
 msgid "How many replicas each Elasticsearch shard has."
 msgstr ""
 
@@ -7682,6 +7730,9 @@ msgid "Includes an MVC structure, Gemfile, Rakefile, along with many others, to 
 msgstr ""
 
 msgid "Includes an MVC structure, mvnw and pom.xml to help you get started."
+msgstr ""
+
+msgid "Incoming email"
 msgstr ""
 
 msgid "Incompatible Project"
@@ -8148,6 +8199,9 @@ msgstr ""
 msgid "Kubernetes configured"
 msgstr ""
 
+msgid "Kubernetes deployment not found"
+msgstr ""
+
 msgid "Kubernetes error: %{error_code}"
 msgstr ""
 
@@ -8471,6 +8525,9 @@ msgid "Linked emails (%{email_count})"
 msgstr ""
 
 msgid "LinkedIn"
+msgstr ""
+
+msgid "LinkedPipelines|%{counterLabel} more downstream pipelines"
 msgstr ""
 
 msgid "List"
@@ -8822,6 +8879,9 @@ msgid "Merge requests"
 msgstr ""
 
 msgid "Merge requests are a place to propose changes you've made to a project and discuss those changes with others"
+msgstr ""
+
+msgid "Merge requests are read-only in a secondary Geo node"
 msgstr ""
 
 msgid "Merge when pipeline succeeds"
@@ -9197,6 +9257,9 @@ msgid "More"
 msgstr ""
 
 msgid "More Information"
+msgstr ""
+
+msgid "More Slack commands"
 msgstr ""
 
 msgid "More info"
@@ -10643,6 +10706,9 @@ msgstr ""
 msgid "Productivity Analytics"
 msgstr ""
 
+msgid "Productivity Analytics app goes here"
+msgstr ""
+
 msgid "Profile"
 msgstr ""
 
@@ -11702,6 +11768,9 @@ msgstr ""
 msgid "Read more about project permissions <strong>%{link_to_help}</strong>"
 msgstr ""
 
+msgid "Read more about related issues"
+msgstr ""
+
 msgid "Real-time features"
 msgstr ""
 
@@ -11822,6 +11891,9 @@ msgid "Remote object has no absolute path."
 msgstr ""
 
 msgid "Remove"
+msgstr ""
+
+msgid "Remove %{displayReference}"
 msgstr ""
 
 msgid "Remove Runner"
@@ -12301,6 +12373,9 @@ msgstr ""
 msgid "Roadmap"
 msgstr ""
 
+msgid "Rollback"
+msgstr ""
+
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
@@ -12685,6 +12760,9 @@ msgstr ""
 msgid "Select Archive Format"
 msgstr ""
 
+msgid "Select GitLab project to link with your Slack team"
+msgstr ""
+
 msgid "Select Page"
 msgstr ""
 
@@ -12767,6 +12845,9 @@ msgid "Select the custom project template source group."
 msgstr ""
 
 msgid "Select timeframe"
+msgstr ""
+
+msgid "Select user"
 msgstr ""
 
 msgid "Selected levels cannot be used by non-admin users for groups, projects or snippets. If the public level is restricted, user profiles are only visible to logged in users."
@@ -14531,6 +14612,9 @@ msgstr ""
 msgid "There was an error subscribing to this label."
 msgstr ""
 
+msgid "There was an error trying to validate your query"
+msgstr ""
+
 msgid "There was an error when reseting email token."
 msgstr ""
 
@@ -15252,6 +15336,9 @@ msgstr ""
 msgid "Track time with quick actions"
 msgstr ""
 
+msgid "Track your GitLab projects with GitLab for Slack."
+msgstr ""
+
 msgid "Transfer project"
 msgstr ""
 
@@ -15388,6 +15475,9 @@ msgid "URL"
 msgstr ""
 
 msgid "Unable to apply suggestions to a deleted line."
+msgstr ""
+
+msgid "Unable to build Slack link."
 msgstr ""
 
 msgid "Unable to connect to Prometheus server"
@@ -16745,6 +16835,9 @@ msgstr ""
 msgid "You don't have any deployments right now."
 msgstr ""
 
+msgid "You don't have any projects available."
+msgstr ""
+
 msgid "You don't have any recent searches"
 msgstr ""
 
@@ -17583,6 +17676,9 @@ msgid "license management"
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"
+msgstr ""
+
+msgid "log in"
 msgstr ""
 
 msgid "manual"

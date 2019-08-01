@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import Flash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';
 
@@ -77,7 +78,7 @@ export default {
     addToSlack() {
       GitlabSlackService.addToSlack(this.slackLinkPath, this.selectedProjectId)
         .then(response => redirectTo(response.data.add_to_slack_link))
-        .catch(() => Flash('Unable to build Slack link.'));
+        .catch(() => Flash(__('Unable to build Slack link.')));
     },
   },
 };
@@ -85,8 +86,8 @@ export default {
 
 <template>
   <div class="text-center">
-    <h1>GitLab for Slack</h1>
-    <p>Track your GitLab projects with GitLab for Slack.</p>
+    <h1>{{ __('GitLab for Slack') }}</h1>
+    <p>{{ __('Track your GitLab projects with GitLab for Slack.') }}</p>
 
     <div v-once class="prepend-top-20 append-bottom-20">
       <img :src="gitlabLogoPath" class="gitlab-slack-logo" />
@@ -102,7 +103,7 @@ export default {
       class="btn btn-red mx-auto js-popup-button prepend-top-default"
       @click="togglePopup"
     >
-      Add GitLab to Slack
+      {{ __('Add GitLab to Slack') }}
     </button>
 
     <div
@@ -110,7 +111,7 @@ export default {
       class="popup gitlab-slack-popup mx-auto prepend-top-20 text-center js-popup"
     >
       <div v-if="isSignedIn && hasProjects" class="inline">
-        <strong>Select GitLab project to link with your Slack team</strong>
+        <strong>{{ __('Select GitLab project to link with your Slack team') }}</strong>
 
         <select
           v-model="selectedProjectId"
@@ -122,16 +123,17 @@ export default {
         </select>
 
         <button type="button" class="btn btn-red float-right js-add-button" @click="addToSlack">
-          Add to Slack
+          {{ __('Add to Slack') }}
         </button>
       </div>
 
-      <span v-else-if="isSignedIn && !hasProjects" class="js-no-projects">
-        You don't have any projects available.
-      </span>
+      <span v-else-if="isSignedIn && !hasProjects" class="js-no-projects">{{
+        __("You don't have any projects available.")
+      }}</span>
 
       <span v-else>
-        You have to <a v-once :href="signInPath" class="js-gitlab-slack-sign-in-link"> log in </a>
+        You have to
+        <a v-once :href="signInPath" class="js-gitlab-slack-sign-in-link">{{ __('log in') }}</a>
       </span>
     </div>
 
@@ -140,7 +142,7 @@ export default {
     </div>
 
     <div v-once class="text-center">
-      <h3>How it works</h3>
+      <h3>{{ __('How it works') }}</h3>
 
       <div class="well gitlab-slack-well mx-auto">
         <code class="code mx-auto append-bottom-10"
@@ -151,7 +153,9 @@ export default {
           Shows the issue with id <strong>&lt;id&gt;</strong>
         </span>
 
-        <div class="prepend-top-default"><a :href="docsPath"> More Slack commands </a></div>
+        <div class="prepend-top-default">
+          <a v-once :href="docsPath">{{ __('More Slack commands') }}</a>
+        </div>
       </div>
     </div>
   </div>

@@ -1,4 +1,5 @@
 <script>
+import { sprintf, s__ } from '~/locale';
 import icon from '~/vue_shared/components/icon.vue';
 import ciStatus from '~/vue_shared/components/ci_icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -59,7 +60,9 @@ export default {
       return `+${this.linkedPipelines.length - this.maxRenderedPipelines}`;
     },
     counterTooltipText() {
-      return `${this.counterLabel} more downstream pipelines`;
+      return sprintf(s__('LinkedPipelines|%{counterLabel} more downstream pipelines'), {
+        counterLabel: this.counterLabel,
+      });
     },
   },
   methods: {
