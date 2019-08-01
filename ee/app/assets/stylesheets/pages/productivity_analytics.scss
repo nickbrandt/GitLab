@@ -1,3 +1,36 @@
+.dropdown-container {
+  flex: 0 0 25%;
+
+  @include media-breakpoint-down(sm) {
+    .dropdown {
+      margin-bottom: $gl-padding-8;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    .group-select,
+    .project-select {
+      margin-right: $gl-padding;
+      flex: 0 1 50%;
+    }
+  }
+}
+
+.filter-container {
+  flex: 1 1 50%;
+
+  @include media-breakpoint-down(md) {
+    .filtered-search-box {
+      margin-bottom: 10px;
+    }
+
+    .issues-details-filters {
+      padding: 0;
+      background: transparent;
+    }
+  }
+}
+
 .mr-table {
   @include media-breakpoint-down(md) {
     .gl-responsive-table-row {

@@ -1,4 +1,11 @@
 - page_title _('Productivity Analytics')
 
--# = render 'shared/issuable/search_bar', type: :issues, show_sorting_dropdown: false
-#js-productivity-analytics-container
+#js-productivity-analytics
+  .row-content-block.second-block.d-flex.flex-column.flex-md-row
+    .dropdown-container
+      .js-group-project-select-container
+    .js-search-bar.filter-container.hide
+      = render 'shared/issuable/search_bar', type: :productivity_analytics
+    .dropdown-container
+      .js-timeframe-container
+  .js-productivity-analytics-app-container
