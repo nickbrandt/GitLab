@@ -9,8 +9,6 @@
 module VulnerabilitiesActions
   extend ActiveSupport::Concern
 
-  HISTORY_RANGE = 3.months
-
   def index
     vulnerabilities = found_vulnerabilities(:with_sha).ordered.page(params[:page])
 
@@ -35,11 +33,11 @@ module VulnerabilitiesActions
   end
 
   def history
-    vulnerabilities_counter = found_vulnerabilities(:all).count_by_day_and_severity(HISTORY_RANGE)
+    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).vulnerabilities_counter
 
     respond_to do |format|
       format.json do
-        render json: Vulnerabilities::HistorySerializer.new.represent(vulnerabilities_counter)
+        render json: history_count
       end
     end
   end

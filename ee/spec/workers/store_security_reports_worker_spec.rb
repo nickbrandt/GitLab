@@ -4,8 +4,9 @@ require 'spec_helper'
 
 describe StoreSecurityReportsWorker do
   describe '#perform' do
-    let(:pipeline) { create(:ci_pipeline, ref: 'master') }
-    let(:project) { pipeline.project }
+    let(:group)   { create(:group) }
+    let(:project) { create(:project, :public, namespace: group) }
+    let(:pipeline) { create(:ci_pipeline, ref: 'master', project: project) }
 
     before do
       allow(Ci::Pipeline).to receive(:find).with(pipeline.id) { pipeline }
