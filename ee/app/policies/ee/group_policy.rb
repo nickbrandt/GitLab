@@ -131,6 +131,8 @@ module EE
       rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
       end
+
+      rule { reporter }.enable :view_productivity_analytics
     end
 
     override :lookup_access_level!

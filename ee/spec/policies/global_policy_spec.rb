@@ -31,4 +31,16 @@ describe GlobalPolicy do
 
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:read_licenses) }
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:destroy_licenses) }
+
+  describe 'view_productivity_analytics' do
+    context 'for admins' do
+      let(:current_user) { create(:admin) }
+
+      it { is_expected.to be_allowed(:view_productivity_analytics) }
+    end
+
+    context 'for non-admins' do
+      it { is_expected.not_to be_allowed(:view_productivity_analytics) }
+    end
+  end
 end

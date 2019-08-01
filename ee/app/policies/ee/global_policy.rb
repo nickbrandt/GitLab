@@ -16,6 +16,8 @@ module EE
       end
 
       rule { support_bot }.prevent :use_quick_actions
+
+      rule { ~anonymous }.enable :view_productivity_analytics
     end
   end
 end

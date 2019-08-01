@@ -403,4 +403,22 @@ describe GroupPolicy do
       end
     end
   end
+
+  describe 'view_productivity_analytics' do
+    %w[admin owner].each do |role|
+      context "for #{role}" do
+        let(:current_user) { public_send(role) }
+
+        it { is_expected.to be_allowed(:view_productivity_analytics) }
+      end
+    end
+
+    %w[maintainer developer reporter guest].each do |role|
+      context "for #{role}" do
+        let(:current_user) { public_send(role) }
+
+        it { is_expected.to be_disallowed(:view_productivity_analytics) }
+      end
+    end
+  end
 end

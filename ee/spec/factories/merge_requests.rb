@@ -30,6 +30,19 @@ FactoryBot.modify do
       merge_user { author }
     end
 
+    trait :with_productivity_metrics do
+      transient do
+        metrics_data {}
+      end
+
+      after :build do |mr, evaluator|
+        next if evaluator.metrics_data.empty?
+
+        mr.build_metrics unless mr.metrics
+        mr.metrics.assign_attributes evaluator.metrics_data
+      end
+    end
+
     transient do
       approval_groups []
       approval_users []
