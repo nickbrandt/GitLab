@@ -15,6 +15,28 @@ RSpec.describe Packages::Package, type: :model do
       it { is_expected.to allow_value("my.app-11.07.2018").for(:name) }
       it { is_expected.not_to allow_value("my(dom$$$ain)com.my-app").for(:name) }
     end
+
+    describe '#package_already_taken' do
+      context 'npm package' do
+        let!(:package) { create(:npm_package) }
+
+        it 'will not allow a package of the same name' do
+          new_package = build(:npm_package, name: package.name)
+
+          expect(new_package).not_to be_valid
+        end
+      end
+
+      context 'maven package' do
+        let!(:package) { create(:maven_package) }
+
+        it 'will allow a package of the same name' do
+          new_package = build(:maven_package, name: package.name)
+
+          expect(new_package).to be_valid
+        end
+      end
+    end
   end
 
   describe '.by_name_and_file_name' do
