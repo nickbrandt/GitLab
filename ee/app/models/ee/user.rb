@@ -72,6 +72,9 @@ module EE
         joins(:identities).where(identities: { provider: provider })
       end
 
+      scope :bots, -> { where.not(bot_type: nil) }
+      scope :humans, -> { where(bot_type: nil) }
+
       accepts_nested_attributes_for :namespace
 
       enum roadmap_layout: { weeks: 1, months: 4, quarters: 12 }

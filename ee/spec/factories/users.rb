@@ -9,6 +9,10 @@ FactoryBot.modify do
     trait :group_managed do
       association :managing_group, factory: :group
     end
+
+    trait :bot do
+      bot_type { User.bot_types[:support_bot] }
+    end
   end
 
   factory :omniauth_user do

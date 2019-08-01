@@ -12,6 +12,7 @@ module EE
       belongs_to :review, inverse_of: :notes
 
       scope :searchable, -> { where(system: false).includes(:noteable) }
+      scope :by_humans, -> { user.joins(:author).merge(::User.humans) }
 
       after_commit :notify_after_create, on: :create
       after_commit :notify_after_destroy, on: :destroy

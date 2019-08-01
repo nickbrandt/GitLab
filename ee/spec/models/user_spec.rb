@@ -71,6 +71,16 @@ describe User do
         expect(user_ids).not_to include(group_guest_user)
       end
     end
+
+    describe 'bots & humans' do
+      it 'returns corresponding users' do
+        human = create(:user)
+        bot = create(:user, :bot)
+
+        expect(described_class.humans).to match_array([human])
+        expect(described_class.bots).to match_array([bot])
+      end
+    end
   end
 
   describe '.find_by_smartcard_identity' do
