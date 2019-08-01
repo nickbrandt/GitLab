@@ -195,7 +195,7 @@ ActiveRecord::Schema.define(version: 2019_08_02_235445) do
     t.boolean "pseudonymizer_enabled", default: false, null: false
     t.boolean "hide_third_party_offers", default: false, null: false
     t.boolean "snowplow_enabled", default: false, null: false
-    t.string "snowplow_collector_uri"
+    t.string "snowplow_collector_hostname"
     t.string "snowplow_site_id"
     t.string "snowplow_cookie_domain"
     t.boolean "instance_statistics_visibility_private", default: false, null: false

@@ -59,7 +59,7 @@ module EE
                 allow_blank: true,
                 length: { maximum: EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT }
 
-      validates :snowplow_collector_uri,
+      validates :snowplow_collector_hostname,
                 presence: true,
                 if: :snowplow_enabled
 
@@ -94,7 +94,7 @@ module EE
           slack_app_id: nil,
           slack_app_secret: nil,
           slack_app_verification_token: nil,
-          snowplow_collector_uri: nil,
+          snowplow_collector_hostname: nil,
           snowplow_cookie_domain: nil,
           snowplow_enabled: false,
           snowplow_site_id: nil,

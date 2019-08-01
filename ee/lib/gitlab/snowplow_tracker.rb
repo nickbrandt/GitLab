@@ -24,7 +24,7 @@ module Gitlab
       end
 
       def emitter
-        ::SnowplowTracker::Emitter.new(Gitlab::CurrentSettings.snowplow_collector_uri)
+        ::SnowplowTracker::Emitter.new(Gitlab::CurrentSettings.snowplow_collector_hostname)
       end
 
       def enabled?
