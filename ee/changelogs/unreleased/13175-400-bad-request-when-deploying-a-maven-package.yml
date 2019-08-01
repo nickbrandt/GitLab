@@ -1,0 +1,5 @@
+---
+title: Change package validation scope to fix Maven package naming functionality
+merge_request: 14922
+author:
+type: fixed
