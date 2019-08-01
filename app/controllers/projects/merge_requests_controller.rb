@@ -82,8 +82,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def pipelines
-    set_pipeline_variables
-    @pipelines = @pipelines.page(params[:page]).per(30)
+    @pipelines = @merge_request.all_pipelines.page(params[:page]).per(30)
 
     Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
