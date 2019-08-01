@@ -118,7 +118,9 @@ export default {
   <div class="block weight">
     <div class="title append-bottom-10">
       Weight
-      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">
+        {{ __('Edit') }}
+      </button>
     </div>
     <div :class="valueClass" class="value">{{ valueText }}</div>
     <div class="selectbox" style="display: none;">
@@ -131,7 +133,7 @@ export default {
           data-default-label="Weight"
           data-toggle="dropdown"
         >
-          <span class="dropdown-toggle-text is-default"> Weight </span>
+          <span class="dropdown-toggle-text is-default">{{ __('Weight') }}</span>
           <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"> </i>
         </button>
         <div class="dropdown-menu dropdown-select dropdown-menu-selectable dropdown-menu-weight">

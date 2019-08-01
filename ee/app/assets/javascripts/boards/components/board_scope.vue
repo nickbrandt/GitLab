@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import ListLabel from '~/boards/models/label';
 import BoardLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
 import BoardMilestoneSelect from './milestone_select.vue';
@@ -69,7 +70,7 @@ export default {
 
   computed: {
     expandButtonText() {
-      return this.expanded ? 'Collapse' : 'Expand';
+      return this.expanded ? __('Collapse') : __('Expand');
     },
   },
 
@@ -99,13 +100,13 @@ export default {
 <template>
   <div>
     <div v-if="canAdminBoard" class="media append-bottom-10">
-      <label class="form-section-title label-bold media-body"> Board scope </label>
+      <label class="form-section-title label-bold media-body">{{ __('Board scope') }}</label>
       <button v-if="collapseScope" type="button" class="btn" @click="expanded = !expanded">
         {{ expandButtonText }}
       </button>
     </div>
     <p class="text-secondary append-bottom-10">
-      Board scope affects which issues are displayed for anyone who visits this board
+      {{ __('Board scope affects which issues are displayed for anyone who visits this board') }}
     </p>
     <div v-if="!collapseScope || expanded">
       <board-milestone-select

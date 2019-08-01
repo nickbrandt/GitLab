@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import UsersSelect from '~/users_select';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
@@ -12,7 +13,7 @@ export default {
     anyUserText: {
       type: String,
       required: false,
-      default: 'Any user',
+      default: __('Any user'),
     },
     board: {
       type: Object,
@@ -39,7 +40,7 @@ export default {
     placeholderText: {
       type: String,
       required: false,
-      default: 'Select user',
+      default: __('Select user'),
     },
     projectId: {
       type: Number,
@@ -98,7 +99,9 @@ export default {
   <div :class="wrapperClass" class="block">
     <div class="title append-bottom-10">
       {{ label }}
-      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">
+        {{ __('Edit') }}
+      </button>
     </div>
     <div class="value">
       <div v-if="hasValue" class="media">
@@ -139,7 +142,7 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
             <input
               autocomplete="off"
               class="dropdown-input-field"
-              placeholder="Search"
+              :placeholder="__('Search')"
               type="search"
             />
             <i aria-hidden="true" class="fa fa-search dropdown-input-search" data-hidden="true">

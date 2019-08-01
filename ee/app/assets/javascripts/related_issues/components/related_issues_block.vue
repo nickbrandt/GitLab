@@ -168,7 +168,7 @@ export default {
           <a v-if="hasHelpPath" :href="helpPath">
             <i
               class="related-issues-header-help-icon fa fa-question-circle"
-              aria-label="Read more about related issues"
+              :aria-label="__('Read more about related issues')"
             ></i>
           </a>
           <div class="d-inline-flex lh-100 align-middle">
@@ -186,7 +186,7 @@ export default {
               type="button"
               :class="qaClass"
               class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
-              aria-label="Add an issue"
+              :aria-label="__('Add an issue')"
               data-placement="top"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >

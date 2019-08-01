@@ -41,6 +41,8 @@ export default {
       return this.isEpicOpen ? __('Open') : __('Closed');
     },
     actionButtonClass() {
+      // False positive css classes
+      // https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
       return `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button ${
         this.isEpicOpen ? 'btn-close' : 'btn-open'
       }`;

@@ -21,7 +21,7 @@ export default {
   <div class="media">
     <status-icon status="warning" show-disabled-button />
     <div class="media-body">
-      <span class="bold"> Merge requests are read-only in a secondary Geo node </span>
+      <span class="bold">{{ __('Merge requests are read-only in a secondary Geo node') }}</span>
       <a
         v-tooltip
         :href="mr.geoSecondaryHelpPath"
