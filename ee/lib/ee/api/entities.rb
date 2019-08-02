@@ -260,11 +260,11 @@ module EE
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
         expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
         expose :state
-        expose :web_edit_url do |epic|
+        expose :web_edit_url, if: can_admin_epic do |epic|
           ::Gitlab::Routing.url_helpers.group_epic_path(epic.group, epic)
         end
-        expose :reference do |epic|
-          epic.to_reference(epic.parent&.group)
+        expose :reference, if: { with_reference: true } do |epic|
+          epic.to_reference(full: true)
         end
         expose :created_at
         expose :updated_at
@@ -298,7 +298,9 @@ module EE
       class EpicIssueLink < Grape::Entity
         expose :id
         expose :relative_position
-        expose :epic, using: EE::API::Entities::Epic
+        expose :epic do |epic_issue_link, _options|
+          ::EE::API::Entities::Epic.represent(epic_issue_link.epic, with_reference: true)
+        end
         expose :issue, using: ::API::Entities::IssueBasic
       end
 
