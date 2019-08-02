@@ -8,6 +8,14 @@ module EE
       APPROVAL_RENDERING_ACTIONS = [:approve, :approvals, :unapprove].freeze
 
       prepended do
+        before_action only: [:show] do
+          push_frontend_feature_flag(:sast_merge_request_report_api)
+          push_frontend_feature_flag(:dast_merge_request_report_api)
+          push_frontend_feature_flag(:container_scanning_merge_request_report_api)
+          push_frontend_feature_flag(:dependency_scanning_merge_request_report_api)
+          push_frontend_feature_flag(:license_management_merge_request_report_api)
+        end
+
         before_action :whitelist_query_limiting_ee_merge, only: [:merge]
         before_action :whitelist_query_limiting_ee_show, only: [:show]
       end
