@@ -26,8 +26,12 @@ module Elastic
     end
 
     class_methods do
-      def write_methods
-        %i(import create_index! delete_index! refresh_index!)
+      def methods_for_all_write_targets
+        %i(refresh_index!)
+      end
+
+      def methods_for_one_write_target
+        %i(import create_index! delete_index!)
       end
     end
   end

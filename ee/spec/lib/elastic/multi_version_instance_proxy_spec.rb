@@ -28,8 +28,8 @@ describe Elastic::MultiVersionInstanceProxy do
       allow(subject).to receive(:elastic_writing_targets).and_return([old_target, new_target])
     end
 
-    it 'forwards write methods to all targets' do
-      Elastic::V12p1::SnippetInstanceProxy.write_methods.each do |method|
+    it 'forwards methods which should touch all write targets' do
+      Elastic::V12p1::SnippetInstanceProxy.methods_for_all_write_targets.each do |method|
         expect(new_target).to receive(method).and_return(response)
         expect(old_target).to receive(method).and_return(response)
 
@@ -44,6 +44,12 @@ describe Elastic::MultiVersionInstanceProxy do
       subject.as_indexed_json
 
       expect(subject).not_to respond_to(:method_missing)
+    end
+
+    it 'does not forward write methods which should touch specific version' do
+      Elastic::V12p1::SnippetInstanceProxy.methods_for_one_write_target.each do |method|
+        expect(subject).not_to respond_to(method)
+      end
     end
   end
 end

@@ -26,8 +26,12 @@ module Elastic
     end
 
     class_methods do
-      def write_methods
+      def methods_for_all_write_targets
         [:index_document, :delete_document, :update_document, :update_document_attributes]
+      end
+
+      def methods_for_one_write_target
+        []
       end
     end
 

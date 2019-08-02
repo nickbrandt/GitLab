@@ -7,6 +7,9 @@ module Elastic
 
     attr_reader :data_class, :data_target
 
+    # TODO: remove once multi-version is functional https://gitlab.com/gitlab-org/gitlab-ee/issues/10156
+    TARGET_VERSION = 'V12p1'
+
     # @params version [String, Module] can be a string "V12p1" or module (Elastic::V12p1)
     def version(version)
       version = Elastic.const_get(version) if version.is_a?(String)
@@ -18,7 +21,7 @@ module Elastic
     # TODO: load from db table https://gitlab.com/gitlab-org/gitlab-ee/issues/12555
     def elastic_reading_target
       strong_memoize(:elastic_reading_target) do
-        version('V12p1')
+        version(TARGET_VERSION)
       end
     end
 
@@ -34,14 +37,16 @@ module Elastic
     end
 
     def generate_forwarding
-      write_methods = elastic_writing_targets.first.real_class.write_methods
+      methods_for_all_write_targets = elastic_writing_targets.first.real_class.methods_for_all_write_targets
+      methods_for_one_write_target = elastic_writing_targets.first.real_class.methods_for_one_write_target
 
-      write_methods.each do |method|
-        self.class.forward_write_method(method)
+      methods_for_all_write_targets.each do |method|
+        self.class.forward_to_all_write_targets(method)
       end
 
       read_methods = elastic_reading_target.real_class.public_instance_methods
-      read_methods -= write_methods
+      read_methods -= methods_for_all_write_targets
+      read_methods -= methods_for_one_write_target
       read_methods -= self.class.instance_methods
       read_methods.delete(:method_missing)
 
@@ -57,7 +62,7 @@ module Elastic
         delegate method, to: :elastic_reading_target
       end
 
-      def forward_write_method(method)
+      def forward_to_all_write_targets(method)
         return if respond_to?(method)
 
         define_method(method) do |*args|
