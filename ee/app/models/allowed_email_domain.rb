@@ -8,7 +8,7 @@ class AllowedEmailDomain < ApplicationRecord
     '*@aol.com',
     '*@msn.com',
     '*@hotmail.co.uk',
-   	'*@hotmail.fr'
+    '*@hotmail.fr'
   ].freeze
 
   validates :domain, exclusion: { in: RESERVED_DOMAINS,
