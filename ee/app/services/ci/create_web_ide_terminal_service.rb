@@ -48,10 +48,13 @@ module Ci
     end
 
     def terminal_stage_seed(pipeline)
-      Gitlab::Ci::Pipeline::Seed::Stage.new(pipeline,
+      attributes = {
         name: TERMINAL_NAME,
         index: 0,
-        builds: [terminal_build_seed])
+        builds: [terminal_build_seed]
+      }
+
+      Gitlab::Ci::Pipeline::Seed::Stage.new(pipeline, attributes, [])
     end
 
     def terminal_build_seed
