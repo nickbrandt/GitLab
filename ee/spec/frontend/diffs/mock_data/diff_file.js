@@ -1,4 +1,4 @@
-// Copied to ee/spec/frontend/diffs/mock_data/diff_file.js
+// Copied from spec/javasripts/diffs/mock_data/diff_file.js
 
 export default {
   submodule: false,

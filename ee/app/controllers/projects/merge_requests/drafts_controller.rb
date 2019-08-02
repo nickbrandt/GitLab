@@ -83,10 +83,16 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
 
   def draft_note_params
     params.require(:draft_note).permit(
+      :commit_id,
       :note,
       :position,
       :resolve_discussion
-    )
+    ).tap do |h|
+      # Old FE version will still be sending `draft_note[commit_id]` as 'undefined'.
+      # That can result to having a note linked to a commit with 'undefined' ID
+      # which is non-existent.
+      h[:commit_id] = nil if h[:commit_id] == 'undefined'
+    end
   end
 
   def prepare_notes_for_rendering(notes)
