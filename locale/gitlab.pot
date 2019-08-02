@@ -4356,7 +4356,7 @@ msgid_plural "CycleAnalytics|%d projects selected"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "CycleAnalytics|group avatar"
+msgid "CycleAnalytics|group dropdown filter"
 msgstr ""
 
 msgid "DNS"
