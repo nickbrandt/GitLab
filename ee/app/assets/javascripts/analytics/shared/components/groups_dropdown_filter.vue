@@ -1,11 +1,11 @@
 <script>
-import { __ } from '~/locale';
+import { s__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
 import Icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
 import Api from '~/api';
-import { getIdenticonBackgroundClass, getIdenticonTitle } from '~/helpers/avatar_helper';
+import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
 export default {
   name: 'GroupsDropdownFilter',
@@ -14,6 +14,13 @@ export default {
     GlLoadingIcon,
     GlButton,
     GlAvatar,
+  },
+  props: {
+    label: {
+      type: String,
+      required: false,
+      default: s__('CycleAnalytics|group dropdown filter'),
+    },
   },
   data() {
     return {
@@ -35,22 +42,17 @@ export default {
       search: {
         fields: ['full_name'],
       },
-      clicked: this.onClick,
-      data: this.fetchData,
+      clicked: this.onClick.bind(this),
+      data: this.fetchData.bind(this),
       renderRow: group => this.rowTemplate(group),
       text: group => group.name,
       opened: e => e.target.querySelector('.dropdown-input-field').focus(),
     });
   },
   methods: {
-    onClick({ $el, e }) {
+    onClick({ selectedObj, e }) {
       e.preventDefault();
-      this.selectedGroup = {
-        id: $el.data('id'),
-        name: $el.data('name'),
-        path: $el.data('path'),
-        avatar_url: $el.data('avatar-url'),
-      };
+      this.selectedGroup = selectedObj;
       this.$emit('selected', this.selectedGroup);
     },
     fetchData(term, callback) {
@@ -63,21 +65,19 @@ export default {
     rowTemplate(group) {
       return `
             <li>
-              <a href='#' class='dropdown-menu-link' data-id="${group.id}" data-name="${_.escape(
-        group.name,
-      )}" data-path="${group.path}" data-avatar-url="${group.avatar_url}">
-              ${this.avatarTemplate(group)}
-              <div class="align-middle">${_.escape(group.name)}</div>
+              <a href='#' class='dropdown-menu-link'>
+                ${this.avatarTemplate(group)}
+                <div class="align-middle">${_.escape(group.name)}</div>
               </a>
             </li>
           `;
     },
     avatarTemplate(group) {
       return group.avatar_url !== null
-        ? `<img src="${group.avatar_url}" alt="${this.groupAvatarAltText}" class="avatar rect-avatar s16"/>`
-        : `<div class="avatar identicon s16 rect-avatar d-flex justify-content-center flex-column ${getIdenticonBackgroundClass(
-            group.id,
-          )}">${getIdenticonTitle(group.name)}</div>`;
+        ? renderAvatar(group, { sizeClass: 's16 rect-avatar' })
+        : renderIdenticon(group, {
+            sizeClass: 's16 rect-avatar d-flex justify-content-center flex-column',
+          });
     },
   },
 };
@@ -91,7 +91,7 @@ export default {
         type="button"
         data-toggle="dropdown"
         aria-expanded="false"
-        :aria-label="selectedGroupName"
+        :aria-label="label"
       >
         <gl-avatar
           v-if="selectedGroup.name"
@@ -100,7 +100,7 @@ export default {
           :entity-name="selectedGroup.name"
           :size="16"
           shape="rect"
-          :alt="s__('CycleAnalytics|group avatar')"
+          :alt="selectedGroup.name"
           class="prepend-top-2"
         />
         {{ selectedGroupName }}
