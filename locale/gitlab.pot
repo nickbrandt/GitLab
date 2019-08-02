@@ -1240,6 +1240,9 @@ msgstr ""
 msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
+msgid "Allowed email domain restriction only allowed for top-level groups"
+msgstr ""
+
 msgid "Allowed to fail"
 msgstr ""
 
@@ -5221,6 +5224,9 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
+msgid "Email domain is not editable in subgroups. Value inherited from top-level parent group."
+msgstr ""
+
 msgid "Email patch"
 msgstr ""
 
@@ -5405,6 +5411,9 @@ msgid "Enter at least three characters to search"
 msgstr ""
 
 msgid "Enter board name"
+msgstr ""
+
+msgid "Enter domain"
 msgstr ""
 
 msgid "Enter in your Bitbucket Server URL and personal access token below"
@@ -10261,6 +10270,9 @@ msgstr ""
 msgid "Only these extensions are supported: %{extension_list}"
 msgstr ""
 
+msgid "Only users with an email address in this domain can be added to the group.<br>Example: <code>*@gitlab.com</code>. Some common domains are not allowed. %{read_more_link}."
+msgstr ""
+
 msgid "Oops, are you sure?"
 msgstr ""
 
@@ -12691,6 +12703,9 @@ msgstr ""
 msgid "Restrict access by IP address"
 msgstr ""
 
+msgid "Restrict membership by email"
+msgstr ""
+
 msgid "Resume"
 msgstr ""
 
@@ -14720,6 +14735,12 @@ msgid "The deployment of this job to %{environmentLink} did not succeed."
 msgstr ""
 
 msgid "The directory has been successfully created."
+msgstr ""
+
+msgid "The domain you entered is misformatted."
+msgstr ""
+
+msgid "The domain you entered is not allowed."
 msgstr ""
 
 msgid "The entered user map is not a valid JSON user map."

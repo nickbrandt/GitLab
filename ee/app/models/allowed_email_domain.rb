@@ -16,7 +16,7 @@ class AllowedEmailDomain < ApplicationRecord
   validate :allow_root_group_only
   validates :domain, exclusion: { in: RESERVED_DOMAINS,
     message: _('The domain you entered is not allowed.') }
-  validates :domain, format: { with: /\*\@\w*\.*./,
+  validates :domain, format: { with: /\*\@\w*\./,
     message: _('The domain you entered is misformatted.') }
 
   belongs_to :group, class_name: 'Group', foreign_key: :group_id

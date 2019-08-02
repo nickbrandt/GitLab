@@ -23,7 +23,7 @@ describe AllowedEmailDomain do
       end
 
       context 'invalid domain' do
-        let(:domain) { 'invalid domain' }
+        let(:domain) { '*@gitlab' }
 
         it 'fails' do
           expect(subject.valid?).to be_falsey

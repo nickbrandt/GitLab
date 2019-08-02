@@ -12,7 +12,7 @@ module EE
           return false if group.errors.present?
         end
 
-        handle_ip_restriction_deletion
+        handle_deletion
 
         remove_insight_if_insight_project_absent
 
@@ -79,6 +79,11 @@ module EE
         end
       end
 
+      def handle_deletion
+        handle_ip_restriction_deletion
+        handle_allowed_domain_deletion
+      end
+
       def handle_ip_restriction_deletion
         return unless ip_restriction_editable?
 
@@ -103,7 +108,6 @@ module EE
         return unless allowed_domain_editable?
 
         return unless group.allowed_email_domain.present?
-
         allowed_domain_params = params[:allowed_email_domain_attributes]
 
         return unless allowed_domain_params
