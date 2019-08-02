@@ -42,7 +42,7 @@ describe 'Epic show', :js do
     it 'shows epic title and description' do
       page.within('.epic-page-container .detail-page-description') do
         expect(find('.title-container .title')).to have_content(epic_title)
-        expect(find('.description .md')).to have_content(markdown)
+        expect(find('.description .md')).to have_content(markdown.squish)
       end
     end
 

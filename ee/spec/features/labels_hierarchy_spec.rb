@@ -45,13 +45,11 @@ describe 'Labels Hierarchy', :js do
 
         wait_for_requests
 
-        expect(page).to have_selector('.board-card', count: label.issues.count)
-
         label.issues.each do |issue|
-          expect(page).to have_selector('.board-card-title') do |card|
-            expect(card).to have_selector('a', text: issue.title)
-          end
+          expect(page).to have_selector('a', text: issue.title)
         end
+
+        expect(page).to have_selector('.badge', text: label.title)
       end
     end
   end
