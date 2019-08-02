@@ -8,6 +8,7 @@ module EE
       extend ::Gitlab::Utils::Override
 
       validate :sso_enforcement, if: :group
+      validate :group_domain_limitations, if: :group_has_domain_limitations?
 
       scope :with_ldap_dn, -> { joins(user: :identities).where("identities.provider LIKE ?", 'ldap%') }
       scope :with_identity_provider, ->(provider) do
@@ -21,6 +22,30 @@ module EE
       def member_of_group?(group, user)
         exists?(group: group, user: user)
       end
+    end
+
+    def group_has_domain_limitations?
+      group.feature_available?(:group_allowed_email_domains) && group.allowed_email_domain.present?
+    end
+
+    def group_domain_limitations
+      if user
+        validate_users_email
+      else
+        validate_invitation_email
+      end
+    end
+
+    def validate_users_email
+      return if user.email.end_with?(group.allowed_email_domain.domain[1..-1])
+
+      errors.add(:user, 'email is not in the right domain')
+    end
+
+    def validate_invitation_email
+      return if invite_email.end_with?(group.allowed_email_domain.domain[1..-1])
+
+      errors.add(:invite_email, 'email is not in the right domain')
     end
   end
 end

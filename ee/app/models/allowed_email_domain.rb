@@ -17,5 +17,5 @@ class AllowedEmailDomain < ApplicationRecord
   validates :domain, format: { with: /\*\@\w*\.*./,
     message: _('The domain you entered is not allowed.') }
 
-  belongs_to :group, class_name: 'Group', foreign_key: :namespace_id
+  belongs_to :group, class_name: 'Group', foreign_key: :group_id
 end
