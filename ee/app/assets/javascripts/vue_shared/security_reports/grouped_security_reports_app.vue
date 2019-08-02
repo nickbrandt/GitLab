@@ -271,6 +271,7 @@ export default {
     :error-text="groupedSummaryText"
     :has-issues="true"
     class="mr-widget-border-top grouped-security-reports mr-report"
+    data-qa-selector="vulnerability_report_grouped"
   >
     <div v-if="pipelinePath" slot="actionButtons">
       <a
