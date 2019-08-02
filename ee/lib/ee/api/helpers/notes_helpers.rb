@@ -15,9 +15,9 @@ module EE
           end
         end
 
-        def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
-          if noteable_type == ::Epic
-            EpicsFinder.new(current_user, group_id: parent_id).find(noteable_id)
+        def add_parent_to_finder_params(finder_params, noteable_type, parent_id)
+          if noteable_type.name.underscore == 'epic'
+            finder_params[:group_id] = parent_id
           else
             super
           end
