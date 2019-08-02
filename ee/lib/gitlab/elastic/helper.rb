@@ -4,8 +4,7 @@ module Gitlab
   module Elastic
     class Helper
       # rubocop: disable CodeReuse/ActiveRecord
-      def self.create_empty_index
-        index_name = Project.index_name
+      def self.create_empty_index(version = ::Elastic::MultiVersionUtil::TARGET_VERSION)
         settings = {}
         mappings = {}
 
@@ -23,7 +22,9 @@ module Gitlab
           mappings.deep_merge!(klass.__elasticsearch__.mappings.to_hash)
         end
 
-        client = Project.__elasticsearch__.client
+        proxy = Project.__elasticsearch__.version(version)
+        client = proxy.client
+        index_name = proxy.index_name
 
         # ES5.6 needs a setting enabled to support JOIN datatypes that ES6 does not support...
         if Gitlab::VersionInfo.parse(client.info['version']['number']) < Gitlab::VersionInfo.new(6)
@@ -42,16 +43,16 @@ module Gitlab
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def self.delete_index
-        Project.__elasticsearch__.delete_index!
+      def self.delete_index(version = ::Elastic::MultiVersionUtil::TARGET_VERSION)
+        Project.__elasticsearch__.version(version).delete_index!
       end
 
       def self.refresh_index
         Project.__elasticsearch__.refresh_index!
       end
 
-      def self.index_size
-        Project.__elasticsearch__.client.indices.stats['indices'][Project.__elasticsearch__.index_name]['total']
+      def self.index_size(version = ::Elastic::MultiVersionUtil::TARGET_VERSION)
+        Project.__elasticsearch__.version(version).client.indices.stats['indices'][Project.__elasticsearch__.index_name]['total']
       end
     end
   end
