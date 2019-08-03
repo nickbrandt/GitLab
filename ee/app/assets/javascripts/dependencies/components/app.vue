@@ -120,7 +120,6 @@ export default {
           v-for="listType in listTypes"
           :key="listType.namespace"
           :disabled="isTabDisabled(listType.namespace)"
-          title-link-class="js-tab"
         >
           <template v-slot:title>
             {{ listType.label }}

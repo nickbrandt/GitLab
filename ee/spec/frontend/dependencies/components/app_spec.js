@@ -308,7 +308,7 @@ describe('DependenciesApp component with dependencyListVulnerabilities feature f
   const findJobFailedAlert = () => wrapper.find(DependencyListJobFailedAlert);
   const findIncompleteListAlert = () => wrapper.find(DependencyListIncompleteAlert);
   const findDependenciesTables = () => wrapper.findAll(PaginatedDependenciesTable);
-  const findTabControls = () => wrapper.findAll('.js-tab');
+  const findTabControls = () => wrapper.findAll('.gl-tab-nav-item');
   const findVulnerableTabControl = () => findTabControls().at(1);
   const findVulnerableTabComponent = () => wrapper.findAll(GlTab).at(1);
 
@@ -426,6 +426,10 @@ describe('DependenciesApp component with dependencyListVulnerabilities feature f
         });
       });
 
+      it('has enabled vulnerable tab', () => {
+        expect(findVulnerableTabComponent().classes('disabled')).toBe(false);
+      });
+
       describe('given there are no vulnerable dependencies', () => {
         beforeEach(() => {
           store.state[vulnerableNamespace].dependencies = [];
@@ -435,11 +439,7 @@ describe('DependenciesApp component with dependencyListVulnerabilities feature f
         });
 
         it('disables the vulnerable tab', () => {
-          expect(findVulnerableTabComponent().props()).toEqual(
-            expect.objectContaining({
-              disabled: true,
-            }),
-          );
+          expect(findVulnerableTabComponent().classes('disabled')).toBe(true);
         });
       });
     });
