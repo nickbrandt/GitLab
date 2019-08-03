@@ -123,6 +123,11 @@ describe 'EE Clusters', :js do
             fill_in 'cluster[provider_gcp_attributes][zone]', with: 'us-central1-a'
             fill_in 'cluster[provider_gcp_attributes][machine_type]', with: 'n1-standard-2'
             click_button 'Create Kubernetes cluster'
+
+            # The frontend won't show the details until the cluster is
+            # created, and we don't want to make calls out to GCP.
+            provider = Clusters::Cluster.last.provider
+            provider.make_created
           end
 
           it 'user sees a cluster details page' do
