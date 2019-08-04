@@ -5,9 +5,7 @@ module Gitlab
     class Median
       include StageQueryHelpers
 
-      attr_reader :stage, :query
-
-      def initialize(stage, query)
+      def initialize(stage:, query:)
         @stage = stage
         @query = query
       end
@@ -18,6 +16,8 @@ module Gitlab
       end
 
       private
+
+      attr_reader :stage, :query
 
       def percentile_cont
         percentile_disc_ordering = Arel::Nodes::UnaryOperation.new(Arel::Nodes::SqlLiteral.new('ORDER BY'), duration)

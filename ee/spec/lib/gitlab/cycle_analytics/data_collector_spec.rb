@@ -5,7 +5,6 @@ describe Gitlab::CycleAnalytics::DataCollector do
     Timecop.freeze { example.run }
   end
 
-  # casting to days since asserting seconds are not reliable
   def round_to_days(seconds)
     seconds.fdiv(1.day.to_i).round
   end
@@ -40,19 +39,17 @@ describe Gitlab::CycleAnalytics::DataCollector do
       end
     end
 
-    it 'loads serialized records for a given stage' do
-      user = create(:user)
+    let(:user) { create(:user) }
+    let(:data_collector) { described_class.new(stage, from: Time.new(2019), to: Time.new(2020), current_user: user) }
+
+    it 'loads serialized records' do
       project.add_user(user, Gitlab::Access::DEVELOPER)
 
-      data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020), current_user: user)
       items = data_collector.records_fetcher.serialized_records
-
       expect(items.size).to eq(3)
     end
 
     it 'loads data for the scatterplot chart' do
-      data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020))
-
       items = data_collector.with_end_date_and_duration_in_seconds
       a, b, c = items.sort_by { |i| i['duration_in_seconds'] }
 
@@ -62,13 +59,11 @@ describe Gitlab::CycleAnalytics::DataCollector do
     end
 
     it 'calculates median' do
-      data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020))
-
       expect(round_to_days(data_collector.median.seconds)).to eq(10)
     end
   end
 
-  shared_examples 'stage pairs' do
+  shared_examples 'test various start and end event combinations' do
     describe 'for Issue related events' do
       describe 'between issue creation time and closing time' do
         let(:start_event_identifier) { :issue_created }
@@ -301,7 +296,7 @@ describe Gitlab::CycleAnalytics::DataCollector do
   end
 
   describe 'for ProjectStage' do
-    it_behaves_like 'stage pairs' do
+    it_behaves_like 'test various start and end event combinations' do
       let(:project) { create(:project, :empty_repo) }
       let(:stage) do
         CycleAnalytics::ProjectStage.new(
@@ -338,7 +333,7 @@ describe Gitlab::CycleAnalytics::DataCollector do
   end
 
   describe 'for GroupStage' do
-    it_behaves_like 'stage pairs' do
+    it_behaves_like 'test various start and end event combinations' do
       let(:group) { create(:group) }
       let(:project) { create(:project, :empty_repo, group: group) }
       let(:stage) do

@@ -2,7 +2,7 @@
 
 module CycleAnalytics
   class StageFindService
-    NUMBER_ONLY = /^\d+$/
+    NUMBER_ONLY = /^\d+$/.freeze
 
     def initialize(parent:, id:)
       @parent = parent
@@ -29,6 +29,7 @@ module CycleAnalytics
       raw_stage = Gitlab::CycleAnalytics::DefaultStages.all.find do |hash|
         hash[:name].eql?(id)
       end || raise(ActiveRecord::RecordNotFound)
+
       parent.cycle_analytics_stages.build(raw_stage)
     end
   end

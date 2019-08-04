@@ -10,14 +10,15 @@ module CycleAnalytics
     end
 
     def execute
-      handle_position_change
+      stage.class.transaction do
+        handle_position_change
 
-      if stage.default_stage? && params.has_key?(:hidden)
-        stage.update(hidden: params[:hidden])
-      else
-        handle_custom_stage_update
+        if stage.default_stage? && params.has_key?(:hidden)
+          stage.update(hidden: params[:hidden])
+        else
+          handle_custom_stage_update
+        end
       end
-
       stage
     end
 

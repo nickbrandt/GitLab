@@ -8,7 +8,7 @@ module CycleAnalytics
     end
 
     def execute
-      persisted_stages.any? ? persisted_stages : build_stages
+      persisted_stages.any? ? persisted_stages : build_default_stages
     end
 
     private
@@ -19,15 +19,13 @@ module CycleAnalytics
       @persisted_stages ||= parent.cycle_analytics_stages.ordered
     end
 
-    def build_stages
+    def build_default_stages
       stages = Gitlab::CycleAnalytics::DefaultStages.all.map do |params|
         parent.cycle_analytics_stages.build(params)
       end
 
-      if allowed_to_customize_stages
-        stages.each(&:save!)
-      end
-
+      # if customization is allowed all stages must be persisted
+      stages.each(&:save!) if allowed_to_customize_stages
       stages
     end
   end

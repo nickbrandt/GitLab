@@ -19,7 +19,9 @@ module CycleAnalytics
       enum start_event_identifier: Gitlab::CycleAnalytics::StageEvents.to_enum, _prefix: :start_event_identifier
       enum end_event_identifier: Gitlab::CycleAnalytics::StageEvents.to_enum, _prefix: :end_event_identifier
 
-      scope :ordered, -> { order(:relative_position) }
+      scope :ordered, -> { order(:relative_position, :id) }
+
+      alias_attribute :custom_stage?, :custom
     end
 
     def parent=(_)
@@ -36,10 +38,6 @@ module CycleAnalytics
 
     def end_event
       Gitlab::CycleAnalytics::StageEvents[end_event_identifier].new({ label: end_event_label })
-    end
-
-    def custom_stage?
-      custom
     end
 
     def default_stage?
