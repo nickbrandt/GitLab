@@ -4,7 +4,10 @@ module Gitlab
   module CycleAnalytics
     module StageQueryHelpers
       def execute_query(query)
-        ActiveRecord::Base.connection.execute(query.to_sql)
+        # Extract raw sql and variable bindings from arel query
+        sql, binds = ActiveRecord::Base.connection.send(:to_sql_and_binds, query) # rubocop:disable GitlabSecurity/PublicSend
+
+        ActiveRecord::Base.connection.exec_query(sql, nil, binds).to_a
       end
 
       def zero_interval

@@ -31,7 +31,7 @@ module Gitlab
           BuildRecordsFetcher.new(stage, query, params).serialized_records
         else
           q = query
-            .join(join_finder_ar_query)
+            .join(finder_arel_query).on(finder_arel_query[:id].eq(subject_model.arel_table[:id]))
             .order(stage.end_event.timestamp_projection.asc)
             .take(MAX_RECORDS)
           q = q.project(*projection_mapping[subject_model], round_duration_to_seconds.as('total_time'))
@@ -41,14 +41,15 @@ module Gitlab
         end
       end
 
-      # INNER JOIN IssuesFinder and MergeRequestsFinder ActiveRecord::Relation with the main Arel query in order to load records in scope of the current user.
-      def join_finder_ar_query
-        ar_relation = FINDER_CLASS_MAPPING.fetch(subject_model)
-          .new(params[:current_user], finder_params)
-          .execute
-        ar_relation = ar_relation.select(subject_model.arel_table[:id])
-
-        Arel.sql("INNER JOIN (#{ar_relation.to_sql}) AS records_finder_results on records_finder_results.id = #{subject_model.arel_table.table_name}.id")
+      # Casting ActiveRecord::Relation returned by the finder class to Arel so it can be joined with the main Arel query
+      def finder_arel_query
+        @finder_arel_query ||= begin
+                                 ar_relation = FINDER_CLASS_MAPPING.fetch(subject_model)
+                                   .new(params[:current_user], finder_params)
+                                   .execute
+                                 ar_relation = ar_relation.select(subject_model.arel_table[:id])
+                                 ar_relation.arel.as('finder_results')
+                               end
       end
 
       private
