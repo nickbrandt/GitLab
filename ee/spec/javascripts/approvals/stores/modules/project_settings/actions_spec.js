@@ -21,7 +21,6 @@ const TEST_RULE_RESPONSE = {
   groups: [{ id: 4 }],
   users: [{ id: 7 }, { id: 8 }],
 };
-const TEST_SETTINGS_PATH = 'projects/9/approval_rules';
 const TEST_RULES_PATH = 'projects/9/approval_rules';
 
 describe('EE approvals project settings module actions', () => {
@@ -33,7 +32,6 @@ describe('EE approvals project settings module actions', () => {
     state = {
       settings: {
         projectId: TEST_PROJECT_ID,
-        settingsPath: TEST_SETTINGS_PATH,
         rulesPath: TEST_RULES_PATH,
       },
     };
@@ -90,7 +88,7 @@ describe('EE approvals project settings module actions', () => {
   describe('fetchRules', () => {
     it('dispatches request/receive', done => {
       const data = { rules: [TEST_RULE_RESPONSE] };
-      mock.onGet(TEST_SETTINGS_PATH).replyOnce(200, data);
+      mock.onGet(TEST_RULES_PATH).replyOnce(200, data);
 
       testAction(
         actions.fetchRules,
@@ -102,7 +100,7 @@ describe('EE approvals project settings module actions', () => {
           { type: 'receiveRulesSuccess', payload: mapApprovalSettingsResponse(data) },
         ],
         () => {
-          expect(mock.history.get.map(x => x.url)).toEqual([TEST_SETTINGS_PATH]);
+          expect(mock.history.get.map(x => x.url)).toEqual([TEST_RULES_PATH]);
 
           done();
         },
@@ -110,7 +108,7 @@ describe('EE approvals project settings module actions', () => {
     });
 
     it('dispatches request/receive on error', done => {
-      mock.onGet(TEST_SETTINGS_PATH).replyOnce(500);
+      mock.onGet(TEST_RULES_PATH).replyOnce(500);
 
       testAction(
         actions.fetchRules,

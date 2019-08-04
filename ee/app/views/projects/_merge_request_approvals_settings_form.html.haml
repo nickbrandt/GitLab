@@ -5,7 +5,6 @@
     = _("Add approvers")
   #js-mr-approvals-settings{ data: { 'project_id': @project.id,
     'project_path': expose_path(api_v4_projects_path(id: @project.id)),
-    'settings_path': expose_path(api_v4_projects_approval_rules_path(id: @project.id)),
     'rules_path': expose_path(api_v4_projects_approval_rules_path(id: @project.id)),
     'allow_multi_rule': @project.multiple_approval_rules_available?.to_s } }
     .text-center.prepend-top-default
