@@ -51,7 +51,7 @@ module Gitlab
       attr_reader :stage, :params
 
       def filter_by_parent_model(query)
-        instance_exec(query, &QUERY_RULES.fetch(stage.parent.class).fetch(stage.model_to_query))
+        instance_exec(query, &QUERY_RULES.fetch(stage.parent.class).fetch(subject_model))
       end
 
       def filter_by_time_range(query)
@@ -71,7 +71,7 @@ module Gitlab
       end
 
       def model_arel_table
-        stage.model_to_query.arel_table
+        subject_model.arel_table
       end
     end
   end

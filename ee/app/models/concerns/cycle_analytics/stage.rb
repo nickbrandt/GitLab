@@ -46,7 +46,7 @@ module CycleAnalytics
       !custom
     end
 
-    def model_to_query
+    def subject_model
       start_event.object_type
     end
 

@@ -27,11 +27,11 @@ shared_examples_for 'cycle analytics stage' do
     end
   end
 
-  describe '#model_to_query' do
+  describe '#subject_model' do
     it 'infers the model to be queried from the start event' do
       stage = described_class.new(valid_params)
 
-      expect(stage.model_to_query).to eq(Issue)
+      expect(stage.subject_model).to eq(Issue)
     end
   end
 end

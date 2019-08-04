@@ -28,9 +28,9 @@ class CycleAnalytics::StageEntity < Grape::Entity
       _("Related Jobs")
     elsif object.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_staging_stage)
       _("Related Deployed Jobs")
-    elsif object.model_to_query.eql?(Issue)
+    elsif object.subject_model.eql?(Issue)
       _("Related Issues")
-    elsif object.model_to_query.eql?(MergeRequest)
+    elsif object.subject_model.eql?(MergeRequest)
       _("Related Merged Requests")
     end
   end

@@ -17,6 +17,8 @@ module Gitlab
         MergeRequest => AnalyticsMergeRequestSerializer
       }.freeze
 
+      delegate :subject_model, to: :stage
+
       def initialize(stage:, query:, params: {})
         @stage = stage
         @query = query
@@ -32,7 +34,7 @@ module Gitlab
             .join(join_finder_ar_query)
             .order(stage.end_event.timestamp_projection.asc)
             .take(MAX_RECORDS)
-          q = q.project(*projection_mapping[stage.model_to_query], round_duration_to_seconds.as('total_time'))
+          q = q.project(*projection_mapping[subject_model], round_duration_to_seconds.as('total_time'))
           execute_query(q).to_a.map do |item|
             SERIALIZER_CLASS_MAPPING.fetch(subject_model).new.represent(item)
           end
@@ -82,10 +84,6 @@ module Gitlab
           Project => { project_id: stage.parent.id },
           Group => { group_id: stage.parent.id, include_subgroups: true }
         }.fetch(stage.parent.class)
-      end
-
-      def subject_model
-        stage.model_to_query
       end
 
       def default_test_stage?
