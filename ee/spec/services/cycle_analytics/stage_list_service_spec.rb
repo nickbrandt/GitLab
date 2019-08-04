@@ -5,12 +5,24 @@ require 'spec_helper'
 describe CycleAnalytics::StageListService do
   let(:project) { build(:project, :empty_repo) }
 
-  it 'persists and returns the default stages if no stages are defined yet' do
-    service = described_class.new(parent: project)
+  it 'returns the default stages as in-memory objects if customizable stages are not allowed' do
+    service = described_class.new(parent: project, allowed_to_customize_stages: false)
 
     stages = service.execute
+
     stage_names = stages.map(&:name)
     expect(stage_names).to eq(Gitlab::CycleAnalytics::DefaultStages.all.map { |p| p[:name] })
+
+    stage_ids = stages.map(&:id)
+    expect(stage_ids.all?(&:nil?)).to eq(true)
+  end
+
+  it 'persists and returns the default stages as records if customizable stages are allowed' do
+    service = described_class.new(parent: project, allowed_to_customize_stages: true)
+
+    stages = service.execute
+
+    expect(stages.all?(&:persisted?)).to eq(true)
   end
 
   it 'returns the persisted stages' do

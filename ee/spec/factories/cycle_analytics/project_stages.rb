@@ -2,6 +2,7 @@
 
 FactoryBot.define do
   factory :cycle_analytics_project_stage, class: CycleAnalytics::ProjectStage do
+    project
     sequence(:name) { |n| "Stage ##{n}" }
     hidden { false }
     start_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueCreated.identifier }

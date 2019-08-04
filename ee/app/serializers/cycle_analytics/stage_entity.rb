@@ -19,6 +19,10 @@ class CycleAnalytics::StageEntity < Grape::Entity
     expose :end_event_label, as: :label, using: LabelEntity
   end
 
+  def id
+    object.id || object.name
+  end
+
   def legend
     if object.matches_with_stage_params?(Gitlab::CycleAnalytics::DefaultStages.params_for_test_stage)
       _("Related Jobs")
