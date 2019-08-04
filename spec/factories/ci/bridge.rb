@@ -30,7 +30,7 @@ FactoryBot.define do
 
       if evaluator.upstream.present?
         bridge.options = bridge.options.to_h.merge(
-          needs: { pipeline: evaluator.upstream.full_path }
+          bridge_needs: { pipeline: evaluator.upstream.full_path }
         )
       end
     end

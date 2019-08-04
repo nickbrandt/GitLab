@@ -39,7 +39,7 @@ describe Ci::Bridge do
 
     context 'when bridge points towards upstream' do
       before do
-        bridge.options = { needs: { pipeline: 'my/project' } }
+        bridge.options = { bridge_needs: { pipeline: 'my/project' } }
       end
 
       it 'subscribes to the upstream project' do

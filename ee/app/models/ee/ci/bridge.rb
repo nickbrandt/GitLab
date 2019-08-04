@@ -99,7 +99,7 @@ module EE
 
       def upstream_project
         strong_memoize(:upstream_project) do
-          options&.dig(:needs, :pipeline)
+          options&.dig(:bridge_needs, :pipeline)
         end
       end
 
