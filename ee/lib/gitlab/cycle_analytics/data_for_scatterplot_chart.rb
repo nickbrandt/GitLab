@@ -5,6 +5,8 @@ module Gitlab
     class DataForScatterplotChart
       include StageQueryHelpers
 
+      delegate :subject_model, to: :stage
+
       def initialize(stage:, query:)
         @stage = stage
         @query = query

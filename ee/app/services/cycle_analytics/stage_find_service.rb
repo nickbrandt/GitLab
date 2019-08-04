@@ -2,6 +2,8 @@
 
 module CycleAnalytics
   class StageFindService
+    NUMBER_ONLY = /^\d+$/
+
     def initialize(parent:, id:)
       @parent = parent
       @id = id
@@ -20,7 +22,7 @@ module CycleAnalytics
     attr_reader :parent, :id
 
     def in_memory_default_stage?
-      id.is_a?(String)
+      !NUMBER_ONLY.match?(id.to_s)
     end
 
     def find_in_memory_stage_by_name!

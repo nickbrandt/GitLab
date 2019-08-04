@@ -33,7 +33,7 @@ describe Gitlab::CycleAnalytics::PlanStage do
       stage = CycleAnalytics::ProjectStage.new(
         Gitlab::CycleAnalytics::DefaultStages.params_for_plan_stage.merge(project: project)
       )
-      dc = Gitlab::CycleAnalytics::DataCollector.new(stage, 2.days.ago)
+      dc = Gitlab::CycleAnalytics::DataCollector.new(stage, from: 2.days.ago)
       expect(dc.median.seconds).to eq(ISSUES_MEDIAN)
     end
   end

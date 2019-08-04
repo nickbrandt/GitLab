@@ -6,6 +6,8 @@ module Gitlab
       include Gitlab::CycleAnalytics::MetricsTables
       include StageQueryHelpers
 
+      delegate :subject_model, to: :stage
+
       QUERY_RULES = {
         Project => {
           Issue => ->(query) {
