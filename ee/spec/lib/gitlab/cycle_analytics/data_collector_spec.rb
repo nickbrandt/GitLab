@@ -41,7 +41,10 @@ describe Gitlab::CycleAnalytics::DataCollector do
     end
 
     it 'loads serialized records for a given stage' do
-      data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020))
+      user = create(:user)
+      project.add_user(user, Gitlab::Access::DEVELOPER)
+
+      data_collector = described_class.new(stage, from: Time.new(2019), to: Time.new(2020), current_user: user)
       items = data_collector.records_fetcher.serialized_records
 
       expect(items.size).to eq(3)
@@ -311,7 +314,10 @@ describe Gitlab::CycleAnalytics::DataCollector do
     end
 
     it 'ignores items outside of the date range' do
+      user = create(:user)
       project = create(:project, :empty_repo)
+      project.add_user(user, Gitlab::Access::DEVELOPER)
+
       stage = CycleAnalytics::ProjectStage.new(
         name: 'My Stage',
         project: project,
@@ -324,7 +330,7 @@ describe Gitlab::CycleAnalytics::DataCollector do
         mr.metrics.update!(latest_closed_at: Time.now)
       end
 
-      data_collector = described_class.new(stage, from: Time.new(2019, 1, 1))
+      data_collector = described_class.new(stage, from: Time.new(2019, 1, 1), current_user: user)
       items = data_collector.records_fetcher.serialized_records
 
       expect(items).to be_empty

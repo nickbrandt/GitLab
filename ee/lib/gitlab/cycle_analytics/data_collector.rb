@@ -9,7 +9,7 @@ module Gitlab
       end
 
       def records_fetcher
-        RecordsFetcher.new(stage: stage, query: query)
+        RecordsFetcher.new(stage: stage, query: query, params: params)
       end
 
       def with_end_date_and_duration_in_seconds
