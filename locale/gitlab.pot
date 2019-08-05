@@ -11489,6 +11489,9 @@ msgstr ""
 msgid "PrometheusService|Custom metrics"
 msgstr ""
 
+msgid "PrometheusService|Custom metrics require Prometheus installed on a cluster with environment scope \"*\" OR a manually configured Prometheus to be available."
+msgstr ""
+
 msgid "PrometheusService|Enable Prometheus to define custom metrics, using either option above"
 msgstr ""
 
