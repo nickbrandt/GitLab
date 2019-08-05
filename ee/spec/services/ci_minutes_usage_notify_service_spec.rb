@@ -189,6 +189,18 @@ describe CiMinutesUsageNotifyService do
         it_behaves_like 'no notification is sent'
       end
 
+      context 'when quota is unlimited' do
+        # Gitlab.com? => true is required in order to excercise the notification
+        let(:gitlab_dot_com) { true }
+        let(:ci_minutes_used) { 1500 }
+
+        before do
+          namespace.update_attribute(:shared_runners_minutes_limit, 0)
+        end
+
+        it_behaves_like 'no notification is sent'
+      end
+
       it_behaves_like 'notification for custom level is sent', 1500, 30
 
       context 'when other Pipeline has finished but second level of alert has not been reached' do

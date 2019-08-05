@@ -13,7 +13,7 @@ class Packages::Package < ApplicationRecord
     format: { with: Gitlab::Regex.package_name_regex }
 
   validate :valid_npm_package_name, if: :npm?
-  validate :package_already_taken
+  validate :package_already_taken, if: :npm?
 
   enum package_type: { maven: 1, npm: 2 }
 
