@@ -230,34 +230,6 @@ describe Issue do
       end
     end
 
-    describe '#shift_after?' do
-      it 'returns true' do
-        issue.update(relative_position: issue1.relative_position - 1)
-
-        expect(issue.shift_after?).to be_truthy
-      end
-
-      it 'returns false' do
-        issue.update(relative_position: issue1.relative_position - 2)
-
-        expect(issue.shift_after?).to be_falsey
-      end
-    end
-
-    describe '#shift_before?' do
-      it 'returns true' do
-        issue.update(relative_position: issue1.relative_position + 1)
-
-        expect(issue.shift_before?).to be_truthy
-      end
-
-      it 'returns false' do
-        issue.update(relative_position: issue1.relative_position + 2)
-
-        expect(issue.shift_before?).to be_falsey
-      end
-    end
-
     describe '#move_between' do
       it 'positions issue between two other' do
         new_issue.move_between(issue, issue1)
