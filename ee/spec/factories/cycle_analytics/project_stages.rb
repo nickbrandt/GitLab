@@ -5,7 +5,11 @@ FactoryBot.define do
     project
     sequence(:name) { |n| "Stage ##{n}" }
     hidden { false }
-    start_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueCreated.identifier }
-    end_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueClosed.identifier }
+    between_issue_created_and_issue_closed
+
+    trait :between_issue_created_and_issue_closed do
+      start_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueCreated.identifier }
+      end_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueClosed.identifier }
+    end
   end
 end
