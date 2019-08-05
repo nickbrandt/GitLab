@@ -57,8 +57,8 @@ module Gitlab
       end
 
       def filter_by_time_range(query)
-        from = params.fetch(:from, 30.days.ago)
-        to = params.fetch(:to, nil)
+        from = params[:from] || 30.days.ago
+        to = params[:to] || nil
 
         query = query.where(model_arel_table[:created_at].gteq(from))
         query = query.where(model_arel_table[:created_at].lteq(to)) if to

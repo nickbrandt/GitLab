@@ -25,7 +25,7 @@ module Gitlab
         end
 
         def subquery
-          resource_label_events_with_subquery(:issue_id, label, ResourceLabelEvent.actions[:remove], :desc, 'label_removed_for_last_time')
+          resource_label_events_with_subquery(:issue_id, label, ::ResourceLabelEvent.actions[:remove], :desc, 'label_removed_for_last_time')
         end
       end
     end

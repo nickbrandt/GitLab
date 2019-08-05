@@ -67,7 +67,7 @@ module Gitlab
         def resource_label_events_with_subquery(foreign_key, label, action, order, as)
           raise "not supported order option: #{order}" unless [:asc, :desc].include?(order)
 
-          table = ResourceLabelEvent.arel_table
+          table = resource_label_events_table
           query = table.project(table[:created_at])
           query = query.project(table[foreign_key])
           query = query.project(
@@ -77,7 +77,7 @@ module Gitlab
               .order(table[:created_at].public_send(order))).as('row_id') # rubocop:disable GitlabSecurity/PublicSend
           )
           query = query.where(table[:action].eq(action))
-          query = query.where(table[:label_id].eq(label_id))
+          query = query.where(table[:label_id].eq(l.id))
           query.as(as)
         end
       end

@@ -3,6 +3,10 @@
 module Gitlab
   module CycleAnalytics
     module MetricsTables
+      def resource_label_events_table
+        ResourceLabelEvent.arel_table
+      end
+
       def mr_metrics_table
         MergeRequest::Metrics.arel_table
       end
