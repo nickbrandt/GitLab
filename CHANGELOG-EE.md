@@ -1,5 +1,14 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.4
+
+### Fixed (3 changes)
+
+- Don't send CI usage email notifications when quota is unlimited. !14810
+- Fix variable mismatch in code quality widget. !14829
+- Change package validation scope to fix Maven package naming functionality. !14922
+
+
 ## 12.1.3
 
 ### Fixed (3 changes)
