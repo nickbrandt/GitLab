@@ -120,14 +120,6 @@ describe Gitlab::Database::LoadBalancing do
       expect(described_class.enable?).to eq(false)
     end
 
-    it 'returns false when a database other than PostgreSQL is being used' do
-      allow(described_class).to receive(:hosts).and_return(%w(foo))
-      allow(Sidekiq).to receive(:server?).and_return(false)
-      allow(Gitlab::Database).to receive(:postgresql?).and_return(false)
-
-      expect(described_class.enable?).to eq(false)
-    end
-
     it 'returns false when running inside a Rake task' do
       expect(described_class).to receive(:program_name).and_return('rake')
 
@@ -137,7 +129,6 @@ describe Gitlab::Database::LoadBalancing do
     it 'returns true when load balancing should be enabled' do
       allow(described_class).to receive(:hosts).and_return(%w(foo))
       allow(Sidekiq).to receive(:server?).and_return(false)
-      allow(Gitlab::Database).to receive(:postgresql?).and_return(true)
 
       expect(described_class.enable?).to eq(true)
     end
@@ -145,7 +136,6 @@ describe Gitlab::Database::LoadBalancing do
     it 'returns true when service discovery is enabled' do
       allow(described_class).to receive(:hosts).and_return([])
       allow(Sidekiq).to receive(:server?).and_return(false)
-      allow(Gitlab::Database).to receive(:postgresql?).and_return(true)
 
       allow(described_class)
         .to receive(:service_discovery_enabled?)
@@ -178,7 +168,6 @@ describe Gitlab::Database::LoadBalancing do
       it 'is enabled' do
         allow(described_class).to receive(:hosts).and_return(%w(foo))
         allow(Sidekiq).to receive(:server?).and_return(false)
-        allow(Gitlab::Database).to receive(:postgresql?).and_return(true)
 
         expect(described_class.enable?).to eq(true)
       end

@@ -6,8 +6,6 @@ module Gitlab
       include Gitlab::Utils::StrongMemoize
 
       def perform_checks
-        raise NotImplementedError.new('Geo is only compatible with PostgreSQL') unless Gitlab::Database.postgresql?
-
         return '' unless Gitlab::Geo.secondary?
         return 'Geo database configuration file is missing.' unless Gitlab::Geo.geo_database_configured?
         return 'Geo node has a database that is writable which is an indication it is not configured for replication with the primary node.' unless Gitlab::Database.db_read_only?

@@ -85,7 +85,6 @@ module Gitlab
       def self.enable?
         return false unless ::License.feature_available?(:db_load_balancing)
         return false if program_name == 'rake' || Sidekiq.server?
-        return false unless Database.postgresql?
 
         hosts.any? || service_discovery_enabled?
       end
