@@ -16,7 +16,7 @@ export default {
 
 <template>
   <ol class="list-unstyled row">
-    <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4">
+    <li v-for="design in designs" :key="design.id" class="col-md-6 col-lg-4 mb-3">
       <design
         :id="design.id"
         :comments-count="design.commentsCount"
