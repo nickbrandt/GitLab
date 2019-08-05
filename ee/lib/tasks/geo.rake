@@ -166,6 +166,46 @@ namespace :geo do
     end
   end
 
+  desc 'Run orphaned project registry cleaner'
+  task run_orphaned_project_registry_cleaner: :environment do
+    abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?
+
+    unless Gitlab::Geo.secondary?
+      abort 'This is not a secondary node'
+    end
+
+    from_project_id = ENV['FROM_PROJECT_ID'] || Geo::ProjectRegistry.minimum(:project_id)
+    to_project_id = ENV['TO_PROJECT_ID'] || Geo::ProjectRegistry.maximum(:project_id)
+
+    if from_project_id > to_project_id
+      abort 'FROM_PROJECT_ID can not be greater than TO_PROJECT_ID'
+    end
+
+    batch_size = 1000
+    total_count = 0
+    current_max_id = 0
+
+    until current_max_id >= to_project_id
+      current_max_id = [from_project_id + batch_size, to_project_id + 1].min
+
+      project_ids = Project
+        .where('id >= ? AND id < ?', from_project_id, current_max_id)
+        .pluck_primary_key
+
+      orphaned_registries = Geo::ProjectRegistry
+        .where('project_id NOT IN(?)', project_ids)
+        .where('project_id >= ? AND project_id < ?', from_project_id, current_max_id)
+      count = orphaned_registries.delete_all
+      total_count += count
+
+      puts "Checked project ids from #{from_project_id} to #{current_max_id} registries. Removed #{count} orphaned registries"
+
+      from_project_id = current_max_id
+    end
+
+    puts "Orphaned registries removed(total): #{total_count}"
+  end
+
   desc 'Make this node the Geo primary'
   task set_primary_node: :environment do
     abort GEO_LICENSE_ERROR_TEXT unless Gitlab::Geo.license_allows?

@@ -347,4 +347,51 @@ describe 'geo rake tasks', :geo do
       end
     end
   end
+
+  describe 'geo:run_orphaned_project_registry_cleaner' do
+    let!(:current_node) { create(:geo_node) }
+
+    before do
+      stub_current_geo_node(current_node)
+
+      create(:geo_project_registry)
+      create(:geo_project_registry)
+
+      @orphaned = create(:geo_project_registry)
+      @orphaned.project.delete
+      @orphaned1 = create(:geo_project_registry)
+      @orphaned1.project.delete
+
+      create(:geo_project_registry)
+    end
+
+    it 'removes orphaned registries' do
+      run_rake_task('geo:run_orphaned_project_registry_cleaner')
+
+      expect(Geo::ProjectRegistry.count).to be 3
+      expect(Geo::ProjectRegistry.find_by_id(@orphaned.id)).to be nil
+    end
+
+    it 'removes orphaned registries taking into account TO_PROJECT_ID' do
+      allow(ENV).to receive(:[]).with('FROM_PROJECT_ID').and_return(nil)
+      allow(ENV).to receive(:[]).with('TO_PROJECT_ID').and_return(@orphaned.project_id)
+
+      run_rake_task('geo:run_orphaned_project_registry_cleaner')
+
+      expect(Geo::ProjectRegistry.count).to be 4
+      expect(Geo::ProjectRegistry.find_by_id(@orphaned.id)).to be nil
+      expect(Geo::ProjectRegistry.find_by_id(@orphaned1.id)).not_to be nil
+    end
+
+    it 'removes orphaned registries taking into account FROM_PROJECT_ID' do
+      allow(ENV).to receive(:[]).with('FROM_PROJECT_ID').and_return(@orphaned1.project_id)
+      allow(ENV).to receive(:[]).with('TO_PROJECT_ID').and_return(nil)
+
+      run_rake_task('geo:run_orphaned_project_registry_cleaner')
+
+      expect(Geo::ProjectRegistry.count).to be 4
+      expect(Geo::ProjectRegistry.find_by_id(@orphaned.id)).not_to be nil
+      expect(Geo::ProjectRegistry.find_by_id(@orphaned1.id)).to be nil
+    end
+  end
 end
