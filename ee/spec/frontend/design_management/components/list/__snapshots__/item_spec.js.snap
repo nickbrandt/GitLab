@@ -6,12 +6,11 @@ exports[`Design management list item component hides comment count 1`] = `
   to="[object Object]"
 >
   <div
-    class="card-body p-0"
+    class="card-body p-0 d-flex align-items-center overflow-hidden"
   >
     <img
       alt="test"
-      class="block ml-auto mr-auto mw-100 design-img"
-      height="230"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -52,12 +51,11 @@ exports[`Design management list item component renders item with multiple commen
   to="[object Object]"
 >
   <div
-    class="card-body p-0"
+    class="card-body p-0 d-flex align-items-center overflow-hidden"
   >
     <img
       alt="test"
-      class="block ml-auto mr-auto mw-100 design-img"
-      height="230"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
       src="http://via.placeholder.com/300"
     />
   </div>
@@ -116,12 +114,11 @@ exports[`Design management list item component renders item with single comment 
   to="[object Object]"
 >
   <div
-    class="card-body p-0"
+    class="card-body p-0 d-flex align-items-center overflow-hidden"
   >
     <img
       alt="test"
-      class="block ml-auto mr-auto mw-100 design-img"
-      height="230"
+      class="block ml-auto mr-auto mw-100 mh-100 design-img"
       src="http://via.placeholder.com/300"
     />
   </div>
