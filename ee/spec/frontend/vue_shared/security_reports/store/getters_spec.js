@@ -1,16 +1,15 @@
 import createState from 'ee/vue_shared/security_reports/store/state';
 import createSastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
+import createDependencyScanningState from 'ee/vue_shared/security_reports/store/modules/dependency_scanning/state';
 import {
   groupedSastContainerText,
   groupedDastText,
-  groupedDependencyText,
   groupedSummaryText,
   allReportsHaveError,
   noBaseInAllReports,
   areReportsLoading,
   sastContainerStatusIcon,
   dastStatusIcon,
-  dependencyScanningStatusIcon,
   anyReportHasError,
   summaryCounts,
 } from 'ee/vue_shared/security_reports/store/getters';
@@ -28,6 +27,7 @@ describe('Security reports getters', () => {
   beforeEach(() => {
     state = createState();
     state.sast = createSastState();
+    state.dependencyScanning = createDependencyScanningState();
   });
 
   describe('groupedSastContainerText', () => {
@@ -172,82 +172,6 @@ describe('Security reports getters', () => {
     });
   });
 
-  describe('groupedDependencyText', () => {
-    describe('with no issues', () => {
-      it('returns no issues text', () => {
-        state.dependencyScanning.paths.head = HEAD_PATH;
-        state.dependencyScanning.paths.base = BASE_PATH;
-
-        expect(groupedDependencyText(state)).toEqual(
-          'Dependency scanning detected no vulnerabilities',
-        );
-      });
-    });
-
-    describe('with new issues and without base', () => {
-      it('returns unable to compare text', () => {
-        state.dependencyScanning.paths.head = HEAD_PATH;
-        state.dependencyScanning.newIssues = [{}];
-
-        expect(groupedDependencyText(state)).toEqual(
-          'Dependency scanning detected 1 vulnerability for the source branch only',
-        );
-      });
-    });
-
-    describe('with base and head', () => {
-      describe('with only new issues', () => {
-        it('returns new issues text', () => {
-          state.dependencyScanning.paths.head = HEAD_PATH;
-          state.dependencyScanning.paths.base = BASE_PATH;
-          state.dependencyScanning.newIssues = [{}];
-
-          expect(groupedDependencyText(state)).toEqual(
-            'Dependency scanning detected 1 new vulnerability',
-          );
-        });
-      });
-
-      describe('with only dismissed issues', () => {
-        it('returns dismissed issues text', () => {
-          state.dependencyScanning.paths.head = HEAD_PATH;
-          state.dependencyScanning.paths.base = BASE_PATH;
-          state.dependencyScanning.newIssues = [{ isDismissed: true }];
-
-          expect(groupedDependencyText(state)).toEqual(
-            'Dependency scanning detected 1 dismissed vulnerability',
-          );
-        });
-      });
-
-      describe('with new and resolved issues', () => {
-        it('returns new and fixed issues text', () => {
-          state.dependencyScanning.paths.head = HEAD_PATH;
-          state.dependencyScanning.paths.base = BASE_PATH;
-          state.dependencyScanning.newIssues = [{}];
-          state.dependencyScanning.resolvedIssues = [{}];
-
-          expect(removeBreakLine(groupedDependencyText(state))).toEqual(
-            'Dependency scanning detected 1 new, and 1 fixed vulnerabilities',
-          );
-        });
-      });
-
-      describe('with only resolved issues', () => {
-        it('returns fixed issues text', () => {
-          state.dependencyScanning.paths.head = HEAD_PATH;
-          state.dependencyScanning.paths.base = BASE_PATH;
-
-          state.dependencyScanning.resolvedIssues = [{}];
-
-          expect(groupedDependencyText(state)).toEqual(
-            'Dependency scanning detected 1 fixed vulnerability',
-          );
-        });
-      });
-    });
-  });
-
   describe('summaryCounts', () => {
     it('returns 0 count for empty state', () => {
       expect(summaryCounts(state)).toEqual({
@@ -260,6 +184,7 @@ describe('Security reports getters', () => {
 
     describe('combines all reports', () => {
       it('of the same type', () => {
+        state.sast.resolvedIssues = [{}];
         state.sastContainer.resolvedIssues = [{}];
         state.dast.resolvedIssues = [{}];
         state.dependencyScanning.resolvedIssues = [{}];
@@ -268,13 +193,13 @@ describe('Security reports getters', () => {
           added: 0,
           dismissed: 0,
           existing: 0,
-          fixed: 3,
+          fixed: 4,
         });
       });
 
       it('of the different types', () => {
+        state.sast.allIssues = [{}];
         state.sastContainer.resolvedIssues = [{}];
-        state.dast.allIssues = [{}];
         state.dast.newIssues = [{ isDismissed: true }];
         state.dependencyScanning.newIssues = [{ isDismissed: false }];
 
@@ -454,24 +379,6 @@ describe('Security reports getters', () => {
     });
   });
 
-  describe('dependencyScanningStatusIcon', () => {
-    it('returns warning with new issues', () => {
-      state.dependencyScanning.newIssues = [{}];
-
-      expect(dependencyScanningStatusIcon(state)).toEqual('warning');
-    });
-
-    it('returns warning with failed report', () => {
-      state.dependencyScanning.hasError = true;
-
-      expect(dependencyScanningStatusIcon(state)).toEqual('warning');
-    });
-
-    it('returns success with no new issues or failed report', () => {
-      expect(dependencyScanningStatusIcon(state)).toEqual('success');
-    });
-  });
-
   describe('areReportsLoading', () => {
     it('returns true when any report is loading', () => {
       state.dast.isLoading = true;
@@ -499,7 +406,8 @@ describe('Security reports getters', () => {
     });
 
     it('returns false when one of the reports does not have error', () => {
-      state.dast.hasError = false;
+      state.sast.hasError = false;
+      state.dast.hasError = true;
       state.sastContainer.hasError = true;
       state.dependencyScanning.hasError = true;
 

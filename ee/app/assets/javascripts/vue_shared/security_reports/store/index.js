@@ -6,6 +6,7 @@ import * as getters from './getters';
 import mutations from './mutations';
 import state from './state';
 
+import dependencyScanning from './modules/dependency_scanning';
 import sast from './modules/sast';
 
 Vue.use(Vuex);
@@ -13,6 +14,7 @@ Vue.use(Vuex);
 export default () =>
   new Vuex.Store({
     modules: {
+      dependencyScanning,
       sast,
     },
     actions,

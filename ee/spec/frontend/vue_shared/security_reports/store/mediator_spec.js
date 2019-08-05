@@ -18,12 +18,12 @@ describe('security reports mediator', () => {
     const type = types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS;
 
     it.each`
-      action                             | category
-      ${'sast/updateVulnerability'}      | ${'sast'}
-      ${'updateDastIssue'}               | ${'dast'}
-      ${'updateDependencyScanningIssue'} | ${'dependency_scanning'}
-      ${'updateContainerScanningIssue'}  | ${'container_scanning'}
-    `(`should trigger $action on when a $category is updated`, data => {
+      action                                      | category
+      ${'sast/updateVulnerability'}               | ${'sast'}
+      ${'updateDastIssue'}                        | ${'dast'}
+      ${'dependencyScanning/updateVulnerability'} | ${'dependency_scanning'}
+      ${'updateContainerScanningIssue'}           | ${'container_scanning'}
+    `("dispatches $action when a $category vulnerability's dismissed status changes", data => {
       const { action, category } = data;
       const payload = { category };
       mockedStore.commit({ type, payload });

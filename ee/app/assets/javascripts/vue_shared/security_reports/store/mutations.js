@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
 import {
-  parseDependencyScanningIssues,
   getDastSite,
   parseDastIssues,
   getUnapprovedVulnerabilities,
@@ -146,75 +145,6 @@ export default {
     Vue.set(state.dast, 'hasError', true);
   },
 
-  // DEPENDECY SCANNING
-
-  [types.SET_DEPENDENCY_SCANNING_HEAD_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'head', path);
-  },
-
-  [types.SET_DEPENDENCY_SCANNING_BASE_PATH](state, path) {
-    Vue.set(state.dependencyScanning.paths, 'base', path);
-  },
-
-  [types.REQUEST_DEPENDENCY_SCANNING_REPORTS](state) {
-    Vue.set(state.dependencyScanning, 'isLoading', true);
-  },
-
-  /**
-   * Compares dependency scanning results and returns the formatted report
-   *
-   * Dependency report has 3 types of issues, newIssues, resolvedIssues and allIssues.
-   *
-   * When we have both base and head:
-   * - newIssues = head - base
-   * - resolvedIssues = base - head
-   * - allIssues = head - newIssues - resolvedIssues
-   *
-   * When we only have head
-   * - newIssues = head
-   * - resolvedIssues = 0
-   * - allIssues = 0
-   */
-  [types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](state, reports) {
-    if (reports.base && reports.head) {
-      const filterKey = 'cve';
-      const parsedHead = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      const parsedBase = parseDependencyScanningIssues(
-        reports.base,
-        reports.enrichData,
-        state.blobPath.base,
-      );
-
-      const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
-      const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
-      const allIssues = filterByKey(parsedHead, newIssues.concat(resolvedIssues), filterKey);
-
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'resolvedIssues', resolvedIssues);
-      Vue.set(state.dependencyScanning, 'allIssues', allIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
-
-    if (reports.head && !reports.base) {
-      const newIssues = parseDependencyScanningIssues(
-        reports.head,
-        reports.enrichData,
-        state.blobPath.head,
-      );
-      Vue.set(state.dependencyScanning, 'newIssues', newIssues);
-      Vue.set(state.dependencyScanning, 'isLoading', false);
-    }
-  },
-
-  [types.RECEIVE_DEPENDENCY_SCANNING_ERROR](state) {
-    Vue.set(state.dependencyScanning, 'isLoading', false);
-    Vue.set(state.dependencyScanning, 'hasError', true);
-  },
-
   [types.SET_ISSUE_MODAL_DATA](state, payload) {
     const { issue, status } = payload;
 
@@ -284,27 +214,6 @@ export default {
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal, 'error', error);
-  },
-
-  [types.UPDATE_DEPENDENCY_SCANNING_ISSUE](state, issue) {
-    // Find issue in the correct list and update it
-
-    const newIssuesIndex = findIssueIndex(state.dependencyScanning.newIssues, issue);
-    if (newIssuesIndex !== -1) {
-      state.dependencyScanning.newIssues.splice(newIssuesIndex, 1, issue);
-      return;
-    }
-
-    const resolvedIssuesIndex = findIssueIndex(state.dependencyScanning.resolvedIssues, issue);
-    if (resolvedIssuesIndex !== -1) {
-      state.dependencyScanning.resolvedIssues.splice(resolvedIssuesIndex, 1, issue);
-      return;
-    }
-
-    const allIssuesIndex = findIssueIndex(state.dependencyScanning.allIssues, issue);
-    if (allIssuesIndex !== -1) {
-      state.dependencyScanning.allIssues.splice(allIssuesIndex, 1, issue);
-    }
   },
 
   [types.UPDATE_CONTAINER_SCANNING_ISSUE](state, issue) {

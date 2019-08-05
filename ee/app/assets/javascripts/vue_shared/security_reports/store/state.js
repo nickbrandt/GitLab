@@ -41,20 +41,6 @@ export default () => ({
     resolvedIssues: [],
   },
 
-  dependencyScanning: {
-    paths: {
-      head: null,
-      base: null,
-    },
-
-    isLoading: false,
-    hasError: false,
-
-    newIssues: [],
-    resolvedIssues: [],
-    allIssues: [],
-  },
-
   modal: {
     title: null,
 

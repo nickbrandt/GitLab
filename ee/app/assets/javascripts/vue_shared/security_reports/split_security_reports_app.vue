@@ -214,10 +214,8 @@ export default {
     ...mapActions([
       'setHeadBlobPath',
       'setSourceBranch',
-      'setDependencyScanningHeadPath',
       'setSastContainerHeadPath',
       'setDastHeadPath',
-      'fetchDependencyScanningReports',
       'fetchSastContainerReports',
       'fetchDastReports',
       'setVulnerabilityFeedbackPath',
@@ -240,6 +238,10 @@ export default {
     ...mapActions('sast', {
       setSastHeadPath: 'setHeadPath',
       fetchSastReports: 'fetchReports',
+    }),
+    ...mapActions('dependencyScanning', {
+      setDependencyScanningHeadPath: 'setHeadPath',
+      fetchDependencyScanningReports: 'fetchReports',
     }),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {

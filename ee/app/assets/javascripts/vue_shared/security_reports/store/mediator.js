@@ -2,7 +2,7 @@ import * as types from './mutation_types';
 
 const updateIssueActionsMap = {
   sast: 'sast/updateVulnerability',
-  dependency_scanning: 'updateDependencyScanningIssue',
+  dependency_scanning: 'dependencyScanning/updateVulnerability',
   container_scanning: 'updateContainerScanningIssue',
   dast: 'updateDastIssue',
 };

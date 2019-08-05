@@ -4,6 +4,8 @@ import axios from '~/lib/utils/axios_utils';
 import component from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
+import dependencyScanningState from 'ee/vue_shared/security_reports/store/modules/dependency_scanning/state';
+import * as dependencyScanningTypes from 'ee/vue_shared/security_reports/store/modules/dependency_scanning/mutation_types';
 import sastState from 'ee/vue_shared/security_reports/store/modules/sast/state';
 import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
@@ -31,6 +33,7 @@ describe('Grouped security reports app', () => {
     vm.$store.replaceState({
       ...state(),
       sast: sastState(),
+      dependencyScanning: dependencyScanningState(),
     });
     vm.$destroy();
     mock.restore();
@@ -75,7 +78,10 @@ describe('Grouped security reports app', () => {
         waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS_ERROR}`),
         waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_ERROR),
         waitForMutation(vm.$store, types.RECEIVE_DAST_ERROR),
-        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_ERROR),
+        waitForMutation(
+          vm.$store,
+          `dependencyScanning/${dependencyScanningTypes.RECEIVE_REPORTS_ERROR}`,
+        ),
       ])
         .then(done)
         .catch();
@@ -189,7 +195,10 @@ describe('Grouped security reports app', () => {
         waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS}`),
         waitForMutation(vm.$store, types.RECEIVE_DAST_REPORTS),
         waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_REPORTS),
-        waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_REPORTS),
+        waitForMutation(
+          vm.$store,
+          `dependencyScanning/${dependencyScanningTypes.RECEIVE_REPORTS_SUCCESS}`,
+        ),
       ])
         .then(done)
         .catch();

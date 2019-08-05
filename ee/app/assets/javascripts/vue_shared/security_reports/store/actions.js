@@ -134,53 +134,6 @@ export const fetchDastReports = ({ state, dispatch }) => {
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
-/**
- * DEPENDENCY SCANNING
- */
-export const setDependencyScanningHeadPath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_HEAD_PATH, path);
-
-export const setDependencyScanningBasePath = ({ commit }, path) =>
-  commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
-
-export const requestDependencyScanningReports = ({ commit }) =>
-  commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
-
-export const receiveDependencyScanningReports = ({ commit }, response) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_REPORTS, response);
-
-export const receiveDependencyScanningError = ({ commit }, error) =>
-  commit(types.RECEIVE_DEPENDENCY_SCANNING_ERROR, error);
-
-export const fetchDependencyScanningReports = ({ state, dispatch }) => {
-  const { base, head } = state.dependencyScanning.paths;
-
-  dispatch('requestDependencyScanningReports');
-
-  return Promise.all([
-    head ? axios.get(head) : Promise.resolve(),
-    base ? axios.get(base) : Promise.resolve(),
-    axios.get(state.vulnerabilityFeedbackPath, {
-      params: {
-        category: 'dependency_scanning',
-      },
-    }),
-  ])
-    .then(values => {
-      dispatch('receiveDependencyScanningReports', {
-        head: values[0] ? values[0].data : null,
-        base: values[1] ? values[1].data : null,
-        enrichData: values && values[2] ? values[2].data : [],
-      });
-    })
-    .catch(() => {
-      dispatch('receiveDependencyScanningError');
-    });
-};
-
-export const updateDependencyScanningIssue = ({ commit }, issue) =>
-  commit(types.UPDATE_DEPENDENCY_SCANNING_ISSUE, issue);
-
 export const openModal = ({ dispatch }, payload) => {
   dispatch('setModalData', payload);
 

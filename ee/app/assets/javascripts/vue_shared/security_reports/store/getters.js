@@ -14,14 +14,6 @@ export const groupedSastContainerText = ({ sastContainer }) =>
 export const groupedDastText = ({ dast }) =>
   groupedReportText(dast, messages.DAST, messages.DAST_HAS_ERROR, messages.DAST_IS_LOADING);
 
-export const groupedDependencyText = ({ dependencyScanning }) =>
-  groupedReportText(
-    dependencyScanning,
-    messages.DEPENDENCY_SCANNING,
-    messages.DEPENDENCY_SCANNING_HAS_ERROR,
-    messages.DEPENDENCY_SCANNING_IS_LOADING,
-  );
-
 export const summaryCounts = state =>
   [state.sast, state.sastContainer, state.dast, state.dependencyScanning].reduce(
     (acc, report) => {
@@ -86,13 +78,6 @@ export const sastContainerStatusIcon = ({ sastContainer }) =>
 
 export const dastStatusIcon = ({ dast }) =>
   statusIcon(dast.isLoading, dast.hasError, dast.newIssues.length);
-
-export const dependencyScanningStatusIcon = ({ dependencyScanning }) =>
-  statusIcon(
-    dependencyScanning.isLoading,
-    dependencyScanning.hasError,
-    dependencyScanning.newIssues.length,
-  );
 
 export const areReportsLoading = state =>
   state.sast.isLoading ||

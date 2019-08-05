@@ -159,12 +159,11 @@ export default {
       'summaryStatus',
       'groupedSastContainerText',
       'groupedDastText',
-      'groupedDependencyText',
       'sastContainerStatusIcon',
       'dastStatusIcon',
-      'dependencyScanningStatusIcon',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
+    ...mapGetters('dependencyScanning', ['groupedDependencyText', 'dependencyScanningStatusIcon']),
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
@@ -233,11 +232,8 @@ export default {
       'setSastContainerBasePath',
       'setDastHeadPath',
       'setDastBasePath',
-      'setDependencyScanningHeadPath',
-      'setDependencyScanningBasePath',
       'fetchSastContainerReports',
       'fetchDastReports',
-      'fetchDependencyScanningReports',
       'setVulnerabilityFeedbackPath',
       'setVulnerabilityFeedbackHelpPath',
       'setCreateVulnerabilityFeedbackIssuePath',
@@ -259,6 +255,11 @@ export default {
       setSastHeadPath: 'setHeadPath',
       setSastBasePath: 'setBasePath',
       fetchSastReports: 'fetchReports',
+    }),
+    ...mapActions('dependencyScanning', {
+      setDependencyScanningHeadPath: 'setHeadPath',
+      setDependencyScanningBasePath: 'setBasePath',
+      fetchDependencyScanningReports: 'fetchReports',
     }),
   },
 };

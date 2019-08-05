@@ -2,11 +2,6 @@ import state from 'ee/vue_shared/security_reports/store/state';
 import mutations from 'ee/vue_shared/security_reports/store/mutations';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import {
-  dependencyScanningIssuesOld,
-  dependencyScanningIssuesBase,
-  parsedDependencyScanningIssuesHead,
-  parsedDependencyScanningBaseStore,
-  parsedDependencyScanningIssuesStore,
   parsedSastContainerBaseStore,
   dockerReport,
   dockerBaseReport,
@@ -254,70 +249,6 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.dast.isLoading).toEqual(false);
       expect(stateCopy.dast.hasError).toEqual(true);
-    });
-  });
-
-  describe('SET_DEPENDENCY_SCANNING_HEAD_PATH', () => {
-    it('should set dependency scanning head path', () => {
-      mutations[types.SET_DEPENDENCY_SCANNING_HEAD_PATH](stateCopy, 'head_path');
-
-      expect(stateCopy.dependencyScanning.paths.head).toEqual('head_path');
-    });
-  });
-
-  describe('SET_DEPENDENCY_SCANNING_BASE_PATH', () => {
-    it('should set dependency scanning base path', () => {
-      mutations[types.SET_DEPENDENCY_SCANNING_BASE_PATH](stateCopy, 'base_path');
-
-      expect(stateCopy.dependencyScanning.paths.base).toEqual('base_path');
-    });
-  });
-
-  describe('REQUEST_DEPENDENCY_SCANNING_REPORTS', () => {
-    it('should set dependency scanning loading flag to true', () => {
-      mutations[types.REQUEST_DEPENDENCY_SCANNING_REPORTS](stateCopy);
-
-      expect(stateCopy.dependencyScanning.isLoading).toEqual(true);
-    });
-  });
-
-  describe('RECEIVE_DEPENDENCY_SCANNING_REPORTS', () => {
-    describe('with head and base', () => {
-      it('should set new, fixed and all issues', () => {
-        mutations[types.SET_BASE_BLOB_PATH](stateCopy, 'path');
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-        mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssuesOld,
-          base: dependencyScanningIssuesBase,
-        });
-
-        expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-        expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesHead);
-        expect(stateCopy.dependencyScanning.resolvedIssues).toEqual(
-          parsedDependencyScanningBaseStore,
-        );
-      });
-    });
-
-    describe('with head', () => {
-      it('should set new issues', () => {
-        mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
-        mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssuesOld,
-        });
-
-        expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-        expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesStore);
-      });
-    });
-  });
-
-  describe('RECEIVE_DEPENDENCY_SCANNING_ERROR', () => {
-    it('should set dependency scanning loading flag to false and error flag to true', () => {
-      mutations[types.RECEIVE_DEPENDENCY_SCANNING_ERROR](stateCopy);
-
-      expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
-      expect(stateCopy.dependencyScanning.hasError).toEqual(true);
     });
   });
 
@@ -575,50 +506,6 @@ describe('security reports mutations', () => {
 
       expect(stateCopy.modal.isCreatingMergeRequest).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');
-    });
-  });
-
-  describe('UPDATE_DEPENDENCY_SCANNING_ISSUE', () => {
-    it('updates issue in the new issues list', () => {
-      stateCopy.dependencyScanning.newIssues = parsedDependencyScanningIssuesHead;
-      stateCopy.dependencyScanning.resolvedIssues = [];
-      stateCopy.dependencyScanning.allIssues = [];
-      const updatedIssue = {
-        ...parsedDependencyScanningIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.dependencyScanning.newIssues[0]).toEqual(updatedIssue);
-    });
-
-    it('updates issue in the resolved issues list', () => {
-      stateCopy.dependencyScanning.newIssues = [];
-      stateCopy.dependencyScanning.resolvedIssues = parsedDependencyScanningIssuesHead;
-      stateCopy.dependencyScanning.allIssues = [];
-      const updatedIssue = {
-        ...parsedDependencyScanningIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.dependencyScanning.resolvedIssues[0]).toEqual(updatedIssue);
-    });
-
-    it('updates issue in the all issues list', () => {
-      stateCopy.dependencyScanning.newIssues = [];
-      stateCopy.dependencyScanning.resolvedIssues = [];
-      stateCopy.dependencyScanning.allIssues = parsedDependencyScanningIssuesHead;
-      const updatedIssue = {
-        ...parsedDependencyScanningIssuesHead[0],
-        foo: 'bar',
-      };
-
-      mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
-
-      expect(stateCopy.dependencyScanning.allIssues[0]).toEqual(updatedIssue);
     });
   });
 
