@@ -265,7 +265,7 @@ module EE
       ::Feature.enabled?(:store_security_reports, self, default_enabled: true) && (
         feature_available?(:sast) ||
         feature_available?(:dependency_scanning) ||
-        feature_available?(:sast_container) ||
+        feature_available?(:container_scanning) ||
         feature_available?(:dast))
     end
 
