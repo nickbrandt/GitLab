@@ -1,10 +1,11 @@
 <script>
-import { sprintf, n__, __ } from '~/locale';
+import { sprintf, n__, s__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
 import Api from '~/api';
+import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
 export default {
   name: 'ProjectsDropdownFilter',
@@ -12,6 +13,7 @@ export default {
     Icon,
     GlLoadingIcon,
     GlButton,
+    GlAvatar,
   },
   props: {
     groupId: {
@@ -22,6 +24,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    label: {
+      type: String,
+      required: false,
+      default: s__('CycleAnalytics|project dropdown filter'),
     },
   },
   data() {
@@ -46,6 +53,9 @@ export default {
     selectedProjectsPlaceholder() {
       return this.multiSelect ? __('Select projects') : __('Select a project');
     },
+    isOnlyOneProjectSelected() {
+      return this.selectedProjects.length === 1;
+    },
   },
   mounted() {
     $(this.$refs.projectsDropdown).glDropdown({
@@ -61,6 +71,7 @@ export default {
       data: this.fetchData.bind(this),
       renderRow: group => this.rowTemplate(group),
       text: project => project.name,
+      opened: e => e.target.querySelector('.dropdown-input-field').focus(),
     });
   },
   methods: {
@@ -90,10 +101,19 @@ export default {
       return `
           <li>
             <a href='#' class='dropdown-menu-link'>
-              ${_.escape(project.name)}
+              ${this.avatarTemplate(project)}
+              <div class="align-middle">${_.escape(project.name)}</div>
             </a>
           </li>
         `;
+    },
+    avatarTemplate(project) {
+      const identiconSizeClass = 's16 rect-avatar d-flex justify-content-center flex-column';
+      return project.avatar_url
+        ? renderAvatar(project, { sizeClass: 's16 rect-avatar' })
+        : renderIdenticon(project, {
+            sizeClass: identiconSizeClass,
+          });
     },
   },
 };
@@ -107,7 +127,18 @@ export default {
         type="button"
         data-toggle="dropdown"
         aria-expanded="false"
+        :aria-label="label"
       >
+        <gl-avatar
+          v-if="isOnlyOneProjectSelected"
+          :src="selectedProjects[0].avatar_url"
+          :entity-id="selectedProjects[0].id"
+          :entity-name="selectedProjects[0].name"
+          :size="16"
+          shape="rect"
+          :alt="selectedProjects[0].name"
+          class="prepend-top-2"
+        />
         {{ selectedProjectsLabel }}
         <icon name="chevron-down" />
       </gl-button>
