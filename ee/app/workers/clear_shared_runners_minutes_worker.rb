@@ -19,18 +19,20 @@ class ClearSharedRunnersMinutesWorker
     Namespace.where('last_ci_minutes_notification_at IS NOT NULL OR last_ci_minutes_usage_notification_level IS NOT NULL')
       .each_batch do |relation|
       relation.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
+
+        NamespaceStatistics.where(namespace: relation)
+          .where.not(shared_runners_seconds: 0)
+          .update_all(
+            shared_runners_seconds: 0,
+            shared_runners_seconds_last_reset: Time.now)
+
+        ProjectStatistics.where(namespace: relation)
+          .where.not(shared_runners_seconds: 0)
+          .update_all(
+            shared_runners_seconds: 0,
+            shared_runners_seconds_last_reset: Time.now)
+      end
     end
-
-    NamespaceStatistics.where.not(shared_runners_seconds: 0)
-      .update_all(
-        shared_runners_seconds: 0,
-        shared_runners_seconds_last_reset: Time.now)
-
-    ProjectStatistics.where.not(shared_runners_seconds: 0)
-      .update_all(
-        shared_runners_seconds: 0,
-        shared_runners_seconds_last_reset: Time.now)
-  end
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
