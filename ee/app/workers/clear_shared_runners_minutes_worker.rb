@@ -26,7 +26,7 @@ class ClearSharedRunnersMinutesWorker
             shared_runners_seconds: 0,
             shared_runners_seconds_last_reset: Time.now)
 
-        ProjectStatistics.where(namespace: relation)
+        ProjectStatistics.where(namespace_id: relation.pluck(:id))
           .where.not(shared_runners_seconds: 0)
           .update_all(
             shared_runners_seconds: 0,
