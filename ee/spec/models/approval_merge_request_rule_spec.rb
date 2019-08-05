@@ -16,6 +16,25 @@ describe ApprovalMergeRequestRule do
       expect(build(:approval_merge_request_rule, name: nil)).not_to be_valid
     end
 
+    context 'approval_project_rule is set' do
+      let(:approval_project_rule) { build(:approval_project_rule) }
+      let(:merge_request_rule) { build(:approval_merge_request_rule, merge_request: merge_request, approval_project_rule: approval_project_rule) }
+
+      context 'when project of approval_project_rule and merge request matches' do
+        let(:merge_request) { build(:merge_request, project: approval_project_rule.project) }
+
+        it 'is valid' do
+          expect(merge_request_rule).to be_valid
+        end
+      end
+
+      context 'when the project of approval_project_rule and merge request does not match' do
+        it 'is invalid' do
+          expect(merge_request_rule).to be_invalid
+        end
+      end
+    end
+
     context 'code owner rules' do
       it 'is valid' do
         expect(build(:code_owner_rule)).to be_valid

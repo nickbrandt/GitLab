@@ -1,0 +1,5 @@
+---
+title: Remove validation of MR level approval rules in merge requests
+merge_request: 14968
+author:
+type: changed

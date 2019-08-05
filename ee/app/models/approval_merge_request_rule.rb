@@ -39,6 +39,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   alias_method :source_rule, :approval_project_rule
 
   validate :validate_approvals_required, unless: :report_approver?
+  validate :validate_approval_project_rule
 
   enum rule_type: {
     regular: 1,
@@ -122,5 +123,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
     if approvals_required < approval_project_rule.approvals_required
       errors.add(:approvals_required, :greater_than_or_equal_to, count: approval_project_rule.approvals_required)
     end
+  end
+
+  def validate_approval_project_rule
+    return if approval_project_rule.blank?
+    return if merge_request.project == approval_project_rule.project
+
+    errors.add(:approval_project_rule, 'must be for the same project')
   end
 end
