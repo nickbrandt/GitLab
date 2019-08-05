@@ -25,7 +25,7 @@ module EE
     end
 
     def group_has_domain_limitations?
-      group.feature_available?(:group_allowed_email_domains) && group.allowed_email_domain.present?
+      group.feature_available?(:group_allowed_email_domains) && group.root_ancestor_allowed_email_domain.present?
     end
 
     def group_domain_limitations
@@ -37,15 +37,15 @@ module EE
     end
 
     def validate_users_email
-      return if user.email.end_with?(group.allowed_email_domain.domain[1..-1])
+      return if user.email.end_with?(group.root_ancestor_allowed_email_domain.domain[1..-1])
 
-      errors.add(:user, 'email is not in the right domain')
+      errors.add(:user, _('email is not in the right domain'))
     end
 
     def validate_invitation_email
-      return if invite_email.end_with?(group.allowed_email_domain.domain[1..-1])
+      return if invite_email.end_with?(group.root_ancestor_allowed_email_domain.domain[1..-1])
 
-      errors.add(:invite_email, 'email is not in the right domain')
+      errors.add(:invite_email, _("'%{email}' is not in the right domain") % { email: invite_email })
     end
   end
 end

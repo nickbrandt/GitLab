@@ -30,6 +30,20 @@ describe GroupMember do
           expect(build(:group_member, group: group, user: nil, invite_email: 'user@gmail.com')).to be_invalid
           expect(build(:group_member, group: group, user: nil, invite_email: 'user@gitlab.com')).to be_valid
         end
+
+        context 'when group is subgroup' do
+          let(:subgroup) { create(:group, parent: group) }
+
+          it 'users email must match allowed domain email' do
+            expect(build(:group_member, group: subgroup, user: user_2)).to be_invalid
+            expect(build(:group_member, group: subgroup, user: user)).to be_valid
+          end
+
+          it 'invited email must match allowed domain email' do
+            expect(build(:group_member, group: subgroup, user: nil, invite_email: 'user@gmail.com')).to be_invalid
+            expect(build(:group_member, group: subgroup, user: nil, invite_email: 'user@gitlab.com')).to be_valid
+          end
+        end
       end
 
       context 'when group has email domain feature switched off' do

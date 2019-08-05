@@ -382,6 +382,9 @@ msgstr ""
 msgid "%{verb} %{time_spent_value} spent time."
 msgstr ""
 
+msgid "'%{email}' is not in the right domain"
+msgstr ""
+
 msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
@@ -17999,6 +18002,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "element is not a hierarchy"
+msgstr ""
+
+msgid "email is not in the right domain"
 msgstr ""
 
 msgid "enabled"
