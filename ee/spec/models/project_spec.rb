@@ -7,6 +7,12 @@ describe Project do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
+  let(:project) { create(:project) }
+
+  it_behaves_like Vulnerable do
+    let(:vulnerable) { project }
+  end
+
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }

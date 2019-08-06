@@ -32,16 +32,6 @@ module VulnerabilitiesActions
     end
   end
 
-  def history
-    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).vulnerabilities_counter
-
-    respond_to do |format|
-      format.json do
-        render json: history_count
-      end
-    end
-  end
-
   private
 
   def filter_params

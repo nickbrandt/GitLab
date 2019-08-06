@@ -3,17 +3,19 @@
 require 'spec_helper'
 
 shared_examples_for Vulnerable do
-  let(:project) { create(:project, namespace: vulnerable) }
-  let(:external_project) { create(:project) }
-  let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
+  include VulnerableHelpers
 
-  let!(:old_vuln) { create_vulnerability(project) }
-  let!(:new_vuln) { create_vulnerability(project) }
+  let(:external_project) { create(:project) }
+  let(:failed_pipeline) { create(:ci_pipeline, :failed, project: vulnerable_project) }
+
+  let!(:old_vuln) { create_vulnerability(vulnerable_project) }
+  let!(:new_vuln) { create_vulnerability(vulnerable_project) }
   let!(:external_vuln) { create_vulnerability(external_project) }
-  let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+  let!(:failed_vuln) { create_vulnerability(vulnerable_project, failed_pipeline) }
+  let(:vulnerable_project) { as_vulnerable_project(vulnerable) }
 
   before do
-    pipeline_ran_against_new_sha = create(:ci_pipeline, :success, project: project, sha: '123')
+    pipeline_ran_against_new_sha = create(:ci_pipeline, :success, project: vulnerable_project, sha: '123')
     new_vuln.pipelines << pipeline_ran_against_new_sha
   end
 
@@ -30,8 +32,8 @@ shared_examples_for Vulnerable do
     end
 
     context 'with vulnerabilities from other branches' do
-      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: vulnerable_project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: vulnerable_project) }
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches
@@ -52,8 +54,8 @@ shared_examples_for Vulnerable do
     it { is_expected.to all(respond_to(:sha)) }
 
     context 'with vulnerabilities from other branches' do
-      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: vulnerable_project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: vulnerable_project) }
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches
@@ -72,8 +74,8 @@ shared_examples_for Vulnerable do
     end
 
     context 'with vulnerabilities from other branches' do
-      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
-      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: vulnerable_project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: vulnerable_project) }
 
       # TODO: This should actually fail and we must scope vulns
       # per branch as soon as we store them for other branches

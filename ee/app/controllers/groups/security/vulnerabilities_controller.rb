@@ -5,4 +5,14 @@ class Groups::Security::VulnerabilitiesController < Groups::ApplicationControlle
   include VulnerabilitiesActions
 
   alias_method :vulnerable, :group
+
+  def history
+    history_count = Gitlab::Vulnerabilities::History.new(group, filter_params).vulnerabilities_counter
+
+    respond_to do |format|
+      format.json do
+        render json: history_count
+      end
+    end
+  end
 end

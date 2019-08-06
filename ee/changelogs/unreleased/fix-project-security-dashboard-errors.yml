@@ -1,0 +1,5 @@
+---
+title: Fix error fetching project security dashboard data for maintainers with access to a project but not to its group & fix routing error for project security dashboard for projects not in a group
+merge_request: 14896
+author:
+type: fixed

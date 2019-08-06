@@ -20,6 +20,7 @@ module EE
       include EachBatch
       include InsightsFeature
       include IgnorableColumn
+      include Vulnerable
 
       ignore_column :mirror_last_update_at,
         :mirror_last_successful_update_at,
