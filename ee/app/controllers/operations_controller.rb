@@ -26,6 +26,13 @@ class OperationsController < ApplicationController
     render json: { projects: serialize_as_json(projects) }
   end
 
+  def environments_list
+    Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
+    projects = load_environments_projects(current_user)
+
+    render json: { projects: serialize_as_json_for_environments(projects) }
+  end
+
   def create
     project_ids = params['project_ids']
 
@@ -58,6 +65,10 @@ class OperationsController < ApplicationController
     Dashboard::Operations::ListService.new(current_user).execute
   end
 
+  def load_environments_projects(current_user)
+    Dashboard::Environments::ListService.new(current_user).execute
+  end
+
   def add_projects(current_user, project_ids)
     UsersOpsDashboardProjects::CreateService.new(current_user).execute(project_ids)
   end
@@ -68,5 +79,9 @@ class OperationsController < ApplicationController
 
   def serialize_as_json(projects)
     DashboardOperationsSerializer.new(current_user: current_user).represent(projects).as_json
+  end
+
+  def serialize_as_json_for_environments(projects)
+    DashboardEnvironmentsSerializer.new.represent(projects).as_json
   end
 end
