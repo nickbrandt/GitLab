@@ -42,10 +42,11 @@ module QA
             new_label_different_scope_multi_colon
           ])
 
-          expect(page).to have_content("added #{initial_label} #{initial_label_multi_colon}")
-          expect(page).to have_content(
-            "added #{new_label_same_scope} #{new_label_same_scope_multi_colon} #{new_label_different_scope_multi_colon} #{new_label_different_scope} scoped labels and automatically removed #{initial_label} #{initial_label_multi_colon}"
-          )
+          initial_labels = "#{initial_label} #{initial_label_multi_colon}"
+          new_labels = "#{new_label_same_scope} #{new_label_same_scope_multi_colon} #{new_label_different_scope_multi_colon} #{new_label_different_scope}"
+
+          expect(page).to have_content("added #{initial_labels}")
+          expect(page).to have_content("added #{new_labels} scoped labels and automatically removed #{initial_labels}")
           expect(show.text_of_labels_block).to have_content(new_label_same_scope)
           expect(show.text_of_labels_block).to have_content(new_label_different_scope)
           expect(show.text_of_labels_block).not_to have_content(initial_label)
