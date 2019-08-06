@@ -167,6 +167,14 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         expect(GroupLabel.count).to eq(0)
       end
 
+      it 'has issue boards' do
+        expect(Project.find_by_path('project').boards.count).to eq(1)
+      end
+
+      it 'has lists associated with the issue board' do
+        expect(Project.find_by_path('project').boards.find_by_name('TestBoardABC').lists.count).to eq(3)
+      end
+
       it 'has a project feature' do
         expect(@project.project_feature).not_to be_nil
       end

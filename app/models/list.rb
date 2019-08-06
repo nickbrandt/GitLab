@@ -6,6 +6,7 @@ class List < ApplicationRecord
 
   belongs_to :board
   belongs_to :label
+  include Importable
 
   enum list_type: { backlog: 0, label: 1, closed: 2, assignee: 3, milestone: 4 }
 
