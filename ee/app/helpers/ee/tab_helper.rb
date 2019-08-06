@@ -12,5 +12,9 @@ module EE
         super
       end
     end
+
+    def analytics_controllers
+      ['analytics/productivity_analytics', 'analytics/cycle_analytics']
+    end
   end
 end
