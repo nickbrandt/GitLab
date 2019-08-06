@@ -9277,6 +9277,9 @@ msgstr ""
 msgid "More Slack commands"
 msgstr ""
 
+msgid "More actions"
+msgstr ""
+
 msgid "More info"
 msgstr ""
 
@@ -11438,9 +11441,6 @@ msgstr ""
 msgid "PrometheusAlerts|Add alert"
 msgstr ""
 
-msgid "PrometheusAlerts|Alert set"
-msgstr ""
-
 msgid "PrometheusAlerts|Edit alert"
 msgstr ""
 
@@ -11454,9 +11454,6 @@ msgid "PrometheusAlerts|Error fetching alert"
 msgstr ""
 
 msgid "PrometheusAlerts|Error saving alert"
-msgstr ""
-
-msgid "PrometheusAlerts|No alert set"
 msgstr ""
 
 msgid "PrometheusAlerts|Operator"

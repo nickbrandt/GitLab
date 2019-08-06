@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlModal } from '@gitlab/ui';
+import { GlModal, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
@@ -51,9 +51,29 @@ describe('Dashboard', () => {
         });
       });
 
-      it('shows alert widget', done => {
+      it('shows alert widget and dropdown item', done => {
         setTimeout(() => {
           expect(vm.find(AlertWidget).exists()).toBe(true);
+          expect(
+            vm
+              .findAll(GlDropdownItem)
+              .filter(i => i.text() === 'Alerts')
+              .exists(),
+          ).toBe(true);
+
+          done();
+        });
+      });
+
+      it('shows More actions dropdown on chart', done => {
+        setTimeout(() => {
+          expect(
+            vm
+              .findAll(GlDropdown)
+              .filter(d => d.attributes('data-original-title') === 'More actions')
+              .exists(),
+          ).toBe(true);
+
           done();
         });
       });
@@ -75,6 +95,26 @@ describe('Dashboard', () => {
       it('does not show alert widget', done => {
         setTimeout(() => {
           expect(vm.find(AlertWidget).exists()).toBe(false);
+          expect(
+            vm
+              .findAll(GlDropdownItem)
+              .filter(i => i.text() === 'Alerts')
+              .exists(),
+          ).toBe(false);
+
+          done();
+        });
+      });
+
+      it('hides More actions dropdown on chart', done => {
+        setTimeout(() => {
+          expect(
+            vm
+              .findAll(GlDropdown)
+              .filter(d => d.attributes('data-original-title') === 'More actions')
+              .exists(),
+          ).toBe(false);
+
           done();
         });
       });
