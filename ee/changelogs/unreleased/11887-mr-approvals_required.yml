@@ -1,0 +1,5 @@
+---
+title: Ensure approvals_required update in MR approvals API is respected
+merge_request: 14587
+author:
+type: fixed
