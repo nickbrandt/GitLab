@@ -85,7 +85,7 @@ module EE
       end
 
       def handle_ip_restriction_deletion
-        return unless ip_restriction_editable?
+        return unless associations_editable?
 
         return unless group.ip_restriction.present?
 
@@ -98,14 +98,14 @@ module EE
         end
       end
 
-      def ip_restriction_editable?
+      def associations_editable?
         return false if group.parent_id.present?
 
         true
       end
 
       def handle_allowed_domain_deletion
-        return unless allowed_domain_editable?
+        return unless associations_editable?
 
         return unless group.allowed_email_domain.present?
 
@@ -116,12 +116,6 @@ module EE
         if allowed_domain_params[:domain]&.blank?
           allowed_domain_params[:_destroy] = 1
         end
-      end
-
-      def allowed_domain_editable?
-        return false if group.parent_id.present?
-
-        true
       end
 
       def log_audit_event
