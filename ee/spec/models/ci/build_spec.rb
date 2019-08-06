@@ -159,48 +159,6 @@ describe Ci::Build do
         end
       end
 
-      context 'when Feature flag is disabled for Dependency Scanning reports parsing' do
-        before do
-          stub_feature_flags(parse_dependency_scanning_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
-        end
-
-        it 'does NOT parse dependency scanning report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
-        end
-      end
-
-      context 'when Feature flag is disabled for Container Scanning reports parsing' do
-        before do
-          stub_feature_flags(parse_container_scanning_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project)
-        end
-
-        it 'does NOT parse container scanning report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
-        end
-      end
-
-      context 'when Feature flag is disabled for DAST reports parsing' do
-        before do
-          stub_feature_flags(parse_dast_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dast, job: job, project: job.project)
-        end
-
-        it 'does NOT parse dast report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
-        end
-      end
-
       context 'when there is a corrupted sast report' do
         before do
           create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)

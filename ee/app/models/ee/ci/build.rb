@@ -49,15 +49,6 @@ module EE
 
       def collect_security_reports!(security_reports)
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
-          next if file_type == "dependency_scanning" &&
-              ::Feature.disabled?(:parse_dependency_scanning_reports, default_enabled: true)
-
-          next if file_type == "container_scanning" &&
-              ::Feature.disabled?(:parse_container_scanning_reports, default_enabled: true)
-
-          next if file_type == "dast" &&
-              ::Feature.disabled?(:parse_dast_reports, default_enabled: true)
-
           security_reports.get_report(file_type).tap do |security_report|
             next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
 
