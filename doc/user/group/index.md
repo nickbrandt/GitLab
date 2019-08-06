@@ -350,6 +350,28 @@ Restriction currently applies to UI, API access is not restricted.
 To avoid accidental lock-out, admins and group owners are are able to access
 the group regardless of the IP restriction.
 
+#### Allowed domain restriction **(PREMIUM ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7297) in
+[GitLab Ultimate](https://about.gitlab.com/pricing/) 12.2.
+
+To make sure only people from within your organization can access particular
+resources, you have the option to restrict access to groups and their
+underlying projects, issues, etc, by allowing only users with emails in particular domain
+to be added to the group.
+
+Add whitelisted email domain and users with emails from different domains won't be allowed to be added
+to this group.
+
+There are domains that cannot be added to this restrictions - the most popular public email domains, such as:
+- `*@gmail.com`
+- `*@yahoo.com`
+- `*@hotmail.com`
+- `*@aol.com`
+- `*@msn.com`
+- `*@hotmail.co.uk`
+- `*@hotmail.fr`
+
 #### Group file templates **(PREMIUM)**
 
 Group file templates allow you to share a set of templates for common file
