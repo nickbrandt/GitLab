@@ -2140,6 +2140,9 @@ msgstr ""
 msgid "BillingPlans|%{group_name} is currently on the %{plan_link} plan."
 msgstr ""
 
+msgid "BillingPlans|@%{user_name} you are currently on the %{plan_link} plan."
+msgstr ""
+
 msgid "BillingPlans|Automatic downgrade and upgrade to some plans is currently not available."
 msgstr ""
 
@@ -2174,9 +2177,6 @@ msgid "BillingPlans|To manage the plan for this group, visit the billing section
 msgstr ""
 
 msgid "BillingPlans|Upgrade"
-msgstr ""
-
-msgid "BillingPlans|You are currently on the %{plan_link} plan."
 msgstr ""
 
 msgid "BillingPlans|Your GitLab.com trial expired on %{expiration_date}. %{learn_more_text}"

@@ -115,9 +115,9 @@ describe 'Billing plan pages', :feature do
 
       it 'displays plan header' do
         page.within('.billing-plan-header') do
-          expect(page).to have_content("You are currently on the Bronze")
+          expect(page).to have_content("@#{user.username} you are currently on the Bronze")
 
-          expect(page).to have_css('.billing-plan-logo svg')
+          expect(page).to have_css('.billing-plan-logo img')
         end
       end
     end
@@ -143,7 +143,7 @@ describe 'Billing plan pages', :feature do
           page.within('.billing-plan-header') do
             expect(page).to have_content("#{group.name} is currently on the Bronze plan")
 
-            expect(page).to have_css('.billing-plan-logo svg')
+            expect(page).to have_css('.billing-plan-logo .identicon')
           end
         end
 
@@ -179,7 +179,7 @@ describe 'Billing plan pages', :feature do
       it 'displays plan header' do
         page.within('.billing-plan-header') do
           expect(page).to have_content("#{subgroup2.full_name} is currently on the Bronze plan")
-          expect(page).to have_css('.billing-plan-logo svg')
+          expect(page).to have_css('.billing-plan-logo .identicon')
           expect(page.find('.btn-success')).to have_content('Manage plan')
         end
 
