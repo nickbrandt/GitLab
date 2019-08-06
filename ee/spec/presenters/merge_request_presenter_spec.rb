@@ -135,14 +135,14 @@ describe MergeRequestPresenter do
     end
 
     with_them do
-      subject { described_class.new(merge_request, current_user: user).public_send(create_feedback_path) }
+      subject { described_class.new(merge_request, current_user: user).public_send(create_feedback_path, merge_request.project) }
 
       it { is_expected.to eq("/#{merge_request.project.full_path}/vulnerability_feedback") }
 
       context 'when not allowed to create vulnerability feedback' do
         let(:unauthorized_user) { create(:user) }
 
-        subject { described_class.new(merge_request, current_user: unauthorized_user).public_send(create_feedback_path) }
+        subject { described_class.new(merge_request, current_user: unauthorized_user).public_send(create_feedback_path, merge_request.project) }
 
         it "does not contain #{params['create_feedback_path']}" do
           expect(subject).to be_nil
