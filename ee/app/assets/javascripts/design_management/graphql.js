@@ -1,22 +1,39 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
-import appDataQuery from './queries/appData.graphql';
-import allDesigns from './queries/allDesigns.graphql';
+import createFlash from '~/flash';
+import { s__ } from '~/locale';
+import appDataQuery from './graphql/queries/appData.query.graphql';
+import projectQuery from './graphql/queries/project.query.graphql';
 
 Vue.use(VueApollo);
 
 const defaultClient = createDefaultClient({
   Query: {
-    design(ctx, { id }, { cache }) {
+    design(ctx, { id }, { cache, client }) {
       const { projectPath, issueIid } = cache.readQuery({ query: appDataQuery });
-      const result = cache.readQuery({
-        query: allDesigns,
-        variables: { fullPath: projectPath, iid: issueIid },
-      });
-
-      return result.project.issue.designs.designs.edges.find(({ node }) => node.filename === id)
-        .node;
+      return client
+        .query({
+          query: projectQuery,
+          variables: { fullPath: projectPath, iid: issueIid },
+        })
+        .then(({ data, errors }) => {
+          if (errors) {
+            createFlash(
+              s__('DesignManagement|An error occurred while loading designs. Please try again.'),
+            );
+            throw new Error(errors);
+          }
+          const edge = data.project.issue.designs.designs.edges.find(
+            ({ node }) => node.filename === id,
+          );
+          return edge.node;
+        })
+        .catch(() => {
+          createFlash(
+            s__('DesignManagement|An error occurred while loading designs. Please try again.'),
+          );
+        });
     },
   },
 });

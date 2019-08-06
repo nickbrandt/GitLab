@@ -35,34 +35,3 @@ exports[`Design management toolbar component renders design and updated data 1`]
   />
 </header>
 `;
-
-exports[`Design management toolbar component renders loading icon 1`] = `
-<header
-  class="d-flex w-100 p-2 bg-white align-items-center js-design-header"
->
-  <a
-    aria-label="Go back to designs"
-    class="mr-3 text-plain"
-  >
-    <icon-stub
-      cssclasses=""
-      name="close"
-      size="18"
-    />
-  </a>
-   
-  <div>
-    <glloadingicon-stub
-      class="mt-2 mb-2"
-      color="orange"
-      label="Loading"
-      size="md"
-    />
-  </div>
-   
-  <pagination-stub
-    class="ml-auto"
-    id="1"
-  />
-</header>
-`;

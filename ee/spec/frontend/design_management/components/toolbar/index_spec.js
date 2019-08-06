@@ -35,12 +35,6 @@ describe('Design management toolbar component', () => {
     });
   }
 
-  it('renders loading icon', () => {
-    createComponent(true);
-
-    expect(vm.element).toMatchSnapshot();
-  });
-
   it('renders design and updated data', () => {
     createComponent();
 

@@ -3014,6 +3014,9 @@ msgstr ""
 msgid "Click the button below to begin the install process by navigating to the Kubernetes page"
 msgstr ""
 
+msgid "Click the image where you'd like to start a new discussion"
+msgstr ""
+
 msgid "Click to expand it."
 msgstr ""
 
@@ -4798,6 +4801,15 @@ msgid "DesignManagement|%{current_design} of %{designs_count}"
 msgstr ""
 
 msgid "DesignManagement|Add designs"
+msgstr ""
+
+msgid "DesignManagement|An error occurred while loading designs. Please try again."
+msgstr ""
+
+msgid "DesignManagement|Could not add a new comment. Please try again"
+msgstr ""
+
+msgid "DesignManagement|Could not create new discussion, please try again."
 msgstr ""
 
 msgid "DesignManagement|Could not find design, please try again."
@@ -12100,6 +12112,9 @@ msgstr ""
 msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
+msgid "Reply..."
+msgstr ""
+
 msgid "Repo by URL"
 msgstr ""
 
@@ -16659,6 +16674,9 @@ msgid "Write"
 msgstr ""
 
 msgid "Write a comment or drag your files here…"
+msgstr ""
+
+msgid "Write a comment…"
 msgstr ""
 
 msgid "Write access allowed"

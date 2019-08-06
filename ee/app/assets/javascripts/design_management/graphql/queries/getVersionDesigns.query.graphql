@@ -1,10 +1,12 @@
-#import "./designListFragment.graphql"
+#import "../fragments/designList.fragment.graphql"
 
-query allDesigns($fullPath: ID!, $iid: String!) {
+query getVersionDesigns($fullPath: ID!, $iid: String!, $atVersion: ID!) {
   project(fullPath: $fullPath) {
+    id
     issue(iid: $iid) {
+      iid
       designs {
-        designs {
+        designs(atVersion: $atVersion) {
           edges {
             node {
               ...DesignListItem

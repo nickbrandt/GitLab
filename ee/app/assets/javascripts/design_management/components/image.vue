@@ -1,4 +1,5 @@
 <script>
+import _ from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
@@ -16,9 +17,39 @@ export default {
       required: false,
       default: '',
     },
-    isLoading: {
-      type: Boolean,
-      required: true,
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resizeThrottled, false);
+  },
+  mounted() {
+    this.onImgLoad();
+    this.resizeThrottled = _.throttle(this.onImgLoad, 400);
+    window.addEventListener('resize', this.resizeThrottled, false);
+  },
+  methods: {
+    onImgLoad() {
+      requestIdleCallback(this.calculateImgSize, { timeout: 1000 });
+    },
+    calculateImgSize() {
+      const { contentImg } = this.$refs;
+
+      if (!contentImg) return;
+
+      this.$nextTick(() => {
+        const naturalRatio = contentImg.naturalWidth / contentImg.naturalHeight;
+        const visibleRatio = contentImg.width / contentImg.height;
+
+        const position = {
+          // Handling the case where img element takes more width than visible image thanks to object-fit: contain
+          width:
+            naturalRatio < visibleRatio
+              ? contentImg.clientHeight * naturalRatio
+              : contentImg.clientWidth,
+          height: contentImg.clientHeight,
+        };
+
+        this.$emit('setOverlayDimensions', position);
+      });
     },
   },
 };
@@ -26,7 +57,12 @@ export default {
 
 <template>
   <div class="d-flex align-items-center h-100 w-100 p-3 overflow-hidden js-design-image">
-    <gl-loading-icon v-if="isLoading" class="ml-auto mr-auto" size="md" color="light" />
-    <img v-else :src="image" :alt="name" class="ml-auto mr-auto img-fluid mh-100" />
+    <img
+      ref="contentImg"
+      :src="image"
+      :alt="name"
+      class="ml-auto mr-auto img-fluid mh-100 design-image"
+      @load="onImgLoad"
+    />
   </div>
 </template>
