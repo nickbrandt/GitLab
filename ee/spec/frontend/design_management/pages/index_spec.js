@@ -2,7 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Index from 'ee/design_management/pages/index.vue';
 import UploadForm from 'ee/design_management/components/upload/form.vue';
-import uploadDesignQuery from 'ee/design_management/queries/uploadDesign.graphql';
+import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesign.mutation.graphql';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -119,6 +119,13 @@ describe('Design management index page', () => {
                     id: expect.anything(),
                     image: '',
                     filename: 'test',
+                    fullPath: '',
+                    diffRefs: {
+                      __typename: 'DiffRefs',
+                      baseSha: '',
+                      startSha: '',
+                      headSha: '',
+                    },
                     versions: {
                       __typename: 'DesignVersionConnection',
                       edges: {

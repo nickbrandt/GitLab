@@ -6,10 +6,10 @@ import { s__, sprintf } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import EmptyState from '../components/empty_state.vue';
-import uploadDesignMutation from '../queries/uploadDesign.graphql';
-import permissionsQuery from '../queries/permissions.graphql';
+import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
+import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import projectQuery from '../queries/project.query.graphql';
+import projectQuery from '../graphql/queries/project.query.graphql';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -93,6 +93,13 @@ export default {
         id: -_.uniqueId(),
         image: '',
         filename: file.name,
+        fullPath: '',
+        diffRefs: {
+          __typename: 'DiffRefs',
+          baseSha: '',
+          startSha: '',
+          headSha: '',
+        },
         versions: {
           __typename: 'DesignVersionConnection',
           edges: {
@@ -188,15 +195,14 @@ export default {
           },
         })
         .then(() => {
-          this.isSaving = false;
           this.$router.push('/designs');
         })
         .catch(e => {
-          this.isSaving = false;
-
           createFlash(s__('DesignManagement|Error uploading a new design. Please try again'));
-
           throw e;
+        })
+        .finally(() => {
+          this.isSaving = false;
         });
     },
   },

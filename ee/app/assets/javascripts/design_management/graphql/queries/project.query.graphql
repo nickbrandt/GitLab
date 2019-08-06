@@ -1,4 +1,4 @@
-#import "./designListFragment.graphql"
+#import "../fragments/designList.fragment.graphql"
 
 query project($fullPath: ID!, $iid: String!) {
   project(fullPath: $fullPath) {

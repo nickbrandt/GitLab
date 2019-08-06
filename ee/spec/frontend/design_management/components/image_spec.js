@@ -31,4 +31,6 @@ describe('Design management large image component', () => {
 
     expect(vm.element).toMatchSnapshot();
   });
+
+  it('emits a setDimensions event on resize', () => {});
 });

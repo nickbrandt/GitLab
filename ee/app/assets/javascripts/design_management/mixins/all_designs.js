@@ -1,6 +1,7 @@
-import appDataQuery from '../queries/appData.graphql';
-import getVersionDesignsQuery from '../queries/getVersionDesigns.query.graphql';
-import projectQuery from '../queries/project.query.graphql';
+import appDataQuery from '../graphql/queries/appData.query.graphql';
+import getVersionDesignsQuery from '../graphql/queries/getVersionDesigns.query.graphql';
+import projectQuery from '../graphql/queries/project.query.graphql';
+import { extractNodes } from '../utils/design_management_utils';
 
 export default {
   apollo: {
@@ -20,7 +21,7 @@ export default {
           iid: this.issueIid,
         };
       },
-      update: data => data.project.issue.designs.designs.edges.map(({ node }) => node),
+      update: data => extractNodes(data.project.issue.designs.designs),
       error() {
         this.error = true;
       },
@@ -38,7 +39,7 @@ export default {
       skip() {
         this.$apollo.queries.versionDesigns.skip = !this.hasValidVersion();
       },
-      update: data => data.project.issue.designs.designs.edges.map(({ node }) => node),
+      update: data => extractNodes(data.project.issue.designs.designs),
     },
   },
   data() {

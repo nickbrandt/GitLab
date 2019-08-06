@@ -3,7 +3,7 @@ import Vue from 'vue';
 import createRouter from './router';
 import App from './components/app.vue';
 import apolloProvider from './graphql';
-import allDesigns from './queries/allDesigns.graphql';
+import projectQuery from './graphql/queries/project.query.graphql';
 
 export default () => {
   const el = document.getElementById('js-design-management');
@@ -28,7 +28,7 @@ export default () => {
 
   apolloProvider.clients.defaultClient
     .watchQuery({
-      query: allDesigns,
+      query: projectQuery,
       variables: {
         fullPath: projectPath,
         iid: issueIid,
