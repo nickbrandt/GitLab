@@ -117,15 +117,15 @@ module EE
       end
 
       expose :create_vulnerability_feedback_issue_path do |merge_request|
-        presenter(merge_request).create_vulnerability_feedback_issue_path
+        presenter(merge_request).create_vulnerability_feedback_issue_path(merge_request.project)
       end
 
       expose :create_vulnerability_feedback_merge_request_path do |merge_request|
-        presenter(merge_request).create_vulnerability_feedback_merge_request_path
+        presenter(merge_request).create_vulnerability_feedback_merge_request_path(merge_request.project)
       end
 
       expose :create_vulnerability_feedback_dismissal_path do |merge_request|
-        presenter(merge_request).create_vulnerability_feedback_dismissal_path
+        presenter(merge_request).create_vulnerability_feedback_dismissal_path(merge_request.project)
       end
 
       expose :rebase_commit_sha

@@ -62,9 +62,9 @@ describe Vulnerabilities::OccurrenceEntity do
       end
 
       it 'does not contain vulnerability feedback paths' do
-        expect(subject).not_to include(:create_vulnerability_feedback_issue_path)
-        expect(subject).not_to include(:create_vulnerability_feedback_merge_request_path)
-        expect(subject).not_to include(:create_vulnerability_feedback_dismissal_path)
+        expect(subject[:create_vulnerability_feedback_issue_path]).to be_falsey
+        expect(subject[:create_vulnerability_feedback_merge_request_path]).to be_falsey
+        expect(subject[:create_vulnerability_feedback_dismissal_path]).to be_falsey
       end
     end
 
@@ -89,7 +89,7 @@ describe Vulnerabilities::OccurrenceEntity do
         let(:project) { create(:project, issues_access_level: ProjectFeature::DISABLED) }
 
         it 'does not contain vulnerability feedback issue path' do
-          expect(subject).not_to include(:create_vulnerability_feedback_issue_path)
+          expect(subject[:create_vulnerability_feedback_issue_path]).to be_falsey
         end
 
         it 'contains vulnerability feedback dismissal path' do
@@ -105,7 +105,7 @@ describe Vulnerabilities::OccurrenceEntity do
         let(:project) { create(:project, merge_requests_access_level: ProjectFeature::DISABLED) }
 
         it 'does not contain vulnerability feedback merge_request path' do
-          expect(subject).not_to include(:create_vulnerability_feedback_merge_request_path)
+          expect(subject[:create_vulnerability_feedback_merge_request_path]).to be_falsey
         end
 
         it 'contains vulnerability feedback issue path' do
