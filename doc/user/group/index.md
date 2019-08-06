@@ -364,6 +364,7 @@ Add whitelisted email domain and users with emails from different domains won't 
 to this group.
 
 There are domains that cannot be added to this restrictions - the most popular public email domains, such as:
+
 - `*@gmail.com`
 - `*@yahoo.com`
 - `*@hotmail.com`
