@@ -729,25 +729,15 @@ describe Namespace do
   describe '#store_security_reports_available?' do
     subject { namespace.store_security_reports_available? }
 
-    context 'when store_security_reports feature is enabled' do
-      before do
-        stub_feature_flags(store_security_reports: true)
-        stub_licensed_features(sast: true)
-      end
+    context 'when at least one security report feature is enabled' do
+      where(report_type: [:sast, :dast, :dependency_scanning, :container_scanning])
 
-      it 'returns true' do
-        expect(subject).to be_truthy
-      end
-    end
+      with_them do
+        before do
+          stub_licensed_features(report_type => true)
+        end
 
-    context 'when store_security_reports feature is disabled' do
-      before do
-        stub_feature_flags(store_security_reports: false)
-        stub_licensed_features(sast: true)
-      end
-
-      it 'returns false' do
-        expect(subject).to be_falsey
+        it { is_expected.to be true }
       end
     end
 
@@ -756,9 +746,7 @@ describe Namespace do
         stub_feature_flags(store_security_reports: true)
       end
 
-      it 'returns false' do
-        expect(subject).to be_falsey
-      end
+      it { is_expected.to be false }
     end
   end
 
