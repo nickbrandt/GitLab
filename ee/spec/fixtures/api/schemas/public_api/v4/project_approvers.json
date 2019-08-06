@@ -5,6 +5,7 @@
     "disable_overriding_approvers_per_merge_request": { "type": ["boolean", "null"] },
     "reset_approvals_on_push": { "type": "boolean" },
     "merge_requests_author_approval": { "type": ["boolean", "null"] },
+    "merge_requests_disable_committers_approval": { "type": ["boolean", "null"] },
     "approvers": {
       "type": "array",
       "items": {

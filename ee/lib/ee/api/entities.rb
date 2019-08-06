@@ -367,6 +367,7 @@ module EE
         expose :reset_approvals_on_push
         expose :disable_overriding_approvers_per_merge_request
         expose :merge_requests_author_approval
+        expose :merge_requests_disable_committers_approval
       end
 
       class Approvals < Grape::Entity
