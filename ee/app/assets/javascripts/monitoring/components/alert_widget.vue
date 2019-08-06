@@ -1,7 +1,6 @@
 <script>
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
-import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
 import { alertsValidator, queriesValidator } from '../validators';
@@ -9,7 +8,6 @@ import { GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 
 export default {
   components: {
-    Icon,
     AlertWidgetForm,
     GlLoadingIcon,
     GlModal,
@@ -55,17 +53,6 @@ export default {
       return Object.keys(this.alertsToManage)
         .map(this.formatAlertSummary)
         .join(', ');
-    },
-    alertIcon() {
-      return this.hasAlerts ? 'notifications' : 'notifications-off';
-    },
-    alertStatus() {
-      return this.hasAlerts
-        ? s__('PrometheusAlerts|Alert set')
-        : s__('PrometheusAlerts|No alert set');
-    },
-    hasAlerts() {
-      return Boolean(Object.keys(this.alertsToManage).length);
     },
     formDisabled() {
       return Boolean(this.errorMessage || this.isLoading);
@@ -176,16 +163,6 @@ export default {
       <gl-loading-icon v-show="isLoading" :inline="true" />
       {{ alertSummary }}
     </span>
-    <button
-      ref="dropdownMenuToggle"
-      v-gl-modal="modalId"
-      :aria-label="alertStatus"
-      class="btn btn-sm mx-2 alert-dropdown-button"
-      type="button"
-    >
-      <icon :name="alertIcon" :size="16" aria-hidden="true" />
-    </button>
-
     <alert-widget-form
       ref="widgetForm"
       :disabled="formDisabled"
