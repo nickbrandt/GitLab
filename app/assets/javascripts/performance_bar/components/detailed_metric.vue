@@ -1,9 +1,12 @@
 <script>
+import requestWarning from './request_warning.vue';
+
 import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
+    requestWarning,
     GlModal: DeprecatedModal2,
     Icon,
   },
@@ -38,6 +41,13 @@ export default {
     },
     detailsList() {
       return this.metricDetails.details;
+    },
+    htmlId() {
+      if (this.currentRequest) {
+        return `performance-bar-warning-${this.currentRequest.id}-${this.metric}`;
+      }
+
+      return '';
     },
   },
 };
@@ -105,5 +115,6 @@ export default {
       <div slot="footer"></div>
     </gl-modal>
     {{ title }}
+    <request-warning :html-id="htmlId" :details="metricDetails" />
   </div>
 </template>

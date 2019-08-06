@@ -4,14 +4,25 @@ import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('request selector', () => {
   const requests = [
-    { id: '123', url: 'https://gitlab.com/' },
+    {
+      id: '123',
+      url: 'https://gitlab.com/',
+      hasWarnings: false,
+    },
     {
       id: '456',
       url: 'https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/1',
+      hasWarnings: false,
     },
     {
       id: '789',
       url: 'https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/1.json?serializer=widget',
+      hasWarnings: false,
+    },
+    {
+      id: 'abc',
+      url: 'https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/1/discussions.json',
+      hasWarnings: true,
     },
   ];
 
@@ -42,5 +53,16 @@ describe('request selector', () => {
 
   it('ignores trailing slashes', () => {
     expect(optionText(requests[0].id)).toEqual('gitlab.com');
+  });
+
+  it('has a warning icon if any requests have warnings', () => {
+    expect(vm.$el.querySelector('span > gl-emoji').dataset.name).toEqual('warning');
+  });
+
+  it('adds a warning icon to requests with warnings', () => {
+    const option = vm.$el.querySelector('[value="abc"]');
+
+    expect(option.querySelector('gl-emoji').dataset.name).toEqual('warning');
+    expect(option.innerText).toContain('discussions.json');
   });
 });

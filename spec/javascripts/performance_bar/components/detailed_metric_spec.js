@@ -39,6 +39,7 @@ describe('detailedMetric', () => {
               duration: '123ms',
               calls: '456',
               details: requestDetails,
+              warnings: ['gitaly calls: 456 over 30'],
             },
           },
         },
@@ -80,6 +81,10 @@ describe('detailedMetric', () => {
 
     it('displays the metric title', () => {
       expect(vm.$el.innerText).toContain('gitaly');
+    });
+
+    it('displays request warnings', () => {
+      expect(vm.$el.querySelector('gl-emoji').dataset.name).toEqual('warning');
     });
 
     describe('when using a custom metric title', () => {

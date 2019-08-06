@@ -41,7 +41,7 @@ export default ({ container }) =>
 
         PerformanceBarService.fetchRequestDetails(this.peekUrl, requestId)
           .then(res => {
-            this.store.addRequestDetails(requestId, res.data.data);
+            this.store.addRequestDetails(requestId, res.data);
           })
           .catch(() =>
             // eslint-disable-next-line no-console

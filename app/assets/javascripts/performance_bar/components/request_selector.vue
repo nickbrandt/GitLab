@@ -1,4 +1,6 @@
 <script>
+import { glEmojiTag } from '~/emoji';
+
 export default {
   props: {
     currentRequest: {
@@ -14,6 +16,11 @@ export default {
     return {
       currentRequestId: this.currentRequest.id,
     };
+  },
+  computed: {
+    anyRequestsWithWarnings() {
+      return this.requests.some(request => request.hasWarnings);
+    },
   },
   watch: {
     currentRequestId(newRequestId) {
@@ -31,6 +38,7 @@ export default {
 
       return truncated;
     },
+    glEmojiTag,
   },
 };
 </script>
@@ -44,7 +52,9 @@ export default {
         class="qa-performance-bar-request"
       >
         {{ truncatedUrl(request.url) }}
+        <span v-if="request.hasWarnings" v-html="glEmojiTag('warning')"></span>
       </option>
     </select>
+    <span v-if="anyRequestsWithWarnings" v-html="glEmojiTag('warning')"></span>
   </div>
 </template>
