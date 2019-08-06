@@ -61,6 +61,7 @@ module EE
 
       validates :snowplow_collector_hostname,
                 presence: true,
+                hostname: true,
                 if: :snowplow_enabled
 
       validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
