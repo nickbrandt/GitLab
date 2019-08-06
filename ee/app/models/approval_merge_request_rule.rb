@@ -38,7 +38,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
   alias_method :source_rule, :approval_project_rule
 
-  validate :validate_approvals_required, unless: :report_approver?
   validate :validate_approval_project_rule
 
   enum rule_type: {
@@ -115,15 +114,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   private
-
-  def validate_approvals_required
-    return unless approval_project_rule
-    return unless approvals_required_changed?
-
-    if approvals_required < approval_project_rule.approvals_required
-      errors.add(:approvals_required, :greater_than_or_equal_to, count: approval_project_rule.approvals_required)
-    end
-  end
 
   def validate_approval_project_rule
     return if approval_project_rule.blank?

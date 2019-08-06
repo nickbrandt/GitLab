@@ -278,33 +278,6 @@ describe ApprovalMergeRequestRule do
         subject.assign_attributes(approvals_required: -1)
         expect(subject).to be_invalid
       end
-
-      context 'when project rule is present' do
-        let(:project_rule) { create(:approval_project_rule, project: merge_request.project, approvals_required: 3) }
-
-        it 'has to be greater than or equal to project rule approvals_required' do
-          subject.assign_attributes(approval_project_rule: project_rule, approvals_required: 2)
-          subject.valid?
-
-          expect(subject.errors[:approvals_required]).to include("must be greater than or equal to 3")
-        end
-
-        context 'when report_approver rule' do
-          subject do
-            build(:report_approver_rule, merge_request: merge_request, approvals_required: 1).tap do |rule|
-              rule.approval_project_rule = project_rule
-            end
-          end
-
-          it 'skips validation' do
-            expect(subject).to be_valid
-
-            subject.approvals_required = 0
-
-            expect(subject).to be_valid
-          end
-        end
-      end
     end
   end
 end
