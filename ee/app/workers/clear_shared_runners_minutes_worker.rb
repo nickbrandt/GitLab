@@ -6,36 +6,33 @@ class ClearSharedRunnersMinutesWorker
   include ApplicationWorker
   include CronjobQueue
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def perform
     return unless try_obtain_lease
 
     Namespace.with_shared_runners_minutes_limit
       .with_extra_shared_runners_minutes_limit
-      .where('namespace_statistics.namespace_id = namespaces.id')
-      .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
+      .with_shared_runners_minutes_exceeding_default_limit
       .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
 
-    Namespace.where('last_ci_minutes_notification_at IS NOT NULL OR last_ci_minutes_usage_notification_level IS NOT NULL')
-      .each_batch do |relation|
-      relation.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
+    Namespace.with_ci_minutes_notification_sent.each_batch do |namespaces|
+      Namespace.transaction do
+        reset_statistics(NamespaceStatistics, namespaces)
+        reset_statistics(ProjectStatistics, namespaces)
 
-        NamespaceStatistics.where(namespace: relation)
-          .where.not(shared_runners_seconds: 0)
-          .update_all(
-            shared_runners_seconds: 0,
-            shared_runners_seconds_last_reset: Time.now)
-
-        ProjectStatistics.where(namespace_id: relation.pluck(:id))
-          .where.not(shared_runners_seconds: 0)
-          .update_all(
-            shared_runners_seconds: 0,
-            shared_runners_seconds_last_reset: Time.now)
+        namespaces.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
       end
     end
-  # rubocop: enable CodeReuse/ActiveRecord
+  end
 
   private
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def reset_statistics(model, namespaces)
+    model.where(namespace: namespaces).where.not(shared_runners_seconds: 0).update_all(
+      shared_runners_seconds: 0,
+      shared_runners_seconds_last_reset: Time.now)
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def extra_minutes_left_sql
     "GREATEST((namespaces.shared_runners_minutes_limit + namespaces.extra_shared_runners_minutes_limit) - ROUND(namespace_statistics.shared_runners_seconds / 60.0), 0)"

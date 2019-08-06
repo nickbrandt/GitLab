@@ -42,6 +42,15 @@ module EE
       scope :with_plan, -> { where.not(plan_id: nil) }
       scope :with_shared_runners_minutes_limit, -> { where("namespaces.shared_runners_minutes_limit > 0") }
       scope :with_extra_shared_runners_minutes_limit, -> { where("namespaces.extra_shared_runners_minutes_limit > 0") }
+      scope :with_shared_runners_minutes_exceeding_default_limit, -> do
+        where('namespace_statistics.namespace_id = namespaces.id')
+        .where('namespace_statistics.shared_runners_seconds > (namespaces.shared_runners_minutes_limit * 60)')
+      end
+
+      scope :with_ci_minutes_notification_sent, -> do
+        where('last_ci_minutes_notification_at IS NOT NULL OR last_ci_minutes_usage_notification_level IS NOT NULL')
+      end
+
       scope :with_feature_available_in_plan, -> (feature) do
         plans = plans_with_feature(feature)
         matcher = Plan.where(name: plans)

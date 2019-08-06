@@ -4,6 +4,8 @@ describe ClearSharedRunnersMinutesWorker do
   let(:worker) { described_class.new }
 
   describe '#perform' do
+    let(:namespace) { create(:namespace, last_ci_minutes_notification_at: Time.now) }
+
     before do
       expect_any_instance_of(described_class)
         .to receive(:try_obtain_lease).and_return(true)
@@ -12,7 +14,7 @@ describe ClearSharedRunnersMinutesWorker do
     subject { worker.perform }
 
     context 'when project statistics are defined' do
-      let(:project) { create(:project) }
+      let(:project) { create(:project, namespace: namespace) }
       let(:statistics) { project.statistics }
 
       before do
@@ -33,7 +35,7 @@ describe ClearSharedRunnersMinutesWorker do
     end
 
     context 'when namespace statistics are defined' do
-      let!(:statistics) { create(:namespace_statistics, shared_runners_seconds: 100) }
+      let!(:statistics) { create(:namespace_statistics, namespace: namespace, shared_runners_seconds: 100) }
 
       it 'clears counters' do
         subject
