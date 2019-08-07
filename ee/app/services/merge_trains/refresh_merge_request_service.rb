@@ -15,7 +15,11 @@ module MergeTrains
 
       validate!
 
-      pipeline_created = create_pipeline! if should_create_pipeline?
+      if should_create_pipeline?
+        cancel_pipeline_if_exist
+        pipeline_created = create_pipeline!
+      end
+
       merge! if should_merge?
 
       success(pipeline_created: pipeline_created.present?)
@@ -58,6 +62,12 @@ module MergeTrains
     # merge request obviously requires to re-create pipeline for merge train.
     def should_create_pipeline?
       pipeline_absent? || require_recreate? || stale_pipeline?
+    end
+
+    def cancel_pipeline_if_exist
+      return unless pipeline_for_merge_train
+
+      pipeline_for_merge_train.cancel_running
     end
 
     def create_pipeline!
