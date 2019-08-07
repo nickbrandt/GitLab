@@ -7,11 +7,11 @@ module RuboCop
         MSG = 'Add an `authorize :ability` call to the type: '\
               'https://docs.gitlab.com/ee/development/api_graphql_styleguide.html#type-authorization'
 
-        TYPES_DIR = 'app/graphql/types'
-
         # We want to exclude our own basetypes and scalars
         WHITELISTED_TYPES = %w[BaseEnum BaseScalar BasePermissionType MutationType
                                QueryType GraphQL::Schema BaseUnion].freeze
+
+        TYPES_DIR = 'app/graphql/types'
 
         def_node_search :authorize?, <<~PATTERN
           (send nil? :authorize ...)
@@ -44,7 +44,7 @@ module RuboCop
         end
 
         def superclass_constant(class_node)
-          # First one is the class name itself, second is it's superclass
+          # First one is the class name itself, second is its superclass
           _class_constant, *others = class_node.descendants
 
           others.find { |node| node.const_type? && node&.const_name != 'Types' }
