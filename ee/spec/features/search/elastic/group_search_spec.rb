@@ -9,7 +9,7 @@ describe 'Group elastic search', :js do
     find('.js-search-group-dropdown').click
     wait_for_requests
 
-    page.within '.search-holder' do
+    page.within '.js-search-form' do
       click_link group.name
     end
   end

@@ -7126,9 +7126,6 @@ msgstr ""
 msgid "Group was successfully updated."
 msgstr ""
 
-msgid "Group:"
-msgstr ""
-
 msgid "Group: %{group_name}"
 msgstr ""
 
@@ -11153,9 +11150,6 @@ msgid "Project uploads"
 msgstr ""
 
 msgid "Project visibility level will be changed to match namespace rules when transferring to a group."
-msgstr ""
-
-msgid "Project:"
 msgstr ""
 
 msgid "Project: %{name}"
@@ -16491,6 +16485,9 @@ msgid "Welcome to the Guided GitLab Tour"
 msgstr ""
 
 msgid "Welcome to your Issue Board!"
+msgstr ""
+
+msgid "What are you searching for?"
 msgstr ""
 
 msgid "When a runner is locked, it cannot be assigned to other projects"
