@@ -51,7 +51,17 @@ module QA
       it 'displays the Security report in the merge request' do
         Page::MergeRequest::Show.perform do |mergerequest|
           expect(mergerequest).to have_vulnerability_report(timeout: 60)
-          expect(mergerequest).to have_detected_vulnerability_count_of "2"
+          expect(mergerequest).to have_detected_vulnerability_count_of "4"
+        end
+      end
+
+      it 'can create an auto-remediation MR' do
+        Page::MergeRequest::Show.perform do |mergerequest|
+          vuln_name = "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js"
+
+          expect(mergerequest).to have_vulnerability_report(timeout: 60)
+          mergerequest.resolve_vulnerability_with_mr vuln_name
+          expect(mergerequest).to have_title vuln_name
         end
       end
     end

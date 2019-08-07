@@ -102,6 +102,7 @@ export default {
       v-if="actionButtons.length > 1"
       :buttons="actionButtons"
       class="js-split-button"
+      data-qa-selector="resolve_split_button"
       @createMergeRequest="$emit('createMergeRequest')"
       @createNewIssue="$emit('createNewIssue')"
       @downloadPatch="$emit('downloadPatch')"

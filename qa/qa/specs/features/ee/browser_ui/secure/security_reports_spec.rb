@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+NUMBER_OF_DEPENDENCIES_IN_FIXTURE = 1309
 
 module QA
   context 'Secure', :docker do
@@ -57,7 +58,7 @@ module QA
         Page::Project::Pipeline::Show.perform do |pipeline|
           pipeline.click_on_security
           expect(pipeline).to have_dependency_report
-          expect(pipeline).to have_content("Dependency scanning detected 2")
+          expect(pipeline).to have_content("Dependency scanning detected 4")
           pipeline.expand_dependency_report
           expect(pipeline).to have_content("jQuery before 3.4.0")
         end
@@ -87,7 +88,7 @@ module QA
         Page::Project::Menu.perform(&:click_on_dependency_list)
 
         EE::Page::Project::Secure::DependencyList.perform do |page|
-          expect(page).to have_dependency_count_of "1293"
+          expect(page).to have_dependency_count_of NUMBER_OF_DEPENDENCIES_IN_FIXTURE
         end
       end
     end
