@@ -7,7 +7,7 @@ module EE
       extend ::Gitlab::Utils::Override
 
       prepended do
-        before_action do
+        before_action only: [:show, :builds, :failures, :security, :licenses] do
           push_frontend_feature_flag(:sast_pipeline_report_api)
           push_frontend_feature_flag(:dast_pipeline_report_api)
           push_frontend_feature_flag(:container_scanning_pipeline_report_api)
