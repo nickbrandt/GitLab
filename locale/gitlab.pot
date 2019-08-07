@@ -6685,10 +6685,10 @@ msgstr ""
 msgid "Geo|%{name} is scheduled for forced re-download"
 msgstr ""
 
-msgid "Geo|%{name} is scheduled for re-check"
+msgid "Geo|%{name} is scheduled for re-sync"
 msgstr ""
 
-msgid "Geo|%{name} is scheduled for re-sync"
+msgid "Geo|%{name} is scheduled for re-verify"
 msgstr ""
 
 msgid "Geo|All"
@@ -6697,10 +6697,10 @@ msgstr ""
 msgid "Geo|All projects"
 msgstr ""
 
-msgid "Geo|All projects are being scheduled for re-check"
+msgid "Geo|All projects are being scheduled for re-sync"
 msgstr ""
 
-msgid "Geo|All projects are being scheduled for re-sync"
+msgid "Geo|All projects are being scheduled for re-verify"
 msgstr ""
 
 msgid "Geo|Batch operations"
@@ -6790,12 +6790,6 @@ msgstr ""
 msgid "Geo|Re-verification interval"
 msgstr ""
 
-msgid "Geo|Recheck"
-msgstr ""
-
-msgid "Geo|Recheck all projects"
-msgstr ""
-
 msgid "Geo|Redownload"
 msgstr ""
 
@@ -6812,6 +6806,12 @@ msgid "Geo|Resync all projects"
 msgstr ""
 
 msgid "Geo|Retry count"
+msgstr ""
+
+msgid "Geo|Reverify"
+msgstr ""
+
+msgid "Geo|Reverify all projects"
 msgstr ""
 
 msgid "Geo|Select groups to replicate."

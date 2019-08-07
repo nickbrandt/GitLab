@@ -30,13 +30,13 @@ namespace :admin do
 
     resources :projects, only: [:index, :destroy] do
       member do
-        post :recheck
+        post :reverify
         post :resync
         post :force_redownload
       end
 
       collection do
-        post :recheck_all
+        post :reverify_all
         post :resync_all
       end
     end

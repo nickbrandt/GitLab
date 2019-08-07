@@ -186,7 +186,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     )
   end
 
-  def self.flag_repositories_for_recheck!
+  def self.flag_repositories_for_reverify!
     update_all(
       repository_verification_checksum_sha: nil,
       last_repository_verification_failure: nil,
@@ -389,8 +389,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   # Flag the repository to be re-checked
   #
-  # This operation happens only in the database and the recheck will be triggered after by the cron job
-  def flag_repository_for_recheck!
+  # This operation happens only in the database and the reverify will be triggered after by the cron job
+  def flag_repository_for_reverify!
     self.update(repository_verification_checksum_sha: nil, last_repository_verification_failure: nil, repository_checksum_mismatch: false)
   end
 
