@@ -41,6 +41,14 @@ module QA
                 element :vulnerability_report_grouped
               end
 
+              view 'app/assets/javascripts/reports/components/report_section.vue' do
+                element :expand_report_button
+              end
+
+              view 'ee/app/assets/javascripts/vue_shared/security_reports/components/modal_footer.vue' do
+                element :resolve_split_button
+              end
+
               def start_review
                 click_element :start_review
               end
@@ -76,6 +84,22 @@ module QA
                 within_element :approver_list do
                   all_elements(:approver).map { |item| item.find('img')['title'] }
                 end
+              end
+
+              def expand_vulnerability_report
+                click_element :expand_report_button
+              end
+
+              def click_vulnerability(name)
+                within_element :vulnerability_report_grouped do
+                  click_on name
+                end
+              end
+
+              def resolve_vulnerability_with_mr(name)
+                expand_vulnerability_report
+                click_vulnerability(name)
+                click_element :resolve_split_button
               end
 
               def has_vulnerability_report?(timeout: 60)
