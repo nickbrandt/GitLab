@@ -11,20 +11,18 @@ class CreateAllowedEmailDomainsForGroups < ActiveRecord::Migration[5.2]
 
   def up
     create_table :allowed_email_domains do |t|
+      t.timestamps_with_timezone null: false
       t.references :group, references: :namespace,
         column: :group_id,
         type: :integer,
         null: false,
         index: true
-      t.string :domain, null: false
       t.foreign_key :namespaces, column: :group_id, on_delete: :cascade
-
-      t.timestamps_with_timezone null: false
+      t.string :domain, null: false, limit: 255
     end
   end
 
   def down
-    remove_foreign_key :allowed_email_domains, :namespaces
     drop_table :allowed_email_domains
   end
 end

@@ -27,10 +27,10 @@ ActiveRecord::Schema.define(version: 2019_08_12_070645) do
   end
 
   create_table "allowed_email_domains", force: :cascade do |t|
-    t.integer "group_id", null: false
-    t.string "domain", null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.integer "group_id", null: false
+    t.string "domain", limit: 255, null: false
     t.index ["group_id"], name: "index_allowed_email_domains_on_group_id"
   end
 
