@@ -10,8 +10,6 @@ class DiscussionSerializer < BaseSerializer
   private
 
   def with_additional_opts(opts)
-    return opts unless @request.project
-
     additional_opts = {
       submodule_links: Gitlab::SubmoduleLinks.new(@request.project.repository)
     }
@@ -19,3 +17,5 @@ class DiscussionSerializer < BaseSerializer
     opts.merge(additional_opts)
   end
 end
+
+DiscussionSerializer.prepend_if_ee('EE::DiscussionSerializer')

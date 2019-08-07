@@ -2,7 +2,6 @@
 
 class List < ApplicationRecord
   prepend ::EE::List # rubocop: disable Cop/InjectEnterpriseEditionModule
-  include Importable
 
   belongs_to :board
   belongs_to :label
