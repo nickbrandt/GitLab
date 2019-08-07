@@ -13,17 +13,15 @@ describe SelfMonitoring::Project::CreateService do
 
     let(:result) { subject.execute }
     let(:project) { result[:project] }
+    let(:application_setting) { Gitlab::CurrentSettings.current_application_settings }
 
     let!(:user) { create(:user, :admin) }
 
     before do
       allow(Gitlab.config).to receive(:prometheus).and_return(prometheus_settings)
 
-      allow(ApplicationSetting)
-        .to receive(:current)
-        .and_return(
-          ApplicationSetting.build_from_defaults(allow_local_requests_from_hooks_and_services: true)
-        )
+      allow(ApplicationSetting).to receive(:current_without_cache) { application_setting }
+      application_setting.allow_local_requests_from_web_hooks_and_services = true
     end
 
     context 'with license' do
