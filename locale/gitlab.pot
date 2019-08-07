@@ -4368,10 +4368,24 @@ msgid_plural "CycleAnalytics|%d projects selected"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "CycleAnalytics|%{stageName}"
+msgid_plural "CycleAnalytics|%d stages selected"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "CycleAnalytics|All stages"
+msgstr ""
+
+msgid "CycleAnalytics|Stages"
+msgstr ""
+
 msgid "CycleAnalytics|group dropdown filter"
 msgstr ""
 
 msgid "CycleAnalytics|project dropdown filter"
+msgstr ""
+
+msgid "CycleAnalytics|stage dropdown"
 msgstr ""
 
 msgid "DNS"
