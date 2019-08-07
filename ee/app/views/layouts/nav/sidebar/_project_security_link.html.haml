@@ -1,4 +1,7 @@
-- if project_nav_tab?(:security)
+- can_view_security_dashboard = project_nav_tab?(:security)
+- can_view_dependency_list = @project.feature_available?(:dependency_list)
+
+- if can_view_security_dashboard
   = nav_link(path: sidebar_security_paths) do
     = link_to project_security_dashboard_path(@project), data: { qa_selector: 'link_security_dashboard' } do
       .nav-icon-container
@@ -16,6 +19,26 @@
       = nav_link(path: 'projects/security/dashboard#show') do
         = link_to project_security_dashboard_path(@project), title: _('Security Dashboard') do
           %span= _('Security Dashboard')
+
+      - if @project.feature_available?(:dependency_list)
+        = nav_link(path: 'projects/dependencies#show') do
+          = link_to project_dependencies_path(@project), title: _('Dependency List'), data: { qa_selector: 'dependency_list_link' } do
+            %span= _('Dependency List')
+
+- elsif can_view_dependency_list 
+  = nav_link(path: sidebar_security_paths) do
+    = link_to project_dependencies_path(@project), data: { qa_selector: 'dependency_list_link' } do
+      .nav-icon-container
+        = sprite_icon('shield')
+      %span.nav-item-name
+        = _('Security & Compliance')
+
+    %ul.sidebar-sub-level-items
+      = nav_link(path: sidebar_security_paths, html_options: { class: "fly-out-top-item" } ) do
+        = link_to project_security_dashboard_path(@project) do
+          %strong.fly-out-top-item-name
+            = _('Security & Compliance')
+      %li.divider.fly-out-top-item
 
       - if @project.feature_available?(:dependency_list)
         = nav_link(path: 'projects/dependencies#show') do
