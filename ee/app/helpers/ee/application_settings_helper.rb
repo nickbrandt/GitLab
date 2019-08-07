@@ -45,7 +45,7 @@ module EE
         :slack_app_id,
         :slack_app_secret,
         :slack_app_verification_token,
-        :snowplow_collector_uri,
+        :snowplow_collector_hostname,
         :snowplow_cookie_domain,
         :snowplow_enabled,
         :snowplow_site_id

@@ -7,7 +7,7 @@
     };p[i].q=p[i].q||[];n=l.createElement(o);g=l.getElementsByTagName(o)[0];n.async=1;
     n.src=w;g.parentNode.insertBefore(n,g)}}(window,document,"script","#{asset_url('snowplow/sp.js')}","snowplow"));
 
-    window.snowplow('newTracker', '#{Gitlab::SnowplowTracker::NAMESPACE}', '#{Gitlab::CurrentSettings.snowplow_collector_uri}', {
+    window.snowplow('newTracker', '#{Gitlab::SnowplowTracker::NAMESPACE}', '#{Gitlab::CurrentSettings.snowplow_collector_hostname}', {
       appId: '#{Gitlab::CurrentSettings.snowplow_site_id}',
       cookieDomain: '#{Gitlab::CurrentSettings.snowplow_cookie_domain}',
       userFingerprint: false,

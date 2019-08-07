@@ -38,7 +38,7 @@ module EE
             optional :snowplow_enabled, type: Grape::API::Boolean, desc: 'Enable Snowplow'
 
             given snowplow_enabled: ->(val) { val } do
-              requires :snowplow_collector_uri, type: String, desc: 'Snowplow Collector URI'
+              requires :snowplow_collector_hostname, type: String, desc: 'Snowplow Collector Hostname'
               optional :snowplow_cookie_domain, type: String, desc: 'Snowplow cookie domain'
               optional :snowplow_site_id, type: String, desc: 'Snowplow Site/Application ID'
             end
