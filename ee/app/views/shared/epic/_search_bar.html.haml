@@ -8,7 +8,7 @@
 - is_weeks = preset_layout == "WEEKS"
 
 .epics-filters{ class: "#{'epics-roadmap-filters' if show_roadmap_presets}" }
-  .d-flex.epics-details-filters.filtered-search-block.row-content-block.second-block
+  .epics-details-filters.filtered-search-block.d-flex.flex-column.flex-md-row.row-content-block.second-block
     - if show_roadmap_presets
       .btn-group.btn-group-toggle.append-right-default.js-btn-roadmap-presets{ data: { toggle: 'buttons' } }
         %label.btn.btn-default.btn-roadmap-preset{ class: ("active" if is_quarters) }
@@ -25,7 +25,7 @@
     = form_tag page_filter_path, method: :get, class: 'flex-fill filter-form js-filter-form' do
       - if params[:search].present?
         = hidden_field_tag :search, params[:search]
-      .epics-other-filters.filtered-search-wrapper
+      .epics-other-filters.filtered-search-wrapper.d-flex.flex-column.flex-md-row
         .filtered-search-box
           = dropdown_tag(custom_icon('icon_history'),
             options: { wrapper_class: "filtered-search-history-dropdown-wrapper",
