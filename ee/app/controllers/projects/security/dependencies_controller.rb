@@ -33,7 +33,7 @@ module Projects
       end
 
       def authorize_read_dependency_list!
-        return render_403 unless can?(current_user, :read_project_security_dashboard, project)
+        return render_403 unless can?(current_user, :read_dependencies, project)
       end
 
       def ensure_dependency_list_feature_available
