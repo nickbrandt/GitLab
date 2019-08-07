@@ -19,10 +19,21 @@ RSpec.describe Geo::Batch::ProjectRegistrySchedulerWorker do
     context 'when operation is :recheck_repositories' do
       let!(:registry) { create(:geo_project_registry, :repository_verified) }
 
-      it 'schedules batches of repositories for recheck' do
+      it 'schedules batches of repositories for reverify' do
         Sidekiq::Testing.fake! do
           expect { subject.perform(:recheck_repositories) }.to change(Geo::Batch::ProjectRegistryWorker.jobs, :size).by(1)
-          expect(Geo::Batch::ProjectRegistryWorker.jobs.last['args']).to include('recheck_repositories')
+          expect(Geo::Batch::ProjectRegistryWorker.jobs.last['args']).to include('reverify_repositories')
+        end
+      end
+    end
+
+    context 'when operation is :reverify_repositories' do
+      let!(:registry) { create(:geo_project_registry, :repository_verified) }
+
+      it 'schedules batches of repositories for reverify' do
+        Sidekiq::Testing.fake! do
+          expect { subject.perform(:reverify_repositories) }.to change(Geo::Batch::ProjectRegistryWorker.jobs, :size).by(1)
+          expect(Geo::Batch::ProjectRegistryWorker.jobs.last['args']).to include('reverify_repositories')
         end
       end
 
@@ -30,7 +41,7 @@ RSpec.describe Geo::Batch::ProjectRegistrySchedulerWorker do
         stub_exclusive_lease_taken(lease_key, timeout: lease_timeout)
 
         Sidekiq::Testing.fake! do
-          expect { subject.perform(:recheck_repositories) }.not_to change(Geo::Batch::ProjectRegistryWorker.jobs, :size)
+          expect { subject.perform(:reverify_repositories) }.not_to change(Geo::Batch::ProjectRegistryWorker.jobs, :size)
         end
       end
     end

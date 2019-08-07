@@ -15,10 +15,17 @@ module Geo
       BATCH_SIZE = 10000
       LEASE_TIMEOUT = 2.minutes # TTL for X amount of loops to happen until it is renewed
       RENEW_AFTER_LOOPS = 20 # renew lease at every 20 loops has finished
-      OPERATIONS = [:resync_repositories, :recheck_repositories].freeze
+      OPERATIONS = [:resync_repositories, :reverify_repositories].freeze
       DELAY_INTERVAL = 10.seconds.to_i # base delay for scheduling batch execution
 
       def perform(operation)
+        # TODO: This is a temporary workaround for backward compatibility
+        # to avoid jobs that have been already scheduled to fail.
+        # See https://gitlab.com/gitlab-org/gitlab-ee/issues/13318
+        if operation.to_sym == :recheck_repositories
+          operation = :reverify_repositories
+        end
+
         return fail_invalid_operation!(operation) unless OPERATIONS.include?(operation.to_sym)
 
         try_obtain_lease do

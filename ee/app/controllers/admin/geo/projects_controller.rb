@@ -34,10 +34,10 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
     redirect_back_or_admin_geo_projects(notice: s_('Geo|Tracking entry for project (%{project_id}) was successfully removed.') % { project_id: @registry.project_id })
   end
 
-  def recheck
-    @registry.flag_repository_for_recheck!
+  def reverify
+    @registry.flag_repository_for_reverify!
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for re-check') % { name: @registry.project.full_name })
+    redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for re-verify') % { name: @registry.project.full_name })
   end
 
   def resync
@@ -52,10 +52,10 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
     redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for forced re-download') % { name: @registry.project.full_name })
   end
 
-  def recheck_all
-    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:recheck_repositories)
+  def reverify_all
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:reverify_repositories)
 
-    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-check'))
+    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-verify'))
   end
 
   def resync_all

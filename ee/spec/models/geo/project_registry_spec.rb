@@ -175,11 +175,11 @@ describe Geo::ProjectRegistry do
     end
   end
 
-  describe '.flag_repositories_for_recheck!' do
-    it 'modified record to a recheck state' do
+  describe '.flag_repositories_for_reverify!' do
+    it 'modified record to a reverify state' do
       registry = create(:geo_project_registry, :repository_verified)
 
-      described_class.flag_repositories_for_recheck!
+      described_class.flag_repositories_for_reverify!
 
       expect(registry.reload).to have_attributes(
         repository_verification_checksum_sha: nil,
@@ -930,10 +930,10 @@ describe Geo::ProjectRegistry do
     end
   end
 
-  describe '#flag_repository_for_recheck!' do
-    it 'modified record to a recheck state' do
+  describe '#flag_repository_for_reverify!' do
+    it 'modified record to a reverify state' do
       registry = create(:geo_project_registry, :repository_verified)
-      registry.flag_repository_for_recheck!
+      registry.flag_repository_for_reverify!
 
       expect(registry).to have_attributes(
         repository_verification_checksum_sha: nil,
@@ -962,7 +962,7 @@ describe Geo::ProjectRegistry do
   end
 
   describe '#flag_repository_for_redownload!' do
-    it 'modified record to a recheck state' do
+    it 'modified record to a redownload state' do
       registry = create(:geo_project_registry, :repository_verified)
       registry.flag_repository_for_redownload!
 
