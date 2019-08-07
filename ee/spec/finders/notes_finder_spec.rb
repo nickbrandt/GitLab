@@ -15,17 +15,25 @@ describe 'EE::NotesFinder' do
   describe '#target' do
     subject { NotesFinder.new(user, { target_id: epic.id, target_type: 'epic', group_id: group.id }).target }
 
-    it 'returns an epic as expected' do
+    it 'returns an epic' do
       expect(subject).to eq(epic)
+    end
+
+    it 'fails if group id is missing' do
+      expect {  NotesFinder.new(user, { target_id: epic.id, target_type: 'epic' }).target }.to raise_error(ArgumentError)
     end
   end
 
   describe '#execute' do
-    context 'when using epics' do
+    context 'when using target id and type of epics' do
       subject { NotesFinder.new(user, { target_id: epic.id, target_type: 'epic', group_id: group.id }).execute }
 
-      it 'returns an epic as expected' do
+      it 'returns the expected notes' do
         expect(subject).to eq([note])
+      end
+
+      it 'fails if group id is missing' do
+        expect { NotesFinder.new(user, { target_id: epic.id, target_type: 'epic' }).execute }.to raise_error(ArgumentError)
       end
     end
 
