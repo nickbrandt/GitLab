@@ -1,18 +1,12 @@
 require 'spec_helper'
 
-describe Gitlab::Elastic::ProjectSearchResults do
+describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
   let(:query) { 'hello world' }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   describe 'initialize with empty ref' do

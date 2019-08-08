@@ -6,10 +6,6 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
-  after do
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
-  end
-
   let(:user) { create(:user) }
   let(:project_1) { create(:project, :repository, :wiki_repo) }
   let(:project_2) { create(:project, :repository, :wiki_repo) }

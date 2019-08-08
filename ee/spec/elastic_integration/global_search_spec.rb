@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'GlobalSearch' do
+describe 'GlobalSearch', :elastic do
   let(:features) { %i(issues merge_requests repository builds wiki snippets) }
   let(:admin) { create :user, admin: true }
   let(:auditor) {create :user, auditor: true }
@@ -12,16 +12,10 @@ describe 'GlobalSearch' do
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
 
     project.add_developer(member)
     project.add_developer(external_member)
     project.add_guest(guest)
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   context "Respect feature visibility levels" do

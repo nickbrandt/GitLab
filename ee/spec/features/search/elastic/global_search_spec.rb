@@ -11,10 +11,6 @@ describe 'Global elastic search', :elastic do
     sign_in(user)
   end
 
-  after do
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
-  end
-
   shared_examples 'an efficient database result' do
     it 'avoids N+1 database queries' do
       create(object, creation_args)

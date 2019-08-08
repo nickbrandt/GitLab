@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Group elastic search', :js do
+describe 'Group elastic search', :js, :elastic do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, :wiki_repo, namespace: group) }
@@ -16,17 +16,11 @@ describe 'Group elastic search', :js do
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    Gitlab::Elastic::Helper.create_empty_index
 
     project.add_maintainer(user)
     group.add_owner(user)
 
     sign_in(user)
-  end
-
-  after do
-    Gitlab::Elastic::Helper.delete_index
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
   end
 
   describe 'issue search' do

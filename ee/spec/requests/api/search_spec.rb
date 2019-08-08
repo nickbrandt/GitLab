@@ -36,12 +36,6 @@ describe API::Search do
   shared_examples 'elasticsearch enabled' do
     before do
       stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-      Gitlab::Elastic::Helper.create_empty_index
-    end
-
-    after do
-      Gitlab::Elastic::Helper.delete_index
-      stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
     end
 
     context 'for wiki_blobs scope' do
@@ -119,7 +113,7 @@ describe API::Search do
         end
       end
 
-      context 'when elasticsearch is enabled' do
+      context 'when elasticsearch is enabled', :elastic do
         it_behaves_like 'elasticsearch enabled' do
           let(:endpoint) { '/search' }
         end
@@ -135,7 +129,7 @@ describe API::Search do
         end
       end
 
-      context 'when elasticsearch is enabled' do
+      context 'when elasticsearch is enabled', :elastic do
         it_behaves_like 'elasticsearch enabled' do
           let(:endpoint) { "/groups/#{group.id}/-/search" }
         end
