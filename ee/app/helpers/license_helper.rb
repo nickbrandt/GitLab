@@ -85,7 +85,7 @@ module LicenseHelper
     return_to_url = CGI.escape(Gitlab.config.gitlab.url)
     uri = URI.parse(::EE::SUBSCRIPTIONS_URL)
     uri.path = '/trials/new'
-    uri.query = "return_to=#{return_to_url}"
+    uri.query = "return_to=#{return_to_url}&id=#{Base64.strict_encode64(current_user.email)}"
     uri.to_s
   end
 
