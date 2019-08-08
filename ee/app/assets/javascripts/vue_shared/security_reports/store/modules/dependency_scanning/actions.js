@@ -44,4 +44,5 @@ export const fetchReports = ({ state, rootState, dispatch }) => {
 export const updateVulnerability = ({ commit }, vulnerability) =>
   commit(types.UPDATE_VULNERABILITY, vulnerability);
 
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
