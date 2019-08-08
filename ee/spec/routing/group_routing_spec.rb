@@ -96,4 +96,12 @@ describe 'Group routing', "routing" do
       expect(post('/groups/gitlabhq/-/merge_requests/bulk_update')).to route_to('groups/merge_requests#bulk_update', group_id: 'gitlabhq')
     end
   end
+
+  describe 'epics' do
+    it 'routes post to #bulk_update' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(post('/groups/gitlabhq/-/epics/bulk_update')).to route_to('groups/epics#bulk_update', group_id: 'gitlabhq')
+    end
+  end
 end

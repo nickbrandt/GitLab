@@ -46,6 +46,7 @@ module EE
       validate :validate_parent, on: :create
 
       alias_attribute :parent_ids, :parent_id
+      alias_method :issuing_parent, :group
 
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }

@@ -9,10 +9,11 @@ class Groups::EpicsController < Groups::ApplicationController
   include EpicsActions
 
   before_action :check_epics_available!
-  before_action :epic, except: [:index, :create]
+  before_action :epic, except: [:index, :create, :bulk_update]
   before_action :set_issuables_index, only: :index
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
+  before_action :verify_group_bulk_edit_enabled!, only: [:bulk_update]
 
   before_action do
     push_frontend_feature_flag(:epic_trees, @group)
@@ -108,5 +109,9 @@ class Groups::EpicsController < Groups::ApplicationController
 
   def authorize_create_epic!
     return render_404 unless can?(current_user, :create_epic, group)
+  end
+
+  def verify_group_bulk_edit_enabled!
+    render_404 unless group.feature_available?(:group_bulk_edit)
   end
 end
