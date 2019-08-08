@@ -52,7 +52,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_artifact_ids: [])
-      job_artifacts
+      current_node.job_artifacts
         .inner_join_job_artifact_registry
         .with_files_stored_remotely
         .id_not_in(except_artifact_ids)
