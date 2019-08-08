@@ -16,7 +16,12 @@ describe('Productivity analytics filter actions', () => {
             payload: 'gitlab-org',
           },
         ],
-        [],
+        [
+          {
+            type: 'table/fetchMergeRequests',
+            payload: null,
+          },
+        ],
         done,
       ));
   });
@@ -33,7 +38,12 @@ describe('Productivity analytics filter actions', () => {
             payload: 'gitlab-test',
           },
         ],
-        [],
+        [
+          {
+            type: 'table/fetchMergeRequests',
+            payload: null,
+          },
+        ],
         done,
       ));
   });
@@ -50,7 +60,12 @@ describe('Productivity analytics filter actions', () => {
             payload: 'author_username=root',
           },
         ],
-        [],
+        [
+          {
+            type: 'table/fetchMergeRequests',
+            payload: null,
+          },
+        ],
         done,
       ));
   });
@@ -67,7 +82,12 @@ describe('Productivity analytics filter actions', () => {
             payload: 90,
           },
         ],
-        [],
+        [
+          {
+            type: 'table/fetchMergeRequests',
+            payload: null,
+          },
+        ],
         done,
       ));
   });

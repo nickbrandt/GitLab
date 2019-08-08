@@ -16,6 +16,7 @@ describe('MergeRequestTable component', () => {
     },
     metricType: 'time_to_last_commit',
     metricLabel: 'Time from first comment to last commit',
+    pageInfo: {},
   };
 
   const factory = (props = defaultProps) => {

@@ -8,4 +8,4 @@
       = render 'shared/issuable/search_bar', type: :productivity_analytics
     .dropdown-container
       .js-timeframe-container
-  .js-productivity-analytics-app-container
+  .js-productivity-analytics-app-container{ data: { endpoint: analytics_productivity_analytics_path, empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg') } }
