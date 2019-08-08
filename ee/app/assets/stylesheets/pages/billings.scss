@@ -210,4 +210,12 @@
       }
     }
   }
+
+  .card-header {
+    .controls {
+      > .btn:not(:last-child) {
+        margin: 0 $gl-padding-8 0 0;
+      }
+    }
+  }
 }
