@@ -81,5 +81,23 @@ describe 'Project settings > [EE] repository' do
         expect(mirrored_project).not_to be_mirror
       end
     end
+
+    context 'with a non-mirrored imported project', :js do
+      let(:external_project) do
+        create(:project_empty_repo,
+               import_url: "https://12345@github.com/testngalog2/newrepository.git")
+      end
+
+      before do
+        external_project.add_maintainer(user)
+      end
+
+      it 'does not show a pull mirror' do
+        visit project_settings_repository_path(external_project)
+
+        expect(page).to have_selector('.js-delete-mirror', count: 0)
+        expect(page).to have_select('Mirror direction', options: %w[Pull Push])
+      end
+    end
   end
 end
