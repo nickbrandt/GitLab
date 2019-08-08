@@ -103,6 +103,7 @@ module QA
 
       module Group
         autoload :IssuesAnalytics, 'qa/ee/page/group/issues_analytics'
+        autoload :Roadmap, 'qa/ee/page/group/roadmap'
 
         module Epic
           autoload :Index, 'qa/ee/page/group/epic/index'
