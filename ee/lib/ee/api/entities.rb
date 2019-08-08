@@ -190,18 +190,6 @@ module EE
         end
       end
 
-      module Variable
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :environment_scope, if: ->(variable, options) do
-            if variable.respond_to?(:environment_scope)
-              variable.project.feature_available?(:variable_environment_scope)
-            end
-          end
-        end
-      end
-
       module Todo
         extend ActiveSupport::Concern
 

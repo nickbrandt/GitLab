@@ -66,7 +66,6 @@ class License < ApplicationRecord
     service_desk
     smartcard_auth
     unprotection_restrictions
-    variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
     external_authorization_service_api_management
@@ -143,7 +142,6 @@ class License < ApplicationRecord
     repository_mirrors
     scoped_issue_board
     service_desk
-    variable_environment_scope
   ].freeze
 
   FEATURES_BY_PLAN = {

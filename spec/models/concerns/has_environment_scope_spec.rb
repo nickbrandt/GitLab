@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe HasEnvironmentScope do
@@ -18,27 +20,27 @@ describe HasEnvironmentScope do
     let(:project) { create(:project) }
 
     it 'returns scoped objects' do
-      cluster1 = create(:cluster, projects: [project], environment_scope: '*')
-      cluster2 = create(:cluster, projects: [project], environment_scope: 'product/*')
-      create(:cluster, projects: [project], environment_scope: 'staging/*')
+      variable1 = create(:ci_variable, project: project, environment_scope: '*')
+      variable2 = create(:ci_variable, project: project, environment_scope: 'product/*')
+      create(:ci_variable, project: project, environment_scope: 'staging/*')
 
-      expect(project.clusters.on_environment('product/canary-1')).to eq([cluster1, cluster2])
+      expect(project.variables.on_environment('product/canary-1')).to eq([variable1, variable2])
     end
 
     it 'returns only the most relevant object if relevant_only is true' do
-      create(:cluster, projects: [project], environment_scope: '*')
-      cluster2 = create(:cluster, projects: [project], environment_scope: 'product/*')
-      create(:cluster, projects: [project], environment_scope: 'staging/*')
+      create(:ci_variable, project: project, environment_scope: '*')
+      variable2 = create(:ci_variable, project: project, environment_scope: 'product/*')
+      create(:ci_variable, project: project, environment_scope: 'staging/*')
 
-      expect(project.clusters.on_environment('product/canary-1', relevant_only: true)).to eq([cluster2])
+      expect(project.variables.on_environment('product/canary-1', relevant_only: true)).to eq([variable2])
     end
 
     it 'returns scopes ordered by lowest precedence first' do
-      create(:cluster, projects: [project], environment_scope: '*')
-      create(:cluster, projects: [project], environment_scope: 'production*')
-      create(:cluster, projects: [project], environment_scope: 'production')
+      create(:ci_variable, project: project, environment_scope: '*')
+      create(:ci_variable, project: project, environment_scope: 'production*')
+      create(:ci_variable, project: project, environment_scope: 'production')
 
-      result = project.clusters.on_environment('production').map(&:environment_scope)
+      result = project.variables.on_environment('production').map(&:environment_scope)
 
       expect(result).to eq(['*', 'production*', 'production'])
     end

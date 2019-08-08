@@ -1,7 +1,7 @@
 - form_field = local_assigns.fetch(:form_field, nil)
 - variable = local_assigns.fetch(:variable, nil)
 
-- if @project && @project.feature_available?(:variable_environment_scope)
+- if @project
   - environment_scope = variable&.environment_scope || '*'
   - environment_scope_label = environment_scope == '*' ? s_('CiVariable|All environments') : environment_scope
 

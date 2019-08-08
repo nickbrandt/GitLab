@@ -93,22 +93,6 @@ describe Ci::Build do
         variable.save!
       end
 
-      context 'when variable environment scope is available' do
-        before do
-          stub_licensed_features(variable_environment_scope: true)
-        end
-
-        it { is_expected.to include(environment_variable) }
-      end
-
-      context 'when variable environment scope is not available' do
-        before do
-          stub_licensed_features(variable_environment_scope: false)
-        end
-
-        it { is_expected.not_to include(environment_variable) }
-      end
-
       context 'when there is a plan for the group' do
         it 'GITLAB_FEATURES should include the features for that plan' do
           is_expected.to include({ key: 'GITLAB_FEATURES', value: anything, public: true, masked: false })
