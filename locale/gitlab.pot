@@ -4360,6 +4360,9 @@ msgstr ""
 msgid "Cycle Analytics"
 msgstr ""
 
+msgid "Cycle Analytics can help you determine your team’s velocity"
+msgstr ""
+
 msgid "Cycle Analytics gives an overview of how much time it takes to go from idea to production in your project."
 msgstr ""
 
@@ -11860,6 +11863,9 @@ msgstr ""
 msgid "Recent"
 msgstr ""
 
+msgid "Recent Activity"
+msgstr ""
+
 msgid "Recent Project Activity"
 msgstr ""
 
@@ -13775,6 +13781,9 @@ msgstr ""
 msgid "Start and due date"
 msgstr ""
 
+msgid "Start by choosing a group to see how your team is spending time. You can then drill down to the project level."
+msgstr ""
+
 msgid "Start cleanup"
 msgstr ""
 
@@ -15185,6 +15194,9 @@ msgid "Timeago|just now"
 msgstr ""
 
 msgid "Timeago|right now"
+msgstr ""
+
+msgid "Timeframe"
 msgstr ""
 
 msgid "Timeout"
