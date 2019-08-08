@@ -200,6 +200,8 @@ module EE
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
 
+      rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
+
       rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
 
       rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do

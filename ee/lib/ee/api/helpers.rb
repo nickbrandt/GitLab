@@ -50,6 +50,12 @@ module EE
         not_found! unless user_project.feature_available?(feature)
       end
 
+      def authorize_change_param(subject, *keys)
+        keys.each do |key|
+          authorize!("change_#{key}".to_sym, subject) if params.has_key?(key)
+        end
+      end
+
       def check_sha_param!(params, merge_request)
         if params[:sha] && merge_request.diff_head_sha != params[:sha]
           render_api_error!("SHA does not match HEAD of source branch: #{merge_request.diff_head_sha}", 409)

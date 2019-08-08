@@ -1,0 +1,5 @@
+---
+title: Expose reject_unsigned_commits option via the API
+merge_request: 14165
+author:
+type: added

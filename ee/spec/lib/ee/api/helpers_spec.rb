@@ -90,4 +90,32 @@ describe EE::API::Helpers do
       expect(JSON.parse(last_response.body)).to eq({ 'message' => '401 Unauthorized' })
     end
   end
+
+  describe '#authorize_change_param' do
+    subject { Class.new.include(described_class).new }
+    let(:project) { create(:project) }
+
+    before do
+      allow(subject).to receive(:params).and_return({ change_commit_committer_check: true })
+    end
+
+    it 'does not throw exception if param is authorized' do
+      allow(subject).to receive(:authorize!).and_return(nil)
+
+      expect { subject.authorize_change_param(project, :change_commit_committer_check) }.not_to raise_error
+    end
+
+    context 'unauthorized param' do
+      before do
+        allow(subject).to receive(:authorize!).and_raise(Exception.new("Forbidden"))
+      end
+      it 'throws exception if unauthorized param is present' do
+        expect { subject.authorize_change_param(project, :change_commit_committer_check) }.to raise_error
+      end
+
+      it 'does not throw exception is unauthorized param is not present' do
+        expect { subject.authorize_change_param(project, :reject_unsigned_commit) }.not_to raise_error
+      end
+    end
+  end
 end
