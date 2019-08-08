@@ -8,13 +8,15 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
 
   before do
     stub_licensed_features(push_rules: push_rules_enabled,
-                           commit_committer_check: ccc_enabled)
+                           commit_committer_check: ccc_enabled,
+                           reject_unsigned_commits: ruc_enabled)
     project.add_maintainer(user)
     project.add_developer(user3)
   end
 
   let(:push_rules_enabled) { true }
   let(:ccc_enabled) { true }
+  let(:ruc_enabled) { true }
 
   describe "GET /projects/:id/push_rule" do
     before do
@@ -47,15 +49,26 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
         end
       end
 
-      context 'the commit_committer_check feature is not enabled' do
-        let(:ccc_enabled) { false }
+      context 'the reject_unsigned_commits feature is enabled' do
+        let(:ruc_enabled) { true }
+
+        it 'returns the reject_unsigned_commits information' do
+          subset = attributes
+            .slice(:reject_unsigned_commits)
+            .transform_keys(&:to_s)
+          expect(json_response).to include(subset)
+        end
+      end
+
+      context 'the reject_unsigned_commits feature is not enabled' do
+        let(:ruc_enabled) { false }
 
         it 'succeeds' do
           expect(response).to have_gitlab_http_status(200)
         end
 
-        it 'does not return the commit_committer_check information' do
-          expect(json_response).not_to have_key('commit_committer_check')
+        it 'does not return the reject_unsigned_commits information' do
+          expect(json_response).not_to have_key('reject_unsigned_commits')
         end
       end
 
@@ -87,7 +100,8 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
         author_email_regex: '[a-zA-Z0-9]+@gitlab.com',
         file_name_regex: '[a-zA-Z0-9]+.key',
         max_file_size: 5,
-        commit_committer_check: true }
+        commit_committer_check: true,
+        reject_unsigned_commits: true }
     end
 
     let(:expected_response) do
@@ -101,6 +115,14 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
 
       context 'commit_committer_check not allowed by License' do
         let(:ccc_enabled) { false }
+
+        it "is forbidden to use this service" do
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'reject_unsigned_commits not allowed by License' do
+        let(:ruc_enabled) { false }
 
         it "is forbidden to use this service" do
           expect(response).to have_gitlab_http_status(403)
@@ -127,6 +149,31 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
         end
 
         context "without the :commit_committer_check parameter" do
+          let(:rules_params) do
+            { deny_delete_tag: true,
+              member_check: true,
+              prevent_secrets: true,
+              commit_message_regex: 'JIRA\-\d+',
+              branch_name_regex: '(feature|hotfix)\/*',
+              author_email_regex: '[a-zA-Z0-9]+@gitlab.com',
+              file_name_regex: '[a-zA-Z0-9]+.key',
+              max_file_size: 5 }
+          end
+
+          it "sets all given parameters" do
+            expect(json_response).to include(expected_response)
+          end
+        end
+      end
+
+      context 'reject_unsigned_commits is not enabled' do
+        let(:ruc_enabled) { false }
+
+        it "is forbidden to send the the :reject_unsigned_commits parameter" do
+          expect(response).to have_gitlab_http_status(403)
+        end
+
+        context "without the :reject_unsigned_commits parameter" do
           let(:rules_params) do
             { deny_delete_tag: true,
               member_check: true,
@@ -219,6 +266,26 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true do
 
       context 'the commit_committer_check feature is not enabled' do
         let(:ccc_enabled) { false }
+
+        it "is an error to provide this parameter" do
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+
+    context "setting reject_unsigned_commits" do
+      let(:new_settings) { { reject_unsigned_commits: true } }
+
+      it "is successful" do
+        expect(response).to have_gitlab_http_status(200)
+      end
+
+      it "sets the reject_unsigned_commits" do
+        expect(json_response).to include('reject_unsigned_commits' => true)
+      end
+
+      context 'the reject_unsigned_commits feature is not enabled' do
+        let(:ruc_enabled) { false }
 
         it "is an error to provide the this parameter" do
           expect(response).to have_gitlab_http_status(403)
