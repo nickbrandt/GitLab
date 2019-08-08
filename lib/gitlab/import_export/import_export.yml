@@ -90,6 +90,7 @@ tree:
     - protected_tags:
       - :create_access_levels
     - :project_feature
+    - :project_setting
     - :custom_attributes
     - :prometheus_metrics
     - :project_badges

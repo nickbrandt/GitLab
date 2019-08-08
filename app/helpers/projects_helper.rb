@@ -563,6 +563,7 @@ module ProjectsHelper
       requestAccessEnabled: !!project.request_access_enabled,
       issuesAccessLevel: feature.issues_access_level,
       repositoryAccessLevel: feature.repository_access_level,
+      forkingEnabled: project.forking_enabled,
       mergeRequestsAccessLevel: feature.merge_requests_access_level,
       buildsAccessLevel: feature.builds_access_level,
       wikiAccessLevel: feature.wiki_access_level,

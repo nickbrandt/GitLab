@@ -373,6 +373,7 @@ project:
 - environments_for_dashboard
 - deployments
 - project_feature
+- project_setting
 - auto_devops
 - pages_domains
 - authorized_users

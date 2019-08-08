@@ -12,11 +12,13 @@ export default {
         this.buildsAccessLevel = Math.min(this.buildsAccessLevel, value);
 
         if (value === 0) {
+          this.forkingEnabled = false;
           this.containerRegistryEnabled = false;
           this.lfsEnabled = false;
         }
       } else if (oldValue === 0) {
         this.mergeRequestsAccessLevel = value;
+        this.forkingEnabled = true;
         this.buildsAccessLevel = value;
         this.containerRegistryEnabled = true;
         this.lfsEnabled = true;

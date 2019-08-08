@@ -34,6 +34,26 @@ describe 'Projects settings' do
     expect_toggle_state(:expanded)
   end
 
+  context 'forking enabled', :js do
+    it 'toggles forking enabled / disabled' do
+      visit edit_project_path(project)
+
+      forking_enabled_input = find('input[name="project[project_setting_attributes][forking_enabled]"]', visible: :hidden)
+      forking_enabled_button = find('input[name="project[project_setting_attributes][forking_enabled]"] + button')
+
+      expect(forking_enabled_input.value).to eq('true')
+
+      # disable by clicking toggle
+      forking_enabled_button.click
+      page.within('.sharing-permissions') do
+        find('input[value="Save changes"]').click
+      end
+      wait_for_requests
+
+      expect(forking_enabled_input.value).to eq('false')
+    end
+  end
+
   def expect_toggle_state(state)
     is_collapsed = state == :collapsed
 

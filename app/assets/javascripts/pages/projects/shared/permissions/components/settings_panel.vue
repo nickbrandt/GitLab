@@ -104,6 +104,7 @@ export default {
       visibilityLevel: visibilityOptions.PUBLIC,
       issuesAccessLevel: 20,
       repositoryAccessLevel: 20,
+      forkingEnabled: true,
       mergeRequestsAccessLevel: 20,
       buildsAccessLevel: 20,
       wikiAccessLevel: 20,
@@ -298,6 +299,18 @@ export default {
             :options="repoFeatureAccessLevelOptions"
             :disabled-input="!repositoryEnabled"
             name="project[project_feature_attributes][merge_requests_access_level]"
+          />
+        </project-setting-row>
+        <project-setting-row
+          :label="s__('ProjectSettings|Forks')"
+          :help-text="
+            s__('ProjectSettings|Allow users to make copies of your repository to a new project')
+          "
+        >
+          <project-feature-toggle
+            v-model="forkingEnabled"
+            :disabled-input="!repositoryEnabled"
+            name="project[project_setting_attributes][forking_enabled]"
           />
         </project-setting-row>
         <project-setting-row
