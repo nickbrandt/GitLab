@@ -586,7 +586,7 @@ module EE
       # on prem installs yet.
       lfs_enabled? &&
         feature_available?(:design_management) &&
-        ::Feature.enabled?(:design_management_flag, self) # Named to avoid the bug: https://gitlab.com/gitlab-org/gitlab-ce/issues/64468
+        ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
     end
 
     def design_repository
