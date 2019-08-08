@@ -83,6 +83,10 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       scope module: :epics do
         resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
       end
+
+      collection do
+        post :bulk_update
+      end
     end
 
     resources :issues, only: [] do

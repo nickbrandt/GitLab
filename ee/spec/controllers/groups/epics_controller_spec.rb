@@ -472,5 +472,67 @@ describe Groups::EpicsController do
         expect(controller).to set_flash[:notice].to(/The epic was successfully deleted\./)
       end
     end
+
+    describe 'POST #bulk_update' do
+      context 'with correct params' do
+        subject { post :bulk_update, params: params, format: :json }
+
+        let(:label1) { create(:group_label, group: group)}
+        let(:label2) { create(:group_label, group: group)}
+        let(:epics)  { create_list(:epic, 2, group: group, labels: [label1]) }
+        let(:params) do
+          {
+            update: {
+              add_label_ids: [label2],
+              issuable_ids: "#{epics[0].id}, #{epics[1].id}",
+              remove_label_ids: [label1]
+            },
+            group_id: group
+          }
+        end
+
+        before do
+          sign_in(user)
+          group.add_reporter(user)
+        end
+
+        context 'when group bulk edit feature is disabled' do
+          before do
+            stub_licensed_features(group_bulk_edit: false, epics: true)
+            group.add_reporter(user)
+          end
+
+          it 'returns status 404' do
+            subject
+
+            expect(response.status).to eq(404)
+          end
+
+          it 'does not update merge requests milestone' do
+            subject
+
+            epics.each { |epic| expect(epic.reload.labels).to eq([label1])}
+          end
+        end
+
+        context 'when group bulk edit feature is enabled' do
+          before do
+            stub_licensed_features(group_bulk_edit: true, epics: true)
+          end
+
+          it 'returns status 200' do
+            subject
+
+            expect(response.status).to eq(200)
+          end
+
+          it 'updates epics labels' do
+            subject
+
+            epics.each {|epic| expect(epic.reload.labels).to eq([label2]) }
+          end
+        end
+      end
+    end
   end
 end

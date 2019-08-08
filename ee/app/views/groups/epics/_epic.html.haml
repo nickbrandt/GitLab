@@ -1,5 +1,8 @@
-%li
+%li{ id: dom_id(epic), data: { labels: epic.label_ids, id: epic.id } }
   .issue-box
+    - if @can_bulk_update
+      .issue-check.hidden
+        = check_box_tag dom_id(epic, "selected"), nil, false, 'data-id' => epic.id, class: "selected-issuable"
     .issuable-info-container
       .issuable-main-info
         .issue-title.title

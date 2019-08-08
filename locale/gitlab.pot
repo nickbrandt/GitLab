@@ -1579,6 +1579,9 @@ msgstr ""
 msgid "Applied"
 msgstr ""
 
+msgid "Apply a label"
+msgstr ""
+
 msgid "Apply suggestion"
 msgstr ""
 
@@ -12868,6 +12871,9 @@ msgid "Select branch/tag"
 msgstr ""
 
 msgid "Select group or project"
+msgstr ""
+
+msgid "Select labels"
 msgstr ""
 
 msgid "Select members to invite"
