@@ -59,6 +59,14 @@ describe MergeRequestBlock do
 
       expect(new_block).not_to be_valid
     end
+
+    it 'forbids blocks from being intra-project' do
+      project = blocking_mr.target_project
+      intra_project_mr = create(:merge_request, :rebased, source_project: project, target_project: project)
+      block.blocked_merge_request = intra_project_mr
+
+      is_expected.not_to be_valid
+    end
   end
 
   describe '.bulk_insert' do
