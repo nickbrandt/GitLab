@@ -3,9 +3,6 @@
 class UserAnalyticsEntity < Grape::Entity
   include RequestAwareEntity
 
-  EVENT_TYPES = [:push, :issues_created, :issues_closed, :merge_requests_created,
-                 :merge_requests_merged, :total_events].freeze
-
   expose :username
 
   expose :name, as: :fullname
@@ -14,9 +11,9 @@ class UserAnalyticsEntity < Grape::Entity
     user_path(user)
   end
 
-  EVENT_TYPES.each do |event_type|
+  Gitlab::ContributionAnalytics::DataCollector::EVENT_TYPES.each do |event_type|
     expose event_type do |user|
-      request.events[event_type].fetch(user.id, 0)
+      request.data_collector.totals[event_type].fetch(user.id, 0)
     end
   end
 end
