@@ -119,6 +119,11 @@ export default class GeoNodesStore {
         successCount: rawNodeDetails.job_artifacts_synced_count || 0,
         failureCount: rawNodeDetails.job_artifacts_failed_count || 0,
       },
+      containerRepositories: {
+        totalCount: rawNodeDetails.container_repositories_count || 0,
+        successCount: rawNodeDetails.container_repositories_synced_count || 0,
+        failureCount: rawNodeDetails.container_repositories_failed_count || 0,
+      },
       attachments: {
         totalCount: rawNodeDetails.attachments_count || 0,
         successCount: rawNodeDetails.attachments_synced_count || 0,

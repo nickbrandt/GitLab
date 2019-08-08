@@ -292,6 +292,13 @@ namespace :geo do
     print "#{current_node_status.job_artifacts_synced_count}/#{current_node_status.job_artifacts_count} "
     puts using_percentage(current_node_status.job_artifacts_synced_in_percentage)
 
+    if Gitlab.config.geo.registry_replication.enabled
+      print 'Container repositories: '.rjust(GEO_STATUS_COLUMN_WIDTH)
+      show_failed_value(current_node_status.container_repositories_failed_count)
+      print "#{current_node_status.container_repositories_synced_count || 0}/#{current_node_status.container_repositories_count || 0} "
+      puts using_percentage(current_node_status.container_repositories_synced_in_percentage)
+    end
+
     if Gitlab::CurrentSettings.repository_checks_enabled
       print 'Repositories Checked: '.rjust(GEO_STATUS_COLUMN_WIDTH)
       show_failed_value(current_node_status.repositories_checked_failed_count)

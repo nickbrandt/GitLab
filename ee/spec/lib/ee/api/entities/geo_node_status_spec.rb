@@ -83,6 +83,18 @@ describe EE::API::Entities::GeoNodeStatus do
     end
   end
 
+  describe '#container_repositories_synced_in_percentage' do
+    it 'formats as percentage' do
+      geo_node_status.assign_attributes(
+        container_repositories_count: 256,
+        container_repositories_failed_count: 12,
+        container_repositories_synced_count: 123
+      )
+
+      expect(subject[:container_repositories_synced_in_percentage]).to eq '48.05%'
+    end
+  end
+
   describe '#repositories_synced_in_percentage' do
     it 'formats as percentage' do
       geo_node_status.assign_attributes(projects_count: 10,
