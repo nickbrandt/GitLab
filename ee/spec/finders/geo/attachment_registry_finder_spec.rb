@@ -52,6 +52,16 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         expect(attachments).to match_ids(upload_4, upload_5, upload_remote_2, upload_remote_3)
       end
 
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'returns local attachments only' do
+          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_5.id])
+
+          expect(attachments).to match_ids(upload_3, upload_4)
+        end
+      end
+
       context 'with selective sync by namespace' do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
@@ -138,6 +148,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         expect(subject.count_synced).to eq 6
       end
 
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'counts only local attachments that have been synced' do
+          expect(subject.count_synced).to eq 4
+        end
+      end
+
       context 'with selective sync by namespace' do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
@@ -168,6 +186,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
       it 'counts attachments that sync has failed' do
         expect(subject.count_failed).to eq 6
+      end
+
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'counts only local attachments that have failed' do
+          expect(subject.count_failed).to eq 4
+        end
       end
 
       context 'with selective sync by namespace' do
@@ -202,6 +228,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         expect(subject.count_synced_missing_on_primary).to eq 5
       end
 
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'counts only local attachments that have been synced and are missing on the primary' do
+          expect(subject.count_synced_missing_on_primary).to eq 3
+        end
+      end
+
       context 'with selective sync by namespace' do
         let(:secondary) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
@@ -222,6 +256,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
     describe '#count_syncable' do
       it 'counts attachments' do
         expect(subject.count_syncable).to eq 8
+      end
+
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'counts only local attachments' do
+          expect(subject.count_syncable).to eq 5
+        end
       end
 
       context 'with selective sync by namespace' do
@@ -255,6 +297,14 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
 
       it 'counts file registries for attachments' do
         expect(subject.count_registry).to eq 8
+      end
+
+      context 'with object storage sync disabled' do
+        let(:secondary) { create(:geo_node, :local_storage) }
+
+        it 'does not apply local attachments only restriction' do
+          expect(subject.count_registry).to eq 8
+        end
       end
 
       context 'with selective sync by namespace' do
