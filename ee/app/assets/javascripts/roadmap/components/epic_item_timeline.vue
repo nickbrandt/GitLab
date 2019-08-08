@@ -116,7 +116,7 @@ export default {
 </script>
 
 <template>
-  <span :style="itemStyles" class="epic-timeline-cell">
+  <span :style="itemStyles" class="epic-timeline-cell" data-qa-selector="epic_timeline_cell">
     <div class="timeline-bar-wrapper">
       <a
         v-if="showTimelineBar"
