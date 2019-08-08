@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';

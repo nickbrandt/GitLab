@@ -98,10 +98,14 @@ export default {
     renderTimelineBar() {
       if (this.hasStartDate()) {
         if (this.presetType === PRESET_TYPES.QUARTERS) {
+          // CSS properties are a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/24
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           this.timelineBarStyles = `width: ${this.getTimelineBarWidthForQuarters()}px; ${this.getTimelineBarStartOffsetForQuarters()}`;
         } else if (this.presetType === PRESET_TYPES.MONTHS) {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           this.timelineBarStyles = `width: ${this.getTimelineBarWidthForMonths()}px; ${this.getTimelineBarStartOffsetForMonths()}`;
         } else if (this.presetType === PRESET_TYPES.WEEKS) {
+          // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
           this.timelineBarStyles = `width: ${this.getTimelineBarWidthForWeeks()}px; ${this.getTimelineBarStartOffsetForWeeks()}`;
         }
         this.timelineBarReady = true;

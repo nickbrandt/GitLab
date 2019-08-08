@@ -89,6 +89,8 @@ export default {
       }
 
       const optimisticResponse = Array.from(files).map(file => ({
+        // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
         id: -_.uniqueId(),
         image: '',
@@ -158,9 +160,13 @@ export default {
 
             const newQueryData = {
               project: {
+                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
                 __typename: 'Project',
                 id: '',
                 issue: {
+                  // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+                  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
                   __typename: 'Issue',
                   designs: {
                     __typename: 'DesignCollection',
@@ -187,6 +193,8 @@ export default {
             });
           },
           optimisticResponse: {
+            // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+            // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
             __typename: 'Mutation',
             designManagementUpload: {
               __typename: 'DesignManagementUploadPayload',

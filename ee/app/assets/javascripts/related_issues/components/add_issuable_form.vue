@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlLoadingIcon } from '@gitlab/ui';
 import RelatedIssuableInput from './related_issuable_input.vue';
 import { issuableTypesMap } from '../constants';

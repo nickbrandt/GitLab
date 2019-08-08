@@ -118,6 +118,8 @@ export default {
             const newDiscussion = {
               __typename: 'DiscussionEdge',
               node: {
+                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
                 __typename: 'Discussion',
                 id: createImageDiffNote.note.discussion.id,
                 replyId: createImageDiffNote.note.discussion.replyId,
