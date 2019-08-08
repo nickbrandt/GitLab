@@ -38,7 +38,7 @@ describe 'Merge Request > User views blocked MR', :js do
       it 'is not mergeable' do
         visit project_merge_request_path(project, blocked_mr)
 
-        expect(page).to have_content('Blocked by 1 merge request')
+        expect(page).to have_content('Depends on 1 merge request')
         expect(page).to have_button('Merge', disabled: true)
 
         click_button 'Expand'
@@ -56,7 +56,7 @@ describe 'Merge Request > User views blocked MR', :js do
       it 'is not mergeable' do
         visit project_merge_request_path(project, blocked_mr)
 
-        expect(page).to have_content('Blocked by 1 merge request')
+        expect(page).to have_content('Depends on 1 merge request')
         expect(page).to have_button('Merge', disabled: true)
 
         click_button 'Expand'

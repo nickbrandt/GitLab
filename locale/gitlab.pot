@@ -50,13 +50,16 @@ msgstr[1] ""
 msgid " or "
 msgstr ""
 
+msgid " or <!merge request id>"
+msgstr ""
+
 msgid " or <#epic id>"
 msgstr ""
 
 msgid " or <#issue id>"
 msgstr ""
 
-msgid " or <#merge request id>"
+msgid " or references (e.g. path/to/project!merge_request_id)"
 msgstr ""
 
 msgid "%d comment"
@@ -1162,6 +1165,9 @@ msgstr ""
 msgid "All changes are committed"
 msgstr ""
 
+msgid "All cross-project dependencies have merged"
+msgstr ""
+
 msgid "All email addresses will be used to identify your commits."
 msgstr ""
 
@@ -2216,19 +2222,6 @@ msgid "Block"
 msgstr ""
 
 msgid "Blocked"
-msgstr ""
-
-msgid "Blocked by %d merge request"
-msgid_plural "Blocked by %d merge requests"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "Blocked by <strong>%d closed</strong> merge request."
-msgid_plural "Blocked by <strong>%d closed</strong> merge requests."
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "Blocking merge requests"
 msgstr ""
 
 msgid "Blog"
@@ -4306,6 +4299,9 @@ msgstr ""
 msgid "Cron syntax"
 msgstr ""
 
+msgid "Cross-project dependencies"
+msgstr ""
+
 msgid "Current Branch"
 msgstr ""
 
@@ -4664,6 +4660,16 @@ msgstr ""
 
 msgid "DependencyProxy|Toggle Dependency Proxy"
 msgstr ""
+
+msgid "Depends on %d merge request being merged"
+msgid_plural "Depends on %d merge requests being merged"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Depends on <strong>%d closed</strong> merge request."
+msgid_plural "Depends on <strong>%d closed</strong> merge requests."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Deploy"
 msgid_plural "Deploys"
@@ -5358,6 +5364,9 @@ msgid "Enter in your Bitbucket Server URL and personal access token below"
 msgstr ""
 
 msgid "Enter in your Phabricator Server URL and personal access token below"
+msgstr ""
+
+msgid "Enter merge request URLs"
 msgstr ""
 
 msgid "Enter the issue description"
@@ -8610,6 +8619,9 @@ msgstr ""
 msgid "List of IPs and CIDRs of allowed secondary nodes. Comma-separated, e.g. \"1.1.1.1, 2.2.2.0/24\""
 msgstr ""
 
+msgid "List the merge requests that must be merged before this one."
+msgstr ""
+
 msgid "List view"
 msgstr ""
 
@@ -9599,9 +9611,6 @@ msgstr ""
 msgid "No available namespaces to fork the project."
 msgstr ""
 
-msgid "No blocking merge requests "
-msgstr ""
-
 msgid "No branches found"
 msgstr ""
 
@@ -10202,9 +10211,6 @@ msgid "Past due"
 msgstr ""
 
 msgid "Paste a machine public key here. Read more about how to generate it %{link_start}here%{link_end}"
-msgstr ""
-
-msgid "Paste a merge request link"
 msgstr ""
 
 msgid "Paste epic link"
@@ -17297,6 +17303,9 @@ msgid "cannot be changed if a personal project has container registry tags."
 msgstr ""
 
 msgid "cannot be enabled unless all domains have TLS certificates"
+msgstr ""
+
+msgid "cannot be in the same project"
 msgstr ""
 
 msgid "cannot block others"

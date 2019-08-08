@@ -90,7 +90,7 @@ describe('BlockingMergeRequestsReport', () => {
       createComponent();
 
       expect(wrapper.vm.blockedByText).toBe(
-        'Blocked by 2 merge requests <strong>(1 closed)</strong>',
+        'Depends on 2 merge requests being merged <strong>(1 closed)</strong>',
       );
     });
 
@@ -106,7 +106,7 @@ describe('BlockingMergeRequestsReport', () => {
       createComponent();
 
       expect(wrapper.vm.blockedByText).toEqual(
-        'Blocked by <strong>1 closed</strong> merge request.',
+        'Depends on <strong>1 closed</strong> merge request.',
       );
     });
   });

@@ -26,11 +26,6 @@ export default {
       hasFieldBeenTouched: false,
     };
   },
-  computed: {
-    autoCompleteSources() {
-      return gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources;
-    },
-  },
   methods: {
     onAddIssuable({ untouchedRawReferences, touchedReference }) {
       this.hasFieldBeenTouched = true;
@@ -77,8 +72,6 @@ export default {
       :references="references"
       :input-value="inputValue"
       :issuable-type="$options.issuableTypesMap.MERGE_REQUEST"
-      :auto-complete-options="{ mergeRequests: true }"
-      :auto-complete-sources="autoCompleteSources"
       @addIssuableFormInput="onAddIssuable"
       @pendingIssuableRemoveRequest="removeReference"
       @addIssuableFormBlur="onBlur"

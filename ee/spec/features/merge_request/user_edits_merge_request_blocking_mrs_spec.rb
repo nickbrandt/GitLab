@@ -19,6 +19,8 @@ describe "User edits merge request with blocking MRs", :js do
     end
 
     context 'user can see the other MR' do
+      let(:blocked_text) { 'Depends on 1 merge request' }
+
       before do
         other_mr.target_project.team.add_developer(user)
       end
@@ -26,11 +28,11 @@ describe "User edits merge request with blocking MRs", :js do
       it 'can add the other MR' do
         visit edit_project_merge_request_path(project, merge_request)
 
-        fill_in 'Blocking merge requests', with: other_mr.to_reference(full: true)
+        fill_in 'Cross-project dependencies', with: other_mr.to_reference(full: true)
 
         click_button 'Save changes'
 
-        expect(page).to have_content('Blocked by 1 merge request')
+        expect(page).to have_content(blocked_text)
       end
 
       it 'can see and remove an existing blocking MR' do
@@ -43,7 +45,7 @@ describe "User edits merge request with blocking MRs", :js do
         click_button "Remove #{other_mr.to_reference(full: true)}"
         click_button 'Save changes'
 
-        expect(page).not_to have_content('Blocked by 1 merge request')
+        expect(page).not_to have_content(blocked_text)
         expect(page).not_to have_content(other_mr.to_reference(full: true))
       end
     end
@@ -52,11 +54,11 @@ describe "User edits merge request with blocking MRs", :js do
       it 'cannot add the other MR' do
         visit edit_project_merge_request_path(project, merge_request)
 
-        fill_in 'Blocking merge requests', with: other_mr.to_reference(full: true)
+        fill_in 'Cross-project dependencies', with: other_mr.to_reference(full: true)
 
         click_button 'Save changes'
 
-        expect(page).not_to have_content('Blocked by 1 merge request')
+        expect(page).not_to have_content('Depends on 1 merge request')
       end
 
       it 'sees the existing MR as hidden and can remove it' do
@@ -69,7 +71,7 @@ describe "User edits merge request with blocking MRs", :js do
         click_button 'Remove 1 inaccessible merge request'
         click_button 'Save changes'
 
-        expect(page).not_to have_content('Blocked by 1 merge request')
+        expect(page).not_to have_content('Depends on 1 merge request')
         expect(page).not_to have_content(other_mr.to_reference(full: true))
       end
     end
