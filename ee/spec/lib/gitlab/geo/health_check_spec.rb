@@ -46,6 +46,14 @@ describe Gitlab::Geo::HealthCheck, :geo do
           end
         end
 
+        context 'when reusing an existing tracking database' do
+          it 'returns an error when event_log_state is older than current node created_at' do
+            create(:geo_event_log_state, created_at: 3.months.ago)
+
+            expect(subject.perform_checks).to include('An existing tracking database cannot be reused.')
+          end
+        end
+
         context 'when the database is writable' do
           let(:db_read_only) { false }
 
