@@ -28,6 +28,19 @@ describe "Admin uploads license" do
     end
   end
 
+  context "when license key is not provided in the query string, as it is a repeat trial" do
+    before do
+      License.destroy_all # rubocop: disable DestroyAll
+
+      visit(admin_license_path(trial_key: ""))
+    end
+
+    it "shows an info banner for repeat trial" do
+      expect(page).to have_selector('div#repeat-trial-info')
+      expect(page).to have_selector('div.bs-callout-info')
+    end
+  end
+
   context "uploading license" do
     before do
       visit(new_admin_license_path)
