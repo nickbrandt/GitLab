@@ -279,13 +279,6 @@ module EE
       end
     end
 
-    def ci_variables_for(ref:, environment: nil)
-      return super.where(environment_scope: '*') unless
-        environment && feature_available?(:variable_environment_scope)
-
-      super.on_environment(environment)
-    end
-
     def execute_hooks(data, hooks_scope = :push_hooks)
       super
 

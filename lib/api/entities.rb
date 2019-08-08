@@ -1346,6 +1346,7 @@ module API
       expose :variable_type, :key, :value
       expose :protected?, as: :protected, if: -> (entity, _) { entity.respond_to?(:protected?) }
       expose :masked?, as: :masked, if: -> (entity, _) { entity.respond_to?(:masked?) }
+      expose :environment_scope, if: -> (entity, _) { entity.respond_to?(:environment_scope) }
     end
 
     class Pipeline < PipelineBasic
@@ -1714,7 +1715,6 @@ API::Entities.prepend_entity(::API::Entities::Namespace, with: EE::API::Entities
 API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::Project)
 API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API::Entities::ProtectedRefAccess)
 API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
-API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
 API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)
 API::Entities.prepend_entity(::API::Entities::Identity, with: EE::API::Entities::Identity)
