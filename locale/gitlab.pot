@@ -4460,6 +4460,9 @@ msgstr ""
 msgid "DayTitle|W"
 msgstr ""
 
+msgid "Days to merge"
+msgstr ""
+
 msgid "Debug"
 msgstr ""
 
@@ -9905,6 +9908,15 @@ msgstr ""
 msgid "Number of Elasticsearch shards"
 msgstr ""
 
+msgid "Number of LOCs per commit"
+msgstr ""
+
+msgid "Number of commits per MR"
+msgstr ""
+
+msgid "Number of files touched"
+msgstr ""
+
 msgid "OK"
 msgstr ""
 
@@ -10780,7 +10792,13 @@ msgstr ""
 msgid "Productivity Analytics"
 msgstr ""
 
-msgid "Productivity Analytics app goes here"
+msgid "Productivity analytics can help identify the problems that are delaying your team"
+msgstr ""
+
+msgid "ProductivityAnalytics|Ascending"
+msgstr ""
+
+msgid "ProductivityAnalytics|Descending"
 msgstr ""
 
 msgid "Profile"
@@ -13784,6 +13802,9 @@ msgstr ""
 msgid "Start by choosing a group to see how your team is spending time. You can then drill down to the project level."
 msgstr ""
 
+msgid "Start by choosing a group to start exploring the merge requests in that group. You can then proceed to filter by projects, labels, milestones, authors and assignees."
+msgstr ""
+
 msgid "Start cleanup"
 msgstr ""
 
@@ -15035,6 +15056,15 @@ msgid "Time between merge request creation and merge/close"
 msgstr ""
 
 msgid "Time estimate"
+msgstr ""
+
+msgid "Time from first comment to last commit"
+msgstr ""
+
+msgid "Time from first commit until first comment"
+msgstr ""
+
+msgid "Time from last commit to merge"
 msgstr ""
 
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."

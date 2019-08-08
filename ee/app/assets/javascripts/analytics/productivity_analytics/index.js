@@ -16,6 +16,8 @@ export default () => {
   const timeframeContainer = container.querySelector('.js-timeframe-container');
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
+  const { endpoint, emptyStateSvgPath } = appContainer.dataset;
+
   let filterManager;
 
   // eslint-disable-next-line no-new
@@ -94,7 +96,12 @@ export default () => {
     el: appContainer,
     store,
     render(h) {
-      return h(ProductivityAnalyticsApp, {});
+      return h(ProductivityAnalyticsApp, {
+        props: {
+          endpoint,
+          emptyStateSvgPath,
+        },
+      });
     },
   });
 };

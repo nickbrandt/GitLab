@@ -1,0 +1,66 @@
+import axios from '~/lib/utils/axios_utils';
+import * as types from './mutation_types';
+import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import { timeToMergeMetric } from '../../../constants';
+
+export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) => {
+  dispatch('requestMergeRequests');
+
+  const { sortField, sortOrder, pageInfo } = state;
+
+  const params = {
+    ...rootGetters['filters/getCommonFilterParams'],
+    // days_to_merge: rootState.charts.charts.main.selected,
+    sort: `${sortField}_${sortOrder}`,
+    page: pageInfo ? pageInfo.page : null,
+  };
+
+  return axios
+    .get(rootState.endpoint, { params })
+    .then(response => {
+      const { headers, data } = response;
+      dispatch('receiveMergeRequestsSuccess', { headers, data });
+    })
+    .catch(() => {
+      dispatch('receiveMergeRequestsError');
+    });
+};
+
+export const requestMergeRequests = ({ commit }) => commit(types.REQUEST_MERGE_REQUESTS);
+
+export const receiveMergeRequestsSuccess = ({ commit }, { headers, data: mergeRequests }) => {
+  const normalizedHeaders = normalizeHeaders(headers);
+  const pageInfo = parseIntPagination(normalizedHeaders);
+
+  commit(types.RECEIVE_MERGE_REQUESTS_SUCCESS, { pageInfo, mergeRequests });
+};
+
+export const receiveMergeRequestsError = ({ commit }) => commit(types.RECEIVE_MERGE_REQUESTS_ERROR);
+
+export const setSortField = ({ commit, dispatch }, data) => {
+  commit(types.SET_SORT_FIELD, data);
+
+  // let's make sure we update the column that we sort on (except for 'time_to_merge')
+  if (data !== timeToMergeMetric) {
+    dispatch('setColumnMetric', data);
+  }
+
+  dispatch('fetchMergeRequests');
+};
+
+export const toggleSortOrder = ({ commit, dispatch }) => {
+  commit(types.TOGGLE_SORT_ORDER);
+
+  dispatch('fetchMergeRequests');
+};
+
+export const setColumnMetric = ({ commit }, data) => commit(types.SET_COLUMN_METRIC, data);
+
+export const setMergeRequestsPage = ({ commit, dispatch }, data) => {
+  commit(types.SET_MERGE_REQUESTS_PAGE, data);
+
+  dispatch('fetchMergeRequests');
+};
+
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
+export default () => {};

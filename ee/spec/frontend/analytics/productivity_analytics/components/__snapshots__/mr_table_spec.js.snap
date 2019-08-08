@@ -87,5 +87,7 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
       />
     </div>
   </div>
+   
+  <!---->
 </div>
 `;

@@ -1,16 +1,22 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import MergeRequestTableRow from './mr_table_row.vue';
+import Pagination from '~/vue_shared/components/pagination_links.vue';
 
 export default {
   components: {
     GlDropdown,
     GlDropdownItem,
     MergeRequestTableRow,
+    Pagination,
   },
   props: {
     mergeRequests: {
       type: Array,
+      required: true,
+    },
+    pageInfo: {
+      type: Object,
       required: true,
     },
     columnOptions: {
@@ -29,6 +35,14 @@ export default {
   computed: {
     metricDropdownLabel() {
       return this.columnOptions[this.metricType];
+    },
+    showPagination() {
+      return this.pageInfo && this.pageInfo.total;
+    },
+  },
+  methods: {
+    onPageChange(page) {
+      this.$emit('pageChange', page);
     },
   },
 };
@@ -76,5 +90,12 @@ export default {
         />
       </div>
     </div>
+
+    <pagination
+      v-if="showPagination"
+      :change="onPageChange"
+      :page-info="pageInfo"
+      class="justify-content-center prepend-top-default"
+    />
   </div>
 </template>
