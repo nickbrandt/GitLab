@@ -40,6 +40,10 @@ module EE
         nav_tabs << :security
       end
 
+      if can?(current_user, :read_dependencies, @project)
+        nav_tabs << :dependencies
+      end
+
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
           can?(current_user, :read_package, project)
