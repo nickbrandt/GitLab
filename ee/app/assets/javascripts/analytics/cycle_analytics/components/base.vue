@@ -1,9 +1,11 @@
 <script>
+import { __ } from '~/locale';
+
 export default {
   name: 'CycleAnalytics',
 };
 </script>
 
 <template>
-  <div>Hello World!</div>
+  <div>{{ __("Hello World!") }}</div>
 </template>
