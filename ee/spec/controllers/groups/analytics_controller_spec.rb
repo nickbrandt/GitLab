@@ -67,14 +67,14 @@ describe Groups::AnalyticsController do
 
     expect(response).to have_gitlab_http_status(200)
 
-    expect(assigns[:users]).to match_array([user, user2, user3])
-    expect(assigns[:events].length).to eq(6)
-    stats = assigns[:stats]
+    expect(assigns[:data_collector].users).to match_array([user, user2, user3])
+    expect(assigns[:data_collector].total_events_by_author_count.values.sum).to eq(6)
+    stats = assigns[:data_collector].group_member_contributions_table_data
 
     # NOTE: The array ordering matters! The view references them all by index
-    expect(stats[:merge_requests_created]).to eq([0, 1, 1])
-    expect(stats[:issues_closed]).to eq([1, 1, 0])
-    expect(stats[:push]).to eq([1, 0, 1])
+    expect(stats[:merge_requests_created][:data]).to eq([0, 1, 1])
+    expect(stats[:issues_closed][:data]).to eq([1, 1, 0])
+    expect(stats[:push][:data]).to eq([1, 0, 1])
   end
 
   it "returns member contributions JSON when format is JSON" do
@@ -92,6 +92,32 @@ describe Groups::AnalyticsController do
     expect(first_user["merge_requests_created"]).to eq(0)
     expect(first_user["merge_requests_merged"]).to eq(0)
     expect(first_user["total_events"]).to eq(2)
+  end
+
+  it "includes projects in subgroups" do
+    subgroup = create(:group, parent: group)
+    subproject = create(:project, :repository, group: subgroup)
+
+    create_event(user, subproject, issue, Event::CLOSED)
+    create_push_event(user, subproject)
+
+    get :show, params: { group_id: group.path }, format: :json
+
+    first_user = json_response.first
+    expect(first_user["issues_closed"]).to eq(2)
+    expect(first_user["push"]).to eq(2)
+  end
+
+  it "excludes projects outside of the group" do
+    empty_group = create(:group)
+    other_project = create(:project, :repository)
+
+    create_event(user, other_project, issue, Event::CLOSED)
+    create_push_event(user, other_project)
+
+    get :show, params: { group_id: empty_group.path }, format: :json
+
+    expect(json_response).to be_empty
   end
 
   it 'does not cause N+1 queries when the format is JSON' do
