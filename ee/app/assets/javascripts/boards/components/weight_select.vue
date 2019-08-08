@@ -1,5 +1,6 @@
 <script>
 /* eslint-disable vue/require-default-prop */
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 
 import WeightSelect from 'ee/weight_select';
 import { GlLoadingIcon } from '@gitlab/ui';

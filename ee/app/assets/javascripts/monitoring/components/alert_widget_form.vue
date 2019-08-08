@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { __, s__ } from '~/locale';
 import _ from 'underscore';
 import Vue from 'vue';

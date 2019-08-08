@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import MilestoneSelect from '~/milestone_select';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
@@ -6,12 +7,14 @@ import { __ } from '~/locale';
 const ANY_MILESTONE = {
   title: __('Any Milestone'),
   titleClass: 'text-secondary',
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   name: 'Any',
   id: null,
 };
 
 const NO_MILESTONE = {
   title: __('No Milestone'),
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   name: 'None',
   id: -1,
 };
