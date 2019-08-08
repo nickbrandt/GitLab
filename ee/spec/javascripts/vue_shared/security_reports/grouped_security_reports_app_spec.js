@@ -195,10 +195,7 @@ describe('Grouped security reports app', () => {
         waitForMutation(vm.$store, `sast/${sastTypes.RECEIVE_REPORTS}`),
         waitForMutation(vm.$store, types.RECEIVE_DAST_REPORTS),
         waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_REPORTS),
-        waitForMutation(
-          vm.$store,
-          `dependencyScanning/${dependencyScanningTypes.RECEIVE_REPORTS_SUCCESS}`,
-        ),
+        waitForMutation(vm.$store, `dependencyScanning/${dependencyScanningTypes.RECEIVE_REPORTS}`),
       ])
         .then(done)
         .catch();
