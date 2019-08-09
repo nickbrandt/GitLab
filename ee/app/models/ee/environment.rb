@@ -10,6 +10,21 @@ module EE
       has_many :prometheus_alerts, inverse_of: :environment
       has_one :last_deployable, through: :last_deployment, source: 'deployable', source_type: 'CommitStatus'
       has_one :last_pipeline, through: :last_deployable, source: 'pipeline'
+
+      # Returns environments where its latest deployment is to a cluster
+      scope :deployed_to_cluster, -> (cluster) do
+        joins(:deployments)
+          .joins("LEFT OUTER JOIN deployments AS later_deployments ON later_deployments.environment_id = deployments.environment_id AND deployments.id < later_deployments.id")
+          .where("later_deployments.id IS NULL")
+          .where(deployments: { cluster_id: cluster.id })
+      end
+
+      scope :preload_for_cluster_environment_entity, -> do
+        preload(
+          last_deployment: [:deployable],
+          project: [:route, { namespace: :route }]
+        )
+      end
     end
 
     def reactive_cache_updated

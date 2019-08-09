@@ -8,6 +8,55 @@ describe Environment, :use_clean_rails_memory_store_caching do
   let(:project) { create(:project, :stubbed_repository) }
   let(:environment) { create(:environment, project: project) }
 
+  describe '.deployed_to_cluster' do
+    let!(:environment) { create(:environment) }
+
+    context 'when there is no deployment' do
+      let(:cluster) { create(:cluster) }
+
+      it 'returns nothing' do
+        expect(described_class.deployed_to_cluster(cluster)).to be_empty
+      end
+    end
+
+    context 'when there is a deployment for the cluster' do
+      let(:cluster) { last_deployment.cluster }
+
+      let(:last_deployment) do
+        create(:deployment, :success, :on_cluster, environment: environment)
+      end
+
+      it 'returns the environment for the last deployment' do
+        expect(described_class.deployed_to_cluster(cluster)).to eq([environment])
+      end
+    end
+
+    context 'when there is a non-cluster deployment' do
+      let(:cluster) { create(:cluster) }
+
+      before do
+        create(:deployment, :success, environment: environment)
+      end
+
+      it 'returns nothing' do
+        expect(described_class.deployed_to_cluster(cluster)).to be_empty
+      end
+    end
+
+    context 'when the non-cluster deployment is latest' do
+      let(:cluster) { create(:cluster) }
+
+      before do
+        create(:deployment, :success, cluster: cluster, environment: environment)
+        create(:deployment, :success, environment: environment)
+      end
+
+      it 'returns nothing' do
+        expect(described_class.deployed_to_cluster(cluster)).to be_empty
+      end
+    end
+  end
+
   describe '#pod_names' do
     context 'when environment does not have a rollout status' do
       it 'returns an empty array' do

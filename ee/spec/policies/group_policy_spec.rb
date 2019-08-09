@@ -19,6 +19,26 @@ describe GroupPolicy do
     it { is_expected.to be_allowed(:read_epic, :create_epic, :admin_epic, :destroy_epic) }
   end
 
+  context 'when cluster deployments is available' do
+    let(:current_user) { maintainer }
+
+    before do
+      stub_licensed_features(cluster_deployments: true)
+    end
+
+    it { is_expected.to be_allowed(:read_cluster_environments) }
+  end
+
+  context 'when cluster deployments is not available' do
+    let(:current_user) { maintainer }
+
+    before do
+      stub_licensed_features(cluster_deployments: false)
+    end
+
+    it { is_expected.not_to be_allowed(:read_cluster_environments) }
+  end
+
   context 'when contribution analytics is available' do
     let(:current_user) { developer }
 

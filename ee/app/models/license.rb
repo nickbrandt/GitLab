@@ -50,6 +50,7 @@ class License < ApplicationRecord
     email_additional_text
     db_load_balancing
     deploy_board
+    cluster_deployments
     extended_audit_events
     file_locks
     geo
