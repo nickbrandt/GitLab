@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.8.0
+
+- Filter title, description, text, and body from logs !402
+- Remove redirections from Terminal to Channel !397
+- Add option to set Sentry environment !396
+
 v8.7.0
 
 - Don't log http.ErrAbortHandler panics in sentry !392
