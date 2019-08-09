@@ -11,8 +11,6 @@ export default () => ({
   createVulnerabilityFeedbackMergeRequestPath: null,
   createVulnerabilityFeedbackDismissalPath: null,
   pipelineId: null,
-  canCreateIssuePermission: false,
-  canCreateFeedbackPermission: false,
 
   containerScanning: {
     paths: {

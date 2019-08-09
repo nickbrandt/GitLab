@@ -146,8 +146,6 @@ export default {
       'dependencyScanning',
       'summaryCounts',
       'modal',
-      'canCreateIssuePermission',
-      'canCreateFeedbackPermission',
     ]),
     ...mapGetters([
       'groupedSummaryText',
@@ -198,9 +196,6 @@ export default {
     this.setCreateVulnerabilityFeedbackDismissalPath(this.createVulnerabilityFeedbackDismissalPath);
     this.setPipelineId(this.pipelineId);
 
-    this.setCanCreateIssuePermission(this.canCreateIssue);
-    this.setCanCreateFeedbackPermission(this.canCreateFeedback);
-
     const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
 
     if (sastDiffEndpoint && this.hasSastReports) {
@@ -241,8 +236,6 @@ export default {
       'setCreateVulnerabilityFeedbackMergeRequestPath',
       'setCreateVulnerabilityFeedbackDismissalPath',
       'setPipelineId',
-      'setCanCreateIssuePermission',
-      'setCanCreateFeedbackPermission',
       'dismissVulnerability',
       'revertDismissVulnerability',
       'createNewIssue',

@@ -40,14 +40,6 @@ export default {
     state.pipelineId = id;
   },
 
-  [types.SET_CAN_CREATE_ISSUE_PERMISSION](state, permission) {
-    state.canCreateIssuePermission = permission;
-  },
-
-  [types.SET_CAN_CREATE_FEEDBACK_PERMISSION](state, permission) {
-    state.canCreateFeedbackPermission = permission;
-  },
-
   // CONTAINER SCANNING
   [types.SET_CONTAINER_SCANNING_DIFF_ENDPOINT](state, path) {
     Vue.set(state.containerScanning.paths, 'diffEndpoint', path);
