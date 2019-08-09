@@ -60,7 +60,7 @@ describe ElasticBatchProjectIndexerWorker do
       worker.perform(projects.first.id, projects.last.id)
     end
 
-    it 'indexes all projects it receives even if already indexed' do
+    it 'indexes all projects it receives even if already indexed', :sidekiq_might_not_need_inline do
       projects.first.index_status.update!(last_commit: 'foo')
 
       expect_index(projects.first).and_call_original

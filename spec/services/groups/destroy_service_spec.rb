@@ -26,7 +26,7 @@ describe Groups::DestroyService do
   end
 
   shared_examples 'group destruction' do |async|
-    context 'database records' do
+    context 'database records', :sidekiq_might_not_need_inline do
       before do
         destroy_group(group, user, async)
       end
@@ -37,7 +37,7 @@ describe Groups::DestroyService do
       it { expect(NotificationSetting.unscoped.all).not_to include(notification_setting) }
     end
 
-    context 'mattermost team' do
+    context 'mattermost team', :sidekiq_might_not_need_inline do
       let!(:chat_team) { create(:chat_team, namespace: group) }
 
       it 'destroys the team too' do
@@ -47,7 +47,7 @@ describe Groups::DestroyService do
       end
     end
 
-    context 'file system' do
+    context 'file system', :sidekiq_might_not_need_inline do
       context 'Sidekiq inline' do
         before do
           # Run sidekiq immediately to check that renamed dir will be removed

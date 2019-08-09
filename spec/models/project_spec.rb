@@ -4623,7 +4623,7 @@ describe Project do
     end
 
     describe '#any_branch_allows_collaboration?' do
-      it 'allows access when there are merge requests open allowing collaboration' do
+      it 'allows access when there are merge requests open allowing collaboration', :sidekiq_might_not_need_inline do
         expect(project.any_branch_allows_collaboration?(user))
           .to be_truthy
       end
@@ -4637,7 +4637,7 @@ describe Project do
     end
 
     describe '#branch_allows_collaboration?' do
-      it 'allows access if the user can merge the merge request' do
+      it 'allows access if the user can merge the merge request', :sidekiq_might_not_need_inline do
         expect(project.branch_allows_collaboration?(user, 'awesome-feature-1'))
           .to be_truthy
       end

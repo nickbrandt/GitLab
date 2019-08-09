@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Elastic::SnippetSearchResults, :elastic do
+describe Gitlab::Elastic::SnippetSearchResults, :elastic, :sidekiq_might_not_need_inline do
   let(:snippet) { create(:personal_snippet, content: 'foo', file_name: 'foo') }
   let(:results) { described_class.new(snippet.author, 'foo', []) }
 
