@@ -48,6 +48,11 @@ module EE
 
       rule { maintainer }.policy do
         enable :create_jira_connect_subscription
+        enable :maintainer_access
+      end
+
+      rule { owner }.policy do
+        enable :owner_access
       end
 
       rule { can?(:read_group) & contribution_analytics_available }

@@ -2,7 +2,7 @@
 
 class IssueBoardEntity < Grape::Entity
   include RequestAwareEntity
-  prepend ::EE::IssueBoardEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
+  include TimeTrackableEntity
 
   expose :id
   expose :iid
@@ -50,3 +50,5 @@ class IssueBoardEntity < Grape::Entity
     project_labels_path(issue.project, format: :json, include_ancestor_groups: true)
   end
 end
+
+IssueBoardEntity.prepend_if_ee('EE::IssueBoardEntity')
