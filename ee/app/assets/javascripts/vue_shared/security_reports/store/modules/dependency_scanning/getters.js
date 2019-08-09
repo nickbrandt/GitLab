@@ -16,4 +16,5 @@ export const groupedDependencyText = state =>
 export const dependencyScanningStatusIcon = ({ isLoading, hasError, newIssues }) =>
   statusIcon(isLoading, hasError, newIssues.length);
 
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
