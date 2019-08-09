@@ -183,7 +183,7 @@ export default {
         <div class="chart-legend d-none d-sm-block bold align-self-center">
           {{ s__('IssuesAnalytics|Issues Created') }}
         </div>
-        <div class="chart-canvas-wrapper">
+        <div class="chart-canvas-wrapper" data-qa-selector="issues_analytics_graph">
           <canvas ref="issuesChart" height="300" class="append-bottom-15"></canvas>
         </div>
       </div>
