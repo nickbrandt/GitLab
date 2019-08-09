@@ -38,9 +38,6 @@ describe('Grouped security reports app', () => {
     vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
     vulnerabilityFeedbackHelpPath: 'path',
     pipelineId: 123,
-    canCreateIssue: true,
-    canCreateMergeRequest: true,
-    canDismissVulnerability: true,
   };
 
   const createWrapper = (propsData, provide = {}) => {
@@ -235,9 +232,6 @@ describe('Grouped security reports app', () => {
     beforeEach(() => {
       createWrapper({
         headBlobPath: 'path',
-        canCreateIssue: false,
-        canCreateMergeRequest: false,
-        canDismissVulnerability: false,
         pipelinePath,
       });
     });

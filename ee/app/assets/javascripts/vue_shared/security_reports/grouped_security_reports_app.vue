@@ -104,18 +104,6 @@ export default {
       required: false,
       default: undefined,
     },
-    canDismissVulnerability: {
-      type: Boolean,
-      required: true,
-    },
-    canCreateMergeRequest: {
-      type: Boolean,
-      required: true,
-    },
-    canCreateIssue: {
-      type: Boolean,
-      required: true,
-    },
     divergedCommitsCount: {
       type: Number,
       required: false,
@@ -157,6 +145,9 @@ export default {
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
       'isBaseSecurityReportOutOfDate',
+      'canCreateIssue',
+      'canCreateMergeRequest',
+      'canDismissVulnerability',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
     securityTab() {
