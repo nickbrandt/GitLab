@@ -1,0 +1,5 @@
+---
+title: Split MR widget into cached and non-cached serializers
+merge_request: 15045
+author:
+type: performance

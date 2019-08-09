@@ -128,9 +128,6 @@ module EE
         presenter(merge_request).create_vulnerability_feedback_dismissal_path(merge_request.project)
       end
 
-      expose :rebase_commit_sha
-      expose :rebase_in_progress?, as: :rebase_in_progress
-
       expose :merge_pipelines_enabled?, as: :merge_pipelines_enabled do |merge_request|
         merge_request.target_project.merge_pipelines_enabled?
       end
@@ -143,9 +140,6 @@ module EE
         merge_request.merge_train.index
       end
 
-      expose :can_push_to_source_branch do |merge_request|
-        presenter(merge_request).can_push_to_source_branch?
-      end
       expose :has_approvals_available do |merge_request|
         merge_request.approval_feature_available?
       end
