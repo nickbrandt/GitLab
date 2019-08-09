@@ -59,20 +59,7 @@ describe Board do
       end
 
       it 'returns nil for invalid milestone id' do
-        nonsense_board_weight = -6
-        board.milestone_id = nonsense_board_weight
-
-        expect(board.milestone).to be_nil
-      end
-
-      it "returns nil for 'No milestone' value" do
         board.milestone_id = -1
-
-        expect(board.milestone).to be_nil
-      end
-
-      it "returns nil for 'Any milestone' value" do
-        board.milestone_id = nil
 
         expect(board.milestone).to be_nil
       end
@@ -92,14 +79,14 @@ describe Board do
       stub_licensed_features(scoped_issue_board: true)
     end
 
-    it 'returns true when milestone is not nil' do
+    it 'returns true when milestone is not nil AND is not "Any milestone"' do
       milestone = create(:milestone)
       board = create(:board, milestone: milestone, weight: nil, labels: [], assignee: nil)
 
       expect(board).to be_scoped
     end
 
-    it 'returns true when weight is not nil' do
+    it 'returns true when weight is not nil AND is not "Any weight"' do
       board = create(:board, milestone: nil, weight: 2, labels: [], assignee: nil)
 
       expect(board).to be_scoped
@@ -126,7 +113,7 @@ describe Board do
     end
 
     it 'returns false when board is not scoped' do
-      board = create(:board, milestone_id: nil, weight: nil, labels: [], assignee: nil)
+      board = create(:board, milestone_id: -1, weight: -1, labels: [], assignee: nil)
 
       expect(board).not_to be_scoped
     end
