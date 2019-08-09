@@ -102,6 +102,8 @@ module QA
       end
 
       module Group
+        autoload :IssuesAnalytics, 'qa/ee/page/group/issues_analytics'
+
         module Epic
           autoload :Index, 'qa/ee/page/group/epic/index'
           autoload :Show, 'qa/ee/page/group/epic/show'
