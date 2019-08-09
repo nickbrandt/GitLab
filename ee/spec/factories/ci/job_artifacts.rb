@@ -122,6 +122,26 @@ FactoryBot.define do
       end
     end
 
+    trait :container_scanning_feature_branch do
+      file_format :raw
+      file_type :container_scanning
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/security-reports/feature-branch/gl-container-scanning-report.json'), 'application/json')
+      end
+    end
+
+    trait :corrupted_container_scanning_report do
+      file_format :raw
+      file_type :container_scanning
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/trace/sample_trace'), 'application/json')
+      end
+    end
+
     trait :dast do
       file_format :raw
       file_type :dast

@@ -42,6 +42,10 @@ module EE
         reports_response(merge_request.compare_license_management_reports)
       end
 
+      def container_scanning_reports
+        reports_response(merge_request.compare_container_scanning_reports)
+      end
+
       def metrics_reports
         reports_response(merge_request.compare_metrics_reports)
       end

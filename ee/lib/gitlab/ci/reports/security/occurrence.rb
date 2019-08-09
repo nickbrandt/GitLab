@@ -70,6 +70,12 @@ module Gitlab
               other.location == location &&
               other.primary_identifier == primary_identifier
           end
+
+          # Array.difference (-) method uses hash and eq? methods to do comparison
+          def hash
+            compare_key.hash
+          end
+
           alias_method :eql?, :== # eql? is necessary in some cases like array intersection
 
           private
