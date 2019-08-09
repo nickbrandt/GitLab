@@ -37,10 +37,10 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
         vuln_async = report.dependencies[3][:vulnerabilities]
 
         expect(vuln_nokogiri.size).to eq(4)
-        expect(vuln_nokogiri[0]['name']).to eq('Vulnerabilities in libxml2')
-        expect(vuln_nokogiri[0]['severity']).to eq('High')
+        expect(vuln_nokogiri[0][:name]).to eq('Vulnerabilities in libxml2')
+        expect(vuln_nokogiri[0][:severity]).to eq('high')
         expect(vuln_debug.size).to eq(1)
-        expect(vuln_debug[0]['name']).to eq('Regular Expression Denial of Service')
+        expect(vuln_debug[0][:name]).to eq('Regular Expression Denial of Service')
         expect(vuln_async.size).to eq(0)
       end
     end

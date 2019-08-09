@@ -37,7 +37,7 @@ module Gitlab
             # https://gitlab.com/gitlab-org/security-products/analyzers/common/blob/a0a5074c49f34332aa3948cd9d6dc2c054cdf3a7/issue/issue.go#L169
             def location(dependency, file_path)
               {
-                "file" => file_path,
+                'file' => file_path,
                 'dependency' => {
                   'package' => {
                     'name' => dependency['package']['name']
@@ -69,9 +69,16 @@ module Gitlab
             def collect_vulnerabilities(vulnerabilities, dependency, file_path)
               dependency_location = location(dependency, file_path)
 
-              vulnerabilities.select do |vulnerability|
-                vulnerability['location'] == dependency_location
-              end
+              vulnerabilities
+                .select { |vulnerability| vulnerability['location'] == dependency_location }
+                .map { |vulnerability| formatted_vulnerability(vulnerability) }
+            end
+
+            def formatted_vulnerability(vulnerability)
+              {
+                name: vulnerability['name'],
+                severity: vulnerability['severity'].downcase
+              }
             end
           end
         end

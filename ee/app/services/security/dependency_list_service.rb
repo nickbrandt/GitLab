@@ -72,10 +72,8 @@ module Security
     # will have highest severity
     def sort_by_severity(collection)
       collection.sort do |dep_i, dep_j|
-        vuln_i = dep_i[:vulnerabilities]
-        vuln_j = dep_j[:vulnerabilities]
-        level_i = vuln_i.any? ? vuln_i.first['severity'].downcase : :undefined
-        level_j = vuln_j.any? ? vuln_j.first['severity'].downcase : :undefined
+        level_i = dep_i.dig(:vulnerabilities, 0, :severity) || :undefined
+        level_j = dep_j.dig(:vulnerabilities, 0, :severity) || :undefined
 
         ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[level_j] <=> ::Vulnerabilities::Occurrence::SEVERITY_LEVELS[level_i]
       end
