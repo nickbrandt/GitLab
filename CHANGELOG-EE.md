@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.0.5
+
+### Security (1 change)
+
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+
+
 ## 12.0.4
 
 ### Security (5 changes)
