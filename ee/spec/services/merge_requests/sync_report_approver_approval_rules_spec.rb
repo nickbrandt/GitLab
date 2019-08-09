@@ -13,7 +13,7 @@ describe MergeRequests::SyncReportApproverApprovalRules do
       let!(:regular_approval_project_rule) { create(:approval_project_rule, project: merge_request.target_project) }
 
       before do
-        stub_feature_flags(report_approver_rules: true)
+        stub_licensed_features(report_approver_rules: true)
       end
 
       it 'creates rule for report approvers' do
@@ -43,10 +43,6 @@ describe MergeRequests::SyncReportApproverApprovalRules do
     end
 
     context 'when report_approver_rules are disabled' do
-      before do
-        stub_feature_flags(report_approver_rules: false)
-      end
-
       it 'copies nothing' do
         expect { service.execute }
           .not_to change { merge_request.approval_rules.count }

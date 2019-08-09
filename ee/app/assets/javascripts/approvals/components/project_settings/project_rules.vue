@@ -22,9 +22,6 @@ export default {
     ...mapState({
       rules: state => state.approvals.rules,
     }),
-    reportApproverRulesAreEnabled() {
-      return Boolean(gon && gon.features && gon.features.reportApproverRules);
-    },
   },
   methods: {
     summaryText(rule) {
@@ -62,7 +59,7 @@ export default {
       );
     },
     showVulnerabilityCheckPopover(rule) {
-      return this.reportApproverRulesAreEnabled && rule.name === VULNERABILITY_CHECK_NAME;
+      return rule.name === VULNERABILITY_CHECK_NAME;
     },
   },
 };
