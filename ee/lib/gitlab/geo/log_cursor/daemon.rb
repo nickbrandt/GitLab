@@ -21,7 +21,7 @@ module Gitlab
           until exit?
             # Prevent the node from processing events unless it's a secondary
             unless Geo.secondary?
-              sleep(SECONDARY_CHECK_INTERVAL)
+              sleep_break(SECONDARY_CHECK_INTERVAL)
               next
             end
 
@@ -44,6 +44,14 @@ module Gitlab
         end
 
         private
+
+        def sleep_break(seconds)
+          while seconds > 0
+            sleep(1)
+            seconds -= 1
+            break if exit?
+          end
+        end
 
         def handle_events(batch, previous_batch_last_id)
           logger.info("Handling events", first_id: batch.first.id, last_id: batch.last.id)

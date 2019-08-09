@@ -54,7 +54,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
       stub_current_geo_node(nil)
 
       is_expected.to receive(:exit?).and_return(false, true)
-      is_expected.to receive(:sleep).with(1.minute)
+      is_expected.to receive(:sleep_break).with(1.minute)
       is_expected.not_to receive(:run_once!)
 
       daemon.run!
@@ -64,7 +64,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
       stub_current_geo_node(primary)
 
       is_expected.to receive(:exit?).and_return(false, true)
-      is_expected.to receive(:sleep).with(1.minute)
+      is_expected.to receive(:sleep_break).with(1.minute)
       is_expected.not_to receive(:run_once!)
 
       daemon.run!
@@ -163,7 +163,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
         expect(Gitlab::Geo::Logger).to receive(:warn)
                                         .with(hash_including(
                                                 class: 'Gitlab::Geo::LogCursor::Daemon',
-                                                message: 'Unknown event',
+                                                message: '#handle_single_event: unknown event',
                                                 event_log_id: new_event.id))
 
         daemon.run_once!
