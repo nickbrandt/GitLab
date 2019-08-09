@@ -15,6 +15,7 @@ module EE
       LICENSE_MANAGEMENT_REPORT_FILE_TYPES = %w[license_management].freeze
       DEPENDENCY_LIST_REPORT_FILE_TYPES = %w[dependency_scanning].freeze
       METRICS_REPORT_FILE_TYPES = %w[metrics].freeze
+      CONTAINER_SCANNING_REPORT_TYPES = %w[container_scanning].freeze
 
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
       scope :project_id_in, ->(ids) { joins(:project).merge(::Project.id_in(ids)) }
@@ -31,6 +32,10 @@ module EE
 
       scope :dependency_list_reports, -> do
         with_file_types(DEPENDENCY_LIST_REPORT_FILE_TYPES)
+      end
+
+      scope :container_scanning_reports, -> do
+        with_file_types(CONTAINER_SCANNING_REPORT_TYPES)
       end
 
       scope :metrics_reports, -> do

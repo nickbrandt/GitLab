@@ -69,6 +69,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         member do
           get :metrics_reports
           get :license_management_reports
+          get :container_scanning_reports
         end
       end
 
