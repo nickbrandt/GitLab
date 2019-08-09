@@ -4,7 +4,7 @@ require 'spec_helper'
 describe API::ProjectMirror do
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
-  let(:project) { create(:project, namespace: user.namespace) }
+  let(:project) { create(:project, :repository, namespace: user.namespace) }
 
   describe 'POST /projects/:id/mirror/pull' do
     context 'when the project is not mirrored' do
@@ -22,63 +22,132 @@ describe API::ProjectMirror do
         allow_any_instance_of(Projects::UpdateMirrorService).to receive(:execute).and_return(status: :success)
       end
 
-      context 'when import state is' do
-        def project_in_state(state)
-          project = create(:project, :repository, namespace: user.namespace)
-          import_state = create(:import_state, :mirror, state, project: project)
-          import_state.update(next_execution_timestamp: 10.minutes.from_now)
+      context 'when it receives a "push" event' do
+        context 'when import state is' do
+          def project_in_state(state)
+            project = create(:project, :repository, namespace: user.namespace)
+            import_state = create(:import_state, :mirror, state, project: project)
+            import_state.update(next_execution_timestamp: 10.minutes.from_now)
 
-          project
+            project
+          end
+
+          it 'none it triggers the pull mirroring operation' do
+            project = project_in_state(:none)
+
+            expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+
+            post api("/projects/#{project.id}/mirror/pull", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+
+          it 'failed it triggers the pull mirroring operation' do
+            project = project_in_state(:failed)
+
+            expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+
+            post api("/projects/#{project.id}/mirror/pull", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+
+          it 'finished it triggers the pull mirroring operation' do
+            project = project_in_state(:finished)
+
+            expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+
+            post api("/projects/#{project.id}/mirror/pull", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+
+          it 'scheduled does not trigger the pull mirroring operation and returns 200' do
+            project = project_in_state(:scheduled)
+
+            expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
+
+            post api("/projects/#{project.id}/mirror/pull", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+
+          it 'started does not trigger the pull mirroring operation and returns 200' do
+            project = project_in_state(:started)
+
+            expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
+
+            post api("/projects/#{project.id}/mirror/pull", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+      end
+
+      context 'when it receives a "pull_request" event' do
+        let(:create_pipeline_service) { instance_double(Ci::CreatePipelineService) }
+        let(:branch) { project.repository.branches.first }
+        let(:source_branch) { branch.name }
+        let(:source_sha) { branch.target }
+        let(:action) { 'opened' }
+
+        let(:params) do
+          {
+            pull_request: {
+              id: 123,
+              head: {
+                ref: source_branch,
+                sha: source_sha,
+                repo: { full_name: 'the-repo' }
+              },
+              base: {
+                ref: 'master',
+                sha: 'a09386439ca39abe575675ffd4b89ae824fec22f',
+                repo: { full_name: 'the-repo' }
+              }
+            },
+            action: action
+          }
         end
 
-        it 'none it triggers the pull mirroring operation' do
-          project = project_in_state(:none)
+        before do
+          create(:import_state, :mirror, :finished, project: project)
+        end
 
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+        it 'triggers a pipeline for pull request' do
+          pipeline_params = {
+            ref: Gitlab::Git::BRANCH_REF_PREFIX + branch.name,
+            source_sha: branch.target,
+            target_sha: 'a09386439ca39abe575675ffd4b89ae824fec22f'
+          }
+          expect(Ci::CreatePipelineService).to receive(:new).with(project, user, pipeline_params).and_return(create_pipeline_service)
+          expect(create_pipeline_service).to receive(:execute).with(:external_pull_request_event, any_args)
 
-          post api("/projects/#{project.id}/mirror/pull", user)
+          post api("/projects/#{project.id}/mirror/pull", user), params: params
 
           expect(response).to have_gitlab_http_status(200)
         end
 
-        it 'failed it triggers the pull mirroring operation' do
-          project = project_in_state(:failed)
+        context 'when any param is missing' do
+          let(:source_sha) { nil }
 
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+          it 'returns the error message' do
+            post api("/projects/#{project.id}/mirror/pull", user), params: params
 
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(400)
+          end
         end
 
-        it 'finished it triggers the pull mirroring operation' do
-          project = project_in_state(:finished)
+        context 'when action is not supported' do
+          let(:action) { 'assigned' }
 
-          expect(UpdateAllMirrorsWorker).to receive(:perform_async).once
+          it 'ignores it and return success status' do
+            expect(Ci::CreatePipelineService).not_to receive(:new)
 
-          post api("/projects/#{project.id}/mirror/pull", user)
+            post api("/projects/#{project.id}/mirror/pull", user), params: params
 
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'scheduled does not trigger the pull mirroring operation and returns 200' do
-          project = project_in_state(:scheduled)
-
-          expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-
-        it 'started does not trigger the pull mirroring operation and returns 200' do
-          project = project_in_state(:started)
-
-          expect(UpdateAllMirrorsWorker).not_to receive(:perform_async)
-
-          post api("/projects/#{project.id}/mirror/pull", user)
-
-          expect(response).to have_gitlab_http_status(200)
+            expect(response).to have_gitlab_http_status(422)
+          end
         end
       end
 

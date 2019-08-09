@@ -9,8 +9,12 @@ describe Git::BranchPushService do
   let(:newrev)   { sample_commit.id }
   let(:ref)      { 'refs/heads/master' }
 
+  let(:params) do
+    { oldrev: oldrev, newrev: newrev, ref: ref }
+  end
+
   subject do
-    described_class.new(project, user, oldrev: oldrev, newrev: newrev, ref: ref)
+    described_class.new(project, user, params)
   end
 
   context 'with pull project' do
@@ -104,6 +108,38 @@ describe Git::BranchPushService do
 
             subject.execute
           end
+        end
+      end
+    end
+
+    context 'External pull requests' do
+      it 'runs UpdateExternalPullRequestsWorker' do
+        expect(UpdateExternalPullRequestsWorker).to receive(:perform_async).with(project.id, user.id, ref)
+
+        subject.execute
+      end
+
+      context 'when project is not mirror' do
+        before do
+          allow(project).to receive(:mirror?).and_return(false)
+        end
+
+        it 'does nothing' do
+          expect(UpdateExternalPullRequestsWorker).not_to receive(:perform_async)
+
+          subject.execute
+        end
+      end
+
+      context 'when param skips pipeline creation' do
+        before do
+          params[:create_pipelines] = false
+        end
+
+        it 'does nothing' do
+          expect(UpdateExternalPullRequestsWorker).not_to receive(:perform_async)
+
+          subject.execute
         end
       end
     end
