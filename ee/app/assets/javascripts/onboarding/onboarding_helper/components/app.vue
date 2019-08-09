@@ -2,7 +2,7 @@
 import _ from 'underscore';
 import { mapState, mapActions, mapGetters } from 'vuex';
 import { redirectTo } from '~/lib/utils/url_utility';
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 import OnboardingHelper from './onboarding_helper.vue';
 import actionPopoverUtils from './../action_popover_utils';
 import eventHub from '../event_hub';
@@ -111,7 +111,7 @@ export default {
     },
     handleRestartStep() {
       this.showExitTourContent(false);
-      Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+      Tracking.event(TRACKING_CATEGORY, 'click_link', {
         label: this.getTrackingLabel(),
         property: 'restart_this_step',
       });
@@ -122,7 +122,7 @@ export default {
         const { selector } = this.actionPopover;
         const popoverEl = selector ? document.querySelector(selector) : null;
         if (popoverEl) {
-          Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+          Tracking.event(TRACKING_CATEGORY, 'click_link', {
             label: this.getTrackingLabel(),
             property: 'skip_this_step',
           });
@@ -177,7 +177,7 @@ export default {
         return;
       }
 
-      Stats.trackEvent(TRACKING_CATEGORY, 'click_button', {
+      Tracking.event(TRACKING_CATEGORY, 'click_button', {
         label: this.getTrackingLabel(),
         property: 'got_it',
       });
@@ -185,7 +185,7 @@ export default {
       this.showActionPopover();
     },
     handleShowExitTourContent(showExitTour) {
-      Stats.trackEvent(TRACKING_CATEGORY, 'click_link', {
+      Tracking.event(TRACKING_CATEGORY, 'click_link', {
         label: this.getTrackingLabel(),
         property: 'exit_learn_gitlab',
       });

@@ -1,10 +1,10 @@
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 import * as types from './mutation_types';
 
 export const setFilter = ({ commit }, payload) => {
   commit(types.SET_FILTER, payload);
 
-  Stats.trackEvent(document.body.dataset.page, 'set_filter', {
+  Tracking.event(document.body.dataset.page, 'set_filter', {
     label: payload.filterId,
     value: payload.optionId,
   });

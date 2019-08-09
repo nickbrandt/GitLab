@@ -1,9 +1,9 @@
-import stats from 'ee/stats';
+import Tracking from '~/tracking';
 
 export default {
   methods: {
     trackUninstallButtonClick: application => {
-      stats.trackEvent('k8s_cluster', 'uninstall', {
+      Tracking.event('k8s_cluster', 'uninstall', {
         label: application,
       });
     },

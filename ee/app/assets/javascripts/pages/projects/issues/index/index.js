@@ -1,7 +1,6 @@
 import '~/pages/projects/issues/index/index';
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 
 document.addEventListener('DOMContentLoaded', () => {
-  Stats.bindTrackableContainer('.issues-export-modal');
-  Stats.bindTrackableContainer('.issues-import-modal');
+  new Tracking().bind();
 });
