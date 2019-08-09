@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.11.8
+
+- No changes.
+
 ## 11.11.7
 
 ### Security (5 changes)
