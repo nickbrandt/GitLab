@@ -3,11 +3,12 @@ import VueRouter from 'vue-router';
 import App from 'ee/design_management/components/app.vue';
 import Designs from 'ee/design_management/pages/index.vue';
 import DesignDetail from 'ee/design_management/pages/design/index.vue';
-import router from 'ee/design_management/router';
+import createRouter from 'ee/design_management/router';
 import '~/commons/bootstrap';
 
 describe('Design management router', () => {
   let vm;
+  let router;
 
   function factory() {
     const localVue = createLocalVue();
@@ -15,6 +16,8 @@ describe('Design management router', () => {
     localVue.use(VueRouter);
 
     window.gon = { sprite_icons: '' };
+
+    router = createRouter('/');
 
     vm = mount(App, {
       localVue,

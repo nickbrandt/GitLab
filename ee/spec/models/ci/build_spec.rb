@@ -93,22 +93,6 @@ describe Ci::Build do
         variable.save!
       end
 
-      context 'when variable environment scope is available' do
-        before do
-          stub_licensed_features(variable_environment_scope: true)
-        end
-
-        it { is_expected.to include(environment_variable) }
-      end
-
-      context 'when variable environment scope is not available' do
-        before do
-          stub_licensed_features(variable_environment_scope: false)
-        end
-
-        it { is_expected.not_to include(environment_variable) }
-      end
-
       context 'when there is a plan for the group' do
         it 'GITLAB_FEATURES should include the features for that plan' do
           is_expected.to include({ key: 'GITLAB_FEATURES', value: anything, public: true, masked: false })
@@ -156,48 +140,6 @@ describe Ci::Build do
           expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
           expect(security_reports.get_report('container_scanning').occurrences.size).to eq(8)
           expect(security_reports.get_report('dast').occurrences.size).to eq(2)
-        end
-      end
-
-      context 'when Feature flag is disabled for Dependency Scanning reports parsing' do
-        before do
-          stub_feature_flags(parse_dependency_scanning_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
-        end
-
-        it 'does NOT parse dependency scanning report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
-        end
-      end
-
-      context 'when Feature flag is disabled for Container Scanning reports parsing' do
-        before do
-          stub_feature_flags(parse_container_scanning_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :container_scanning, job: job, project: job.project)
-        end
-
-        it 'does NOT parse container scanning report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
-        end
-      end
-
-      context 'when Feature flag is disabled for DAST reports parsing' do
-        before do
-          stub_feature_flags(parse_dast_reports: false)
-          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
-          create(:ee_ci_job_artifact, :dast, job: job, project: job.project)
-        end
-
-        it 'does NOT parse dast report' do
-          subject
-
-          expect(security_reports.reports.keys).to contain_exactly('sast')
         end
       end
 

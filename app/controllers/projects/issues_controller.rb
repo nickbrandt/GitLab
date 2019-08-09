@@ -10,10 +10,6 @@ class Projects::IssuesController < Projects::ApplicationController
   include SpammableActions
   include RecordUserLastActivity
 
-  before_action do
-    push_frontend_feature_flag(:manual_sorting, default_enabled: true)
-  end
-
   def issue_except_actions
     %i[index calendar new create bulk_update import_csv]
   end
@@ -285,4 +281,4 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 end
 
-Projects::IssuesController.prepend(EE::Projects::IssuesController)
+Projects::IssuesController.prepend_if_ee('EE::Projects::IssuesController')

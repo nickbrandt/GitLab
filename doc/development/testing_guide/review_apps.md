@@ -8,38 +8,33 @@ Review Apps are automatically deployed by each pipeline, both in
 
 ### CI/CD architecture diagram
 
-![Review Apps CI/CD architecture](img/review_apps_cicd_architecture.png)
-
-<details>
-<summary>Show mermaid source</summary>
-<pre>
+```mermaid
 graph TD
     build-qa-image -.->|once the `prepare` stage is done| gitlab:assets:compile
     review-build-cng -->|triggers a CNG-mirror pipeline and wait for it to be done| CNG-mirror
     review-build-cng -.->|once the `test` stage is done| review-deploy
     review-deploy -.->|once the `review` stage is done| review-qa-smoke
 
-subgraph 1. gitlab-ce/ee `prepare` stage
+subgraph "1. gitlab-ce/ee `prepare` stage"
     build-qa-image
     end
 
-subgraph 2. gitlab-ce/ee `test` stage
+subgraph "2. gitlab-ce/ee `test` stage"
     gitlab:assets:compile -->|plays dependent job once done| review-build-cng
     end
 
-subgraph 3. gitlab-ce/ee `review` stage
-    review-deploy["review-deploy<br /><br />Helm deploys the Review App using the Cloud<br/>Native images built by the CNG-mirror pipeline.<br /><br />Cloud Native images are deployed to the `review-apps-ce` or `review-apps-ee`<br />Kubernetes (GKE) cluster, in the GCP `gitlab-review-apps` project."]
+subgraph "3. gitlab-ce/ee `review` stage"
+    review-deploy["review-deploy<br><br>Helm deploys the Review App using the Cloud<br/>Native images built by the CNG-mirror pipeline.<br><br>Cloud Native images are deployed to the `review-apps-ce` or `review-apps-ee`<br>Kubernetes (GKE) cluster, in the GCP `gitlab-review-apps` project."]
     end
 
-subgraph 4. gitlab-ce/ee `qa` stage
-    review-qa-smoke[review-qa-smoke<br /><br />gitlab-qa runs the smoke suite against the Review App.]
+subgraph "4. gitlab-ce/ee `qa` stage"
+    review-qa-smoke[review-qa-smoke<br><br>gitlab-qa runs the smoke suite against the Review App.]
     end
 
-subgraph CNG-mirror pipeline
+subgraph "CNG-mirror pipeline"
     CNG-mirror>Cloud Native images are built];
     end
-</pre>
-</details>
+```
 
 ### Detailed explanation
 
@@ -114,6 +109,28 @@ On every [pipeline][gitlab-pipeline] in the `qa` stage, the
 `review-performance` job is automatically started: this job does basic
 browser performance testing using a
 [Sitespeed.io Container](../../user/project/merge_requests/browser_performance_testing.md).
+
+## Cluster configuration
+
+### Node pools
+
+Both `review-apps-ce` and `review-apps-ee` clusters are currently set up with
+two node pools:
+
+- a node pool of non-preemptible `n1-standard-2` (2 vCPU, 7.5 GB memory) nodes
+  dedicated to the `tiller` deployment (see below) with a single node.
+- a node pool of preemptible `n1-standard-2` (2 vCPU, 7.5 GB memory) nodes,
+  with a minimum of 1 node and a maximum of 250 nodes.
+
+### Helm/Tiller
+
+The `tiller` deployment (the Helm server) is deployed to a dedicated node pool
+that has the `app=helm` label and a specific
+[taint](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+to prevent other pods from being scheduled on this node pool.
+
+This is to ensure Tiller isn't affected by "noisy" neighbors that could put
+their node under pressure.
 
 ## How to:
 
@@ -240,15 +257,6 @@ thousands of unused Docker images.**
   > We have to start somewhere and improve later. Also, we're using the
   CNG-mirror project to store these Docker images so that we can just wipe out
   the registry at some point, and use a new fresh, empty one.
-
-**How big are the Kubernetes clusters (`review-apps-ce` and `review-apps-ee`)?**
-
-  > The clusters are currently set up with a single pool of preemptible nodes,
-  with a minimum of 1 node and a maximum of 500 nodes.
-
-**What are the machine running on the cluster?**
-
-  > We're currently using `n1-standard-1` (1 vCPU, 3.75 GB memory) machines.
 
 **How do we secure this from abuse? Apps are open to the world so we need to
 find a way to limit it to only us.**

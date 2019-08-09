@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared_state do
+describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 

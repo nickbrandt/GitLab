@@ -282,6 +282,17 @@ class User < ApplicationRecord
   scope :for_todos, -> (todos) { where(id: todos.select(:user_id)) }
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
+  scope :with_public_profile, -> { where(private_profile: false) }
+
+  def self.with_visible_profile(user)
+    return with_public_profile if user.nil?
+
+    if user.admin?
+      all
+    else
+      with_public_profile.or(where(id: user.id))
+    end
+  end
 
   # Limits the users to those that have TODOs, optionally in the given state.
   #
@@ -933,7 +944,7 @@ class User < ApplicationRecord
   end
 
   def project_deploy_keys
-    DeployKey.unscoped.in_projects(authorized_projects.pluck(:id)).distinct(:id)
+    DeployKey.in_projects(authorized_projects.select(:id)).distinct(:id)
   end
 
   def highest_role
@@ -941,11 +952,10 @@ class User < ApplicationRecord
   end
 
   def accessible_deploy_keys
-    @accessible_deploy_keys ||= begin
-      key_ids = project_deploy_keys.pluck(:id)
-      key_ids.push(*DeployKey.are_public.pluck(:id))
-      DeployKey.where(id: key_ids)
-    end
+    DeployKey.from_union([
+      DeployKey.where(id: project_deploy_keys.select(:deploy_key_id)),
+      DeployKey.are_public
+    ])
   end
 
   def created_by
@@ -1627,4 +1637,4 @@ class User < ApplicationRecord
   end
 end
 
-User.prepend(EE::User)
+User.prepend_if_ee('EE::User')

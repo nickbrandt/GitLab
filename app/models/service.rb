@@ -347,4 +347,4 @@ class Service < ApplicationRecord
   end
 end
 
-Service.prepend(EE::Service)
+Service.prepend_if_ee('EE::Service')

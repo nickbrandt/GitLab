@@ -10,7 +10,7 @@ describe 'admin/groups/_form' do
     allow(view).to receive(:visibility_level) { group.visibility_level }
   end
 
-  context 'when sub group is used', :nested_groups do
+  context 'when sub group is used' do
     let(:root_ancestor) { create(:group) }
     let(:group) { build(:group, parent: root_ancestor) }
 

@@ -11,53 +11,19 @@ describe Groups::Security::VulnerabilitiesController do
     let(:vulnerable_params) { { group_id: group } }
   end
 
-  before do
-    sign_in(user)
+  it_behaves_like SecurityDashboardsPermissions do
+    let(:vulnerable) { group }
+    let(:security_dashboard_action) { get :index, params: { group_id: group }, format: :json }
   end
 
-  describe 'access for all actions' do
-    context 'when security dashboard feature is disabled' do
-      it 'returns 404' do
-        stub_licensed_features(security_dashboard: false)
-
-        get :index, params: { group_id: group }, format: :json
-
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-
-    context 'when security dashboard feature is enabled' do
-      before do
-        stub_licensed_features(security_dashboard: true)
-      end
-
-      context 'when user has guest access' do
-        it 'denies access' do
-          group.add_guest(user)
-
-          get :index, params: { group_id: group }, format: :json
-
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
-
-      context 'when user has developer access' do
-        it 'grants access' do
-          group.add_developer(user)
-
-          get :index, params: { group_id: group }, format: :json
-
-          expect(response).to have_gitlab_http_status(200)
-        end
-      end
-    end
+  before do
+    sign_in(user)
+    stub_licensed_features(security_dashboard: true)
+    group.add_developer(user)
   end
 
   describe 'GET index.json' do
     it 'returns vulnerabilities for all projects in the group' do
-      stub_licensed_features(security_dashboard: true)
-      group.add_developer(user)
-
       # create projects for the group
       2.times do
         project = create(:project, namespace: group)
@@ -74,6 +40,89 @@ describe Groups::Security::VulnerabilitiesController do
       get :index, params: { group_id: group }, format: :json
 
       expect(json_response.count).to be(2)
+    end
+  end
+
+  describe 'GET history.json' do
+    let(:params) { { group_id: group } }
+    let(:project) { create(:project, namespace: group) }
+    let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+    subject { get :history, params: params, format: :json }
+
+    before do
+      travel_to(Time.zone.parse('2018-11-10')) do
+        create(:vulnerabilities_occurrence,
+                pipelines: [pipeline],
+                project: project,
+                report_type: :sast,
+                severity: :critical)
+
+        create(:vulnerabilities_occurrence,
+                pipelines: [pipeline],
+                project: project,
+                report_type: :dependency_scanning,
+                severity: :low)
+      end
+
+      travel_to(Time.zone.parse('2018-11-12')) do
+        create(:vulnerabilities_occurrence,
+                pipelines: [pipeline],
+                project: project,
+                report_type: :sast,
+                severity: :critical)
+
+        create(:vulnerabilities_occurrence,
+                pipelines: [pipeline],
+                project: project,
+                report_type: :dependency_scanning,
+                severity: :low)
+      end
+    end
+
+    it 'returns vulnerability history within last 90 days' do
+      travel_to(Time.zone.parse('2019-02-11')) do
+        subject
+      end
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response['total']).to eq({ '2018-11-12' => 2 })
+      expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
+      expect(json_response['low']).to eq({ '2018-11-12' => 1 })
+      expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+    end
+
+    it 'returns empty history if there are no vulnerabilities within last 90 days' do
+      travel_to(Time.zone.parse('2019-02-13')) do
+        subject
+      end
+
+      expect(json_response).to eq({
+        "undefined" => {},
+        "info" => {},
+        "unknown" => {},
+        "low" => {},
+        "medium" => {},
+        "high" => {},
+        "critical" => {},
+        "total" => {}
+      })
+    end
+
+    context 'with a report type filter' do
+      let(:params) { { group_id: group, report_type: %w[sast] } }
+
+      before do
+        travel_to(Time.zone.parse('2019-02-11')) do
+          subject
+        end
+      end
+
+      it 'returns filtered history if filters are enabled' do
+        expect(json_response['total']).to eq({ '2018-11-12' => 1 })
+        expect(json_response['critical']).to eq({ '2018-11-12' => 1 })
+        expect(json_response['low']).to eq({})
+      end
     end
   end
 end

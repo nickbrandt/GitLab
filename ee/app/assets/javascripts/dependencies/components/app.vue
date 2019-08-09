@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlBadge, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlBadge, GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import DependenciesActions from './dependencies_actions.vue';
 import DependencyListIncompleteAlert from './dependency_list_incomplete_alert.vue';
 import DependencyListJobFailedAlert from './dependency_list_job_failed_alert.vue';
@@ -14,9 +14,17 @@ export default {
     GlBadge,
     GlEmptyState,
     GlLoadingIcon,
+    GlTab,
+    GlTabs,
     DependencyListIncompleteAlert,
     DependencyListJobFailedAlert,
     PaginatedDependenciesTable,
+  },
+  inject: {
+    dependencyListVulnerabilities: {
+      from: 'dependencyListVulnerabilities',
+      default: false,
+    },
   },
   props: {
     endpoint: {
@@ -39,28 +47,47 @@ export default {
     };
   },
   computed: {
-    ...mapState(['currentList']),
-    ...mapGetters(DEPENDENCY_LIST_TYPES.all, ['isJobNotSetUp', 'isJobFailed', 'isIncomplete']),
-    ...mapState(DEPENDENCY_LIST_TYPES.all, ['initialized', 'pageInfo', 'reportInfo']),
+    ...mapState(['currentList', 'listTypes']),
+    ...mapGetters([
+      'isInitialized',
+      'isJobNotSetUp',
+      'isJobFailed',
+      'isIncomplete',
+      'reportInfo',
+      'totals',
+    ]),
+    ...mapState(DEPENDENCY_LIST_TYPES.all.namespace, ['pageInfo']),
+    currentListIndex: {
+      get() {
+        return this.listTypes.map(({ namespace }) => namespace).indexOf(this.currentList);
+      },
+      set(index) {
+        const { namespace } = this.listTypes[index] || {};
+        this.setCurrentList(namespace);
+      },
+    },
   },
   created() {
     this.setDependenciesEndpoint(this.endpoint);
     this.fetchDependencies();
   },
   methods: {
-    ...mapActions(DEPENDENCY_LIST_TYPES.all, ['setDependenciesEndpoint', 'fetchDependencies']),
+    ...mapActions(['setDependenciesEndpoint', 'fetchDependencies', 'setCurrentList']),
     dismissIncompleteListAlert() {
       this.isIncompleteAlertDismissed = true;
     },
     dismissJobFailedAlert() {
       this.isJobFailedAlertDismissed = true;
     },
+    isTabDisabled(namespace) {
+      return this.totals[namespace] <= 0;
+    },
   },
 };
 </script>
 
 <template>
-  <gl-loading-icon v-if="!initialized" size="md" class="mt-4" />
+  <gl-loading-icon v-if="!isInitialized" size="md" class="mt-4" />
 
   <gl-empty-state
     v-else-if="isJobNotSetUp"
@@ -85,15 +112,42 @@ export default {
       @close="dismissJobFailedAlert"
     />
 
-    <div class="d-sm-flex justify-content-between align-items-baseline my-2">
-      <h4 class="h5">
-        {{ __('Dependencies') }}
-        <gl-badge v-if="pageInfo.total" pill>{{ pageInfo.total }}</gl-badge>
-      </h4>
+    <template v-if="dependencyListVulnerabilities">
+      <h3 class="h5">{{ __('Dependencies') }}</h3>
 
-      <dependencies-actions :namespace="currentList" />
-    </div>
+      <gl-tabs v-model="currentListIndex">
+        <gl-tab
+          v-for="listType in listTypes"
+          :key="listType.namespace"
+          :disabled="isTabDisabled(listType.namespace)"
+        >
+          <template v-slot:title>
+            {{ listType.label }}
+            <gl-badge pill>{{ totals[listType.namespace] }}</gl-badge>
+          </template>
+          <paginated-dependencies-table :namespace="listType.namespace" />
+        </gl-tab>
+        <template v-slot:tabs>
+          <li class="d-flex align-items-center ml-sm-auto">
+            <dependencies-actions :namespace="currentList" class="my-2 my-sm-0" />
+          </li>
+        </template>
+      </gl-tabs>
+    </template>
 
-    <paginated-dependencies-table :namespace="currentList" />
+    <template v-else>
+      <div class="d-sm-flex justify-content-between align-items-baseline my-2">
+        <h3 class="h5">
+          {{ __('Dependencies') }}
+          <gl-badge v-if="pageInfo.total" pill data-qa-selector="dependency_list_total_content">{{
+            pageInfo.total
+          }}</gl-badge>
+        </h3>
+
+        <dependencies-actions :namespace="currentList" />
+      </div>
+
+      <paginated-dependencies-table :namespace="currentList" />
+    </template>
   </div>
 </template>

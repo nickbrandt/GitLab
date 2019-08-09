@@ -14,7 +14,6 @@ export default {
   },
   data() {
     return {
-      loading: false,
       pages: [],
     };
   },
@@ -35,19 +34,24 @@ export default {
     load() {
       this.pages = [];
       return pdfjsLib
-        .getDocument(this.document)
-        .then(this.renderPages)
-        .then(() => this.$emit('pdflabload'))
-        .catch(error => this.$emit('pdflaberror', error))
-        .then(() => {
-          this.loading = false;
+        .getDocument({
+          url: this.document,
+          cMapUrl: '/assets/webpack/cmaps/',
+          cMapPacked: true,
+        })
+        .promise.then(this.renderPages)
+        .then(pages => {
+          this.pages = pages;
+          this.$emit('pdflabload');
+        })
+        .catch(error => {
+          this.$emit('pdflaberror', error);
         });
     },
     renderPages(pdf) {
       const pagePromises = [];
-      this.loading = true;
       for (let num = 1; num <= pdf.numPages; num += 1) {
-        pagePromises.push(pdf.getPage(num).then(p => this.pages.push(p)));
+        pagePromises.push(pdf.getPage(num));
       }
       return Promise.all(pagePromises);
     },
@@ -59,8 +63,8 @@ export default {
   <div v-if="hasPDF" class="pdf-viewer">
     <page
       v-for="(page, index) in pages"
+      v-if="page"
       :key="index"
-      :v-if="!loading"
       :page="page"
       :number="index + 1"
     />

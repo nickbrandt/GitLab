@@ -1,10 +1,11 @@
 <script>
-import { __ } from '~/locale';
+import { s__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
 import Icon from '~/vue_shared/components/icon.vue';
-import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
 import Api from '~/api';
+import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 
 export default {
   name: 'GroupsDropdownFilter',
@@ -12,6 +13,14 @@ export default {
     Icon,
     GlLoadingIcon,
     GlButton,
+    GlAvatar,
+  },
+  props: {
+    label: {
+      type: String,
+      required: false,
+      default: s__('CycleAnalytics|group dropdown filter'),
+    },
   },
   data() {
     return {
@@ -33,20 +42,17 @@ export default {
       search: {
         fields: ['full_name'],
       },
-      clicked: this.onClick,
-      data: this.fetchData,
+      clicked: this.onClick.bind(this),
+      data: this.fetchData.bind(this),
       renderRow: group => this.rowTemplate(group),
       text: group => group.name,
+      opened: e => e.target.querySelector('.dropdown-input-field').focus(),
     });
   },
   methods: {
-    onClick({ $el, e }) {
+    onClick({ selectedObj, e }) {
       e.preventDefault();
-      this.selectedGroup = {
-        id: $el.data('id'),
-        name: $el.data('name'),
-        path: $el.data('path'),
-      };
+      this.selectedGroup = selectedObj;
       this.$emit('selected', this.selectedGroup);
     },
     fetchData(term, callback) {
@@ -59,13 +65,19 @@ export default {
     rowTemplate(group) {
       return `
             <li>
-              <a href='#' class='dropdown-menu-link' data-id="${group.id}" data-name="${
-        group.name
-      }" data-path="${group.path}">
-                ${_.escape(group.name)}
+              <a href='#' class='dropdown-menu-link'>
+                ${this.avatarTemplate(group)}
+                <div class="align-middle">${_.escape(group.name)}</div>
               </a>
             </li>
           `;
+    },
+    avatarTemplate(group) {
+      return group.avatar_url !== null
+        ? renderAvatar(group, { sizeClass: 's16 rect-avatar' })
+        : renderIdenticon(group, {
+            sizeClass: 's16 rect-avatar d-flex justify-content-center flex-column',
+          });
     },
   },
 };
@@ -79,8 +91,20 @@ export default {
         type="button"
         data-toggle="dropdown"
         aria-expanded="false"
+        :aria-label="label"
       >
-        {{ selectedGroupName }} <icon name="chevron-down" />
+        <gl-avatar
+          v-if="selectedGroup.name"
+          :src="selectedGroup.avatar_url"
+          :entity-id="selectedGroup.id"
+          :entity-name="selectedGroup.name"
+          :size="16"
+          shape="rect"
+          :alt="selectedGroup.name"
+          class="prepend-top-2"
+        />
+        {{ selectedGroupName }}
+        <icon name="chevron-down" />
       </gl-button>
       <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
         <div class="dropdown-title">{{ __('Groups') }}</div>
@@ -89,7 +113,7 @@ export default {
           <icon name="search" class="dropdown-input-search" data-hidden="true" />
         </div>
         <div class="dropdown-content"></div>
-        <div class="dropdown-loading"><gl-loading-icon /></div>
+        <gl-loading-icon class="dropdown-loading" />
       </div>
     </div>
   </div>

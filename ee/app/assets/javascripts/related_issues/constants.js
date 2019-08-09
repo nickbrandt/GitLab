@@ -10,19 +10,19 @@ export const autoCompleteTextMap = {
   true: {
     [issuableTypesMap.ISSUE]: __(' or <#issue id>'),
     [issuableTypesMap.EPIC]: __(' or <#epic id>'),
-    [issuableTypesMap.MERGE_REQUEST]: __(' or <#merge request id>'),
+    [issuableTypesMap.MERGE_REQUEST]: __(' or <!merge request id>'),
   },
   false: {
     [issuableTypesMap.ISSUE]: '',
     [issuableTypesMap.EPIC]: '',
-    [issuableTypesMap.MERGE_REQUEST]: '',
+    [issuableTypesMap.MERGE_REQUEST]: __(' or references (e.g. path/to/project!merge_request_id)'),
   },
 };
 
 export const inputPlaceholderTextMap = {
   [issuableTypesMap.ISSUE]: __('Paste issue link'),
   [issuableTypesMap.EPIC]: __('Paste epic link'),
-  [issuableTypesMap.MERGE_REQUEST]: __('Paste a merge request link'),
+  [issuableTypesMap.MERGE_REQUEST]: __('Enter merge request URLs'),
 };
 
 export const relatedIssuesRemoveErrorMap = {

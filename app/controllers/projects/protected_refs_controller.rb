@@ -66,4 +66,4 @@ class Projects::ProtectedRefsController < Projects::ApplicationController
   end
 end
 
-Projects::ProtectedRefsController.prepend(EE::Projects::ProtectedRefsController)
+Projects::ProtectedRefsController.prepend_if_ee('EE::Projects::ProtectedRefsController')

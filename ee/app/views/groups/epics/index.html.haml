@@ -1,12 +1,19 @@
+- @can_bulk_update = can?(current_user, :admin_epic, @group) && @group.feature_available?(:group_bulk_edit)
+
 - page_title "Epics"
 
 .top-area
   = render 'shared/issuable/epic_nav', type: :epics
   .nav-controls
+    - if @can_bulk_update
+      = render_if_exists 'shared/issuable/bulk_update_button', type: :epics
     - if can?(current_user, :create_epic, @group)
       #epic-create-root{ data: { endpoint: request.url, 'align-right' => true } }
 
 = render 'shared/epic/search_bar', type: :epics
+
+- if @can_bulk_update
+  = render_if_exists 'shared/issuable/group_bulk_update_sidebar', group: @group, type: :epics
 
 - if @epics.to_a.any?
   = render 'shared/epics'

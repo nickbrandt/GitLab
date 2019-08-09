@@ -2,36 +2,26 @@
 
 exports[`Design management design index page renders design index 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column"
+  class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center"
 >
-  <toolbar-stub
-    id="1"
-    name="test.jpg"
-    updatedby="[object Object]"
-  />
-   
-  <designimage-stub
-    image="test.jpg"
-    name="test.jpg"
+  <glloadingicon-stub
+    class="align-self-center"
+    color="orange"
+    label="Loading"
+    size="xl"
   />
 </div>
 `;
 
 exports[`Design management design index page sets loading state 1`] = `
 <div
-  class="design-detail fixed-top w-100 position-bottom-0 d-flex flex-column"
+  class="design-detail fixed-top w-100 position-bottom-0 d-sm-flex justify-content-center"
 >
-  <toolbar-stub
-    id="1"
-    isloading="true"
-    name=""
-    updatedby="[object Object]"
-  />
-   
-  <designimage-stub
-    image=""
-    isloading="true"
-    name=""
+  <glloadingicon-stub
+    class="align-self-center"
+    color="orange"
+    label="Loading"
+    size="xl"
   />
 </div>
 `;

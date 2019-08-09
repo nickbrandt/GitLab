@@ -21,4 +21,4 @@ class Admin::LogsController < Admin::ApplicationController
   end
 end
 
-Admin::LogsController.prepend(EE::Admin::LogsController)
+Admin::LogsController.prepend_if_ee('EE::Admin::LogsController')

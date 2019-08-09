@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::ObjectHierarchy, :postgresql do
+describe Gitlab::ObjectHierarchy do
   let!(:parent) { create(:group) }
   let!(:child1) { create(:group, parent: parent) }
   let!(:child2) { create(:group, parent: child1) }
@@ -142,20 +142,6 @@ describe Gitlab::ObjectHierarchy, :postgresql do
       relation = described_class.new(Group.where(id: child2)).ancestors(upto: child1)
 
       expect(relation).to be_empty
-    end
-  end
-
-  describe '#root' do
-    it 'includes only the roots' do
-      relation = described_class.new(Group.where(id: child2)).roots
-
-      expect(relation).to contain_exactly(parent)
-    end
-
-    it 'when quering parent it includes parent' do
-      relation = described_class.new(Group.where(id: parent)).roots
-
-      expect(relation).to contain_exactly(parent)
     end
   end
 

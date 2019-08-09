@@ -24,14 +24,17 @@ module Peek
       end
 
       def format_call_details(call)
-        call.merge(duration: (call[:duration] * 1000).round(3),
-                   args: format_args(call[:args]))
+        super.merge(args: format_args(call[:args]))
       end
 
       def format_args(args)
         args.map do |arg|
-          # Needed to avoid infinite as_json calls
-          if arg.is_a?(Gitlab::Git::Repository)
+          # ActiveSupport::JSON recursively calls as_json on all
+          # instance variables, and if that instance variable points to
+          # something that refers back to the same instance, we can wind
+          # up in an infinite loop. Currently this only seems to happen with
+          # Gitlab::Git::Repository and ::Repository.
+          if arg.instance_variables.present?
             arg.to_s
           else
             arg

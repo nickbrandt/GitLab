@@ -9,18 +9,19 @@ exports[`DependenciesApp component on creation given a dependency list which is 
   <div
     class="d-sm-flex justify-content-between align-items-baseline my-2"
   >
-    <h4
+    <h3
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <glbadge-stub
+        data-qa-selector="dependency_list_total_content"
         pill=""
       >
         100
       </glbadge-stub>
-    </h4>
+    </h3>
      
     <dependenciesactions-stub
       namespace="allDependencies"
@@ -42,14 +43,14 @@ exports[`DependenciesApp component on creation given a fetch error matches the s
   <div
     class="d-sm-flex justify-content-between align-items-baseline my-2"
   >
-    <h4
+    <h3
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <!---->
-    </h4>
+    </h3>
      
     <dependenciesactions-stub
       namespace="allDependencies"
@@ -71,18 +72,19 @@ exports[`DependenciesApp component on creation given a list of dependencies and 
   <div
     class="d-sm-flex justify-content-between align-items-baseline my-2"
   >
-    <h4
+    <h3
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <glbadge-stub
+        data-qa-selector="dependency_list_total_content"
         pill=""
       >
         100
       </glbadge-stub>
-    </h4>
+    </h3>
      
     <dependenciesactions-stub
       namespace="allDependencies"
@@ -106,14 +108,14 @@ exports[`DependenciesApp component on creation given the dependency list job fai
   <div
     class="d-sm-flex justify-content-between align-items-baseline my-2"
   >
-    <h4
+    <h3
       class="h5"
     >
       
-      Dependencies
-      
+        Dependencies
+        
       <!---->
-    </h4>
+    </h3>
      
     <dependenciesactions-stub
       namespace="allDependencies"

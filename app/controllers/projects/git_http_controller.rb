@@ -111,4 +111,4 @@ class Projects::GitHttpController < Projects::GitHttpClientController
   end
 end
 
-Projects::GitHttpController.prepend(EE::Projects::GitHttpController)
+Projects::GitHttpController.prepend_if_ee('EE::Projects::GitHttpController')

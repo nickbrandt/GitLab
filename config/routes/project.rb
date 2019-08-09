@@ -170,7 +170,9 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             get :recent
           end
         end
+
         resources :releases, only: [:index]
+        resources :starrers, only: [:index]
         resources :forks, only: [:index, :new, :create]
         resources :group_links, only: [:index, :create, :update, :destroy], constraints: { id: /\d+/ }
 
@@ -339,11 +341,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       resource :variables, only: [:show, :update]
 
-      resources :triggers, only: [:index, :create, :edit, :update, :destroy] do
-        member do
-          post :take_ownership
-        end
-      end
+      resources :triggers, only: [:index, :create, :edit, :update, :destroy]
 
       resource :mirror, only: [:show, :update] do
         member do
@@ -504,6 +502,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :realtime_changes
           post :create_merge_request
           get :discussions, format: :json
+
+          Gitlab.ee do
+            get 'designs(/*vueroute)', to: 'issues#show', format: false
+          end
         end
 
         collection do

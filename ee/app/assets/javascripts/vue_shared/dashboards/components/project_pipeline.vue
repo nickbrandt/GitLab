@@ -86,7 +86,7 @@ export default {
     extraDownstreamTitle() {
       const extra = this.downstreamCount - this.shownDownstreamCount;
 
-      return sprintf('%{extra} more downstream pipelines', {
+      return sprintf(__('%{extra} more downstream pipelines'), {
         extra,
       });
     },

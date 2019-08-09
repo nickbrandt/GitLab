@@ -41,6 +41,14 @@ RSpec.describe AuditEvent, type: :model do
         end
       end
     end
+
+    context 'when authored by an unauthenticated user' do
+      subject(:event) { described_class.new(author_id: -1) }
+
+      it 'returns `An unauthenticated user`' do
+        expect(subject.author_name).to eq('An unauthenticated user')
+      end
+    end
   end
 
   describe '#entity' do

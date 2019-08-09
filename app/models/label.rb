@@ -137,6 +137,10 @@ class Label < ApplicationRecord
     where(id: ids)
   end
 
+  def self.on_project_board?(project_id, label_id)
+    on_project_boards(project_id).where(id: label_id).exists?
+  end
+
   def open_issues_count(user = nil)
     issues_count(user, state: 'opened')
   end
@@ -263,4 +267,4 @@ class Label < ApplicationRecord
   end
 end
 
-Label.prepend(EE::Label)
+Label.prepend_if_ee('EE::Label')

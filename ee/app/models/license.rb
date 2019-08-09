@@ -66,7 +66,6 @@ class License < ApplicationRecord
     service_desk
     smartcard_auth
     unprotection_restrictions
-    variable_environment_scope
     reject_unsigned_commits
     commit_committer_check
     external_authorization_service_api_management
@@ -89,6 +88,7 @@ class License < ApplicationRecord
     custom_prometheus_metrics
     required_ci_templates
     project_aliases
+    cycle_analytics_for_groups
   ]
   EEP_FEATURES.freeze
 
@@ -98,7 +98,6 @@ class License < ApplicationRecord
     dependency_list
     license_management
     sast
-    sast_container
     container_scanning
     cluster_health
     dast
@@ -143,7 +142,6 @@ class License < ApplicationRecord
     repository_mirrors
     scoped_issue_board
     service_desk
-    variable_environment_scope
   ].freeze
 
   FEATURES_BY_PLAN = {

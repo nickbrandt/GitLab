@@ -175,6 +175,10 @@ module Gitlab
       @project_git_route_regex ||= /#{project_route_regex}\.git/.freeze
     end
 
+    def project_wiki_git_route_regex
+      @project_wiki_git_route_regex ||= /#{PATH_REGEX_STR}\.wiki/.freeze
+    end
+
     def full_namespace_path_regex
       @full_namespace_path_regex ||= %r{\A#{full_namespace_route_regex}/\z}
     end
@@ -243,4 +247,4 @@ module Gitlab
   end
 end
 
-Gitlab::PathRegex.prepend(EE::Gitlab::PathRegex)
+Gitlab::PathRegex.prepend_if_ee('EE::Gitlab::PathRegex')

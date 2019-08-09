@@ -267,4 +267,4 @@ class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
   end
 end
 
-MergeRequestPresenter.prepend(EE::MergeRequestPresenter)
+MergeRequestPresenter.prepend_if_ee('EE::MergeRequestPresenter')

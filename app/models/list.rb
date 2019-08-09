@@ -2,13 +2,15 @@
 
 class List < ApplicationRecord
   prepend ::EE::List # rubocop: disable Cop/InjectEnterpriseEditionModule
+  include Importable
 
   belongs_to :board
   belongs_to :label
+  include Importable
 
   enum list_type: { backlog: 0, label: 1, closed: 2, assignee: 3, milestone: 4 }
 
-  validates :board, :list_type, presence: true
+  validates :board, :list_type, presence: true, unless: :importing?
   validates :label, :position, presence: true, if: :label?
   validates :label_id, uniqueness: { scope: :board_id }, if: :label?
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, if: :movable?

@@ -115,4 +115,4 @@ class Projects::GitHttpClientController < Projects::ApplicationController
   end
 end
 
-Projects::GitHttpClientController.prepend(EE::Projects::GitHttpClientController)
+Projects::GitHttpClientController.prepend_if_ee('EE::Projects::GitHttpClientController')

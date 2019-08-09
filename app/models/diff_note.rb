@@ -20,7 +20,6 @@ class DiffNote < Note
   validates :noteable_type, inclusion: { in: -> (_note) { noteable_types } }
   validate :positions_complete
   validate :verify_supported
-  validate :diff_refs_match_commit, if: :for_commit?
 
   before_validation :set_line_code, if: :on_text?
   after_save :keep_around_commits
@@ -154,12 +153,6 @@ class DiffNote < Note
     errors.add(:position, "is invalid")
   end
 
-  def diff_refs_match_commit
-    return if self.original_position.diff_refs == self.commit.diff_refs
-
-    errors.add(:commit_id, 'does not match the diff refs')
-  end
-
   def keep_around_commits
     shas = [
       self.original_position.base_sha,
@@ -181,4 +174,4 @@ class DiffNote < Note
   end
 end
 
-DiffNote.prepend(::EE::DiffNote)
+DiffNote.prepend_if_ee('::EE::DiffNote')

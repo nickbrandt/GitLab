@@ -123,4 +123,4 @@ module Projects
   end
 end
 
-Projects::Settings::CiCdController.prepend(EE::Projects::Settings::CiCdController)
+Projects::Settings::CiCdController.prepend_if_ee('EE::Projects::Settings::CiCdController')

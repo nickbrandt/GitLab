@@ -1,0 +1,87 @@
+.dropdown-container {
+  flex: 0 0 25%;
+
+  @include media-breakpoint-down(sm) {
+    .dropdown {
+      margin-bottom: $gl-padding-8;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    .group-select,
+    .project-select {
+      margin-right: $gl-padding;
+      flex: 0 1 50%;
+    }
+  }
+}
+
+.filter-container {
+  flex: 1 1 50%;
+
+  @include media-breakpoint-down(md) {
+    .filtered-search-box {
+      margin-bottom: 10px;
+    }
+
+    .issues-details-filters {
+      padding: 0;
+      background: transparent;
+    }
+  }
+}
+
+.mr-table {
+  @include media-breakpoint-down(md) {
+    .gl-responsive-table-row {
+      border: 0;
+      margin-top: 10px;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+      }
+    }
+
+    .table-section {
+      border: 0;
+      min-height: auto;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .metric-col {
+      flex: 1;
+    }
+
+    .metric-label {
+      white-space: pre-wrap;
+    }
+
+    .avatar {
+      margin-right: 0;
+    }
+  }
+
+  .metric-col {
+    flex: 0 0 50%;
+
+    .time {
+      font-size: $gl-font-size-large;
+
+      span {
+        font-size: $gl-font-size;
+      }
+    }
+  }
+
+  .card-header {
+    background-color: transparent;
+    font-weight: $gl-font-weight-bold;
+  }
+
+  .mr-title {
+    a {
+      color: $gl-text-color;
+    }
+  }
+}

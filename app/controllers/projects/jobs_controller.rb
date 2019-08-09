@@ -94,7 +94,7 @@ class Projects::JobsController < Projects::ApplicationController
   def play
     return respond_422 unless @build.playable?
 
-    build = @build.play(current_user)
+    build = @build.play(current_user, play_params[:job_variables_attributes])
     redirect_to build_path(build)
   end
 
@@ -190,6 +190,10 @@ class Projects::JobsController < Projects::ApplicationController
     { query: { 'response-content-type' => 'text/plain; charset=utf-8', 'response-content-disposition' => 'inline' } }
   end
 
+  def play_params
+    params.permit(job_variables_attributes: %i[key secret_value])
+  end
+
   def trace_artifact_file
     @trace_artifact_file ||= build.job_artifacts_trace&.file
   end
@@ -213,4 +217,4 @@ class Projects::JobsController < Projects::ApplicationController
   end
 end
 
-Projects::JobsController.prepend(EE::Projects::JobsController)
+Projects::JobsController.prepend_if_ee('EE::Projects::JobsController')

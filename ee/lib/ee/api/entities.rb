@@ -21,6 +21,16 @@ module EE
         end
       end
 
+      module EntityHelpers
+        def can_read(attr, &block)
+          ->(obj, opts) { Ability.allowed?(opts[:user], "read_#{attr}".to_sym, yield(obj)) }
+        end
+
+        def expose_restricted(attr, &block)
+          expose attr, if: can_read(attr, &block)
+        end
+      end
+
       module UserPublic
         extend ActiveSupport::Concern
 
@@ -180,18 +190,6 @@ module EE
         end
       end
 
-      module Variable
-        extend ActiveSupport::Concern
-
-        prepended do
-          expose :environment_scope, if: ->(variable, options) do
-            if variable.respond_to?(:environment_scope)
-              variable.project.feature_available?(:variable_environment_scope)
-            end
-          end
-        end
-      end
-
       module Todo
         extend ActiveSupport::Concern
 
@@ -206,13 +204,13 @@ module EE
       # EE-specific entities #
       ########################
       class ProjectPushRule < Grape::Entity
+        extend EntityHelpers
         expose :id, :project_id, :created_at
         expose :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :deny_delete_tag
         expose :member_check, :prevent_secrets, :author_email_regex
         expose :file_name_regex, :max_file_size
-        expose :commit_committer_check, if: ->(rule, opts) do
-          Ability.allowed?(opts[:user], :read_commit_committer_check, rule.project)
-        end
+        expose_restricted :commit_committer_check, &:project
+        expose_restricted :reject_unsigned_commits, &:project
       end
 
       class LdapGroupLink < Grape::Entity
@@ -367,6 +365,7 @@ module EE
         expose :reset_approvals_on_push
         expose :disable_overriding_approvers_per_merge_request
         expose :merge_requests_author_approval
+        expose :merge_requests_disable_committers_approval
       end
 
       class Approvals < Grape::Entity
@@ -551,6 +550,13 @@ module EE
         expose :job_artifacts_synced_missing_on_primary_count
         expose :job_artifacts_synced_in_percentage do |node|
           number_to_percentage(node.job_artifacts_synced_in_percentage, precision: 2)
+        end
+
+        expose :container_repositories_count
+        expose :container_repositories_synced_count
+        expose :container_repositories_failed_count
+        expose :container_repositories_synced_in_percentage do |node|
+          number_to_percentage(node.container_repositories_synced_in_percentage, precision: 2)
         end
 
         expose :projects_count

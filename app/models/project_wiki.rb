@@ -222,4 +222,4 @@ class ProjectWiki
   end
 end
 
-ProjectWiki.prepend(EE::ProjectWiki)
+ProjectWiki.prepend_if_ee('EE::ProjectWiki')

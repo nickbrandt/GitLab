@@ -48,6 +48,7 @@ class Environment < ApplicationRecord
   end
   scope :in_review_folder, -> { where(environment_type: "review") }
   scope :for_name, -> (name) { where(name: name) }
+  scope :preload_cluster, -> { preload(last_deployment: :cluster) }
 
   ##
   # Search environments which have names like the given query.
@@ -170,7 +171,7 @@ class Environment < ApplicationRecord
 
   def deployment_namespace
     strong_memoize(:kubernetes_namespace) do
-      deployment_platform&.kubernetes_namespace_for(project)
+      deployment_platform.cluster.kubernetes_namespace_for(self) if deployment_platform
     end
   end
 
@@ -204,7 +205,7 @@ class Environment < ApplicationRecord
     public_path = project.public_path_for_source_path(path, commit_sha)
     return unless public_path
 
-    [external_url, public_path].join('/')
+    [external_url.delete_suffix('/'), public_path.delete_prefix('/')].join('/')
   end
 
   def expire_etag_cache
@@ -233,6 +234,12 @@ class Environment < ApplicationRecord
     end
   end
 
+  def knative_services_finder
+    if last_deployment&.cluster
+      Clusters::KnativeServicesFinder.new(last_deployment.cluster, self)
+    end
+  end
+
   private
 
   def generate_slug
@@ -240,4 +247,4 @@ class Environment < ApplicationRecord
   end
 end
 
-Environment.prepend(EE::Environment)
+Environment.prepend_if_ee('EE::Environment')

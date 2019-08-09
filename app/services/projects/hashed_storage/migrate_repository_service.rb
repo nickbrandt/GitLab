@@ -39,4 +39,4 @@ module Projects
   end
 end
 
-Projects::HashedStorage::MigrateRepositoryService.prepend(EE::Projects::HashedStorage::MigrateRepositoryService)
+Projects::HashedStorage::MigrateRepositoryService.prepend_if_ee('EE::Projects::HashedStorage::MigrateRepositoryService')

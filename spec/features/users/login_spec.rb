@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Login' do
@@ -132,7 +134,6 @@ describe 'Login' do
       it 'does not show a "You are already signed in." error message' do
         expect(authentication_metrics)
           .to increment(:user_authenticated_counter)
-          .and increment(:user_session_override_counter)
           .and increment(:user_two_factor_authenticated_counter)
 
         enter_code(user.current_otp)
@@ -144,7 +145,6 @@ describe 'Login' do
         it 'allows login with valid code' do
           expect(authentication_metrics)
             .to increment(:user_authenticated_counter)
-            .and increment(:user_session_override_counter)
             .and increment(:user_two_factor_authenticated_counter)
 
           enter_code(user.current_otp)
@@ -170,7 +170,6 @@ describe 'Login' do
         it 'allows login with invalid code, then valid code' do
           expect(authentication_metrics)
             .to increment(:user_authenticated_counter)
-            .and increment(:user_session_override_counter)
             .and increment(:user_two_factor_authenticated_counter)
 
           enter_code('foo')
@@ -178,6 +177,15 @@ describe 'Login' do
 
           enter_code(user.current_otp)
           expect(current_path).to eq root_path
+        end
+
+        it 'triggers ActiveSession.cleanup for the user' do
+          expect(authentication_metrics)
+            .to increment(:user_authenticated_counter)
+            .and increment(:user_two_factor_authenticated_counter)
+          expect(ActiveSession).to receive(:cleanup).with(user).once.and_call_original
+
+          enter_code(user.current_otp)
         end
       end
 
@@ -195,7 +203,6 @@ describe 'Login' do
           it 'allows login' do
             expect(authentication_metrics)
               .to increment(:user_authenticated_counter)
-              .and increment(:user_session_override_counter)
               .and increment(:user_two_factor_authenticated_counter)
 
             enter_code(codes.sample)
@@ -206,7 +213,6 @@ describe 'Login' do
           it 'invalidates the used code' do
             expect(authentication_metrics)
               .to increment(:user_authenticated_counter)
-              .and increment(:user_session_override_counter)
               .and increment(:user_two_factor_authenticated_counter)
 
             expect { enter_code(codes.sample) }
@@ -216,7 +222,6 @@ describe 'Login' do
           it 'invalidates backup codes twice in a row' do
             expect(authentication_metrics)
               .to increment(:user_authenticated_counter).twice
-              .and increment(:user_session_override_counter).twice
               .and increment(:user_two_factor_authenticated_counter).twice
               .and increment(:user_session_destroyed_counter)
 
@@ -229,6 +234,15 @@ describe 'Login' do
 
             expect { enter_code(codes.sample) }
               .to change { user.reload.otp_backup_codes.size }.by(-1)
+          end
+
+          it 'triggers ActiveSession.cleanup for the user' do
+            expect(authentication_metrics)
+              .to increment(:user_authenticated_counter)
+                    .and increment(:user_two_factor_authenticated_counter)
+            expect(ActiveSession).to receive(:cleanup).with(user).once.and_call_original
+
+            enter_code(codes.sample)
           end
         end
 
@@ -274,7 +288,7 @@ describe 'Login' do
 
           expect(authentication_metrics)
             .to increment(:user_authenticated_counter)
-            .and increment(:user_session_override_counter)
+          expect(ActiveSession).to receive(:cleanup).with(user).once.and_call_original
 
           sign_in_using_saml!
 
@@ -287,8 +301,8 @@ describe 'Login' do
         it 'shows 2FA prompt after OAuth login' do
           expect(authentication_metrics)
             .to increment(:user_authenticated_counter)
-            .and increment(:user_session_override_counter)
             .and increment(:user_two_factor_authenticated_counter)
+          expect(ActiveSession).to receive(:cleanup).with(user).once.and_call_original
 
           sign_in_using_saml!
 
@@ -328,6 +342,14 @@ describe 'Login' do
         visit new_user_session_path
 
         expect(page).not_to have_content(I18n.t('devise.failure.already_authenticated'))
+      end
+
+      it 'triggers ActiveSession.cleanup for the user' do
+        expect(authentication_metrics)
+          .to increment(:user_authenticated_counter)
+        expect(ActiveSession).to receive(:cleanup).with(user).once.and_call_original
+
+        gitlab_sign_in(user)
       end
     end
 
@@ -649,7 +671,6 @@ describe 'Login' do
         it 'asks the user to accept the terms' do
           expect(authentication_metrics)
             .to increment(:user_authenticated_counter)
-            .and increment(:user_session_override_counter)
             .and increment(:user_two_factor_authenticated_counter)
 
           visit new_user_session_path
@@ -708,7 +729,6 @@ describe 'Login' do
       it 'asks the user to accept the terms before setting an email' do
         expect(authentication_metrics)
           .to increment(:user_authenticated_counter)
-          .and increment(:user_session_override_counter)
 
         gitlab_sign_in_via('saml', user, 'my-uid')
 

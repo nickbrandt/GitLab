@@ -6,10 +6,10 @@ import { s__, sprintf } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
 import EmptyState from '../components/empty_state.vue';
-import uploadDesignMutation from '../queries/uploadDesign.graphql';
-import permissionsQuery from '../queries/permissions.graphql';
+import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
+import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
-import projectQuery from '../queries/project.query.graphql';
+import projectQuery from '../graphql/queries/project.query.graphql';
 
 const MAXIMUM_FILE_UPLOAD_LIMIT = 10;
 
@@ -89,10 +89,19 @@ export default {
       }
 
       const optimisticResponse = Array.from(files).map(file => ({
+        // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         __typename: 'Design',
         id: -_.uniqueId(),
         image: '',
         filename: file.name,
+        fullPath: '',
+        diffRefs: {
+          __typename: 'DiffRefs',
+          baseSha: '',
+          startSha: '',
+          headSha: '',
+        },
         versions: {
           __typename: 'DesignVersionConnection',
           edges: {
@@ -151,9 +160,13 @@ export default {
 
             const newQueryData = {
               project: {
+                // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+                // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
                 __typename: 'Project',
                 id: '',
                 issue: {
+                  // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+                  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
                   __typename: 'Issue',
                   designs: {
                     __typename: 'DesignCollection',
@@ -180,6 +193,8 @@ export default {
             });
           },
           optimisticResponse: {
+            // False positive i18n lint: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26
+            // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
             __typename: 'Mutation',
             designManagementUpload: {
               __typename: 'DesignManagementUploadPayload',
@@ -188,15 +203,14 @@ export default {
           },
         })
         .then(() => {
-          this.isSaving = false;
           this.$router.push('/designs');
         })
         .catch(e => {
-          this.isSaving = false;
-
           createFlash(s__('DesignManagement|Error uploading a new design. Please try again'));
-
           throw e;
+        })
+        .finally(() => {
+          this.isSaving = false;
         });
     },
   },

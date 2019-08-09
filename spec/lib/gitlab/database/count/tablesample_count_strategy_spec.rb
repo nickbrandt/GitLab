@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Gitlab::Database::Count::TablesampleCountStrategy do
@@ -12,7 +14,7 @@ describe Gitlab::Database::Count::TablesampleCountStrategy do
 
   subject { strategy.count }
 
-  describe '#count', :postgresql do
+  describe '#count' do
     let(:estimates) do
       {
         Project => threshold + 1,

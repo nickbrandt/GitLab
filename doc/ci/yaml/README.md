@@ -1771,17 +1771,40 @@ sequentially from `job_name 1/N` to `job_name N/N`.
 
 For every job, `CI_NODE_INDEX` and `CI_NODE_TOTAL` [environment variables](../variables/README.md#predefined-environment-variables) are set.
 
-A simple example:
+Marking a job to be run in parallel requires only a simple addition to your configuration file:
 
-```yaml
-test:
-  script: rspec
-  parallel: 5
+```diff
+ test:
+   script: rspec
++  parallel: 5
 ```
-
 TIP: **Tip:**
 Parallelize tests suites across parallel jobs.
 Different languages have different tools to facilitate this.
+
+A simple example using [Sempahore Test Boosters](https://github.com/renderedtext/test-boosters) and RSpec to run some Ruby tests:
+
+```ruby
+# Gemfile
+source 'https://rubygems.org'
+
+gem 'rspec'
+gem 'semaphore_test_boosters'
+```
+
+```yaml
+test:
+  parallel: 3
+  script:
+    - bundle
+    - bundle exec rspec_booster --job $CI_NODE_INDEX/$CI_NODE_TOTAL
+```
+
+CAUTION: **Caution:**
+Please be aware that semaphore_test_boosters reports usages statistics to the author.
+
+You can then navigate to the **Jobs** tab of a new pipeline build and see your RSpec
+job split into three separate jobs.
 
 ### `trigger` **(PREMIUM)**
 
@@ -2445,20 +2468,20 @@ There are three possible values: `none`, `normal`, and `recursive`:
 - `normal` means that only the top-level submodules will be included. It is
   equivalent to:
 
-    ```
-    git submodule sync
-    git submodule update --init
-    ```
+  ```
+  git submodule sync
+  git submodule update --init
+  ```
 
 - `recursive` means that all submodules (including submodules of submodules)
   will be included. This feature needs Git v1.8.1 and later. When using a
   GitLab Runner with an executor not based on Docker, make sure the Git version
   meets that requirement. It is equivalent to:
 
-    ```
-    git submodule sync --recursive
-    git submodule update --init --recursive
-    ```
+  ```
+  git submodule sync --recursive
+  git submodule update --init --recursive
+  ```
 
 Note that for this feature to work correctly, the submodules must be configured
 (in `.gitmodules`) with either:

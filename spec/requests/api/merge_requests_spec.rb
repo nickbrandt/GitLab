@@ -723,7 +723,7 @@ describe API::MergeRequests do
 
     it_behaves_like 'merge requests list'
 
-    context 'when have subgroups', :nested_groups do
+    context 'when have subgroups' do
       let!(:group) { create(:group, :public) }
       let!(:subgroup) { create(:group, parent: group) }
       let!(:project) { create(:project, :public, :repository, creator: user, namespace: subgroup, only_allow_merge_if_pipeline_succeeds: false) }
@@ -1571,7 +1571,7 @@ describe API::MergeRequests do
     end
   end
 
-  describe "GET /projects/:id/merge_requests/:merge_request_iid/merge_ref" do
+  describe "GET /projects/:id/merge_requests/:merge_request_iid/merge_ref", :clean_gitlab_redis_shared_state do
     before do
       merge_request.mark_as_unchecked!
     end

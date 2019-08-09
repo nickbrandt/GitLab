@@ -13,6 +13,12 @@ module Geo
       establish_connection Rails.configuration.geo_database
     end
 
+    def self.connected?
+      super if ::Gitlab::Geo.geo_database_configured?
+
+      false
+    end
+
     def self.connection
       unless ::Gitlab::Geo.geo_database_configured?
         message = NOT_CONFIGURED_MSG

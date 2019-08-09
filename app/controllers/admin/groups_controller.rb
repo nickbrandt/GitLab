@@ -96,4 +96,4 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 end
 
-Admin::GroupsController.prepend(EE::Admin::GroupsController)
+Admin::GroupsController.prepend_if_ee('EE::Admin::GroupsController')

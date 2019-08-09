@@ -16,7 +16,7 @@ class AutocompleteController < ApplicationController
       .new(params: params, current_user: current_user, project: project, group: group)
       .execute
 
-    render json: UserSerializer.new.represent(users)
+    render json: UserSerializer.new(params).represent(users, project: project)
   end
 
   def user
@@ -47,4 +47,4 @@ class AutocompleteController < ApplicationController
   end
 end
 
-AutocompleteController.prepend(EE::AutocompleteController)
+AutocompleteController.prepend_if_ee('EE::AutocompleteController')

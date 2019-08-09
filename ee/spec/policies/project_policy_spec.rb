@@ -25,7 +25,7 @@ describe ProjectPolicy do
     include_context 'ProjectPolicy context'
 
     let(:additional_guest_permissions) do
-      %i[read_issue_link read_vulnerability_feedback read_software_license_policy]
+      %i[read_issue_link read_software_license_policy]
     end
     let(:additional_reporter_permissions) { [:admin_issue_link] }
     let(:additional_developer_permissions) { %i[admin_vulnerability_feedback read_project_security_dashboard read_feature_flag] }
@@ -359,6 +359,36 @@ describe ProjectPolicy do
         let(:current_user) { nil }
 
         it { is_expected.to be_disallowed(:read_vulnerability_feedback) }
+      end
+    end
+
+    context 'with public project' do
+      let(:current_user) { create(:user) }
+
+      context 'with limited access to both builds and merge requests' do
+        context 'when builds enabled for project members' do
+          let(:project) { create(:project, :public, :merge_requests_private, :builds_private) }
+
+          it { is_expected.not_to be_allowed(:read_vulnerability_feedback) }
+        end
+
+        context 'when public builds disabled' do
+          let(:project) { create(:project, :public, :merge_requests_private, public_builds: false) }
+
+          it { is_expected.not_to be_allowed(:read_vulnerability_feedback) }
+        end
+      end
+
+      context 'with limited access to merge requests' do
+        let(:project) { create(:project, :public, :merge_requests_private) }
+
+        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
+      end
+
+      context 'with public access to repository' do
+        let(:project) { create(:project, :public) }
+
+        it { is_expected.to be_allowed(:read_vulnerability_feedback) }
       end
     end
   end
@@ -864,6 +894,37 @@ describe ProjectPolicy do
 
       it { is_expected.not_to be_allowed(:change_commit_committer_check) }
       it { is_expected.to be_allowed(:read_commit_committer_check) }
+    end
+  end
+
+  context 'reject_unsigned_commits is not enabled by the current license' do
+    before do
+      stub_licensed_features(reject_unsigned_commits: false)
+    end
+
+    let(:current_user) { maintainer }
+
+    it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+    it { is_expected.not_to be_allowed(:read_reject_unsigned_commits) }
+  end
+
+  context 'reject_unsigned_commits is enabled by the current license' do
+    before do
+      stub_licensed_features(reject_unsigned_commits: true)
+    end
+
+    context 'the user is a maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:change_reject_unsigned_commits) }
+      it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
+    end
+
+    context 'the user is a developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.not_to be_allowed(:change_reject_unsigned_commits) }
+      it { is_expected.to be_allowed(:read_reject_unsigned_commits) }
     end
   end
 end

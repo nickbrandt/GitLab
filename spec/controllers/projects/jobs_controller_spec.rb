@@ -546,7 +546,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['id']).to eq job.id
         expect(json_response['status']).to eq job.status
-        expect(json_response['html']).to eq('<span class="">BUILD TRACE</span>')
+        expect(json_response['html']).to eq('<span>BUILD TRACE</span>')
       end
     end
 
@@ -676,6 +676,8 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
   end
 
   describe 'POST play' do
+    let(:variable_attributes) { [] }
+
     before do
       project.add_developer(user)
 
@@ -698,6 +700,14 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
       it 'transits to pending' do
         expect(job.reload).to be_pending
       end
+
+      context 'when job variables are specified' do
+        let(:variable_attributes) { [{ key: 'first', secret_value: 'first' }] }
+
+        it 'assigns the job variables' do
+          expect(job.reload.job_variables.map(&:key)).to contain_exactly('first')
+        end
+      end
     end
 
     context 'when job is not playable' do
@@ -712,7 +722,8 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
       post :play, params: {
                     namespace_id: project.namespace,
                     project_id: project,
-                    id: job.id
+                    id: job.id,
+                    job_variables_attributes: variable_attributes
                   }
     end
   end

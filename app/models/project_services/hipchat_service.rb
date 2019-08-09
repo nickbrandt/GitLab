@@ -310,4 +310,4 @@ class HipchatService < Service
   end
 end
 
-HipchatService.prepend(EE::HipchatService)
+HipchatService.prepend_if_ee('EE::HipchatService')

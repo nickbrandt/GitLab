@@ -16,7 +16,7 @@ gem 'sprockets', '~> 3.7.0'
 gem 'default_value_for', '~> 3.2.0'
 
 # Supported DBs
-gem 'pg', '~> 1.1', group: :postgres
+gem 'pg', '~> 1.1'
 
 gem 'rugged', '~> 0.28'
 gem 'grape-path-helpers', '~> 1.1'
@@ -144,7 +144,7 @@ gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '0.0.9'
-gem 'rouge', '~> 3.5'
+gem 'rouge', '~> 3.7'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
 gem 'nokogiri', '~> 1.10.3'
@@ -180,7 +180,7 @@ gem 'acts-as-taggable-on', '~> 6.0'
 gem 'sidekiq', '~> 5.2.7'
 gem 'sidekiq-cron', '~> 1.0'
 gem 'redis-namespace', '~> 1.6.0'
-gem 'gitlab-sidekiq-fetcher', '~> 0.4.0', require: 'sidekiq-reliable-fetch'
+gem 'gitlab-sidekiq-fetcher', '0.5.1', require: 'sidekiq-reliable-fetch'
 
 # Cron Parser
 gem 'fugit', '~> 1.2.1'
@@ -210,12 +210,12 @@ gem 'js_regex', '~> 3.1'
 # User agent parsing
 gem 'device_detector'
 
-# Cache
-gem 'redis-rails', '~> 5.0.2'
-
 # Redis
-gem 'redis', '~> 3.2'
+gem 'redis', '~> 4.0'
 gem 'connection_pool', '~> 2.0'
+
+# Redis session store
+gem 'redis-rails', '~> 5.0.2'
 
 # Discord integration
 gem 'discordrb-webhooks-blackst0ne', '~> 3.3', require: false
@@ -308,9 +308,6 @@ gem 'batch-loader', '~> 1.4.0'
 
 # Perf bar
 gem 'peek', '~> 1.0.1'
-gem 'peek-gc', '~> 0.0.2'
-gem 'peek-pg', '~> 1.3.0', group: :postgres
-gem 'peek-rblineprof', '~> 0.2.0'
 
 # Snowplow events tracking
 gem 'snowplow-tracker', '~> 0.6.1'
@@ -404,7 +401,6 @@ group :test do
   gem 'json-schema', '~> 2.8.0'
   gem 'webmock', '~> 3.5.1'
   gem 'rails-controller-testing'
-  gem 'sham_rack', '~> 1.3.6'
   gem 'concurrent-ruby', '~> 1.1'
   gem 'test-prof', '~> 0.2.5'
   gem 'rspec_junit_formatter'

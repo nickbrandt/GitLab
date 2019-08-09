@@ -408,4 +408,4 @@ class Event < ApplicationRecord
   end
 end
 
-Event.prepend(EE::Event)
+Event.prepend_if_ee('EE::Event')

@@ -82,7 +82,10 @@ module ContainerRegistry
     def redirect_response(location)
       return unless location
 
-      faraday_redirect.get(location)
+      uri = URI(@base_uri).merge(location)
+      raise ArgumentError, "Invalid scheme for #{location}" unless %w[http https].include?(uri.scheme)
+
+      faraday_redirect.get(uri)
     end
 
     def faraday
@@ -107,3 +110,5 @@ module ContainerRegistry
     end
   end
 end
+
+ContainerRegistry::Client.prepend_if_ee('EE::ContainerRegistry::Client')

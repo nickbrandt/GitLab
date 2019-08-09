@@ -58,7 +58,7 @@ describe RoutableActions do
         include_examples 'sso redirects'
       end
 
-      describe 'for a nested group', :nested_groups do
+      describe 'for a nested group' do
         let(:routable) { create(:group, :private, parent: root_group) }
 
         include_examples 'sso redirects'
@@ -70,7 +70,7 @@ describe RoutableActions do
         include_examples 'sso redirects'
       end
 
-      describe 'for a nested project', :nested_groups do
+      describe 'for a nested project' do
         let(:routable) { create(:project, :private, group: create(:group, :private, parent: root_group)) }
 
         include_examples 'sso redirects'

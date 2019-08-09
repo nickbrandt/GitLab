@@ -5,7 +5,7 @@ exports[`Design management list component renders list 1`] = `
   class="list-unstyled row"
 >
   <li
-    class="col-md-6 col-lg-4"
+    class="col-md-6 col-lg-4 mb-3"
   >
     <design-stub
       commentscount="2"
@@ -16,7 +16,7 @@ exports[`Design management list component renders list 1`] = `
     />
   </li>
   <li
-    class="col-md-6 col-lg-4"
+    class="col-md-6 col-lg-4 mb-3"
   >
     <design-stub
       commentscount="2"

@@ -4,8 +4,8 @@ class Milestone < ApplicationRecord
   # Represents a "No Milestone" state used for filtering Issues and Merge
   # Requests that have no milestone assigned.
   MilestoneStruct = Struct.new(:title, :name, :id)
-  None = MilestoneStruct.new('No Milestone', 'No Milestone', 0)
-  Any = MilestoneStruct.new('Any Milestone', '', -1)
+  None = MilestoneStruct.new('No Milestone', 'No Milestone', -1)
+  Any = MilestoneStruct.new('Any Milestone', '', nil)
   Upcoming = MilestoneStruct.new('Upcoming', '#upcoming', -2)
   Started = MilestoneStruct.new('Started', '#started', -3)
 
@@ -151,29 +151,10 @@ class Milestone < ApplicationRecord
   end
 
   def self.upcoming_ids(projects, groups)
-    rel = unscoped
-            .for_projects_and_groups(projects, groups)
-            .active.where('milestones.due_date > CURRENT_DATE')
-
-    if Gitlab::Database.postgresql?
-      rel.order(:project_id, :group_id, :due_date).select('DISTINCT ON (project_id, group_id) id')
-    else
-      # We need to use MySQL's NULL-safe comparison operator `<=>` here
-      # because one of `project_id` or `group_id` is always NULL
-      join_clause = <<~HEREDOC
-        LEFT OUTER JOIN milestones earlier_milestones
-          ON milestones.project_id <=> earlier_milestones.project_id
-            AND milestones.group_id <=> earlier_milestones.group_id
-            AND milestones.due_date > earlier_milestones.due_date
-            AND earlier_milestones.due_date > CURRENT_DATE
-            AND earlier_milestones.state = 'active'
-      HEREDOC
-
-      rel
-        .joins(join_clause)
-        .where('earlier_milestones.id IS NULL')
-        .select(:id)
-    end
+    unscoped
+      .for_projects_and_groups(projects, groups)
+      .active.where('milestones.due_date > CURRENT_DATE')
+      .order(:project_id, :group_id, :due_date).select('DISTINCT ON (project_id, group_id) id')
   end
 
   def participants

@@ -140,4 +140,4 @@ module Projects
   end
 end
 
-Projects::AfterRenameService.prepend(EE::Projects::AfterRenameService)
+Projects::AfterRenameService.prepend_if_ee('EE::Projects::AfterRenameService')

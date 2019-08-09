@@ -22,6 +22,7 @@ module EE
 
             if child_epic && !quick_action_target.child?(child_epic.id)
               EpicLinks::CreateService.new(quick_action_target, current_user, { target_issuable: child_epic }).execute
+              @execution_message[:child_epic] = _("Added %{epic_ref} as child epic.") % { epic_ref: child_epic.to_reference(quick_action_target) }
             end
           end
 
@@ -29,7 +30,7 @@ module EE
           explanation do |epic_param|
             child_epic = extract_epic(epic_param)
 
-            _("Removes %{epic_ref} from child epics.") % { epic_ref: child_epic.to_reference(quick_action_target) } if child_epic
+            _("Removes %{epic_ref} from child epics.") % { epic_ref: child_epic.to_reference(quick_action_target) }
           end
           types Epic
           condition { action_allowed? }
@@ -39,6 +40,7 @@ module EE
 
             if child_epic && quick_action_target.child?(child_epic.id)
               EpicLinks::DestroyService.new(child_epic, current_user).execute
+              @execution_message[:remove_child_epic] = _("Removed %{epic_ref} from child epics.") % { epic_ref: child_epic.to_reference(quick_action_target) }
             end
           end
 
@@ -56,6 +58,7 @@ module EE
 
             if parent_epic && !parent_epic.child?(quick_action_target.id)
               EpicLinks::CreateService.new(parent_epic, current_user, { target_issuable: quick_action_target }).execute
+              @execution_message[:parent_epic] = _("Set %{epic_ref} as parent epic.") % { epic_ref: parent_epic.to_reference(quick_action_target) }
             end
           end
 
@@ -70,7 +73,9 @@ module EE
             action_allowed? && quick_action_target.parent.present?
           end
           command :remove_parent_epic do
+            parent_epic = quick_action_target.parent
             EpicLinks::DestroyService.new(quick_action_target, current_user).execute
+            @execution_message[:remove_parent_epic] = _('Removed parent epic %{epic_ref}.') % { epic_ref: parent_epic.to_reference(quick_action_target) }
           end
 
           private
@@ -82,7 +87,7 @@ module EE
           end
 
           def action_allowed?
-            ::Epic.supports_nested_objects? && quick_action_target.group&.feature_available?(:epics) &&
+            quick_action_target.group&.feature_available?(:epics) &&
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
           end
         end

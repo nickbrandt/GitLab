@@ -16,4 +16,4 @@ class ProjectMemberPresenter < MemberPresenter
   end
 end
 
-ProjectMemberPresenter.prepend(EE::ProjectMemberPresenter)
+ProjectMemberPresenter.prepend_if_ee('EE::ProjectMemberPresenter')

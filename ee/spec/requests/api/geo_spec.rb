@@ -244,7 +244,7 @@ describe API::Geo do
     end
   end
 
-  describe 'POST /geo/status', :postgresql do
+  describe 'POST /geo/status' do
     let(:geo_base_request) { Gitlab::Geo::BaseRequest.new(scope: ::Gitlab::Geo::API_SCOPE) }
 
     let(:data) do
@@ -265,6 +265,9 @@ describe API::Geo do
         job_artifacts_synced_count: 50,
         job_artifacts_failed_count: 12,
         job_artifacts_synced_missing_on_primary_count: 5,
+        container_repositories_count: 100,
+        container_repositories_synced_count: 50,
+        container_repositories_failed_count: 12,
         attachments_count: 30,
         attachments_synced_count: 30,
         attachments_failed_count: 25,

@@ -189,17 +189,11 @@ function deploy() {
   gitlab_shell_image_repository="${IMAGE_REPOSITORY}/gitlab-shell"
   gitlab_workhorse_image_repository="${IMAGE_REPOSITORY}/gitlab-workhorse-${IMAGE_VERSION}"
 
-  # Cleanup and previous installs, as FAILED and PENDING_UPGRADE will cause errors with `upgrade`
-  if [ "$CI_ENVIRONMENT_SLUG" != "production" ] && previous_deploy_failed "$CI_ENVIRONMENT_SLUG" ; then
-    echo "Deployment in bad state, cleaning up $CI_ENVIRONMENT_SLUG"
-    delete
-  fi
-
   create_application_secret
 
 HELM_CMD=$(cat << EOF
   helm upgrade --install \
-    --wait \
+    --atomic \
     --timeout 900 \
     --set releaseOverride="$CI_ENVIRONMENT_SLUG" \
     --set global.appConfig.enableUsagePing=false \
@@ -343,31 +337,6 @@ function display_deployment_debug() {
     echoinfo "Logs tail of the ${unicorn_pod} pod..."
 
     kubectl logs -n "$KUBE_NAMESPACE" -c unicorn "${unicorn_pod}" | sed "s/${REVIEW_APPS_ROOT_PASSWORD}/[REDACTED]/g"
-  fi
-}
-
-function wait_for_review_app_to_be_accessible() {
-  echoinfo "Waiting for the Review App at ${CI_ENVIRONMENT_URL} to be accessible..." true
-
-  local interval=5
-  local elapsed_seconds=0
-  local max_seconds=$((2 * 60))
-  while true; do
-    local review_app_http_code
-    review_app_http_code=$(curl --silent --output /dev/null --max-time 5 --write-out "%{http_code}" "${CI_ENVIRONMENT_URL}/users/sign_in")
-    if [[ "${review_app_http_code}" -eq "200" ]] || [[ "${elapsed_seconds}" -gt "${max_seconds}" ]]; then
-      break
-    fi
-
-    let "elapsed_seconds+=interval"
-    sleep ${interval}
-  done
-
-  if [[ "${review_app_http_code}" -eq "200" ]]; then
-    echoinfo "The Review App at ${CI_ENVIRONMENT_URL} is ready after ${elapsed_seconds} seconds!"
-  else
-    echoerr "The Review App at ${CI_ENVIRONMENT_URL} isn't ready after ${max_seconds} seconds of polling..."
-    exit 1
   fi
 }
 

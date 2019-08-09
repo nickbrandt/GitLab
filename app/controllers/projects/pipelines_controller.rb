@@ -198,4 +198,4 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 end
 
-Projects::PipelinesController.prepend(EE::Projects::PipelinesController)
+Projects::PipelinesController.prepend_if_ee('EE::Projects::PipelinesController')

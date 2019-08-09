@@ -13,25 +13,13 @@ describe Gitlab::Geo::HealthCheck, :geo do
 
     context 'when an exception is raised' do
       it 'catches the exception nicely and returns the message' do
-        allow(Gitlab::Database).to receive(:postgresql?).and_raise('Uh oh')
+        allow(Gitlab::Geo).to receive(:secondary?).and_raise('Uh oh')
 
         expect(subject.perform_checks).to eq('Uh oh')
       end
     end
 
-    context 'without PostgreSQL' do
-      it 'raises an error' do
-        allow(Gitlab::Database).to receive(:postgresql?) { false }
-
-        expect { subject.perform_checks }.to raise_error(NotImplementedError)
-      end
-    end
-
     context 'with PostgreSQL' do
-      before do
-        allow(Gitlab::Database).to receive(:postgresql?) { true }
-      end
-
       context 'on the primary node' do
         it 'returns an empty string' do
           allow(Gitlab::Geo).to receive(:secondary?) { false }
@@ -55,6 +43,14 @@ describe Gitlab::Geo::HealthCheck, :geo do
 
           it 'returns an error' do
             expect(subject.perform_checks).to include('Geo database configuration file is missing')
+          end
+        end
+
+        context 'when reusing an existing tracking database' do
+          it 'returns an error when event_log_state is older than current node created_at' do
+            create(:geo_event_log_state, created_at: 3.months.ago)
+
+            expect(subject.perform_checks).to include('An existing tracking database cannot be reused.')
           end
         end
 

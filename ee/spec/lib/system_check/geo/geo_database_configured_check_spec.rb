@@ -35,10 +35,22 @@ describe SystemCheck::Geo::GeoDatabaseConfiguredCheck do
       expect(subject.multi_check).to be_falsey
     end
 
+    it "checks if existing database is being reused" do
+      stub_configuration_check(true)
+      stub_connection_state(true)
+      stub_tables_existence(true)
+      stub_fresh_database(false)
+
+      expect(subject).to receive(:try_fixing_it).with(described_class::REUSING_EXISTING_DATABASE_MESSAGE)
+
+      expect(subject.multi_check).to be_falsey
+    end
+
     it "returns true when all checks passed" do
       stub_configuration_check(true)
       stub_connection_state(true)
       stub_tables_existence(true)
+      stub_fresh_database(true)
 
       expect(subject).not_to receive(:try_fixing_it)
 
@@ -58,5 +70,11 @@ describe SystemCheck::Geo::GeoDatabaseConfiguredCheck do
 
   def stub_tables_existence(state)
     expect_any_instance_of(ActiveRecord::MigrationContext).to receive(:needs_migration?).and_return(!state)
+  end
+
+  def stub_fresh_database(state)
+    expect_next_instance_of(Gitlab::Geo::HealthCheck) do |geo_health_check|
+      expect(geo_health_check).to receive(:reusing_existing_tracking_database?).and_return(!state)
+    end
   end
 end

@@ -81,4 +81,4 @@ module Users
   end
 end
 
-Users::UpdateService.prepend(EE::Users::UpdateService)
+Users::UpdateService.prepend_if_ee('EE::Users::UpdateService')

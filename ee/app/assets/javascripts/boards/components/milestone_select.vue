@@ -1,9 +1,40 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import MilestoneSelect from '~/milestone_select';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 
-const ANY_MILESTONE = 'Any Milestone';
-const NO_MILESTONE = 'No Milestone';
+const ANY_MILESTONE = {
+  title: __('Any Milestone'),
+  titleClass: 'text-secondary',
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  name: 'Any',
+  id: null,
+};
+
+const NO_MILESTONE = {
+  title: __('No Milestone'),
+  // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
+  name: 'None',
+  id: -1,
+};
+
+const DEFAULT_MILESTONE = {
+  title: ANY_MILESTONE.title,
+  titleClass: 'bold',
+  name: '',
+};
+
+function getMilestoneIdFromTitle({ title, id }) {
+  switch (title) {
+    case ANY_MILESTONE.title:
+      return ANY_MILESTONE.id;
+    case NO_MILESTONE.title:
+      return NO_MILESTONE.id;
+    default:
+      return id;
+  }
+}
 
 export default {
   components: {
@@ -26,22 +57,27 @@ export default {
   },
 
   computed: {
-    milestoneTitle() {
-      if (this.noMilestone) return NO_MILESTONE;
-      return this.board.milestone ? this.board.milestone.title : ANY_MILESTONE;
+    milestone() {
+      switch (this.milestoneId) {
+        case NO_MILESTONE.id:
+          return NO_MILESTONE;
+        case ANY_MILESTONE.id:
+          return ANY_MILESTONE;
+        default:
+          return this.board.milestone || DEFAULT_MILESTONE;
+      }
     },
-    noMilestone() {
-      return this.milestoneId === 0;
+    milestoneTitle() {
+      return this.milestone.title;
     },
     milestoneId() {
       return this.board.milestone_id;
     },
     milestoneTitleClass() {
-      return this.milestoneTitle === ANY_MILESTONE ? 'text-secondary' : 'bold';
+      return this.milestone.titleClass || DEFAULT_MILESTONE.titleClass;
     },
     selected() {
-      if (this.noMilestone) return NO_MILESTONE;
-      return this.board.milestone ? this.board.milestone.name : '';
+      return this.milestone.name;
     },
   },
   mounted() {
@@ -51,13 +87,7 @@ export default {
   },
   methods: {
     selectMilestone(milestone) {
-      let { id } = milestone;
-      // swap the IDs of 'Any' and 'No' milestone to what backend requires
-      if (milestone.title === ANY_MILESTONE) {
-        id = -1;
-      } else if (milestone.title === NO_MILESTONE) {
-        id = 0;
-      }
+      const id = getMilestoneIdFromTitle(milestone);
       this.board.milestone_id = id;
       this.board.milestone = {
         ...milestone,
@@ -72,7 +102,9 @@ export default {
   <div class="block milestone">
     <div class="title append-bottom-10">
       Milestone
-      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">
+        {{ __('Edit') }}
+      </button>
     </div>
     <div :class="milestoneTitleClass" class="value">{{ milestoneTitle }}</div>
     <div class="selectbox" style="display: none;">
@@ -98,7 +130,7 @@ export default {
             <input
               type="search"
               class="dropdown-input-field"
-              placeholder="Search milestones"
+              :placeholder="__('Search milestones')"
               autocomplete="off"
             />
             <i aria-hidden="true" data-hidden="true" class="fa fa-search dropdown-input-search">

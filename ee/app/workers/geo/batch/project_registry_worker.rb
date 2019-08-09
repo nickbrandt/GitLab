@@ -12,14 +12,21 @@ module Geo
       include ::Gitlab::Geo::LogHelpers
 
       BATCH_SIZE = 250
-      OPERATIONS = [:resync_repositories, :recheck_repositories].freeze
+      OPERATIONS = [:resync_repositories, :reverify_repositories].freeze
 
       def perform(operation, range)
+        # TODO: This is a temporary workaround for backward compatibility
+        # to avoid jobs that have been already scheduled to fail.
+        # See https://gitlab.com/gitlab-org/gitlab-ee/issues/13318
+        if operation.to_sym == :recheck_repositories
+          operation = :reverify_repositories
+        end
+
         case operation.to_sym
         when :resync_repositories
           resync_repositories(range)
-        when :recheck_repositories
-          recheck_repositories(range)
+        when :reverify_repositories
+          reverify_repositories(range)
         else
           fail_invalid_operation!(operation)
         end
@@ -33,9 +40,9 @@ module Geo
         end
       end
 
-      def recheck_repositories(range)
+      def reverify_repositories(range)
         Geo::ProjectRegistry.with_range(range[0], range[1]).each_batch(of: BATCH_SIZE) do |batch|
-          batch.flag_repositories_for_recheck!
+          batch.flag_repositories_for_reverify!
         end
       end
 

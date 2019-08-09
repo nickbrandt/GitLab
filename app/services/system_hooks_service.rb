@@ -149,4 +149,4 @@ class SystemHooksService
   end
 end
 
-SystemHooksService.prepend(EE::SystemHooksService)
+SystemHooksService.prepend_if_ee('EE::SystemHooksService')

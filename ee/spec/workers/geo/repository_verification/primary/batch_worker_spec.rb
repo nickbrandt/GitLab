@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositoryVerification::Primary::BatchWorker, :postgresql, :clean_gitlab_redis_cache do
+describe Geo::RepositoryVerification::Primary::BatchWorker, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
 
   set(:healthy_not_verified) { create(:project) }

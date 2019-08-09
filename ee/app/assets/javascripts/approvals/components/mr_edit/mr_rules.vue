@@ -50,7 +50,7 @@ export default {
           :disabled="!settings.canEdit"
           class="form-control mw-6em"
           type="number"
-          :min="rule.minApprovalsRequired"
+          :min="rule.minApprovalsRequired || 0"
           @input="putRule({ id: rule.id, approvalsRequired: Number($event.target.value) })"
         />
       </td>

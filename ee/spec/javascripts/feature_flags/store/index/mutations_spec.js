@@ -2,6 +2,7 @@ import state from 'ee/feature_flags/store/modules/index/state';
 import mutations from 'ee/feature_flags/store/modules/index/mutations';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import { getRequestData, rotateData } from '../../mock_data';
 
 describe('Feature flags store Mutations', () => {
@@ -73,8 +74,13 @@ describe('Feature flags store Mutations', () => {
       expect(stateCopy.hasError).toEqual(false);
     });
 
-    it('should set featureFlags with the given data', () => {
-      expect(stateCopy.featureFlags).toEqual(getRequestData.feature_flags);
+    it('should set featureFlags with the transformed data', () => {
+      const expected = getRequestData.feature_flags.map(f => ({
+        ...f,
+        scopes: mapToScopesViewModel(f.scopes || []),
+      }));
+
+      expect(stateCopy.featureFlags).toEqual(expected);
     });
 
     it('should set count with the given data', () => {

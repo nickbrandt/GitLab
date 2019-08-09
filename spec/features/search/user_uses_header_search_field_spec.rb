@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'User uses header search field', :js do
@@ -20,7 +22,7 @@ describe 'User uses header search field', :js do
       fill_in('search', with: 'gitlab')
       find('#search').native.send_keys(:enter)
 
-      page.within('.breadcrumbs-sub-title') do
+      page.within('.page-title') do
         expect(page).to have_content('Search')
       end
     end

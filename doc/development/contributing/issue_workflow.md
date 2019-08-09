@@ -92,9 +92,6 @@ The following team labels are **true** teams per our [organization structure](ht
 The descriptions on the [labels page](https://gitlab.com/gitlab-org/gitlab-ce/-/labels) explain what falls under the
 responsibility of each team.
 
-Within those team labels, we also have the ~backend and ~frontend labels to
-indicate if an issue needs backend work, frontend work, or both.
-
 Team labels are always capitalized so that they show up as the first label for
 any issue.
 
@@ -106,15 +103,6 @@ The current stage labels can be found by [searching the labels list for `devops:
 
 These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
 and thus are mutually exclusive.
-
-They differ from the [Team labels](#team-labels) because teams may work on
-issues outside their stage.
-
-Normally there is a 1:1 relationship between Stage labels and Team labels, but
-any issue can be picked up by any team, depending on current priorities.
-So, an issue labeled ~"devops:create" may be scheduled by the ~Plan team, for
-example. In such cases, it's usual to include both team labels so each team can
-be aware of the progress.
 
 The Stage labels are used to generate the [direction pages][direction-pages] automatically.
 
@@ -130,9 +118,16 @@ The current group labels can be found by [searching the labels list for `group::
 These labels are [scoped labels](../../user/project/labels.md#scoped-labels-premium)
 and thus are mutually exclusive.
 
-Groups are nested beneath a particular stage, so only one stage label and one group label
-can be applied to a single issue. You can find the groups listed in the
-[Product Categories pages][product-categories].
+You can find the groups listed in the [Product Stages, Groups, and Categories][product-categories] page.
+
+We use the term group to map down product requirements from our product stages. 
+As a team needs some way to collect the work their members are planning to be assigned to, we use the `~group::` labels to do so.
+
+Normally there is a 1:1 relationship between Stage labels and Group labels. In the spirit of "Everyone can contribute",
+any issue can be picked up by any group, depending on current priorities. For example, an issue labeled ~"devops::create" may be picked up by the ~"group::access" group.
+
+We also use stage and group labels to help quantify our [throughput](https://about.gitlab.com/handbook/engineering/management/throughput). 
+Please read [Stage and Group labels in Throughtput](https://about.gitlab.com/handbook/engineering/management/throughput/#stage-and-group-labels-in-throughput) for more information on how the labels are used in this context.
 
 [structure-groups]: https://about.gitlab.com/company/team/structure/#groups
 [product-categories]: https://about.gitlab.com/handbook/product/categories/
@@ -245,7 +240,7 @@ know how difficult the issue is. Additionally:
   as suitable for people that have never contributed to GitLab before on the
   [Up For Grabs campaign](http://up-for-grabs.net)
 - We encourage people that have never contributed to any open source project to
-  look for [`Accepting merge requests` issues with a weight of 1][firt-timers]
+  look for [`Accepting merge requests` issues with a weight of 1][first-timers]
 
 If you've decided that you would like to work on an issue, please @-mention
 the [appropriate product manager](https://about.gitlab.com/handbook/product/#who-to-talk-to-for-what)
@@ -258,8 +253,8 @@ GitLab team members who apply the ~"Accepting merge requests" label to an issue
 should update the issue description with a responsible product manager, inviting
 any potential community contributor to @-mention per above.
 
-[up-for-grabs]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=0&sort=weight
-[firt-timers]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=0&sort=weight&weight=1
+[up-for-grabs]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=None&sort=weight
+[first-timers]: https://gitlab.com/groups/gitlab-org/-/issues?state=opened&label_name[]=Accepting+merge+requests&assignee_id=None&sort=weight&weight=1
 
 ## Issue triaging
 

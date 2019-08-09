@@ -138,4 +138,4 @@ module Boards
   end
 end
 
-Boards::Issues::MoveService.prepend(EE::Boards::Issues::MoveService)
+Boards::Issues::MoveService.prepend_if_ee('EE::Boards::Issues::MoveService')

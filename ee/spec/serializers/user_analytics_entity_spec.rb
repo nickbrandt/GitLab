@@ -12,13 +12,9 @@ describe UserAnalyticsEntity do
       total_events: {}
     }
   end
-  let(:request) { double('request') }
+  let(:request) { double('request', data_collector: instance_double(Gitlab::ContributionAnalytics::DataCollector, totals: events)) }
 
   subject(:json) { described_class.new(user, request: request).as_json }
-
-  before do
-    allow(request).to receive(:events).and_return(events)
-  end
 
   it 'has all the user attributes' do
     is_expected.to include(:username, :fullname, :user_web_url)

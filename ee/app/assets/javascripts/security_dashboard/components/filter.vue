@@ -36,6 +36,9 @@ export default {
         option.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
       );
     },
+    qaSelector() {
+      return `filter_${this.filter.name.toLowerCase().replace(' ', '_')}_dropdown`;
+    },
   },
   methods: {
     ...mapActions('filters', ['setFilter']),
@@ -60,7 +63,7 @@ export default {
     <strong class="js-name">{{ filter.name }}</strong>
     <gl-dropdown ref="dropdown" class="d-block mt-1" menu-class="dropdown-extended-height">
       <template slot="button-content">
-        <span class="text-truncate">
+        <span class="text-truncate" :data-qa-selector="qaSelector">
           {{ selectedOptionText.firstOption }}
         </span>
         <span v-if="selectedOptionText.extraOptionCount" class="flex-grow-1 ml-1">
@@ -91,7 +94,10 @@ export default {
         :placeholder="__('Filter...')"
       />
 
-      <div :class="{ 'dropdown-content': filterId === 'project_id' }">
+      <div
+        data-qa-selector="filter_dropdown_content"
+        :class="{ 'dropdown-content': filterId === 'project_id' }"
+      >
         <button
           v-for="option in filteredOptions"
           :key="option.id"

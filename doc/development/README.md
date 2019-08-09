@@ -113,6 +113,10 @@ description: 'Learn how to contribute to GitLab.'
 - [Database helper modules](database_helpers.md)
 - [Code comments](code_comments.md)
 
+## Case studies
+
+- [Database case study: Filtering by label](filtering_by_label.md)
+
 ## Integration guides
 
 - [Jira Connect app](integrations/jira_connect.md)
@@ -145,6 +149,10 @@ description: 'Learn how to contribute to GitLab.'
 ## Go guides
 
 - [Go Guidelines](go_guide/index.md)
+
+## Shell Scripting guides
+
+- [Shell scripting standards and style guidelines](shell_scripting_guide/index.md)
 
 ## Other GitLab Development Kit (GDK) guides
 

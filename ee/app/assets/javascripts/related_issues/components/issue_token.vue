@@ -1,5 +1,5 @@
 <script>
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import relatedIssuableMixin from '~/vue_shared/mixins/related_issuable_mixin';
 
 export default {
@@ -14,7 +14,8 @@ export default {
   },
   computed: {
     removeButtonLabel() {
-      return `Remove ${this.displayReference}`;
+      const { displayReference } = this;
+      return sprintf(__('Remove %{displayReference}'), { displayReference });
     },
     stateTitle() {
       if (this.isCondensed) return '';

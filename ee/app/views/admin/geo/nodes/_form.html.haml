@@ -8,12 +8,12 @@
   .form-group.col-sm-6
     = form.label :url, s_('Geo|URL'), class: 'font-weight-bold'
     = form.text_field :url, class: 'form-control qa-node-url-field'
-    .form-text.text-muted= _('The user-facing URL of the Geo node.')
+    .form-text.text-muted= _('The user-facing URL of the Geo node')
 
   .form-group.col-sm-6.js-internal-url{ class: ('hidden' unless geo_node.primary?) }
-    = form.label :internal_url, s_('Geo|Internal URL'), class: 'font-weight-bold'
+    = form.label :internal_url, s_('Geo|Internal URL (optional)'), class: 'font-weight-bold'
     = form.text_field :internal_url, class: 'form-control'
-    .form-text.text-muted= s_('Geo|The URL defined on the primary node that secondary nodes should use to contact it. Returns `url` if not set')
+    .form-text.text-muted= s_('Geo|The URL defined on the primary node that secondary nodes should use to contact it. Defaults to URL')
 
 
 .form-group.row

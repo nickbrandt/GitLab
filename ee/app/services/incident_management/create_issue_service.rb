@@ -13,6 +13,10 @@ module IncidentManagement
       DESCRIPTION
     }.freeze
 
+    def initialize(project, params)
+      super(project, User.alert_bot, params)
+    end
+
     def execute
       return error_with('setting disabled') unless incident_management_setting.create_issue?
       return error_with('invalid alert') unless alert.valid?
@@ -42,17 +46,11 @@ module IncidentManagement
     def do_create_issue(**params)
       Issues::CreateService.new(
         project,
-        issue_author,
+        current_user,
         title: issue_title,
         description: issue_description,
         **params
       ).execute
-    end
-
-    def issue_author
-      strong_memoize(:issue_author) do
-        User.alert_bot
-      end
     end
 
     def issue_title
@@ -77,7 +75,7 @@ module IncidentManagement
 
     def find_or_create_label(**params)
       Labels::FindOrCreateService
-        .new(issue_author, project, **params)
+        .new(current_user, project, **params)
         .execute
     end
 

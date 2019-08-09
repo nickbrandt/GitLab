@@ -6,7 +6,11 @@ import { TEST_HOST } from 'helpers/test_constants';
 import * as actions from 'ee/dependencies/store/modules/list/actions';
 import * as types from 'ee/dependencies/store/modules/list/mutation_types';
 import getInitialState from 'ee/dependencies/store/modules/list/state';
-import { SORT_ORDER, FETCH_ERROR_MESSAGE } from 'ee/dependencies/store/modules/list/constants';
+import {
+  FILTER,
+  SORT_ORDER,
+  FETCH_ERROR_MESSAGE,
+} from 'ee/dependencies/store/modules/list/constants';
 import createFlash from '~/flash';
 
 import mockDependenciesResponse from './data/mock_dependencies';
@@ -50,6 +54,25 @@ describe('Dependencies actions', () => {
         ],
         [],
       ));
+  });
+
+  describe('setInitialState', () => {
+    it('commits the SET_INITIAL_STATE mutation', () => {
+      const payload = { filter: 'foo' };
+
+      return testAction(
+        actions.setInitialState,
+        payload,
+        getInitialState(),
+        [
+          {
+            type: types.SET_INITIAL_STATE,
+            payload,
+          },
+        ],
+        [],
+      );
+    });
   });
 
   describe('requestDependencies', () => {
@@ -141,6 +164,7 @@ describe('Dependencies actions', () => {
             sort_by: state.sortField,
             sort: state.sortOrder,
             page: state.pageInfo.page,
+            filter: state.filter,
           };
 
           mock
@@ -167,7 +191,12 @@ describe('Dependencies actions', () => {
       });
 
       describe('given params', () => {
-        const paramsGiven = { sort_by: 'packager', sort: SORT_ORDER.descending, page: 4 };
+        const paramsGiven = {
+          sort_by: 'packager',
+          sort: SORT_ORDER.descending,
+          page: 4,
+          filter: FILTER.vulnerable,
+        };
 
         beforeEach(() => {
           mock

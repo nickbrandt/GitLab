@@ -50,6 +50,12 @@ module EE
         not_found! unless user_project.feature_available?(feature)
       end
 
+      def authorize_change_param(subject, *keys)
+        keys.each do |key|
+          authorize!("change_#{key}".to_sym, subject) if params.has_key?(key)
+        end
+      end
+
       def check_sha_param!(params, merge_request)
         if params[:sha] && merge_request.diff_head_sha != params[:sha]
           render_api_error!("SHA does not match HEAD of source branch: #{merge_request.diff_head_sha}", 409)
@@ -108,6 +114,17 @@ module EE
       # rubocop: enable CodeReuse/ActiveRecord
 
       private
+
+      override :send_git_archive
+      def send_git_archive(repository, **kwargs)
+        AuditEvents::RepositoryDownloadStartedAuditEventService.new(
+          current_user,
+          repository.project,
+          ip_address
+        ).for_project.security_event
+
+        super
+      end
 
       def private_token
         params[::APIGuard::PRIVATE_TOKEN_PARAM] || env[::APIGuard::PRIVATE_TOKEN_HEADER]

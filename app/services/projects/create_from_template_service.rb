@@ -27,4 +27,4 @@ module Projects
   end
 end
 
-Projects::CreateFromTemplateService.prepend(EE::Projects::CreateFromTemplateService)
+Projects::CreateFromTemplateService.prepend_if_ee('EE::Projects::CreateFromTemplateService')

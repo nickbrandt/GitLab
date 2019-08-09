@@ -24,7 +24,7 @@ describe Gitlab::UsageData do
       create(:cluster, :group, :disabled)
       create(:clusters_applications_helm, :installed, cluster: gcp_cluster)
       create(:clusters_applications_ingress, :installed, cluster: gcp_cluster)
-      create(:clusters_applications_cert_managers, :installed, cluster: gcp_cluster)
+      create(:clusters_applications_cert_manager, :installed, cluster: gcp_cluster)
       create(:clusters_applications_prometheus, :installed, cluster: gcp_cluster)
       create(:clusters_applications_runner, :installed, cluster: gcp_cluster)
       create(:clusters_applications_knative, :installed, cluster: gcp_cluster)
@@ -62,12 +62,16 @@ describe Gitlab::UsageData do
       ))
 
       expect(subject).to include(
+        snippet_create: a_kind_of(Integer),
+        snippet_update: a_kind_of(Integer),
+        snippet_comment: a_kind_of(Integer),
         wiki_pages_create: a_kind_of(Integer),
         wiki_pages_update: a_kind_of(Integer),
         wiki_pages_delete: a_kind_of(Integer),
         web_ide_views: a_kind_of(Integer),
         web_ide_commits: a_kind_of(Integer),
-        web_ide_merge_requests: a_kind_of(Integer)
+        web_ide_merge_requests: a_kind_of(Integer),
+        navbar_searches: a_kind_of(Integer)
       )
     end
 

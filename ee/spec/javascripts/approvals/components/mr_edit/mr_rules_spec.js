@@ -16,8 +16,13 @@ localVue.use(Vuex);
 describe('EE Approvals MRRules', () => {
   let wrapper;
   let store;
+  let approvalRules;
 
   const factory = () => {
+    if (approvalRules) {
+      store.modules.approvals.state.rules = approvalRules;
+    }
+
     wrapper = mount(localVue.extend(MRRules), {
       localVue,
       store: new Vuex.Store(store),
@@ -47,6 +52,8 @@ describe('EE Approvals MRRules', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+    store = null;
+    approvalRules = null;
   });
 
   describe('when allow multiple rules', () => {
@@ -64,7 +71,7 @@ describe('EE Approvals MRRules', () => {
       const expected = createMRRuleWithSource();
 
       beforeEach(() => {
-        store.modules.approvals.state.rules = [createMRRuleWithSource()];
+        approvalRules = [createMRRuleWithSource()];
 
         factory();
       });
@@ -110,15 +117,30 @@ describe('EE Approvals MRRules', () => {
       const expected = createMRRule();
 
       beforeEach(() => {
-        store.modules.approvals.state.rules = [createMRRule()];
-        factory();
+        approvalRules = [createMRRule()];
       });
 
       it('shows controls', () => {
+        factory();
+
         const controls = findRuleControls();
 
         expect(controls.exists()).toBe(true);
         expect(controls.props('rule')).toEqual(expected);
+      });
+
+      describe('without min approvals required', () => {
+        beforeEach(() => {
+          delete approvalRules[0].minApprovalsRequired;
+        });
+
+        it('defaults min approvals required input to 0', () => {
+          factory();
+
+          const input = findRuleApprovalsRequired();
+
+          expect(Number(input.attributes('min'))).toEqual(0);
+        });
       });
 
       describe('with settings cannot edit', () => {
@@ -155,7 +177,8 @@ describe('EE Approvals MRRules', () => {
 
     describe('with source rule', () => {
       beforeEach(() => {
-        store.modules.approvals.state.rules = [createMRRuleWithSource()];
+        approvalRules = [createMRRuleWithSource()];
+
         factory();
       });
 

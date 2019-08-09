@@ -16,4 +16,4 @@ class GroupMemberPresenter < MemberPresenter
   end
 end
 
-GroupMemberPresenter.prepend(EE::GroupMemberPresenter)
+GroupMemberPresenter.prepend_if_ee('EE::GroupMemberPresenter')

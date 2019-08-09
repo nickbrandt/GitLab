@@ -43,6 +43,7 @@ class Issue < ApplicationRecord
   validates :project, presence: true
 
   alias_attribute :parent_ids, :project_id
+  alias_method :issuing_parent, :project
 
   scope :in_projects, ->(project_ids) { where(project_id: project_ids) }
 
@@ -294,4 +295,4 @@ class Issue < ApplicationRecord
   end
 end
 
-Issue.prepend(EE::Issue)
+Issue.prepend_if_ee('EE::Issue')

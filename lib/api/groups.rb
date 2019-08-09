@@ -114,10 +114,7 @@ module API
       params do
         requires :name, type: String, desc: 'The name of the group'
         requires :path, type: String, desc: 'The path of the group'
-
-        if ::Group.supports_nested_objects?
-          optional :parent_id, type: Integer, desc: 'The parent group id for creating nested group'
-        end
+        optional :parent_id, type: Integer, desc: 'The parent group id for creating nested group'
 
         use :optional_params
       end
@@ -267,4 +264,4 @@ module API
   end
 end
 
-API::Groups.prepend(EE::API::Groups)
+API::Groups.prepend_if_ee('EE::API::Groups')

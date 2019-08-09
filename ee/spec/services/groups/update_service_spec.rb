@@ -108,7 +108,7 @@ describe Groups::UpdateService, '#execute' do
         expect(group.errors[:file_template_project_id]).to include('is invalid')
       end
 
-      context 'in a subgroup', :nested_groups do
+      context 'in a subgroup' do
         let(:parent_group) { create(:group) }
         let(:hidden_project) { create(:project, :private, namespace: parent_group) }
         let(:group) { create(:group, parent: parent_group) }
@@ -200,6 +200,58 @@ describe Groups::UpdateService, '#execute' do
 
         expect(group.shared_runners_minutes_limit).to be_nil
         expect(group.extra_shared_runners_minutes_limit).to be_nil
+      end
+    end
+  end
+
+  context 'updating insight_attributes.project_id param' do
+    let(:attrs) { { insight_attributes: { project_id: private_project.id } } }
+
+    shared_examples 'successful update of the Insights project' do
+      it 'updates the Insights project' do
+        update_group(group, user, attrs)
+
+        expect(group.insight.project).to eq(private_project)
+      end
+    end
+
+    shared_examples 'ignorance of the Insights project ID' do
+      it 'ignores the Insights project ID' do
+        update_group(group, user, attrs)
+
+        expect(group.insight).to be_nil
+      end
+    end
+
+    context 'when project is not in the group' do
+      let(:private_project) { create(:project, :private) }
+
+      context 'when user can read the project' do
+        before do
+          private_project.add_maintainer(user)
+        end
+
+        it_behaves_like 'ignorance of the Insights project ID'
+      end
+
+      context 'when user cannot read the project' do
+        it_behaves_like 'ignorance of the Insights project ID'
+      end
+    end
+
+    context 'when project is in the group' do
+      let(:private_project) { create(:project, :private, group: group) }
+
+      context 'when user can read the project' do
+        before do
+          private_project.add_maintainer(user)
+        end
+
+        it_behaves_like 'successful update of the Insights project'
+      end
+
+      context 'when user cannot read the project' do
+        it_behaves_like 'ignorance of the Insights project ID'
       end
     end
   end

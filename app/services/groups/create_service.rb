@@ -75,4 +75,4 @@ module Groups
   end
 end
 
-Groups::CreateService.prepend(EE::Groups::CreateService)
+Groups::CreateService.prepend_if_ee('EE::Groups::CreateService')

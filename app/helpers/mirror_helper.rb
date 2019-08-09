@@ -13,4 +13,4 @@ module MirrorHelper
   end
 end
 
-MirrorHelper.prepend(EE::MirrorHelper)
+MirrorHelper.prepend_if_ee('EE::MirrorHelper')

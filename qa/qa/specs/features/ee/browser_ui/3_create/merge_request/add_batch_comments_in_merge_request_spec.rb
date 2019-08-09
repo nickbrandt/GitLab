@@ -3,8 +3,7 @@
 module QA
   context 'Create' do
     describe 'batch comments in merge request' do
-      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/60
-      it 'user submits, discards batch comments', :quarantine do
+      it 'user submits, discards batch comments' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
@@ -12,11 +11,13 @@ module QA
           project.name = 'project-with-merge-request'
         end
 
-        Resource::MergeRequest.fabricate! do |merge_request|
+        mr = Resource::MergeRequest.fabricate! do |merge_request|
           merge_request.title = 'This is a merge request'
           merge_request.description = 'Great feature'
           merge_request.project = project
         end
+
+        mr.visit!
 
         Page::MergeRequest::Show.perform do |show_page|
           show_page.click_discussions_tab
@@ -27,7 +28,7 @@ module QA
           show_page.type_reply_to_discussion("Could you please check this?")
           show_page.comment_now
           expect(show_page).to have_content("Could you please check this?")
-          expect(show_page).to have_content("0/1 discussion resolved")
+          expect(show_page).to have_content("0/1 thread resolved")
 
           show_page.type_reply_to_discussion("Could you also check that?")
           show_page.resolve_review_discussion
@@ -48,12 +49,13 @@ module QA
           expect(show_page).to have_content("Finish review 2")
 
           show_page.submit_pending_reviews
-          expect(show_page).to have_content("2/2 discussions resolved")
+          expect(show_page).to have_content("2/2 threads resolved")
 
+          show_page.toggle_comments
           show_page.type_reply_to_discussion("Unresolving this discussion")
           show_page.unresolve_review_discussion
           show_page.comment_now
-          expect(show_page).to have_content("1/2 discussions resolved")
+          expect(show_page).to have_content("1/2 threads resolved")
         end
 
         Page::MergeRequest::Show.perform do |show_page|

@@ -90,4 +90,4 @@ class Dashboard::ProjectsController < Dashboard::ApplicationController
   end
 end
 
-Dashboard::ProjectsController.prepend(EE::Dashboard::ProjectsController)
+Dashboard::ProjectsController.prepend_if_ee('EE::Dashboard::ProjectsController')

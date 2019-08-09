@@ -52,4 +52,4 @@ class MemberPresenter < Gitlab::View::Presenter::Delegated
   end
 end
 
-MemberPresenter.prepend(EE::MemberPresenter)
+MemberPresenter.prepend_if_ee('EE::MemberPresenter')

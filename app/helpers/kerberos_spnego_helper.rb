@@ -10,4 +10,4 @@ module KerberosSpnegoHelper
   end
 end
 
-KerberosSpnegoHelper.prepend(EE::KerberosSpnegoHelper)
+KerberosSpnegoHelper.prepend_if_ee('EE::KerberosSpnegoHelper')

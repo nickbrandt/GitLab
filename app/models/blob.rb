@@ -244,4 +244,4 @@ class Blob < SimpleDelegator
   end
 end
 
-Blob.prepend(EE::Blob)
+Blob.prepend_if_ee('EE::Blob')

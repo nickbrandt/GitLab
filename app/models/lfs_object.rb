@@ -42,4 +42,4 @@ class LfsObject < ApplicationRecord
   end
 end
 
-LfsObject.prepend(EE::LfsObject)
+LfsObject.prepend_if_ee('EE::LfsObject')

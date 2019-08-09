@@ -11,7 +11,7 @@ describe 'layouts/_head' do
     before do
       allow(ActionController::Base).to receive(:asset_host).and_return(asset_host)
       allow(Gitlab::CurrentSettings).to receive(:snowplow_enabled?).and_return(true)
-      allow(Gitlab::CurrentSettings).to receive(:snowplow_collector_uri).and_return('www.snow.plow')
+      allow(Gitlab::CurrentSettings).to receive(:snowplow_collector_hostname).and_return('www.snow.plow')
     end
 
     it 'add a snowplow script tag with asset host' do

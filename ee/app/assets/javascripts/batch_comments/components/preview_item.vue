@@ -45,6 +45,7 @@ export default {
     },
     linePosition() {
       if (this.draft.position && this.draft.position.position_type === IMAGE_DIFF_POSITION_TYPE) {
+        // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
         return `${this.draft.position.x}x ${this.draft.position.y}y`;
       }
 

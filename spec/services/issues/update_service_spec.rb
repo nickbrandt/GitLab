@@ -116,7 +116,7 @@ describe Issues::UpdateService, :mailer do
         expect(issue.relative_position).to be_between(issue1.relative_position, issue2.relative_position)
       end
 
-      context 'when moving issue between issues from different projects', :nested_groups do
+      context 'when moving issue between issues from different projects' do
         let(:group) { create(:group) }
         let(:subgroup) { create(:group, parent: group) }
 
@@ -224,6 +224,15 @@ describe Issues::UpdateService, :mailer do
         expect(note).not_to be_nil
         expect(note.note).to eq('changed the description')
       end
+    end
+
+    it 'creates zoom_link_added system note when a zoom link is added to the description' do
+      update_issue(description: 'Changed description https://zoom.us/j/5873603787')
+
+      note = find_note('a Zoom call was added')
+
+      expect(note).not_to be_nil
+      expect(note.note).to eq('a Zoom call was added to this issue')
     end
 
     context 'when issue turns confidential' do
@@ -703,7 +712,7 @@ describe Issues::UpdateService, :mailer do
       end
     end
 
-    context 'when moving an issue ', :nested_groups do
+    context 'when moving an issue ' do
       it 'raises an error for invalid move ids within a project' do
         opts = { move_between_ids: [9000, 9999] }
 

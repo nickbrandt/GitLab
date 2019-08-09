@@ -32,4 +32,4 @@ class ConfirmationsController < Devise::ConfirmationsController
   end
 end
 
-ConfirmationsController.prepend(EE::ConfirmationsController)
+ConfirmationsController.prepend_if_ee('EE::ConfirmationsController')

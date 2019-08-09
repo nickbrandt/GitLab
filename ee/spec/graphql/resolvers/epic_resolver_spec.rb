@@ -60,7 +60,7 @@ describe Resolvers::EpicResolver do
         end
       end
 
-      context 'with subgroups', :nested_groups do
+      context 'with subgroups' do
         let(:sub_group) { create(:group, parent: group) }
         let(:iids)      { [epic1, epic2].map(&:iid) }
         let!(:epic3)    { create(:epic, group: sub_group, iid: epic1.iid) }

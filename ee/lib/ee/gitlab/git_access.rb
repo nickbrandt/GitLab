@@ -120,7 +120,7 @@ module EE
       def check_quarantine_size?
         git_env = ::Gitlab::Git::HookEnv.all(repository.gl_repository)
 
-        git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present? && ::Feature.enabled?(:quarantine_push_size_check, default_enabled: true)
+        git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present?
       end
 
       def check_repository_disk_size

@@ -1,0 +1,5 @@
+---
+title: Geo - Disable built-in Sidekiq retry for verification workers
+merge_request: 14946
+author:
+type: fixed

@@ -194,6 +194,7 @@ class MergeRequest < ApplicationRecord
   alias_attribute :project, :target_project
   alias_attribute :project_id, :target_project_id
   alias_attribute :auto_merge_enabled, :merge_when_pipeline_succeeds
+  alias_method :issuing_parent, :target_project
 
   def self.reference_prefix
     '!'
@@ -754,7 +755,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def check_mergeability
-    MergeRequests::MergeabilityCheckService.new(self).execute
+    MergeRequests::MergeabilityCheckService.new(self).execute(retry_lease: false)
   end
   # rubocop: enable CodeReuse/ServiceClass
 
@@ -1251,15 +1252,8 @@ class MergeRequest < ApplicationRecord
   end
 
   def all_commits
-    # MySQL doesn't support LIMIT in a subquery.
-    diffs_relation = if Gitlab::Database.postgresql?
-                       merge_request_diffs.recent
-                     else
-                       merge_request_diffs
-                     end
-
     MergeRequestDiffCommit
-      .where(merge_request_diff: diffs_relation)
+      .where(merge_request_diff: merge_request_diffs.recent)
       .limit(10_000)
   end
 

@@ -35,8 +35,6 @@ module EE
 
       has_many :blocked_merge_requests, through: :blocks_as_blocker
 
-      validate :validate_approval_rule_source
-
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
@@ -104,21 +102,6 @@ module EE
       hidden.delete_if(&:merged?) unless include_merged
 
       hidden.count
-    end
-
-    def validate_approval_rule_source
-      return unless approval_rules.any?
-
-      local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
-      local_project_rule_ids.compact!
-
-      invalid = if new_record?
-                  local_project_rule_ids.to_set != project.visible_regular_approval_rules.pluck(:id).to_set
-                else
-                  (local_project_rule_ids - project.approval_rule_ids).present?
-                end
-
-      errors.add(:approval_rules, :invalid_sourcing_to_project_rules) if invalid
     end
 
     def participant_approvers

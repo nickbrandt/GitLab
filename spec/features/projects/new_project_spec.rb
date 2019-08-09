@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'New project' do
@@ -294,7 +296,7 @@ describe 'New project' do
         end
       end
 
-      context 'from manifest file', :postgresql do
+      context 'from manifest file' do
         before do
           first('.import_manifest').click
         end

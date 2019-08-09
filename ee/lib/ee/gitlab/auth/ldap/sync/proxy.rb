@@ -35,6 +35,11 @@ module EE
               @dn_for_uid[uid]
             end
 
+            def dns_for_filter(filter)
+              @dns_for_filter ||= Hash.new { |h, k| h[k] = dn_filter_search(k) }
+              @dns_for_filter[filter.downcase]
+            end
+
             private
 
             def ldap_group_member_dns(ldap_group_cn)
@@ -72,7 +77,8 @@ module EE
             def ensure_full_dns!(dns)
               dns.map! do |dn|
                 begin
-                  parsed_dn = ::Gitlab::Auth::LDAP::DN.new(dn).to_a
+                  dn_obj = ::Gitlab::Auth::LDAP::DN.new(dn)
+                  parsed_dn = dn_obj.to_a
                 rescue ::Gitlab::Auth::LDAP::DN::FormatError => e
                   logger.error { "Found malformed DN: '#{dn}'. Skipping. Error: \"#{e.message}\"" }
                   next
@@ -82,7 +88,7 @@ module EE
                   # If there is more than one key/value set we must have a full DN,
                   # or at least the probability is higher.
                   if parsed_dn.count > 2
-                    dn
+                    dn_obj.to_normalized_s
                   elsif parsed_dn.count == 0
                     logger.warn { "Found null DN. Skipping." }
                     nil
@@ -142,6 +148,18 @@ module EE
               identity.save
             end
             # rubocop: enable CodeReuse/ActiveRecord
+
+            def dn_filter_search(filter)
+              logger.debug { "Running filter \"#{filter}\" against #{provider}" }
+
+              dns = adapter.filter_search(filter).map(&:dn)
+
+              ensure_full_dns!(dns)
+
+              logger.debug { "Found #{dns.count} matching users for filter #{filter}" }
+
+              dns
+            end
 
             def logger
               Rails.logger # rubocop:disable Gitlab/RailsLogger

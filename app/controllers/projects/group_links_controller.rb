@@ -54,4 +54,4 @@ class Projects::GroupLinksController < Projects::ApplicationController
   end
 end
 
-Projects::GroupLinksController.prepend(EE::Projects::GroupLinksController)
+Projects::GroupLinksController.prepend_if_ee('EE::Projects::GroupLinksController')

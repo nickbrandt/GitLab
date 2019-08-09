@@ -30,11 +30,21 @@ module EE
       tooltip
     end
 
-    def label_dropdown_data(project, opts = {})
-      super.merge({
-        scoped_labels: project&.feature_available?(:scoped_labels)&.to_s,
+    def label_dropdown_data(edit_context, opts = {})
+      scoped_labels_fields = {
+        scoped_labels: edit_context&.feature_available?(:scoped_labels)&.to_s,
         scoped_labels_documentation_link: help_page_path('user/project/labels.md', anchor: 'scoped-labels')
-      })
+      }
+
+      return super.merge(scoped_labels_fields) unless edit_context.is_a?(Group)
+
+      {
+        toggle: "dropdown",
+        field_name: opts[:field_name] || "label_name[]",
+        show_no: "true",
+        show_any: "true",
+        group_id: edit_context&.try(:id)
+      }.merge(scoped_labels_fields, opts)
     end
 
     def sidebar_label_dropdown_data(issuable_type, issuable_sidebar)

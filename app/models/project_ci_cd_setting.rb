@@ -37,4 +37,4 @@ class ProjectCiCdSetting < ApplicationRecord
   end
 end
 
-ProjectCiCdSetting.prepend(EE::ProjectCiCdSetting)
+ProjectCiCdSetting.prepend_if_ee('EE::ProjectCiCdSetting')

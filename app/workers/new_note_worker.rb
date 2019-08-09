@@ -24,4 +24,4 @@ class NewNoteWorker
   # rubocop: enable CodeReuse/ActiveRecord
 end
 
-NewNoteWorker.prepend(EE::NewNoteWorker)
+NewNoteWorker.prepend_if_ee('EE::NewNoteWorker')

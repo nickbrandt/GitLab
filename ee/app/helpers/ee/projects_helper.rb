@@ -172,9 +172,8 @@ module EE
       else
         {
           project: { id: project.id, name: project.name },
-          vulnerabilities_endpoint: group_security_vulnerabilities_path(project.group),
-          vulnerabilities_summary_endpoint: summary_group_security_vulnerabilities_path(project.group),
-          vulnerabilities_history_endpoint: history_group_security_vulnerabilities_path(project.group),
+          vulnerabilities_endpoint: project_security_vulnerabilities_path(project),
+          vulnerabilities_summary_endpoint: summary_project_security_vulnerabilities_path(project),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EE::Gitlab::UsageCounters
+module Gitlab::UsageCounters
   class DesignsCounter
     extend ::Gitlab::UsageDataCounters::RedisCounter
 

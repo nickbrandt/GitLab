@@ -194,10 +194,9 @@ module IssuableCollections
   end
 
   def collection_type
-    @collection_type ||= case finder_type.name
-                         when 'IssuesFinder'
+    @collection_type ||= if finder_type <= IssuesFinder
                            'Issue'
-                         when 'MergeRequestsFinder'
+                         elsif finder_type <= MergeRequestsFinder
                            'MergeRequest'
                          end
   end
@@ -215,4 +214,4 @@ module IssuableCollections
   # rubocop:enable Gitlab/ModuleWithInstanceVariables
 end
 
-IssuableCollections.prepend(EE::IssuableCollections)
+IssuableCollections.prepend_if_ee('EE::IssuableCollections')

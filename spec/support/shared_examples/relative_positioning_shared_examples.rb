@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples "a class that supports relative positioning" do
+RSpec.shared_examples 'a class that supports relative positioning' do
   let(:item1) { create(factory, default_params) }
   let(:item2) { create(factory, default_params) }
   let(:new_item) { create(factory, default_params) }
@@ -9,16 +9,30 @@ RSpec.shared_examples "a class that supports relative positioning" do
     create(factory, params.merge(default_params))
   end
 
-  describe '.move_to_end' do
-    it 'moves the object to the end' do
-      item1.update(relative_position: 5)
-      item2.update(relative_position: 15)
+  def create_items_with_positions(positions)
+    positions.map do |position|
+      create_item(relative_position: position)
+    end
+  end
 
-      described_class.move_to_end([item1, item2])
+  describe '.move_nulls_to_end' do
+    it 'moves items with null relative_position to the end' do
+      skip("#{item1} has a default relative position") if item1.relative_position
+      skip("#{item2} has a default relative position") if item2.relative_position
+
+      described_class.move_nulls_to_end([item1, item2])
 
       expect(item2.prev_relative_position).to eq item1.relative_position
       expect(item1.prev_relative_position).to eq nil
       expect(item2.next_relative_position).to eq nil
+    end
+
+    it 'moves the item near the start position when there are no existing positions' do
+      skip("#{item1} has a default relative position") if item1.relative_position
+
+      described_class.move_nulls_to_end([item1])
+
+      expect(item1.relative_position).to eq(described_class::START_POSITION + described_class::IDEAL_DISTANCE)
     end
 
     it 'does not perform any moves if all items have their relative_position set' do
@@ -26,7 +40,7 @@ RSpec.shared_examples "a class that supports relative positioning" do
 
       expect(item1).not_to receive(:save)
 
-      described_class.move_to_end([item1])
+      described_class.move_nulls_to_end([item1])
     end
   end
 
@@ -93,46 +107,6 @@ RSpec.shared_examples "a class that supports relative positioning" do
       new_item.move_to_end
 
       expect(new_item.relative_position).to be > item2.relative_position
-    end
-  end
-
-  describe '#shift_after?' do
-    before do
-      [item1, item2].each do |item1|
-        item1.move_to_end && item1.save
-      end
-    end
-
-    it 'returns true' do
-      item1.update(relative_position: item2.relative_position - 1)
-
-      expect(item1.shift_after?).to be_truthy
-    end
-
-    it 'returns false' do
-      item1.update(relative_position: item2.relative_position - 2)
-
-      expect(item1.shift_after?).to be_falsey
-    end
-  end
-
-  describe '#shift_before?' do
-    before do
-      [item1, item2].each do |item1|
-        item1.move_to_end && item1.save
-      end
-    end
-
-    it 'returns true' do
-      item1.update(relative_position: item2.relative_position + 1)
-
-      expect(item1.shift_before?).to be_truthy
-    end
-
-    it 'returns false' do
-      item1.update(relative_position: item2.relative_position + 2)
-
-      expect(item1.shift_before?).to be_falsey
     end
   end
 
@@ -248,6 +222,62 @@ RSpec.shared_examples "a class that supports relative positioning" do
       new_item.save!
 
       expect(new_item.relative_position).to be(100)
+    end
+
+    it 'avoids N+1 queries when rebalancing other items' do
+      items = create_items_with_positions([100, 101, 102])
+
+      count = ActiveRecord::QueryRecorder.new do
+        new_item.move_between(items[-2], items[-1])
+      end
+
+      items = create_items_with_positions([150, 151, 152, 153, 154])
+
+      expect { new_item.move_between(items[-2], items[-1]) }.not_to exceed_query_limit(count)
+    end
+  end
+
+  describe '#move_sequence_before' do
+    it 'moves the whole sequence of items to the middle of the nearest gap' do
+      items = create_items_with_positions([90, 100, 101, 102])
+
+      items.last.move_sequence_before
+      items.last.save!
+
+      positions = items.map { |item| item.reload.relative_position }
+      expect(positions).to eq([90, 95, 96, 102])
+    end
+
+    it 'finds a gap if there are unused positions' do
+      items = create_items_with_positions([100, 101, 102])
+
+      items.last.move_sequence_before
+      items.last.save!
+
+      positions = items.map { |item| item.reload.relative_position }
+      expect(positions).to eq([50, 51, 102])
+    end
+  end
+
+  describe '#move_sequence_after' do
+    it 'moves the whole sequence of items to the middle of the nearest gap' do
+      items = create_items_with_positions([100, 101, 102, 110])
+
+      items.first.move_sequence_after
+      items.first.save!
+
+      positions = items.map { |item| item.reload.relative_position }
+      expect(positions).to eq([100, 105, 106, 110])
+    end
+
+    it 'finds a gap if there are unused positions' do
+      items = create_items_with_positions([100, 101, 102])
+
+      items.first.move_sequence_after
+      items.first.save!
+
+      positions = items.map { |item| item.reload.relative_position }
+      expect(positions).to eq([100, 601, 602])
     end
   end
 end

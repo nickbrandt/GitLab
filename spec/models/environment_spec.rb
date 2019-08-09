@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe Environment, :use_clean_rails_memory_store_caching do
   include ReactiveCachingHelpers
+  using RSpec::Parameterized::TableSyntax
 
   let(:project) { create(:project, :stubbed_repository) }
   subject(:environment) { create(:environment, project: project) }
@@ -574,6 +575,34 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
   end
 
+  describe '#deployment_namespace' do
+    let(:environment) { create(:environment) }
+
+    subject { environment.deployment_namespace }
+
+    before do
+      allow(environment).to receive(:deployment_platform).and_return(deployment_platform)
+    end
+
+    context 'no deployment platform available' do
+      let(:deployment_platform) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'deployment platform is available' do
+      let(:cluster) { create(:cluster, :provided_by_user, :project, projects: [environment.project]) }
+      let(:deployment_platform) { cluster.platform }
+
+      it 'retrieves a namespace from the cluster' do
+        expect(cluster).to receive(:kubernetes_namespace_for)
+          .with(environment).and_return('mock-namespace')
+
+        expect(subject).to eq 'mock-namespace'
+      end
+    end
+  end
+
   describe '#terminals' do
     subject { environment.terminals }
 
@@ -782,12 +811,9 @@ describe Environment, :use_clean_rails_memory_store_caching do
     let(:source_path) { 'source/file.html' }
     let(:sha) { RepoHelpers.sample_commit.id }
 
-    before do
-      environment.external_url = 'http://example.com'
-    end
-
     context 'when the public path is not known' do
       before do
+        environment.external_url = 'http://example.com'
         allow(project).to receive(:public_path_for_source_path).with(source_path, sha).and_return(nil)
       end
 
@@ -797,12 +823,23 @@ describe Environment, :use_clean_rails_memory_store_caching do
     end
 
     context 'when the public path is known' do
-      before do
-        allow(project).to receive(:public_path_for_source_path).with(source_path, sha).and_return('file.html')
+      where(:external_url, :public_path, :full_url) do
+        'http://example.com'          | 'file.html'         | 'http://example.com/file.html'
+        'http://example.com/'         | 'file.html'         | 'http://example.com/file.html'
+        'http://example.com'          | '/file.html'        | 'http://example.com/file.html'
+        'http://example.com/'         | '/file.html'        | 'http://example.com/file.html'
+        'http://example.com/subpath'  | 'public/file.html'  | 'http://example.com/subpath/public/file.html'
+        'http://example.com/subpath/' | 'public/file.html'  | 'http://example.com/subpath/public/file.html'
+        'http://example.com/subpath'  | '/public/file.html' | 'http://example.com/subpath/public/file.html'
+        'http://example.com/subpath/' | '/public/file.html' | 'http://example.com/subpath/public/file.html'
       end
+      with_them do
+        it 'returns the full external URL' do
+          environment.external_url = external_url
+          allow(project).to receive(:public_path_for_source_path).with(source_path, sha).and_return(public_path)
 
-      it 'returns the full external URL' do
-        expect(environment.external_url_for(source_path, sha)).to eq('http://example.com/file.html')
+          expect(environment.external_url_for(source_path, sha)).to eq(full_url)
+        end
       end
     end
   end
@@ -812,6 +849,37 @@ describe Environment, :use_clean_rails_memory_store_caching do
       expect_any_instance_of(Prometheus::AdapterService).to receive(:prometheus_adapter)
 
       subject.prometheus_adapter
+    end
+  end
+
+  describe '#knative_services_finder' do
+    let(:environment) { create(:environment) }
+
+    subject { environment.knative_services_finder }
+
+    context 'environment has no deployments' do
+      it { is_expected.to be_nil }
+    end
+
+    context 'environment has a deployment' do
+      let!(:deployment) { create(:deployment, :success, environment: environment, cluster: cluster) }
+
+      context 'with no cluster associated' do
+        let(:cluster) { nil }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'with a cluster associated' do
+        let(:cluster) { create(:cluster) }
+
+        it 'calls the service finder' do
+          expect(Clusters::KnativeServicesFinder).to receive(:new)
+            .with(cluster, environment).and_return(:finder)
+
+          is_expected.to eq :finder
+        end
+      end
     end
   end
 end

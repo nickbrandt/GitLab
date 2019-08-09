@@ -11,6 +11,7 @@ module EE
       scope :closed, -> { where(action: ::Event::CLOSED) }
       scope :merged, -> { where(action: ::Event::MERGED) }
       scope :totals_by_author, -> { group(:author_id).count }
+      scope :totals_by_author_target_type_action, -> { group(:author_id, :target_type, :action).count }
     end
   end
 end

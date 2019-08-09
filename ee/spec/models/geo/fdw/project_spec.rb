@@ -7,6 +7,7 @@ RSpec.describe Geo::Fdw::Project, :geo, type: :model do
     it { is_expected.to have_many(:job_artifacts).class_name('Geo::Fdw::Ci::JobArtifact') }
     it { is_expected.to have_many(:lfs_objects_projects).class_name('Geo::Fdw::LfsObjectsProject') }
     it { is_expected.to have_many(:lfs_objects).class_name('Geo::Fdw::LfsObject').through(:lfs_objects_projects) }
+    it { is_expected.to have_many(:container_repositories).class_name('Geo::Fdw::ContainerRepository') }
   end
 
   describe '.search' do

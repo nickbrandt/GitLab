@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
@@ -33,7 +33,7 @@ export default {
     weightNoneValue: {
       type: String,
       required: true,
-      default: 'None',
+      default: __('None'),
     },
     editable: {
       type: Boolean,
@@ -171,7 +171,7 @@ export default {
         :value="weight"
         class="form-control"
         type="text"
-        placeholder="Enter a number"
+        :placeholder="__('Enter a number')"
         @blur="onSubmit"
         @keydown.enter="onSubmit"
       />

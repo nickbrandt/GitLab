@@ -16,6 +16,25 @@ describe ApprovalMergeRequestRule do
       expect(build(:approval_merge_request_rule, name: nil)).not_to be_valid
     end
 
+    context 'approval_project_rule is set' do
+      let(:approval_project_rule) { build(:approval_project_rule) }
+      let(:merge_request_rule) { build(:approval_merge_request_rule, merge_request: merge_request, approval_project_rule: approval_project_rule) }
+
+      context 'when project of approval_project_rule and merge request matches' do
+        let(:merge_request) { build(:merge_request, project: approval_project_rule.project) }
+
+        it 'is valid' do
+          expect(merge_request_rule).to be_valid
+        end
+      end
+
+      context 'when the project of approval_project_rule and merge request does not match' do
+        it 'is invalid' do
+          expect(merge_request_rule).to be_invalid
+        end
+      end
+    end
+
     context 'code owner rules' do
       it 'is valid' do
         expect(build(:code_owner_rule)).to be_valid
@@ -258,33 +277,6 @@ describe ApprovalMergeRequestRule do
 
         subject.assign_attributes(approvals_required: -1)
         expect(subject).to be_invalid
-      end
-
-      context 'when project rule is present' do
-        let(:project_rule) { create(:approval_project_rule, project: merge_request.project, approvals_required: 3) }
-
-        it 'has to be greater than or equal to project rule approvals_required' do
-          subject.assign_attributes(approval_project_rule: project_rule, approvals_required: 2)
-          subject.valid?
-
-          expect(subject.errors[:approvals_required]).to include("must be greater than or equal to 3")
-        end
-
-        context 'when report_approver rule' do
-          subject do
-            build(:report_approver_rule, merge_request: merge_request, approvals_required: 1).tap do |rule|
-              rule.approval_project_rule = project_rule
-            end
-          end
-
-          it 'skips validation' do
-            expect(subject).to be_valid
-
-            subject.approvals_required = 0
-
-            expect(subject).to be_valid
-          end
-        end
       end
     end
   end

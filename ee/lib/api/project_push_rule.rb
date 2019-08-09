@@ -5,11 +5,7 @@ module API
     before { authenticate! }
     before { authorize_admin_project }
     before { check_project_feature_available!(:push_rules) }
-    before do
-      if params.has_key?(:commit_committer_check)
-        authorize! :change_commit_committer_check, user_project
-      end
-    end
+    before { authorize_change_param(user_project, :commit_committer_check, :reject_unsigned_commits) }
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
@@ -27,10 +23,12 @@ module API
           optional :file_name_regex, type: String, desc: 'All commited filenames must not match this'
           optional :max_file_size, type: Integer, desc: 'Maximum file size (MB)'
           optional :commit_committer_check, type: Boolean, desc: 'Users may only push their own commits'
+          optional :reject_unsigned_commits, type: Boolean, desc: 'Only GPG signed commits can be pushed to this project'
           at_least_one_of :deny_delete_tag, :member_check, :prevent_secrets,
                           :commit_message_regex, :commit_message_negative_regex, :branch_name_regex, :author_email_regex,
                           :file_name_regex, :max_file_size,
-                          :commit_committer_check
+                          :commit_committer_check,
+                          :reject_unsigned_commits
         end
       end
 

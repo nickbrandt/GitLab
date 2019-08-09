@@ -1,5 +1,10 @@
 - if search_service.use_elasticsearch?
-  %li{ class: active_when(@scope == 'blobs') }
+  %li{ class: active_when(@scope == 'notes') }
+    = link_to search_filter_path(scope: 'notes') do
+      = _("Comments")
+      %span.badge.badge-pill
+        = limited_count(@search_results.notes_count)
+  %li{ class: active_when(@scope == 'blobs'), data: { qa_selector: 'code_tab' } }
     = link_to search_filter_path(scope: 'blobs') do
       = _("Code")
       %span.badge.badge-pill

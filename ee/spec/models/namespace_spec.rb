@@ -213,13 +213,11 @@ describe Namespace do
           end
         end
 
-        if Group.supports_nested_objects?
-          context 'when license is applied to parent group' do
-            let(:child_group) { create :group, parent: group }
+        context 'when license is applied to parent group' do
+          let(:child_group) { create :group, parent: group }
 
-            it 'child group has feature available' do
-              expect(child_group.feature_available?(feature)).to be_truthy
-            end
+          it 'child group has feature available' do
+            expect(child_group.feature_available?(feature)).to be_truthy
           end
         end
       end
@@ -460,7 +458,7 @@ describe Namespace do
 
         it { is_expected.to be_truthy }
 
-        context 'when is subgroup', :nested_groups do
+        context 'when is subgroup' do
           before do
             namespace.parent = build(:group)
           end
@@ -478,7 +476,7 @@ describe Namespace do
   describe '#shared_runners_enabled?' do
     subject { namespace.shared_runners_enabled? }
 
-    context 'subgroup with shared runners enabled project', :nested_groups do
+    context 'subgroup with shared runners enabled project' do
       let(:subgroup) { create(:group, parent: namespace) }
       let!(:subproject) { create(:project, namespace: subgroup, shared_runners_enabled: true) }
 
@@ -731,25 +729,15 @@ describe Namespace do
   describe '#store_security_reports_available?' do
     subject { namespace.store_security_reports_available? }
 
-    context 'when store_security_reports feature is enabled' do
-      before do
-        stub_feature_flags(store_security_reports: true)
-        stub_licensed_features(sast: true)
-      end
+    context 'when at least one security report feature is enabled' do
+      where(report_type: [:sast, :dast, :dependency_scanning, :container_scanning])
 
-      it 'returns true' do
-        expect(subject).to be_truthy
-      end
-    end
+      with_them do
+        before do
+          stub_licensed_features(report_type => true)
+        end
 
-    context 'when store_security_reports feature is disabled' do
-      before do
-        stub_feature_flags(store_security_reports: false)
-        stub_licensed_features(sast: true)
-      end
-
-      it 'returns false' do
-        expect(subject).to be_falsey
+        it { is_expected.to be true }
       end
     end
 
@@ -758,9 +746,7 @@ describe Namespace do
         stub_feature_flags(store_security_reports: true)
       end
 
-      it 'returns false' do
-        expect(subject).to be_falsey
-      end
+      it { is_expected.to be false }
     end
   end
 
@@ -776,7 +762,7 @@ describe Namespace do
     end
   end
 
-  describe '#membership_lock with subgroups', :nested_groups do
+  describe '#membership_lock with subgroups' do
     context 'when creating a subgroup' do
       let(:subgroup) { create(:group, parent: root_group) }
 

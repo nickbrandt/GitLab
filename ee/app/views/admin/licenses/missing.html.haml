@@ -7,6 +7,8 @@
   = render "upload_trial_license"
 
 %hr
+  - if params.key?(:trial_key) && params[:trial_key].blank?
+    = render "repeat_trial_info"
 
 .container.blank-state-container
   .text-center

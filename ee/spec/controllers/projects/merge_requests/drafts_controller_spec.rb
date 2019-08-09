@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe Projects::MergeRequests::DraftsController do
+  include RepoHelpers
+
   let(:project)       { create(:project, :repository) }
   let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
   let(:user)          { project.owner }
@@ -62,7 +64,7 @@ describe Projects::MergeRequests::DraftsController do
     end
 
     it 'creates draft note with position' do
-      diff_refs = project.commit(RepoHelpers.sample_commit.id).try(:diff_refs)
+      diff_refs = project.commit(sample_commit.id).try(:diff_refs)
 
       position = Gitlab::Diff::Position.new(
         old_path: "files/ruby/popen.rb",
@@ -133,6 +135,40 @@ describe Projects::MergeRequests::DraftsController do
             draft_overrides: { resolve_discussion: true, note: 'A note' }
           )
         end.to change { DraftNote.count }.by(0)
+      end
+    end
+
+    context 'commit_id is present' do
+      let(:commit) { project.commit(sample_commit.id) }
+
+      let(:position) do
+        Gitlab::Diff::Position.new(
+          old_path: "files/ruby/popen.rb",
+          new_path: "files/ruby/popen.rb",
+          old_line: nil,
+          new_line: 14,
+          diff_refs: commit.diff_refs
+        )
+      end
+
+      before do
+        create_draft_note(draft_overrides: { commit_id: commit_id, position: position.to_json })
+      end
+
+      context 'value is a commit sha' do
+        let(:commit_id) { commit.id }
+
+        it 'creates the draft note with commit ID' do
+          expect(DraftNote.last.commit_id).to eq(commit_id)
+        end
+      end
+
+      context 'value is "undefined"' do
+        let(:commit_id) { 'undefined' }
+
+        it 'creates the draft note with nil commit ID' do
+          expect(DraftNote.last.commit_id).to be_nil
+        end
       end
     end
   end
@@ -211,7 +247,7 @@ describe Projects::MergeRequests::DraftsController do
     end
 
     it 'publishes draft notes with position' do
-      diff_refs = project.commit(RepoHelpers.sample_commit.id).try(:diff_refs)
+      diff_refs = project.commit(sample_commit.id).try(:diff_refs)
 
       position = Gitlab::Diff::Position.new(
         old_path: "files/ruby/popen.rb",

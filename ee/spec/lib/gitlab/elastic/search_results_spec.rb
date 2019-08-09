@@ -144,6 +144,52 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     end
   end
 
+  describe 'notes' do
+    let(:issue) { create(:issue, project: project_1, title: 'Hello') }
+
+    before do
+      @note_1 = create(
+        :note,
+        noteable: issue,
+        project: project_1,
+        note: 'foo bar'
+      )
+      @note_2 = create(
+        :note_on_issue,
+        noteable: issue,
+        project: project_1,
+        note: 'foo baz'
+      )
+      @note_3 = create(
+        :note_on_issue,
+        noteable: issue,
+        project: project_1,
+        note: 'bar baz'
+      )
+
+      Gitlab::Elastic::Helper.refresh_index
+    end
+
+    it_behaves_like 'a paginated object', 'notes'
+
+    it 'lists found notes' do
+      results = described_class.new(user, 'foo', limit_project_ids)
+      notes = results.objects('notes')
+
+      expect(notes).to include @note_1
+      expect(notes).to include @note_2
+      expect(notes).not_to include @note_3
+      expect(results.notes_count).to eq 2
+    end
+
+    it 'returns empty list when notes are not found' do
+      results = described_class.new(user, 'security', limit_project_ids)
+
+      expect(results.objects('notes')).to be_empty
+      expect(results.notes_count).to eq 0
+    end
+  end
+
   describe 'confidential issues' do
     let(:project_3) { create(:project) }
     let(:project_4) { create(:project) }

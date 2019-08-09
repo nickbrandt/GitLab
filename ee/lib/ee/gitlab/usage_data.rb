@@ -10,7 +10,7 @@ module EE
 
         override :usage_data_counters
         def usage_data_counters
-          super + [::EE::Gitlab::UsageCounters::DesignsCounter]
+          super + [::Gitlab::UsageCounters::DesignsCounter]
         end
 
         override :features_usage_data
@@ -141,12 +141,9 @@ module EE
             projects_with_packages: count(::Packages::Package.select('distinct project_id')),
             projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
             projects_with_tracing_enabled: count(ProjectTracingSetting)
-          }).merge(service_desk_counts).merge(security_products_usage)
-
-          # MySql does not support recursive queries so we can't retrieve epics relationship depth
-          if ::Group.supports_nested_objects?
-            usage_data[:counts] = usage_data[:counts].merge(epics_deepest_relationship_level)
-          end
+          }).merge(service_desk_counts)
+            .merge(security_products_usage)
+            .merge(epics_deepest_relationship_level)
 
           usage_data
         end

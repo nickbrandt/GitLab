@@ -183,4 +183,4 @@ module Ci
   end
 end
 
-Ci::RegisterJobService.prepend(EE::Ci::RegisterJobService)
+Ci::RegisterJobService.prepend_if_ee('EE::Ci::RegisterJobService')

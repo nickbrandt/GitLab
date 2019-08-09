@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Geo::RepositoryVerification::Primary::SingleWorker, :postgresql, :clean_gitlab_redis_cache do
+describe Geo::RepositoryVerification::Primary::SingleWorker, :clean_gitlab_redis_cache do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
@@ -10,6 +10,14 @@ describe Geo::RepositoryVerification::Primary::SingleWorker, :postgresql, :clean
 
   before do
     stub_current_geo_node(primary)
+  end
+
+  it 'disables retrying of failed jobs' do
+    expect(subject.sidekiq_options_hash).to eq(
+      'retry' => false,
+      'queue' => 'geo:geo_repository_verification_primary_single',
+      'queue_namespace' => :geo
+    )
   end
 
   describe '#perform' do

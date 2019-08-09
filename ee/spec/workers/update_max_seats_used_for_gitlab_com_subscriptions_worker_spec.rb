@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker, :postgresql do
+describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
   subject { described_class.new }
 
   let!(:user)                { create(:user) }
@@ -9,12 +9,10 @@ describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker, :postgresql do
   let!(:early_adopter_plan)  { create(:early_adopter_plan) }
   let!(:gitlab_subscription) { create(:gitlab_subscription, namespace: group) }
 
-  let(:db_is_postgres) { true }
   let(:db_is_read_only) { false }
   let(:subscription_attrs) { nil }
 
   before do
-    allow(Gitlab::Database).to receive(:postgresql?) { db_is_postgres }
     allow(Gitlab::Database).to receive(:read_only?) { db_is_read_only }
     allow(Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?) { true }
 
@@ -25,12 +23,6 @@ describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker, :postgresql do
     it 'does not update max_seats_used' do
       expect { subject.perform }.not_to change { gitlab_subscription.reload.max_seats_used }
     end
-  end
-
-  context 'when the DB is not PostgreSQL' do
-    let(:db_is_postgres) { false }
-
-    include_examples 'keeps original max_seats_used value'
   end
 
   context 'where the DB is read only' do

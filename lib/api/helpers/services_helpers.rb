@@ -767,4 +767,4 @@ module API
   end
 end
 
-API::Helpers::ServicesHelpers.prepend(EE::API::Helpers::ServicesHelpers)
+API::Helpers::ServicesHelpers.prepend_if_ee('EE::API::Helpers::ServicesHelpers')

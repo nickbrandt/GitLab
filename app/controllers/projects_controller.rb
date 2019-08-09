@@ -284,6 +284,18 @@ class ProjectsController < Projects::ApplicationController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
+  def resolve
+    @project = Project.find(params[:id])
+
+    if can?(current_user, :read_project, @project)
+      redirect_to @project
+    else
+      render_404
+    end
+  end
+
+  private
+
   # Render project landing depending of which features are available
   # So if page is not available in the list it renders the next page
   #
@@ -453,16 +465,6 @@ class ProjectsController < Projects::ApplicationController
   def present_project
     @project = @project.present(current_user: current_user)
   end
-
-  def resolve
-    @project = Project.find(params[:id])
-
-    if can?(current_user, :read_project, @project)
-      redirect_to @project
-    else
-      render_404
-    end
-  end
 end
 
-ProjectsController.prepend(EE::ProjectsController)
+ProjectsController.prepend_if_ee('EE::ProjectsController')

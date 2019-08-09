@@ -8,6 +8,8 @@ module Geo
         include GeoQueue
         include ExclusiveLeaseGuard
 
+        sidekiq_options retry: false
+
         LEASE_TIMEOUT = 1.hour.to_i
 
         attr_reader :project

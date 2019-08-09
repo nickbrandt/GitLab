@@ -2,6 +2,8 @@
 
 module EE
   module DashboardHelper
+    extend ::Gitlab::Utils::Override
+
     def controller_action_to_child_dashboards(controller = controller_name, action = action_name)
       case "#{controller}##{action}"
       when 'projects#index', 'root#index', 'projects#starred', 'projects#trending'
@@ -27,6 +29,15 @@ module EE
 
     def has_start_trial?
       !current_license && current_user.admin?
+    end
+
+    private
+
+    override :get_dashboard_nav_links
+    def get_dashboard_nav_links
+      super.tap do |links|
+        links << :analytics if ::Feature.enabled?(:analytics)
+      end
     end
   end
 end

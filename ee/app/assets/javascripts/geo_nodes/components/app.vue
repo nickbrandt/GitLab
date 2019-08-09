@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 import Flash from '~/flash';
 import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
 import SmartInterval from '~/smart_interval';
@@ -117,7 +117,7 @@ export default {
           this.store.setNodeDetails(nodeId, {
             geo_node_id: nodeId,
             health: err.message,
-            health_status: 'Unknown',
+            health_status: __('Unknown'),
             missing_oauth_application: null,
             sync_status_unavailable: true,
             storage_shards_match: null,

@@ -73,4 +73,4 @@ class GlobalPolicy < BasePolicy
   end
 end
 
-GlobalPolicy.prepend(EE::GlobalPolicy)
+GlobalPolicy.prepend_if_ee('EE::GlobalPolicy')

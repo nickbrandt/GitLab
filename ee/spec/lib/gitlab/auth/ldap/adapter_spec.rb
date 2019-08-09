@@ -40,6 +40,28 @@ describe Gitlab::Auth::LDAP::Adapter do
     end
   end
 
+  describe '#filter_search' do
+    before do
+      stub_ldap_config(
+        base: 'ou=my_groups,dc=example,dc=com'
+      )
+    end
+
+    it 'searches with the proper options' do
+      expect(adapter).to receive(:ldap_search) do |arg|
+        expect(arg[:filter].to_s).to eq('(ou=people)')
+        expect(arg[:base]).to eq('ou=my_groups,dc=example,dc=com')
+      end.and_return({})
+
+      adapter.filter_search('(ou=people)')
+    end
+
+    it 'errors out with an invalid filter' do
+      expect { adapter.filter_search(')(') }
+        .to raise_error(Net::LDAP::FilterSyntaxInvalidError, 'Invalid filter syntax.')
+    end
+  end
+
   describe '#user_by_certificate_assertion' do
     let(:certificate_assertion) { 'certificate_assertion' }
 

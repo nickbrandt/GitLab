@@ -112,4 +112,4 @@ module Banzai
   end
 end
 
-Banzai::Filter::LabelReferenceFilter.prepend(EE::Banzai::Filter::LabelReferenceFilter)
+Banzai::Filter::LabelReferenceFilter.prepend_if_ee('EE::Banzai::Filter::LabelReferenceFilter')

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe StorageShardEntity, :postgresql do
+describe StorageShardEntity do
   let(:entity) { described_class.new(StorageShard.new, request: double) }
 
   subject { entity.as_json }

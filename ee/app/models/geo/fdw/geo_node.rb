@@ -14,6 +14,18 @@ module Geo
       has_many :geo_node_namespace_links, class_name: 'Geo::Fdw::GeoNodeNamespaceLink'
       has_many :namespaces, class_name: 'Geo::Fdw::Namespace', through: :geo_node_namespace_links
 
+      def projects_outside_selective_sync
+        projects = if selective_sync_by_namespaces?
+                     projects_outside_selected_namespaces
+                   elsif selective_sync_by_shards?
+                     projects_outside_selected_shards
+                   else
+                     Geo::Fdw::Project.none
+                   end
+
+        projects.inner_join_project_registry
+      end
+
       def job_artifacts
         Geo::Fdw::Ci::JobArtifact.all unless selective_sync?
 
@@ -55,6 +67,12 @@ module Geo
         else
           Geo::ProjectRegistry.none
         end
+      end
+
+      def container_repositories
+        return Geo::Fdw::ContainerRepository.all unless selective_sync?
+
+        Geo::Fdw::ContainerRepository.project_id_in(projects)
       end
 
       private

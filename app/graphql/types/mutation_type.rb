@@ -18,4 +18,4 @@ module Types
   end
 end
 
-::Types::MutationType.prepend(::EE::Types::MutationType)
+::Types::MutationType.prepend_if_ee('::EE::Types::MutationType')

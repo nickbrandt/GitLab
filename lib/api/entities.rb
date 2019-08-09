@@ -2,6 +2,19 @@
 
 module API
   module Entities
+    class BlameRangeCommit < Grape::Entity
+      expose :id
+      expose :parent_ids
+      expose :message
+      expose :authored_date, :author_name, :author_email
+      expose :committed_date, :committer_name, :committer_email
+    end
+
+    class BlameRange < Grape::Entity
+      expose :commit, using: BlameRangeCommit
+      expose :lines
+    end
+
     class WikiPageBasic < Grape::Entity
       expose :format
       expose :slug
@@ -62,6 +75,11 @@ module API
       expose :username
       expose :last_activity_on
       expose :last_activity_on, as: :last_activity_at # Back-compat
+    end
+
+    class UserStarsProject < Grape::Entity
+      expose :starred_since
+      expose :user, using: Entities::UserBasic
     end
 
     class Identity < Grape::Entity
@@ -366,10 +384,7 @@ module API
       end
       expose :request_access_enabled
       expose :full_name, :full_path
-
-      if ::Group.supports_nested_objects?
-        expose :parent_id
-      end
+      expose :parent_id
 
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
 
@@ -1152,6 +1167,7 @@ module API
         attributes = ::ApplicationSettingsHelper.visible_attributes
         attributes.delete(:performance_bar_allowed_group_path)
         attributes.delete(:performance_bar_enabled)
+        attributes.delete(:allow_local_requests_from_hooks_and_services)
 
         attributes
       end
@@ -1170,6 +1186,7 @@ module API
       # support legacy names, can be removed in v5
       expose :password_authentication_enabled_for_web, as: :password_authentication_enabled
       expose :password_authentication_enabled_for_web, as: :signin_enabled
+      expose :allow_local_requests_from_web_hooks_and_services, as: :allow_local_requests_from_hooks_and_services
     end
 
     # deprecated old Release representation
@@ -1329,6 +1346,7 @@ module API
       expose :variable_type, :key, :value
       expose :protected?, as: :protected, if: -> (entity, _) { entity.respond_to?(:protected?) }
       expose :masked?, as: :masked, if: -> (entity, _) { entity.respond_to?(:masked?) }
+      expose :environment_scope, if: -> (entity, _) { entity.respond_to?(:environment_scope) }
     end
 
     class Pipeline < PipelineBasic
@@ -1685,7 +1703,7 @@ module API
   end
 end
 
-API::Entities.prepend(EE::API::Entities::Entities) # rubocop: disable Cop/InjectEnterpriseEditionModule
+API::Entities.prepend_if_ee('EE::API::Entities::Entities') # rubocop: disable Cop/InjectEnterpriseEditionModule
 API::Entities.prepend_entity(::API::Entities::ApplicationSetting, with: EE::API::Entities::ApplicationSetting)
 API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Board)
 API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)
@@ -1697,7 +1715,6 @@ API::Entities.prepend_entity(::API::Entities::Namespace, with: EE::API::Entities
 API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::Project)
 API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API::Entities::ProtectedRefAccess)
 API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
-API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
 API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)
 API::Entities.prepend_entity(::API::Entities::Identity, with: EE::API::Entities::Identity)

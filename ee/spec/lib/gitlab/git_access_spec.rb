@@ -262,57 +262,45 @@ describe Gitlab::GitAccess do
           .to receive(:all)
           .with(repository.gl_repository)
           .and_return({ 'GIT_OBJECT_DIRECTORY_RELATIVE' => 'objects' })
+
+        # Stub the object directory size to "simulate" quarantine size
+        allow(repository)
+          .to receive(:object_directory_size)
+          .and_return(object_directory_size)
       end
 
-      context 'when quarantine_push_size_check feature is enabled (default)' do
-        let(:object_directory_size) { 1.megabyte }
+      let(:object_directory_size) { 1.megabyte }
 
-        before do
-          # Stub the object directory size to "simulate" quarantine size
-          allow(repository)
-            .to receive(:object_directory_size)
-            .and_return(object_directory_size)
-        end
+      context 'when repository size is over limit' do
+        let(:repository_size) { 2.megabytes }
+        let(:repository_size_limit) { 1.megabyte }
 
-        context 'when repository size is over limit' do
-          let(:repository_size) { 2.megabytes }
-          let(:repository_size_limit) { 1.megabyte }
-
-          it_behaves_like 'a push to repository over the limit'
-        end
-
-        context 'when repository size is below the limit' do
-          let(:repository_size) { 1.megabyte }
-          let(:repository_size_limit) { 2.megabytes }
-
-          it_behaves_like 'a push to repository below the limit'
-
-          context 'when object directory (quarantine) size exceeds the limit' do
-            let(:object_directory_size) { 2.megabytes }
-
-            it 'rejects the push' do
-              expect do
-                push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
-              end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
-            end
-          end
-
-          context 'when object directory (quarantine) size does not exceed the limit' do
-            it 'accepts the push' do
-              expect do
-                push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/my_branch_3")
-              end.not_to raise_error
-            end
-          end
-        end
+        it_behaves_like 'a push to repository over the limit'
       end
 
-      context 'when quarantine_push_size_check feature is disabled' do
-        before do
-          stub_feature_flags(quarantine_push_size_check: false)
+      context 'when repository size is below the limit' do
+        let(:repository_size) { 1.megabyte }
+        let(:repository_size_limit) { 2.megabytes }
+
+        it_behaves_like 'a push to repository below the limit'
+
+        context 'when object directory (quarantine) size exceeds the limit' do
+          let(:object_directory_size) { 2.megabytes }
+
+          it 'rejects the push' do
+            expect do
+              push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_2_mb_file} refs/heads/my_branch_2")
+            end.to raise_error(described_class::UnauthorizedError, /Your push to this repository would cause it to exceed the size limit/)
+          end
         end
 
-        it_behaves_like 'a push to repository using git-rev-list for checking against repository size limit'
+        context 'when object directory (quarantine) size does not exceed the limit' do
+          it 'accepts the push' do
+            expect do
+              push_changes("#{Gitlab::Git::BLANK_SHA} #{sha_with_smallest_changes} refs/heads/my_branch_3")
+            end.not_to raise_error
+          end
+        end
       end
     end
 

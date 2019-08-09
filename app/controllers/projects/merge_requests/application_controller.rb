@@ -45,7 +45,7 @@ class Projects::MergeRequests::ApplicationController < Projects::ApplicationCont
 
   def set_pipeline_variables
     @pipelines =
-      if can?(current_user, :read_pipeline, @project)
+      if can?(current_user, :read_pipeline, @merge_request.source_project)
         @merge_request.all_pipelines
       else
         Ci::Pipeline.none
@@ -60,4 +60,4 @@ class Projects::MergeRequests::ApplicationController < Projects::ApplicationCont
   end
 end
 
-Projects::MergeRequests::ApplicationController.prepend(EE::Projects::MergeRequests::ApplicationController)
+Projects::MergeRequests::ApplicationController.prepend_if_ee('EE::Projects::MergeRequests::ApplicationController')

@@ -82,7 +82,8 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def pipelines
-    @pipelines = @merge_request.all_pipelines.page(params[:page]).per(30)
+    set_pipeline_variables
+    @pipelines = @pipelines.page(params[:page]).per(30)
 
     Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
@@ -337,4 +338,4 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 end
 
-Projects::MergeRequestsController.prepend(EE::Projects::MergeRequestsController)
+Projects::MergeRequestsController.prepend_if_ee('EE::Projects::MergeRequestsController')

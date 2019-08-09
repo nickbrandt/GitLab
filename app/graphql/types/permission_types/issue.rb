@@ -13,4 +13,4 @@ module Types
   end
 end
 
-Types::PermissionTypes::Issue.prepend(::EE::Types::PermissionTypes::Issue)
+Types::PermissionTypes::Issue.prepend_if_ee('::EE::Types::PermissionTypes::Issue')

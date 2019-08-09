@@ -18,7 +18,7 @@ export const mapApprovalRuleResponse = res => ({
   hasSource: Boolean(res.source_rule),
   name: res.name,
   approvalsRequired: res.approvals_required,
-  minApprovalsRequired: res.source_rule ? res.source_rule.approvals_required : 0,
+  minApprovalsRequired: 0,
   approvers: res.approvers,
   containsHiddenGroups: res.contains_hidden_groups,
   users: res.users,
@@ -41,7 +41,7 @@ export const mapMRSourceRule = ({ id, ...rule }) => ({
   ...rule,
   hasSource: true,
   sourceId: id,
-  minApprovalsRequired: rule.approvalsRequired || 0,
+  minApprovalsRequired: 0,
 });
 
 /**

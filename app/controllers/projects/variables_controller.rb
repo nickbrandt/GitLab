@@ -38,8 +38,6 @@ class Projects::VariablesController < Projects::ApplicationController
   end
 
   def variable_params_attributes
-    %i[id variable_type key secret_value protected masked _destroy]
+    %i[id variable_type key secret_value protected masked environment_scope _destroy]
   end
 end
-
-Projects::VariablesController.prepend(EE::Projects::VariablesController)

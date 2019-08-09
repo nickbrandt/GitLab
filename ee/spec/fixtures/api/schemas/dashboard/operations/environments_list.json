@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "required": [
+    "projects"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/project"
+      }
+    }
+  },
+  "definitions": {
+    "project": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "avatar_url",
+        "remove_path",
+        "web_url",
+        "namespace"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "avatar_url": { "type": ["string", "null"] },
+        "remove_path": { "type": "string" },
+        "web_url": { "type": "string" },
+        "namespace": { "$ref": "#/definitions/namespace" }
+      }
+    },
+    "namespace": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "avatar_url",
+        "full_path"
+      ],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "avatar_url": { "type": ["string", "null"] },
+        "full_path": { "type": "string" }
+      }
+    }
+  }
+}

@@ -9,8 +9,6 @@
 module VulnerabilitiesActions
   extend ActiveSupport::Concern
 
-  HISTORY_RANGE = 3.months
-
   def index
     vulnerabilities = found_vulnerabilities(:with_sha).ordered.page(params[:page])
 
@@ -30,16 +28,6 @@ module VulnerabilitiesActions
     respond_to do |format|
       format.json do
         render json: VulnerabilitySummarySerializer.new.represent(vulnerabilities_summary)
-      end
-    end
-  end
-
-  def history
-    vulnerabilities_counter = found_vulnerabilities(:all).count_by_day_and_severity(HISTORY_RANGE)
-
-    respond_to do |format|
-      format.json do
-        render json: Vulnerabilities::HistorySerializer.new.represent(vulnerabilities_counter)
       end
     end
   end

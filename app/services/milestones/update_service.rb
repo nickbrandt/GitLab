@@ -23,4 +23,4 @@ module Milestones
   end
 end
 
-Milestones::UpdateService.prepend(EE::Milestones::UpdateService)
+Milestones::UpdateService.prepend_if_ee('EE::Milestones::UpdateService')

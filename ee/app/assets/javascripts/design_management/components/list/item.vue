@@ -45,8 +45,8 @@ export default {
     :to="{ name: 'design', params: { id: name } }"
     class="card cursor-pointer text-plain js-design-list-item design-list-item"
   >
-    <div class="card-body p-0">
-      <img :src="image" :alt="name" class="block ml-auto mr-auto mw-100 design-img" height="230" />
+    <div class="card-body p-0 d-flex align-items-center overflow-hidden">
+      <img :src="image" :alt="name" class="block ml-auto mr-auto mw-100 mh-100 design-img" />
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">

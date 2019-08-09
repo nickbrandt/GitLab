@@ -47,6 +47,29 @@ describe OperationsController do
     end
   end
 
+  describe 'GET #environments' do
+    it_behaves_like 'unlicensed', :get, :environments
+
+    it 'renders the view' do
+      get :environments
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response).to render_template(:environments)
+    end
+
+    context 'with an anonymous user' do
+      before do
+        sign_out(user)
+      end
+
+      it 'redirects to sign-in page' do
+        get :environments
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
   describe 'GET #list' do
     let(:now) { Time.now.change(usec: 0) }
     let(:project) { create(:project, :repository) }
@@ -137,6 +160,78 @@ describe OperationsController do
         get :list
 
         expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
+  describe 'GET #environment_list' do
+    it_behaves_like 'unlicensed', :get, :environments_list
+
+    context 'with an anonymous user' do
+      before do
+        sign_out(user)
+      end
+
+      it 'redirects to sign-in page' do
+        get :environments_list
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'with an authenticated user without sufficient access_level' do
+      it 'returns an empty project list' do
+        project = create(:project)
+        project.add_reporter(user)
+        user.update!(ops_dashboard_projects: [project])
+
+        get :environments_list
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['projects']).to eq([])
+      end
+    end
+
+    context 'with an authenticated developer' do
+      it 'returns an empty project list' do
+        get :environments_list
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['projects']).to eq([])
+      end
+
+      it 'sets the polling interval header' do
+        get :environments_list
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response.headers[Gitlab::PollingInterval::HEADER_NAME]).to eq('120000')
+      end
+
+      it "returns an empty project list when the project is not in the developer's dashboard" do
+        project = create(:project)
+        project.add_developer(user)
+        user.update!(ops_dashboard_projects: [])
+
+        get :environments_list
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['projects']).to eq([])
+      end
+
+      it 'returns a list with one project when the developer has added that project to the dashboard' do
+        project = create(:project, :with_avatar)
+        project.add_developer(user)
+        user.update!(ops_dashboard_projects: [project])
+
+        get :environments_list
+
+        project_json = json_response['projects'].first
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+        expect(project_json['id']).to eq(project.id)
+        expect(project_json['name']).to eq(project.name)
+        expect(project_json['namespace']['id']).to eq(project.namespace.id)
+        expect(project_json['namespace']['name']).to eq(project.namespace.name)
       end
     end
   end

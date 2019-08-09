@@ -17,10 +17,6 @@ export default {
       type: String,
       required: true,
     },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
     name: {
       type: String,
       required: false,
@@ -58,11 +54,8 @@ export default {
       <icon :size="18" name="close" />
     </router-link>
     <div>
-      <gl-loading-icon v-if="isLoading" size="md" class="mt-2 mb-2" />
-      <template v-else>
-        <h2 class="m-0">{{ name }}</h2>
-        <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
-      </template>
+      <h2 class="m-0">{{ name }}</h2>
+      <small v-if="updatedAt" class="text-secondary">{{ updatedText }}</small>
     </div>
     <pagination :id="id" class="ml-auto" />
   </header>

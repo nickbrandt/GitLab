@@ -54,7 +54,7 @@ describe('Split security reports app', () => {
     });
 
     it('renders loading summary text + spinner', done => {
-      expect(vm.$el.querySelector('.spinner')).not.toBeNull();
+      expect(vm.$el.querySelector('.gl-spinner')).not.toBeNull();
 
       expect(vm.$el.textContent).toContain('SAST is loading');
       expect(vm.$el.textContent).toContain('Dependency scanning is loading');
@@ -99,7 +99,7 @@ describe('Split security reports app', () => {
 
     it('renders reports', done => {
       setTimeout(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+        expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
 
         expect(vm.$el.textContent).toContain('SAST detected 3 vulnerabilities');
         expect(vm.$el.textContent).toContain('Dependency scanning detected 3 vulnerabilities');
@@ -118,7 +118,7 @@ describe('Split security reports app', () => {
 
     it('renders all reports collapsed by default', done => {
       setTimeout(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+        expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
         const reports = vm.$el.querySelectorAll('.js-report-section-container');
@@ -135,7 +135,7 @@ describe('Split security reports app', () => {
       vm.alwaysOpen = true;
 
       setTimeout(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+        expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(vm.$el.querySelector('.js-collapse-btn')).toBeNull();
 
         const reports = vm.$el.querySelectorAll('.js-report-section-container');
@@ -181,7 +181,7 @@ describe('Split security reports app', () => {
 
     it('renders error state', done => {
       setTimeout(() => {
-        expect(vm.$el.querySelector('.fa-spinner')).toBeNull();
+        expect(vm.$el.querySelector('.gl-spinner')).toBeNull();
 
         expect(vm.$el.textContent).toContain('SAST: Loading resulted in an error');
         expect(vm.$el.textContent).toContain('Dependency scanning: Loading resulted in an error');

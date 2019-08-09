@@ -9,17 +9,17 @@ describe Projects::Security::DependenciesController do
     let(:params) { { namespace_id: project.namespace, project_id: project } }
 
     before do
-      project.add_developer(user)
+      sign_in(user)
     end
 
     context 'with authorized user' do
       before do
-        sign_in(user)
+        project.add_developer(user)
       end
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true)
+          stub_licensed_features(dependency_list: true, security_dashboard: true)
         end
 
         it 'counts usage of the feature' do
@@ -58,23 +58,55 @@ describe Projects::Security::DependenciesController do
 
           context 'with params' do
             context 'with sorting params' do
+              context 'when sorted by packager' do
+                let(:params) do
+                  {
+                    namespace_id: project.namespace,
+                    project_id: project,
+                    sort_by: 'packager',
+                    sort: 'desc',
+                    page: 1
+                  }
+                end
+
+                it 'returns sorted list' do
+                  expect(json_response['dependencies'].first['packager']).to eq('Ruby (Bundler)')
+                  expect(json_response['dependencies'].last['packager']).to eq('JavaScript (Yarn)')
+                end
+
+                it 'return 20 dependencies' do
+                  expect(json_response['dependencies'].length).to eq(20)
+                end
+              end
+
+              context 'when sorted by severity' do
+                let(:params) do
+                  {
+                    namespace_id: project.namespace,
+                    project_id: project,
+                    sort_by: 'severity',
+                    page: 1
+                  }
+                end
+
+                it 'returns sorted list' do
+                  expect(json_response['dependencies'].first['name']).to eq('nokogiri')
+                  expect(json_response['dependencies'].second['name']).to eq('debug')
+                end
+              end
+            end
+
+            context 'with filter by vulnerable' do
               let(:params) do
                 {
                   namespace_id: project.namespace,
                   project_id: project,
-                  sort_by: 'packager',
-                  sort: 'desc',
-                  page: 1
+                  filter: 'vulnerable'
                 }
               end
 
-              it 'returns sorted list' do
-                expect(json_response['dependencies'].first['packager']).to eq('Ruby (Bundler)')
-                expect(json_response['dependencies'].last['packager']).to eq('JavaScript (Yarn)')
-              end
-
-              it 'return 20 dependencies' do
-                expect(json_response['dependencies'].length).to eq(20)
+              it 'return vulnerable dependencies' do
+                expect(json_response['dependencies'].length).to eq(3)
               end
             end
 
@@ -135,6 +167,8 @@ describe Projects::Security::DependenciesController do
 
       context 'when feature is not available' do
         before do
+          stub_licensed_features(security_dashboard: true)
+
           get :index, params: params, format: :json
         end
 
@@ -146,11 +180,13 @@ describe Projects::Security::DependenciesController do
 
     context 'with unauthorized user' do
       before do
+        project.add_guest(user)
+
         get :index, params: params, format: :json
       end
 
-      it 'returns 404' do
-        expect(response).to have_gitlab_http_status(404)
+      it 'returns 403' do
+        expect(response).to have_gitlab_http_status(403)
       end
     end
   end

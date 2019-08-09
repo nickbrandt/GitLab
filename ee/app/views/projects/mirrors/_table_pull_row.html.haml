@@ -1,26 +1,26 @@
+// There's no way to disable or enable a pull mirror, so if the boolean
+// isn't set, then we don't have a pull mirror.
+- return unless @project.mirror?
+
 - import_state = @project.import_state
-- disabled_mirror = !@project.mirror?
 
 - return unless import_state
 
-%tr{ class: ('bg-secondary' if disabled_mirror) }
+%tr
   %td.mirror-url= @project.safe_import_url
   %td= _('Pull')
   %td= import_state.last_update_at.present? ? time_ago_with_tooltip(import_state.last_update_at) : _('Never')
   %td
-    - if disabled_mirror
-      = render 'projects/mirrors/disabled_mirror_badge'
     - if import_state&.last_error.present?
       .badge.badge-danger{ data: { toggle: 'tooltip', html: 'true' }, title: html_escape(import_state.last_error.try(:strip)) }= _('Error')
   %td.mirror-action-buttons
     .btn-group.mirror-actions-group.pull-right{ role: 'group' }
-      - if @project.mirror?
-        - ssh_public_key = @project.import_data.ssh_public_key
-        - if ssh_public_key
-          = clipboard_button(text: ssh_public_key, class: 'btn btn-default qa-copy-ssh-public-key', title: _('Copy SSH public key'))
-        - if import_state.mirror_update_due? || import_state.updating_mirror?
-          %button.btn.disabled{ type: 'button', data: { container: 'body', toggle: 'tooltip' }, title: _('Updating') }= icon("refresh spin")
-        - else
-          = link_to update_now_project_mirror_path(@project), method: :post, class: 'btn js-force-update-mirror', data: { container: 'body', toggle: 'tooltip' }, title: _('Update now') do
-            = icon("refresh")
+      - ssh_public_key = @project.import_data.ssh_public_key
+      - if ssh_public_key
+        = clipboard_button(text: ssh_public_key, class: 'btn btn-default qa-copy-ssh-public-key', title: _('Copy SSH public key'))
+      - if import_state.mirror_update_due? || import_state.updating_mirror?
+        %button.btn.disabled{ type: 'button', data: { container: 'body', toggle: 'tooltip' }, title: _('Updating') }= icon("refresh spin")
+      - else
+        = link_to update_now_project_mirror_path(@project), method: :post, class: 'btn js-force-update-mirror', data: { container: 'body', toggle: 'tooltip' }, title: _('Update now') do
+          = icon("refresh")
       %button.js-delete-mirror.js-delete-pull-mirror.btn.btn-danger{ type: 'button', data: { toggle: 'tooltip', container: 'body' }, title: _('Remove') }= icon('trash-o')

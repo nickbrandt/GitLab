@@ -135,4 +135,4 @@ module TabHelper
   end
 end
 
-TabHelper.prepend(EE::TabHelper)
+TabHelper.prepend_if_ee('EE::TabHelper')

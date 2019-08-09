@@ -33,4 +33,4 @@ module Projects
   end
 end
 
-Projects::Prometheus::MetricsController.prepend(EE::Projects::Prometheus::MetricsController)
+Projects::Prometheus::MetricsController.prepend_if_ee('EE::Projects::Prometheus::MetricsController')

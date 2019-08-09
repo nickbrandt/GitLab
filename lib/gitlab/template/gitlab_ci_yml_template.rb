@@ -33,4 +33,4 @@ module Gitlab
   end
 end
 
-Gitlab::Template::GitlabCiYmlTemplate.prepend(::EE::Gitlab::Template::GitlabCiYmlTemplate)
+Gitlab::Template::GitlabCiYmlTemplate.prepend_if_ee('::EE::Gitlab::Template::GitlabCiYmlTemplate')

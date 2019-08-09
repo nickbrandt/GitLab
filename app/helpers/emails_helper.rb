@@ -188,4 +188,4 @@ module EmailsHelper
   end
 end
 
-EmailsHelper.prepend(EE::EmailsHelper)
+EmailsHelper.prepend_if_ee('EE::EmailsHelper')

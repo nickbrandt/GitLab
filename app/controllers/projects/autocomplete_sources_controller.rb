@@ -44,4 +44,4 @@ class Projects::AutocompleteSourcesController < Projects::ApplicationController
   end
 end
 
-Projects::AutocompleteSourcesController.prepend(EE::Projects::AutocompleteSourcesController)
+Projects::AutocompleteSourcesController.prepend_if_ee('EE::Projects::AutocompleteSourcesController')

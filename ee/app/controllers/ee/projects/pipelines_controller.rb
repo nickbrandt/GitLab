@@ -14,10 +14,18 @@ module EE
       end
 
       def licenses
-        if pipeline.expose_license_management_data?
-          render_show
-        else
-          redirect_to pipeline_path(pipeline)
+        report_exists = pipeline.expose_license_management_data?
+
+        respond_to do |format|
+          if report_exists
+            format.html { render_show }
+            format.json do
+              render json: LicenseManagementReportLicenseEntity.licenses_payload(pipeline.license_management_report), status: :ok
+            end
+          else
+            format.html { redirect_to pipeline_path(pipeline) }
+            format.json { head :not_found }
+          end
         end
       end
 

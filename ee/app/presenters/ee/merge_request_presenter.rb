@@ -3,6 +3,7 @@
 module EE
   module MergeRequestPresenter
     include ::VisibleApprovable
+    include ::EE::ProjectsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def approvals_path
       if expose_mr_approval_path?
@@ -56,33 +57,10 @@ module EE
       project_vulnerability_feedback_index_path(merge_request.project)
     end
 
-    def create_vulnerability_feedback_issue_path
-      if expose_create_feedback_path?(:issue)
-        vulnerability_feedback_path
-      end
-    end
-
-    def create_vulnerability_feedback_merge_request_path
-      if expose_create_feedback_path?(:merge_request)
-        vulnerability_feedback_path
-      end
-    end
-
-    def create_vulnerability_feedback_dismissal_path
-      if expose_create_feedback_path?(:dismissal)
-        vulnerability_feedback_path
-      end
-    end
-
     private
 
     def expose_mr_approval_path?
       approval_feature_available? && merge_request.iid
-    end
-
-    def expose_create_feedback_path?(feedback_type)
-      feedback = Vulnerabilities::Feedback.new(project: merge_request.project, feedback_type: feedback_type)
-      can?(current_user, :create_vulnerability_feedback, feedback)
     end
   end
 end

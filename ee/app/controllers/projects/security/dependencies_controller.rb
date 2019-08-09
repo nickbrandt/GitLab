@@ -3,6 +3,7 @@
 module Projects
   module Security
     class DependenciesController < Projects::ApplicationController
+      before_action :authorize_read_dependency_list!
       before_action :ensure_dependency_list_feature_available
 
       def index
@@ -31,6 +32,10 @@ module Projects
         ::Gitlab::DependenciesCollection.new(found_dependencies)
       end
 
+      def authorize_read_dependency_list!
+        return render_403 unless can?(current_user, :read_project_security_dashboard, project)
+      end
+
       def ensure_dependency_list_feature_available
         render_404 unless project.feature_available?(:dependency_list)
       end
@@ -39,14 +44,19 @@ module Projects
         @dependencies ||= collect_dependencies
       end
 
+      def match_disallowed(param, value)
+        param == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
+          param == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES) ||
+          param == :filter && !value.in?(::Security::DependencyListService::FILTER_VALUES)
+      end
+
       def pipeline
-        @pipeline ||= project.all_pipelines.latest_successful_for(project.default_branch)
+        @pipeline ||= project.all_pipelines.latest_successful_for_ref(project.default_branch)
       end
 
       def query_params
-        params.permit(:sort, :sort_by).delete_if do |key, value|
-          key == :sort_by && !value.in?(::Security::DependencyListService::SORT_BY_VALUES) ||
-            key == :sort && !value.in?(::Security::DependencyListService::SORT_VALUES)
+        params.permit(:sort, :sort_by, :filter).delete_if do |key, value|
+          match_disallowed(key, value)
         end
       end
 

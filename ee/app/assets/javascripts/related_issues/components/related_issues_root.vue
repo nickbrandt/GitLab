@@ -25,6 +25,7 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
 */
 import _ from 'underscore';
 import Flash from '~/flash';
+import { __ } from '~/locale';
 import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
 import RelatedIssuesService from '../services/related_issues_service';
@@ -63,7 +64,7 @@ export default {
     title: {
       type: String,
       required: false,
-      default: 'Related issues',
+      default: __('Related issues'),
     },
     issuableType: {
       type: String,
@@ -176,7 +177,7 @@ export default {
         .catch(() => {
           this.store.setRelatedIssues([]);
           this.isFetching = false;
-          Flash('An error occurred while fetching issues.');
+          Flash(__('An error occurred while fetching issues.'));
         });
     },
     saveIssueOrder({ issueId, beforeId, afterId, oldIndex, newIndex }) {
@@ -195,7 +196,7 @@ export default {
             }
           })
           .catch(() => {
-            Flash('An error occurred while reordering issues.');
+            Flash(__('An error occurred while reordering issues.'));
           });
       }
     },

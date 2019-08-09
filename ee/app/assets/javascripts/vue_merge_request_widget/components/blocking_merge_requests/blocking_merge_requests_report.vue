@@ -65,15 +65,15 @@ export default {
     blockedByText() {
       if (this.closedCount > 0 && this.closedCount === this.unmergedCount) {
         return n__(
-          'Blocked by <strong>%d closed</strong> merge request.',
-          'Blocked by <strong>%d closed</strong> merge requests.',
+          'Depends on <strong>%d closed</strong> merge request.',
+          'Depends on <strong>%d closed</strong> merge requests.',
           this.closedCount,
         );
       }
 
       const mainText = n__(
-        'Blocked by %d merge request',
-        'Blocked by %d merge requests',
+        'Depends on %d merge request being merged',
+        'Depends on %d merge requests being merged',
         this.unmergedCount,
       );
 
@@ -104,7 +104,7 @@ export default {
     issue-item-class="p-0"
   >
     <template v-slot:success>
-      {{ __('No blocking merge requests ') }}
+      {{ __('All cross-project dependencies have merged') }}
       <span class="text-secondary">
         {{
           sprintf(__('(%{mrCount} merged)'), {

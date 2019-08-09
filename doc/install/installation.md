@@ -6,7 +6,7 @@ type: howto
 
 This is the official installation guide to set up a production GitLab server
 using the source files. To set up a **development installation** or for many
-other installation options, see the [main installation page](index.md).
+other installation options, see the [main installation page](README.md).
 It was created for and tested on **Debian/Ubuntu** operating systems.
 Read [requirements.md](requirements.md) for hardware and operating system requirements.
 If you want to install on RHEL/CentOS, we recommend using the
@@ -134,7 +134,7 @@ Make sure you have the right version of Git installed:
 # Install Git
 sudo apt-get install -y git-core
 
-# Make sure Git is version 2.21.0 or higher
+# Make sure Git is version 2.22.0 or higher
 git --version
 ```
 
@@ -171,9 +171,9 @@ sudo make install
 
 # Download and compile from source
 cd /tmp
-curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.21.0.tar.gz
-echo '85eca51c7404da75e353eba587f87fea9481ba41e162206a6f70ad8118147bee  git-2.21.0.tar.gz' | shasum -a256 -c - && tar -xzf git-2.21.0.tar.gz
-cd git-2.21.0/
+curl --remote-name --location --progress https://www.kernel.org/pub/software/scm/git/git-2.22.0.tar.gz
+echo 'a4b7e4365bee43caa12a38d646d2c93743d755d1cea5eab448ffb40906c9da0b'  git-2.22.0.tar.gz' | shasum -a256 -c - && tar -xzf git-2.22.0.tar.gz
+cd git-2.22.0/
 ./configure --with-libpcre
 make prefix=/usr/local all
 
@@ -938,7 +938,7 @@ To use GitLab with Puma:
    cd /home/git/gitlab
 
    # Copy config file for the web server
-   sudo -u git -H config/puma.rb.example config/puma.rb
+   sudo -u git -H cp config/puma.rb.example config/puma.rb
    ```
 
 1. Edit the system `init.d` script to use `EXPERIMENTAL_PUMA=1` flag. If you have `/etc/default/gitlab`, then you should edit it instead.

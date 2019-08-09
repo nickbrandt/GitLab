@@ -421,7 +421,7 @@ class ApplicationController < ActionController::Base
   end
 
   def manifest_import_enabled?
-    Group.supports_nested_objects? && Gitlab::CurrentSettings.import_sources.include?('manifest')
+    Gitlab::CurrentSettings.import_sources.include?('manifest')
   end
 
   def phabricator_import_enabled?
@@ -530,4 +530,4 @@ class ApplicationController < ActionController::Base
   end
 end
 
-ApplicationController.prepend(EE::ApplicationController)
+ApplicationController.prepend_if_ee('EE::ApplicationController')

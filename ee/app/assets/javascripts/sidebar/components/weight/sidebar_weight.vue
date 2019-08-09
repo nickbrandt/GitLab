@@ -1,4 +1,5 @@
 <script>
+import { __ } from '~/locale';
 import Flash from '~/flash';
 import eventHub from '~/sidebar/event_hub';
 import weightComponent from './weight.vue';
@@ -28,7 +29,7 @@ export default {
   methods: {
     onUpdateWeight(newWeight) {
       this.mediator.updateWeight(newWeight).catch(() => {
-        Flash('Error occurred while updating the issue weight');
+        Flash(__('Error occurred while updating the issue weight'));
       });
     },
   },

@@ -20,6 +20,7 @@ module EE
       include EachBatch
       include InsightsFeature
       include IgnorableColumn
+      include Vulnerable
 
       ignore_column :mirror_last_update_at,
         :mirror_last_successful_update_at,
@@ -153,8 +154,8 @@ module EE
     end
 
     def latest_pipeline_with_security_reports
-      ci_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
-        ci_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+      all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
+        all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
@@ -276,13 +277,6 @@ module EE
 
         job_id
       end
-    end
-
-    def ci_variables_for(ref:, environment: nil)
-      return super.where(environment_scope: '*') unless
-        environment && feature_available?(:variable_environment_scope)
-
-      super.on_environment(environment)
     end
 
     def execute_hooks(data, hooks_scope = :push_hooks)
@@ -585,7 +579,7 @@ module EE
       # on prem installs yet.
       lfs_enabled? &&
         feature_available?(:design_management) &&
-        ::Feature.enabled?(:design_management_flag, self) # Named to avoid the bug: https://gitlab.com/gitlab-org/gitlab-ce/issues/64468
+        ::Feature.enabled?(:design_management_flag, self, default_enabled: true)
     end
 
     def design_repository

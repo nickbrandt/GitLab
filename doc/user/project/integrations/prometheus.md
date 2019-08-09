@@ -98,7 +98,10 @@ You can view the performance dashboard for an environment by [clicking on the mo
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3799) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.6.
 
-Additional metrics can be monitored by adding them on the Prometheus integration page. Once saved, they will be displayed on the environment performance dashboard.
+Custom metrics can be monitored by adding them on the Prometheus integration page. Once saved, they will be displayed on the environment performance dashboard provided that either:
+
+- A [connected Kubernetes cluster](../clusters/index.md#adding-and-removing-clusters) with the environment scope of `*` is used and [Prometheus installed on the cluster](#enabling-prometheus-integration), or
+- Prometheus is [manually configured](#manual-configuration-of-prometheus).
 
 ![Add New Metric](img/prometheus_add_metric.png)
 
@@ -326,8 +329,6 @@ Once enabled, an issue will be opened automatically when an alert is triggered w
 - Alert [GFM](../../markdown.md): GitLab Flavored Markdown from `annotations/gitlab_incident_markdown`
 
 To further customize the issue, you can add labels, mentions, or any other supported [quick action](../quick_actions.md) in the selected issue template, which will apply to all incidents. To limit quick actions or other information to only specific types of alerts, use the `annotations/gitlab_incident_markdown` field.
-
-Since [version 12.2](https://gitlab.com/gitlab-org/gitlab-ce/issues/63373), GitLab will tag each incident issue with the `incident` label automatically. If the label does not yet exist, it will be created automatically as well.
 
 Since [version 12.2](https://gitlab.com/gitlab-org/gitlab-ce/issues/63373), GitLab will tag each incident issue with the `incident` label automatically. If the label does not yet exist, it will be created automatically as well.
 

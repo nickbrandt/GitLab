@@ -1,41 +1,149 @@
+import { mount } from '@vue/test-utils';
 import $ from 'jquery';
-import Vue from 'vue';
-import GLDropdown from '~/gl_dropdown'; // eslint-disable-line no-unused-vars
+import 'bootstrap';
+import '~/gl_dropdown';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import Api from '~/api';
+import { TEST_HOST } from 'helpers/test_constants';
+
+jest.mock('~/api', () => ({
+  groups: jest.fn(),
+}));
+
+const groups = [
+  {
+    id: 1,
+    name: 'foo',
+    avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
+  },
+  {
+    id: 2,
+    name: 'foobar',
+    avatar_url: null,
+  },
+];
 
 describe('GroupsDropdownFilter component', () => {
-  const Component = Vue.extend(GroupsDropdownFilter);
-  let vm;
+  let wrapper;
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   beforeEach(() => {
     jest.spyOn($.fn, 'glDropdown');
-    vm = mountComponent(Component);
+    Api.groups.mockImplementation((term, options, callback) => {
+      callback(groups);
+    });
+    wrapper = mount(GroupsDropdownFilter);
   });
+
+  const findDropdown = () => wrapper.find('.dropdown');
+  const openDropdown = () => {
+    $(findDropdown().element)
+      .parent()
+      .trigger('shown.bs.dropdown');
+  };
+  const findDropdownItems = () => findDropdown().findAll('a');
+  const findDropdownButton = () => findDropdown().find('button');
 
   it('should call glDropdown', () => {
     expect($.fn.glDropdown).toHaveBeenCalled();
   });
 
-  describe('onClick', () => {
-    const group = {
-      id: 1,
-      name: 'foo',
-      path: 'bar',
-    };
-    const $el = $('<a></a>').data(group);
-    const e = new Event('click');
+  describe('it renders the items correctly', () => {
+    beforeEach(() => {
+      openDropdown();
 
-    it('should emit the "setSelectedGroup" event', () => {
-      jest.spyOn(vm, '$emit');
+      return wrapper.vm.$nextTick();
+    });
 
-      vm.onClick({ $el, e });
+    it('should contain 2 items', () => {
+      expect(findDropdownItems().length).toEqual(2);
+    });
 
-      expect(vm.$emit).toHaveBeenCalledWith('selected', group);
+    it('renders an avatar when the group has an avatar_url', () => {
+      expect(
+        findDropdownItems()
+          .at(0)
+          .contains('img.avatar'),
+      ).toBe(true);
+      expect(
+        findDropdownItems()
+          .at(0)
+          .contains('div.identicon'),
+      ).toBe(false);
+    });
+
+    it("renders an identicon when the group doesn't have an avatar_url", () => {
+      expect(
+        findDropdownItems()
+          .at(1)
+          .contains('img.avatar'),
+      ).toBe(false);
+      expect(
+        findDropdownItems()
+          .at(1)
+          .contains('div.identicon'),
+      ).toBe(true);
+    });
+  });
+
+  describe('on group click', () => {
+    beforeEach(() => {
+      openDropdown();
+
+      return wrapper.vm.$nextTick();
+    });
+
+    it('should emit the "selected" event with the selected group', () => {
+      findDropdownItems()
+        .at(0)
+        .trigger('click');
+
+      expect(wrapper.emittedByOrder()).toEqual([
+        {
+          name: 'selected',
+          args: [groups[0]],
+        },
+      ]);
+    });
+
+    it('should change selection when new group is clicked', () => {
+      findDropdownItems()
+        .at(1)
+        .trigger('click');
+
+      expect(wrapper.emittedByOrder()).toEqual([
+        {
+          name: 'selected',
+          args: [groups[1]],
+        },
+      ]);
+    });
+
+    it('renders an avatar in the dropdown button when the group has an avatar_url', done => {
+      findDropdownItems()
+        .at(0)
+        .trigger('click');
+
+      wrapper.vm.$nextTick(() => {
+        expect(findDropdownButton().contains('img.avatar')).toBe(true);
+        expect(findDropdownButton().contains('div.identicon')).toBe(false);
+        done();
+      });
+    });
+
+    it("renders an identicon in the dropdown button when the group doesn't have an avatar_url", done => {
+      findDropdownItems()
+        .at(1)
+        .trigger('click');
+
+      wrapper.vm.$nextTick(() => {
+        expect(findDropdownButton().contains('img.avatar')).toBe(false);
+        expect(findDropdownButton().contains('div.identicon')).toBe(true);
+        done();
+      });
     });
   });
 });

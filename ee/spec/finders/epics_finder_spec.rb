@@ -110,7 +110,7 @@ describe EpicsFinder do
           end
         end
 
-        context 'when subgroups are supported', :nested_groups do
+        context 'when subgroups are supported' do
           let(:subgroup) { create(:group, :private, parent: group) }
           let(:subgroup2) { create(:group, :private, parent: subgroup) }
           let!(:subepic1) { create(:epic, group: subgroup) }

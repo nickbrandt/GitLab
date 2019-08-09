@@ -7,6 +7,12 @@ describe Project do
   include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
+  let(:project) { create(:project) }
+
+  it_behaves_like Vulnerable do
+    let(:vulnerable) { project }
+  end
+
   describe 'associations' do
     it { is_expected.to delegate_method(:shared_runners_minutes).to(:statistics) }
     it { is_expected.to delegate_method(:shared_runners_seconds).to(:statistics) }
@@ -598,7 +604,7 @@ describe Project do
 
     subject { project.root_namespace }
 
-    context 'when namespace has parent group', :nested_groups do
+    context 'when namespace has parent group' do
       let(:root_ancestor) { create(:group) }
       let(:parent) { create(:group, parent: root_ancestor) }
 
@@ -616,7 +622,7 @@ describe Project do
     end
   end
 
-  describe '#shared_runners_limit_namespace', :nested_groups do
+  describe '#shared_runners_limit_namespace' do
     set(:root_ancestor) { create(:group) }
     set(:group) { create(:group, parent: root_ancestor) }
     let(:project) { create(:project, namespace: group) }
@@ -768,178 +774,6 @@ describe Project do
 
     it 'uses project full path as service desk address key' do
       expect(project.service_desk_address).to eq("test+#{project.full_path_slug}-#{project.project_id}-issue-@mail.com")
-    end
-  end
-
-  describe '#ci_variables_for' do
-    let(:project) { create(:project) }
-
-    let!(:ci_variable) do
-      create(:ci_variable, value: 'secret', project: project)
-    end
-
-    let!(:protected_variable) do
-      create(:ci_variable, :protected, value: 'protected', project: project)
-    end
-
-    subject { project.ci_variables_for(ref: 'ref') }
-
-    before do
-      stub_application_setting(
-        default_branch_protection: Gitlab::Access::PROTECTION_NONE)
-    end
-
-    context 'when environment name is specified' do
-      let(:environment) { 'review/name' }
-
-      subject do
-        project.ci_variables_for(ref: 'ref', environment: environment)
-      end
-
-      shared_examples 'matching environment scope' do
-        context 'when variable environment scope is available' do
-          before do
-            stub_licensed_features(variable_environment_scope: true)
-          end
-
-          it 'contains the ci variable' do
-            is_expected.to contain_exactly(ci_variable)
-          end
-        end
-
-        context 'when variable environment scope is unavailable' do
-          before do
-            stub_licensed_features(variable_environment_scope: false)
-          end
-
-          it 'does not contain the ci variable' do
-            is_expected.not_to contain_exactly(ci_variable)
-          end
-        end
-      end
-
-      shared_examples 'not matching environment scope' do
-        context 'when variable environment scope is available' do
-          before do
-            stub_licensed_features(variable_environment_scope: true)
-          end
-
-          it 'does not contain the ci variable' do
-            is_expected.not_to contain_exactly(ci_variable)
-          end
-        end
-
-        context 'when variable environment scope is unavailable' do
-          before do
-            stub_licensed_features(variable_environment_scope: false)
-          end
-
-          it 'does not contain the ci variable' do
-            is_expected.not_to contain_exactly(ci_variable)
-          end
-        end
-      end
-
-      context 'when environment scope is exactly matched' do
-        before do
-          ci_variable.update(environment_scope: 'review/name')
-        end
-
-        it_behaves_like 'matching environment scope'
-      end
-
-      context 'when environment scope is matched by wildcard' do
-        before do
-          ci_variable.update(environment_scope: 'review/*')
-        end
-
-        it_behaves_like 'matching environment scope'
-      end
-
-      context 'when environment scope does not match' do
-        before do
-          ci_variable.update(environment_scope: 'review/*/special')
-        end
-
-        it_behaves_like 'not matching environment scope'
-      end
-
-      context 'when environment scope has _' do
-        before do
-          stub_licensed_features(variable_environment_scope: true)
-        end
-
-        it 'does not treat it as wildcard' do
-          ci_variable.update(environment_scope: '*_*')
-
-          is_expected.not_to contain_exactly(ci_variable)
-        end
-
-        context 'when environment name contains underscore' do
-          let(:environment) { 'foo_bar/test' }
-
-          it 'matches literally for _' do
-            ci_variable.update(environment_scope: 'foo_bar/*')
-
-            is_expected.to contain_exactly(ci_variable)
-          end
-        end
-      end
-
-      # The environment name and scope cannot have % at the moment,
-      # but we're considering relaxing it and we should also make sure
-      # it doesn't break in case some data sneaked in somehow as we're
-      # not checking this integrity in database level.
-      context 'when environment scope has %' do
-        before do
-          stub_licensed_features(variable_environment_scope: true)
-        end
-
-        it 'does not treat it as wildcard' do
-          ci_variable.update_attribute(:environment_scope, '*%*')
-
-          is_expected.not_to contain_exactly(ci_variable)
-        end
-
-        context 'when environment name contains a percent' do
-          let(:environment) { 'foo%bar/test' }
-
-          it 'matches literally for _' do
-            ci_variable.update(environment_scope: 'foo%bar/*')
-
-            is_expected.to contain_exactly(ci_variable)
-          end
-        end
-      end
-
-      context 'when variables with the same name have different environment scopes' do
-        let!(:partially_matched_variable) do
-          create(:ci_variable,
-                 key: ci_variable.key,
-                 value: 'partial',
-                 environment_scope: 'review/*',
-                 project: project)
-        end
-
-        let!(:perfectly_matched_variable) do
-          create(:ci_variable,
-                 key: ci_variable.key,
-                 value: 'prefect',
-                 environment_scope: 'review/name',
-                 project: project)
-        end
-
-        before do
-          stub_licensed_features(variable_environment_scope: true)
-        end
-
-        it 'puts variables matching environment scope more in the end' do
-          is_expected.to eq(
-            [ci_variable,
-             partially_matched_variable,
-             perfectly_matched_variable])
-        end
-      end
     end
   end
 
@@ -1747,7 +1581,7 @@ describe Project do
 
         context 'when the group has an Insights config from another project' do
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => insights_file_content })
           end
 
           before do
@@ -1760,6 +1594,18 @@ describe Project do
             it 'returns the group config data from the other project' do
               expect(project.insights_config).to eq(config_project.insights_config)
               expect(project.insights_config).to eq(group.insights_config)
+            end
+
+            context 'when the project is inside a nested group' do
+              let(:nested_group) { create(:group, parent: group) }
+              let(:project) { create(:project, group: nested_group) }
+
+              # The following expectaction should be changed to
+              # expect(project.insights_config).to eq(config_project.insights_config)
+              # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+              it 'returns the project default config' do
+                expect(project.insights_config).to eq(project.default_insights_config)
+              end
             end
           end
 
@@ -1783,25 +1629,22 @@ describe Project do
         let(:insights_file_content) { 'key: monthlyBugsCreated' }
 
         it 'returns the insights config data' do
-          insights_config = project.insights_config
-
-          expect(insights_config).to eq(key: 'monthlyBugsCreated')
+          expect(project.insights_config).to eq(key: 'monthlyBugsCreated')
         end
 
         context 'when the project is inside a group having another config' do
+          let(:group) { create(:group) }
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => ': foo bar' })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => ': foo bar' })
           end
 
           before do
-            project.group = create(:group)
+            project.group = group
             project.group.create_insight!(project: config_project)
           end
 
           it 'returns the project insights config data' do
-            insights_config = project.insights_config
-
-            expect(insights_config).to eq(key: 'monthlyBugsCreated')
+            expect(project.insights_config).to eq(key: 'monthlyBugsCreated')
           end
         end
       end
@@ -1814,12 +1657,13 @@ describe Project do
         end
 
         context 'when the project is inside a group having another config' do
+          let(:group) { create(:group) }
           let(:config_project) do
-            create(:project, :custom_repo, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => 'key: monthlyBugsCreated' })
+            create(:project, :custom_repo, group: group, files: { ::Gitlab::Insights::CONFIG_FILE_PATH => 'key: monthlyBugsCreated' })
           end
 
           before do
-            project.group = create(:group)
+            project.group = group
             project.group.create_insight!(project: config_project)
           end
 

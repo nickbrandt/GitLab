@@ -86,3 +86,5 @@ class Projects::RepositoriesController < Projects::ApplicationController
     render_404
   end
 end
+
+Projects::RepositoriesController.prepend_if_ee('EE::Projects::RepositoriesController')

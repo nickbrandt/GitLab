@@ -1,6 +1,0 @@
-query getDesign($id: String!) {
-  design(id: $id) @client {
-    image
-    filename
-  }
-}

@@ -1,5 +1,46 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.4
+
+### Fixed (3 changes)
+
+- Don't send CI usage email notifications when quota is unlimited. !14810
+- Fix variable mismatch in code quality widget. !14829
+- Change package validation scope to fix Maven package naming functionality. !14922
+
+
+## 12.1.3
+
+### Fixed (3 changes)
+
+- Allow bulk editing group issues for reporter access level and higher. !14744
+- Initialize Application Table on Instance-wide Cluster Details. !14749
+- Hide "Buy additional minutes" button for self-managed installs. !14826
+
+### Added (4 changes)
+
+- Add Vulnerabilities API scoping: pipeline. !14376
+- Add policy for accessing dependencies. !14561
+- Add filtering by package manager for dependencies. !14562
+- Add dependency list public endpoint. !14612
+
+
+## 12.1.2
+
+### Security (1 change)
+
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+
+### Security (6 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Queries for Upload should be scoped by model.
+- Fix bypass email verification when SCIM user is created via API.
+- Prevent an XSS vector in the add approver email.
+- Make vulnerability feedback invisible if limited access to repo.
+
+
 ## 12.1.1
 
 ### Fixed (1 change)
@@ -148,6 +189,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Fix typos in i18n strings for onboarding tour. !14153
 - Externalize strings of chat page in user profile. !28632
 - Remove commit count from storage quotass.
+
+
+## 11.11.7
+
+### Security (5 changes)
+
+- Don't override approval rules if not allowed.
+- Grant admin note permissions in epics for maintainers and owners.
+- Prevent an XSS vector in the add approver email.
+- Ensure the Insights configuration project is part of the group and is accessible to the current user.
+- Make vulnerability feedback invisible if limited access to repo.
 
 
 ## 11.11.4 (2019-06-26)

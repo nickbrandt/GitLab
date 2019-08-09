@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EE::API::Entities::GeoNodeStatus, :postgresql do
+describe EE::API::Entities::GeoNodeStatus do
   include ::EE::GeoHelpers
 
   let(:geo_node_status) { build(:geo_node_status) }
@@ -80,6 +80,18 @@ describe EE::API::Entities::GeoNodeStatus, :postgresql do
                                         job_artifacts_synced_count: 123)
 
       expect(subject[:job_artifacts_synced_in_percentage]).to eq '48.05%'
+    end
+  end
+
+  describe '#container_repositories_synced_in_percentage' do
+    it 'formats as percentage' do
+      geo_node_status.assign_attributes(
+        container_repositories_count: 256,
+        container_repositories_failed_count: 12,
+        container_repositories_synced_count: 123
+      )
+
+      expect(subject[:container_repositories_synced_in_percentage]).to eq '48.05%'
     end
   end
 

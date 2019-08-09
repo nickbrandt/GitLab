@@ -50,4 +50,4 @@ module Gitlab
   end
 end
 
-Gitlab::GlRepository.prepend(::EE::Gitlab::GlRepository)
+Gitlab::GlRepository.prepend_if_ee('::EE::Gitlab::GlRepository')

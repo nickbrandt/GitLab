@@ -55,4 +55,4 @@ module Notes
   end
 end
 
-Notes::QuickActionsService.prepend(EE::Notes::QuickActionsService)
+Notes::QuickActionsService.prepend_if_ee('EE::Notes::QuickActionsService')

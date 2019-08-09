@@ -122,7 +122,7 @@ describe API::V3::Github do
     end
 
     describe 'GET /users/:username' do
-      let!(:user1) { create(:user, username: 'jane') }
+      let!(:user1) { create(:user, username: 'jane.porter') }
 
       before do
         stub_licensed_features(jira_dev_panel_integration: true)
@@ -130,7 +130,7 @@ describe API::V3::Github do
 
       context 'user exists' do
         it 'responds with the expected user' do
-          jira_get v3_api('/users/jane', user)
+          jira_get v3_api("/users/#{user.username}", user)
 
           expect(response).to have_gitlab_http_status(200)
           expect(response).to match_response_schema('entities/github/user', dir: 'ee')
@@ -154,7 +154,7 @@ describe API::V3::Github do
         end
 
         it 'responds with forbidden' do
-          jira_get v3_api('/users/jane', unauthorized_user)
+          jira_get v3_api("/users/#{user.username}", unauthorized_user)
 
           expect(response).to have_gitlab_http_status(403)
         end
@@ -163,7 +163,7 @@ describe API::V3::Github do
 
     describe 'GET events' do
       let(:group) { create(:group) }
-      let(:project) { create(:project, :empty_repo, group: group) }
+      let(:project) { create(:project, :empty_repo, path: 'project.with.dot', group: group) }
       let(:events_path) { "/repos/#{group.path}/#{project.path}/events" }
 
       before do
@@ -308,7 +308,7 @@ describe API::V3::Github do
       end
     end
 
-    context 'nested group namespace', :nested_groups do
+    context 'nested group namespace' do
       let(:group) { create(:group, :nested) }
       let!(:parent_group_project) { create(:project, group: group.parent, name: 'parent_group_project') }
       let!(:child_group_project) { create(:project, group: group, name: 'child_group_project') }

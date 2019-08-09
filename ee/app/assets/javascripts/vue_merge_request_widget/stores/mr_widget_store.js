@@ -30,8 +30,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.canCreateMergeRequest = Boolean(this.createVulnerabilityFeedbackMergeRequestPath);
     this.canDismissVulnerability = Boolean(this.createVulnerabilityFeedbackDismissalPath);
     this.canCreateFeedback = data.can_create_feedback || false;
-    this.visualReviewAppAvailable = data.visual_review_app_available;
-    this.visualReviewFF = gon && gon.features && gon.features.visualReviewApp;
+    this.visualReviewAppAvailable = Boolean(data.visual_review_app_available);
     this.appUrl = gon && gon.gitlab_url;
 
     this.initCodeclimate(data);
@@ -96,9 +95,11 @@ export default class MergeRequestStore extends CEMergeRequestStore {
 
   static doCodeClimateComparison(headIssues, baseIssues) {
     // Do these comparisons in worker threads to avoid blocking the main thread
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const worker = new CodeQualityComparisonWorker();
-      worker.addEventListener('message', ({ data }) => resolve(data));
+      worker.addEventListener('message', ({ data }) =>
+        data.newIssues && data.resolvedIssues ? resolve(data) : reject(data),
+      );
       worker.postMessage({
         headIssues,
         baseIssues,

@@ -32,6 +32,10 @@ class PrometheusMetric < ApplicationRecord
     Gitlab::Prometheus::Metric.new(id: id, title: title, required_metrics: required_metrics, weight: 0, y_label: y_label, queries: queries)
   end
 
+  def to_metric_hash
+    queries.first.merge(metric_id: id)
+  end
+
   def queries
     [
       {
@@ -64,4 +68,4 @@ class PrometheusMetric < ApplicationRecord
   end
 end
 
-PrometheusMetric.prepend(EE::PrometheusMetric)
+PrometheusMetric.prepend_if_ee('EE::PrometheusMetric')

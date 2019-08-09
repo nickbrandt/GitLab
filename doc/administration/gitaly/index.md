@@ -36,12 +36,17 @@ installations will be better served with the default configuration
 used by Omnibus and the GitLab source installation guide.
 
 Starting with GitLab 11.4, Gitaly is able to serve all Git requests without
-needed a shared NFS mount for Git repository data.
+requiring a shared NFS mount for Git repository data.
 Between 11.4 and 11.8 the exception was the
 [Elasticsearch indexer](https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer).
 But since 11.8 the indexer uses Gitaly for data access as well. NFS can still
 be leveraged for redudancy on block level of the Git data. But only has to
 be mounted on the Gitaly server.
+
+Starting with GitLab 11.8, it is possible to use ElasticSearch in conjunction with
+a Gitaly setup that isn't utilising NFS. In order to use ElasticSearch in this
+scenario, the [new repository indexer](../../integration/elasticsearch.md#elasticsearch-repository-indexer-beta)
+needs to be enabled in your GitLab configuration.
 
 NOTE: **Note:** While Gitaly can be used as a replacement for NFS, it's not recommended
 to use EFS as it may impact GitLab's performance. Review the [relevant documentation](../high_availability/nfs.md#avoid-using-awss-elastic-file-system-efs)
@@ -469,7 +474,16 @@ One current feature of GitLab that still requires a shared directory (NFS) is
 There is [work in progress](https://gitlab.com/gitlab-org/gitlab-pages/issues/196)
 to eliminate the need for NFS to support GitLab Pages.
 
-## Troubleshooting
+## Troubleshooting Gitaly
+
+### Commits, pushes, and clones return a 401
+
+```
+remote: GitLab: 401 Unauthorized
+```
+
+You will need to sync your `gitlab-secrets.json` file with your GitLab
+app nodes.
 
 ### `gitaly-debug`
 
@@ -510,3 +524,94 @@ implemented as calls to `gitaly-ruby`:
 ```
 sum(rate(grpc_client_handled_total[5m])) by (grpc_method) > 0
 ```
+
+### Repository changes fail with a `401 Unauthorized` error
+
+If you're running Gitaly on its own server and notice that users can
+successfully clone and fetch repositories (via both SSH and HTTPS), but can't
+push to them or make changes to the repository in the web UI without getting a
+`401 Unauthorized` message, then it's possible Gitaly is failing to authenticate
+with the other nodes due to having the [wrong secrets file](#3-gitaly-server-configuration).
+
+Confirm the following are all true:
+
+- When any user performs a `git push` to any repository on this Gitaly node, it
+  fails with the following error (note the `401 Unauthorized`):
+
+  ```sh
+  remote: GitLab: 401 Unauthorized
+  To <REMOTE_URL>
+  ! [remote rejected] branch-name -> branch-name (pre-receive hook declined)
+  error: failed to push some refs to '<REMOTE_URL>'
+  ```
+
+- When any user adds or modifies a file from the repository using the GitLab
+  UI, it immediatley fails with a red `401 Unauthorized` banner.
+- Creating a new project and [initializing it with a README](../../gitlab-basics/create-project.md#blank-projects)
+  successfully creates the project but doesn't create the README.
+- When [tailing the logs](https://docs.gitlab.com/omnibus/settings/logs.md#tail-logs-in-a-console-on-the-server) on an app node and reproducing the error, you get `401` errors
+  when reaching the `/api/v4/internal/allowed` endpoint:
+
+  ```sh
+  # api_json.log
+  {
+    "time": "2019-07-18T00:30:14.967Z",
+    "severity": "INFO",
+    "duration": 0.57,
+    "db": 0,
+    "view": 0.57,
+    "status": 401,
+    "method": "POST",
+    "path": "\/api\/v4\/internal\/allowed",
+    "params": [
+      {
+        "key": "action",
+        "value": "git-receive-pack"
+      },
+      {
+        "key": "changes",
+        "value": "REDACTED"
+      },
+      {
+        "key": "gl_repository",
+        "value": "REDACTED"
+      },
+      {
+        "key": "project",
+        "value": "\/path\/to\/project.git"
+      },
+      {
+        "key": "protocol",
+        "value": "web"
+      },
+      {
+        "key": "env",
+        "value": "{\"GIT_ALTERNATE_OBJECT_DIRECTORIES\":[],\"GIT_ALTERNATE_OBJECT_DIRECTORIES_RELATIVE\":[],\"GIT_OBJECT_DIRECTORY\":null,\"GIT_OBJECT_DIRECTORY_RELATIVE\":null}"
+      },
+      {
+        "key": "user_id",
+        "value": "2"
+      },
+      {
+        "key": "secret_token",
+        "value": "[FILTERED]"
+      }
+    ],
+    "host": "gitlab.example.com",
+    "ip": "REDACTED",
+    "ua": "Ruby",
+    "route": "\/api\/:version\/internal\/allowed",
+    "queue_duration": 4.24,
+    "gitaly_calls": 0,
+    "gitaly_duration": 0,
+    "correlation_id": "XPUZqTukaP3"
+  }
+
+  # nginx_access.log
+  [IP] - - [18/Jul/2019:00:30:14 +0000] "POST /api/v4/internal/allowed HTTP/1.1" 401 30 "" "Ruby"
+  ```
+
+To fix this problem, confirm that your [`gitlab-secrets.json` file](#3-gitaly-server-configuration)
+on the Gitaly node matches the one on all other nodes. If it doesn't match,
+update the secrets file on the Gitaly node to match the others, then
+[reconfigure the node](../restart_gitlab.md#omnibus-gitlab-reconfigure).

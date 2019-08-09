@@ -84,4 +84,4 @@ module Boards
   end
 end
 
-Boards::ListsController.prepend(EE::Boards::ListsController)
+Boards::ListsController.prepend_if_ee('EE::Boards::ListsController')

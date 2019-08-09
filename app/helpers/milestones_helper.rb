@@ -260,4 +260,4 @@ module MilestonesHelper
   end
 end
 
-MilestonesHelper.prepend(EE::MilestonesHelper)
+MilestonesHelper.prepend_if_ee('EE::MilestonesHelper')

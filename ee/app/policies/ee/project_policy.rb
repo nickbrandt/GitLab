@@ -147,7 +147,7 @@ module EE
         prevent :read_project_security_dashboard
       end
 
-      rule { can?(:read_project) }.enable :read_vulnerability_feedback
+      rule { can?(:read_project) & (can?(:read_merge_request) | can?(:read_build)) }.enable :read_vulnerability_feedback
 
       rule { license_management_enabled & can?(:read_project) }.enable :read_software_license_policy
 
@@ -199,6 +199,8 @@ module EE
       rule { ~can?(:push_code) }.prevent :push_code_to_protected_branches
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
+
+      rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
 
       rule { ~reject_unsigned_commits_available }.prevent :change_reject_unsigned_commits
 

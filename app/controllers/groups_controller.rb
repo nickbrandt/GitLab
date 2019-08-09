@@ -7,10 +7,6 @@ class GroupsController < Groups::ApplicationController
   include PreviewMarkdown
   include RecordUserLastActivity
 
-  before_action do
-    push_frontend_feature_flag(:manual_sorting, default_enabled: true)
-  end
-
   respond_to :html
 
   prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
@@ -233,4 +229,4 @@ class GroupsController < Groups::ApplicationController
   end
 end
 
-GroupsController.prepend(EE::GroupsController)
+GroupsController.prepend_if_ee('EE::GroupsController')

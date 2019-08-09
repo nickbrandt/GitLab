@@ -8,18 +8,18 @@
 
 .use-pg: &use-pg
   services:
-    - name: postgres:9.6.11
+    - name: postgres:9.6.14
       command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
     - name: redis:alpine
 
 .gitlab:assets:compile-metadata:
   <<: *assets-compile-cache
   extends: .dedicated-no-docs-pull-cache-job
-  image: dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.6.3-git-2.21-chrome-73.0-node-12.x-yarn-1.16-graphicsmagick-1.3.29-docker-18.06.1
+  image: dev.gitlab.org:5005/gitlab/gitlab-build-images:ruby-2.6.3-git-2.22-chrome-73.0-node-12.x-yarn-1.16-graphicsmagick-1.3.29-docker-18.06.1
   dependencies:
     - setup-test-env
   services:
-    - docker:stable-dind
+    - docker:19.03.0-dind
   variables:
     NODE_ENV: "production"
     RAILS_ENV: "production"
@@ -73,7 +73,7 @@ gitlab:assets:compile pull-cache:
     refs:
       - master@gitlab-org/gitlab-ce
       - master@gitlab-org/gitlab-ee
-      - /(^docs[\/-].*|.*-docs$)/
+      - /(^docs[\/-].+|.+-docs$)/
 
 .compile-assets-metadata:
   extends: .dedicated-runner
@@ -111,7 +111,7 @@ compile-assets pull-cache:
     refs:
       - master@gitlab-org/gitlab-ce
       - master@gitlab-org/gitlab-ee
-      - /(^docs[\/-].*|.*-docs$)/
+      - /(^docs[\/-].+|.+-docs$)/
 
 karma:
   extends: .dedicated-no-docs-pull-cache-job

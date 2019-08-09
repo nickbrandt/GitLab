@@ -1,5 +1,6 @@
 import { DEPENDENCY_LIST_TYPES } from './constants';
 
 export default () => ({
-  currentList: DEPENDENCY_LIST_TYPES.all,
+  listTypes: [DEPENDENCY_LIST_TYPES.all],
+  currentList: DEPENDENCY_LIST_TYPES.all.namespace,
 });

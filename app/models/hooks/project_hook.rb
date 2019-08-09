@@ -20,4 +20,4 @@ class ProjectHook < WebHook
   validates :project, presence: true
 end
 
-ProjectHook.prepend(EE::ProjectHook)
+ProjectHook.prepend_if_ee('EE::ProjectHook')

@@ -10,4 +10,4 @@ module BranchesHelper
   end
 end
 
-BranchesHelper.prepend(EE::BranchesHelper)
+BranchesHelper.prepend_if_ee('EE::BranchesHelper')

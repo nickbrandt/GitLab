@@ -21,7 +21,8 @@ module ApplicationSettingImplementation
       {
         after_sign_up_text: nil,
         akismet_enabled: false,
-        allow_local_requests_from_hooks_and_services: false,
+        allow_local_requests_from_web_hooks_and_services: false,
+        allow_local_requests_from_system_hooks: true,
         dns_rebinding_protection_enabled: true,
         authorized_keys_enabled: true, # TODO default to false if the instance is configured to use AuthorizedKeysCommand
         container_registry_token_expire_delay: 5,
@@ -158,11 +159,24 @@ module ApplicationSettingImplementation
   end
 
   def outbound_local_requests_whitelist_raw=(values)
+    clear_memoization(:outbound_local_requests_whitelist_arrays)
+
     self.outbound_local_requests_whitelist = domain_strings_to_array(values)
+  end
+
+  def add_to_outbound_local_requests_whitelist(values_array)
+    clear_memoization(:outbound_local_requests_whitelist_arrays)
+
+    self.outbound_local_requests_whitelist ||= []
+    self.outbound_local_requests_whitelist += values_array
+
+    self.outbound_local_requests_whitelist.uniq!
   end
 
   def outbound_local_requests_whitelist_arrays
     strong_memoize(:outbound_local_requests_whitelist_arrays) do
+      next [[], []] unless self.outbound_local_requests_whitelist
+
       ip_whitelist = []
       domain_whitelist = []
 
@@ -284,6 +298,8 @@ module ApplicationSettingImplementation
   end
 
   def domain_strings_to_array(values)
+    return [] unless values
+
     values
       .split(DOMAIN_LIST_SEPARATOR)
       .reject(&:empty?)

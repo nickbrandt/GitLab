@@ -24,7 +24,7 @@ class MockDeploymentService < Service
     %w()
   end
 
-  def predefined_variables(project:)
+  def predefined_variables(project:, environment_name:)
     []
   end
 
@@ -33,4 +33,4 @@ class MockDeploymentService < Service
   end
 end
 
-MockDeploymentService.prepend(EE::MockDeploymentService)
+MockDeploymentService.prepend_if_ee('EE::MockDeploymentService')

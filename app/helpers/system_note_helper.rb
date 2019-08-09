@@ -21,6 +21,7 @@ module SystemNoteHelper
     'discussion' => 'comment',
     'moved' => 'arrow-right',
     'outdated' => 'pencil-square',
+    'pinned_embed' => 'thumbtack',
     'duplicate' => 'issue-duplicate',
     'locked' => 'lock',
     'unlocked' => 'lock-open',
@@ -39,8 +40,8 @@ module SystemNoteHelper
   extend self
 end
 
-SystemNoteHelper.prepend(EE::SystemNoteHelper) # rubocop: disable Cop/InjectEnterpriseEditionModule
+SystemNoteHelper.prepend_if_ee('EE::SystemNoteHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
 # The methods in `EE::SystemNoteHelper` should be available as both instance and
 # class methods.
-SystemNoteHelper.extend(EE::SystemNoteHelper)
+SystemNoteHelper.extend_if_ee('EE::SystemNoteHelper')

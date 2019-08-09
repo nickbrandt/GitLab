@@ -165,7 +165,8 @@ class Projects::EnvironmentsController < Projects::ApplicationController
         project,
         current_user,
         environment,
-        embedded: params[:embedded]
+        dashboard_path: params[:dashboard],
+        **dashboard_params.to_h.symbolize_keys
       )
     elsif Feature.enabled?(:environment_metrics_show_multiple_dashboards, project)
       result = dashboard_finder.find(
@@ -233,6 +234,10 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     params.require([:start, :end])
   end
 
+  def dashboard_params
+    params.permit(:embedded, :group, :title, :y_label)
+  end
+
   def dashboard_finder
     Gitlab::Metrics::Dashboard::Finder
   end
@@ -256,4 +261,4 @@ class Projects::EnvironmentsController < Projects::ApplicationController
   end
 end
 
-Projects::EnvironmentsController.prepend(EE::Projects::EnvironmentsController)
+Projects::EnvironmentsController.prepend_if_ee('EE::Projects::EnvironmentsController')

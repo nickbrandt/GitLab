@@ -38,4 +38,4 @@ module Ci
   end
 end
 
-Ci::BuildRunnerSession.prepend(EE::Ci::BuildRunnerSession)
+Ci::BuildRunnerSession.prepend_if_ee('EE::Ci::BuildRunnerSession')

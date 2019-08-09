@@ -74,14 +74,14 @@ module API
       end
 
       def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
-        params = params_by_noteable_type_and_id(noteable_type, noteable_id)
+        params = finder_params_by_noteable_type_and_id(noteable_type, noteable_id, parent_id)
 
-        noteable = NotesFinder.new(user_project, current_user, params).target
+        noteable = NotesFinder.new(current_user, params).target
         noteable = nil unless can?(current_user, noteable_read_ability_name(noteable), noteable)
         noteable || not_found!(noteable_type)
       end
 
-      def params_by_noteable_type_and_id(type, id)
+      def finder_params_by_noteable_type_and_id(type, id, parent_id)
         target_type = type.name.underscore
         { target_type: target_type }.tap do |h|
           if %w(issue merge_request).include?(target_type)
@@ -89,7 +89,13 @@ module API
           else
             h[:target_id] = id
           end
+
+          add_parent_to_finder_params(h, type, parent_id)
         end
+      end
+
+      def add_parent_to_finder_params(finder_params, noteable_type, parent_id)
+        finder_params[:project] = user_project
       end
 
       def noteable_parent(noteable)
@@ -127,4 +133,4 @@ module API
   end
 end
 
-API::Helpers::NotesHelpers.prepend(EE::API::Helpers::NotesHelpers)
+API::Helpers::NotesHelpers.prepend_if_ee('EE::API::Helpers::NotesHelpers')

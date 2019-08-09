@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlLoadingIcon } from '@gitlab/ui';
 import RelatedIssuableInput from './related_issuable_input.vue';
 import { issuableTypesMap } from '../constants';
@@ -93,7 +94,7 @@ export default {
         <gl-loading-icon v-if="isSubmitting" ref="loadingIcon" :inline="true" />
       </button>
       <button type="button" class="btn btn-default float-right" @click="onFormCancel">
-        Cancel
+        {{ __('Cancel') }}
       </button>
     </div>
   </form>

@@ -156,10 +156,8 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
   end
 
   describe '#primary_write_location' do
-    if Gitlab::Database.postgresql?
-      it 'returns a String' do
-        expect(lb.primary_write_location).to be_an_instance_of(String)
-      end
+    it 'returns a String' do
+      expect(lb.primary_write_location).to be_an_instance_of(String)
     end
 
     it 'raises an error if the write location could not be retrieved' do

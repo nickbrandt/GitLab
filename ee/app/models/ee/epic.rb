@@ -12,7 +12,6 @@ module EE
       include Referable
       include Awardable
       include LabelEventable
-      include Descendant
       include RelativePositioning
 
       enum state: { opened: 1, closed: 2 }
@@ -47,6 +46,7 @@ module EE
       validate :validate_parent, on: :create
 
       alias_attribute :parent_ids, :parent_id
+      alias_method :issuing_parent, :group
 
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
       scope :inc_group, -> { includes(:group) }
@@ -164,8 +164,6 @@ module EE
       # epic2 - parent: epic1
       # Returns: 2
       def deepest_relationship_level
-        return unless supports_nested_objects?
-
         ::Gitlab::ObjectHierarchy.new(self.where(parent_id: nil)).max_descendants_depth
       end
 

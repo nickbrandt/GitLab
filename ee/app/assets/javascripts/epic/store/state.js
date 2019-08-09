@@ -21,7 +21,6 @@ export default () => ({
   canUpdate: false,
   canDestroy: false,
   canAdmin: false,
-  subepicsSupported: false,
 
   // Epic Information
   epicId: 0,

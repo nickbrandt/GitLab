@@ -94,7 +94,7 @@ describe Gitlab::UsageData do
       expect(count_data[:feature_flags]).to eq(1)
     end
 
-    it 'gathers deepest epic relationship level', :postgresql do
+    it 'gathers deepest epic relationship level' do
       expect(count_data.keys).to include(:epics_deepest_relationship_level)
     end
 

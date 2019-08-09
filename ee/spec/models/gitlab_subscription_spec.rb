@@ -48,14 +48,14 @@ describe GitlabSubscription do
       expect(gitlab_subscription.seats_in_use).to eq(1)
     end
 
-    it 'also counts users from subgroups', :postgresql do
+    it 'also counts users from subgroups' do
       group.add_developer(user_1)
       subgroup_1.add_developer(user_2)
 
       expect(gitlab_subscription.seats_in_use).to eq(2)
     end
 
-    it 'does not count duplicated members', :postgresql do
+    it 'does not count duplicated members' do
       group.add_developer(user_1)
       subgroup_1.add_developer(user_2)
       subgroup_2.add_developer(user_2)

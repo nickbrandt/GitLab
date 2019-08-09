@@ -23,7 +23,7 @@ describe Gitlab::SnowplowTracker do
       before do
         stub_application_setting(snowplow_enabled: true)
         stub_application_setting(snowplow_site_id: 'awesome gitlab')
-        stub_application_setting(snowplow_collector_uri: 'url.com')
+        stub_application_setting(snowplow_collector_hostname: 'url.com')
       end
 
       it 'tracks the event' do

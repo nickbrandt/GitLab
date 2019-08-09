@@ -6,7 +6,7 @@ export default () => ({
 
   name: null,
   description: null,
-  scopes: null,
+  scopes: [],
   isLoading: false,
   hasError: false,
 });

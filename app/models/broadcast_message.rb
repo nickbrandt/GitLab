@@ -77,4 +77,4 @@ class BroadcastMessage < ApplicationRecord
   end
 end
 
-BroadcastMessage.prepend(EE::BroadcastMessage)
+BroadcastMessage.prepend_if_ee('EE::BroadcastMessage')

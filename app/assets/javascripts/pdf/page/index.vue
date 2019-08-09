@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     viewport() {
-      return this.page.getViewport(this.scale);
+      return this.page.getViewport({ scale: this.scale });
     },
     context() {
       return this.$refs.canvas.getContext('2d');
@@ -36,10 +36,12 @@ export default {
     this.rendering = true;
     this.page
       .render(this.renderContext)
-      .then(() => {
+      .promise.then(() => {
         this.rendering = false;
       })
-      .catch(error => this.$emit('pdflaberror', error));
+      .catch(error => {
+        this.$emit('pdflaberror', error);
+      });
   },
 };
 </script>

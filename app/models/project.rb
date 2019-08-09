@@ -214,7 +214,7 @@ class Project < ApplicationRecord
     as: :source, class_name: 'ProjectMember', dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
   has_many :members_and_requesters, as: :source, class_name: 'ProjectMember'
 
-  has_many :deploy_keys_projects
+  has_many :deploy_keys_projects, inverse_of: :project
   has_many :deploy_keys, through: :deploy_keys_projects
   has_many :users_star_projects
   has_many :starrers, through: :users_star_projects, source: :user
@@ -413,12 +413,6 @@ class Project < ApplicationRecord
   scope :with_group_runners_enabled, -> do
     joins(:ci_cd_settings)
     .where(project_ci_cd_settings: { group_runners_enabled: true })
-  end
-
-  scope :missing_kubernetes_namespace, -> (kubernetes_namespaces) do
-    subquery = kubernetes_namespaces.select('1').where('clusters_kubernetes_namespaces.project_id = projects.id')
-
-    where('NOT EXISTS (?)', subquery)
   end
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
@@ -719,16 +713,27 @@ class Project < ApplicationRecord
     repository.commits_by(oids: oids)
   end
 
-  # ref can't be HEAD, can only be branch/tag name or SHA
-  def latest_successful_build_for(job_name, ref = default_branch)
-    latest_pipeline = ci_pipelines.latest_successful_for(ref)
+  # ref can't be HEAD, can only be branch/tag name
+  def latest_successful_build_for_ref(job_name, ref = default_branch)
+    return unless ref
+
+    latest_pipeline = ci_pipelines.latest_successful_for_ref(ref)
     return unless latest_pipeline
 
     latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
   end
 
-  def latest_successful_build_for!(job_name, ref = default_branch)
-    latest_successful_build_for(job_name, ref) || raise(ActiveRecord::RecordNotFound.new("Couldn't find job #{job_name}"))
+  def latest_successful_build_for_sha(job_name, sha)
+    return unless sha
+
+    latest_pipeline = ci_pipelines.latest_successful_for_sha(sha)
+    return unless latest_pipeline
+
+    latest_pipeline.builds.latest.with_artifacts_archive.find_by(name: job_name)
+  end
+
+  def latest_successful_build_for_ref!(job_name, ref = default_branch)
+    latest_successful_build_for_ref(job_name, ref) || raise(ActiveRecord::RecordNotFound.new("Couldn't find job #{job_name}"))
   end
 
   def merge_base_commit(first_commit_id, second_commit_id)
@@ -1482,6 +1487,9 @@ class Project < ApplicationRecord
   end
 
   def pipeline_for(ref, sha = nil, id = nil)
+    sha ||= commit(ref).try(:sha)
+    return unless sha
+
     if id.present?
       pipelines_for(ref, sha).find_by(id: id)
     else
@@ -1489,11 +1497,7 @@ class Project < ApplicationRecord
     end
   end
 
-  def pipelines_for(ref, sha = nil)
-    sha ||= commit(ref).try(:sha)
-
-    return unless sha
-
+  def pipelines_for(ref, sha)
     ci_pipelines.order(id: :desc).where(sha: sha, ref: ref)
   end
 
@@ -1503,12 +1507,12 @@ class Project < ApplicationRecord
     end
 
     @latest_successful_pipeline_for_default_branch =
-      ci_pipelines.latest_successful_for(default_branch)
+      ci_pipelines.latest_successful_for_ref(default_branch)
   end
 
   def latest_successful_pipeline_for(ref = nil)
     if ref && ref != default_branch
-      ci_pipelines.latest_successful_for(ref)
+      ci_pipelines.latest_successful_for_ref(ref)
     else
       latest_successful_pipeline_for_default_branch
     end
@@ -1824,11 +1828,16 @@ class Project < ApplicationRecord
   end
 
   def ci_variables_for(ref:, environment: nil)
-    # EE would use the environment
-    if protected_for?(ref)
-      variables
+    result = if protected_for?(ref)
+               variables
+             else
+               variables.unprotected
+             end
+
+    if environment
+      result.on_environment(environment)
     else
-      variables.unprotected
+      result.where(environment_scope: '*')
     end
   end
 
@@ -1851,8 +1860,12 @@ class Project < ApplicationRecord
     end
   end
 
-  def deployment_variables(environment: nil)
-    deployment_platform(environment: environment)&.predefined_variables(project: self) || []
+  def deployment_variables(environment:)
+    platform = deployment_platform(environment: environment)
+
+    return [] unless platform.present?
+
+    platform.predefined_variables(project: self, environment_name: environment)
   end
 
   def auto_devops_variables
@@ -2288,4 +2301,4 @@ class Project < ApplicationRecord
   end
 end
 
-Project.prepend(EE::Project)
+Project.prepend_if_ee('EE::Project')

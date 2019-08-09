@@ -8,4 +8,4 @@ module DeployKeys
   end
 end
 
-DeployKeys::CreateService.prepend(::EE::DeployKeys::CreateService)
+DeployKeys::CreateService.prepend_if_ee('::EE::DeployKeys::CreateService')

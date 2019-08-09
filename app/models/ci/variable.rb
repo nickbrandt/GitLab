@@ -6,6 +6,7 @@ module Ci
     include HasVariable
     include Presentable
     include Maskable
+    prepend HasEnvironmentScope
 
     belongs_to :project
 
@@ -19,5 +20,3 @@ module Ci
     scope :unprotected, -> { where(protected: false) }
   end
 end
-
-Ci::Variable.prepend(HasEnvironmentScope)

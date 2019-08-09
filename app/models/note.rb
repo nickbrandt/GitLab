@@ -27,6 +27,10 @@ class Note < ApplicationRecord
       def values
         constants.map {|const| self.const_get(const)}
       end
+
+      def value?(val)
+        values.include?(val)
+      end
     end
   end
 
@@ -514,4 +518,4 @@ class Note < ApplicationRecord
   end
 end
 
-Note.prepend(EE::Note)
+Note.prepend_if_ee('EE::Note')

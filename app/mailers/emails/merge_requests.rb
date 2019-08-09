@@ -118,4 +118,4 @@ module Emails
   end
 end
 
-Emails::MergeRequests.prepend(EE::Emails::MergeRequests)
+Emails::MergeRequests.prepend_if_ee('EE::Emails::MergeRequests')

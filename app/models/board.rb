@@ -41,4 +41,4 @@ class Board < ApplicationRecord
   end
 end
 
-Board.prepend(EE::Board)
+Board.prepend_if_ee('EE::Board')
