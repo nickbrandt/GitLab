@@ -11614,6 +11614,9 @@ msgstr ""
 msgid "PrometheusService|New metric"
 msgstr ""
 
+msgid "PrometheusService|No custom metrics have been created. Create one using the button above"
+msgstr ""
+
 msgid "PrometheusService|Prometheus API Base URL, like http://prometheus.example.com/"
 msgstr ""
 

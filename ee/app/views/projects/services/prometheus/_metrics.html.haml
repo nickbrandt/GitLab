@@ -8,22 +8,23 @@
 .col-lg-9
   .card.custom-monitored-metrics.js-panel-custom-monitored-metrics{ data: { active_custom_metrics: project_prometheus_metrics_path(project), environments_data: environments_list_data, service_active: "#{@service.active}" } }
     .card-header
-      %h3.card-title
+      %strong
         = s_('PrometheusService|Custom metrics')
-        %span.badge.badge-pill.js-custom-monitored-count 0
-        = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success js-new-metric-button hidden'
+      %span.badge.badge-pill.js-custom-monitored-count 0
+      = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success js-new-metric-button hidden'
     .card-body
       .flash-container.hidden
         .flash-warning
           .flash-text
       .loading-metrics.js-loading-custom-metrics
-        %p.prepend-top-10.prepend-left-10
+        %p.m-3
           = icon('spinner spin', class: 'metrics-load-spinner')
           = s_('PrometheusService|Finding custom metrics...')
       .empty-metrics.hidden.js-empty-custom-metrics
-        %p.text-tertiary.prepend-top-10.prepend-left-10.js-no-active-integration-text.hidden
+        %p.text-tertiary.m-3.js-no-active-integration-text.hidden
           = s_('PrometheusService|Enable Prometheus to define custom metrics, using either option above')
-        = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success prepend-top-10 prepend-left-10 append-bottom-10 js-new-metric-body-button hidden'
+        %p.text-tertiary.m-3.js-new-metric-text.hidden
+          = s_('PrometheusService|No custom metrics have been created. Create one using the button above')
       %ul.list-unstyled.metrics-list.hidden.js-custom-metrics-list
 
 = render_ce 'projects/services/prometheus/metrics', project: project

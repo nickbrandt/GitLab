@@ -56,7 +56,7 @@ describe('PrometheusMetrics EE', () => {
       ).toBeTruthy();
 
       expect(prometheusMetrics.$newCustomMetricButton.hasClass('hidden')).toBeTruthy();
-      expect(prometheusMetrics.$newCustomMetricButtonBody.hasClass('hidden')).toBeTruthy();
+      expect(prometheusMetrics.$newCustomMetricText.hasClass('hidden')).toBeTruthy();
     });
 
     it('should show metrics list when called with `list`', () => {
@@ -70,7 +70,7 @@ describe('PrometheusMetrics EE', () => {
       ).toBeTruthy();
 
       expect(prometheusMetrics.$newCustomMetricButton.hasClass('hidden')).toEqual(false);
-      expect(prometheusMetrics.$newCustomMetricButtonBody.hasClass('hidden')).toBeTruthy();
+      expect(prometheusMetrics.$newCustomMetricText.hasClass('hidden')).toBeTruthy();
     });
 
     it('should show empty state when called with `empty`', () => {
@@ -84,7 +84,7 @@ describe('PrometheusMetrics EE', () => {
       ).toBeTruthy();
 
       expect(prometheusMetrics.$newCustomMetricButton.hasClass('hidden')).toEqual(false);
-      expect(prometheusMetrics.$newCustomMetricButtonBody.hasClass('hidden')).toEqual(false);
+      expect(prometheusMetrics.$newCustomMetricText.hasClass('hidden')).toEqual(false);
     });
 
     it('should show monitored metrics list', () => {
@@ -100,7 +100,7 @@ describe('PrometheusMetrics EE', () => {
       ).toBeTruthy();
 
       expect(prometheusMetrics.$newCustomMetricButton.hasClass('hidden')).toEqual(false);
-      expect(prometheusMetrics.$newCustomMetricButtonBody.hasClass('hidden')).toBeTruthy();
+      expect(prometheusMetrics.$newCustomMetricText.hasClass('hidden')).toBeTruthy();
 
       expect($metricsListLi.length).toEqual(metrics.length);
     });
@@ -116,7 +116,7 @@ describe('PrometheusMetrics EE', () => {
       expect(prometheusMetrics.$monitoredCustomMetricsLoading.hasClass('hidden')).toBeTruthy();
       expect(prometheusMetrics.$monitoredCustomMetricsList.hasClass('hidden')).toBeTruthy();
       expect(prometheusMetrics.$newCustomMetricButton.hasClass('hidden')).toBeTruthy();
-      expect(prometheusMetrics.$newCustomMetricButtonBody.hasClass('hidden')).toBeTruthy();
+      expect(prometheusMetrics.$newCustomMetricText.hasClass('hidden')).toBeTruthy();
     });
   });
 });

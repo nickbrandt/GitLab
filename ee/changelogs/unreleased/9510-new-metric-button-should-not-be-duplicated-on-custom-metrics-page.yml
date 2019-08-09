@@ -1,0 +1,5 @@
+---
+title: Remove duplicated 'New metric' button in prometheus configuration
+merge_request: 14964
+author:
+type: changed
