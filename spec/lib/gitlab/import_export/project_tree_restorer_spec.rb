@@ -264,14 +264,6 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
           expect(CommitStatus.all).to all(have_attributes(pipeline_id: a_value > 0))
         end
       end
-
-      it 'has issue boards' do
-        expect(Project.find_by_path('project').boards.count).to eq(1)
-      end
-
-      it 'has lists associated with the issue board' do
-        expect(Project.find_by_path('project').boards.find_by_name('TestBoardABC').lists.count).to eq(3)
-      end
     end
   end
 
