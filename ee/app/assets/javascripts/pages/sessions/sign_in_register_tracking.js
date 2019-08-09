@@ -1,5 +1,6 @@
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 
 export default () => {
-  Stats.bindTrackableContainer('#signin-container');
+  const container = document.getElementById('#signin-container');
+  new Tracking().bind(container);
 };

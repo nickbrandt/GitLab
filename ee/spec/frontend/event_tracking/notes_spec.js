@@ -1,7 +1,9 @@
 import Vue from 'vue';
-import Stats from 'ee_else_ce/stats';
+import Tracking from '~/tracking';
 import { shallowMount } from '@vue/test-utils';
 import initNoteStats from 'ee_else_ce/event_tracking/notes';
+
+jest.mock('~/tracking');
 
 describe('initNoteStats', () => {
   let wrapper;
@@ -14,13 +16,8 @@ describe('initNoteStats', () => {
     return shallowMount(component, { attachToDocument: true });
   };
 
-  jest.mock('ee_else_ce/stats');
-  Stats.trackEvent = jest.fn();
-  Stats.bindTrackableContainer = jest.fn();
-
   afterEach(() => {
-    Stats.trackEvent.mockClear();
-    Stats.bindTrackableContainer.mockClear();
+    jest.clearAllMocks();
     wrapper.destroy();
   });
 
@@ -33,12 +30,12 @@ describe('initNoteStats', () => {
     });
 
     it('calls bindTrackableContainer', () => {
-      expect(Stats.bindTrackableContainer).toHaveBeenCalledTimes(1);
+      expect(Tracking.prototype.bind).toHaveBeenCalledTimes(1);
     });
 
     it('calls trackEvent', () => {
       wrapper.find('.main-notes-list').trigger('click');
-      expect(Stats.trackEvent).toHaveBeenCalledTimes(1);
+      expect(Tracking.event).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -47,7 +44,7 @@ describe('initNoteStats', () => {
       wrapper = createComponent("<div><button class='main-notes-list'></button></div>");
       initNoteStats();
       wrapper.find('.main-notes-list').trigger('click');
-      expect(Stats.trackEvent).not.toHaveBeenCalled();
+      expect(Tracking.event).not.toHaveBeenCalled();
     });
   });
 });

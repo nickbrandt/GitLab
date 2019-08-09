@@ -1,15 +1,15 @@
 import trackUninstallButtonClick from 'ee/clusters/mixins/track_uninstall_button_click';
-import stats from 'ee/stats';
+import Tracking from '~/tracking';
 
-jest.mock('ee/stats');
+jest.mock('~/tracking');
 
 describe('trackUninstallButtonClickMixin', () => {
   describe('trackUninstallButtonClick', () => {
-    it('sends snowplow event indicating which application will be uninstalled', () => {
+    it('tracks an event indicating which application will be uninstalled', () => {
       const application = 'ingress';
 
       trackUninstallButtonClick.methods.trackUninstallButtonClick(application);
-      expect(stats.trackEvent).toHaveBeenCalledWith('k8s_cluster', 'uninstall', {
+      expect(Tracking.event).toHaveBeenCalledWith('k8s_cluster', 'uninstall', {
         label: application,
       });
     });

@@ -1,4 +1,4 @@
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 
 export default () => {
   document.querySelector('.main-notes-list').addEventListener('click', event => {
@@ -7,7 +7,7 @@ export default () => {
     );
 
     if (isReplyButtonClick) {
-      Stats.trackEvent(document.body.dataset.page, 'click_button', {
+      Tracking.event(document.body.dataset.page, 'click_button', {
         label: 'reply_comment_button',
         property: '',
         value: '',
@@ -15,5 +15,5 @@ export default () => {
     }
   });
 
-  Stats.bindTrackableContainer('.js-main-target-form');
+  new Tracking().bind();
 };

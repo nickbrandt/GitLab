@@ -1,6 +1,6 @@
 <script>
 import { GlButton } from '@gitlab/ui';
-import Stats from 'ee/stats';
+import Tracking from '~/tracking';
 import { s__ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
@@ -31,11 +31,11 @@ export default {
   },
   methods: {
     addCommentAndDismiss() {
-      Stats.trackEvent(document.body.dataset.page, 'click_add_comment_and_dismiss');
+      Tracking.event(document.body.dataset.page, 'click_add_comment_and_dismiss');
       this.$emit('addCommentAndDismiss');
     },
     addDismissalComment() {
-      Stats.trackEvent(document.body.dataset.page, 'click_add_comment');
+      Tracking.event(document.body.dataset.page, 'click_add_comment');
       this.$emit('addDismissalComment');
     },
     handleSubmit() {
