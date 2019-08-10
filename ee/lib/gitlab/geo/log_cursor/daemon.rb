@@ -16,12 +16,14 @@ module Gitlab
         end
 
         def run!
+          logger.debug('#run!: start')
           trap_signals
 
           until exit?
             # Prevent the node from processing events unless it's a secondary
             unless Geo.secondary?
-              sleep(SECONDARY_CHECK_INTERVAL)
+              logger.debug("#run!: not a secondary, sleeping for #{SECONDARY_CHECK_INTERVAL} secs")
+              sleep_break(SECONDARY_CHECK_INTERVAL)
               next
             end
 
@@ -31,6 +33,8 @@ module Gitlab
             # When no new event is found sleep for a few moments
             arbitrary_sleep(lease[:ttl])
           end
+
+          logger.debug('#run!: finish')
         end
 
         def run_once!
@@ -45,8 +49,16 @@ module Gitlab
 
         private
 
+        def sleep_break(seconds)
+          while seconds > 0
+            sleep(1)
+            seconds -= 1
+            break if exit?
+          end
+        end
+
         def handle_events(batch, previous_batch_last_id)
-          logger.info("Handling events", first_id: batch.first.id, last_id: batch.last.id)
+          logger.info("#handle_events:", first_id: batch.first.id, last_id: batch.last.id)
 
           gap_tracking.previous_id = previous_batch_last_id
 
@@ -63,7 +75,7 @@ module Gitlab
           # If a project is deleted, the event log and its associated event data
           # could be purged from the log. We ignore this and move along.
           unless event
-            logger.warn("Unknown event", event_log_id: event_log.id)
+            logger.warn("#handle_single_event: unknown event", event_log_id: event_log.id)
             return
           end
 
@@ -89,13 +101,13 @@ module Gitlab
         end
 
         def trap_signals
-          trap(:TERM) { quit! }
-          trap(:INT) { quit! }
+          trap(:TERM) { quit!(:term) }
+          trap(:INT) { quit!(:int) }
         end
 
         # Safe shutdown
-        def quit!
-          $stdout.puts 'Exiting...'
+        def quit!(signal)
+          warn("Signal #{signal} received, Exiting...")
 
           @exit = true
         end
@@ -132,7 +144,11 @@ module Gitlab
         end
 
         def log_level
-          options[:debug] ? :debug : Rails.logger.level # rubocop:disable Gitlab/RailsLogger
+          debug_logging? ? :debug : Rails.logger.level # rubocop:disable Gitlab/RailsLogger
+        end
+
+        def debug_logging?
+          options[:debug]
         end
 
         def event_data(event_log)
