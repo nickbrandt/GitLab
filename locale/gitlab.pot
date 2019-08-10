@@ -5879,6 +5879,9 @@ msgstr ""
 msgid "Expand approvers"
 msgstr ""
 
+msgid "Expand down"
+msgstr ""
+
 msgid "Expand dropdown"
 msgstr ""
 
