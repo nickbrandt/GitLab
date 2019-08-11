@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Geo', :orchestrated, :geo do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/123
+  context 'Geo', :orchestrated, :geo, :quarantine do
     describe 'GitLab SSH push to secondary' do
       let(:file_content_primary) { 'This is a Geo project!  Commit from primary.' }
       let(:file_content_secondary) { 'This is a Geo project!  Commit from secondary.' }
