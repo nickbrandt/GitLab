@@ -4,6 +4,7 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   include ActionView::Helpers::DateHelper
   include ActionView::Helpers::TextHelper
   include CycleAnalyticsParams
+  include CycleAnalytics::DurationChart
 
   before_action :whitelist_query_limiting, only: [:show]
   before_action :authorize_group_cycle_analytics!, only: [:show]
@@ -15,14 +16,11 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
     end
   end
 
-  def duration_chart
-    stage_class = ::Gitlab::CycleAnalytics::Stage[params[:stage_id]]
-    stage = stage_class.new(options: options(cycle_analytics_params).merge(group: group))
-
-    render json: stage.data_for_duration_chart
-  end
-
   private
+
+  def duration_chart_params
+    options(cycle_analytics_params).merge(group: group)
+  end
 
   def cycle_analytics_params
     return {} unless params[:cycle_analytics].present?

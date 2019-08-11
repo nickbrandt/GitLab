@@ -11,7 +11,7 @@ module Gitlab
       end
 
       def fetch
-        ActiveRecord::Base.connection.execute(build_query.to_sql).to_a.map do |row|
+        results.map do |row|
           [DateTime.strptime(row['finished_at'].to_s, '%s'), row['duration_in_seconds'].round(2)]
         end
       end
@@ -21,13 +21,12 @@ module Gitlab
       attr_reader :stage
 
       def build_query
-        query = stage.stage_query(stage.projects.map(&:id))
-
-        query.projections = [] # clear existing projections
-        query.project(seconds_took.as('duration_in_seconds'))
-        query.project(finished_at.as('finished_at'))
-        query.where(duration.gteq(zero_interval))
-        query
+        stage.stage_query(stage.projects.map(&:id)).tap do |query|
+          query.projections = [] # clear existing projections
+          query.project(seconds_took.as('duration_in_seconds'))
+          query.project(finished_at.as('finished_at'))
+          query.where(duration.gteq(zero_interval))
+        end
       end
 
       def seconds_took
@@ -44,6 +43,10 @@ module Gitlab
 
       def finished_at
         epoch(Arel::Nodes::NamedFunction.new("COALESCE", Array.wrap(stage.end_time_attrs)))
+      end
+
+      def results
+        ActiveRecord::Base.connection.execute(build_query.to_sql).to_a
       end
     end
   end

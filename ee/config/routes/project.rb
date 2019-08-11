@@ -13,7 +13,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Use this scope for all new project routes.
       scope '-' do
         scope :cycle_analytics do
-          get '/duration_chart/:stage_id', to: 'cycle_analytics#duration_chart'
+          get '/duration_chart/:stage_name', to: 'cycle_analytics#duration_chart'
         end
 
         resources :packages, only: [:index, :show, :destroy], module: :packages

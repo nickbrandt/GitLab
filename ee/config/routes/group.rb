@@ -19,7 +19,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
 
     resource :analytics, only: [:show]
     resource :cycle_analytics, only: [:show] do
-      get '/duration_chart/:stage_id', to: 'cycle_analytics#duration_chart'
+      get '/duration_chart/:stage_name', to: 'cycle_analytics#duration_chart'
     end
     namespace :cycle_analytics do
       scope :events, controller: 'events' do

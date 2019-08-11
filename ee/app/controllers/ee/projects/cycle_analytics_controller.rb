@@ -6,17 +6,15 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        include CycleAnalytics::DurationChart
         before_action :authorize_cycle_analytics_duration_chart, only: [:duration_chart]
       end
 
-      def duration_chart
-        stage_class = ::Gitlab::CycleAnalytics::Stage[params[:stage_id]]
-        stage = stage_class.new(options: options(cycle_analytics_params).merge(project: project))
-
-        render json: stage.data_for_duration_chart
-      end
-
       private
+
+      def duration_chart_params
+        options(cycle_analytics_params).merge(project: project)
+      end
 
       def authorize_cycle_analytics_duration_chart
         unless can?(current_user, :read_project_cycle_analytics_duration_chart, project)
