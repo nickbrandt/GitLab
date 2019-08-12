@@ -12,6 +12,17 @@ module QA
 
         attribute :id
         attribute :iid
+        attribute :start_date_is_fixed
+        attribute :start_date_fixed
+        attribute :due_date_is_fixed
+        attribute :due_date_fixed
+
+        def initialize
+          @start_date_is_fixed = false
+          @start_date_fixed = nil
+          @due_date_is_fixed = false
+          @due_date_fixed = nil
+        end
 
         def fabricate!
           group.visit!
@@ -44,7 +55,11 @@ module QA
 
         def api_post_body
           {
-            title: title
+            title: title,
+            start_date_is_fixed: @start_date_is_fixed,
+            start_date_fixed: @start_date_fixed,
+            due_date_is_fixed: @due_date_is_fixed,
+            due_date_fixed: @due_date_fixed
           }
         end
       end

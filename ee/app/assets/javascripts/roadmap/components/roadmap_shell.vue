@@ -128,6 +128,7 @@ export default {
     :class="{ 'prevent-vertical-scroll': noScroll }"
     :style="containerStyles"
     class="roadmap-shell"
+    data-qa-selector="roadmap_shell"
     @scroll="handleScroll"
   >
     <roadmap-timeline-section

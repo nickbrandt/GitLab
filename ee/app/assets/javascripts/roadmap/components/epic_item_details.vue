@@ -76,7 +76,7 @@ export default {
 </script>
 
 <template>
-  <span class="epic-details-cell">
+  <span class="epic-details-cell" data-qa-selector="epic_details_cell">
     <div class="epic-title">
       <a v-tooltip :href="epic.webUrl" :title="epic.title" data-container="body" class="epic-url">
         {{ epic.title }}
