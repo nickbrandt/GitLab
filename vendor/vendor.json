@@ -569,36 +569,36 @@
 			"revisionTime": "2018-11-02T16:30:54Z"
 		},
 		{
-			"checksumSHA1": "0SRNhL8pjnvbTuxsGBM0a1KECl4=",
-			"path": "gitlab.com/gitlab-org/gitaly-proto/go/gitalypb",
-			"revision": "a78297381af20d4ac7108c07c09539ae70ebf074",
-			"revisionTime": "2019-03-27T06:54:18Z",
-			"version": "v1.19.0",
-			"versionExact": "v1.19.0"
-		},
-		{
-			"checksumSHA1": "SbYAalNU5azT8lJGerDI4I/Nw84=",
+			"checksumSHA1": "eRUc8HVxFw7kNzeT7oi9NtEnr/Q=",
 			"path": "gitlab.com/gitlab-org/gitaly/auth",
-			"revision": "8a8daada771e4659baeb6fc08178179ea78010a6",
-			"revisionTime": "2018-09-07T08:03:54Z",
-			"version": "v0.120.0",
-			"versionExact": "v0.120.0"
+			"revision": "a8e2980b1ffe1a728ab13032dc81f90f4b990a03",
+			"revisionTime": "2019-08-07T10:01:44Z",
+			"version": "v1.57.0",
+			"versionExact": "v1.57.0"
 		},
 		{
-			"checksumSHA1": "aL94A408/lEOF/XC4KDHvZnwnbk=",
+			"checksumSHA1": "v26xJ6qOTee2cJ/NR8pH3YTkLpY=",
 			"path": "gitlab.com/gitlab-org/gitaly/client",
-			"revision": "ef786ff72690836cc3ec1214b11bd10748271c5b",
-			"revisionTime": "2019-01-14T13:41:50Z",
-			"version": "v1.13.0",
-			"versionExact": "v1.13.0"
+			"revision": "a8e2980b1ffe1a728ab13032dc81f90f4b990a03",
+			"revisionTime": "2019-08-07T10:01:44Z",
+			"version": "v1.57.0",
+			"versionExact": "v1.57.0"
+		},
+		{
+			"checksumSHA1": "s3Vqfux+BOQOXQN3bHvCHPxTR6k=",
+			"path": "gitlab.com/gitlab-org/gitaly/proto/go/gitalypb",
+			"revision": "a8e2980b1ffe1a728ab13032dc81f90f4b990a03",
+			"revisionTime": "2019-08-07T10:01:44Z",
+			"version": "v1.57.0",
+			"versionExact": "v1.57.0"
 		},
 		{
 			"checksumSHA1": "mifcYH0qXpoPkX5KzXoM3mterWQ=",
 			"path": "gitlab.com/gitlab-org/gitaly/streamio",
-			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
-			"revisionTime": "2018-01-18T11:33:00Z",
-			"version": "v0.71.0",
-			"versionExact": "v0.71.0"
+			"revision": "a8e2980b1ffe1a728ab13032dc81f90f4b990a03",
+			"revisionTime": "2019-08-07T10:01:44Z",
+			"version": "v1.57.0",
+			"versionExact": "v1.57.0"
 		},
 		{
 			"checksumSHA1": "86VccaJApU9EEq4KKen8DX9gMUM=",

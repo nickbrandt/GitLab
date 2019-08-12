@@ -8,9 +8,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	gitalyauth "gitlab.com/gitlab-org/gitaly/auth"
 	gitalyclient "gitlab.com/gitlab-org/gitaly/client"
+	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 	"google.golang.org/grpc"
 
 	grpccorrelation "gitlab.com/gitlab-org/labkit/correlation/grpc"
