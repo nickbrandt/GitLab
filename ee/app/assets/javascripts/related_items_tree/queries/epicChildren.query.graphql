@@ -1,10 +1,6 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 #import "./epic.fragment.graphql"
 #import "./issue.fragment.graphql"
-
-fragment PageInfo on PageInfo {
-  endCursor
-  hasNextPage
-}
 
 query childItems(
   $fullPath: ID!
