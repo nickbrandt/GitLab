@@ -15,12 +15,13 @@ export const mockNodes = [
     files_max_capacity: 10,
     repos_max_capacity: 25,
     container_repositories_max_capacity: 10,
+    verification_max_capacity: 100,
     clone_protocol: 'http',
+    web_edit_url: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/1',
       repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/repair',
       status: 'http://127.0.0.1:3001/api/v4/geo_nodes/1/status',
-      web_edit: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
     },
   },
   {
@@ -32,12 +33,14 @@ export const mockNodes = [
     files_max_capacity: 10,
     repos_max_capacity: 25,
     container_repositories_max_capacity: 10,
+    verification_max_capacity: 100,
+    sync_object_storage: true,
     clone_protocol: 'http',
+    web_edit_url: 'http://127.0.0.1:3001/admin/geo/nodes/1/edit',
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/2',
       repair: 'http://127.0.0.1:3001/api/v4/geo_nodes/2/repair',
       status: 'http://127.0.0.1:3001/api/v4/geo_nodes/2/status',
-      web_edit: 'http://127.0.0.1:3001/admin/geo/nodes/2/edit',
     },
   },
 ];
