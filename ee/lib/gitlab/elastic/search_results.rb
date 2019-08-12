@@ -53,10 +53,32 @@ module Gitlab
         @generic_search_results ||= Gitlab::SearchResults.new(current_user, limit_projects, query)
       end
 
+      def formatted_count(scope)
+        case scope
+        when 'projects'
+          projects_count.to_s
+        when 'notes'
+          notes_count.to_s
+        when 'blobs'
+          blobs_count.to_s
+        when 'wiki_blobs'
+          wiki_blobs_count.to_s
+        when 'commits'
+          commits_count.to_s
+        when 'issues'
+          issues_count.to_s
+        when 'merge_requests'
+          merge_requests_count.to_s
+        when 'milestones'
+          milestones_count.to_s
+        when 'users'
+          generic_search_results.formatted_count('users')
+        end
+      end
+
       def projects_count
         @projects_count ||= projects.total_count
       end
-      alias_method :limited_projects_count, :projects_count
 
       def notes_count
         @notes_count ||= notes.total_count
@@ -77,17 +99,14 @@ module Gitlab
       def issues_count
         @issues_count ||= issues.total_count
       end
-      alias_method :limited_issues_count, :issues_count
 
       def merge_requests_count
         @merge_requests_count ||= merge_requests.total_count
       end
-      alias_method :limited_merge_requests_count, :merge_requests_count
 
       def milestones_count
         @milestones_count ||= milestones.total_count
       end
-      alias_method :limited_milestones_count, :milestones_count
 
       def single_commit_result?
         false

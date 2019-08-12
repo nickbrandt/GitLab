@@ -11,10 +11,6 @@ describe 'Global elastic search', :elastic do
     sign_in(user)
   end
 
-  after do
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
-  end
-
   shared_examples 'an efficient database result' do
     it 'avoids N+1 database queries' do
       create(object, creation_args)
@@ -207,6 +203,30 @@ describe 'Global elastic search', :elastic do
       click_link 'Next'
 
       expect(page).to have_content(expected_message)
+    end
+  end
+
+  describe 'I search globally', :js do
+    before do
+      create(:issue, project: project, title: 'project issue')
+      Gitlab::Elastic::Helper.refresh_index
+
+      visit dashboard_projects_path
+
+      fill_in('search', with: 'project')
+      find('#search').send_keys(:enter)
+    end
+
+    it 'displays result counts for all categories' do
+      expect(page).to have_content('Projects 1')
+      expect(page).to have_content('Issues 1')
+      expect(page).to have_content('Merge requests 0')
+      expect(page).to have_content('Milestones 0')
+      expect(page).to have_content('Comments 0')
+      expect(page).to have_content('Code 0')
+      expect(page).to have_content('Commits 0')
+      expect(page).to have_content('Wiki 0')
+      expect(page).to have_content('Users 0')
     end
   end
 end

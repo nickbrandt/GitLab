@@ -92,7 +92,7 @@ module Gitlab
 
       def run_indexer!(to_sha)
         if index_status && !repository_contains_last_indexed_commit?
-          repository.delete_index_for_commits_and_blobs
+          repository.delete_index_for_commits_and_blobs(wiki: wiki?)
         end
 
         command =

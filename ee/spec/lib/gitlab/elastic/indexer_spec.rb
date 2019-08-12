@@ -31,7 +31,7 @@ describe Gitlab::Elastic::Indexer do
   end
 
   context 'wikis' do
-    let!(:project) { create(:project, :wiki_repo) }
+    let(:project) { create(:project, :wiki_repo) }
     let(:indexer) { described_class.new(project, wiki: true) }
 
     before do
@@ -65,6 +65,57 @@ describe Gitlab::Elastic::Indexer do
       ).and_return(popen_success)
 
       indexer.run
+    end
+
+    context 'when IndexStatus#last_wiki_commit is no longer in repository', :elastic do
+      let(:user) { project.owner }
+      let(:ee_application_setting) { nil }
+
+      before do
+        stub_ee_application_setting(elasticsearch_indexing: true)
+        ElasticIndexerWorker.new.perform('index', 'Project', project.id, project.es_id)
+      end
+
+      def change_wiki_and_index(project, &blk)
+        yield blk if blk
+
+        current_commit = project.wiki.repository.commit('master').sha
+
+        described_class.new(project, wiki: true).run(current_commit)
+        Gitlab::Elastic::Helper.refresh_index
+      end
+
+      def indexed_wiki_paths_for(term)
+        blobs = ProjectWiki.search(
+          term,
+          type: :wiki_blob
+        )[:wiki_blobs][:results].response
+
+        blobs.map do |blob|
+          blob['_source']['blob']['path']
+        end
+      end
+
+      it 'reindexes from scratch' do
+        sha_for_reset = nil
+
+        change_wiki_and_index(project) do
+          sha_for_reset = project.wiki.repository.create_file(user, '12', '', message: '12', branch_name: 'master')
+          project.wiki.repository.create_file(user, '23', '', message: '23', branch_name: 'master')
+        end
+
+        expect(indexed_wiki_paths_for('12')).to include('12')
+        expect(indexed_wiki_paths_for('23')).to include('23')
+
+        project.index_status.update!(last_wiki_commit: '____________')
+
+        change_wiki_and_index(project) do
+          project.wiki.repository.write_ref('master', sha_for_reset)
+        end
+
+        expect(indexed_wiki_paths_for('12')).to include('12')
+        expect(indexed_wiki_paths_for('23')).not_to include('23')
+      end
     end
   end
 
@@ -250,10 +301,10 @@ describe Gitlab::Elastic::Indexer do
 
     context 'when IndexStatus#last_commit is no longer in repository' do
       before do
-        ElasticIndexerWorker.new.perform("index", "Project", project.id, project.es_id)
+        ElasticIndexerWorker.new.perform('index', 'Project', project.id, project.es_id)
       end
 
-      it 'reindexes from scratch if IndexStatus#last_commit is no longer in repository' do
+      it 'reindexes from scratch' do
         sha_for_reset = nil
 
         change_repository_and_index(project) do
@@ -264,7 +315,7 @@ describe Gitlab::Elastic::Indexer do
         expect(indexed_file_paths_for('12')).to include('12')
         expect(indexed_file_paths_for('23')).to include('23')
 
-        project.index_status.update(last_commit: '____________')
+        project.index_status.update!(last_commit: '____________')
 
         change_repository_and_index(project) do
           project.repository.write_ref('master', sha_for_reset)

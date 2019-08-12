@@ -40,23 +40,6 @@ module Gitlab
         @generic_search_results ||= Gitlab::ProjectSearchResults.new(current_user, project, query, repository_ref)
       end
 
-      def blobs_count
-        @blobs_count ||= blobs.total_count
-      end
-
-      def notes_count
-        @notes_count ||= notes.total_count
-      end
-      alias_method :limited_notes_count, :notes_count
-
-      def wiki_blobs_count
-        @wiki_blobs_count ||= wiki_blobs.total_count
-      end
-
-      def commits_count
-        @commits_count ||= commits.total_count
-      end
-
       private
 
       def blobs

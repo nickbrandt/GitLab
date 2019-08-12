@@ -318,7 +318,14 @@ module Elasticsearch
           res
         end
 
-        def delete_index_for_commits_and_blobs
+        def delete_index_for_commits_and_blobs(wiki: false)
+          types =
+            if wiki
+              %w[wiki_blob]
+            else
+              %w[commit blob]
+            end
+
           client_for_indexing.delete_by_query(
             index: self.class.index_name,
             routing: es_parent,
@@ -328,7 +335,7 @@ module Elasticsearch
                   filter: [
                     {
                       terms: {
-                        type: %w{commit blob}
+                        type: types
                       }
                     },
                     {

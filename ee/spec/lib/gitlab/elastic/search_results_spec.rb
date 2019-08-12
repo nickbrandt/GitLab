@@ -6,10 +6,6 @@ describe Gitlab::Elastic::SearchResults, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
-  after do
-    stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
-  end
-
   let(:user) { create(:user) }
   let(:project_1) { create(:project, :repository, :wiki_repo) }
   let(:project_2) { create(:project, :repository, :wiki_repo) }
@@ -22,6 +18,36 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       results = described_class.new(user, 'hello world', limit_project_ids)
       expect(results.objects('commits', 2)).to be_empty
       expect(results.commits_count).to eq 0
+    end
+  end
+
+  describe '#formatted_count' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+
+    where(:scope, :count_method, :expected) do
+      'projects'       | :projects_count       | '1234'
+      'notes'          | :notes_count          | '1234'
+      'blobs'          | :blobs_count          | '1234'
+      'wiki_blobs'     | :wiki_blobs_count     | '1234'
+      'commits'        | :commits_count        | '1234'
+      'issues'         | :issues_count         | '1234'
+      'merge_requests' | :merge_requests_count | '1234'
+      'milestones'     | :milestones_count     | '1234'
+      'unknown'        | nil                   | nil
+    end
+
+    with_them do
+      it 'returns the expected formatted count' do
+        expect(results).to receive(count_method).and_return(1234) if count_method
+        expect(results.formatted_count(scope)).to eq(expected)
+      end
+    end
+
+    it 'delegates to generic_search_results for users' do
+      expect(results.generic_search_results).to receive(:formatted_count).with('users').and_return('1000+')
+      expect(results.formatted_count('users')).to eq('1000+')
     end
   end
 
