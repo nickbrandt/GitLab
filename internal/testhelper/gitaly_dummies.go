@@ -1,7 +1,7 @@
 package testhelper
 
 import (
-	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
+	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 	"golang.org/x/net/context"
 )
 
@@ -174,5 +174,17 @@ func (s *GitalyTestServer) FetchHTTPRemote(context.Context, *gitalypb.FetchHTTPR
 }
 
 func (s *GitalyTestServer) PreFetch(context.Context, *gitalypb.PreFetchRequest) (*gitalypb.PreFetchResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CloneFromPool(context.Context, *gitalypb.CloneFromPoolRequest) (*gitalypb.CloneFromPoolResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CloneFromPoolInternal(context.Context, *gitalypb.CloneFromPoolInternalRequest) (*gitalypb.CloneFromPoolInternalResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) GetObjectDirectorySize(context.Context, *gitalypb.GetObjectDirectorySizeRequest) (*gitalypb.GetObjectDirectorySizeResponse, error) {
 	return nil, nil
 }

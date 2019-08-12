@@ -55,10 +55,13 @@ func Dial(rawAddress string, connOpts []grpc.DialOption) (*grpc.ClientConn, erro
 		connOpts = append(connOpts, grpc.WithInsecure())
 
 	case unixConnection:
-		canonicalAddress = rawAddress // This will be overriden by the custom dialer...
+		canonicalAddress = rawAddress // This will be overridden by the custom dialer...
 		connOpts = append(
 			connOpts,
 			grpc.WithInsecure(),
+			// Use a custom dialer to ensure that we don't experience
+			// issues in environments that have proxy configurations
+			// https://gitlab.com/gitlab-org/gitaly/merge_requests/1072#note_140408512
 			grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) {
 				path, err := extractPathFromSocketURL(addr)
 				if err != nil {
