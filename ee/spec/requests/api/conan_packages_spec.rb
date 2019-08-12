@@ -2,13 +2,13 @@
 require 'spec_helper'
 
 describe API::ConanPackages do
-  let(:base_secret) { SecureRandom.base64(32) }
+  let(:base_secret) { SecureRandom.base64(64) }
 
   let(:jwt_secret) do
     OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest::SHA256.new,
       base_secret,
-      API::ConanPackages::HMAC_KEY
+      Gitlab::ConanToken::HMAC_KEY
     )
   end
 
