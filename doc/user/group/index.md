@@ -353,7 +353,7 @@ the group regardless of the IP restriction.
 #### Allowed domain restriction **(PREMIUM ONLY)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7297) in
-[GitLab Ultimate](https://about.gitlab.com/pricing/) 12.2.
+[GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
 
 To make sure only people from within your organization can access particular
 resources, you have the option to restrict access to groups and their
