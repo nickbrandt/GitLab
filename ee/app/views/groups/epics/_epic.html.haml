@@ -19,3 +19,15 @@
             &nbsp;
             - epic.labels.each do |label|
               = render_label(label.present(issuable_subject: @group), tooltip: true, link: group_epics_path(@group, label_name:[label.name]), css: 'label-link')
+
+      .issuable-meta
+        %ul.controls
+          - if epic.closed?
+            %li.issuable-status
+              = _('CLOSED')
+
+          = render 'shared/issuable_meta_data', issuable: epic
+
+        .float-right.issuable-updated-at.d-none.d-sm-inline-block
+          %span
+            = _('updated %{time_ago}').html_safe % { time_ago: time_ago_with_tooltip(epic.updated_at, placement: 'bottom', html_class: 'issue_update_ago') }

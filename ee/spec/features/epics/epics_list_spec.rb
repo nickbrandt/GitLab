@@ -37,6 +37,15 @@ describe 'epics list', :js do
       expect(first('.nav-sidebar .active a .count')).to have_content('3')
     end
 
+    it 'shows epic updated date and comment count' do
+      page.within('.issuable-list') do
+        page.within('li:nth-child(1) .issuable-meta') do
+          expect(find('.issuable-updated-at')).to have_content('updated just now')
+          expect(find('.issuable-comments')).to have_content('0')
+        end
+      end
+    end
+
     it 'renders the filtered search bar correctly' do
       page.within('.content-wrapper .content') do
         expect(page).to have_css('.epics-filters')
@@ -50,15 +59,15 @@ describe 'epics list', :js do
         expect(find('.top-area')).to have_content('All 3')
 
         page.within('.issuable-list') do
-          page.within('li:nth-child(1)') do
+          page.within('li:nth-child(1) .issuable-main-info') do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within('li:nth-child(2)') do
+          page.within('li:nth-child(2) .issuable-main-info') do
             expect(page).to have_content(epic2.title)
           end
 
-          page.within('li:nth-child(3)') do
+          page.within('li:nth-child(3) .issuable-main-info') do
             expect(page).to have_content(epic1.title)
           end
         end
@@ -84,15 +93,15 @@ describe 'epics list', :js do
         expect(find('.top-area')).to have_content('All 3')
 
         page.within('.issuable-list') do
-          page.within('li:nth-child(1)') do
+          page.within('li:nth-child(1) .issuable-main-info') do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within('li:nth-child(2)') do
+          page.within('li:nth-child(2) .issuable-main-info') do
             expect(page).to have_content(epic2.title)
           end
 
-          page.within('li:nth-child(3)') do
+          page.within('li:nth-child(3) .issuable-main-info') do
             expect(page).to have_content(epic1.title)
           end
         end
@@ -147,6 +156,28 @@ describe 'epics list', :js do
       wait_for_requests
 
       expect(page.find('.issuable-details h2.title')).to have_content(epic1.title)
+    end
+  end
+
+  context 'when closed epics exist for the group' do
+    let!(:epic1) { create(:epic, :closed, group: group, end_date: 10.days.ago) }
+
+    before do
+      visit group_epics_path(group)
+    end
+
+    it 'shows epic status, updated date and comment count' do
+      page.within('.epics-state-filters') do
+        click_link 'Closed'
+      end
+
+      page.within('.issuable-list') do
+        page.within('li:nth-child(1) .issuable-meta') do
+          expect(find('.issuable-status')).to have_content('CLOSED')
+          expect(find('.issuable-updated-at')).to have_content('updated just now')
+          expect(find('.issuable-comments')).to have_content('0')
+        end
+      end
     end
   end
 
