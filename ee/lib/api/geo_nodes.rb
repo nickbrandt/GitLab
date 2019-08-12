@@ -147,6 +147,7 @@ module API
           optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node'
           optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node'
           optional :container_repositories_max_capacity, type: Integer, desc: 'Control the maximum concurrency of container repository sync for this node'
+          optional :sync_object_storage, type: Boolean, desc: 'Flag indicating if the secondary Geo node will handle replication for blobs on the Object Storage'
         end
         put do
           not_found!('GeoNode') unless geo_node
