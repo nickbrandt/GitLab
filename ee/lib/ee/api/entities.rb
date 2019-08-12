@@ -485,7 +485,7 @@ module EE
         expose :repos_max_capacity
         expose :verification_max_capacity
         expose :container_repositories_max_capacity
-        expose :sync_object_storage, if: ->(geo_node, _) { geo_node.secondary? }
+        expose :sync_object_storage, if: ->(geo_node, _) { ::Feature.enabled?(:geo_object_storage_replication) && geo_node.secondary? }
 
         # Retained for backwards compatibility. Remove in API v5
         expose :clone_protocol do |_record, _options|
