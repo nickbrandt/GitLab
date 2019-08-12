@@ -7,6 +7,10 @@ export const getProjectPath = () => {
   const projectPathInput = activeTab.querySelector('#project_path');
   const select = activeTab.querySelector('select.js-select-namespace');
 
+  if (!projectPathInput) {
+    return '';
+  }
+
   if (select) {
     const selectedOption = select.options[select.selectedIndex];
     const { showPath } = selectedOption.dataset;
