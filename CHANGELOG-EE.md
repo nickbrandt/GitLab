@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.5
+
+- No changes.
+
 ## 12.1.4
 
 ### Fixed (3 changes)
@@ -47,6 +51,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 - Don't send CI usage email notifications for self-hosted instances. !14809
 
+
+## 12.0.6
+
+- No changes.
 
 ## 12.0.2 (2019-06-25)
 
@@ -190,6 +198,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Externalize strings of chat page in user profile. !28632
 - Remove commit count from storage quotass.
 
+
+## 11.11.8
+
+- No changes.
 
 ## 11.11.7
 
