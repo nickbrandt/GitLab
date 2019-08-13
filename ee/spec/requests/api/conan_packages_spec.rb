@@ -123,4 +123,85 @@ describe API::ConanPackages do
       expect(duration).to eq(1.hour)
     end
   end
+
+  describe 'GET /api/v4/packages/conan/v1/users/check_credentials' do
+    it 'responds with a 200 OK' do
+      get api('/packages/conan/v1/users/check_credentials')
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+  end
+
+  context 'recipe endpoints' do
+    let(:recipe) { 'my-package-name/1.0/username/channel' }
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe' do
+      it 'responds with an empty response' do
+        get api("/packages/conan/v1/conans/#{recipe}")
+
+        expect(response.body).to be {}
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/digest' do
+      it 'responds with a 404' do
+        get api("/packages/conan/v1/conans/#{recipe}/digest")
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/upload_urls' do
+      let(:params) do
+        { "conanfile.py": 24,
+          "conanmanifext.txt": 123 }
+      end
+      it 'returns a set of upload urls for the files requested' do
+        post api("/packages/conan/v1/conans/#{recipe}/upload_urls"), params: params
+
+        expected_response = {
+          'conanfile.py':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanfile.py",
+          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanmanifest.txt"
+        }
+
+        expect(response.body).to eq expected_response.to_json
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id' do
+      it 'responds with an empty response' do
+        get api("/packages/conan/v1/conans/#{recipe}/packages/123456789")
+
+        expect(response.body).to be {}
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/digest' do
+      it 'responds with a 404' do
+        get api("/packages/conan/v1/conans/#{recipe}/packages/123456789/digest")
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/upload_urls' do
+      let(:params) do
+        { "conaninfo.txt": 24,
+          "conanmanifext.txt": 123,
+          "conan_package.tgz": 523 }
+      end
+
+      it 'returns a set of upload urls for the files requested' do
+        post api("/packages/conan/v1/conans/#{recipe}/packages/123456789/upload_urls"), params: params
+
+        expected_response = {
+          'conaninfo.txt':     "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conaninfo.py",
+          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conanmanifest.txt",
+          'conanmanifest.tgz': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conan_package.txt"
+        }
+
+        expect(response.body).to eq expected_response.to_json
+      end
+    end
+  end
 end
