@@ -1,5 +1,7 @@
 # GitLab
 
+![logo](https://about.gitlab.com/images/logo.png)
+
 ## Test coverage
 
 - [![Ruby coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=coverage)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-ruby) Ruby
@@ -10,8 +12,6 @@
 The canonical source of GitLab Community Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/).
 
 The source of GitLab Enterprise Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ee).
-
-# ![logo](https://about.gitlab.com/images/logo.png) GitLab
 
 ## Free trial
 
@@ -28,16 +28,21 @@ To see how GitLab looks please see the [features page on our website](https://ab
 - Used by more than 100,000 organizations, GitLab is the most popular solution to manage Git repositories on-premises
 - Completely free and open source (MIT Expat license)
 
-## Hiring
-
-We're hiring developers, support people, and production engineers all the time, please see our [jobs page](https://about.gitlab.com/jobs/).
-
 ## Editions
 
 There are two editions of GitLab:
 
 - GitLab Community Edition (CE) is available freely under the MIT Expat license.
 - GitLab Enterprise Edition (EE) includes [extra features](https://about.gitlab.com/pricing/#compare-options) that are more useful for organizations with more than 100 users. To use EE and get official support please [become a subscriber](https://about.gitlab.com/pricing/).
+
+## Licensing
+
+See the [LICENSE](LICENSE) file for licensing information as it pertains to
+files in this repository.
+
+## Hiring
+
+We're hiring developers, support people, and production engineers all the time, please see our [jobs page](https://about.gitlab.com/jobs/).
 
 ## Website
 
@@ -65,14 +70,6 @@ There are various other options to install GitLab, please refer to the [installa
 ## Contributing
 
 GitLab is an open source project and we are very happy to accept community contributions. Please refer to [Contributing to GitLab page](https://about.gitlab.com/contributing/) for more details.
-
-## Licensing
-
-GitLab Community Edition (CE) is available freely under the MIT Expat license.
-
-All third party components incorporated into the GitLab Software are licensed under the original license provided by the owner of the applicable component.
-
-All Documentation content that resides under the `doc/` directory of this repository is licensed under Creative Commons: CC BY-SA 4.0.
 
 ## Install a development environment
 
