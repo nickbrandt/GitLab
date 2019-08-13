@@ -68,7 +68,9 @@ export default {
           :key="`${project.organizationSlug}.${project.slug}`"
           class="w-100"
           @click="$emit('select-project', project)"
-          >{{ getDisplayName(project) }}</gl-dropdown-item
+          >
+            <div></div>{{ getDisplayName(project) }}
+          </gl-dropdown-item
         >
       </gl-dropdown>
     </div>

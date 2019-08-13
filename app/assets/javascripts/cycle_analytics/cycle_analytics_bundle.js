@@ -49,6 +49,8 @@ export default () => {
         import('ee_component/analytics/cycle_analytics/components/custom_stage_form.vue'),
       AddStageButton: () =>
         import('ee_component/analytics/cycle_analytics/components/add_stage_button.vue'),
+      CustomStageFormContainer: () =>
+        import('ee_component/analytics/cycle_analytics/components/custom_stage_form_container.vue'),
     },
     mixins: [filterMixins, addStageMixin],
     data() {
@@ -77,6 +79,14 @@ export default () => {
       // variable itself can be completely removed.
       // Follow up issue: https://gitlab.com/gitlab-org/gitlab-foss/issues/64490
       if (cycleAnalyticsEl.dataset.requestPath) this.fetchCycleAnalyticsData();
+
+      console.log('LOADING::data', cycleAnalyticsEl.dataset);
+
+      // groupLabels needed for label dropdown in the custom stages form
+      const groupLabels = cycleAnalyticsEl.dataset.groupLabels
+        ? JSON.parse(cycleAnalyticsEl.dataset.groupLabels)
+        : [];
+      this.store.setGroupLabels(groupLabels);
     },
     methods: {
       handleError() {

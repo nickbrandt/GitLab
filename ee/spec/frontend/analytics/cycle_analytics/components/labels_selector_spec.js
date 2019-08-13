@@ -84,4 +84,21 @@ describe('Cycle Analytics LabelsSelector', () => {
       expect(activeItem.text()).toEqual(selectedLabel.name);
     });
   });
+
+  describe('with selectedLabelId set', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        selectedLabelId: 55,
+      });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+    it('will set the active class', () => {
+      const activeItem = wrapper.find('[active="true"]');
+      expect(activeItem.exists()).toBe(true);
+      expect(activeItem.text()).toEqual('workflow::this-is-a-label');
+    });
+  });
 });

@@ -127,7 +127,7 @@ export default {
 
 <template>
   <div class="block labels js-labels-block">
-    <dropdown-value-collapsed
+    <!-- <dropdown-value-collapsed
       v-if="showCreate"
       :labels="context.labels"
       @onValueClick="handleCollapsedValueClick"
@@ -140,8 +140,8 @@ export default {
       :enable-scoped-labels="enableScopedLabels"
     >
       <slot></slot>
-    </dropdown-value>
-    <div v-if="canEdit" class="selectbox js-selectbox" style="display: none;">
+    </dropdown-value> -->
+    <div class="selectbox js-selectbox">
       <dropdown-hidden-input
         v-for="label in context.labels"
         :key="label.id"
