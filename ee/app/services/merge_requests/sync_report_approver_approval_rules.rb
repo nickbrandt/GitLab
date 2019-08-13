@@ -7,7 +7,7 @@ module MergeRequests
     end
 
     def execute
-      if merge_request.target_project.beta_feature_available?(:report_approver_rules)
+      if merge_request.target_project.feature_available?(:report_approver_rules)
         sync_rules
       end
     end

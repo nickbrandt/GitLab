@@ -6,7 +6,6 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      before_action :set_report_approver_rules_feature_flag, only: [:edit]
       before_action :log_audit_event, only: [:download_export]
     end
 
@@ -81,10 +80,6 @@ module EE
 
     def allow_merge_pipelines_params?
       project&.feature_available?(:merge_pipelines)
-    end
-
-    def set_report_approver_rules_feature_flag
-      push_frontend_feature_flag(:report_approver_rules, default_enabled: false)
     end
 
     def log_audit_event
