@@ -82,7 +82,7 @@ describe 'groups/edit.html.haml' do
         expect(rendered).to render_template('groups/settings/_allowed_email_domain')
         expect(rendered).to(have_field('group_allowed_email_domain_attributes_domain',
                                        { disabled: false,
-                                         with: '*@gitlab.com' }))
+                                         with: 'gitlab.com' }))
       end
     end
 
@@ -100,7 +100,7 @@ describe 'groups/edit.html.haml' do
         expect(rendered).to render_template('groups/settings/_allowed_email_domain')
         expect(rendered).to(have_field('group_allowed_email_domain_attributes_domain',
                                        { disabled: true,
-                                         with: '*@gitlab.com' }))
+                                         with: 'gitlab.com' }))
       end
     end
 

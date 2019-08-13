@@ -37,13 +37,13 @@ module EE
     end
 
     def validate_users_email
-      return if user.email.end_with?(group.root_ancestor_allowed_email_domain.domain[1..-1])
+      return if group.root_ancestor_allowed_email_domain.email_matches_domain?(user.email)
 
-      errors.add(:user, _('email is not in the right domain'))
+      errors.add(:user, _("email '%{user_email}' does not match the allowed domain of '%{email_domain}'" % { user_email: user.email, email_domain: group.root_ancestor_allowed_email_domain.domain }))
     end
 
     def validate_invitation_email
-      return if invite_email.end_with?(group.root_ancestor_allowed_email_domain.domain[1..-1])
+      return if group.root_ancestor_allowed_email_domain.email_matches_domain?(invite_email)
 
       errors.add(:invite_email, _("'%{email}' is not in the right domain") % { email: invite_email })
     end

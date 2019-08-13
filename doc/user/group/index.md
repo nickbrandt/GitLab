@@ -365,13 +365,16 @@ to this group.
 
 There are domains that cannot be added to this restrictions - the most popular public email domains, such as:
 
-- `*@gmail.com`
-- `*@yahoo.com`
-- `*@hotmail.com`
-- `*@aol.com`
-- `*@msn.com`
-- `*@hotmail.co.uk`
-- `*@hotmail.fr`
+- `gmail.com`
+- `yahoo.com`
+- `hotmail.com`
+- `aol.com`
+- `msn.com`
+- `hotmail.co.uk`
+- `hotmail.fr`
+- `live.com`
+- `outlook.com`
+- `icloud.com`
 
 #### Group file templates **(PREMIUM)**
 

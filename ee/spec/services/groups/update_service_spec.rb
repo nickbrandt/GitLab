@@ -190,13 +190,13 @@ describe Groups::UpdateService, '#execute' do
     end
 
     context 'when allowed_email_domain already exists' do
-      let!(:allowed_domain) { create(:allowed_email_domain, group: group, domain: '*@gitlab.com') }
+      let!(:allowed_domain) { create(:allowed_email_domain, group: group, domain: 'gitlab.com') }
 
       context 'empty allowed_email_domain param' do
         let(:params) { { allowed_email_domain_attributes: { id: allowed_domain.id, domain: '' } } }
 
         it 'deletes ip restriction' do
-          expect(group.allowed_email_domain.domain).to eql('*@gitlab.com')
+          expect(group.allowed_email_domain.domain).to eql('gitlab.com')
 
           subject
 

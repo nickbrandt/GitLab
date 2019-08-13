@@ -106,16 +106,16 @@ module EE
 
       def handle_allowed_domain_deletion
         return unless associations_editable?
-
         return unless group.allowed_email_domain.present?
-
-        allowed_domain_params = params[:allowed_email_domain_attributes]
-
         return unless allowed_domain_params
 
         if allowed_domain_params[:domain]&.blank?
           allowed_domain_params[:_destroy] = 1
         end
+      end
+
+      def allowed_domain_params
+        @allowed_domain_params ||= params[:allowed_email_domain_attributes]
       end
 
       def log_audit_event

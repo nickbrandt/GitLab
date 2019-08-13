@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :allowed_email_domain, class: AllowedEmailDomain do
-    domain { '*@gitlab.com' }
+    domain { 'gitlab.com' }
     group
   end
 end
