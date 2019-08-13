@@ -9,10 +9,12 @@ FactoryBot.define do
     end
 
     primary false
+    sync_object_storage true
 
     trait :primary do
       primary true
       minimum_reverification_interval 7
+      sync_object_storage false
     end
   end
 end

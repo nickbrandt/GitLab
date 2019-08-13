@@ -118,6 +118,7 @@ describe GeoNode, :geo, type: :model do
       :repos_max_capacity                  | 25
       :files_max_capacity                  | 10
       :container_repositories_max_capacity | 10
+      :sync_object_storage                 | false
     end
 
     with_them do

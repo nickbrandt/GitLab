@@ -58,6 +58,7 @@ class Admin::Geo::NodesController < Admin::Geo::ApplicationController
       :verification_max_capacity,
       :minimum_reverification_interval,
       :container_repositories_max_capacity,
+      :sync_object_storage,
       selective_sync_shards: []
     )
   end
