@@ -33,7 +33,7 @@ module Clusters
       end
 
       def check_timeout
-        if timeouted?
+        if timed_out?
           begin
             app.make_update_errored!('Update timed out')
           ensure
@@ -45,7 +45,7 @@ module Clusters
         end
       end
 
-      def timeouted?
+      def timed_out?
         Time.now.utc - app.updated_at.to_time.utc > ::ClusterWaitForAppUpdateWorker::TIMEOUT
       end
 
