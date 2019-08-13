@@ -46,7 +46,7 @@ describe Gitlab::ConanToken do
     end
   end
 
-  describe '#to_s' do
+  describe '#to_jwt' do
     it 'returns the encoded JWT' do
       allow(SecureRandom).to receive(:uuid).and_return('u-u-i-d')
 
@@ -55,7 +55,7 @@ describe Gitlab::ConanToken do
 
         token = described_class.new(personal_access_token_id: 123, user_id: 456)
 
-        expect(token.to_s).to eq(jwt.encoded)
+        expect(token.to_jwt).to eq(jwt.encoded)
       end
     end
   end

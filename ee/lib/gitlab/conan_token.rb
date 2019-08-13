@@ -31,7 +31,7 @@ module Gitlab
       @user_id = user_id
     end
 
-    def to_s
+    def to_jwt
       hmac_token.encoded
     end
 

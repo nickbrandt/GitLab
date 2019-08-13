@@ -20,7 +20,8 @@ module API
         detail 'This feature was introduced in GitLab 12.2'
       end
       get 'authenticate' do
-        ::Gitlab::ConanToken.from_personal_access_token(access_token)
+        token = ::Gitlab::ConanToken.from_personal_access_token(access_token)
+        token.to_jwt
       end
     end
 
