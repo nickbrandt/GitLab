@@ -11,12 +11,16 @@ class DependencyListEntity < Grape::Entity
       status(list[:dependencies], options[:build])
     end
 
-    expose :job_path, if: ->(_, options) { options[:build] } do |_, options|
+    expose :job_path, if: ->(_, options) { options[:build] && can_read_job_path? } do |_, options|
       project_build_path(project, options[:build].id)
     end
   end
 
   private
+
+  def can_read_job_path?
+    can?(request.user, :read_pipeline, project)
+  end
 
   def project
     request.project
