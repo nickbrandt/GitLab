@@ -6814,7 +6814,7 @@ msgstr ""
 msgid "Geo|All projects are being scheduled for re-verify"
 msgstr ""
 
-msgid "Geo|Allow GitLab to replicate content on Object Storage"
+msgid "Geo|Allow this secondary node to replicate content on Object Storage"
 msgstr ""
 
 msgid "Geo|Batch operations"
@@ -6856,7 +6856,7 @@ msgstr ""
 msgid "Geo|Groups to synchronize"
 msgstr ""
 
-msgid "Geo|If enabled, GitLab will perform Object Storage replication using Geo"
+msgid "Geo|If enabled, GitLab will handle Object Storage replication using Geo"
 msgstr ""
 
 msgid "Geo|In sync"

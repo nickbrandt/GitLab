@@ -77,6 +77,6 @@
       .form-check
         = form.check_box :sync_object_storage, class: 'form-check-input'
         = form.label :sync_object_storage, class: 'form-check-label' do
-          %span= s_('Geo|Allow GitLab to replicate content on Object Storage')
-        .form-text.text-muted= s_('Geo|If enabled, GitLab will perform Object Storage replication using Geo')
+          %span= s_('Geo|Allow this secondary node to replicate content on Object Storage')
+        .form-text.text-muted= s_('Geo|If enabled, GitLab will handle Object Storage replication using Geo')
 
