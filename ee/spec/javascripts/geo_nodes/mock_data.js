@@ -14,6 +14,7 @@ export const mockNodes = [
     current: true,
     files_max_capacity: 10,
     repos_max_capacity: 25,
+    container_repositories_max_capacity: 10,
     clone_protocol: 'http',
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/1',
@@ -30,6 +31,7 @@ export const mockNodes = [
     current: false,
     files_max_capacity: 10,
     repos_max_capacity: 25,
+    container_repositories_max_capacity: 10,
     clone_protocol: 'http',
     _links: {
       self: 'http://127.0.0.1:3001/api/v4/geo_nodes/2',

@@ -146,6 +146,7 @@ module API
           optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node'
           optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node'
           optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node'
+          optional :container_repositories_max_capacity, type: Integer, desc: 'Control the maximum concurrency of container repository sync for this node'
         end
         put do
           not_found!('GeoNode') unless geo_node
