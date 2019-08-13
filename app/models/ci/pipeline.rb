@@ -390,20 +390,15 @@ module Ci
     def legacy_stages
       # TODO, this needs refactoring, see gitlab-foss#26481.
 
-      stages_query = statuses
-        .group('stage').select(:stage).order('max(stage_idx)')
-
-      status_sql = statuses.latest.where('stage=sg.stage').status_sql
-
-      warnings_sql = statuses.latest.select('COUNT(*)')
-        .where('stage=sg.stage').failed_but_allowed.to_sql
-
-      stages_with_statuses = CommitStatus.from(stages_query, :sg)
-        .pluck('sg.stage', status_sql, "(#{warnings_sql})")
-
-      stages_with_statuses.map do |stage|
-        Ci::LegacyStage.new(self, Hash[%i[name status warnings].zip(stage)])
-      end
+      Gitlab::Ci::Status::GroupedStatuses
+        .new(statuses.latest, :stage, :stage_idx)
+        .group(:stage, :stage_idx)
+        .map do |stage|
+          Ci::LegacyStage.new(self,
+            name: stage[:stage],
+            status: stage[:status],
+            warnings: stage[:warnings])
+        end
     end
 
     def valid_commit_sha

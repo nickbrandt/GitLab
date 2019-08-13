@@ -29,14 +29,6 @@ class CommitStatus < ApplicationRecord
     where(allow_failure: true, status: [:failed, :canceled])
   end
 
-  scope :exclude_ignored, -> do
-    # We want to ignore failed but allowed to fail jobs.
-    #
-    # TODO, we also skip ignored optional manual actions.
-    where("allow_failure = ? OR status IN (?)",
-      false, all_state_names - [:failed, :canceled, :manual])
-  end
-
   scope :latest, -> { where(retried: [false, nil]) }
   scope :retried, -> { where(retried: true) }
   scope :ordered, -> { order(:name) }

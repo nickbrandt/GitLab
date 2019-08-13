@@ -10,6 +10,7 @@ module HasStatus
   ACTIVE_STATUSES = %w[preparing pending running].freeze
   COMPLETED_STATUSES = %w[success failed canceled skipped].freeze
   ORDERED_STATUSES = %w[failed preparing pending running manual scheduled canceled success skipped created].freeze
+  WARNING_STATUSES = %w[manual failed canceled].to_set.freeze
   STATUSES_ENUM = { created: 0, pending: 1, running: 2, success: 3,
                     failed: 4, canceled: 5, skipped: 6, manual: 7,
                     scheduled: 8, preparing: 9 }.freeze
@@ -17,44 +18,10 @@ module HasStatus
   UnknownStatusError = Class.new(StandardError)
 
   class_methods do
-    def status_sql
-      scope_relevant = respond_to?(:exclude_ignored) ? exclude_ignored : all
-      scope_warnings = respond_to?(:failed_but_allowed) ? failed_but_allowed : none
-
-      builds = scope_relevant.select('count(*)').to_sql
-      created = scope_relevant.created.select('count(*)').to_sql
-      success = scope_relevant.success.select('count(*)').to_sql
-      manual = scope_relevant.manual.select('count(*)').to_sql
-      scheduled = scope_relevant.scheduled.select('count(*)').to_sql
-      preparing = scope_relevant.preparing.select('count(*)').to_sql
-      pending = scope_relevant.pending.select('count(*)').to_sql
-      running = scope_relevant.running.select('count(*)').to_sql
-      skipped = scope_relevant.skipped.select('count(*)').to_sql
-      canceled = scope_relevant.canceled.select('count(*)').to_sql
-      warnings = scope_warnings.select('count(*) > 0').to_sql.presence || 'false'
-
-      Arel.sql(
-        "(CASE
-          WHEN (#{builds})=(#{skipped}) AND (#{warnings}) THEN 'success'
-          WHEN (#{builds})=(#{skipped}) THEN 'skipped'
-          WHEN (#{builds})=(#{success}) THEN 'success'
-          WHEN (#{builds})=(#{created}) THEN 'created'
-          WHEN (#{builds})=(#{preparing}) THEN 'preparing'
-          WHEN (#{builds})=(#{success})+(#{skipped}) THEN 'success'
-          WHEN (#{builds})=(#{success})+(#{skipped})+(#{canceled}) THEN 'canceled'
-          WHEN (#{builds})=(#{created})+(#{skipped})+(#{pending}) THEN 'pending'
-          WHEN (#{running})+(#{pending})>0 THEN 'running'
-          WHEN (#{manual})>0 THEN 'manual'
-          WHEN (#{scheduled})>0 THEN 'scheduled'
-          WHEN (#{preparing})>0 THEN 'preparing'
-          WHEN (#{created})>0 THEN 'running'
-          ELSE 'failed'
-        END)"
-      )
-    end
-
     def status
-      all.pluck(status_sql).first
+      Gitlab::Ci::Status::GroupedStatuses
+        .new(all)
+        .one&.dig(:status)
     end
 
     def started_at
