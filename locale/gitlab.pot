@@ -7069,6 +7069,9 @@ msgstr ""
 msgid "GitLab for Slack"
 msgstr ""
 
+msgid "GitLab member or Email address"
+msgstr ""
+
 msgid "GitLab metadata URL"
 msgstr ""
 
@@ -13114,9 +13117,6 @@ msgid "Select group or project"
 msgstr ""
 
 msgid "Select labels"
-msgstr ""
-
-msgid "Select members to invite"
 msgstr ""
 
 msgid "Select merge moment"
