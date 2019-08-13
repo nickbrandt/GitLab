@@ -9,6 +9,8 @@
 %tr
   %td.mirror-url= @project.safe_import_url
   %td= _('Pull')
+  %td
+    = import_state.last_update_started_at.present? ? time_ago_with_tooltip(import_state.last_update_started_at) : _('Never')
   %td= import_state.last_update_at.present? ? time_ago_with_tooltip(import_state.last_update_at) : _('Never')
   %td
     - if import_state&.last_error.present?
