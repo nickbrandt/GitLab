@@ -2227,16 +2227,10 @@ msgstr ""
 msgid "BillingPlans|Contact Support"
 msgstr ""
 
-msgid "BillingPlans|Contact Support"
-msgstr ""
-
 msgid "BillingPlans|Current plan"
 msgstr ""
 
 msgid "BillingPlans|Downgrade"
-msgstr ""
-
-msgid "BillingPlans|If you would like to downgrade your plan please %{support_link}."
 msgstr ""
 
 msgid "BillingPlans|If you would like to downgrade your plan please %{support_link}."
@@ -2249,9 +2243,6 @@ msgid "BillingPlans|Learn more about each plan by visiting our %{pricing_page_li
 msgstr ""
 
 msgid "BillingPlans|Manage plan"
-msgstr ""
-
-msgid "BillingPlans|Pricing page"
 msgstr ""
 
 msgid "BillingPlans|Pricing page"
