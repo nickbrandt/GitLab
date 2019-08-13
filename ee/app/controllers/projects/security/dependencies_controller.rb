@@ -3,8 +3,8 @@
 module Projects
   module Security
     class DependenciesController < Projects::ApplicationController
-      before_action :authorize_read_dependency_list!
       before_action :ensure_dependency_list_feature_available
+      before_action :authorize_read_dependency_list!
 
       def index
         respond_to do |format|
@@ -33,7 +33,7 @@ module Projects
       end
 
       def authorize_read_dependency_list!
-        return render_403 unless can?(current_user, :read_project_security_dashboard, project)
+        render_403 unless can?(current_user, :read_dependencies, project)
       end
 
       def ensure_dependency_list_feature_available
@@ -61,7 +61,7 @@ module Projects
       end
 
       def serializer
-        serializer = ::DependencyListSerializer.new(project: project)
+        serializer = ::DependencyListSerializer.new(project: project, user: current_user)
         serializer = serializer.with_pagination(request, response) if params[:page]
         serializer
       end

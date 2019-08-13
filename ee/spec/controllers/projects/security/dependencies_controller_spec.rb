@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Projects::Security::DependenciesController do
   describe 'GET index.json' do
-    set(:project) { create(:project, :repository, :public) }
+    set(:project) { create(:project, :repository, :private) }
     set(:user) { create(:user) }
     let(:params) { { namespace_id: project.namespace, project_id: project } }
 
@@ -19,7 +19,7 @@ describe Projects::Security::DependenciesController do
 
       context 'when feature is available' do
         before do
-          stub_licensed_features(dependency_list: true, security_dashboard: true)
+          stub_licensed_features(dependency_list: true)
         end
 
         it 'counts usage of the feature' do
@@ -167,8 +167,6 @@ describe Projects::Security::DependenciesController do
 
       context 'when feature is not available' do
         before do
-          stub_licensed_features(security_dashboard: true)
-
           get :index, params: params, format: :json
         end
 
@@ -181,6 +179,7 @@ describe Projects::Security::DependenciesController do
     context 'with unauthorized user' do
       before do
         project.add_guest(user)
+        stub_licensed_features(dependency_list: true)
 
         get :index, params: params, format: :json
       end

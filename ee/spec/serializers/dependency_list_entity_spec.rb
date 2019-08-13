@@ -9,15 +9,19 @@ describe DependencyListEntity do
     end
 
     let(:request) { double('request') }
-    let(:project) { create(:project) }
+    set(:project) { create(:project, :repository, :private) }
+    set(:developer) { create(:user) }
 
     subject { entity.as_json }
 
     before do
+      project.add_developer(developer)
       allow(request).to receive(:project).and_return(project)
+      allow(request).to receive(:user).and_return(user)
     end
 
     context 'with success build' do
+      let(:user) { developer }
       let(:build) { create(:ee_ci_build, :success) }
 
       context 'with provided dependencies' do
@@ -43,6 +47,7 @@ describe DependencyListEntity do
       end
 
       context 'with no dependencies' do
+        let(:user) { developer }
         let(:dependencies) { [] }
 
         it 'has empty array of dependencies with status no_dependencies' do
@@ -59,19 +64,33 @@ describe DependencyListEntity do
       let(:build) { create(:ee_ci_build, :failed) }
       let(:dependencies) { [] }
 
-      it 'has job_path with status failed_job' do
-        expect(subject[:report][:status]).to eq(:job_failed)
-        expect(subject[:report]).to include(:job_path)
+      context 'with authorized user' do
+        let(:user) { developer }
+
+        it 'has job_path with status failed_job' do
+          expect(subject[:report][:status]).to eq(:job_failed)
+          expect(subject[:report]).to include(:job_path)
+        end
+      end
+
+      context 'without authorized user' do
+        let(:user) { create(:user) }
+
+        it 'has only status failed_job' do
+          expect(subject[:report][:status]).to eq(:job_failed)
+          expect(subject[:report]).not_to include(:job_path)
+        end
       end
     end
 
     context 'with no build' do
+      let(:user) { developer }
       let(:build) { nil }
       let(:dependencies) { [] }
 
       it 'has status job_not_set_up and no job_path' do
         expect(subject[:report][:status]).to eq(:job_not_set_up)
-        expect(subject[:report]).not_to include(:job_path)
+        expect(subject[:report][:job_path]).not_to be_present
       end
     end
   end

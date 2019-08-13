@@ -3,9 +3,13 @@
 require 'spec_helper'
 
 describe DependencyListSerializer do
-  let(:serializer) { described_class.new(project: project).represent(dependencies, build: build) }
   let(:build) { create(:ee_ci_build, :success) }
-  let(:project) { create(:project) }
+  set(:project) { create(:project, :repository, :private) }
+  set(:user) { create(:user) }
+
+  let(:serializer) do
+    described_class.new(project: project, user: user).represent(dependencies, build: build)
+  end
 
   let(:dependencies) do
     [{
@@ -22,6 +26,11 @@ describe DependencyListSerializer do
             severity: 'low'
           }]
      }]
+  end
+
+  before do
+    stub_licensed_features(security_dashboard: true)
+    project.add_developer(user)
   end
 
   describe "#to_json" do
