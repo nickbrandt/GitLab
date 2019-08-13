@@ -22,7 +22,6 @@ class GeoNode < ApplicationRecord
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
   validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
-  validates :sync_object_storage, if: :primary, inclusion: { in: [false], message: 'Geo primary node doesnt use sync_object_storage value' }
 
   validates :access_key, presence: true
   validates :encrypted_secret_access_key, presence: true

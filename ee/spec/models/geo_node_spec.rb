@@ -43,13 +43,6 @@ describe GeoNode, :geo, type: :model do
         expect(primary_node).not_to be_valid
         expect(primary_node.errors).to include(:enabled)
       end
-
-      it 'requires sync_object_storage to be disabled' do
-        primary_node.sync_object_storage = true
-
-        expect(primary_node).not_to be_valid
-        expect(primary_node.errors).to include(:sync_object_storage)
-      end
     end
 
     context 'when validating url' do
