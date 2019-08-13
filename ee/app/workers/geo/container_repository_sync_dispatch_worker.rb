@@ -5,8 +5,6 @@ module Geo
     include CronjobQueue
 
     def perform
-      return unless Feature.enabled?(:geo_registry_replication)
-
       unless Gitlab.config.geo.registry_replication.enabled
         log_info('Container Registry replication is not enabled')
         return

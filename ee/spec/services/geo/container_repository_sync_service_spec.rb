@@ -45,16 +45,5 @@ describe Geo::ContainerRepositorySyncService, :geo do
 
       expect(registry.synced?).to be_truthy
     end
-
-    it 'does not do anything if feature is disabled' do
-      stub_feature_flags(geo_registry_replication: false)
-
-      expect_any_instance_of(Geo::ContainerRepositorySync)
-        .not_to receive(:execute)
-
-      result = described_class.new(container_repository_registry.container_repository).execute
-
-      expect(result).to be_nil
-    end
   end
 end

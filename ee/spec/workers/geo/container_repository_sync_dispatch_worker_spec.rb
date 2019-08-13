@@ -30,16 +30,6 @@ describe Geo::ContainerRepositorySyncDispatchWorker, :geo, :geo_fdw do
     allow(Gitlab::Geo).to receive(:geo_database_configured?).and_call_original
   end
 
-  it 'does not schedule anything when feature is disabled' do
-    create(:container_repository)
-
-    stub_feature_flags(geo_registry_replication: false)
-
-    expect(Geo::ContainerRepositorySyncWorker).not_to receive(:perform_async)
-
-    subject.perform
-  end
-
   it 'does not schedule anything when node is disabled' do
     create(:container_repository)
 

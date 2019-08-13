@@ -15,8 +15,6 @@ module Geo
     end
 
     def perform(id)
-      return unless Feature.enabled?(:geo_registry_replication)
-
       repository = ContainerRepository.find_by_id(id)
 
       if repository.nil?
