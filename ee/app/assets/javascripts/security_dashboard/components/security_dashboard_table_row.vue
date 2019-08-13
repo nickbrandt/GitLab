@@ -143,7 +143,7 @@ export default {
   }
 
   .vulnerabilities-row:hover .action-buttons,
-  .vulnerabilities-row:focus .action-buttons {
+  .vulnerabilities-row:focus-within .action-buttons {
     opacity: 1;
   }
 }
