@@ -26,7 +26,7 @@ module Geo
       if selective_sync?
         lfs_objects
       else
-        local_storage_only? ? LfsObject.syncable.with_files_stored_locally : LfsObject.syncable
+        local_storage_only? ? LfsObject.with_files_stored_locally : LfsObject
       end
     end
 
@@ -39,8 +39,7 @@ module Geo
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      current_node
-        .lfs_objects
+      lfs_objects
         .missing_file_registry
         .id_not_in(except_file_ids)
         .limit(batch_size)
@@ -49,7 +48,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      lfs_objects
+      all_lfs_objects
         .inner_join_file_registry
         .with_files_stored_remotely
         .id_not_in(except_file_ids)
@@ -81,7 +80,11 @@ module Geo
     private
 
     def lfs_objects
-      local_storage_only? ? current_node.lfs_objects.with_files_stored_locally : current_node.lfs_objects
+      local_storage_only? ? all_lfs_objects.with_files_stored_locally : all_lfs_objects
+    end
+
+    def all_lfs_objects
+      current_node.lfs_objects
     end
 
     def registries_for_lfs_objects

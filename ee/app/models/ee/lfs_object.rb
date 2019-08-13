@@ -16,7 +16,6 @@ module EE
       after_destroy :log_geo_deleted_event
 
       scope :project_id_in, ->(ids) { joins(:projects).merge(::Project.id_in(ids)) }
-      scope :syncable, -> { with_files_stored_locally }
     end
 
     def log_geo_deleted_event
