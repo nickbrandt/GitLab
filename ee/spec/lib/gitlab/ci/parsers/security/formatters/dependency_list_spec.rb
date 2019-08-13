@@ -43,8 +43,8 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
         vulnerabilities = data[:vulnerabilities]
 
         expect(vulnerabilities.size).to eq(4)
-        expect(vulnerabilities[0][:name]).to eq('Vulnerabilities in libxml2')
-        expect(vulnerabilities[3][:name]).to eq('Bypass of a protection mechanism in libxslt')
+        expect(vulnerabilities[0][:name]).to eq('Vulnerabilities in libxml2 in nokogiri')
+        expect(vulnerabilities[3][:name]).to eq('Bypass of a protection mechanism in libxslt in nokogiri')
         expect(vulnerabilities[0][:severity]).to eq('high')
       end
     end

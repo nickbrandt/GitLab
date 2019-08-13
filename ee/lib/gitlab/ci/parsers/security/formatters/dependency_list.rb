@@ -76,7 +76,7 @@ module Gitlab
 
             def formatted_vulnerability(vulnerability)
               {
-                name: vulnerability['name'],
+                name: vulnerability['message'],
                 severity: vulnerability['severity'].downcase
               }
             end
