@@ -27,7 +27,7 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
     feedback.issue.iid
   end
 
-  expose :issue_url, if: -> (feedback, _) { feedback.issue.present? } do |feedback|
+  expose :issue_url, if: -> (_, _) { can_read_issue? } do |feedback|
     project_issue_url(feedback.project, feedback.issue)
   end
 
@@ -35,7 +35,7 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
     feedback.merge_request.iid
   end
 
-  expose :merge_request_path, if: -> (feedback, _) { feedback.merge_request.present? } do |feedback|
+  expose :merge_request_path, if: -> (_, _) { can_read_merge_request? } do |feedback|
     project_merge_request_path(feedback.project, feedback.merge_request)
   end
 
@@ -58,5 +58,13 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
 
   def can_destroy_feedback?
     can?(request.current_user, :destroy_vulnerability_feedback, feedback)
+  end
+
+  def can_read_issue?
+    feedback.issue.present? && can?(request.current_user, :read_issue, feedback.issue)
+  end
+
+  def can_read_merge_request?
+    feedback.merge_request.present? && can?(request.current_user, :read_merge_request, feedback.merge_request)
   end
 end

@@ -22,9 +22,26 @@ describe Vulnerabilities::FeedbackEntity do
     context 'feedback type is issue' do
       let(:feedback) { build(:vulnerability_feedback, :issue, project: project) }
 
-      it 'exposes issue information' do
-        is_expected.to include(:issue_iid)
-        is_expected.to include(:issue_url)
+      context 'when issue is present' do
+        it 'exposes the issue iid' do
+          is_expected.to include(:issue_iid)
+        end
+
+        context 'when user can view issues' do
+          before do
+            project.add_developer(user)
+          end
+
+          it 'exposes issue url' do
+            is_expected.to include(:issue_url)
+          end
+        end
+
+        context 'when user cannot view issues' do
+          it 'does not expose issue url' do
+            is_expected.not_to include(:issue_url)
+          end
+        end
       end
 
       context 'when issue is not present' do
@@ -50,9 +67,26 @@ describe Vulnerabilities::FeedbackEntity do
     context 'feedback type is merge_request' do
       let(:feedback) { build(:vulnerability_feedback, :merge_request, project: project) }
 
-      it 'exposes merge request information' do
-        is_expected.to include(:merge_request_iid)
-        is_expected.to include(:merge_request_path)
+      context 'when merge request is present' do
+        it 'exposes the merge request iid' do
+          is_expected.to include(:merge_request_iid)
+        end
+
+        context 'when user can view merge requests' do
+          before do
+            project.add_developer(user)
+          end
+
+          it 'exposes merge request url' do
+            is_expected.to include(:merge_request_path)
+          end
+        end
+
+        context 'when user cannot view merge requests' do
+          it 'does not expose merge request url' do
+            is_expected.not_to include(:merge_request_path)
+          end
+        end
       end
 
       context 'when merge request is not present' do
@@ -114,42 +148,6 @@ describe Vulnerabilities::FeedbackEntity do
       expect(subject[:comment_details]).to include(:comment)
       expect(subject[:comment_details]).to include(:comment_timestamp)
       expect(subject[:comment_details]).to include(:comment_author)
-    end
-  end
-
-  context 'when issue is present' do
-    let(:feedback) { build(:vulnerability_feedback, :issue ) }
-
-    it 'exposes issue information' do
-      is_expected.to include(:issue_iid)
-      is_expected.to include(:issue_url)
-    end
-  end
-
-  context 'when issue is not present' do
-    let(:feedback) { build(:vulnerability_feedback, feedback_type: 'issue', issue: nil) }
-
-    it 'does not expose issue information' do
-      is_expected.not_to include(:issue_iid)
-      is_expected.not_to include(:issue_url)
-    end
-  end
-
-  context 'when merge request is present' do
-    let(:feedback) { build(:vulnerability_feedback, :merge_request ) }
-
-    it 'exposes merge request information' do
-      is_expected.to include(:merge_request_iid)
-      is_expected.to include(:merge_request_path)
-    end
-  end
-
-  context 'when merge request is not present' do
-    let(:feedback) { build(:vulnerability_feedback, feedback_type: 'merge_request', merge_request: nil) }
-
-    it 'does not expose merge request information' do
-      is_expected.not_to include(:merge_request_iid)
-      is_expected.not_to include(:merge_request_path)
     end
   end
 end

@@ -100,8 +100,14 @@ export default {
     issueFeedback() {
       return this.vulnerability && this.vulnerability.issue_feedback;
     },
+    canReadIssueFeedback() {
+      return this.issueFeedback && this.issueFeedback.issue_url;
+    },
     mergeRequestFeedback() {
       return this.vulnerability && this.vulnerability.merge_request_feedback;
+    },
+    canReadMergeRequestFeedback() {
+      return this.mergeRequestFeedback && this.mergeRequestFeedback.merge_request_path;
     },
     dismissalFeedback() {
       return (
@@ -204,7 +210,7 @@ export default {
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       />
 
-      <ul v-if="issueFeedback || mergeRequestFeedback" class="notes card my-4">
+      <ul v-if="canReadIssueFeedback || canReadMergeRequestFeedback" class="notes card my-4">
         <li v-if="issueFeedback" class="note">
           <div class="card-body">
             <issue-note :feedback="issueFeedback" :project="project" />
