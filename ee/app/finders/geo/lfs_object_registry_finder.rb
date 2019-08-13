@@ -2,6 +2,8 @@
 
 module Geo
   class LfsObjectRegistryFinder < FileRegistryFinder
+    # Counts all existing registries independent
+    # of any change on filters / selective sync
     def count_registry
       Geo::FileRegistry.lfs_objects.count
     end

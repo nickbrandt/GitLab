@@ -2,6 +2,8 @@
 
 module Geo
   class AttachmentRegistryFinder < FileRegistryFinder
+    # Counts all existing registries independent
+    # of any change on filters / selective sync
     def count_registry
       Geo::FileRegistry.attachments.count
     end
@@ -54,7 +56,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      attachments
+      all_attachments
         .inner_join_file_registry
         .with_files_stored_remotely
         .merge(Geo::FileRegistry.attachments)
@@ -89,7 +91,11 @@ module Geo
     private
 
     def attachments
-      local_storage_only? ? current_node.attachments.with_files_stored_locally : current_node.attachments
+      local_storage_only? ? all_attachments.with_files_stored_locally : all_attachments
+    end
+
+    def all_attachments
+      current_node.attachments
     end
 
     def registries_for_attachments

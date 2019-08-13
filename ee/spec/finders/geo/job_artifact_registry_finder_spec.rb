@@ -219,7 +219,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
       context 'with object storage sync disabled' do
         let(:secondary) { create(:geo_node, :local_storage) }
 
-        it 'does not apply the selective sync restriction' do
+        it 'counts file registries for job artifacts ignoring remote artifacts' do
           expect(subject.count_registry).to eq 4
         end
       end
@@ -265,7 +265,7 @@ describe Geo::JobArtifactRegistryFinder, :geo_fdw do
       context 'with object storage sync disabled' do
         let(:secondary) { create(:geo_node, :local_storage) }
 
-        it 'returns job artifacts without an entry on the tracking database, ignoring expired ones' do
+        it 'returns job artifacts without an entry on the tracking database, ignoring expired ones and remotes' do
           job_artifacts = subject.find_unsynced(batch_size: 10)
 
           expect(job_artifacts).to match_ids(job_artifact_2, job_artifact_4)
