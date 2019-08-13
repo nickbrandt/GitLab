@@ -15,6 +15,7 @@ module Gitlab
         payload = JSONWebToken::HMACToken.decode(jwt, secret).first
 
         new(personal_access_token_id: payload['pat'], user_id: payload['u'])
+      rescue JWT::DecodeError
       end
 
       def secret

@@ -52,10 +52,9 @@ module API
         return unless jwt
 
         token = ::Gitlab::ConanToken.decode(jwt)
+        return unless token&.personal_access_token_id && token&.user_id
 
         PersonalAccessToken.find_by_id_and_user_id(token.personal_access_token_id, token.user_id)
-      rescue JWT::DecodeError
-        unauthorized!
       end
 
       def find_personal_access_token_from_conan_http_basic_auth

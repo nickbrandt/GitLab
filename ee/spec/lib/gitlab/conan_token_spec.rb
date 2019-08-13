@@ -44,6 +44,10 @@ describe Gitlab::ConanToken do
       expect(token.personal_access_token_id).to eq(123)
       expect(token.user_id).to eq(456)
     end
+
+    it 'returns nil for invalid JWT' do
+      expect(described_class.decode('invalid-jwt')).to be_nil
+    end
   end
 
   describe '#to_jwt' do
