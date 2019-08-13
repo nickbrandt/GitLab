@@ -11,8 +11,6 @@ module Geo
     end
 
     def execute
-      return unless Feature.enabled?(:geo_registry_replication)
-
       log_info('Marking sync as started')
       registry.start_sync!
 

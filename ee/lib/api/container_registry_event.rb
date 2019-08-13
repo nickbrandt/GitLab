@@ -9,8 +9,6 @@ module API
     resource :container_registry_event do
       helpers do
         def authenticate_registry_notification!
-          unauthorized! unless Feature.enabled?(:geo_registry_replication)
-
           endpoint = Gitlab.config.registry.notifications.find { |e| e['name'] == 'geo_event'}
           secret_token = endpoint['headers']['Authorization']
 

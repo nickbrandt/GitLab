@@ -35,18 +35,6 @@ describe API::ContainerRegistryEvent do
       expect(response.status).to eq 401
     end
 
-    it 'returns 401 error status when feature is disabled' do
-      stub_feature_flags(geo_registry_replication: false)
-
-      expect(::ContainerRegistry::EventHandler).not_to receive(:new)
-
-      post api('/container_registry_event/events'),
-           params: { events: events }.to_json,
-           headers: registry_headers.merge('Authorization' => secret_token)
-
-      expect(response.status).to eq 401
-    end
-
     def stub_registry_endpoints_configuration(configuration)
       allow(Gitlab.config.registry).to receive(:notifications) { configuration }
     end

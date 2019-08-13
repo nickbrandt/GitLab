@@ -58,12 +58,11 @@
     = form.number_field :verification_max_capacity, class: 'form-control col-sm-2', min: 0
     .form-text.text-muted= s_('Geo|Control the maximum concurrency of verification operations for this Geo node')
 
-- if Feature.enabled?(:geo_registry_replication)
-  .form-row.form-group
-    .col-sm-8
-      = form.label :container_repositories_max_capacity, s_('Geo|Container repositories sync capacity'), class: 'font-weight-bold'
-      = form.number_field :container_repositories_max_capacity, class: 'form-control col-sm-2', min: 0
-      .form-text.text-muted= s_('Geo|Control the maximum concurrency of container repository operations for this Geo node')
+.form-row.form-group
+  .col-sm-8
+    = form.label :container_repositories_max_capacity, s_('Geo|Container repositories sync capacity'), class: 'font-weight-bold'
+    = form.number_field :container_repositories_max_capacity, class: 'form-control col-sm-2', min: 0
+    .form-text.text-muted= s_('Geo|Control the maximum concurrency of container repository operations for this Geo node')
 
 .form-row.form-group.js-hide-if-geo-secondary{ class: ('hidden' unless geo_node.primary?) }
   .col-sm-8

@@ -8,8 +8,6 @@ module Gitlab
           include BaseEvent
 
           def process
-            return unless Feature.enabled?(:geo_registry_replication)
-
             registry.repository_updated!
 
             job_id = ::Geo::ContainerRepositorySyncWorker.perform_async(event.container_repository_id)
