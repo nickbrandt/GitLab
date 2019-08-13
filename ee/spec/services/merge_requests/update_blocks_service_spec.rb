@@ -84,6 +84,16 @@ describe MergeRequests::UpdateBlocksService do
             expect(merge_request.blocking_merge_requests)
               .to contain_exactly(mr_to_add, mr_to_keep, hidden_mr)
           end
+
+          context 'with a self-referential block' do
+            let(:mr_to_add) { merge_request }
+
+            it 'ignores the addition' do
+              service.execute
+
+              expect(merge_request.blocking_merge_requests).not_to include(mr_to_add)
+            end
+          end
         end
 
         context 'with remove_hidden: true' do

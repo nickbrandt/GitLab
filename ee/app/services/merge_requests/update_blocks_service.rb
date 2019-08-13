@@ -38,9 +38,13 @@ module MergeRequests
         .with_blocking_mr_ids(ids_to_del)
         .delete_all
 
-      ::MergeRequestBlock.bulk_insert(
-        ids_to_add.map { |blocking_id| [blocking_id, merge_request.id] }
-      )
+      # If the block is invalid, silently fail to add it
+      ids_to_add.each do |blocking_id|
+        ::MergeRequestBlock.create(
+          blocking_merge_request_id: blocking_id,
+          blocked_merge_request_id: merge_request.id
+        )
+      end
 
       true
     end
