@@ -128,6 +128,82 @@ describe('Security Reports modal', () => {
     });
   });
 
+  describe('related issue read access', () => {
+    describe('with permission to read', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+        };
+
+        propsData.modal.vulnerability.issue_feedback = {
+          issue_url: 'http://issue.url',
+        };
+        wrapper = shallowMount(Component, { propsData });
+      });
+
+      it('displays a link to the issue', () => {
+        const notes = wrapper.find('.notes');
+        expect(notes.exists()).toBe(true);
+      });
+    });
+
+    describe('without permission to read', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+        };
+
+        propsData.modal.vulnerability.issue_feedback = {
+          issue_url: null,
+        };
+        wrapper = shallowMount(Component, { propsData });
+      });
+
+      it('hides the link to the issue', () => {
+        const notes = wrapper.find('.notes');
+        expect(notes.exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('related merge request read access', () => {
+    describe('with permission to read', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+        };
+
+        propsData.modal.vulnerability.merge_request_feedback = {
+          merge_request_path: 'http://mr.url',
+        };
+        wrapper = shallowMount(Component, { propsData });
+      });
+
+      it('displays a link to the merge request', () => {
+        const notes = wrapper.find('.notes');
+        expect(notes.exists()).toBe(true);
+      });
+    });
+
+    describe('without permission to read', () => {
+      beforeEach(() => {
+        const propsData = {
+          modal: createState().modal,
+        };
+
+        propsData.modal.vulnerability.merge_request_feedback = {
+          merge_request_path: null,
+        };
+        wrapper = shallowMount(Component, { propsData });
+      });
+
+      it('hides the link to the merge request', () => {
+        const notes = wrapper.find('.notes');
+        expect(notes.exists()).toBe(false);
+      });
+    });
+  });
+
   describe('with a resolved issue', () => {
     beforeEach(() => {
       const propsData = {
