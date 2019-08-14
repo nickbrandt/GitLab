@@ -13,37 +13,39 @@ export const licenseSummaryText = (state, getters) => {
 
   if (getters.isLoading) {
     return sprintf(s__('ciReport|Loading %{reportName} report'), {
-      reportName: s__('license management'),
+      reportName: s__('License Compliance'),
     });
   }
 
   if (state.loadLicenseReportError) {
     return sprintf(s__('ciReport|Failed to load %{reportName} report'), {
-      reportName: s__('license management'),
+      reportName: s__('License Compliance'),
     });
   }
 
   if (hasReportItems) {
     if (!baseReportHasLicenses) {
       return n__(
-        'ciReport|License management detected %d license for the source branch only',
-        'ciReport|License management detected %d licenses for the source branch only',
+        'LicenseCompliance|License Compliance detected %d license for the source branch only',
+        'LicenseCompliance|License Compliance detected %d licenses for the source branch only',
         getters.licenseReport.length,
       );
     }
 
     return n__(
-      'ciReport|License management detected %d new license',
-      'ciReport|License management detected %d new licenses',
+      'LicenseCompliance|License Compliance detected %d new license',
+      'LicenseCompliance|License Compliance detected %d new licenses',
       getters.licenseReport.length,
     );
   }
 
   if (!baseReportHasLicenses) {
-    return s__('ciReport|License management detected no licenses for the source branch only');
+    return s__(
+      'LicenseCompliance|License Compliance detected no licenses for the source branch only',
+    );
   }
 
-  return s__('ciReport|License management detected no new licenses');
+  return s__('LicenseCompliance|License Compliance detected no new licenses');
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

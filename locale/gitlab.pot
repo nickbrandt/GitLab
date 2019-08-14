@@ -1945,7 +1945,7 @@ msgstr ""
 msgid "Auto DevOps, runners and job artifacts"
 msgstr ""
 
-msgid "Auto License Complience"
+msgid "Auto License Compliance"
 msgstr ""
 
 msgid "Auto-cancel redundant, pending pipelines"
@@ -8689,79 +8689,98 @@ msgstr ""
 msgid "License"
 msgstr ""
 
-msgid "License Compliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
+msgid "License Compliance"
 msgstr ""
 
-msgid "LicenseManagement|Add a license"
+msgid "LicenseCompliance|Add a license"
 msgstr ""
 
-msgid "LicenseManagement|Add licenses manually to approve or blacklist"
+msgid "LicenseCompliance|Add licenses manually to approve or blacklist"
 msgstr ""
 
-msgid "LicenseManagement|Approve"
+msgid "LicenseCompliance|Approve"
 msgstr ""
 
-msgid "LicenseManagement|Approve license"
+msgid "LicenseCompliance|Approve license"
 msgstr ""
 
-msgid "LicenseManagement|Approve license?"
+msgid "LicenseCompliance|Approve license?"
 msgstr ""
 
-msgid "LicenseManagement|Approved"
+msgid "LicenseCompliance|Approved"
 msgstr ""
 
-msgid "LicenseManagement|Blacklist"
+msgid "LicenseCompliance|Blacklist"
 msgstr ""
 
-msgid "LicenseManagement|Blacklist license"
+msgid "LicenseCompliance|Blacklist license"
 msgstr ""
 
-msgid "LicenseManagement|Blacklist license?"
+msgid "LicenseCompliance|Blacklist license?"
 msgstr ""
 
-msgid "LicenseManagement|Blacklisted"
+msgid "LicenseCompliance|Blacklisted"
 msgstr ""
 
-msgid "LicenseManagement|Cancel"
+msgid "LicenseCompliance|Cancel"
 msgstr ""
 
-msgid "LicenseManagement|License"
+msgid "LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request."
 msgstr ""
 
-msgid "LicenseManagement|License Management"
+msgid "LicenseCompliance|License"
 msgstr ""
 
-msgid "LicenseManagement|License details"
+msgid "LicenseCompliance|License Compliance"
 msgstr ""
 
-msgid "LicenseManagement|License name"
+msgid "LicenseCompliance|License Compliance detected %d license for the source branch only"
+msgid_plural "LicenseCompliance|License Compliance detected %d licenses for the source branch only"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "LicenseCompliance|License Compliance detected %d new license"
+msgid_plural "LicenseCompliance|License Compliance detected %d new licenses"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "LicenseCompliance|License Compliance detected no licenses for the source branch only"
 msgstr ""
 
-msgid "LicenseManagement|Packages"
+msgid "LicenseCompliance|License Compliance detected no new licenses"
 msgstr ""
 
-msgid "LicenseManagement|Remove license"
+msgid "LicenseCompliance|License details"
 msgstr ""
 
-msgid "LicenseManagement|Remove license?"
+msgid "LicenseCompliance|License name"
 msgstr ""
 
-msgid "LicenseManagement|Submit"
+msgid "LicenseCompliance|Packages"
 msgstr ""
 
-msgid "LicenseManagement|There are currently no approved or blacklisted licenses in this project."
+msgid "LicenseCompliance|Remove license"
 msgstr ""
 
-msgid "LicenseManagement|There are currently no approved or blacklisted licenses that match in this project."
+msgid "LicenseCompliance|Remove license?"
 msgstr ""
 
-msgid "LicenseManagement|This license already exists in this project."
+msgid "LicenseCompliance|Submit"
 msgstr ""
 
-msgid "LicenseManagement|URL"
+msgid "LicenseCompliance|There are currently no approved or blacklisted licenses in this project."
 msgstr ""
 
-msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
+msgid "LicenseCompliance|There are currently no approved or blacklisted licenses that match in this project."
+msgstr ""
+
+msgid "LicenseCompliance|This license already exists in this project."
+msgstr ""
+
+msgid "LicenseCompliance|URL"
+msgstr ""
+
+msgid "LicenseCompliance|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
 msgid "Licensed Features"
@@ -17749,22 +17768,6 @@ msgstr ""
 msgid "ciReport|Learn more about interacting with security reports"
 msgstr ""
 
-msgid "ciReport|License management detected %d license for the source branch only"
-msgid_plural "ciReport|License management detected %d licenses for the source branch only"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "ciReport|License management detected %d new license"
-msgid_plural "ciReport|License management detected %d new licenses"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "ciReport|License management detected no licenses for the source branch only"
-msgstr ""
-
-msgid "ciReport|License management detected no new licenses"
-msgstr ""
-
 msgid "ciReport|Links"
 msgstr ""
 
@@ -18077,9 +18080,6 @@ msgid "latest version"
 msgstr ""
 
 msgid "leave %{group_name}"
-msgstr ""
-
-msgid "license management"
 msgstr ""
 
 msgid "locked by %{path_lock_user_name} %{created_at}"

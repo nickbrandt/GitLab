@@ -4,13 +4,13 @@
 %section.settings.no-animate#js-license-management{ class: ('expanded' if expanded) }
   .settings-header
     %h4
-      = s_('LicenseManagement|License Management')
+      = s_('LicenseCompliance|License Compliance')
       = link_to icon('question-circle'), help_page_path('user/project/merge_requests/license_management'), target: '_blank', rel: 'noopener noreferrer'
     %button.btn.js-settings-toggle{ type: 'button' }
       = expanded ? _('Collapse') : _('Expand')
     %p
       - ci = link_to(s_('Gitlab CI/CD'), 'https://docs.gitlab.com/ee/ci/', target: '_blank', rel: 'noopener noreferrer')
-      - license = link_to(s_('Auto License Complience'), 'https://docs.gitlab.com/ee/topics/autodevops/index.html#auto-license-management-ultimate', target: '_blank', rel: 'noopener noreferrer')
-      = s_('License Compliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request.').html_safe % { ci: ci, license: license }
+      - license = link_to(s_('Auto License Compliance'), 'https://docs.gitlab.com/ee/topics/autodevops/index.html#auto-license-management-ultimate', target: '_blank', rel: 'noopener noreferrer')
+      = s_('LicenseCompliance|Here you can approve or blacklist licenses for this project. Using %{ci} or %{license} will allow you to see if there are any unmanaged licenses and approve or blacklist them in merge request.').html_safe % { ci: ci, license: license }
   .settings-content
     #js-managed-licenses{ data: { api_url: @license_management_url } }

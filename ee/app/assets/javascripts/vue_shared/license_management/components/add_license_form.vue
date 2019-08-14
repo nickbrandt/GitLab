@@ -12,8 +12,8 @@ export default {
   },
   LICENSE_APPROVAL_STATUS,
   approvalStatusOptions: [
-    { value: LICENSE_APPROVAL_STATUS.APPROVED, label: s__('LicenseManagement|Approve') },
-    { value: LICENSE_APPROVAL_STATUS.BLACKLISTED, label: s__('LicenseManagement|Blacklist') },
+    { value: LICENSE_APPROVAL_STATUS.APPROVED, label: s__('LicenseCompliance|Approve') },
+    { value: LICENSE_APPROVAL_STATUS.BLACKLISTED, label: s__('LicenseCompliance|Blacklist') },
   ],
   props: {
     managedLicenses: {
@@ -54,15 +54,15 @@ export default {
   <div class="col-sm-6 js-add-license-form">
     <div class="form-group">
       <label class="label-bold" for="js-license-dropdown">
-        {{ s__('LicenseManagement|Add licenses manually to approve or blacklist') }}
+        {{ s__('LicenseCompliance|Add licenses manually to approve or blacklist') }}
       </label>
       <add-license-form-dropdown
         id="js-license-dropdown"
         v-model="licenseName"
-        :placeholder="s__('LicenseManagement|License name')"
+        :placeholder="s__('LicenseCompliance|License name')"
       />
       <div class="invalid-feedback" :class="{ 'd-block': isInvalidLicense }">
-        {{ s__('LicenseManagement|This license already exists in this project.') }}
+        {{ s__('LicenseCompliance|This license already exists in this project.') }}
       </div>
     </div>
     <div class="form-group">
@@ -80,10 +80,10 @@ export default {
       </div>
     </div>
     <gl-button class="js-submit" variant="default" :disabled="submitDisabled" @click="addLicense">
-      {{ s__('LicenseManagement|Submit') }}
+      {{ s__('LicenseCompliance|Submit') }}
     </gl-button>
     <gl-button class="js-cancel" variant="default" @click="closeForm">
-      {{ s__('LicenseManagement|Cancel') }}
+      {{ s__('LicenseCompliance|Cancel') }}
     </gl-button>
   </div>
 </template>
