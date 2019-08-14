@@ -21,6 +21,11 @@ export default {
       required: false,
       default: s__('CycleAnalytics|group dropdown filter'),
     },
+    queryParams: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -57,7 +62,8 @@ export default {
     },
     fetchData(term, callback) {
       this.loading = true;
-      return Api.groups(term, {}, groups => {
+
+      return Api.groups(term, this.queryParams, groups => {
         this.loading = false;
         callback(groups);
       });
