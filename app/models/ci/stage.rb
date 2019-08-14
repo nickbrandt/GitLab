@@ -78,7 +78,7 @@ module Ci
 
     def update_status
       retry_optimistic_lock(self) do
-        case statuses.latest.status
+        case latest_stage_status
         when 'created' then nil
         when 'preparing' then prepare
         when 'pending' then enqueue
@@ -123,6 +123,12 @@ module Ci
 
     def manual_playable?
       blocked? || skipped?
+    end
+
+    def latest_stage_status
+      Gitlab::Ci::Status::GroupedStatuses
+        .new(statuses.latest)
+        .one[:status] || 'skipped'
     end
   end
 end

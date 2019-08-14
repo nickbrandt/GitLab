@@ -3,12 +3,13 @@
 require 'spec_helper'
 
 describe HasStatus do
-  describe '.status' do
-    subject { CommitStatus.status }
+  describe '.legacy_status' do
+    subject { CommitStatus.legacy_status }
 
     shared_examples 'build status summary' do
       context 'all successful' do
         let!(:statuses) { Array.new(2) { create(type, status: :success) } }
+
         it { is_expected.to eq 'success' }
       end
 
@@ -372,8 +373,8 @@ describe HasStatus do
     end
   end
 
-  describe '.status_sql' do
-    subject { Ci::Build.status_sql }
+  describe '.legacy_status_sql' do
+    subject { Ci::Build.legacy_status_sql }
 
     it 'returns SQL' do
       puts subject

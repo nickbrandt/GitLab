@@ -5,36 +5,39 @@ module Gitlab
     module Status
       class CompositeStatus
         def initialize(all_statuses)
-          @status_set = build_status_set(all_statuses)
+          @warnings = false
+          @status_set = Set.new
+          
+          build_status_set(all_statuses)
         end
 
         def status
           case
-          when only?(:skipped, :warning)
+          when only_of?(:skipped) && warnings?
             :success
-          when only?(:skipped)
+          when only_of?(:skipped)
             :skipped
-          when only?(:success)
-            :skipped
-          when only?(:created)
+          when only_of?(:success)
+            :success
+          when only_of?(:created)
             :created
-          when only?(:preparing)
+          when only_of?(:preparing)
             :preparing
-          when only?(:success, :skipped)
+          when only_of?(:success, :skipped)
             :success
-          when only?(:success, :skipped, :canceled)
+          when only_of?(:success, :skipped, :canceled)
             :canceled
-          when only?(:created, :skipped, :pending)
+          when only_of?(:created, :skipped, :pending)
             :pending
-          when include?(:running, :pending)
+          when any_of?(:running, :pending)
             :running
-          when include?(:manual)
+          when any_of?(:manual)
             :manual
-          when include?(:scheduled)
+          when any_of?(:scheduled)
             :scheduled
-          when include?(:preparing)
+          when any_of?(:preparing)
             :preparing
-          when include?(:created)
+          when any_of?(:created)
             :running
           else
             :failed
@@ -42,31 +45,28 @@ module Gitlab
         end
 
         def warnings?
-          include?(:warning)
+          @warnings
         end
 
         private
 
-        def include?(*names)
+        def any_of?(*names)
           names.any? { |name| @status_set.include?(name) }
         end
 
-        def only?(*names)
-          matching = names.count { |name| @status_set.include?(name) } == @status_set.size
+        def only_of?(*names)
+          matching = names.count { |name| @status_set.include?(name) }
+          matching == @status_set.size
         end
 
         def build_status_set(all_statuses)
-          status_set = Set.new
-
           all_statuses.each do |status|
             if status[:allow_failure] && HasStatus::WARNING_STATUSES.include?(status[:status])
-              status_set.add(:warning)
+              @warnings = true
             else
-              status_set.add(status[:status].to_sym)
+              @status_set.add(status[:status].to_sym)
             end
           end
-
-          status_set
         end
       end
     end

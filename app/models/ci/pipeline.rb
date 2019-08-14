@@ -904,7 +904,9 @@ module Ci
     def latest_builds_status
       return 'failed' unless yaml_errors.blank?
 
-      statuses.latest.status || 'skipped'
+      Gitlab::Ci::Status::GroupedStatuses
+        .new(statuses.latest)
+        .one[:status] || 'skipped'
     end
 
     def keep_around_commits
