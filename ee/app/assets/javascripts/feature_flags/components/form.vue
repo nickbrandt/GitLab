@@ -13,6 +13,7 @@ import {
   INTERNAL_ID_PREFIX,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
+import UserWithId from './strategies/user_with_id.vue';
 
 export default {
   components: {
@@ -22,6 +23,7 @@ export default {
     ToggleButton,
     Icon,
     EnvironmentsDropdown,
+    UserWithId,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -98,6 +100,11 @@ export default {
     permissionsFlag() {
       return gon && gon.features && gon.features.featureFlagPermissions;
     },
+
+    userIds() {
+      const scope = this.formScopes.find(s => Array.isArray(s.rolloutUserIds)) || {};
+      return scope.rolloutUserIds || [];
+    },
   },
   methods: {
     isAllEnvironment(name) {
@@ -144,6 +151,13 @@ export default {
         description: this.formDescription,
         scopes: this.formScopes,
       });
+    },
+
+    updateUserIds(userIds) {
+      this.formScopes = this.formScopes.map(s => ({
+        ...s,
+        rolloutUserIds: userIds,
+      }));
     },
 
     canUpdateScope(scope) {
@@ -397,6 +411,7 @@ export default {
         </div>
       </div>
     </fieldset>
+    <user-with-id :value="userIds" @input="updateUserIds" />
 
     <div class="form-actions">
       <gl-button
@@ -405,14 +420,12 @@ export default {
         variant="success"
         class="js-ff-submit col-xs-12"
         @click="handleSubmit"
-        >{{ submitText }}</gl-button
       >
-      <gl-button
-        :href="cancelPath"
-        variant="secondary"
-        class="js-ff-cancel col-xs-12 float-right"
-        >{{ __('Cancel') }}</gl-button
-      >
+        {{ submitText }}
+      </gl-button>
+      <gl-button :href="cancelPath" variant="secondary" class="js-ff-cancel col-xs-12 float-right">
+        {{ __('Cancel') }}
+      </gl-button>
     </div>
   </form>
 </template>
