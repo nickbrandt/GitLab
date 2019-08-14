@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Gitlab::Elastic::SnippetSearchResults, :elastic do
-  let(:snippet) { create(:snippet, content: 'foo', file_name: 'foo') }
+  let(:snippet) { create(:personal_snippet, content: 'foo', file_name: 'foo') }
   let(:results) { described_class.new(snippet.author, 'foo') }
 
   before do
@@ -43,12 +43,22 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
     end
 
     context 'when snippet is public' do
-      let(:snippet) { create(:snippet, :public, content: 'foo', file_name: 'foo') }
+      let(:snippet) { create(:personal_snippet, :public, content: 'foo', file_name: 'foo') }
 
       it 'returns public snippet' do
         expect(results.snippet_titles_count).to eq(1)
         expect(results.snippet_blobs_count).to eq(1)
       end
+    end
+  end
+
+  context 'when user has full_private_access' do
+    let(:user) { create(:admin) }
+    let(:results) { described_class.new(user, 'foo') }
+
+    it 'returns matched snippets' do
+      expect(results.snippet_titles_count).to eq(1)
+      expect(results.snippet_blobs_count).to eq(1)
     end
   end
 end

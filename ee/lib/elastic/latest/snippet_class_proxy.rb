@@ -17,6 +17,10 @@ module Elastic
         search(query_hash)
       end
 
+      def es_type
+        target.base_class.name.underscore
+      end
+
       private
 
       def filter(query_hash, user)
@@ -31,7 +35,10 @@ module Elastic
                   { terms: { project_id: authorized_project_ids_for_user(user) } },
                   {
                     bool: {
-                      filter: { terms: { visibility_level: [Snippet::PUBLIC, Snippet::INTERNAL] } },
+                      filter: [
+                        { terms: { visibility_level: [Snippet::PUBLIC, Snippet::INTERNAL] } },
+                        { term: { type: self.es_type } }
+                      ],
                       must_not: { exists: { field: 'project_id' } }
                     }
                   }
@@ -41,7 +48,10 @@ module Elastic
           else
             {
               bool: {
-                filter: { term: { visibility_level: Snippet::PUBLIC } },
+                filter: [
+                  { term: { visibility_level: Snippet::PUBLIC } },
+                  { term: { type: self.es_type } }
+                ],
                 must_not: { exists: { field: 'project_id' } }
               }
             }
