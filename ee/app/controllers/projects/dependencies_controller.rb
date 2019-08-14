@@ -5,7 +5,7 @@ module Projects
     before_action :check_feature_enabled!
 
     before_action do
-      push_frontend_feature_flag(:dependency_list_vulnerabilities)
+      push_frontend_feature_flag(:dependency_list_vulnerabilities, default_enabled: true)
     end
 
     def check_feature_enabled!
