@@ -115,7 +115,7 @@ export default {
     <template v-if="dependencyListVulnerabilities">
       <h3 class="h5">{{ __('Dependencies') }}</h3>
 
-      <gl-tabs v-model="currentListIndex">
+      <gl-tabs v-model="currentListIndex" content-class="pt-0">
         <gl-tab
           v-for="listType in listTypes"
           :key="listType.namespace"
