@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe Ci::CompareDependencyScanningReportsService do
+  let(:service) { described_class.new(project) }
+  let(:project) { create(:project, :repository) }
+
+  before do
+    stub_licensed_features(dependency_scanning: true)
+  end
+
+  describe '#execute' do
+    subject { service.execute(base_pipeline, head_pipeline) }
+
+    context 'when head pipeline has dependency scanning reports' do
+      let!(:base_pipeline) { create(:ee_ci_pipeline) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
+
+      it 'reports new vulnerabilities' do
+        expect(subject[:status]).to eq(:parsed)
+        expect(subject[:data]['added'].count).to eq(4)
+        expect(subject[:data]['existing'].count).to eq(0)
+        expect(subject[:data]['fixed'].count).to eq(0)
+      end
+    end
+
+    context 'when base and head pipelines have dependency scanning reports' do
+      let!(:base_pipeline) { create(:ee_ci_pipeline, :with_dependency_scanning_report, project: project) }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_dependency_scanning_feature_branch, project: project) }
+
+      it 'reports status as parsed' do
+        expect(subject[:status]).to eq(:parsed)
+      end
+
+      it 'reports fixed vulnerability' do
+        expect(subject[:data]['added'].count).to eq(1)
+        expect(subject[:data]['added']).to include(a_hash_including('compare_key' => 'Gemfile.lock:rubyzip:cve:CVE-2017-5946'))
+      end
+
+      it 'reports existing dependency vulenerabilities' do
+        expect(subject[:data]['existing'].count).to eq(3)
+      end
+
+      it 'reports fixed dependency scanning vulnerabilities' do
+        expect(subject[:data]['fixed'].count).to eq(1)
+        compare_keys = subject[:data]['fixed'].map { |t| t['compare_key'] }
+        expected_keys = %w(rails/Gemfile.lock:nokogiri@1.8.0:USN-3424-1)
+        expect(compare_keys - expected_keys).to eq([])
+      end
+    end
+
+    context 'when head pipeline has corrupted dependency scanning vulnerability reports' do
+      let!(:base_pipeline) { nil }
+      let!(:head_pipeline) { create(:ee_ci_pipeline, :with_corrupted_dependency_scanning_report, project: project) }
+
+      it 'returns status and error message' do
+        expect(subject[:status]).to eq(:error)
+        expect(subject[:status_reason]).to include('JSON parsing failed')
+      end
+    end
+  end
+end

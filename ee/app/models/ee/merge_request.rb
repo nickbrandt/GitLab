@@ -112,6 +112,18 @@ module EE
       end
     end
 
+    def has_dependency_scanning_reports?
+      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports)
+    end
+
+    def compare_dependency_scanning_reports
+      unless has_dependency_scanning_reports?
+        return { status: :error, status_reason: 'This merge request does not have dependency scanning reports' }
+      end
+
+      compare_reports(::Ci::CompareDependencyScanningReportsService)
+    end
+
     def has_license_management_reports?
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.license_management_reports)
     end

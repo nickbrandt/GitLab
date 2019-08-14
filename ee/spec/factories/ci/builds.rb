@@ -60,6 +60,24 @@ FactoryBot.define do
       end
     end
 
+    trait :dependency_scanning_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :dependency_scanning_feature_branch, job: build)
+      end
+    end
+
+    trait :dependency_scanning_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :dependency_scanning_report, job: build)
+      end
+    end
+
+    trait :corrupted_dependency_scanning_report do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :corrupted_dependency_scanning_report, job: build)
+      end
+    end
+
     trait :license_management_feature_branch do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :license_management_feature_branch, job: build)
