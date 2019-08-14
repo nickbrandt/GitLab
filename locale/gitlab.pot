@@ -382,9 +382,6 @@ msgstr ""
 msgid "%{verb} %{time_spent_value} spent time."
 msgstr ""
 
-msgid "'%{email}' is not in the right domain"
-msgstr ""
-
 msgid "'%{level}' is not a valid visibility level"
 msgstr ""
 
@@ -1243,7 +1240,7 @@ msgstr ""
 msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
-msgid "Allowed email domain restriction only allowed for top-level groups"
+msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
 msgid "Allowed to fail"
@@ -10273,7 +10270,7 @@ msgstr ""
 msgid "Only these extensions are supported: %{extension_list}"
 msgstr ""
 
-msgid "Only users with an email address in this domain can be added to the group.<br>Example: <code>*@gitlab.com</code>. Some common domains are not allowed. %{read_more_link}."
+msgid "Only users with an email address in this domain can be added to the group.<br>Example: <code>gitlab.com</code>. Some common domains are not allowed. %{read_more_link}."
 msgstr ""
 
 msgid "Oops, are you sure?"
@@ -18004,7 +18001,7 @@ msgstr[1] ""
 msgid "element is not a hierarchy"
 msgstr ""
 
-msgid "email is not in the right domain"
+msgid "email '%{email}' does not match the allowed domain of '%{email_domain}'"
 msgstr ""
 
 msgid "enabled"
