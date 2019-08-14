@@ -12,7 +12,8 @@ export default {
   props: {
     jobPath: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
   },
   data() {
@@ -36,7 +37,7 @@ export default {
     v-on="$listeners"
   >
     <p v-html="message"></p>
-    <gl-button :href="jobPath" class="btn-inverted btn-danger mb-2">
+    <gl-button v-if="jobPath" :href="jobPath" class="btn-inverted btn-danger mb-2">
       {{ __('View job') }}
     </gl-button>
   </dependency-list-alert>
