@@ -9,6 +9,7 @@ module Ci
   #
   class Group
     include StaticModel
+    include Gitlab::Utils::StrongMemoize
 
     attr_reader :stage, :name, :jobs
 
@@ -21,7 +22,11 @@ module Ci
     end
 
     def status
-      @status ||= commit_statuses.status
+      strong_memoize(:status) do
+        Gitlab::Ci::Status::GroupedStatuses
+          .new(@jobs)
+          .one[:status]
+      end
     end
 
     def detailed_status(current_user)

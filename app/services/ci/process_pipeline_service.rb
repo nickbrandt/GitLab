@@ -2,6 +2,8 @@
 
 module Ci
   class ProcessPipelineService < BaseService
+    include Gitlab::Utils::StrongMemoize
+
     attr_reader :pipeline
 
     def execute(pipeline, trigger_build_ids = nil)

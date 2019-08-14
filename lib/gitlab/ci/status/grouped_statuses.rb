@@ -12,8 +12,11 @@ module Gitlab
         def one(**query)
           validate_keys!(query.keys)
 
-          item_hash = find_one(data_hash, query)
-          status_for_key(query, item_hash) if item_hash
+          if item_hash = find_one(data_hash, query)
+            status_for_key(query, item_hash)
+          else
+            {}
+          end
         end
 
         def group(*keys)
@@ -42,7 +45,7 @@ module Gitlab
           # we request allow_failure when
           # we don't have column_names, or such column does exist
           columns << :allow_failure if !subject.respond_to?(:column_names) || subject.column_names.include?('allow_failure')
-    
+
           subject
             .pluck(*columns)
             .map { |attrs| columns.zip(attrs).to_h }

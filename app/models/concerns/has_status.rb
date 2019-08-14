@@ -21,7 +21,7 @@ module HasStatus
     def status
       Gitlab::Ci::Status::GroupedStatuses
         .new(all)
-        .one&.dig(:status)
+        .one[:status]
     end
 
     def started_at
