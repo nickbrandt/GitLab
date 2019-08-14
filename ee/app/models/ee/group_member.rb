@@ -29,23 +29,29 @@ module EE
     end
 
     def group_domain_limitations
-      if user
-        validate_users_email
-      else
-        validate_invitation_email
-      end
+      user ? validate_users_email : validate_invitation_email
     end
 
     def validate_users_email
-      return if group.root_ancestor_allowed_email_domain.email_matches_domain?(user.email)
+      return if group_allowed_email_domain.email_matches_domain?(user.email)
 
-      errors.add(:user, _("email '%{user_email}' does not match the allowed domain of '%{email_domain}'" % { user_email: user.email, email_domain: group.root_ancestor_allowed_email_domain.domain }))
+      errors.add(:user, email_no_match_email_domain(user.email))
     end
 
     def validate_invitation_email
-      return if group.root_ancestor_allowed_email_domain.email_matches_domain?(invite_email)
+      return if group_allowed_email_domain.email_matches_domain?(invite_email)
 
-      errors.add(:invite_email, _("'%{email}' is not in the right domain") % { email: invite_email })
+      errors.add(:invite_email, email_no_match_email_domain(invite_email))
+    end
+
+    private
+
+    def email_no_match_email_domain(email)
+      _("email '%{email}' does not match the allowed domain of '%{email_domain}'" % { email: email, email_domain: group_allowed_email_domain.domain })
+    end
+
+    def group_allowed_email_domain
+      group.root_ancestor_allowed_email_domain
     end
   end
 end

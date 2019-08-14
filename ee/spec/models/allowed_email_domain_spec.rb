@@ -62,4 +62,28 @@ describe AllowedEmailDomain do
       end
     end
   end
+
+  describe '#email_matches_domain?' do
+    subject { described_class.new(group: create(:group), domain: 'gitlab.com') }
+
+    context 'with matching domain' do
+      it 'returns true' do
+        expect(subject.email_matches_domain?('test@gitlab.com')).to eq(true)
+      end
+    end
+
+    context 'with not matching domain' do
+      it 'returns false' do
+        expect(subject.email_matches_domain?('test@gitlab.com.uk')).to eq(false)
+      end
+    end
+  end
+
+  describe '#email_domain' do
+    subject { described_class.new(group: create(:group), domain: 'gitlab.com') }
+
+    it 'returns formatted domain' do
+      expect(subject.email_domain).to eq('@gitlab.com')
+    end
+  end
 end
