@@ -3,7 +3,6 @@
 module API
   class Todos < Grape::API
     include PaginationParams
-    prepend EE::API::Todos # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     before { authenticate! }
 
@@ -13,6 +12,13 @@ module API
       'merge_requests' => ->(iid) { find_merge_request_with_access(iid) },
       'issues' => ->(iid) { find_project_issue(iid) }
     }.freeze
+
+    helpers do
+      # EE::API::Todos would override this method
+      def find_todos
+        TodosFinder.new(current_user, params).execute
+      end
+    end
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
@@ -42,10 +48,6 @@ module API
 
     resource :todos do
       helpers do
-        def find_todos
-          TodosFinder.new(current_user, params).execute
-        end
-
         def issuable_and_awardable?(type)
           obj_type = Object.const_get(type)
 
@@ -108,3 +110,5 @@ module API
     end
   end
 end
+
+API::Todos.prepend_if_ee('EE::API::Todos')
