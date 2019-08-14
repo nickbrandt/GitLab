@@ -6526,6 +6526,9 @@ msgstr ""
 msgid "For public projects, anyone can view pipelines and access job details (output logs and artifacts)"
 msgstr ""
 
+msgid "Forgot your password?"
+msgstr ""
+
 msgid "Fork"
 msgstr ""
 
@@ -16524,6 +16527,9 @@ msgid "Username is already taken."
 msgstr ""
 
 msgid "Username is available."
+msgstr ""
+
+msgid "Username or email"
 msgstr ""
 
 msgid "Users"
