@@ -8,11 +8,7 @@ module EE
 
       prepended do
         before_action only: [:show, :builds, :failures, :security, :licenses] do
-          push_frontend_feature_flag(:sast_pipeline_report_api)
-          push_frontend_feature_flag(:dast_pipeline_report_api)
-          push_frontend_feature_flag(:container_scanning_pipeline_report_api)
-          push_frontend_feature_flag(:dependency_scanning_pipeline_report_api)
-          push_frontend_feature_flag(:license_management_pipeline_report_api)
+          push_frontend_feature_flag(:pipeline_report_api)
         end
       end
 
