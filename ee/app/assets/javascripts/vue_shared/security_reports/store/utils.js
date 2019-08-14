@@ -198,61 +198,67 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
 };
 
 /**
- * Extracts the site property out of a DAST report
- * This should be dropped once we support multi-sites reports
+ * Forces the site property to be an Array in DAST reports.
+ * We do this to also support single-site legacy DAST reports.
  *
- * @param {Object|Array} site
+ * @param {Object|Array} sites
  */
-export const getDastSite = site => (Array.isArray(site) && site.length ? site[0] : site);
+export const getDastSites = sites => (Array.isArray(sites) ? sites : [sites]);
 
 /**
  * Parses DAST into a common format to allow to use the same Vue component.
  * DAST report is currently the straigh output from the underlying tool (ZAProxy)
  * hence the formatting happenning here.
  *
- * @param {Array} issues
+ * @param {Array} sites
  * @param {Array} feedback
  * @returns {Array}
  */
-export const parseDastIssues = (issues = [], feedback = []) =>
-  issues.map(issue => {
-    const parsed = {
-      ...issue,
-      category: 'dast',
-      project_fingerprint: sha1(issue.pluginid),
-      title: issue.name,
-      description: stripHtml(issue.desc, ' '),
-      solution: stripHtml(issue.solution, ' '),
-    };
+export const parseDastIssues = (sites = [], feedback = []) =>
+  getDastSites(sites).reduce(
+    (acc, site) => [
+      ...acc,
+      ...(site.alerts || []).map(issue => {
+        const parsed = {
+          ...issue,
+          category: 'dast',
+          project_fingerprint: sha1(issue.pluginid),
+          title: issue.name,
+          description: stripHtml(issue.desc, ' '),
+          solution: stripHtml(issue.solution, ' '),
+        };
 
-    if (!_.isEmpty(issue.cweid)) {
-      Object.assign(parsed, {
-        identifiers: [
-          {
-            type: 'CWE',
-            name: `CWE-${issue.cweid}`,
-            value: issue.cweid,
-            url: `https://cwe.mitre.org/data/definitions/${issue.cweid}.html`,
-          },
-        ],
-      });
-    }
+        if (!_.isEmpty(issue.cweid)) {
+          Object.assign(parsed, {
+            identifiers: [
+              {
+                type: 'CWE',
+                name: `CWE-${issue.cweid}`,
+                value: issue.cweid,
+                url: `https://cwe.mitre.org/data/definitions/${issue.cweid}.html`,
+              },
+            ],
+          });
+        }
 
-    if (issue.riskdesc && issue.riskdesc !== '') {
-      // Split riskdesc into severity and confidence.
-      // Riskdesc format is: "severity (confidence)"
-      const [, severity, confidence] = issue.riskdesc.match(/(.*) \((.*)\)/);
-      Object.assign(parsed, {
-        severity,
-        confidence,
-      });
-    }
+        if (issue.riskdesc && issue.riskdesc !== '') {
+          // Split riskdesc into severity and confidence.
+          // Riskdesc format is: "severity (confidence)"
+          const [, severity, confidence] = issue.riskdesc.match(/(.*) \((.*)\)/);
+          Object.assign(parsed, {
+            severity,
+            confidence,
+          });
+        }
 
-    return {
-      ...parsed,
-      ...enrichVulnerabilityWithfeedback(parsed, feedback),
-    };
-  });
+        return {
+          ...parsed,
+          ...enrichVulnerabilityWithfeedback(parsed, feedback),
+        };
+      }),
+    ],
+    [],
+  );
 
 export const getUnapprovedVulnerabilities = (issues = [], unapproved = []) =>
   issues.filter(item => unapproved.find(el => el === item.vulnerability));
