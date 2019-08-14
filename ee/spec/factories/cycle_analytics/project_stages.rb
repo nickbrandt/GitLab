@@ -11,5 +11,10 @@ FactoryBot.define do
       start_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueCreated.identifier }
       end_event_identifier { Gitlab::CycleAnalytics::StageEvents::IssueClosed.identifier }
     end
+
+    trait :between_merge_request_created_and_merge_request_merged do
+      start_event_identifier { Gitlab::CycleAnalytics::StageEvents::MergeRequestCreated.identifier }
+      end_event_identifier { Gitlab::CycleAnalytics::StageEvents::MergeRequestMerged.identifier }
+    end
   end
 end

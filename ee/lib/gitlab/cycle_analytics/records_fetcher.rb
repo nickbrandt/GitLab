@@ -17,6 +17,19 @@ module Gitlab
         MergeRequest => AnalyticsMergeRequestSerializer
       }.freeze
 
+      SORTING_RULES = {
+        Issue => {
+          duration: -> { duration },
+          created_at: -> { issue_table[:created_at] },
+          closed_at: -> {issue_table[:closed_at] }
+        },
+        MergeRequest => {
+          duration: -> { duration },
+          created_at: -> { mr_table[:created_at] },
+          merged_at: -> { mr_table[:merged_at] }
+        }
+      }.freeze
+
       delegate :subject_model, to: :stage
 
       def initialize(stage:, query:, params: {})
@@ -32,7 +45,7 @@ module Gitlab
         else
           q = query
             .join(finder_arel_query).on(finder_arel_query[:id].eq(subject_model.arel_table[:id]))
-            .order(stage.end_event.timestamp_projection.asc)
+            .order(order_expression)
             .take(MAX_RECORDS)
           q = q.project(*projection_mapping[subject_model], round_duration_to_seconds.as('total_time'))
           execute_query(q).to_a.map do |item|
@@ -55,6 +68,19 @@ module Gitlab
       private
 
       attr_reader :stage, :query, :params
+
+      def order_expression
+        directions = %w[asc desc]
+        *splitted_field, direction = params[:sort].to_s.split('_')
+        sorting_rules = SORTING_RULES.fetch(subject_model)
+        field = splitted_field.nil? ? sorting_rules.keys.first : splitted_field.join('_').to_sym
+        direction = directions.include?(direction) ? direction : 'desc'
+
+        sorter = sorting_rules[field] || sorting_rules[sorting_rules.keys.first]
+
+        arel_column_expression = instance_exec(&sorter)
+        arel_column_expression.send(direction) # rubocop:disable GitlabSecurity/PublicSend
+      end
 
       def projection_mapping
         {
