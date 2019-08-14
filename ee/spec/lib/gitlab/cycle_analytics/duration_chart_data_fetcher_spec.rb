@@ -36,7 +36,7 @@ describe Gitlab::CycleAnalytics::DurationChartDataFetcher do
         issue1.metrics.update!(first_associated_with_milestone_at: 60.minutes.ago )
         issue2.metrics.update!(first_added_to_board_at: 10.minutes.ago)
 
-        items = stage.data_for_duration_chart
+        items = subject.fetch
         expect(items.size).to eq(2)
 
         durations_in_seconds = items.map(&:last)
@@ -69,7 +69,7 @@ describe Gitlab::CycleAnalytics::DurationChartDataFetcher do
         create(:merge_requests_closing_issues, merge_request: mr1, issue: issue1)
         create(:merge_requests_closing_issues, merge_request: mr2, issue: issue2)
 
-        items = stage.data_for_duration_chart
+        items = subject.fetch
         expect(items.size).to eq(2)
 
         durations_in_seconds = items.map(&:last)
