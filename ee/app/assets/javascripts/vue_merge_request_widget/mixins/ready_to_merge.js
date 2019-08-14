@@ -30,5 +30,12 @@ export default {
       }
       return __('Merge when pipeline succeeds');
     },
+    shouldShowMergeImmediatelyDropdown() {
+      if (this.mr.preferredAutoMergeStrategy === MT_MERGE_STRATEGY) {
+        return true;
+      }
+
+      return this.mr.isPipelineActive && !this.mr.onlyAllowMergeIfPipelineSucceeds;
+    },
   },
 };

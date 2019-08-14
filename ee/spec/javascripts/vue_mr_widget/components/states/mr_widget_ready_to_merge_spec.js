@@ -141,4 +141,43 @@ describe('ReadyToMerge', () => {
       });
     });
   });
+
+  describe('shouldShowMergeImmediatelyDropdown', () => {
+    it('should return false if no pipeline is active', () => {
+      factory({
+        isPipelineActive: false,
+        onlyAllowMergeIfPipelineSucceeds: false,
+      });
+
+      expect(vm.shouldShowMergeImmediatelyDropdown).toBe(false);
+    });
+
+    it('should return false if "Pipelines must succeed" is enabled for the current project', () => {
+      factory({
+        isPipelineActive: true,
+        onlyAllowMergeIfPipelineSucceeds: true,
+      });
+
+      expect(vm.shouldShowMergeImmediatelyDropdown).toBe(false);
+    });
+
+    it('should return true if the MR\'s pipeline is active and "Pipelines must succeed" is not enabled for the current project', () => {
+      factory({
+        isPipelineActive: true,
+        onlyAllowMergeIfPipelineSucceeds: false,
+      });
+
+      expect(vm.shouldShowMergeImmediatelyDropdown).toBe(true);
+    });
+
+    it('should return true when the merge train auto merge stategy is available ', () => {
+      factory({
+        preferredAutoMergeStrategy: MT_MERGE_STRATEGY,
+        isPipelineActive: false,
+        onlyAllowMergeIfPipelineSucceeds: true,
+      });
+
+      expect(vm.shouldShowMergeImmediatelyDropdown).toBe(true);
+    });
+  });
 });
