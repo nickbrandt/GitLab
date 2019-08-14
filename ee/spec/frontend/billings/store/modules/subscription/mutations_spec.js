@@ -75,6 +75,10 @@ describe('EE billings subscription module mutations', () => {
         expect(getStateTableValues(tableKey)).toMatchSnapshot();
       });
     });
+
+    it('sets table values', () => {
+      expect(getStateTableValues('free')).toMatchSnapshot();
+    });
   });
 
   describe(types.RECEIVE_SUBSCRIPTION_ERROR, () => {
