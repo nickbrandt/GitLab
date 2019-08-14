@@ -5,7 +5,6 @@ module QA
     module Project
       module Issue
         class Show < Page::Base
-          prepend QA::EE::Page::Project::Issue::Show
           include Page::Component::Issuable::Common
           include Page::Component::Note
 
@@ -27,15 +26,15 @@ module QA
             element :dropdown_input_field
           end
 
-          view 'app/views/shared/issuable/_sidebar.html.haml' do
-            element :dropdown_menu_labels
-            element :edit_link_labels
-            element :labels_block
-          end
-
           view 'app/views/shared/notes/_form.html.haml' do
             element :new_note_form, 'new-note' # rubocop:disable QA/ElementWithPattern
             element :new_note_form, 'attr: :note' # rubocop:disable QA/ElementWithPattern
+          end
+
+          view 'app/views/shared/issuable/_sidebar.html.haml' do
+            element :labels_block
+            element :edit_link_labels
+            element :dropdown_menu_labels
           end
 
           # Adds a comment to an issue
@@ -109,3 +108,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project::Issue::Show.prepend(QA::EE::Page::Project::Issue::Show)

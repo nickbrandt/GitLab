@@ -137,6 +137,10 @@ module QA
           autoload :GroupSAML, 'qa/ee/scenario/test/integration/group_saml'
           autoload :Elasticsearch, 'qa/ee/scenario/test/integration/elasticsearch'
         end
+
+        module Sanity
+          autoload :Selectors, 'qa/ee/scenario/test/sanity/selectors'
+        end
       end
     end
   end
