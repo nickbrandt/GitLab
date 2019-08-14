@@ -19,8 +19,8 @@ module Gitlab
           ProjectWiki,
           Repository
         ].each do |klass|
-          settings.deep_merge!(klass.settings.to_hash)
-          mappings.deep_merge!(klass.mappings.to_hash)
+          settings.deep_merge!(klass.__elasticsearch__.settings.to_hash)
+          mappings.deep_merge!(klass.__elasticsearch__.mappings.to_hash)
         end
 
         client = Project.__elasticsearch__.client

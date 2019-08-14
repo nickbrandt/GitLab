@@ -1,124 +1,9 @@
 # frozen_string_literal: true
+
 module Elastic
-  module ApplicationSearch
-    extend ActiveSupport::Concern
-
-    # Defer evaluation from class-definition time to index-creation time
-    class AsJSON
-      def initialize(&blk)
-        @blk = blk
-      end
-
-      def call
-        @blk.call
-      end
-
-      def as_json(*args, &blk)
-        call
-      end
-    end
-
-    included do
-      include Elasticsearch::Model
-
-      index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
-
-      # ES6 requires a single type per index
-      document_type 'doc'
-
-      # A temp solution to keep only one copy of setting,
-      # will be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/12548
-      __elasticsearch__.instance_variable_set(:@settings, Elastic::Latest::Config.settings)
-      __elasticsearch__.instance_variable_set(:@mapping, Elastic::Latest::Config.mappings)
-
-      after_commit on: :create do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
-        end
-      end
-
-      after_commit on: :update do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(
-            :update,
-            self.class.to_s,
-            self.id,
-            self.es_id,
-            changed_fields: self.previous_changes.keys
-          )
-        end
-      end
-
-      after_commit on: :destroy do
-        if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(
-            :delete,
-            self.class.to_s,
-            self.id,
-            self.es_id,
-            es_parent: self.es_parent
-          )
-        end
-      end
-
-      # Should be overridden in the models where some records should be skipped
-      def searchable?
-        self.use_elasticsearch?
-      end
-
-      def use_elasticsearch?
-        self.project&.use_elasticsearch?
-      end
-
-      def generic_attributes
-        {
-          'join_field' => {
-            'name' => es_type,
-            'parent' => es_parent
-          },
-          'type' => es_type
-        }
-      end
-
-      def es_parent
-        "project_#{project_id}" unless is_a?(Project) || self&.project_id.nil?
-      end
-
-      def es_type
-        self.class.es_type
-      end
-
-      def es_id
-        "#{es_type}_#{id}"
-      end
-
-      # Some attributes are actually complicated methods. Bad data can cause
-      # them to raise exceptions. When this happens, we still want the remainder
-      # of the object to be saved, so silently swallow the errors
-      def safely_read_attribute_for_elasticsearch(attr_name)
-        send(attr_name) # rubocop:disable GitlabSecurity/PublicSend
-      rescue => err
-        logger.warn("Elasticsearch failed to read #{attr_name} for #{self.class} #{self.id}: #{err}")
-        nil
-      end
-    end
-
-    class_methods do
-      # Support STI models
-      def inherited(subclass)
-        super
-
-        # Avoid SystemStackError in Model.import
-        # See https://github.com/elastic/elasticsearch-rails/issues/144
-        subclass.include Elasticsearch::Model
-
-        # Use ES configuration from parent model
-        # TODO: Revisit after upgrading to elasticsearch-model 7.0.0
-        # See https://github.com/elastic/elasticsearch-rails/commit/b8455db186664e21927bfb271bab6390853e7ff3
-        subclass.__elasticsearch__.index_name = self.index_name
-        subclass.__elasticsearch__.document_type = self.document_type
-        subclass.__elasticsearch__.instance_variable_set(:@mapping, self.mapping.dup)
-      end
+  module Latest
+    class ApplicationClassProxy < Elasticsearch::Model::Proxy::ClassMethodsProxy
+      include ClassProxyUtil
 
       # Should be overridden for all nested models
       def nested?
@@ -126,8 +11,24 @@ module Elastic
       end
 
       def es_type
-        name.underscore
+        target.name.underscore
       end
+
+      def es_import(**options)
+        transform = lambda do |r|
+          proxy = r.__elasticsearch__.version(version_namespace)
+
+          { index: { _id: proxy.es_id, data: proxy.as_indexed_json } }.tap do |data|
+            data[:index][:routing] = proxy.es_parent if proxy.es_parent
+          end
+        end
+
+        options[:transform] = transform
+
+        self.import(options)
+      end
+
+      private
 
       def highlight_options(fields)
         es_fields = fields.map { |field| field.split('^').first }.each_with_object({}) do |field, memo|
@@ -137,46 +38,35 @@ module Elastic
         { fields: es_fields }
       end
 
-      def es_import(**options)
-        transform = lambda do |r|
-          { index: { _id: r.es_id, data: r.__elasticsearch__.as_indexed_json } }.tap do |data|
-            data[:index][:routing] = r.es_parent if r.es_parent
-          end
-        end
-
-        options[:transform] = transform
-
-        self.import(options)
-      end
-
       def basic_query_hash(fields, query)
-        query_hash = if query.present?
-                       {
-                         query: {
-                           bool: {
-                             must: [{
-                               simple_query_string: {
-                                 fields: fields,
-                                 query: query,
-                                 default_operator: :and
-                               }
-                             }],
-                             filter: [{
-                               term: { type: self.es_type }
-                             }]
-                           }
-                         }
-                       }
-                     else
-                       {
-                         query: {
-                           bool: {
-                             must: { match_all: {} }
-                           }
-                         },
-                         track_scores: true
-                       }
-                     end
+        query_hash =
+          if query.present?
+            {
+              query: {
+                bool: {
+                  must: [{
+                    simple_query_string: {
+                      fields: fields,
+                      query: query,
+                      default_operator: :and
+                    }
+                  }],
+                  filter: [{
+                    term: { type: self.es_type }
+                  }]
+                }
+              }
+            }
+          else
+            {
+              query: {
+                bool: {
+                  must: { match_all: {} }
+                }
+              },
+              track_scores: true
+            }
+          end
 
         query_hash[:sort] = [
           { updated_at: { order: :desc } },
@@ -192,7 +82,7 @@ module Elastic
         {
           query: {
             bool: {
-               filter: [{ term: { iid: iid } }]
+              filter: [{ term: { iid: iid } }]
             }
           }
         }
@@ -254,8 +144,6 @@ module Elastic
 
         { should: conditions }
       end
-
-      private
 
       # Most users come with a list of projects they are members of, which may
       # be a mix of public, internal or private. Grant access to them all, as
