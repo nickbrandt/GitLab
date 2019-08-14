@@ -930,6 +930,84 @@ export const dockerReportParsed = {
   ],
 };
 
+export const multiSitesDast = {
+  site: [
+    {
+      '@port': '8080',
+      '@host': 'goat',
+      '@name': 'http://goat:8080',
+      alerts: [
+        {
+          name: 'Absence of Anti-CSRF Tokens',
+          riskcode: '1',
+          riskdesc: 'Low (Medium)',
+          cweid: '3',
+          desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
+          pluginid: '123',
+          solution: '<p>Update to latest</p>',
+          instances: [
+            {
+              uri: 'http://192.168.32.236:3001/explore?sort=latest_activity_desc',
+              method: 'GET',
+              evidence:
+                "<form class='form-inline' action='/search' accept-charset='UTF-8' method='get'>",
+            },
+            {
+              uri: 'http://192.168.32.236:3001/help/user/group/subgroups/index.md',
+              method: 'GET',
+              evidence:
+                "<form class='form-inline' action='/search' accept-charset='UTF-8' method='get'>",
+            },
+          ],
+        },
+        {
+          alert: 'X-Content-Type-Options Header Missing',
+          name: 'X-Content-Type-Options Header Missing',
+          riskdesc: 'Low (Medium)',
+          cweid: '4',
+          desc:
+            '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
+          pluginid: '3456',
+          solution: '<p>Update to latest</p>',
+          instances: [
+            {
+              uri: 'http://192.168.32.236:3001/assets/webpack/main.bundle.js',
+              method: 'GET',
+              param: 'X-Content-Type-Options',
+            },
+          ],
+        },
+      ],
+      '@ssl': 'false',
+    },
+    {
+      '@port': '8081',
+      '@host': 'nginx',
+      '@name': 'http://nginx:8081',
+      alerts: [
+        {
+          alert: 'X-Content-Type-Options Header Missing',
+          name: 'X-Content-Type-Options Header Missing',
+          riskdesc: 'Low (Medium)',
+          cweid: '4',
+          desc:
+            '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
+          pluginid: '3456',
+          solution: '<p>Update to latest</p>',
+          instances: [
+            {
+              uri: 'http://192.168.32.236:3001/assets/webpack/main.bundle.js',
+              method: 'GET',
+              param: 'X-Content-Type-Options',
+            },
+          ],
+        },
+      ],
+      '@ssl': 'false',
+    },
+  ],
+};
+
 export const dast = {
   site: {
     alerts: [
@@ -1006,6 +1084,104 @@ export const dastBase = {
     ],
   },
 };
+
+export const parsedMultiSitesDast = [
+  {
+    category: 'dast',
+    project_fingerprint: '40bd001563085fc35165329ea1ff5c5ecbdbbeef',
+    name: 'Absence of Anti-CSRF Tokens',
+    title: 'Absence of Anti-CSRF Tokens',
+    riskcode: '1',
+    riskdesc: 'Low (Medium)',
+    severity: 'Low',
+    confidence: 'Medium',
+    cweid: '3',
+    desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
+    pluginid: '123',
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-3',
+        value: '3',
+        url: 'https://cwe.mitre.org/data/definitions/3.html',
+      },
+    ],
+    instances: [
+      {
+        uri: 'http://192.168.32.236:3001/explore?sort=latest_activity_desc',
+        method: 'GET',
+        evidence: "<form class='form-inline' action='/search' accept-charset='UTF-8' method='get'>",
+      },
+      {
+        uri: 'http://192.168.32.236:3001/help/user/group/subgroups/index.md',
+        method: 'GET',
+        evidence: "<form class='form-inline' action='/search' accept-charset='UTF-8' method='get'>",
+      },
+    ],
+    solution: ' Update to latest ',
+    description: ' No Anti-CSRF tokens were found in a HTML submission form. ',
+  },
+  {
+    category: 'dast',
+    project_fingerprint: 'ae8fe380dd9aa5a7a956d9085fe7cf6b87d0d028',
+    alert: 'X-Content-Type-Options Header Missing',
+    name: 'X-Content-Type-Options Header Missing',
+    title: 'X-Content-Type-Options Header Missing',
+    riskdesc: 'Low (Medium)',
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-4',
+        value: '4',
+        url: 'https://cwe.mitre.org/data/definitions/4.html',
+      },
+    ],
+    severity: 'Low',
+    confidence: 'Medium',
+    cweid: '4',
+    desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
+    pluginid: '3456',
+    instances: [
+      {
+        uri: 'http://192.168.32.236:3001/assets/webpack/main.bundle.js',
+        method: 'GET',
+        param: 'X-Content-Type-Options',
+      },
+    ],
+    solution: ' Update to latest ',
+    description: ' The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff". ',
+  },
+  {
+    category: 'dast',
+    project_fingerprint: 'ae8fe380dd9aa5a7a956d9085fe7cf6b87d0d028',
+    alert: 'X-Content-Type-Options Header Missing',
+    name: 'X-Content-Type-Options Header Missing',
+    title: 'X-Content-Type-Options Header Missing',
+    riskdesc: 'Low (Medium)',
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-4',
+        value: '4',
+        url: 'https://cwe.mitre.org/data/definitions/4.html',
+      },
+    ],
+    severity: 'Low',
+    confidence: 'Medium',
+    cweid: '4',
+    desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff".</p>',
+    pluginid: '3456',
+    instances: [
+      {
+        uri: 'http://192.168.32.236:3001/assets/webpack/main.bundle.js',
+        method: 'GET',
+        param: 'X-Content-Type-Options',
+      },
+    ],
+    solution: ' Update to latest ',
+    description: ' The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff". ',
+  },
+];
 
 export const parsedDast = [
   {

@@ -4,7 +4,7 @@ import {
   findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
-  getDastSite,
+  getDastSites,
   parseDastIssues,
   getUnapprovedVulnerabilities,
   groupedTextBuilder,
@@ -33,7 +33,9 @@ import {
   dockerReport,
   containerScanningFeedbacks,
   dast,
+  multiSitesDast,
   dastFeedbacks,
+  parsedMultiSitesDast,
   parsedDast,
 } from '../mock_data';
 
@@ -351,28 +353,37 @@ describe('security reports utils', () => {
     });
   });
 
-  describe('getDastSite', () => {
-    it.each([{}, 'site', 1, [], undefined])('returns argument as is if arg is %p', arg => {
-      expect(getDastSite(arg)).toEqual(arg);
+  describe('getDastSites', () => {
+    it.each([{}, 'site', 1, undefined])('wraps non-array argument %p into an array', arg => {
+      expect(getDastSites(arg)).toEqual([arg]);
     });
 
-    it('returns first item if arg is a non-empty array', () => {
-      expect(getDastSite([{}])).toEqual({});
+    it("returns argument if it's an array", () => {
+      const sites = [];
+      expect(getDastSites(sites)).toEqual(sites);
     });
   });
 
   describe('parseDastIssues', () => {
-    it('parses dast report', () => {
-      expect(parseDastIssues(dast.site.alerts)).toEqual(parsedDast);
-    });
-
-    it('includes vulnerability feedbacks', () => {
-      const parsed = parseDastIssues(dast.site.alerts, dastFeedbacks)[0];
+    it.each`
+      description                  | report
+      ${'multi-sites dast report'} | ${multiSitesDast}
+      ${'legacy dast report'}      | ${dast}
+    `('includes vulnerability feedbacks in $description', ({ report }) => {
+      const parsed = parseDastIssues(report.site, dastFeedbacks)[0];
 
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dastFeedbacks[0]);
       expect(parsed.issue_feedback).toEqual(dastFeedbacks[1]);
+    });
+
+    it('parses dast report', () => {
+      expect(parseDastIssues(multiSitesDast.site)).toEqual(parsedMultiSitesDast);
+    });
+
+    it('parses legacy dast report', () => {
+      expect(parseDastIssues(dast.site)).toEqual(parsedDast);
     });
   });
 
