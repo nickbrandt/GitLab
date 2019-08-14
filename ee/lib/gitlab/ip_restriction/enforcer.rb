@@ -22,9 +22,11 @@ module Gitlab
       attr_reader :group
 
       def allows_address?(address)
-        return true unless group.root_ancestor_ip_restriction
+        root_ancestor_ip_restrictions = group.root_ancestor_ip_restrictions
 
-        group.root_ancestor_ip_restriction.allows_address?(address)
+        return true unless root_ancestor_ip_restrictions.present?
+
+        root_ancestor_ip_restrictions.any? { |ip_restriction| ip_restriction.allows_address?(address) }
       end
     end
   end

@@ -19,35 +19,66 @@ describe 'groups/edit.html.haml' do
     end
 
     context 'top-level group' do
-      before do
-        create(:ip_restriction, group: group, range: '192.168.0.0/24')
+      shared_examples 'renders ip_restriction setting' do
+        it 'renders ranges in comma separated format' do
+          render
+
+          expect(rendered).to render_template('groups/settings/_ip_restriction')
+          expect(rendered).to(have_field('group_ip_restriction_ranges',
+                                         { disabled: false,
+                                           with: ranges.join(",") }))
+        end
       end
 
-      it 'renders ip_restriction setting' do
-        render
+      before do
+        ranges.each do |range|
+          create(:ip_restriction, group: group, range: range)
+        end
+      end
 
-        expect(rendered).to render_template('groups/settings/_ip_restriction')
-        expect(rendered).to(have_field('group_ip_restriction_attributes_range',
-                                       { disabled: false,
-                                         with: '192.168.0.0/24' }))
+      context 'with single subnet' do
+        let(:ranges) { ['192.168.0.0/24'] }
+
+        it_behaves_like 'renders ip_restriction setting'
+      end
+
+      context 'with multiple subnets' do
+        let(:ranges) { ['192.168.0.0/24', '192.168.1.0/8'] }
+
+        it_behaves_like 'renders ip_restriction setting'
       end
     end
 
     context 'subgroup' do
+      shared_examples 'renders read-only ip_restriction setting of root ancestor' do
+        it 'renders disabled ranges of root ancestor in comma separated format' do
+          render
+
+          expect(rendered).to render_template('groups/settings/_ip_restriction')
+          expect(rendered).to(have_field('group_ip_restriction_ranges',
+                                         { disabled: true,
+                                           with: ranges.join(",") }))
+        end
+      end
+
       let(:group) { create(:group, :nested) }
 
       before do
-        create(:ip_restriction, group: group.parent, range: '192.168.0.0/24')
-        group.build_ip_restriction
+        ranges.each do |range|
+          create(:ip_restriction, group: group.parent, range: range)
+        end
       end
 
-      it 'show read-only ip_restriction setting of root ancestor' do
-        render
+      context 'with single subnet' do
+        let(:ranges) { ['192.168.0.0/24'] }
 
-        expect(rendered).to render_template('groups/settings/_ip_restriction')
-        expect(rendered).to(have_field('group_ip_restriction_attributes_range',
-                                       { disabled: true,
-                                         with: '192.168.0.0/24' }))
+        it_behaves_like 'renders read-only ip_restriction setting of root ancestor'
+      end
+
+      context 'with multiple subnets' do
+        let(:ranges) { ['192.168.0.0/24', '192.168.1.0/8'] }
+
+        it_behaves_like 'renders read-only ip_restriction setting of root ancestor'
       end
     end
 

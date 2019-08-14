@@ -15232,7 +15232,7 @@ msgstr ""
 msgid "This group does not provide any group Runners yet."
 msgstr ""
 
-msgid "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Example: <code>192.168.0.0/24</code>. %{read_more_link}."
+msgid "This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Multiple addresses are supported with comma delimiters. Example: <code>192.168.0.0/24,192.168.1.0/24</code>. %{read_more_link}."
 msgstr ""
 
 msgid "This is a \"Ghost User\", created to hold all issues authored by users that have since been deleted. This user cannot be removed."

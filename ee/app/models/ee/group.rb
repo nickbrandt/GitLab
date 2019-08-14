@@ -19,8 +19,7 @@ module EE
       has_many :epics
 
       has_one :saml_provider
-      has_one :ip_restriction
-      accepts_nested_attributes_for :ip_restriction, allow_destroy: true, reject_if: :all_blank
+      has_many :ip_restrictions, autosave: true
       has_one :insight, foreign_key: :namespace_id
       accepts_nested_attributes_for :insight, allow_destroy: true
       has_one :scim_oauth_access_token
@@ -113,6 +112,12 @@ module EE
       end
     end
 
+    def ip_restriction_ranges
+      return unless ip_restrictions.present?
+
+      ip_restrictions.map(&:range).join(",")
+    end
+
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
@@ -177,10 +182,10 @@ module EE
       all_projects.where('EXISTS (?)', ::Vulnerabilities::Occurrence.select(1).where('vulnerability_occurrences.project_id = projects.id')).pluck_primary_key
     end
 
-    def root_ancestor_ip_restriction
-      return ip_restriction if parent_id.nil?
+    def root_ancestor_ip_restrictions
+      return ip_restrictions if parent_id.nil?
 
-      root_ancestor.ip_restriction
+      root_ancestor.ip_restrictions
     end
 
     def root_ancestor_allowed_email_domain
