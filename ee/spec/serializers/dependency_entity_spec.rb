@@ -9,33 +9,7 @@ describe DependencyEntity do
     set(:project) { create(:project, :repository, :private) }
     set(:user) { create(:user) }
     let(:request) { double('request') }
-    let(:dependency) { dependency_info.merge(vulnerabilities) }
-
-    let(:dependency_info) do
-      {
-        name:     'nokogiri',
-        packager: 'Ruby (Bundler)',
-        version:  '1.8.0',
-        location: {
-          blob_path: '/some_project/path/Gemfile.lock',
-          path:      'Gemfile.lock'
-        }
-      }
-    end
-
-    let(:vulnerabilities) do
-      {
-        vulnerabilities:
-          [{
-             name:     'DDoS',
-             severity: 'high'
-           },
-           {
-             name:     'XSS vulnerability',
-             severity: 'low'
-           }]
-      }
-    end
+    let(:dependency) { build(:dependency, :with_vulnerabilities) }
 
     before do
       stub_licensed_features(security_dashboard: true)
@@ -54,6 +28,8 @@ describe DependencyEntity do
     end
 
     context 'with reporter' do
+      let(:dependency_info) { build(:dependency) }
+
       before do
         project.add_reporter(user)
       end

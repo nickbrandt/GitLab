@@ -5,7 +5,7 @@ require 'spec_helper'
 describe DependencyListEntity do
   describe '#as_json' do
     let(:entity) do
-      described_class.represent(dependencies, build: build, request: request)
+      described_class.represent(dependencies, build: ci_build, request: request)
     end
 
     let(:request) { double('request') }
@@ -22,23 +22,13 @@ describe DependencyListEntity do
 
     context 'with success build' do
       let(:user) { developer }
-      let(:build) { create(:ee_ci_build, :success) }
+      let(:ci_build) { create(:ee_ci_build, :success) }
 
       context 'with provided dependencies' do
-        let(:dependencies) do
-          [{
-             name:     'nokogiri',
-             packager: 'Ruby (Bundler)',
-             version:  '1.8.0',
-             location: {
-               blob_path: '/some_project/path/Gemfile.lock',
-               path:      'Gemfile.lock'
-             }
-           }]
-        end
+        let(:dependencies) { [build(:dependency)] }
 
         it 'has array of dependencies with status ok' do
-          job_path = "/#{project.full_path}/builds/#{build.id}"
+          job_path = "/#{project.full_path}/builds/#{ci_build.id}"
 
           expect(subject[:dependencies][0][:name]).to eq('nokogiri')
           expect(subject[:report][:status]).to eq(:ok)
@@ -51,7 +41,7 @@ describe DependencyListEntity do
         let(:dependencies) { [] }
 
         it 'has empty array of dependencies with status no_dependencies' do
-          job_path = "/#{project.full_path}/builds/#{build.id}"
+          job_path = "/#{project.full_path}/builds/#{ci_build.id}"
 
           expect(subject[:dependencies].length).to eq(0)
           expect(subject[:report][:status]).to eq(:no_dependencies)
@@ -61,7 +51,7 @@ describe DependencyListEntity do
     end
 
     context 'with failed build' do
-      let(:build) { create(:ee_ci_build, :failed) }
+      let(:ci_build) { create(:ee_ci_build, :failed) }
       let(:dependencies) { [] }
 
       context 'with authorized user' do
@@ -85,7 +75,7 @@ describe DependencyListEntity do
 
     context 'with no build' do
       let(:user) { developer }
-      let(:build) { nil }
+      let(:ci_build) { nil }
       let(:dependencies) { [] }
 
       it 'has status job_not_set_up and no job_path' do
