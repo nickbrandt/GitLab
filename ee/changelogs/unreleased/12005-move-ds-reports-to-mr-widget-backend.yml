@@ -1,0 +1,5 @@
+---
+title: Move dependency scanning comparision logic to backend
+merge_request: 15023
+author:
+type: changed
