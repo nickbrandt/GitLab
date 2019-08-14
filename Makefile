@@ -4,7 +4,6 @@ BUILD_DIR ?= $(CURDIR)
 TARGET_DIR ?= $(BUILD_DIR)/_build
 TARGET_SETUP := $(TARGET_DIR)/.ok
 BIN_BUILD_DIR := $(TARGET_DIR)/bin
-PKG_BUILD_DIR := $(TARGET_DIR)/src/$(PKG)
 COVERAGE_DIR := $(TARGET_DIR)/cover
 VERSION_STRING := $(shell git describe)
 ifeq ($(strip $(VERSION_STRING)),)
@@ -16,23 +15,19 @@ EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 INSTALL := install
 BUILD_TAGS := tracer_static tracer_static_jaeger
 
-MINIMUM_SUPPORTED_GO_VERSION := 1.8
+MINIMUM_SUPPORTED_GO_VERSION := 1.11
 
-# Some users may have these variables set in their environment, but doing so could break
-# their build process, so unset then
-unexport GOROOT
-unexport GOBIN
+export GOBIN := $(TARGET_DIR)/bin
+export PATH := $(GOBIN):$(PATH)
+export GOPROXY ?= https://proxy.golang.org
+export GO111MODULE=on
 
-export GOPATH := $(TARGET_DIR)
-export PATH := $(GOPATH)/bin:$(PATH)
-
-# Returns a list of all non-vendored (local packages)
-LOCAL_PACKAGES = $(shell cd "$(PKG_BUILD_DIR)" && GOPATH=$(GOPATH) go list ./... | grep -v -e '^$(PKG)/vendor/' -e '^$(PKG)/ruby/')
-LOCAL_GO_FILES = $(shell find -L $(PKG_BUILD_DIR)  -name "*.go" -not -path "$(PKG_BUILD_DIR)/vendor/*" -not -path "$(PKG_BUILD_DIR)/_build/*")
+LOCAL_GO_FILES = $(shell find . -type f -name '*.go' | grep -v -e /_ -e /testdata/)
 
 define message
 	@echo "### $(1)"
 endef
+
 
 .NOTPARALLEL:
 
@@ -41,10 +36,8 @@ all:	clean-build $(EXE_ALL)
 
 $(TARGET_SETUP):
 	$(call message,"Setting up target directory")
-	rm -rf $(TARGET_DIR)
-	mkdir -p "$(dir $(PKG_BUILD_DIR))"
-	ln -sf "$(CURDIR)" "$(PKG_BUILD_DIR)"
-	mkdir -p "$(BIN_BUILD_DIR)"
+	rm -rf "$(TARGET_DIR)"
+	mkdir -p "$(TARGET_DIR)"
 	touch "$(TARGET_SETUP)"
 
 gitlab-zip-cat:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-cat/ -name '*.go')
@@ -68,13 +61,13 @@ install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 .PHONY:	test
 test: $(TARGET_SETUP) prepare-tests
 	$(call message,$@)
-	@go test -tags "$(BUILD_TAGS)" $(LOCAL_PACKAGES)
+	@go test -tags "$(BUILD_TAGS)" ./...
 	@echo SUCCESS
 
 .PHONY:	coverage
 coverage:	$(TARGET_SETUP) prepare-tests
 	$(call message,$@)
-	@go test -tags "$(BUILD_TAGS)" -cover -coverprofile=test.coverage $(LOCAL_PACKAGES)
+	@go test -tags "$(BUILD_TAGS)" -cover -coverprofile=test.coverage ./...
 	go tool cover -html=test.coverage -o coverage.html
 	rm -f test.coverage
 
@@ -104,7 +97,7 @@ clean-build:
 	rm -rf $(TARGET_DIR)
 
 .PHONY:	prepare-tests
-prepare-tests:	govendor-sync testdata/data/group/test.git $(EXE_ALL)
+prepare-tests:	testdata/data/group/test.git $(EXE_ALL)
 
 testdata/data/group/test.git:
 	$(call message,$@)
@@ -114,15 +107,15 @@ testdata/data/group/test.git:
 verify: lint vet detect-context check-formatting staticcheck
 
 .PHONY: lint
-lint: $(TARGET_SETUP) govendor-sync
+lint: $(TARGET_SETUP)
 	$(call message,Verify: $@)
-	@command -v golint || go get -v golang.org/x/lint/golint
-	@_support/lint.sh $(LOCAL_PACKAGES)
+	go install golang.org/x/lint/golint
+	@_support/lint.sh ./...
 
 .PHONY: vet
-vet: $(TARGET_SETUP) govendor-sync
+vet: $(TARGET_SETUP) 
 	$(call message,Verify: $@)
-	@go vet $(LOCAL_PACKAGES)
+	@go vet ./...
 
 .PHONY: detect-context
 detect-context: $(TARGET_SETUP)
@@ -138,18 +131,10 @@ check-formatting: $(TARGET_SETUP) install-goimports
 # Additionally, megacheck will not return failure exit codes unless explicitly told to via the
 # `-simple.exit-non-zero` `-unused.exit-non-zero` and `-staticcheck.exit-non-zero` flags
 .PHONY: staticcheck
-staticcheck: $(TARGET_SETUP) govendor-sync
+staticcheck: $(TARGET_SETUP)
 	$(call message,Verify: $@)
-	@command -v staticcheck || go get -v honnef.co/go/tools/cmd/staticcheck
-	@staticcheck -go $(MINIMUM_SUPPORTED_GO_VERSION) $(LOCAL_PACKAGES)
-
-# Some vendor components, used for testing are GPL, so we don't distribute them
-# and need to go a sync before using them
-.PHONY: govendor-sync
-govendor-sync: $(TARGET_SETUP)
-	$(call message,$@)
-	@command -v govendor || go get github.com/kardianos/govendor
-	@cd $(PKG_BUILD_DIR) && govendor sync
+	go install honnef.co/go/tools/cmd/staticcheck
+	@ $(GOBIN)/staticcheck -go $(MINIMUM_SUPPORTED_GO_VERSION) ./...
 
 # In addition to fixing imports, goimports also formats your code in the same style as gofmt
 # so it can be used as a replacement.
@@ -161,4 +146,4 @@ fmt: $(TARGET_SETUP) install-goimports
 .PHONY:	goimports
 install-goimports:	$(TARGET_SETUP)
 	$(call message,$@)
-	@command -v goimports || go get -v golang.org/x/tools/cmd/goimports
+	go install golang.org/x/tools/cmd/goimports

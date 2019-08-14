@@ -17,10 +17,6 @@ verify:
   - apt-get update && apt-get -y install libimage-exiftool-perl
   - make test
 
-test using go 1.10:
-  image: golang:1.10
-  <<: *test_definition
-
 test using go 1.11:
   <<: *test_definition
 
