@@ -1,6 +1,0 @@
-- return unless Feature.enabled?(:additional_snowplow_tracking, @group)
-
-= javascript_tag nonce: true do
-  :plain
-    window.snowplow('enableFormTracking');
-    window.snowplow('enableLinkClickTracking');

@@ -59,11 +59,6 @@ module EE
                 allow_blank: true,
                 length: { maximum: EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT }
 
-      validates :snowplow_collector_hostname,
-                presence: true,
-                hostname: true,
-                if: :snowplow_enabled
-
       validates :geo_node_allowed_ips, length: { maximum: 255 }, presence: true
 
       validates :required_instance_ci_template, presence: true, allow_nil: true
@@ -95,10 +90,6 @@ module EE
           slack_app_id: nil,
           slack_app_secret: nil,
           slack_app_verification_token: nil,
-          snowplow_collector_hostname: nil,
-          snowplow_cookie_domain: nil,
-          snowplow_enabled: false,
-          snowplow_site_id: nil,
           custom_project_templates_group_id: nil,
           geo_node_allowed_ips: '0.0.0.0/0, ::/0'
         )

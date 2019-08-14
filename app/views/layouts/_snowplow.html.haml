@@ -14,13 +14,16 @@
       respectDoNotTrack: true,
       forceSecureTracker: true,
       post: true,
-      contexts: {
-          webPage: true,
-      },
+      contexts: { webPage: true },
       stateStorageStrategy: "localStorage"
     });
 
     window.snowplow('enableActivityTracking', 30, 30);
     window.snowplow('trackPageView');
 
-= render 'layouts/snowplow_additional_tracking'
+- return unless Feature.enabled?(:additional_snowplow_tracking, @group)
+
+= javascript_tag nonce: true do
+  :plain
+    window.snowplow('enableFormTracking');
+    window.snowplow('enableLinkClickTracking');
