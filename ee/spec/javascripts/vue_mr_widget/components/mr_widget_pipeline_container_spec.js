@@ -1,7 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import MrWidgetPipelineContainer from '~/vue_merge_request_widget/components/mr_widget_pipeline_container.vue';
 import { MT_MERGE_STRATEGY, MWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
-import MergeTrainInfo from 'ee/vue_merge_request_widget/components/merge_train_info.vue';
+import MergeTrainPositionIndicator from 'ee/vue_merge_request_widget/components/merge_train_position_indicator.vue';
 import { mockStore } from 'spec/vue_mr_widget/mock_data';
 
 describe('MrWidgetPipelineContainer', () => {
@@ -29,7 +29,7 @@ describe('MrWidgetPipelineContainer', () => {
         autoMergeStrategy: MT_MERGE_STRATEGY,
       });
 
-      expect(wrapper.find(MergeTrainInfo).exists()).toBe(false);
+      expect(wrapper.find(MergeTrainPositionIndicator).exists()).toBe(false);
     });
 
     it('should not render the merge train indicator if the MR is closed', () => {
@@ -38,7 +38,7 @@ describe('MrWidgetPipelineContainer', () => {
         autoMergeStrategy: MT_MERGE_STRATEGY,
       });
 
-      expect(wrapper.find(MergeTrainInfo).exists()).toBe(false);
+      expect(wrapper.find(MergeTrainPositionIndicator).exists()).toBe(false);
     });
 
     it('should not render the merge train indicator if the MR is not on the merge train', () => {
@@ -47,7 +47,7 @@ describe('MrWidgetPipelineContainer', () => {
         autoMergeStrategy: MWPS_MERGE_STRATEGY,
       });
 
-      expect(wrapper.find(MergeTrainInfo).exists()).toBe(false);
+      expect(wrapper.find(MergeTrainPositionIndicator).exists()).toBe(false);
     });
   });
 });

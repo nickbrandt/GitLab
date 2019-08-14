@@ -1,14 +1,14 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { trimText } from 'spec/helpers/text_helper';
-import MergeTrainInfo from 'ee/vue_merge_request_widget/components/merge_train_info.vue';
+import { trimText } from 'helpers/text_helper';
+import MergeTrainPositionIndicator from 'ee/vue_merge_request_widget/components/merge_train_position_indicator.vue';
 
-describe('MergeTrainInfo', () => {
+describe('MergeTrainPositionIndicator', () => {
   const localVue = createLocalVue();
   let wrapper;
   let vm;
 
   const factory = propsData => {
-    wrapper = shallowMount(localVue.extend(MergeTrainInfo), {
+    wrapper = shallowMount(localVue.extend(MergeTrainPositionIndicator), {
       propsData,
       localVue,
       sync: false,

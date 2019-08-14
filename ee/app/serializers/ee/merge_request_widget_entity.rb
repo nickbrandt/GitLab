@@ -161,6 +161,9 @@ module EE
       expose :api_unapprove_path do |merge_request|
         presenter(merge_request).api_unapprove_path
       end
+      expose :merge_train_when_pipeline_succeeds_docs_path do |merge_request|
+        presenter(merge_request).merge_train_when_pipeline_succeeds_docs_path
+      end
 
       expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }
 
