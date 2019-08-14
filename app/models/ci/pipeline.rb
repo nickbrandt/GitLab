@@ -393,6 +393,7 @@ module Ci
       Gitlab::Ci::Status::GroupedStatuses
         .new(statuses.latest, :stage, :stage_idx)
         .group(:stage, :stage_idx)
+        .sort_by { |stage| stage[:stage_idx] }
         .map do |stage|
           Ci::LegacyStage.new(self,
             name: stage[:stage],

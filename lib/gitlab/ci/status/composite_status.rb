@@ -35,8 +35,8 @@ module Gitlab
           when include?(:preparing)
             :preparing
           when include?(:created)
-            :created
-          when include?
+            :running
+          else
             :failed
           end
         end
@@ -48,12 +48,11 @@ module Gitlab
         private
 
         def include?(*names)
-          names.all? { |name| @status_set.include?(name) }
+          names.any? { |name| @status_set.include?(name) }
         end
 
         def only?(*names)
-          @status_set.size == names.size &&
-            names.all? { |name| @status_set.include?(name) }
+          matching = names.count { |name| @status_set.include?(name) } == @status_set.size
         end
 
         def build_status_set(all_statuses)
