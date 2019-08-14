@@ -7,6 +7,8 @@ module EE
 
       prepended do
         helpers do
+          extend ::Gitlab::Utils::Override
+
           # rubocop: disable CodeReuse/ActiveRecord
           def epic
             @epic ||= user_group.epics.find_by(iid: params[:epic_iid])
@@ -15,6 +17,14 @@ module EE
 
           def authorize_can_read!
             authorize!(:read_epic, epic)
+          end
+
+          override :find_todos
+          def find_todos
+            # Todos for Designs are intentionally not supported yet.
+            # https://gitlab.com/gitlab-org/gitlab-ee/issues/13543
+            # https://gitlab.com/gitlab-org/gitlab-ee/issues/13494#note_203518559
+            super.where.not(target_type: ::DesignManagement::Design.name) # rubocop: disable CodeReuse/ActiveRecord
           end
         end
 

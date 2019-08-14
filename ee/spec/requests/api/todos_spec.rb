@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe API::Todos do
-  let(:group) { create(:group) }
+  set(:group) { create(:group) }
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }
+  set(:project) { create(:project, group: group) }
 
   describe 'GET /todos' do
     let(:author_1) { create(:user) }
@@ -12,8 +13,6 @@ describe API::Todos do
     before do
       group.add_developer(user)
       group.add_developer(author_1)
-
-      create_todo_for_new_epic
     end
 
     def create_todo_for_new_epic
@@ -25,18 +24,58 @@ describe API::Todos do
       create(:todo, project: nil, group: new_group, author: author_1, user: user, target: new_epic)
     end
 
-    it 'avoids N+1 queries', :request_store do
-      create_todo_for_new_epic
+    def create_todo_for_mentioned_in_design
+      issue = create(:issue, project: project)
+      create(:todo, :mentioned,
+             user: user,
+             project: project,
+             target: create(:design, issue: issue),
+             author: create(:user),
+             note: create(:note, project: project, note: "I am note, hear me roar"))
+    end
 
-      get api('/todos', personal_access_token: pat)
+    context 'when there is an Epic Todo' do
+      let!(:epic_todo) { create_todo_for_new_epic }
 
-      control = ActiveRecord::QueryRecorder.new { get api('/todos', personal_access_token: pat) }
+      before do
+        get api('/todos', personal_access_token: pat)
+      end
 
-      create_todo_for_new_epic
+      it 'responds without error' do
+        expect(response.status).to eq(200)
+      end
 
-      expect { get api('/todos', personal_access_token: pat) }.not_to exceed_query_limit(control)
+      it 'avoids N+1 queries', :request_store do
+        create_todo_for_new_epic
 
-      expect(response.status).to eq(200)
+        control = ActiveRecord::QueryRecorder.new { get api('/todos', personal_access_token: pat) }
+
+        create_todo_for_new_epic
+
+        expect { get api('/todos', personal_access_token: pat) }.not_to exceed_query_limit(control)
+      end
+
+      it 'includes the Epic Todo in the response' do
+        expect(json_response).to include(
+          a_hash_including('id' => epic_todo.id)
+        )
+      end
+    end
+
+    context 'when there is a Design Todo' do
+      let!(:design_todo) { create_todo_for_mentioned_in_design }
+
+      before do
+        get api('/todos', personal_access_token: pat)
+      end
+
+      it 'responds without error' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'does not include the Design Todo in the response' do
+        expect(json_response).to be_empty
+      end
     end
   end
 

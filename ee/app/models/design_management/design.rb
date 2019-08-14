@@ -18,12 +18,22 @@ module DesignManagement
     validates :filename, uniqueness: { scope: :issue_id }
     validate :validate_file_is_image
 
+    alias_attribute :title, :filename
+
     scope :visible_at_version, -> (version) do
       created_before_version = DesignManagement::DesignVersion.select(1)
                                .where("#{table_name}.id = #{DesignManagement::DesignVersion.table_name}.design_id")
                                .where("#{DesignManagement::DesignVersion.table_name}.version_id <= ?", version)
 
       where('EXISTS(?)', created_before_version)
+    end
+
+    def to_reference(_opts)
+      filename
+    end
+
+    def description
+      ''
     end
 
     def new_design?
