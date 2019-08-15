@@ -15,7 +15,9 @@ module Gitlab
 
         def status
           case
-          when none? || only_of?(:skipped)
+          when none?
+            :skipped
+          when only_of?(:skipped)
             warnings? ? :success : :skipped
           when only_of?(:success, :skipped)
             :success

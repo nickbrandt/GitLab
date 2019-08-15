@@ -31,7 +31,6 @@ module Ci
 
     def status
       @status ||= statuses.latest.slow_composite_status
-
     end
 
     def detailed_status(current_user)

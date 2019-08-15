@@ -387,9 +387,24 @@ module Ci
       end
     end
 
-    def legacy_stages
+    def legacy_stages_using_sql
       # TODO, this needs refactoring, see gitlab-foss#26481.
+      stages_query = statuses
+        .group('stage').select(:stage).order('max(stage_idx)')
 
+      status_sql = statuses.latest.where('stage=sg.stage').legacy_status_sql
+
+      warnings_sql = statuses.latest.select('COUNT(*)')
+        .where('stage=sg.stage').failed_but_allowed.to_sql
+
+      stages_with_statuses = CommitStatus.from(stages_query, :sg)
+        .pluck('sg.stage', status_sql, "(#{warnings_sql})")
+
+      stages_with_statuses.map do |stage|
+        Ci::LegacyStage.new(self, Hash[%i[name status warnings].zip(stage)])
+    end
+
+    def legacy_stages_using_composite_status
       stages = Gitlab::Ci::Status::GroupedStatuses
         .new(statuses.latest, :stage, :stage_idx)
         .group(:stage, :stage_idx)
@@ -400,6 +415,13 @@ module Ci
           name: stage[:stage],
           status: stage[:status],
           warnings: stage[:warnings])
+    end
+
+    def legacy_stages
+      if Feature.enabled?(:ci_composite_status, default_enabled: true)
+        legacy_stages_using_composite_status
+      else
+        legacy_status_using_sql
       end
     end
 
@@ -633,7 +655,8 @@ module Ci
 
     def update_status
       retry_optimistic_lock(self) do
-        case latest_builds_status.to_s
+        new_status = latest_builds_status.to_s
+        case new_status
         when 'created' then nil
         when 'preparing' then prepare
         when 'pending' then enqueue
@@ -646,7 +669,7 @@ module Ci
         when 'scheduled' then delay
         else
           raise HasStatus::UnknownStatusError,
-                "Unknown status `#{latest_builds_status}`"
+                "Unknown status `#{new_status}`"
         end
       end
     end

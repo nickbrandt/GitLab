@@ -59,9 +59,13 @@ module HasStatus
     end
 
     def slow_composite_status
-      Gitlab::Ci::Status::GroupedStatuses
-        .new(all)
-        .one[:status]
+      if Feature.enabled?(:ci_composite_status, default_enabled: true)
+        Gitlab::Ci::Status::GroupedStatuses
+          .new(all)
+          .one[:status]
+      else
+        legacy_status
+      end
     end
 
     def started_at

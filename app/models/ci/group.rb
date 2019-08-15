@@ -23,7 +23,13 @@ module Ci
 
     def status
       strong_memoize(:status) do
-        @jobs.slow_composite_status
+        if Feature.enabled?(:ci_composite_status, default_enabled: true)
+          Gitlab::Ci::Status::GroupedStatuses
+            .new(@jobs)
+            .one[:status]
+        else
+          CommitStatus.where(id: @jobs).legacy_status
+        end
       end
     end
 
