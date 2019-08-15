@@ -402,6 +402,7 @@ module Ci
 
       stages_with_statuses.map do |stage|
         Ci::LegacyStage.new(self, Hash[%i[name status warnings].zip(stage)])
+      end
     end
 
     def legacy_stages_using_composite_status
@@ -415,6 +416,7 @@ module Ci
           name: stage[:stage],
           status: stage[:status],
           warnings: stage[:warnings])
+      end
     end
 
     def legacy_stages
