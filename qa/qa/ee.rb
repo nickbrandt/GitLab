@@ -118,8 +118,12 @@ module QA
     end
 
     module Resource
+      autoload :Board, 'qa/ee/resource/board'
+      autoload :LabelBoardList, 'qa/ee/resource/label_board_list'
+      autoload :MilestoneBoardList, 'qa/ee/resource/milestone_board_list'
       autoload :License, 'qa/ee/resource/license'
       autoload :Epic, 'qa/ee/resource/epic'
+      autoload :ProjectMilestone, 'qa/ee/resource/project_milestone'
 
       module Geo
         autoload :Node, 'qa/ee/resource/geo/node'
