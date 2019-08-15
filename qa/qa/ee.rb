@@ -72,6 +72,10 @@ module QA
         module Issue
           autoload :Index, 'qa/ee/page/project/issue/index'
           autoload :Show, 'qa/ee/page/project/issue/show'
+
+          module Board
+            autoload :Show, 'qa/ee/page/project/issue/board/show'
+          end
         end
 
         module Settings
