@@ -17,6 +17,8 @@ export default class MembersEE extends Members {
   }
 
   dropdownClicked(options) {
+    options.e.preventDefault();
+
     const $link = options.$el;
 
     if (!$link.data('revert')) {
