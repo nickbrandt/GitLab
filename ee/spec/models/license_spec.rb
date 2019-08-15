@@ -83,7 +83,7 @@ describe License do
             active_user_count: User.active.count - 1
           }
 
-          allow(license).to receive(:historical_max).and_return(0)
+          HistoricalData.delete_all
         end
 
         context 'with previous_user_count and active users above of license limit' do

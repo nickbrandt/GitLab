@@ -406,10 +406,7 @@ class License < ApplicationRecord
   end
 
   def historical_max(from = nil, to = nil)
-    from ||= starts_at - 1.year
-    to   ||= starts_at
-
-    HistoricalData.during(from..to).maximum(:active_user_count) || 0
+    HistoricalData.max_historical_user_count(license: self, from: from, to: to)
   end
 
   def historical_max_with_default_period
@@ -439,22 +436,27 @@ class License < ApplicationRecord
     self.errors.add(:base, "The license key is invalid. Make sure it is exactly as you received it from GitLab Inc.")
   end
 
-  def empty_historical_max?
-    historical_max == 0
+  def prior_historical_max
+    @prior_historical_max ||= begin
+      from = starts_at - 1.year
+      to   = starts_at
+
+      historical_max(from, to)
+    end
   end
 
   def check_users_limit
     return unless restricted_user_count
 
-    if previous_user_count && (historical_max <= previous_user_count)
+    if previous_user_count && (prior_historical_max <= previous_user_count)
       return if restricted_user_count >= current_active_users_count
     else
-      return if restricted_user_count >= historical_max
+      return if restricted_user_count >= prior_historical_max
     end
 
-    user_count = empty_historical_max? ? current_active_users_count : historical_max
+    user_count = prior_historical_max.zero? ? current_active_users_count : prior_historical_max
 
-    add_limit_error(current_period: empty_historical_max?, user_count: user_count)
+    add_limit_error(current_period: prior_historical_max.zero?, user_count: user_count)
   end
 
   def check_trueup
