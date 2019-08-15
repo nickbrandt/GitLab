@@ -161,15 +161,11 @@ class CommitStatus < ApplicationRecord
   end
 
   def self.status_for_prior_stages(index)
-    Gitlab::Ci::Status::GroupedStatuses
-      .new(before_stage(index).latest)
-      .one[:status] || 'success'
+    before_stage(index).latest.slow_composite_status || 'success'
   end
 
   def self.status_for_names(names)
-    Gitlab::Ci::Status::GroupedStatuses
-      .new(where(name: names).latest)
-      .one[:status] || 'success'
+    where(name: names).latest.slow_composite_status || 'success'
   end
 
   def locking_enabled?

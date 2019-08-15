@@ -30,10 +30,7 @@ module Ci
     end
 
     def status
-      @status ||=
-        Gitlab::Ci::Status::GroupedStatuses
-          .new(statuses.latest)
-          .one[:status]
+      @status ||= statuses.latest.slow_composite_status
 
     end
 

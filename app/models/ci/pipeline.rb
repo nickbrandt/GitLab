@@ -390,16 +390,17 @@ module Ci
     def legacy_stages
       # TODO, this needs refactoring, see gitlab-foss#26481.
 
-      Gitlab::Ci::Status::GroupedStatuses
+      stages = Gitlab::Ci::Status::GroupedStatuses
         .new(statuses.latest, :stage, :stage_idx)
         .group(:stage, :stage_idx)
         .sort_by { |stage| stage[:stage_idx] }
-        .map do |stage|
-          Ci::LegacyStage.new(self,
-            name: stage[:stage],
-            status: stage[:status],
-            warnings: stage[:warnings])
-        end
+
+      stages.map do |stage|
+        Ci::LegacyStage.new(self,
+          name: stage[:stage],
+          status: stage[:status],
+          warnings: stage[:warnings])
+      end
     end
 
     def valid_commit_sha
@@ -904,9 +905,7 @@ module Ci
     def latest_builds_status
       return 'failed' unless yaml_errors.blank?
 
-      Gitlab::Ci::Status::GroupedStatuses
-        .new(statuses.latest)
-        .one[:status] || 'skipped'
+      statuses.latest.slow_composite_status || 'skipped'
     end
 
     def keep_around_commits

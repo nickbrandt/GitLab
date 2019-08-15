@@ -23,9 +23,7 @@ module Ci
 
     def status
       strong_memoize(:status) do
-        Gitlab::Ci::Status::GroupedStatuses
-          .new(@jobs)
-          .one[:status]
+        @jobs.slow_composite_status
       end
     end
 

@@ -126,9 +126,7 @@ module Ci
     end
 
     def latest_stage_status
-      Gitlab::Ci::Status::GroupedStatuses
-        .new(statuses.latest)
-        .one[:status] || 'skipped'
+      statuses.latest.slow_composite_status || 'skipped'
     end
   end
 end
