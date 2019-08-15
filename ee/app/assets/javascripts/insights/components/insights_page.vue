@@ -90,10 +90,10 @@ export default {
 };
 </script>
 <template>
-  <div class="insights-page">
+  <div class="insights-page" data-qa-selector="insights_page">
     <div v-if="hasChartsConfigured" class="js-insights-page-container">
       <h4 class="text-center">{{ pageConfig.title }}</h4>
-      <div v-if="!pageLoading" class="insights-charts">
+      <div v-if="!pageLoading" class="insights-charts" data-qa-selector="insights_charts">
         <div v-for="(insights, key, index) in chartData" :key="index" class="insights-chart">
           <component
             :is="chartType(insights.type)"

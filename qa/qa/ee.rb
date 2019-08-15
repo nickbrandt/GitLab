@@ -64,6 +64,7 @@ module QA
       module Project
         autoload :New, 'qa/ee/page/project/new'
         autoload :Show, 'qa/ee/page/project/show'
+        autoload :Menu, 'qa/ee/page/project/menu'
 
         module SubMenus
           autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
@@ -118,6 +119,10 @@ module QA
         module Secure
           autoload :Show, 'qa/ee/page/group/secure/show'
         end
+      end
+
+      module Insights
+        autoload :Show, 'qa/ee/page/insights/show'
       end
     end
 
