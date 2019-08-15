@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe RegistrationsController do
+  before do
+    stub_feature_flags(invisible_captcha: false)
+  end
+
   describe '#create' do
     context 'when the user opted-in' do
       let(:user_params) { { user: attributes_for(:user, email_opted_in: '1') } }
