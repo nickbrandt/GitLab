@@ -23,6 +23,11 @@ module EE
           def update_params_at_least_one_of
             [*super, :weight]
           end
+
+          override :sort_options
+          def sort_options
+            [*super, 'weight']
+          end
         end
       end
     end
