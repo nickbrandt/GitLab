@@ -105,19 +105,6 @@ describe('Dashboard', () => {
           done();
         });
       });
-
-      it('hides More actions dropdown on chart', done => {
-        setTimeout(() => {
-          expect(
-            vm
-              .findAll(GlDropdown)
-              .filter(d => d.attributes('data-original-title') === 'More actions')
-              .exists(),
-          ).toBe(false);
-
-          done();
-        });
-      });
     });
   });
 
