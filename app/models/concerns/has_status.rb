@@ -10,7 +10,8 @@ module HasStatus
   ACTIVE_STATUSES = %w[preparing pending running].freeze
   COMPLETED_STATUSES = %w[success failed canceled skipped].freeze
   ORDERED_STATUSES = %w[failed preparing pending running manual scheduled canceled success skipped created].freeze
-  WARNING_STATUSES = %w[manual failed canceled].to_set.freeze
+  WARNING_IF_ALLOW_FAILURE_STATUSES = %w[manual failed canceled].to_set.freeze
+  IGNORED_IF_ALLOW_FAILURE_STATUSES = %w[failed canceled].to_set.freeze
   STATUSES_ENUM = { created: 0, pending: 1, running: 2, success: 3,
                     failed: 4, canceled: 5, skipped: 6, manual: 7,
                     scheduled: 8, preparing: 9 }.freeze

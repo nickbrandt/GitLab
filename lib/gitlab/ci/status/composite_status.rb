@@ -15,9 +15,7 @@ module Gitlab
 
         def status
           case
-          when none?
-            :skipped
-          when only_of?(:skipped)
+          when none? || only_of?(:skipped)
             warnings? ? :success : :skipped
           when only_of?(:success, :skipped)
             :success
@@ -65,9 +63,11 @@ module Gitlab
 
         def build_status_set(all_statuses)
           all_statuses.each do |status|
-            if status[:allow_failure] && HasStatus::WARNING_STATUSES.include?(status[:status])
+            if status[:allow_failure] && HasStatus::WARNING_IF_ALLOW_FAILURE_STATUSES.include?(status[:status])
               @warnings += 1
-            else
+            end
+
+            if !status[:allow_failure] || !HasStatus::IGNORED_IF_ALLOW_FAILURE_STATUSES.include?(status[:status])
               @status_set.add(status[:status].to_sym)
             end
           end
