@@ -1,0 +1,5 @@
+---
+title: Show correct historic max user count for a license
+merge_request: 15107
+author:
+type: fixed
