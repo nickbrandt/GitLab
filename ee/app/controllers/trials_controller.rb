@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class TrialsController < RegistrationsController
+  before_action :set_redirect_url, only: [:new]
+
   private
 
-  def after_sign_up_path_for(user)
-    root_path
+  def set_redirect_url
+    store_location_for(:user, root_url)
   end
 
   def sign_up_params
