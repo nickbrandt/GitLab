@@ -7,6 +7,7 @@ module Gitlab
         attr_reader :warnings
 
         def initialize(all_statuses)
+          @count = 0
           @warnings = 0
           @status_set = Set.new
 
@@ -15,6 +16,8 @@ module Gitlab
 
         def status
           case
+          when @count.zero?
+            nil
           when none? || only_of?(:skipped)
             warnings? ? :success : :skipped
           when only_of?(:success, :skipped)
@@ -63,13 +66,18 @@ module Gitlab
 
         def build_status_set(all_statuses)
           all_statuses.each do |status|
-            if status[:allow_failure] && HasStatus::WARNING_IF_ALLOW_FAILURE_STATUSES.include?(status[:status])
-              @warnings += 1
+            @count += 1
+            if status[:allow_failure]
+              if HasStatus::PASSED_WITH_WARNINGS_STATUSES.include?(status[:status])
+                @warnings += 1
+              end
+
+              if HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[:status])
+                next
+              end
             end
 
-            if !status[:allow_failure] || !HasStatus::IGNORED_IF_ALLOW_FAILURE_STATUSES.include?(status[:status])
-              @status_set.add(status[:status].to_sym)
-            end
+            @status_set.add(status[:status].to_sym)
           end
         end
       end
