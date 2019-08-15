@@ -58,6 +58,12 @@ module HasStatus
       all.pluck(legacy_status_sql).first
     end
 
+    def slow_composite_status
+      Gitlab::Ci::Status::GroupedStatuses
+        .new(all)
+        .one[:status]
+    end
+
     def started_at
       all.minimum(:started_at)
     end

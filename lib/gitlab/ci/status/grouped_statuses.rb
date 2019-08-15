@@ -70,7 +70,8 @@ module Gitlab
 
           key.merge(
             status: composite_status.status.to_s,
-            warnings: composite_status.warnings?)
+            warnings: composite_status.warnings?
+          )
         end
       end
     end

@@ -2301,36 +2301,38 @@ describe Ci::Pipeline, :mailer do
   describe '#update_status' do
     context 'when pipeline is empty' do
       it 'updates does not change pipeline status' do
-        expect(pipeline.statuses.latest.status).to be_nil
+        expect(pipeline.statuses.latest.slow_composite_status).to be_nil
 
         expect { pipeline.update_status }
-          .to change { pipeline.reload.status }.to 'skipped'
+          .to change { pipeline.reload.status }
+          .from('created')
+          .to('skipped')
       end
     end
 
     context 'when updating status to pending' do
       before do
-        allow(pipeline)
-          .to receive_message_chain(:statuses, :latest, :status)
-          .and_return(:running)
+        create(:ci_build, pipeline: pipeline, status: :running)
       end
 
       it 'updates pipeline status to running' do
         expect { pipeline.update_status }
-          .to change { pipeline.reload.status }.to 'running'
+          .to change { pipeline.reload.status }
+          .from('created')
+          .to('running')
       end
     end
 
     context 'when updating status to scheduled' do
       before do
-        allow(pipeline)
-          .to receive_message_chain(:statuses, :latest, :status)
-          .and_return(:scheduled)
+        create(:ci_build, pipeline: pipeline, status: :scheduled)
       end
 
       it 'updates pipeline status to scheduled' do
         expect { pipeline.update_status }
-          .to change { pipeline.reload.status }.to 'scheduled'
+          .to change { pipeline.reload.status }
+          .from('created')
+          .to('scheduled')
       end
     end
 

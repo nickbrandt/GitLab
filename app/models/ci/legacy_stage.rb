@@ -30,7 +30,11 @@ module Ci
     end
 
     def status
-      @status ||= statuses.latest.status
+      @status ||=
+        Gitlab::Ci::Status::GroupedStatuses
+          .new(statuses.latest)
+          .one[:status]
+
     end
 
     def detailed_status(current_user)
@@ -52,8 +56,11 @@ module Ci
     end
 
     def has_warnings?
-      if @warnings.is_a?(Integer)
+      case @warnings
+      when Integer
         @warnings > 0
+      when TrueClass, FalseClass
+        @warnings
       else
         statuses.latest.failed_but_allowed.any?
       end
