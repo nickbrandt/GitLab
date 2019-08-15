@@ -19,8 +19,11 @@ module EE
 
     override :note_etag_key
     def note_etag_key
-      if self.is_a?(Epic)
+      case self
+      when Epic
         ::Gitlab::Routing.url_helpers.group_epic_notes_path(group, self)
+      when DesignManagement::Design
+        ::Gitlab::Routing.url_helpers.designs_project_issue_path(project, issue, { vueroute: filename })
       else
         super
       end

@@ -8,5 +8,9 @@ module EE
     def parent
       project || group
     end
+
+    def for_design?
+      target_type == DesignManagement::Design.name
+    end
   end
 end
