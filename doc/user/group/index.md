@@ -355,15 +355,13 @@ the group regardless of the IP restriction.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7297) in
 [GitLab Premium](https://about.gitlab.com/pricing/) 12.2.
 
-To make sure only people from within your organization can access particular
-resources, you have the option to restrict access to groups and their
-underlying projects, issues, etc, by allowing only users with emails in particular domain
-to be added to the group.
+You can restrict access to groups and their underlying projects by
+allowing only users with email addresses in particular domains to be added to the group.
 
 Add whitelisted email domain and users with emails from different domains won't be allowed to be added
 to this group.
 
-There are domains that cannot be added to this restrictions - the most popular public email domains, such as:
+Some domains cannot be restricted. These are the most popular public email domains, such as:
 
 - `gmail.com`
 - `yahoo.com`
@@ -375,6 +373,14 @@ There are domains that cannot be added to this restrictions - the most popular p
 - `live.com`
 - `outlook.com`
 - `icloud.com`
+
+To enable this feature:
+
+1. Navigate to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and enter domain name into **Restrict membership by email** field.
+1. Click **Save changes**.
+
+This will enable the domain-checking for all new users added to the group from this moment on.
 
 #### Group file templates **(PREMIUM)**
 
