@@ -76,19 +76,47 @@ describe Repository, :elastic do
     search_and_check!(project.repository, '-foo', type: :commit)
   end
 
-  describe "class method find_commits_by_message_with_elastic" do
-    it "returns commits" do
-      project = create :project, :repository
-      project1 = create :project, :repository
+  describe 'class method find_commits_by_message_with_elastic' do
+    let(:project) { create :project, :repository }
+    let(:project1) { create :project, :repository }
+    let(:results) { Repository.find_commits_by_message_with_elastic('initial') }
 
+    before do
       project.repository.index_commits
       project1.repository.index_commits
 
       Gitlab::Elastic::Helper.refresh_index
+    end
 
-      expect(Repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
-      expect(Repository.find_commits_by_message_with_elastic('initial').count).to eq(2)
-      expect(Repository.find_commits_by_message_with_elastic('initial').total_count).to eq(2)
+    it 'returns commits' do
+      expect(results).to contain_exactly(instance_of(Commit), instance_of(Commit))
+      expect(results.count).to eq(2)
+      expect(results.total_count).to eq(2)
+    end
+
+    context 'with a deleted project' do
+      before do
+        # Call DELETE directly to avoid triggering our callback to clear the ES index
+        project.delete
+      end
+
+      it 'skips its commits' do
+        expect(results).to contain_exactly(instance_of(Commit))
+        expect(results.count).to eq(1)
+        expect(results.total_count).to eq(1)
+      end
+    end
+
+    context 'with a project pending deletion' do
+      before do
+        project.update!(pending_delete: true)
+      end
+
+      it 'skips its commits' do
+        expect(results).to contain_exactly(instance_of(Commit))
+        expect(results.count).to eq(1)
+        expect(results.total_count).to eq(1)
+      end
     end
   end
 

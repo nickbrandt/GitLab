@@ -1,0 +1,5 @@
+---
+title: Skip ES commit results for deleted projects
+merge_request: 15236
+author:
+type: fixed
