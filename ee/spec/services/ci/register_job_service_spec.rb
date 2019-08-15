@@ -2,13 +2,17 @@ require 'spec_helper'
 
 describe Ci::RegisterJobService do
   set(:shared_runner) { create(:ci_runner, :instance) }
-  let!(:project) { create :project, shared_runners_enabled: false }
+  let!(:project) { create :project, shared_runners_enabled: true }
   let!(:pipeline) { create :ci_empty_pipeline, project: project }
   let!(:pending_build) { create :ci_build, pipeline: pipeline }
 
   describe '#execute' do
     context 'checks database loadbalancing stickiness' do
       subject { described_class.new(shared_runner).execute }
+
+      before do
+        project.update(shared_runners_enabled: false)
+      end
 
       it 'result is valid if replica did caught-up' do
         allow(Gitlab::Database::LoadBalancing).to receive(:enable?)
@@ -31,58 +35,116 @@ describe Ci::RegisterJobService do
       end
     end
 
-    context 'for project with shared runners when global minutes limit is set' do
-      before do
-        project.update(shared_runners_enabled: true)
-        stub_application_setting(shared_runners_minutes: 100)
-      end
+    context 'shared runners minutes limit' do
+      subject { described_class.new(shared_runner).execute.build }
 
-      context 'allow to pick builds' do
-        let(:build) { execute(shared_runner) }
-
-        it { expect(build).to be_kind_of(Ci::Build) }
-      end
-
-      context 'when over the global quota' do
+      shared_examples 'returns a build' do |runners_minutes_used|
         before do
           project.namespace.create_namespace_statistics(
-            shared_runners_seconds: 6001)
+            shared_runners_seconds: runners_minutes_used * 60)
         end
 
-        let(:build) { execute(shared_runner) }
+        it { is_expected.to be_kind_of(Ci::Build) }
+      end
 
-        it "does not return a build" do
-          expect(build).to be_nil
+      shared_examples 'does not return a build' do |runners_minutes_used|
+        before do
+          project.namespace.create_namespace_statistics(
+            shared_runners_seconds: runners_minutes_used * 60)
         end
 
-        context 'when project is public' do
+        it { is_expected.to be_nil }
+      end
+
+      context 'when limit set at global level' do
+        before do
+          stub_application_setting(shared_runners_minutes: 10)
+        end
+
+        context 'and usage is below the limit' do
+          it_behaves_like 'returns a build', 9
+        end
+
+        context 'and usage is above the limit' do
+          it_behaves_like 'does not return a build', 11
+
+          context 'and project is public' do
+            before do
+              project.update(visibility_level: Project::PUBLIC)
+            end
+
+            it_behaves_like 'returns a build', 11
+          end
+        end
+
+        context 'and extra shared runners minutes purchased' do
           before do
-            project.update(visibility_level: Project::PUBLIC)
+            project.namespace.update(extra_shared_runners_minutes_limit: 10)
           end
 
-          it "does return the build" do
-            expect(build).to be_kind_of(Ci::Build)
+          context 'and usage is below the combined limit' do
+            it_behaves_like 'returns a build', 19
+          end
+
+          context 'and usage is above the combined limit' do
+            it_behaves_like 'does not return a build', 21
           end
         end
+      end
 
-        context 'when namespace limit is set to unlimited' do
+      context 'when limit set at namespace level' do
+        before do
+          project.namespace.update(shared_runners_minutes_limit: 5)
+        end
+
+        context 'and limit set to unlimited' do
           before do
             project.namespace.update(shared_runners_minutes_limit: 0)
           end
 
-          it "does return the build" do
-            expect(build).to be_kind_of(Ci::Build)
-          end
+          it_behaves_like 'returns a build', 10
         end
 
-        context 'when namespace quota is bigger than a global one' do
+        context 'and usage is below the limit' do
+          it_behaves_like 'returns a build', 4
+        end
+
+        context 'and usage is above the limit' do
+          it_behaves_like 'does not return a build', 6
+        end
+
+        context 'and extra shared runners minutes purchased' do
           before do
-            project.namespace.update(shared_runners_minutes_limit: 101)
+            project.namespace.update(extra_shared_runners_minutes_limit: 5)
           end
 
-          it "does return the build" do
-            expect(build).to be_kind_of(Ci::Build)
+          context 'and usage is below the combined limit' do
+            it_behaves_like 'returns a build', 9
           end
+
+          context 'and usage is above the combined limit' do
+            it_behaves_like 'does not return a build', 11
+          end
+        end
+      end
+
+      context 'when limit set at global and namespace level' do
+        context 'and namespace limit lower than global limit' do
+          before do
+            stub_application_setting(shared_runners_minutes: 10)
+            project.namespace.update(shared_runners_minutes_limit: 5)
+          end
+
+          it_behaves_like 'does not return a build', 6
+        end
+
+        context 'and namespace limit higher than global limit' do
+          before do
+            stub_application_setting(shared_runners_minutes: 5)
+            project.namespace.update(shared_runners_minutes_limit: 10)
+          end
+
+          it_behaves_like 'returns a build', 6
         end
       end
 
@@ -90,77 +152,28 @@ describe Ci::RegisterJobService do
         let!(:root_ancestor) { create(:group) }
         let!(:group) { create(:group, parent: root_ancestor) }
         let!(:project) { create :project, shared_runners_enabled: true, group: group }
-        let(:build) { execute(shared_runner) }
 
-        it "does return a build" do
-          expect(build).not_to be_nil
-        end
-
-        context 'when we are over limit on subnamespace' do
+        context 'and usage below the limit on root namespace' do
           before do
-            group.create_namespace_statistics(
-              shared_runners_seconds: 6001)
+            root_ancestor.update(shared_runners_minutes_limit: 10)
           end
 
-          it "limit is ignored and build is returned" do
-            expect(build).not_to be_nil
-          end
+          it_behaves_like 'returns a build', 9
         end
 
-        context 'when we are over limit on root namespace' do
+        context 'and usage above the limit on root namespace' do
           before do
+            # limit is ignored on subnamespace
+            group.update(shared_runners_minutes_limit: 20)
+
+            root_ancestor.update(shared_runners_minutes_limit: 10)
             root_ancestor.create_namespace_statistics(
-              shared_runners_seconds: 6001)
+              shared_runners_seconds: 60 * 11)
           end
 
-          it "does not return a build" do
-            expect(build).to be_nil
-          end
+          it_behaves_like 'does not return a build', 11
         end
       end
-    end
-
-    context 'for project with shared runners when limit is set only on namespace' do
-      let(:build) { execute(shared_runner) }
-      let(:runners_seconds_used) { 0 }
-
-      before do
-        project.update(shared_runners_enabled: true)
-        project.namespace.update(shared_runners_minutes_limit: 100)
-        project.namespace.create_namespace_statistics(shared_runners_seconds: runners_seconds_used)
-      end
-
-      context 'when we are under the limit' do
-        let(:runners_seconds_used) { 5000 }
-
-        it "does return a build" do
-          expect(build).not_to be_nil
-        end
-      end
-
-      context 'when we are over the limit' do
-        let(:runners_seconds_used) { 6001 }
-
-        it "does not return a build" do
-          expect(build).to be_nil
-        end
-      end
-
-      context 'when namespace has extra minutes' do
-        let(:runners_seconds_used) { 6001 }
-
-        before do
-          project.namespace.update(extra_shared_runners_minutes_limit: 5)
-        end
-
-        it "does return a build" do
-          expect(build).not_to be_nil
-        end
-      end
-    end
-
-    def execute(runner)
-      described_class.new(runner).execute.build
     end
   end
 end
