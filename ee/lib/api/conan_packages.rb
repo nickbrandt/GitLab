@@ -2,7 +2,49 @@
 
 module API
   class ConanPackages < Grape::API
+    content_type :txt, 'text/plain'
+    content_type :md5, 'text/plain'
+    content_type :sha1, 'text/plain'
+    content_type :binary, 'application/octet-stream'
+
+    rescue_from ActiveRecord::RecordInvalid do |e|
+      render_api_error!(e.message, 400)
+    end
+
     helpers ::API::Helpers::PackagesHelpers
+
+    helpers do
+      def extract_format(file_name)
+        name, _, format = file_name.rpartition('.')
+
+        if %w(md5 sha1).include?(format)
+          [name, format]
+        else
+          [file_name, nil]
+        end
+      end
+
+      def verify_package_file(package_file, uploaded_file)
+        stored_sha1 = Digest::SHA256.hexdigest(package_file.file_sha1)
+        expected_sha1 = uploaded_file.sha256
+
+        if stored_sha1 == expected_sha1
+          no_content!
+        else
+          conflict!
+        end
+      end
+
+      def parse_recipe(recipe)
+        split_recipe = recipe.split('/')
+        {
+          package_name: split_recipe[0],
+          version: split_recipe[1],
+          pkg_username: split_recipe[2],
+          channel: split_recipe[3],
+        }
+      end
+    end
 
     before do
       Rails.logger.info '-----------------------------------------------'
@@ -49,10 +91,7 @@ module API
 
     namespace 'packages/conan/v1/conans/*recipe' do
       params do
-        # requires :name, type: String, desc: 'Package name'
-        # requires :package_version, type: Float, desc: 'Package version'
-        # requires :username, type: String, desc: 'Conan package username'
-        # requires :channel, type: String, desc: 'Conan package channel'
+        requires :recipe, type: String, desc: 'Package recipe'
       end
 
       # Get the recipe manifest
@@ -99,9 +138,9 @@ module API
       post 'packages/:package_id/upload_urls' do
         status 200
         {
-          'conaninfo.txt':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/package/12345/0/conaninfo.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/package/12345/0/conanmanifest.txt",
-          'conanmanifest.tgz': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/package/12345/0/conan_package.txt"
+          'conaninfo.txt':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conaninfo.py",
+          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conanmanifest.txt",
+          'conanmanifest.tgz': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conan_package.txt"
         }
       end
 
@@ -111,8 +150,8 @@ module API
       post 'upload_urls' do
         status 200
         {
-          'conanfile.py':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/export/conanfile.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/export/conanmanifest.txt"
+          'conanfile.py':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/export/conanfile.py",
+          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/export/conanmanifest.txt"
         }
       end
 
@@ -137,29 +176,73 @@ module API
       end
     end
 
-    namespace 'packages/conan/v1/files/*recipe' do
-      params do
-        # requires :name, type: String, desc: 'Package name'
-        # requires :package_version, type: String, desc: 'Package version'
-        # requires :username, type: String, desc: 'Conan package username'
-        # requires :channel, type: String, desc: 'Conan package channel'
-      end
+    desc 'Upload the conan package file' do
+      detail 'This feature was introduced in GitLab 11.3'
+    end
+    params do
+      requires :recipe, type: String, desc: 'Package recipe'
+      requires :path, type: String, desc: 'Package path'
+    end
+    # route_setting :authentication, job_token_allowed: true
+    put 'packages/conan/v1/files/*recipe/-/*path/authorize' do
+      require_gitlab_workhorse!
+      Gitlab::Workhorse.verify_api_request!(headers)
 
-      desc 'Upload package files' do
-        detail 'This feature was introduced in GitLab 12.3'
-      end
-      put '*path' do
-        Rails.logger.info "***UPLOADING***"
-        true
-      end
+      status 200
+      content_type Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE
+      ::Packages::PackageFileUploader.workhorse_authorize(has_length: true)
+    end
 
-      desc 'Download package files' do
-        detail 'This feature was introduced in GitLab 12.3'
-      end
-      get '*path' do
-        Rails.logger.info "***DOWNLOADING***"
-        true
-      end
+    desc 'Upload package files' do
+      detail 'This feature was introduced in GitLab 12.3'
+    end
+    params do
+      requires :recipe, type: String, desc: 'Package recipe'
+      requires :path, type: String, desc: 'Package path'
+      requires :file_name, type: String, desc: 'Package file name'
+      optional 'file.path', type: String, desc: %q(path to locally stored body (generated by Workhorse))
+      optional 'file.name', type: String, desc: %q(real filename as send in Content-Disposition (generated by Workhorse))
+      optional 'file.type', type: String, desc: %q(real content type as send in Content-Type (generated by Workhorse))
+      optional 'file.size', type: Integer, desc: %q(real size of file (generated by Workhorse))
+      optional 'file.md5', type: String, desc: %q(md5 checksum of the file (generated by Workhorse))
+      optional 'file.sha1', type: String, desc: %q(sha1 checksum of the file (generated by Workhorse))
+      optional 'file.sha256', type: String, desc: %q(sha256 checksum of the file (generated by Workhorse))
+    end
+    put 'packages/conan/v1/files/*recipe/-/*path/:file_name' do
+      Rails.logger.info '+++++++++++++++++++++++++++++++++++++++++++++++'
+      Rails.logger.info params
+      Rails.logger.info '+++++++++++++++++++++++++++++++++++++++++++++++'
+      require_gitlab_workhorse!
+
+      uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
+      bad_request!('Missing package file!') unless uploaded_file
+      Rails.logger.info '111'
+
+      package = ::Packages::FindOrCreateConanPackageService
+        .new(User.first.projects.first, User.first, params).execute
+      Rails.logger.info '222'
+
+      file_params = {
+        file:      uploaded_file,
+        size:      params['file.size'],
+        file_name: params['file_name'],
+        file_type: params['file.type'],
+        file_sha1: params['file.sha1'],
+        file_md5:  params['file.md5']
+      }
+      Rails.logger.info '333'
+
+      ::Packages::CreatePackageFileService.new(package, file_params).execute
+      Rails.logger.info '444'
+
+    end
+
+    desc 'Download package files' do
+      detail 'This feature was introduced in GitLab 12.3'
+    end
+    get 'packages/conan/v1/files/*recipe/-/*path/:file_name' do
+      Rails.logger.info "***DOWNLOADING***"
+      true
     end
 
     helpers do
