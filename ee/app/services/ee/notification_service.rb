@@ -16,6 +16,8 @@ module EE
     #  * the new approvers
     #
     def add_merge_request_approvers(merge_request, new_approvers, current_user)
+      return if merge_request.project.emails_disabled?
+
       add_mr_approvers_email(merge_request, new_approvers, current_user)
     end
 
@@ -34,6 +36,8 @@ module EE
     end
 
     def mirror_was_hard_failed(project)
+      return if project.emails_disabled?
+
       recipients = project.members.active_without_invites_and_requests.owners_and_maintainers
 
       if recipients.empty? && project.group
@@ -58,10 +62,14 @@ module EE
     end
 
     def project_mirror_user_changed(new_mirror_user, deleted_user_name, project)
+      return if project.emails_disabled?
+
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
     end
 
     def prometheus_alerts_fired(project, alerts)
+      return if project.emails_disabled?
+
       recipients = project.members.active_without_invites_and_requests.owners_and_masters
 
       if recipients.empty? && project.group

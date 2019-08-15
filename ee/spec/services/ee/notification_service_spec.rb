@@ -122,6 +122,15 @@ describe EE::NotificationService, :mailer do
       subject.new_review(review)
     end
 
+    it_behaves_like 'project emails are disabled' do
+      let(:notification_target)  { review }
+      let(:notification_trigger) { subject.new_review(review) }
+
+      around do |example|
+        perform_enqueued_jobs { example.run }
+      end
+    end
+
     def build_team(project, merge_request)
       @u_watcher               = create_global_setting_for(create(:user), :watch)
       @u_participating         = create_global_setting_for(create(:user), :participating)
@@ -174,28 +183,45 @@ describe EE::NotificationService, :mailer do
     let(:user) { create(:user) }
 
     context 'when the project has invited members' do
-      it 'sends email' do
-        project = create(:project, :mirror, :import_hard_failed)
-        create(:project_member, :invited, project: project)
+      let(:project) { create(:project, :mirror, :import_hard_failed) }
+      let!(:project_member) { create(:project_member, :invited, project: project) }
 
+      it 'sends email' do
         expect(Notify).to receive(:mirror_was_hard_failed_email).with(project.id, project.owner.id).and_call_original
 
         subject.mirror_was_hard_failed(project)
+      end
+
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { project }
+        let(:notification_trigger) { subject.mirror_was_hard_failed(project) }
+
+        around do |example|
+          perform_enqueued_jobs { example.run }
+        end
       end
     end
 
     context 'when user is owner' do
-      it 'sends email' do
-        project = create(:project, :mirror, :import_hard_failed)
+      let(:project) { create(:project, :mirror, :import_hard_failed) }
 
+      it 'sends email' do
         expect(Notify).to receive(:mirror_was_hard_failed_email).with(project.id, project.owner.id).and_call_original
 
         subject.mirror_was_hard_failed(project)
       end
 
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { project }
+        let(:notification_trigger) { subject.mirror_was_hard_failed(project) }
+
+        around do |example|
+          perform_enqueued_jobs { example.run }
+        end
+      end
+
       context 'when owner is blocked' do
         it 'does not send email' do
-          project = create(:project, :mirror, :import_hard_failed)
           project.owner.block!
 
           expect(Notify).not_to receive(:mirror_was_hard_failed_email)
@@ -276,31 +302,56 @@ describe EE::NotificationService, :mailer do
   end
 
   context 'mirror user changed' do
-    it 'sends email' do
-      mirror_user = create(:user)
-      project = create(:project, :mirror, mirror_user_id: mirror_user.id)
-      new_mirror_user = project.team.owners.first
+    let(:mirror_user) { create(:user) }
+    let(:project) { create(:project, :mirror, mirror_user_id: mirror_user.id) }
+    let(:new_mirror_user) { project.team.owners.first }
 
+    it 'sends email' do
       expect(Notify).to receive(:project_mirror_user_changed_email).with(new_mirror_user.id, mirror_user.name, project.id).and_call_original
 
       subject.project_mirror_user_changed(new_mirror_user, mirror_user.name, project)
     end
+
+    it_behaves_like 'project emails are disabled' do
+      let(:notification_target)  { project }
+      let(:notification_trigger) { subject.project_mirror_user_changed(new_mirror_user, mirror_user.name, project) }
+
+      around do |example|
+        perform_enqueued_jobs { example.run }
+      end
+    end
   end
 
   describe '#prometheus_alerts_fired' do
-    it 'sends the email to owners and masters' do
-      project = create(:project)
-      prometheus_alert = create(:prometheus_alert, project: project)
-      master = create(:user)
-      developer = create(:user)
+    let!(:project) { create(:project) }
+    let!(:prometheus_alert) { create(:prometheus_alert, project: project) }
+    let!(:master) { create(:user) }
+    let!(:developer) { create(:user) }
 
+    before do
       project.add_master(master)
+    end
 
+    it 'sends the email to owners and masters' do
       expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, master.id, prometheus_alert).and_call_original
       expect(Notify).to receive(:prometheus_alert_fired_email).with(project.id, project.owner.id, prometheus_alert).and_call_original
       expect(Notify).not_to receive(:prometheus_alert_fired_email).with(project.id, developer.id, prometheus_alert)
 
       subject.prometheus_alerts_fired(prometheus_alert.project, [prometheus_alert])
+    end
+
+    it_behaves_like 'project emails are disabled' do
+      before do
+        allow_any_instance_of(::Gitlab::Alerting::Alert).to receive(:valid?).and_return(true)
+      end
+
+      let(:alert_params) { { 'labels' => { 'gitlab_alert_id' => 'unknown' } } }
+      let(:notification_target)  { prometheus_alert.project }
+      let(:notification_trigger) { subject.prometheus_alerts_fired(prometheus_alert.project, [alert_params]) }
+
+      around do |example|
+        perform_enqueued_jobs { example.run }
+      end
     end
   end
 
@@ -367,6 +418,11 @@ describe EE::NotificationService, :mailer do
           should_not_email(@u_outsider_mentioned)
           should_not_email(@u_lazy_participant)
         end
+
+        it_behaves_like 'group emails are disabled' do
+          let(:notification_target)  { epic.group }
+          let(:notification_trigger) { subject.new_note(note) }
+        end
       end
     end
 
@@ -402,6 +458,11 @@ describe EE::NotificationService, :mailer do
         should_email(watcher)
         should_email(participating)
         should_not_email(other_user)
+      end
+
+      it_behaves_like 'group emails are disabled' do
+        let(:notification_target)  { epic.group }
+        let(:notification_trigger) { execute }
       end
     end
 
@@ -507,6 +568,11 @@ describe EE::NotificationService, :mailer do
         merge_request.assignees.each { |assignee| should_email(assignee) }
       end
 
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { merge_request }
+        let(:notification_trigger) { notification.new_merge_request(merge_request, assignee) }
+      end
+
       context 'when the target project has approvers set' do
         let(:project_approvers) { create_list(:user, 3) }
         let!(:rule) { create(:approval_project_rule, project: project, users: project_approvers, approvals_required: 1 )}
@@ -529,6 +595,11 @@ describe EE::NotificationService, :mailer do
           project_approvers.each { |approver| should_not_email(approver) }
         end
 
+        it_behaves_like 'project emails are disabled' do
+          let(:notification_target)  { merge_request }
+          let(:notification_trigger) { notification.new_merge_request(merge_request, @u_disabled) }
+        end
+
         context 'when the merge request has approvers set' do
           let(:mr_approvers) { create_list(:user, 3) }
           let!(:mr_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: mr_approvers, approvals_required: 1 )}
@@ -547,6 +618,11 @@ describe EE::NotificationService, :mailer do
             notification.new_merge_request(merge_request, @u_disabled)
 
             project_approvers.each { |approver| should_not_email(approver) }
+          end
+
+          it_behaves_like 'project emails are disabled' do
+            let(:notification_target)  { merge_request }
+            let(:notification_trigger) { notification.new_merge_request(merge_request, @u_disabled) }
           end
         end
       end
