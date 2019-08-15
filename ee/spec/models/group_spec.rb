@@ -16,6 +16,7 @@ describe Group do
     # method can't be called with a public_send.
     it { is_expected.to belong_to(:file_template_project).class_name('Project').without_validating_presence }
     it { is_expected.to have_many(:dependency_proxy_blobs) }
+    it { is_expected.to have_many(:cycle_analytics_stages) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
   end
 
