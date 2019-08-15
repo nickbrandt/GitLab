@@ -21,6 +21,7 @@ describe Namespace do
   it { is_expected.to delegate_method(:shared_runners_seconds_last_reset).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:trial?).to(:gitlab_subscription) }
   it { is_expected.to delegate_method(:trial_ends_on).to(:gitlab_subscription) }
+  it { is_expected.to delegate_method(:upgradable?).to(:gitlab_subscription) }
 
   context 'scopes' do
     describe '.with_plan' do

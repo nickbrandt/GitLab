@@ -15,7 +15,7 @@ describe 'Billing plan pages', :feature do
   end
 
   before do
-    stub_full_request("https://customers.gitlab.com/gitlab_plans?plan=#{plan}")
+    stub_full_request("#{EE::SUBSCRIPTIONS_URL}/gitlab_plans?plan=#{plan}")
       .to_return(status: 200, body: plans_data.to_json)
     stub_application_setting(check_namespace_plan: true)
     allow(Gitlab).to receive(:com?) { true }
