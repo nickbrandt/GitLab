@@ -1,4 +1,5 @@
 <script>
+import _ from 'underscore';
 import ReportSection from '~/reports/components/report_section.vue';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
@@ -11,9 +12,12 @@ import { n__, s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
+import MergeTrainHelperText from './components/merge_train_helper_text.vue';
+import { ATMTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 export default {
   components: {
+    MergeTrainHelperText,
     MrWidgetLicenses,
     MrWidgetApprovals,
     MrWidgetGeoSecondaryNode,
@@ -130,6 +134,16 @@ export default {
 
     performanceStatus() {
       return this.checkReportStatus(this.isLoadingPerformance, this.loadingPerformanceFailed);
+    },
+
+    shouldRenderMergeTrainHelperText() {
+      return (
+        this.mr.pipeline &&
+        _.isNumber(this.mr.pipeline.id) &&
+        _.isString(this.mr.pipeline.path) &&
+        this.mr.preferredAutoMergeStrategy === ATMTWPS_MERGE_STRATEGY &&
+        !this.mr.autoMergeEnabled
+      );
     },
   },
   created() {
@@ -331,6 +345,13 @@ export default {
           <source-branch-removal-status v-if="shouldRenderSourceBranchRemovalStatus" />
         </div>
       </div>
+      <merge-train-helper-text
+        v-if="shouldRenderMergeTrainHelperText"
+        :pipeline-id="mr.pipeline.id"
+        :pipeline-link="mr.pipeline.path"
+        :merge-train-length="mr.mergeTrainsCount"
+        :merge-train-when-pipeline-succeeds-docs-path="mr.mergeTrainWhenPipelineSucceedsDocsPath"
+      />
       <div v-if="shouldRenderMergeHelp" class="mr-widget-footer"><mr-widget-merge-help /></div>
     </div>
     <mr-widget-pipeline-container

@@ -2,7 +2,7 @@
 import { s__, sprintf } from '~/locale';
 
 export default {
-  name: 'MergeTrainInfo',
+  name: 'MergeTrainPositionIndicator',
   props: {
     mergeTrainIndex: {
       type: Number,
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <div class="pt-2 pb-2 pl-3 plr-3 merge-train-info">
+  <div class="pt-2 pb-2 pl-3 plr-3 merge-train-position-indicator">
     <div class="media-body">
       {{ message }}
     </div>

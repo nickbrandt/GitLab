@@ -41,6 +41,10 @@ module EE
       end
     end
 
+    def merge_train_when_pipeline_succeeds_docs_path
+      help_page_path('ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md', anchor: 'startadd-to-merge-train-when-pipeline-succeeds')
+    end
+
     def target_project
       merge_request.target_project.present(current_user: current_user)
     end

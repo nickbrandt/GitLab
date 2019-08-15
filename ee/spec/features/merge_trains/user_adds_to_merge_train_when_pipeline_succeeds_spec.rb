@@ -12,6 +12,8 @@ describe 'User adds to merge train when pipeline succeeds', :js do
       target_project: project, target_branch: 'master')
   end
 
+  let(:pipeline) { merge_request.all_pipelines.first }
+
   before do
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.add_maintainer(user)
@@ -21,10 +23,16 @@ describe 'User adds to merge train when pipeline succeeds', :js do
     sign_in(user)
   end
 
-  it 'shows Start merge train when pipeline succeeds button' do
+  it 'shows Start merge train when pipeline succeeds button and helper texts' do
     visit project_merge_request_path(project, merge_request)
 
     expect(page).to have_button('Start merge train when pipeline succeeds')
+
+    within('.js-merge-train-helper-text') do
+      expect(page).to have_content("This merge request will start a merge train when pipeline ##{pipeline.id} succeeds.")
+      expect(page).to have_link('More information',
+        href: MergeRequestPresenter.new(merge_request).merge_train_when_pipeline_succeeds_docs_path)
+    end
   end
 
   context 'when merge_trains EEP license is not available' do
