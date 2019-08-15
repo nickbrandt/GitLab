@@ -3,10 +3,12 @@
 - setting = tracing_setting
 - has_jaeger_url = setting.external_url.present?
 
-%section.settings.expanded.border-0.no-animate
+%section.settings.border-0.no-animate
   .settings-header{ :class => "border-top" }
     %h4
       = _("Jaeger tracing")
+    %button.btn.js-settings-toggle{ type: 'button' }
+      = _('Expand')
     %p
       - if has_jaeger_url
         - tracing_link = link_to sanitize(@project.tracing_external_url, scrubber: Rails::Html::TextOnlyScrubber.new), target: "_blank", rel: 'noopener noreferrer' do
