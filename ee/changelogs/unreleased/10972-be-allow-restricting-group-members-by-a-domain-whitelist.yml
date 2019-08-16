@@ -1,0 +1,6 @@
+---
+title: Allow adding email domain to group to limit users to ones with email in this
+  particular domain
+merge_request: 14800
+author:
+type: added

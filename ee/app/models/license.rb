@@ -89,6 +89,7 @@ class License < ApplicationRecord
     required_ci_templates
     project_aliases
     cycle_analytics_for_groups
+    group_allowed_email_domains
   ]
   EEP_FEATURES.freeze
 

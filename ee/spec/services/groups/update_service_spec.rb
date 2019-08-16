@@ -180,6 +180,32 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  context 'setting allowed email domain' do
+    let(:group) { create(:group) }
+
+    subject { update_group(group, user, params) }
+
+    before do
+      stub_licensed_features(group_allowed_email_domains: true)
+    end
+
+    context 'when allowed_email_domain already exists' do
+      let!(:allowed_domain) { create(:allowed_email_domain, group: group, domain: 'gitlab.com') }
+
+      context 'empty allowed_email_domain param' do
+        let(:params) { { allowed_email_domain_attributes: { id: allowed_domain.id, domain: '' } } }
+
+        it 'deletes ip restriction' do
+          expect(group.allowed_email_domain.domain).to eql('gitlab.com')
+
+          subject
+
+          expect(group.reload.allowed_email_domain).to be_nil
+        end
+      end
+    end
+  end
+
   context 'updating protected params' do
     let(:attrs) { { shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100 } }
 
