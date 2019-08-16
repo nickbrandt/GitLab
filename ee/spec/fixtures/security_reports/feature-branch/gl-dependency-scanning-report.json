@@ -97,47 +97,36 @@
     },
     {
       "category": "dependency_scanning",
-      "name": "nokogiri - USN-3424-1",
-      "message": "Vulnerabilities in libxml2",
-      "cve": "rails/Gemfile.lock:nokogiri@1.8.0:USN-3424-1",
-      "severity": "Unknown",
-      "solution": "Upgrade to latest version.",
+      "message": "Directory traversal vulnerability in rubyzip",
+      "cve": "Gemfile.lock:rubyzip:cve:CVE-2017-5946",
+      "severity": "High",
+      "solution": "upgrade to \u003e= 1.2.1",
       "scanner": {
-        "id": "gemnasium",
-        "name": "Gemnasium"
+        "id": "bundler_audit",
+        "name": "bundler-audit"
       },
       "location": {
-        "file": "rails/Gemfile.lock",
+        "file": "Gemfile.lock",
         "dependency": {
           "package": {
-            "name": "nokogiri"
+            "name": "rubyzip"
           },
-          "version": "1.8.0"
+          "version": "1.2.0"
         }
       },
       "identifiers": [
         {
-          "type": "gemnasium",
-          "name": "Gemnasium-06565b64-486d-4326-b906-890d9915804d",
-          "value": "06565b64-486d-4326-b906-890d9915804d",
-          "url": "https://deps.sec.gitlab.com/packages/gem/nokogiri/versions/1.8.0/advisories"
-        },
-        {
-          "type": "usn",
-          "name": "USN-3424-1",
-          "value": "USN-3424-1",
-          "url": "https://usn.ubuntu.com/3424-1/"
+          "type": "cve",
+          "name": "CVE-2017-5946",
+          "value": "CVE-2017-5946",
+          "url": "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5946"
         }
       ],
       "links": [
         {
-          "url": "https://github.com/sparklemotion/nokogiri/issues/1673"
+          "url": "https://github.com/rubyzip/rubyzip/issues/315"
         }
-      ],
-      "priority": "Unknown",
-      "file": "rails/Gemfile.lock",
-      "url": "https://github.com/sparklemotion/nokogiri/issues/1673",
-      "tool": "gemnasium"
+      ]
     },
     {
       "category": "dependency_scanning",

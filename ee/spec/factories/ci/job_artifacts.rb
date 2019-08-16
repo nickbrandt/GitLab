@@ -118,7 +118,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security-reports/feature-branch/gl-dependency-scanning-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-dependency-scanning-report.json'), 'application/json')
       end
     end
 
@@ -148,7 +148,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/feature-branch/gl-container-scanning-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-container-scanning-report.json'), 'application/json')
       end
     end
 
