@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'User Onboarding' do
+  include MobileHelpers
+
   let(:user) { create(:user) }
   let(:project) { create(:project) }
 
@@ -18,13 +20,27 @@ describe 'User Onboarding' do
     end
 
     describe 'help menu' do
-      it 'shows the "Learn GitLab" item in the help menu' do
+      before do
         visit root_dashboard_path
 
         find('.header-help-dropdown-toggle').click
+      end
 
+      it 'shows the "Learn GitLab" item in the help menu' do
         page.within('.header-help') do
           expect(page).to have_link('Learn GitLab', href: explore_onboarding_index_path(from_help_menu: true))
+        end
+      end
+
+      context 'when on a mobile device' do
+        before do
+          resize_screen_sm
+        end
+
+        it 'does not show the "Learn GitLab" item in the help menu' do
+          page.within('.header-help') do
+            expect(page).not_to have_link('Learn GitLab')
+          end
         end
       end
     end
@@ -39,6 +55,17 @@ describe 'User Onboarding' do
         visit explore_onboarding_index_path
 
         expect(page).to have_content('Welcome to the Guided GitLab Tour')
+      end
+
+      context 'when on a mobile device' do
+        before do
+          resize_screen_sm
+        end
+
+        it 'does not show the "Learn GitLab" welcome page' do
+          visit explore_onboarding_index_path
+          expect(page).not_to have_content('Welcome to the Guided GitLab Tour')
+        end
       end
     end
 
