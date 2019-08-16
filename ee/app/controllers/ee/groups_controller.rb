@@ -44,7 +44,7 @@ module EE
       strong_memoize(:redirect_show_path) do
         case group_view
         when 'security_dashboard'
-          helpers.group_security_dashboard_path(group) if ::Feature.enabled?(:group_overview_security_dashboard)
+          helpers.group_security_dashboard_path(group)
         else
           nil
         end

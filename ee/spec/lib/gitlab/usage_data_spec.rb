@@ -112,11 +112,6 @@ describe Gitlab::UsageData do
         group_overview_security_dashboard: 2
       )
     end
-
-    it 'does not gather group overview preferences usage data when the feature is disabled' do
-      stub_feature_flags(group_overview_security_dashboard: false)
-      expect(subject[:counts].keys).not_to include(:user_preferences)
-    end
   end
 
   describe '#features_usage_data_ee' do

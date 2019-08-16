@@ -140,42 +140,6 @@ describe GroupsController do
               expect(subject).to render_template('groups/show')
             end
           end
-
-          context 'and the feature flag is disabled' do
-            before do
-              stub_feature_flags(group_overview_security_dashboard: false)
-            end
-
-            it 'renders the expected template' do
-              expect(subject).to render_template('groups/show')
-            end
-          end
-        end
-      end
-
-      context 'when feature flag is disabled' do
-        before do
-          stub_feature_flags(group_overview_security_dashboard: false)
-        end
-
-        let(:user) { create(:user, group_view: :security_dashboard) } # not a member of a group
-
-        context 'when security dashboard feature is enabled' do
-          before do
-            stub_licensed_features(security_dashboard: true)
-          end
-
-          context 'when user is not allowed to access group security dashboard' do
-            it 'works because security dashboard is not rendered' do
-              expect(subject).to have_gitlab_http_status(200)
-            end
-          end
-        end
-
-        context 'when security dashboard feature is disabled' do
-          it 'works because security dashboard is not rendered' do
-            expect(subject).to have_gitlab_http_status(200)
-          end
         end
       end
     end
@@ -193,16 +157,6 @@ describe GroupsController do
 
           it 'does not redirect to the security dashboard' do
             expect(subject).not_to redirect_to(group_security_dashboard_url(group))
-          end
-
-          context 'and the feature flag is disabled' do
-            before do
-              stub_feature_flags(group_overview_security_dashboard: false)
-            end
-
-            it 'renders the expected template' do
-              expect(subject).to render_template('groups/show')
-            end
           end
         end
       end
