@@ -55,6 +55,8 @@ module Elastic
           options: options
         )[:commits][:results]
 
+        response_count = response.total_count
+
         # Avoid one SELECT per result by loading all projects into a hash
         project_ids = response.map {|result| result["_source"]["commit"]["rid"] }.uniq
         projects = Project.includes(:route).where(id: project_ids).index_by(&:id)
@@ -62,6 +64,12 @@ module Elastic
         commits = response.map do |result|
           project_id = result["_source"]["commit"]["rid"].to_i
           project = projects[project_id]
+
+          if project.nil? || project.pending_delete?
+            response_count -= 1
+            next
+          end
+
           raw_commit = Gitlab::Git::Commit.new(
             project.repository.raw,
             prepare_commit(result['_source']['commit']),
@@ -70,9 +78,12 @@ module Elastic
           Commit.new(raw_commit, project)
         end
 
+        # Remove results for deleted projects
+        commits.compact!
+
         # Before "map" we had a paginated array so we need to recover it
         offset = per_page * ((page || 1) - 1)
-        Kaminari.paginate_array(commits, total_count: response.total_count, limit: per_page, offset: offset)
+        Kaminari.paginate_array(commits, total_count: response_count, limit: per_page, offset: offset)
       end
 
       def prepare_commit(raw_commit_hash)
