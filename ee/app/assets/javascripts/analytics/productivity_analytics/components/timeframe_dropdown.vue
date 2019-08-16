@@ -17,7 +17,7 @@ export default {
 <template>
   <div
     v-if="groupNamespace"
-    class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
+    class="dropdown-container d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end"
   >
     <label class="mb-0 mr-1">{{ s__('Analytics|Timeframe') }}</label>
     <date-range-dropdown :default-selected="daysInPast" @selected="setDaysInPast" />

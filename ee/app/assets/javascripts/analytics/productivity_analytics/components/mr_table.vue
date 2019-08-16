@@ -1,5 +1,6 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
 import MergeRequestTableRow from './mr_table_row.vue';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 
@@ -7,6 +8,7 @@ export default {
   components: {
     GlDropdown,
     GlDropdownItem,
+    Icon,
     MergeRequestTableRow,
     Pagination,
   },
@@ -44,6 +46,9 @@ export default {
     onPageChange(page) {
       this.$emit('pageChange', page);
     },
+    isSelectedMetric(metric) {
+      return this.metricType === metric;
+    },
   },
 };
 </script>
@@ -73,7 +78,16 @@ export default {
                   class="w-100"
                   @click="$emit('columnMetricChange', key)"
                 >
-                  {{ value }}
+                  <span class="d-flex">
+                    <icon
+                      class="flex-shrink-0 append-right-4"
+                      :class="{
+                        invisible: !isSelectedMetric(key),
+                      }"
+                      name="mobile-issue-close"
+                    />
+                    {{ value }}
+                  </span>
                 </gl-dropdown-item>
               </gl-dropdown>
             </div>

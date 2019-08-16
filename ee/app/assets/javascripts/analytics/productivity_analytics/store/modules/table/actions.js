@@ -10,7 +10,7 @@ export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) 
 
   const params = {
     ...rootGetters['filters/getCommonFilterParams'],
-    // days_to_merge: rootState.charts.charts.main.selected,
+    days_to_merge: rootState.charts.charts.main.selected,
     sort: `${sortField}_${sortOrder}`,
     page: pageInfo ? pageInfo.page : null,
   };

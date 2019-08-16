@@ -8,9 +8,10 @@ import {
   GlButton,
   GlTooltipDirective,
 } from '@gitlab/ui';
+import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import Icon from '~/vue_shared/components/icon.vue';
 import MergeRequestTable from './mr_table.vue';
-import { chartKeys } from '../constants';
+import { chartKeys, metricTypes } from '../constants';
 
 export default {
   components: {
@@ -18,6 +19,7 @@ export default {
     GlLoadingIcon,
     GlDropdown,
     GlDropdownItem,
+    GlColumnChart,
     GlButton,
     Icon,
     MergeRequestTable,
@@ -49,12 +51,20 @@ export default {
       'sortFields',
       'columnMetric',
     ]),
+    ...mapGetters('charts', [
+      'chartLoading',
+      'getChartData',
+      'getColumnChartOption',
+      'getMetricDropdownLabel',
+      'isSelectedMetric',
+    ]),
     ...mapGetters('table', [
       'sortFieldDropdownLabel',
       'sortIcon',
       'sortTooltipTitle',
       'getColumnOptions',
       'columnMetricLabel',
+      'isSelectedSortField',
     ]),
   },
   mounted() {
@@ -63,12 +73,20 @@ export default {
   methods: {
     ...mapActions(['setEndpoint']),
     ...mapActions('filters', ['setProjectPath']),
+    ...mapActions('charts', ['fetchChartData', 'setMetricType', 'chartItemClicked']),
     ...mapActions('table', [
       'setSortField',
       'setMergeRequestsPage',
       'toggleSortOrder',
       'setColumnMetric',
     ]),
+    onMainChartItemClicked({ params }) {
+      const itemValue = params.data.value[0];
+      this.chartItemClicked({ chartKey: this.chartKeys.main, item: itemValue });
+    },
+    getMetricTypes(chartKey) {
+      return metricTypes.filter(m => m.chart === chartKey);
+    },
   },
 };
 </script>
@@ -89,6 +107,119 @@ export default {
       "
     />
     <template v-else>
+      <h4>{{ __('Merge Requests') }}</h4>
+      <div class="qa-time-to-merge mb-4">
+        <h5>{{ __('Time to merge') }}</h5>
+        <gl-loading-icon v-if="chartLoading(chartKeys.main)" size="md" class="my-4 py-4" />
+        <template v-else>
+          <p class="text-muted">
+            {{ __('You can filter by "days to merge" by clicking on the columns in the chart.') }}
+          </p>
+          <gl-column-chart
+            :data="getChartData(chartKeys.main)"
+            :option="getColumnChartOption(chartKeys.main)"
+            :y-axis-title="__('Merge requests')"
+            :x-axis-title="__('Days')"
+            x-axis-type="category"
+            @chartItemClicked="onMainChartItemClicked"
+          />
+        </template>
+      </div>
+
+      <div class="row">
+        <div class="qa-time-based col-lg-6 col-sm-12 mb-4">
+          <gl-dropdown
+            class="mb-4 metric-dropdown"
+            toggle-class="dropdown-menu-toggle w-100"
+            menu-class="w-100 mw-100"
+            :text="getMetricDropdownLabel(chartKeys.timeBasedHistogram)"
+          >
+            <gl-dropdown-item
+              v-for="metric in getMetricTypes(chartKeys.timeBasedHistogram)"
+              :key="metric.key"
+              active-class="is-active"
+              class="w-100"
+              @click="
+                setMetricType({ metricType: metric.key, chartKey: chartKeys.timeBasedHistogram })
+              "
+            >
+              <span class="d-flex">
+                <icon
+                  class="flex-shrink-0 append-right-4"
+                  :class="{
+                    invisible: !isSelectedMetric({
+                      metric: metric.key,
+                      chartKey: chartKeys.timeBasedHistogram,
+                    }),
+                  }"
+                  name="mobile-issue-close"
+                />
+                {{ metric.label }}
+              </span>
+            </gl-dropdown-item>
+          </gl-dropdown>
+          <gl-loading-icon
+            v-if="chartLoading(chartKeys.timeBasedHistogram)"
+            size="md"
+            class="my-4 py-4"
+          />
+          <gl-column-chart
+            v-else
+            :data="getChartData(chartKeys.timeBasedHistogram)"
+            :option="getColumnChartOption(chartKeys.timeBasedHistogram)"
+            :y-axis-title="__('Merge requests')"
+            :x-axis-title="__('Hours')"
+            x-axis-type="category"
+          />
+        </div>
+
+        <div class="qa-commit-based col-lg-6 col-sm-12 mb-4">
+          <gl-dropdown
+            class="mb-4 metric-dropdown"
+            toggle-class="dropdown-menu-toggle w-100"
+            menu-class="w-100 mw-100"
+            :text="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
+          >
+            <gl-dropdown-item
+              v-for="metric in getMetricTypes(chartKeys.commitBasedHistogram)"
+              :key="metric.key"
+              active-class="is-active"
+              class="w-100"
+              @click="
+                setMetricType({ metricType: metric.key, chartKey: chartKeys.commitBasedHistogram })
+              "
+            >
+              <span class="d-flex">
+                <icon
+                  class="flex-shrink-0 append-right-4"
+                  :class="{
+                    invisible: !isSelectedMetric({
+                      metric: metric.key,
+                      chartKey: chartKeys.commitBasedHistogram,
+                    }),
+                  }"
+                  name="mobile-issue-close"
+                />
+                {{ metric.label }}
+              </span>
+            </gl-dropdown-item>
+          </gl-dropdown>
+          <gl-loading-icon
+            v-if="chartLoading(chartKeys.commitBasedHistogram)"
+            size="md"
+            class="my-4 py-4"
+          />
+          <gl-column-chart
+            v-else
+            :data="getChartData(chartKeys.commitBasedHistogram)"
+            :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
+            :y-axis-title="__('Merge requests')"
+            :x-axis-title="__('Commits')"
+            x-axis-type="category"
+          />
+        </div>
+      </div>
+
       <div
         class="qa-mr-table-sort d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
       >
@@ -108,7 +239,16 @@ export default {
                 class="w-100"
                 @click="setSortField(key)"
               >
-                {{ value }}
+                <span class="d-flex">
+                  <icon
+                    class="flex-shrink-0 append-right-4"
+                    :class="{
+                      invisible: !isSelectedSortField(key),
+                    }"
+                    name="mobile-issue-close"
+                  />
+                  {{ value }}
+                </span>
               </gl-dropdown-item>
             </gl-dropdown>
             <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">

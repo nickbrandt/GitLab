@@ -4,19 +4,26 @@ import * as types from 'ee/analytics/productivity_analytics/store/modules/filter
 import getInitialState from 'ee/analytics/productivity_analytics/store/modules/filters/state';
 
 describe('Productivity analytics filter actions', () => {
+  const groupNamespace = 'gitlab-org';
+  const projectPath = 'gitlab-test';
+
   describe('setGroupNamespace', () => {
     it('commits the SET_GROUP_NAMESPACE mutation', done =>
       testAction(
         actions.setGroupNamespace,
-        'gitlab-org',
+        groupNamespace,
         getInitialState(),
         [
           {
             type: types.SET_GROUP_NAMESPACE,
-            payload: 'gitlab-org',
+            payload: groupNamespace,
           },
         ],
         [
+          {
+            type: 'charts/fetchAllChartData',
+            payload: null,
+          },
           {
             type: 'table/fetchMergeRequests',
             payload: null,
@@ -30,15 +37,19 @@ describe('Productivity analytics filter actions', () => {
     it('commits the SET_PROJECT_PATH mutation', done =>
       testAction(
         actions.setProjectPath,
-        'gitlab-test',
+        projectPath,
         getInitialState(),
         [
           {
             type: types.SET_PROJECT_PATH,
-            payload: 'gitlab-test',
+            payload: projectPath,
           },
         ],
         [
+          {
+            type: 'charts/fetchAllChartData',
+            payload: null,
+          },
           {
             type: 'table/fetchMergeRequests',
             payload: null,
@@ -62,6 +73,10 @@ describe('Productivity analytics filter actions', () => {
         ],
         [
           {
+            type: 'charts/fetchAllChartData',
+            payload: null,
+          },
+          {
             type: 'table/fetchMergeRequests',
             payload: null,
           },
@@ -83,6 +98,10 @@ describe('Productivity analytics filter actions', () => {
           },
         ],
         [
+          {
+            type: 'charts/fetchAllChartData',
+            payload: null,
+          },
           {
             type: 'table/fetchMergeRequests',
             payload: null,

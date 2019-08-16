@@ -2,6 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
+import { accessLevelReporter } from '../constants';
 
 export default {
   components: {
@@ -11,6 +12,9 @@ export default {
   data() {
     return {
       groupId: null,
+      groupsQueryParams: {
+        min_access_level: accessLevelReporter,
+      },
     };
   },
   computed: {
@@ -36,8 +40,12 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex flex-column flex-md-row">
-    <groups-dropdown-filter class="group-select" @selected="onGroupSelected" />
+  <div class="dropdown-container d-flex flex-column flex-lg-row">
+    <groups-dropdown-filter
+      class="group-select"
+      :query-params="groupsQueryParams"
+      @selected="onGroupSelected"
+    />
     <projects-dropdown-filter
       v-if="showProjectsDropdownFilter"
       :key="groupId"

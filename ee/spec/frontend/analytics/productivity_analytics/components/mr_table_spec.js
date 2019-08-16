@@ -2,7 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MergeRequestTable from 'ee/analytics/productivity_analytics/components/mr_table.vue';
 import MergeRequestTableRow from 'ee/analytics/productivity_analytics/components/mr_table_row.vue';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import mockMergeRequests from './../mock_data';
+import { mockMergeRequests } from '../mock_data';
 
 describe('MergeRequestTable component', () => {
   let wrapper;

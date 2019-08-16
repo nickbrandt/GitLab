@@ -405,7 +405,7 @@ describe GroupPolicy do
   end
 
   describe 'view_productivity_analytics' do
-    %w[admin owner].each do |role|
+    %w[admin owner maintainer developer reporter].each do |role|
       context "for #{role}" do
         let(:current_user) { public_send(role) }
 
@@ -413,7 +413,7 @@ describe GroupPolicy do
       end
     end
 
-    %w[maintainer developer reporter guest].each do |role|
+    %w[guest].each do |role|
       context "for #{role}" do
         let(:current_user) { public_send(role) }
 
