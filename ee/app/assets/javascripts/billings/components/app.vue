@@ -8,10 +8,19 @@ export default {
     SubscriptionTable,
   },
   props: {
+    planUpgradeHref: {
+      type: String,
+      required: false,
+      default: null,
+    },
     namespaceId: {
       type: String,
       required: false,
       default: null,
+    },
+    namespaceName: {
+      type: String,
+      required: true,
     },
   },
   created() {
@@ -24,5 +33,5 @@ export default {
 </script>
 
 <template>
-  <subscription-table />
+  <subscription-table :namespace-name="namespaceName" :plan-upgrade-href="planUpgradeHref" />
 </template>

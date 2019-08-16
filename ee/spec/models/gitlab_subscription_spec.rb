@@ -154,4 +154,79 @@ describe GitlabSubscription do
       end
     end
   end
+
+  describe '#expired?' do
+    let(:gitlab_subscription) { create(:gitlab_subscription, end_date: end_date) }
+    subject { gitlab_subscription.expired? }
+
+    context 'when end_date is expired' do
+      let(:end_date) { Date.yesterday }
+
+      it { is_expected.to be(true) }
+    end
+
+    context 'when end_date is not expired' do
+      let(:end_date) { 1.week.from_now }
+
+      it { is_expected.to be(false) }
+    end
+
+    context 'when end_date is nil' do
+      let(:end_date) { nil }
+
+      it { is_expected.to be(false) }
+    end
+  end
+
+  describe '#has_a_paid_hosted_plan?' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:subscription) { build(:gitlab_subscription) }
+
+    where(:plan_name, :seats, :hosted, :result) do
+      'bronze'        | 0 | true  | false
+      'bronze'        | 1 | true  | true
+      'bronze'        | 1 | false | false
+      'silver'        | 1 | true  | true
+      'early_adopter' | 1 | true  | false
+    end
+
+    with_them do
+      before do
+        plan = build(:plan, name: plan_name)
+        allow(subscription).to receive(:hosted?).and_return(hosted)
+        subscription.assign_attributes(hosted_plan: plan, seats: seats)
+      end
+
+      it 'returns true if subscription has a paid hosted plan' do
+        expect(subscription.has_a_paid_hosted_plan?).to eq(result)
+      end
+    end
+  end
+
+  describe '#upgradable?' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:subscription) { build(:gitlab_subscription) }
+
+    where(:plan_name, :paid_hosted_plan, :expired, :result) do
+      'bronze' | true | false  | true
+      'bronze' | true | true   | false
+      'silver' | true | false  | true
+      'gold'   | true | false  | false
+    end
+
+    with_them do
+      before do
+        plan = build(:plan, name: plan_name)
+        allow(subscription).to receive(:expired?) { expired }
+        allow(subscription).to receive(:has_a_paid_hosted_plan?) { paid_hosted_plan }
+        subscription.assign_attributes(hosted_plan: plan)
+      end
+
+      it 'returns true if subscription is upgradable' do
+        expect(subscription.upgradable?).to eq(result)
+      end
+    end
+  end
 end

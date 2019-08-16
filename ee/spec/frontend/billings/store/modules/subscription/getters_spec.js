@@ -1,7 +1,7 @@
 import State from 'ee/billings/stores/modules/subscription/state';
 import * as getters from 'ee/billings/stores/modules/subscription/getters';
 
-describe('subscription module getters', () => {
+describe('EE billings subscription module getters', () => {
   let state;
 
   beforeEach(() => {

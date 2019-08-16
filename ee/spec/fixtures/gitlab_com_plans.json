@@ -46,6 +46,7 @@
         }
     },
     {
+        "id": "bronze-external-id",
         "about_page_href": "https://about.gitlab.com/gitlab-com/",
         "code": "bronze",
         "features": [
@@ -92,6 +93,7 @@
         }
     },
     {
+        "id": "silver-external-id",
         "about_page_href": "https://about.gitlab.com/gitlab-com/",
         "code": "silver",
         "features": [
@@ -126,6 +128,7 @@
         }
     },
     {
+        "id": "gold-external-id",
         "about_page_href": "https://about.gitlab.com/gitlab-com/",
         "code": "gold",
         "features": [

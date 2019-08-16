@@ -253,10 +253,11 @@ describe API::Namespaces do
         do_get(owner)
 
         expect(json_response.keys).to match_array(%w[plan usage billing])
-        expect(json_response['plan'].keys).to match_array(%w[name code trial])
+        expect(json_response['plan'].keys).to match_array(%w[name code trial upgradable])
         expect(json_response['plan']['name']).to eq('Silver')
         expect(json_response['plan']['code']).to eq('silver')
         expect(json_response['plan']['trial']).to eq(false)
+        expect(json_response['plan']['upgradable']).to eq(true)
         expect(json_response['usage'].keys).to match_array(%w[seats_in_subscription seats_in_use max_seats_used seats_owed])
         expect(json_response['billing'].keys).to match_array(%w[subscription_start_date subscription_end_date trial_ends_on])
       end

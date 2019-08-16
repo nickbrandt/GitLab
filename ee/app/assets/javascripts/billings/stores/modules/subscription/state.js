@@ -8,6 +8,7 @@ export default () => ({
     code: null,
     name: null,
     trial: false,
+    upgradable: false,
   },
   tables: {
     free: {

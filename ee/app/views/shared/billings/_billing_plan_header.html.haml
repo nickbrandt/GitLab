@@ -14,11 +14,11 @@
         = group_icon(@group, class: 'avatar avatar-tile s96', width: 96, height: 96, alt: @group.name)
 
   %h4
-    - plan_link = plan.about_page_href ? link_to(plan.name, plan.about_page_href) : plan.name
+    - plan_link = plan.about_page_href ? link_to(plan.code.titleize, plan.about_page_href) : plan.name
     - if namespace == current_user.namespace
       = s_("BillingPlans|@%{user_name} you are currently on the %{plan_link} plan.").html_safe % { user_name: current_user.username, plan_link: plan_link }
     - else
-      = s_("BillingPlans|%{group_name} is currently on the %{plan_link} plan.").html_safe % { group_name: namespace.full_name, plan_link: plan_link }
+      = s_("BillingPlans|%{group_name} is currently using the %{plan_link} plan.").html_safe % { group_name: namespace.full_name, plan_link: plan_link }
 
   - if parent_group
     %p= s_("BillingPlans|This group uses the plan associated with its parent group.")

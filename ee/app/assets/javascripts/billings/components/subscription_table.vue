@@ -2,6 +2,7 @@
 import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import SubscriptionTableRow from './subscription_table_row.vue';
 import {
   CUSTOMER_PORTAL_URL,
@@ -9,7 +10,6 @@ import {
   TABLE_TYPE_FREE,
   TABLE_TYPE_TRIAL,
 } from '../constants';
-import { s__, sprintf } from '~/locale';
 
 export default {
   name: 'SubscriptionTable',
@@ -17,21 +17,48 @@ export default {
     SubscriptionTableRow,
     GlLoadingIcon,
   },
+  props: {
+    namespaceName: {
+      type: String,
+      required: true,
+    },
+    planUpgradeHref: {
+      type: String,
+      required: false,
+      default: null,
+    },
+  },
   computed: {
     ...mapState('subscription', ['isLoading', 'hasError', 'plan', 'tables', 'endpoint']),
     ...mapGetters('subscription', ['isFreePlan']),
     subscriptionHeader() {
-      let suffix = '';
-      if (!this.isFreePlan && this.plan.trial) {
-        suffix = `${s__('SubscriptionTable|Trial')}`;
-      }
-      return sprintf(s__('SubscriptionTable|GitLab.com %{planName} %{suffix}'), {
-        planName: this.isFreePlan ? s__('SubscriptionTable|Free') : _.escape(this.plan.name),
-        suffix,
-      });
+      const planName = this.isFreePlan ? s__('SubscriptionTable|Free') : _.escape(this.plan.name);
+      const suffix = !this.isFreePlan && this.plan.trial ? s__('SubscriptionTable|Trial') : '';
+
+      return `${this.namespaceName}: ${planName} ${suffix}`;
     },
-    actionButtonText() {
-      return this.isFreePlan ? s__('SubscriptionTable|Upgrade') : s__('SubscriptionTable|Manage');
+    upgradeButton() {
+      if (!this.isFreePlan && !this.plan.upgradable) {
+        return null;
+      }
+
+      return {
+        text: s__('SubscriptionTable|Upgrade'),
+        href: !this.isFreePlan && this.planUpgradeHref ? this.planUpgradeHref : CUSTOMER_PORTAL_URL,
+      };
+    },
+    manageButton() {
+      if (this.isFreePlan) {
+        return null;
+      }
+
+      return {
+        text: s__('SubscriptionTable|Manage'),
+        href: CUSTOMER_PORTAL_URL,
+      };
+    },
+    buttons() {
+      return [this.upgradeButton, this.manageButton].filter(Boolean);
     },
     visibleRows() {
       let tableKey = TABLE_TYPE_DEFAULT;
@@ -65,12 +92,15 @@ export default {
         <strong> {{ subscriptionHeader }} </strong>
         <div class="controls">
           <a
-            :href="$options.customerPortalUrl"
+            v-for="(button, index) in buttons"
+            :key="button.text"
+            :href="button.href"
             target="_blank"
             rel="noopener noreferrer"
             class="btn btn-inverted-secondary"
+            :class="{ 'ml-2': index !== 0 }"
           >
-            {{ actionButtonText }}
+            {{ button.text }}
           </a>
         </div>
       </div>

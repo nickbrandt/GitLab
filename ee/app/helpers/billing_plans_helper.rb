@@ -28,4 +28,20 @@ module BillingPlansHelper
   def new_gitlab_com_trial_url
     "#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true"
   end
+
+  def subscription_plan_data_attributes(group, plan)
+    return {} unless group
+
+    {
+      namespace_id: group.id,
+      namespace_name: group.name,
+      plan_upgrade_href: plan_upgrade_url(group, plan)
+    }
+  end
+
+  def plan_upgrade_url(group, plan)
+    return unless group && plan&.id
+
+    "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
+  end
 end

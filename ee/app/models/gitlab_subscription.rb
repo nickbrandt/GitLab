@@ -36,6 +36,18 @@ class GitlabSubscription < ApplicationRecord
       Plan::PAID_HOSTED_PLANS.include?(plan_name)
   end
 
+  def expired?
+    return false unless end_date
+
+    end_date < Date.today
+  end
+
+  def upgradable?
+    has_a_paid_hosted_plan? &&
+      !expired? &&
+      plan_name != Plan::PAID_HOSTED_PLANS[-1]
+  end
+
   def plan_code=(code)
     code ||= Namespace::FREE_PLAN
 
