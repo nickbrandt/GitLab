@@ -27,7 +27,7 @@ module EE
     private
 
     def group_view_security_dashboard_enabled?
-      License.feature_available?(:security_dashboard) && ::Feature.enabled?(:group_overview_security_dashboard)
+      License.feature_available?(:security_dashboard)
     end
   end
 end

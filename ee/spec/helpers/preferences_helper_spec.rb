@@ -40,14 +40,6 @@ describe PreferencesHelper do
       end
 
       it { is_expected.to include(['Security dashboard', :security_dashboard]) }
-
-      context 'but feature flag is disabled' do
-        before do
-          stub_feature_flags(group_overview_security_dashboard: false)
-        end
-
-        it { is_expected.not_to include(['Security dashboard', :security_dashboard]) }
-      end
     end
 
     context 'when security dashboard feature is disabled' do
@@ -64,14 +56,6 @@ describe PreferencesHelper do
       end
 
       it { is_expected.to eq(true) }
-
-      context 'but feature flag is disabled' do
-        before do
-          stub_feature_flags(group_overview_security_dashboard: false)
-        end
-
-        it { is_expected.to eq(false) }
-      end
     end
 
     context 'when security dashboard feature is disabled' do

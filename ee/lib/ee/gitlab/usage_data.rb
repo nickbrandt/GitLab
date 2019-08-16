@@ -101,12 +101,10 @@ module EE
         override :user_preferences_usage
         def user_preferences_usage
           super.tap do |user_prefs_usage|
-            if ::Feature.enabled?(:group_overview_security_dashboard)
-              user_prefs_usage.merge!(
-                group_overview_details: count(::User.active.group_view_details),
-                group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
-              )
-            end
+            user_prefs_usage.merge!(
+              group_overview_details: count(::User.active.group_view_details),
+              group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
+            )
           end
         end
 
