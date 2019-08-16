@@ -49,10 +49,10 @@ export default {
     },
   },
   emptyMessage: s__(
-    'LicenseManagement|There are currently no approved or blacklisted licenses in this project.',
+    'LicenseCompliance|There are currently no approved or blacklisted licenses in this project.',
   ),
   emptySearchMessage: s__(
-    'LicenseManagement|There are currently no approved or blacklisted licenses that match in this project.',
+    'LicenseCompliance|There are currently no approved or blacklisted licenses that match in this project.',
   ),
 };
 </script>
@@ -74,7 +74,7 @@ export default {
           variant="success"
           @click="openAddLicenseForm"
         >
-          {{ s__('LicenseManagement|Add a license') }}
+          {{ s__('LicenseCompliance|Add a license') }}
         </gl-button>
       </template>
 

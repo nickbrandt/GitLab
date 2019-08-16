@@ -13,12 +13,12 @@ export default {
     ...mapState(['currentLicenseInModal', 'canManageLicenses']),
     headerTitleText() {
       if (!this.canManageLicenses) {
-        return s__('LicenseManagement|License details');
+        return s__('LicenseCompliance|License details');
       }
       if (this.canApprove) {
-        return s__('LicenseManagement|Approve license?');
+        return s__('LicenseCompliance|Approve license?');
       }
-      return s__('LicenseManagement|Blacklist license?');
+      return s__('LicenseCompliance|Blacklist license?');
     },
     canApprove() {
       return (
@@ -50,7 +50,7 @@ export default {
     <slot v-if="currentLicenseInModal">
       <div class="row prepend-top-10 append-bottom-10 js-license-name">
         <label class="col-sm-3 text-right font-weight-bold">
-          {{ s__('LicenseManagement|License') }}:
+          {{ s__('LicenseCompliance|License') }}:
         </label>
         <div class="col-sm-9 text-secondary">{{ currentLicenseInModal.name }}</div>
       </div>
@@ -59,7 +59,7 @@ export default {
         class="row prepend-top-10 append-bottom-10 js-license-url"
       >
         <label class="col-sm-3 text-right font-weight-bold">
-          {{ s__('LicenseManagement|URL') }}:
+          {{ s__('LicenseCompliance|URL') }}:
         </label>
         <div class="col-sm-9 text-secondary">
           <safe-link
@@ -72,7 +72,7 @@ export default {
       </div>
       <div class="row prepend-top-10 append-bottom-10 js-license-packages">
         <label class="col-sm-3 text-right font-weight-bold">
-          {{ s__('LicenseManagement|Packages') }}:
+          {{ s__('LicenseCompliance|Packages') }}:
         </label>
         <license-packages
           :packages="currentLicenseInModal.packages"
@@ -95,7 +95,7 @@ export default {
         data-dismiss="modal"
         @click="blacklistLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseManagement|Blacklist license') }}
+        {{ s__('LicenseCompliance|Blacklist license') }}
       </button>
       <button
         v-if="canApprove"
@@ -104,7 +104,7 @@ export default {
         data-dismiss="modal"
         @click="approveLicense(currentLicenseInModal)"
       >
-        {{ s__('LicenseManagement|Approve license') }}
+        {{ s__('LicenseCompliance|Approve license') }}
       </button>
     </template>
   </gl-modal>

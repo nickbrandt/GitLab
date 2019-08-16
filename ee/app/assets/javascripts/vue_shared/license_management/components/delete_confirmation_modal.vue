@@ -13,7 +13,7 @@ export default {
       const name = `<strong>${_.escape(this.currentLicenseInModal.name)}</strong>`;
 
       return sprintf(
-        s__('LicenseManagement|You are about to remove the license, %{name}, from this project.'),
+        s__('LicenseCompliance|You are about to remove the license, %{name}, from this project.'),
         { name },
         false,
       );
@@ -27,8 +27,8 @@ export default {
 <template>
   <gl-modal
     id="modal-license-delete-confirmation"
-    :header-title-text="s__('LicenseManagement|Remove license?')"
-    :footer-primary-button-text="s__('LicenseManagement|Remove license')"
+    :header-title-text="s__('LicenseCompliance|Remove license?')"
+    :footer-primary-button-text="s__('LicenseCompliance|Remove license')"
     footer-primary-button-variant="danger"
     @cancel="resetLicenseInModal"
     @submit="deleteLicense(currentLicenseInModal)"

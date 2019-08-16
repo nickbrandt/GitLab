@@ -133,7 +133,7 @@ describe 'Pipeline', :js do
       stub_licensed_features(license_management: true)
     end
 
-    context 'with a license management artifact' do
+    context 'with a License Compliance artifact' do
       before do
         create(:ee_ci_build, :license_management, pipeline: pipeline)
 
@@ -147,11 +147,11 @@ describe 'Pipeline', :js do
       end
 
       it 'shows security report section' do
-        expect(page).to have_content('Loading license management report')
+        expect(page).to have_content('Loading License Compliance report')
       end
     end
 
-    context 'without license management artifact' do
+    context 'without License Compliance artifact' do
       before do
         visit licenses_project_pipeline_path(project, pipeline)
       end
