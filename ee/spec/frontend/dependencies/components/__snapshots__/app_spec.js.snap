@@ -16,7 +16,7 @@ exports[`DependenciesApp component on creation given a dependency list which is 
         Dependencies
         
       <glbadge-stub
-        data-qa-selector="dependency_list_total_content"
+        data-qa-selector="dependency_list_total_count"
         pill=""
       >
         100
@@ -79,7 +79,7 @@ exports[`DependenciesApp component on creation given a list of dependencies and 
         Dependencies
         
       <glbadge-stub
-        data-qa-selector="dependency_list_total_content"
+        data-qa-selector="dependency_list_total_count"
         pill=""
       >
         100
