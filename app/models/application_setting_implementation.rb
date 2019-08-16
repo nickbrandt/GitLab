@@ -23,7 +23,6 @@ module ApplicationSettingImplementation
         akismet_enabled: false,
         allow_local_requests_from_web_hooks_and_services: false,
         allow_local_requests_from_system_hooks: true,
-        dns_rebinding_protection_enabled: true,
         asset_proxy_enabled: false,
         authorized_keys_enabled: true, # TODO default to false if the instance is configured to use AuthorizedKeysCommand
         commit_email_hostname: default_commit_email_hostname,
@@ -106,7 +105,7 @@ module ApplicationSettingImplementation
         snowplow_collector_hostname: nil,
         snowplow_cookie_domain: nil,
         snowplow_enabled: false,
-        snowplow_site_id: nil,
+        snowplow_site_id: nil
       }
     end
 
