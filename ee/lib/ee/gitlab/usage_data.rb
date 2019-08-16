@@ -174,20 +174,21 @@ module EE
         end
 
         # Source: https://gitlab.com/gitlab-data/analytics/blob/master/transform/snowflake-dbt/data/ping_metrics_to_stage_mapping_data.csv
-        # rubocop: disable CodeReuse/ActiveRecord
         def usage_activity_by_stage
           {
             usage_activity_by_stage: {
-              manage: {
-                groups: count(::GroupMember.distinct, count_by: :user_id),
-                ldap_group_links: -1, # no creator / user ID
-                ldap_keys: count(::LDAPKey.distinct, count_by: :user_id),
-                ldap_users: count(::GroupMember.distinct.of_ldap_type, count_by: :user_id)
-              }
+              manage: usage_activity_by_stage_manage
             }
           }
         end
-        # rubocop: enable CodeReuse/ActiveRecord
+
+        def usage_activity_by_stage_manage
+          {
+            groups: ::GroupMember.distinct_count_by(:user_id),
+            ldap_keys: ::LDAPKey.distinct_count_by(:user_id),
+            ldap_users: ::GroupMember.of_ldap_type.distinct_count_by(:user_id)
+          }
+        end
       end
     end
   end

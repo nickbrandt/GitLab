@@ -6,6 +6,7 @@ module EE
 
     prepended do
       extend ::Gitlab::Utils::Override
+      include UsageStatistics
 
       validate :sso_enforcement, if: :group
 
