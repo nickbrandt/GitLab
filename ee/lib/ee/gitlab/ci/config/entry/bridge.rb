@@ -14,14 +14,19 @@ module EE
             include ::Gitlab::Config::Entry::Attributable
 
             ALLOWED_KEYS = %i[trigger stage allow_failure only except
-                              when extends variables].freeze
+                              when extends variables needs].freeze
 
             validations do
               validates :config, allowed_keys: ALLOWED_KEYS
               validates :config, presence: true
-              validates :trigger, presence: true
               validates :name, presence: true
               validates :name, type: Symbol
+
+              validate do
+                unless trigger.present? || needs.present?
+                  errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+                end
+              end
 
               with_options allow_nil: true do
                 validates :when,
@@ -33,6 +38,9 @@ module EE
 
             entry :trigger, ::EE::Gitlab::Ci::Config::Entry::Trigger,
               description: 'CI/CD Bridge downstream trigger definition.'
+
+            entry :needs, ::EE::Gitlab::Ci::Config::Entry::Needs,
+              description: 'CI/CD Bridge needs dependency definition.'
 
             entry :stage, ::Gitlab::Ci::Config::Entry::Stage,
               description: 'Pipeline stage this job will be executed into.'
@@ -53,7 +61,8 @@ module EE
             def self.matching?(name, config)
               ::Feature.enabled?(:cross_project_pipeline_triggers, default_enabled: true) &&
                 !name.to_s.start_with?('.') &&
-                config.is_a?(Hash) && config.key?(:trigger)
+                config.is_a?(Hash) &&
+                (config.key?(:trigger) || config.key?(:needs))
             end
 
             def self.visible?
@@ -66,7 +75,8 @@ module EE
 
             def value
               { name: name,
-                trigger: trigger_value,
+                trigger: (trigger_value if trigger_defined?),
+                needs: (needs_value if needs_defined?),
                 ignore: !!allow_failure,
                 stage: stage_value,
                 when: when_value,

@@ -1,5 +1,4 @@
-require 'fast_spec_helper'
-require_dependency 'active_model'
+require 'spec_helper'
 
 describe EE::Gitlab::Ci::Config::Entry::Bridge do
   describe '.matching?' do
@@ -41,7 +40,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
   end
 
   describe '.new' do
-    subject { described_class.new(config, name: :my_trigger) }
+    subject { described_class.new(config, name: :my_bridge) }
 
     before do
       subject.compose!
@@ -56,8 +55,26 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#value' do
         it 'is returns a bridge job configuration' do
-          expect(subject.value).to eq(name: :my_trigger,
+          expect(subject.value).to eq(name: :my_bridge,
                                       trigger: { project: 'some/project' },
+                                      ignore: false,
+                                      stage: 'test',
+                                      only: { refs: %w[branches tags] })
+        end
+      end
+    end
+
+    context 'when needs pipeline config is a non-empty string' do
+      let(:config) { { needs: { pipeline: 'some/project' } } }
+
+      describe '#valid?' do
+        it { is_expected.to be_valid }
+      end
+
+      describe '#value' do
+        it 'is returns a bridge job configuration' do
+          expect(subject.value).to eq(name: :my_bridge,
+                                      needs: { pipeline: 'some/project' },
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] })
@@ -76,9 +93,9 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#value' do
         it 'is returns a bridge job configuration hash' do
-          expect(subject.value).to eq(name: :my_trigger,
+          expect(subject.value).to eq(name: :my_bridge,
                                       trigger: { project: 'some/project',
-                                                branch: 'feature' },
+                                                 branch: 'feature' },
                                       ignore: false,
                                       stage: 'test',
                                       only: { refs: %w[branches tags] })
@@ -89,6 +106,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     context 'when bridge configuration contains all supported keys' do
       let(:config) do
         { trigger: { project: 'some/project', branch: 'feature' },
+          needs: { pipeline: 'other/project' },
           when: 'always',
           extends: '.some-key',
           stage: 'deploy',
@@ -109,7 +127,21 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty trigger config' do
-          expect(subject.errors.first).to match /can't be blank/
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
+        end
+      end
+    end
+
+    context 'when upstream config is nil' do
+      let(:config) { { needs: nil } }
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'is returns an error about empty upstream config' do
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
         end
       end
     end

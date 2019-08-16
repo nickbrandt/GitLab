@@ -9,6 +9,8 @@ describe Ci::ProcessPipelineService, '#execute' do
     create(:ci_empty_pipeline, ref: 'master', project: project, user: user)
   end
 
+  let(:service) { described_class.new(pipeline.project, user) }
+
   before do
     project.add_maintainer(user)
     downstream.add_developer(user)
