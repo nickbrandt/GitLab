@@ -8,7 +8,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/master/gl-sast-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-report.json'), 'text/plain')
       end
     end
 
@@ -18,7 +18,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/deprecated/gl-sast-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-sast-report.json'), 'text/plain')
       end
     end
 
@@ -38,7 +38,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/master/gl-license-management-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-license-management-report.json'), 'application/json')
       end
     end
 
@@ -48,7 +48,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/feature-branch/gl-license-management-report.json'), 'application/json')
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-license-management-report.json'), 'application/json')
       end
     end
 
@@ -88,7 +88,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/master/gl-dependency-scanning-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dependency-scanning-report.json'), 'text/plain')
       end
     end
 
@@ -98,7 +98,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/remediations/gl-dependency-scanning-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/remediations/gl-dependency-scanning-report.json'), 'text/plain')
       end
     end
 
@@ -108,7 +108,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/deprecated/gl-dependency-scanning-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/deprecated/gl-dependency-scanning-report.json'), 'text/plain')
       end
     end
 
@@ -138,7 +138,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/master/gl-container-scanning-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-container-scanning-report.json'), 'text/plain')
       end
     end
 
@@ -168,7 +168,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/master/gl-dast-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-report.json'), 'text/plain')
       end
     end
 
@@ -198,7 +198,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
-          Rails.root.join('spec/fixtures/security-reports/dependency_list/gl-dependency-scanning-report.json'), 'text/plain')
+          Rails.root.join('ee/spec/fixtures/security_reports/dependency_list/gl-dependency-scanning-report.json'), 'text/plain')
       end
     end
   end

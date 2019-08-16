@@ -9,7 +9,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::Dast do
   let(:parsed_report) do
     JSON.parse!(
       File.read(
-        Rails.root.join('spec/fixtures/security-reports/master/gl-dast-report.json')
+        Rails.root.join('ee/spec/fixtures/security_reports/master/gl-dast-report.json')
       )
     )
   end

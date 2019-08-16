@@ -8,7 +8,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
   let(:clair_vulnerabilities) do
     JSON.parse!(
       File.read(
-        Rails.root.join('spec/fixtures/security-reports/master/gl-container-scanning-report.json')
+        Rails.root.join('ee/spec/fixtures/security_reports/master/gl-container-scanning-report.json')
       )
     )['vulnerabilities']
   end
