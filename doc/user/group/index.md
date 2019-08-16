@@ -358,8 +358,8 @@ the group regardless of the IP restriction.
 You can restrict access to groups and their underlying projects by
 allowing only users with email addresses in particular domains to be added to the group.
 
-Add whitelisted email domain and users with emails from different domains won't be allowed to be added
-to this group.
+Add email domains you want to whitelist and users with emails from different 
+domains won't be allowed to be added to this group.
 
 Some domains cannot be restricted. These are the most popular public email domains, such as:
 
