@@ -31,6 +31,9 @@ module EE
       has_one :dependency_proxy_setting, class_name: 'DependencyProxy::GroupSetting'
       has_many :dependency_proxy_blobs, class_name: 'DependencyProxy::Blob'
 
+      has_one :allowed_email_domain
+      accepts_nested_attributes_for :allowed_email_domain, allow_destroy: true, reject_if: :all_blank
+
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
       has_many :audit_events, -> { where(entity_type: ::Group.name) }, foreign_key: 'entity_id'
@@ -178,6 +181,12 @@ module EE
       return ip_restriction if parent_id.nil?
 
       root_ancestor.ip_restriction
+    end
+
+    def root_ancestor_allowed_email_domain
+      return allowed_email_domain if parent_id.nil?
+
+      root_ancestor.allowed_email_domain
     end
 
     # Overrides a method defined in `::EE::Namespace`

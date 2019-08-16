@@ -64,4 +64,57 @@ describe 'groups/edit.html.haml' do
       end
     end
   end
+
+  context 'allowed_email_domain' do
+    before do
+      allow(group).to receive(:feature_available?).and_return(false)
+      allow(group).to receive(:feature_available?).with(:group_allowed_email_domains).and_return(true)
+    end
+
+    context 'top-level group' do
+      before do
+        create(:allowed_email_domain, group: group)
+      end
+
+      it 'renders allowed_email_domain setting' do
+        render
+
+        expect(rendered).to render_template('groups/settings/_allowed_email_domain')
+        expect(rendered).to(have_field('group_allowed_email_domain_attributes_domain',
+                                       { disabled: false,
+                                         with: 'gitlab.com' }))
+      end
+    end
+
+    context 'subgroup' do
+      let(:group) { create(:group, :nested) }
+
+      before do
+        create(:allowed_email_domain, group: group.parent)
+        group.build_allowed_email_domain
+      end
+
+      it 'show read-only allowed_email_domain setting of root ancestor' do
+        render
+
+        expect(rendered).to render_template('groups/settings/_allowed_email_domain')
+        expect(rendered).to(have_field('group_allowed_email_domain_attributes_domain',
+                                       { disabled: true,
+                                         with: 'gitlab.com' }))
+      end
+    end
+
+    context 'feature is disabled' do
+      before do
+        stub_licensed_features(group_allowed_email_domains: false)
+      end
+
+      it 'does not show allowed_email_domain setting' do
+        render
+
+        expect(rendered).to render_template('groups/settings/_allowed_email_domain')
+        expect(rendered).not_to have_field('group_allowed_email_domain_attributes_domain')
+      end
+    end
+  end
 end
