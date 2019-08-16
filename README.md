@@ -111,7 +111,7 @@ For upgrading information please see our [update page](https://about.gitlab.com/
 
 ## Documentation
 
-All documentation can be found on [doc.gitlab.com/ee/](http://doc.gitlab.com/ee/).
+All documentation can be found on [docs.gitlab.com/ee/](https://docs.gitlab.com/ee/).
 
 ## Getting help
 
