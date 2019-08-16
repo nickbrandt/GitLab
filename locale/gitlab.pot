@@ -2149,13 +2149,16 @@ msgstr ""
 msgid "Billing"
 msgstr ""
 
-msgid "BillingPlans|%{group_name} is currently on the %{plan_link} plan."
+msgid "BillingPlans|%{group_name} is currently using the %{plan_link} plan."
 msgstr ""
 
 msgid "BillingPlans|@%{user_name} you are currently on the %{plan_link} plan."
 msgstr ""
 
 msgid "BillingPlans|Automatic downgrade and upgrade to some plans is currently not available."
+msgstr ""
+
+msgid "BillingPlans|Contact Support"
 msgstr ""
 
 msgid "BillingPlans|Current plan"
@@ -2167,16 +2170,22 @@ msgstr ""
 msgid "BillingPlans|Downgrade"
 msgstr ""
 
+msgid "BillingPlans|If you would like to downgrade your plan please %{support_link}."
+msgstr ""
+
 msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold."
 msgstr ""
 
-msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}."
+msgid "BillingPlans|Learn more about each plan by visiting our %{pricing_page_link}."
 msgstr ""
 
 msgid "BillingPlans|Manage plan"
 msgstr ""
 
 msgid "BillingPlans|Please contact %{customer_support_link} in that case."
+msgstr ""
+
+msgid "BillingPlans|Pricing page"
 msgstr ""
 
 msgid "BillingPlans|See all %{plan_name} features"
@@ -14271,9 +14280,6 @@ msgid "SubscriptionTable|Free"
 msgstr ""
 
 msgid "SubscriptionTable|GitLab allows you to continue using your subscription even if you exceed the number of seats you purchased. You will be required to pay for these seats upon renewal."
-msgstr ""
-
-msgid "SubscriptionTable|GitLab.com %{planName} %{suffix}"
 msgstr ""
 
 msgid "SubscriptionTable|Last invoice"

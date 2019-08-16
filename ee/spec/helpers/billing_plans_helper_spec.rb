@@ -14,4 +14,42 @@ describe BillingPlansHelper do
       expect(helper.current_plan?(plan)).to be_falsy
     end
   end
+
+  describe '#subscription_plan_data_attributes' do
+    let(:group) { build(:group) }
+    let(:plan) do
+      Hashie::Mash.new(id: 'external-paid-plan-hash-code')
+    end
+
+    context 'when group and plan with ID present' do
+      it 'returns data attributes' do
+        upgrade_href =
+          "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
+
+        expect(helper.subscription_plan_data_attributes(group, plan))
+          .to eq(namespace_id: group.id,
+                 namespace_name: group.name,
+                 plan_upgrade_href: upgrade_href)
+      end
+    end
+
+    context 'when group not present' do
+      let(:group) { nil }
+
+      it 'returns empty data attributes' do
+        expect(helper.subscription_plan_data_attributes(group, plan)).to eq({})
+      end
+    end
+
+    context 'when plan with ID not present' do
+      let(:plan) { Hashie::Mash.new(id: nil) }
+
+      it 'returns data attributes without upgrade href' do
+        expect(helper.subscription_plan_data_attributes(group, plan))
+          .to eq(namespace_id: group.id,
+                 namespace_name: group.name,
+                 plan_upgrade_href: nil)
+      end
+    end
+  end
 end

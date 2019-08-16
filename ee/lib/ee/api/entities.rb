@@ -682,6 +682,7 @@ module EE
           expose :plan_name, as: :code
           expose :plan_title, as: :name
           expose :trial
+          expose :upgradable?, as: :upgradable
         end
 
         expose :usage do

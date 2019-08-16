@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SubscriptionApp component on creation matches the snapshot 1`] = `
+<subscriptiontable-stub
+  namespacename="bronze"
+  planupgradehref="/url"
+/>
+`;

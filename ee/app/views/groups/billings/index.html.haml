@@ -1,5 +1,4 @@
 - current_plan = subscription_plan_info(@plans_data, @group.actual_plan_name)
-
 - page_title "Billing"
 
 - if @top_most_group
@@ -8,4 +7,10 @@
 - else
   = render 'shared/billings/billing_plan_header', namespace: @group, plan: current_plan
 
-  #js-billing-plans{ data: { namespace_id: @group.id } }
+  #js-billing-plans{ data: subscription_plan_data_attributes(@group, current_plan) }
+
+- if @group.actual_plan
+  .center
+    - support_link = link_to s_("BillingPlans|Contact Support"), "https://support.gitlab.com"
+
+    = s_("BillingPlans|If you would like to downgrade your plan please %{support_link}.").html_safe % { support_link: support_link }
