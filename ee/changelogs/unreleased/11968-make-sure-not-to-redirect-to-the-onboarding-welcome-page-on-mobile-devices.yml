@@ -1,0 +1,6 @@
+---
+title: Resolve Make sure not to redirect to the onboarding welcome page on mobile
+  devices
+merge_request: 14842
+author:
+type: fixed
