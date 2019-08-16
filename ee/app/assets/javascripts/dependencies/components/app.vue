@@ -82,6 +82,9 @@ export default {
     isTabDisabled(namespace) {
       return this.totals[namespace] <= 0;
     },
+    qaCountSelector(label) {
+      return `dependency_list_${label.toLowerCase().replace(' ', '_')}_count`;
+    },
   },
 };
 </script>
@@ -123,7 +126,9 @@ export default {
         >
           <template v-slot:title>
             {{ listType.label }}
-            <gl-badge pill>{{ totals[listType.namespace] }}</gl-badge>
+            <gl-badge pill :data-qa-selector="qaCountSelector(listType.label)">{{
+              totals[listType.namespace]
+            }}</gl-badge>
           </template>
           <paginated-dependencies-table :namespace="listType.namespace" />
         </gl-tab>
@@ -139,7 +144,7 @@ export default {
       <div class="d-sm-flex justify-content-between align-items-baseline my-2">
         <h3 class="h5">
           {{ __('Dependencies') }}
-          <gl-badge v-if="pageInfo.total" pill data-qa-selector="dependency_list_total_content">{{
+          <gl-badge v-if="pageInfo.total" pill data-qa-selector="dependency_list_total_count">{{
             pageInfo.total
           }}</gl-badge>
         </h3>
