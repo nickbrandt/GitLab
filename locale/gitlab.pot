@@ -6645,6 +6645,9 @@ msgstr ""
 msgid "Generate key"
 msgstr ""
 
+msgid "Generate link to chart"
+msgstr ""
+
 msgid "Generate new export"
 msgstr ""
 
@@ -8822,6 +8825,9 @@ msgid "Limited to showing %d event at most"
 msgid_plural "Limited to showing %d events at most"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Link copied to clipboard"
+msgstr ""
 
 msgid "Linked emails (%{email_count})"
 msgstr ""
