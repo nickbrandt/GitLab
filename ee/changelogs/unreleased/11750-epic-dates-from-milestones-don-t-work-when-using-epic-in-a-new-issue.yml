@@ -1,0 +1,5 @@
+---
+title: Update epic dates when creating an issue that adds the epic using commands
+merge_request: 15062
+author:
+type: fixed
