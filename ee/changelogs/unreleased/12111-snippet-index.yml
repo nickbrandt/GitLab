@@ -1,0 +1,5 @@
+---
+title: "Elasticsearch: index snippet content only up to 1 MB"
+merge_request: 15215
+author:
+type: changed

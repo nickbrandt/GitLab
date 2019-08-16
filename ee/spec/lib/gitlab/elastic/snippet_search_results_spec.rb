@@ -61,4 +61,14 @@ describe Gitlab::Elastic::SnippetSearchResults, :elastic do
       expect(results.snippet_blobs_count).to eq(1)
     end
   end
+
+  context 'when content is too long' do
+    let(:content) { "abc" + (" " * Elastic::Latest::SnippetInstanceProxy::MAX_INDEX_SIZE) + "xyz" }
+    let(:snippet) { create(:personal_snippet, :public, content: content) }
+
+    it 'indexes up to a limit' do
+      expect(described_class.new(nil, 'abc').snippet_blobs_count).to eq(1)
+      expect(described_class.new(nil, 'xyz').snippet_blobs_count).to eq(0)
+    end
+  end
 end
