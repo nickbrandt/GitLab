@@ -6,10 +6,9 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
   let(:parser) { described_class.new(project, sha) }
   let(:project) { create(:project) }
   let(:sha) { '4242424242424242' }
+  let(:report) { Gitlab::Ci::Reports::DependencyList::Report.new }
 
   describe '#parse!' do
-    let(:report) { Gitlab::Ci::Reports::DependencyList::Report.new }
-
     before do
       artifact.each_blob do |blob|
         parser.parse!(blob, report)
@@ -50,6 +49,39 @@ describe Gitlab::Ci::Parsers::Security::DependencyList do
 
       it 'returns empty list of dependencies' do
         expect(report.dependencies.size).to eq(0)
+      end
+    end
+  end
+
+  describe '#parse_licenses!' do
+    let(:artifact) { create(:ee_ci_job_artifact, :license_management) }
+    let(:dependency_info) { build(:dependency, :with_vulnerabilities) }
+
+    before do
+      report.add_dependency(dependency)
+
+      artifact.each_blob do |blob|
+        parser.parse_licenses!(blob, report)
+      end
+    end
+
+    context 'with existing license' do
+      let(:dependency) { dependency_info }
+
+      it 'apply license to dependency' do
+        licenses = report.dependencies.last[:licenses]
+
+        expect(licenses.count).to eq(1)
+        expect(licenses[0][:name]).to eq('MIT')
+        expect(licenses[0][:url]).to eq('http://opensource.org/licenses/mit-license')
+      end
+    end
+
+    context 'without existing license' do
+      let(:dependency) { dependency_info.merge(name: 'irigokon') }
+
+      it 'does not apply any license if name mismatch' do
+        expect(report.dependencies.first[:licenses]).to be_empty
       end
     end
   end

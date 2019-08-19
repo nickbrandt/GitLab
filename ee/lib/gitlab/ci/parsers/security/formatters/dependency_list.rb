@@ -20,7 +20,8 @@ module Gitlab
                   path:      file_path
                 },
                 version:  dependency['version'],
-                vulnerabilities: collect_vulnerabilities(vulnerabilities, dependency, file_path)
+                vulnerabilities: collect_vulnerabilities(vulnerabilities, dependency, file_path),
+                licenses: []
               }
             end
 

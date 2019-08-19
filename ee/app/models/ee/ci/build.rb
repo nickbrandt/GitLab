@@ -78,6 +78,10 @@ module EE
           each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
             dependency_list.parse!(blob, dependency_list_report)
           end
+
+          each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
+            dependency_list.parse_licenses!(blob, dependency_list_report)
+          end
         end
 
         dependency_list_report

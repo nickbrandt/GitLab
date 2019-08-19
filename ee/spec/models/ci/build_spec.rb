@@ -235,7 +235,8 @@ describe Ci::Build do
   end
 
   describe '#collect_dependency_list_reports!' do
-    let!(:artifact) { create(:ee_ci_job_artifact, :dependency_list, job: job, project: job.project) }
+    let!(:dl_artifact) { create(:ee_ci_job_artifact, :dependency_list, job: job, project: job.project) }
+    let!(:lm_artifact) { create(:ee_ci_job_artifact, :license_management, job: job, project: job.project) }
     let(:dependency_list_report) { Gitlab::Ci::Reports::DependencyList::Report.new }
 
     subject { job.collect_dependency_list_reports!(dependency_list_report) }
@@ -248,10 +249,13 @@ describe Ci::Build do
       it 'parses blobs and add the results to the report' do
         subject
         blob_path = "/#{project.full_path}/blob/#{job.sha}/yarn/yarn.lock"
+        mini_portile2 = dependency_list_report.dependencies[0]
+        yarn = dependency_list_report.dependencies[20]
 
         expect(dependency_list_report.dependencies.count).to eq(21)
-        expect(dependency_list_report.dependencies[0][:name]).to eq('mini_portile2')
-        expect(dependency_list_report.dependencies[20][:location][:blob_path]).to eq(blob_path)
+        expect(mini_portile2[:name]).to eq('mini_portile2')
+        expect(mini_portile2[:licenses][0][:name]).to eq('MIT')
+        expect(yarn[:location][:blob_path]).to eq(blob_path)
       end
     end
 
