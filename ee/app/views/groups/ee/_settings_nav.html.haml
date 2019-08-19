@@ -22,7 +22,8 @@
       %span
         Audit Events
 
-- if License.feature_available?(:usage_quotas)
+-# Check if this is not a sub group
+- if License.feature_available?(:usage_quotas) && @group.parent.nil?
   = nav_link(path: 'usage_quota#index') do
     = link_to group_usage_quotas_path(@group), title: s_('UsageQuota|Usage Quotas') do
       %span
