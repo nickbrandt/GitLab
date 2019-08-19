@@ -166,7 +166,7 @@ module EE
       if pipeline.nil?
         {
           empty_state_illustration_path: image_path('illustrations/security-dashboard_empty.svg'),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard'),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           has_pipeline_data: "false"
         }
       else
@@ -177,7 +177,7 @@ module EE
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard'),
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           pipeline_id: pipeline.id,
           user_path: user_url(pipeline.user),
           user_avatar_path: pipeline.user.avatar_url,
