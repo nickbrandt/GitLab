@@ -10,6 +10,7 @@ module EE
         mount ::EE::API::GroupBoards
 
         mount ::API::ProjectApprovalRules
+        mount ::API::ProjectApprovalSettings
         mount ::API::Unleash
         mount ::API::EpicIssues
         mount ::API::EpicLinks

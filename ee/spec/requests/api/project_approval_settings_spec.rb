@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe API::ProjectApprovalRules do
+describe API::ProjectApprovalSettings do
   set(:group) { create(:group_with_members) }
   set(:user) { create(:user) }
   set(:user2) { create(:user) }
@@ -10,8 +10,8 @@ describe API::ProjectApprovalRules do
   set(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   set(:approver) { create(:user) }
 
-  describe 'GET /projects/:id/approval_rules' do
-    let(:url) { "/projects/#{project.id}/approval_rules" }
+  describe 'GET /projects/:id/approval_settings' do
+    let(:url) { "/projects/#{project.id}/approval_settings" }
 
     context 'when the request is correct' do
       let!(:rule) do
@@ -30,13 +30,13 @@ describe API::ProjectApprovalRules do
         get api(url, developer)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(response).to match_response_schema('public_api/v4/project_approval_rules', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/project_approval_settings', dir: 'ee')
 
         json = json_response
 
-        expect(json.size).to eq(1)
+        expect(json['rules'].size).to eq(1)
 
-        rule = json.first
+        rule = json['rules'].first
 
         expect(rule['approvals_required']).to eq(7)
         expect(rule['name']).to eq('security')
@@ -53,7 +53,7 @@ describe API::ProjectApprovalRules do
           get api(url, developer)
 
           json = json_response
-          rule = json.first
+          rule = json['rules'].first
 
           expect(rule['groups'].size).to eq(0)
         end
@@ -64,7 +64,7 @@ describe API::ProjectApprovalRules do
           get api(url, developer)
 
           json = json_response
-          rule = json.first
+          rule = json['rules'].first
 
           expect(rule['groups'].size).to eq(1)
         end
@@ -80,31 +80,31 @@ describe API::ProjectApprovalRules do
 
           json = json_response
 
-          expect(json.size).to eq(2)
-          expect(json.map { |rule| rule['name'] }).to contain_exactly(rule.name, report_approver_rule.name)
+          expect(json['rules'].size).to eq(2)
+          expect(json['rules'].map { |rule| rule['name'] }).to contain_exactly(rule.name, report_approver_rule.name)
         end
       end
     end
   end
 
-  describe 'POST /projects/:id/approval_rules' do
-    let(:schema) { 'public_api/v4/project_approval_rule' }
-    let(:url) { "/projects/#{project.id}/approval_rules" }
+  describe 'POST /projects/:id/approval_settings/rules' do
+    let(:schema) { 'public_api/v4/project_approval_setting' }
+    let(:url) { "/projects/#{project.id}/approval_settings/rules" }
 
     it_behaves_like 'an API endpoint for creating project approval rule'
   end
 
-  describe 'PUT /projects/:id/approval_rules/:approval_rule_id' do
+  describe 'PUT /projects/:id/approval_settings/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:schema) { 'public_api/v4/project_approval_rule' }
-    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
+    let(:schema) { 'public_api/v4/project_approval_setting' }
+    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
 
     it_behaves_like 'an API endpoint for updating project approval rule'
   end
 
-  describe 'DELETE /projects/:id/approval_rules/:approval_rule_id' do
+  describe 'DELETE /projects/:id/approval_settings/rules/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
+    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
 
     it_behaves_like 'an API endpoint for deleting project approval rule'
   end
