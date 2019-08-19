@@ -11,4 +11,12 @@ class JiraConnectInstallation < ApplicationRecord
   validates :client_key, presence: true, uniqueness: true
   validates :shared_secret, presence: true
   validates :base_url, presence: true, public_url: true
+
+  scope :for_project, -> (project) {
+    distinct
+      .joins(:subscriptions)
+      .where(jira_connect_subscriptions: {
+        id: JiraConnectSubscription.for_project(project)
+      })
+  }
 end
