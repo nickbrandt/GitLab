@@ -10,7 +10,7 @@
             .avatar-container.s40
               = group_icon(group, alt: group.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
             .template-subgroup-name.prepend-left-5
-              %strong= group.name
+              %strong= group.full_name
               - if group.description.present?
                 .text-muted
                   = group.description
