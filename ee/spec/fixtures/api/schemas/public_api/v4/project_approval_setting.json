@@ -6,7 +6,7 @@
     "approvals_required": { "type": "integer" },
     "contains_hidden_groups": { "type": "boolean" },
     "rule_type": { "type": "tring" },
-    "eligible_approvers": {
+    "approvers": {
       "type": "array",
       "items": {
         "type": "object",

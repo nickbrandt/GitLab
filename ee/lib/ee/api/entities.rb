@@ -309,7 +309,7 @@ module EE
         expose :id, :name, :rule_type
       end
 
-      class ApprovalRule < ApprovalRuleShort
+      class ApprovalSettingRule < ApprovalRuleShort
         def initialize(object, options = {})
           presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
           super(presenter, options)
@@ -322,7 +322,11 @@ module EE
         expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
-      class MergeRequestApprovalRule < ApprovalRule
+      class ApprovalRule < ApprovalSettingRule
+        expose :approvers, as: :eligible_approvers, using: ::API::Entities::UserBasic, override: true
+      end
+
+      class MergeRequestApprovalRule < ApprovalSettingRule
         class SourceRule < Grape::Entity
           expose :approvals_required
         end
@@ -343,8 +347,8 @@ module EE
       end
 
       # Decorates Project
-      class ProjectApprovalRules < Grape::Entity
-        expose :visible_approval_rules, as: :rules, using: ApprovalRule
+      class ProjectApprovalSettings < Grape::Entity
+        expose :visible_approval_rules, as: :rules, using: ApprovalSettingRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
       end
 
