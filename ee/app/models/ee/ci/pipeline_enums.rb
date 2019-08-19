@@ -10,7 +10,11 @@ module EE
 
         override :failure_reasons
         def failure_reasons
-          super.merge(activity_limit_exceeded: 20, size_limit_exceeded: 21)
+          super.merge(
+            activity_limit_exceeded: 20,
+            size_limit_exceeded: 21,
+            job_activity_limit_exceeded: 22
+          )
         end
 
         override :sources
