@@ -1,11 +1,11 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import _ from 'underscore';
 import createFlash from '~/flash';
 import { s__, sprintf } from '~/locale';
 import DesignList from '../components/list/index.vue';
 import UploadForm from '../components/upload/form.vue';
-import EmptyState from '../components/empty_state.vue';
+import UploadButton from '../components/upload/button.vue';
 import uploadDesignMutation from '../graphql/mutations/uploadDesign.mutation.graphql';
 import permissionsQuery from '../graphql/queries/permissions.query.graphql';
 import allDesignsMixin from '../mixins/all_designs';
@@ -18,7 +18,8 @@ export default {
     GlLoadingIcon,
     DesignList,
     UploadForm,
-    EmptyState,
+    UploadButton,
+    GlEmptyState,
   },
   mixins: [allDesignsMixin],
   apollo: {
@@ -233,12 +234,20 @@ export default {
       </div>
       <design-list v-else-if="hasVersion" :designs="versionDesigns" />
       <design-list v-else-if="hasDesigns" :designs="designs" />
-      <empty-state
+      <gl-empty-state
         v-else
-        :can-upload-design="canCreateDesign"
-        :is-saving="isSaving"
-        @upload="onUploadDesign"
-      />
+        :title="s__('DesignManagement|The one place for your designs')"
+        :description="
+          s__(`DesignManagement|Upload and view the latest designs for this issue.
+            Consistent and easy to find, so everyone is up to date.`)
+        "
+      >
+        <template #actions>
+          <div v-if="canCreateDesign" class="center">
+            <upload-button :is-saving="isSaving" @upload="onUploadDesign" />
+          </div>
+        </template>
+      </gl-empty-state>
     </div>
     <router-view />
   </div>

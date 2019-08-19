@@ -26,8 +26,9 @@ exports[`Design management index page designs renders empty text 1`] = `
   <div
     class="mt-4"
   >
-    <emptystate-stub
-      canuploaddesign="true"
+    <glemptystate-stub
+      description="Upload and view the latest designs for this issue. Consistent and easy to find, so everyone is up to date."
+      title="The one place for your designs"
     />
   </div>
    
