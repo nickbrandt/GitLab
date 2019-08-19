@@ -4,8 +4,8 @@
       .top-bar.js-top-bar
         .truncated-info.d-none.d-md-flex.append-right-8
           = s_('Environments|Pod logs from')
-        .dropdown.js-pod-dropdown
-          %button.dropdown-menu-toggle{ type: 'button', data: { toggle: 'dropdown' }, 'aria-expanded': false }
+        .dropdown.js-pod-dropdown.d-flex
+          %button.dropdown-menu-toggle.d-flex.align-content-center.align-self-center{ type: 'button', data: { toggle: 'dropdown' }, 'aria-expanded': false }
             = icon('chevron-down')
           .dropdown-menu.dropdown-menu-selectable.dropdown-menu-drop-up
         .controllers
@@ -17,7 +17,7 @@
               = custom_icon('scroll_down')
           .refresh-control
             .has-tooltip.controllers-buttons{ title: _('Refresh'), data: { placement: 'top', container: 'body'} }
-              %button.js-refresh-log.btn.btn-default.btn-refresh{ type: 'button', disabled: true }
+              %button.js-refresh-log.btn.btn-default.btn-refresh.h-32-px{ type: 'button', disabled: true }
                 = sprite_icon('retry')
 
       = render 'shared/builds/build_output'
