@@ -11,7 +11,7 @@ module QA
             def self.included(page)
               page.class_eval do
                 view 'ee/app/views/layouts/nav/sidebar/_project_security_link.html.haml' do
-                  element :link_security_dashboard
+                  element :security_dashboard_link
                   element :dependency_list_link
                 end
               end
@@ -19,7 +19,7 @@ module QA
 
             def click_on_security_dashboard
               within_sidebar do
-                click_element :link_security_dashboard
+                click_element :security_dashboard_link
               end
             end
 
@@ -33,7 +33,7 @@ module QA
 
             def hover_security_compliance
               within_sidebar do
-                find_element(:link_security_dashboard).hover
+                find_element(:security_dashboard_link).hover
 
                 yield
               end
