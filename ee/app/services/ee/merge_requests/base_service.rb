@@ -3,10 +3,30 @@
 module EE
   module MergeRequests
     module BaseService
+      extend ::Gitlab::Utils::Override
+
+      override :execute_hooks
+      def execute_hooks(merge_request, action = 'open', old_rev: nil, old_associations: {})
+        super
+
+        return unless merge_request.project && jira_subscription_exists?
+
+        if Atlassian::JiraIssueKeyExtractor.has_keys?(merge_request.title, merge_request.description)
+          JiraConnect::SyncMergeRequestWorker.perform_async(merge_request.id)
+        end
+      end
+
       private
 
       attr_accessor :blocking_merge_requests_params
 
+      def jira_subscription_exists?
+        ::Feature.enabled?(:jira_connect_app) &&
+          project.feature_available?(:jira_dev_panel_integration) &&
+          JiraConnectSubscription.for_project(project).exists?
+      end
+
+      override :filter_params
       def filter_params(merge_request)
         unless current_user.can?(:update_approvers, merge_request)
           params.delete(:approvals_before_merge)

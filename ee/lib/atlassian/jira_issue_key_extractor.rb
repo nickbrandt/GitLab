@@ -2,6 +2,10 @@
 
 module Atlassian
   class JiraIssueKeyExtractor
+    def self.has_keys?(*text)
+      new(*text).issue_keys.any?
+    end
+
     def initialize(*text)
       @text = text.join(' ')
     end
