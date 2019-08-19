@@ -23,12 +23,12 @@ describe DependencyEntity do
       end
 
       it do
-        is_expected.to eq(dependency)
+        is_expected.to eq(dependency.except(:licenses))
       end
     end
 
     context 'with reporter' do
-      let(:dependency_info) { build(:dependency) }
+      let(:dependency_info) { build(:dependency).except(:licenses) }
 
       before do
         project.add_reporter(user)

@@ -33,6 +33,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
         expect(data[:location][:path]).to eq('rails/Gemfile.lock')
         expect(data[:version]).to eq('2.2.0')
         expect(data[:vulnerabilities]).to be_empty
+        expect(data[:licenses]).to be_empty
       end
     end
 

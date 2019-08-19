@@ -10,7 +10,7 @@ module Gitlab
           end
 
           def parse!(json_data, report)
-            report_data = JSON.parse!(json_data)
+            report_data = JSON.parse(json_data)
             report_data.fetch('dependency_files', []).each do |file|
               file['dependencies'].each do |dependency|
                 report.add_dependency(formatter.format(dependency,
@@ -18,6 +18,13 @@ module Gitlab
                                                        file['path'],
                                                        report_data['vulnerabilities']))
               end
+            end
+          end
+
+          def parse_licenses!(json_data, report)
+            licenses = JSON.parse(json_data, symbolize_names: true)
+            licenses[:dependencies].each do |license|
+              report.apply_license(license)
             end
           end
 

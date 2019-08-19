@@ -5,6 +5,7 @@ FactoryBot.define do
     name 'nokogiri'
     packager 'Ruby (Bundler)'
     version '1.8.0'
+    licenses { [] }
     location do
       {
         blob_path: '/some_project/path/Gemfile.lock',
