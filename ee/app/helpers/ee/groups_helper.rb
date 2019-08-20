@@ -4,6 +4,13 @@ module EE
   module GroupsHelper
     extend ::Gitlab::Utils::Override
 
+    def group_epics_count(state:)
+      EpicsFinder
+        .new(current_user, group_id: @group.id, state: state)
+        .execute
+        .count
+    end
+
     override :group_overview_nav_link_paths
     def group_overview_nav_link_paths
       super + %w[
