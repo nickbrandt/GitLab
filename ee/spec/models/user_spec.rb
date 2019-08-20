@@ -364,7 +364,7 @@ describe User do
 
       context 'when the access level of the user is below the required one' do
         before do
-          group_1.add_developer(user)
+          group_1.add_reporter(user)
         end
 
         it 'returns an empty collection' do
@@ -374,9 +374,9 @@ describe User do
 
       context 'when the access level of the user is the correct' do
         before do
-          group_1.add_maintainer(user)
+          group_1.add_developer(user)
           group_2.add_maintainer(user)
-          group_3.add_maintainer(user)
+          group_3.add_developer(user)
         end
 
         context 'when a Group ID is passed' do
