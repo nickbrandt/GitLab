@@ -28,8 +28,10 @@ describe Gitlab::Vulnerabilities::History do
       end
 
       it 'returns the proper format for the history' do
-        expect(counter[:total]).to eq({ Date.today => 3 })
-        expect(counter[:high]).to eq({ Date.today => 2 })
+        Timecop.freeze do
+          expect(counter[:total]).to eq({ Date.today => 3 })
+          expect(counter[:high]).to eq({ Date.today => 2 })
+        end
       end
     end
 
@@ -55,8 +57,27 @@ describe Gitlab::Vulnerabilities::History do
       end
 
       it 'returns the proper format for the history' do
-        expect(counter[:total]).to eq({ Date.today => 3 })
-        expect(counter[:high]).to eq({ Date.today => 2 })
+        Timecop.freeze do
+          expect(counter[:total]).to eq({ Date.today => 3 })
+          expect(counter[:high]).to eq({ Date.today => 2 })
+        end
+      end
+
+      context 'multiple projects with vulnerabilities' do
+        before do
+          Timecop.freeze(Date.today - 1) do
+            create_vulnerabilities(1, project1, { severity: :high })
+          end
+          Timecop.freeze(Date.today - 4) do
+            create_vulnerabilities(1, project2, { severity: :high })
+          end
+        end
+
+        it 'sorts by date for each key' do
+          Timecop.freeze do
+            expect(counter[:high].keys).to eq([(Date.today - 4), (Date.today - 1), Date.today])
+          end
+        end
       end
     end
 
@@ -64,7 +85,8 @@ describe Gitlab::Vulnerabilities::History do
       report_type = options[:report_type] || :sast
       severity = options[:severity] || :high
       pipeline = create(:ci_pipeline, :success, project: project)
-      create_list(:vulnerabilities_occurrence, count, report_type: report_type, severity: severity, pipelines: [pipeline], project: project)
+      created_at = options[:created_at] || Date.today
+      create_list(:vulnerabilities_occurrence, count, report_type: report_type, severity: severity, pipelines: [pipeline], project: project, created_at: created_at)
     end
   end
 end

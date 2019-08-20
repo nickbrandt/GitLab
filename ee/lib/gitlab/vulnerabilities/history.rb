@@ -32,14 +32,19 @@ module Gitlab
 
         project_ids_to_fetch.each do |project_id|
           project_history = Gitlab::Vulnerabilities::HistoryCache.new(group, project_id).fetch(HISTORY_RANGE)
-          history_keys = ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.map(&:to_sym)
-          history_keys << :total
-          history_keys.each do |key|
-            history[key].merge!(project_history[key]) { |k, aggregate, project_count| aggregate + project_count }
+          history.each do |key, value|
+            value.merge!(project_history[key]) { |k, aggregate, project_count| aggregate + project_count }
           end
         end
 
-        history[:total] = history[:total].sort_by { |date, count| date }.to_h
+        sort_by_date_for_each_key(history)
+      end
+
+      def sort_by_date_for_each_key(history)
+        history.each do |key, value|
+          history[key] = value.sort_by { |date, count| date }.to_h
+        end
+
         history
       end
 
