@@ -13,6 +13,7 @@ module EE
 
     DEFAULT_ROADMAP_LAYOUT = 'months'.freeze
     DEFAULT_GROUP_VIEW = 'details'.freeze
+    MAX_USERNAME_SUGGESTION_ATTEMPTS = 15
 
     prepended do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
@@ -125,6 +126,19 @@ module EE
       def find_by_smartcard_identity(certificate_subject, certificate_issuer)
         joins(:smartcard_identities)
           .find_by(smartcard_identities: { subject: certificate_subject, issuer: certificate_issuer })
+      end
+
+      def username_suggestion(base_name)
+        suffix = nil
+        base_name = base_name.parameterize(separator: '_')
+        MAX_USERNAME_SUGGESTION_ATTEMPTS.times do |attempt|
+          username = "#{base_name}#{suffix}"
+          return username unless ::Namespace.find_by_path_or_name(username)
+
+          suffix = attempt + 1
+        end
+
+        ''
       end
     end
 
