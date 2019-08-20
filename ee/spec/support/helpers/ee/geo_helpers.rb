@@ -21,8 +21,26 @@ module EE
       allow(::Gitlab::Geo).to receive(:secondary?).and_return(true)
     end
 
+    def stub_node_disabled(node)
+      allow(node).to receive(:enabled?).and_return(false)
+    end
+
     def stub_selective_sync(node, value)
       allow(node).to receive(:selective_sync?).and_return(value)
+    end
+
+    def stub_healthy_shards(shards)
+      ::Gitlab::ShardHealthCache.update(Array(shards))
+    end
+
+    def with_no_geo_database_configured(&block)
+      allow(::Gitlab::Geo).to receive(:geo_database_configured?).and_return(false)
+
+      yield
+
+      # We need to unstub here or the DatabaseCleaner will have issues since it
+      # will appear as though the tracking DB were not available
+      allow(::Gitlab::Geo).to receive(:geo_database_configured?).and_call_original
     end
   end
 end

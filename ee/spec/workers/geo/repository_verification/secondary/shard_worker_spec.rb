@@ -167,7 +167,7 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :r
     end
 
     it 'does not schedule jobs when not running on a secondary' do
-      allow(Gitlab::Geo).to receive(:primary?) { false }
+      allow(Gitlab::Geo).to receive(:secondary?) { false }
 
       expect(secondary_single_worker).not_to receive(:perform_async)
 
