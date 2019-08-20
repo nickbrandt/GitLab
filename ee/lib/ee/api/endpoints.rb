@@ -34,6 +34,7 @@ module EE
         mount ::API::ProjectApprovals
         mount ::API::Vulnerabilities
         mount ::API::MergeRequestApprovals
+        mount ::API::MergeRequestApprovalRules
         mount ::API::ProjectAliases
         mount ::API::Dependencies
 

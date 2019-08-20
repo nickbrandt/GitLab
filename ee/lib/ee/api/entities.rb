@@ -317,41 +317,45 @@ module EE
         expose :id, :name, :rule_type
       end
 
-      class ApprovalSettingRule < ApprovalRuleShort
+      class ApprovalRule < ApprovalRuleShort
         def initialize(object, options = {})
           presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
           super(presenter, options)
         end
 
-        expose :approvers, using: ::API::Entities::UserBasic
+        expose :approvers, as: :eligible_approvers, using: ::API::Entities::UserBasic
         expose :approvals_required
         expose :users, using: ::API::Entities::UserBasic
         expose :groups, using: ::API::Entities::Group
         expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
-      class ApprovalRule < ApprovalSettingRule
-        expose :approvers, as: :eligible_approvers, using: ::API::Entities::UserBasic, override: true
+      class ApprovalSettingRule < ApprovalRule
+        expose :approvers, using: ::API::Entities::UserBasic, override: true
       end
 
-      class MergeRequestApprovalRule < ApprovalSettingRule
+      class MergeRequestApprovalRule < ApprovalRule
         class SourceRule < Grape::Entity
           expose :approvals_required
         end
 
-        expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
-        expose :code_owner
         expose :source_rule, using: SourceRule
+      end
+
+      class MergeRequestApprovalSettingRule < MergeRequestApprovalRule
+        expose :approvers, using: ::API::Entities::UserBasic, override: true
+        expose :code_owner
+        expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
         expose :approved?, as: :approved
       end
 
       # Decorates ApprovalState
-      class MergeRequestApprovalRules < Grape::Entity
+      class MergeRequestApprovalSettings < Grape::Entity
         expose :approval_rules_overwritten do |approval_state|
           approval_state.approval_rules_overwritten?
         end
 
-        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
+        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule
       end
 
       # Decorates Project
