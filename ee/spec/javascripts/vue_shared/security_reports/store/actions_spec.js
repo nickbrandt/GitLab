@@ -58,6 +58,9 @@ import actions, {
   setSastContainerDiffEndpoint,
   receiveSastContainerDiffSuccess,
   fetchSastContainerDiff,
+  setDependencyScanningDiffEndpoint,
+  receiveDependencyScanningDiffSuccess,
+  fetchDependencyScanningDiff,
 } from 'ee/vue_shared/security_reports/store/actions';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
@@ -72,6 +75,7 @@ import {
   sastFeedbacks,
   dastFeedbacks,
   containerScanningFeedbacks,
+  dependencyScanningFeedbacks,
 } from '../mock_data';
 
 const createVulnerability = options => ({
@@ -1721,6 +1725,146 @@ describe('security reports actions', () => {
             },
             {
               type: 'receiveSastContainerError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('setDependencyScanningDiffEndpoint', () => {
+    it('should pass down the endpoint to the mutation', done => {
+      const payload = '/dependency_scanning_endpoint.json';
+
+      testAction(
+        setDependencyScanningDiffEndpoint,
+        payload,
+        mockedState,
+        [
+          {
+            type: types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveDependencyScanningDiffSuccess', () => {
+    it('should pass down the response to the mutation', done => {
+      const payload = { data: 'Effort yields its own rewards.' };
+
+      testAction(
+        receiveDependencyScanningDiffSuccess,
+        payload,
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchDependencyScanningDiff', () => {
+    const diff = { foo: {} };
+
+    beforeEach(() => {
+      mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_feedback';
+      mockedState.dependencyScanning.paths.diffEndpoint = 'dependency_scanning_diff.json';
+    });
+
+    describe('on success', () => {
+      it('should dispatch `receiveDependencyScanningDiffSuccess`', done => {
+        mock.onGet('dependency_scanning_diff.json').reply(200, diff);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'dependency_scanning',
+            },
+          })
+          .reply(200, dependencyScanningFeedbacks);
+
+        testAction(
+          fetchDependencyScanningDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestDependencyScanningReports',
+            },
+            {
+              type: 'receiveDependencyScanningDiffSuccess',
+              payload: {
+                diff,
+                enrichData: dependencyScanningFeedbacks,
+              },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when vulnerabilities path errors', () => {
+      it('should dispatch `receiveDependencyScanningError`', done => {
+        mock.onGet('dependency_scanning_diff.json').reply(500);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'dependency_scanning',
+            },
+          })
+          .reply(200, dependencyScanningFeedbacks);
+
+        testAction(
+          fetchDependencyScanningDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestDependencyScanningReports',
+            },
+            {
+              type: 'receiveDependencyScanningError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when feedback path errors', () => {
+      it('should dispatch `receiveDependencyScanningError`', done => {
+        mock.onGet('dependency_scanning_diff.json').reply(200, diff);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'dependency_scanning',
+            },
+          })
+          .reply(500);
+
+        testAction(
+          fetchDependencyScanningDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestDependencyScanningReports',
+            },
+            {
+              type: 'receiveDependencyScanningError',
             },
           ],
           done,

@@ -5,7 +5,7 @@ import {
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
-  enrichVulnerabilityWithFeedback,
+  parseDiff,
 } from './utils';
 import filterByKey from './utils/filter_by_key';
 import { parseSastContainer } from './utils/container_scanning';
@@ -106,18 +106,12 @@ export default {
   },
 
   [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
-    const fillInTheGaps = vulnerability => ({
-      ...enrichVulnerabilityWithFeedback(vulnerability, enrichData),
-      category: vulnerability.report_type,
-      title: vulnerability.message || vulnerability.name,
-    });
-
-    const added = diff.added ? diff.added.map(fillInTheGaps) : [];
-    const fixed = diff.fixed ? diff.fixed.map(fillInTheGaps) : [];
+    const { added, fixed, existing } = parseDiff(diff, enrichData);
 
     Vue.set(state.sastContainer, 'isLoading', false);
     Vue.set(state.sastContainer, 'newIssues', added);
     Vue.set(state.sastContainer, 'resolvedIssues', fixed);
+    Vue.set(state.sastContainer, 'allIssues', existing);
   },
 
   [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
@@ -173,6 +167,10 @@ export default {
     Vue.set(state.dependencyScanning.paths, 'base', path);
   },
 
+  [types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT](state, path) {
+    Vue.set(state.dependencyScanning.paths, 'diffEndpoint', path);
+  },
+
   [types.REQUEST_DEPENDENCY_SCANNING_REPORTS](state) {
     Vue.set(state.dependencyScanning, 'isLoading', true);
   },
@@ -225,6 +223,15 @@ export default {
       Vue.set(state.dependencyScanning, 'newIssues', newIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
     }
+  },
+
+  [types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS](state, { diff, enrichData }) {
+    const { added, fixed, existing } = parseDiff(diff, enrichData);
+
+    Vue.set(state.dependencyScanning, 'isLoading', false);
+    Vue.set(state.dependencyScanning, 'newIssues', added);
+    Vue.set(state.dependencyScanning, 'resolvedIssues', fixed);
+    Vue.set(state.dependencyScanning, 'allIssues', existing);
   },
 
   [types.RECEIVE_DEPENDENCY_SCANNING_ERROR](state) {

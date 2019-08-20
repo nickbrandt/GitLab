@@ -420,3 +420,24 @@ export const groupedReportText = (report, reportType, errorMessage, loadingMessa
     paths,
   });
 };
+
+/**
+ * Generates the added, fixed, and existing vulnerabilities from the API report.
+ *
+ * @param {Object} diff The original reports.
+ * @param {Object} enrichData Feedback data to add to the reports.
+ * @returns {Object}
+ */
+export const parseDiff = (diff, enrichData) => {
+  const enrichVulnerability = vulnerability => ({
+    ...enrichVulnerabilityWithFeedback(vulnerability, enrichData),
+    category: vulnerability.report_type,
+    title: vulnerability.message || vulnerability.name,
+  });
+
+  return {
+    added: diff.added ? diff.added.map(enrichVulnerability) : [],
+    fixed: diff.fixed ? diff.fixed.map(enrichVulnerability) : [],
+    existing: diff.existing ? diff.existing.map(enrichVulnerability) : [],
+  };
+};
