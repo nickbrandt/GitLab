@@ -17,29 +17,16 @@
       align-items: center;
     }
 
-    .dropdown {
-      display: flex;
+    .dropdown-menu-toggle {
+      width: 200px;
 
-      > .dropdown-menu-toggle {
-        display: flex;
-        align-content: center;
-        align-self: center;
-        width: 200px;
-
-        @include media-breakpoint-up(sm) {
-          width: 300px;
-        }
-      }
-
-      > .dropdown-menu {
+      @include media-breakpoint-up(sm) {
         width: 300px;
       }
+    }
 
-      .dropdown-toggle-text {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
+    .dropdown-menu {
+      width: 300px;
     }
 
     .controllers {
@@ -49,17 +36,11 @@
     .refresh-control {
       @include build-controllers(16px, flex-end, true, 0);
       margin-left: 2px;
-
-      .controllers-buttons {
-        .btn-refresh {
-          height: 32px;
-
-          svg {
-            top: 0;
-          }
-        }
-      }
     }
+  }
+
+  .btn-refresh svg {
+    top: 0;
   }
 
   .build-loader-animation {

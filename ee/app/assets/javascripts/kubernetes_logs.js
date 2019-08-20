@@ -79,7 +79,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
     this.$podDropdown
       .find('.dropdown-menu-toggle')
       .html(
-        `<span class="dropdown-toggle-text">${this.podName}</span><i class="fa fa-chevron-down"></i>`,
+        `<span class="dropdown-toggle-text text-truncate">${this.podName}</span><i class="fa fa-chevron-down"></i>`,
       );
     $podDropdownMenu.off('click');
     $podDropdownMenu.empty();
