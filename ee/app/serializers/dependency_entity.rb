@@ -11,13 +11,22 @@ class DependencyEntity < Grape::Entity
     expose :name, :severity
   end
 
+  class LicenseEntity < Grape::Entity
+    expose :name, :url
+  end
+
   expose :name, :packager, :version
   expose :location, using: LocationEntity
   expose :vulnerabilities, using: VulnerabilityEntity, if: ->(_) { can_read_vulnerabilities? }
+  expose :licenses, using: LicenseEntity, if: ->(_) { can_read_licenses? }
 
   private
 
   def can_read_vulnerabilities?
     can?(request.user, :read_project_security_dashboard, request.project)
+  end
+
+  def can_read_licenses?
+    can?(request.user, :read_software_license_policy, request.project)
   end
 end

@@ -26,6 +26,15 @@ FactoryBot.define do
       end
     end
 
+    trait :with_licenses do
+      licenses do
+        [{
+           name: 'MIT',
+           url: 'http://opensource.org/licenses/mit-license'
+         }]
+      end
+    end
+
     initialize_with { attributes }
   end
 end

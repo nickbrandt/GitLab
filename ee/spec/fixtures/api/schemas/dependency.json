@@ -5,7 +5,8 @@
     "packager",
     "version",
     "location",
-    "vulnerabilities"
+    "vulnerabilities",
+    "licenses"
   ],
   "properties": {
     "name": {
@@ -32,6 +33,17 @@
           "type": "string"
         },
         "severity": {
+          "type": "string"
+        }
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
           "type": "string"
         }
       }
