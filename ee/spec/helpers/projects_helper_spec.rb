@@ -114,7 +114,7 @@ describe ProjectsHelper do
       subject { helper.project_security_dashboard_config(project, nil) }
 
       it 'returns simple config' do
-        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard'
+        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'false'
       end
     end
@@ -123,7 +123,7 @@ describe ProjectsHelper do
       subject { helper.project_security_dashboard_config(project, pipeline) }
 
       it 'returns config containing pipeline details' do
-        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard'
+        expect(subject[:security_dashboard_help_path]).to eq '/help/user/application_security/security_dashboard/index'
         expect(subject[:has_pipeline_data]).to eq 'true'
       end
     end
