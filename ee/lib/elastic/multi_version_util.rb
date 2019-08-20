@@ -36,6 +36,19 @@ module Elastic
       klass < ActiveRecord::Base ? klass.base_class : klass
     end
 
+    # Handles which method calls should be forwarded to all targets,
+    # and which calls should be forwarded to just one target.
+    #
+    # This first sets up forwarding for methods which should go to all targets.
+    # This is specified by implementing `methods_for_all_write_targets`.
+    # Examples include document indexing/updating operations.
+    #
+    # Then other methods are forwarded to just the single read target.
+    # Examples include user searches.
+    #
+    # Special write operations specified in `methods_for_one_write_target` are left out.
+    # The caller must always specify the version the call should be triggered.
+    # Examples include deleting the whole index.
     def generate_forwarding
       methods_for_all_write_targets = elastic_writing_targets.first.real_class.methods_for_all_write_targets
       methods_for_one_write_target = elastic_writing_targets.first.real_class.methods_for_one_write_target
