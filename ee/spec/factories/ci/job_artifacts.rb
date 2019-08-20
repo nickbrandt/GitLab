@@ -12,6 +12,16 @@ FactoryBot.define do
       end
     end
 
+    trait :sast_feature_branch do
+      file_format :raw
+      file_type :sast
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/feature-branch/gl-sast-report.json'), 'application/json')
+      end
+    end
+
     trait :sast_deprecated do
       file_type :sast
       file_format :raw

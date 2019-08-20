@@ -140,6 +140,18 @@ module EE
       compare_reports(::Ci::CompareContainerScanningReportsService)
     end
 
+    def has_sast_reports?
+      actual_head_pipeline&.has_reports?(::Ci::JobArtifact.sast_reports)
+    end
+
+    def compare_sast_reports
+      unless has_sast_reports?
+        return { status: :error, status_reason: 'This merge request does not have SAST reports' }
+      end
+
+      compare_reports(::Ci::CompareSastReportsService)
+    end
+
     def compare_license_management_reports
       unless has_license_management_reports?
         return { status: :error, status_reason: 'This merge request does not have license management reports' }

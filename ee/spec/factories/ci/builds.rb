@@ -48,6 +48,12 @@ FactoryBot.define do
       end
     end
 
+    trait :sast_feature_branch do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :sast_feature_branch, job: build)
+      end
+    end
+
     trait :container_scanning_feature_branch do
       after(:build) do |build|
         build.job_artifacts << create(:ee_ci_job_artifact, :container_scanning_feature_branch, job: build)
