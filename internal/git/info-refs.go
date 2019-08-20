@@ -1,10 +1,15 @@
 package git
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/golang/gddo/httputil"
+
+	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
@@ -16,30 +21,31 @@ func GetInfoRefsHandler(a *api.API) http.Handler {
 }
 
 func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {
-	w := NewHttpResponseWriter(rw)
+	responseWriter := NewHttpResponseWriter(rw)
 	// Log 0 bytes in because we ignore the request body (and there usually is none anyway).
-	defer w.Log(r, 0)
+	defer responseWriter.Log(r, 0)
 
 	rpc := getService(r)
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
-		http.Error(w, "Not Found", 404)
+		http.Error(responseWriter, "Not Found", 404)
 		return
 	}
 
-	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-	w.Header().Set("Cache-Control", "no-cache")
+	responseWriter.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
+	responseWriter.Header().Set("Cache-Control", "no-cache")
 
 	gitProtocol := r.Header.Get("Git-Protocol")
 
-	err := handleGetInfoRefsWithGitaly(r.Context(), w, a, rpc, gitProtocol)
+	offers := []string{"gzip", "identity"}
+	encoding := httputil.NegotiateContentEncoding(r, offers)
 
-	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: %v", err))
+	if err := handleGetInfoRefsWithGitaly(r.Context(), responseWriter, a, rpc, gitProtocol, encoding); err != nil {
+		helper.Fail500(responseWriter, r, fmt.Errorf("handleGetInfoRefs: %v", err))
 	}
 }
 
-func handleGetInfoRefsWithGitaly(ctx context.Context, w http.ResponseWriter, a *api.Response, rpc string, gitProtocol string) error {
+func handleGetInfoRefsWithGitaly(ctx context.Context, responseWriter *HttpResponseWriter, a *api.Response, rpc, gitProtocol, encoding string) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
@@ -50,8 +56,20 @@ func handleGetInfoRefsWithGitaly(ctx context.Context, w http.ResponseWriter, a *
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
+	var w io.Writer
+
+	if encoding == "gzip" {
+		gzWriter := gzip.NewWriter(responseWriter)
+		w = gzWriter
+		defer gzWriter.Close()
+
+		responseWriter.Header().Set("Content-Encoding", "gzip")
+	} else {
+		w = responseWriter
+	}
+
 	if _, err = io.Copy(w, infoRefsResponseReader); err != nil {
-		return fmt.Errorf("GetInfoRefsHandler: copy Gitaly response: %v", err)
+		log.WithError(err).Error("GetInfoRefsHandler: error copying gitaly response")
 	}
 
 	return nil
