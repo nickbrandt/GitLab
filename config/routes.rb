@@ -189,7 +189,7 @@ Rails.application.routes.draw do
   draw :project
 
   Gitlab.ee do
-    draw :trial
+    draw :trial_registration
   end
 
   root to: "root#index"
