@@ -42,6 +42,32 @@ module API
             render_api_error!(result[:message], 400)
           end
         end
+
+        segment ':approval_rule_id' do
+          desc 'Update merge request approval rule' do
+            success EE::API::Entities::MergeRequestApprovalRule
+          end
+          params do
+            requires :approval_rule_id, type: Integer, desc: 'The ID of an approval rule'
+            optional :name, type: String, desc: 'The name of the approval rule'
+            optional :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
+            optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
+            optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'
+            optional :remove_hidden_groups, type: Boolean, desc: 'Whether hidden groups should be removed'
+          end
+          put do
+            merge_request = find_merge_request_with_access(params[:merge_request_iid], :update_approvers)
+            params = declared_params(include_missing: false)
+            approval_rule = merge_request.approval_rules.find(params.delete(:approval_rule_id))
+            result = ::ApprovalRules::UpdateService.new(approval_rule, current_user, params).execute
+
+            if result[:status] == :success
+              present result[:rule], with: EE::API::Entities::MergeRequestApprovalRule, current_user: current_user
+            else
+              render_api_error!(result[:message], 400)
+            end
+          end
+        end
       end
     end
   end

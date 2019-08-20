@@ -193,4 +193,134 @@ describe API::MergeRequestApprovalRules do
       end
     end
   end
+
+  describe 'PUT /projects/:id/merge_requests/:merge_request_iid/approval_rules/:approval_rule_id' do
+    let(:existing_approver) { create(:user) }
+    let(:existing_group) { create(:group) }
+
+    let(:approval_rule) do
+      create(
+        :approval_merge_request_rule,
+        merge_request: merge_request,
+        name: 'Old Name',
+        approvals_required: 2,
+        users: [existing_approver],
+        groups: [existing_group]
+      )
+    end
+
+    let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules/#{approval_rule.id}" }
+    let(:new_approver) { create(:user) }
+    let(:new_group) { create(:group) }
+    let(:users) { [] }
+    let(:groups) { [] }
+    let(:remove_hidden_groups) { nil }
+
+    let(:params) do
+      {
+        name: 'Test',
+        approvals_required: 1,
+        users: users,
+        groups: groups,
+        remove_hidden_groups: remove_hidden_groups
+      }
+    end
+
+    before do
+      project.add_developer(existing_approver)
+      project.add_developer(new_approver)
+      existing_group.add_developer(existing_approver)
+      new_group.add_developer(new_approver)
+    end
+
+    context 'disable_overriding_approvers_per_merge_request is set to true' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: true)
+
+        put api(url, user), params: params
+      end
+
+      it 'responds with 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'disable_overriding_approvers_per_merge_request is set to false' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: false)
+
+        put api(url, current_user), params: params
+      end
+
+      context 'user cannot update merge request' do
+        let(:current_user) { other_user }
+
+        it 'responds with 403' do
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'user can update merge request' do
+        let(:current_user) { user }
+
+        it 'matches the response schema' do
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
+
+          rule = json_response
+
+          expect(rule['name']).to eq(params[:name])
+          expect(rule['approvals_required']).to eq(params[:approvals_required])
+          expect(rule['rule_type']).to eq(approval_rule.rule_type)
+          expect(rule['contains_hidden_groups']).to eq(false)
+          expect(rule['source_rule']).to be_nil
+          expect(rule['eligible_approvers']).to be_empty
+          expect(rule['users']).to be_empty
+          expect(rule['groups']).to be_empty
+        end
+
+        context 'users are passed' do
+          let(:users) { [new_approver.id] }
+
+          it 'changes users' do
+            rule = json_response
+
+            expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
+            expect(rule['users']).to match([hash_including('id' => new_approver.id)])
+          end
+        end
+
+        context 'groups are passed' do
+          let(:groups) { [new_group.id] }
+
+          it 'changes groups' do
+            rule = json_response
+
+            expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
+            expect(rule['groups']).to match([hash_including('id' => new_group.id)])
+          end
+        end
+
+        context 'remove_hidden_groups is passed' do
+          let(:existing_group) { create(:group, :private) }
+
+          context 'when set to true' do
+            let(:remove_hidden_groups) { true }
+
+            it 'removes the existing private group' do
+              expect(approval_rule.reload.groups).not_to include(existing_group)
+            end
+          end
+
+          context 'when set to false' do
+            let(:remove_hidden_groups) { false }
+
+            it 'does not remove the existing private group' do
+              expect(approval_rule.reload.groups).to include(existing_group)
+            end
+          end
+        end
+      end
+    end
+  end
 end
