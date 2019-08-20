@@ -64,7 +64,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts LFS objects ignoring remote objects' do
           expect(subject.count_syncable).to eq 5
@@ -110,7 +110,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts file registries for LFS objects' do
           expect(subject.count_registry).to eq 4
@@ -161,7 +161,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts LFS objects that has been synced ignoring remote objects' do
           expect(subject.count_synced).to eq 3
@@ -169,7 +169,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts LFS objects that has been synced, ignoring remotes' do
           expect(subject.count_synced).to eq 3
@@ -216,7 +216,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts LFS objects that sync has failed, ignoring remotes' do
           expect(subject.count_failed).to eq 3
@@ -251,7 +251,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts LFS objects that have been synced and are missing on the primary, excluding not synced ones' do
           expect(subject.count_synced_missing_on_primary).to eq 1
@@ -311,7 +311,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns LFS objects without an entry on the tracking database' do
           lfs_objects = subject.find_unsynced(batch_size: 10)
@@ -399,7 +399,7 @@ describe Geo::LfsObjectRegistryFinder, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns LFS objects remotely and successfully synced locally' do
           create(:geo_file_registry, :lfs, file_id: lfs_object_remote_1.id)

@@ -53,7 +53,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'returns local attachments only' do
           attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_5.id])
@@ -149,7 +149,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts only local attachments that have been synced' do
           expect(subject.count_synced).to eq 4
@@ -189,7 +189,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts only local attachments that have failed' do
           expect(subject.count_failed).to eq 4
@@ -229,7 +229,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts only local attachments that have been synced and are missing on the primary' do
           expect(subject.count_synced_missing_on_primary).to eq 3
@@ -259,7 +259,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'counts only local attachments' do
           expect(subject.count_syncable).to eq 5
@@ -300,7 +300,7 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
       end
 
       context 'with object storage sync disabled' do
-        let(:secondary) { create(:geo_node, :local_storage) }
+        let(:secondary) { create(:geo_node, :local_storage_only) }
 
         it 'does not apply local attachments only restriction' do
           expect(subject.count_registry).to eq 8

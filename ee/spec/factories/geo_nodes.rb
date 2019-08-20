@@ -17,7 +17,7 @@ FactoryBot.define do
       sync_object_storage false
     end
 
-    trait :local_storage do
+    trait :local_storage_only do
       sync_object_storage false
     end
   end
