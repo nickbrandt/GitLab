@@ -1,4 +1,5 @@
 <script>
+import Mousetrap from 'mousetrap';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import { GlLoadingIcon } from '@gitlab/ui';
@@ -83,6 +84,12 @@ export default {
       return this.discussions.length || this.annotationCoordinates;
     },
   },
+  mounted() {
+    Mousetrap.bind('esc', this.closeDesign);
+  },
+  beforeDestroy() {
+    Mousetrap.unbind('esc', this.closeDesign);
+  },
   methods: {
     addImageDiffNote() {
       const { x, y, width, height } = this.annotationCoordinates;
@@ -166,6 +173,11 @@ export default {
     setOverlayDimensions(position) {
       this.overlayDimensions.width = position.width;
       this.overlayDimensions.height = position.height;
+    },
+    closeDesign() {
+      // This needs to be changed to take a design version into account as soon as
+      // https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15119 is merged
+      this.$router.push('/designs');
     },
   },
   beforeRouteUpdate(to, from, next) {

@@ -59,7 +59,7 @@ export default {
         @input="$emit('input', $event.target.value)"
         @keydown.meta.enter="submitForm"
         @keydown.ctrl.enter="submitForm"
-        @keydown.esc.exact="$emit('cancelForm')"
+        @keyup.esc.stop="$emit('cancelForm')"
       >
       </textarea>
     </markdown-field>

@@ -6,6 +6,11 @@ import DesignDetail from 'ee/design_management/pages/design/index.vue';
 import createRouter from 'ee/design_management/router';
 import '~/commons/bootstrap';
 
+jest.mock('mousetrap', () => ({
+  bind: jest.fn(),
+  unbind: jest.fn(),
+}));
+
 describe('Design management router', () => {
   let vm;
   let router;
