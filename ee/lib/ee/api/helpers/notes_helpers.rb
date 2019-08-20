@@ -17,7 +17,7 @@ module EE
 
         def find_noteable(parent_type, parent_id, noteable_type, noteable_id)
           if noteable_type == ::Epic
-            EpicsFinder.new(current_user, group_id: parent_id).find(noteable_id)
+            EpicsFinder.new(current_user, group_id: parent_id).find_by!(id: noteable_id) # rubocop:disable CodeReuse/ActiveRecord
           else
             super
           end
