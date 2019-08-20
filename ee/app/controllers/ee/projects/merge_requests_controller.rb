@@ -50,6 +50,10 @@ module EE
         reports_response(merge_request.compare_dependency_scanning_reports)
       end
 
+      def sast_reports
+        reports_response(merge_request.compare_sast_reports)
+      end
+
       def metrics_reports
         reports_response(merge_request.compare_metrics_reports)
       end

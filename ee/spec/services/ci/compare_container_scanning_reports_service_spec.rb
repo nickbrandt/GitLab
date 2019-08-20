@@ -36,7 +36,7 @@ describe Ci::CompareContainerScanningReportsService do
         expect(subject[:data]['added']).to include(a_hash_including('compare_key' => 'CVE-2017-15650'))
       end
 
-      it 'reports existing container vulenerabilities' do
+      it 'reports existing container vulnerabilities' do
         expect(subject[:data]['existing'].count).to eq(0)
       end
 
