@@ -17,13 +17,7 @@ module EE
 
         def find_group_epic(id)
           finder_params = { group_id: user_group.id }
-          EpicsFinder.new(current_user, finder_params).find(id)
-        end
-
-        def noteable_parent_str(noteable_class)
-          parent_class = ::Epic <= noteable_class ? ::Group : ::Project
-
-          parent_class.to_s.underscore
+          EpicsFinder.new(current_user, finder_params).find_by!(id: id) # rubocop:disable CodeReuse/ActiveRecord
         end
       end
     end
