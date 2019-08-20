@@ -160,6 +160,10 @@ describe 'Billing plan pages', :feature do
           end
         end
 
+        it 'does not display the billing plans table' do
+          expect(page).not_to have_css('.billing-plans')
+        end
+
         it 'displays subscription table', :js do
           expect(page).to have_selector('.js-subscription-table')
         end
@@ -198,6 +202,8 @@ describe 'Billing plan pages', :feature do
           expect(page).to have_css('.billing-plan-logo .identicon')
           expect(page.find('.btn-success')).to have_content('Manage plan')
         end
+
+        expect(page).not_to have_css('.billing-plans')
       end
     end
   end
@@ -229,6 +235,16 @@ describe 'Billing plan pages', :feature do
 
     it 'renders no header for missing plan' do
       expect(page).not_to have_css('.billing-plan-header')
+    end
+
+    it 'displays all plans' do
+      page.within('.billing-plans') do
+        panels = page.all('.card')
+        expect(panels.length).to eq(plans_data.length)
+        plans_data.each_with_index do |data, index|
+          expect(panels[index].find('.card-header')).to have_content(data[:name])
+        end
+      end
     end
   end
 end
