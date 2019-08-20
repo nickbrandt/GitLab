@@ -10,6 +10,10 @@ module Gitlab
           @hosts = hosts.shuffle
           @index = 0
           @mutex = Mutex.new
+          @hosts_gauge = Gitlab::Metrics.gauge(:db_load_balancing_hosts, 'Current number of load balancing hosts')
+          @index_gauge = Gitlab::Metrics.gauge(:db_load_balancing_index, 'Current load balancing host index')
+
+          set_metrics!
         end
 
         def hosts
@@ -29,13 +33,24 @@ module Gitlab
             @hosts = hosts.shuffle
             @index = 0
           end
+
+          set_metrics!
         end
+
+        # Sets metrics before returning next host
+        def next
+          next_host.tap do |_|
+            set_metrics!
+          end
+        end
+
+        private
 
         # Returns the next available host.
         #
         # Returns a Gitlab::Database::LoadBalancing::Host instance, or nil if no
         # hosts were available.
-        def next
+        def next_host
           @mutex.synchronize do
             break if @hosts.empty?
 
@@ -52,6 +67,11 @@ module Gitlab
               break if @index == started_at
             end
           end
+        end
+
+        def set_metrics!
+          @hosts_gauge.set({}, @hosts.length)
+          @index_gauge.set({}, @index)
         end
       end
     end
