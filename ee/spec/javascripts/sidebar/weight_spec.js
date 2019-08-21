@@ -11,8 +11,10 @@ const DEFAULT_PROPS = {
 describe('Weight', function() {
   let vm;
   let Weight;
+  let statsSpy;
 
   beforeEach(() => {
+    statsSpy = spyOnDependency(weight, 'trackEvent');
     Weight = Vue.extend(weight);
   });
 
@@ -104,6 +106,22 @@ describe('Weight', function() {
     vm.$nextTick()
       .then(() => {
         expect(vm.shouldShowEditField).toEqual(true);
+      })
+      .then(done)
+      .catch(done.fail);
+  });
+
+  it('calls trackEvent when "Edit" is clicked', done => {
+    vm = mountComponent(Weight, {
+      ...DEFAULT_PROPS,
+      editable: true,
+    });
+
+    vm.$el.querySelector('.js-weight-edit-link').click();
+
+    vm.$nextTick()
+      .then(() => {
+        expect(statsSpy).toHaveBeenCalled();
       })
       .then(done)
       .catch(done.fail);
