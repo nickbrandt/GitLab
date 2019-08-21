@@ -1,5 +1,0 @@
----
-title: Fix min approvals required for new MR rules
-merge_request: 14988
-author:
-type: fixed

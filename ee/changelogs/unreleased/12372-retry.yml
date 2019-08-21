@@ -1,5 +1,0 @@
----
-title: Improve Elasticsearch database import by retrying only failed cases first
-merge_request: 14657
-author:
-type: performance

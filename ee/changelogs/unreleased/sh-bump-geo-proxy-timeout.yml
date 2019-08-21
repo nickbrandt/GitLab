@@ -1,5 +1,0 @@
----
-title: 'Geo: Increase HTTP read timeout of proxy requests to 60 s'
-merge_request: 14671
-author:
-type: changed

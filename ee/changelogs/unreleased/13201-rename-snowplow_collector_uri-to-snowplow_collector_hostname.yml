@@ -1,5 +1,0 @@
----
-title: Rename snowplow_collector_uri to snowplow_collector_hostname
-merge_request: 14963
-author:
-type: changed

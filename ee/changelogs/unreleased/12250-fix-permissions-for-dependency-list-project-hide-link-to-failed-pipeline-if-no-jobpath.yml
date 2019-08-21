@@ -1,6 +1,0 @@
----
-title: Dependency List Job Failed Alert - Hide link to job if payload from API does
-  not include 'job_path'
-merge_request: 15068
-author:
-type: changed

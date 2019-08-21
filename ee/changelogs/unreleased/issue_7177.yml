@@ -1,5 +1,0 @@
----
-title: Fix error when creating issues in scoped boards
-merge_request: 11080
-author:
-type: fixed

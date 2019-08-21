@@ -1,6 +1,0 @@
----
-title: Fix issue that caused the "Merge Immediately" option not to be available when
-  merge trains were enabled
-merge_request: 14894
-author:
-type: fixed

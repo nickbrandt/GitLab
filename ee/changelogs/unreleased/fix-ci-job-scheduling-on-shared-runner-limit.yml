@@ -1,6 +1,0 @@
----
-title: Fix job scheduling when extra CI minutes purchased and minutes usage is above
-  application shared Runners minutes limit
-merge_request: 15120
-author:
-type: fixed
