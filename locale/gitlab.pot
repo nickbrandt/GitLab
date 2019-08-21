@@ -4627,6 +4627,9 @@ msgstr ""
 msgid "Create a local proxy for storing frequently used upstream images. %{link_start}Learn more%{link_end} about dependency proxies."
 msgstr ""
 
+msgid "Create a Mattermost team for this group"
+msgstr ""
+
 msgid "Create a merge request"
 msgstr ""
 
