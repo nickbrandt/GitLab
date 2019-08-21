@@ -1659,6 +1659,9 @@ msgstr ""
 msgid "ApprovalRule|No. approvals required"
 msgstr ""
 
+msgid "ApprovalRule|Rule name"
+msgstr ""
+
 msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
