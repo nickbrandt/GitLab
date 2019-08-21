@@ -8,7 +8,18 @@ describe GitlabSchema.types['Design'] do
   it { expect(described_class.interfaces).to include(Types::Notes::NoteableType.to_graphql) }
 
   it 'exposes the expected fields' do
-    expected_fields = [:id, :project, :issue, :filename, :image, :versions, :discussions, :notes, :diff_refs, :full_path]
+    expected_fields = %i[
+      id
+      project
+      issue
+      filename
+      image
+      versions
+      discussions
+      notes
+      diff_refs
+      full_path
+    ]
 
     is_expected.to have_graphql_fields(*expected_fields)
   end

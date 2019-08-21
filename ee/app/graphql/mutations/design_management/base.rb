@@ -13,10 +13,6 @@ module Mutations
                required: true,
                description: "The iid of the issue to modify designs for"
 
-      field :designs, [Types::DesignManagement::DesignType],
-            null: false,
-            description: "The designs that were updated by the mutation"
-
       private
 
       def find_object(project_path:, iid:)

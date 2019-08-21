@@ -22,5 +22,9 @@ module DesignManagement
     def repository
       project.design_repository
     end
+
+    def designs_by_filename(filenames)
+      designs.current.where(filename: filenames)
+    end
   end
 end

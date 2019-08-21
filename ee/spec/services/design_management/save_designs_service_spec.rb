@@ -4,10 +4,10 @@ require 'spec_helper'
 describe DesignManagement::SaveDesignsService do
   let(:issue) { create(:issue, project: project) }
   let(:project) { create(:project) }
-  let(:user) { project.owner }
+  let(:developer) { create(:user) }
+  let(:user) { developer }
   let(:files) { [rails_sample] }
   let(:design_repository) { EE::Gitlab::GlRepository::DESIGN.repository_accessor.call(project) }
-  let(:design_collection) { DesignManagement::DesignCollection.new(issue) }
   let(:rails_sample_name) { 'rails_sample.jpg' }
   let(:rails_sample) { sample_image(rails_sample_name) }
   let(:dk_png) { sample_image('dk.png') }
@@ -16,11 +16,28 @@ describe DesignManagement::SaveDesignsService do
     fixture_file_upload("spec/fixtures/#{filename}")
   end
 
-  subject(:service) { described_class.new(project, user, issue: issue, files: files) }
+  before do
+    project.add_developer(developer)
+  end
+
+  def run_service(files_to_upload = nil)
+    service = described_class.new(project, user,
+                                  issue: issue,
+                                  files: files_to_upload || files)
+    service.execute
+  end
+
+  let(:response) { run_service }
 
   shared_examples 'a service error' do
     it 'returns an error', :aggregate_failures do
-      expect(service.execute).to match(a_hash_including(status: :error))
+      expect(response).to match(a_hash_including(status: :error))
+    end
+  end
+
+  shared_examples 'an execution error' do
+    it 'returns an error', :aggregate_failures do
+      expect { service.execute }.to raise_error(some_error)
     end
   end
 
@@ -47,23 +64,25 @@ describe DesignManagement::SaveDesignsService do
           allow(project).to receive(:lfs_enabled?).and_return(true)
         end
 
-        it "creates a design repository when it didn't exist" do
-          repository_exists = -> do
+        describe 'repository existence' do
+          def repository_exists
             # Expire the memoized value as the service creates it's own instance
             design_repository.expire_exists_cache
             design_repository.exists?
           end
 
-          expect { service.execute }.to change { repository_exists.call }.from(false).to(true)
+          it 'creates a design repository when it did not exist' do
+            expect { run_service }.to change { repository_exists }.from(false).to(true)
+          end
         end
 
         it 'updates the creation count' do
           counter = Gitlab::UsageCounters::DesignsCounter
-          expect { service.execute }.to change { counter.read(:create) }.by(1)
+          expect { run_service }.to change { counter.read(:create) }.by(1)
         end
 
-        it 'creates a nice commit in the repository' do
-          service.execute
+        it 'creates a commit in the repository' do
+          run_service
 
           commit = design_repository.commit # Get the HEAD
 
@@ -72,10 +91,16 @@ describe DesignManagement::SaveDesignsService do
           expect(commit.message).to include(rails_sample_name)
         end
 
+        it 'causes diff_refs not to be nil' do
+          expect(response).to include(
+            designs: all(have_attributes(diff_refs: be_present))
+          )
+        end
+
         it 'creates a design & a version for the filename if it did not exist' do
           expect(issue.designs.size).to eq(0)
 
-          updated_designs = service.execute[:designs]
+          updated_designs = response[:designs]
 
           expect(updated_designs.size).to eq(1)
           expect(updated_designs.first.versions.size).to eq(1)
@@ -89,12 +114,12 @@ describe DesignManagement::SaveDesignsService do
           end
 
           it 'saves the design to LFS' do
-            expect { service.execute }.to change { LfsObject.count }.by(1)
+            expect { run_service }.to change { LfsObject.count }.by(1)
           end
 
           it 'saves the repository_type of the LfsObjectsProject as design' do
             expect do
-              service.execute
+              run_service
             end.to change { project.lfs_objects_projects.count }.from(0).to(1)
 
             expect(project.lfs_objects_projects.first.repository_type).to eq('design')
@@ -105,14 +130,14 @@ describe DesignManagement::SaveDesignsService do
           before do
             # This makes sure the file is created in the repository.
             # otherwise we'd have a database & repository that are not in sync.
-            service.execute
+            run_service
           end
 
           it 'creates a new version for the existing design and updates the file' do
             expect(issue.designs.size).to eq(1)
             expect(DesignManagement::Version.for_designs(issue.designs).size).to eq(1)
 
-            updated_designs = service.execute[:designs]
+            updated_designs = response[:designs]
 
             expect(updated_designs.size).to eq(1)
             expect(updated_designs.first.versions.size).to eq(2)
@@ -120,15 +145,14 @@ describe DesignManagement::SaveDesignsService do
 
           it 'increments the update counter' do
             counter = Gitlab::UsageCounters::DesignsCounter
-            expect { service.execute }.to change { counter.read(:update) }.by 1
+            expect { run_service }.to change { counter.read(:update) }.by 1
           end
 
           context 'when uploading a new design' do
             it 'does not link the new version to the existing design' do
               existing_design = issue.designs.first
 
-              updated_designs = described_class.new(project, user, issue: issue, files: [dk_png])
-                                  .execute[:designs]
+              updated_designs = run_service([dk_png])[:designs]
 
               expect(existing_design.versions.reload.size).to eq(1)
               expect(updated_designs.size).to eq(1)
@@ -142,12 +166,12 @@ describe DesignManagement::SaveDesignsService do
 
           before do
             # Create just the first one, which we will later update.
-            described_class.new(project, user, issue: issue, files: [files.first]).execute
+            run_service([files.first])
           end
 
           it 'counts one creation and one update' do
             counter = Gitlab::UsageCounters::DesignsCounter
-            expect { service.execute }
+            expect { run_service }
               .to change { counter.read(:create) }.by(1)
               .and change { counter.read(:update) }.by(1)
           end
@@ -158,7 +182,7 @@ describe DesignManagement::SaveDesignsService do
               design_repository.commit_count
             end
 
-            expect { service.execute }.to change { commit_count.call }.by(1)
+            expect { run_service }.to change { commit_count.call }.by(1)
           end
         end
 
@@ -166,17 +190,18 @@ describe DesignManagement::SaveDesignsService do
           let(:files) { [rails_sample, dk_png] }
 
           it 'returns information about both designs in the response' do
-            expect(service.execute).to include(designs: have_attributes(size: 2), status: :success)
+            expect(response).to include(designs: have_attributes(size: 2), status: :success)
           end
 
           it 'creates 2 designs with a single version' do
-            expect { service.execute }.to change { issue.designs.count }.from(0).to(2)
+            expect { run_service }.to change { issue.designs.count }.from(0).to(2)
+
             expect(DesignManagement::Version.for_designs(issue.designs).size).to eq(1)
           end
 
           it 'increments the creation count by 2' do
             counter = Gitlab::UsageCounters::DesignsCounter
-            expect { service.execute }.to change { counter.read(:create) }.by 2
+            expect { run_service }.to change { counter.read(:create) }.by 2
           end
 
           it 'creates a single commit' do
@@ -185,24 +210,27 @@ describe DesignManagement::SaveDesignsService do
               design_repository.commit_count
             end
 
-            expect { service.execute }.to change { commit_count.call }.by(1)
+            expect { run_service }.to change { commit_count.call }.by(1)
           end
 
           it 'only does 5 gitaly calls', :request_store do
+            service = described_class.new(project, user, issue: issue, files: files)
             # Some unrelated calls that are usually cached or happen only once
             service.__send__(:repository).create_if_not_exists
             service.__send__(:repository).has_visible_content?
 
+            request_count = -> { Gitlab::GitalyClient.get_request_count }
+
             # An exists?, a check for existing blobs, default branch, an after_commit
             # callback on LfsObjectsProject, and the creation of commits
-            expect { service.execute }.to change { Gitlab::GitalyClient.get_request_count }.by(5)
+            expect { service.execute }.to change(&request_count).by(5)
           end
 
           context 'when uploading too many files' do
             let(:files) { Array.new(DesignManagement::SaveDesignsService::MAX_FILES + 1) { dk_png } }
 
             it 'returns the correct error' do
-              expect(service.execute[:message]).to match(/only \d+ files are allowed simultaneously/i)
+              expect(response[:message]).to match(/only \d+ files are allowed simultaneously/i)
             end
           end
         end
@@ -213,24 +241,30 @@ describe DesignManagement::SaveDesignsService do
           it_behaves_like 'a service error'
         end
 
-        context 'when creating the commit fails' do
+        describe 'failure modes' do
+          let(:service) { described_class.new(project, user, issue: issue, files: files) }
+          let(:response) { service.execute }
+
           before do
-            expect(service).to receive(:save_designs!).and_raise(Gitlab::Git::BaseError)
+            expect(service).to receive(:run_actions).and_raise(some_error)
           end
 
-          it_behaves_like 'a service error'
-        end
+          context 'when creating the commit fails' do
+            let(:some_error) { Gitlab::Git::BaseError }
 
-        context 'when creating the versions fails' do
-          before do
-            expect(service).to receive(:save_designs!).and_raise(ActiveRecord::RecordInvalid)
+            it_behaves_like 'an execution error'
           end
 
-          it_behaves_like 'a service error'
+          context 'when creating the versions fails' do
+            let(:some_error) { ActiveRecord::RecordInvalid }
+
+            it_behaves_like 'a service error'
+          end
         end
 
         context "when a design already existed in the repo but we didn't know about it in the database" do
           let(:filename) { rails_sample_name }
+
           before do
             path = File.join(build(:design, issue: issue, filename: filename).full_path)
             design_repository.create_if_not_exists
@@ -240,11 +274,26 @@ describe DesignManagement::SaveDesignsService do
           end
 
           it 'creates the design and a new version for it' do
-            first_updated_design = service.execute[:designs].first
+            first_updated_design = response[:designs].first
 
             expect(first_updated_design.filename).to eq(filename)
             expect(first_updated_design.versions.size).to eq(1)
           end
+        end
+      end
+
+      describe 'scalability' do
+        before do
+          run_service([dk_png]) # ensure project, issue, etc are created
+        end
+
+        it 'runs the same queries for all requests, regardless of number of files' do
+          one = [dk_png]
+          two = [rails_sample, dk_png]
+
+          baseline = ActiveRecord::QueryRecorder.new { run_service(one) }
+
+          expect { run_service(two) }.not_to exceed_query_limit(baseline)
         end
       end
     end

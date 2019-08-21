@@ -13,9 +13,8 @@ module Types
             Types::DesignManagement::DesignType.connection_type,
             null: false,
             resolver: Resolvers::DesignManagement::DesignResolver,
-            description: "All visible designs for this collection"
+            description: "All designs for this collection"
       # TODO: allow getting a single design by filename
-      # TODO: when we allow hiding designs, we will also expose a relation
       # exposing all designs
       field :versions,
             Types::DesignManagement::VersionType.connection_type,

@@ -3,6 +3,14 @@
 require 'rails_helper'
 
 describe DesignManagement::Design do
+  include DesignManagementTestHelpers
+
+  set(:issue) { create(:issue) }
+  set(:design1) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  set(:design2) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  set(:design3) { create(:design, :with_versions, issue: issue, versions_count: 1) }
+  set(:deleted_design) { create(:design, :with_versions, deleted: true) }
+
   describe 'relations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:issue) }
@@ -25,46 +33,193 @@ describe DesignManagement::Design do
 
       expect(design).not_to be_valid
       expect(design.errors[:filename].first)
-        .to match /Only these extensions are supported/
+        .to match %r/Only these extensions are supported/
     end
   end
 
   describe 'scopes' do
     describe '.visible_at_version' do
-      let!(:design1) { create(:design, :with_file, versions_count: 1) }
-      let!(:design2) { create(:design, :with_file, versions_count: 1) }
-      let(:first_version) { DesignManagement::Version.ordered.last }
-      let(:second_version) { DesignManagement::Version.ordered.first }
+      let(:versions) { DesignManagement::Version.where(issue: issue).ordered }
 
-      it 'returns just designs that existed at that version' do
-        expect(described_class.visible_at_version(first_version)).to eq([design1])
-        expect(described_class.visible_at_version(second_version)).to contain_exactly(design1, design2)
+      context 'at oldest version' do
+        let(:version) { versions.last }
+
+        it 'finds the first design only' do
+          expect(described_class.visible_at_version(version)).to contain_exactly(design1)
+        end
       end
 
-      it 'can be passed either a DesignManagement::Version or an ID' do
-        [first_version, first_version.id].each do |arg|
-          expect(described_class.visible_at_version(arg)).to eq([design1])
+      context 'at version 2' do
+        let(:version) { versions.second }
+
+        it 'finds the first and second designs' do
+          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2)
         end
+      end
+
+      context 'at latest version' do
+        let(:version) { versions.first }
+
+        it 'finds designs' do
+          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2, design3)
+        end
+      end
+
+      context 'when the argument is nil' do
+        let(:version) { nil }
+
+        it 'finds all undeleted designs' do
+          expect(described_class.visible_at_version(version)).to contain_exactly(design1, design2, design3)
+        end
+      end
+
+      describe 'one of the designs was deleted before the given version' do
+        before do
+          delete_designs(design2)
+        end
+
+        it 'is not returned' do
+          current_version = versions.first
+
+          expect(described_class.visible_at_version(current_version)).to contain_exactly(design1, design3)
+        end
+      end
+
+      context 'a re-created history' do
+        before do
+          delete_designs(design1, design2)
+          restore_designs(design1)
+        end
+
+        it 'is returned, though other deleted events are not' do
+          expect(described_class.visible_at_version(nil)).to contain_exactly(design1, design3)
+        end
+      end
+
+      # test that a design that has been modified at various points
+      # can be queried for correctly at different points in its history
+      describe 'dead or alive' do
+        let(:versions) { DesignManagement::Version.where(issue: issue).map { |v| [v, :alive] } }
+
+        before do
+          versions << [delete_designs(design1),          :dead]
+          versions << [modify_designs(design2),          :dead]
+          versions << [restore_designs(design1),         :alive]
+          versions << [modify_designs(design3),          :alive]
+          versions << [delete_designs(design1),          :dead]
+          versions << [modify_designs(design2, design3), :dead]
+          versions << [restore_designs(design1),         :alive]
+        end
+
+        it 'can establish the history at any point' do
+          history = versions.map(&:first).map do |v|
+            described_class.visible_at_version(v).include?(design1) ? :alive : :dead
+          end
+
+          expect(history).to eq(versions.map(&:second))
+        end
+      end
+    end
+
+    describe '.current' do
+      it 'returns just the undeleted designs' do
+        delete_designs(design3)
+
+        expect(described_class.current).to contain_exactly(design1, design2)
+      end
+    end
+  end
+
+  describe '#status' do
+    context 'the design is new' do
+      subject { build(:design) }
+
+      it { is_expected.to have_attributes(status: :new) }
+    end
+
+    context 'the design is current' do
+      subject { design1 }
+
+      it { is_expected.to have_attributes(status: :current) }
+    end
+
+    context 'the design has been deleted' do
+      subject { deleted_design }
+
+      it { is_expected.to have_attributes(status: :deleted) }
+    end
+  end
+
+  describe '#deleted?' do
+    context 'the design is new' do
+      let(:design) { build(:design) }
+
+      it 'is falsy' do
+        expect(design).not_to be_deleted
+      end
+    end
+
+    context 'the design is current' do
+      let(:design) { design1 }
+
+      it 'is falsy' do
+        expect(design).not_to be_deleted
+      end
+    end
+
+    context 'the design has been deleted' do
+      let(:design) { deleted_design }
+
+      it 'is truthy' do
+        expect(design).to be_deleted
+      end
+    end
+
+    context 'the design has been deleted, but was then re-created' do
+      let(:design) { create(:design, :with_versions, versions_count: 1, deleted: true) }
+
+      it 'is falsy' do
+        restore_designs(design)
+
+        expect(design).not_to be_deleted
       end
     end
   end
 
   describe "#new_design?" do
-    set(:versions) { create(:design_version) }
-    set(:design) { create(:design, versions: [versions]) }
+    let(:design) { design1 }
 
     it "is false when there are versions" do
-      expect(design.new_design?).to be_falsy
+      expect(design1).not_to be_new_design
     end
 
     it "is true when there are no versions" do
-      expect(build(:design).new_design?).to be_truthy
+      expect(build(:design)).to be_new_design
+    end
+
+    it 'is false for deleted designs' do
+      expect(deleted_design).not_to be_new_design
     end
 
     it "does not cause extra queries when versions are loaded" do
-      design.versions.map(&:id)
+      design.design_versions.map(&:id)
 
       expect { design.new_design? }.not_to exceed_query_limit(0)
+    end
+
+    it "implicitly caches values" do
+      expect do
+        design.new_design?
+        design.new_design?
+      end.not_to exceed_query_limit(1)
+    end
+
+    it "queries again when the clear_version_cache trigger has been called" do
+      expect do
+        design.new_design?
+        design.clear_version_cache
+        design.new_design?
+      end.not_to exceed_query_limit(2)
     end
 
     it "causes a single query when there versions are not loaded" do
@@ -84,18 +239,32 @@ describe DesignManagement::Design do
   end
 
   describe '#diff_refs' do
-    it "builds diff refs based on the first commit and it's for the design" do
-      design = create(:design, :with_file, versions_count: 3)
+    let(:design) { create(:design, :with_file, versions_count: versions_count) }
 
-      expect(design.diff_refs.base_sha).to eq(design.versions.ordered.second.sha)
-      expect(design.diff_refs.head_sha).to eq(design.versions.ordered.first.sha)
+    context 'there are several versions' do
+      let(:versions_count) { 3 }
+
+      it "builds diff refs based on the first commit and it's for the design" do
+        expect(design.diff_refs.base_sha).to eq(design.versions.ordered.second.sha)
+        expect(design.diff_refs.head_sha).to eq(design.versions.ordered.first.sha)
+      end
     end
 
-    it 'builds diff refs based on the empty tree if there was only one version' do
-      design = create(:design, :with_file, versions_count: 1)
+    context 'there is just one version' do
+      let(:versions_count) { 1 }
 
-      expect(design.diff_refs.base_sha).to eq(Gitlab::Git::BLANK_SHA)
-      expect(design.diff_refs.head_sha).to eq(design.diff_refs.head_sha)
+      it 'builds diff refs based on the empty tree if there was only one version' do
+        design = create(:design, :with_file, versions_count: 1)
+
+        expect(design.diff_refs.base_sha).to eq(Gitlab::Git::BLANK_SHA)
+        expect(design.diff_refs.head_sha).to eq(design.diff_refs.head_sha)
+      end
+    end
+
+    it 'has no diff ref if new' do
+      design = build(:design)
+
+      expect(design.diff_refs).to be_nil
     end
   end
 

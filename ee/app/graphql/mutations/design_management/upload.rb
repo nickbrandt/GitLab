@@ -11,6 +11,10 @@ module Mutations
 
       authorize :create_design
 
+      field :designs, [Types::DesignManagement::DesignType],
+            null: false,
+            description: "The designs that were uploaded by the mutation"
+
       def resolve(project_path:, iid:, files:)
         issue = authorized_find!(project_path: project_path, iid: iid)
         project = issue.project

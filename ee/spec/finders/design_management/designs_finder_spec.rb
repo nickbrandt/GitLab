@@ -47,13 +47,13 @@ describe DesignManagement::DesignsFinder do
           let(:second_version) { all_versions.first }
 
           context 'when argument is the first version' do
-            let(:params) { { visible_at_version: first_version.id } }
+            let(:params) { { visible_at_version: first_version } }
 
             it { is_expected.to eq([design1]) }
           end
 
           context 'when argument is the second version' do
-            let(:params) { { visible_at_version: second_version.id } }
+            let(:params) { { visible_at_version: second_version } }
 
             it { is_expected.to contain_exactly(design2, design1) }
           end
