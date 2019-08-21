@@ -5,6 +5,7 @@ import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { trackEvent } from 'ee/event_tracking/issue_sidebar';
 
 export default {
   components: {
@@ -101,6 +102,11 @@ export default {
     checkIfNoValue(weight) {
       return weight === undefined || weight === null || weight === this.weightNoneValue;
     },
+    onEditClick(shouldShowEditField = true) {
+      this.showEditField(shouldShowEditField);
+
+      trackEvent('click_edit_button', 'weight');
+    },
     showEditField(bool = true) {
       this.shouldShowEditField = bool;
 
@@ -160,7 +166,7 @@ export default {
         v-if="editable"
         class="float-right js-weight-edit-link"
         href="#"
-        @click="showEditField(!shouldShowEditField)"
+        @click="onEditClick(!shouldShowEditField)"
       >
         {{ __('Edit') }}
       </a>
