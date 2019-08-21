@@ -1,5 +1,0 @@
----
-title: "Geo: Don't wait when exiting the log cursor"
-merge_request: 15070
-author:
-type: performance

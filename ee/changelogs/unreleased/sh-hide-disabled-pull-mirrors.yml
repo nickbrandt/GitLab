@@ -1,5 +1,0 @@
----
-title: Only show a pull mirror if mirroring is actually enabled
-merge_request: 15049
-author:
-type: fixed

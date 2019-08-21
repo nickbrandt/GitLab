@@ -1,5 +1,0 @@
----
-title: Fix GeoNode#name backward compatibility
-merge_request: 14564
-author:
-type: fixed

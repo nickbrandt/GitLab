@@ -1,6 +1,0 @@
----
-title: Geo - Show why node is unhealthy in the rake task to check the health of the
-  secondary node
-merge_request: 14615
-author:
-type: fixed

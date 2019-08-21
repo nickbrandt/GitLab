@@ -1,5 +1,0 @@
----
-title: Batching minutes reset queries to avoid query timeouts
-merge_request: 15002
-author:
-type: fixed

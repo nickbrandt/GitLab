@@ -1,5 +1,0 @@
----
-title: Fix race condition on merge train that it cannot process merge request sometimes
-merge_request: 14386
-author:
-type: fixed
