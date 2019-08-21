@@ -11,6 +11,6 @@
 
 - if @group.actual_plan
   .center
-    - support_link = link_to s_("BillingPlans|Contact Support"), "https://support.gitlab.com"
+    - support_link = link_to s_("BillingPlans|Contact Support"), EE::CUSTOMER_SUPPORT_URL
 
     = s_("BillingPlans|If you would like to downgrade your plan please %{support_link}.").html_safe % { support_link: support_link }

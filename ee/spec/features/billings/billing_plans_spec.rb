@@ -100,7 +100,7 @@ describe 'Billing plan pages', :feature do
         page.within('.content') do
           expect(page).to have_link('Upgrade plan', href: external_upgrade_url(namespace, bronze_plan))
           expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('Contact Support', href: 'https://support.gitlab.com')
+          expect(page).to have_link('Contact Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
       end
     end
@@ -126,7 +126,7 @@ describe 'Billing plan pages', :feature do
         page.within('.content') do
           expect(page).not_to have_link('Upgrade plan')
           expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('Contact Support', href: 'https://support.gitlab.com')
+          expect(page).to have_link('Contact Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
       end
     end

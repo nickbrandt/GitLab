@@ -1,5 +1,5 @@
 - current_plan = subscription_plan_info(plans_data, namespace.actual_plan_name)
-- support_link = link_to s_("BillingPlans|Contact Support"), "https://support.gitlab.com"
+- support_link = link_to s_("BillingPlans|Contact Support"), EE::CUSTOMER_SUPPORT_URL
 
 - if current_plan
   = render 'shared/billings/billing_plan_header', namespace: namespace, plan: current_plan
