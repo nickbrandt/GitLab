@@ -15,7 +15,7 @@ module GroupSaml
         new_user.managing_group = group if group.saml_provider&.enforced_group_managed_accounts?
 
         if new_user.save
-          identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(new_user, oauth_data, group.saml_provider, session)
+          identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(new_user, oauth_data, session, group.saml_provider)
           identity_linker.link
         end
 
