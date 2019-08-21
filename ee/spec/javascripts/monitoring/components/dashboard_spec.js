@@ -5,7 +5,7 @@ import Dashboard from 'ee/monitoring/components/dashboard.vue';
 import { createStore } from '~/monitoring/stores';
 import axios from '~/lib/utils/axios_utils';
 import { metricsGroupsAPIResponse, mockApiEndpoint } from 'spec/monitoring/mock_data';
-import propsData from 'spec/monitoring/dashboard_spec';
+import propsData from 'spec/monitoring/components/dashboard_spec';
 import AlertWidget from 'ee/monitoring/components/alert_widget.vue';
 import CustomMetricsFormFields from 'ee/custom_metrics/components/custom_metrics_form_fields.vue';
 
