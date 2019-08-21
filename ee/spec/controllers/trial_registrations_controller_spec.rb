@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TrialRegistrationsController do
@@ -10,7 +12,8 @@ describe TrialRegistrationsController do
 
     let(:user_params) do
       {
-        name: 'John Doe',
+        first_name: 'John Doe',
+        last_name: 'Doe',
         email: 'johnd2019@local.dev',
         username: 'johnd',
         password: 'abcd1234'
@@ -30,6 +33,14 @@ describe TrialRegistrationsController do
         post :create, params: { user: user_params }
 
         expect(User.last).not_to be_confirmed
+      end
+    end
+
+    context 'derivation of name' do
+      it 'sets name from first and last name' do
+        post :create, params: { user: user_params }
+
+        expect(User.last.name).to eq("#{user_params[:first_name]} #{user_params[:last_name]}")
       end
     end
   end

@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-resources :trial_registrations, only: [:create]
+resources :trial_registrations, only: [:new, :create]
