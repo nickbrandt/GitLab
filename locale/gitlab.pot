@@ -2224,16 +2224,13 @@ msgstr ""
 msgid "BillingPlans|%{group_name} is currently using the %{plan_link} plan."
 msgstr ""
 
-msgid "BillingPlans|Contact Support"
-msgstr ""
-
 msgid "BillingPlans|Current plan"
 msgstr ""
 
 msgid "BillingPlans|Downgrade"
 msgstr ""
 
-msgid "BillingPlans|If you would like to downgrade your plan please %{support_link}."
+msgid "BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}."
 msgstr ""
 
 msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold."
