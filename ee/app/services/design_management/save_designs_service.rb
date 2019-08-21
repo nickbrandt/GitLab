@@ -121,8 +121,6 @@ module DesignManagement
     end
 
     def file_content(file, full_path)
-      return file.to_io if ::Feature.disabled?(:store_designs_in_lfs, default_enabled: true)
-
       transformer = ::Lfs::FileTransformer.new(project, repository, target_branch)
       transformer.new_file(full_path, file.to_io).content
     end
