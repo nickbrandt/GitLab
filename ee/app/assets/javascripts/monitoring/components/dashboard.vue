@@ -9,18 +9,6 @@ export default {
     CustomMetricsFormFields,
   },
   extends: CeDashboard,
-  props: {
-    alertsEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    prometheusAlertsAvailable: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       allAlerts: {},
