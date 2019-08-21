@@ -3411,6 +3411,7 @@ ActiveRecord::Schema.define(version: 2019_08_15_093949) do
     t.string "timezone"
     t.boolean "time_display_relative"
     t.boolean "time_format_in_24h"
+    t.string "projects_sort", limit: 64
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true
   end
 

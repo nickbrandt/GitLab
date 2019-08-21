@@ -19,7 +19,7 @@ module Groups
 
     private
 
-    def issuable_sorting_field
+    def sorting_field
       :roadmaps_sort
     end
 

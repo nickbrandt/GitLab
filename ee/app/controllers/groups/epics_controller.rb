@@ -99,7 +99,7 @@ class Groups::EpicsController < Groups::ApplicationController
     EpicsFinder
   end
 
-  def issuable_sorting_field
+  def sorting_field
     :epics_sort
   end
 
