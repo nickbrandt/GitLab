@@ -5,9 +5,13 @@ import DesignReplyForm from 'ee/design_management/components/design_notes/design
 import createImageDiffNoteMutation from 'ee/design_management/graphql/mutations/createImageDiffNote.mutation.graphql';
 import design from '../../mock_data/design';
 
+jest.mock('mousetrap', () => ({
+  bind: jest.fn(),
+  unbind: jest.fn(),
+}));
+
 describe('Design management design index page', () => {
   let wrapper;
-
   const newComment = 'new comment';
   const annotationCoordinates = {
     x: 10,

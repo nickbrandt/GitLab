@@ -96,8 +96,8 @@ describe('Design reply form component', () => {
       expect(wrapper.emitted('input')).toBeTruthy();
     });
 
-    it('emits cancelForm event on escape keydown on textarea', () => {
-      findTextarea().trigger('keydown.esc');
+    it('emits cancelForm event on pressing escape button on textarea', () => {
+      findTextarea().trigger('keyup.esc');
 
       expect(wrapper.emitted('cancelForm')).toBeTruthy();
     });
