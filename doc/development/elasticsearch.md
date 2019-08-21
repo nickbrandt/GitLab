@@ -154,7 +154,7 @@ Currently GitLab can only handle a single version of setting. Any setting/schema
 
 To avoid downtime, GitLab is working on to allow multiple indices to function at the same time. Whenever the schema changes, the admin will be able to create a new index and reindex to it, while users still searches using the older stable index. Any data updates would be forwarded to both indices. Once the new index is ready, admin can mark it as the read node where search takes place, and remove the old index.
 
-This is also helpful for migrating self-hosted elasticsearch server onto AWS.
+This is also helpful for migrating to new servers, e.g. moving to/from AWS.
 
 Currently we are on the process of migrating to this new design. Everything is hardwired to work with one single version for now.
 
@@ -169,12 +169,12 @@ These proxy objects would talk to Elasticsearch server directly (see top half of
 
 ![Elasticsearch Architecture](img/elasticsearch_architecture.svg)
 
-In the planned new design, each model would have a pair of corresponding subclassed proxy objects, where model-specific logic are located at. For example, `Snippet` would have `SnippetClassProxy` and `SnippetInstanceProxy` (being subclass of `Elasticsearch::Model::Proxy::ClassMethodsProxy` and `Elasticsearch::Model::Proxy::InstanceMethodsProxy` respectively).
+In the planned new design, each model would have a pair of corresponding subclassed proxy objects, in which model-specific logic is located. For example, `Snippet` would have `SnippetClassProxy` and `SnippetInstanceProxy` (being subclass of `Elasticsearch::Model::Proxy::ClassMethodsProxy` and `Elasticsearch::Model::Proxy::InstanceMethodsProxy`, respectively).
 
-`__elasticsearch__` would represent another layer of proxy object, keeping track of multiple actual proxy objects. It would forward method calls to the intended proxy. For example, `model.__elasticsearch__.foo` would:
+`__elasticsearch__` would represent another layer of proxy object, keeping track of multiple actual proxy objects. It would forward method calls to the appropriate index. For example:
 
-- forward to one stable index, if `foo` is a read method
-- forward to all indices, if `foo` is for document indexing/updating/deleting.
+- `model.__elasticsearch__.search` would be forwarded to the one stable index, since it is a read operation.
+- `model.__elasticsearch__.update_document` would be forwarded to all indices, to keep all indices up-to-date.
 
 The global configurations per version are now in the `Elastic::(Version)::Config` class. You can change mappings there.
 
@@ -182,7 +182,9 @@ The global configurations per version are now in the `Elastic::(Version)::Config
 
 NOTE: **Note:** this is not applicable yet as multiple indices functionality is not fully implemented.
 
-Since multiple versions of setting can exist in different folders (e.g. `ee/lib/elastic/v12p1` and `ee/lib/elastic/v12p3`). To keep a continuous git history, the latest version lives under the `/latest` folder, but is aliased as the latest version.
+Folders like `ee/lib/elastic/v12p1` contain snapshots of search logic from different versions. To keep a continuous git history, the latest version lives under `ee/lib/elastic/latest`, but its classes are aliased under an actual version (e.g. `ee/lib/elastic/v12p3`). When referencing these classes, never use the `Latest` namespace directly, but use the actual version (e.g. `V12p3`).
+
+The version name basically follows GitLab's release version. If setting is changed in 12.3, we will create a new namespace called `V12p3` (p stands for "point"). Raise an issue if there is a need to name a version differently.
 
 If the current version is `v12p1`, and we need to create a new version for `v12p3`, the steps are as follows:
 
@@ -191,7 +193,7 @@ If the current version is `v12p1`, and we need to create a new version for `v12p
 1. Delete `v12p1` folder
 1. Copy the entire folder of `latest` as `v12p1`
 1. Change the namespace for files under `v12p1` folder from `Latest` to `V12p1`
-1. Make changes to `Latest` as needed
+1. Make changes to files under the `latest` folder as needed
 
 ## Troubleshooting
 
