@@ -8,7 +8,7 @@ module StrategyHelpers
 
   def post(*args)
     super.tap do
-      @response = ActionDispatch::TestResponse.from_response(last_response) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      @response = ActionDispatch::TestResponse.from_response(last_response)
     end
   end
 
