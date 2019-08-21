@@ -61,7 +61,7 @@ describe MergeRequest, :elastic do
               'type' => merge_request.es_type
             })
 
-    expect(merge_request.as_indexed_json).to eq(expected_hash)
+    expect(merge_request.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
   it_behaves_like 'no results when the user cannot read cross project' do

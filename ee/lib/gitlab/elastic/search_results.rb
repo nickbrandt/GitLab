@@ -199,7 +199,7 @@ module Gitlab
       def milestones
         strong_memoize(:milestones) do
           # Must pass 'issues' and 'merge_requests' to check
-          # if any of the features is available for projects in Elastic::ApplicationSearch#project_ids_query
+          # if any of the features is available for projects in ApplicationClassProxy#project_ids_query
           # Otherwise it will ignore project_ids and return milestones
           # from projects with milestones disabled.
           options = base_options

@@ -159,6 +159,6 @@ describe Project, :elastic do
     expected_hash['name_with_namespace'] = project.full_name
     expected_hash['path_with_namespace'] = project.full_path
 
-    expect(project.as_indexed_json).to eq(expected_hash)
+    expect(project.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 end
