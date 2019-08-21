@@ -222,7 +222,7 @@ export default {
     <div class="row">
       <div v-if="settings.allowMultiRule" class="form-group col-sm-6">
         <label class="label-wrapper">
-          <span class="mb-2 bold inline">{{ s__('ApprovalRule|Name') }}</span>
+          <span class="mb-2 bold inline">{{ s__('ApprovalRule|Rule name') }}</span>
           <input
             v-model="name"
             :class="{ 'is-invalid': validation.name }"

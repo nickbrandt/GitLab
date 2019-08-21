@@ -53,7 +53,7 @@ describe 'Merge request > User edits MR with approval rules', :js do
 
     click_button "Add approvers"
 
-    fill_in "Name", with: rule_name
+    fill_in "Rule name", with: rule_name
 
     add_approval_rule_member('user', approver.name)
 
