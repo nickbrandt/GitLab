@@ -154,8 +154,8 @@ describe API::Epics do
       end
 
       it 'has upvote/downvote information' do
-        epic.create_award_emoji('thumbsup', user)
-        epic2.create_award_emoji('thumbsdown', user)
+        create(:award_emoji, name: 'thumbsup', awardable: epic, user: user )
+        create(:award_emoji, name: 'thumbsdown', awardable: epic2, user: user )
 
         get api(url)
 
