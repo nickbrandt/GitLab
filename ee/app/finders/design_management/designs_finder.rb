@@ -15,17 +15,13 @@ module DesignManagement
         return ::DesignManagement::Design.none
       end
 
-      items = issue.designs
-      items = by_visible_at_version(items)
-      items
+      by_visible_at_version(issue.designs)
     end
 
     private
 
     # Returns all designs that existed at a particular design version
     def by_visible_at_version(items)
-      return items unless params[:visible_at_version]
-
       items.visible_at_version(params[:visible_at_version])
     end
   end

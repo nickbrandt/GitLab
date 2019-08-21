@@ -31,16 +31,23 @@ describe "uploading designs" do
   it "returns an error if the user is not allowed to upload designs" do
     post_graphql_mutation(mutation, current_user: create(:user))
 
-    expect(graphql_errors).not_to be_empty
+    expect(graphql_errors).to be_present
+  end
+
+  it 'succeeds' do
+    post_graphql_mutation(mutation, current_user: current_user)
+
+    expect(graphql_errors).not_to be_present
   end
 
   it "responds with the created designs" do
     post_graphql_mutation(mutation, current_user: current_user)
 
-    designs = mutation_response["designs"]
-
-    expect(designs.size).to eq(1)
-    expect(designs.first["filename"]).to eq("dk.png")
+    expect(mutation_response).to include(
+      'designs' => a_collection_containing_exactly(
+        a_hash_including('filename' => 'dk.png')
+      )
+    )
   end
 
   context "when the issue does not exist" do

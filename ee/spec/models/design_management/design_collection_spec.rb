@@ -2,7 +2,10 @@
 require 'spec_helper'
 
 describe DesignManagement::DesignCollection do
-  let(:issue) { create(:issue) }
+  include DesignManagementTestHelpers
+
+  set(:issue) { create(:issue) }
+
   subject(:collection) { described_class.new(issue) }
 
   describe ".find_or_create_design!" do
@@ -49,6 +52,31 @@ describe DesignManagement::DesignCollection do
   describe "#repository" do
     it "builds a design repository" do
       expect(collection.repository).to be_a(DesignManagement::Repository)
+    end
+  end
+
+  describe '#designs_by_filename' do
+    let(:designs) { create_list(:design, 5, :with_file, issue: issue) }
+    let(:filenames) { designs.map(&:filename) }
+    let(:query) { subject.designs_by_filename(filenames) }
+
+    it 'finds all the designs with those filenames on this issue' do
+      expect(query).to have_attributes(size: 5)
+    end
+
+    it 'only makes a single query' do
+      designs.each(&:id)
+      expect { query }.not_to exceed_query_limit(1)
+    end
+
+    context 'some are deleted' do
+      before do
+        delete_designs(*designs.sample(2))
+      end
+
+      it 'takes deletion into account' do
+        expect(query).to have_attributes(size: 3)
+      end
     end
   end
 end
