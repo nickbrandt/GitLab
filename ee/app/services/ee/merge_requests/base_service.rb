@@ -9,7 +9,7 @@ module EE
       def execute_hooks(merge_request, action = 'open', old_rev: nil, old_associations: {})
         super
 
-        return unless merge_request.project && jira_subscription_exists?
+        return unless jira_subscription_exists?
 
         if Atlassian::JiraIssueKeyExtractor.has_keys?(merge_request.title, merge_request.description)
           JiraConnect::SyncMergeRequestWorker.perform_async(merge_request.id)
