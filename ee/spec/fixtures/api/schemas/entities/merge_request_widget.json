@@ -4,22 +4,19 @@
     { "$ref": "../../../../../../spec/fixtures/api/schemas/entities/merge_request_widget.json" },
     {
       "properties": {
-        "has_approvals_available": { "type": ["boolean"] },
-        "approvals_before_merge": { "type": ["integer", "null"] },
-        "approved": { "type": "boolean" },
-        "approvals_path": { "type": ["string", "null"] },
-        "api_approvals_path": { "type": ["string", "null"] },
-        "api_approval_settings_path": { "type": ["string", "null"] },
-        "api_approve_path": { "type": ["string", "null"] },
-        "api_unapprove_path": { "type": ["string", "null"] },
-        "codeclimate": {
-          "head_path": { "type": "string" },
-          "base_path": { "type": "string" }
-        },
         "blob_path": {
           "head_path": { "type": "string" },
           "base_path": { "type": "string" }
         },
+        "codeclimate": {
+          "head_path": { "type": "string" },
+          "base_path": { "type": "string" }
+        },
+        "has_approvals_available": { "type": ["boolean"] },
+        "api_approvals_path": { "type": ["string", "null"] },
+        "api_approval_settings_path": { "type": ["string", "null"] },
+        "api_approve_path": { "type": ["string", "null"] },
+        "api_unapprove_path": { "type": ["string", "null"] },
         "vulnerability_feedback_path": { "type": "string" },
         "create_vulnerability_feedback_issue_path": { "type": ["string", "null"] },
         "create_vulnerability_feedback_merge_request_path": { "type": ["string", "null"] },

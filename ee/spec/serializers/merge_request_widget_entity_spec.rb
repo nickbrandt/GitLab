@@ -29,10 +29,6 @@ describe MergeRequestWidgetEntity do
     expect(subject.as_json[:blob_path]).to include(:head_path)
   end
 
-  it 'sets approvals_before_merge to 0 if nil' do
-    expect(subject.as_json[:approvals_before_merge]).to eq(0)
-  end
-
   def create_all_artifacts
     artifacts = %i(codequality sast dependency_scanning container_scanning dast license_management performance)
 
@@ -186,7 +182,9 @@ describe MergeRequestWidgetEntity do
   end
 
   it 'has vulnerability feedback paths' do
-    expect(subject.as_json).to include(:vulnerability_feedback_path)
+    expect(subject.as_json[:vulnerability_feedback_path]).to eq(
+      "/#{merge_request.project.full_path}/vulnerability_feedback"
+    )
     expect(subject.as_json).to include(:create_vulnerability_feedback_issue_path)
     expect(subject.as_json).to include(:create_vulnerability_feedback_merge_request_path)
     expect(subject.as_json).to include(:create_vulnerability_feedback_dismissal_path)

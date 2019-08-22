@@ -119,12 +119,6 @@ describe MergeRequestPresenter do
     end
   end
 
-  describe '#vulnerability_feedback_path' do
-    subject { described_class.new(merge_request, current_user: user).vulnerability_feedback_path }
-
-    it { is_expected.to eq("/#{merge_request.project.full_path}/vulnerability_feedback") }
-  end
-
   describe 'create vulnerability feedback paths' do
     where(:create_feedback_path) do
       [

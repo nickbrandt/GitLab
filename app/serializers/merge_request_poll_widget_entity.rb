@@ -141,4 +141,4 @@ class MergeRequestPollWidgetEntity < IssuableEntity
   end
 end
 
-MergeRequestPollWidgetEntity.prepend_if_ee('EE::MergeRequestWidgetEntity')
+MergeRequestPollWidgetEntity.prepend_if_ee('EE::MergeRequestPollWidgetEntity')
