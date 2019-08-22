@@ -27,7 +27,6 @@ module API
         params do
           requires :name, type: String, desc: 'The name of the approval rule'
           requires :approvals_required, type: Integer, desc: 'The number of required approvals for this rule'
-          requires :rule_type, type: String, desc: 'The type of approval rule'
           optional :approval_project_rule_id, type: Integer, desc: 'The ID of a project-level approval rule'
           optional :users, as: :user_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The user ids for this rule'
           optional :groups, as: :group_ids, type: Array, coerce_with: ARRAY_COERCION_LAMBDA, desc: 'The group ids for this rule'

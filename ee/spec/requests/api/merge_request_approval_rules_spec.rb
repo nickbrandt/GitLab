@@ -142,7 +142,6 @@ describe API::MergeRequestApprovalRules do
       {
         name: 'Test',
         approvals_required: 1,
-        rule_type: 'regular',
         approval_project_rule_id: approval_project_rule_id,
         users: users,
         groups: groups
@@ -170,7 +169,7 @@ describe API::MergeRequestApprovalRules do
 
         expect(rule['name']).to eq(params[:name])
         expect(rule['approvals_required']).to eq(params[:approvals_required])
-        expect(rule['rule_type']).to eq(params[:rule_type])
+        expect(rule['rule_type']).to eq('regular')
         expect(rule['contains_hidden_groups']).to eq(false)
         expect(rule['source_rule']).to be_nil
         expect(rule['eligible_approvers']).to be_empty
@@ -196,6 +195,30 @@ describe API::MergeRequestApprovalRules do
           rule = json_response
 
           expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
+          expect(rule['groups']).to match([hash_including('id' => group.id)])
+        end
+      end
+
+      context 'approval_project_rule_id is passed' do
+        let(:approval_project_rule) do
+          create(
+            :approval_project_rule,
+            project: project,
+            users: [approver],
+            groups: [group]
+          )
+        end
+
+        let(:approval_project_rule_id) { approval_project_rule.id }
+
+        it 'copies the attributes from the project rule execpt approvals_required' do
+          rule = json_response
+
+          expect(rule['name']).to eq(approval_project_rule.name)
+          expect(rule['approvals_required']).to eq(params[:approvals_required])
+          expect(rule['source_rule']['approvals_required']).to eq(approval_project_rule.approvals_required)
+          expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
+          expect(rule['users']).to match([hash_including('id' => approver.id)])
           expect(rule['groups']).to match([hash_including('id' => group.id)])
         end
       end
