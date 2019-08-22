@@ -57,10 +57,6 @@ module EE
       ::ApproverGroup.filtered_approver_groups(merge_request.approver_groups, current_user)
     end
 
-    def vulnerability_feedback_path
-      project_vulnerability_feedback_index_path(merge_request.project)
-    end
-
     private
 
     def expose_mr_approval_path?

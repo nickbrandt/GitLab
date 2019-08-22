@@ -6,8 +6,6 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      expose :approvals_required, as: :approvals_before_merge
-
       expose :blob_path do
         expose :head_path, if: -> (mr, _) { mr.head_pipeline_sha } do |merge_request|
           project_blob_path(merge_request.project, merge_request.head_pipeline_sha)
@@ -113,7 +111,7 @@ module EE
       end
 
       expose :vulnerability_feedback_path do |merge_request|
-        presenter(merge_request).vulnerability_feedback_path
+        project_vulnerability_feedback_index_path(merge_request.project)
       end
 
       expose :create_vulnerability_feedback_issue_path do |merge_request|
@@ -128,39 +126,26 @@ module EE
         presenter(merge_request).create_vulnerability_feedback_dismissal_path(merge_request.project)
       end
 
-      expose :merge_pipelines_enabled?, as: :merge_pipelines_enabled do |merge_request|
-        merge_request.target_project.merge_pipelines_enabled?
-      end
-
-      expose :merge_trains_count, if: -> (*) { merge_trains_enabled? } do |merge_request|
-        MergeTrain.total_count_in_train(merge_request)
-      end
-
-      expose :merge_train_index, if: -> (merge_request) { merge_request.on_train? } do |merge_request|
-        merge_request.merge_train.index
-      end
-
       expose :has_approvals_available do |merge_request|
         merge_request.approval_feature_available?
       end
-      expose :rebase_path do |merge_request|
-        presenter(merge_request).rebase_path
-      end
-      expose :approvals_path do |merge_request|
-        presenter(merge_request).approvals_path
-      end
+
       expose :api_approvals_path do |merge_request|
         presenter(merge_request).api_approvals_path
       end
+
       expose :api_approval_settings_path do |merge_request|
         presenter(merge_request).api_approval_settings_path
       end
+
       expose :api_approve_path do |merge_request|
         presenter(merge_request).api_approve_path
       end
+
       expose :api_unapprove_path do |merge_request|
         presenter(merge_request).api_unapprove_path
       end
+
       expose :merge_train_when_pipeline_succeeds_docs_path do |merge_request|
         presenter(merge_request).merge_train_when_pipeline_succeeds_docs_path
       end
@@ -198,10 +183,6 @@ module EE
     def base_pipeline_downloadable_path_for_report_type(file_type)
       object.base_pipeline&.present(current_user: current_user)
         &.downloadable_path_for_report_type(file_type)
-    end
-
-    def merge_trains_enabled?
-      object.target_project.merge_trains_enabled?
     end
   end
 end

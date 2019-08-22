@@ -39,11 +39,21 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.metricsReportsPath = data.metrics_reports_path;
 
     this.blockingMergeRequests = data.blocking_merge_requests;
+
+    this.hasApprovalsAvailable = data.has_approvals_available;
+    this.apiApprovalsPath = data.api_approvals_path;
+    this.apiApprovalSettingsPath = data.api_approval_settings_path;
+    this.apiApprovePath = data.api_approve_path;
+    this.apiUnapprovePath = data.api_unapprove_path;
   }
 
   setData(data, isRebased) {
     this.initGeo(data);
-    this.initApprovals(data);
+    this.initApprovals();
+
+    this.mergePipelinesEnabled = Boolean(data.merge_pipelines_enabled);
+    this.mergeTrainsCount = data.merge_trains_count || 0;
+    this.mergeTrainIndex = data.merge_train_index;
 
     super.setData(data, isRebased);
   }
@@ -53,17 +63,10 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.geoSecondaryHelpPath = this.geoSecondaryHelpPath || data.geo_secondary_help_path;
   }
 
-  initApprovals(data) {
+  initApprovals() {
     this.isApproved = this.isApproved || false;
     this.approvals = this.approvals || null;
     this.approvalRules = this.approvalRules || [];
-    this.hasApprovalsAvailable = Boolean(
-      data.has_approvals_available || this.hasApprovalsAvailable,
-    );
-    this.apiApprovalsPath = data.api_approvals_path || this.apiApprovalsPath;
-    this.apiApprovalSettingsPath = data.api_approval_settings_path || this.apiApprovalSettingsPath;
-    this.apiApprovePath = data.api_approve_path || this.apiApprovePath;
-    this.apiUnapprovePath = data.api_unapprove_path || this.apiUnapprovePath;
   }
 
   setApprovals(data) {
