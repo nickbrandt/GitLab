@@ -16,20 +16,18 @@ describe 'Snippet elastic search', :js, :elastic do
       create(:personal_snippet, author: user, content: 'Test searching for personal snippets')
 
       visit explore_snippets_path
-      fill_in 'search', with: 'Test'
-      find('#search').native.send_keys(:enter)
+      submit_search('Test')
 
-      expect(page).to have_content('Test searching for personal snippets')
+      expect(page).to have_selector('.results', text: 'Test searching for personal snippets')
     end
 
     it 'finds a project snippet' do
       create(:project_snippet, project: project, content: 'Test searching for personal snippets')
 
       visit explore_snippets_path
-      fill_in 'search', with: 'Test'
-      find('#search').native.send_keys(:enter)
+      submit_search('Test')
 
-      expect(page).to have_content('Test searching for personal snippets')
+      expect(page).to have_selector('.results', text: 'Test searching for personal snippets')
     end
   end
 end
