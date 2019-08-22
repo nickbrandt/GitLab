@@ -14,7 +14,6 @@ describe 'Epic in issue sidebar', :js do
     context 'projects within a group' do
       before do
         group.add_owner(user)
-        set_cookie('epics_select_dropdown', 'true')
         visit project_issue_path(project, issue)
       end
 

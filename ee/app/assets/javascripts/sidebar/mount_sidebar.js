@@ -1,11 +1,9 @@
 import Vue from 'vue';
-import Cookies from 'js-cookie';
 import * as CEMountSidebar from '~/sidebar/mount_sidebar';
 import { parseBoolean } from '~/lib/utils/common_utils';
 
 import sidebarWeight from './components/weight/sidebar_weight.vue';
 
-import SidebarItemEpic from './components/sidebar_item_epic.vue';
 import SidebarItemEpicsSelect from './components/sidebar_item_epics_select.vue';
 import SidebarStore from './stores/sidebar_store';
 
@@ -25,20 +23,6 @@ const mountWeightComponent = mediator => {
           mediator,
         },
       }),
-  });
-};
-
-const mountEpic = () => {
-  const el = document.querySelector('#js-vue-sidebar-item-epic');
-
-  if (!el) return false;
-
-  return new Vue({
-    el,
-    components: {
-      SidebarItemEpic,
-    },
-    render: createElement => createElement('sidebar-item-epic', {}),
   });
 };
 
@@ -71,9 +55,5 @@ const mountEpicsSelect = () => {
 export default function mountSidebar(mediator) {
   CEMountSidebar.mountSidebar(mediator);
   mountWeightComponent(mediator);
-  if (parseBoolean(Cookies.get('epics_select_dropdown'))) {
-    mountEpicsSelect();
-  } else {
-    mountEpic();
-  }
+  mountEpicsSelect();
 }
