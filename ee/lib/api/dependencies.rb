@@ -37,7 +37,7 @@ module API
 
         dependencies = dependencies_by(declared_params.merge(project: user_project))
 
-        present dependencies, with: ::EE::API::Entities::Dependency
+        present dependencies, with: ::EE::API::Entities::Dependency, user: current_user, project: user_project
       end
     end
   end
