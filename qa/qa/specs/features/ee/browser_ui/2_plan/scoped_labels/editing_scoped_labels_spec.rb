@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QA
   context 'Plan' do
     describe 'Editing scoped labels on issues' do
