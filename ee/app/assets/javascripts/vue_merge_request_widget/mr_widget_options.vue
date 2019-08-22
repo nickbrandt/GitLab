@@ -13,7 +13,7 @@ import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetApprovals from './components/approvals/approvals.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import MergeTrainHelperText from './components/merge_train_helper_text.vue';
-import { ATMTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 export default {
   components: {
@@ -141,7 +141,7 @@ export default {
         this.mr.pipeline &&
         _.isNumber(this.mr.pipeline.id) &&
         _.isString(this.mr.pipeline.path) &&
-        this.mr.preferredAutoMergeStrategy === ATMTWPS_MERGE_STRATEGY &&
+        this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY &&
         !this.mr.autoMergeEnabled
       );
     },

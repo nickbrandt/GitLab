@@ -1,4 +1,4 @@
-import { ATMTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 import { __ } from '~/locale';
 
 export default {
@@ -17,7 +17,7 @@ export default {
       );
     },
     autoMergeText() {
-      if (this.mr.preferredAutoMergeStrategy === ATMTWPS_MERGE_STRATEGY) {
+      if (this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY) {
         if (this.mr.mergeTrainsCount === 0) {
           return __('Start merge train when pipeline succeeds');
         }

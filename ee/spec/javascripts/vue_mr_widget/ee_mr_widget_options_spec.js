@@ -29,7 +29,7 @@ import {
   sastBaseAllIssues,
   sastHeadAllIssues,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
-import { ATMTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
+import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 describe('ee merge request widget options', () => {
   let vm;
@@ -795,11 +795,11 @@ describe('ee merge request widget options', () => {
     });
 
     describe('shouldRenderMergeTrainHelperText', () => {
-      it('should return true if ATMTWPS is available and the user has not yet pressed the ATMTWPS button', () => {
+      it('should return true if MTWPS is available and the user has not yet pressed the MTWPS button', () => {
         vm = mountComponent(Component, {
           mrData: {
             ...mockData,
-            available_auto_merge_strategies: [ATMTWPS_MERGE_STRATEGY],
+            available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
             auto_merge_enabled: false,
           },
         });
@@ -907,7 +907,7 @@ describe('ee merge request widget options', () => {
   describe('merge train helper text', () => {
     const getHelperTextElement = () => vm.$el.querySelector('.js-merge-train-helper-text');
 
-    it('does not render the merge train helpe text if the ATMTWPS strategy is not available', () => {
+    it('does not render the merge train helpe text if the MTWPS strategy is not available', () => {
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
@@ -928,7 +928,7 @@ describe('ee merge request widget options', () => {
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
-          available_auto_merge_strategies: [ATMTWPS_MERGE_STRATEGY],
+          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
           merge_trains_count: 2,
           merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
           pipeline: {
@@ -951,7 +951,7 @@ describe('ee merge request widget options', () => {
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
-          available_auto_merge_strategies: [ATMTWPS_MERGE_STRATEGY],
+          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
           merge_trains_count: 0,
           merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
           pipeline: {
@@ -974,7 +974,7 @@ describe('ee merge request widget options', () => {
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
-          available_auto_merge_strategies: [ATMTWPS_MERGE_STRATEGY],
+          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
           merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
           pipeline: {
             ...mockData.pipeline,
@@ -996,7 +996,7 @@ describe('ee merge request widget options', () => {
       vm = mountComponent(Component, {
         mrData: {
           ...mockData,
-          available_auto_merge_strategies: [ATMTWPS_MERGE_STRATEGY],
+          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
           merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
           pipeline: {
             ...mockData.pipeline,
