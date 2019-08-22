@@ -1,0 +1,5 @@
+---
+title: Support restricting group access by multiple IP subnets
+merge_request: 15142
+author:
+type: added

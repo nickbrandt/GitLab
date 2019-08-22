@@ -20,17 +20,19 @@ describe Gitlab::IpRestriction::Enforcer do
 
     context 'with restriction' do
       before do
-        create(:ip_restriction, group: group, range: range)
+        ranges.each do |range|
+          create(:ip_restriction, group: group, range: range)
+        end
       end
 
-      context 'address is within the range' do
-        let(:range) { '192.168.0.0/24' }
+      context 'address is within one of the ranges' do
+        let(:ranges) { ['192.168.0.0/24', '255.255.255.224/27'] }
 
         it { is_expected.to be_truthy }
       end
 
-      context 'address is outside the range' do
-        let(:range) { '10.0.0.0/8' }
+      context 'address is outside all of the ranges' do
+        let(:ranges) { ['10.0.0.0/8', '255.255.255.224/27'] }
 
         it { is_expected.to be_falsey }
       end

@@ -17,6 +17,7 @@ describe Group do
     it { is_expected.to belong_to(:file_template_project).class_name('Project').without_validating_presence }
     it { is_expected.to have_many(:dependency_proxy_blobs) }
     it { is_expected.to have_many(:cycle_analytics_stages) }
+    it { is_expected.to have_many(:ip_restrictions) }
     it { is_expected.to have_one(:dependency_proxy_setting) }
   end
 
@@ -219,6 +220,28 @@ describe Group do
 
         expect(group).to be_valid
         expect(group.file_template_project_id).to eq(valid_project.id)
+      end
+    end
+  end
+
+  describe '#ip_restriction_ranges' do
+    context 'group with no associated ip_restriction records' do
+      it 'returns nil' do
+        expect(group.ip_restriction_ranges).to eq(nil)
+      end
+    end
+
+    context 'group with associated ip_restriction records' do
+      let(:ranges) { ['192.168.0.0/24', '10.0.0.0/8'] }
+
+      before do
+        ranges.each do |range|
+          create(:ip_restriction, group: group, range: range)
+        end
+      end
+
+      it 'returns a comma separated string of ranges of its ip_restriction records' do
+        expect(group.ip_restriction_ranges).to eq('192.168.0.0/24,10.0.0.0/8')
       end
     end
   end

@@ -4,14 +4,13 @@
 
 %h5= _('Restrict access by IP address')
 
-= f.fields_for :ip_restriction do |ip_restriction_form|
-  .form-group
-    - if read_only
-      = ip_restriction_form.text_field :range, value: group.root_ancestor_ip_restriction&.range, class: 'form-control', disabled: true, placeholder: _('No value set by top-level parent group.')
-      .form-text.text-muted
-        = _('IP address restriction is not editable in subgroups. Value inherited from top-level parent group.')
-    - else
-      = ip_restriction_form.text_field :range, class: 'form-control', placeholder: _('Enter IP address range')
+.form-group
+  - if read_only
+    = f.text_field :ip_restriction_ranges, value: group.root_ancestor&.ip_restriction_ranges, class: 'form-control', disabled: true, placeholder: _('No value set by top-level parent group.')
     .form-text.text-muted
-      - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'ip-access-restriction-ultimate'))
-      = _('This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Example: <code>192.168.0.0/24</code>. %{read_more_link}.').html_safe % { read_more_link: read_more_link }
+      = _('IP address restriction is not editable in subgroups. Value inherited from top-level parent group.')
+  - else
+    = f.text_field :ip_restriction_ranges, class: 'form-control', placeholder: _('Enter IP address range')
+  .form-text.text-muted
+    - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'ip-access-restriction-ultimate'))
+    = _('This group, including all subgroups, projects and git repositories, will only be reachable from the specified IP address range. Multiple addresses are supported with comma delimiters. Example: <code>192.168.0.0/24,192.168.1.0/24</code>. %{read_more_link}.').html_safe % { read_more_link: read_more_link }

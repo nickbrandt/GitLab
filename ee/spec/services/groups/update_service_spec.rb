@@ -167,14 +167,14 @@ describe Groups::UpdateService, '#execute' do
       let!(:ip_restriction) { IpRestriction.create!(group: group, range: '10.0.0.0/8') }
 
       context 'empty ip restriction param' do
-        let(:params) { { ip_restriction_attributes: { id: ip_restriction.id, range: '' } } }
+        let(:params) { { ip_restriction_ranges: '' } }
 
         it 'deletes ip restriction' do
-          expect(group.ip_restriction.range).to eql('10.0.0.0/8')
+          expect(group.ip_restrictions.first.range).to eql('10.0.0.0/8')
 
           subject
 
-          expect(group.reload.ip_restriction).to be_nil
+          expect(group.reload.ip_restrictions.count).to eq(0)
         end
       end
     end

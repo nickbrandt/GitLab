@@ -12,7 +12,7 @@ module EE
           return false if group.errors.present?
         end
 
-        handle_deletion
+        handle_changes
 
         remove_insight_if_insight_project_absent
 
@@ -79,23 +79,17 @@ module EE
         end
       end
 
-      def handle_deletion
-        handle_ip_restriction_deletion
+      def handle_changes
         handle_allowed_domain_deletion
+        handle_ip_restriction_update
       end
 
-      def handle_ip_restriction_deletion
-        return unless associations_editable?
+      def handle_ip_restriction_update
+        comma_separated_ranges = params.delete(:ip_restriction_ranges)
 
-        return unless group.ip_restriction.present?
+        return if comma_separated_ranges.nil?
 
-        ip_restriction_params = params[:ip_restriction_attributes]
-
-        return unless ip_restriction_params
-
-        if ip_restriction_params[:range]&.blank?
-          ip_restriction_params[:_destroy] = 1
-        end
+        IpRestrictions::UpdateService.new(group, comma_separated_ranges).execute
       end
 
       def associations_editable?

@@ -6,7 +6,6 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      before_action :set_ip_restriction, only: [:edit]
       before_action :set_allowed_domain, only: [:edit]
     end
 
@@ -33,7 +32,7 @@ module EE
         params_ee << { insight_attributes: [:id, :project_id, :_destroy] } if current_group&.insights_available?
         params_ee << :file_template_project_id if current_group&.feature_available?(:custom_file_templates_for_namespace)
         params_ee << :custom_project_templates_group_id if current_group&.group_project_template_available?
-        params_ee << { ip_restriction_attributes: [:id, :range] } if current_group&.feature_available?(:group_ip_restriction)
+        params_ee << :ip_restriction_ranges if current_group&.feature_available?(:group_ip_restriction)
         params_ee << { allowed_email_domain_attributes: [:id, :domain] } if current_group&.feature_available?(:group_allowed_email_domains)
       end
     end
@@ -59,12 +58,6 @@ module EE
 
     def default_group_view
       EE::User::DEFAULT_GROUP_VIEW
-    end
-
-    def set_ip_restriction
-      return if group.ip_restriction.present?
-
-      group.build_ip_restriction
     end
 
     def set_allowed_domain
