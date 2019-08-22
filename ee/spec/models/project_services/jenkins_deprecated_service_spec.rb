@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe JenkinsDeprecatedService, use_clean_rails_memory_store_caching: true do
