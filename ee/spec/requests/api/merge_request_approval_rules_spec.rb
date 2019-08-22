@@ -323,4 +323,45 @@ describe API::MergeRequestApprovalRules do
       end
     end
   end
+
+  describe 'DELETE /projects/:id/merge_requests/:merge_request_iid/approval_rules/:approval_rule_id' do
+    let(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
+    let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules/#{approval_rule.id}" }
+
+    context 'disable_overriding_approvers_per_merge_request is set to true' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: true)
+
+        delete api(url, user)
+      end
+
+      it 'responds with 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'disable_overriding_approvers_per_merge_request is set to false' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: false)
+
+        delete api(url, current_user)
+      end
+
+      context 'user cannot update merge request' do
+        let(:current_user) { other_user }
+
+        it 'responds with 403' do
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'user can update merge request' do
+        let(:current_user) { user }
+
+        it 'responds with 204' do
+          expect(response).to have_gitlab_http_status(204)
+        end
+      end
+    end
+  end
 end

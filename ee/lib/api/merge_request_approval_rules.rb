@@ -67,6 +67,19 @@ module API
               render_api_error!(result[:message], 400)
             end
           end
+
+          desc 'Destroy merge request approval rule'
+          params do
+            requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
+          end
+          delete do
+            merge_request = find_merge_request_with_access(params[:merge_request_iid], :update_approvers)
+            approval_rule = merge_request.approval_rules.find(params[:approval_rule_id])
+
+            destroy_conditionally!(approval_rule) do |rule|
+              approval_rule.destroy
+            end
+          end
         end
       end
     end
