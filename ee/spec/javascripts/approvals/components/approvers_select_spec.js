@@ -74,7 +74,7 @@ describe('Approvals ApproversSelect', () => {
   beforeEach(() => {
     jasmine.clock().install();
     spyOn(Api, 'groups').and.returnValue(Promise.resolve(TEST_GROUPS));
-    spyOn(Api, 'approverUsers').and.returnValue(Promise.resolve(TEST_USERS));
+    spyOn(Api, 'projectUsers').and.returnValue(Promise.resolve(TEST_USERS));
   });
 
   afterEach(() => {
@@ -127,9 +127,8 @@ describe('Approvals ApproversSelect', () => {
     });
 
     it('fetches users', () => {
-      expect(Api.approverUsers).toHaveBeenCalledWith(term, {
+      expect(Api.projectUsers).toHaveBeenCalledWith(TEST_PROJECT_ID, term, {
         skip_users: [],
-        project_id: TEST_PROJECT_ID,
       });
     });
   });
@@ -161,9 +160,8 @@ describe('Approvals ApproversSelect', () => {
     });
 
     it('skips users', () => {
-      expect(Api.approverUsers).toHaveBeenCalledWith('', {
+      expect(Api.projectUsers).toHaveBeenCalledWith(TEST_PROJECT_ID, '', {
         skip_users: skipUserIds,
-        project_id: TEST_PROJECT_ID,
       });
     });
   });

@@ -136,9 +136,8 @@ export default {
       });
     },
     fetchUsers(term) {
-      return Api.approverUsers(term, {
+      return Api.projectUsers(this.projectId, term, {
         skip_users: this.skipUserIds,
-        project_id: this.projectId,
       });
     },
     onChange() {

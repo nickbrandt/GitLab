@@ -8,25 +8,6 @@ export default {
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
 
-  approverUsers(search, options, callback = () => {}) {
-    const url = Api.buildUrl('/autocomplete/users.json');
-    return axios
-      .get(url, {
-        params: Object.assign(
-          {
-            search,
-            per_page: 20,
-          },
-          options,
-        ),
-      })
-      .then(({ data }) => {
-        callback(data);
-
-        return data;
-      });
-  },
-
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
 
