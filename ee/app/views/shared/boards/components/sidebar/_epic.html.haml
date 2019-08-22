@@ -1,12 +1,7 @@
 - return unless @group&.feature_available?(:epics) || @project&.group&.feature_available?(:epics)
 
-.block.epic
-  .title
-    Epic
-    %span.js-epic-label-loading{ "v-if" => "issue.isFetching && issue.isFetching.epic" }
-      = icon('spinner spin', class: 'loading-icon')
-  .value.js-epic-label{ "v-if" => "issue.isFetching && !issue.isFetching.epic" }
-    %a.bold{ "v-if" => "issue.epic", ":href" => "issue.epic.url" }
-      {{ issue.epic.title }}
-    .no-value{ "v-if" => "!issue.epic" }
-      None
+%sidebar-epics-select{ ":sidebar-store" => "issue",
+  ":group-id": "#{@project&.group&.id}",
+  ":issue-id": "issue.id",
+  ":epic-issue-id": "(issue.epic && issue.epic.epic_issue_id) || 0",
+  ":can-edit": can_admin_issue? }

@@ -1,9 +1,6 @@
 - if issuable_sidebar[:supports_epic]
   - if issuable_sidebar[:features_available][:epics]
-    .block.epic
-      #js-vue-sidebar-item-epic
-        .title.hide-collapsed
-          Epic
-          = icon('spinner spin')
+    #js-vue-sidebar-item-epics-select{ data: { can_edit: can_admin_issue?.to_s, group_id: @project.group.id, issue_id: @issuable.id, epic_issue_id: @issuable.epic_issue&.id } }
+
   - else
     = render 'shared/promotions/promote_epics'
