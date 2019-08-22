@@ -52,11 +52,11 @@ func realGitalyOkBody(t *testing.T) *api.Response {
 }
 
 func ensureGitalyRepository(t *testing.T, apiResponse *api.Response) error {
-	namespace, err := gitaly.NewNamespaceClient(apiResponse.GitalyServer)
+	ctx, namespace, err := gitaly.NewNamespaceClient(context.Background(), apiResponse.GitalyServer)
 	if err != nil {
 		return err
 	}
-	repository, err := gitaly.NewRepositoryClient(apiResponse.GitalyServer)
+	ctx, repository, err := gitaly.NewRepositoryClient(ctx, apiResponse.GitalyServer)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func ensureGitalyRepository(t *testing.T, apiResponse *api.Response) error {
 		StorageName: apiResponse.Repository.StorageName,
 		Name:        apiResponse.Repository.RelativePath,
 	}
-	_, err = namespace.RemoveNamespace(context.Background(), rmNsReq)
+	_, err = namespace.RemoveNamespace(ctx, rmNsReq)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func ensureGitalyRepository(t *testing.T, apiResponse *api.Response) error {
 		Url:        "https://gitlab.com/gitlab-org/gitlab-test.git",
 	}
 
-	_, err = repository.CreateRepositoryFromURL(context.Background(), createReq)
+	_, err = repository.CreateRepositoryFromURL(ctx, createReq)
 	return err
 }
 
