@@ -525,6 +525,113 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe(types.REQUEST_DELETE_DISMISSAL_COMMENT, () => {
+    beforeEach(() => {
+      mutations[types.REQUEST_DELETE_DISMISSAL_COMMENT](stateCopy);
+    });
+
+    it('should set isDismissingVulnerability to true', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to true', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(true);
+    });
+
+    it('should nullify the error state on the modal', () => {
+      expect(stateCopy.modal.error).toBeNull();
+    });
+  });
+
+  describe(types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS, () => {
+    let payload;
+    let vulnerability;
+    let data;
+
+    beforeEach(() => {
+      vulnerability = { id: 1 };
+      data = { name: 'dismissal feedback' };
+      payload = { id: vulnerability.id, data };
+      mutations[types.RECEIVE_DELETE_DISMISSAL_COMMENT_SUCCESS](stateCopy, payload);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability on the modal to false', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('shoulfd set isDissmissed on the modal vulnerability to be true', () => {
+      expect(stateCopy.modal.vulnerability.isDismissed).toBe(true);
+    });
+  });
+
+  describe(types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR, () => {
+    const error = 'There was an error deleting the comment.';
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_DELETE_DISMISSAL_COMMENT_ERROR](stateCopy, error);
+    });
+
+    it('should set isDismissingVulnerability to false', () => {
+      expect(stateCopy.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set isDismissingVulnerability in the modal data to false', () => {
+      expect(stateCopy.modal.isDismissingVulnerability).toBe(false);
+    });
+
+    it('should set the error state on the modal', () => {
+      expect(stateCopy.modal.error).toEqual(error);
+    });
+  });
+
+  describe(types.SHOW_DISMISSAL_DELETE_BUTTONS, () => {
+    beforeEach(() => {
+      mutations[types.SHOW_DISMISSAL_DELETE_BUTTONS](stateCopy);
+    });
+
+    it('should set isShowingDeleteButtonsto to true', () => {
+      expect(stateCopy.modal.isShowingDeleteButtons).toBe(true);
+    });
+  });
+
+  describe(types.HIDE_DISMISSAL_DELETE_BUTTONS, () => {
+    beforeEach(() => {
+      mutations[types.HIDE_DISMISSAL_DELETE_BUTTONS](stateCopy);
+    });
+
+    it('should set isShowingDeleteButtons to false', () => {
+      expect(stateCopy.modal.isShowingDeleteButtons).toBe(false);
+    });
+  });
+
+  describe('OPEN_DISMISSAL_COMMENT_BOX', () => {
+    beforeEach(() => {
+      mutations[types.OPEN_DISMISSAL_COMMENT_BOX](stateCopy);
+    });
+
+    it('should set isCommentingOnDismissal to true', () => {
+      expect(stateCopy.modal.isCommentingOnDismissal).toBe(true);
+    });
+  });
+
+  describe('CLOSE_DISMISSAL_COMMENT_BOX', () => {
+    beforeEach(() => {
+      mutations[types.CLOSE_DISMISSAL_COMMENT_BOX](stateCopy);
+    });
+
+    it('should set isCommentingOnDismissal to false', () => {
+      expect(stateCopy.modal.isCommentingOnDismissal).toBe(false);
+    });
+
+    it('should set isShowingDeleteButtons to false', () => {
+      expect(stateCopy.modal.isShowingDeleteButtons).toBe(false);
+    });
+  });
+
   describe('REQUEST_CREATE_ISSUE', () => {
     it('sets isCreatingNewIssue prop to true and resets error', () => {
       mutations[types.REQUEST_CREATE_ISSUE](stateCopy);

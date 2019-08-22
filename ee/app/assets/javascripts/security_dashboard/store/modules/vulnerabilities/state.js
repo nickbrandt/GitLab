@@ -40,8 +40,8 @@ export default () => ({
     isCreatingMergeRequest: false,
     isDismissingVulnerability: false,
     isCommentingOnDismissal: false,
+    isShowingDeleteButtons: false,
   },
   isCreatingIssue: false,
   isCreatingMergeRequest: false,
-  isDismissingVulnerability: false,
 });

@@ -13,6 +13,11 @@ export default {
       type: Array,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data: () => ({
     selectedButton: {},
@@ -34,6 +39,7 @@ export default {
 <template>
   <gl-dropdown
     v-if="selectedButton"
+    :disabled="disabled"
     no-caret
     right
     split

@@ -4581,6 +4581,9 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgid "Delete Comment"
+msgstr ""
+
 msgid "Delete Package"
 msgstr ""
 
@@ -5162,6 +5165,9 @@ msgid "Edit %{issuable}"
 msgstr ""
 
 msgid "Edit %{name}"
+msgstr ""
+
+msgid "Edit Comment"
 msgstr ""
 
 msgid "Edit Deploy Key"
@@ -13167,6 +13173,9 @@ msgstr ""
 msgid "Security Reports|There was an error creating the merge request."
 msgstr ""
 
+msgid "Security Reports|There was an error deleting the comment."
+msgstr ""
+
 msgid "Security Reports|There was an error dismissing the vulnerability."
 msgstr ""
 
@@ -18753,6 +18762,9 @@ msgid "vulnerability|Add comment & dismiss"
 msgstr ""
 
 msgid "vulnerability|Dismiss vulnerability"
+msgstr ""
+
+msgid "vulnerability|Save comment"
 msgstr ""
 
 msgid "vulnerability|Undo dismiss"

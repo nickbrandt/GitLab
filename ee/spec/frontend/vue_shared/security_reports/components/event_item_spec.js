@@ -1,38 +1,91 @@
-import Vue from 'vue';
-import component from 'ee/vue_shared/security_reports/components/event_item.vue';
-import mountComponent from 'helpers/vue_mount_component_helper';
+import Component from 'ee/vue_shared/security_reports/components/event_item.vue';
+import { shallowMount, mount } from '@vue/test-utils';
 
 describe('Event Item', () => {
-  const Component = Vue.extend(component);
-  const props = {
-    author: {
-      name: 'Tanuki',
-      username: 'gitlab',
-    },
-  };
-  let vm;
+  describe('initial state', () => {
+    let wrapper;
 
-  afterEach(() => {
-    vm.$destroy();
+    const propsData = {
+      author: {
+        name: 'Tanuki',
+        username: 'gitlab',
+      },
+    };
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    beforeEach(() => {
+      wrapper = shallowMount(Component, { propsData });
+    });
+
+    it('uses the author name', () => {
+      expect(wrapper.find('.js-author').text()).toContain(propsData.author.name);
+    });
+
+    it('uses the author username', () => {
+      expect(wrapper.find('.js-author').text()).toContain(`@${propsData.author.username}`);
+    });
+
+    it('uses the fallback icon', () => {
+      expect(wrapper.props().iconName).toBe('plus');
+    });
+
+    it('uses the fallback icon class', () => {
+      expect(wrapper.props().iconStyle).toBe('ci-status-icon-success');
+    });
+
+    it('renders the action buttons tontainer', () => {
+      expect(wrapper.find('.action-buttons')).toExist();
+    });
   });
+  describe('with action buttons', () => {
+    let wrapper;
 
-  beforeEach(() => {
-    vm = mountComponent(Component, props);
-  });
+    const propsData = {
+      author: {
+        name: 'Tanuki',
+        username: 'gitlab',
+      },
+      actionButtons: [
+        {
+          iconName: 'pencil',
+          emit: 'fooEvent',
+          title: 'Foo Action',
+        },
+        {
+          iconName: 'remove',
+          emit: 'barEvent',
+          title: 'Bar Action',
+        },
+      ],
+    };
 
-  it('uses the author name', () => {
-    expect(vm.$el.querySelector('.js-author').textContent).toContain(props.author.name);
-  });
+    afterEach(() => {
+      wrapper.destroy();
+    });
 
-  it('uses the author username', () => {
-    expect(vm.$el.querySelector('.js-author').textContent).toContain(`@${props.author.username}`);
-  });
+    beforeEach(() => {
+      wrapper = mount(Component, { propsData });
+    });
 
-  it('uses the fallback icon', () => {
-    expect(vm.iconName).toBe('plus');
-  });
+    it('renders the action buttons container', () => {
+      expect(wrapper.find('.action-buttons')).toExist();
+    });
 
-  it('uses the fallback icon class', () => {
-    expect(vm.iconStyle).toBe('ci-status-icon-success');
+    it('renders the action buttons', () => {
+      expect(wrapper.findAll('.action-buttons > button').length).toBe(2);
+      expect(wrapper).toMatchSnapshot();
+    });
+
+    it('emits the button events when clicked', () => {
+      const buttons = wrapper.findAll('.action-buttons > button');
+      buttons.at(0).trigger('click');
+      buttons.at(1).trigger('click');
+
+      expect(wrapper.emitted().fooEvent.length).toEqual(1);
+      expect(wrapper.emitted().barEvent.length).toEqual(1);
+    });
   });
 });

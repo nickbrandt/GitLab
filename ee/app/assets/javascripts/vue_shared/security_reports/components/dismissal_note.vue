@@ -2,10 +2,14 @@
 import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
+import { GlButton } from '@gitlab/ui';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
     EventItem,
+    GlButton,
+    LoadingButton,
   },
   props: {
     feedback: {
@@ -16,6 +20,26 @@ export default {
       type: Object,
       required: false,
       default: () => ({}),
+    },
+    isCommentingOnDismissal: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isShowingDeleteButtons: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    showDismissalCommentActions: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isDismissingVulnerability: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -49,6 +73,20 @@ export default {
     commentDetails() {
       return this.feedback.comment_details;
     },
+    vulnDismissalActionButtons() {
+      return [
+        {
+          iconName: 'pencil',
+          emit: 'editVulnerabilityDismissalComment',
+          title: __('Edit Comment'),
+        },
+        {
+          iconName: 'remove',
+          emit: 'showDismissalDeleteButtons',
+          title: __('Delete Comment'),
+        },
+      ];
+    },
   },
 };
 </script>
@@ -63,15 +101,36 @@ export default {
     >
       <div v-html="eventText"></div>
     </event-item>
-    <template v-if="commentDetails">
+    <template v-if="commentDetails && !isCommentingOnDismissal">
       <hr class="my-3" />
       <event-item
+        :action-buttons="vulnDismissalActionButtons"
         :author="commentDetails.comment_author"
         :created-at="commentDetails.comment_timestamp"
+        :show-right-slot="isShowingDeleteButtons"
+        :show-action-buttons="showDismissalCommentActions"
         icon-name="comment"
         icon-style="ci-status-icon-pending"
+        @editVulnerabilityDismissalComment="$emit('editVulnerabilityDismissalComment')"
+        @showDismissalDeleteButtons="$emit('showDismissalDeleteButtons')"
+        @hideDismissalDeleteButtons="$emit('hideDismissalDeleteButtons')"
+        @deleteDismissalComment="$emit('deleteDismissalComment')"
       >
         {{ commentDetails.comment }}
+
+        <template v-slot:right-content>
+          <div class="d-flex flex-grow-1 align-self-start flex-row-reverse">
+            <loading-button
+              :label="__('Delete comment')"
+              container-class="btn btn-remove"
+              @click="$emit('deleteDismissalComment')"
+            />
+
+            <gl-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
+              {{ __('Cancel') }}
+            </gl-button>
+          </div>
+        </template>
       </event-item>
     </template>
   </div>

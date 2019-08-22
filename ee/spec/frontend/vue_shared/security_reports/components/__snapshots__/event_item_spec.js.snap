@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Event Item with action buttons renders the action buttons 1`] = `
+VueWrapper {
+  "_emitted": Object {
+    "hook:mounted": Array [
+      Array [],
+    ],
+  },
+  "_emittedByOrder": Array [
+    Object {
+      "args": Array [],
+      "name": "hook:mounted",
+    },
+  ],
+  "isFunctionalComponent": undefined,
+}
+`;

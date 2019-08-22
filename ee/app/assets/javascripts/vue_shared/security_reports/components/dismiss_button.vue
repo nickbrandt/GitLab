@@ -24,6 +24,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     buttonText() {
@@ -48,7 +53,7 @@ export default {
   <div class="btn-group" role="group">
     <loading-button
       :loading="isDismissing"
-      :disabled="isDismissing"
+      :disabled="isDismissing || disabled"
       :label="buttonText"
       container-class="js-dismiss-btn btn btn-close"
       @click="handleDismissClick"
@@ -57,6 +62,7 @@ export default {
       v-if="!isDismissed"
       v-gl-tooltip.hover
       v-gl-tooltip.focus
+      :disabled="disabled"
       :title="s__('vulnerability|Add comment & dismiss')"
       variant="close"
       class="js-dismiss-with-comment "

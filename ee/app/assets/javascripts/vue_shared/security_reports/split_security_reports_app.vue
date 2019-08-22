@@ -236,6 +236,9 @@ export default {
       'closeDismissalCommentBox',
       'downloadPatch',
       'addDismissalComment',
+      'deleteDismissalComment',
+      'showDismissalDeleteButtons',
+      'hideDismissalDeleteButtons',
     ]),
     ...mapActions('sast', {
       setSastHeadPath: 'setHeadPath',
@@ -331,6 +334,10 @@ export default {
       @revertDismissVulnerability="revertDismissVulnerability"
       @downloadPatch="downloadPatch"
       @addDismissalComment="addDismissalComment({ comment: $event })"
+      @editVulnerabilityDismissalComment="openDismissalCommentBox()"
+      @deleteDismissalComment="deleteDismissalComment"
+      @showDismissalDeleteButtons="showDismissalDeleteButtons"
+      @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
     />
   </div>
 </template>

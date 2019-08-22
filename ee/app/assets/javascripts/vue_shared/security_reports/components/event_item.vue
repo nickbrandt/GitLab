@@ -1,4 +1,5 @@
 <script>
+import { GlTooltipDirective, GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
@@ -7,6 +8,10 @@ export default {
   components: {
     Icon,
     TimeAgoTooltip,
+    GlButton,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     author: {
@@ -27,6 +32,21 @@ export default {
       type: String,
       required: false,
       default: 'ci-status-icon-success',
+    },
+    actionButtons: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    showRightSlot: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    showActionButtons: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
 };
@@ -57,6 +77,25 @@ export default {
         </span>
       </div>
       <slot></slot>
+    </div>
+
+    <slot v-if="showRightSlot" name="right-content"></slot>
+
+    <div v-else class="d-flex flex-grow-1 align-self-start flex-row-reverse">
+      <div v-if="showActionButtons" class="action-buttons">
+        <gl-button
+          v-for="button in actionButtons"
+          :key="button.title"
+          ref="button"
+          v-gl-tooltip
+          class="px-1"
+          variant="transparent"
+          :title="button.title"
+          @click="$emit(button.emit)"
+        >
+          <icon :name="button.iconName" css-classes="link-highlight" />
+        </gl-button>
+      </div>
     </div>
   </div>
 </template>

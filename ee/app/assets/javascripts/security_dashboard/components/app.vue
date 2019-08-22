@@ -97,6 +97,7 @@ export default {
   methods: {
     ...mapActions('vulnerabilities', [
       'addDismissalComment',
+      'deleteDismissalComment',
       'closeDismissalCommentBox',
       'createIssue',
       'createMergeRequest',
@@ -108,6 +109,8 @@ export default {
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
+      'showDismissalDeleteButtons',
+      'hideDismissalDeleteButtons',
       'undoDismiss',
       'downloadPatch',
     ]),
@@ -138,6 +141,10 @@ export default {
       :can-create-merge-request="canCreateMergeRequest"
       :can-dismiss-vulnerability="canDismissVulnerability"
       @addDismissalComment="addDismissalComment({ vulnerability, comment: $event })"
+      @editVulnerabilityDismissalComment="openDismissalCommentBox()"
+      @showDismissalDeleteButtons="showDismissalDeleteButtons"
+      @hideDismissalDeleteButtons="hideDismissalDeleteButtons"
+      @deleteDismissalComment="deleteDismissalComment({ vulnerability })"
       @closeDismissalCommentBox="closeDismissalCommentBox()"
       @createMergeRequest="createMergeRequest({ vulnerability })"
       @createNewIssue="createIssue({ vulnerability })"
