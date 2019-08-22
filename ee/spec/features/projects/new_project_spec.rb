@@ -111,12 +111,12 @@ describe 'New project' do
           find('.js-import-github').click
         end
 
-        expect(page).to have_text('Connect repositories from GitHub')
+        expect(page).to have_text('Authenticate with GitHub')
 
         allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repos).and_return([repo])
 
         fill_in 'personal_access_token', with: 'fake-token'
-        click_button 'List your GitHub repositories'
+        click_button 'Authenticate'
         wait_for_requests
 
         # Mock the POST `/import/github`
@@ -140,12 +140,6 @@ describe 'New project' do
         expect(created_project.project_feature).not_to be_issues_enabled
       end
 
-      it 'new GitHub CI/CD project page has link to status page with ?ci_cd_only=true param' do
-        visit new_import_github_path(ci_cd_only: true)
-
-        expect(page).to have_link('List your GitHub repositories', href: status_import_github_path(ci_cd_only: true))
-      end
-
       it 'stays on GitHub import page after access token failure' do
         visit new_project_path
         find('#ci-cd-project-tab').click
@@ -157,7 +151,7 @@ describe 'New project' do
         allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repos).and_raise(Octokit::Unauthorized)
 
         fill_in 'personal_access_token', with: 'unauthorized-fake-token'
-        click_button 'List your GitHub repositories'
+        click_button 'Authenticate'
 
         expect(page).to have_text('Access denied to your GitHub account.')
         expect(page).to have_current_path(new_import_github_path(ci_cd_only: true))
