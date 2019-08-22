@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 	gitalyauth "gitlab.com/gitlab-org/gitaly/auth"
 	gitalyclient "gitlab.com/gitlab-org/gitaly/client"
 	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
@@ -32,7 +33,19 @@ var (
 	cache           = connectionsCache{
 		connections: make(map[Server]*grpc.ClientConn),
 	}
+
+	connectionsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_gitaly_connections_total",
+			Help: "Number of Gitaly connections that have been established",
+		},
+		[]string{"status"},
+	)
 )
+
+func init() {
+	prometheus.MustRegister(connectionsTotal)
+}
 
 func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	conn, err := getOrCreateConnection(server)
@@ -135,7 +148,15 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 		),
 	)
 
-	return gitalyclient.Dial(server.Address, connOpts)
+	conn, connErr := gitalyclient.Dial(server.Address, connOpts)
+
+	label := "ok"
+	if connErr != nil {
+		label = "fail"
+	}
+	connectionsTotal.WithLabelValues(label).Inc()
+
+	return conn, connErr
 }
 
 func UnmarshalJSON(s string, msg proto.Message) error {
