@@ -63,16 +63,31 @@ describe('Card security reports app', () => {
       createComponent();
     });
 
-    it('render sub components', () => {
+    it('renders the filters', () => {
       expect(wrapper.find(Filters).exists()).toBe(true);
-      expect(wrapper.find(SecurityDashboardTable).exists()).toBe(true);
-      expect(wrapper.find(VulnerabilityChart).exists()).toBe(true);
-      expect(wrapper.find(VulnerabilityCountList).exists()).toBe(true);
     });
 
-    it('fetches projects and does not lock projects filter', () => {
+    it('renders the security dashboard table ', () => {
+      expect(wrapper.find(SecurityDashboardTable).exists()).toBe(true);
+    });
+
+    it('renders the vulnerability chart', () => {
+      expect(wrapper.find(VulnerabilityChart).exists()).toBe(true);
+    });
+
+    it('does not render the vulnerability count list', () => {
+      expect(wrapper.find(VulnerabilityCountList).exists()).toBe(false);
+    });
+
+    it('does not lock to a project', () => {
       expect(wrapper.vm.isLockedToProject).toBe(false);
+    });
+
+    it('fetches projects', () => {
       expect(fetchProjectsSpy).toHaveBeenCalled();
+    });
+
+    it('does not lock project filters', () => {
       expect(lockFilterSpy).not.toHaveBeenCalled();
     });
   });
@@ -89,9 +104,19 @@ describe('Card security reports app', () => {
       });
     });
 
-    it('locks to given project and does not fetch projects', () => {
+    it('renders the vulnerability count list', () => {
+      expect(wrapper.find(VulnerabilityCountList).exists()).toBe(true);
+    });
+
+    it('locks to a given project', () => {
       expect(wrapper.vm.isLockedToProject).toBe(true);
+    });
+
+    it('does not fetch projects', () => {
       expect(fetchProjectsSpy).not.toHaveBeenCalled();
+    });
+
+    it('locks the filters to a given project', () => {
       expect(lockFilterSpy).toHaveBeenCalledWith({
         filterId: 'project_id',
         optionId: project.id,

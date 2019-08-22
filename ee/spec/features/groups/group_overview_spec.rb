@@ -40,9 +40,14 @@ describe 'Group overview', :js do
       it 'displays the Security Dashboard view' do
         visit group_path(group)
 
-        page.within(find('.content')) do
-          expect(page).to have_content 'Vulnerability Chart'
-          expect(page).to have_content 'Vulnerability List'
+        page.within(find('main')) do
+          expect(page).to have_selector('.js-security-dashboard-table')
+        end
+
+        page.within(find('aside')) do
+          expect(page).to have_content 'Vulnerabilities over time'
+          expect(page).to have_selector('.js-vulnerabilities-chart-time-info')
+          expect(page).to have_selector('.js-vulnerabilities-chart-line-chart')
         end
       end
     end
