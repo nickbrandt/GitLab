@@ -8,7 +8,38 @@ describe API::MergeRequestApprovalRules do
   set(:project) { create(:project, :public, :repository, creator: user, namespace: user.namespace) }
   let(:merge_request) { create(:merge_request, author: user, source_project: project, target_project: project) }
 
+  shared_examples_for 'a protected API endpoint for merge request approval rule action' do
+    context 'disable_overriding_approvers_per_merge_request is set to true' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: true)
+
+        action
+      end
+
+      it 'responds with 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+
+    context 'disable_overriding_approvers_per_merge_request is set to false' do
+      before do
+        project.update!(disable_overriding_approvers_per_merge_request: false)
+
+        action
+      end
+
+      context 'user cannot update merge request' do
+        let(:current_user) { other_user }
+
+        it 'responds with 403' do
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+  end
+
   describe 'GET /projects/:id/merge_requests/:merge_request_iid/approval_rules' do
+    let(:current_user) { other_user }
     let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules" }
 
     context 'user cannot read merge request' do
@@ -24,7 +55,6 @@ describe API::MergeRequestApprovalRules do
     end
 
     context 'use can read merge request' do
-      let(:current_user) { other_user }
       let(:approver) { create(:user) }
       let(:group) { create(:group) }
       let(:source_rule) { nil }
@@ -100,6 +130,7 @@ describe API::MergeRequestApprovalRules do
   end
 
   describe 'POST /projects/:id/merge_requests/:merge_request_iid/approval_rules' do
+    let(:current_user) { user }
     let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules" }
     let(:approver) { create(:user) }
     let(:group) { create(:group) }
@@ -118,83 +149,61 @@ describe API::MergeRequestApprovalRules do
       }
     end
 
-    before do
-      project.add_developer(approver)
-      group.add_developer(approver)
-    end
+    let(:action) { post api(url, current_user), params: params }
 
-    context 'disable_overriding_approvers_per_merge_request is set to true' do
-      before do
-        project.update!(disable_overriding_approvers_per_merge_request: true)
+    it_behaves_like 'a protected API endpoint for merge request approval rule action'
 
-        post api(url, user), params: params
-      end
-
-      it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'disable_overriding_approvers_per_merge_request is set to false' do
+    context 'when user can update merge request and approval rules can be overridden' do
       before do
         project.update!(disable_overriding_approvers_per_merge_request: false)
+        project.add_developer(approver)
+        group.add_developer(approver)
 
-        post api(url, current_user), params: params
+        action
       end
 
-      context 'user cannot update merge request' do
-        let(:current_user) { other_user }
+      it 'matches the response schema' do
+        expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
 
-        it 'responds with 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
+        rule = json_response
+
+        expect(rule['name']).to eq(params[:name])
+        expect(rule['approvals_required']).to eq(params[:approvals_required])
+        expect(rule['rule_type']).to eq(params[:rule_type])
+        expect(rule['contains_hidden_groups']).to eq(false)
+        expect(rule['source_rule']).to be_nil
+        expect(rule['eligible_approvers']).to be_empty
+        expect(rule['users']).to be_empty
+        expect(rule['groups']).to be_empty
       end
 
-      context 'user can update merge request' do
-        let(:current_user) { user }
+      context 'users are passed' do
+        let(:users) { [approver.id] }
 
-        it 'matches the response schema' do
-          expect(response).to have_gitlab_http_status(201)
-          expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
-
+        it 'includes users' do
           rule = json_response
 
-          expect(rule['name']).to eq(params[:name])
-          expect(rule['approvals_required']).to eq(params[:approvals_required])
-          expect(rule['rule_type']).to eq(params[:rule_type])
-          expect(rule['contains_hidden_groups']).to eq(false)
-          expect(rule['source_rule']).to be_nil
-          expect(rule['eligible_approvers']).to be_empty
-          expect(rule['users']).to be_empty
-          expect(rule['groups']).to be_empty
+          expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
+          expect(rule['users']).to match([hash_including('id' => approver.id)])
         end
+      end
 
-        context 'users are passed' do
-          let(:users) { [approver.id] }
+      context 'groups are passed' do
+        let(:groups) { [group.id] }
 
-          it 'includes users' do
-            rule = json_response
+        it 'includes groups' do
+          rule = json_response
 
-            expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
-            expect(rule['users']).to match([hash_including('id' => approver.id)])
-          end
-        end
-
-        context 'groups are passed' do
-          let(:groups) { [group.id] }
-
-          it 'includes groups' do
-            rule = json_response
-
-            expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
-            expect(rule['groups']).to match([hash_including('id' => group.id)])
-          end
+          expect(rule['eligible_approvers']).to match([hash_including('id' => approver.id)])
+          expect(rule['groups']).to match([hash_including('id' => group.id)])
         end
       end
     end
   end
 
   describe 'PUT /projects/:id/merge_requests/:merge_request_iid/approval_rules/:approval_rule_id' do
+    let(:current_user) { user }
     let(:existing_approver) { create(:user) }
     let(:existing_group) { create(:group) }
 
@@ -226,98 +235,75 @@ describe API::MergeRequestApprovalRules do
       }
     end
 
-    before do
-      project.add_developer(existing_approver)
-      project.add_developer(new_approver)
-      existing_group.add_developer(existing_approver)
-      new_group.add_developer(new_approver)
-    end
+    let(:action) { put api(url, current_user), params: params }
 
-    context 'disable_overriding_approvers_per_merge_request is set to true' do
-      before do
-        project.update!(disable_overriding_approvers_per_merge_request: true)
+    it_behaves_like 'a protected API endpoint for merge request approval rule action'
 
-        put api(url, user), params: params
-      end
-
-      it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'disable_overriding_approvers_per_merge_request is set to false' do
+    context 'when user can update merge request and approval rules can be overridden' do
       before do
         project.update!(disable_overriding_approvers_per_merge_request: false)
+        project.add_developer(existing_approver)
+        project.add_developer(new_approver)
+        existing_group.add_developer(existing_approver)
+        new_group.add_developer(new_approver)
 
-        put api(url, current_user), params: params
+        action
       end
 
-      context 'user cannot update merge request' do
-        let(:current_user) { other_user }
+      it 'matches the response schema' do
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
 
-        it 'responds with 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
+        rule = json_response
+
+        expect(rule['name']).to eq(params[:name])
+        expect(rule['approvals_required']).to eq(params[:approvals_required])
+        expect(rule['rule_type']).to eq(approval_rule.rule_type)
+        expect(rule['contains_hidden_groups']).to eq(false)
+        expect(rule['source_rule']).to be_nil
+        expect(rule['eligible_approvers']).to be_empty
+        expect(rule['users']).to be_empty
+        expect(rule['groups']).to be_empty
       end
 
-      context 'user can update merge request' do
-        let(:current_user) { user }
+      context 'users are passed' do
+        let(:users) { [new_approver.id] }
 
-        it 'matches the response schema' do
-          expect(response).to have_gitlab_http_status(200)
-          expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
-
+        it 'changes users' do
           rule = json_response
 
-          expect(rule['name']).to eq(params[:name])
-          expect(rule['approvals_required']).to eq(params[:approvals_required])
-          expect(rule['rule_type']).to eq(approval_rule.rule_type)
-          expect(rule['contains_hidden_groups']).to eq(false)
-          expect(rule['source_rule']).to be_nil
-          expect(rule['eligible_approvers']).to be_empty
-          expect(rule['users']).to be_empty
-          expect(rule['groups']).to be_empty
+          expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
+          expect(rule['users']).to match([hash_including('id' => new_approver.id)])
         end
+      end
 
-        context 'users are passed' do
-          let(:users) { [new_approver.id] }
+      context 'groups are passed' do
+        let(:groups) { [new_group.id] }
 
-          it 'changes users' do
-            rule = json_response
+        it 'changes groups' do
+          rule = json_response
 
-            expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
-            expect(rule['users']).to match([hash_including('id' => new_approver.id)])
+          expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
+          expect(rule['groups']).to match([hash_including('id' => new_group.id)])
+        end
+      end
+
+      context 'remove_hidden_groups is passed' do
+        let(:existing_group) { create(:group, :private) }
+
+        context 'when set to true' do
+          let(:remove_hidden_groups) { true }
+
+          it 'removes the existing private group' do
+            expect(approval_rule.reload.groups).not_to include(existing_group)
           end
         end
 
-        context 'groups are passed' do
-          let(:groups) { [new_group.id] }
+        context 'when set to false' do
+          let(:remove_hidden_groups) { false }
 
-          it 'changes groups' do
-            rule = json_response
-
-            expect(rule['eligible_approvers']).to match([hash_including('id' => new_approver.id)])
-            expect(rule['groups']).to match([hash_including('id' => new_group.id)])
-          end
-        end
-
-        context 'remove_hidden_groups is passed' do
-          let(:existing_group) { create(:group, :private) }
-
-          context 'when set to true' do
-            let(:remove_hidden_groups) { true }
-
-            it 'removes the existing private group' do
-              expect(approval_rule.reload.groups).not_to include(existing_group)
-            end
-          end
-
-          context 'when set to false' do
-            let(:remove_hidden_groups) { false }
-
-            it 'does not remove the existing private group' do
-              expect(approval_rule.reload.groups).to include(existing_group)
-            end
+          it 'does not remove the existing private group' do
+            expect(approval_rule.reload.groups).to include(existing_group)
           end
         end
       end
@@ -325,42 +311,22 @@ describe API::MergeRequestApprovalRules do
   end
 
   describe 'DELETE /projects/:id/merge_requests/:merge_request_iid/approval_rules/:approval_rule_id' do
+    let(:current_user) { user }
     let(:approval_rule) { create(:approval_merge_request_rule, merge_request: merge_request) }
     let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules/#{approval_rule.id}" }
+    let(:action) { delete api(url, current_user) }
 
-    context 'disable_overriding_approvers_per_merge_request is set to true' do
-      before do
-        project.update!(disable_overriding_approvers_per_merge_request: true)
+    it_behaves_like 'a protected API endpoint for merge request approval rule action'
 
-        delete api(url, user)
-      end
-
-      it 'responds with 403' do
-        expect(response).to have_gitlab_http_status(403)
-      end
-    end
-
-    context 'disable_overriding_approvers_per_merge_request is set to false' do
+    context 'when user can update merge request and approval rules can be overridden' do
       before do
         project.update!(disable_overriding_approvers_per_merge_request: false)
 
-        delete api(url, current_user)
+        action
       end
 
-      context 'user cannot update merge request' do
-        let(:current_user) { other_user }
-
-        it 'responds with 403' do
-          expect(response).to have_gitlab_http_status(403)
-        end
-      end
-
-      context 'user can update merge request' do
-        let(:current_user) { user }
-
-        it 'responds with 204' do
-          expect(response).to have_gitlab_http_status(204)
-        end
+      it 'responds with 204' do
+        expect(response).to have_gitlab_http_status(204)
       end
     end
   end
