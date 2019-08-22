@@ -17,6 +17,7 @@ describe API::Dependencies do
     context 'with an authorized user with proper permissions' do
       before do
         create(:ee_ci_pipeline, :with_dependency_list_report, project: project)
+        project.add_developer(user)
         request
       end
 
@@ -25,6 +26,13 @@ describe API::Dependencies do
         expect(response).to match_response_schema('public_api/v4/dependencies', dir: 'ee')
 
         expect(json_response.length).to eq(21)
+      end
+
+      it 'returns vulnerabilities info' do
+        vulnerability = json_response.select { |dep| dep['name'] == 'debug' }[0]['vulnerabilities'][0]
+
+        expect(vulnerability['name']).to eq('Regular Expression Denial of Service in debug')
+        expect(vulnerability['severity']).to eq('unknown')
       end
 
       context 'with filter options' do
@@ -41,6 +49,17 @@ describe API::Dependencies do
             expect(json_response['error']).to eq('package_manager does not have a valid value')
           end
         end
+      end
+    end
+
+    context 'without permissions to see vulnerabilities' do
+      before do
+        create(:ee_ci_pipeline, :with_dependency_list_report, project: project)
+        request
+      end
+
+      it 'returns empty vulnerabilities' do
+        expect(json_response.first['vulnerabilities']).to be_nil
       end
     end
 

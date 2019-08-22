@@ -20,6 +20,17 @@
       },
       "dependency_file_path": {
         "type": "string"
+      },
+      "vulnerabilities": {
+        "type": "array",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          }
+        }
       }
     }
   }

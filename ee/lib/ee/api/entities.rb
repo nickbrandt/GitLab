@@ -739,9 +739,20 @@ module EE
       end
 
       class Dependency < Grape::Entity
+        class Vulnerability < Grape::Entity
+          expose :name, :severity
+        end
+
         expose :name, :version, :package_manager, :dependency_file_path
         expose :dependency_file_path do |dependency|
           dependency[:location][:path]
+        end
+        expose :vulnerabilities, using: Vulnerability, if: ->(_, opts) { can_read_vulnerabilities?(opts[:user], opts[:project]) }
+
+        private
+
+        def can_read_vulnerabilities?(user, project)
+          Ability.allowed?(user, :read_project_security_dashboard, project)
         end
       end
     end
