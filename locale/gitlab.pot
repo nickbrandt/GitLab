@@ -1270,9 +1270,6 @@ msgstr ""
 msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to connect."
 msgstr ""
 
-msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
-msgstr ""
-
 msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
 msgstr ""
 
@@ -1904,6 +1901,12 @@ msgid "Aug"
 msgstr ""
 
 msgid "August"
+msgstr ""
+
+msgid "Authenticate"
+msgstr ""
+
+msgid "Authenticate with GitHub"
 msgstr ""
 
 msgid "Authentication Log"
@@ -4212,6 +4215,9 @@ msgid "Create a personal access token on your account to pull or push via %{prot
 msgstr ""
 
 msgid "Create an issue. Issues are created for each alert triggered."
+msgstr ""
+
+msgid "Create and provide your GitHub %{link_start}Personal Access Token%{link_end}. You will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
 msgstr ""
 
 msgid "Create board"
@@ -8923,9 +8929,6 @@ msgid "List view"
 msgstr ""
 
 msgid "List your Bitbucket Server repositories"
-msgstr ""
-
-msgid "List your GitHub repositories"
 msgstr ""
 
 msgid "Live preview"
@@ -15674,6 +15677,9 @@ msgstr ""
 msgid "To connect GitHub repositories, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to connect."
 msgstr ""
 
+msgid "To connect GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories."
+msgstr ""
+
 msgid "To connect GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories:"
 msgstr ""
 
@@ -15699,12 +15705,6 @@ msgid "To help improve GitLab and its user experience, GitLab will periodically 
 msgstr ""
 
 msgid "To help improve GitLab, we would like to periodically collect usage information. This can be changed at any time in %{settings_link_start}Settings%{link_end}. %{info_link_start}More Information%{link_end}"
-msgstr ""
-
-msgid "To import GitHub repositories, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
-msgstr ""
-
-msgid "To import GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories:"
 msgstr ""
 
 msgid "To import an SVN repository, check out %{svn_link}."
@@ -18057,6 +18057,9 @@ msgid "draft"
 msgid_plural "drafts"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "e.g. %{token}"
+msgstr ""
 
 msgid "element is not a hierarchy"
 msgstr ""
