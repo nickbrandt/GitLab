@@ -39,13 +39,13 @@ func (s *snapshot) Inject(w http.ResponseWriter, r *http.Request, sendData strin
 		return
 	}
 
-	c, err := gitaly.NewRepositoryClient(params.GitalyServer)
+	ctx, c, err := gitaly.NewRepositoryClient(r.Context(), params.GitalyServer)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendSnapshot: gitaly.NewRepositoryClient: %v", err))
 		return
 	}
 
-	reader, err := c.SnapshotReader(r.Context(), request)
+	reader, err := c.SnapshotReader(ctx, request)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendSnapshot: client.SnapshotReader: %v", err))
 		return

@@ -32,13 +32,13 @@ func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	diffClient, err := gitaly.NewDiffClient(params.GitalyServer)
+	ctx, diffClient, err := gitaly.NewDiffClient(r.Context(), params.GitalyServer)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("diff.RawPatch: %v", err))
 		return
 	}
 
-	if err := diffClient.SendRawPatch(r.Context(), w, request); err != nil {
+	if err := diffClient.SendRawPatch(ctx, w, request); err != nil {
 		helper.LogError(
 			r,
 			&copyError{fmt.Errorf("diff.RawPatch: request=%v, err=%v", request, err)},

@@ -26,13 +26,13 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 		return
 	}
 
-	blobClient, err := gitaly.NewBlobClient(params.GitalyServer)
+	ctx, blobClient, err := gitaly.NewBlobClient(r.Context(), params.GitalyServer)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("blob.GetBlob: %v", err))
 		return
 	}
 
-	if err := blobClient.SendBlob(r.Context(), w, &params.GetBlobRequest); err != nil {
+	if err := blobClient.SendBlob(ctx, w, &params.GetBlobRequest); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("blob.GetBlob: %v", err))
 		return
 	}

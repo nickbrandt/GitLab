@@ -64,6 +64,23 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalyServer.Address = gitalyAddress
 
+	goodMetadata := map[string]string{
+		"gitaly-feature-foobar": "true",
+		"gitaly-feature-bazqux": "false",
+	}
+	badMetadata := map[string]string{
+		"bad-metadata": "is blocked",
+	}
+
+	features := make(map[string]string)
+	for k, v := range goodMetadata {
+		features[k] = v
+	}
+	for k, v := range badMetadata {
+		features[k] = v
+	}
+	apiResponse.GitalyServer.Features = features
+
 	testCases := []struct {
 		showAllRefs bool
 		gitRpc      string
@@ -106,6 +123,18 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 			require.Equal(t, tc.gitRpc, bodySplit[1])
 
 			require.Equal(t, string(testhelper.GitalyInfoRefsResponseMock), bodySplit[2], "GET %q: response body", resource)
+
+			md := gitalyServer.LastIncomingMetadata
+			for k, v := range goodMetadata {
+				actual := md[k]
+				require.Len(t, actual, 1, "number of metadata values for %v", k)
+				require.Equal(t, v, actual[0], "value for %v", k)
+			}
+
+			for k := range badMetadata {
+				actual := md[k]
+				require.Empty(t, actual, "metadata for bad key %v", k)
+			}
 		})
 	}
 }

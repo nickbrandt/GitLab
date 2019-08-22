@@ -14,12 +14,14 @@ import (
 	"gitlab.com/gitlab-org/labkit/log"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 type GitalyTestServer struct {
 	finalMessageCode codes.Code
 	sync.WaitGroup
+	LastIncomingMetadata metadata.MD
 }
 
 var (
@@ -70,6 +72,11 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *gitalypb.InfoRefsRequest, stre
 		"git-upload-pack",
 		GitalyInfoRefsResponseMock,
 	}, "\000"))
+
+	s.LastIncomingMetadata = nil
+	if md, ok := metadata.FromIncomingContext(stream.Context()); ok {
+		s.LastIncomingMetadata = md
+	}
 
 	return s.sendInfoRefs(stream, data)
 }
