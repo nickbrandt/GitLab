@@ -21,7 +21,8 @@
             %span.toggle-icon
               = sprite_icon('status_success_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-checked')
               = sprite_icon('status_failed_borderless', size: 16, css_class: 'toggle-icon-svg toggle-status-unchecked')
-          %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= s_('GroupSAML|Enforce SSO-only authentication for this group.')
+            - sso_enforcement_text = Feature.enabled?(:enforced_sso_requires_session, group) ? s_('GroupSAML|Enforce SSO-only authentication for this group.') : s_('GroupSAML|Enforce SSO-only membership for this group.')
+          %span.form-text.d-inline.font-weight-normal.align-text-bottom.ml-3= sso_enforcement_text
         .form-text.text-muted.js-group-saml-enforced-sso-helper-text{ style: "display: #{'none' if saml_provider.enabled?} #{'block' unless saml_provider.enabled?}" }
           %span
             = s_('GroupSAML|To be able to enable enforced SSO, you first need to enable SAML authentication.')
