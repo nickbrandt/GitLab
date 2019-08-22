@@ -128,7 +128,11 @@ module Geo::SelectiveSync
   end
 
   def attachments_for_model_type_with_id_in(model_type, model_ids)
-    uploads_table[:model_type].eq(model_type).and(uploads_table[:model_id].in(model_ids.arel))
+    uploads_table[:model_type]
+        .eq(model_type)
+        .and(
+          uploads_table[:model_id].in(model_ids.arel)
+        )
   end
 
   # This concern doesn't define a geo_node_namespace_links relation. That's

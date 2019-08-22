@@ -79,7 +79,7 @@ module Geo
     end
 
     def local_storage_only?
-      !current_node.sync_object_storage
+      !current_node&.sync_object_storage
     end
   end
 end

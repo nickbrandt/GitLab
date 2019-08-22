@@ -41,19 +41,21 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         create(:geo_file_registry, :avatar, file_id: upload_remote_synced_project.id)
       end
 
-      it 'returns attachments without an entry on the tracking database' do
-        attachments = subject.find_unsynced(batch_size: 10)
+      context 'with object storage sync enabled' do
+        it 'returns attachments without an entry on the tracking database' do
+          attachments = subject.find_unsynced(batch_size: 10)
 
-        expect(attachments).to match_ids(upload_issuable_synced_nested_project, upload_unsynced_project,
-                                         upload_synced_project, upload_personal_snippet, upload_remote_unsynced_project,
-                                         upload_remote_synced_group)
-      end
+          expect(attachments).to match_ids(upload_issuable_synced_nested_project, upload_unsynced_project,
+                                           upload_synced_project, upload_personal_snippet, upload_remote_unsynced_project,
+                                           upload_remote_synced_group)
+        end
 
-      it 'returns attachments without an entry on the tracking database, excluding from exception list' do
-        attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_issuable_synced_nested_project.id])
+        it 'returns attachments without an entry on the tracking database, excluding from exception list' do
+          attachments = subject.find_unsynced(batch_size: 10, except_file_ids: [upload_issuable_synced_nested_project.id])
 
-        expect(attachments).to match_ids(upload_unsynced_project, upload_synced_project, upload_personal_snippet,
-                                         upload_remote_unsynced_project, upload_remote_synced_group)
+          expect(attachments).to match_ids(upload_unsynced_project, upload_synced_project, upload_personal_snippet,
+                                           upload_remote_unsynced_project, upload_remote_synced_group)
+        end
       end
 
       context 'with object storage sync disabled' do
@@ -143,8 +145,10 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         create(:geo_file_registry, :attachment, file_id: upload_remote_unsynced_project.id)
       end
 
-      it 'counts attachments that have been synced' do
-        expect(subject.count_synced).to eq 7
+      context 'with object storage sync enabled' do
+        it 'counts attachments that have been synced' do
+          expect(subject.count_synced).to eq 7
+        end
       end
 
       context 'with object storage sync disabled' do
@@ -184,8 +188,10 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         create(:geo_file_registry, :attachment, :failed, file_id: upload_remote_unsynced_project.id)
       end
 
-      it 'counts attachments that sync has failed' do
-        expect(subject.count_failed).to eq 7
+      context 'with object storage sync enabled' do
+        it 'counts attachments that sync has failed' do
+          expect(subject.count_failed).to eq 7
+        end
       end
 
       context 'with object storage sync disabled' do
@@ -225,8 +231,10 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         create(:geo_file_registry, :attachment, file_id: upload_remote_unsynced_project.id, missing_on_primary: true)
       end
 
-      it 'counts attachments that have been synced and are missing on the primary' do
-        expect(subject.count_synced_missing_on_primary).to eq 6
+      context 'with object storage sync enabled' do
+        it 'counts attachments that have been synced and are missing on the primary' do
+          expect(subject.count_synced_missing_on_primary).to eq 6
+        end
       end
 
       context 'with object storage sync disabled' do
@@ -255,8 +263,10 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
     end
 
     describe '#count_syncable' do
-      it 'counts attachments' do
-        expect(subject.count_syncable).to eq 9
+      context 'with object storage sync enabled' do
+        it 'counts attachments' do
+          expect(subject.count_syncable).to eq 9
+        end
       end
 
       context 'with object storage sync disabled' do
@@ -297,8 +307,10 @@ describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do
         create(:geo_file_registry, :attachment, file_id: upload_remote_synced_group.id, missing_on_primary: true)
       end
 
-      it 'counts file registries for attachments' do
-        expect(subject.count_registry).to eq 9
+      context 'with object storage sync enabled' do
+        it 'counts file registries for attachments' do
+          expect(subject.count_registry).to eq 9
+        end
       end
 
       context 'with object storage sync disabled' do

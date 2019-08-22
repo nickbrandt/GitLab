@@ -28,7 +28,7 @@ module Geo
               .on(arel_table[:id].eq(file_registry_table[:file_id]))
 
           joins(join_statement.join_sources)
-              .merge(Geo::FileRegistry.lfs_objects)
+            .merge(Geo::FileRegistry.lfs_objects)
         end
 
         def missing_file_registry

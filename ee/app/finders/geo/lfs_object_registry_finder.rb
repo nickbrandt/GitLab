@@ -25,11 +25,10 @@ module Geo
     end
 
     def syncable
-      if selective_sync?
-        lfs_objects
-      else
-        local_storage_only? ? LfsObject.with_files_stored_locally : LfsObject
-      end
+      return lfs_objects if selective_sync?
+      return LfsObject.with_files_stored_locally if local_storage_only?
+
+      LfsObject
     end
 
     # Find limited amount of non replicated lfs objects.

@@ -28,11 +28,10 @@ module Geo
     end
 
     def syncable
-      if selective_sync?
-        attachments
-      else
-        local_storage_only? ? Upload.with_files_stored_locally : Upload
-      end
+      return attachments if selective_sync?
+      return Upload.with_files_stored_locally if local_storage_only?
+
+      Upload
     end
 
     # Find limited amount of non replicated attachments.

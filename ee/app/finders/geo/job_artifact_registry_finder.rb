@@ -25,11 +25,10 @@ module Geo
     end
 
     def syncable
-      if selective_sync?
-        job_artifacts.not_expired
-      else
-        local_storage_only? ? Ci::JobArtifact.not_expired.with_files_stored_locally : Ci::JobArtifact.not_expired
-      end
+      return job_artifacts.not_expired if selective_sync?
+      return Ci::JobArtifact.not_expired.with_files_stored_locally if local_storage_only?
+
+      Ci::JobArtifact.not_expired
     end
 
     # Find limited amount of non replicated job artifacts.
