@@ -335,4 +335,60 @@ describe ProjectsController do
       end
     end
   end
+
+  context 'Archive & Unarchive actions' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project, group: group) }
+    let(:archived_project) { create(:project, :archived, group: group) }
+
+    describe 'POST #archive' do
+      let(:request) { post :archive, params: { namespace_id: project.namespace, id: project } }
+
+      context 'for a user with the ability to archive a project' do
+        before do
+          group.add_owner(user)
+        end
+
+        it 'logs the audit event' do
+          expect { request }.to change { SecurityEvent.count }.by(1)
+          expect(SecurityEvent.last.details[:custom_message]).to eq('Project archived')
+        end
+      end
+
+      context 'for a user that does not have the ability to archive a project' do
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'does not log the audit event' do
+          expect { request }.not_to change { SecurityEvent.count }
+        end
+      end
+    end
+
+    describe 'POST #unarchive' do
+      let(:request) { post :unarchive, params: { namespace_id: archived_project.namespace, id: archived_project } }
+
+      context 'for a user with the ability to unarchive a project' do
+        before do
+          group.add_owner(user)
+        end
+
+        it 'logs the audit event' do
+          expect { request }.to change { SecurityEvent.count }.by(1)
+          expect(SecurityEvent.last.details[:custom_message]).to eq('Project unarchived')
+        end
+      end
+
+      context 'for a user that does not have the ability to unarchive a project' do
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'does not log the audit event' do
+          expect { request }.not_to change { SecurityEvent.count }
+        end
+      end
+    end
+  end
 end

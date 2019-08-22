@@ -6,7 +6,9 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      before_action :log_audit_event, only: [:download_export]
+      before_action :log_download_export_audit_event, only: [:download_export]
+      before_action :log_archive_audit_event, only: [:archive]
+      before_action :log_unarchive_audit_event, only: [:unarchive]
     end
 
     override :project_params_attributes
@@ -82,13 +84,25 @@ module EE
       project&.feature_available?(:merge_pipelines)
     end
 
-    def log_audit_event
+    def log_audit_event(message:)
       AuditEvents::CustomAuditEventService.new(
         current_user,
         project,
         request.remote_ip,
-        'Export file download started'
+        message
       ).for_project.security_event
+    end
+
+    def log_download_export_audit_event
+      log_audit_event(message: 'Export file download started')
+    end
+
+    def log_archive_audit_event
+      log_audit_event(message: 'Project archived')
+    end
+
+    def log_unarchive_audit_event
+      log_audit_event(message: 'Project unarchived')
     end
   end
 end
