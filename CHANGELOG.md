@@ -4,6 +4,15 @@ entry.
 
 ## 12.2.1
 
+### Fixed (2 changes)
+
+- Fix for embedded metrics undefined params. !31975
+- Fix "ERR value is not an integer or out of range" errors. !32126
+
+### Performance (1 change)
+
+- Fix Gitaly N+1 calls with listing issues/MRs via API. !31938
+
 ### Fixed (3 changes)
 
 - Fix for embedded metrics undefined params. !31975
