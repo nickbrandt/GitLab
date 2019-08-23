@@ -2,7 +2,7 @@
 
 module Audit
   class Details
-    ACTIONS = %i[add remove failed_login change custom_message].freeze
+    ACTIONS = %i[add remove failed_login change updated_ref custom_message].freeze
 
     def self.humanize(*args)
       new(*args).humanize
@@ -32,6 +32,12 @@ module Audit
         "Removed #{target_name}"
       when :failed_login
         "Failed to login with #{oauth_label} authentication"
+      when :updated_ref
+        target_ref = @details[:updated_ref]
+        from_sha = @details[:from]
+        to_sha = @details[:to]
+
+        "Updated ref #{target_ref} from #{from_sha} to #{to_sha}"
       when :custom_message
         detail_value
       else

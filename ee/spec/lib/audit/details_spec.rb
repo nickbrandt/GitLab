@@ -124,5 +124,23 @@ describe Audit::Details do
         expect(string).to eq('Changed email from a@b.com to c@b.com')
       end
     end
+
+    context 'updated ref' do
+      let(:action) do
+        {
+          updated_ref: 'master',
+          author_name: 'Hackerman',
+          from: 'b6bce79c',
+          to: 'a7bce79c',
+          target_details: 'group/project'
+        }
+      end
+
+      it 'humanizes the action' do
+        string = described_class.humanize(action)
+
+        expect(string).to eq('Updated ref master from b6bce79c to a7bce79c')
+      end
+    end
   end
 end

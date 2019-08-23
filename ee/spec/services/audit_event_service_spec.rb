@@ -56,6 +56,29 @@ describe AuditEventService do
     end
   end
 
+  describe '#enabled?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:admin_audit_log, :audit_events, :extended_audit_events, :result) do
+      true  | false | false | true
+      false | true  | false | true
+      false | false | true  | true
+      false | false | false | false
+    end
+
+    with_them do
+      before do
+        stub_licensed_features(admin_audit_log: admin_audit_log,
+                               audit_events: audit_events,
+                               extended_audit_events: extended_audit_events)
+      end
+
+      it 'returns the correct result when feature is available' do
+        expect(service.enabled?).to eq(result)
+      end
+    end
+  end
+
   describe '#entity_audit_events_enabled??' do
     context 'entity is a project' do
       let(:service) { described_class.new(user, project, { action: :destroy }) }

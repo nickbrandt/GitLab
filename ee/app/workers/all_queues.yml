@@ -68,3 +68,4 @@
 - project_update_repository_storage
 - rebase
 - repository_update_mirror
+- repository_push_audit_event
