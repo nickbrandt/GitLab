@@ -38,6 +38,16 @@ describe API::MergeRequestApprovalRules do
     end
   end
 
+  shared_examples_for 'a protected API endpoint that only allows action on regular merge request approval rule' do
+    context 'approval rule is not a regular type' do
+      let(:approval_rule) { create(:code_owner_rule, merge_request: merge_request) }
+
+      it 'responds with 403' do
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
   describe 'GET /projects/:id/merge_requests/:merge_request_iid/approval_rules' do
     let(:current_user) { other_user }
     let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules" }
@@ -273,6 +283,8 @@ describe API::MergeRequestApprovalRules do
         action
       end
 
+      it_behaves_like 'a protected API endpoint that only allows action on regular merge request approval rule'
+
       it 'matches the response schema' do
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('public_api/v4/merge_request_approval_rule', dir: 'ee')
@@ -347,6 +359,8 @@ describe API::MergeRequestApprovalRules do
 
         action
       end
+
+      it_behaves_like 'a protected API endpoint that only allows action on regular merge request approval rule'
 
       it 'responds with 204' do
         expect(response).to have_gitlab_http_status(204)
