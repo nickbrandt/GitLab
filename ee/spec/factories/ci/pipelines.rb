@@ -33,22 +33,6 @@ FactoryBot.define do
       end
     end
 
-    trait :with_dependency_scanning_feature_branch do
-      status :success
-
-      after(:build) do |pipeline, evaluator|
-        pipeline.builds << build(:ee_ci_build, :dependency_scanning_feature_branch, pipeline: pipeline, project: pipeline.project)
-      end
-    end
-
-    trait :with_corrupted_dependency_scanning_report do
-      status :success
-
-      after(:build) do |pipeline, evaluator|
-        pipeline.builds << build(:ee_ci_build, :corrupted_dependency_scanning_report, pipeline: pipeline, project: pipeline.project)
-      end
-    end
-
     trait :with_license_management_feature_branch do
       status :success
 
