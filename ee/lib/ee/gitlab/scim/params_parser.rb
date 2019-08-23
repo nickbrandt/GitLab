@@ -9,6 +9,7 @@ module EE
 
         ATTRIBUTE_MAP = {
           id: :extern_uid,
+          displayName: :name,
           'name.formatted': :name,
           'emails[type eq "work"].value': :email,
           active: :active,
@@ -67,10 +68,8 @@ module EE
         end
 
         def process_params
-          parse_params.merge(
-            email: parse_emails,
-            name: parse_name
-          ).compact # so if parse_emails returns nil, it'll be removed from the hash
+          overwrites = { email: parse_emails, name: parse_name }.compact
+          parse_params.merge(overwrites)
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
@@ -96,7 +95,11 @@ module EE
         def parse_name
           name = @params.delete(:name)
 
-          @hash[:name] = name[:formatted] if name
+          return unless name
+
+          formatted_name = name[:formatted]&.presence
+          formatted_name ||= [name[:givenName], name[:familyName]].compact.join(' ')
+          @hash[:name] = formatted_name
         end
 
         def coerce(value)
