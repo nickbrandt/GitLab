@@ -3,7 +3,7 @@
 module Ci
   class CompareContainerScanningReportsService < ::Ci::CompareReportsBaseService
     def comparer_class
-      Gitlab::Ci::Reports::Security::ContainerScanningReportsComparer
+      Gitlab::Ci::Reports::Security::VulnerabilityReportsComparer
     end
 
     def serializer_class
