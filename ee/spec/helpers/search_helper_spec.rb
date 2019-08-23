@@ -60,8 +60,7 @@ describe SearchHelper do
     it "returns parsed result" do
       project = create :project, :repository
 
-      project.repository.index_blobs
-
+      project.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
 
       result = project.repository.search(
@@ -99,7 +98,7 @@ describe SearchHelper do
       control_count = ActiveRecord::QueryRecorder.new { blob_projects(es_blob_search) }.count
 
       projects = create_list :project, 3, :repository, :public
-      projects.each { |project| project.repository.index_blobs }
+      projects.each { |project| project.repository.index_commits_and_blobs }
 
       Gitlab::Elastic::Helper.refresh_index
 

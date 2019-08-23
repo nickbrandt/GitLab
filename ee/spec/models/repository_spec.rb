@@ -79,8 +79,8 @@ describe Repository do
         project = create :project, :repository
         project1 = create :project, :repository
 
-        project.repository.index_commits
-        project1.repository.index_commits
+        project.repository.index_commits_and_blobs
+        project1.repository.index_commits_and_blobs
 
         Gitlab::Elastic::Helper.refresh_index
 
@@ -94,8 +94,7 @@ describe Repository do
       it "returns commits" do
         project = create :project, :repository
 
-        project.repository.index_commits
-
+        project.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
 
         expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)

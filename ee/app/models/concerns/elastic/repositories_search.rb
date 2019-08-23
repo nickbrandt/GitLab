@@ -23,15 +23,6 @@ module Elastic
         self.__elasticsearch__.client
       end
 
-      def self.import
-        Project.find_each do |project|
-          if project.repository.exists? && !project.repository.empty? && project.use_elasticsearch?
-            project.repository.index_commits
-            project.repository.index_blobs
-          end
-        end
-      end
-
       def find_commits_by_message_with_elastic(query, page: 1, per_page: 20)
         response = project.repository.search(query, type: :commit, page: page, per: per_page)[:commits][:results]
 

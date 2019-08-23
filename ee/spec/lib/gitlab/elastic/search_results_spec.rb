@@ -512,7 +512,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
   describe 'Blobs' do
     before do
-      project_1.repository.index_blobs
+      project_1.repository.index_commits_and_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -537,7 +537,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
     it 'finds blobs from public projects only' do
       project_2 = create :project, :repository, :private
-      project_2.repository.index_blobs
+      project_2.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
 
       results = described_class.new(user, 'def', [project_1.id])
@@ -565,7 +565,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
           message: 'added test file',
           branch_name: 'master')
 
-        project_1.repository.index_blobs
+        project_1.repository.index_commits_and_blobs
 
         Gitlab::Elastic::Helper.refresh_index
       end
@@ -612,7 +612,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
       before do
         project_1.repository.create_file(user, file_name, file_content, message: 'Some commit message', branch_name: 'master')
-        project_1.repository.index_blobs
+        project_1.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
       end
 
@@ -718,8 +718,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
 
   describe 'Commits' do
     before do
-      project_1.repository.index_commits
-
+      project_1.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
     end
 
@@ -729,13 +728,13 @@ describe Gitlab::Elastic::SearchResults, :elastic do
       results = described_class.new(user, 'add', limit_project_ids)
       commits = results.objects('commits')
 
-      expect(commits.first.message).to include("Add")
+      expect(commits.first.message.downcase).to include("add")
       expect(results.commits_count).to eq 24
     end
 
     it 'finds commits from public projects only' do
       project_2 = create :project, :private, :repository
-      project_2.repository.index_commits
+      project_2.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
 
       results = described_class.new(user, 'add', [project_1.id])
@@ -1002,7 +1001,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
             branch_name: 'master'
           )
 
-          project.repository.index_commits
+          project.repository.index_commits_and_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index
@@ -1034,7 +1033,7 @@ describe Gitlab::Elastic::SearchResults, :elastic do
             branch_name: 'master'
           )
 
-          project.repository.index_blobs
+          project.repository.index_commits_and_blobs
         end
 
         Gitlab::Elastic::Helper.refresh_index

@@ -25,7 +25,6 @@ module EE
         :elasticsearch_aws_access_key,
         :elasticsearch_aws_region,
         :elasticsearch_aws_secret_access_key,
-        :elasticsearch_experimental_indexer,
         :elasticsearch_indexing,
         :elasticsearch_replicas,
         :elasticsearch_search,

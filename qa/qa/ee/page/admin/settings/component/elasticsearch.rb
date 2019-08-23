@@ -9,7 +9,6 @@ module QA
             class Elasticsearch < QA::Page::Base
               view 'ee/app/views/admin/application_settings/_elasticsearch_form.html.haml' do
                 element :indexing_checkbox
-                element :experimental_indexer_checkbox
                 element :search_checkbox
                 element :url_field
                 element :submit_button
@@ -17,10 +16,6 @@ module QA
 
               def check_indexing
                 check_element :indexing_checkbox
-              end
-
-              def check_new_indexer
-                check_element :experimental_indexer_checkbox
               end
 
               def check_search

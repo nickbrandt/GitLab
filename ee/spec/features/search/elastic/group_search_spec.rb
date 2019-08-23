@@ -43,7 +43,7 @@ describe 'Group elastic search', :js, :elastic do
 
   describe 'blob search' do
     before do
-      project.repository.index_blobs
+      project.repository.index_commits_and_blobs
 
       Gitlab::Elastic::Helper.refresh_index
     end
@@ -77,8 +77,7 @@ describe 'Group elastic search', :js, :elastic do
 
   describe 'commit search' do
     before do
-      project.repository.index_commits
-
+      project.repository.index_commits_and_blobs
       Gitlab::Elastic::Helper.refresh_index
     end
 

@@ -22,31 +22,8 @@ describe ProjectWiki, :elastic do
     expect(project.wiki.search('term1 | term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(2)
   end
 
-  context 'with old indexer' do
-    before do
-      stub_ee_application_setting(elasticsearch_experimental_indexer: false)
-    end
-
-    it 'searches wiki page' do
-      expect(project.wiki.search('term1', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
-      expect(project.wiki.search('term1 | term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(2)
-    end
-  end
-
-  it 'uses the experimental indexer if enabled' do
-    stub_ee_application_setting(elasticsearch_experimental_indexer: true)
-
-    expect(project.wiki).not_to receive(:index_blobs)
+  it 'indexes' do
     expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
-
-    project.wiki.index_wiki_blobs
-  end
-
-  it 'indexes inside Rails if experimental indexer is not enabled' do
-    stub_ee_application_setting(elasticsearch_experimental_indexer: false)
-
-    expect(project.wiki).to receive(:index_blobs)
-    expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
 
     project.wiki.index_wiki_blobs
   end

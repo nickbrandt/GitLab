@@ -61,7 +61,7 @@ describe 'Project elastic search', :js, :elastic do
     end
 
     it 'finds commits' do
-      project.repository.index_commits
+      project.repository.index_commits_and_blobs
 
       submit_search('initial')
       select_search_scope('Commits')
@@ -70,7 +70,7 @@ describe 'Project elastic search', :js, :elastic do
     end
 
     it 'finds blobs' do
-      project.repository.index_blobs
+      project.repository.index_commits_and_blobs
 
       submit_search('def')
       select_search_scope('Code')

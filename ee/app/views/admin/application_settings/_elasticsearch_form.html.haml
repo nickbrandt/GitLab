@@ -30,15 +30,6 @@
                   = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
                       class: 'btn btn-success', method: :post
 
-          - missing = !Gitlab::Elastic::Indexer.experimental_indexer_present?
-          .form-group
-            .form-check
-              = f.check_box :elasticsearch_experimental_indexer, disabled: missing, class: 'form-check-input', data: { qa_selector: 'experimental_indexer_checkbox' }
-              = f.label :elasticsearch_experimental_indexer, class: 'form-check-label' do
-                Use the <a href="https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer">new repository indexer (beta)</a>
-                - if missing
-                  (not installed)
-
           .form-group
             .form-check
               = f.check_box :elasticsearch_search, class: 'form-check-input', data: { qa_selector: 'search_checkbox' }

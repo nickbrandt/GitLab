@@ -24,11 +24,7 @@ module Elastic
       end
 
       def index_wiki_blobs(to_sha = nil)
-        if ::Gitlab::CurrentSettings.elasticsearch_experimental_indexer?
-          ElasticCommitIndexerWorker.perform_async(project.id, nil, to_sha, true)
-        else
-          project.wiki.index_blobs
-        end
+        ElasticCommitIndexerWorker.perform_async(project.id, nil, to_sha, true)
       end
 
       def self.import

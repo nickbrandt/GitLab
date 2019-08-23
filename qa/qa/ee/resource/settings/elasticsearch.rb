@@ -8,12 +8,10 @@ module QA
           attr_accessor :es_enabled
           attr_accessor :es_indexing
           attr_accessor :es_url
-          attr_accessor :es_experimental_indexer
 
           def initialize
             @es_enabled = true
             @es_indexing = true
-            @es_experimental_indexer = true
             @es_url = 'http://elastic68:9200'
           end
 
@@ -23,7 +21,6 @@ module QA
             QA::EE::Page::Admin::Settings::Integration.perform do |integration|
               integration.expand_elasticsearch do |es|
                 es.check_indexing if @es_indexing
-                es.check_new_indexer if @es_experimental_indexer
                 es.check_search if @es_enabled
                 es.enter_link(@es_url)
                 es.click_submit
@@ -53,7 +50,6 @@ module QA
             {
               elasticsearch_search: @es_enabled,
               elasticsearch_indexing: @es_indexing,
-              elasticsearch_experimental_indexer: @es_experimental_indexer,
               elasticsearch_url: @es_url
             }
           end

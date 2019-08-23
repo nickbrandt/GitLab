@@ -1,0 +1,5 @@
+---
+title: Remove Ruby Elasticsearch indexer
+merge_request: 15641
+author:
+type: removed
