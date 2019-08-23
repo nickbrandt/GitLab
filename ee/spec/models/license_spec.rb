@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe License do
@@ -94,8 +96,8 @@ describe License do
           it 'shows the proper error message' do
             license.valid?
 
-            error_msg = "This GitLab installation currently has 2 active users, exceeding this license's limit of 1 by 1 user. "
-            error_msg << "Please upload a license for at least 2 users or contact sales at renewals@gitlab.com"
+            error_msg = "This GitLab installation currently has 2 active users, exceeding this license's limit of 1 by 1 user. " \
+                        "Please upload a license for at least 2 users or contact sales at renewals@gitlab.com"
 
             expect(license.errors[:base].first).to eq(error_msg)
           end
