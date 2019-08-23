@@ -64,6 +64,7 @@ export default {
     <div v-else-if="configPresent" class="insights-wrapper">
       <gl-dropdown
         class="js-insights-dropdown col-8 col-md-9 gl-pr-0"
+        data-qa-selector="insights_dashboard_dropdown"
         menu-class="w-100 mw-100"
         toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
         :text="__('Select Page')"

@@ -25,6 +25,10 @@ module QA
             element :security_dashboard_link
           end
 
+          view 'ee/app/views/layouts/nav/_group_insights_link.html.haml' do
+            element :group_insights_link
+          end
+
           def go_to_saml_sso_group_settings
             hover_settings do
               within_submenu do
@@ -38,6 +42,12 @@ module QA
               within_submenu do
                 click_element(:ldap_synchronization_link)
               end
+            end
+          end
+
+          def click_group_insights_link
+            within_sidebar do
+              click_element(:group_insights_link)
             end
           end
 
