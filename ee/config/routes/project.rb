@@ -70,7 +70,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get :metrics_reports
           get :license_management_reports
           get :container_scanning_reports
-          get :dependency_scanning_reports
         end
       end
 

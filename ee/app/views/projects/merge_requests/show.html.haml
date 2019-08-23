@@ -18,4 +18,3 @@
     window.gl.mrWidgetData.visual_review_app_available = '#{@project.feature_available?(:visual_review_app)}' === 'true';
     window.gl.mrWidgetData.license_management_comparsion_path = '#{license_management_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:license_management)}'
     window.gl.mrWidgetData.container_scanning_comparsion_path = '#{container_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:container_scanning)}'
-    window.gl.mrWidgetData.dependency_scanning_comparsion_path = '#{dependency_scanning_reports_project_merge_request_path(@project, @merge_request) if @project.feature_available?(:dependency_scanning)}'

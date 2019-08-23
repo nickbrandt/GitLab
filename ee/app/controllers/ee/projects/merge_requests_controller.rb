@@ -46,10 +46,6 @@ module EE
         reports_response(merge_request.compare_container_scanning_reports)
       end
 
-      def dependency_scanning_reports
-        reports_response(merge_request.compare_dependency_scanning_reports)
-      end
-
       def metrics_reports
         reports_response(merge_request.compare_metrics_reports)
       end

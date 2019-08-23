@@ -139,27 +139,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#has_dependency_scanning_reports?' do
-    subject { merge_request.has_dependency_scanning_reports? }
-    let(:project) { create(:project, :repository) }
-
-    before do
-      stub_licensed_features(container_scanning: true)
-    end
-
-    context 'when head pipeline has dependency scannning reports' do
-      let(:merge_request) { create(:ee_merge_request, :with_dependency_scanning_reports, source_project: project) }
-
-      it { is_expected.to be_truthy }
-    end
-
-    context 'when head pipeline does not have dependency scanning reports' do
-      let(:merge_request) { create(:ee_merge_request, source_project: project) }
-
-      it { is_expected.to be_falsey }
-    end
-  end
-
   describe '#has_container_scanning_reports?' do
     subject { merge_request.has_container_scanning_reports? }
     let(:project) { create(:project, :repository) }
