@@ -10,11 +10,25 @@ module Resolvers
              required: false,
              description: 'The list of IIDs of epics, e.g., [1, 2]'
 
+    argument :state, Types::EpicStateEnum,
+             required: false,
+             description: 'Filter epics by state'
+
+    argument :start_date, Types::TimeType,
+             required: false,
+             description: 'List epics within a time frame where epics.start_date is between start_date and end_date parameters (end_date parameter must be present)'
+
+    argument :end_date, Types::TimeType,
+             required: false,
+             description: 'List epics within a time frame where epics.end_date is between start_date and end_date parameters (start_date parameter must be present)'
+
     type Types::EpicType, null: true
 
     def resolve(**args)
       return [] unless object.present?
       return [] unless epic_feature_enabled?
+
+      validate_date_params!(args)
 
       find_epics(transform_args(args))
     end
@@ -27,6 +41,16 @@ module Resolvers
 
     def epic_feature_enabled?
       group.feature_available?(:epics)
+    end
+
+    def validate_date_params!(args)
+      return unless args[:start_date].present? || args[:end_date].present?
+
+      date_params_complete = args[:start_date] && args[:end_date]
+
+      unless date_params_complete
+        raise Gitlab::Graphql::Errors::ArgumentError, "Both start_date and end_date must be present."
+      end
     end
 
     def transform_args(args)

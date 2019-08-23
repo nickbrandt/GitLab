@@ -60,6 +60,48 @@ describe Resolvers::EpicResolver do
         end
       end
 
+      context 'within timeframe' do
+        let!(:epic1) { create(:epic, group: group, state: :closed, start_date: "2019-08-13", end_date: "2019-08-20") }
+        let!(:epic2) { create(:epic, group: group, state: :closed, start_date: "2019-08-13", end_date: "2019-08-21") }
+
+        context 'when start_date and end_date are present' do
+          it 'returns epics within timeframe' do
+            epics = resolve_epics(start_date: '2019-08-13', end_date: '2019-08-21')
+
+            expect(epics).to match_array([epic1, epic2])
+          end
+        end
+
+        context 'when only start_date is present' do
+          it 'returns epics within timeframe' do
+            expect { resolve_epics(start_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
+          end
+        end
+
+        context 'when only end_date is present' do
+          it 'returns epics within timeframe' do
+            expect { resolve_epics(end_date: '2019-08-13') }.to raise_error(Gitlab::Graphql::Errors::ArgumentError)
+          end
+        end
+      end
+
+      context 'with state' do
+        let!(:epic1) { create(:epic, group: group, state: :opened, start_date: "2019-08-13", end_date: "2019-08-20") }
+        let!(:epic2) { create(:epic, group: group, state: :closed, start_date: "2019-08-13", end_date: "2019-08-21") }
+
+        it 'lists epics with opened state' do
+          epics = resolve_epics(state: 'opened')
+
+          expect(epics).to match_array([epic1])
+        end
+
+        it 'lists epics with closed state' do
+          epics = resolve_epics(state: 'closed')
+
+          expect(epics).to match_array([epic2])
+        end
+      end
+
       context 'with subgroups' do
         let(:sub_group) { create(:group, parent: group) }
         let(:iids)      { [epic1, epic2].map(&:iid) }
