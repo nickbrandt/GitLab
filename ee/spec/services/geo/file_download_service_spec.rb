@@ -446,6 +446,6 @@ describe Geo::FileDownloadService do
                     success: success,
                     primary_missing_file: primary_missing_file)
     instance = double("(instance of Gitlab::Geo::Replication::Transfer)", download_from_primary: result)
-    allow(Gitlab::Geo::Replication::Transfer).to receive(:new).and_return(instance)
+    allow(Gitlab::Geo::Replication::BaseTransfer).to receive(:new).and_return(instance)
   end
 end

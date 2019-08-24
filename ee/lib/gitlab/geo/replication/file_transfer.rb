@@ -7,7 +7,7 @@ module Gitlab
       #   * Requesting an Upload file from the primary
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
-      class FileTransfer < Transfer
+      class FileTransfer < BaseTransfer
         def initialize(file_type, upload)
           super(
             file_type,

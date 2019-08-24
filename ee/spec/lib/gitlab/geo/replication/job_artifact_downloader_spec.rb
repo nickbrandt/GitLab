@@ -7,7 +7,7 @@ describe Gitlab::Geo::Replication::JobArtifactDownloader, :geo do
     context 'with job artifact' do
       it 'returns a FileDownloader::Result object' do
         downloader = described_class.new(:job_artifact, job_artifact.id)
-        result = Gitlab::Geo::Replication::Transfer::Result.new(success: true, bytes_downloaded: 1)
+        result = Gitlab::Geo::Replication::BaseTransfer::Result.new(success: true, bytes_downloaded: 1)
 
         allow_any_instance_of(Gitlab::Geo::Replication::JobArtifactTransfer)
           .to receive(:download_from_primary).and_return(result)

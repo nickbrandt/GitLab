@@ -7,7 +7,7 @@ module Gitlab
       #   * Requesting an ::Ci::JobArtifact file from the primary
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
-      class JobArtifactTransfer < Transfer
+      class JobArtifactTransfer < BaseTransfer
         def initialize(job_artifact)
           super(
             :job_artifact,

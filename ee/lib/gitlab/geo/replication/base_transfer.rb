@@ -3,7 +3,7 @@
 module Gitlab
   module Geo
     module Replication
-      class Transfer
+      class BaseTransfer
         include LogHelpers
 
         attr_reader :file_type, :file_id, :filename, :expected_checksum, :request_data
@@ -127,7 +127,7 @@ module Gitlab
         end
 
         def code_file_not_found?(geo_code)
-          geo_code == Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE
+          geo_code == Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE
         end
 
         def default_permissions

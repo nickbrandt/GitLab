@@ -7,7 +7,7 @@ module Gitlab
       #   * Requesting an LfsObject file from the primary
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
-      class LfsTransfer < Transfer
+      class LfsTransfer < BaseTransfer
         def initialize(lfs_object)
           super(
             :lfs,

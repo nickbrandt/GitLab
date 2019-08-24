@@ -312,7 +312,7 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
     stub_const('Geo::Scheduler::SchedulerWorker::DB_RETRIEVE_BATCH_SIZE', 5)
     secondary.update!(files_max_capacity: 2)
     result_object = double(:result, success: true, bytes_downloaded: 100, primary_missing_file: false)
-    allow_any_instance_of(::Gitlab::Geo::Replication::Transfer).to receive(:download_from_primary).and_return(result_object)
+    allow_any_instance_of(::Gitlab::Geo::Replication::BaseTransfer).to receive(:download_from_primary).and_return(result_object)
 
     avatar = fixture_file_upload('spec/fixtures/dk.png')
     create_list(:lfs_object, 2, :with_file)
