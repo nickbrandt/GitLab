@@ -55,6 +55,9 @@ import actions, {
   requestDeleteDismissalComment,
   showDismissalDeleteButtons,
   hideDismissalDeleteButtons,
+  setSastContainerDiffEndpoint,
+  receiveSastContainerDiffSuccess,
+  fetchSastContainerDiff,
 } from 'ee/vue_shared/security_reports/store/actions';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import state from 'ee/vue_shared/security_reports/store/state';
@@ -1583,6 +1586,146 @@ describe('security reports actions', () => {
         [],
         done,
       );
+    });
+  });
+
+  describe('setSastContainerDiffEndpoint', () => {
+    it('should pass down the endpoint to the mutation', done => {
+      const payload = '/sast_container_endpoint.json';
+
+      testAction(
+        setSastContainerDiffEndpoint,
+        payload,
+        mockedState,
+        [
+          {
+            type: types.SET_SAST_CONTAINER_DIFF_ENDPOINT,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveSastContainerDiffSuccess', () => {
+    it('should pass down the response to the mutation', done => {
+      const payload = { data: 'Effort yields its own rewards.' };
+
+      testAction(
+        receiveSastContainerDiffSuccess,
+        payload,
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchSastContainerDiff', () => {
+    const diff = { vulnerabilities: [] };
+
+    beforeEach(() => {
+      mockedState.vulnerabilityFeedbackPath = 'vulnerabilities_feedback';
+      mockedState.sastContainer.paths.diffEndpoint = 'sast_container_diff.json';
+    });
+
+    describe('on success', () => {
+      it('should dispatch `receiveSastContainerDiffSuccess`', done => {
+        mock.onGet('sast_container_diff.json').reply(200, diff);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'container_scanning',
+            },
+          })
+          .reply(200, containerScanningFeedbacks);
+
+        testAction(
+          fetchSastContainerDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestSastContainerReports',
+            },
+            {
+              type: 'receiveSastContainerDiffSuccess',
+              payload: {
+                diff,
+                enrichData: containerScanningFeedbacks,
+              },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when vulnerabilities path errors', () => {
+      it('should dispatch `receiveSastContainerError`', done => {
+        mock.onGet('sast_container_diff.json').reply(500);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'container_scanning',
+            },
+          })
+          .reply(200, containerScanningFeedbacks);
+
+        testAction(
+          fetchSastContainerDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestSastContainerReports',
+            },
+            {
+              type: 'receiveSastContainerError',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when feedback path errors', () => {
+      it('should dispatch `receiveSastContainerError`', done => {
+        mock.onGet('sast_container_diff.json').reply(200, diff);
+        mock
+          .onGet('vulnerabilities_feedback', {
+            params: {
+              category: 'container_scanning',
+            },
+          })
+          .reply(500);
+
+        testAction(
+          fetchSastContainerDiff,
+          null,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestSastContainerReports',
+            },
+            {
+              type: 'receiveSastContainerError',
+            },
+          ],
+          done,
+        );
+      });
     });
   });
 });

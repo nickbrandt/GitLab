@@ -271,4 +271,52 @@ describe('Grouped security reports app', () => {
       expect(vm.securityTab).toEqual(`${pipelinePath}/security`);
     });
   });
+
+  describe('with the reports API enabled', () => {
+    const sastContainerEndpoint = 'sast_container.json';
+
+    beforeEach(done => {
+      gon.features = gon.features || {};
+      gon.features.containerScanningMergeRequestReportApi = true;
+
+      gl.mrWidgetData = gl.mrWidgetData || {};
+      gl.mrWidgetData.container_scanning_comparison_path = sastContainerEndpoint;
+
+      mock.onGet(sastContainerEndpoint).reply(200, {
+        added: [dockerReport.vulnerabilities[0], dockerReport.vulnerabilities[1]],
+        fixed: [dockerReport.vulnerabilities[2]],
+      });
+
+      mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+
+      vm = mountComponent(Component, {
+        headBlobPath: 'path',
+        baseBlobPath: 'path',
+        sastHelpPath: 'path',
+        sastContainerHelpPath: 'path',
+        dastHelpPath: 'path',
+        dependencyScanningHelpPath: 'path',
+        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
+        vulnerabilityFeedbackHelpPath: 'path',
+        pipelineId: 123,
+        canCreateIssue: true,
+        canCreateMergeRequest: true,
+        canDismissVulnerability: true,
+      });
+
+      waitForMutation(vm.$store, types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS)
+        .then(done)
+        .catch();
+    });
+
+    it('should set setSastContainerDiffEndpoint', () => {
+      expect(vm.sastContainer.paths.diffEndpoint).toEqual(sastContainerEndpoint);
+    });
+
+    it('should call `fetchSastContainerDiff`', () => {
+      expect(vm.$el.textContent).toContain(
+        'Container scanning detected 2 new, and 1 fixed vulnerabilities',
+      );
+    });
+  });
 });

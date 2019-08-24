@@ -784,4 +784,60 @@ describe('security reports mutations', () => {
       expect(stateCopy.dast.resolvedIssues[0]).toEqual(updatedIssue);
     });
   });
+
+  describe('SET_SAST_CONTAINER_DIFF_ENDPOINT', () => {
+    const endpoint = 'sast_container_diff_endpoint.json';
+
+    beforeEach(() => {
+      mutations[types.SET_SAST_CONTAINER_DIFF_ENDPOINT](stateCopy, endpoint);
+    });
+
+    it('should set the correct endpoint', () => {
+      expect(stateCopy.sastContainer.paths.diffEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('RECEIVE_SAST_CONTAINER_DIFF_SUCCESS', () => {
+    const reports = {
+      diff: {
+        added: [
+          { name: 'added vuln 1', report_type: 'container_scanning' },
+          { name: 'added vuln 2', report_type: 'container_scanning' },
+        ],
+        fixed: [{ name: 'fixed vuln 1', report_type: 'container_scanning' }],
+      },
+    };
+
+    beforeEach(() => {
+      mutations[types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](stateCopy, reports);
+    });
+
+    it('should set isLoading to false', () => {
+      expect(stateCopy.sastContainer.isLoading).toBe(false);
+    });
+
+    it('should parse and set the added vulnerabilities', () => {
+      reports.diff.added.forEach((vuln, i) => {
+        expect(stateCopy.sastContainer.newIssues[i]).toEqual(
+          expect.objectContaining({
+            name: vuln.name,
+            title: vuln.name,
+            category: vuln.report_type,
+          }),
+        );
+      });
+    });
+
+    it('should parse and set the fixed vulnerabilities', () => {
+      reports.diff.fixed.forEach((vuln, i) => {
+        expect(stateCopy.sastContainer.resolvedIssues[i]).toEqual(
+          expect.objectContaining({
+            name: vuln.name,
+            title: vuln.name,
+            category: vuln.report_type,
+          }),
+        );
+      });
+    });
+  });
 });

@@ -5,6 +5,7 @@ import {
   parseDastIssues,
   getUnapprovedVulnerabilities,
   findIssueIndex,
+  enrichVulnerabilityWithFeedback,
 } from './utils';
 import filterByKey from './utils/filter_by_key';
 import { parseSastContainer } from './utils/container_scanning';
@@ -64,6 +65,10 @@ export default {
     Vue.set(state.sastContainer.paths, 'base', path);
   },
 
+  [types.SET_SAST_CONTAINER_DIFF_ENDPOINT](state, path) {
+    Vue.set(state.sastContainer.paths, 'diffEndpoint', path);
+  },
+
   [types.REQUEST_SAST_CONTAINER_REPORTS](state) {
     Vue.set(state.sastContainer, 'isLoading', true);
   },
@@ -98,6 +103,21 @@ export default {
       Vue.set(state.sastContainer, 'newIssues', newIssues);
       Vue.set(state.sastContainer, 'isLoading', false);
     }
+  },
+
+  [types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS](state, { diff, enrichData }) {
+    const fillInTheGaps = vulnerability => ({
+      ...enrichVulnerabilityWithFeedback(vulnerability, enrichData),
+      category: vulnerability.report_type,
+      title: vulnerability.message || vulnerability.name,
+    });
+
+    const added = diff.added ? diff.added.map(fillInTheGaps) : [];
+    const fixed = diff.fixed ? diff.fixed.map(fillInTheGaps) : [];
+
+    Vue.set(state.sastContainer, 'isLoading', false);
+    Vue.set(state.sastContainer, 'newIssues', added);
+    Vue.set(state.sastContainer, 'resolvedIssues', fixed);
   },
 
   [types.RECEIVE_SAST_CONTAINER_ERROR](state) {
