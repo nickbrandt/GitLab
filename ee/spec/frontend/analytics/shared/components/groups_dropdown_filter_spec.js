@@ -14,11 +14,13 @@ const groups = [
   {
     id: 1,
     name: 'foo',
+    full_name: 'foo',
     avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
   },
   {
     id: 2,
-    name: 'foobar',
+    name: 'subgroup',
+    full_name: 'group / subgroup',
     avatar_url: null,
   },
 ];
@@ -86,6 +88,15 @@ describe('GroupsDropdownFilter component', () => {
           .at(1)
           .contains('div.identicon'),
       ).toBe(true);
+    });
+
+    it('renders the full group name and highlights the last part', () => {
+      expect(
+        findDropdownItems()
+          .at(1)
+          .find('.js-group-path')
+          .html(),
+      ).toContain('group / <strong>subgroup</strong>');
     });
   });
 
