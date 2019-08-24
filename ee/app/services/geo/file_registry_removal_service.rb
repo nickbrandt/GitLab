@@ -78,7 +78,7 @@ module Geo
           LfsObject.find(object_db_id).file
         when :job_artifact
           Ci::JobArtifact.find(object_db_id).file
-        when *Gitlab::Geo::FileReplication::USER_UPLOADS_OBJECT_TYPES
+        when *Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES
           Upload.find(object_db_id).build_uploader
         else
           raise NameError, "Unrecognized type: #{object_type}"

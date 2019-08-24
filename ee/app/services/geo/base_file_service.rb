@@ -25,7 +25,7 @@ module Geo
     private
 
     def user_upload?
-      Gitlab::Geo::FileReplication.object_type_from_user_uploads?(object_type)
+      Gitlab::Geo::Replication.object_type_from_user_uploads?(object_type)
     end
 
     def job_artifact?
