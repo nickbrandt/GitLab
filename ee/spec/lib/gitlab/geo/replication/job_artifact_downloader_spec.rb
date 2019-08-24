@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::JobArtifactDownloader, :geo do
+describe Gitlab::Geo::Replication::JobArtifactDownloader, :geo do
   let(:job_artifact) { create(:ci_job_artifact) }
 
   context '#execute' do
     context 'with job artifact' do
       it 'returns a FileDownloader::Result object' do
         downloader = described_class.new(:job_artifact, job_artifact.id)
-        result = Gitlab::Geo::Transfer::Result.new(success: true, bytes_downloaded: 1)
+        result = Gitlab::Geo::Replication::Transfer::Result.new(success: true, bytes_downloaded: 1)
 
         allow_any_instance_of(Gitlab::Geo::JobArtifactTransfer)
           .to receive(:download_from_primary).and_return(result)
 
-        expect(downloader.execute).to be_a(Gitlab::Geo::FileDownloader::Result)
+        expect(downloader.execute).to be_a(Gitlab::Geo::Replication::FileDownloader::Result)
       end
     end
 
@@ -20,7 +20,7 @@ describe Gitlab::Geo::JobArtifactDownloader, :geo do
       let(:downloader) { described_class.new(:job_artifact, 10000) }
 
       it 'returns a FileDownloader::Result object' do
-        expect(downloader.execute).to be_a(Gitlab::Geo::FileDownloader::Result)
+        expect(downloader.execute).to be_a(Gitlab::Geo::Replication::FileDownloader::Result)
       end
 
       it 'returns a result indicating a failure before a transfer was attempted' do

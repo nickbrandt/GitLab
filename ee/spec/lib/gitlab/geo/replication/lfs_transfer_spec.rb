@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::LfsTransfer do
+describe Gitlab::Geo::Replication::LfsTransfer do
   include ::EE::GeoHelpers
 
   set(:primary_node) { create(:geo_node, :primary) }
@@ -49,7 +49,7 @@ describe Gitlab::Geo::LfsTransfer do
         it 'returns a failed result indicating primary_missing_file' do
           expect(FileUtils).not_to receive(:mv).with(anything, lfs_object.file.path).and_call_original
           response = double(:response, success?: false, code: 404, msg: "No such file")
-          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE}\"}")
+          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE}\"}")
           expect(Gitlab::HTTP).to receive(:get).and_return(response)
 
           result = subject.download_from_primary

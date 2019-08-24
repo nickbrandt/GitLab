@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::JobArtifactUploader, :geo do
+describe Gitlab::Geo::Replication::JobArtifactUploader, :geo do
   context '#execute' do
     let(:uploader) { described_class.new(job_artifact.id, {}) }
     subject { uploader.execute }

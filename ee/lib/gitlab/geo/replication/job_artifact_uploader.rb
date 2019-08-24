@@ -7,7 +7,7 @@ module Gitlab
     #   * Returning the necessary response data to send the file back
     #
     # TODO: Rearrange things so this class does not inherit from FileUploader
-    class JobArtifactUploader < ::Gitlab::Geo::FileUploader
+    class JobArtifactUploader < FileUploader
       # rubocop: disable CodeReuse/ActiveRecord
       def execute
         job_artifact = ::Ci::JobArtifact.find_by(id: object_db_id)

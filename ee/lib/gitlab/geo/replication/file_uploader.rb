@@ -30,6 +30,7 @@ module Gitlab
 
         success(CarrierWave::SanitizedFile.new(recorded_file.absolute_path))
       end
+
       # rubocop: enable CodeReuse/ActiveRecord
 
       private

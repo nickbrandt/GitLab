@@ -27,9 +27,10 @@ module Gitlab
         return fail_before_transfer unless upload.present?
         return missing_on_primary if upload.model.nil?
 
-        transfer = ::Gitlab::Geo::FileTransfer.new(object_type.to_sym, upload)
+        transfer = ::Gitlab::Geo::Replication::FileTransfer.new(object_type.to_sym, upload)
         Result.from_transfer_result(transfer.download_from_primary)
       end
+
       # rubocop: enable CodeReuse/ActiveRecord
 
       class Result

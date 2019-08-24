@@ -117,12 +117,16 @@ module Gitlab
         if response.code == 404 && body.present?
           begin
             json_response = JSON.parse(body)
-            return json_response['geo_code'] == Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE
+            return code_file_not_found?(json_response['geo_code'])
           rescue JSON::ParserError
           end
         end
 
         false
+      end
+
+      def code_file_not_found?(geo_code)
+        geo_code == Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE
       end
 
       def default_permissions
@@ -141,6 +145,7 @@ module Gitlab
         nil
       end
 
+      # @param [String] file_path disk location to compare checksum mismatch
       def checksum_mismatch?(file_path)
         # Skip checksum check if primary didn't generate one because, for
         # example, large attachments are checksummed asynchronously, and most
