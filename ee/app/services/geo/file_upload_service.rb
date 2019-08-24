@@ -4,7 +4,7 @@ module Geo
   # This class is responsible for:
   #   * Handling file requests from the secondary over the API
   #   * Returning the necessary response data to send the file back
-  class FileUploadService < FileService
+  class FileUploadService < BaseFileService
     attr_reader :auth_header
     include ::Gitlab::Utils::StrongMemoize
 
@@ -17,7 +17,7 @@ module Geo
     def execute
       return unless decoded_authorization.present? && jwt_scope_valid?
 
-      uploader_klass.new(object_db_id, decoded_authorization).execute
+      uploader.execute
     end
 
     private
@@ -32,11 +32,19 @@ module Geo
       end
     end
 
+    def uploader
+      uploader_klass.new(object_db_id, decoded_authorization)
+    end
+
     def uploader_klass
-      "Gitlab::Geo::#{service_klass_name}Uploader".constantize
-    rescue NameError => e
-      log_error('Unknown file type', e)
-      raise
+      return Gitlab::Geo::FileUploader if user_upload?
+      return Gitlab::Geo::JobArtifactUploader if job_artifact?
+      return Gitlab::Geo::LfsUploader if lfs?
+
+      error_message = "Cannot find a Gitlab::Geo Uploader for object_type = '#{object_type}'"
+
+      log_error(error_message)
+      raise NotImplementedError, error_message
     end
   end
 end

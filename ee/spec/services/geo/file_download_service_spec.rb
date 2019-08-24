@@ -11,6 +11,16 @@ describe Geo::FileDownloadService do
     stub_current_geo_node(secondary)
   end
 
+  describe '#downloader' do
+    Gitlab::Geo::FileReplication::USER_UPLOADS_OBJECT_TYPES.each do |object_type|
+      subject {described_class.new(object_type, 1) }
+
+      it "returns FileDownloader given object_type is #{object_type}" do
+        expect(subject.downloader).to eq(Gitlab::Geo::FileDownloader)
+      end
+    end
+  end
+
   context 'retry time' do
     before do
       stub_transfer_result(bytes_downloaded: 0, success: false)

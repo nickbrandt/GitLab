@@ -5,7 +5,7 @@ module Geo
   #   * Finding the appropriate Downloader class for a FileRegistry record
   #   * Executing the Downloader
   #   * Marking the FileRegistry record as synced or needing retry
-  class FileDownloadService < FileService
+  class FileDownloadService < BaseFileService
     LEASE_TIMEOUT = 8.hours.freeze
 
     include Delay
@@ -26,14 +26,21 @@ module Geo
       end
     end
 
+    def downloader
+      downloader_klass.new(object_type, object_db_id)
+    end
+
     private
 
-    def downloader
-      klass = "Gitlab::Geo::#{service_klass_name}Downloader".constantize
-      klass.new(object_type, object_db_id)
-    rescue NameError => e
-      log_error('Unknown file type', e)
-      raise
+    def downloader_klass
+      return Gitlab::Geo::FileDownloader if user_upload?
+      return Gitlab::Geo::JobArtifactDownloader if job_artifact?
+      return Gitlab::Geo::LfsDownloader if lfs?
+
+      error_message = "Cannot find a Gitlab::Geo Downloader for object_type = '#{object_type}'"
+
+      log_error(error_message)
+      raise NotImplementedError, error_message
     end
 
     def log_file_download(mark_as_synced, download_result, start_time)

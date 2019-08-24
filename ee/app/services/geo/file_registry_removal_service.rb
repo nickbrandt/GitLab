@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileRegistryRemovalService < FileService
+  class FileRegistryRemovalService < BaseFileService
     include ::Gitlab::Utils::StrongMemoize
 
     LEASE_TIMEOUT = 8.hours.freeze
@@ -62,7 +62,7 @@ module Geo
         next file_uploader.file.path if file_uploader.object_store == ObjectStorage::Store::LOCAL
 
         # For remote storage more juggling is needed to actually get the full path on disk
-        if upload?
+        if user_upload?
           upload = file_uploader.upload
           file_uploader.class.absolute_path(upload)
         else
