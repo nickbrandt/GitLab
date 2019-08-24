@@ -22,6 +22,16 @@ export default class ProtectedBranchEdit {
     );
 
     this.buildDropdowns();
+    this.toggleCodeOwnerApproval();
+  }
+
+  toggleCodeOwnerApproval() {
+    const toggleButton = this.$wrap.find('.js-project-feature-toggle');
+    toggleButton.on('click', e => {
+      console.log('e', e);
+      toggleButton.toggleClass('is-checked');
+      // Trigger API call here
+    });
   }
 
   buildDropdowns() {

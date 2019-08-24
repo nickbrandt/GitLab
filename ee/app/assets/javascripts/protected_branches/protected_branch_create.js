@@ -15,10 +15,21 @@ export default class ProtectedBranchCreate {
     this.buildDropdowns();
     this.$branchInput = this.$form.find('input[name="protected_branch[name]"]');
     this.bindEvents();
+    this.toggleCodeOwnerApproval();
   }
 
   bindEvents() {
     this.$form.on('submit', this.onFormSubmit.bind(this));
+  }
+
+  toggleCodeOwnerApproval() {
+    const toggleButton = this.$form.find('.js-project-feature-toggle');
+
+    toggleButton.on('click', e => {
+      console.log('clicked', e);
+      toggleButton.toggleClass('is-checked');
+      // Trigger API call here
+    });
   }
 
   buildDropdowns() {
