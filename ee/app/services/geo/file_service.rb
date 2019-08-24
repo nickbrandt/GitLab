@@ -7,9 +7,7 @@ module Geo
 
     attr_reader :object_type, :object_db_id
 
-    DEFAULT_OBJECT_TYPES = %i[attachment avatar file import_export namespace_file personal_file favicon].freeze
-    DEFAULT_SERVICE_TYPE = :file
-    UPLOAD_OBJECT_TYPE = :file
+    DEFAULT_KLASS_NAME = 'File'.freeze
 
     def initialize(object_type, object_db_id)
       @object_type = object_type.to_sym
@@ -22,8 +20,8 @@ module Geo
 
     private
 
-    def upload?
-      DEFAULT_OBJECT_TYPES.include?(object_type)
+    def upload_object?
+      Gitlab::Geo::FileReplication.object_type_from_user_uploads?(object_type)
     end
 
     def job_artifact?
@@ -31,14 +29,9 @@ module Geo
     end
 
     def service_klass_name
-      klass_name =
-        if upload?
-          DEFAULT_SERVICE_TYPE
-        else
-          object_type
-        end
+      return DEFAULT_KLASS_NAME if upload_object?
 
-      klass_name.to_s.camelize
+      object_type.to_s.camelize
     end
 
     def base_log_data(message)
