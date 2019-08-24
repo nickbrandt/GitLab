@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::JobArtifactTransfer, :geo do
+describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
   include ::EE::GeoHelpers
 
   set(:primary_node) { create(:geo_node, :primary) }

@@ -33,9 +33,9 @@ module Geo
     private
 
     def downloader_klass
-      return Gitlab::Geo::FileDownloader if user_upload?
-      return Gitlab::Geo::JobArtifactDownloader if job_artifact?
-      return Gitlab::Geo::LfsDownloader if lfs?
+      return Gitlab::Geo::Replication::FileDownloader if user_upload?
+      return Gitlab::Geo::Replication::JobArtifactDownloader if job_artifact?
+      return Gitlab::Geo::Replication::LfsDownloader if lfs?
 
       error_message = "Cannot find a Gitlab::Geo Downloader for object_type = '#{object_type}'"
 

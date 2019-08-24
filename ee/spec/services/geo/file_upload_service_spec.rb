@@ -200,7 +200,7 @@ describe Geo::FileUploadService do
     context 'job artifact' do
       let(:job_artifact) { create(:ci_job_artifact, :with_file) }
       let(:params) { { id: job_artifact.id, type: 'job_artifact' } }
-      let(:request_data) { Gitlab::Geo::JobArtifactTransfer.new(job_artifact).request_data }
+      let(:request_data) { Gitlab::Geo::Replication::JobArtifactTransfer.new(job_artifact).request_data }
 
       it 'sends job artifact file' do
         service = described_class.new(params, req_header)

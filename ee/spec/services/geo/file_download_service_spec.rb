@@ -435,7 +435,7 @@ describe Geo::FileDownloadService do
 
     context 'bad object type' do
       it 'raises an error' do
-        expect { described_class.new(:bad, 1).execute }.to raise_error(NameError)
+        expect { described_class.new(:bad, 1).execute }.to raise_error(NotImplementedError)
       end
     end
   end
@@ -445,7 +445,7 @@ describe Geo::FileDownloadService do
                     bytes_downloaded: bytes_downloaded,
                     success: success,
                     primary_missing_file: primary_missing_file)
-    instance = double("(instance of Gitlab::Geo::Transfer)", download_from_primary: result)
+    instance = double("(instance of Gitlab::Geo::Replication::Transfer)", download_from_primary: result)
     allow(Gitlab::Geo::Replication::Transfer).to receive(:new).and_return(instance)
   end
 end
