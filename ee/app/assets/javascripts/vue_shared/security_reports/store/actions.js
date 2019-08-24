@@ -4,6 +4,8 @@ import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
+import Poll from '~/lib/utils/poll';
+import httpStatusCodes from '~/lib/utils/http_status';
 
 /**
  * A lot of this file has duplicate actions to
@@ -54,6 +56,9 @@ export const setSastContainerHeadPath = ({ commit }, path) =>
 export const setSastContainerBasePath = ({ commit }, path) =>
   commit(types.SET_SAST_CONTAINER_BASE_PATH, path);
 
+export const setSastContainerDiffEndpoint = ({ commit }, path) =>
+  commit(types.SET_SAST_CONTAINER_DIFF_ENDPOINT, path);
+
 export const requestSastContainerReports = ({ commit }) =>
   commit(types.REQUEST_SAST_CONTAINER_REPORTS);
 
@@ -62,6 +67,52 @@ export const receiveSastContainerReports = ({ commit }, response) =>
 
 export const receiveSastContainerError = ({ commit }, error) =>
   commit(types.RECEIVE_SAST_CONTAINER_ERROR, error);
+
+export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
+
+export const fetchSastContainerDiff = ({ state, dispatch }) => {
+  dispatch('requestSastContainerReports');
+
+  const pollPromise = new Promise((resolve, reject) => {
+    const eTagPoll = new Poll({
+      resource: {
+        getReports(endpoint) {
+          return axios.get(endpoint);
+        },
+      },
+      data: state.sastContainer.paths.diffEndpoint,
+      method: 'getReports',
+      successCallback: response => {
+        if (response.status === httpStatusCodes.OK) {
+          resolve(response);
+          eTagPoll.stop();
+        }
+      },
+      errorCallback: reject,
+    });
+
+    eTagPoll.makeRequest();
+  });
+
+  return Promise.all([
+    pollPromise,
+    axios.get(state.vulnerabilityFeedbackPath, {
+      params: {
+        category: 'container_scanning',
+      },
+    }),
+  ])
+    .then(values => {
+      dispatch('receiveSastContainerDiffSuccess', {
+        diff: values[0].data,
+        enrichData: values[1].data,
+      });
+    })
+    .catch(() => {
+      dispatch('receiveSastContainerError');
+    });
+};
 
 export const fetchSastContainerReports = ({ state, dispatch }) => {
   const { base, head } = state.sastContainer.paths;

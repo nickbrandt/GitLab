@@ -43,7 +43,7 @@ export const findMatchingRemediations = (remediations, vulnerability) => {
  * @param {Object} vulnerability
  * @param {Array} feedback
  */
-export const enrichVulnerabilityWithfeedback = (vulnerability, feedback = []) =>
+export const enrichVulnerabilityWithFeedback = (vulnerability, feedback = []) =>
   feedback
     .filter(fb => fb.project_fingerprint === vulnerability.project_fingerprint)
     .reduce((vuln, fb) => {
@@ -160,7 +160,7 @@ export const parseSastIssues = (report = [], feedback = [], path = '') =>
       ...parsed,
       path: parsed.location.file,
       urlPath: fileUrl(parsed.location, path),
-      ...enrichVulnerabilityWithfeedback(parsed, feedback),
+      ...enrichVulnerabilityWithFeedback(parsed, feedback),
     };
   });
 
@@ -192,7 +192,7 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
       ...parsed,
       path: parsed.location.file,
       urlPath: fileUrl(parsed.location, path),
-      ...enrichVulnerabilityWithfeedback(parsed, feedback),
+      ...enrichVulnerabilityWithFeedback(parsed, feedback),
     };
   });
 };
@@ -253,7 +253,7 @@ export const parseDastIssues = (sites = [], feedback = []) =>
 
         return {
           ...parsed,
-          ...enrichVulnerabilityWithfeedback(parsed, feedback),
+          ...enrichVulnerabilityWithFeedback(parsed, feedback),
         };
       }),
     ],
@@ -274,7 +274,7 @@ export const groupedTextBuilder = ({
 }) => {
   let baseString = '';
 
-  if (!paths.base) {
+  if (!paths.base && !paths.diffEndpoint) {
     if (added && !dismissed) {
       // added
       baseString = n__(
@@ -300,7 +300,7 @@ export const groupedTextBuilder = ({
         'ciReport|%{reportType} %{status} detected no vulnerabilities for the source branch only',
       );
     }
-  } else if (paths.head) {
+  } else if (paths.head || paths.diffEndpoint) {
     if (added && !fixed && !dismissed) {
       // added
       baseString = n__(

@@ -168,6 +168,11 @@ export default {
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
+    shouldRenderSastContainer() {
+      const { head, diffEndpoint } = this.sastContainer.paths;
+
+      return head || diffEndpoint;
+    },
   },
 
   created() {
@@ -196,7 +201,17 @@ export default {
       this.fetchSastReports();
     }
 
-    if (this.sastContainerHeadPath) {
+    const sastContainerDiffEndpoint =
+      gl && gl.mrWidgetData && gl.mrWidgetData.container_scanning_comparison_path;
+
+    if (
+      gon.features &&
+      gon.features.containerScanningMergeRequestReportApi &&
+      sastContainerDiffEndpoint
+    ) {
+      this.setSastContainerDiffEndpoint(sastContainerDiffEndpoint);
+      this.fetchSastContainerDiff();
+    } else if (this.sastContainerHeadPath) {
       this.setSastContainerHeadPath(this.sastContainerHeadPath);
 
       if (this.sastContainerBasePath) {
@@ -257,6 +272,8 @@ export default {
       'deleteDismissalComment',
       'showDismissalDeleteButtons',
       'hideDismissalDeleteButtons',
+      'fetchSastContainerDiff',
+      'setSastContainerDiffEndpoint',
     ]),
     ...mapActions('sast', {
       setSastHeadPath: 'setHeadPath',
@@ -322,7 +339,7 @@ export default {
         />
       </template>
 
-      <template v-if="sastContainerHeadPath">
+      <template v-if="shouldRenderSastContainer">
         <summary-row
           :summary="groupedSastContainerText"
           :status-icon="sastContainerStatusIcon"
