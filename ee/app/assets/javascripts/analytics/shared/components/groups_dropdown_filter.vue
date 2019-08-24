@@ -73,10 +73,30 @@ export default {
             <li>
               <a href='#' class='dropdown-menu-link'>
                 ${this.avatarTemplate(group)}
-                <div class="align-middle">${_.escape(group.name)}</div>
+                <div class="js-group-path align-middle">${this.formatGroupPath(
+                  group.full_name,
+                )}</div>
               </a>
             </li>
           `;
+    },
+    /**
+     * Formats the group's full name.
+     * It renders the last part (the part after the last backslash) of a group's full name as bold text.
+     * @returns String
+     */
+    formatGroupPath(fullName) {
+      if (!fullName) {
+        return '';
+      }
+
+      const parts = fullName.split('/');
+      const lastPart = parts.length - 1;
+      return parts
+        .map((part, idx) =>
+          idx === lastPart ? `<strong>${_.escape(part.trim())}</strong>` : _.escape(part.trim()),
+        )
+        .join(' / ');
     },
     avatarTemplate(group) {
       return group.avatar_url !== null
