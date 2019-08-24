@@ -7,11 +7,9 @@ module Gitlab
       #   * Finding an LfsObject record
       #   * Returning the necessary response data to send the file back
       #
-      # TODO: Rearrange things so this class does not inherit from FileUploader
-      class LfsUploader < FileUploader
-        # rubocop: disable CodeReuse/ActiveRecord
+      class LfsUploader < BaseUploader
         def execute
-          lfs_object = LfsObject.find_by(id: object_db_id)
+          lfs_object = fetch_resource
 
           return error('LFS object not found') unless lfs_object
           return error('LFS object not found') if message[:checksum] != lfs_object.oid
@@ -24,6 +22,15 @@ module Gitlab
 
           success(lfs_object.file)
         end
+
+        private
+
+        # rubocop: disable CodeReuse/ActiveRecord
+
+        def fetch_resource
+          LfsObject.find_by(id: object_db_id)
+        end
+
         # rubocop: enable CodeReuse/ActiveRecord
       end
     end

@@ -7,11 +7,9 @@ module Gitlab
       #   * Finding an ::Ci::JobArtifact record
       #   * Returning the necessary response data to send the file back
       #
-      # TODO: Rearrange things so this class does not inherit from FileUploader
-      class JobArtifactUploader < FileUploader
-        # rubocop: disable CodeReuse/ActiveRecord
+      class JobArtifactUploader < BaseUploader
         def execute
-          job_artifact = ::Ci::JobArtifact.find_by(id: object_db_id)
+          job_artifact = fetch_resource
 
           unless job_artifact.present?
             return error('Job artifact not found')
@@ -25,6 +23,15 @@ module Gitlab
 
           success(job_artifact.file)
         end
+
+        private
+
+        # rubocop: disable CodeReuse/ActiveRecord
+
+        def fetch_resource
+          ::Ci::JobArtifact.find_by(id: object_db_id)
+        end
+
         # rubocop: enable CodeReuse/ActiveRecord
       end
     end
