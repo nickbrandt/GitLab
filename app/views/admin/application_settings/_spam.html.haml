@@ -16,13 +16,6 @@
         %span.form-text.text-muted#recaptcha_help_block
           = _('Helps prevent bots from brute-force attacks.')
     .form-group
-      .form-check
-        = f.check_box :login_recaptcha_protection_enabled, class: 'form-check-input'
-        = f.label :login_recaptcha_protection_enabled, class: 'form-check-label' do
-          Enable reCAPTCHA for login
-        %span.form-text.text-muted#recaptcha_help_block
-          = _('Helps prevent bots from brute-force attacks.')
-    .form-group
       = f.label :recaptcha_site_key, 'reCAPTCHA Site Key', class: 'label-bold'
       = f.text_field :recaptcha_site_key, class: 'form-control'
       .form-text.text-muted
