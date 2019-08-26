@@ -411,7 +411,7 @@ gem 'mail_room', '~> 0.9.1'
 gem 'email_reply_trimmer', '~> 0.1'
 gem 'html2text'
 
-gem 'ruby-prof', '~> 0.17.0'
+gem 'ruby-prof', '~> 1.0.0'
 gem 'rbtrace', '~> 0.4', require: false
 gem 'memory_profiler', '~> 0.9', require: false
 gem 'benchmark-memory', '~> 0.1', require: false
@@ -453,6 +453,7 @@ gem 'toml-rb', '~> 1.0.0', require: false
 gem 'flipper', '~> 0.13.0'
 gem 'flipper-active_record', '~> 0.13.0'
 gem 'flipper-active_support_cache_store', '~> 0.13.0'
+gem 'unleash', '~> 0.1.5'
 
 # Structured logging
 gem 'lograge', '~> 0.5'
