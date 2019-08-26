@@ -87,9 +87,7 @@ module Users
         :password_automatically_set,
         :name,
         :password,
-        :username,
-        :first_name,
-        :last_name
+        :username
       ]
     end
 
@@ -108,10 +106,6 @@ module Users
         user_params = params.slice(*allowed_signup_params)
         if user_params[:skip_confirmation].nil?
           user_params[:skip_confirmation] = skip_user_confirmation_email_from_setting
-        end
-
-        if (user_params[:first_name].present? || user_params[:last_name].present?) && !user_params[:name].present?
-          user_params[:name] = "#{user_params[:first_name]} #{user_params[:last_name]}"
         end
       end
 

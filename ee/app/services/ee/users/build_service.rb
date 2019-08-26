@@ -27,7 +27,7 @@ module EE
 
       override :signup_params
       def signup_params
-        super + email_opted_in_params
+        super + email_opted_in_params + name_params
       end
 
       def email_opted_in_params
@@ -36,6 +36,13 @@ module EE
           :email_opted_in_ip,
           :email_opted_in_source_id,
           :email_opted_in_at
+        ]
+      end
+
+      def name_params
+        [
+          :first_name,
+          :last_name
         ]
       end
 
@@ -51,6 +58,21 @@ module EE
         else
           super
         end
+      end
+
+      override :build_user_params
+      def build_user_params(skip_authorization:)
+        unless current_user&.admin?
+          user_params = params.slice(*signup_params)
+
+          # For trial signups, name is derived from first name and last name.
+          if (user_params[:first_name].present? || user_params[:last_name].present?) && !user_params[:name].present?
+            name = "#{user_params[:first_name]} #{user_params[:last_name]}"
+            return super.merge(name: name)
+          end
+        end
+
+        super
       end
 
       def saml_provider_id
