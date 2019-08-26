@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::LogCursor::Logger do
+describe Gitlab::Geo::LogCursor::Logger, :geo do
   class LoggerSpec; end
 
   subject(:logger) { described_class.new(LoggerSpec) }
@@ -37,6 +37,18 @@ describe Gitlab::Geo::LogCursor::Logger do
                                                       cursor_delay_s: 0.0)
 
       logger.event_info(Time.now, 'Test')
+    end
+  end
+
+  context 'when class is extended with StdoutLogger' do
+    it 'logs to stdout' do
+      message = 'this message should appear on stdout'
+      Gitlab::Geo::Logger.extend(Gitlab::Geo::Logger::StdoutLogger)
+      # This is needed because otherwise https://gitlab.com/gitlab-org/gitlab-ee/blob/master/config/environments/test.rb#L52
+      # sets the default logging level to :fatal when running under CI
+      allow(Rails.logger).to receive(:level).and_return(:info)
+
+      expect { logger.info(message) }.to output(/#{message}/).to_stdout
     end
   end
 end
