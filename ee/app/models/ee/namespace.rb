@@ -223,6 +223,10 @@ module EE
       actual_plan&.pipeline_size_limit.to_i
     end
 
+    def max_active_jobs
+      actual_plan&.active_jobs_limit.to_i
+    end
+
     def memoized_plans=(plans)
       @plans = plans # rubocop: disable Gitlab/ModuleWithInstanceVariables
     end

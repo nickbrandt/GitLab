@@ -345,6 +345,45 @@ describe Namespace do
     end
   end
 
+  describe '#max_active_jobs' do
+    context 'when there is no limit defined' do
+      it 'returns zero' do
+        expect(namespace.max_active_jobs).to be_zero
+      end
+    end
+
+    context 'when free plan has limit defined' do
+      before do
+        free_plan.update_column(:active_jobs_limit, 100)
+      end
+
+      it 'returns a free plan limits' do
+        expect(namespace.max_active_jobs).to be 100
+      end
+    end
+
+    context 'when associated plan has no limit defined' do
+      before do
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+      end
+
+      it 'returns zero' do
+        expect(namespace.max_active_jobs).to be_zero
+      end
+    end
+
+    context 'when limit is defined' do
+      before do
+        gold_plan.update_column(:active_jobs_limit, 10)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+      end
+
+      it 'returns a number of maximum active jobs' do
+        expect(namespace.max_active_jobs).to eq 10
+      end
+    end
+  end
+
   describe '#shared_runners_enabled?' do
     subject { namespace.shared_runners_enabled? }
 
