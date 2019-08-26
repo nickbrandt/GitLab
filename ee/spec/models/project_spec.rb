@@ -316,6 +316,30 @@ describe Project do
     end
   end
 
+  describe '#has_active_hooks?' do
+    context "with group hooks" do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, namespace: group) }
+      let!(:group_hook) { create(:group_hook, group: group, push_events: true) }
+
+      before do
+        stub_licensed_features(group_webhooks: true)
+      end
+
+      it 'returns true' do
+        expect(project.has_active_hooks?).to be_truthy
+        expect(project.has_group_hooks?).to be_truthy
+      end
+    end
+
+    context 'with no group hooks' do
+      it 'returns false' do
+        expect(project.has_active_hooks?).to be_falsey
+        expect(project.has_group_hooks?).to be_falsey
+      end
+    end
+  end
+
   describe "#execute_hooks" do
     context "group hooks" do
       let(:group) { create(:group) }
