@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe MergeRequests::CreateService do
+describe MergeRequests::CreateService, :clean_gitlab_redis_shared_state do
   let(:project) { create(:project, :repository) }
   let(:user) { project.owner }
 
