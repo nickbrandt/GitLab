@@ -23,11 +23,12 @@ module QA
             issue.title = issue_title
             issue.labels = [label]
           end
+
+          label_board_list.project.visit!
+          Page::Project::Menu.perform(&:go_to_boards)
         end
 
         it 'shows the just created board with a "Doing" (label) list, and an issue on it' do
-          page.visit("#{label_board_list.project.web_url}/-/boards")
-
           EE::Page::Project::Issue::Board::Show.perform do |show|
             expect(show.boards_dropdown).to have_content(label_board_list.board.name)
             expect(show.boards_list_header_with_index(1)).to have_content(label)
@@ -48,11 +49,12 @@ module QA
             issue.title = issue_title
             issue.milestone = milestone_board_list.project_milestone
           end
+
+          milestone_board_list.project.visit!
+          Page::Project::Menu.perform(&:go_to_boards)
         end
 
         it 'shows the just created board with a "1.0" (milestone) list, and an issue on it' do
-          page.visit("#{milestone_board_list.project.web_url}/-/boards")
-
           EE::Page::Project::Issue::Board::Show.perform do |show|
             expect(show.boards_dropdown).to have_content(milestone_board_list.board.name)
             expect(show.boards_list_header_with_index(1)).to have_content('1.0')
