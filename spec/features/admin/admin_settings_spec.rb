@@ -261,6 +261,7 @@ describe 'Admin updates settings' do
 
       page.within('.as-spam') do
         check 'Enable reCAPTCHA'
+        check 'Enable reCAPTCHA for login'
         fill_in 'reCAPTCHA Site Key', with: 'key'
         fill_in 'reCAPTCHA Private Key', with: 'key'
         fill_in 'IPs per user', with: 15
@@ -270,6 +271,7 @@ describe 'Admin updates settings' do
       expect(page).to have_content "Application settings saved successfully"
       expect(Gitlab::CurrentSettings.recaptcha_enabled).to be true
       expect(Gitlab::CurrentSettings.unique_ips_limit_per_user).to eq(15)
+      expect(Gitlab::CurrentSettings.login_recaptcha_protection_enabled).to be true
     end
   end
 
