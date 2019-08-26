@@ -269,7 +269,9 @@ describe 'Admin updates settings' do
       end
 
       expect(page).to have_content "Application settings saved successfully"
+
       expect(Gitlab::CurrentSettings.recaptcha_enabled).to be true
+      expect(Gitlab::CurrentSettings.login_recaptcha_protection_enabled).to be true
       expect(Gitlab::CurrentSettings.unique_ips_limit_per_user).to eq(15)
       expect(Gitlab::CurrentSettings.login_recaptcha_protection_enabled).to be true
     end
