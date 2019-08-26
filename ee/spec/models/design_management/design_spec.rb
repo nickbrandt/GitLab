@@ -49,6 +49,10 @@ describe DesignManagement::Design do
     end
   end
 
+  describe '#to_ability_name' do
+    it { expect(described_class.new.to_ability_name).to eq('design') }
+  end
+
   describe "#new_design?" do
     set(:versions) { create(:design_version) }
     set(:design) { create(:design, versions: [versions]) }

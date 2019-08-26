@@ -32,6 +32,10 @@ module DesignManagement
       filename
     end
 
+    def to_ability_name
+      'design'
+    end
+
     def description
       ''
     end
