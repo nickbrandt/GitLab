@@ -2,6 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.9.0
+
+- Update Gitaly library code to v1.57.0 !407
+- Replace govendor with go mod !411
+- Support gzip compression for Git info/refs !404
+- Add prometheus counter for Gitaly connection stubs !414
+- Support passing on Gitaly feature flags  !410
+
 v8.8.0
 
 - Filter title, description, text, and body from logs !402
