@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe TrialRegistrationsController do
-
   describe '#create' do
     before do
       stub_feature_flags(invisible_captcha: false)
