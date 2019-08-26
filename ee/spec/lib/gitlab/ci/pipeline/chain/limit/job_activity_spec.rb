@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
+describe ::Gitlab::Ci::Pipeline::Chain::Limit::JobActivity do
   set(:namespace) { create(:namespace) }
   set(:project) { create(:project, namespace: namespace) }
   set(:user) { create(:user) }
@@ -15,13 +15,15 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
 
   let(:step) { described_class.new(pipeline, command) }
 
-  context 'when active pipelines limit is exceeded' do
+  context 'when active jobs limit is exceeded' do
     before do
-      gold_plan = create(:gold_plan, active_pipelines_limit: 1)
+      gold_plan = create(:gold_plan, active_jobs_limit: 2)
       create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
-      create(:ci_pipeline, project: project, status: 'pending')
-      create(:ci_pipeline, project: project, status: 'running')
+      pipeline = create(:ci_pipeline, project: project, status: 'running', created_at: Time.now)
+      create(:ci_build, pipeline: pipeline)
+      create(:ci_build, pipeline: pipeline)
+      create(:ci_build, pipeline: pipeline)
 
       step.perform!
     end
@@ -39,11 +41,11 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
 
     it 'sets a valid failure reason' do
-      expect(pipeline.activity_limit_exceeded?).to be true
+      expect(pipeline.job_activity_limit_exceeded?).to be true
     end
   end
 
-  context 'when pipeline activity limit is not exceeded' do
+  context 'when job activity limit is not exceeded' do
     before do
       step.perform!
     end
