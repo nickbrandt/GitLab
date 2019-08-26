@@ -5,7 +5,7 @@ module Gitlab
     module LoadBalancing
       # A single database host used for load balancing.
       class Host
-        attr_reader :pool, :last_checked_at, :intervals, :load_balancer, :host
+        attr_reader :pool, :last_checked_at, :intervals, :load_balancer, :host, :port
 
         delegate :connection, :release_connection, to: :pool
 
@@ -25,10 +25,11 @@ module Gitlab
 
         # host - The address of the database.
         # load_balancer - The LoadBalancer that manages this Host.
-        def initialize(host, load_balancer)
+        def initialize(host, load_balancer, port: nil)
           @host = host
+          @port = port
           @load_balancer = load_balancer
-          @pool = Database.create_connection_pool(LoadBalancing.pool_size, host)
+          @pool = Database.create_connection_pool(LoadBalancing.pool_size, host, port)
           @online = true
           @last_checked_at = Time.zone.now
 

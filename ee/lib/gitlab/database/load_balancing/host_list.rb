@@ -20,8 +20,8 @@ module Gitlab
           @mutex.synchronize { @hosts.length }
         end
 
-        def host_names
-          @mutex.synchronize { @hosts.map(&:host) }
+        def host_names_and_ports
+          @mutex.synchronize { @hosts.map { |host| [host.host, host.port] } }
         end
 
         def hosts=(hosts)

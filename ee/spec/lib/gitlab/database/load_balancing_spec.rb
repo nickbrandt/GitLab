@@ -220,6 +220,7 @@ describe Gitlab::Database::LoadBalancing do
           nameserver: 'localhost',
           port: 8600,
           record: nil,
+          record_type: 'A',
           interval: 60,
           disconnect_timeout: 120,
           use_tcp: false
@@ -231,12 +232,13 @@ describe Gitlab::Database::LoadBalancing do
       it 'returns a Hash including the custom configuration' do
         allow(described_class)
           .to receive(:configuration)
-          .and_return('discover' => { 'record' => 'foo' })
+          .and_return('discover' => { 'record' => 'foo', 'record_type' => 'SRV' })
 
         expect(described_class.service_discovery_configuration).to eq(
           nameserver: 'localhost',
           port: 8600,
           record: 'foo',
+          record_type: 'SRV',
           interval: 60,
           disconnect_timeout: 120,
           use_tcp: false

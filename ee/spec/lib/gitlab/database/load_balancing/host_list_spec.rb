@@ -11,7 +11,7 @@ describe Gitlab::Database::LoadBalancing::HostList do
 
   let(:host_list) do
     hosts = Array.new(2) do
-      Gitlab::Database::LoadBalancing::Host.new('localhost', load_balancer)
+      Gitlab::Database::LoadBalancing::Host.new('localhost', load_balancer, port: 5432)
     end
 
     described_class.new(hosts)
@@ -23,9 +23,35 @@ describe Gitlab::Database::LoadBalancing::HostList do
     end
   end
 
-  describe '#host_names' do
-    it 'returns the host names of all hosts' do
-      expect(host_list.host_names).to eq(%w[localhost localhost])
+  describe '#host_names_and_ports' do
+    context 'with ports' do
+      it 'returns the host names of all hosts' do
+        hosts = [
+          ['localhost', 5432],
+          ['localhost', 5432]
+        ]
+
+        expect(host_list.host_names_and_ports).to eq(hosts)
+      end
+    end
+
+    context 'without ports' do
+      let(:host_list) do
+        hosts = Array.new(2) do
+          Gitlab::Database::LoadBalancing::Host.new('localhost', load_balancer)
+        end
+
+        described_class.new(hosts)
+      end
+
+      it 'returns the host names of all hosts' do
+        hosts = [
+          ['localhost', nil],
+          ['localhost', nil]
+        ]
+
+        expect(host_list.host_names_and_ports).to eq(hosts)
+      end
     end
   end
 
