@@ -9627,9 +9627,6 @@ msgstr ""
 msgid "Minutes"
 msgstr ""
 
-msgid "Mirror a repository"
-msgstr ""
-
 msgid "Mirror direction"
 msgstr ""
 
