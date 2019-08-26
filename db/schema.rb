@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_15_093949) do
+ActiveRecord::Schema.define(version: 2019_08_22_181528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1917,6 +1917,17 @@ ActiveRecord::Schema.define(version: 2019_08_15_093949) do
     t.text "data", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "list_user_preferences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "list_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.boolean "collapsed"
+    t.index ["list_id"], name: "index_list_user_preferences_on_list_id"
+    t.index ["user_id", "list_id"], name: "index_list_user_preferences_on_user_id_and_list_id", unique: true
+    t.index ["user_id"], name: "index_list_user_preferences_on_user_id"
   end
 
   create_table "lists", id: :serial, force: :cascade do |t|
@@ -3875,6 +3886,8 @@ ActiveRecord::Schema.define(version: 2019_08_15_093949) do
   add_foreign_key "labels", "projects", name: "fk_7de4989a69", on_delete: :cascade
   add_foreign_key "lfs_file_locks", "projects", on_delete: :cascade
   add_foreign_key "lfs_file_locks", "users", on_delete: :cascade
+  add_foreign_key "list_user_preferences", "lists", on_delete: :cascade
+  add_foreign_key "list_user_preferences", "users", on_delete: :cascade
   add_foreign_key "lists", "boards", name: "fk_0d3f677137", on_delete: :cascade
   add_foreign_key "lists", "labels", name: "fk_7a5553d60f", on_delete: :cascade
   add_foreign_key "lists", "milestones", on_delete: :cascade
