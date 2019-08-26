@@ -83,19 +83,14 @@ describe ApprovalRules::CreateService do
 
     it_behaves_like "creatable"
 
-    context 'when name matches default for security reports' do
-      it 'sets rule_type as report_approver' do
-        result = described_class.new(target, user, {
-          name: ApprovalProjectRule::DEFAULT_NAME_FOR_SECURITY_REPORT,
-          approvals_required: 1
-        }).execute
+    ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
+      context "when the rule name is `#{rule_name}`" do
+        subject { described_class.new(target, user, { name: rule_name, approvals_required: 1 }) }
+        let(:result) { subject.execute }
 
-        expect(result[:status]).to eq(:success)
-
-        rule = result[:rule]
-
-        expect(rule.approvals_required).to eq(1)
-        expect(rule.rule_type).to eq('report_approver')
+        specify { expect(result[:status]).to eq(:success) }
+        specify { expect(result[:rule].approvals_required).to eq(1) }
+        specify { expect(result[:rule].rule_type).to eq('report_approver') }
       end
     end
   end

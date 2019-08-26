@@ -22,6 +22,10 @@ module Gitlab
             @found_licenses[key] ||= ::Gitlab::Ci::Reports::LicenseManagement::License.new(license_name)
             @found_licenses[key].add_dependency(dependency_name)
           end
+
+          def violates?(software_license_policies)
+            software_license_policies.blacklisted.with_license_by_name(license_names).exists?
+          end
         end
       end
     end

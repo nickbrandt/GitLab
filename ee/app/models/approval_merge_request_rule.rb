@@ -47,7 +47,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
   }
 
   enum report_type: {
-    security: 1
+    security: 1,
+    license_management: 2
   }
 
   # Deprecated scope until code_owner column has been migrated to rule_type
