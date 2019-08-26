@@ -93,6 +93,10 @@ existing merge train to be reconstructed, specifically, it regenerates expected
 merge commits and pipelines. This means, merging immediately essentially wastes
 CI resources.
 
+## Cancelation of redundant pipelines
+
+When user merges a merge request immediately with on-going merge train, the train will be reconstructed for the new expected post-merge commit. In this case, the merge train would already have pipelines running on the old expected post-merge commit. These pipelines are redundant and will be canceled immediately.
+
 ## Troubleshooting
 
 ### Merge request dropped from the merge train immediately
