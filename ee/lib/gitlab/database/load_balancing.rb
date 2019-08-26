@@ -63,6 +63,7 @@ module Gitlab
           nameserver: conf['nameserver'] || 'localhost',
           port: conf['port'] || 8600,
           record: conf['record'],
+          record_type: conf['record_type'] || 'A',
           interval: conf['interval'] || 60,
           disconnect_timeout: conf['disconnect_timeout'] || 120,
           use_tcp: conf['use_tcp'] || false

@@ -16,6 +16,26 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
       .and_return(packet)
   end
 
+  describe '#initialize' do
+    describe ':record_type' do
+      subject { described_class.new(nameserver: 'localhost', port: 8600, record: 'foo', record_type: record_type) }
+
+      context 'with a supported type' do
+        let(:record_type) { 'SRV' }
+
+        it { expect(subject.record_type).to eq Net::DNS::SRV }
+      end
+
+      context 'with an unsupported type' do
+        let(:record_type) { 'AAAA' }
+
+        it 'raises an argument error' do
+          expect { subject }.to raise_error(ArgumentError, 'Unsupported record type: AAAA')
+        end
+      end
+    end
+  end
+
   describe '#start' do
     before do
       allow(service)
@@ -63,6 +83,9 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
   end
 
   describe '#refresh_if_necessary' do
+    let(:address_foo) { described_class::Address.new('foo') }
+    let(:address_bar) { described_class::Address.new('bar') }
+
     context 'when a refresh is necessary' do
       before do
         allow(service)
@@ -71,13 +94,13 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
 
         allow(service)
           .to receive(:addresses_from_dns)
-          .and_return([10, %w[foo bar]])
+          .and_return([10, [address_foo, address_bar]])
       end
 
       it 'refreshes the load balancer hosts' do
         expect(service)
           .to receive(:replace_hosts)
-          .with(%w[foo bar])
+          .with([address_foo, address_bar])
 
         expect(service.refresh_if_necessary).to eq(10)
       end
@@ -104,8 +127,11 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
   end
 
   describe '#replace_hosts' do
+    let(:address_foo) { described_class::Address.new('foo') }
+    let(:address_bar) { described_class::Address.new('bar') }
+
     let(:load_balancer) do
-      Gitlab::Database::LoadBalancing::LoadBalancer.new(%w[foo])
+      Gitlab::Database::LoadBalancing::LoadBalancer.new([address_foo])
     end
 
     before do
@@ -115,9 +141,9 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
     end
 
     it 'replaces the hosts of the load balancer' do
-      service.replace_hosts(%w[bar])
+      service.replace_hosts([address_bar])
 
-      expect(load_balancer.host_list.host_names).to eq(%w[bar])
+      expect(load_balancer.host_list.host_names_and_ports).to eq([['bar', nil]])
     end
 
     it 'disconnects the old connections' do
@@ -131,23 +157,51 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
         .to receive(:disconnect!)
         .with(2)
 
-      service.replace_hosts(%w[bar])
+      service.replace_hosts([address_bar])
     end
   end
 
   describe '#addresses_from_dns' do
-    it 'returns a TTL and ordered list of IP addresses' do
-      res1 = double(:resource, address: '255.255.255.0', ttl: 90)
-      res2 = double(:resource, address: '127.0.0.1', ttl: 90)
-      packet = double(:packet, answer: [res1, res2])
+    let(:service) { described_class.new(nameserver: 'localhost', port: 8600, record: 'foo', record_type: record_type) }
+    let(:packet) { double(:packet, answer: [res1, res2]) }
 
+    before do
       allow(service.resolver)
         .to receive(:search)
-        .with('foo', Net::DNS::A)
+        .with('foo', described_class::RECORD_TYPES[record_type])
         .and_return(packet)
+    end
 
-      expect(service.addresses_from_dns)
-        .to eq([90, %w[127.0.0.1 255.255.255.0]])
+    context 'with an A record' do
+      let(:record_type) { 'A' }
+
+      let(:res1) { double(:resource, address: '255.255.255.0', ttl: 90) }
+      let(:res2) { double(:resource, address: '127.0.0.1', ttl: 90) }
+
+      it 'returns a TTL and ordered list of IP addresses' do
+        addresses = [
+          described_class::Address.new('127.0.0.1'),
+          described_class::Address.new('255.255.255.0')
+        ]
+
+        expect(service.addresses_from_dns).to eq([90, addresses])
+      end
+    end
+
+    context 'with an SRV record' do
+      let(:record_type) { 'SRV' }
+
+      let(:res1) { double(:resource, host: '255.255.255.0', port: 5432, weight: 1, priority: 1, ttl: 90) }
+      let(:res2) { double(:resource, host: '127.0.0.1', port: 5433, weight: 1, priority: 1, ttl: 90) }
+
+      it 'returns a TTL and ordered list of hosts' do
+        addresses = [
+          described_class::Address.new('127.0.0.1', 5433),
+          described_class::Address.new('255.255.255.0', 5432)
+        ]
+
+        expect(service.addresses_from_dns).to eq([90, addresses])
+      end
     end
   end
 
@@ -177,7 +231,12 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
         .to receive(:load_balancer)
         .and_return(load_balancer)
 
-      expect(service.addresses_from_load_balancer).to eq(%w[a b])
+      addresses = [
+        described_class::Address.new('a'),
+        described_class::Address.new('b')
+      ]
+
+      expect(service.addresses_from_load_balancer).to eq(addresses)
     end
   end
 end
