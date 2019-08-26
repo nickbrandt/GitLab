@@ -8,7 +8,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   before_action :check_draft_notes_available!, except: [:index]
   before_action :authorize_create_draft!, only: [:create]
   before_action :authorize_admin_draft!, only: [:update, :destroy]
-  before_action :authorize_admin_draft!, only: [:publish], if: -> { params[:id].present? }
+  before_action :authorize_admin_draft!, if: -> { action_name == 'publish' && params[:id].present? }
 
   def index
     drafts = prepare_notes_for_rendering(draft_notes)
