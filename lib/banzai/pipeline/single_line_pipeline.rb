@@ -9,6 +9,7 @@ module Banzai
         @filters ||= FilterArray[
           Filter::HtmlEntityFilter,
           Filter::SanitizationFilter,
+          Filter::AssetProxyFilter,
 
           Filter::EmojiFilter,
           Filter::AutolinkFilter,
@@ -31,6 +32,8 @@ module Banzai
       end
 
       def self.transform_context(context)
+        context = Filter::AssetProxyFilter.transform_context(context)
+
         super(context).merge(
           no_sourcepos: true
         )
