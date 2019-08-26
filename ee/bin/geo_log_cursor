@@ -41,12 +41,6 @@ class GeoLogCursorOptionParser
   end
 end
 
-module StdoutLogger
-  def full_log_path
-    STDOUT
-  end
-end
-
 if $0 == __FILE__
   options = GeoLogCursorOptionParser.parse(ARGV)
 
@@ -57,7 +51,7 @@ if $0 == __FILE__
     # Monkey patch the logging class because multiple places use it (that
     # contain mostly class methods) and is not possible to pass
     # options[:stdout_logging] around without a refactor.
-    Gitlab::Geo::Logger.extend(StdoutLogger)
+    Gitlab::Geo::Logger.extend(Gitlab::Geo::Logger::StdoutLogger)
   end
 
   Gitlab::Geo::LogCursor::Daemon.new(options).run!
