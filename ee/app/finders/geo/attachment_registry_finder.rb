@@ -2,6 +2,8 @@
 
 module Geo
   class AttachmentRegistryFinder < FileRegistryFinder
+    # Counts all existing registries independent
+    # of any change on filters / selective sync
     def count_registry
       Geo::FileRegistry.attachments.count
     end
@@ -11,27 +13,25 @@ module Geo
     end
 
     def count_synced
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.synced).count
+      registries_for_attachments.merge(Geo::FileRegistry.synced).count
     end
 
     def count_failed
-      registries_for_attachments.syncable.merge(Geo::FileRegistry.failed).count
+      registries_for_attachments.merge(Geo::FileRegistry.failed).count
     end
 
     def count_synced_missing_on_primary
       registries_for_attachments
-        .syncable
         .merge(Geo::FileRegistry.synced)
         .merge(Geo::FileRegistry.missing_on_primary)
         .count
     end
 
     def syncable
-      if selective_sync?
-        attachments.syncable
-      else
-        Upload.syncable
-      end
+      return attachments if selective_sync?
+      return Upload.with_files_stored_locally if local_storage_only?
+
+      Upload
     end
 
     # Find limited amount of non replicated attachments.
@@ -48,7 +48,6 @@ module Geo
     def find_unsynced(batch_size:, except_file_ids: [])
       attachments
         .missing_file_registry
-        .syncable
         .id_not_in(except_file_ids)
         .limit(batch_size)
     end
@@ -56,7 +55,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      attachments
+      all_attachments
         .inner_join_file_registry
         .with_files_stored_remotely
         .merge(Geo::FileRegistry.attachments)
@@ -91,6 +90,10 @@ module Geo
     private
 
     def attachments
+      local_storage_only? ? all_attachments.with_files_stored_locally : all_attachments
+    end
+
+    def all_attachments
       current_node.attachments
     end
 

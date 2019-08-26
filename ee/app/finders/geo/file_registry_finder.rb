@@ -77,5 +77,9 @@ module Geo
     def find_retryable_synced_missing_on_primary_registries
       raise NotImplementedError
     end
+
+    def local_storage_only?
+      !current_node&.sync_object_storage
+    end
   end
 end

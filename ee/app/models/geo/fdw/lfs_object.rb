@@ -14,12 +14,10 @@ module Geo
       has_many :projects, class_name: 'Geo::Fdw::Project', through: :lfs_objects_projects
 
       scope :project_id_in, ->(ids) { joins(:projects).merge(Geo::Fdw::Project.id_in(ids)) }
-      scope :syncable, -> { with_files_stored_locally }
 
       class << self
         def failed
           inner_join_file_registry
-            .syncable
             .merge(Geo::FileRegistry.failed)
         end
 
@@ -45,7 +43,6 @@ module Geo
 
         def synced
           inner_join_file_registry
-            .syncable
             .merge(Geo::FileRegistry.synced)
         end
 

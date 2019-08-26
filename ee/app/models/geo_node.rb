@@ -381,15 +381,7 @@ class GeoNode < ApplicationRecord
     Project
   end
 
-  def projects_table
-    Project.arel_table
-  end
-
   def uploads_model
     Upload
-  end
-
-  def uploads_table
-    Upload.arel_table
   end
 end

@@ -16,5 +16,9 @@ FactoryBot.define do
       minimum_reverification_interval 7
       sync_object_storage false
     end
+
+    trait :local_storage_only do
+      sync_object_storage false
+    end
   end
 end

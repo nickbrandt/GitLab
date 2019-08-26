@@ -2,6 +2,8 @@
 
 module Geo
   class JobArtifactRegistryFinder < FileRegistryFinder
+    # Counts all existing registries independent
+    # of any change on filters / selective sync
     def count_registry
       Geo::JobArtifactRegistry.count
     end
@@ -23,11 +25,10 @@ module Geo
     end
 
     def syncable
-      if selective_sync?
-        job_artifacts.syncable
-      else
-        Ci::JobArtifact.syncable
-      end
+      return job_artifacts.not_expired if selective_sync?
+      return Ci::JobArtifact.not_expired.with_files_stored_locally if local_storage_only?
+
+      Ci::JobArtifact.not_expired
     end
 
     # Find limited amount of non replicated job artifacts.
@@ -43,7 +44,7 @@ module Geo
     # rubocop: disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_artifact_ids: [])
       job_artifacts
-        .syncable
+        .not_expired
         .missing_job_artifact_registry
         .id_not_in(except_artifact_ids)
         .limit(batch_size)
@@ -52,7 +53,7 @@ module Geo
 
     # rubocop: disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_artifact_ids: [])
-      job_artifacts
+      all_job_artifacts
         .inner_join_job_artifact_registry
         .with_files_stored_remotely
         .id_not_in(except_artifact_ids)
@@ -84,13 +85,17 @@ module Geo
     private
 
     def job_artifacts
+      local_storage_only? ? all_job_artifacts.with_files_stored_locally : all_job_artifacts
+    end
+
+    def all_job_artifacts
       current_node.job_artifacts
     end
 
     def registries_for_job_artifacts
       job_artifacts
         .inner_join_job_artifact_registry
-        .syncable
+        .not_expired
     end
   end
 end

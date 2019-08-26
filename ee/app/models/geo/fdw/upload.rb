@@ -11,7 +11,7 @@ module Geo
       self.primary_key = :id
       self.table_name = Gitlab::Geo::Fdw.foreign_table_name('uploads')
 
-      scope :syncable, -> { with_files_stored_locally }
+      has_one :registry, class_name: 'Geo::FileRegistry', foreign_key: :file_id
 
       class << self
         def for_model(model)
@@ -21,12 +21,7 @@ module Geo
         end
 
         def inner_join_file_registry
-          join_statement =
-            arel_table
-              .join(file_registry_table, Arel::Nodes::InnerJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]))
-
-          joins(join_statement.join_sources)
+          joins(:registry)
         end
 
         def missing_file_registry

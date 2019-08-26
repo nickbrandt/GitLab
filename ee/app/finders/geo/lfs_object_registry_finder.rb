@@ -2,6 +2,8 @@
 
 module Geo
   class LfsObjectRegistryFinder < FileRegistryFinder
+    # Counts all existing registries independent
+    # of any change on filters / selective sync
     def count_registry
       Geo::FileRegistry.lfs_objects.count
     end
@@ -23,11 +25,10 @@ module Geo
     end
 
     def syncable
-      if selective_sync?
-        current_node.lfs_objects.syncable
-      else
-        LfsObject.syncable
-      end
+      return lfs_objects if selective_sync?
+      return LfsObject.with_files_stored_locally if local_storage_only?
+
+      LfsObject
     end
 
     # Find limited amount of non replicated lfs objects.
@@ -39,9 +40,7 @@ module Geo
     # @param [Array<Integer>] except_file_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_unsynced(batch_size:, except_file_ids: [])
-      current_node
-        .lfs_objects
-        .syncable
+      lfs_objects
         .missing_file_registry
         .id_not_in(except_file_ids)
         .limit(batch_size)
@@ -50,7 +49,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_migrated_local(batch_size:, except_file_ids: [])
-      lfs_objects
+      all_lfs_objects
         .inner_join_file_registry
         .with_files_stored_remotely
         .id_not_in(except_file_ids)
@@ -82,6 +81,10 @@ module Geo
     private
 
     def lfs_objects
+      local_storage_only? ? all_lfs_objects.with_files_stored_locally : all_lfs_objects
+    end
+
+    def all_lfs_objects
       current_node.lfs_objects
     end
 

@@ -147,18 +147,10 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
 
   context 'with LFS objects' do
     let!(:lfs_object_local_store) { create(:lfs_object, :with_file) }
-    let!(:lfs_object_remote_store) { create(:lfs_object, :with_file) }
+    let!(:lfs_object_remote_store) { create(:lfs_object, :with_file, :object_storage) }
 
     before do
       stub_lfs_object_storage
-      lfs_object_remote_store.file.migrate!(LfsObjectUploader::Store::REMOTE)
-    end
-
-    it 'filters S3-backed files' do
-      expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
-      expect(Geo::FileDownloadWorker).not_to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
-
-      subject.perform
     end
 
     context 'with files missing on the primary that are marked as synced' do
@@ -171,6 +163,7 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
       it 'retries the files if there is spare capacity' do
         expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
         expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_file_missing_on_primary.id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
 
         subject.perform
       end
@@ -178,7 +171,7 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
       it 'does not retry those files if there is no spare capacity' do
         expect(subject).to receive(:db_retrieve_batch_size).and_return(1).twice
 
-        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).once
 
         subject.perform
       end
@@ -186,7 +179,9 @@ describe Geo::FileDownloadDispatchWorker, :geo, :geo_fdw do
       it 'does not retry those files if they are already scheduled' do
         scheduled_jobs = [{ type: 'lfs', id: lfs_object_file_missing_on_primary.id, job_id: 'foo' }]
         expect(subject).to receive(:scheduled_jobs).and_return(scheduled_jobs).at_least(1)
+
         expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_local_store.id)
+        expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_remote_store.id)
 
         subject.perform
       end
