@@ -33,13 +33,12 @@ describe Gitlab::Geo::Replication::FileTransfer do
       stub_current_geo_node(secondary_node)
     end
 
-    context 'when the destination filename is a directory' do
-      it 'returns a failed result' do
-        expect(upload).to receive(:absolute_path).and_return('/tmp')
-
+    context 'when pre-conditions are not satisfied' do
+      it 'returns a skipped result' do
+        allow(subject).to receive(:can_transfer?) { false }
         result = subject.download_from_primary
 
-        expect_result(result, success: false, bytes_downloaded: 0, primary_missing_file: false)
+        expect_result(result, success: false, skipped: true, bytes_downloaded: 0, primary_missing_file: false)
       end
     end
 
@@ -110,7 +109,8 @@ describe Gitlab::Geo::Replication::FileTransfer do
 
         allow(FileUtils).to receive(:mkdir_p) { raise Errno::EEXIST }
 
-        expect(subject).to receive(:log_error).with("unable to create directory /foo: File exists")
+        expect(subject).to receive(:log_error).with("Unable to create directory /foo: File exists").once
+        expect(subject).to receive(:log_error).with("Skipping transfer as we cannot create the destination directory").once
         result = subject.download_from_primary
 
         expect(result.success).to eq(false)
@@ -144,7 +144,7 @@ describe Gitlab::Geo::Replication::FileTransfer do
     end
   end
 
-  def expect_result(result, success:, bytes_downloaded:, primary_missing_file:)
+  def expect_result(result, success:, bytes_downloaded:, primary_missing_file:, skipped: false)
     expect(result.success).to eq(success)
     expect(result.bytes_downloaded).to eq(bytes_downloaded)
     expect(result.primary_missing_file).to eq(primary_missing_file)

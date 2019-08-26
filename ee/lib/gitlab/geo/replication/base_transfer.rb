@@ -10,7 +10,7 @@ module Gitlab
 
         TEMP_PREFIX = 'tmp_'.freeze
 
-        def initialize(file_type, file_id, filename, expected_checksum, request_data)
+        def initialize(file_type:, file_id:, expected_checksum:, filename:, request_data:)
           @file_type = file_type
           @file_id = file_id
           @filename = filename
@@ -18,40 +18,72 @@ module Gitlab
           @request_data = request_data
         end
 
+        # Return whether the transfer will be attempted or not
+        #
+        # @return [Boolean] whether preconditions for a transfer are fulfilled
+        def can_transfer?
+          unless Gitlab::Geo.secondary?
+            log_error('Skipping transfer as this is not a Secondary node')
+
+            return false
+          end
+
+          unless Gitlab::Geo.primary_node
+            log_error 'Skipping transfer as there is no Primary node to download from'
+
+            return false
+          end
+
+          if File.directory?(filename)
+            log_error 'Skipping transfer as destination exist and is a directory', filename: filename
+
+            return false
+          end
+
+          true
+        end
+
         # Returns Result object with success boolean and number of bytes downloaded.
         def download_from_primary
-          return failure unless Gitlab::Geo.secondary?
-          return failure if File.directory?(filename)
+          return skipped_result unless can_transfer?
 
-          primary = Gitlab::Geo.primary_node
+          unless ensure_destination_path_exists
+            log_error 'Skipping transfer as we cannot create the destination directory'
 
-          return failure unless primary
+            return skipped_result
+          end
 
-          url = primary.geo_transfers_url(file_type, file_id.to_s)
+          url = Gitlab::Geo.primary_node.geo_transfers_url(file_type, file_id.to_s)
           req_headers = TransferRequest.new(request_data).headers
-
-          return failure unless ensure_path_exists
 
           download_file(url, req_headers)
         end
 
         class Result
-          attr_reader :success, :bytes_downloaded, :primary_missing_file
+          attr_reader :success, :bytes_downloaded, :primary_missing_file, :skipped
 
-          def initialize(success:, bytes_downloaded:, primary_missing_file: false)
+          def initialize(success:, bytes_downloaded:, primary_missing_file: false, skipped: false)
             @success = success
             @bytes_downloaded = bytes_downloaded
             @primary_missing_file = primary_missing_file
+            @skipped = skipped
           end
         end
 
         private
 
-        def failure(bytes_downloaded: 0, primary_missing_file: false)
+        def skipped_result
+          Result.new(success: false, bytes_downloaded: 0, skipped: true)
+        end
+
+        def failure_result(bytes_downloaded: 0, primary_missing_file: false)
           Result.new(success: false, bytes_downloaded: bytes_downloaded, primary_missing_file: primary_missing_file)
         end
 
-        def ensure_path_exists
+        # Ensure entire destination path exist or try to create when not available
+        #
+        # @return [Boolean] whether destination path exists or could be created
+        def ensure_destination_path_exists
           path = Pathname.new(filename)
           dir = path.dirname
 
@@ -60,7 +92,8 @@ module Gitlab
           begin
             FileUtils.mkdir_p(dir)
           rescue => e
-            log_error("unable to create directory #{dir}: #{e}")
+            log_error("Unable to create directory #{dir}: #{e}")
+
             return false
           end
 
@@ -69,11 +102,13 @@ module Gitlab
 
         # Use Gitlab::HTTP for now but switch to curb if performance becomes
         # an issue
+        #
+        # @return [Result] Object with transfer status and information
         def download_file(url, req_headers)
           file_size = -1
           temp_file = open_temp_file(filename)
 
-          return failure unless temp_file
+          return failure_result unless temp_file
 
           begin
             response = Gitlab::HTTP.get(url, allow_local_requests: true, headers: req_headers, stream_body: true) do |fragment|
@@ -84,19 +119,22 @@ module Gitlab
 
             unless response.success?
               log_error("Unsuccessful download", filename: filename, response_code: response.code, response_msg: response.try(:msg), url: url)
-              return failure(primary_missing_file: primary_missing_file?(response, temp_file))
+
+              return failure_result(primary_missing_file: primary_missing_file?(response, temp_file))
             end
 
             if File.directory?(filename)
               log_error("Destination file is a directory", filename: filename)
-              return failure
+
+              return failure_result
             end
 
             file_size = File.stat(temp_file.path).size
 
             if checksum_mismatch?(temp_file.path)
               log_error("Downloaded file checksum mismatch", expected_checksum: expected_checksum, actual_checksum: @actual_checksum, file_size_bytes: file_size)
-              return failure(bytes_downloaded: file_size)
+
+              return failure_result(bytes_downloaded: file_size)
             end
 
             FileUtils.mv(temp_file.path, filename)

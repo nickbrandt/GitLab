@@ -10,11 +10,11 @@ module Gitlab
       class JobArtifactTransfer < BaseTransfer
         def initialize(job_artifact)
           super(
-            :job_artifact,
-            job_artifact.id,
-            job_artifact.file.path,
-            job_artifact.file_sha256,
-            job_artifact_request_data(job_artifact)
+            file_type: :job_artifact,
+            file_id: job_artifact.id,
+            filename: job_artifact.file.path,
+            expected_checksum: job_artifact.file_sha256,
+            request_data: job_artifact_request_data(job_artifact)
           )
         end
 

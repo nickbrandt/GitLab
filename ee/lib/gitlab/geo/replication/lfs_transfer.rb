@@ -10,11 +10,11 @@ module Gitlab
       class LfsTransfer < BaseTransfer
         def initialize(lfs_object)
           super(
-            :lfs,
-            lfs_object.id,
-            lfs_object.file.path,
-            lfs_object.oid,
-            lfs_request_data(lfs_object)
+            file_type: :lfs,
+            file_id: lfs_object.id,
+            filename: lfs_object.file.path,
+            expected_checksum: lfs_object.oid,
+            request_data: lfs_request_data(lfs_object)
           )
         end
 

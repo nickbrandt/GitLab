@@ -90,7 +90,8 @@ describe Gitlab::Geo::Replication::LfsTransfer do
 
         allow(FileUtils).to receive(:mkdir_p) { raise Errno::EEXIST }
 
-        expect(subject).to receive(:log_error).with("unable to create directory /foo: File exists")
+        expect(subject).to receive(:log_error).with("Unable to create directory /foo: File exists").once
+        expect(subject).to receive(:log_error).with("Skipping transfer as we cannot create the destination directory").once
         result = subject.download_from_primary
 
         expect(result.success).to eq(false)
