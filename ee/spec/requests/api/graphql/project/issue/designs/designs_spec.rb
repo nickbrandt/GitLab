@@ -204,5 +204,46 @@ describe "Getting designs related to an issue" do
         end
       end
     end
+
+    describe 'a design with note annotations' do
+      let!(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
+
+      let(:design_query) do
+        <<~NODE
+        designs {
+          edges {
+            node {
+              notesCount
+              notes {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+        NODE
+      end
+
+      let(:design_response) do
+        design_collection["designs"]["edges"].first["node"]
+      end
+
+      before do
+        post_graphql(query, current_user: current_user)
+      end
+
+      it 'returns the notes for the design' do
+        expect(design_response.dig("notes", "edges")).to eq(
+          ["node" => { "id" => note.to_global_id.to_s }]
+        )
+      end
+
+      it 'returns a note_count for the design' do
+        expect(design_response["notesCount"]).to eq(1)
+      end
+    end
   end
 end

@@ -12,6 +12,9 @@ module EE
       belongs_to :review, inverse_of: :notes
 
       scope :searchable, -> { where(system: false).includes(:noteable) }
+
+      after_commit :notify_after_create, on: :create
+      after_commit :notify_after_destroy, on: :destroy
     end
 
     # Original method in Elastic::ApplicationSearch
@@ -54,6 +57,14 @@ module EE
     override :parent
     def parent
       for_epic? ? noteable.group : super
+    end
+
+    def notify_after_create
+      noteable&.after_note_created(self)
+    end
+
+    def notify_after_destroy
+      noteable&.after_note_destroyed(self)
     end
 
     private

@@ -285,4 +285,49 @@ describe DesignManagement::Design do
       )
     end
   end
+
+  describe '#user_notes_count', :use_clean_rails_memory_store_caching do
+    set(:design) { create(:design, :with_file) }
+
+    subject { design.user_notes_count }
+
+    # Note: Cache invalidation tests are in `design_user_notes_count_service_spec.rb`
+
+    it 'returns a count of user-generated notes' do
+      create(:diff_note_on_design, noteable: design, project: design.project)
+
+      is_expected.to eq(1)
+    end
+
+    it 'does not count notes on other designs' do
+      second_design = create(:design, :with_file)
+      create(:diff_note_on_design, noteable: second_design, project: second_design.project)
+
+      is_expected.to eq(0)
+    end
+
+    it 'does not count system notes' do
+      create(:diff_note_on_design, system: true, noteable: design, project: design.project)
+
+      is_expected.to eq(0)
+    end
+  end
+
+  describe '#after_note_changed' do
+    subject { build(:design) }
+
+    it 'calls #delete_cache on DesignUserNotesCountService' do
+      expect_next_instance_of(DesignManagement::DesignUserNotesCountService) do |service|
+        expect(service).to receive(:delete_cache)
+      end
+
+      subject.after_note_changed(build(:note))
+    end
+
+    it 'does not call #delete_cache on DesignUserNotesCountService when passed a system note' do
+      expect(DesignManagement::DesignUserNotesCountService).not_to receive(:new)
+
+      subject.after_note_changed(build(:note, :system))
+    end
+  end
 end

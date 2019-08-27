@@ -9,16 +9,17 @@ describe GitlabSchema.types['Design'] do
 
   it 'exposes the expected fields' do
     expected_fields = %i[
-      id
-      project
-      issue
-      filename
-      image
-      versions
-      discussions
-      notes
       diff_refs
+      discussions
+      filename
       full_path
+      id
+      image
+      issue
+      notes
+      notes_count
+      project
+      versions
     ]
 
     is_expected.to have_graphql_fields(*expected_fields)
