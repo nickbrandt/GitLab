@@ -3,24 +3,6 @@
 module EE
   module API
     module Entities
-      #######################
-      # Entities extensions #
-      #######################
-      module Entities
-        extend ActiveSupport::Concern
-
-        class_methods do
-          def prepend_entity(klass, with: nil)
-            if with.nil?
-              raise ArgumentError, 'You need to pass either the :with or :namespace option!'
-            end
-
-            klass.descendants.each { |descendant| descendant.prepend(with) }
-            klass.prepend(with)
-          end
-        end
-      end
-
       module EntityHelpers
         def can_read(attr, &block)
           ->(obj, opts) { Ability.allowed?(opts[:user], "read_#{attr}".to_sym, yield(obj)) }
