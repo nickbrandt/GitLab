@@ -14,6 +14,11 @@ module Types
       field :id, GraphQL::ID_TYPE, null: false
       field :project, Types::ProjectType, null: false
       field :issue, Types::IssueType, null: false
+      field :notes_count,
+            GraphQL::INT_TYPE,
+            null: false,
+            method: :user_notes_count,
+            description: 'The total count of user-created notes for this design'
       field :filename, GraphQL::STRING_TYPE, null: false
       field :full_path, GraphQL::STRING_TYPE, null: false
       field :image, GraphQL::STRING_TYPE, null: false, extras: [:parent]

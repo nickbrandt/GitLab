@@ -28,5 +28,13 @@ module EE
         super
       end
     end
+
+    def after_note_created(_note)
+      # no-op
+    end
+
+    def after_note_destroyed(_note)
+      # no-op
+    end
   end
 end
