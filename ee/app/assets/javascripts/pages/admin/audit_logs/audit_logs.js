@@ -15,7 +15,7 @@ class AuditLogs {
     groupsSelect();
     new UsersSelect();
 
-    this.initFilterDropdown($('.js-type-filter'), 'event_type', null, () => {
+    this.initFilterDropdown($('.js-type-filter'), 'entity_type', null, () => {
       $('.hidden-filter-value').val('');
       $('form.filter-form').submit();
     });

@@ -11,6 +11,7 @@ module EE
         mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 
+        mount ::API::AuditEvents
         mount ::API::ProjectApprovalRules
         mount ::API::ProjectApprovalSettings
         mount ::API::Unleash
