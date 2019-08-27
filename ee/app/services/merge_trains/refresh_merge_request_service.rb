@@ -65,12 +65,6 @@ module MergeTrains
       pipeline_absent? || require_recreate? || stale_pipeline?
     end
 
-    def cancel_pipeline_if_exist
-      return unless pipeline_for_merge_train
-
-      pipeline_for_merge_train.cancel_running
-    end
-
     def create_pipeline!
       result = MergeTrains::CreatePipelineService.new(merge_request.project, merge_user)
         .execute(merge_request, previous_ref)
