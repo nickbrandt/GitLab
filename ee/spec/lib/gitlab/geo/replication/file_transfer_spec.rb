@@ -66,7 +66,7 @@ describe Gitlab::Geo::Replication::FileTransfer do
           expect(FileUtils).not_to receive(:mv).with(anything, upload.absolute_path).and_call_original
           response = double(:response, success?: false, code: 404, msg: "No such file")
 
-          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE}\"}")
+          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE}\"}")
           expect(Gitlab::HTTP).to receive(:get).and_return(response)
 
           result = subject.download_from_primary

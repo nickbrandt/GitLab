@@ -178,7 +178,7 @@ describe API::Geo do
             get api("/geo/transfers/file/#{upload.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(404)
-            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE)
+            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
       end
@@ -229,7 +229,7 @@ describe API::Geo do
             get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(404)
-            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE)
+            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
       end

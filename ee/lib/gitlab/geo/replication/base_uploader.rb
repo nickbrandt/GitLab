@@ -6,8 +6,6 @@ module Gitlab
       class BaseUploader
         include LogHelpers
 
-        FILE_NOT_FOUND_GEO_CODE = 'FILE_NOT_FOUND'.freeze
-
         attr_reader :object_db_id, :message
 
         def initialize(object_db_id, message)
@@ -31,7 +29,7 @@ module Gitlab
         def file_not_found(resource)
           {
             code: :not_found,
-            geo_code: FILE_NOT_FOUND_GEO_CODE,
+            geo_code: Replication::FILE_NOT_FOUND_GEO_CODE,
             message: "#{resource.class.name} ##{resource.id} file not found"
           }
         end

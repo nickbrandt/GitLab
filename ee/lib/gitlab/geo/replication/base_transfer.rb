@@ -127,7 +127,7 @@ module Gitlab
         end
 
         def code_file_not_found?(geo_code)
-          geo_code == Gitlab::Geo::Replication::FileUploader::FILE_NOT_FOUND_GEO_CODE
+          geo_code == Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE
         end
 
         def default_permissions
