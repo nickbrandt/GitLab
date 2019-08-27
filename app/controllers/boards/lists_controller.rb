@@ -60,8 +60,12 @@ module Boards
 
     private
 
+    def list_creation_attrs
+      %i[label_id]
+    end
+
     def create_list_params
-      params.require(:list).permit(:label_id)
+      params.require(:list).permit(list_creation_attrs)
     end
 
     def update_list_params
