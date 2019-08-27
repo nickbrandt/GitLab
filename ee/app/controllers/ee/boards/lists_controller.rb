@@ -5,8 +5,8 @@ module EE
     module ListsController
       extend ::Gitlab::Utils::Override
 
-      override :list_creation_attrs
-      def list_creation_attrs
+      override :create_list_params
+      def create_list_params
         super + %i[assignee_id milestone_id]
       end
 

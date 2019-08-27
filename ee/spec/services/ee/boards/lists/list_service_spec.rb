@@ -50,20 +50,22 @@ describe Boards::Lists::ListService do
     end
 
     context 'when board parent is a project' do
+      let(:user) { create(:user) }
       let(:project) { create(:project) }
       let(:board) { create(:board, project: project) }
       let(:label) { create(:label, project: project) }
-      let(:service) { described_class.new(project, double) }
+      let(:service) { described_class.new(project, user) }
 
       it_behaves_like 'list service for board with assignee lists'
       it_behaves_like 'list service for board with milestone lists'
     end
 
     context 'when board parent is a group' do
+      let(:user) { create(:user) }
       let(:group) { create(:group) }
       let(:board) { create(:board, group: group) }
       let(:label) { create(:group_label, group: group) }
-      let(:service) { described_class.new(group, double) }
+      let(:service) { described_class.new(group, user) }
 
       it_behaves_like 'list service for board with assignee lists'
       it_behaves_like 'list service for board with milestone lists'
