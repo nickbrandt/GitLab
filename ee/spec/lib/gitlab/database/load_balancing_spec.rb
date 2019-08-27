@@ -1,14 +1,6 @@
 require 'spec_helper'
 
 describe Gitlab::Database::LoadBalancing do
-  describe '.log' do
-    it 'logs a message' do
-      expect(Rails.logger).to receive(:info).with('boop')
-
-      described_class.log(:info, 'boop')
-    end
-  end
-
   describe '.configuration' do
     it 'returns a Hash' do
       config = { 'hosts' => %w(foo) }

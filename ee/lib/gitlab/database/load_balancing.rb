@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable GitlabSecurity/PublicSend
-
 module Gitlab
   module Database
     module LoadBalancing
       # The connection proxy to use for load balancing (if enabled).
       cattr_accessor :proxy
-
-      LOG_TAG = 'DB-LB'.freeze
 
       # The exceptions raised for connection errors.
       CONNECTION_ERRORS = if defined?(PG)
@@ -69,14 +65,6 @@ module Gitlab
           use_tcp: conf['use_tcp'] || false
         }
       end
-
-      # rubocop:disable Gitlab/RailsLogger
-      def self.log(level, message)
-        Rails.logger.tagged(LOG_TAG) do
-          Rails.logger.send(level, message)
-        end
-      end
-      # rubocop:enable Gitlab/RailsLogger
 
       def self.pool_size
         ActiveRecord::Base.configurations[Rails.env]['pool']
