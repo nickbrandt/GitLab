@@ -354,14 +354,14 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
           parent_group.add_reporter(user)
         end
 
-        it "adds member with the ldap group link's acces level" do
+        it "adds member with the ldap group link's access level" do
           sync_group.update_permissions
 
           expect(group.members.find_by(user_id: user.id).access_level)
             .to eq(::Gitlab::Access::DEVELOPER)
         end
 
-        it "downgrades existing member access to the ldap group link's acces level" do
+        it "downgrades existing member access to the ldap group link's access level" do
           group.add_user(user, Gitlab::Access::MAINTAINER)
 
           sync_group.update_permissions

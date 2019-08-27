@@ -109,7 +109,7 @@ module EE
               # Users in this LDAP group may already have a higher access level in a parent group.
               # Currently demoting a user in a subgroup is forbidden by (Group)Member validation
               # so we must propagate any higher inherited permissions unconditionally.
-              propagate_inherited_access_levels(group, access_levels)
+              inherit_higher_access_levels(group, access_levels)
 
               logger.debug do
                 <<-MSG.strip_heredoc.tr("\n", ' ')
@@ -150,9 +150,9 @@ module EE
             end
 
             # for all LDAP Distinguished Names in access_levels, merge access level
-            # with any permission inherited from a parent group
+            # with any higher permission inherited from a parent group
             # rubocop: disable CodeReuse/ActiveRecord
-            def propagate_inherited_access_levels(group, access_levels)
+            def inherit_higher_access_levels(group, access_levels)
               return unless group.parent
 
               # for any permission granted by an ancestor group to any DN in access_levels,
@@ -161,8 +161,7 @@ module EE
               permissions_in_ancestry = ::GroupMember.of_groups(group.ancestors)
                 .non_request
                 .with_identity_provider(provider)
-                .where(identities: { extern_uid: access_levels.keys })
-                .joins(user: :identities)
+                .where(users: { identities: Identity.iwhere(extern_uid: access_levels.keys) })
                 .select(:id, 'identities.extern_uid AS distinguished_name', :access_level, :source_id)
                 .references(:identities)
 
@@ -303,7 +302,7 @@ module EE
             # returns a hash of normalized DN -> user for the current LDAP provider
             # rubocop: disable CodeReuse/ActiveRecord
             def resolve_users_from_normalized_dn(for_normalized_dns:)
-              ::Identity.with_provider(provider).where(extern_uid: for_normalized_dns)
+              ::Identity.with_provider(provider).iwhere(extern_uid: for_normalized_dns)
                 .preload(:user)
                 .map {|identity| [identity.extern_uid, identity.user] }
                 .to_h
