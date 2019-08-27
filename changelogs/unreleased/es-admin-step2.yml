@@ -1,0 +1,5 @@
+---
+title: Support for multiple Elasticsearch indices
+merge_request: 17226
+author:
+type: added

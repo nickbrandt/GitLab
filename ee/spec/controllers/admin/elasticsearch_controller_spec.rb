@@ -6,8 +6,11 @@ describe Admin::ElasticsearchController do
   let(:admin) { create(:admin) }
 
   describe 'POST #enqueue_index' do
+    let(:back) { admin_application_settings_path }
+
     before do
       sign_in(admin)
+      request.env['HTTP_REFERER'] = back
     end
 
     it 'starts indexing' do
@@ -18,7 +21,7 @@ describe Admin::ElasticsearchController do
       post :enqueue_index
 
       expect(controller).to set_flash[:notice].to include('/admin/sidekiq/queues/elastic_full_index')
-      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+      expect(response).to redirect_to(back)
     end
 
     context 'when feature is disabled' do

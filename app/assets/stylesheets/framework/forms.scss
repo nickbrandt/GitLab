@@ -232,6 +232,16 @@ label {
   color: $gray-600;
 }
 
+.input-xs {
+  max-width: $input-xs-width;
+  width: 100%;
+}
+
+.input-sm {
+  max-width: $input-sm-width;
+  width: 100%;
+}
+
 .input-md {
   max-width: $input-md-width;
   width: 100%;

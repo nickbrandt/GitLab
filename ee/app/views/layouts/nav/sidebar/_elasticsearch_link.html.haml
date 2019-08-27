@@ -1,0 +1,23 @@
+- return unless License.feature_available?(:elastic_search)
+
+= nav_link(controller: :elasticsearch) do
+  = link_to admin_elasticsearch_root_path do
+    .nav-icon-container
+      = sprite_icon('search')
+    %span.nav-item-name{ data: { qa_selector: 'qa_admin_elasticsearch_item' } }
+      = _('Elasticsearch')
+
+  %ul.sidebar-sub-level-items{ data: { qa_selector: 'qa_admin_sidebar_submenu' } }
+    = nav_link(controller: :elasticsearch, html_options: { class: "fly-out-top-item" } ) do
+      = link_to admin_elasticsearch_root_path do
+        %strong.fly-out-top-item-name
+          = _('Elasticsearch')
+      %li.divider.fly-out-top-item
+      = nav_link(path: 'elasticsearch#show') do
+        = link_to admin_elasticsearch_root_path, title: _('GitLab index'), data: { qa_selector: 'elasticsearch_index_link' } do
+          %span
+            = _('GitLab index')
+      = nav_link(path: 'elasticsearch#settings') do
+        = link_to admin_elasticsearch_settings_path, title: _('Settings'), data: { qa_selector: 'elasticsearch_settings_link' } do
+          %span
+            = _('Settings')

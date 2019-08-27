@@ -1,0 +1,72 @@
+- breadcrumb_title _("Elasticsearch")
+- page_title _("Elasticsearch")
+
+- recreate_index_url = help_page_url('integration/elasticsearch.md')
+- recreate_index_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: recreate_index_url }
+- recreate_index_text = s_("Changes won't take place until the index is %{link_start}recreated%{link_end}.").html_safe % { link_start: recreate_index_link_start, link_end: '</a>'.html_safe }
+
+%h3.page-title
+  = _('GitLab index')
+
+%hr.clearfix
+
+= form_for @application_setting, url: admin_application_settings_path, html: { class: 'fieldset-form' } do |f|
+  = form_errors(@application_setting)
+
+  .form-group
+    .form-check
+      = f.check_box :elasticsearch_indexing, class: 'form-check-input', data: { qa_selector: 'indexing_checkbox' }
+      = f.label :elasticsearch_indexing, class: 'form-check-label' do
+        = _('Elasticsearch indexing')
+
+      - if Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true) && Gitlab::CurrentSettings.elasticsearch_indexing?
+        .form-text
+          = link_to _('Index all projects'), admin_elasticsearch_enqueue_index_path,
+                  class: 'btn btn-success', method: :post
+
+  .form-group
+    = f.label :elasticsearch_url, 'URL', class: 'label-bold'
+    = f.text_field :elasticsearch_url, value: @application_setting.elasticsearch_url.join(', '), class: 'form-control input-lg', placeholder: 'http://localhost:9200', data: { qa_selector: 'url_field' }
+    .form-text.text-muted
+      = _('The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., "http://localhost:9200, http://localhost:9201").')
+
+  .form-group
+    .form-check
+      = f.check_box :elasticsearch_aws, class: 'form-check-input', data: {'toggle': 'collapse', 'target': '#js-elasticsearch-aws-setting'}
+      = f.label :elasticsearch_aws, class: 'form-check-label' do
+        = _('Using AWS hosted Elasticsearch with IAM credentials')
+
+  #js-elasticsearch-aws-setting.collapse{ :class => @application_setting.elasticsearch_aws && 'show' }
+    .form-group
+      = f.label :elasticsearch_aws_region, _('AWS region'), class: 'label-bold'
+      = f.text_field :elasticsearch_aws_region, value: @application_setting.elasticsearch_aws_region, class: 'form-control input-lg'
+      .form-text.text-muted
+        = _('Region that elasticsearch is configured')
+
+    .form-group
+      = f.label :elasticsearch_aws_access_key, _('AWS Access Key'), class: 'label-bold'
+      = f.text_field :elasticsearch_aws_access_key, value: @application_setting.elasticsearch_aws_access_key, class: 'form-control input-lg'
+      .form-text.text-muted
+        = _('AWS Access Key. Only required if not using role instance credentials')
+
+    .form-group
+      = f.label :elasticsearch_aws_secret_access_key, _('AWS Secret Access Key'), class: 'label-bold'
+      = f.password_field :elasticsearch_aws_secret_access_key, value: @application_setting.elasticsearch_aws_secret_access_key, class: 'form-control input-lg'
+      .form-text.text-muted
+        = _('AWS Secret Access Key. Only required if not using role instance credentials')
+
+  .form-group
+    = f.label :elasticsearch_shards, _('Number of Elasticsearch shards'), class: 'label-bold'
+    = f.number_field :elasticsearch_shards, value: @application_setting.elasticsearch_shards, class: 'form-control input-xs'
+    .form-text.text-muted
+      = _('How many shards to split the Elasticsearch index over.')
+      = recreate_index_text
+
+  .form-group
+    = f.label :elasticsearch_replicas, _('Number of Elasticsearch replicas'), class: 'label-bold'
+    = f.number_field :elasticsearch_replicas, value: @application_setting.elasticsearch_replicas, class: 'form-control input-xs'
+    .form-text.text-muted
+      = _('How many replicas each Elasticsearch shard has.')
+      = recreate_index_text
+
+  = f.submit _('Save changes'), class: "btn btn-success", data: { qa_selector: 'submit_button' }

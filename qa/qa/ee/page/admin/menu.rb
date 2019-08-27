@@ -37,6 +37,31 @@ module QA
             click_element :link_geo_menu
           end
 
+          def go_to_elsticsearch_settings
+            hover_elasticsearch do
+              within_submenu do
+                click_element :admin_elasticsearch_settings_item
+              end
+            end
+          end
+
+          def go_to_elsticsearch_index
+            hover_elasticsearch do
+              within_submenu do
+                click_element :admin_elasticsearch_index_item
+              end
+            end
+          end
+
+          def hover_elasticsearch
+            within_sidebar do
+              scroll_to_element(:admin_elasticsearch_item)
+              find_element(:admin_elasticsearch_item).hover
+
+              yield
+            end
+          end
+
           def click_license_menu_link
             click_element :link_license_menu
           end

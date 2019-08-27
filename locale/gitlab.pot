@@ -674,6 +674,21 @@ msgstr ""
 msgid "API Token"
 msgstr ""
 
+msgid "AWS Access Key"
+msgstr ""
+
+msgid "AWS Access Key. Only required if not using role instance credentials"
+msgstr ""
+
+msgid "AWS Secret Access Key"
+msgstr ""
+
+msgid "AWS Secret Access Key. Only required if not using role instance credentials"
+msgstr ""
+
+msgid "AWS region"
+msgstr ""
+
 msgid "Abort"
 msgstr ""
 
@@ -1214,6 +1229,9 @@ msgid "AdminUsers|Without projects"
 msgstr ""
 
 msgid "Advanced"
+msgstr ""
+
+msgid "Advanced Global Search enabled"
 msgstr ""
 
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
@@ -5607,13 +5625,13 @@ msgstr ""
 msgid "Elasticsearch"
 msgstr ""
 
-msgid "Elasticsearch indexing restrictions"
+msgid "Elasticsearch indexing"
 msgstr ""
 
 msgid "Elasticsearch indexing started"
 msgstr ""
 
-msgid "Elasticsearch integration. Elasticsearch AWS IAM."
+msgid "Elasticsearch settings"
 msgstr ""
 
 msgid "Elastic|None. Select namespaces to index."
@@ -7584,6 +7602,9 @@ msgid "GitLab allows you to continue using your license even if you exceed the n
 msgstr ""
 
 msgid "GitLab for Slack"
+msgstr ""
+
+msgid "GitLab index"
 msgstr ""
 
 msgid "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later."
@@ -13024,6 +13045,9 @@ msgstr ""
 msgid "Regex pattern"
 msgstr ""
 
+msgid "Region that elasticsearch is configured"
+msgstr ""
+
 msgid "Register"
 msgstr ""
 
@@ -15681,6 +15705,9 @@ msgstr ""
 msgid "The Issue Tracker is the place to add things that need to be improved or solved in a project. You can register or sign in to create issues for this project."
 msgstr ""
 
+msgid "The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., \"http://localhost:9200, http://localhost:9201\")."
+msgstr ""
+
 msgid "The X509 Certificate to use when mutual TLS is required to communicate with the external authorization service. If left blank, the server certificate is still validated when accessing over HTTPS."
 msgstr ""
 
@@ -17663,6 +17690,9 @@ msgid "UsersSelect|Unassigned"
 msgstr ""
 
 msgid "Using %{code_start}::%{code_end} denotes a %{link_start}scoped label set%{link_end}"
+msgstr ""
+
+msgid "Using AWS hosted Elasticsearch with IAM credentials"
 msgstr ""
 
 msgid "Using required encryption strategy when encrypted field is missing!"

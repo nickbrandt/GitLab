@@ -47,6 +47,8 @@ namespace :admin do
   end
 
   namespace :elasticsearch do
+    root action: :show
+    get :settings
     post :enqueue_index
   end
 

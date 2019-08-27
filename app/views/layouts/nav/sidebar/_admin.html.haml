@@ -170,6 +170,8 @@
 
       = render_if_exists 'layouts/nav/ee/admin/geo_sidebar'
 
+      = render_if_exists 'layouts/nav/sidebar/elasticsearch_link'
+
       = nav_link(controller: :deploy_keys) do
         = link_to admin_deploy_keys_path do
           .nav-icon-container
