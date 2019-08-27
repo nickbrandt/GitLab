@@ -161,7 +161,7 @@ module EE
               permissions_in_ancestry = ::GroupMember.of_groups(group.ancestors)
                 .non_request
                 .with_identity_provider(provider)
-                .where(users: { identities: Identity.iwhere(extern_uid: access_levels.keys) })
+                .where(users: { identities: ::Identity.iwhere(extern_uid: access_levels.keys) })
                 .select(:id, 'identities.extern_uid AS distinguished_name', :access_level, :source_id)
                 .references(:identities)
 
