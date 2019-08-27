@@ -139,7 +139,7 @@ The following options can be set:
 |----------------------|---------------------------------------------------------------------------------------------------|-----------|
 | `nameserver`         | The nameserver to use for looking up the DNS record.                                              | localhost |
 | `record`             | The record to look up. This option is required for service discovery to work.                     |           |
-| `record_type`        | Optional record type to look up, this can be either A or SRV (since GitLab 12.3)                  | A         |
+| `record_type`        | Optional record type to look up ([Introduced][ee-13732] in GitLab 12.3). Valid values are A, AAAA, or SRV. | A         |
 | `port`               | The port of the nameserver.                                                                       | 8600      |
 | `interval`           | The minimum time in seconds between checking the DNS record.                                      | 60        |
 | `disconnect_timeout` | The time in seconds after which an old connection is closed, after the list of hosts was updated. | 120       |
@@ -280,4 +280,5 @@ production:
 [db-req]: ../install/requirements.md#database
 [ee-3526]: https://gitlab.com/gitlab-org/gitlab/merge_requests/3526
 [ee-5883]: https://gitlab.com/gitlab-org/gitlab/merge_requests/5883
+[ee-13732]: https://gitlab.com/gitlab-org/gitlab/issues/13732
 [consul-udp]: https://www.consul.io/docs/agent/dns.html#udp-based-dns-queries

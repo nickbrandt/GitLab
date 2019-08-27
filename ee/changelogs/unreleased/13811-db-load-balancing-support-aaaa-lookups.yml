@@ -1,0 +1,5 @@
+---
+title: Support AAAA records in DB load balancer service discovery
+merge_request: 15669
+author:
+type: added

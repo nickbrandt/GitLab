@@ -27,10 +27,10 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
       end
 
       context 'with an unsupported type' do
-        let(:record_type) { 'AAAA' }
+        let(:record_type) { 'TXT' }
 
         it 'raises an argument error' do
-          expect { subject }.to raise_error(ArgumentError, 'Unsupported record type: AAAA')
+          expect { subject }.to raise_error(ArgumentError, 'Unsupported record type: TXT')
         end
       end
     end
@@ -182,6 +182,22 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
         addresses = [
           described_class::Address.new('127.0.0.1'),
           described_class::Address.new('255.255.255.0')
+        ]
+
+        expect(service.addresses_from_dns).to eq([90, addresses])
+      end
+    end
+
+    context 'with an AAAA record' do
+      let(:record_type) { 'AAAA' }
+
+      let(:res1) { double(:resource, address: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff', ttl: 90) }
+      let(:res2) { double(:resource, address: '::1', ttl: 90) }
+
+      it 'returns a TTL and ordered list of IP addresses' do
+        addresses = [
+          described_class::Address.new('::1'),
+          described_class::Address.new('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')
         ]
 
         expect(service.addresses_from_dns).to eq([90, addresses])

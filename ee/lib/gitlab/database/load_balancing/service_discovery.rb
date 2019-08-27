@@ -19,6 +19,7 @@ module Gitlab
 
         RECORD_TYPES = {
           'A' => Net::DNS::A,
+          'AAAA' => Net::DNS::AAAA,
           'SRV' => Net::DNS::SRV
         }.freeze
 
@@ -122,8 +123,8 @@ module Gitlab
 
           addresses =
             case record_type
-            when Net::DNS::A
-              addresses_from_a_record(resources)
+            when Net::DNS::A, Net::DNS::AAAA
+              addresses_from_address_record(resources)
             when Net::DNS::SRV
               addresses_from_srv_record(response)
             end
@@ -178,7 +179,7 @@ module Gitlab
           end.compact
         end
 
-        def addresses_from_a_record(resources)
+        def addresses_from_address_record(resources)
           resources.map { |r| Address.new(r.address.to_s) }
         end
       end
