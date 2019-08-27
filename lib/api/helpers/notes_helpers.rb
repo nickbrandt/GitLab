@@ -81,6 +81,10 @@ module API
         noteable || not_found!(noteable_type)
       end
 
+      def reject_note?(noteable_type, noteable, parent_type, parent_id, note)
+        note.cross_reference_not_visible_for?(current_user)
+      end
+
       def params_by_noteable_type_and_id(type, id)
         target_type = type.name.underscore
         { target_type: target_type }.tap do |h|
