@@ -54,7 +54,12 @@ module Gitlab
         end
 
         def offline!
-          LoadBalancing.log(:warn, "Marking host #{@host} as offline")
+          LoadBalancing::Logger.warn(
+            event: :host_offline,
+            message: 'Marking host as offline',
+            db_host: @host,
+            db_port: @port
+          )
 
           @online = false
           @pool.disconnect!
@@ -66,7 +71,14 @@ module Gitlab
 
           refresh_status
 
-          LoadBalancing.log(:info, "Host #{@host} came back online") if @online
+          if @online
+            LoadBalancing::Logger.info(
+              event: :host_online,
+              message: 'Host came back online',
+              db_host: @host,
+              db_port: @port
+            )
+          end
 
           @online
         rescue *CONNECTION_ERRORS

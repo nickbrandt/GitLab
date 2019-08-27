@@ -147,8 +147,8 @@ describe('ProjectsDropdownFilter component', () => {
           .trigger('click');
 
         wrapper.vm.$nextTick(() => {
-          expect(findDropdownButton().contains('img.avatar')).toBe(true);
-          expect(findDropdownButton().contains('div.identicon')).toBe(false);
+          expect(findDropdownButton().contains('img.gl-avatar')).toBe(true);
+          expect(findDropdownButton().contains('.gl-avatar-identicon')).toBe(false);
           done();
         });
       });
@@ -159,8 +159,8 @@ describe('ProjectsDropdownFilter component', () => {
           .trigger('click');
 
         wrapper.vm.$nextTick(() => {
-          expect(findDropdownButton().contains('img.avatar')).toBe(false);
-          expect(findDropdownButton().contains('div.identicon')).toBe(true);
+          expect(findDropdownButton().contains('img.gl-avatar')).toBe(false);
+          expect(findDropdownButton().contains('.gl-avatar-identicon')).toBe(true);
           done();
         });
       });

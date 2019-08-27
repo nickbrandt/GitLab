@@ -38,7 +38,19 @@ module Gitlab
                 #
                 # In this event we'll cycle through the secondaries at most 3
                 # times before using the primary instead.
-                if conflict_retried < @host_list.length * 3
+                will_retry = conflict_retried < @host_list.length * 3
+
+                LoadBalancing::Logger.warn(
+                  event: :host_query_conflict,
+                  message: 'Query conflict on host',
+                  conflict_retried: conflict_retried,
+                  will_retry: will_retry,
+                  db_host: host.host,
+                  db_port: host.port,
+                  host_list_length: @host_list.length
+                )
+
+                if will_retry
                   conflict_retried += 1
                   release_host
                 else
@@ -53,8 +65,12 @@ module Gitlab
             end
           end
 
-          LoadBalancing
-            .log(:warn, 'No secondaries were available, using primary instead')
+          LoadBalancing::Logger.warn(
+            event: :no_secondaries_available,
+            message: 'No secondaries were available, using primary instead',
+            conflict_retried: conflict_retried,
+            host_list_length: @host_list.length
+          )
 
           read_write(&block)
         end

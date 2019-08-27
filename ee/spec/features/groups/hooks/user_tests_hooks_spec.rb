@@ -1,6 +1,8 @@
 require "rails_helper"
 
 describe "User tests hooks", :js do
+  include StubRequests
+
   let!(:group) { create(:group) }
   let!(:hook) { create(:group_hook, group: group) }
   let!(:user) { create(:user) }
@@ -29,7 +31,7 @@ describe "User tests hooks", :js do
 
     context "when URL is invalid" do
       before do
-        stub_request(:post, hook.url).to_raise(SocketError.new("Failed to open"))
+        stub_full_request(hook.url, method: :post).to_raise(SocketError.new("Failed to open"))
 
         click_link("Test")
       end
@@ -51,7 +53,7 @@ describe "User tests hooks", :js do
   private
 
   def trigger_hook
-    stub_request(:post, hook.url).to_return(status: 200)
+    stub_full_request(hook.url, method: :post).to_return(status: 200)
 
     click_link("Test")
   end

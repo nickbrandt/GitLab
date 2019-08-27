@@ -22,7 +22,12 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
 
     if populate_in.include?(:new_schema)
-      approval_rule.add_member(member)
+      case member
+      when User
+        approval_rule.users << member
+      when Group
+        approval_rule.groups << member
+      end
     end
   end
 

@@ -139,7 +139,7 @@ Git operations in GitLab will result in an API error.
 
 NOTE: **Note:**
 In most or all cases, the storage paths below end in `/repositories` which is
-not that case with `path` in `git_data_dirs` of Omnibus GitLab installations.
+not the case with `path` in `git_data_dirs` of Omnibus GitLab installations.
 Check the directory layout on your Gitaly server to be sure.
 
 **For Omnibus GitLab**
@@ -283,10 +283,6 @@ can read and write to `/mnt/gitlab/storage2`.
    gitlab_rails['gitaly_token'] = 'abc123secret'
    ```
 
-   NOTE: **Note:**
-   In some cases, you'll have to set `path` for each `git_data_dirs` in the
-   format `'path' => '/mnt/gitlab/<storage name>'`.
-
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 1. Tail the logs to see the requests:
 
@@ -304,18 +300,22 @@ can read and write to `/mnt/gitlab/storage2`.
        storages:
          default:
            gitaly_address: tcp://gitaly1.internal:8075
+           path: /some/dummy/path
          storage1:
            gitaly_address: tcp://gitaly1.internal:8075
+           path: /some/dummy/path
          storage2:
            gitaly_address: tcp://gitaly2.internal:8075
+           path: /some/dummy/path
 
      gitaly:
        token: 'abc123secret'
    ```
 
    NOTE: **Note:**
-   In some cases, you'll have to set `path` for each of the `storages` in the
-   format `path: /mnt/gitlab/<storage name>/repositories`.
+   `/some/dummy/path` should be set to a local folder that exists, however no
+   data will be stored in this folder. This will no longer be necessary after
+   [this issue](https://gitlab.com/gitlab-org/gitaly/issues/1282) is resolved.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 1. Tail the logs to see the requests:
@@ -416,18 +416,22 @@ To configure Gitaly with TLS:
        storages:
          default:
            gitaly_address: tls://gitaly1.internal:9999
+           path: /some/dummy/path
          storage1:
            gitaly_address: tls://gitaly1.internal:9999
+           path: /some/dummy/path
          storage2:
            gitaly_address: tls://gitaly2.internal:9999
+           path: /some/dummy/path
 
      gitaly:
        token: 'abc123secret'
    ```
 
    NOTE: **Note:**
-   In some cases, you'll have to set `path` for each of the `storages` in the
-   format `path: /mnt/gitlab/<storage name>/repositories`.
+   `/some/dummy/path` should be set to a local folder that exists, however no
+   data will be stored in this folder. This will no longer be necessary after
+   [this issue](https://gitlab.com/gitlab-org/gitaly/issues/1282) is resolved.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source).
 1. On the Gitaly server nodes, edit `/home/git/gitaly/config.toml`:
@@ -513,6 +517,47 @@ One current feature of GitLab that still requires a shared directory (NFS) is
 [GitLab Pages](../../user/project/pages/index.md).
 There is [work in progress](https://gitlab.com/gitlab-org/gitlab-pages/issues/196)
 to eliminate the need for NFS to support GitLab Pages.
+
+## Limiting RPC concurrency
+
+It can happen that CI clone traffic puts a large strain on your Gitaly
+service. The bulk of the work gets done in the SSHUploadPack (for Git
+SSH) and PostUploadPack (for Git HTTP) RPC's. To prevent such workloads
+from overcrowding your Gitaly server you can set concurrency limits in
+Gitaly's configuration file.
+
+```ruby
+# in /etc/gitlab/gitlab.rb
+
+gitaly['concurrency'] = [
+  {
+    'rpc' => "/gitaly.SmartHTTPService/PostUploadPack",
+    'max_per_repo' => 20
+  },
+  {
+    'rpc' => "/gitaly.SSHService/SSHUploadPack",
+    'max_per_repo' => 20
+  }
+]
+```
+This will limit the number of in-flight RPC calls for the given RPC's.
+The limit is applied per repository. In the example above, each on the
+Gitaly server can have at most 20 simultaneous PostUploadPack calls in
+flight, and the same for SSHUploadPack. If another request comes in for
+a repository that hase used up its 20 slots, that request will get
+queued.
+
+You can observe the behavior of this queue via the Gitaly logs and via
+Prometheus. In the Gitaly logs, you can look for the string (or
+structured log field) `acquire_ms`. Messages that have this field are
+reporting about the concurrency limiter. In Prometheus, look for the
+`gitaly_rate_limiting_in_progress`, `gitaly_rate_limiting_queued` and
+`gitaly_rate_limiting_seconds` metrics.
+
+The name of the Prometheus metric is not quite right because this is a
+concurrency limiter, not a rate limiter. If a client makes 1000 requests
+in a row in a very short timespan, the concurrency will not exceed 1,
+and this mechanism (the concurrency limiter) will do nothing.
 
 ## Troubleshooting Gitaly
 

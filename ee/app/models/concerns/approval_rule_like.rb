@@ -28,24 +28,6 @@ module ApprovalRuleLike
                    end
   end
 
-  def add_member(member)
-    case member
-    when User
-      users << member unless users.exists?(member.id)
-    when Group
-      groups << member unless groups.exists?(member.id)
-    end
-  end
-
-  def remove_member(member)
-    case member
-    when User
-      users.delete(member)
-    when Group
-      groups.delete(member)
-    end
-  end
-
   def code_owner?
     raise NotImplementedError
   end

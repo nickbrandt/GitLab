@@ -1121,10 +1121,12 @@ ActiveRecord::Schema.define(version: 2019_08_22_181528) do
     t.datetime_with_timezone "expires_at", null: false
     t.datetime_with_timezone "created_at", null: false
     t.string "name", null: false
-    t.string "token", null: false
+    t.string "token"
     t.string "username"
+    t.string "token_encrypted", limit: 255
     t.index ["token", "expires_at", "id"], name: "index_deploy_tokens_on_token_and_expires_at_and_id", where: "(revoked IS FALSE)"
     t.index ["token"], name: "index_deploy_tokens_on_token", unique: true
+    t.index ["token_encrypted"], name: "index_deploy_tokens_on_token_encrypted", unique: true
   end
 
   create_table "deployments", id: :serial, force: :cascade do |t|
@@ -3522,6 +3524,8 @@ ActiveRecord::Schema.define(version: 2019_08_22_181528) do
     t.integer "group_view"
     t.integer "managing_group_id"
     t.integer "bot_type", limit: 2
+    t.string "first_name", limit: 255
+    t.string "last_name", limit: 255
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id"
     t.index ["admin"], name: "index_users_on_admin"
     t.index ["bot_type"], name: "index_users_on_bot_type"
