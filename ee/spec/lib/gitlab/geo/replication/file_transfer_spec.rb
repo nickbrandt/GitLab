@@ -46,15 +46,14 @@ describe Gitlab::Geo::Replication::FileTransfer do
       it 'returns a successful result' do
         content = upload.build_uploader.file.read
         size = content.bytesize
-
-        expect(FileUtils).to receive(:mv).with(anything, upload.absolute_path).and_call_original
-        response = double(:response, success?: true)
-        expect(Gitlab::HTTP).to receive(:get).and_yield(content.to_s).and_return(response)
+        stub_request(:get, subject.resource_url).to_return(status: 200, body: content)
 
         result = subject.download_from_primary
 
         expect_result(result, success: true, bytes_downloaded: size, primary_missing_file: false)
+
         stat = File.stat(upload.absolute_path)
+
         expect(stat.size).to eq(size)
         expect(stat.mode & 0777).to eq(0666 - File.umask)
         expect(File.binread(upload.absolute_path)).to eq(content)
@@ -64,11 +63,10 @@ describe Gitlab::Geo::Replication::FileTransfer do
     context 'when the HTTP response is unsuccessful' do
       context 'when the HTTP response indicates a missing file on the primary' do
         it 'returns a failed result indicating primary_missing_file' do
-          expect(FileUtils).not_to receive(:mv).with(anything, upload.absolute_path).and_call_original
-          response = double(:response, success?: false, code: 404, msg: "No such file")
-
-          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE}\"}")
-          expect(Gitlab::HTTP).to receive(:get).and_return(response)
+          stub_request(:get, subject.resource_url)
+            .to_return(status: 404,
+                       headers: { content_type: 'application/json' },
+                       body: { geo_code: Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE }.to_json)
 
           result = subject.download_from_primary
 
@@ -78,10 +76,7 @@ describe Gitlab::Geo::Replication::FileTransfer do
 
       context 'when the HTTP response does not indicate a missing file on the primary' do
         it 'returns a failed result' do
-          expect(FileUtils).not_to receive(:mv).with(anything, upload.absolute_path).and_call_original
-          response = double(:response, success?: false, code: 404, msg: 'No such file')
-
-          expect(Gitlab::HTTP).to receive(:get).and_return(response)
+          stub_request(:get, subject.resource_url).to_return(status: 404, body: 'Not found')
 
           result = subject.download_from_primary
 
@@ -121,8 +116,8 @@ describe Gitlab::Geo::Replication::FileTransfer do
     context 'when the checksum of the downloaded file does not match' do
       it 'returns a failed result' do
         bad_content = 'corrupted!!!'
-        response = double(:response, success?: true)
-        expect(Gitlab::HTTP).to receive(:get).and_yield(bad_content).and_return(response)
+        stub_request(:get, subject.resource_url)
+          .to_return(status: 200, body: bad_content)
 
         result = subject.download_from_primary
 
@@ -134,8 +129,8 @@ describe Gitlab::Geo::Replication::FileTransfer do
       it 'returns a successful result' do
         upload.update_column(:checksum, nil)
         content = 'foo'
-        response = double(:response, success?: true)
-        expect(Gitlab::HTTP).to receive(:get).and_yield(content).and_return(response)
+        stub_request(:get, subject.resource_url)
+          .to_return(status: 200, body: content)
 
         result = subject.download_from_primary
 

@@ -43,6 +43,11 @@ module Gitlab
           true
         end
 
+        # @return [String] URL to download the resource from
+        def resource_url
+          Gitlab::Geo.primary_node.geo_transfers_url(file_type, file_id.to_s)
+        end
+
         # Returns Result object with success boolean and number of bytes downloaded.
         def download_from_primary
           return skipped_result unless can_transfer?
@@ -53,10 +58,9 @@ module Gitlab
             return skipped_result
           end
 
-          url = Gitlab::Geo.primary_node.geo_transfers_url(file_type, file_id.to_s)
           req_headers = TransferRequest.new(request_data).headers
 
-          download_file(url, req_headers)
+          download_file(resource_url, req_headers)
         end
 
         class Result
@@ -100,8 +104,7 @@ module Gitlab
           true
         end
 
-        # Use Gitlab::HTTP for now but switch to curb if performance becomes
-        # an issue
+        # Download file from informed URL using HTTP.rb
         #
         # @return [Result] Object with transfer status and information
         def download_file(url, req_headers)
@@ -111,37 +114,42 @@ module Gitlab
           return failure_result unless temp_file
 
           begin
-            response = Gitlab::HTTP.get(url, allow_local_requests: true, headers: req_headers, stream_body: true) do |fragment|
-              temp_file.write(fragment)
+            # Make the request
+            response = ::HTTP.get(url, headers: req_headers)
+
+            # Check for failures
+            unless response.status.success?
+              log_error("Unsuccessful download", filename: filename, status_code: response.status.code, reason: response.status.reason, url: url)
+
+              return failure_result(primary_missing_file: primary_missing_file?(response))
             end
 
+            # Stream to temporary file on disk
+            response.body.each do |chunk|
+              temp_file.write(chunk)
+            end
+
+            # Make sure file is written to the disk
+            # This is required to get correct file size.
             temp_file.flush
-
-            unless response.success?
-              log_error("Unsuccessful download", filename: filename, response_code: response.code, response_msg: response.try(:msg), url: url)
-
-              return failure_result(primary_missing_file: primary_missing_file?(response, temp_file))
-            end
-
-            if File.directory?(filename)
-              log_error("Destination file is a directory", filename: filename)
-
-              return failure_result
-            end
 
             file_size = File.stat(temp_file.path).size
 
+            # Check for checksum mismatch
             if checksum_mismatch?(temp_file.path)
               log_error("Downloaded file checksum mismatch", expected_checksum: expected_checksum, actual_checksum: @actual_checksum, file_size_bytes: file_size)
 
               return failure_result(bytes_downloaded: file_size)
             end
 
+            # Move transfered file to the target location
             FileUtils.mv(temp_file.path, filename)
 
             log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
-          rescue StandardError, Gitlab::HTTP::Error => e
+          rescue StandardError, ::HTTP::Error => e
             log_error("Error downloading file", error: e, filename: filename, url: url)
+
+            return failure_result
           ensure
             temp_file.close
             temp_file.unlink
@@ -150,12 +158,11 @@ module Gitlab
           Result.new(success: file_size > -1, bytes_downloaded: [file_size, 0].max)
         end
 
-        def primary_missing_file?(response, temp_file)
-          body = File.read(temp_file.path) if File.exist?(temp_file.path)
-
-          if response.code == 404 && body.present?
+        def primary_missing_file?(response)
+          if response.status.not_found?
             begin
-              json_response = JSON.parse(body)
+              json_response = response.parse
+
               return code_file_not_found?(json_response['geo_code'])
             rescue JSON::ParserError
             end
@@ -180,7 +187,7 @@ module Gitlab
           temp.binmode
           temp
         rescue StandardError => e
-          log_error("Error creating temporary file", error: e)
+          log_error("Error creating temporary file", error: e, filename: target_filename)
           nil
         end
 
