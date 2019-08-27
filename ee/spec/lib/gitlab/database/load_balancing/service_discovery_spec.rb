@@ -191,8 +191,18 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
     context 'with an SRV record' do
       let(:record_type) { 'SRV' }
 
-      let(:res1) { double(:resource, host: '255.255.255.0', port: 5432, weight: 1, priority: 1, ttl: 90) }
-      let(:res2) { double(:resource, host: '127.0.0.1', port: 5433, weight: 1, priority: 1, ttl: 90) }
+      let(:res1) { double(:resource, host: 'foo1.service.consul.', port: 5432, weight: 1, priority: 1, ttl: 90) }
+      let(:res2) { double(:resource, host: 'foo2.service.consul.', port: 5433, weight: 1, priority: 1, ttl: 90) }
+      let(:res3) { double(:resource, host: 'foo3.service.consul.', port: 5434, weight: 1, priority: 1, ttl: 90) }
+      let(:packet) { double(:packet, answer: [res1, res2, res3], additional: []) }
+
+      before do
+        expect_next_instance_of(Gitlab::Database::LoadBalancing::SrvResolver) do |resolver|
+          allow(resolver).to receive(:address_for).with('foo1.service.consul.').and_return('255.255.255.0')
+          allow(resolver).to receive(:address_for).with('foo2.service.consul.').and_return('127.0.0.1')
+          allow(resolver).to receive(:address_for).with('foo3.service.consul.').and_return(nil)
+        end
+      end
 
       it 'returns a TTL and ordered list of hosts' do
         addresses = [

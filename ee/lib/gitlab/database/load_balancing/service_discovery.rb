@@ -117,14 +117,15 @@ module Gitlab
         # 1. The time to wait for the next check.
         # 2. An array containing the hostnames of the DNS record.
         def addresses_from_dns
-          resources = resolver.search(record, record_type).answer
+          response = resolver.search(record, record_type)
+          resources = response.answer
 
           addresses =
             case record_type
             when Net::DNS::A
               addresses_from_a_record(resources)
             when Net::DNS::SRV
-              addresses_from_srv_record(resources)
+              addresses_from_srv_record(response)
             end
 
           # Addresses are sorted so we can directly compare the old and new
@@ -166,8 +167,15 @@ module Gitlab
           end
         end
 
-        def addresses_from_srv_record(resources)
-          resources.map { |r| Address.new(r.host.to_s, r.port) }
+        def addresses_from_srv_record(response)
+          srv_resolver = SrvResolver.new(resolver, response.additional)
+
+          response.answer.map do |r|
+            address = srv_resolver.address_for(r.host.to_s)
+            next unless address
+
+            Address.new(address, r.port)
+          end.compact
         end
 
         def addresses_from_a_record(resources)

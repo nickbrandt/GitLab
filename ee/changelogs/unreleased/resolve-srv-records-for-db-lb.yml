@@ -1,0 +1,5 @@
+---
+title: Resolve SRV records for DB load balancing
+merge_request: 15691
+author:
+type: fixed
