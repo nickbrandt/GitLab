@@ -16,8 +16,9 @@ module MergeTrains
       validate!
 
       if should_create_pipeline?
-        cancel_pipeline_if_exist
+        previous_pipeline = pipeline_for_merge_train
         pipeline_created = create_pipeline!
+        previous_pipeline&.auto_cancel_running(pipeline_created)
       end
 
       merge! if should_merge?
@@ -77,6 +78,7 @@ module MergeTrains
       raise ProcessError, result[:message] unless result[:status] == :success
 
       merge_train.update!(pipeline: result[:pipeline])
+      result[:pipeline]
     end
 
     def should_merge?

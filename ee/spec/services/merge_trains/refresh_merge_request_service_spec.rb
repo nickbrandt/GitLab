@@ -40,13 +40,32 @@ describe MergeTrains::RefreshMergeRequestService do
 
       it do
         expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
-          allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: create(:ci_pipeline) } }
+          allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: pipeline } }
           expect(pipeline_service).to receive(:execute).with(merge_request, previous_ref)
         end
 
         result = subject
         expect(result[:status]).to eq(:success)
         expect(result[:pipeline_created]).to eq(true)
+      end
+    end
+
+    shared_examples_for 'cancels and recreates a pipeline for the merge train' do
+      let(:previous_ref) { 'refs/heads/master' }
+
+      it do
+        expect_next_instance_of(MergeTrains::CreatePipelineService, project, maintainer) do |pipeline_service|
+          allow(pipeline_service).to receive(:execute) { { status: :success, pipeline: create(:ci_pipeline) } }
+          expect(pipeline_service).to receive(:execute).with(merge_request, previous_ref)
+        end
+
+        result = subject
+        new_pipeline = merge_request.merge_train.pipeline
+
+        expect(result[:status]).to eq(:success)
+        expect(result[:pipeline_created]).to eq(true)
+        expect(pipeline.reload.status).to eq('canceled')
+        expect(pipeline.reload.auto_canceled_by_id).to eq(new_pipeline.id)
       end
     end
 
@@ -57,12 +76,6 @@ describe MergeTrains::RefreshMergeRequestService do
         result = subject
         expect(result[:status]).to eq(:success)
         expect(result[:pipeline_created]).to be_falsy
-      end
-    end
-
-    shared_examples_for 'cancels the old pipeline for merge train' do
-      it do
-        expect { subject }.to change { pipeline.reload.status }.to('canceled')
       end
     end
 
@@ -143,7 +156,7 @@ describe MergeTrains::RefreshMergeRequestService do
     end
 
     context 'when pipeline for merge train is running' do
-      let(:pipeline) { create(:ci_pipeline, :running, :with_job, target_sha: previous_ref_sha, source_sha: merge_request.diff_head_sha) }
+      let(:pipeline) { create(:ci_pipeline, :running, :with_job, project: project, target_sha: previous_ref_sha, source_sha: merge_request.diff_head_sha) }
       let(:previous_ref_sha) { project.repository.commit('refs/heads/master').sha }
 
       before do
@@ -157,15 +170,13 @@ describe MergeTrains::RefreshMergeRequestService do
       context 'when the pipeline is stale' do
         let(:previous_ref_sha) { project.repository.commits('refs/heads/master', limit: 2).last.sha }
 
-        it_behaves_like 'cancels the old pipeline for merge train'
-        it_behaves_like 'creates a pipeline for merge train'
+        it_behaves_like 'cancels and recreates a pipeline for the merge train'
       end
 
       context 'when the pipeline is required to be recreated' do
         let(:require_recreate) { true }
 
-        it_behaves_like 'cancels the old pipeline for merge train'
-        it_behaves_like 'creates a pipeline for merge train'
+        it_behaves_like 'cancels and recreates a pipeline for the merge train'
       end
     end
 
