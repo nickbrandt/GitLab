@@ -32,7 +32,7 @@ var (
 	)
 	totalMessages = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_keywather_total_messages",
+			Name: "gitlab_workhorse_keywatcher_total_messages",
 			Help: "How many messages gitlab-workhorse has received in total on pubsub.",
 		},
 	)
