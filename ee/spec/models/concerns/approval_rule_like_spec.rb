@@ -12,39 +12,6 @@ describe ApprovalRuleLike do
   let(:merge_request) { create(:merge_request) }
 
   shared_examples 'approval rule like' do
-    describe '#add_member' do
-      it 'adds as a member of the rule' do
-        expect do
-          subject.add_member(user1)
-          subject.add_member(group1)
-        end.to change { subject.users.count }.by(1).and change { subject.groups.count }.by(1)
-      end
-
-      it 'does nothing if already a member' do
-        subject.add_member(user1)
-
-        expect do
-          subject.add_member(user1)
-        end.not_to change { subject.users.count + subject.groups.count }
-      end
-    end
-
-    describe '#remove_member' do
-      it 'removes a member from the rule' do
-        subject.add_member(group1)
-
-        expect do
-          subject.remove_member(group1)
-        end.to change { subject.groups.count }.by(-1)
-      end
-
-      it 'does nothing if not a member' do
-        expect do
-          subject.remove_member(group1)
-        end.not_to change { subject.groups.count }
-      end
-    end
-
     describe '#approvers' do
       let(:group1_user) { create(:user) }
       let(:group2_user) { create(:user) }

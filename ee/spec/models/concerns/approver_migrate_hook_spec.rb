@@ -38,7 +38,12 @@ describe ApproverMigrateHook do
 
           context 'when member mapping already exists' do
             before do
-              approval_rule.add_member approver.member
+              case member
+              when User
+                approval_rule.users << member
+              when Group
+                approval_rule.groups << member
+              end
             end
 
             it 'does nothing' do
@@ -64,7 +69,8 @@ describe ApproverMigrateHook do
     end
 
     context 'User' do
-      let(:approver) { create(:approver, target: target) }
+      let(:member) { create(:user) }
+      let(:approver) { create(:approver, target: target, user: member) }
 
       context 'merge request' do
         let(:target) { create(:merge_request) }
@@ -80,7 +86,8 @@ describe ApproverMigrateHook do
     end
 
     context 'Group' do
-      let(:approver) { create(:approver_group, target: target) }
+      let(:member) { create(:group) }
+      let(:approver) { create(:approver_group, target: target, group: member) }
 
       context 'merge request' do
         let(:target) { create(:merge_request) }
