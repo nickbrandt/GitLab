@@ -18,23 +18,38 @@ describe Gitlab::Geo::Replication::BaseTransfer do
       stub_current_geo_node(secondary_node)
     end
 
-    it 'returns false when not a secondary node' do
-      expect(Gitlab::Geo).to receive(:secondary?) { false }
+    context 'when not a primary node' do
+      it 'returns false when not a secondary node' do
+        expect(Gitlab::Geo).to receive(:secondary?) { false }
 
-      expect(subject.can_transfer?).to be_falsey
+        expect(subject.can_transfer?).to be_falsey
+      end
     end
 
-    it 'returns false when no primary node exists' do
-      expect(Gitlab::Geo).to receive(:primary_node) { nil }
+    context 'when no primary node exists' do
+      it 'returns false' do
+        expect(Gitlab::Geo).to receive(:primary_node) { nil }
 
-      expect(subject.can_transfer?).to be_falsey
+        expect(subject.can_transfer?).to be_falsey
+      end
     end
 
-    it 'returns false when destination filename is a directory' do
-      subject = described_class.new(file_type: :avatar, file_id: 1, filename:  Dir::Tmpname.tmpdir,
-                                    expected_checksum: nil, request_data: nil)
+    context 'when destination filename is a directory' do
+      it 'returns false' do
+        subject = described_class.new(file_type: :avatar, file_id: 1, filename: Dir::Tmpname.tmpdir,
+                                      expected_checksum: nil, request_data: nil)
 
-      expect(subject.can_transfer?).to be_falsey
+        expect(subject.can_transfer?).to be_falsey
+      end
+    end
+
+    context 'when no filename is informed' do
+      it 'returns true' do
+        subject = described_class.new(file_type: :avatar, file_id: 1,
+                                      expected_checksum: nil, request_data: nil)
+
+        expect(subject.can_transfer?).to be_truthy
+      end
     end
 
     it 'returns true when is a secondary, a primary exists and filename doesnt point to an existing directory' do

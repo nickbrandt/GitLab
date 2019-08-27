@@ -15,7 +15,7 @@ class Upload < ApplicationRecord
   scope :with_files_stored_remotely, -> { where(store: ObjectStorage::Store::REMOTE) }
 
   before_save  :calculate_checksum!, if: :foreground_checksummable?
-  after_commit :schedule_checksum,   if: :checksummable?
+  after_commit :schedule_checksum,   if: :needs_checksum?
 
   # as the FileUploader is not mounted, the default CarrierWave ActiveRecord
   # hooks are not executed and the file will not be deleted
@@ -53,7 +53,7 @@ class Upload < ApplicationRecord
 
   def calculate_checksum!
     self.checksum = nil
-    return unless checksummable?
+    return unless needs_checksum?
 
     self.checksum = Digest::SHA256.file(absolute_path).hexdigest
   end
@@ -65,8 +65,15 @@ class Upload < ApplicationRecord
     end
   end
 
+  # This checks for existence of the upload on storage
+  #
+  # @return [Boolean] whether upload exists on storage
   def exist?
-    exist = File.exist?(absolute_path)
+    exist = if local?
+              File.exist?(absolute_path)
+            else
+              build_uploader.exists?
+            end
 
     # Help sysadmins find missing upload files
     if persisted? && !exist
@@ -91,18 +98,24 @@ class Upload < ApplicationRecord
     store == ObjectStorage::Store::LOCAL
   end
 
+  # Returns whether generating checksum is needed
+  #
+  # This takes into account whether file exists, if any checksum exists
+  # or if the storage has checksum generation code implemented
+  #
+  # @return [Boolean] whether generating a checksum is needed
+  def needs_checksum?
+    checksum.nil? && local? && exist?
+  end
+
   private
 
   def delete_file!
     build_uploader.remove!
   end
 
-  def checksummable?
-    checksum.nil? && local? && exist?
-  end
-
   def foreground_checksummable?
-    checksummable? && size <= CHECKSUM_THRESHOLD
+    needs_checksum? && size <= CHECKSUM_THRESHOLD
   end
 
   def schedule_checksum

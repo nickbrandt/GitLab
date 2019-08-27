@@ -6,14 +6,15 @@ module Gitlab
       class BaseTransfer
         include LogHelpers
 
-        attr_reader :file_type, :file_id, :filename, :expected_checksum, :request_data
+        attr_reader :file_type, :file_id, :filename, :uploader, :expected_checksum, :request_data
 
         TEMP_PREFIX = 'tmp_'.freeze
 
-        def initialize(file_type:, file_id:, expected_checksum:, filename:, request_data:)
+        def initialize(file_type:, file_id:, request_data:, expected_checksum: nil, filename: nil, uploader: nil)
           @file_type = file_type
           @file_id = file_id
           @filename = filename
+          @uploader = uploader
           @expected_checksum = expected_checksum
           @request_data = request_data
         end
@@ -34,7 +35,7 @@ module Gitlab
             return false
           end
 
-          if File.directory?(filename)
+          if filename && File.directory?(filename)
             log_error 'Skipping transfer as destination exist and is a directory', filename: filename
 
             return false
@@ -61,6 +62,14 @@ module Gitlab
           req_headers = TransferRequest.new(request_data).headers
 
           download_file(resource_url, req_headers)
+        end
+
+        def stream_from_primary_to_object_storage
+          return skipped_result unless can_transfer?
+
+          req_headers = TransferRequest.new(request_data).headers
+
+          transfer_file_to_object_storage(resource_url, req_headers)
         end
 
         class Result
@@ -142,12 +151,61 @@ module Gitlab
               return failure_result(bytes_downloaded: file_size)
             end
 
-            # Move transfered file to the target location
+            # Move transferred file to the target location
             FileUtils.mv(temp_file.path, filename)
 
-            log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
+            log_info("Successfully downloaded", filename: filename, file_size_bytes: file_size)
           rescue StandardError, ::HTTP::Error => e
             log_error("Error downloading file", error: e, filename: filename, url: url)
+
+            return failure_result
+          ensure
+            temp_file.close
+            temp_file.unlink
+          end
+
+          Result.new(success: file_size > -1, bytes_downloaded: [file_size, 0].max)
+        end
+
+        def transfer_file_to_object_storage(url, req_headers)
+          file_size = -1
+
+          # Create a temporary file for Object Storage transfers
+          temp_file = Tempfile.new("#{TEMP_PREFIX}-#{file_type}-#{file_id}")
+          temp_file.chmod(default_permissions)
+          temp_file.binmode
+
+          return failure_result unless temp_file
+
+          begin
+            # Make the request
+            response = ::HTTP.follow.get(url, headers: req_headers)
+
+            # Check for failures
+            unless response.status.success?
+              log_error("Unsuccessful download", file_type: file_type, file_id: file_id,
+                        status_code: response.status.code, reason: response.status.reason, url: url)
+
+              return failure_result(primary_missing_file: primary_missing_file?(response))
+            end
+
+            # Stream to temporary file on disk
+            response.body.each do |chunk|
+              temp_file.write(chunk)
+            end
+
+            file_size = temp_file.size
+
+            # Upload file to Object Storage
+            uploader.send(:storage).store! CarrierWave::SanitizedFile.new(temp_file)
+
+            log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
+          rescue => e
+            log_error("Error downloading file", error: e, filename: filename, url: url)
+
+            return failure_result
+          rescue Errno::EEXIST => e
+            log_error("Destination file is a directory", error: e, filename: filename)
 
             return failure_result
           ensure
@@ -186,7 +244,7 @@ module Gitlab
           temp.chmod(default_permissions)
           temp.binmode
           temp
-        rescue StandardError => e
+        rescue => e
           log_error("Error creating temporary file", error: e, filename: target_filename)
           nil
         end
