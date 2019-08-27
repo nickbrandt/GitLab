@@ -1,12 +1,5 @@
 # GitLab
 
-![logo](https://about.gitlab.com/images/logo.png)
-
-## Test coverage
-
-- [![Ruby coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=coverage)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-ruby) Ruby
-- [![JavaScript coverage](https://gitlab.com/gitlab-org/gitlab-ee/badges/master/coverage.svg?job=karma)](https://gitlab-org.gitlab.io/gitlab-ee/coverage-javascript) JavaScript
-
 ## Canonical source
 
 The canonical source of GitLab Community Edition is [hosted on GitLab.com](https://gitlab.com/gitlab-org/gitlab-ce/).
@@ -111,7 +104,7 @@ For upgrading information please see our [update page](https://about.gitlab.com/
 
 ## Documentation
 
-All documentation can be found on [docs.gitlab.com/ee/](https://docs.gitlab.com/ee/).
+All documentation can be found on <https://docs.gitlab.com>.
 
 ## Getting help
 
