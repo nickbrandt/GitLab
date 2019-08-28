@@ -24,7 +24,7 @@ module Epics
     private
 
     def track_event
-      ::Gitlab::SnowplowTracker.track_event(
+      ::Gitlab::Tracking.event(
         'epics', 'promote', property: 'issue_id', value: original_entity.id
       )
     end
