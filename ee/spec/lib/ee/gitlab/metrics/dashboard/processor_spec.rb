@@ -6,7 +6,7 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:project) { build(:project) }
   let(:environment) { create(:environment, project: project) }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
-  let(:params) { [project, environment, dashboard_yml] }
+  let(:params) { [project, dashboard_yml, { environment: environment }] }
 
   describe 'sequence' do
     let(:environment) { build(:environment) }

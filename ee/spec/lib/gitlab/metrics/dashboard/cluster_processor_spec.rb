@@ -2,14 +2,15 @@
 
 require 'spec_helper'
 
-describe Gitlab::Metrics::Dashboard::Processor do
-  let(:project) { build(:project) }
-  let(:environment) { create(:environment, project: project) }
+describe Gitlab::Metrics::Dashboard::ClusterProcessor do
+  let(:cluster_project) { build(:cluster_project) }
+  let(:cluster) { cluster_project.cluster }
+  let(:project) { cluster_project.project }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
 
   describe 'process' do
-    let(:process_params) { [project, dashboard_yml, { environment: environment }] }
-    let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: true) }
+    let(:process_params) { [project, dashboard_yml, { cluster: cluster, cluster_type: :project }] }
+    let(:dashboard) { described_class.new(*process_params).process }
 
     it 'includes a path for the prometheus endpoint with each metric' do
       expect(all_metrics).to satisfy_all do |metric|
@@ -28,47 +29,9 @@ describe Gitlab::Metrics::Dashboard::Processor do
       end
     end
 
-    context 'when the project has associated metrics' do
-      let!(:project_response_metric) { create(:prometheus_metric, project: project, group: :response) }
-      let!(:project_system_metric) { create(:prometheus_metric, project: project, group: :system) }
-      let!(:project_business_metric) { create(:prometheus_metric, project: project, group: :business) }
-
-      it 'includes project-specific metrics' do
-        expect(all_metrics).to include get_metric_details(project_system_metric)
-        expect(all_metrics).to include get_metric_details(project_response_metric)
-        expect(all_metrics).to include get_metric_details(project_business_metric)
-      end
-
-      it 'orders groups by priority and panels by weight' do
-        expected_metrics_order = [
-          'metric_b', # group priority 10, panel weight 1
-          'metric_a2', # group priority 1, panel weight 2
-          'metric_a1', # group priority 1, panel weight 1
-          project_business_metric.id, # group priority 0, panel weight nil (0)
-          project_response_metric.id, # group priority -5, panel weight nil (0)
-          project_system_metric.id, # group priority -10, panel weight nil (0)
-        ]
-        actual_metrics_order = all_metrics.map { |m| m[:id] || m[:metric_id] }
-
-        expect(actual_metrics_order).to eq expected_metrics_order
-      end
-
-      context 'when the dashboard should not include project metrics' do
-        let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: false) }
-
-        it 'includes only dashboard metrics' do
-          metrics = all_metrics.map { |m| m[:id] }
-
-          expect(metrics.length).to be(3)
-          expect(metrics).to eq %w(metric_b metric_a2 metric_a1)
-        end
-      end
-    end
-
     shared_examples_for 'errors with message' do |expected_message|
       it 'raises a DashboardLayoutError' do
         error_class = Gitlab::Metrics::Dashboard::Errors::DashboardProcessingError
-
         expect { dashboard }.to raise_error(error_class, expected_message)
       end
     end
@@ -117,9 +80,9 @@ describe Gitlab::Metrics::Dashboard::Processor do
   end
 
   def prometheus_path(query)
-    Gitlab::Routing.url_helpers.prometheus_api_project_environment_path(
+    Gitlab::Routing.url_helpers.prometheus_api_project_cluster_path(
       project,
-      environment,
+      cluster,
       proxy_path: :query_range,
       query: query
     )

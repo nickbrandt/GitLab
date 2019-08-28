@@ -7,17 +7,10 @@ module Gitlab
       # relevant DB records & sorting for proper rendering in
       # the UI. These includes shared metric info, custom metrics
       # info, and alerts (only in EE).
-      class Processor
-        SYSTEM_SEQUENCE = [
+      class ClusterProcessor
+        SEQUENCE = [
           Stages::CommonMetricsInserter,
-          Stages::ProjectMetricsInserter,
-          Stages::EndpointInserter,
-          Stages::Sorter
-        ].freeze
-
-        PROJECT_SEQUENCE = [
-          Stages::CommonMetricsInserter,
-          Stages::EndpointInserter,
+          Stages::ClusterEndpointInserter,
           Stages::Sorter
         ].freeze
 
@@ -29,22 +22,14 @@ module Gitlab
 
         # Returns a new dashboard hash with the results of
         # running transforms on the dashboard.
-        def process(insert_project_metrics:)
+        def process
           @dashboard.deep_symbolize_keys.tap do |dashboard|
-            sequence(insert_project_metrics).each do |stage|
+            SEQUENCE.each do |stage|
               stage.new(@project, dashboard, @params).transform!
             end
           end
-        end
-
-        private
-
-        def sequence(insert_project_metrics)
-          insert_project_metrics ? SYSTEM_SEQUENCE : PROJECT_SEQUENCE
         end
       end
     end
   end
 end
-
-Gitlab::Metrics::Dashboard::Processor.prepend_if_ee('EE::Gitlab::Metrics::Dashboard::Processor')
