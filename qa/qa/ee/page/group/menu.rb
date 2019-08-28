@@ -15,6 +15,7 @@ module QA
             element :group_sidebar_submenu
             element :group_settings_item
             element :group_members_item
+            element :general_settings_link
           end
 
           view 'ee/app/views/layouts/nav/ee/_epic_link.html.haml' do
@@ -54,6 +55,14 @@ module QA
           def click_group_members_item
             within_sidebar do
               click_element(:group_members_item)
+            end
+          end
+
+          def click_group_general_settings_item
+            hover_settings do
+              within_submenu do
+                click_element(:general_settings_link)
+              end
             end
           end
 
