@@ -29,8 +29,7 @@ describe ::TodosHelper do
       it 'produces a good link' do
         path = helper.todo_target_path(todo)
         link = helper.todo_target_link(todo)
-        expected = ["<a class=\"has-tooltip\" title=\"#{design.filename}\"",
-                    "href=\"#{path}\">design #{design.filename}</a>"].join(' ')
+        expected = "<a href=\"#{path}\">design #{design.filename}</a>"
 
         expect(link).to eq(expected)
       end
