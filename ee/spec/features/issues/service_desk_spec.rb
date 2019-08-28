@@ -37,16 +37,12 @@ describe 'Service Desk Issue Tracker', :js do
             visit service_desk_project_issues_path(project_without_service_desk)
           end
 
-          it 'displays the large info box' do
-            expect(page).to have_css('.empty-state')
-          end
-
-          it 'has a link to the documentation' do
-            expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
-          end
-
-          it 'does show a button configure service desk' do
-            expect(page).to have_link('Turn on Service Desk')
+          it 'displays the large info box, documentation, and a button to configure' do
+            aggregate_failures do
+              expect(page).to have_css('.empty-state')
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
+              expect(page).to have_link('Turn on Service Desk')
+            end
           end
         end
 
@@ -70,20 +66,32 @@ describe 'Service Desk Issue Tracker', :js do
             visit service_desk_project_issues_path(project)
           end
 
-          it 'displays the large info box' do
-            expect(page).to have_css('.empty-state')
+          it 'displays the large info box, documentation, and the address' do
+            aggregate_failures do
+              expect(page).to have_css('.empty-state')
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
+              expect(page).not_to have_link('Turn on Service Desk')
+              expect(page).to have_content(project.service_desk_address)
+            end
           end
 
-          it 'has a link to the documentation' do
-            expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
-          end
+          context 'when user does not have permission to edit project settings' do
+            before do
+              user_2 = create(:user)
 
-          it 'does not show a button configure service desk' do
-            expect(page).not_to have_link('Turn on Service Desk')
-          end
+              project.add_guest(user_2)
+              sign_in(user_2)
+              visit service_desk_project_issues_path(project)
+            end
 
-          it 'shows the service desk email address' do
-            expect(page).to have_content(project.service_desk_address)
+            it 'displays the large info box and the documentation link' do
+              aggregate_failures do
+                expect(page).to have_css('.empty-state')
+                expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
+                expect(page).not_to have_link('Turn on Service Desk')
+                expect(page).not_to have_content(project.service_desk_address)
+              end
+            end
           end
         end
       end
@@ -99,20 +107,13 @@ describe 'Service Desk Issue Tracker', :js do
             visit service_desk_project_issues_path(project)
           end
 
-          it 'displays the small info box' do
-            expect(page).to have_css('.non-empty-state')
-          end
-
-          it 'has a link to the documentation' do
-            expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
-          end
-
-          it 'does not show a button configure service desk' do
-            expect(page).not_to have_link('Turn on Service Desk')
-          end
-
-          it 'shows the service desk email address' do
-            expect(page).to have_content(project.service_desk_address)
+          it 'displays the small info box, documentation, a button to configure service desk, and the address' do
+            aggregate_failures do
+              expect(page).to have_css('.non-empty-state')
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
+              expect(page).not_to have_link('Turn on Service Desk')
+              expect(page).to have_content(project.service_desk_address)
+            end
           end
         end
 
