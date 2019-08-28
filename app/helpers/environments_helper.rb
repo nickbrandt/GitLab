@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EnvironmentsHelper
-  prepend ::EE::EnvironmentsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('::EE::EnvironmentsHelper') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def environments_list_data
     {

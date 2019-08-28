@@ -134,4 +134,4 @@ module MigrationsHelpers
   end
 end
 
-MigrationsHelpers.prepend(EE::MigrationsHelpers)
+MigrationsHelpers.prepend_if_ee('EE::MigrationsHelpers')

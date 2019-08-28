@@ -7,7 +7,7 @@ class CommitStatus < ApplicationRecord
   include Presentable
   include EnumWithNil
 
-  prepend ::EE::CommitStatus # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('::EE::CommitStatus') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   self.table_name = 'ci_builds'
 

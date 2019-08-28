@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MembersPreloader
-  prepend EE::MembersPreloader # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('EE::MembersPreloader') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   attr_reader :members
 

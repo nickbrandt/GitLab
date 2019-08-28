@@ -2,7 +2,7 @@
 
 module RepositoryCheck
   class BatchWorker
-    prepend ::EE::RepositoryCheck::BatchWorker # rubocop: disable Cop/InjectEnterpriseEditionModule
+    prepend_if_ee('::EE::RepositoryCheck::BatchWorker') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     include ApplicationWorker
     include RepositoryCheckQueue

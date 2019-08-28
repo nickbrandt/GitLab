@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProjectMirrorEntity < Grape::Entity
-  prepend ::EE::ProjectMirrorEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('::EE::ProjectMirrorEntity') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :id
 

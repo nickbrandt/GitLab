@@ -54,4 +54,4 @@ module QA
   end
 end
 
-QA::Page::Project::Operations::Kubernetes::Show.prepend(QA::EE::Page::Project::Operations::Kubernetes::Show)
+QA::Page::Project::Operations::Kubernetes::Show.prepend_if_ee('QA::EE::Page::Project::Operations::Kubernetes::Show')

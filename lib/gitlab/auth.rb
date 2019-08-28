@@ -26,7 +26,7 @@ module Gitlab
     DEFAULT_SCOPES = [:api].freeze
 
     class << self
-      prepend EE::Gitlab::Auth # rubocop: disable Cop/InjectEnterpriseEditionModule
+      prepend_if_ee('EE::Gitlab::Auth') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def omniauth_enabled?
         Gitlab.config.omniauth.enabled

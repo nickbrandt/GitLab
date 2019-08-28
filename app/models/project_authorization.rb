@@ -2,7 +2,7 @@
 
 class ProjectAuthorization < ApplicationRecord
   include FromUnion
-  prepend ::EE::ProjectAuthorization # rubocop: disable Cop/InjectEnterpriseEditionModule
+  prepend_if_ee('::EE::ProjectAuthorization') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   belongs_to :user
   belongs_to :project
