@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/FZambia/sentinel v1.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/garyburd/redigo v1.6.0 // indirect
 	github.com/getsentry/raven-go v0.1.2
 	github.com/golang/gddo v0.0.0-20190419222130-af0f2af80721
 	github.com/golang/protobuf v1.3.1
@@ -19,7 +18,7 @@ require (
 	github.com/jpillora/backoff v0.0.0-20170918002102-8eab2debe79d
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.0.0
-	github.com/rafaeljusto/redigomock v0.0.0-20170720131524-7ae0511314e9
+	github.com/rafaeljusto/redigomock v0.0.0-20190202135759-257e089e14a1
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/sirupsen/logrus v1.3.0
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
