@@ -42,6 +42,10 @@ describe Note do
       it 'returns true for a guest user' do
         expect(note.visible_for?(guest)).to be_truthy
       end
+
+      it 'returns true for a nil user' do
+        expect(note.visible_for?(nil)).to be_truthy
+      end
     end
 
     context 'when note is older than epic' do
@@ -61,6 +65,10 @@ describe Note do
 
       it 'returns false for a guest user' do
         expect(older_note.visible_for?(guest)).to be_falsy
+      end
+
+      it 'returns false for a nil user' do
+        expect(older_note.visible_for?(nil)).to be_falsy
       end
     end
   end
