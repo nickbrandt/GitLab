@@ -540,9 +540,9 @@ module API
             },
             {
               required: false,
-              name: :notify_only_default_branch,
-              type: Boolean,
-              desc: 'Send notifications only for the default branch'
+              name: :branches_to_be_notified,
+              type: String,
+              desc: 'Branches for which notifications are to be sent'
             }
           ],
           'pivotaltracker' => [
