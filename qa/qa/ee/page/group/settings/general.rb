@@ -15,6 +15,10 @@ module QA
               element :save_changes_button
             end
 
+            view 'ee/app/views/groups/settings/_ip_restriction.html.haml' do
+              element :ip_restriction_field
+            end
+
             def current_custom_project_template
               expand_section(:custom_project_templates)
 
@@ -32,6 +36,13 @@ module QA
               click_element :custom_project_template_select
               search_and_select(path)
               click_element :save_changes_button
+            end
+
+            def set_ip_address_restriction(ip_address)
+              expand_section(:permission_lfs_2fa_section)
+              find_element(:ip_restriction_field).send_keys([:command, 'a'], :backspace)
+              find_element(:ip_restriction_field).set ip_address
+              click_element :save_permissions_changes_button
             end
           end
         end
