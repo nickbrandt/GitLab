@@ -40,7 +40,7 @@ module API
       end
 
       def parse_recipe(url_recipe)
-        split_recipe = recipe.split('/')
+        split_recipe = url_recipe.split('/')
         {
           package_name: split_recipe[0],
           version: split_recipe[1],
@@ -59,23 +59,23 @@ module API
       end
 
       def find_project_by_recipe(url_recipe)
-        project_path = parse_recipe(url_recipe)[:pkg_username]
+        project_path = parse_recipe(url_recipe)[:pkg_username].tr('.', '/')
         Project.find_by_full_path(project_path)
       end
     end
 
     before do
-      # Rails.logger.info '-----------------------------------------------'
-      # Rails.logger.info headers
-      # Rails.logger.info '-----------------------------------------------'
-      # Rails.logger.info request.body.read if request.body.is_a?(StringIO)
-      # Rails.logger.info '-----------------------------------------------'
+      Rails.logger.info '-----------------------------------------------'
+      Rails.logger.info headers
+      Rails.logger.info '-----------------------------------------------'
+      Rails.logger.info request.body.read if request.body.is_a?(StringIO)
+      Rails.logger.info '-----------------------------------------------'
       not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
       # Personal access token will be extracted from Bearer or Basic authorization
       # in the overriden find_personal_access_token helper
-      # authenticate!
+      authenticate!
     end
 
     namespace 'packages/conan/v1' do
@@ -121,14 +121,14 @@ module API
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'digest' do
-        recipe = generate_recipe(url_recipe)
-        project = find_project_by_recipe(recipe)
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
         render_api_error!("No recipe manifest found", 404) unless project
 
-        authorize!(:read_package, project)
+        # authorize!(:read_package, project)
 
-        service = ConanService.new(recipe)
-        urls = service.recipe_urls
+        service = ::Packages::ConanPackageService.new(recipe, current_user)
+        urls = service.urls(:recipe)
 
         render_api_error!("No recipe manifest found", 404) if urls.empty?
 
@@ -139,14 +139,14 @@ module API
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'packages/:package_id/digest' do
-        recipe = generate_recipe(url_recipe)
-        project = find_project_by_recipe(recipe)
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
         render_api_error!("No recipe manifest found", 404) unless project
 
-        authorize!(:read_package, project)
+        # authorize!(:read_package, project)
 
-        service = ConanService.new(recipe, params[:package_id])
-        urls = service.package_urls
+        service = ::Packages::ConanPackageService.new(recipe, current_user, params[:package_id])
+        urls = service.urls(:package)
 
         render_api_error!("No recipe manifest found", 404) if urls.empty?
 
@@ -192,18 +192,26 @@ module API
         detail 'This feature was introduced in GitLab 12.3'
       end
       get '/' do
-        recipe = generate_recipe(url_recipe)
-        authorize!(:read_package, project)
-        ConanService.new(recipe).recipe_snapshot
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
+
+        return {} unless project # rubocop:disable Cop/AvoidReturnFromBlocks
+
+        # authorize!(:read_package, project)
+        ::Packages::ConanPackageService.new(recipe, current_user).snapshot(:recipe)
       end
 
       desc 'Package Snapshot' do
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'packages/:package_id' do
-        recipe = generate_recipe(url_recipe)
-        authorize!(:read_package, project)
-        ConanService.new(recipe, params[:package_id]).package_snapshot
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
+
+        return {} unless project # rubocop:disable Cop/AvoidReturnFromBlocks
+
+        # authorize!(:read_package, project)
+        ::Packages::ConanPackageService.new(recipe, current_user, params[:package_id]).snapshot(:package)
       end
     end
 
@@ -245,21 +253,25 @@ module API
       uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
       bad_request!('Missing package file!') unless uploaded_file
 
-      recipe = generate_recipe(url_recipe)
+      recipe = generate_recipe(params[:url_recipe])
+      project = find_project_by_recipe(params[:url_recipe])
+      render_api_error!("No GitLab project found", 404) unless project
+
       package = ::Packages::FindOrCreateConanPackageService
-        .new(User.first.projects.first, User.first, params.merge(recipe: recipe)).execute
+        .new(project, User.first, params.merge(recipe: recipe)).execute
 
       file_params = {
         file:      uploaded_file,
         size:      params['file.size'],
-        file_name: params['file_name'],
+        file_name: params[:file_name],
         file_type: params['file.type'],
         file_sha1: params['file.sha1'],
-        file_md5:  params['file.md5']
+        file_md5:  params['file.md5'],
+        path:      params[:path],
+        recipe:    recipe
       }
 
-      ::Packages::CreatePackageFileService.new(package, file_params).execute
-      ::Packages::CreatePackageFileService.new(package, file_params).execute
+      ::Packages::CreateConanPackageFileService.new(package, file_params).execute
     end
 
     helpers do
