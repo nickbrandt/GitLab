@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe Packages::Package, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:project) }
-    it { is_expected.to have_many(:package_files) }
+    it { is_expected.to have_many(:package_files).dependent(:destroy) }
   end
 
   describe 'validations' do
@@ -36,6 +36,18 @@ RSpec.describe Packages::Package, type: :model do
           expect(new_package).to be_valid
         end
       end
+    end
+  end
+
+  describe '#destroy' do
+    let(:package) { create(:npm_package) }
+    let(:package_file) { package.package_files.first }
+    let(:project_statistics) { ProjectStatistics.for_project_ids(package.project.id).first }
+
+    it 'affects project statistics' do
+      expect { package.destroy! }
+        .to change { project_statistics.reload.packages_size }
+              .from(package_file.size).to(0)
     end
   end
 
