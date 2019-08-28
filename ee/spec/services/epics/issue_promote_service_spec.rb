@@ -56,7 +56,7 @@ describe Epics::IssuePromoteService do
 
         context 'when issue is promoted' do
           before do
-            allow(Gitlab::SnowplowTracker).to receive(:track_event).with('epics', 'promote', an_instance_of(Hash))
+            allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
 
             subject.execute(issue)
           end
@@ -89,7 +89,7 @@ describe Epics::IssuePromoteService do
           let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
 
           before do
-            allow(Gitlab::SnowplowTracker).to receive(:track_event).with('epics', 'promote', an_instance_of(Hash))
+            allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
             issue.reload
           end
 
