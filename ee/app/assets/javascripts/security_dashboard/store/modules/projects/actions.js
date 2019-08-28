@@ -9,6 +9,7 @@ const getAllProjects = (url, page = '1', projects = []) =>
       per_page: 100,
       page,
       include_subgroups: true,
+      with_security_reports: true,
       order_by: 'path',
       sort: 'asc',
     },

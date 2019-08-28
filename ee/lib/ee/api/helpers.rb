@@ -115,6 +115,15 @@ module EE
 
       private
 
+      override :project_finder_params_ee
+      def project_finder_params_ee
+        if params[:with_security_reports].present?
+          { with_security_reports: true }
+        else
+          {}
+        end
+      end
+
       override :send_git_archive
       def send_git_archive(repository, **kwargs)
         AuditEvents::RepositoryDownloadStartedAuditEventService.new(

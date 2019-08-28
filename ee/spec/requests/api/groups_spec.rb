@@ -220,6 +220,45 @@ describe API::Groups do
     end
   end
 
+  describe "GET /groups/:id/projects" do
+    context "when authenticated as user" do
+      let(:project_with_reports) { create(:project, :public, group: group) }
+      let!(:project_without_reports) { create(:project, :public, group: group) }
+
+      before do
+        create(:ee_ci_job_artifact, :sast, project: project_with_reports)
+      end
+
+      subject { get api("/groups/#{group.id}/projects", user), params: { with_security_reports: true } }
+
+      context 'when security dashboard is enabled for a group' do
+        let(:group) { create(:group, plan: :gold_plan) } # overriding group from parent context
+
+        before do
+          stub_licensed_features(security_dashboard: true)
+          enable_namespace_license_check!
+
+          create(:gitlab_subscription, hosted_plan: group.plan, namespace: group)
+        end
+
+        it "returns only projects with security reports" do
+          subject
+
+          expect(json_response.map { |p| p['id'] }).to contain_exactly(project_with_reports.id)
+        end
+      end
+
+      context 'when security dashboard is disabled for a group' do
+        it "returns all projects regardless of the security reports" do
+          subject
+
+          # using `include` since other projects may be added to this group from different contexts
+          expect(json_response.map { |p| p['id'] }).to include(project_with_reports.id, project_without_reports.id)
+        end
+      end
+    end
+  end
+
   def ldap_sync(group_id, user, sidekiq_testing_method)
     Sidekiq::Testing.send(sidekiq_testing_method) do
       post api("/groups/#{group_id}/ldap_sync", user)
