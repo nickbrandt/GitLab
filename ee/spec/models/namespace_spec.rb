@@ -70,6 +70,7 @@ describe Namespace do
         it 'returns namespaces with plan' do
           create(:gitlab_subscription, :bronze, namespace: namespace)
           create(:gitlab_subscription, :free, namespace: create(:namespace))
+
           expect(described_class.with_feature_available_in_plan(:audit_events)).to eq([namespace])
         end
       end

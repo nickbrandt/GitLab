@@ -9,17 +9,27 @@ class GroupsWithTemplatesFinder
   end
 
   def execute
-    groups = @group_id ? ::Group.find(group_id).self_and_ancestors : ::Group.all
-    groups = groups.with_project_templates
-
     if ::Gitlab::CurrentSettings.should_check_namespace_plan? && Time.zone.now > CUT_OFF_DATE
-      groups = groups.with_feature_available_in_plan(:group_project_templates)
+      groups = extended_group_search
+      simple_group_search(groups)
+    else
+      simple_group_search(Group.all)
     end
-
-    groups
   end
 
   private
 
   attr_reader :group_id
+
+  def extended_group_search
+    groups = Group.with_feature_available_in_plan(:group_project_templates)
+    Gitlab::ObjectHierarchy.new(groups).base_and_descendants
+  end
+
+  def simple_group_search(groups)
+    groups = group_id ? groups.find_by(id: group_id)&.self_and_ancestors : groups # rubocop: disable CodeReuse/ActiveRecord
+    return Group.none unless groups
+
+    groups.with_project_templates
+  end
 end
