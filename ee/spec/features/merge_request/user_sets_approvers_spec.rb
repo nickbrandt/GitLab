@@ -83,7 +83,7 @@ describe 'Merge request > User sets approvers', :js do
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
         click_button 'Add'
-        click_button 'Update approvers'
+        click_button 'Update approval rule'
 
         click_on("Submit merge request")
         wait_for_all_requests
@@ -109,7 +109,7 @@ describe 'Merge request > User sets approvers', :js do
           expect(page).to have_css('.content-list li', count: 1)
         end
 
-        click_button 'Update approvers'
+        click_button 'Update approval rule'
         click_on("Submit merge request")
         wait_for_all_requests
         click_on("View eligible approvers") if page.has_button?("View eligible approvers")
@@ -150,7 +150,7 @@ describe 'Merge request > User sets approvers', :js do
         find('.select2-results .user-result', text: group.name).click
         close_approver_select
         click_button 'Add'
-        click_button 'Update approvers'
+        click_button 'Update approval rule'
 
         click_on("Save changes")
         wait_for_all_requests
@@ -177,7 +177,7 @@ describe 'Merge request > User sets approvers', :js do
           expect(page).to have_css('.content-list li', count: 1)
         end
 
-        click_button 'Update approvers'
+        click_button 'Update approval rule'
         click_on("Save changes")
         wait_for_all_requests
 
@@ -207,7 +207,7 @@ describe 'Merge request > User sets approvers', :js do
 
         fill_in 'No. approvals required', with: '3'
 
-        click_button 'Update approvers'
+        click_button 'Update approval rule'
         click_on('Save changes')
         wait_for_all_requests
 

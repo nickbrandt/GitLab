@@ -51,13 +51,13 @@ describe 'Merge request > User edits MR with approval rules', :js do
   it "allows user to create approval rule" do
     rule_name = "Custom Approval Rule"
 
-    click_button "Add approvers"
+    click_button "Add approval rule"
 
     fill_in "Rule name", with: rule_name
 
     add_approval_rule_member('user', approver.name)
 
-    find("#{modal_id} button", text: 'Add approvers').click
+    find("#{modal_id} button", text: 'Add approval rule').click
     wait_for_requests
 
     expect(page_rule_names.last).to have_text(rule_name)
@@ -69,7 +69,7 @@ describe 'Merge request > User edits MR with approval rules', :js do
     before do
       group.add_developer create(:user)
 
-      click_button "Add approvers"
+      click_button "Add approval rule"
     end
 
     it "with empty search, does not show public group" do

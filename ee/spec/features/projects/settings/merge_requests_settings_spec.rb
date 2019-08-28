@@ -40,7 +40,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
     expect(find('.select2-results')).not_to have_content(user.name)
 
     close_approver_select
-    click_button 'Update approvers'
+    click_button 'Update approval rule'
     wait_for_requests
 
     expect_avatar(find('.js-members'), user)
@@ -60,7 +60,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
 
     expect(find('.content-list')).to have_content(group.name)
 
-    click_button 'Update approvers'
+    click_button 'Update approval rule'
     wait_for_requests
 
     expect_avatar(find('.js-members'), group.users)
@@ -81,7 +81,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
 
       open_modal
       remove_approver(group.name)
-      click_button "Update approvers"
+      click_button "Update approval rule"
       wait_for_requests
 
       expect_avatar(find('.js-members'), [non_group_approver])

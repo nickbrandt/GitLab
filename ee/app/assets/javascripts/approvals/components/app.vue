@@ -49,7 +49,7 @@ export default {
         <gl-loading-icon v-if="isLoading" />
         <div v-if="settings.allowMultiRule" class="d-flex">
           <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null)">{{
-            __('Add approvers')
+            __('Add approval rule')
           }}</gl-button>
         </div>
       </div>

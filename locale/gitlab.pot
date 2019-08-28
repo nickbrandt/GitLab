@@ -866,6 +866,9 @@ msgstr ""
 msgid "Add an issue"
 msgstr ""
 
+msgid "Add approval rule"
+msgstr ""
+
 msgid "Add approvers"
 msgstr ""
 
@@ -1650,7 +1653,7 @@ msgstr[1] ""
 msgid "ApprovalRule|All members with Developer role or higher and code owners (if any)"
 msgstr ""
 
-msgid "ApprovalRule|Members"
+msgid "ApprovalRule|Approvers"
 msgstr ""
 
 msgid "ApprovalRule|Name"
@@ -16235,7 +16238,7 @@ msgstr ""
 msgid "Update all"
 msgstr ""
 
-msgid "Update approvers"
+msgid "Update approval rule"
 msgstr ""
 
 msgid "Update failed"
