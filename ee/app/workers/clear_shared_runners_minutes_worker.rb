@@ -18,7 +18,7 @@ class ClearSharedRunnersMinutesWorker
       namespaces.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
     end
 
-    Namespace.each_batch do |namespaces|
+    Namespace.select(:id).each_batch do |namespaces|
       Namespace.transaction do
         reset_statistics(NamespaceStatistics, namespaces)
         reset_statistics(ProjectStatistics, namespaces)
