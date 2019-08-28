@@ -4,7 +4,7 @@ describe ClearSharedRunnersMinutesWorker do
   let(:worker) { described_class.new }
 
   describe '#perform' do
-    let(:namespace) { create(:namespace, last_ci_minutes_notification_at: Time.now) }
+    let(:namespace) { create(:namespace) }
 
     before do
       expect_any_instance_of(described_class)
