@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
 
 import EpicsSelectBase from 'ee/vue_shared/components/sidebar/epics_select/base.vue';
@@ -11,26 +11,21 @@ import DropdownHeader from 'ee/vue_shared/components/sidebar/epics_select/dropdo
 import DropdownSearchInput from 'ee/vue_shared/components/sidebar/epics_select/dropdown_search_input.vue';
 import DropdownContents from 'ee/vue_shared/components/sidebar/epics_select/dropdown_contents.vue';
 
-import EpicsSelectService from 'ee/vue_shared/components/sidebar/epics_select/service/epics_select_service';
-import EpicsSelectStore from 'ee/vue_shared/components/sidebar/epics_select/store/epics_select_store';
+import createDefaultStore from 'ee/vue_shared/components/sidebar/epics_select/store';
 
-import {
-  mockEpic1,
-  mockEpic2,
-  mockIssue,
-  mockEpics,
-  mockAssignRemoveRes,
-  noneEpic,
-} from '../../../../sidebar/mock_data';
+import { mockEpic1, mockEpic2, mockIssue, noneEpic } from '../mock_data';
 
 describe('EpicsSelect', () => {
   describe('Base', () => {
-    const errorMessage = 'Something went wrong while fetching group epics.';
     let wrapper;
+    // const errorMessage = 'Something went wrong while fetching group epics.';
+    const store = createDefaultStore();
 
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
       wrapper = shallowMount(EpicsSelectBase, {
+        store,
+        localVue: createLocalVue(),
         propsData: {
           canEdit: true,
           blockTitle: 'Epic',
@@ -47,14 +42,8 @@ describe('EpicsSelect', () => {
       wrapper.destroy();
     });
 
-    describe('data', () => {
-      it('should have `service` & `store` props initialized', () => {
-        expect(wrapper.vm.service instanceof EpicsSelectService).toBe(true);
-        expect(wrapper.vm.store instanceof EpicsSelectStore).toBe(true);
-      });
-    });
-
     describe('methods', () => {
+      /*
       describe('fetchGroupEpics', () => {
         it('should call `service.getGroupEpics` and set response to store on request success', done => {
           jest.spyOn(wrapper.vm.service, 'getGroupEpics').mockResolvedValue({ data: mockEpics });
@@ -312,17 +301,18 @@ describe('EpicsSelect', () => {
             .catch(done.fail);
         });
       });
+      */
 
       describe('handleDropdownShown', () => {
-        it('should call `fetchGroupEpics` when store does not have any epics loaded yet', done => {
-          jest.spyOn(wrapper.vm, 'fetchGroupEpics');
+        it('should call `fetchEpics` when `groupEpics` does not return any epics', done => {
+          jest.spyOn(wrapper.vm, 'fetchEpics');
 
-          wrapper.vm.store.setEpics([]);
+          store.dispatch('receiveEpicsSuccess', []);
 
           wrapper.vm.$nextTick(() => {
             wrapper.vm.handleDropdownShown();
 
-            expect(wrapper.vm.fetchGroupEpics).toHaveBeenCalled();
+            expect(wrapper.vm.fetchEpics).toHaveBeenCalled();
 
             done();
           });
@@ -340,6 +330,7 @@ describe('EpicsSelect', () => {
       describe('handleItemSelect', () => {
         it('should call `removeIssueFromEpic` with selected epic when `epic` param represents `No Epic`', () => {
           jest.spyOn(wrapper.vm, 'removeIssueFromEpic');
+          store.dispatch('setSelectedEpic', mockEpic1);
 
           wrapper.vm.handleItemSelect(noneEpic);
 
@@ -352,16 +343,6 @@ describe('EpicsSelect', () => {
           wrapper.vm.handleItemSelect(mockEpic2);
 
           expect(wrapper.vm.assignIssueToEpic).toHaveBeenCalledWith(mockEpic2);
-        });
-      });
-
-      describe('handleSearchInput', () => {
-        it('should call `store.filterEpics` with passed `query` param', () => {
-          jest.spyOn(wrapper.vm.store, 'filterEpics');
-
-          wrapper.vm.handleSearchInput('foo');
-
-          expect(wrapper.vm.store.filterEpics).toHaveBeenCalledWith('foo');
         });
       });
     });
@@ -445,9 +426,7 @@ describe('EpicsSelect', () => {
 
       it('should render DropdownContents component when props `canEdit` & `showDropdown` are true and `isEpicsLoading` is false', done => {
         showDropdown();
-        wrapper.setData({
-          isEpicsLoading: false,
-        });
+        store.dispatch('receiveEpicsSuccess', []);
 
         wrapper.vm.$nextTick(() => {
           expect(wrapper.find(DropdownContents).exists()).toBe(true);
@@ -457,9 +436,7 @@ describe('EpicsSelect', () => {
 
       it('should render GlLoadingIcon component when props `canEdit` & `showDropdown` and `isEpicsLoading` are true', done => {
         showDropdown();
-        wrapper.setData({
-          isEpicsLoading: true,
-        });
+        store.dispatch('requestEpics');
 
         wrapper.vm.$nextTick(() => {
           expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);

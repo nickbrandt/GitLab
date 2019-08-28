@@ -4,7 +4,7 @@ import { GlLink } from '@gitlab/ui';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import DropdownContents from 'ee/vue_shared/components/sidebar/epics_select/dropdown_contents.vue';
 
-import { mockEpic1, mockEpic2, mockEpics, noneEpic } from '../../../../sidebar/mock_data';
+import { mockEpic1, mockEpic2, mockEpics, noneEpic } from '../mock_data';
 
 const epics = mockEpics.map(epic => convertObjectPropsToCamelCase(epic));
 

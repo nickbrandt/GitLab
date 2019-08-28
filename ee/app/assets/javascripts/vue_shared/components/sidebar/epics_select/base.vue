@@ -1,13 +1,12 @@
 <script>
+import { mapState, mapGetters, mapActions } from 'vuex';
+
 import $ from 'jquery';
 import { GlLoadingIcon } from '@gitlab/ui';
 
-import createFlash from '~/flash';
-import { s__ } from '~/locale';
 import { noneEpic } from 'ee/vue_shared/constants';
 
-import EpicsSelectService from './service/epics_select_service';
-import EpicsSelectStore from './store/epics_select_store';
+import createStore from './store';
 
 import DropdownTitle from './dropdown_title.vue';
 import DropdownValue from './dropdown_value.vue';
@@ -19,6 +18,7 @@ import DropdownSearchInput from './dropdown_search_input.vue';
 import DropdownContents from './dropdown_contents.vue';
 
 export default {
+  store: createStore(),
   components: {
     GlLoadingIcon,
     DropdownTitle,
@@ -61,25 +61,14 @@ export default {
   },
   data() {
     return {
-      service: new EpicsSelectService({
-        groupId: this.groupId,
-      }),
-      store: new EpicsSelectStore({
-        selectedEpic: this.initialEpic,
-        groupId: this.groupId,
-        selectedEpicIssueId: this.epicIssueId,
-      }),
       showDropdown: false,
-      isEpicSelectLoading: false,
-      isEpicsLoading: false,
     };
   },
   computed: {
-    epics() {
-      return this.store.getEpics();
-    },
-    selectedEpic() {
-      return this.store.getSelectedEpic();
+    ...mapState(['epicSelectInProgress', 'epicsFetchInProgress', 'selectedEpic']),
+    ...mapGetters(['groupEpics']),
+    dropdownSelectInProgress() {
+      return this.initialEpicLoading || this.epicSelectInProgress;
     },
   },
   watch: {
@@ -88,77 +77,28 @@ export default {
      * So we need to watch for updates before updating local store.
      */
     initialEpicLoading() {
-      this.store.setSelectedEpic(this.initialEpic);
+      this.setSelectedEpic(this.initialEpic);
     },
   },
   mounted() {
+    this.setInitialData({
+      groupId: this.groupId,
+      issueId: this.issueId,
+      selectedEpic: this.selectedEpic,
+      selectedEpicIssueId: this.epicIssueId,
+    });
     $(this.$refs.dropdown).on('shown.bs.dropdown', this.handleDropdownShown);
     $(this.$refs.dropdown).on('hidden.bs.dropdown', this.handleDropdownHidden);
   },
   methods: {
-    fetchGroupEpics() {
-      this.isEpicsLoading = true;
-      return this.service
-        .getGroupEpics()
-        .then(({ data }) => {
-          this.isEpicsLoading = false;
-          this.store.setEpics(data);
-        })
-        .catch(() => {
-          this.isEpicsLoading = false;
-          createFlash(s__('Epics|Something went wrong while fetching group epics.'));
-        });
-    },
-    handleSelectSuccess({ data, epic, originalSelectedEpic }) {
-      // Verify if attachment was successful
-      this.isEpicSelectLoading = false;
-      if (data.epic.id === epic.id && data.issue.id === this.issueId) {
-        this.store.setSelectedEpicIssueId(data.id);
-      } else {
-        // Revert back to originally selected epic.
-        this.store.setSelectedEpic(originalSelectedEpic);
-      }
-    },
-    handleSelectFailure(errorMessage, originalSelectedEpic) {
-      this.isEpicSelectLoading = false;
-      // Revert back to originally selected epic in case of failure.
-      this.store.setSelectedEpic(originalSelectedEpic);
-      createFlash(errorMessage);
-    },
-    assignIssueToEpic(epic) {
-      const originalSelectedEpic = this.store.getSelectedEpic();
-      this.isEpicSelectLoading = true;
-
-      this.store.setSelectedEpic(epic);
-      return this.service
-        .assignIssueToEpic(this.issueId, epic)
-        .then(({ data }) => {
-          this.handleSelectSuccess({ data, epic, originalSelectedEpic });
-        })
-        .catch(() => {
-          this.handleSelectFailure(
-            s__('Epics|Something went wrong while assigning issue to epic.'),
-            originalSelectedEpic,
-          );
-        });
-    },
-    removeIssueFromEpic(epic) {
-      const originalSelectedEpic = this.store.getSelectedEpic();
-      this.isEpicSelectLoading = true;
-
-      this.store.setSelectedEpic(noneEpic);
-      return this.service
-        .removeIssueFromEpic(this.store.getSelectedEpicIssueId(), epic)
-        .then(({ data }) => {
-          this.handleSelectSuccess({ data, epic, originalSelectedEpic });
-        })
-        .catch(() => {
-          this.handleSelectFailure(
-            s__('Epics|Something went wrong while removing issue from epic.'),
-            originalSelectedEpic,
-          );
-        });
-    },
+    ...mapActions([
+      'setInitialData',
+      'setSearchQuery',
+      'setSelectedEpic',
+      'fetchEpics',
+      'assignIssueToEpic',
+      'removeIssueFromEpic',
+    ]),
     handleEditClick() {
       this.showDropdown = true;
 
@@ -175,7 +115,7 @@ export default {
       });
     },
     handleDropdownShown() {
-      if (this.epics.length === 0) this.fetchGroupEpics();
+      if (this.groupEpics.length === 0) this.fetchEpics();
     },
     handleDropdownHidden() {
       this.showDropdown = false;
@@ -187,9 +127,6 @@ export default {
         this.assignIssueToEpic(epic);
       }
     },
-    handleSearchInput(query) {
-      this.store.filterEpics(query);
-    },
   },
 };
 </script>
@@ -200,7 +137,7 @@ export default {
     <dropdown-title
       :can-edit="canEdit"
       :block-title="blockTitle"
-      :is-loading="initialEpicLoading || isEpicSelectLoading"
+      :is-loading="dropdownSelectInProgress"
       @onClickEdit="handleEditClick"
     />
     <dropdown-value v-show="!showDropdown" :epic="selectedEpic">
@@ -214,14 +151,18 @@ export default {
 dropdown-menu-epics dropdown-menu-selectable"
         >
           <dropdown-header />
-          <dropdown-search-input @onSearchInput="handleSearchInput" />
+          <dropdown-search-input @onSearchInput="setSearchQuery" />
           <dropdown-contents
-            v-if="!isEpicsLoading"
-            :epics="epics"
+            v-if="!epicsFetchInProgress"
+            :epics="groupEpics"
             :selected-epic="selectedEpic"
             @onItemSelect="handleItemSelect"
           />
-          <gl-loading-icon v-if="isEpicsLoading" class="dropdown-contents-loading" size="md" />
+          <gl-loading-icon
+            v-if="epicsFetchInProgress"
+            class="dropdown-contents-loading"
+            size="md"
+          />
         </div>
       </div>
     </div>

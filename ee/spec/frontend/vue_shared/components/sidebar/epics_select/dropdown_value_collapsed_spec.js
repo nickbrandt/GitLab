@@ -4,7 +4,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 
 import DropdownValueCollapsed from 'ee/vue_shared/components/sidebar/epics_select/dropdown_value_collapsed.vue';
 
-import { mockEpic1 } from '../../../../sidebar/mock_data';
+import { mockEpic1 } from '../mock_data';
 
 describe('EpicsSelect', () => {
   describe('DropdownValueCollapsed', () => {
