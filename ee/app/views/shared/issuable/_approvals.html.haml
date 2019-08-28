@@ -9,7 +9,7 @@
 
 .form-group.row
   .col-sm-2.col-form-label
-    = form.label :approver_ids, "Approvers"
+    = form.label :approver_ids, "Approval rules"
   .col-sm-10
     #js-mr-approvals-input{ data: { 'project_id': @target_project.id,
       'can_edit': can?(current_user, :update_approvers, issuable).to_s,

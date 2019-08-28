@@ -60,8 +60,8 @@ describe('Approvals ModalRuleCreate', () => {
 
       expect(modal.props('modalModule')).toEqual(MODAL_MODULE);
       expect(modal.props('modalId')).toEqual(TEST_MODAL_ID);
-      expect(modal.attributes('title')).toEqual('Add approvers');
-      expect(modal.attributes('ok-title')).toEqual('Add approvers');
+      expect(modal.attributes('title')).toEqual('Add approval rule');
+      expect(modal.attributes('ok-title')).toEqual('Add approval rule');
     });
 
     it('renders form', () => {
@@ -99,8 +99,8 @@ describe('Approvals ModalRuleCreate', () => {
 
       expect(modal.exists()).toBe(true);
 
-      expect(modal.attributes('title')).toEqual('Update approvers');
-      expect(modal.attributes('ok-title')).toEqual('Update approvers');
+      expect(modal.attributes('title')).toEqual('Update approval rule');
+      expect(modal.attributes('ok-title')).toEqual('Update approval rule');
     });
 
     it('renders form', () => {

@@ -135,7 +135,7 @@ describe('EE Approvals App', () => {
         const button = findAddButton();
 
         expect(button.exists()).toBe(true);
-        expect(button.text()).toBe('Add approvers');
+        expect(button.text()).toBe('Add approval rule');
       });
 
       it('opens create modal when add button is clicked', () => {

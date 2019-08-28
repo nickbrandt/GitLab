@@ -20,7 +20,7 @@ export default {
       rule: 'data',
     }),
     title() {
-      return this.rule ? __('Update approvers') : __('Add approvers');
+      return this.rule ? __('Update approval rule') : __('Add approval rule');
     },
   },
   methods: {

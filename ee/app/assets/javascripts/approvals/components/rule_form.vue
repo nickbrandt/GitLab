@@ -252,7 +252,7 @@ export default {
       </div>
     </div>
     <div class="form-group">
-      <label class="label-bold">{{ s__('ApprovalRule|Members') }}</label>
+      <label class="label-bold">{{ s__('ApprovalRule|Approvers') }}</label>
       <div class="d-flex align-items-start">
         <div class="w-100">
           <approvers-select
