@@ -2,9 +2,8 @@
 module Packages
   class FindOrCreateConanPackageService < BaseService
     def execute
-      Rails.logger.info "FindorCreate"
       package = ::Packages::ConanPackageFinder
-        .new(params[:path], current_user, project: project).execute
+        .new(params[:recipe], current_user, project: project).execute
 
       unless package
         package_params = {

@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 class Packages::ConanPackageFinder
-  attr_reader :path, :current_user, :project, :group
+  attr_reader :recipe, :current_user, :project, :group
 
-  def initialize(path, current_user, project: nil, group: nil)
-    @path = path
+  def initialize(recipe, current_user, project: nil, group: nil)
+    @recipe = recipe
     @current_user = current_user
     @project = project
     @group = group
   end
 
   def execute
-    Rails.logger.info "Find"
     base.last
   end
 

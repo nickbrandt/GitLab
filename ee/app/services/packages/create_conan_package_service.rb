@@ -2,7 +2,6 @@
 module Packages
   class CreateConanPackageService < BaseService
     def execute
-      Rails.logger.info "Create"
       project.packages.create!(
         name: params[:name],
         version: params[:version],

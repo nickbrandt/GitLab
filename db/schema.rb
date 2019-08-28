@@ -2415,6 +2415,17 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.index ["project_id", "token_encrypted"], name: "index_feature_flags_clients_on_project_id_and_token_encrypted", unique: true
   end
 
+  create_table "packages_conan_file_metadata", force: :cascade do |t|
+    t.bigint "package_file_id"
+    t.string "recipe", null: false
+    t.string "path", null: false
+    t.string "version", default: "0", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.index ["package_file_id", "path"], name: "index_packages_maven_metadata_on_package_file_id_and_path"
+    t.index ["package_file_id"], name: "index_packages_conan_file_metadata_on_package_file_id"
+  end
+
   create_table "packages_maven_metadata", force: :cascade do |t|
     t.bigint "package_id", null: false
     t.datetime_with_timezone "created_at", null: false

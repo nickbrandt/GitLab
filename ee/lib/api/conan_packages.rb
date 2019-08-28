@@ -14,6 +14,10 @@ module API
     helpers ::API::Helpers::PackagesHelpers
 
     helpers do
+      def base_file_url
+        "#{::Settings.gitlab.base_url}/api/v4/packages/conan/v1/files"
+      end
+
       def extract_format(file_name)
         name, _, format = file_name.rpartition('.')
 
@@ -35,23 +39,37 @@ module API
         end
       end
 
-      def parse_recipe(recipe)
+      def parse_recipe(url_recipe)
         split_recipe = recipe.split('/')
         {
           package_name: split_recipe[0],
           version: split_recipe[1],
           pkg_username: split_recipe[2],
-          channel: split_recipe[3],
+          channel: split_recipe[3]
         }
+      end
+
+      def generate_recipe(url_recipe)
+        recipe_obj = parse_recipe(url_recipe)
+        "#{recipe_obj[:package_name]}/#{recipe_obj[:version]}@#{recipe_obj[:pkg_username]}/#{recipe_obj[:channel]}"
+      end
+
+      def generate_recipe_url(recipe)
+        recipe.tr('@', '/')
+      end
+
+      def find_project_by_recipe(url_recipe)
+        project_path = parse_recipe(url_recipe)[:pkg_username]
+        Project.find_by_full_path(project_path)
       end
     end
 
     before do
-      Rails.logger.info '-----------------------------------------------'
-      Rails.logger.info headers
-      Rails.logger.info '-----------------------------------------------'
-      Rails.logger.info request.body.read if request.body.is_a?(StringIO)
-      Rails.logger.info '-----------------------------------------------'
+      # Rails.logger.info '-----------------------------------------------'
+      # Rails.logger.info headers
+      # Rails.logger.info '-----------------------------------------------'
+      # Rails.logger.info request.body.read if request.body.is_a?(StringIO)
+      # Rails.logger.info '-----------------------------------------------'
       not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
@@ -89,9 +107,9 @@ module API
       end
     end
 
-    namespace 'packages/conan/v1/conans/*recipe' do
+    namespace 'packages/conan/v1/conans/*url_recipe' do
       params do
-        requires :recipe, type: String, desc: 'Package recipe'
+        requires :url_recipe, type: String, desc: 'Package recipe'
       end
 
       # Get the recipe manifest
@@ -103,26 +121,36 @@ module API
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'digest' do
-        # authorize read
-        # service = ::Packages::ConanService.new(params[:recipe])
-        # urls = service.get_conan_download_urls
-        # not_found!('Recipe') unless urls
-        # urls
-        # {
-        #   'conanfile.py': '#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/export/conanfile.py?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXQiOjgsInUiOjEsImp0aSI6ImRhZjM5MWVkLTA0Y2EtNDhlYS04ZmQwLTc5OGU2MzcwMWU4NCIsImlhdCI6MTU2NTY0MzM5MiwibmJmIjoxNTY1NjQzMzg3LCJleHAiOjE1NjU2NDY5OTJ9.kwA6GK5L6ykTgH_mBIL7hmVBnrvi5lEEHdLU-Pd5M_Y',
-        #   'conanmanifest.txt': '#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{params[:recipe]}/0/export/conanmanifest.txt?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXQiOjgsInUiOjEsImp0aSI6ImRhZjM5MWVkLTA0Y2EtNDhlYS04ZmQwLTc5OGU2MzcwMWU4NCIsImlhdCI6MTU2NTY0MzM5MiwibmJmIjoxNTY1NjQzMzg3LCJleHAiOjE1NjU2NDY5OTJ9.kwA6GK5L6ykTgH_mBIL7hmVBnrvi5lEEHdLU-Pd5M_Y'
-        # }
-        # {
-        #   'conanmanifest.txt': '#{Settings.build_base_gitlab_url}/api/v4/packages/conan/v1/files/#{params[:recipe]}/export/conanmanifest.txt'
-        # }
-        render_api_error!("No recipe manifest found", 404)
+        recipe = generate_recipe(url_recipe)
+        project = find_project_by_recipe(recipe)
+        render_api_error!("No recipe manifest found", 404) unless project
+
+        authorize!(:read_package, project)
+
+        service = ConanService.new(recipe)
+        urls = service.recipe_urls
+
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+
+        urls
       end
 
       desc 'Package Digest' do
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'packages/:package_id/digest' do
-        render_api_error!("No package manifest found", 404)
+        recipe = generate_recipe(url_recipe)
+        project = find_project_by_recipe(recipe)
+        render_api_error!("No recipe manifest found", 404) unless project
+
+        authorize!(:read_package, project)
+
+        service = ConanService.new(recipe, params[:package_id])
+        urls = service.package_urls
+
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+
+        urls
       end
 
       # Get the upload urls
@@ -138,9 +166,9 @@ module API
       post 'packages/:package_id/upload_urls' do
         status 200
         {
-          'conaninfo.txt':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conaninfo.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conanmanifest.txt",
-          'conanmanifest.tgz': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/package/12345/0/conan_package.txt"
+          'conaninfo.txt':      "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conaninfo.py",
+          'conanmanifest.txt': "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conanmanifest.txt",
+          'conan_package.tgz': "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conan_package.txt"
         }
       end
 
@@ -150,8 +178,8 @@ module API
       post 'upload_urls' do
         status 200
         {
-          'conanfile.py':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/export/conanfile.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{params[:recipe]}/-/0/export/conanmanifest.txt"
+          'conanfile.py':      "#{base_file_url}/#{params[:url_recipe]}/-/0/export/conanfile.py",
+          'conanmanifest.txt': "#{base_file_url}/#{params[:url_recipe]}/-/0/export/conanmanifest.txt"
         }
       end
 
@@ -159,20 +187,23 @@ module API
       #
       # the snapshot is a hash of { filename: md5 hash }
       # md5 hash is the has of that file. This hash is used to diff the files existing on the client
-      # to determine which client files need to be uploaded
-      # if no recipe exists the snapshot is empty
+      # to determine which client files need to be uploaded if no recipe exists the snapshot is empty
       desc 'Recipe Snapshot' do
         detail 'This feature was introduced in GitLab 12.3'
       end
       get '/' do
-        {}
+        recipe = generate_recipe(url_recipe)
+        authorize!(:read_package, project)
+        ConanService.new(recipe).recipe_snapshot
       end
 
       desc 'Package Snapshot' do
         detail 'This feature was introduced in GitLab 12.3'
       end
       get 'packages/:package_id' do
-        {}
+        recipe = generate_recipe(url_recipe)
+        authorize!(:read_package, project)
+        ConanService.new(recipe, params[:package_id]).package_snapshot
       end
     end
 
@@ -180,11 +211,11 @@ module API
       detail 'This feature was introduced in GitLab 11.3'
     end
     params do
-      requires :recipe, type: String, desc: 'Package recipe'
+      requires :url_recipe, type: String, desc: 'Package recipe'
       requires :path, type: String, desc: 'Package path'
     end
     # route_setting :authentication, job_token_allowed: true
-    put 'packages/conan/v1/files/*recipe/-/*path/authorize' do
+    put 'packages/conan/v1/files/*url_recipe/-/*path/authorize' do
       require_gitlab_workhorse!
       Gitlab::Workhorse.verify_api_request!(headers)
 
@@ -197,7 +228,7 @@ module API
       detail 'This feature was introduced in GitLab 12.3'
     end
     params do
-      requires :recipe, type: String, desc: 'Package recipe'
+      requires :url_recipe, type: String, desc: 'Package recipe'
       requires :path, type: String, desc: 'Package path'
       requires :file_name, type: String, desc: 'Package file name'
       optional 'file.path', type: String, desc: %q(path to locally stored body (generated by Workhorse))
@@ -208,19 +239,15 @@ module API
       optional 'file.sha1', type: String, desc: %q(sha1 checksum of the file (generated by Workhorse))
       optional 'file.sha256', type: String, desc: %q(sha256 checksum of the file (generated by Workhorse))
     end
-    put 'packages/conan/v1/files/*recipe/-/*path/:file_name' do
-      Rails.logger.info '+++++++++++++++++++++++++++++++++++++++++++++++'
-      Rails.logger.info params
-      Rails.logger.info '+++++++++++++++++++++++++++++++++++++++++++++++'
+    put 'packages/conan/v1/files/*url_recipe/-/*path/:file_name' do
       require_gitlab_workhorse!
 
       uploaded_file = UploadedFile.from_params(params, :file, ::Packages::PackageFileUploader.workhorse_local_upload_path)
       bad_request!('Missing package file!') unless uploaded_file
-      Rails.logger.info '111'
 
+      recipe = generate_recipe(url_recipe)
       package = ::Packages::FindOrCreateConanPackageService
-        .new(User.first.projects.first, User.first, params).execute
-      Rails.logger.info '222'
+        .new(User.first.projects.first, User.first, params.merge(recipe: recipe)).execute
 
       file_params = {
         file:      uploaded_file,
@@ -230,19 +257,9 @@ module API
         file_sha1: params['file.sha1'],
         file_md5:  params['file.md5']
       }
-      Rails.logger.info '333'
 
       ::Packages::CreatePackageFileService.new(package, file_params).execute
-      Rails.logger.info '444'
-
-    end
-
-    desc 'Download package files' do
-      detail 'This feature was introduced in GitLab 12.3'
-    end
-    get 'packages/conan/v1/files/*recipe/-/*path/:file_name' do
-      Rails.logger.info "***DOWNLOADING***"
-      true
+      ::Packages::CreatePackageFileService.new(package, file_params).execute
     end
 
     helpers do

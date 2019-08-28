@@ -7,6 +7,9 @@ class Packages::PackageFile < ApplicationRecord
   update_project_statistics project_statistics_name: :packages_size
 
   belongs_to :package
+  has_one :conan_file_metadatum, inverse_of: :package
+
+  accepts_nested_attributes_for :conan_file_metadatum
 
   validates :package, presence: true
   validates :file, presence: true

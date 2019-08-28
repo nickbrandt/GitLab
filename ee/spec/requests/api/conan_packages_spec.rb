@@ -160,8 +160,8 @@ describe API::ConanPackages do
         post api("/packages/conan/v1/conans/#{recipe}/upload_urls"), params: params
 
         expected_response = {
-          'conanfile.py':      "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanfile.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanmanifest.txt"
+          'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanfile.py",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/0/export/conanmanifest.txt"
         }
 
         expect(response.body).to eq expected_response.to_json
@@ -195,9 +195,9 @@ describe API::ConanPackages do
         post api("/packages/conan/v1/conans/#{recipe}/packages/123456789/upload_urls"), params: params
 
         expected_response = {
-          'conaninfo.txt':     "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conaninfo.py",
-          'conanmanifest.txt': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conanmanifest.txt",
-          'conanmanifest.tgz': "http://localhost:3001/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conan_package.txt"
+          'conaninfo.txt':     "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conaninfo.py",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conanmanifest.txt",
+          'conanmanifest.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/0/package/12345/0/conan_package.txt"
         }
 
         expect(response.body).to eq expected_response.to_json
