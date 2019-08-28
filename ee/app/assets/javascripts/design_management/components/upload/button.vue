@@ -1,10 +1,13 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
     GlLoadingIcon,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     isSaving: {
@@ -25,7 +28,17 @@ export default {
 
 <template>
   <div>
-    <gl-button :disabled="isSaving" variant="primary" @click="openFileUpload">
+    <gl-button
+      v-gl-tooltip.hover
+      :title="
+        s__(
+          'DesignManagement|Adding a design with the same filename replaces the file in a new version.',
+        )
+      "
+      :disabled="isSaving"
+      variant="primary"
+      @click="openFileUpload"
+    >
       {{ s__('DesignManagement|Add designs') }}
       <gl-loading-icon v-if="isSaving" inline class="ml-1" />
     </gl-button>
