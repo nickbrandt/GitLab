@@ -1,5 +1,0 @@
----
-title: Limit number of jobs in running pipelines for the past hour on per plan basis
-merge_request: 1182
-author:
-type: security
