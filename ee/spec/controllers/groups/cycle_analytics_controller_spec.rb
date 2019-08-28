@@ -36,7 +36,7 @@ describe Groups::CycleAnalyticsController do
             },
             format: :json)
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'calls service with specific params' do
@@ -56,7 +56,7 @@ describe Groups::CycleAnalyticsController do
             },
             format: :json)
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 

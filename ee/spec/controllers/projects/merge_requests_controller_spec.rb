@@ -24,7 +24,7 @@ shared_examples 'approvals' do
     it 'approves the merge request' do
       approvals = json_response
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(approvals['approvals_left']).to eq 1
       expect(approvals['approved_by'].size).to eq 1
       expect(approvals['approved_by'][0]['user']['username']).to eq user.username
@@ -53,7 +53,7 @@ shared_examples 'approvals' do
 
       approvals = json_response
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(approvals['approvals_left']).to eq 1
       expect(approvals['approved_by'].size).to eq 1
       expect(approvals['approved_by'][0]['user']['username']).to eq approver.username
@@ -80,7 +80,7 @@ shared_examples 'approvals' do
     it 'unapproves the merge request' do
       approvals = json_response
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(approvals['approvals_left']).to eq 2
       expect(approvals['approved_by']).to be_empty
       expect(approvals['user_has_approved']).to be false
