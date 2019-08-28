@@ -330,6 +330,10 @@ module EE
         expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
+      # Being used in private project-level approvals API.
+      # This overrides the `eligible_approvers` to be exposed as `approvers`.
+      #
+      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
       class ApprovalSettingRule < ApprovalRule
         expose :approvers, using: ::API::Entities::UserBasic, override: true
       end
@@ -342,6 +346,12 @@ module EE
         expose :source_rule, using: SourceRule
       end
 
+      # Being used in private MR-level approvals API.
+      # This overrides the `eligible_approvers` to be exposed as `approvers` and
+      # include additional properties.
+      #
+      # To be made public in https://gitlab.com/gitlab-org/gitlab-ee/issues/13712
+      # and the `approvers` override can be removed.
       class MergeRequestApprovalSettingRule < MergeRequestApprovalRule
         expose :approvers, using: ::API::Entities::UserBasic, override: true
         expose :code_owner
