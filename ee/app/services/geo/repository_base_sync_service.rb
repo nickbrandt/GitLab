@@ -3,7 +3,7 @@
 require 'securerandom'
 
 module Geo
-  class BaseSyncService
+  class RepositoryBaseSyncService
     include ExclusiveLeaseGuard
     include ::Gitlab::Geo::ProjectLogHelpers
     include ::Gitlab::ShellAdapter
@@ -15,9 +15,9 @@ module Geo
 
     attr_reader :project
 
-    GEO_REMOTE_NAME = 'geo'.freeze
-    LEASE_TIMEOUT    = 8.hours.freeze
-    LEASE_KEY_PREFIX = 'geo_sync_service'.freeze
+    GEO_REMOTE_NAME  = 'geo'
+    LEASE_TIMEOUT    = 8.hours
+    LEASE_KEY_PREFIX = 'geo_sync_service'
 
     def initialize(project)
       @project = project
@@ -143,8 +143,8 @@ module Geo
       reschedule_sync unless persisted
 
       log_info("Finished #{type} sync",
-               update_delay_s: update_delay_in_seconds,
-               download_time_s: download_time_in_seconds)
+              update_delay_s: update_delay_in_seconds,
+              download_time_s: download_time_in_seconds)
     end
 
     def reschedule_sync
