@@ -1,5 +1,0 @@
----
-title: "Moved EE-specific code in `app/view/search/_form.html.haml` to subtemplate"
-merge_request: 13578
-author: Michel Engelen
-type: other
