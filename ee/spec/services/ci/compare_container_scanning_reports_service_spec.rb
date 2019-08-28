@@ -33,7 +33,7 @@ describe Ci::CompareContainerScanningReportsService do
 
       it 'reports new vulnerability' do
         expect(subject[:data]['added'].count).to eq(1)
-        expect(subject[:data]['added']).to include(a_hash_including('compare_key' => 'CVE-2017-15650'))
+        expect(subject[:data]['added'].first['identifiers']).to include(a_hash_including('external_id' => 'CVE-2017-15650'))
       end
 
       it 'reports existing container vulnerabilities' do
@@ -42,7 +42,7 @@ describe Ci::CompareContainerScanningReportsService do
 
       it 'reports fixed container scanning vulnerabilities' do
         expect(subject[:data]['fixed'].count).to eq(8)
-        compare_keys = subject[:data]['fixed'].map { |t| t['compare_key'] }
+        compare_keys = subject[:data]['fixed'].map { |t| t['identifiers'].first['external_id'] }
         expected_keys = %w(CVE-2017-16997 CVE-2017-18269 CVE-2018-1000001 CVE-2016-10228 CVE-2010-4052 CVE-2018-18520 CVE-2018-16869 CVE-2018-18311)
         expect(compare_keys - expected_keys).to eq([])
       end

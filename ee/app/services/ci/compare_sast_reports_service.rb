@@ -11,11 +11,7 @@ module Ci
     end
 
     def get_report(pipeline)
-      report = pipeline&.security_reports&.get_report('sast')
-
-      raise report.error if report&.errored? # propagate error to base class's execute method
-
-      report
+      Security::PipelineVulnerabilitiesFinder.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
     end
   end
 end

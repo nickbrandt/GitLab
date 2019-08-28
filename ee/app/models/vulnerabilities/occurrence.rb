@@ -182,5 +182,24 @@ module Vulnerabilities
     def remediations
       metadata.dig('remediations')
     end
+
+    alias_method :==, :eql? # eql? is necessary in some cases like array intersection
+
+    def eql?(other)
+      other.report_type == report_type &&
+        other.location == location &&
+        other.first_fingerprint == first_fingerprint
+    end
+
+    # Array.difference (-) method uses hash and eql? methods to do comparison
+    def hash
+      report_type.hash ^ location.hash ^ first_fingerprint.hash
+    end
+
+    protected
+
+    def first_fingerprint
+      identifiers.first&.fingerprint
+    end
   end
 end

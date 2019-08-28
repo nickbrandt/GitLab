@@ -36,5 +36,8 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
   end
 
   alias_method :occurrence, :object
-  delegate :current_user, to: :request
+
+  def current_user
+    return request.current_user if request.respond_to?(:current_user)
+  end
 end

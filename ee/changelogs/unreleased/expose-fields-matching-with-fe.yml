@@ -1,0 +1,5 @@
+---
+title: Change payload for comparing security reports in MR widget
+merge_request: 15531
+author:
+type: fixed
