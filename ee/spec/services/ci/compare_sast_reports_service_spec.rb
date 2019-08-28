@@ -36,7 +36,7 @@ describe Ci::CompareSastReportsService do
 
       it 'reports new vulnerability' do
         expect(subject[:data]['added'].count).to eq(1)
-        expect(subject[:data]['added']).to include(a_hash_including('compare_key' => 'c/subdir/utils.c:b466873101951fe96e1332f6728eb7010acbbd5dfc3b65d7d53571d091a06d9e:CWE-119!/CWE-120'))
+        expect(subject[:data]['added'].first['identifiers']).to include(a_hash_including('name' => 'CWE-120'))
       end
 
       it 'reports existing sast vulnerabilities' do
@@ -45,8 +45,8 @@ describe Ci::CompareSastReportsService do
 
       it 'reports fixed sast vulnerabilities' do
         expect(subject[:data]['fixed'].count).to eq(4)
-        compare_keys = subject[:data]['fixed'].map { |t| t['compare_key'] }
-        expected_keys = ['c/subdir/utils.c:b466873101951fe96e1332f6728eb7010acbbd5dfc3b65d7d53571d091a06d9e:CWE-119!/CWE-120', 'c/subdir/utils.c:bab681140fcc8fc3085b6bba74081b44ea145c1c98b5e70cf19ace2417d30770:CWE-362', 'cplusplus/src/hello.cpp:c8c6dd0afdae6814194cf0930b719f757ab7b379cf8f261e7f4f9f2f323a818a:CWE-119!/CWE-120', 'cplusplus/src/hello.cpp:331c04062c4fe0c7c486f66f59e82ad146ab33cdd76ae757ca41f392d568cbd0:CWE-120']
+        compare_keys = subject[:data]['fixed'].map { |t| t['identifiers'].first['external_id'] }
+        expected_keys = %w(char fopen strcpy char)
         expect(compare_keys - expected_keys).to eq([])
       end
     end

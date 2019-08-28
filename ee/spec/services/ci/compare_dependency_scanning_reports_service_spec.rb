@@ -35,7 +35,7 @@ describe Ci::CompareDependencyScanningReportsService do
 
       it 'reports fixed vulnerability' do
         expect(subject[:data]['added'].count).to eq(1)
-        expect(subject[:data]['added']).to include(a_hash_including('compare_key' => 'Gemfile.lock:rubyzip:cve:CVE-2017-5946'))
+        expect(subject[:data]['added'].first['identifiers']).to include(a_hash_including('external_id' => 'CVE-2017-5946'))
       end
 
       it 'reports existing dependency vulenerabilities' do
@@ -44,8 +44,8 @@ describe Ci::CompareDependencyScanningReportsService do
 
       it 'reports fixed dependency scanning vulnerabilities' do
         expect(subject[:data]['fixed'].count).to eq(1)
-        compare_keys = subject[:data]['fixed'].map { |t| t['compare_key'] }
-        expected_keys = %w(rails/Gemfile.lock:nokogiri@1.8.0:USN-3424-1)
+        compare_keys = subject[:data]['fixed'].map { |t| t['identifiers'].first['external_id'] }
+        expected_keys = %w(06565b64-486d-4326-b906-890d9915804d)
         expect(compare_keys - expected_keys).to eq([])
       end
     end
