@@ -25,6 +25,7 @@ module MergeTrains
     private
 
     def create_or_replace_pipeline
+
       if should_create_pipeline?
         previous_pipeline = pipeline_for_merge_train
         pipeline_created = create_pipeline!
@@ -32,6 +33,7 @@ module MergeTrains
           previous_pipeline.auto_cancel_running(pipeline_created)
         end
       end
+
       pipeline_created
     end
 
