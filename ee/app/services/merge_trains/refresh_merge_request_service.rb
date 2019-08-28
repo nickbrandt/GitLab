@@ -14,15 +14,7 @@ module MergeTrains
       @merge_request = merge_request
 
       validate!
-
-      if should_create_pipeline?
-        previous_pipeline = pipeline_for_merge_train
-        pipeline_created = create_pipeline!
-        if previous_pipeline&.reload&.active?
-          previous_pipeline.auto_cancel_running(pipeline_created)
-        end
-      end
-
+      pipeline_created = create_or_replace_pipeline
       merge! if should_merge?
 
       success(pipeline_created: pipeline_created.present?)
@@ -31,6 +23,17 @@ module MergeTrains
     end
 
     private
+
+    def create_or_replace_pipeline
+      if should_create_pipeline?
+        previous_pipeline = pipeline_for_merge_train
+        pipeline_created = create_pipeline!
+        if previous_pipeline&.reload&.active?
+          previous_pipeline.auto_cancel_running(pipeline_created)
+        end
+      end
+      pipeline_created
+    end
 
     def validate!
       unless project.merge_trains_enabled?
