@@ -67,7 +67,7 @@ module DesignManagement
       strong_memoize(:most_recent_design_version) { design_versions.ordered.last }
     end
 
-    def to_reference(_opts)
+    def to_reference(from = nil, full: false)
       filename
     end
 

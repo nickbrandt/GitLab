@@ -101,7 +101,7 @@ describe 'Update Epic', :js do
         end
         expect(page).to have_selector('.todos-list .todo', count: 1)
         within first('.todo') do
-          expect(page).to have_content "epic #{epic.to_reference(full: true)}"
+          expect(page).to have_content "epic #{epic.to_reference} \"#{epic.title}\" at #{epic.group.name}"
         end
       end
 
