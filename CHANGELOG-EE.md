@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.2.2
+
+- Unreleased due to QA failure.
+
 ## 12.2.1
 
 - No changes.
