@@ -74,7 +74,7 @@ module QA
       context 'git-lfs commit' do
         it 'is replicated to the secondary' do
           file_content = 'This is a Geo project!'
-          lfs_file_content = 'The rendered file could not be displayed because it is stored in LFS.'
+          lfs_file_display_message = 'The rendered file could not be displayed because it is stored in LFS.'
           project = nil
 
           Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
@@ -103,7 +103,7 @@ module QA
               show.wait_for_repository_replication
 
               expect(page).to have_content(file_name)
-              expect(page).to have_content(lfs_file_content)
+              expect(page).to have_content(lfs_file_display_message)
             end
           end
 
@@ -127,7 +127,7 @@ module QA
               show.wait_for_repository_replication_with(file_name)
 
               expect(page).to have_content(file_name)
-              expect(page).to have_content(lfs_file_content)
+              expect(page).to have_content(lfs_file_display_message)
             end
           end
         end
