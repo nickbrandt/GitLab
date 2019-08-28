@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/127
-  context 'Create', :quarantine do
+  context 'Create' do
     describe 'Search using Elasticsearch', :orchestrated, :elasticsearch do
       include Runtime::Fixtures
 
