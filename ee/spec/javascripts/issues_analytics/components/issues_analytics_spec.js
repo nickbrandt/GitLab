@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import IssuesAnalytics from 'ee/issues_analytics/components/issues_analytics.vue';
+import EmptyState from 'ee/issues_analytics/components/empty_state.vue';
+import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'ee/issues_analytics/stores';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 
 describe('Issues Analytics component', () => {
   let vm;
@@ -9,24 +10,6 @@ describe('Issues Analytics component', () => {
   let mountComponent;
   const Component = Vue.extend(IssuesAnalytics);
   const mockChartData = { '2017-11': 0, '2017-12': 2 };
-  const mockTooltipData = {
-    y: 1,
-    x: 1,
-    title: ['Jul 2018'],
-    opacity: 1,
-    body: [
-      {
-        lines: ['1'],
-      },
-    ],
-    caretHeight: 1,
-    caretPadding: 1,
-  };
-
-  const mockCanvas = {
-    offsetLeft: 1,
-    offsetTop: 1,
-  };
 
   beforeEach(() => {
     store = createStore();
@@ -38,11 +21,18 @@ describe('Issues Analytics component', () => {
         endpoint: gl.TEST_HOST,
         filterBlockEl: document.querySelector('#mock-filter'),
       };
-      return mountComponentWithStore(Component, { store, props });
+
+      return shallowMount(Component, {
+        propsData: props,
+        stubs: {
+          GlColumnChart: true,
+          EmptyState,
+        },
+        store,
+      }).vm;
     };
 
     vm = mountComponent();
-    spyOn(vm, 'createChart').and.stub();
   });
 
   afterEach(() => {
@@ -68,21 +58,6 @@ describe('Issues Analytics component', () => {
 
     vm.$nextTick(() => {
       expect(vm.$el.querySelector('.issues-analytics-chart')).not.toBe(null);
-      done();
-    });
-  });
-
-  it('renders chart tooltip with the correct details', done => {
-    const [popoverTitle] = mockTooltipData.title;
-    const [popoverContent] = mockTooltipData.body[0].lines;
-
-    vm.$store.state.issueAnalytics.chartData = mockChartData;
-    vm.generateCustomTooltip(mockTooltipData, mockCanvas);
-
-    vm.$nextTick(() => {
-      expect(vm.showPopover).toBe(true);
-      expect(vm.popoverTitle).toEqual(popoverTitle);
-      expect(vm.popoverContent).toEqual(popoverContent);
       done();
     });
   });

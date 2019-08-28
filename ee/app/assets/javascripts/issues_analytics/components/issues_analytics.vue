@@ -1,16 +1,19 @@
 <script>
+import { s__ } from '~/locale';
 import { mapGetters, mapActions, mapState } from 'vuex';
-import Chart from 'chart.js';
+import { engineeringNotation, sum, average } from '@gitlab/ui/utils/number_utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import bp from '~/breakpoints';
+import { GlColumnChart, GlChartLegend } from '@gitlab/ui/charts';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
+import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import EmptyState from './empty_state.vue';
-import { CHART_OPTNS, CHART_COLORS } from '../constants';
 
 export default {
   components: {
     EmptyState,
     GlLoadingIcon,
+    GlColumnChart,
+    GlChartLegend,
   },
   props: {
     endpoint: {
@@ -24,31 +27,38 @@ export default {
   },
   data() {
     return {
-      drawChart: true,
-      chartOptions: {
-        ...CHART_OPTNS,
-      },
-      showPopover: false,
-      popoverTitle: '',
-      popoverContent: '',
-      popoverPositionLeft: true,
+      svgs: {},
+      chart: null,
+      seriesInfo: [
+        {
+          type: 'solid',
+          name: s__('IssuesAnalytics | Issues created'),
+          color: '#1F78D1',
+        },
+      ],
     };
   },
   computed: {
     ...mapState('issueAnalytics', ['chartData', 'loading']),
     ...mapGetters('issueAnalytics', ['hasFilters', 'appliedFilters']),
-    chartLabels() {
+    data() {
       const { chartData, chartHasData } = this;
-      const labels = [];
+      const data = [];
 
       if (chartHasData()) {
-        Object.keys(chartData).forEach(label => {
-          const date = new Date(label);
-          labels.push(`${getMonthNames(true)[date.getUTCMonth()]} ${date.getUTCFullYear()}`);
+        Object.keys(chartData).forEach(key => {
+          const date = new Date(key);
+          const label = `${getMonthNames(true)[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+          const val = chartData[key];
+
+          data.push([label, val]);
         });
       }
 
-      return labels;
+      return data;
+    },
+    chartLabels() {
+      return this.data.map(val => val[0]);
     },
     chartDateRange() {
       return `${this.chartLabels[0]} - ${this.chartLabels[this.chartLabels.length - 1]}`;
@@ -62,14 +72,28 @@ export default {
     showFiltersEmptyState() {
       return !this.loading && !this.showChart && this.hasFilters;
     },
+    chartOptions() {
+      return {
+        dataZoom: [
+          {
+            type: 'slider',
+            startValue: 0,
+            handleIcon: this.svgs['scroll-handle'],
+          },
+        ],
+      };
+    },
+    series() {
+      return this.data.map(val => val[1]);
+    },
+    seriesAverage() {
+      return engineeringNotation(average(...this.series), 0);
+    },
+    seriesTotal() {
+      return engineeringNotation(sum(...this.series));
+    },
   },
   watch: {
-    chartData() {
-      // If chart data changes we need to redraw chart
-      if (this.chartHasData()) {
-        this.drawChart = true;
-      }
-    },
     appliedFilters() {
       this.fetchChartData(this.endpoint);
     },
@@ -79,95 +103,32 @@ export default {
       }
     },
   },
+  created() {
+    this.setSvg('scroll-handle');
+  },
   mounted() {
     this.fetchChartData(this.endpoint);
   },
-  updated() {
-    // Only render chart when DOM is ready
-    if (this.showChart && this.drawChart) {
-      this.$nextTick(() => {
-        this.createChart();
-      });
-    }
-  },
   methods: {
     ...mapActions('issueAnalytics', ['fetchChartData']),
-    createChart() {
-      const { chartData, chartOptions, chartLabels } = this;
-      const largeBreakpoints = ['md', 'lg'];
-
-      // Reset spacing of chart item on large screens
-      if (largeBreakpoints.includes(bp.getBreakpointSize())) {
-        chartOptions.barValueSpacing = 12;
-      }
-
-      // Render chart when DOM has been updated
-      this.$nextTick(() => {
-        const ctx = this.$refs.issuesChart.getContext('2d');
-
-        this.drawChart = false;
-        return new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: chartLabels,
-            datasets: [
-              {
-                ...CHART_COLORS,
-                data: Object.values(chartData),
-              },
-            ],
-          },
-          options: {
-            ...chartOptions,
-            tooltips: {
-              enabled: false,
-              custom: tooltip => this.generateCustomTooltip(tooltip, ctx.canvas),
-            },
-          },
-        });
-      });
-    },
-    generateCustomTooltip(tooltip, canvas) {
-      if (!tooltip.opacity) {
-        this.showPopover = false;
-        return;
-      }
-
-      // Find Y Location on page
-      let top; // Find Y Location on page
-      if (tooltip.yAlign === 'above') {
-        top = tooltip.y - tooltip.caretSize - tooltip.caretPadding;
-      } else {
-        top = tooltip.y + tooltip.caretSize + tooltip.caretPadding;
-      }
-
-      [this.popoverTitle] = tooltip.title;
-      [this.popoverContent] = tooltip.body[0].lines;
-      this.showPopover = true;
-
-      this.$nextTick(() => {
-        const tooltipEl = this.$refs.chartTooltip;
-        const tooltipWidth = tooltipEl.getBoundingClientRect().width;
-        const tooltipLeftOffest = window.innerWidth - tooltipWidth;
-        const tooltipLeftPosition = canvas.offsetLeft + tooltip.caretX;
-
-        this.popoverPositionLeft = tooltipLeftPosition < tooltipLeftOffest;
-        tooltipEl.style.top = `${canvas.offsetTop + top}px`;
-
-        // Move tooltip to the right if too close to the left
-        if (this.popoverPositionLeft) {
-          tooltipEl.style.left = `${tooltipLeftPosition}px`;
-        } else {
-          tooltipEl.style.left = `${tooltipLeftPosition - tooltipWidth}px`;
-        }
-      });
+    onCreated(chart) {
+      this.chart = chart;
     },
     chartHasData() {
       if (!this.chartData) {
         return false;
       }
 
-      return Object.values(this.chartData).reduce((acc, value) => acc + parseInt(value, 10), 0) > 0;
+      return Object.values(this.chartData).some(val => val > 0);
+    },
+    setSvg(name) {
+      getSvgIconPathContent(name)
+        .then(path => {
+          if (path) {
+            this.$set(this.svgs, name, `path://${path}`);
+          }
+        })
+        .catch(() => {});
     },
   },
 };
@@ -177,36 +138,29 @@ export default {
     <div v-if="loading" class="issues-analytics-loading text-center">
       <gl-loading-icon :inline="true" :size="4" />
     </div>
+
     <div v-if="showChart" class="issues-analytics-chart">
       <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues created per month') }}</h4>
+
+      <gl-column-chart
+        data-qa-selector="issues_analytics_graph"
+        :data="{ Full: data }"
+        :option="chartOptions"
+        :y-axis-title="s__('IssuesAnalytics|Issues Created')"
+        :x-axis-title="s__('IssuesAnalytics|Last 12 months') + ' (' + chartDateRange + ')'"
+        x-axis-type="category"
+        @created="onCreated"
+      />
       <div class="d-flex">
-        <div class="chart-legend d-none d-sm-block bold align-self-center">
-          {{ s__('IssuesAnalytics|Issues Created') }}
-        </div>
-        <div class="chart-canvas-wrapper" data-qa-selector="issues_analytics_graph">
-          <canvas ref="issuesChart" height="300" class="append-bottom-15"></canvas>
-        </div>
-      </div>
-      <p class="bold text-center">
-        {{ s__('IssuesAnalytics|Last 12 months') }} ({{ chartDateRange }})
-      </p>
-      <div
-        ref="chartTooltip"
-        :class="[
-          showPopover ? 'show' : 'hide',
-          popoverPositionLeft ? 'bs-popover-right' : 'bs-popover-left',
-        ]"
-        class="popover no-pointer-events"
-        role="tooltip"
-      >
-        <div class="arrow"></div>
-        <h3 class="popover-header">{{ popoverTitle }}</h3>
-        <div class="popover-body">
-          <span class="popover-label">{{ s__('IssuesAnalytics|Issues Created') }}</span>
-          {{ popoverContent }}
+        <gl-chart-legend v-if="chart" :chart="chart" :series-info="seriesInfo" />
+        <div class="issues-analytics-legend">
+          <span>{{ s__('IssuesAnalytics|Total:') }} {{ seriesTotal }}</span>
+          <span>&#8226;</span>
+          <span>{{ s__('IssuesAnalytics|Avg/Month:') }} {{ seriesAverage }}</span>
         </div>
       </div>
     </div>
+
     <empty-state
       v-if="showFiltersEmptyState"
       image="illustrations/issues.svg"
@@ -217,6 +171,7 @@ export default {
         )
       "
     />
+
     <empty-state
       v-if="showNoDataEmptyState"
       image="illustrations/monitoring/getting_started.svg"
