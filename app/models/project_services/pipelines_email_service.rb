@@ -1,16 +1,11 @@
 # frozen_string_literal: true
 
 class PipelinesEmailService < Service
+  include NotificationBranchSelection
+
   prop_accessor :recipients, :branches_to_be_notified
   boolean_accessor :notify_only_broken_pipelines, :notify_only_default_branch
   validates :recipients, presence: true, if: :valid_recipients?
-
-  BRANCH_CHOICES = [
-    ['All branches', 'all'],
-    ['Default branch', 'default'],
-    ['Protected branches', 'protected'],
-    ['Default branch and protected branches', 'default_and_protected']
-  ].freeze
 
   def initialize_properties
     if properties.nil?
@@ -90,25 +85,7 @@ class PipelinesEmailService < Service
   end
 
   def should_pipeline_be_notified?(data)
-    notify_for_pipeline_branch?(data) && notify_for_pipeline?(data)
-  end
-
-  def notify_for_pipeline_branch?(data)
-    ref = if data[:ref]
-            Gitlab::Git.ref_name(data[:ref])
-          else
-            data.dig(:object_attributes, :ref)
-          end
-
-    if branches_to_be_notified == "all"
-      true
-    elsif %w[default default_and_protected].include?(branches_to_be_notified)
-      ref == project.default_branch
-    elsif %w[protected default_and_protected].include?(branches_to_be_notified)
-      project.protected_branches.exists?(name: ref)
-    else
-      false
-    end
+    notify_for_branch?(data) && notify_for_pipeline?(data)
   end
 
   def notify_for_pipeline?(data)

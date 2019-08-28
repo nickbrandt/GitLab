@@ -4,6 +4,7 @@
 # This class is not meant to be used directly, but only to inherit from.
 class ChatNotificationService < Service
   include ChatMessage
+  include NotificationBranchSelection
 
   SUPPORTED_EVENTS = %w[
     push issue confidential_issue merge_request note confidential_note
@@ -22,13 +23,6 @@ class ChatNotificationService < Service
   boolean_accessor :notify_only_broken_pipelines, :notify_only_default_branch
 
   validates :webhook, presence: true, public_url: true, if: :activated?
-
-  BRANCH_CHOICES = [
-    ['All branches', 'all'],
-    ['Default branch', 'default'],
-    ['Protected branches', 'protected'],
-    ['Default branch and protected branches', 'default_and_protected']
-  ].freeze
 
   def initialize_properties
     if properties.nil?
@@ -185,26 +179,7 @@ class ChatNotificationService < Service
     return true if data[:object_kind] == 'tag_push'
     return true if data.dig(:object_attributes, :tag)
 
-    ref = if data[:ref]
-            Gitlab::Git.ref_name(data[:ref])
-          else
-            data.dig(:object_attributes, :ref)
-          end
-
-    is_default_branch = ref == project.default_branch
-    is_protected_branch = project.protected_branches.exists?(name: ref)
-
-    if branches_to_be_notified == "all"
-      true
-    elsif branches_to_be_notified == "default"
-      is_default_branch
-    elsif branches_to_be_notified == "protected"
-      is_protected_branch
-    elsif branches_to_be_notified == "default_and_protected"
-      is_default_branch || is_protected_branch
-    else
-      false
-    end
+    notify_for_branch?(data)
   end
 
   def notify_for_pipeline?(data)
