@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AddGeoContainerRepositoryCounters < ActiveRecord::Migration[5.1]
+  include Gitlab::Database::MigrationHelpers
+
   DOWNTIME = false
 
   def change
