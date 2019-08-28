@@ -1,0 +1,5 @@
+---
+title: Ensure all CI minutes used are reset for all namespaces and relative projects
+merge_request: 15744
+author:
+type: fixed
