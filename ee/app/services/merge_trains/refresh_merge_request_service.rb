@@ -18,7 +18,9 @@ module MergeTrains
       if should_create_pipeline?
         previous_pipeline = pipeline_for_merge_train
         pipeline_created = create_pipeline!
-        previous_pipeline&.auto_cancel_running(pipeline_created)
+        if previous_pipeline&.reload&.active?
+          previous_pipeline.auto_cancel_running(pipeline_created)
+        end
       end
 
       merge! if should_merge?
