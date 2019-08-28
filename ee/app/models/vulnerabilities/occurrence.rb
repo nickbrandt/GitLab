@@ -87,6 +87,8 @@ module Vulnerabilities
       preload(:scanner, :identifiers, project: [:namespace, :project_feature])
     end
 
+    scope :scoped_project, -> { where('vulnerability_occurrences.project_id = projects.id') }
+
     def self.for_pipelines_with_sha(pipelines)
       joins(:pipelines)
         .where(ci_pipelines: { id: pipelines })

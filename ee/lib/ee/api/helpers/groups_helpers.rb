@@ -19,6 +19,10 @@ module EE
           params :optional_update_params_ee do
             optional :file_template_project_id, type: Integer, desc: 'The ID of a project to use for custom templates in this group'
           end
+
+          params :optional_projects_params_ee do
+            optional :with_security_reports, type: ::Grape::API::Boolean, default: false, desc: 'Return only projects having security report artifacts present'
+          end
         end
       end
     end
