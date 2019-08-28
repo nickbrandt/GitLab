@@ -15,11 +15,13 @@ class ClearSharedRunnersMinutesWorker
       .update_all("extra_shared_runners_minutes_limit = #{extra_minutes_left_sql} FROM namespace_statistics")
 
     Namespace.with_ci_minutes_notification_sent.each_batch do |namespaces|
+      namespaces.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
+    end
+
+    Namespace.select(:id).each_batch do |namespaces|
       Namespace.transaction do
         reset_statistics(NamespaceStatistics, namespaces)
         reset_statistics(ProjectStatistics, namespaces)
-
-        namespaces.update_all(last_ci_minutes_notification_at: nil, last_ci_minutes_usage_notification_level: nil)
       end
     end
   end
