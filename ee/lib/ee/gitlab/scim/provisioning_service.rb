@@ -87,7 +87,7 @@ module EE
         end
 
         def member
-          @member ||= @group.add_user(user, DEFAULT_ACCESS)
+          @member ||= @group.add_user(user, DEFAULT_ACCESS) if user.valid?
         end
 
         def existing_member?

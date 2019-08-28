@@ -8,7 +8,7 @@ describe API::Scim do
   let(:scim_token) { create(:scim_oauth_access_token, group: group) }
 
   before do
-    stub_licensed_features(group_saml: true)
+    stub_licensed_features(group_allowed_email_domains: true, group_saml: true)
 
     group.add_owner(user)
   end
@@ -74,7 +74,7 @@ describe API::Scim do
           active: nil,
           userName: 'username',
           emails: [
-            { primary: true, type: 'work', value: 'work@example.com' }
+            { primary: nil, type: 'work', value: 'work@example.com' }
           ],
           name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
         }.to_query
@@ -116,6 +116,62 @@ describe API::Scim do
 
         it 'created the right member' do
           expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+        end
+      end
+
+      context 'with allowed domain setting switched on' do
+        let(:new_user) { User.find_by_email('work@example.com') }
+        let(:member) { GroupMember.find_by(user: new_user, group: group) }
+
+        context 'with different domains' do
+          before do
+            create(:allowed_email_domain, group: group)
+            post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+          end
+
+          it 'created the user' do
+            expect(new_user).not_to be_nil
+          end
+
+          it 'did not create member' do
+            expect(member).to be_nil
+          end
+
+          context 'with invalid user params' do
+            let(:post_params) do
+              {
+                externalId: 'test_uid',
+                active: nil,
+                userName: 'username',
+                emails: [
+                  { primary: nil, type: 'work', value: '' }
+                ],
+                name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
+              }.to_query
+            end
+
+            it 'returns user error' do
+              post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+
+              expect(response).to have_gitlab_http_status(412)
+              expect(json_response.fetch('detail')).to include("Email can't be blank")
+            end
+          end
+        end
+
+        context 'with matching domains' do
+          before do
+            create(:allowed_email_domain, group: group, domain: 'example.com')
+            post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
+          end
+
+          it 'created the user' do
+            expect(new_user).not_to be_nil
+          end
+
+          it 'created the right member' do
+            expect(member.access_level).to eq(::Gitlab::Access::GUEST)
+          end
         end
       end
 
