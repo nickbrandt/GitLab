@@ -16,8 +16,8 @@ class LabelsEE extends Labels {
     const useScoped = $parentEl.find('.js-use-scoped-labels');
 
     const isScoped = isScopedLabel({ title });
-    hasScoped.toggleClass('hidden', isScoped);
-    useScoped.toggleClass('hidden', !isScoped);
+    hasScoped.toggleClass('hidden', !isScoped);
+    useScoped.toggleClass('hidden', isScoped);
   }
 }
 
