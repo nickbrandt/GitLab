@@ -2,6 +2,10 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 12.1.8
+
+- No changes.
+
 ## 12.1.7
 
 - Unreleased due to QA failure.
