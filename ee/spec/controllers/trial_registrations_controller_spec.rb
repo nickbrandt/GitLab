@@ -11,7 +11,7 @@ describe TrialRegistrationsController do
 
     let(:user_params) do
       {
-        first_name: 'John Doe',
+        first_name: 'John',
         last_name: 'Doe',
         email: 'johnd2019@local.dev',
         username: 'johnd',
@@ -19,27 +19,45 @@ describe TrialRegistrationsController do
       }
     end
 
-    context 'with skip_confirmation' do
-      it 'creates the account as confirmed' do
-        post :create, params: { user: user_params.merge(skip_confirmation: true) }
+    context 'when invalid - instance is not GL.com' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(false)
+      end
 
-        expect(User.last).to be_confirmed
+      it 'returns 404 not found' do
+        post :create, params: { user: user_params }
+
+        expect(response.status).to eq(404)
       end
     end
 
-    context 'without skip_confirmation' do
-      it 'creates the account with pending confirmation' do
-        post :create, params: { user: user_params }
-
-        expect(User.last).not_to be_confirmed
+    context 'when valid' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(true)
       end
-    end
 
-    context 'derivation of name' do
-      it 'sets name from first and last name' do
-        post :create, params: { user: user_params }
+      context 'with skip_confirmation' do
+        it 'creates the account as confirmed' do
+          post :create, params: { user: user_params.merge(skip_confirmation: true) }
 
-        expect(User.last.name).to eq("#{user_params[:first_name]} #{user_params[:last_name]}")
+          expect(User.last).to be_confirmed
+        end
+      end
+
+      context 'without skip_confirmation' do
+        it 'creates the account with pending confirmation' do
+          post :create, params: { user: user_params }
+
+          expect(User.last).not_to be_confirmed
+        end
+      end
+
+      context 'derivation of name' do
+        it 'sets name from first and last name' do
+          post :create, params: { user: user_params }
+
+          expect(User.last.name).to eq("#{user_params[:first_name]} #{user_params[:last_name]}")
+        end
       end
     end
   end
