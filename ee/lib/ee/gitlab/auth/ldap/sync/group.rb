@@ -106,6 +106,19 @@ module EE
                 update_access_levels(access_levels, group_link)
               end
 
+              # Users in this LDAP group may already have a higher access level in a parent group.
+              # Currently demoting a user in a subgroup is forbidden by (Group)Member validation
+              # so we must propagate any higher inherited permissions unconditionally.
+              inherit_higher_access_levels(group, access_levels)
+
+              logger.debug do
+                <<-MSG.strip_heredoc.tr("\n", ' ')
+                  Resolved '#{group.name}' group member access,
+                  propagating any higher access inherited from a parent group:
+                  #{access_levels.to_hash}
+                MSG
+              end
+
               update_existing_group_membership(group, access_levels)
               add_new_members(group, access_levels)
             end
@@ -136,38 +149,60 @@ module EE
               proxy.dns_for_group_cn(group_cn)
             end
 
+            # for all LDAP Distinguished Names in access_levels, merge access level
+            # with any higher permission inherited from a parent group
+            # rubocop: disable CodeReuse/ActiveRecord
+            def inherit_higher_access_levels(group, access_levels)
+              return unless group.parent
+
+              # for any permission granted by an ancestor group to any DN in access_levels,
+              # retrieve user DN, access_level and ID of the group providing it.
+              # Ignore unapproved access requests.
+              permissions_in_ancestry = ::GroupMember.of_groups(group.ancestors)
+                .non_request
+                .with_identity_provider(provider)
+                .where(users: { identities: ::Identity.iwhere(extern_uid: access_levels.keys) })
+                .select(:id, 'identities.extern_uid AS distinguished_name', :access_level, :source_id)
+                .references(:identities)
+
+              permissions_in_ancestry.each do |member|
+                access_levels.set([member.distinguished_name], to: member.access_level)
+              end
+            end
+            # rubocop: enable CodeReuse/ActiveRecord
+
             def update_existing_group_membership(group, access_levels)
               logger.debug { "Updating existing membership for '#{group.name}' group" }
 
-              select_and_preload_group_members(group).each do |member|
+              multiple_ldap_providers = ::Gitlab::Auth::LDAP::Config.providers.count > 1
+              existing_members = select_and_preload_group_members(group)
+              # For each existing group member, we'll need to look up its LDAP identity in the current LDAP provider.
+              # It is much faster to resolve these at once than later for each member one by one.
+              ldap_identity_by_user_id = resolve_ldap_identities(for_users: existing_members.map(&:user))
+
+              existing_members.each do |member|
                 user = member.user
-                identity = user.identities.select(:id, :extern_uid)
-                             .with_provider(provider).first
-                member_dn = identity.extern_uid.downcase
+                identity = ldap_identity_by_user_id[user.id]
 
                 # Skip if this is not an LDAP user with a valid `extern_uid`.
-                next unless member_dn.present?
+                next unless identity.present? && identity.extern_uid.present?
+
+                member_dn = identity.extern_uid
 
                 # Prevent shifting group membership, in case where user is a member
                 # of two LDAP groups from different providers linked to the same
                 # GitLab group. This is not ideal, but preserves existing behavior.
-                if user.ldap_identity.id != identity.id
+                if multiple_ldap_providers && user.ldap_identity.id != identity.id
                   access_levels.delete(member_dn)
                   next
                 end
-
-                desired_access = access_levels[member_dn]
 
                 # Skip validations and callbacks. We have a limited set of attrs
                 # due to the `select` lookup, and we need to be efficient.
                 # Low risk, because the member should already be valid.
                 member.update_column(:ldap, true) unless member.ldap?
 
-                # Don't do anything if the user already has the desired access level
-                if member.access_level == desired_access
-                  access_levels.delete(member_dn)
-                  next
-                end
+                desired_access = access_levels[member_dn]
 
                 # Check and update the access level. If `desired_access` is `nil`
                 # we need to delete the user from the group.
@@ -175,7 +210,9 @@ module EE
                   # Delete this entry from the hash now that we're acting on it
                   access_levels.delete(member_dn)
 
-                  next if member.ldap? && member.override?
+                  # Don't do anything if the user already has the desired access level
+                  # and respect existing overrides
+                  next if member.access_level == desired_access || member.override?
 
                   add_or_update_user_membership(
                     user,
@@ -193,8 +230,15 @@ module EE
             def add_new_members(group, access_levels)
               logger.debug { "Adding new members to '#{group.name}' group" }
 
+              return unless access_levels.present?
+
+              # Even in the absence of new members, the list of DNs to add can be consistently large
+              # when LDAP groups contain members who do not have a gitlab account.
+              # Thus we can be a lot more efficient by pre-resolving all candidate DNs into gitlab users.
+              gitlab_users_by_dn = resolve_users_from_normalized_dn(for_normalized_dns: access_levels.keys)
+
               access_levels.each do |member_dn, access_level|
-                user = ::Gitlab::Auth::LDAP::User.find_by_uid_and_provider(member_dn, provider)
+                user = gitlab_users_by_dn[member_dn]
 
                 if user.present?
                   add_or_update_user_membership(
@@ -245,6 +289,23 @@ module EE
             def select_and_preload_group_members(group)
               group.members.select(:id, :access_level, :user_id, :ldap, :override)
                 .with_identity_provider(provider).preload(:user)
+            end
+            # rubocop: enable CodeReuse/ActiveRecord
+
+            # returns a hash user_id -> LDAP identity in current LDAP provider
+            def resolve_ldap_identities(for_users:)
+              ::Identity.for_user(for_users).with_provider(provider)
+                .map {|identity| [identity.user_id, identity] }
+                .to_h
+            end
+
+            # returns a hash of normalized DN -> user for the current LDAP provider
+            # rubocop: disable CodeReuse/ActiveRecord
+            def resolve_users_from_normalized_dn(for_normalized_dns:)
+              ::Identity.with_provider(provider).iwhere(extern_uid: for_normalized_dns)
+                .preload(:user)
+                .map {|identity| [identity.extern_uid, identity.user] }
+                .to_h
             end
             # rubocop: enable CodeReuse/ActiveRecord
 
