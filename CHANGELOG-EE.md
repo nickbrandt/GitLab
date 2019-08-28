@@ -1,5 +1,14 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.0.8
+
+### Security (3 changes)
+
+- Limit number of jobs in running pipelines for the past hour on per plan basis. !1182
+- Queries for Upload should be scoped by model.
+- Filter out old system notes for epics in notes api endpoint response.
+
+
 ## 12.0.7
 
 - Unreleased due to QA failure.
