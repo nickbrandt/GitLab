@@ -2,11 +2,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 12.1.7
 
-### Security (2 changes)
-
-- Limit number of jobs in running pipelines for the past hour on per plan basis. !1182
-- Filter out old system notes for epics in notes api endpoint response.
-
+- Unreleased due to QA failure.
 
 ## 12.1.6
 
