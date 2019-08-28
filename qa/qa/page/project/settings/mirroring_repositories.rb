@@ -5,8 +5,6 @@ module QA
     module Project
       module Settings
         class MirroringRepositories < Page::Base
-          prepend_if_ee('QA::EE::Page::Project::Settings::MirroringRepositories')
-
           view 'app/views/projects/mirrors/_authentication_method.html.haml' do
             element :authentication_method
             element :password
@@ -91,3 +89,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project::Settings::MirroringRepositories.prepend_if_ee('QA::EE::Page::Project::Settings::MirroringRepositories')

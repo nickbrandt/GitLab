@@ -4,8 +4,6 @@ module QA
   module Page
     module File
       class Show < Page::Base
-        prepend QA::EE::Page::File::Show
-
         include Shared::CommitMessage
         include Project::SubMenus::Settings
         include Project::SubMenus::Common
@@ -34,3 +32,5 @@ module QA
     end
   end
 end
+
+QA::Page::File::Show.prepend_if_ee('QA::EE::Page::File::Show')

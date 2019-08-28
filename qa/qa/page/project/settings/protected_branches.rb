@@ -5,8 +5,6 @@ module QA
     module Project
       module Settings
         class ProtectedBranches < Page::Base
-          prepend_if_ee('QA::EE::Page::Project::Settings::ProtectedBranches')
-
           view 'app/views/projects/protected_branches/shared/_dropdown.html.haml' do
             element :protected_branch_select
             element :protected_branch_dropdown
@@ -75,3 +73,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project::Settings::ProtectedBranches.prepend_if_ee('QA::EE::Page::Project::Settings::ProtectedBranches')

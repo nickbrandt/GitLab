@@ -5,7 +5,6 @@ module QA
     module Project
       class New < Page::Base
         include Page::Component::Select2
-        prepend_if_ee('QA::EE::Page::Project::New')
 
         view 'app/views/projects/new.html.haml' do
           element :project_create_from_template_tab
@@ -74,3 +73,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project::New.prepend_if_ee('QA::EE::Page::Project::New')

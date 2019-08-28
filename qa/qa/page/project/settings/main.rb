@@ -5,8 +5,6 @@ module QA
     module Project
       module Settings
         class Main < Page::Base
-          prepend QA::EE::Page::Project::Settings::Main
-
           include Common
           include Component::Select2
           include SubMenus::Project
@@ -43,3 +41,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project::Settings::Main.prepend_if_ee('QA::EE::Page::Project::Settings::Main')

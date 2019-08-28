@@ -4,8 +4,6 @@ module QA
   module Page
     module Admin
       class Menu < Page::Base
-        prepend_if_ee('QA::EE::Page::Admin::Menu')
-
         view 'app/views/layouts/nav/sidebar/_admin.html.haml' do
           element :admin_sidebar
           element :admin_sidebar_submenu
@@ -85,3 +83,5 @@ module QA
     end
   end
 end
+
+QA::Page::Admin::Menu.prepend_if_ee('QA::EE::Page::Admin::Menu')
