@@ -14,14 +14,12 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/jfbus/httprs v0.0.0-20180614100821-7861a1150846
+	github.com/jfbus/httprs v0.0.0-20190827093123-b0af8319bb15
 	github.com/jpillora/backoff v0.0.0-20170918002102-8eab2debe79d
-	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.0.0
 	github.com/rafaeljusto/redigomock v0.0.0-20190202135759-257e089e14a1
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/sirupsen/logrus v1.3.0
-	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/stretchr/testify v1.3.0
 	gitlab.com/gitlab-org/gitaly v1.57.0
 	gitlab.com/gitlab-org/labkit v0.0.0-20190731061835-905271af7abb
