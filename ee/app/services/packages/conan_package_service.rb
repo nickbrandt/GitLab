@@ -2,14 +2,16 @@
 
 module Packages
   class ConanPackageService
-    def initialize(recipe, user, package_id = nil)
+    def initialize(recipe, user, project, package_id = nil)
       @recipe = recipe
       @user = user
+      @project = project
       @package_id = package_id
     end
 
     def urls(level)
       urls = {}
+      return urls unless package
 
       package.package_files.each do |package_file|
         conan_metadata = package_file.conan_file_metadatum
@@ -29,6 +31,9 @@ module Packages
     end
 
     def snapshot(level)
+      digests = {}
+      return digests unless package
+
       package.package_files.each do |package_file|
         conan_metadata = package_file.conan_file_metadatum
 
@@ -54,7 +59,7 @@ module Packages
 
     def package
       @package ||= ::Packages::ConanPackageFinder
-        .new(@recipe, user, project: project).execute
+        .new(@recipe, @user, project: @project).execute
     end
 
     def package_path?(path)
