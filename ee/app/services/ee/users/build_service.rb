@@ -27,7 +27,7 @@ module EE
 
       override :signup_params
       def signup_params
-        super + email_opted_in_params
+        super + email_opted_in_params + name_params
       end
 
       def email_opted_in_params
@@ -36,6 +36,13 @@ module EE
           :email_opted_in_ip,
           :email_opted_in_source_id,
           :email_opted_in_at
+        ]
+      end
+
+      def name_params
+        [
+          :first_name,
+          :last_name
         ]
       end
 
@@ -50,6 +57,18 @@ module EE
           super.merge(saml_provider_id: saml_provider_id)
         else
           super
+        end
+      end
+
+      override :build_user_params
+      def build_user_params(skip_authorization:)
+        user_params = super
+        fallback_name = "#{user_params[:first_name]} #{user_params[:last_name]}"
+
+        if user_params[:name].blank? && fallback_name.present?
+          user_params.merge(name: fallback_name)
+        else
+          user_params
         end
       end
 
