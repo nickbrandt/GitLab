@@ -25,7 +25,6 @@ module MergeTrains
     private
 
     def create_or_replace_pipeline
-
       if should_create_pipeline?
         previous_pipeline = pipeline_for_merge_train
         pipeline_created = create_pipeline!
