@@ -2,6 +2,8 @@
 
 module ApprovalRules
   class CreateService < ::ApprovalRules::BaseService
+    include ::ApprovalRules::Updater
+
     # @param target [Project, MergeRequest]
     def initialize(target, user, params)
       @rule = target.approval_rules.build

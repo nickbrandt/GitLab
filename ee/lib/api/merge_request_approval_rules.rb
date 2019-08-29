@@ -7,10 +7,8 @@ module API
     ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }
 
     helpers do
-      def find_merge_request_approval_rule_with_access(merge_request, id, access_level = :edit_approval_rule)
-        approval_rule = merge_request.approval_rules.find_by_id!(id)
-        authorize! access_level, approval_rule
-        approval_rule
+      def find_merge_request_approval_rule(merge_request, id)
+        merge_request.approval_rules.find_by_id!(id)
       end
     end
 
@@ -46,7 +44,7 @@ module API
           if result[:status] == :success
             present result[:rule], with: EE::API::Entities::MergeRequestApprovalRule, current_user: current_user
           else
-            render_api_error!(result[:message], 400)
+            render_api_error!(result[:message], result[:http_status] || 400)
           end
         end
 
@@ -65,13 +63,13 @@ module API
           put do
             merge_request = find_merge_request_with_access(params[:merge_request_iid], :update_approvers)
             params = declared_params(include_missing: false)
-            approval_rule = find_merge_request_approval_rule_with_access(merge_request, params.delete(:approval_rule_id))
+            approval_rule = find_merge_request_approval_rule(merge_request, params.delete(:approval_rule_id))
             result = ::ApprovalRules::UpdateService.new(approval_rule, current_user, params).execute
 
             if result[:status] == :success
               present result[:rule], with: EE::API::Entities::MergeRequestApprovalRule, current_user: current_user
             else
-              render_api_error!(result[:message], 400)
+              render_api_error!(result[:message], result[:http_status] || 400)
             end
           end
 
@@ -81,10 +79,14 @@ module API
           end
           delete do
             merge_request = find_merge_request_with_access(params[:merge_request_iid], :update_approvers)
-            approval_rule = find_merge_request_approval_rule_with_access(merge_request, params[:approval_rule_id])
+            approval_rule = find_merge_request_approval_rule(merge_request, params[:approval_rule_id])
 
             destroy_conditionally!(approval_rule) do |rule|
-              approval_rule.destroy
+              result = ::ApprovalRules::MergeRequestRuleDestroyService.new(rule, current_user).execute
+
+              if result[:status] == :error
+                render_api_error!(result[:message], result[:http_status] || 400)
+              end
             end
           end
         end
