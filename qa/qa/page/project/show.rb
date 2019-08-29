@@ -4,8 +4,6 @@ module QA
   module Page
     module Project
       class Show < Page::Base
-        prepend QA::EE::Page::Project::Show
-
         include Page::Component::ClonePanel
         include Page::Project::SubMenus::Settings
 
@@ -133,3 +131,5 @@ module QA
     end
   end
 end
+
+QA::Page::Project.prepend_if_ee('QA::EE::Page::Project::Show')

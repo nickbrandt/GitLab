@@ -5,8 +5,6 @@ require 'gitlab/qa'
 module QA
   module Runtime
     module Env
-      prepend QA::EE::Runtime::Env
-
       extend self
 
       attr_writer :personal_access_token, :ldap_username, :ldap_password
@@ -235,3 +233,5 @@ module QA
     end
   end
 end
+
+QA::Runtime::Env.extend_if_ee('QA::EE::Runtime::Env')

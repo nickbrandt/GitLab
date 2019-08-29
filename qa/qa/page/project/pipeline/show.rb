@@ -3,8 +3,6 @@
 module QA::Page
   module Project::Pipeline
     class Show < QA::Page::Base
-      prepend QA::EE::Page::Project::Pipeline::Show
-
       view 'app/assets/javascripts/vue_shared/components/header_ci_component.vue' do
         element :pipeline_header, /header class.*ci-header-container.*/ # rubocop:disable QA/ElementWithPattern
       end
@@ -62,3 +60,5 @@ module QA::Page
     end
   end
 end
+
+QA::Page::Project::Pipeline::Show.prepend_if_ee('QA::EE::Page::Project::Pipeline::Show')
