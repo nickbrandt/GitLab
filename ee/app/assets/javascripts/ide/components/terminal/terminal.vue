@@ -92,7 +92,7 @@ export default {
 <template>
   <div class="d-flex flex-column flex-fill min-height-0">
     <div class="top-bar d-flex border-left-0 align-items-center">
-      <div v-if="loadingText">
+      <div v-if="loadingText" data-qa-selector="loading_container">
         <gl-loading-icon :inline="true" />
         <span>{{ loadingText }}</span>
       </div>
@@ -110,6 +110,7 @@ export default {
         ref="terminal"
         class="ide-terminal-trace flex-fill min-height-0 w-100"
         :data-project-path="terminalPath"
+        data-qa-selector="terminal_screen"
       ></div>
     </div>
   </div>

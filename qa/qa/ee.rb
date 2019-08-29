@@ -12,6 +12,12 @@ module QA
     end
 
     module Page
+      module Component
+        module WebIDE
+          autoload :WebTerminalPanel, 'qa/ee/page/component/web_ide/web_terminal_panel'
+        end
+      end
+
       module Dashboard
         autoload :Projects, 'qa/ee/page/dashboard/projects'
       end

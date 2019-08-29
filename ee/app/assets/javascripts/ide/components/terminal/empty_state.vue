@@ -47,7 +47,13 @@ export default {
     <template v-else>
       <p>{{ __('Run tests against your code live using the Web Terminal') }}</p>
       <p>
-        <button :disabled="!isValid" class="btn btn-info" type="button" @click="onStart">
+        <button
+          :disabled="!isValid"
+          class="btn btn-info"
+          type="button"
+          data-qa-selector="start_web_terminal_button"
+          @click="onStart"
+        >
           {{ __('Start Web Terminal') }}
         </button>
       </p>
