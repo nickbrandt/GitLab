@@ -130,6 +130,10 @@ describe DesignManagement::Design do
     end
   end
 
+  describe '#to_ability_name' do
+    it { expect(described_class.new.to_ability_name).to eq('design') }
+  end
+
   describe '#status' do
     context 'the design is new' do
       subject { build(:design) }

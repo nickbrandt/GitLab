@@ -19,6 +19,7 @@ module Banzai
           Filter::SpacedLinkFilter,
 
           Filter::SanitizationFilter,
+          Filter::AssetProxyFilter,
           Filter::SyntaxHighlightFilter,
 
           Filter::MathFilter,
@@ -62,7 +63,7 @@ module Banzai
       def self.transform_context(context)
         context[:only_path] = true unless context.key?(:only_path)
 
-        context
+        Filter::AssetProxyFilter.transform_context(context)
       end
     end
   end

@@ -43,7 +43,7 @@ describe ::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
     end
   end
 
-  context 'when pipeline size limit is not exceeded' do
+  context 'when pipeline activity limit is not exceeded' do
     before do
       step.perform!
     end

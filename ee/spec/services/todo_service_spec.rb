@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe TodoService do
+  include DesignManagementTestHelpers
+
   let(:author) { create(:user, username: 'author') }
   let(:non_member) { create(:user, username: 'non_member') }
   let(:member) { create(:user, username: 'member') }
@@ -309,6 +311,8 @@ describe TodoService do
     let(:design) { create(:design, issue: issue) }
 
     before do
+      enable_design_management
+
       project.add_guest(author)
       project.add_developer(john_doe)
     end

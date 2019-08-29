@@ -67,7 +67,28 @@ module EE
       noteable&.after_note_destroyed(self)
     end
 
+    override :visible_for?
+    def visible_for?(user)
+      return false unless super
+
+      return true unless system_note_for_epic? && created_before_noteable?
+
+      group_reporter?(user, noteable.group)
+    end
+
     private
+
+    def system_note_for_epic?
+      for_epic? && system?
+    end
+
+    def created_before_noteable?
+      created_at.to_i < noteable.created_at.to_i
+    end
+
+    def group_reporter?(user, group)
+      group.max_member_access_for_user(user) >= ::Gitlab::Access::REPORTER
+    end
 
     def banzai_context_params
       { group: noteable.group, label_url_method: :group_epics_url }
