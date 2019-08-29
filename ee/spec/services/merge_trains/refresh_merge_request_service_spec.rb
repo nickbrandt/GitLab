@@ -61,11 +61,12 @@ describe MergeTrains::RefreshMergeRequestService do
 
         result = subject
         new_pipeline = merge_request.merge_train.pipeline
+        pipeline.reset
 
         expect(result[:status]).to eq(:success)
         expect(result[:pipeline_created]).to eq(true)
-        expect(pipeline.reload.status).to eq('canceled')
-        expect(pipeline.reload.auto_canceled_by_id).to eq(new_pipeline.id)
+        expect(pipeline.status).to eq('canceled')
+        expect(pipeline.auto_canceled_by_id).to eq(new_pipeline.id)
       end
     end
 
