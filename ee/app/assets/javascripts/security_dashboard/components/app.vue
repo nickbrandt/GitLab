@@ -121,18 +121,25 @@ export default {
 </script>
 
 <template>
-  <div>
-    <filters />
-    <vulnerability-count-list :class="{ 'mb-0': isLockedToProject }" />
+  <section>
+    <header>
+      <filters />
+    </header>
 
-    <vulnerability-chart v-if="!isLockedToProject" />
+    <vulnerability-count-list v-if="isLockedToProject" class="mb-0" />
 
-    <h4 v-if="!isLockedToProject" class="my-4">{{ __('Vulnerability List') }}</h4>
+    <div class="row mt-4">
+      <main role="main" class="col" :class="{ 'col-xl-7': !isLockedToProject }">
+        <security-dashboard-table
+          :dashboard-documentation="dashboardDocumentation"
+          :empty-state-svg-path="emptyStateSvgPath"
+        />
+      </main>
 
-    <security-dashboard-table
-      :dashboard-documentation="dashboardDocumentation"
-      :empty-state-svg-path="emptyStateSvgPath"
-    />
+      <aside v-if="!isLockedToProject" class="col-xl-5">
+        <vulnerability-chart />
+      </aside>
+    </div>
 
     <issue-modal
       :modal="modal"
@@ -153,5 +160,5 @@ export default {
       @revertDismissVulnerability="undoDismiss({ vulnerability })"
       @downloadPatch="downloadPatch({ vulnerability })"
     />
-  </div>
+  </section>
 </template>

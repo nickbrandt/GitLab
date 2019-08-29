@@ -53,7 +53,7 @@ export default {
 </script>
 
 <template>
-  <div class="ci-table">
+  <div class="ci-table js-security-dashboard-table">
     <div
       class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
       role="row"

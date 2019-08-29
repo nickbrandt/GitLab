@@ -4566,9 +4566,6 @@ msgstr ""
 msgid "Data is still calculating..."
 msgstr ""
 
-msgid "Date"
-msgstr ""
-
 msgid "Date picker"
 msgstr ""
 
@@ -17063,13 +17060,13 @@ msgstr ""
 msgid "Vulnerabilities"
 msgstr ""
 
-msgid "Vulnerability Chart"
-msgstr ""
-
-msgid "Vulnerability List"
+msgid "Vulnerabilities over time"
 msgstr ""
 
 msgid "Vulnerability-Check requires one or more merge request approvals only if high or critical security vulnerabilities are detected."
+msgstr ""
+
+msgid "VulnerabilityChart|%{formattedStartDate} to today"
 msgstr ""
 
 msgid "Vulnerability|Class"
