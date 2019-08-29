@@ -56,8 +56,10 @@ module QA
         module Settings
           autoload :Templates, 'qa/ee/page/admin/settings/templates'
           autoload :Integration, 'qa/ee/page/admin/settings/integration'
+          autoload :Preferences, 'qa/ee/page/admin/settings/preferences'
 
           module Component
+            autoload :Email, 'qa/ee/page/admin/settings/component/email'
             autoload :Elasticsearch, 'qa/ee/page/admin/settings/component/elasticsearch'
           end
         end
