@@ -14,7 +14,7 @@ module MergeTrains
       @merge_request = merge_request
 
       validate!
-      pipeline_created = create_or_replace_pipeline
+      pipeline_created = create_pipeline! if should_create_pipeline?
       merge! if should_merge?
 
       success(pipeline_created: pipeline_created.present?)
@@ -23,18 +23,6 @@ module MergeTrains
     end
 
     private
-
-    def create_or_replace_pipeline
-      if should_create_pipeline?
-        previous_pipeline = pipeline_for_merge_train
-        pipeline_created = create_pipeline!
-        if previous_pipeline&.reload&.active?
-          previous_pipeline.auto_cancel_running(pipeline_created)
-        end
-      end
-
-      pipeline_created
-    end
 
     def validate!
       unless project.merge_trains_enabled?
@@ -77,8 +65,8 @@ module MergeTrains
 
       raise ProcessError, result[:message] unless result[:status] == :success
 
-      merge_train.update!(pipeline: result[:pipeline])
-      result[:pipeline]
+      cancel_pipeline_for_merge_train(result[:pipeline])
+      update_pipeline_for_merge_train(result[:pipeline])
     end
 
     def should_merge?
@@ -123,6 +111,18 @@ module MergeTrains
 
     def pipeline_for_merge_train
       merge_train.pipeline
+    end
+
+    def cancel_pipeline_for_merge_train(new_pipeline)
+      pipeline_for_merge_train&.auto_cancel_running(new_pipeline)
+    rescue ActiveRecord::StaleObjectError
+      # Often the pipeline has already been canceled by the default cancelaltion
+      # mechanizm `Ci::CreatePipelineService#cancel_pending_pipelines`. In this
+      # case, we can ignore the exception as it's already canceled.
+    end
+
+    def update_pipeline_for_merge_train(pipeline)
+      merge_train.update!(pipeline: pipeline)
     end
 
     def merge_user
