@@ -609,20 +609,10 @@ module EE
     end
 
     def add_software_license_policy_for(license_name:, classification:)
-      policy = software_license_policies.create!(
+      software_license_policies.create!(
         approval_status: classification,
         software_license: software_license_for(name: license_name)
       )
-      merge_requests.find_each do |merge_request|
-        if merge_request.head_pipeline.license_management_report.violates?(software_license_policies)
-          puts "TRUE"
-          merge_request.approval_rules.license_management.first.update!(approvals_required: approval_rules.license_management.first.approvals_required)
-        else
-          puts "FALSE"
-        end
-      end
-
-      policy
     end
 
     private
