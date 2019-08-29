@@ -60,7 +60,8 @@ module QA
         expect(page).to have_content("Test SAML SSO")
       end
 
-      context 'Enforced SSO' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/129
+      context 'Enforced SSO', :quarantine do
         before do
           Runtime::Feature.enable("enforced_sso")
           Runtime::Feature.enable("enforced_sso_requires_session")
