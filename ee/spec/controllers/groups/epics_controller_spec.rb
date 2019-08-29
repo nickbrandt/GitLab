@@ -461,14 +461,14 @@ describe Groups::EpicsController do
 
       it "rejects a developer to destroy an epic" do
         group.add_developer(user)
-        delete :destroy, params: { group_id: group, id: epic.to_param }
+        delete :destroy, params: { group_id: group, id: epic.to_param, destroy_confirm: true }
 
         expect(response).to have_gitlab_http_status(404)
       end
 
       it "deletes the epic" do
         group.add_owner(user)
-        delete :destroy, params: { group_id: group, id: epic.to_param }
+        delete :destroy, params: { group_id: group, id: epic.to_param, destroy_confirm: true }
 
         expect(response).to have_gitlab_http_status(302)
         expect(controller).to set_flash[:notice].to(/The epic was successfully deleted\./)
