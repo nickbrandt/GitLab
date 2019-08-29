@@ -7,6 +7,7 @@ module Projects
     skip_before_action :project
 
     prepend_before_action :repository, :project_without_auth
+    before_action :check_generic_alert_endpoint_feature_flag!
 
     def create
       head :ok
@@ -21,6 +22,10 @@ module Projects
       id = params[:project_id]
 
       @project = Project.find_by_full_path("#{namespace}/#{id}")
+    end
+
+    def check_generic_alert_endpoint_feature_flag!
+      render_404 unless Feature.enabled?(:generic_alert_endpoint, @project)
     end
   end
 end

@@ -7,10 +7,32 @@ describe Projects::AlertNotificationsController do
   set(:environment) { create(:environment, project: project) }
 
   describe 'POST #create' do
-    it 'returns ok' do
+    def make_request(opts = {})
       post :create, params: project_params, session: { as: :json }
+    end
 
-      expect(response).to have_gitlab_http_status(:ok)
+    context 'when feature flag is on' do
+      before do
+        stub_feature_flags(generic_alert_endpoint: true)
+      end
+
+      it 'responds with ok' do
+        make_request
+
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+    end
+
+    context 'when feature flag is off' do
+      before do
+        stub_feature_flags(generic_alert_endpoint: false)
+      end
+
+      it 'responds with not_found' do
+        make_request
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
     end
   end
 
