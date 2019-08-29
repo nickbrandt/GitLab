@@ -10,7 +10,11 @@ class RefreshLicenseComplianceChecksWorker
     project_approval_rule = license_compliance_rule_for(project)
     return if project_approval_rule.nil?
 
-    project.merge_requests.opened.find_each do |merge_request|
+    merge_requests = project
+      .merge_requests
+      .opened
+      .includes(:approval_rules, :head_pipeline)
+    merge_requests.find_each do |merge_request|
       merge_request_rule = license_compliance_rule_for(merge_request)
       next if merge_request_rule.nil?
 
@@ -20,6 +24,7 @@ class RefreshLicenseComplianceChecksWorker
       if license_report.violates?(project.software_license_policies)
         merge_request_rule.update!(approvals_required: project_approval_rule.approvals_required)
       else
+        merge_request_rule.update!(approvals_required: 0)
       end
     end
   end
