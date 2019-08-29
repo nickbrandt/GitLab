@@ -101,7 +101,7 @@ describe DesignManagement::Version do
       end
     end
 
-    describe 'then error raised when the designs come from different issues' do
+    describe 'the error raised when the designs come from different issues' do
       let(:sha) { 'f00' }
       let(:designs) { create_list(:design, 2) }
       let(:actions) { as_actions(designs) }

@@ -2,14 +2,14 @@
 
 module Projects
   class DependenciesController < Projects::ApplicationController
-    before_action :check_feature_enabled!
+    before_action :authorize_read_dependency_list!
 
     before_action do
       push_frontend_feature_flag(:dependency_list_vulnerabilities, default_enabled: true)
     end
 
-    def check_feature_enabled!
-      render_404 unless project.feature_available?(:dependency_list)
+    def authorize_read_dependency_list!
+      render_404 unless can?(current_user, :read_dependencies, project)
     end
   end
 end
