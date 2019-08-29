@@ -608,6 +608,13 @@ module EE
         .exists?
     end
 
+    def add_software_license_policy_for(license_name:, classification:)
+      software_license_policies.create!(
+        approval_status: classification,
+        software_license: software_license_for(name: license_name)
+      )
+    end
+
     private
 
     def set_override_pull_mirror_available
@@ -645,6 +652,16 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
+    end
+
+    def software_license_for(name:)
+      SoftwareLicense.transaction do
+        SoftwareLicense.transaction(requires_new: true) do
+          SoftwareLicense.find_or_create_by(name: name)
+        end
+      rescue ActiveRecord::RecordNotUnique
+        retry
+      end
     end
   end
 end

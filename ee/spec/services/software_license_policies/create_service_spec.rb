@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe SoftwareLicensePolicies::CreateService do
-  let(:project) { create(:project)}
+  let(:project) { create(:project) }
   let(:params) { { name: 'ExamplePL/2.1', approval_status: 'blacklisted' } }
 
   let(:user) do
@@ -16,7 +16,7 @@ describe SoftwareLicensePolicies::CreateService do
     stub_licensed_features(license_management: true)
   end
 
-  subject { described_class.new(project, user, params).execute }
+  subject { described_class.new(project, user, params) }
 
   describe '#execute' do
     context 'with license management unavailable' do
@@ -25,18 +25,38 @@ describe SoftwareLicensePolicies::CreateService do
       end
 
       it 'does not creates a software license policy' do
-        expect { subject }.to change { project.software_license_policies.count }.by(0)
+        expect { subject.execute }.to change { project.software_license_policies.count }.by(0)
       end
     end
 
     context 'with a user who is allowed to admin' do
       it 'creates one software license policy correctly' do
-        expect { subject }.to change { project.software_license_policies.count }.from(0).to(1)
+        expect { subject.execute }.to change { project.software_license_policies.count }.from(0).to(1)
 
         software_license_policy = project.software_license_policies.last
         expect(software_license_policy).to be_persisted
-        expect(software_license_policy.name).to eq('ExamplePL/2.1')
+        expect(software_license_policy.name).to eq(params[:name])
         expect(software_license_policy.approval_status).to eq('blacklisted')
+      end
+
+      context "when an argument error is raised" do
+        before do
+          allow_any_instance_of(Project).to receive(:software_license_policies).and_raise(ArgumentError)
+        end
+
+        specify { expect(subject.execute[:status]).to be(:error) }
+        specify { expect(subject.execute[:message]).to be_present }
+        specify { expect(subject.execute[:http_status]).to be(400) }
+      end
+
+      context "when invalid input is provided" do
+        before do
+          params[:approval_status] = nil
+        end
+
+        specify { expect(subject.execute[:status]).to be(:error) }
+        specify { expect(subject.execute[:message]).to be_present }
+        specify { expect(subject.execute[:http_status]).to be(400) }
       end
     end
 
@@ -44,7 +64,7 @@ describe SoftwareLicensePolicies::CreateService do
       let(:user) { create(:user) }
 
       it 'does not create a software license policy' do
-        expect { subject }.to change { project.software_license_policies.count }.by(0)
+        expect { subject.execute }.to change { project.software_license_policies.count }.by(0)
       end
     end
   end
