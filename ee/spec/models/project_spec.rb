@@ -2036,6 +2036,16 @@ describe Project do
       specify { expect(result.software_license).to eql(mit_license) }
     end
 
+    context "when a software license with a given name has NOT been created" do
+      let(:license_name) { SecureRandom.uuid }
+      let(:result) { subject.add_software_license_policy_for(license_name: license_name, classification: :blacklisted) }
+
+      specify { expect(result).to be_persisted }
+      specify { expect(result).to be_blacklisted }
+      specify { expect(result.software_license).to be_persisted }
+      specify { expect(result.software_license.name).to eql(license_name) }
+    end
+
     context "when there are open merge requests in the project" do
       let!(:merge_request_1) { create(:merge_request, target_project: project, source_project: project) }
 
