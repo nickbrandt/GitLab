@@ -65,18 +65,12 @@ module API
     end
 
     before do
-      Rails.logger.info '-----------------------------------------------'
-      Rails.logger.info headers
-      Rails.logger.info '---------------------------hh--------------------'
-      Rails.logger.info request.body.read if request.body.is_a?(StringIO)
-      Rails.logger.info '-----------------------------------------------'
-
       not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
       # Personal access token will be extracted from Bearer or Basic authorization
       # in the overriden find_personal_access_token helper
-      # authenticate!
+      authenticate!
     end
 
     namespace 'packages/conan/v1' do
@@ -85,6 +79,16 @@ module API
       end
       get 'ping' do
         header 'X-Conan-Server-Capabilities', [].join(',')
+      end
+
+      desc 'Search for packages' do
+        detail 'This feature was introduced in GitLab 12.3'
+      end
+      params do
+        requires :q, type: String, desc: 'Search query'
+      end
+      get 'conans/search' do
+        ::Packages::ConanPackageSearchService.new(params[:q], current_user).execute
       end
     end
 
@@ -266,7 +270,7 @@ module API
       requires :path, type: String, desc: 'Package path'
     end
     # route_setting :authentication, job_token_allowed: true
-    put 'packages/conan/v1/files/*url_recipe/-/*path/authorize' do
+    put 'packages/conan/v1/files/*url_recipe/-/*path/:file_name/authorize' do
       require_gitlab_workhorse!
       Gitlab::Workhorse.verify_api_request!(headers)
 
