@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Kerberos clone instructions', :js do
   include MobileHelpers

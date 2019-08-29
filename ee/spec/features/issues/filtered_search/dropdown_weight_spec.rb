@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Dropdown weight', :js do
   include FilteredSearchHelpers

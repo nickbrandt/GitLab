@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
 describe ScopedLabelSet do
   set(:kv_label1) { create(:label, title: 'key::label1') }

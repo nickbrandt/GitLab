@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe Packages::MavenMetadatum, type: :model do
   describe 'relationships' do

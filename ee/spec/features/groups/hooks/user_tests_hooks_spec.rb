@@ -1,4 +1,4 @@
-require "rails_helper"
+require 'spec_helper'
 
 describe "User tests hooks", :js do
   include StubRequests

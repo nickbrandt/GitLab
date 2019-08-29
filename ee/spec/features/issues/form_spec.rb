@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'New/edit issue', :js do
   include GitlabRoutingHelper

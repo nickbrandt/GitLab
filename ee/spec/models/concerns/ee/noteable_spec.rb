@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
 describe EE::Noteable do
   subject(:klazz) { Class.new { include Noteable } }
