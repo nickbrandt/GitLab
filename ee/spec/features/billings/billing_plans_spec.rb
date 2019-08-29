@@ -100,7 +100,7 @@ describe 'Billing plan pages', :feature do
         page.within('.content') do
           expect(page).to have_link('Upgrade plan', href: external_upgrade_url(namespace, bronze_plan))
           expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('contact support', href: EE::CUSTOMER_SUPPORT_URL)
+          expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
       end
     end
@@ -126,7 +126,7 @@ describe 'Billing plan pages', :feature do
         page.within('.content') do
           expect(page).not_to have_link('Upgrade plan')
           expect(page).to have_content('downgrade your plan')
-          expect(page).to have_link('contact support', href: EE::CUSTOMER_SUPPORT_URL)
+          expect(page).to have_link('Customer Support', href: EE::CUSTOMER_SUPPORT_URL)
         end
       end
     end
