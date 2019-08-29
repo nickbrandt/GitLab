@@ -142,6 +142,16 @@ describe Project do
         expect(described_class.with_repositories_enabled).not_to include(project_with_repositories_disabled)
       end
     end
+
+    describe '.with_github_service_pipeline_events' do
+      it 'returns the correct project' do
+        project_with_github_service_pipeline_events = create(:project, github_service: create(:github_service))
+        project_without_github_service_pipeline_events = create(:project)
+
+        expect(described_class.with_github_service_pipeline_events).to include(project_with_github_service_pipeline_events)
+        expect(described_class.with_github_service_pipeline_events).not_to include(project_without_github_service_pipeline_events)
+      end
+    end
   end
 
   describe 'validations' do

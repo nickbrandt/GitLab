@@ -17,6 +17,8 @@ module EE
       }.with_indifferent_access.freeze
 
       prepended do
+        include UsageStatistics
+
         after_save :stick_build_if_status_changed
         delegate :service_specification, to: :runner_session, allow_nil: true
 

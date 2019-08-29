@@ -185,7 +185,8 @@ module EE
             usage_activity_by_stage: {
               create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
-              plan: usage_activity_by_stage_plan
+              plan: usage_activity_by_stage_plan,
+              verify: usage_activity_by_stage_verify
             }
           }
         end
@@ -233,6 +234,22 @@ module EE
             service_desk_enabled_projects: ::Project.with_active_services.service_desk_enabled.distinct_count_by(:creator_id),
             service_desk_issues: ::Issue.service_desk.distinct_count_by,
             todos: ::Todo.distinct_count_by(:author_id)
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `ci_runners`
+        def usage_activity_by_stage_verify
+          {
+            ci_builds: ::Ci::Build.distinct_count_by(:user_id),
+            ci_external_pipelines: ::Ci::Pipeline.external.distinct_count_by(:user_id),
+            ci_internal_pipelines: ::Ci::Pipeline.internal.distinct_count_by(:user_id),
+            ci_pipeline_config_auto_devops: ::Ci::Pipeline.auto_devops_source.distinct_count_by(:user_id),
+            ci_pipeline_config_repository: ::Ci::Pipeline.repository_source.distinct_count_by(:user_id),
+            ci_pipeline_schedules: ::Ci::PipelineSchedule.distinct_count_by(:owner_id),
+            ci_pipelines: ::Ci::Pipeline.distinct_count_by(:user_id),
+            ci_triggers: ::Ci::Trigger.distinct_count_by(:owner_id),
+            clusters_applications_runner: ::Clusters::Applications::Runner.distinct_by_user,
+            projects_reporting_ci_cd_back_to_github: ::Project.with_github_service_pipeline_events.distinct_count_by(:creator_id)
           }
         end
       end

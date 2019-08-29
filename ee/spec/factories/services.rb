@@ -16,4 +16,11 @@ FactoryBot.define do
       active { false }
     end
   end
+
+  factory :github_service do
+    project
+    active { true }
+    token { 'github-token' }
+    type { 'GithubService' }
+  end
 end

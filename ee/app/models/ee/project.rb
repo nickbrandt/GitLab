@@ -118,6 +118,7 @@ module EE
 
       scope :with_security_reports_stored, -> { where('EXISTS (?)', ::Vulnerabilities::Occurrence.scoped_project.select(1)) }
       scope :with_security_reports, -> { where('EXISTS (?)', ::Ci::JobArtifact.security_reports.scoped_project.select(1)) }
+      scope :with_github_service_pipeline_events, -> { joins(:github_service).merge(GithubService.pipeline_hooks) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
