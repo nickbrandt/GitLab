@@ -74,7 +74,7 @@ describe API::Scim do
           active: nil,
           userName: 'username',
           emails: [
-            { primary: nil, type: 'work', value: 'work@example.com' }
+            { primary: true, type: 'work', value: 'work@example.com' }
           ],
           name: { formatted: 'Test Name', familyName: 'Name', givenName: 'Test' }
         }.to_query
