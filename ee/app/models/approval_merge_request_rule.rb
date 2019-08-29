@@ -114,6 +114,22 @@ class ApprovalMergeRequestRule < ApplicationRecord
     self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
   end
 
+  def refresh_required_approvals!(project_approval_rule)
+    return unless report_approver?
+
+    case name
+    when DEFAULT_NAME_FOR_LICENSE_REPORT
+      license_report = merge_request.head_pipeline.license_management_report
+      return if license_report.blank?
+
+      if license_report.violates?(project.software_license_policies)
+        update!(approvals_required: project_approval_rule.approvals_required)
+      else
+        update!(approvals_required: 0)
+      end
+    end
+  end
+
   private
 
   def validate_approval_project_rule
