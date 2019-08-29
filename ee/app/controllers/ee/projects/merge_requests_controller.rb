@@ -18,7 +18,7 @@ module EE
 
         before_action :whitelist_query_limiting_ee_merge, only: [:merge]
         before_action :whitelist_query_limiting_ee_show, only: [:show]
-        before_action :authorize_read_pipeline!, only: [:sast_reports]
+        before_action :authorize_read_pipeline!, only: [:container_scanning_reports, :dependency_scanning_reports, :sast_reports]
       end
 
       def approve
