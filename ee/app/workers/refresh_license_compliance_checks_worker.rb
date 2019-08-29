@@ -10,7 +10,7 @@ class RefreshLicenseComplianceChecksWorker
     project_approval_rule = license_compliance_rule_for(project)
     return if project_approval_rule.nil?
 
-    project.merge_requests.find_each do |merge_request|
+    project.merge_requests.opened.find_each do |merge_request|
       merge_request_rule = license_compliance_rule_for(merge_request)
       next if merge_request_rule.nil?
 
