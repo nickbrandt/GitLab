@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe EE::NotificationService, :mailer do
+  include EmailSpec::Matchers
   include NotificationHelpers
 
   let(:subject) { NotificationService.new }
@@ -417,6 +418,9 @@ describe EE::NotificationService, :mailer do
           should_not_email(@unsubscriber)
           should_not_email(@u_outsider_mentioned)
           should_not_email(@u_lazy_participant)
+
+          expect(find_email_for(@u_mentioned)).to have_header('X-GitLab-NotificationReason', 'mentioned')
+          expect(find_email_for(@u_custom_global)).to have_header('X-GitLab-NotificationReason', '')
         end
 
         it_behaves_like 'group emails are disabled' do
