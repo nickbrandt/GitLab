@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Projects::DependenciesController do
-  set(:project) { create(:project, :repository, :private) }
+  set(:project) { create(:project, :repository, :public, :repository_private) }
   set(:user) { create(:user) }
 
   subject { get :show, params: { namespace_id: project.namespace, project_id: project } }
@@ -11,7 +11,7 @@ describe Projects::DependenciesController do
   describe 'GET show' do
     context 'with authorized user' do
       before do
-        project.add_developer(user)
+        project.add_reporter(user)
         sign_in(user)
       end
 
@@ -55,7 +55,9 @@ describe Projects::DependenciesController do
       end
     end
 
-    context 'with anonymous user' do
+    context 'with anonymous user and private project' do
+      let(:project) { create(:project, :repository, :private) }
+
       it 'returns 302' do
         subject
 
