@@ -185,6 +185,47 @@ module API
         }
       end
 
+      # Get the download urls
+      #
+      # returns the download urls for the existing recipe or package in the registry
+      #
+      # the manifest is a hash of { filename: url }
+      # where the url is the download url for the file
+      desc 'Package Download Urls' do
+        detail 'This feature was introduced in GitLab 12.3'
+      end
+      post 'packages/:package_id/download_urls' do
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
+        render_api_error!("No recipe manifest found", 404) unless project
+
+        authorize!(:read_package, project)
+
+        service = ::Packages::ConanPackageService.new(recipe, current_user, project, params[:package_id])
+        urls = service.urls(:package)
+
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+
+        urls
+      end
+
+      desc 'Recipe Download Urls' do
+        detail 'This feature was introduced in GitLab 12.3'
+      end
+      post 'download_urls' do
+        recipe = generate_recipe(params[:url_recipe])
+        project = find_project_by_recipe(params[:url_recipe])
+        render_api_error!("No recipe manifest found", 404) unless project
+
+        authorize!(:read_package, project)
+
+        service = ::Packages::ConanPackageService.new(recipe, current_user, project)
+        urls = service.urls(:recipe)
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+
+        urls
+      end
+
       # Get the recipe snapshot
       #
       # the snapshot is a hash of { filename: md5 hash }
@@ -276,6 +317,31 @@ module API
       }
 
       ::Packages::CreateConanPackageFileService.new(package, file_params).execute
+    end
+
+    desc 'Download package files' do
+      detail 'This feature was introduced in GitLab 12.3'
+    end
+    params do
+      requires :url_recipe, type: String, desc: 'Package recipe'
+      requires :path, type: String, desc: 'Package path'
+      requires :file_name, type: String, desc: 'Package file name'
+    end
+    get 'packages/conan/v1/files/*url_recipe/-/*path/:file_name' do
+      recipe = generate_recipe(params[:url_recipe])
+      project = find_project_by_recipe(params[:url_recipe])
+
+      render_api_error!("No GitLab project found", 404) unless project
+      authorize!(:read_package, project)
+      forbidden! unless project.feature_available?(:packages)
+
+      package = ::Packages::ConanPackageFinder
+        .new(recipe, current_user, project: project).execute
+
+      package_file = ::Packages::PackageFileFinder
+        .new(package, file_name).execute!
+
+      present_carrierwave_file!(package_file.file)
     end
 
     helpers do
