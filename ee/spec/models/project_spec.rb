@@ -2047,20 +2047,24 @@ describe Project do
     end
 
     context "when there are open merge requests in the project" do
-      let!(:merge_request_1) { create(:merge_request, target_project: project, source_project: project) }
+      let!(:merge_request_1) { create(:merge_request, target_project: subject, source_project: subject) }
 
       context "when the `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` approval rule is enabled" do
         let!(:merge_request_approval_rule_1) { create(:report_approver_rule, :license_management, merge_request: merge_request_1) }
-        let!(:project_approval_rule_1) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
+        let!(:project_approval_rule_1) { create(:approval_project_rule, :requires_approval, :license_management, project: subject) }
 
         context "when a license is blacklisted, that appears in some of the license management reports" do
-          subject { described_class.new(project, user, params) }
-          let(:params) { { name: 'MIT', approval_status: 'blacklisted' } }
-          let!(:pipeline) { create(:ee_ci_pipeline, :success, project: project, merge_requests_as_head_pipeline: [merge_request_1]) }
-          let!(:ci_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline, project: project) }
+          let!(:pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: subject, merge_requests_as_head_pipeline: [merge_request_1]) }
+          let!(:ci_build) { create(:ee_ci_build, :success, :license_management, pipeline: pipeline, project: subject) }
+          let(:license_report) { pipeline.license_management_report }
 
           before do
-            subject.execute
+            license_report.add_dependency('MIT', 'rails')
+
+            subject.add_software_license_policy_for(
+              license_name: license_report.license_names[0],
+              classification: :blacklisted
+            )
           end
 
           pending do

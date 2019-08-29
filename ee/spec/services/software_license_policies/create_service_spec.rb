@@ -39,6 +39,19 @@ describe SoftwareLicensePolicies::CreateService do
         expect(software_license_policy.approval_status).to eq('blacklisted')
       end
 
+      context "when valid parameters are specified" do
+        let(:result) { subject.execute }
+
+        before do
+          allow(RefreshLicenseComplianceChecksWorker).to receive(:perform_async)
+          result
+        end
+
+        specify { expect(result[:status]).to be(:success) }
+        specify { expect(result[:software_license_policy]).to be_present }
+        specify { expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id) }
+      end
+
       context "when an argument error is raised" do
         before do
           allow_any_instance_of(Project).to receive(:software_license_policies).and_raise(ArgumentError)

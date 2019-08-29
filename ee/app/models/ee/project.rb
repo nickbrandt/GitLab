@@ -609,10 +609,20 @@ module EE
     end
 
     def add_software_license_policy_for(license_name:, classification:)
-      software_license_policies.create!(
+      policy = software_license_policies.create!(
         approval_status: classification,
         software_license: software_license_for(name: license_name)
       )
+      merge_requests.find_each do |merge_request|
+        if merge_request.head_pipeline.license_management_report.violates?(software_license_policies)
+          puts "TRUE"
+          merge_request.approval_rules.license_management.first.update!(approvals_required: approval_rules.license_management.first.approvals_required)
+        else
+          puts "FALSE"
+        end
+      end
+
+      policy
     end
 
     private
@@ -655,13 +665,11 @@ module EE
     end
 
     def software_license_for(name:)
-      SoftwareLicense.transaction do
-        SoftwareLicense.transaction(requires_new: true) do
-          SoftwareLicense.find_or_create_by(name: name)
-        end
-      rescue ActiveRecord::RecordNotUnique
-        retry
+      SoftwareLicense.transaction(requires_new: true) do
+        SoftwareLicense.find_or_create_by!(name: name)
       end
+    rescue ActiveRecord::RecordNotUnique
+      retry
     end
   end
 end

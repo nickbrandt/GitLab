@@ -18,10 +18,12 @@ module SoftwareLicensePolicies
     private
 
     def create_software_license_policy
-      @project.add_software_license_policy_for(
+      policy = @project.add_software_license_policy_for(
         license_name: params[:name],
         classification: params[:approval_status]
       )
+      RefreshLicenseComplianceChecksWorker.perform_async(@project.id)
+      policy
     end
 
     def prepare_message_for(error)
