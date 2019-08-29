@@ -145,16 +145,16 @@ describe API::MergeRequestApprovalRules do
     let(:approver) { create(:user) }
     let(:group) { create(:group) }
     let(:approval_project_rule_id) { nil }
-    let(:users) { [] }
-    let(:groups) { [] }
+    let(:user_ids) { [] }
+    let(:group_ids) { [] }
 
     let(:params) do
       {
         name: 'Test',
         approvals_required: 1,
         approval_project_rule_id: approval_project_rule_id,
-        users: users,
-        groups: groups
+        user_ids: user_ids,
+        group_ids: group_ids
       }
     end
 
@@ -188,7 +188,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       context 'users are passed' do
-        let(:users) { [approver.id] }
+        let(:user_ids) { [approver.id] }
 
         it 'includes users' do
           rule = json_response
@@ -199,7 +199,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       context 'groups are passed' do
-        let(:groups) { [group.id] }
+        let(:group_ids) { [group.id] }
 
         it 'includes groups' do
           rule = json_response
@@ -254,16 +254,16 @@ describe API::MergeRequestApprovalRules do
     let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules/#{approval_rule.id}" }
     let(:new_approver) { create(:user) }
     let(:new_group) { create(:group) }
-    let(:users) { [] }
-    let(:groups) { [] }
+    let(:user_ids) { [] }
+    let(:group_ids) { [] }
     let(:remove_hidden_groups) { nil }
 
     let(:params) do
       {
         name: 'Test',
         approvals_required: 1,
-        users: users,
-        groups: groups,
+        user_ids: user_ids,
+        group_ids: group_ids,
         remove_hidden_groups: remove_hidden_groups
       }
     end
@@ -302,7 +302,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       context 'users are passed' do
-        let(:users) { [new_approver.id] }
+        let(:user_ids) { [new_approver.id] }
 
         it 'changes users' do
           rule = json_response
@@ -313,7 +313,7 @@ describe API::MergeRequestApprovalRules do
       end
 
       context 'groups are passed' do
-        let(:groups) { [new_group.id] }
+        let(:group_ids) { [new_group.id] }
 
         it 'changes groups' do
           rule = json_response
