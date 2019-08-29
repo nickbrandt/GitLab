@@ -8171,7 +8171,7 @@ msgstr ""
 msgid "Incompatible options set!"
 msgstr ""
 
-msgid "Indexing"
+msgid "Index all projects"
 msgstr ""
 
 msgid "Indicates whether this runner can pick jobs without tags"
@@ -14355,9 +14355,6 @@ msgid "Stars"
 msgstr ""
 
 msgid "Start GitLab Ultimate trial"
-msgstr ""
-
-msgid "Start Indexing"
 msgstr ""
 
 msgid "Start Web Terminal"

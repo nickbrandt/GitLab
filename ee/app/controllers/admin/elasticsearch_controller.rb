@@ -4,7 +4,7 @@ class Admin::ElasticsearchController < Admin::ApplicationController
   before_action :check_elasticsearch_web_indexing_feature_flag!
 
   def check_elasticsearch_web_indexing_feature_flag!
-    render_404 unless Feature.enabled?(:elasticsearch_web_indexing)
+    render_404 unless Feature.enabled?(:elasticsearch_web_indexing, default_enabled: true)
   end
 
   # POST
@@ -16,6 +16,6 @@ class Admin::ElasticsearchController < Admin::ApplicationController
     queue_link = helpers.link_to(_('(check progress)'), sidekiq_path + '/queues/elastic_full_index')
     flash[:notice] = "#{notice} #{queue_link}".html_safe
 
-    redirect_back_or_default
+    redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
   end
 end

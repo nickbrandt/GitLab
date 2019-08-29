@@ -18,9 +18,10 @@ describe Admin::ElasticsearchController do
       post :enqueue_index
 
       expect(controller).to set_flash[:notice].to include('/admin/sidekiq/queues/elastic_full_index')
+      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
     end
 
-    context 'when feature disabled' do
+    context 'when feature is disabled' do
       it 'does nothing and returns 404' do
         stub_feature_flags(elasticsearch_web_indexing: false)
 
