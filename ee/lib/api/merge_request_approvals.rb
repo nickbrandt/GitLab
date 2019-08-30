@@ -6,8 +6,11 @@ module API
 
     ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }
 
-    helpers ::API::Helpers::ApprovalHelpers
     helpers do
+      def present_approval(merge_request)
+        present merge_request.approval_state, with: ::EE::API::Entities::ApprovalState, current_user: current_user
+      end
+
       def handle_merge_request_errors!(errors)
         if errors.has_key? :project_access
           error!(errors[:project_access], 422)
@@ -50,13 +53,13 @@ module API
         end
 
         desc 'List approval rules for merge request', {
-          success: ::EE::API::Entities::MergeRequestApprovalRules,
+          success: ::EE::API::Entities::MergeRequestApprovalSettings,
           hidden: true
         }
         get 'approval_settings' do
           merge_request = find_merge_request_with_access(params[:merge_request_iid])
 
-          present merge_request.approval_state, with: ::EE::API::Entities::MergeRequestApprovalRules, current_user: current_user
+          present merge_request.approval_state, with: ::EE::API::Entities::MergeRequestApprovalSettings, current_user: current_user
         end
 
         desc 'Change approval-related configuration' do

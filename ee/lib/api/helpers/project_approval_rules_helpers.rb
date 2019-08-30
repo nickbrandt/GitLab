@@ -40,7 +40,7 @@ module API
         if result[:status] == :success
           present result[:rule], with: present_with, current_user: current_user
         else
-          render_api_error!(result[:message], 400)
+          render_api_error!(result[:message], result[:http_status] || 400)
         end
       end
 
@@ -54,7 +54,7 @@ module API
         if result[:status] == :success
           present result[:rule], with: present_with, current_user: current_user
         else
-          render_api_error!(result[:message], 400)
+          render_api_error!(result[:message], result[:http_status] || 400)
         end
       end
 
