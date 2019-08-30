@@ -64,7 +64,8 @@ module QA
         end
       end
 
-      it 'displays the Dependency Scanning report in the project security dashboard' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/70
+      it 'displays the Dependency Scanning report in the project security dashboard', :quarantine do
         Page::Project::Menu.perform(&:click_project)
         Page::Project::Menu.perform(&:click_on_security_dashboard)
 
@@ -73,7 +74,8 @@ module QA
         end
       end
 
-      it 'displays the Dependency Scanning report in the group security dashboard' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/130
+      it 'displays the Dependency Scanning report in the group security dashboard', :quarantine do
         Page::Main::Menu.perform { |page| page.go_to_groups }
         Page::Dashboard::Groups.perform { |page| page.click_group(@project.group.path) }
         EE::Page::Group::Menu.perform { |page| page.click_group_security_link }
@@ -84,7 +86,8 @@ module QA
         end
       end
 
-      it 'displays the Dependency List' do
+      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/70
+      it 'displays the Dependency List', :quarantine do
         Page::Project::Menu.perform(&:click_on_dependency_list)
 
         EE::Page::Project::Secure::DependencyList.perform do |page|
