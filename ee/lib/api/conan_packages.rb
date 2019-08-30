@@ -65,6 +65,12 @@ module API
     end
 
     before do
+      Rails.logger.info '-----------------------------------------------'
+      Rails.logger.info headers
+      Rails.logger.info '-----------------------------------------------'
+      Rails.logger.info request.body.read if request.body.is_a?(StringIO)
+      Rails.logger.info '-----------------------------------------------'
+
       not_found! unless Feature.enabled?(:conan_package_registry)
       require_packages_enabled!
 
@@ -133,11 +139,10 @@ module API
         authorize!(:read_package, project)
 
         service = ::Packages::ConanPackageService.new(recipe, current_user, project)
-        urls = service.urls(:recipe)
-        Rails.logger.info "=======ccc=============================="
-        Rails.logger.info urls
-        render_api_error!("No recipe manifest found", 404) if urls.empty?
+        urls = service.recipe_urls
 
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+        Rails.logger.info urls
         urls
       end
 
@@ -152,10 +157,10 @@ module API
         authorize!(:read_package, project)
 
         service = ::Packages::ConanPackageService.new(recipe, current_user, project, params[:package_id])
-        urls = service.urls(:package)
+        urls = service.package_urls
 
         render_api_error!("No recipe manifest found", 404) if urls.empty?
-
+        Rails.logger.info urls
         urls
       end
 
@@ -174,7 +179,7 @@ module API
         {
           'conaninfo.txt':      "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conaninfo.py",
           'conanmanifest.txt': "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conanmanifest.txt",
-          'conan_package.tgz': "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conan_package.txt"
+          'conan_package.tgz': "#{base_file_url}/#{params[:url_recipe]}/-/0/package/#{params[:package_id]}/0/conan_package.tgz"
         }
       end
 
@@ -198,7 +203,7 @@ module API
       desc 'Package Download Urls' do
         detail 'This feature was introduced in GitLab 12.3'
       end
-      post 'packages/:package_id/download_urls' do
+      get 'packages/:package_id/download_urls' do
         recipe = generate_recipe(params[:url_recipe])
         project = find_project_by_recipe(params[:url_recipe])
         render_api_error!("No recipe manifest found", 404) unless project
@@ -206,17 +211,17 @@ module API
         authorize!(:read_package, project)
 
         service = ::Packages::ConanPackageService.new(recipe, current_user, project, params[:package_id])
-        urls = service.urls(:package)
+        urls = service.package_urls
 
         render_api_error!("No recipe manifest found", 404) if urls.empty?
-
+        Rails.logger.info urls
         urls
       end
 
       desc 'Recipe Download Urls' do
         detail 'This feature was introduced in GitLab 12.3'
       end
-      post 'download_urls' do
+      get 'download_urls' do
         recipe = generate_recipe(params[:url_recipe])
         project = find_project_by_recipe(params[:url_recipe])
         render_api_error!("No recipe manifest found", 404) unless project
@@ -224,9 +229,10 @@ module API
         authorize!(:read_package, project)
 
         service = ::Packages::ConanPackageService.new(recipe, current_user, project)
-        urls = service.urls(:recipe)
-        render_api_error!("No recipe manifest found", 404) if urls.empty?
+        urls = service.recipe_urls
 
+        render_api_error!("No recipe manifest found", 404) if urls.empty?
+        Rails.logger.info urls
         urls
       end
 
@@ -245,7 +251,9 @@ module API
         return {} unless project # rubocop:disable Cop/AvoidReturnFromBlocks
 
         authorize!(:read_package, project)
-        ::Packages::ConanPackageService.new(recipe, current_user, project).snapshot(:recipe)
+        snapshot = ::Packages::ConanPackageService.new(recipe, current_user, project).recipe_snapshot
+        Rails.logger.info snapshot
+        snapshot
       end
 
       desc 'Package Snapshot' do
@@ -258,7 +266,9 @@ module API
         return {} unless project # rubocop:disable Cop/AvoidReturnFromBlocks
 
         authorize!(:read_package, project)
-        ::Packages::ConanPackageService.new(recipe, current_user, project, params[:package_id]).snapshot(:package)
+        snapshot = ::Packages::ConanPackageService.new(recipe, current_user, project, params[:package_id]).package_snapshot
+        Rails.logger.info snapshot
+        snapshot
       end
     end
 
@@ -270,7 +280,7 @@ module API
       requires :path, type: String, desc: 'Package path'
     end
     # route_setting :authentication, job_token_allowed: true
-    put 'packages/conan/v1/files/*url_recipe/-/*path/:file_name/authorize' do
+    put 'packages/conan/v1/files/*url_recipe/-/*path/authorize' do
       require_gitlab_workhorse!
       Gitlab::Workhorse.verify_api_request!(headers)
 
@@ -312,7 +322,7 @@ module API
       file_params = {
         file:      uploaded_file,
         size:      params['file.size'],
-        file_name: params[:file_name],
+        file_name: "#{params[:file_name]}.#{params[:format]}",
         file_type: params['file.type'],
         file_sha1: params['file.sha1'],
         file_md5:  params['file.md5'],
@@ -343,7 +353,7 @@ module API
         .new(recipe, current_user, project: project).execute
 
       package_file = ::Packages::PackageFileFinder
-        .new(package, file_name).execute!
+        .new(package, "#{params[:file_name]}.#{params[:format]}").execute!
 
       present_carrierwave_file!(package_file.file)
     end

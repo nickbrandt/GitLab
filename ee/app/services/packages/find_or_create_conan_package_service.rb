@@ -9,7 +9,7 @@ module Packages
         package_params = {
           name: params[:recipe],
           path: params[:path],
-          version: params[:recipe_url].split('/')[1]
+          version: params[:url_recipe].split('/')[1]
         }
 
         package = ::Packages::CreateConanPackageService

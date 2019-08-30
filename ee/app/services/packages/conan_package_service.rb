@@ -9,44 +9,54 @@ module Packages
       @package_id = package_id
     end
 
-    def urls(level)
+    def recipe_urls
       urls = {}
       return urls unless package
 
       package.package_files.each do |package_file|
         conan_metadata = package_file.conan_file_metadatum
+        next unless recipe_path?(conan_metadata.path)
 
-        case level
-        when :recipe
-          next unless recipe_path?(conan_metadata.path)
-        when :package
-          next unless package_path?(conan_metadata.path)
-        else
-          next
-        end
-
-        urls[package_file.file_name] = "#{base_file_url}/#{@recipe}-/#{conan_metadata.path}/#{package_file.file_name}}"
+        urls[package_file.file_name] = "#{base_file_url}/#{recipe_to_url(@recipe)}/-/#{conan_metadata.path}/#{package_file.file_name}"
       end
       urls
     end
 
-    def snapshot(level)
+    def recipe_snapshot
       digests = {}
       return digests unless package
 
       package.package_files.each do |package_file|
         conan_metadata = package_file.conan_file_metadatum
+        next unless recipe_path?(conan_metadata.path)
 
-        case level
-        when :recipe
-          next unless recipe_path?(conan_metadata.path)
-        when :package
-          next unless package_path?(conan_metadata.path)
-        else
-          next
-        end
+        digests[package_file.file_name] = package_file.file_md5
+      end
+      digests
+    end
 
-        digests[package_file.file_name] = Digest::MD5.hexdigest(package_file.file)
+    def package_urls
+      urls = {}
+      return urls unless package
+
+      package.package_files.reverse.each do |package_file|
+        conan_metadata = package_file.conan_file_metadatum
+        next unless package_path?(conan_metadata.path)
+
+        urls[package_file.file_name] = "#{base_file_url}/#{recipe_to_url(@recipe)}/-/#{conan_metadata.path}/#{package_file.file_name}"
+      end
+      urls
+    end
+
+    def package_snapshot
+      digests = []
+      return digests unless package
+
+      package.package_files.each do |package_file|
+        conan_metadata = package_file.conan_file_metadatum
+        next unless package_path?(conan_metadata.path)
+
+        digests[package_file.file_name] = package_file.file_md5
       end
       digests
     end
@@ -63,11 +73,15 @@ module Packages
     end
 
     def package_path?(path)
-      path.include?('/package/')
+      path.include?('/package')
     end
 
     def recipe_path?(path)
-      path.include?('/export/')
+      path.include?('/export')
+    end
+
+    def recipe_to_url(recipe)
+      recipe.tr('@', '/')
     end
   end
 end
