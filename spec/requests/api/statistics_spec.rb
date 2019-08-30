@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe API::Statistics, 'Statistics' do
+  include ProjectForksHelper
+
   let(:path) { "/application/statistics" }
 
   describe "GET /application/statistics" do
@@ -43,6 +45,13 @@ describe API::Statistics, 'Statistics' do
         create_list(:milestone, 3, project: projects.first)
         create(:key, user: admin)
         create(:merge_request, source_project: projects.first)
+        fork_project(projects.first, admin)
+
+        # Make sure the reltuples have been updated
+        # to get a correct count on postgresql
+        %w[issues merge_requests notes snippets fork_networks fork_network_members keys milestones users].each do |table|
+          ActiveRecord::Base.connection.execute("ANALYZE #{table}")
+        end
 
         get api(path, admin)
 
@@ -50,7 +59,7 @@ describe API::Statistics, 'Statistics' do
         expect(json_response['merge_requests']).to eq('1')
         expect(json_response['notes']).to eq('2')
         expect(json_response['snippets']).to eq('2')
-        expect(json_response['forks']).to eq('0')
+        expect(json_response['forks']).to eq('1')
         expect(json_response['ssh_keys']).to eq('1')
         expect(json_response['milestones']).to eq('3')
         expect(json_response['active_users']).to eq('1')
