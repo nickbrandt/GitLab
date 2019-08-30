@@ -14,7 +14,7 @@ module EE
 
       belongs_to :file_template_project, class_name: "Project"
 
-      self.ignored_columns = %i[minimum_mirror_sync_time]
+      self.ignored_columns += %i[minimum_mirror_sync_time]
 
       validates :shared_runners_minutes,
                 numericality: { greater_than_or_equal_to: 0 }

@@ -23,7 +23,7 @@ class User < ApplicationRecord
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
-  self.ignored_columns = %i[
+  self.ignored_columns += %i[
                          authentication_token
                          email_provider
                          external_email

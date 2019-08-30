@@ -21,7 +21,7 @@ module EE
       include InsightsFeature
       include Vulnerable
 
-      self.ignored_columns = %i[
+      self.ignored_columns += %i[
         mirror_last_update_at
         mirror_last_successful_update_at
         next_execution_timestamp

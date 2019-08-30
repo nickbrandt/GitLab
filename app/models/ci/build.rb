@@ -17,7 +17,7 @@ module Ci
 
     BuildArchivedError = Class.new(StandardError)
 
-    self.ignored_columns = %i[
+    self.ignored_columns += %i[
                            artifacts_file
                            artifacts_file_store
                            artifacts_metadata
