@@ -151,8 +151,6 @@ describe API::Scim do
             end
 
             it 'returns user error' do
-              post scim_api("scim/v2/groups/#{group.full_path}/Users?params=#{post_params}")
-
               expect(response).to have_gitlab_http_status(412)
               expect(json_response.fetch('detail')).to include("Email can't be blank")
             end
