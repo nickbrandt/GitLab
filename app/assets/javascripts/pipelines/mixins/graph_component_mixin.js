@@ -40,5 +40,8 @@ export default {
     refreshPipelineGraph() {
       this.$emit('refreshPipelineGraph');
     },
+    shouldAddRightMargin(index) {
+      return !(index === this.graph.length - 1)
+    }    
   },
 };
