@@ -2,10 +2,12 @@
 
 module EE
   module API
-    module Endpoints
+    module API
       extend ActiveSupport::Concern
 
       prepended do
+        use ::Gitlab::Middleware::IpRestrictor
+
         mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 

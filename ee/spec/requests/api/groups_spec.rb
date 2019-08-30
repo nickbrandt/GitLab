@@ -39,6 +39,43 @@ describe API::Groups do
     end
   end
 
+  describe 'GET /groups/:id' do
+    before do
+      create(:ip_restriction, group: private_group)
+      private_group.add_maintainer(user)
+    end
+
+    context 'when the group_ip_restriction feature is not available' do
+      before do
+        stub_licensed_features(group_ip_restriction: false)
+      end
+
+      it 'returns 200' do
+        get api("/groups/#{private_group.id}", user)
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+
+    context 'when the group_ip_restriction feature is available' do
+      before do
+        stub_licensed_features(group_ip_restriction: true)
+      end
+
+      it 'returns 404 for request from ip not in the range' do
+        get api("/groups/#{private_group.id}", user)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+
+      it 'returns 200 for request from ip in the range' do
+        get api("/groups/#{private_group.id}", user), headers: { 'REMOTE_ADDR' => '192.168.0.0' }
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+  end
+
   describe 'PUT /groups/:id' do
     subject { put api("/groups/#{group.id}", user), params: params }
 

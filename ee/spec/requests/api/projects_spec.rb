@@ -100,6 +100,46 @@ describe API::Projects do
           expect(json_response['external_authorization_classification_label']).to be_nil
         end
       end
+
+      context 'with ip restriction' do
+        let(:group) { create :group, :private }
+
+        before do
+          create(:ip_restriction, group: group)
+          group.add_maintainer(user)
+          project.update(namespace: group)
+        end
+
+        context 'when the group_ip_restriction feature is not available' do
+          before do
+            stub_licensed_features(group_ip_restriction: false)
+          end
+
+          it 'returns 200' do
+            get api("/projects/#{project.id}", user)
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        context 'when the group_ip_restriction feature is available' do
+          before do
+            stub_licensed_features(group_ip_restriction: true)
+          end
+
+          it 'returns 404 for request from ip not in the range' do
+            get api("/projects/#{project.id}", user)
+
+            expect(response).to have_gitlab_http_status(404)
+          end
+
+          it 'returns 200 for request from ip in the range' do
+            get api("/projects/#{project.id}", user), headers: { 'REMOTE_ADDR' => '192.168.0.0' }
+
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+      end
     end
 
     describe 'packages_enabled attribute' do
