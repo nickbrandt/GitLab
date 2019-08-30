@@ -21,6 +21,9 @@ describe 'Group elastic search', :js, :elastic do
     group.add_owner(user)
 
     sign_in(user)
+
+    visit(search_path)
+    choose_group(group)
   end
 
   describe 'issue search' do
@@ -31,13 +34,9 @@ describe 'Group elastic search', :js, :elastic do
     end
 
     it 'finds the issue' do
-      visit search_path
+      submit_search('chosen')
+      select_search_scope('Issues')
 
-      choose_group group
-      fill_in 'search', with: 'chosen'
-      find('.btn-search').click
-
-      select_filter('Issues')
       expect(page).to have_content('chosen issue title')
     end
   end
@@ -50,13 +49,8 @@ describe 'Group elastic search', :js, :elastic do
     end
 
     it 'finds files' do
-      visit search_path
-
-      choose_group group
-      fill_in 'search', with: 'def'
-      find('.btn-search').click
-
-      select_filter('Code')
+      submit_search('def')
+      select_search_scope('Code')
 
       expect(page).to have_selector('.file-content .code')
     end
@@ -72,35 +66,25 @@ describe 'Group elastic search', :js, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    it "finds pages" do
-      visit search_path
-
-      choose_group group
-      fill_in "search", with: "term"
-      find('.btn-search').click
-
-      select_filter("Wiki")
+    it 'finds pages' do
+      submit_search('term')
+      select_search_scope('Wiki')
 
       expect(page).to have_selector('.file-content .code')
-
-      expect(page).to have_selector("span.line[lang='markdown']")
+      expect(page).to have_selector('span.line[lang="markdown"]')
     end
   end
 
   describe 'commit search' do
     before do
       project.repository.index_commits
+
       Gitlab::Elastic::Helper.refresh_index
     end
 
     it 'finds commits' do
-      visit search_path
-
-      choose_group group
-      fill_in 'search', with: 'add'
-      find('.btn-search').click
-
-      select_filter('Commits')
+      submit_search('add')
+      select_search_scope('Commits')
 
       expect(page).to have_selector('.commit-list > .commit')
     end

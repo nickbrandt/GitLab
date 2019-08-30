@@ -9,77 +9,73 @@ describe 'Project elastic search', :js, :elastic do
 
     project.add_maintainer(user)
     sign_in(user)
+
+    visit project_path(project)
   end
 
   describe 'searching' do
     it 'finds issues' do
       create(:issue, project: project, title: 'Test searching for an issue')
 
-      expect_search_result(scope: 'Issues', term: 'Test', result: 'Test searching for an issue')
+      submit_search('Test')
+      select_search_scope('Issues')
+
+      expect(page).to have_selector('.results', text: 'Test searching for an issue')
     end
 
     it 'finds merge requests' do
       create(:merge_request, source_project: project, target_project: project, title: 'Test searching for an MR')
 
-      expect_search_result(scope: 'Merge requests', term: 'Test', result: 'Test searching for an MR')
+      submit_search('Test')
+      select_search_scope('Merge requests')
+
+      expect(page).to have_selector('.results', text: 'Test searching for an MR')
     end
 
     it 'finds milestones' do
       create(:milestone, project: project, title: 'Test searching for a milestone')
 
-      expect_search_result(scope: 'Milestones', term: 'Test', result: 'Test searching for a milestone')
+      submit_search('Test')
+      select_search_scope('Milestones')
+
+      expect(page).to have_selector('.results', text: 'Test searching for a milestone')
     end
 
     it 'finds wiki pages' do
       project.wiki.create_page('test.md', 'Test searching for a wiki page')
       project.wiki.index_wiki_blobs
 
-      expect_search_result(scope: 'Wiki', term: 'Test', result: 'Test searching for a wiki page')
+      submit_search('Test')
+      select_search_scope('Wiki')
+
+      expect(page).to have_selector('.results', text: 'Test searching for a wiki page')
     end
 
     it 'finds notes' do
-      create(:note, project: project, note: 'Test searching for a note')
+      create(:note, project: project, note: 'Test searching for a comment')
 
-      search(scope: 'Comments', term: 'Test')
+      submit_search('Test')
+      select_search_scope('Comments')
 
-      expect(page).to have_content(/showing (\d+) - (\d+) of (\d+) notes/i)
-      expect(page).to have_content('Test searching for a note')
+      expect(page).to have_selector('.results', text: 'Test searching for a comment')
     end
 
     it 'finds commits' do
       project.repository.index_commits
 
-      search(scope: 'Commits', term: 'initial')
+      submit_search('initial')
+      select_search_scope('Commits')
 
-      expect(page).to have_content(/showing (\d+) - (\d+) of (\d+) commits/i)
-      expect(page).to have_content('Initial commit')
+      expect(page).to have_selector('.results', text: 'Initial commit')
     end
 
     it 'finds blobs' do
       project.repository.index_blobs
 
-      search(scope: 'Code', term: 'def')
+      submit_search('def')
+      select_search_scope('Code')
 
-      expect(page).to have_content(/showing (\d+) - (\d+) of (\d+) blobs/i)
-      expect(page).to have_content('def username_regex')
+      expect(page).to have_selector('.results', text: 'def username_regex')
     end
-  end
-
-  def search(scope:, term:)
-    visit project_path(project)
-
-    fill_in('search', with: term)
-    find('#search').native.send_keys(:enter)
-
-    page.within '.search-filter' do
-      click_link scope
-    end
-  end
-
-  def expect_search_result(scope:, term:, result:)
-    search(scope: scope, term: term)
-
-    expect(page).to have_content(/showing (\d+) - (\d+) of (\d+) #{Regexp.escape(scope)}/i)
-    expect(page).to have_content(result)
   end
 end

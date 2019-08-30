@@ -433,26 +433,21 @@ describe 'Promotions', :js do
     it 'appears on seearch page' do
       visit search_path
 
-      fill_in 'search', with: 'chosen'
-      find('.btn-search').click
+      submit_search('chosen')
 
       expect(find('#promote_advanced_search')).to have_content 'Improve search with Advanced Global Search and GitLab Enterprise Edition.'
     end
 
     it 'does not show when cookie is set' do
       visit search_path
-
-      fill_in 'search', with: 'chosen'
-      find('.btn-search').click
+      submit_search('chosen')
 
       within('#promote_advanced_search') do
         find('.close').click
       end
 
       visit search_path
-
-      fill_in 'search', with: 'chosen'
-      find('.btn-search').click
+      submit_search('chosen')
 
       expect(page).not_to have_selector('#promote_advanced_search')
     end

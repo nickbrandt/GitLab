@@ -76,10 +76,9 @@ describe 'Global elastic search', :elastic do
     it "has a pagination" do
       visit dashboard_projects_path
 
-      fill_in "search", with: "initial"
-      click_button "Go"
+      submit_search('initial')
+      select_search_scope('Issues')
 
-      select_filter("Issues")
       expect(page).to have_selector('.gl-pagination .js-pagination-page', count: 2)
     end
   end
@@ -95,10 +94,8 @@ describe 'Global elastic search', :elastic do
     it "has a pagination" do
       visit dashboard_projects_path
 
-      fill_in "search", with: "foo"
-      click_button "Go"
-
-      select_filter("Comments")
+      submit_search('foo')
+      select_search_scope('Comments')
 
       expect(page).to have_selector('.gl-pagination .js-pagination-page', count: 2)
     end
@@ -116,10 +113,8 @@ describe 'Global elastic search', :elastic do
     it "finds files" do
       visit dashboard_projects_path
 
-      fill_in "search", with: "application.js"
-      click_button "Go"
-
-      select_filter("Code")
+      submit_search('application.js')
+      select_search_scope('Code')
 
       expect(page).to have_selector('.file-content .code')
 
@@ -142,8 +137,7 @@ describe 'Global elastic search', :elastic do
 
       visit dashboard_projects_path
 
-      fill_in "search", with: "application.js"
-      click_button "Go"
+      submit_search('application.js')
 
       expect(page).not_to have_content 'supercalifragilisticexpialidocious'
     end
@@ -160,10 +154,8 @@ describe 'Global elastic search', :elastic do
     it "finds files" do
       visit dashboard_projects_path
 
-      fill_in "search", with: "term"
-      click_button "Go"
-
-      select_filter("Wiki")
+      submit_search('term')
+      select_search_scope('Wiki')
 
       expect(page).to have_selector('.file-content .code')
 
@@ -180,10 +172,8 @@ describe 'Global elastic search', :elastic do
     it "finds commits" do
       visit dashboard_projects_path
 
-      fill_in "search", with: "add"
-      click_button "Go"
-
-      select_filter("Commits")
+      submit_search('add')
+      select_search_scope('Commits')
 
       expect(page).to have_selector('.commit-row-description')
       expect(page).to have_selector('.project-namespace')
@@ -192,12 +182,11 @@ describe 'Global elastic search', :elastic do
     it 'shows proper page 2 results' do
       visit dashboard_projects_path
 
-      fill_in "search", with: "add"
-      click_button "Go"
+      submit_search('add')
+      select_search_scope('Commits')
 
       expected_message = "Add directory structure for tree_helper spec"
 
-      select_filter("Commits")
       expect(page).not_to have_content(expected_message)
 
       click_link 'Next'
@@ -213,8 +202,7 @@ describe 'Global elastic search', :elastic do
 
       visit dashboard_projects_path
 
-      fill_in('search', with: 'project')
-      find('#search').send_keys(:enter)
+      submit_search('project')
     end
 
     it 'displays result counts for all categories' do
