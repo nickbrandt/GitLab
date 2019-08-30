@@ -1,0 +1,32 @@
+---
+table_display_block: true
+---
+
+# Application statistics API
+
+## Get current application statistics
+
+List the current statistics of the GitLab instance.
+
+```
+GET /application/statistics
+```
+
+```bash
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/application/statistics
+```
+
+Example response:
+
+```json
+{
+   "forks": "10",
+   "issues": "76",
+   "merge_requests": "27",
+   "notes": "954",
+   "snippets": "50",
+   "ssh_keys": "10",
+   "milestones": "40",
+   "active_users": "50"
+}
+```
