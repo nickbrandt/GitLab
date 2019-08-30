@@ -4,7 +4,7 @@ module API
   class Statistics < Grape::API
     before { authenticated_as_admin! }
 
-    COUNTED_ITEMS = [Project, User, Group, ForkNetworkMember, ForkNetwork, Issue,
+    COUNTED_ITEMS = [ForkNetworkMember, ForkNetwork, Issue,
                      MergeRequest, Note, Snippet, Key, Milestone].freeze
 
     desc 'Get the current application statistics' do

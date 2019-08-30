@@ -8,9 +8,6 @@
     "snippets",
     "ssh_keys",
     "milestones",
-    "users",
-    "projects",
-    "groups",
     "active_users"
   ],
   "properties" : {
@@ -21,9 +18,6 @@
     "snippets'": { "type": "string" },
     "ssh_keys'": { "type": "string" },
     "milestones'": { "type": "string" },
-    "users'": { "type": "string" },
-    "projects'": { "type": "string" },
-    "groups'": { "type": "string" },
     "active_users'": { "type": "string" }
   }
 }

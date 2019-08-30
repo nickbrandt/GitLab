@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe API::Statistics, 'Statistics' do
@@ -36,7 +38,6 @@ describe API::Statistics, 'Statistics' do
         projects = create_list(:project, 4, namespace: create(:namespace, owner: admin))
         issues = create_list(:issue, 2, project: projects.first, updated_by: admin)
 
-        create_list(:group, 2)
         create_list(:snippet, 2, :public, author: admin)
         create_list(:note, 2, author: admin, project: projects.first, noteable: issues.first)
         create_list(:milestone, 3, project: projects.first)
@@ -52,9 +53,6 @@ describe API::Statistics, 'Statistics' do
         expect(json_response['forks']).to eq('0')
         expect(json_response['ssh_keys']).to eq('1')
         expect(json_response['milestones']).to eq('3')
-        expect(json_response['users']).to eq('1')
-        expect(json_response['projects']).to eq('4')
-        expect(json_response['groups']).to eq('2')
         expect(json_response['active_users']).to eq('1')
       end
     end
