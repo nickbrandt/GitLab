@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 class ProjectRepositoryState < ApplicationRecord
-  include IgnorableColumn
   include ShaAttribute
 
-  ignore_column :last_repository_verification_failed
-  ignore_column :last_wiki_verification_failed
+  self.ignored_columns += %i[last_repository_verification_failed last_wiki_verification_failed]
 
   sha_attribute :repository_verification_checksum
   sha_attribute :wiki_verification_checksum

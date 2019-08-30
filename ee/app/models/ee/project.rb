@@ -19,12 +19,13 @@ module EE
       include EE::DeploymentPlatform # rubocop: disable Cop/InjectEnterpriseEditionModule
       include EachBatch
       include InsightsFeature
-      include IgnorableColumn
       include Vulnerable
 
-      ignore_column :mirror_last_update_at,
-        :mirror_last_successful_update_at,
-        :next_execution_timestamp
+      self.ignored_columns += %i[
+        mirror_last_update_at
+        mirror_last_successful_update_at
+        next_execution_timestamp
+      ]
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
       before_save :set_next_execution_timestamp_to_now, if: ->(project) { project.mirror? && project.mirror_changed? && project.import_state }
