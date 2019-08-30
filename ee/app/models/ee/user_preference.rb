@@ -6,7 +6,7 @@ module EE
 
     prepended do
       validates :roadmap_epics_state, allow_nil: true, inclusion: {
-        in: ::Epic.states.values, message: "%{value} is not a valid epic state"
+        in: ::Epic.state_ids.values, message: "%{value} is not a valid epic state id"
       }
 
       validates :epic_notes_filter, inclusion: { in: ::UserPreference::NOTES_FILTERS.values }, presence: true
