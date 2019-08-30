@@ -14,7 +14,8 @@ module EE
       include LabelEventable
       include RelativePositioning
 
-      enum state: { opened: 1, closed: 2 }
+      enum state_id: { opened: 1, closed: 2 }
+      alias_attribute :state, :state_id
 
       belongs_to :closed_by, class_name: 'User'
 
