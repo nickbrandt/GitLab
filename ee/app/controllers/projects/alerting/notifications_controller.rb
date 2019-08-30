@@ -28,7 +28,6 @@ module Projects
       def check_generic_alert_endpoint_feature_flag!
         render_404 unless Feature.enabled?(:generic_alert_endpoint, @project)
       end
-
     end
   end
 end
