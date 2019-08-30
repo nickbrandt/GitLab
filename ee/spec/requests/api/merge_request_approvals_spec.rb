@@ -10,6 +10,47 @@ describe API::MergeRequestApprovals do
   set(:approver) { create :user }
   set(:group) { create :group }
 
+  shared_examples_for 'an API endpoint for getting merge request approval state' do
+    context 'when source rule is present' do
+      let(:source_rule) { create(:approval_project_rule, project: project, approvals_required: 1, name: 'zoo') }
+
+      before do
+        rule.create_approval_merge_request_rule_source!(approval_project_rule: source_rule)
+
+        get api(url, user)
+      end
+
+      it 'returns source rule details' do
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['rules'].size).to eq(1)
+
+        rule_response = json_response['rules'].first
+
+        expect(rule_response['source_rule']['approvals_required']).to eq(source_rule.approvals_required)
+      end
+    end
+
+    context 'when user cannot view a group included in groups' do
+      let(:private_group) { create(:group, :private) }
+
+      before do
+        rule.groups << private_group
+
+        get api(url, user)
+      end
+
+      it 'excludes private groups' do
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['rules'].size).to eq(1)
+
+        rule_response = json_response['rules'].first
+
+        expect(rule_response['id']).to eq(rule.id)
+        expect(rule_response['groups'].size).to eq(0)
+      end
+    end
+  end
+
   describe 'GET :id/merge_requests/:merge_request_iid/approvals' do
     let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
 
@@ -96,14 +137,19 @@ describe API::MergeRequestApprovals do
   end
 
   describe 'GET :id/merge_requests/:merge_request_iid/approval_settings' do
-    let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
+    let(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
+    let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings" }
 
-    it 'retrieves the approval rules details' do
+    before do
       project.add_developer(approver)
       merge_request.approvals.create(user: approver)
       rule.users << approver
+    end
 
-      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
+    it_behaves_like 'an API endpoint for getting merge request approval state'
+
+    it 'retrieves the approval rules details' do
+      get api(url, user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['rules'].size).to eq(1)
@@ -116,35 +162,22 @@ describe API::MergeRequestApprovals do
       expect(rule_response['approved_by'][0]['username']).to eq(approver.username)
       expect(rule_response['source_rule']).to eq(nil)
     end
+  end
 
-    context 'when source rule is present' do
-      let!(:source_rule) { create(:approval_project_rule, project: project, approvals_required: 1, name: 'zoo') }
-      let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
+  describe 'GET :id/merge_requests/:merge_request_iid/approval_state' do
+    let(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
+    let(:url) { "/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_state" }
 
-      it 'returns source rule details' do
-        project.add_developer(approver)
-        merge_request.approvals.create(user: approver)
-        rule.users << approver
-        rule.create_approval_merge_request_rule_source!(approval_project_rule: source_rule)
-
-        get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['rules'].size).to eq(1)
-
-        rule_response = json_response['rules'].first
-
-        expect(rule_response['source_rule']['approvals_required']).to eq(source_rule.approvals_required)
-      end
+    before do
+      project.add_developer(approver)
+      merge_request.approvals.create(user: approver)
+      rule.users << approver
     end
 
-    it 'excludes private groups' do
-      private_group = create(:group, :private)
+    it_behaves_like 'an API endpoint for getting merge request approval state'
 
-      rule.users << approver
-      rule.groups << private_group
-
-      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
+    it 'retrieves the approval state details' do
+      get api(url, user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['rules'].size).to eq(1)
@@ -152,7 +185,10 @@ describe API::MergeRequestApprovals do
       rule_response = json_response['rules'].first
 
       expect(rule_response['id']).to eq(rule.id)
-      expect(rule_response['groups'].size).to eq(0)
+      expect(rule_response['name']).to eq('foo')
+      expect(rule_response['eligible_approvers'][0]['username']).to eq(approver.username)
+      expect(rule_response['approved_by'][0]['username']).to eq(approver.username)
+      expect(rule_response['source_rule']).to eq(nil)
     end
   end
 

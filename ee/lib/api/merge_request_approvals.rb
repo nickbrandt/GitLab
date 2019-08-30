@@ -26,6 +26,12 @@ module API
 
         render_api_error!(errors, 400)
       end
+
+      def get_merge_request_approval_state(present_with:)
+        merge_request = find_merge_request_with_access(params[:merge_request_iid])
+
+        present merge_request.approval_state, with: present_with, current_user: current_user
+      end
     end
 
     params do
@@ -57,9 +63,14 @@ module API
           hidden: true
         }
         get 'approval_settings' do
-          merge_request = find_merge_request_with_access(params[:merge_request_iid])
+          get_merge_request_approval_state(present_with: ::EE::API::Entities::MergeRequestApprovalSettings)
+        end
 
-          present merge_request.approval_state, with: ::EE::API::Entities::MergeRequestApprovalSettings, current_user: current_user
+        desc 'Get approval state of merge request' do
+          success ::EE::API::Entities::MergeRequestApprovalState
+        end
+        get 'approval_state' do
+          get_merge_request_approval_state(present_with: ::EE::API::Entities::MergeRequestApprovalState)
         end
 
         desc 'Change approval-related configuration' do
