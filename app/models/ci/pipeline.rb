@@ -461,7 +461,7 @@ module Ci
     end
 
     def cancel_running(retries: nil)
-      retry_optimistic_lock(cancelable_statuses) do |cancelable|
+      retry_optimistic_lock(cancelable_statuses, retries) do |cancelable|
         cancelable.find_each do |job|
           yield(job) if block_given?
           job.cancel
