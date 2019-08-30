@@ -4,7 +4,7 @@ import MRWidgetAutoMergeEnabled from '~/vue_merge_request_widget/components/stat
 import {
   MWPS_MERGE_STRATEGY,
   MT_MERGE_STRATEGY,
-  ATMTWPS_MERGE_STRATEGY,
+  MTWPS_MERGE_STRATEGY,
 } from '~/vue_merge_request_widget/constants';
 
 describe('MRWidgetAutoMergeEnabled', () => {
@@ -27,7 +27,7 @@ describe('MRWidgetAutoMergeEnabled', () => {
     sha: '1EA2EZ34',
     targetBranchPath: '/foo/bar',
     targetBranch: 'foo',
-    autoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+    autoMergeStrategy: MTWPS_MERGE_STRATEGY,
   };
 
   const factory = (mrUpdates = {}) => {
@@ -55,8 +55,8 @@ describe('MRWidgetAutoMergeEnabled', () => {
         expect(vm.statusTextBeforeAuthor).toBe('Added to the merge train by');
       });
 
-      it('should return "Set by" if the ATMTWPS is selected', () => {
-        factory({ autoMergeStrategy: ATMTWPS_MERGE_STRATEGY });
+      it('should return "Set by" if the MTWPS is selected', () => {
+        factory({ autoMergeStrategy: MTWPS_MERGE_STRATEGY });
 
         expect(vm.statusTextBeforeAuthor).toBe('Set by');
       });
@@ -69,18 +69,18 @@ describe('MRWidgetAutoMergeEnabled', () => {
     });
 
     describe('statusTextAfterAuthor', () => {
-      it('should return "to start a merge train..." if ATMTWPS is selected and there is no existing merge train', () => {
+      it('should return "to start a merge train..." if MTWPS is selected and there is no existing merge train', () => {
         factory({
-          autoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          autoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 0,
         });
 
         expect(vm.statusTextAfterAuthor).toBe('to start a merge train when the pipeline succeeds');
       });
 
-      it('should return "to be added to the merge train..." if ATMTWPS is selected and there is an existing merge train', () => {
+      it('should return "to be added to the merge train..." if MTWPS is selected and there is an existing merge train', () => {
         factory({
-          autoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          autoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 1,
         });
 
@@ -99,8 +99,8 @@ describe('MRWidgetAutoMergeEnabled', () => {
     });
 
     describe('cancelButtonText', () => {
-      it('should return "Cancel start merge train" if ATMTWPS is selected', () => {
-        factory({ autoMergeStrategy: ATMTWPS_MERGE_STRATEGY });
+      it('should return "Cancel start merge train" if MTWPS is selected', () => {
+        factory({ autoMergeStrategy: MTWPS_MERGE_STRATEGY });
 
         expect(vm.cancelButtonText).toBe('Cancel automatic merge');
       });
@@ -120,9 +120,9 @@ describe('MRWidgetAutoMergeEnabled', () => {
   });
 
   describe('template', () => {
-    it('should render the status text as "...to start a merge train" if ATMTWPS is selected and there is no existing merge train', () => {
+    it('should render the status text as "...to start a merge train" if MTWPS is selected and there is no existing merge train', () => {
       factory({
-        autoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+        autoMergeStrategy: MTWPS_MERGE_STRATEGY,
         mergeTrainsCount: 0,
       });
 
@@ -131,9 +131,9 @@ describe('MRWidgetAutoMergeEnabled', () => {
       expect(statusText).toBe('to start a merge train when the pipeline succeeds');
     });
 
-    it('should render the status text as "...to be added to the merge train" ATMTWPS is selected and there is an existing merge train', () => {
+    it('should render the status text as "...to be added to the merge train" MTWPS is selected and there is an existing merge train', () => {
       factory({
-        autoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+        autoMergeStrategy: MTWPS_MERGE_STRATEGY,
         mergeTrainsCount: 1,
       });
 
@@ -142,8 +142,8 @@ describe('MRWidgetAutoMergeEnabled', () => {
       expect(statusText).toBe('to be added to the merge train when the pipeline succeeds');
     });
 
-    it('should render the cancel button as "Cancel automatic merge" if ATMTWPS is selected', () => {
-      factory({ autoMergeStrategy: ATMTWPS_MERGE_STRATEGY });
+    it('should render the cancel button as "Cancel automatic merge" if MTWPS is selected', () => {
+      factory({ autoMergeStrategy: MTWPS_MERGE_STRATEGY });
 
       const cancelButtonText = trimText(vm.$el.querySelector('.js-cancel-auto-merge').innerText);
 

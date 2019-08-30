@@ -3,7 +3,7 @@ import ReadyToMerge from '~/vue_merge_request_widget/components/states/ready_to_
 import {
   MWPS_MERGE_STRATEGY,
   MT_MERGE_STRATEGY,
-  ATMTWPS_MERGE_STRATEGY,
+  MTWPS_MERGE_STRATEGY,
 } from '~/vue_merge_request_widget/constants';
 
 describe('ReadyToMerge', () => {
@@ -96,18 +96,18 @@ describe('ReadyToMerge', () => {
         expect(vm.mergeButtonText).toEqual('Add to merge train');
       });
 
-      it('should return "Start merge train when pipeline succeeds" when the ATMTWPS auto merge strategy is available and there is no existing merge train', () => {
+      it('should return "Start merge train when pipeline succeeds" when the MTWPS auto merge strategy is available and there is no existing merge train', () => {
         factory({
-          preferredAutoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          preferredAutoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 0,
         });
 
         expect(vm.mergeButtonText).toEqual('Start merge train when pipeline succeeds');
       });
 
-      it('should return "Add to merge train when pipeline succeeds" when the ATMTWPS auto merge strategy is available and a merge train already exists', () => {
+      it('should return "Add to merge train when pipeline succeeds" when the MTWPS auto merge strategy is available and a merge train already exists', () => {
         factory({
-          preferredAutoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          preferredAutoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 1,
         });
 
@@ -124,7 +124,7 @@ describe('ReadyToMerge', () => {
 
       it('should return Start merge train when pipeline succeeds', () => {
         factory({
-          preferredAutoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          preferredAutoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 0,
         });
 
@@ -133,7 +133,7 @@ describe('ReadyToMerge', () => {
 
       it('should return Add to merge train when pipeline succeeds', () => {
         factory({
-          preferredAutoMergeStrategy: ATMTWPS_MERGE_STRATEGY,
+          preferredAutoMergeStrategy: MTWPS_MERGE_STRATEGY,
           mergeTrainsCount: 1,
         });
 
