@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Projects::AlertNotificationsController do
+describe Projects::Alerting::NotificationsController do
   set(:project) { create(:project) }
   set(:environment) { create(:environment, project: project) }
 

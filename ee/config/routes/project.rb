@@ -52,7 +52,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
       # End of the /-/ scope.
 
-      resource :alert_notification, only: :create
+      post 'alerts/notify', to: 'alerting/notifications#create'
 
       resource :tracing, only: [:show]
 
