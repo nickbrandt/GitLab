@@ -460,7 +460,7 @@ module Ci
       canceled? && auto_canceled_by_id?
     end
 
-    def cancel_running(retries = nil)
+    def cancel_running(retries: nil)
       retry_optimistic_lock(cancelable_statuses) do |cancelable|
         cancelable.find_each do |job|
           yield(job) if block_given?
