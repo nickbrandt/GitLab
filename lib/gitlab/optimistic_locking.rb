@@ -4,7 +4,7 @@ module Gitlab
   module OptimisticLocking
     module_function
 
-    def retry_lock(subject, retries: nil, &block)
+    def retry_lock(subject, retries = nil, &block)
       retries ||= 100
       # TODO(Observability): We should be recording details of the number of retries and the duration of the total execution here
       ActiveRecord::Base.transaction do
