@@ -1,9 +1,8 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe EnvironmentEntity do
-  using RSpec::Parameterized::TableSyntax
-
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
   let(:environment) { create(:environment, :with_review_app, ref: 'development', project: project) }

@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "iid": { "type": "integer" },
+    "deployable": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "../../../../../../spec/fixtures/api/schemas/job/job.json" }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

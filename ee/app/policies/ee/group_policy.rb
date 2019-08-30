@@ -41,6 +41,10 @@ module EE
         @subject.feature_available?(:dependency_proxy)
       end
 
+      condition(:cluster_deployments_available) do
+        @subject.feature_available?(:cluster_deployments)
+      end
+
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
@@ -54,6 +58,9 @@ module EE
       rule { owner }.policy do
         enable :owner_access
       end
+
+      rule { can?(:read_cluster) & cluster_deployments_available }
+        .enable :read_cluster_environments
 
       rule { can?(:read_group) & contribution_analytics_available }
         .enable :read_group_contribution_analytics
