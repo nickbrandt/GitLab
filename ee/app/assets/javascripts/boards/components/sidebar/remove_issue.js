@@ -1,7 +1,8 @@
 import base from '~/boards/components/sidebar/remove_issue.vue';
 import boardsStore from '~/boards/stores/boards_store';
 
-export default base.extend({
+export default {
+  extends: base,
   methods: {
     seedPatchRequest(issue, req) {
       /* eslint-disable no-param-reassign */
@@ -29,4 +30,4 @@ export default base.extend({
       };
     },
   },
-});
+};
