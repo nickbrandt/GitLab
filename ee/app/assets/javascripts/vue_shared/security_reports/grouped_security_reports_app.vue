@@ -173,6 +173,11 @@ export default {
 
       return head || diffEndpoint;
     },
+    shouldRenderDependencyScanning() {
+      const { head, diffEndpoint } = this.dependencyScanning.paths;
+
+      return head || diffEndpoint;
+    },
   },
 
   created() {
@@ -229,7 +234,17 @@ export default {
       this.fetchDastReports();
     }
 
-    if (this.dependencyScanningHeadPath) {
+    const dependencyScanningDiffEndpoint =
+      gl && gl.mrWidgetData && gl.mrWidgetData.dependency_scanning_comparison_path;
+
+    if (
+      gon.features &&
+      gon.features.dependencyScanningMergeRequestReportApi &&
+      dependencyScanningDiffEndpoint
+    ) {
+      this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
+      this.fetchDependencyScanningDiff();
+    } else if (this.dependencyScanningHeadPath) {
       this.setDependencyScanningHeadPath(this.dependencyScanningHeadPath);
 
       if (this.dependencyScanningBasePath) {
@@ -274,6 +289,8 @@ export default {
       'hideDismissalDeleteButtons',
       'fetchSastContainerDiff',
       'setSastContainerDiffEndpoint',
+      'fetchDependencyScanningDiff',
+      'setDependencyScanningDiffEndpoint',
     ]),
     ...mapActions('sast', {
       setSastHeadPath: 'setHeadPath',
@@ -322,7 +339,7 @@ export default {
         />
       </template>
 
-      <template v-if="dependencyScanningHeadPath">
+      <template v-if="shouldRenderDependencyScanning">
         <summary-row
           :summary="groupedDependencyText"
           :status-icon="dependencyScanningStatusIcon"

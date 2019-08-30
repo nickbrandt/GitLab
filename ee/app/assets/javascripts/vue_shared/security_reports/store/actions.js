@@ -18,6 +18,28 @@ import httpStatusCodes from '~/lib/utils/http_status';
 
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
 
+const pollUntilComplete = endpoint =>
+  new Promise((resolve, reject) => {
+    const eTagPoll = new Poll({
+      resource: {
+        getReports(url) {
+          return axios.get(url);
+        },
+      },
+      data: endpoint,
+      method: 'getReports',
+      successCallback: response => {
+        if (response.status === httpStatusCodes.OK) {
+          resolve(response);
+          eTagPoll.stop();
+        }
+      },
+      errorCallback: reject,
+    });
+
+    eTagPoll.makeRequest();
+  });
+
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 
 export const setBaseBlobPath = ({ commit }, blobPath) => commit(types.SET_BASE_BLOB_PATH, blobPath);
@@ -74,29 +96,8 @@ export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
 export const fetchSastContainerDiff = ({ state, dispatch }) => {
   dispatch('requestSastContainerReports');
 
-  const pollPromise = new Promise((resolve, reject) => {
-    const eTagPoll = new Poll({
-      resource: {
-        getReports(endpoint) {
-          return axios.get(endpoint);
-        },
-      },
-      data: state.sastContainer.paths.diffEndpoint,
-      method: 'getReports',
-      successCallback: response => {
-        if (response.status === httpStatusCodes.OK) {
-          resolve(response);
-          eTagPoll.stop();
-        }
-      },
-      errorCallback: reject,
-    });
-
-    eTagPoll.makeRequest();
-  });
-
   return Promise.all([
-    pollPromise,
+    pollUntilComplete(state.sastContainer.paths.diffEndpoint),
     axios.get(state.vulnerabilityFeedbackPath, {
       params: {
         category: 'container_scanning',
@@ -194,6 +195,9 @@ export const setDependencyScanningHeadPath = ({ commit }, path) =>
 export const setDependencyScanningBasePath = ({ commit }, path) =>
   commit(types.SET_DEPENDENCY_SCANNING_BASE_PATH, path);
 
+export const setDependencyScanningDiffEndpoint = ({ commit }, path) =>
+  commit(types.SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT, path);
+
 export const requestDependencyScanningReports = ({ commit }) =>
   commit(types.REQUEST_DEPENDENCY_SCANNING_REPORTS);
 
@@ -202,6 +206,31 @@ export const receiveDependencyScanningReports = ({ commit }, response) =>
 
 export const receiveDependencyScanningError = ({ commit }, error) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_ERROR, error);
+
+export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
+
+export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
+  dispatch('requestDependencyScanningReports');
+
+  return Promise.all([
+    pollUntilComplete(state.dependencyScanning.paths.diffEndpoint),
+    axios.get(state.vulnerabilityFeedbackPath, {
+      params: {
+        category: 'dependency_scanning',
+      },
+    }),
+  ])
+    .then(values => {
+      dispatch('receiveDependencyScanningDiffSuccess', {
+        diff: values[0].data,
+        enrichData: values[1].data,
+      });
+    })
+    .catch(() => {
+      dispatch('receiveDependencyScanningError');
+    });
+};
 
 export const fetchDependencyScanningReports = ({ state, dispatch }) => {
   const { base, head } = state.dependencyScanning.paths;
