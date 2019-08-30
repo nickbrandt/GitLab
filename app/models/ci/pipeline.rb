@@ -469,7 +469,7 @@ module Ci
       end
     end
 
-    def auto_cancel_running(pipeline, retries = nil)
+    def auto_cancel_running(pipeline, retries: nil)
       update(auto_canceled_by: pipeline)
 
       cancel_running(retries) do |job|
