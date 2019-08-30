@@ -241,6 +241,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.boolean "pseudonymizer_enabled", default: false, null: false
     t.boolean "hide_third_party_offers", default: false, null: false
     t.boolean "snowplow_enabled", default: false, null: false
+    t.string "snowplow_collector_hostname"
     t.string "snowplow_site_id"
     t.string "snowplow_cookie_domain"
     t.boolean "instance_statistics_visibility_private", default: false, null: false
@@ -265,19 +266,18 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.integer "elasticsearch_replicas", default: 1, null: false
     t.text "encrypted_lets_encrypt_private_key"
     t.text "encrypted_lets_encrypt_private_key_iv"
+    t.string "required_instance_ci_template"
     t.boolean "dns_rebinding_protection_enabled", default: true, null: false
     t.boolean "default_project_deletion_protection", default: false, null: false
-    t.string "required_instance_ci_template"
+    t.boolean "grafana_enabled", default: false, null: false
     t.boolean "lock_memberships_to_ldap", default: false, null: false
     t.boolean "time_tracking_limit_to_hours", default: false, null: false
-    t.boolean "grafana_enabled", default: false, null: false
     t.string "grafana_url", default: "/-/grafana", null: false
     t.boolean "login_recaptcha_protection_enabled", default: false, null: false
     t.string "outbound_local_requests_whitelist", limit: 255, default: [], null: false, array: true
     t.integer "raw_blob_request_limit", default: 300, null: false
     t.boolean "allow_local_requests_from_web_hooks_and_services", default: false, null: false
     t.boolean "allow_local_requests_from_system_hooks", default: true, null: false
-    t.string "snowplow_collector_hostname"
     t.bigint "instance_administration_project_id"
     t.boolean "asset_proxy_enabled", default: false, null: false
     t.string "asset_proxy_url"
@@ -2242,8 +2242,6 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.integer "last_ci_minutes_usage_notification_level"
     t.integer "subgroup_creation_level", default: 1
     t.boolean "emails_disabled"
-    t.index "lower((name)::text)", name: "index_on_namespaces_lower_name"
-    t.index "lower((path)::text)", name: "index_on_namespaces_lower_path"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"
@@ -2827,8 +2825,6 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.boolean "merge_requests_disable_committers_approval"
     t.boolean "require_password_to_approve"
     t.boolean "emails_disabled"
-    t.index "lower((name)::text)", name: "index_projects_on_lower_name"
-    t.index "lower((path)::text)", name: "index_on_projects_lower_path"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))"
     t.index ["created_at"], name: "index_projects_on_created_at"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
@@ -3023,10 +3019,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.string "path", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index "lower((path)::text) varchar_pattern_ops", name: "index_redirect_routes_on_path_unique_text_pattern_ops", unique: true
-    t.index "lower((path)::text)", name: "index_on_redirect_routes_lower_path"
     t.index ["path"], name: "index_redirect_routes_on_path", unique: true
-    t.index ["path"], name: "index_redirect_routes_on_path_text_pattern_ops", opclass: :varchar_pattern_ops
     t.index ["source_type", "source_id"], name: "index_redirect_routes_on_source_type_and_source_id"
   end
 
@@ -3119,7 +3112,6 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "name"
-    t.index "lower((path)::text)", name: "index_on_routes_lower_path"
     t.index ["path"], name: "index_routes_on_path", unique: true
     t.index ["path"], name: "index_routes_on_path_text_pattern_ops", opclass: :varchar_pattern_ops
     t.index ["source_type", "source_id"], name: "index_routes_on_source_type_and_source_id", unique: true
@@ -3551,12 +3543,8 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.integer "group_view"
     t.integer "managing_group_id"
     t.integer "bot_type", limit: 2
-    t.boolean "support_bot"
     t.string "first_name", limit: 255
     t.string "last_name", limit: 255
-    t.index "lower((email)::text)", name: "index_on_users_lower_email"
-    t.index "lower((name)::text)", name: "index_on_users_name_lower"
-    t.index "lower((username)::text)", name: "index_on_users_lower_username"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id"
     t.index ["admin"], name: "index_users_on_admin"
     t.index ["bot_type"], name: "index_users_on_bot_type"
@@ -3575,8 +3563,6 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["state"], name: "index_users_on_state"
     t.index ["state"], name: "index_users_on_state_and_internal", where: "((ghost <> true) AND (bot_type IS NULL))"
-    t.index ["state"], name: "index_users_on_state_and_internal_attrs", where: "((ghost <> true) AND (support_bot <> true))"
-    t.index ["support_bot"], name: "index_users_on_support_bot"
     t.index ["username"], name: "index_users_on_username"
     t.index ["username"], name: "index_users_on_username_trigram", opclass: :gin_trgm_ops, using: :gin
   end
@@ -3838,8 +3824,8 @@ ActiveRecord::Schema.define(version: 2019_08_28_083843) do
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
-  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", on_delete: :cascade
-  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade
+  add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", name: "fk_f4d25ba00c", on_delete: :cascade
   add_foreign_key "design_management_versions", "issues", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
