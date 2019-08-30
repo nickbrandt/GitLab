@@ -6,7 +6,8 @@ table_display_block: true
 
 ## Get current application statistics
 
-List the current statistics of the GitLab instance.
+List the current statistics of the GitLab instance. You have to be an
+administrator in order to perform this action.
 
 ```
 GET /application/statistics
