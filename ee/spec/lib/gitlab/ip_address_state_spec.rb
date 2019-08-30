@@ -3,9 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::IpAddressState do
+  let(:address) { '1.1.1.1' }
   describe '.with' do
-    let(:address) { '1.1.1.1' }
-
     it 'saves IP address' do
       described_class.with(address) do
         expect(Thread.current[described_class::THREAD_KEY]).to eq(address)
@@ -24,6 +23,22 @@ describe Gitlab::IpAddressState do
       end.to raise_error(StandardError)
 
       expect(Thread.current[described_class::THREAD_KEY]).to eq(nil)
+    end
+  end
+
+  describe '.set_address' do
+    it 'saves IP address' do
+      described_class.set_address(address) do
+        expect(Thread.current[described_class::THREAD_KEY]).to eq(address)
+      end
+    end
+  end
+
+  describe '.nullify_address' do
+    it 'clears IP address' do
+      described_class.nullify_address do
+        expect(Thread.current[described_class::THREAD_KEY]).to eq(nil)
+      end
     end
   end
 end

@@ -6,9 +6,17 @@ module Gitlab
 
     class << self
       def with(address)
-        self.current = address
+        set_address(address)
         yield
       ensure
+        nullify_address
+      end
+
+      def set_address(address)
+        self.current = address
+      end
+
+      def nullify_address
         self.current = nil
       end
 

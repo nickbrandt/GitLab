@@ -1,0 +1,5 @@
+---
+title: Apply the group setting "Restrict access by IP address" to API requests
+merge_request: 15282
+author:
+type: changed
