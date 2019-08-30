@@ -420,7 +420,7 @@ module TestEnv
   end
 end
 
-require_relative '../../../ee/spec/support/helpers/ee/test_env'
+require_relative('../../../ee/spec/support/helpers/ee/test_env') if Gitlab.ee?
 
 ::TestEnv.prepend_if_ee('::EE::TestEnv')
 ::TestEnv.extend_if_ee('::EE::TestEnv')
