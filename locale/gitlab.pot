@@ -2224,6 +2224,9 @@ msgstr ""
 msgid "BillingPlans|%{group_name} is currently using the %{plan_link} plan."
 msgstr ""
 
+msgid "BillingPlans|@%{user_name} you are currently using the %{plan_link} plan."
+msgstr ""
+
 msgid "BillingPlans|Current plan"
 msgstr ""
 
@@ -2255,9 +2258,6 @@ msgid "BillingPlans|To manage the plan for this group, visit the billing section
 msgstr ""
 
 msgid "BillingPlans|Upgrade"
-msgstr ""
-
-msgid "BillingPlans|You are currently using the %{plan_link} plan."
 msgstr ""
 
 msgid "BillingPlans|Your GitLab.com trial expired on %{expiration_date}. %{learn_more_text}"

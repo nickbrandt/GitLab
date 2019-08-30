@@ -92,7 +92,7 @@ describe 'Billing plan pages', :feature do
 
       it 'displays header and actions' do
         page.within('.billing-plan-header') do
-          expect(page).to have_content('You are currently using the Bronze plan.')
+          expect(page).to have_content("#{user.username} you are currently using the Bronze plan.")
 
           expect(page).to have_css('.billing-plan-logo img')
         end
@@ -118,7 +118,7 @@ describe 'Billing plan pages', :feature do
 
       it 'displays header and actions' do
         page.within('.billing-plan-header') do
-          expect(page).to have_content('You are currently using the Gold plan.')
+          expect(page).to have_content("#{user.username} you are currently using the Gold plan.")
 
           expect(page).to have_css('.billing-plan-logo img')
         end
