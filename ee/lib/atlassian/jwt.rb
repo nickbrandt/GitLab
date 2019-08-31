@@ -8,9 +8,6 @@ require 'digest'
 module Atlassian
   module Jwt
     class << self
-      CANONICAL_QUERY_SEPARATOR = '&'
-      ESCAPED_CANONICAL_QUERY_SEPARATOR = '%26'
-
       def decode(token, secret, validate = true, options = {})
         options = { algorithm: 'HS256' }.merge(options)
         ::JWT.decode(token, secret, validate, options)
