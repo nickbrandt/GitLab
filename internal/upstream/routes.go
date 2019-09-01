@@ -44,10 +44,12 @@ type routeOptions struct {
 }
 
 const (
-	apiPattern        = `^/api/`
-	ciAPIPattern      = `^/ci/api/`
-	gitProjectPattern = `^/([^/]+/){1,}[^/]+\.git/`
-	projectPattern    = `^/([^/]+/){1,}[^/]+/`
+	apiPattern           = `^/api/`
+	ciAPIPattern         = `^/ci/api/`
+	gitProjectPattern    = `^/([^/]+/){1,}[^/]+\.git/`
+	projectPattern       = `^/([^/]+/){1,}[^/]+/`
+	snippetUploadPattern = `^/uploads/personal_snippet`
+	userUploadPattern    = `^/uploads/user`
 )
 
 func compileRegexp(regexpStr string) *regexp.Regexp {
@@ -217,6 +219,8 @@ func (u *upstream) configureRoutes() {
 
 		// Uploads
 		route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, proxy)),
+		route("POST", snippetUploadPattern, upload.Accelerate(api, proxy)),
+		route("POST", userUploadPattern, upload.Accelerate(api, proxy)),
 
 		// For legacy reasons, user uploads are stored under the document root.
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file

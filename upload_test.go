@@ -102,10 +102,6 @@ func parseJWT(token *jwt.Token) (interface{}, error) {
 }
 
 func TestAcceleratedUpload(t *testing.T) {
-	reqBody, contentType, err := multipartBodyWithFile()
-	if err != nil {
-		t.Fatal(err)
-	}
 	ts := uploadTestServer(t, func(r *http.Request) {
 		jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), parseJWT)
 		require.NoError(t, err)
@@ -120,14 +116,16 @@ func TestAcceleratedUpload(t *testing.T) {
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	resource := `/example`
-	resp, err := http.Post(ws.URL+resource, contentType, reqBody)
-	if err != nil {
-		t.Error(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	resources := []string{`/example`, `/uploads/personal_snippet`, `/uploads/user`}
+	for _, resource := range resources {
+		reqBody, contentType, err := multipartBodyWithFile()
+		require.NoError(t, err)
+
+		resp, err := http.Post(ws.URL+resource, contentType, reqBody)
+		require.NoError(t, err)
+		require.Equal(t, 200, resp.StatusCode)
+
+		resp.Body.Close()
 	}
 }
 
