@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.10.0
+
+- Use accelerated uploads for users/personal snippets
+- Fix typo in keywatcher prometheus metrics !420
+
 v8.9.0
 
 - Update Gitaly library code to v1.57.0 !407
@@ -10,11 +15,19 @@ v8.9.0
 - Add prometheus counter for Gitaly connection stubs !414
 - Support passing on Gitaly feature flags  !410
 
+v8.8.1
+
+- Use accelerated uploads for users/personal snippets
+
 v8.8.0
 
 - Filter title, description, text, and body from logs !402
 - Remove redirections from Terminal to Channel !397
 - Add option to set Sentry environment !396
+
+v8.7.1
+
+- Use accelerated uploads for users/personal snippets
 
 v8.7.0
 
