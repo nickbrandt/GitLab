@@ -70,14 +70,22 @@ shared_examples_for "chat service" do |service_name|
         subject.execute(sample_data)
       end
 
-      context "with not default branch" do
+      context "with default branch" do
         let(:sample_data) do
-          Gitlab::DataBuilder::Push.build(project: project, user: user, ref: "not-the-default-branch")
+          Gitlab::DataBuilder::Push.build(project: project, user: user, ref: project.default_branch)
         end
 
-        context "when notify_only_default_branch enabled" do
+        context "when only default branch are to be notified" do
           before do
-            subject.notify_only_default_branch = true
+            subject.branches_to_be_notified = "default"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when only protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "protected"
           end
 
           it "does not call the Discord Webhooks API" do
@@ -87,9 +95,113 @@ shared_examples_for "chat service" do |service_name|
           end
         end
 
-        context "when notify_only_default_branch disabled" do
+        context "when default and protected branches are to be notified" do
           before do
-            subject.notify_only_default_branch = false
+            subject.branches_to_be_notified = "default_and_protected"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when all branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "all"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+      end
+
+      context "with protected branch" do
+        before do
+          create(:protected_branch, project: project, name: "a-protected-branch")
+        end
+
+        let(:sample_data) do
+          Gitlab::DataBuilder::Push.build(project: project, user: user, ref: "a-protected-branch")
+        end
+
+        context "when only default branch are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when only protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "protected"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when default and protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default_and_protected"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when all branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "all"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+      end
+
+      context "with neither default nor protected branch" do
+        let(:sample_data) do
+          Gitlab::DataBuilder::Push.build(project: project, user: user, ref: "a-random-branch")
+        end
+
+        context "when only default branch are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when only protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "protected"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when default and protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default_and_protected"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when all branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "all"
           end
 
           it_behaves_like "#{service_name} service"
@@ -220,15 +332,19 @@ shared_examples_for "chat service" do |service_name|
         end
       end
 
-      context "with not default branch" do
-        let(:pipeline) do
-          create(:ci_pipeline, :failed, project: project,
-                 sha: project.commit.sha, ref: "not-the-default-branch")
+      context "with protected branch" do
+        before do
+          create(:protected_branch, project: project, name: 'a-protected-branch')
         end
 
-        context "when notify_only_default_branch enabled" do
+        let(:pipeline) do
+          create(:ci_pipeline, :failed, project: project,
+                 sha: project.commit.sha, ref: 'a-protected-branch')
+        end
+
+        context "when only default branch are to be notified" do
           before do
-            subject.notify_only_default_branch = true
+            subject.branches_to_be_notified = "default"
           end
 
           it "does not call the Discord Webhooks API" do
@@ -238,9 +354,76 @@ shared_examples_for "chat service" do |service_name|
           end
         end
 
-        context "when notify_only_default_branch disabled" do
+        context "when only protected branches are to be notified" do
           before do
-            subject.notify_only_default_branch = false
+            subject.branches_to_be_notified = "protected"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when default and protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default_and_protected"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+
+        context "when all branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "all"
+          end
+
+          it_behaves_like "#{service_name} service"
+        end
+      end
+
+      context "with neither default nor protected branch" do
+        let(:pipeline) do
+          create(:ci_pipeline, :failed, project: project,
+                 sha: project.commit.sha, ref: "a-random-branch")
+        end
+
+        context "when only default branch are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when only protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "protected"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when default and protected branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "default_and_protected"
+          end
+
+          it "does not call the Discord Webhooks API" do
+            result = subject.execute(sample_data)
+
+            expect(result).to be_falsy
+          end
+        end
+
+        context "when all branches are to be notified" do
+          before do
+            subject.branches_to_be_notified = "all"
           end
 
           it_behaves_like "#{service_name} service"

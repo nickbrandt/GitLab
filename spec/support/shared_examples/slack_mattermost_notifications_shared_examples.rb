@@ -269,32 +269,63 @@ RSpec.shared_examples 'slack or mattermost notifications' do
       WebMock.stub_request(:post, webhook_url)
     end
 
-    context 'only notify for the default branch' do
-      context 'when enabled' do
+    context 'on default branch' do
+      it 'still notifies about pushed tags' do
+        ref = "#{Gitlab::Git::TAG_REF_PREFIX}test"
+        push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+
+        chat_service.execute(push_sample_data)
+
+        expect(WebMock).to have_requested(:post, webhook_url).once
+      end
+
+      context 'notification enabled only for default branch' do
         before do
-          chat_service.notify_only_default_branch = true
+          chat_service.branches_to_be_notified = "default"
         end
 
-        it 'does not notify push events if they are not for the default branch' do
-          ref = "#{Gitlab::Git::BRANCH_REF_PREFIX}test"
-          push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: project.default_branch
+          )
 
           chat_service.execute(push_sample_data)
 
-          expect(WebMock).not_to have_requested(:post, webhook_url)
+          expect(WebMock).to have_requested(:post, webhook_url)
+        end
+      end
+
+      context 'notification enabled only for protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "protected"
         end
 
-        it 'notifies about push events for the default branch' do
-          push_sample_data = Gitlab::DataBuilder::Push.build_sample(project, user)
+        it 'does not notify about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: project.default_branch
+          )
 
           chat_service.execute(push_sample_data)
 
-          expect(WebMock).to have_requested(:post, webhook_url).once
+          expect(WebMock).not_to have_requested(:post, webhook_url).once
+        end
+      end
+
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "default_and_protected"
         end
 
-        it 'still notifies about pushed tags' do
-          ref = "#{Gitlab::Git::TAG_REF_PREFIX}test"
-          push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: project.default_branch
+          )
 
           chat_service.execute(push_sample_data)
 
@@ -302,14 +333,186 @@ RSpec.shared_examples 'slack or mattermost notifications' do
         end
       end
 
-      context 'when disabled' do
+      context 'notification enabled for all branches' do
         before do
-          chat_service.notify_only_default_branch = false
+          chat_service.branches_to_be_notified = "all"
         end
 
-        it 'notifies about all push events' do
-          ref = "#{Gitlab::Git::BRANCH_REF_PREFIX}test"
-          push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: project.default_branch
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).to have_requested(:post, webhook_url).once
+        end
+      end
+    end
+
+    context 'on a protected branch' do
+      before do
+        create(:protected_branch, project: project, name: 'a-protected-branch')
+      end
+
+      it 'still notifies about pushed tags' do
+        ref = "#{Gitlab::Git::TAG_REF_PREFIX}test"
+        push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+
+        chat_service.execute(push_sample_data)
+
+        expect(WebMock).to have_requested(:post, webhook_url).once
+      end
+
+      context 'notification enabled only for default branch' do
+        before do
+          chat_service.branches_to_be_notified = "default"
+        end
+
+        it 'does not notify about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-protected-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).not_to have_requested(:post, webhook_url)
+        end
+      end
+
+      context 'notification enabled only for protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "protected"
+        end
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-protected-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).to have_requested(:post, webhook_url).once
+        end
+      end
+
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "default_and_protected"
+        end
+
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-protected-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).to have_requested(:post, webhook_url).once
+        end
+      end
+
+      context 'notification enabled for all branches' do
+        before do
+          chat_service.branches_to_be_notified = "all"
+        end
+
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-protected-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).to have_requested(:post, webhook_url).once
+        end
+      end
+    end
+
+    context 'on a neither protected nor default branch' do
+      it 'still notifies about pushed tags' do
+        ref = "#{Gitlab::Git::TAG_REF_PREFIX}test"
+        push_sample_data = Gitlab::DataBuilder::Push.build(project: project, user: user, ref: ref)
+
+        chat_service.execute(push_sample_data)
+
+        expect(WebMock).to have_requested(:post, webhook_url).once
+      end
+
+      context 'notification enabled only for default branch' do
+        before do
+          chat_service.branches_to_be_notified = "default"
+        end
+
+        it 'does not notify about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-random-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).not_to have_requested(:post, webhook_url)
+        end
+      end
+
+      context 'notification enabled only for protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "protected"
+        end
+
+        it 'does not notify about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-random-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).not_to have_requested(:post, webhook_url).once
+        end
+      end
+
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = "default_and_protected"
+        end
+
+        it 'does not notify about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-random-branch'
+          )
+
+          chat_service.execute(push_sample_data)
+
+          expect(WebMock).not_to have_requested(:post, webhook_url).once
+        end
+      end
+
+      context 'notification enabled for all branches' do
+        before do
+          chat_service.branches_to_be_notified = "all"
+        end
+
+        it 'notifies about push events' do
+          push_sample_data = Gitlab::DataBuilder::Push.build(
+            project: project,
+            user: user,
+            ref: 'a-random-branch'
+          )
 
           chat_service.execute(push_sample_data)
 
@@ -451,15 +654,22 @@ RSpec.shared_examples 'slack or mattermost notifications' do
       end
     end
 
-    context 'only notify for the default branch' do
-      context 'when enabled' do
-        let(:pipeline) do
-          create(:ci_pipeline, :failed, project: project, sha: project.commit.sha, ref: 'not-the-default-branch')
+    context 'on a default branch' do
+      let(:pipeline) do
+        create(:ci_pipeline, :failed, project: project, sha: project.commit.sha, ref: project.default_branch)
+      end
+
+      context 'notification enabled only for default branch' do
+        before do
+          chat_service.branches_to_be_notified = 'default'
         end
 
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+
+      context 'notification enabled only for protected branch' do
         before do
-          chat_service.notify_only_default_branch = true
-          WebMock.stub_request(:post, webhook_url)
+          chat_service.branches_to_be_notified = 'protected'
         end
 
         it 'does not call the Slack/Mattermost API for pipeline events' do
@@ -470,13 +680,117 @@ RSpec.shared_examples 'slack or mattermost notifications' do
         end
       end
 
-      context 'when disabled' do
-        let(:pipeline) do
-          create(:ci_pipeline, :failed, project: project, sha: project.commit.sha, ref: 'not-the-default-branch')
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = 'default_and_protected'
         end
 
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+
+      context 'notification enabled for all branches' do
         before do
-          chat_service.notify_only_default_branch = false
+          chat_service.branches_to_be_notified = 'all'
+        end
+
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+    end
+
+    context 'on a protected branch' do
+      before do
+        create(:protected_branch, project: project, name: 'a-protected-branch')
+      end
+
+      let(:pipeline) do
+        create(:ci_pipeline, :failed, project: project, sha: project.commit.sha, ref: 'a-protected-branch')
+      end
+
+      context 'notification enabled only for default branch' do
+        before do
+          chat_service.branches_to_be_notified = 'default'
+        end
+
+        it 'does not call the Slack/Mattermost API for pipeline events' do
+          data = Gitlab::DataBuilder::Pipeline.build(pipeline)
+          result = chat_service.execute(data)
+
+          expect(result).to be_falsy
+        end
+      end
+
+      context 'notification enabled only for protected branch' do
+        before do
+          chat_service.branches_to_be_notified = 'protected'
+        end
+
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = 'default_and_protected'
+        end
+
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+
+      context 'notification enabled for all branches' do
+        before do
+          chat_service.branches_to_be_notified = 'all'
+        end
+
+        it_behaves_like 'call Slack/Mattermost API'
+      end
+    end
+
+    context 'on a neithuer protected nor default branch' do
+      let(:pipeline) do
+        create(:ci_pipeline, :failed, project: project, sha: project.commit.sha, ref: 'a-random-branch')
+      end
+
+      context 'notification enabled only for default branch' do
+        before do
+          chat_service.branches_to_be_notified = 'default'
+        end
+
+        it 'does not call the Slack/Mattermost API for pipeline events' do
+          data = Gitlab::DataBuilder::Pipeline.build(pipeline)
+          result = chat_service.execute(data)
+
+          expect(result).to be_falsy
+        end
+      end
+
+      context 'notification enabled only for protected branch' do
+        before do
+          chat_service.branches_to_be_notified = 'protected'
+        end
+
+        it 'does not call the Slack/Mattermost API for pipeline events' do
+          data = Gitlab::DataBuilder::Pipeline.build(pipeline)
+          result = chat_service.execute(data)
+
+          expect(result).to be_falsy
+        end
+      end
+
+      context 'notification enabled only for default and protected branches' do
+        before do
+          chat_service.branches_to_be_notified = 'default_and_protected'
+        end
+
+        it 'does not call the Slack/Mattermost API for pipeline events' do
+          data = Gitlab::DataBuilder::Pipeline.build(pipeline)
+          result = chat_service.execute(data)
+
+          expect(result).to be_falsy
+        end
+      end
+
+      context 'notification enabled for all branches' do
+        before do
+          chat_service.branches_to_be_notified = 'all'
         end
 
         it_behaves_like 'call Slack/Mattermost API'
