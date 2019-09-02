@@ -6,12 +6,12 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
   include EE::GeoHelpers
 
   let(:primary) { create(:geo_node, :primary) }
-  let(:secondary) { create(:geo_node) }
+  let(:secondary) { create(:geo_node, repos_max_capacity: 5) }
   let(:shard_name) { Gitlab.config.repositories.storages.keys.first }
 
   before do
     stub_current_geo_node(secondary)
-    stub_shard_healthy(shard_name, true)
+    stub_healthy_shards(shard_name)
   end
 
   describe '#perform' do
@@ -35,7 +35,7 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
     end
 
     it 'does not schedule jobs when shard is not healthy' do
-      stub_shard_healthy(shard_name, false)
+      stub_healthy_shards([])
       create(:project)
 
       expect(Geo::ProjectSyncWorker).not_to receive(:perform_async)
@@ -65,6 +65,16 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
       create_list(:project, 2)
 
       expect(Geo::ProjectSyncWorker).to receive(:perform_async).twice.and_return(true)
+
+      subject.perform(shard_name)
+    end
+
+    it 'respects Geo secondary node max capacity per shard' do
+      stub_healthy_shards([shard_name, 'shard2', 'shard3', 'shard4', 'shard5'])
+      allow(Geo::ProjectSyncWorker).to receive(:perform_async).twice.and_return('jid-123')
+      create_list(:project, 2)
+
+      expect(subject).to receive(:sleep).twice.and_call_original
 
       subject.perform(shard_name)
     end
