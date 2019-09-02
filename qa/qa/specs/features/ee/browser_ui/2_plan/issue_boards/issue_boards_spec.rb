@@ -14,7 +14,7 @@ module QA
         let(:label) { 'Doing' }
 
         let(:label_board_list) do
-          EE::Resource::LabelBoardList.fabricate_via_api!
+          EE::Resource::BoardList::LabelBoardList.fabricate_via_api!
         end
 
         before do
@@ -40,7 +40,7 @@ module QA
 
       context 'Milestone issue board' do
         let(:milestone_board_list) do
-          EE::Resource::MilestoneBoardList.fabricate_via_api!
+          EE::Resource::BoardList::MilestoneBoardList.fabricate_via_api!
         end
 
         before do
