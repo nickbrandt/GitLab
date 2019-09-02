@@ -25,11 +25,11 @@ class License < ApplicationRecord
     ldap_group_sync
     member_lock
     merge_request_approvers
-    multiple_ldap_servers
     multiple_issue_assignees
+    multiple_ldap_servers
     multiple_merge_request_assignees
-    push_rules
     protected_refs_for_users
+    push_rules
     related_issues
     repository_mirrors
     repository_size_limit
@@ -41,78 +41,78 @@ class License < ApplicationRecord
   EEP_FEATURES = EES_FEATURES + %i[
     admin_audit_log
     auditor_user
+    batch_comments
     blocking_merge_requests
     board_assignee_lists
     board_milestone_lists
+    ci_cd_projects
+    cluster_deployments
+    code_owner_approval_required
+    commit_committer_check
     cross_project_pipelines
     custom_file_templates
     custom_file_templates_for_namespace
-    email_additional_text
+    custom_project_templates
+    custom_prometheus_metrics
+    cycle_analytics_for_groups
     db_load_balancing
+    default_project_deletion_protection
+    dependency_proxy
     deploy_board
-    cluster_deployments
+    design_management
+    email_additional_text
     extended_audit_events
+    external_authorization_service_api_management
+    feature_flags
     file_locks
     geo
     github_project_service_integration
+    group_allowed_email_domains
+    group_project_templates
+    group_saml
+    issues_analytics
     jira_dev_panel_integration
-    scoped_labels
     ldap_group_sync_filter
+    merge_pipelines
+    merge_request_performance_metrics
+    merge_trains
+    metrics_reports
+    multiple_approval_rules
     multiple_clusters
     multiple_group_issue_boards
-    multiple_approval_rules
-    merge_request_performance_metrics
     object_storage
-    group_saml
+    operations_dashboard
+    packages
+    project_aliases
+    protected_environments
+    reject_unsigned_commits
+    required_ci_templates
+    scoped_labels
     service_desk
     smartcard_auth
     unprotection_restrictions
-    reject_unsigned_commits
-    commit_committer_check
-    external_authorization_service_api_management
-    ci_cd_projects
-    default_project_deletion_protection
-    protected_environments
-    custom_project_templates
-    group_project_templates
-    packages
-    code_owner_approval_required
-    feature_flags
-    batch_comments
-    issues_analytics
-    merge_pipelines
-    merge_trains
-    design_management
-    operations_dashboard
-    dependency_proxy
-    metrics_reports
-    custom_prometheus_metrics
-    required_ci_templates
-    project_aliases
-    cycle_analytics_for_groups
-    group_allowed_email_domains
   ]
   EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
-    security_dashboard
-    dependency_scanning
-    dependency_list
-    license_management
-    sast
-    container_scanning
     cluster_health
+    container_scanning
     dast
+    dependency_list
+    dependency_scanning
     epics
-    pod_logs
-    pseudonymizer
-    prometheus_alerts
-    tracing
-    insights
-    web_ide_terminal
-    incident_management
-    report_approver_rules
     group_ip_restriction
+    incident_management
+    insights
+    license_management
+    pod_logs
+    prometheus_alerts
+    pseudonymizer
+    report_approver_rules
+    sast
+    security_dashboard
+    tracing
+    web_ide_terminal
   ]
   EEU_FEATURES.freeze
 
@@ -136,8 +136,8 @@ class License < ApplicationRecord
     issue_weights
     jenkins_integration
     merge_request_approvers
-    multiple_issue_assignees
     multiple_group_issue_boards
+    multiple_issue_assignees
     protected_refs_for_users
     push_rules
     related_issues
@@ -172,8 +172,8 @@ class License < ApplicationRecord
   # Features added here are available for all namespaces.
   ANY_PLAN_FEATURES = %i[
     ci_cd_projects
-    repository_mirrors
     github_project_service_integration
+    repository_mirrors
   ].freeze
 
   # Global features that cannot be restricted to only a subset of projects or namespaces.
@@ -183,20 +183,20 @@ class License < ApplicationRecord
     admin_audit_log
     auditor_user
     custom_file_templates
+    custom_project_templates
     db_load_balancing
     elastic_search
     extended_audit_events
+    external_authorization_service_api_management
     geo
     ldap_group_sync
     ldap_group_sync_filter
     multiple_ldap_servers
     object_storage
-    repository_size_limit
-    external_authorization_service_api_management
-    custom_project_templates
-    usage_quotas
-    required_ci_templates
     project_aliases
+    repository_size_limit
+    required_ci_templates
+    usage_quotas
   ].freeze
 
   validate :valid_license
