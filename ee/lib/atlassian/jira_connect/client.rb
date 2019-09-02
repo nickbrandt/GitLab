@@ -34,10 +34,10 @@ module Atlassian
 
       def jwt_token(http_method, uri)
         claims = Atlassian::Jwt.build_claims(
-          issuer: Atlassian::JiraConnect.app_key,
-          method: http_method,
-          uri: uri,
-          base_uri: @base_uri
+          Atlassian::JiraConnect.app_key,
+          uri,
+          http_method,
+          @base_uri
         )
 
         Atlassian::Jwt.encode(claims, @shared_secret)

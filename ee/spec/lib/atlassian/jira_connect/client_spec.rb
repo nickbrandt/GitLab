@@ -15,9 +15,9 @@ describe Atlassian::JiraConnect::Client do
     it "calls the API with auth headers" do
       expected_jwt = Atlassian::Jwt.encode(
         Atlassian::Jwt.build_claims(
-          issuer: Atlassian::JiraConnect.app_key,
-          method: 'POST',
-          uri: '/rest/devinfo/0.10/bulk'
+          Atlassian::JiraConnect.app_key,
+          '/rest/devinfo/0.10/bulk',
+          'POST'
         ),
         'sample_secret'
       )

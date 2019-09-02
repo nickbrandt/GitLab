@@ -26,7 +26,7 @@ class JiraConnect::ApplicationController < ApplicationController
     payload, _ = decode_auth_token!
 
     # Make sure `qsh` claim matches the current request
-    render_403 unless payload['qsh'] == Atlassian::Jwt.create_query_string_hash(request.method, request.url, base_uri: jira_connect_base_url)
+    render_403 unless payload['qsh'] == Atlassian::Jwt.create_query_string_hash(request.url, request.method, jira_connect_base_url)
   rescue
     render_403
   end

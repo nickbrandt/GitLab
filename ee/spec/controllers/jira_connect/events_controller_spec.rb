@@ -65,7 +65,7 @@ describe JiraConnect::EventsController do
 
     describe '#uninstalled' do
       let!(:installation) { create(:jira_connect_installation) }
-      let(:qsh) { Atlassian::Jwt.create_query_string_hash('POST', '/events/uninstalled') }
+      let(:qsh) { Atlassian::Jwt.create_query_string_hash('https://gitlab.test/events/uninstalled', 'POST', 'https://gitlab.test') }
 
       before do
         request.headers['Authorization'] = "JWT #{auth_token}"
