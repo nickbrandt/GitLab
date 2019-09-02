@@ -87,7 +87,9 @@ module EE
         end
 
         def member
-          @member ||= @group.add_user(user, DEFAULT_ACCESS) if user.valid?
+          strong_memoize(:member) do
+            @group.add_user(user, DEFAULT_ACCESS) if user.valid?
+          end
         end
 
         def existing_member?
