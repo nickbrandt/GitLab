@@ -56,7 +56,7 @@ describe JiraConnect::SubscriptionsController do
       end
 
       context 'with valid JWT' do
-        let(:qsh) { Atlassian::Jwt.create_query_string_hash('GET', '/subscriptions') }
+        let(:qsh) { Atlassian::Jwt.create_query_string_hash('https://gitlab.test/subscriptions', 'GET', 'https://gitlab.test') }
         let(:jwt) { Atlassian::Jwt.encode({ iss: installation.client_key, qsh: qsh }, installation.shared_secret) }
 
         it 'returns 200' do
