@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Gitlab::ImportExport::FastHashSerializer do
-  subject { described_class.new(project, tree).execute }
+  subject { JSON.parse(JSON.generate(described_class.new(project, tree).execute)) }
 
   let!(:project) { setup_project }
   let(:user) { create(:user) }

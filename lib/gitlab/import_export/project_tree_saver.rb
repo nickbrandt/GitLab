@@ -20,7 +20,8 @@ module Gitlab
 
         project_tree = serialize_project_tree
         fix_project_tree(project_tree)
-        File.write(full_path, project_tree.to_json)
+        project_tree_json = JSON.generate(project_tree)
+        File.write(full_path, project_tree_json)
 
         true
       rescue => e
