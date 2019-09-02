@@ -1199,6 +1199,18 @@ module API
         approximate_count_with_delimiters(counts, ::Milestone)
       end
 
+      expose :users do |counts|
+        approximate_count_with_delimiters(counts, ::User)
+      end
+
+      expose :projects do |counts|
+        approximate_count_with_delimiters(counts, ::Project)
+      end
+
+      expose :groups do |counts|
+        approximate_count_with_delimiters(counts, ::Group)
+      end
+
       expose :active_users do |_|
         number_with_delimiter(::User.active.count)
       end

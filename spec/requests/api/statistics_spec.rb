@@ -4,6 +4,7 @@ require 'spec_helper'
 
 describe API::Statistics, 'Statistics' do
   include ProjectForksHelper
+  TABLES_TO_ANALYZE = %w[projects users namespaces issues merge_requests notes snippets fork_networks fork_network_members keys milestones].freeze
 
   let(:path) { "/application/statistics" }
 
@@ -49,7 +50,7 @@ describe API::Statistics, 'Statistics' do
 
         # Make sure the reltuples have been updated
         # to get a correct count on postgresql
-        %w[issues merge_requests notes snippets fork_networks fork_network_members keys milestones users].each do |table|
+        TABLES_TO_ANALYZE.each do |table|
           ActiveRecord::Base.connection.execute("ANALYZE #{table}")
         end
 
@@ -62,6 +63,9 @@ describe API::Statistics, 'Statistics' do
         expect(json_response['forks']).to eq('1')
         expect(json_response['ssh_keys']).to eq('1')
         expect(json_response['milestones']).to eq('3')
+        expect(json_response['users']).to eq('1')
+        expect(json_response['projects']).to eq('5') # projects + forks
+        expect(json_response['groups']).to eq('1')
         expect(json_response['active_users']).to eq('1')
       end
     end

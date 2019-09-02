@@ -28,6 +28,9 @@ Example response:
    "snippets": "50",
    "ssh_keys": "10",
    "milestones": "40",
+   "users": "50",
+   "groups": "10",
+   "projects": "20",
    "active_users": "50"
 }
 ```
