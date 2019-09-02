@@ -3,8 +3,11 @@
 module Geo
   class RepositorySyncWorker < Geo::Scheduler::Secondary::PerShardSchedulerWorker
     def schedule_job(shard_name)
-      # TODO: Put this behind a feature flag
-      Geo::Secondary::RepositoryBackfillWorker.perform_async(shard_name)
+      if ::Feature.enabled?(:geo_streaming_results_repository_sync)
+        Geo::Secondary::RepositoryBackfillWorker.perform_async(shard_name)
+      else
+        Geo::RepositoryShardSyncWorker.perform_async(shard_name)
+      end
     end
   end
 end

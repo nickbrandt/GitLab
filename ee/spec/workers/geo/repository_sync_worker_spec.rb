@@ -8,10 +8,7 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
   let!(:synced_group) { create(:group) }
   let!(:project_in_synced_group) { create(:project, group: synced_group) }
   let!(:unsynced_project) { create(:project) }
-
   let(:healthy_shard_name) { project_in_synced_group.repository.storage }
-
-  subject { described_class.new }
 
   before do
     stub_current_geo_node(secondary)
@@ -21,7 +18,7 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
     Sidekiq::Testing.inline! { example.run }
   end
 
-  describe '#perform' do
+  shared_examples '#perform' do |worker|
     context 'additional shards' do
       it 'skips backfill for repositories on other shards' do
         create(:project, :broken_storage, group: synced_group)
@@ -32,7 +29,7 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
           raise GRPC::Unavailable.new('No Gitaly available')
         end
 
-        expect(Geo::RepositoryShardSyncWorker).not_to receive(:perform_async).with('broken')
+        expect(worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end
@@ -44,8 +41,8 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
         expect(Gitlab::HealthChecks::GitalyCheck).to receive(:readiness)
           .and_return([result(true, healthy_shard_name), result(true, 'broken')])
 
-        expect(Geo::RepositoryShardSyncWorker).to receive(:perform_async).with('default')
-        expect(Geo::RepositoryShardSyncWorker).not_to receive(:perform_async).with('broken')
+        expect(worker).to receive(:perform_async).with('default')
+        expect(worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end
@@ -61,8 +58,8 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
         # hide the 'broken' storage for this spec
         stub_storage_settings({})
 
-        expect(Geo::RepositoryShardSyncWorker).to receive(:perform_async).with(project_in_synced_group.repository.storage)
-        expect(Geo::RepositoryShardSyncWorker).not_to receive(:perform_async).with('unknown')
+        expect(worker).to receive(:perform_async).with(project_in_synced_group.repository.storage)
+        expect(worker).not_to receive(:perform_async).with('unknown')
 
         subject.perform
       end
@@ -77,12 +74,28 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
         expect(Gitlab::HealthChecks::GitalyCheck).to receive(:readiness)
           .and_return([result(true, healthy_shard_name), result(false, 'broken')])
 
-        expect(Geo::RepositoryShardSyncWorker).to receive(:perform_async).with(healthy_shard_name)
-        expect(Geo::RepositoryShardSyncWorker).not_to receive(:perform_async).with('broken')
+        expect(worker).to receive(:perform_async).with(healthy_shard_name)
+        expect(worker).not_to receive(:perform_async).with('broken')
 
         subject.perform
       end
     end
+  end
+
+  context 'when geo_streaming_results_repository_sync flag is enabled', :geo_fdw do
+    before do
+      stub_feature_flags(geo_streaming_results_repository_sync: true)
+    end
+
+    include_examples '#perform', Geo::Secondary::RepositoryBackfillWorker
+  end
+
+  context 'when geo_streaming_results_repository_sync flag is disabled' do
+    before do
+      stub_feature_flags(geo_streaming_results_repository_sync: false)
+    end
+
+    include_examples '#perform', Geo::RepositoryShardSyncWorker
   end
 
   def result(success, shard)
