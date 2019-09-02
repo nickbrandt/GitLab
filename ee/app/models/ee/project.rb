@@ -279,6 +279,17 @@ module EE
       end
     end
 
+    override :has_active_hooks?
+    def has_active_hooks?(hooks_scope = :push_hooks)
+      super || has_group_hooks?(hooks_scope)
+    end
+
+    def has_group_hooks?(hooks_scope = :push_hooks)
+      return unless group && feature_available?(:group_webhooks)
+
+      group.hooks.hooks_for(hooks_scope).any?
+    end
+
     def execute_hooks(data, hooks_scope = :push_hooks)
       super
 
