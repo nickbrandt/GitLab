@@ -20,13 +20,14 @@ module NotificationBranchSelection
     is_default_branch = ref == project.default_branch
     is_protected_branch = project.protected_branches.exists?(name: ref)
 
-    if branches_to_be_notified == "all"
+    case branches_to_be_notified
+    when "all"
       true
-    elsif branches_to_be_notified == "default"
+    when  "default"
       is_default_branch
-    elsif branches_to_be_notified == "protected"
+    when  "protected"
       is_protected_branch
-    elsif branches_to_be_notified == "default_and_protected"
+    when  "default_and_protected"
       is_default_branch || is_protected_branch
     else
       false
