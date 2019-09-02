@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class RepositorySyncService < BaseSyncService
+  class RepositorySyncService < RepositoryBaseSyncService
     self.type = :repository
 
     private
