@@ -193,6 +193,7 @@ Rails.application.routes.draw do
   draw :project
 
   Gitlab.ee do
+    draw :trial_registration
     draw :trial
   end
 
