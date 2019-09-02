@@ -19,8 +19,10 @@
 module Gitlab
   module ImportExport
     class RelationRenameService
+      # Each relation added will result in being
+      # exported twice, consuming twice amount of
+      # resources
       RENAMES = {
-        'pipelines' => 'ci_pipelines' # Added in 11.6, remove in 11.7
       }.freeze
 
       def self.rename(tree_hash)

@@ -26,6 +26,45 @@ module Gitlab
     class FastHashSerializer
       attr_reader :subject, :tree
 
+      # Usage of this class results in delayed
+      # serialization of relation. The serialization
+      # will be triggered when the `JSON.generate`
+      # is exected.
+      #
+      # This class uses memory-optimised, lazily
+      # initialised, fast to recycle relation
+      # serialization.
+      #
+      # The `JSON.generate` does use `#to_json`,
+      # that returns raw JSON content that is written
+      # directly to file.
+      class JSONBatchRelation
+        def initialize(relation, options, preloads)
+          @relation = relation
+          @options = options
+          @preloads = preloads
+        end
+
+        def to_json(options = {})
+          result = String.new
+          items = 0
+
+          batch = @relation
+          batch = batch.preload(@preloads) if @preloads
+          batch.each do |item|
+            result.concat(",") unless result.empty?
+            result.concat(item.to_json(@options))
+            items += 1
+          end
+
+          result
+        end
+
+        def as_json(*)
+          raise NotImplementedError
+        end
+      end
+
       BATCH_SIZE = 100
 
       def initialize(subject, tree, batch_size: BATCH_SIZE)
@@ -85,12 +124,10 @@ module Gitlab
           return record.as_json(options)
         end
 
-        # has-many relation
         data = []
 
         record.in_batches(of: @batch_size) do |batch| # rubocop:disable Cop/InBatches
-          batch = batch.preload(preloads[key]) if preloads&.key?(key)
-          data += batch.as_json(options)
+          data.append(JSONBatchRelation.new(batch, options, preloads[key]))
         end
 
         data
