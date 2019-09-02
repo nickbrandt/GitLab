@@ -9,6 +9,9 @@ table_display_block: true
 List the current statistics of the GitLab instance. You have to be an
 administrator in order to perform this action.
 
+NOTE: **Note:**
+These statistics are approximate and are not guaranteed to be exact numbers.
+
 ```
 GET /application/statistics
 ```
