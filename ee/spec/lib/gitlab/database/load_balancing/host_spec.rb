@@ -124,6 +124,20 @@ describe Gitlab::Database::LoadBalancing::Host do
 
         expect(host).to be_online
       end
+
+      context 'and replica is not up to date' do
+        before do
+          expect(host).to receive(:replica_is_up_to_date?).and_return(false)
+        end
+
+        it 'marks the host offline' do
+          expect(Gitlab::Database::LoadBalancing::Logger).to receive(:warn)
+            .with(hash_including(event: :host_offline))
+            .and_call_original
+
+          expect(host).not_to be_online
+        end
+      end
     end
 
     context 'when the replica is not online' do
