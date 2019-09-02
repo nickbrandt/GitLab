@@ -45,7 +45,7 @@ describe 'Environment > Pod Logs', :js do
 
   context 'with perf bar enabled' do
     before do
-      allow_any_instance_of(WithPerformanceBar).to receive(:peek_enabled?).and_return(true)
+      allow(Gitlab::PerformanceBar).to receive(:enabled_for_request?).and_return(true)
     end
 
     it 'log header sticks to top' do
