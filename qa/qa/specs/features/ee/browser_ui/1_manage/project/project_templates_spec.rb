@@ -2,8 +2,7 @@
 require 'securerandom'
 
 module QA
-  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
-  context :manage, :quarantine do
+  context :manage do
     describe 'Project templates' do
       before(:all) do
         @files = [
@@ -39,7 +38,42 @@ module QA
         end
       end
 
-      context 'instance level' do
+      context 'built-in' do
+        before do
+          # Log out if already logged in
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+
+          Runtime::Browser.visit(:gitlab, Page::Main::Login)
+          Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+
+          @group = Resource::Group.fabricate_via_api!
+        end
+
+        it 'successfully imports the project using template' do
+          built_in = 'Ruby on Rails'
+
+          @group.visit!
+          Page::Group::Show.perform(&:go_to_new_project)
+          Page::Project::New.perform do |page|
+            page.click_create_from_template_tab
+
+            expect(page).to have_text(built_in)
+          end
+
+          create_project_using_template(project_name: 'Project using built-in project template',
+                                        namespace: Runtime::Namespace.name,
+                                        template_name: built_in)
+
+          Page::Project::Show.perform(&:wait_for_import_success)
+
+          expect(page).to have_content("Initialized from '#{built_in}' project template")
+          expect(page).to have_content(".ruby-version")
+        end
+      end
+      # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/61
+      context 'instance level', :quarantine do
         before do
           # Log out if already logged in
           Page::Main::Menu.perform do |menu|
