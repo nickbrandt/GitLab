@@ -1,5 +1,0 @@
----
-title: Fix group hooks not firing in PostReceive
-merge_request: 15598
-author:
-type: fixed

@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.2.4
+
+### Fixed (1 change)
+
+- Fix group hooks not firing in PostReceive. !15598
+
+
 ## 12.2.3
 
 ### Security (2 changes)
