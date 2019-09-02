@@ -165,6 +165,9 @@ module EE
           builds.latest.with_reports(::Ci::JobArtifact.dependency_list_reports).each do |build|
             build.collect_dependency_list_reports!(dependency_list_report)
           end
+          builds.latest.with_reports(::Ci::JobArtifact.license_management_reports).each do |build|
+            build.collect_licenses_for_dependency_list!(dependency_list_report)
+          end
         end
       end
 

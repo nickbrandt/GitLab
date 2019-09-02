@@ -78,6 +78,14 @@ module EE
           each_report(::Ci::JobArtifact::DEPENDENCY_LIST_REPORT_FILE_TYPES) do |file_type, blob|
             dependency_list.parse!(blob, dependency_list_report)
           end
+        end
+
+        dependency_list_report
+      end
+
+      def collect_licenses_for_dependency_list!(dependency_list_report)
+        if project.feature_available?(:dependency_list)
+          dependency_list = ::Gitlab::Ci::Parsers::Security::DependencyList.new(project, sha)
 
           each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
             dependency_list.parse_licenses!(blob, dependency_list_report)
