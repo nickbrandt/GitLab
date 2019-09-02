@@ -74,7 +74,7 @@ module Gitlab
           if @online
             LoadBalancing::Logger.info(
               event: :host_online,
-              message: 'Host came back online',
+              message: 'Host is online after replica status check',
               db_host: @host,
               db_port: @port
             )
