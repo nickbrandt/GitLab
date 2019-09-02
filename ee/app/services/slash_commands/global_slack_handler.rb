@@ -13,7 +13,7 @@ module SlashCommands
       return false unless valid_token?
 
       if help_command?
-        return Gitlab::SlashCommands::ApplicationHelp.new(params).execute
+        return Gitlab::SlashCommands::ApplicationHelp.new(nil, params).execute
       end
 
       unless integration = find_integration
