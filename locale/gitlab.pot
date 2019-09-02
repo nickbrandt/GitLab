@@ -4151,13 +4151,7 @@ msgstr ""
 msgid "Could not add admins as members"
 msgstr ""
 
-msgid "Could not add admins as members to self-monitoring project. Errors: %{errors}"
-msgstr ""
-
 msgid "Could not add prometheus URL to whitelist"
-msgstr ""
-
-msgid "Could not add prometheus URL to whitelist, errors: %{errors}"
 msgstr ""
 
 msgid "Could not authorize chat nickname. Try again!"
@@ -4178,9 +4172,6 @@ msgstr ""
 msgid "Could not create group"
 msgstr ""
 
-msgid "Could not create instance administration project. Errors: %{errors}"
-msgstr ""
-
 msgid "Could not create project"
 msgstr ""
 
@@ -4199,16 +4190,10 @@ msgstr ""
 msgid "Could not revoke personal access token %{personal_access_token_name}."
 msgstr ""
 
-msgid "Could not save instance administration project ID, errors: %{errors}"
-msgstr ""
-
 msgid "Could not save project ID"
 msgstr ""
 
 msgid "Could not save prometheus manual configuration"
-msgstr ""
-
-msgid "Could not save prometheus manual configuration for self-monitoring project. Errors: %{errors}"
 msgstr ""
 
 msgid "Coverage"
@@ -8233,9 +8218,6 @@ msgstr ""
 msgid "Instance Statistics visibility"
 msgstr ""
 
-msgid "Instance administration project already exists"
-msgstr ""
-
 msgid "Instance administrators group already exists"
 msgstr ""
 
@@ -12043,7 +12025,7 @@ msgstr ""
 msgid "ProjectsNew|Want to house several dependent projects under the same namespace? %{link_start}Create a group.%{link_end}"
 msgstr ""
 
-msgid "Prometheus listen_address is not a valid URI"
+msgid "Prometheus listen_address in config/gitlab.yml is not a valid URI"
 msgstr ""
 
 msgid "PrometheusAlerts|Add alert"
@@ -18857,12 +18839,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "project avatar"
-msgstr ""
-
-msgid "prometheus.enable is not present in gitlab.yml"
-msgstr ""
-
-msgid "prometheus.listen_address is not present in gitlab.yml"
 msgstr ""
 
 msgid "quick actions"
