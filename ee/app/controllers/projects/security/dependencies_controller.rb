@@ -3,7 +3,6 @@
 module Projects
   module Security
     class DependenciesController < Projects::ApplicationController
-      before_action :ensure_dependency_list_feature_available
       before_action :authorize_read_dependency_list!
 
       def index
@@ -34,10 +33,6 @@ module Projects
 
       def authorize_read_dependency_list!
         render_403 unless can?(current_user, :read_dependencies, project)
-      end
-
-      def ensure_dependency_list_feature_available
-        render_404 unless project.feature_available?(:dependency_list)
       end
 
       def dependencies
