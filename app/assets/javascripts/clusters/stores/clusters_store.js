@@ -84,6 +84,7 @@ export default class ClusterStore {
         },
       },
       environments: [],
+      fetchingEnvironments: false,
     };
   }
 
@@ -204,6 +205,10 @@ export default class ClusterStore {
         this.state.applications.runner.updateAvailable = updateAvailable;
       }
     });
+  }
+
+  toggleFetchEnvironments(isFetching) {
+    this.state.fetchingEnvironments = isFetching;
   }
 
   updateEnvironments(environments = []) {
