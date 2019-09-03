@@ -27,6 +27,12 @@ module QA
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
         autoload :Members, 'qa/ee/page/group/members'
 
+        module Issue
+          module Board
+            autoload :Show, 'qa/ee/page/group/issue/board/show'
+          end
+        end
+
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'
           autoload :LDAPSync, 'qa/ee/page/group/settings/ldap_sync'
