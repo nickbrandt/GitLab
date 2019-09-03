@@ -71,7 +71,7 @@ export default {
     rowTemplate(group) {
       return `
             <li>
-              <a href='#' class='dropdown-menu-link'>
+              <a href='#' class='dropdown-menu-link d-flex'>
                 ${this.avatarTemplate(group)}
                 <div class="js-group-path align-middle">${this.formatGroupPath(
                   group.full_name,
@@ -100,9 +100,9 @@ export default {
     },
     avatarTemplate(group) {
       return group.avatar_url !== null
-        ? renderAvatar(group, { sizeClass: 's16 rect-avatar' })
+        ? renderAvatar(group, { sizeClass: 's16 rect-avatar flex-shrink-0' })
         : renderIdenticon(group, {
-            sizeClass: 's16 rect-avatar d-flex justify-content-center flex-column',
+            sizeClass: 's16 rect-avatar d-flex justify-content-center flex-column flex-shrink-0',
           });
     },
   },
