@@ -7,7 +7,7 @@ module QA
     describe 'Custom email' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
         Page::Main::Menu.perform(&:click_admin_area)
         Page::Admin::Menu.perform(&:go_to_preferences_settings)
       end
