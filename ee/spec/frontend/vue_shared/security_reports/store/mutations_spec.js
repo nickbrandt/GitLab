@@ -841,6 +841,15 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe('RECEIVE_SAST_CONTAINER_DIFF_ERROR', () => {
+    it('should set sast container loading flag to false and error flag to true', () => {
+      mutations[types.RECEIVE_SAST_CONTAINER_DIFF_ERROR](stateCopy);
+
+      expect(stateCopy.sastContainer.isLoading).toEqual(false);
+      expect(stateCopy.sastContainer.hasError).toEqual(true);
+    });
+  });
+
   describe('SET_DEPENDENCY_SCANNING_DIFF_ENDPOINT', () => {
     const endpoint = 'dependency_scannning_diff_endpoint.json';
 
@@ -896,6 +905,82 @@ describe('security reports mutations', () => {
           }),
         );
       });
+    });
+  });
+
+  describe('RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR', () => {
+    it('should set dependency scanning loading flag to false and error flag to true', () => {
+      mutations[types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR](stateCopy);
+
+      expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
+      expect(stateCopy.dependencyScanning.hasError).toEqual(true);
+    });
+  });
+
+  describe('SET_DAST_DIFF_ENDPOINT', () => {
+    const endpoint = 'dast_diff_endpoint.json';
+
+    beforeEach(() => {
+      mutations[types.SET_DAST_DIFF_ENDPOINT](stateCopy, endpoint);
+    });
+
+    it('should set the correct endpoint', () => {
+      expect(stateCopy.dast.paths.diffEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('RECEIVE_DAST_DIFF_SUCCESS', () => {
+    let reports = {};
+
+    beforeEach(() => {
+      reports = {
+        diff: {
+          added: [
+            { name: 'added vuln 1', report_type: 'dast' },
+            { name: 'added vuln 2', report_type: 'dast' },
+          ],
+          fixed: [{ name: 'fixed vuln 1', report_type: 'dast' }],
+          existing: [{ name: 'existing vuln 1', report_type: 'dast' }],
+        },
+      };
+      mutations[types.RECEIVE_DAST_DIFF_SUCCESS](stateCopy, reports);
+    });
+
+    it('should set isLoading to false', () => {
+      expect(stateCopy.dast.isLoading).toBe(false);
+    });
+
+    it('should parse and set the added vulnerabilities', () => {
+      reports.diff.added.forEach((vuln, i) => {
+        expect(stateCopy.dast.newIssues[i]).toEqual(
+          expect.objectContaining({
+            name: vuln.name,
+            title: vuln.name,
+            category: vuln.report_type,
+          }),
+        );
+      });
+    });
+
+    it('should parse and set the fixed vulnerabilities', () => {
+      reports.diff.fixed.forEach((vuln, i) => {
+        expect(stateCopy.dast.resolvedIssues[i]).toEqual(
+          expect.objectContaining({
+            name: vuln.name,
+            title: vuln.name,
+            category: vuln.report_type,
+          }),
+        );
+      });
+    });
+  });
+
+  describe('RECEIVE_DAST_DIFF_ERROR', () => {
+    it('should set dast loading flag to false and error flag to true', () => {
+      mutations[types.RECEIVE_DAST_DIFF_ERROR](stateCopy);
+
+      expect(stateCopy.dast.isLoading).toEqual(false);
+      expect(stateCopy.dast.hasError).toEqual(true);
     });
   });
 });
