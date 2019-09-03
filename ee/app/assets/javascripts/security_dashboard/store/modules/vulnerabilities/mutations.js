@@ -3,8 +3,12 @@ import { s__, __ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import { DAYS } from './constants';
+import { isSameVulnerability } from './utils';
 
 export default {
+  [types.SET_PIPELINE_ID](state, payload) {
+    state.pipelineId = payload;
+  },
   [types.SET_VULNERABILITIES_ENDPOINT](state, payload) {
     state.vulnerabilitiesEndpoint = payload;
   },
@@ -106,7 +110,7 @@ export default {
       }
 
       Vue.set(state.modal.data.className, 'value', className);
-      Vue.set(state.modal.data.file, 'value', `${file}${lineSuffix}`);
+      Vue.set(state.modal.data.file, 'value', file ? `${file}${lineSuffix}` : null);
       Vue.set(state.modal.data.image, 'value', image);
       Vue.set(state.modal.data.namespace, 'value', namespace);
     }
@@ -164,7 +168,9 @@ export default {
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS](state, payload) {
-    const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
+    const vulnerability = state.vulnerabilities.find(vuln =>
+      isSameVulnerability(vuln, payload.vulnerability),
+    );
     vulnerability.dismissal_feedback = payload.data;
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
@@ -185,7 +191,9 @@ export default {
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_ADD_DISMISSAL_COMMENT_SUCCESS](state, payload) {
-    const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
+    const vulnerability = state.vulnerabilities.find(vuln =>
+      isSameVulnerability(vuln, payload.vulnerability),
+    );
     if (vulnerability) {
       vulnerability.dismissal_feedback = payload.data;
       state.isDismissingVulnerability = false;
@@ -223,7 +231,9 @@ export default {
     Vue.set(state.modal, 'error', null);
   },
   [types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload) {
-    const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
+    const vulnerability = state.vulnerabilities.find(vuln =>
+      isSameVulnerability(vuln, payload.vulnerability),
+    );
     vulnerability.dismissal_feedback = null;
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);

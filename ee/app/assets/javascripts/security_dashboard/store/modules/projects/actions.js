@@ -27,6 +27,10 @@ export const setProjectsEndpoint = ({ commit }, endpoint) => {
 };
 
 export const fetchProjects = ({ state, dispatch }) => {
+  if (!state.projectsEndpoint) {
+    return;
+  }
+
   dispatch('requestProjects');
 
   getAllProjects(state.projectsEndpoint)

@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardDocumentation,
     emptyStateSvgPath,
     vulnerabilitiesEndpoint,
-    vulnerabilitiesHistoryEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
     securityDashboardHelpPath,
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardDocumentation,
     emptyStateSvgPath,
     vulnerabilitiesEndpoint,
-    vulnerabilitiesHistoryEndpoint,
     vulnerabilitiesSummaryEndpoint,
     vulnerabilityFeedbackHelpPath,
     securityDashboardHelpPath,
@@ -80,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     components: {
       SecurityReportApp,
     },
-    methods: {},
     render(createElement) {
       return createElement('security-report-app', {
         props,

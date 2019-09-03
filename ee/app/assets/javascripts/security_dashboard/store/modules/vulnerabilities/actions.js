@@ -17,6 +17,8 @@ import createFlash from '~/flash';
 
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
 
+export const setPipelineId = ({ commit }, id) => commit(types.SET_PIPELINE_ID, id);
+
 export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_ENDPOINT, endpoint);
 };
@@ -145,7 +147,10 @@ export const receiveCreateIssueError = ({ commit }, { flashError }) => {
   }
 };
 
-export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, comment }) => {
+export const dismissVulnerability = (
+  { dispatch, state },
+  { vulnerability, flashError, comment },
+) => {
   dispatch('requestDismissVulnerability');
 
   axios
@@ -154,6 +159,7 @@ export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, 
         category: vulnerability.report_type,
         comment,
         feedback_type: 'dismissal',
+        pipeline_id: state.pipelineId,
         project_fingerprint: vulnerability.project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
@@ -162,9 +168,8 @@ export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError, 
       },
     })
     .then(({ data }) => {
-      const { id } = vulnerability;
       dispatch('closeDismissalCommentBox');
-      dispatch('receiveDismissVulnerabilitySuccess', { id, data });
+      dispatch('receiveDismissVulnerabilitySuccess', { vulnerability, data });
     })
     .catch(() => {
       dispatch('receiveDismissVulnerabilityError', { flashError });
@@ -204,9 +209,8 @@ export const addDismissalComment = ({ dispatch }, { vulnerability, comment }) =>
       comment,
     })
     .then(({ data }) => {
-      const { id } = vulnerability;
       dispatch('closeDismissalCommentBox');
-      dispatch('receiveAddDismissalCommentSuccess', { id, data });
+      dispatch('receiveAddDismissalCommentSuccess', { vulnerability, data });
     })
     .catch(() => {
       dispatch('receiveAddDismissalCommentError');
@@ -276,8 +280,7 @@ export const undoDismiss = ({ dispatch }, { vulnerability, flashError }) => {
   axios
     .delete(destroy_vulnerability_feedback_dismissal_path)
     .then(() => {
-      const { id } = vulnerability;
-      dispatch('receiveUndoDismissSuccess', { id });
+      dispatch('receiveUndoDismissSuccess', { vulnerability });
     })
     .catch(() => {
       dispatch('receiveUndoDismissError', { flashError });

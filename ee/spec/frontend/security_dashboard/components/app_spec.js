@@ -13,31 +13,37 @@ import createStore from 'ee/security_dashboard/store';
 
 const localVue = createLocalVue();
 
+const pipelineId = 123;
 const projectsEndpoint = `${TEST_HOST}/projects`;
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
 const vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilities_history`;
 
-describe('Card security reports app', () => {
+describe('Security Dashboard app', () => {
   let wrapper;
   let mock;
   let fetchProjectsSpy;
   let lockFilterSpy;
+  let setPipelineIdSpy;
+  let store;
 
   const setup = () => {
     mock = new MockAdapter(axios);
     fetchProjectsSpy = jest.fn();
     lockFilterSpy = jest.fn();
+    setPipelineIdSpy = jest.fn();
   };
 
   const createComponent = props => {
+    store = createStore();
     wrapper = shallowMount(SecurityDashboardApp, {
       localVue,
-      store: createStore(),
+      store,
       sync: false,
       methods: {
         lockFilter: lockFilterSpy,
         fetchProjects: fetchProjectsSpy,
+        setPipelineId: setPipelineIdSpy,
       },
       propsData: {
         dashboardDocumentation: '',
@@ -46,6 +52,7 @@ describe('Card security reports app', () => {
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
+        pipelineId,
         vulnerabilityFeedbackHelpPath: `${TEST_HOST}/vulnerabilities_feedback_help`,
         ...props,
       },
@@ -90,12 +97,27 @@ describe('Card security reports app', () => {
     it('does not lock project filters', () => {
       expect(lockFilterSpy).not.toHaveBeenCalled();
     });
+
+    it('sets the pipeline id', () => {
+      expect(setPipelineIdSpy).toHaveBeenCalledWith(pipelineId);
+    });
+
+    describe('when the total number of vulnerabilities change', () => {
+      const newCount = 3;
+
+      beforeEach(() => {
+        localVue.set(store.state.vulnerabilities.pageInfo, 'total', newCount);
+      });
+
+      it('emits a vulnerabilitiesCountChanged event', () => {
+        expect(wrapper.emitted('vulnerabilitiesCountChanged')).toEqual([[newCount]]);
+      });
+    });
   });
 
   describe('with project lock', () => {
     const project = {
       id: 123,
-      name: 'my-project',
     };
     beforeEach(() => {
       setup();
@@ -112,8 +134,8 @@ describe('Card security reports app', () => {
       expect(wrapper.vm.isLockedToProject).toBe(true);
     });
 
-    it('does not fetch projects', () => {
-      expect(fetchProjectsSpy).not.toHaveBeenCalled();
+    it('fetches projects', () => {
+      expect(fetchProjectsSpy).toHaveBeenCalled();
     });
 
     it('locks the filters to a given project', () => {
@@ -121,6 +143,23 @@ describe('Card security reports app', () => {
         filterId: 'project_id',
         optionId: project.id,
       });
+    });
+  });
+
+  describe.each`
+    endpointProp                        | Component
+    ${'vulnerabilitiesCountEndpoint'}   | ${VulnerabilityCountList}
+    ${'vulnerabilitiesHistoryEndpoint'} | ${VulnerabilityChart}
+  `('with an empty $endpointProp', ({ endpointProp, Component }) => {
+    beforeEach(() => {
+      setup();
+      createComponent({
+        [endpointProp]: '',
+      });
+    });
+
+    it(`does not show the ${Component.name}`, () => {
+      expect(wrapper.find(Component).exists()).toBe(false);
     });
   });
 });
