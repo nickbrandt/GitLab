@@ -56,17 +56,23 @@ describe API::Statistics, 'Statistics' do
 
         get api(path, admin)
 
-        expect(json_response['issues']).to eq('2')
-        expect(json_response['merge_requests']).to eq('1')
-        expect(json_response['notes']).to eq('2')
-        expect(json_response['snippets']).to eq('2')
-        expect(json_response['forks']).to eq('1')
-        expect(json_response['ssh_keys']).to eq('1')
-        expect(json_response['milestones']).to eq('3')
-        expect(json_response['users']).to eq('1')
-        expect(json_response['projects']).to eq('5') # projects + forks
-        expect(json_response['groups']).to eq('1')
-        expect(json_response['active_users']).to eq('1')
+        expected_statistics = {
+          issues: 2,
+          merge_requests: 1,
+          notes: 2,
+          snippets: 2,
+          forks: 1,
+          ssh_keys: 1,
+          milestones: 3,
+          users: 1,
+          projects: 5,
+          groups: 1,
+          active_users: 1
+        }
+
+        expected_statistics.each do |entity, count|
+          expect(json_response[entity.to_s]).to eq(count.to_s)
+        end
       end
     end
   end
