@@ -25,9 +25,9 @@ module EE
         finder_params =
           case parent
           when Group
-            { group_ids: [parent.id] }
+            { group_ids: parent.self_and_ancestors }
           when Project
-            { project_ids: [parent.id], group_ids: [parent.group&.id] }
+            { project_ids: [parent.id], group_ids: parent.group&.self_and_ancestors }
           end
 
         milestone = ::MilestonesFinder.new(finder_params).find_by(id: milestone_id)
