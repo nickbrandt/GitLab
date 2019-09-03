@@ -18,7 +18,7 @@ describe Projects::Alerting::NotifyService do
     let(:payload_raw) do
       {
         'title' => 'alert title',
-        'starts_at' => starts_at.rfc3339
+        'start_time' => starts_at.rfc3339
       }
     end
     let(:payload) { ActionController::Parameters.new(payload_raw).permit! }
