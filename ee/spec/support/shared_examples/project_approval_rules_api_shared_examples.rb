@@ -45,12 +45,16 @@ shared_examples_for 'an API endpoint for creating project approval rule' do
       expect(json_response.symbolize_keys).to include(params)
     end
 
-    it 'sets rule_type as report_approver if name matches default name for security reports' do
-      expect do
-        post api(url, current_user), params: params.merge(name: ApprovalProjectRule::DEFAULT_NAME_FOR_SECURITY_REPORT)
-      end.to change { ApprovalProjectRule.report_approver.count }.from(0).to(1)
+    ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.keys.each do |rule_name|
+      context "when creating a '#{rule_name}' approval rule" do
+        it 'specifies a `rule_type` of `report_approver`' do
+          expect do
+            post api(url, current_user), params: params.merge(name: rule_name)
+          end.to change { ApprovalProjectRule.report_approver.count }.from(0).to(1)
 
-      expect(response).to have_gitlab_http_status(201)
+          expect(response).to have_gitlab_http_status(201)
+        end
+      end
     end
   end
 end
