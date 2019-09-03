@@ -1,0 +1,5 @@
+---
+title: Fix UI on Project Audit Events when the feature not available
+merge_request: 16032
+author: Takuya Noguchi
+type: fixed
