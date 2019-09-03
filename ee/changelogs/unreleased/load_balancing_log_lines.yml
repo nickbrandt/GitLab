@@ -1,0 +1,5 @@
+---
+title: Improve DB load balancing log to log host offline due to replication lag
+merge_request: 15995
+author:
+type: changed

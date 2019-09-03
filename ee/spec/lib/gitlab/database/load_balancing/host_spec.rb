@@ -77,31 +77,66 @@ describe Gitlab::Database::LoadBalancing::Host do
     it 'marks the host as offline' do
       expect(host.pool).to receive(:disconnect!)
 
+      expect(Gitlab::Database::LoadBalancing::Logger).to receive(:warn)
+        .with(hash_including(event: :host_offline))
+        .and_call_original
+
       host.offline!
     end
   end
 
   describe '#online?' do
     context 'when the replica status is recent enough' do
-      it 'returns the latest status' do
-        Timecop.freeze do
-          host = described_class.new('localhost', load_balancer)
+      before do
+        expect(host).to receive(:check_replica_status?).and_return(false)
+      end
 
-          expect(host).not_to receive(:refresh_status)
-          expect(host).to be_online
-        end
+      it 'returns the latest status' do
+        expect(host).not_to receive(:refresh_status)
+        expect(Gitlab::Database::LoadBalancing::Logger).not_to receive(:info)
+        expect(Gitlab::Database::LoadBalancing::Logger).not_to receive(:warn)
+
+        expect(host).to be_online
+      end
+
+      it 'returns an offline status' do
+        host.offline!
+
+        expect(host).not_to receive(:refresh_status)
+        expect(Gitlab::Database::LoadBalancing::Logger).not_to receive(:info)
+        expect(Gitlab::Database::LoadBalancing::Logger).not_to receive(:warn)
+
+        expect(host).not_to be_online
       end
     end
 
     context 'when the replica status is outdated' do
-      it 'refreshes the status' do
-        host.offline!
-
+      before do
         expect(host)
           .to receive(:check_replica_status?)
           .and_return(true)
+      end
+
+      it 'refreshes the status' do
+        expect(Gitlab::Database::LoadBalancing::Logger).to receive(:info)
+          .with(hash_including(event: :host_online))
+          .and_call_original
 
         expect(host).to be_online
+      end
+
+      context 'and replica is not up to date' do
+        before do
+          expect(host).to receive(:replica_is_up_to_date?).and_return(false)
+        end
+
+        it 'marks the host offline' do
+          expect(Gitlab::Database::LoadBalancing::Logger).to receive(:warn)
+            .with(hash_including(event: :host_offline))
+            .and_call_original
+
+          expect(host).not_to be_online
+        end
       end
     end
 
@@ -270,9 +305,7 @@ describe Gitlab::Database::LoadBalancing::Host do
 
   describe '#replication_lag_size' do
     it 'returns the lag size as an Integer' do
-      # On newer versions of Ruby the class is Integer, but on CI we run a
-      # version that still uses Fixnum.
-      expect([Fixnum, Integer]).to include(host.replication_lag_size.class) # rubocop: disable Lint/UnifiedInteger
+      expect(host.replication_lag_size).to be_an_instance_of(Integer)
     end
 
     it 'returns nil when the database query returned no rows' do
