@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Manually create a todo item from epic', :js do
   let(:group) { create(:group) }

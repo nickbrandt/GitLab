@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
 describe ProjectFeatureUsage, type: :model do
   describe '.jira_dvcs_integrations_enabled_count' do

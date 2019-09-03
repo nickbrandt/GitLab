@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'User adds a merge request to a merge train', :js do
   let(:project) { create(:project, :repository) }

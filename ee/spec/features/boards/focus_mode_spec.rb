@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Issue Boards focus mode', :js do
   let(:project) { create(:project, :public) }

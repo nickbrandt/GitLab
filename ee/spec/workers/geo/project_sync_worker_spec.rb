@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe Geo::ProjectSyncWorker do
   describe '#perform' do

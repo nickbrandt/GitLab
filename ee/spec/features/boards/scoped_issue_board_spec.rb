@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Scoped issue boards', :js do
   include FilteredSearchHelpers

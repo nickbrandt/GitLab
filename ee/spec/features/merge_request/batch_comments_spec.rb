@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Merge request > Batch comments', :js do
   include MergeRequestDiffHelpers

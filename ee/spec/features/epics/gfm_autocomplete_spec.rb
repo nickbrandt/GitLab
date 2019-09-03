@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'GFM autocomplete', :js do
   let(:user) { create(:user, name: '💃speciąl someone💃', username: 'someone.special') }

@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Related issues', :js do
   let(:user) { create(:user) }

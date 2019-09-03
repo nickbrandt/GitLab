@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Projects > Show > Developer views empty project instructions' do
   let(:project) { create(:project, :empty_repo) }

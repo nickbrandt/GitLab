@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe 'Jira referenced paths', type: :request do
   using RSpec::Parameterized::TableSyntax
