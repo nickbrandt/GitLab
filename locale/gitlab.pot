@@ -18417,9 +18417,6 @@ msgstr ""
 msgid "issue"
 msgstr ""
 
-msgid "issue boards"
-msgstr ""
-
 msgid "it is stored externally"
 msgstr ""
 
