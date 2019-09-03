@@ -128,7 +128,7 @@ module EE
       end
 
       def bridge_waiting?
-        source_bridge.dependent?
+        source_bridge&.dependent?
       end
 
       def update_bridge_status!
