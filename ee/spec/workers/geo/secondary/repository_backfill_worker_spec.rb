@@ -69,6 +69,25 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
       subject.perform(shard_name)
     end
 
+    it 'schedules a job for each project where last attempt to sync failed' do
+      create(:geo_project_registry, :sync_failed)
+      create(:geo_project_registry, :synced)
+
+      expect(Geo::ProjectSyncWorker).to receive(:perform_async).once.and_return(true)
+
+      subject.perform(shard_name)
+    end
+
+    it 'schedules a job for each synced project updated recently' do
+      create(:geo_project_registry, :synced, :repository_dirty)
+      create(:geo_project_registry, :synced)
+      create(:geo_project_registry, :synced, :wiki_dirty)
+
+      expect(Geo::ProjectSyncWorker).to receive(:perform_async).twice.and_return(true)
+
+      subject.perform(shard_name)
+    end
+
     it 'respects Geo secondary node max capacity per shard' do
       stub_healthy_shards([shard_name, 'shard2', 'shard3', 'shard4', 'shard5'])
       allow(Geo::ProjectSyncWorker).to receive(:perform_async).twice.and_return('jid-123')

@@ -21,7 +21,7 @@ module Geo
           reason = :unknown
 
           begin
-            connection.send_query(unsynced_projects_ids.to_sql)
+            connection.send_query("#{projects_ids_unsynced.to_sql};#{project_ids_updated_recently.to_sql}")
             connection.set_single_row_mode
 
             reason = loop do
@@ -106,11 +106,21 @@ module Geo
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
-      def unsynced_projects_ids
+      def projects_ids_unsynced
         Geo::ProjectUnsyncedFinder
           .new(current_node: Gitlab::Geo.current_node, shard_name: shard_name)
           .execute
           .reorder(last_repository_updated_at: :desc)
+          .select(:id)
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def project_ids_updated_recently
+        Geo::ProjectUpdatedRecentlyFinder
+          .new(current_node: Gitlab::Geo.current_node, shard_name: shard_name)
+          .execute
+          .order('project_registry.last_repository_synced_at ASC NULLS FIRST, projects.last_repository_updated_at ASC')
           .select(:id)
       end
       # rubocop: enable CodeReuse/ActiveRecord
