@@ -10,12 +10,6 @@ describe ResourceEvents::MergeIntoNotesService do
     create(:resource_label_event, event_params.merge(params))
   end
 
-  def create_note(params)
-    opts = { noteable: resource, project: project }
-
-    create(:note_on_issue, opts.merge(params))
-  end
-
   set(:project) { create(:project) }
   set(:user) { create(:user) }
   set(:resource) { create(:issue, project: project) }
@@ -57,6 +51,39 @@ describe ResourceEvents::MergeIntoNotesService do
 
       expect(notes.count).to eq(4)
       expect(notes.map(&:note)).to match_array(expected)
+    end
+
+    context 'scoped labels' do
+      context 'when all labels are automatically removed' do
+        it 'adds "automatically removed" message' do
+          create_event(created_at: time, label: scoped_label_group1_1, action: :add)
+          create_event(created_at: time, label: scoped_label_group1_2, action: :remove)
+          create_event(created_at: time, label: scoped_label_group2_1, action: :add)
+          create_event(created_at: time, label: scoped_label_group2_2, action: :remove)
+
+          note = described_class.new(resource, user).execute.first.note
+
+          added_scoped_labels_refs = [scoped_label_group1_1, scoped_label_group2_1].map(&:to_reference).sort.join(' ')
+          removed_scoped_labels_refs = [scoped_label_group1_2, scoped_label_group2_2].map(&:to_reference).sort.join(' ')
+
+          expect(note).to eq("added #{added_scoped_labels_refs} scoped labels and automatically removed #{removed_scoped_labels_refs} labels")
+        end
+      end
+
+      context 'when any of the labels is manually removed' do
+        it 'adds "removed" message' do
+          create_event(created_at: time, label: scoped_label_group1_1, action: :add)
+          create_event(created_at: time, label: scoped_label_group1_2, action: :remove)
+          create_event(created_at: time, label: scoped_label_group2_1, action: :remove)
+
+          note = described_class.new(resource, user).execute.first.note
+
+          added_scoped_labels_refs = scoped_label_group1_1.to_reference
+          removed_scoped_labels_refs = [scoped_label_group1_2, scoped_label_group2_1].map(&:to_reference).sort.join(' ')
+
+          expect(note).to eq("added #{added_scoped_labels_refs} scoped label and removed #{removed_scoped_labels_refs} labels")
+        end
+      end
     end
   end
 end
