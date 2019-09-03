@@ -423,8 +423,10 @@ describe Ci::Pipeline do
         end
       end
     end
+  end
 
-    context 'when pipeline has bridged jobs' do
+  describe 'state machine transitions' do
+    context 'when pipeline has downstream bridges' do
       before do
         pipeline.downstream_bridges << create(:ci_bridge)
       end
@@ -442,6 +444,32 @@ describe Ci::Pipeline do
           expect(::Ci::PipelineBridgeStatusWorker).to receive(:perform_async).with(pipeline.id)
 
           pipeline.block!
+        end
+      end
+    end
+
+    context 'when pipeline is bridge triggered' do
+      before do
+        pipeline.source_bridge = create(:ci_bridge)
+      end
+
+      context 'when source bridge is dependent on pipeline status' do
+        before do
+          allow(pipeline.source_bridge).to receive(:dependent?).and_return(true)
+        end
+
+        it 'schedules the pipeline bridge worker' do
+          expect(::Ci::PipelineBridgeStatusWorker).to receive(:perform_async)
+
+          pipeline.succeed!
+        end
+      end
+
+      context 'when source bridge is not dependent on pipeline status' do
+        it 'does not schedule the pipeline bridge worker' do
+          expect(::Ci::PipelineBridgeStatusWorker).not_to receive(:perform_async)
+
+          pipeline.succeed!
         end
       end
     end
