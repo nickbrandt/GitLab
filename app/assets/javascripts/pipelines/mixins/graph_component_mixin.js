@@ -42,13 +42,13 @@ export default {
     },
     /**
      * CSS class is applied:
-     *  - if pipeline graph contains only one stage column component 
-     * 
+     *  - if pipeline graph contains only one stage column component
+     *
      * @param {number} index
-     * @returns {boolean} 
+     * @returns {boolean}
      */
     shouldAddRightMargin(index) {
-      return !(index === this.graph.length - 1)
-    }    
+      return !(index === this.graph.length - 1);
+    },
   },
 };
