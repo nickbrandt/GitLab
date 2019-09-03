@@ -13,7 +13,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
     stub_current_geo_node(secondary)
   end
 
-  shared_examples '#perform' do
+  describe '#perform' do
     let!(:restricted_group) { create(:group) }
 
     let!(:unsynced_project_in_restricted_group) { create(:project, group: restricted_group) }
@@ -288,17 +288,5 @@ describe Geo::RepositoryShardSyncWorker, :geo, :geo_fdw, :clean_gitlab_redis_cac
         subject.perform(shard_name)
       end
     end
-  end
-
-  describe 'when PostgreSQL FDW is available', :geo, :geo_fdw do
-    it_behaves_like '#perform'
-  end
-
-  describe 'when PostgreSQL FDW is not enabled', :geo do
-    before do
-      allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
-    end
-
-    it_behaves_like '#perform'
   end
 end

@@ -11,7 +11,6 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :geo, :geo_fdw, :r
 
   before do
     stub_current_geo_node(secondary)
-    stub_fdw_disabled
   end
 
   describe '#perform' do
