@@ -61,4 +61,27 @@ describe ApprovalProjectRule do
       expect(build(:approval_project_rule, :security_report).rule_type).to eq('report_approver')
     end
   end
+
+  describe "#apply_report_approver_rules_to" do
+    let(:project) { merge_request.target_project }
+    let(:merge_request) { create(:merge_request) }
+    let(:user) { create(:user) }
+    let(:group) { create(:group) }
+
+    before do
+      subject.users << user
+      subject.groups << group
+    end
+
+    ApprovalProjectRule::REPORT_TYPES_BY_DEFAULT_NAME.each do |name, value|
+      context "when the project rule is for a `#{name}`" do
+        subject { create(:approval_project_rule, value, :requires_approval, project: project) }
+        let!(:result) { subject.apply_report_approver_rules_to(merge_request) }
+
+        specify { expect(merge_request.reload.approval_rules).to match_array([result]) }
+        specify { expect(result.users).to match_array([user]) }
+        specify { expect(result.groups).to match_array([group]) }
+      end
+    end
+  end
 end

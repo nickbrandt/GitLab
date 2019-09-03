@@ -15,5 +15,11 @@ FactoryBot.define do
         report.add_dependency('Apache 2.0', 'Library3')
       end
     end
+
+    trait :mit do
+      after(:build) do |report, evaluator|
+        report.add_dependency('MIT', 'rails')
+      end
+    end
   end
 end

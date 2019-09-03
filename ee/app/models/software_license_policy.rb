@@ -35,10 +35,8 @@ class SoftwareLicensePolicy < ApplicationRecord
   scope :including_license, -> { includes(:software_license) }
 
   scope :with_license_by_name, -> (license_name) do
-    joins(:software_license).where(software_licenses: { name: license_name })
+    with_license.where(SoftwareLicense.arel_table[:name].lower.in(Array(license_name).map(&:downcase)))
   end
 
-  def name
-    software_license.name
-  end
+  delegate :name, to: :software_license
 end
