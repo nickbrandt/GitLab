@@ -26,6 +26,8 @@ namespace :admin do
   end
 
   namespace :geo do
+    get '/' => 'nodes#index'
+
     resources :nodes, only: [:index, :create, :new, :edit, :update]
 
     resources :projects, only: [:index, :destroy] do
