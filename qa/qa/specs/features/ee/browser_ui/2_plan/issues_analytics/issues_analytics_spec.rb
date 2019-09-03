@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/131
+  context 'Plan', :quarantine do
     describe 'Issues analytics' do
       let(:issue) do
         Resource::Issue.fabricate_via_api! do |issue|
