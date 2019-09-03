@@ -4,7 +4,7 @@ import { GlLink } from '@gitlab/ui';
 
 import DropdownValue from 'ee/vue_shared/components/sidebar/epics_select/dropdown_value.vue';
 
-import { mockEpic1 } from '../../../../sidebar/mock_data';
+import { mockEpic1 } from '../mock_data';
 
 describe('EpicsSelect', () => {
   describe('DropdownValue', () => {

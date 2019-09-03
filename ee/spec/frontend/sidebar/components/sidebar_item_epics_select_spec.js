@@ -2,7 +2,11 @@ import { shallowMount } from '@vue/test-utils';
 
 import SidebarItemEpicsSelect from 'ee/sidebar/components/sidebar_item_epics_select.vue';
 
-import { mockSidebarStore, mockEpic1, mockIssue } from '../mock_data';
+import {
+  mockSidebarStore,
+  mockEpic1,
+  mockIssue,
+} from '../../vue_shared/components/sidebar/mock_data';
 
 describe('SidebarItemEpicsSelect', () => {
   let wrapper;
