@@ -1,4 +1,5 @@
 import { s__, sprintf } from '~/locale';
+import { glEmojiTag } from '~/emoji';
 
 export const ONBOARDING_DISMISSED_COOKIE_NAME = 'onboarding_dismissed';
 
@@ -31,16 +32,36 @@ export const LABEL_SEARCH_QUERY = `scope=all&state=opened&label_name[]=${encodeU
   ACCEPTING_MR_LABEL_TEXT,
 )}`;
 
-export const EXIT_TOUR_CONTENT = {
+export const FEEDBACK_CONTENT = {
   text: sprintf(
     s__(
-      'UserOnboardingTour|Thanks for taking the guided tour. Remember, if you want to go through it again, you can start %{emphasisStart}Learn GitLab%{emphasisEnd} in the help menu on the top right.',
+      "UserOnboardingTour|Great job! %{clapHands} We hope the tour was helpful and that you learned how to use GitLab.%{lineBreak}%{lineBreak}We'd love to get your feedback on this tour.%{lineBreak}%{lineBreak}%{emphasisStart}How helpful would you say this guided tour was?%{emphasisEnd}%{lineBreak}%{lineBreak}",
     ),
     {
       emphasisStart: '<strong>',
       emphasisEnd: '</strong>',
+      lineBreak: '<br/>',
+      clapHands: glEmojiTag('clap'),
     },
     false,
   ),
-  buttons: [{ text: s__('UserOnboardingTour|Got it'), btnClass: 'btn-primary', exitTour: true }],
+  feedbackButtons: true,
+  feedbackSize: 5,
+};
+
+export const EXIT_TOUR_CONTENT = {
+  text: sprintf(
+    s__('UserOnboardingTour|Thanks for the feedback! %{thumbsUp}'),
+    {
+      thumbsUp: glEmojiTag('thumbsup'),
+    },
+    false,
+  ),
+  buttons: [
+    {
+      text: s__("UserOnboardingTour|Close 'Learn GitLab'"),
+      btnClass: 'btn-primary',
+      exitTour: true,
+    },
+  ],
 };

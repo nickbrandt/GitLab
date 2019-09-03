@@ -11,4 +11,5 @@ export default () => ({
   dismissed: false,
   createdProjectPath: '',
   exitTour: false,
+  tourFeedback: false,
 });

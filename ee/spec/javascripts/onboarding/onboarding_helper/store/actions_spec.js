@@ -8,6 +8,7 @@ import {
   setLastStepIndex,
   setHelpContentIndex,
   switchTourPart,
+  setTourFeedback,
   setExitTour,
   setDismissed,
 } from 'ee/onboarding/onboarding_helper/store/actions';
@@ -134,6 +135,21 @@ describe('User onboarding helper store actions', () => {
         exitTour,
         state,
         [{ type: types.SET_EXIT_TOUR, payload: exitTour }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setTourFeedback', () => {
+    it(`commits ${types.SET_FEEDBACK} mutation`, done => {
+      const tourFeedback = true;
+
+      testAction(
+        setTourFeedback,
+        tourFeedback,
+        state,
+        [{ type: types.SET_FEEDBACK, payload: tourFeedback }],
         [],
         done,
       );

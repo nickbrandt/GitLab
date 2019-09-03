@@ -1,11 +1,12 @@
 <script>
-import { GlPopover, GlButton } from '@gitlab/ui';
+import { GlPopover, GlButton, GlButtonGroup } from '@gitlab/ui';
 
 export default {
   name: 'HelpContentPopover',
   components: {
     GlPopover,
     GlButton,
+    GlButtonGroup,
   },
   props: {
     target: {
@@ -67,6 +68,27 @@ export default {
             {{ button.text }}
           </span>
         </template>
+      </template>
+      <template v-if="helpContent.feedbackButtons">
+        <gl-button-group>
+          <gl-button
+            v-for="feedbackValue in helpContent.feedbackSize"
+            :key="feedbackValue"
+            @click="
+              callButtonAction({
+                feedbackResult: feedbackValue,
+                showExitTourContent: true,
+                exitTour: true,
+              })
+            "
+          >
+            {{ feedbackValue }}
+          </gl-button>
+        </gl-button-group>
+        <div class="pt-1">
+          <small>{{ __('Not helpful') }}</small>
+          <small class="ml-4">{{ __('Very helpful') }}</small>
+        </div>
       </template>
     </div>
   </gl-popover>

@@ -10217,6 +10217,9 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
+msgid "Not helpful"
+msgstr ""
+
 msgid "Not now"
 msgstr ""
 
@@ -16682,6 +16685,9 @@ msgstr ""
 msgid "UserOnboardingTour|Click to open the latest commit to see its details."
 msgstr ""
 
+msgid "UserOnboardingTour|Close 'Learn GitLab'"
+msgstr ""
+
 msgid "UserOnboardingTour|Commits are shown in chronological order and can be filtered by the commit message or by the branch."
 msgstr ""
 
@@ -16692,6 +16698,9 @@ msgid "UserOnboardingTour|Exit 'Learn GitLab'"
 msgstr ""
 
 msgid "UserOnboardingTour|Got it"
+msgstr ""
+
+msgid "UserOnboardingTour|Great job! %{clapHands} We hope the tour was helpful and that you learned how to use GitLab.%{lineBreak}%{lineBreak}We'd love to get your feedback on this tour.%{lineBreak}%{lineBreak}%{emphasisStart}How helpful would you say this guided tour was?%{emphasisEnd}%{lineBreak}%{lineBreak}"
 msgstr ""
 
 msgid "UserOnboardingTour|Guided GitLab Tour"
@@ -16757,7 +16766,7 @@ msgstr ""
 msgid "UserOnboardingTour|Take a look. Here's a nifty menu for quickly creating issues, merge requests, snippets, projects and groups. Click on it and select \"New project\" from the \"GitLab\" section to get started."
 msgstr ""
 
-msgid "UserOnboardingTour|Thanks for taking the guided tour. Remember, if you want to go through it again, you can start %{emphasisStart}Learn GitLab%{emphasisEnd} in the help menu on the top right."
+msgid "UserOnboardingTour|Thanks for the feedback! %{thumbsUp}"
 msgstr ""
 
 msgid "UserOnboardingTour|That's it for issues. Let'st take a look at %{emphasisStart}Merge Requests%{emphasisEnd}."
@@ -16962,6 +16971,9 @@ msgid "Verified"
 msgstr ""
 
 msgid "Version"
+msgstr ""
+
+msgid "Very helpful"
 msgstr ""
 
 msgid "View app"
@@ -17171,7 +17183,7 @@ msgstr ""
 msgid "We couldn't find any results matching"
 msgstr ""
 
-msgid "We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You willl be guided by two types of helpers, best recognized by their color."
+msgid "We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You will be guided by two types of helpers, best recognized by their color."
 msgstr ""
 
 msgid "We detected potential spam in the %{humanized_resource_name}. Please solve the reCAPTCHA to proceed."

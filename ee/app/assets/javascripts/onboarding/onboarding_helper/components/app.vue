@@ -18,6 +18,10 @@ export default {
       type: Array,
       required: true,
     },
+    feedbackContent: {
+      type: Object,
+      required: true,
+    },
     exitTourContent: {
       type: Object,
       required: true,
@@ -41,6 +45,7 @@ export default {
       'tourData',
       'lastStepIndex',
       'helpContentIndex',
+      'tourFeedback',
       'exitTour',
       'dismissed',
     ]),
@@ -53,11 +58,11 @@ export default {
       'actionPopover',
     ]),
     helpContentData() {
-      if (this.showStepContent) {
-        return this.exitTour ? this.exitTourContent : this.helpContent;
-      }
+      if (!this.showStepContent) return null;
+      if (this.exitTour) return this.exitTourContent;
+      if (this.tourFeedback) return this.feedbackContent;
 
-      return null;
+      return this.helpContent;
     },
     completedSteps() {
       return Math.max(this.lastStepIndex, 0);
@@ -73,6 +78,7 @@ export default {
       'setHelpContentIndex',
       'switchTourPart',
       'setExitTour',
+      'setTourFeedback',
       'setDismissed',
     ]),
     init() {
@@ -111,6 +117,7 @@ export default {
     },
     handleRestartStep() {
       this.showExitTourContent(false);
+      this.handleFeedbackTourContent(false);
       Tracking.event(TRACKING_CATEGORY, 'click_link', {
         label: this.getTrackingLabel(),
         property: 'restart_this_step',
@@ -131,19 +138,41 @@ export default {
       }
     },
     handleClickPopoverButton(button) {
-      const { showExitTourContent, exitTour, redirectPath, nextPart, dismissPopover } = button;
+      const {
+        showExitTourContent,
+        exitTour,
+        redirectPath,
+        nextPart,
+        dismissPopover,
+        feedbackResult,
+        showFeedbackTourContent,
+      } = button;
       const helpContentItems = this.stepContent
         ? this.stepContent.getHelpContent({ projectName: this.projectName })
         : null;
-
       const showNextContentItem =
         helpContentItems &&
         helpContentItems.length > 1 &&
         this.helpContentIndex < helpContentItems.length - 1;
 
+      // track feedback
+      if (feedbackResult) {
+        Tracking.event(TRACKING_CATEGORY, 'click_link', {
+          label: 'feedback',
+          property: 'feedback_result',
+          value: feedbackResult,
+        });
+      }
+
+      // display feedback content after user hits the exit button
+      if (showFeedbackTourContent) {
+        this.handleFeedbackTourContent(true);
+        return;
+      }
+
       // display exit tour content
       if (showExitTourContent) {
-        this.showExitTourContent(true);
+        this.handleShowExitTourContent(true);
         return;
       }
 
@@ -191,6 +220,11 @@ export default {
       });
       this.showExitTourContent(showExitTour);
     },
+    handleFeedbackTourContent(showTourFeedback) {
+      this.dismissPopover = false;
+      this.showStepContent = true;
+      this.setTourFeedback(showTourFeedback);
+    },
     showExitTourContent(showExitTour) {
       this.dismissPopover = false;
       this.showStepContent = true;
@@ -230,6 +264,7 @@ export default {
       @clickPopoverButton="handleClickPopoverButton"
       @restartStep="handleRestartStep"
       @skipStep="handleSkipStep"
+      @showFeedbackContent="handleFeedbackTourContent"
       @showExitTourContent="handleShowExitTourContent"
       @exitTour="handleExitTour"
     />

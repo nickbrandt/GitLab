@@ -23,6 +23,7 @@ describe('User onboarding helper store mutations', () => {
         dismissed: false,
         createdProjectPath: '',
         exitTour: false,
+        tourFeedback: false,
       };
 
       mutations[types.SET_INITIAL_DATA](state, initialData);
@@ -63,6 +64,14 @@ describe('User onboarding helper store mutations', () => {
       mutations[types.SET_EXIT_TOUR](state, true);
 
       expect(state.exitTour).toBeTruthy();
+    });
+  });
+
+  describe('SET_FEEDBACK', () => {
+    it('sets the tourFeedback property to true', () => {
+      mutations[types.SET_FEEDBACK](state, true);
+
+      expect(state.tourFeedback).toBeTruthy();
     });
   });
 

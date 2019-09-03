@@ -3,7 +3,7 @@ import { mapActions } from 'vuex';
 import OnboardingApp from './components/app.vue';
 import createStore from './store';
 import onboardingUtils from './../utils';
-import { TOUR_TITLES, EXIT_TOUR_CONTENT } from './../constants';
+import { TOUR_TITLES, FEEDBACK_CONTENT, EXIT_TOUR_CONTENT } from './../constants';
 import TOUR_PARTS from './../tour_parts';
 
 export default function() {
@@ -51,6 +51,7 @@ export default function() {
         props: {
           tourTitles: TOUR_TITLES,
           exitTourContent: EXIT_TOUR_CONTENT,
+          feedbackContent: FEEDBACK_CONTENT,
           goldenTanukiSvgPath,
         },
       });
