@@ -12,7 +12,7 @@ module EE
         # because the user can freely navigate between them *without*
         # triggering a page load.
         before_action only: [:show, :builds, :failures, :security, :licenses] do
-          push_frontend_feature_flag(:pipeline_report_api)
+          push_frontend_feature_flag(:pipeline_report_api, default_enabled: true)
         end
       end
 
