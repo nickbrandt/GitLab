@@ -93,6 +93,9 @@ export const receiveSastContainerError = ({ commit }, error) =>
 export const receiveSastContainerDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_SAST_CONTAINER_DIFF_SUCCESS, response);
 
+export const receiveSastContainerDiffError = ({ commit }) =>
+  commit(types.RECEIVE_SAST_CONTAINER_DIFF_ERROR);
+
 export const fetchSastContainerDiff = ({ state, dispatch }) => {
   dispatch('requestSastContainerReports');
 
@@ -111,7 +114,7 @@ export const fetchSastContainerDiff = ({ state, dispatch }) => {
       });
     })
     .catch(() => {
-      dispatch('receiveSastContainerError');
+      dispatch('receiveSastContainerDiffError');
     });
 };
 
@@ -151,6 +154,8 @@ export const setDastHeadPath = ({ commit }, path) => commit(types.SET_DAST_HEAD_
 
 export const setDastBasePath = ({ commit }, path) => commit(types.SET_DAST_BASE_PATH, path);
 
+export const setDastDiffEndpoint = ({ commit }, path) => commit(types.SET_DAST_DIFF_ENDPOINT, path);
+
 export const requestDastReports = ({ commit }) => commit(types.REQUEST_DAST_REPORTS);
 
 export const receiveDastReports = ({ commit }, response) =>
@@ -186,6 +191,33 @@ export const fetchDastReports = ({ state, dispatch }) => {
 
 export const updateDastIssue = ({ commit }, issue) => commit(types.UPDATE_DAST_ISSUE, issue);
 
+export const receiveDastDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_DAST_DIFF_SUCCESS, response);
+
+export const receiveDastDiffError = ({ commit }) => commit(types.RECEIVE_DAST_DIFF_ERROR);
+
+export const fetchDastDiff = ({ state, dispatch }) => {
+  dispatch('requestDastReports');
+
+  return Promise.all([
+    pollUntilComplete(state.dast.paths.diffEndpoint),
+    axios.get(state.vulnerabilityFeedbackPath, {
+      params: {
+        category: 'dast',
+      },
+    }),
+  ])
+    .then(values => {
+      dispatch('receiveDastDiffSuccess', {
+        diff: values[0].data,
+        enrichData: values[1].data,
+      });
+    })
+    .catch(() => {
+      dispatch('receiveDastDiffError');
+    });
+};
+
 /**
  * DEPENDENCY SCANNING
  */
@@ -210,6 +242,9 @@ export const receiveDependencyScanningError = ({ commit }, error) =>
 export const receiveDependencyScanningDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS, response);
 
+export const receiveDependencyScanningDiffError = ({ commit }) =>
+  commit(types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR);
+
 export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
   dispatch('requestDependencyScanningReports');
 
@@ -228,7 +263,7 @@ export const fetchDependencyScanningDiff = ({ state, dispatch }) => {
       });
     })
     .catch(() => {
-      dispatch('receiveDependencyScanningError');
+      dispatch('receiveDependencyScanningDiffError');
     });
 };
 
