@@ -6,7 +6,15 @@ import uploadDesignQuery from 'ee/design_management/graphql/mutations/uploadDesi
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
-const router = new VueRouter();
+const router = new VueRouter({
+  routes: [
+    {
+      name: 'designs',
+      path: '/designs',
+      component: Index,
+    },
+  ],
+});
 
 describe('Design management index page', () => {
   let mutate;

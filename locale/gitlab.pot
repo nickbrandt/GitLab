@@ -4990,6 +4990,12 @@ msgstr ""
 msgid "DesignManagement|Go to previous design"
 msgstr ""
 
+msgid "DesignManagement|Requested design version does not exist"
+msgstr ""
+
+msgid "DesignManagement|Requested design version does not exist. Showing latest version instead"
+msgstr ""
+
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 

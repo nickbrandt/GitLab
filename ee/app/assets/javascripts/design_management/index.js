@@ -32,6 +32,7 @@ export default () => {
       variables: {
         fullPath: projectPath,
         iid: issueIid,
+        atVersion: null,
       },
     })
     .subscribe(({ data }) => {

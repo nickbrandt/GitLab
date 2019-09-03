@@ -2,10 +2,10 @@ import { shallowMount } from '@vue/test-utils';
 import Pagination from 'ee/design_management/components/toolbar/pagination.vue';
 
 describe('Design management pagination component', () => {
-  let vm;
+  let wrapper;
 
   function createComponent() {
-    vm = shallowMount(Pagination, {
+    wrapper = shallowMount(Pagination, {
       propsData: {
         id: '2',
       },
@@ -17,18 +17,18 @@ describe('Design management pagination component', () => {
   });
 
   afterEach(() => {
-    vm.destroy();
+    wrapper.destroy();
   });
 
   it('hides components when designs are empty', () => {
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders pagination buttons', () => {
-    vm.setData({
+    wrapper.setData({
       designs: [{ id: '1' }, { id: '2' }],
     });
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 });

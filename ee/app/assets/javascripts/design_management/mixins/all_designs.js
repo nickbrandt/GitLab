@@ -1,62 +1,41 @@
-import appDataQuery from '../graphql/queries/appData.query.graphql';
-import getVersionDesignsQuery from '../graphql/queries/getVersionDesigns.query.graphql';
+import createFlash from '~/flash';
+import { s__ } from '~/locale';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import { extractNodes } from '../utils/design_management_utils';
+import allVersionsMixin from './all_versions';
 
 export default {
+  mixins: [allVersionsMixin],
   apollo: {
-    appData: {
-      query: appDataQuery,
-      manual: true,
-      result({ data: { projectPath, issueIid } }) {
-        this.projectPath = projectPath;
-        this.issueIid = issueIid;
-      },
-    },
     designs: {
       query: projectQuery,
       variables() {
         return {
           fullPath: this.projectPath,
           iid: this.issueIid,
+          atVersion: this.designsVersion,
         };
       },
       update: data => extractNodes(data.project.issue.designs.designs),
       error() {
         this.error = true;
       },
-    },
-    versionDesigns: {
-      query: getVersionDesignsQuery,
-      fetchPolicy: 'no-cache',
-      variables() {
-        return {
-          fullPath: this.projectPath,
-          iid: this.issueIid,
-          atVersion: `gid://gitlab/DesignManagement::Version/${this.$route.query.version}`,
-        };
+      result() {
+        if (this.$route.query.version && !this.hasValidVersion) {
+          createFlash(
+            s__(
+              'DesignManagement|Requested design version does not exist. Showing latest version instead',
+            ),
+          );
+          this.$router.replace({ name: 'designs', query: { version: undefined } });
+        }
       },
-      skip() {
-        this.$apollo.queries.versionDesigns.skip = !this.hasValidVersion();
-      },
-      update: data => extractNodes(data.project.issue.designs.designs),
     },
   },
   data() {
     return {
       designs: [],
       error: false,
-      projectPath: '',
-      issueIid: null,
-      versionDesigns: [],
     };
-  },
-  methods: {
-    hasValidVersion() {
-      if (Object.keys(this.$route.query).length === 0) {
-        return false;
-      }
-      return this.allVersions.some(version => version.node.id.endsWith(this.$route.query.version));
-    },
   },
 };

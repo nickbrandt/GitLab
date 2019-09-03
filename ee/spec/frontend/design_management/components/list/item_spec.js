@@ -1,11 +1,19 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import VueRouter from 'vue-router';
 import Item from 'ee/design_management/components/list/item.vue';
 
+const localVue = createLocalVue();
+localVue.use(VueRouter);
+const router = new VueRouter();
+
 describe('Design management list item component', () => {
-  let vm;
+  let wrapper;
 
   function createComponent(commentsCount = 1) {
-    vm = shallowMount(Item, {
+    wrapper = shallowMount(Item, {
+      sync: false,
+      localVue,
+      router,
       propsData: {
         id: 1,
         name: 'test',
@@ -18,24 +26,24 @@ describe('Design management list item component', () => {
   }
 
   afterEach(() => {
-    vm.destroy();
+    wrapper.destroy();
   });
 
   it('renders item with single comment', () => {
     createComponent();
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders item with multiple comments', () => {
     createComponent(2);
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('hides comment count', () => {
     createComponent(0);
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 });
