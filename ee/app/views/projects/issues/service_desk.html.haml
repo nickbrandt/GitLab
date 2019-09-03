@@ -1,4 +1,3 @@
-- @no_container = true
 - @can_bulk_update = false
 
 - page_title "Service Desk"
@@ -8,7 +7,7 @@
 
 - support_bot_attrs = UserSerializer.new.represent(User.support_bot).to_json
 
-%div{ class: "#{container_class} js-service-desk-issues service-desk-issues", data: { support_bot: support_bot_attrs } }
+%div{ class: "js-service-desk-issues service-desk-issues", data: { support_bot: support_bot_attrs } }
   .top-area
     = render 'shared/issuable/nav', type: :issues
     .nav-controls.d-block.d-sm-none
