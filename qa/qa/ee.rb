@@ -135,15 +135,27 @@ module QA
     end
 
     module Resource
-      autoload :Board, 'qa/ee/resource/board'
       autoload :License, 'qa/ee/resource/license'
       autoload :Epic, 'qa/ee/resource/epic'
       autoload :ProjectMilestone, 'qa/ee/resource/project_milestone'
+      autoload :GroupLabel, 'qa/ee/resource/group_label.rb'
 
-      module BoardList
-        autoload :BaseBoardList, 'qa/ee/resource/board_list/base_board_list'
-        autoload :LabelBoardList, 'qa/ee/resource/board_list/label_board_list'
-        autoload :MilestoneBoardList, 'qa/ee/resource/board_list/milestone_board_list'
+      module Board
+        autoload :BaseBoard, 'qa/ee/resource/board/base_board'
+        autoload :GroupBoard, 'qa/ee/resource/board/group_board'
+        autoload :ProjectBoard, 'qa/ee/resource/board/project_board'
+
+        module BoardList
+          module Group
+            autoload :BoardList, 'qa/ee/resource/board/board_list/group/board_list'
+          end
+
+          module Project
+            autoload :BaseBoardList, 'qa/ee/resource/board/board_list/project/base_board_list'
+            autoload :LabelBoardList, 'qa/ee/resource/board/board_list/project/label_board_list'
+            autoload :MilestoneBoardList, 'qa/ee/resource/board/board_list/project/milestone_board_list'
+          end
+        end
       end
 
       module Geo
