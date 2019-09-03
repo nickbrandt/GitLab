@@ -11,7 +11,7 @@
 
 - if pipeline.expose_security_dashboard?
   #js-tab-security.build-security.tab-pane
-    - if Feature.enabled?(:pipeline_report_api)
+    - if Feature.enabled?(:pipeline_report_api, default_enabled: true)
       #js-security-report-app{ data: { dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
       empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
       pipeline_id: pipeline.id,
