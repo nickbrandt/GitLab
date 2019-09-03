@@ -34,20 +34,6 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
   end
 
   context 'when trigger is a hash' do
-    context 'when branch is not provided' do
-      let(:config) { { project: 'some/project' } }
-
-      describe '#valid?' do
-        it { is_expected.to be_valid }
-      end
-
-      describe '#value' do
-        it 'is returns a trigger configuration hash' do
-          expect(subject.value).to eq(project: 'some/project')
-        end
-      end
-    end
-
     context 'when branch is provided' do
       let(:config) { { project: 'some/project', branch: 'feature' } }
 
@@ -59,6 +45,38 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
         it 'is returns a trigger configuration hash' do
           expect(subject.value)
             .to eq(project: 'some/project', branch: 'feature')
+        end
+      end
+    end
+
+    context 'when strategy is provided' do
+      context 'when strategy is depend' do
+        let(:config) { { project: 'some/project', strategy: 'depend' } }
+
+        describe '#valid?' do
+          it { is_expected.to be_valid }
+        end
+
+        describe '#value' do
+          it 'is returns a trigger configuration hash' do
+            expect(subject.value)
+              .to eq(project: 'some/project', strategy: 'depend')
+          end
+        end
+      end
+
+      context 'when strategy is invalid' do
+        let(:config) { { project: 'some/project', strategy: 'notdepend' } }
+
+        describe '#valid?' do
+          it { is_expected.not_to be_valid }
+        end
+
+        describe '#errors' do
+          it 'is returns an error about unknown config key' do
+            expect(subject.errors.first)
+              .to match /trigger strategy should be depend/
+          end
         end
       end
     end

@@ -105,8 +105,18 @@ module EE
             end
           end
 
+          after_transition any => ::Ci::Pipeline.completed_statuses do |pipeline|
+            next unless pipeline.bridge_triggered?
+            next unless pipeline.bridge_waiting?
+
+            pipeline.run_after_commit do
+              ::Ci::PipelineBridgeStatusWorker.perform_async(pipeline.id)
+            end
+          end
+
           after_transition created: :pending do |pipeline|
             next unless pipeline.bridge_triggered?
+            next if pipeline.bridge_waiting?
 
             pipeline.update_bridge_status!
           end
@@ -115,6 +125,10 @@ module EE
 
       def bridge_triggered?
         source_bridge.present?
+      end
+
+      def bridge_waiting?
+        source_bridge.dependent?
       end
 
       def update_bridge_status!

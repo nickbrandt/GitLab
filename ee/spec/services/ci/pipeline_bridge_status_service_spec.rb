@@ -3,70 +3,66 @@
 require 'spec_helper'
 
 describe Ci::PipelineBridgeStatusService do
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
-  let(:pipeline) { create(:ci_pipeline, status: status, project: project) }
+  let(:user) { build(:user) }
+  let(:project) { build(:project) }
+  let(:pipeline) { build(:ci_pipeline, project: project) }
 
   describe '#execute' do
     subject { described_class.new(project, user).execute(pipeline) }
 
-    context 'when pipeline has bridged jobs' do
-      let(:bridge) { create(:ci_bridge, status: 'pending') }
+    context 'when pipeline has downstream bridges' do
+      let(:bridge) { build(:ci_bridge) }
 
       before do
         pipeline.downstream_bridges << bridge
       end
 
-      context 'when pipeline has the same status as the bridge' do
-        let(:status) { 'running' }
+      it 'calls inherit_status_from_upstream on downstream bridges' do
+        expect(bridge).to receive(:inherit_status_from_upstream!)
 
-        before do
-          bridge.status = 'running'
-        end
+        subject
+      end
+    end
 
-        it 'does not update the bridge status' do
-          expect { subject }.not_to change { bridge.status }
-        end
+    context 'when pipeline has upstream bridge' do
+      let(:bridge) { build(:ci_bridge) }
 
-        it 'does not save the bridge' do
-          expect(bridge).not_to receive(:save!)
-        end
+      before do
+        pipeline.source_bridge = bridge
       end
 
-      context 'when pipeline starts running' do
-        let(:status) { 'running' }
+      it 'calls inherit_status_from_downstream on upstream bridge' do
+        expect(bridge).to receive(:inherit_status_from_downstream!).with(pipeline)
 
-        it 'updates the bridge status with the pipeline status' do
-          expect { subject }.to change { bridge.status }.from('pending').to('running')
-        end
+        subject
+      end
+    end
 
-        it 'persists the status change' do
-          expect(bridge).to be_persisted
-        end
+    context 'when pipeline has both downstream and upstream bridge' do
+      let(:downstream_bridge) { build(:ci_bridge) }
+      let(:upstream_bridge) { build(:ci_bridge) }
+
+      before do
+        pipeline.downstream_bridges << downstream_bridge
+        pipeline.source_bridge = upstream_bridge
       end
 
-      context 'when pipeline succeeds' do
-        let(:status) { 'success' }
+      it 'only calls inherit_status_from_downstream on upstream bridge' do
+        allow(downstream_bridge).to receive(:inherit_status_from_upstream!)
 
-        it 'updates the bridge status with the pipeline status' do
-          expect { subject }.to change { bridge.status }.from('pending').to('success')
-        end
+        expect(upstream_bridge).to receive(:inherit_status_from_downstream!).with(pipeline)
+        expect(downstream_bridge).not_to receive(:inherit_status_from_downstream!)
 
-        it 'persists the status change' do
-          expect(bridge).to be_persisted
-        end
+        subject
       end
 
-      context 'when pipeline gets blocked' do
-        let(:status) { 'manual' }
+      it 'only calls inherit_status_from_upstream on downstream bridge' do
+        allow(upstream_bridge).to receive(:inherit_status_from_downstream!)
 
-        it 'updates the bridge status with the pipeline status' do
-          expect { subject }.to change { bridge.status }.from('pending').to('manual')
-        end
+        expect(upstream_bridge).not_to receive(:inherit_status_from_upstream!)
+        expect(downstream_bridge).to receive(:inherit_status_from_upstream!)
 
-        it 'persists the status change' do
-          expect(bridge).to be_persisted
-        end
+        subject
       end
     end
   end
