@@ -5,7 +5,7 @@
   %li.js-security-tab-link
     = link_to security_project_pipeline_path(project, pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab qa-security-tab' do
       = _("Security")
-      %span.badge.badge-pill.js-sast-counter.hidden
+      %span.badge.badge-pill.js-security-counter.hidden
 
 - if pipeline.expose_license_management_data?
   %li.js-licenses-tab-link

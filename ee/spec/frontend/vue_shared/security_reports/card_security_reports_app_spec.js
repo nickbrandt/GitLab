@@ -12,7 +12,6 @@ const localVue = createLocalVue();
 
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesSummaryEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
-const vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilities_history`;
 
 describe('Card security reports app', () => {
   let wrapper;
@@ -58,7 +57,6 @@ describe('Card security reports app', () => {
         vulnerabilityFeedbackHelpPath: `${TEST_HOST}/vulnerability_feedback_help`,
         vulnerabilitiesEndpoint,
         vulnerabilitiesSummaryEndpoint,
-        vulnerabilitiesHistoryEndpoint,
         ...props,
       },
     });

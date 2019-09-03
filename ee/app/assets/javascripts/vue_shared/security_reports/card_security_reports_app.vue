@@ -81,11 +81,6 @@ export default {
       required: false,
       default: null,
     },
-    vulnerabilitiesHistoryEndpoint: {
-      type: String,
-      required: false,
-      default: null,
-    },
   },
   computed: {
     headline() {
@@ -141,7 +136,6 @@ export default {
         :empty-state-svg-path="emptyStateSvgPath"
         :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
         :vulnerabilities-count-endpoint="vulnerabilitiesSummaryEndpoint"
-        :vulnerabilities-history-endpoint="vulnerabilitiesHistoryEndpoint"
         :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       />
     </template>
