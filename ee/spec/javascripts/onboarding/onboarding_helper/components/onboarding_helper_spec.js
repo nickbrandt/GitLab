@@ -226,7 +226,7 @@ describe('User onboarding tour parts list', () => {
       it('emits the "showExitTourContent" event when the "Exit Learn GitLab" link is clicked', () => {
         wrapper.find('.qa-exit-tour-link').vm.$emit('click');
 
-        expect(wrapper.emitted('showExitTourContent')).toBeTruthy();
+        expect(wrapper.emitted('showFeedbackContent')).toBeTruthy();
       });
     });
 

@@ -125,7 +125,7 @@ describe('User onboarding welcome page', () => {
 
     it('displays the welcome text', () => {
       expect(wrapper.text()).toContain(
-        'We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You willl be guided by two types of helpers, best recognized by their color.',
+        'We created a short guided tour that will help you learn the basics of GitLab and how it will help you be better at your job. It should only take a couple of minutes. You will be guided by two types of helpers, best recognized by their color.',
       );
     });
 

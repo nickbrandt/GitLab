@@ -13,6 +13,9 @@ export default {
   [types.SET_HELP_CONTENT_INDEX](state, payload) {
     state.helpContentIndex = payload;
   },
+  [types.SET_FEEDBACK](state, payload) {
+    state.tourFeedback = payload;
+  },
   [types.SET_EXIT_TOUR](state, payload) {
     state.exitTour = payload;
   },
