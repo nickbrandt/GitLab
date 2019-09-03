@@ -37,6 +37,7 @@ module EE
       belongs_to :due_date_sourcing_milestone, class_name: 'Milestone'
       belongs_to :parent, class_name: "Epic"
       has_many :children, class_name: "Epic", foreign_key: :parent_id
+      has_many :events, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
       has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.epics&.maximum(:iid) }
 
@@ -206,6 +207,10 @@ module EE
           .joins(issues: :epic_issue)
           .where('epic_issues.epic_id = epics.id')
       end
+    end
+
+    def resource_parent
+      group
     end
 
     def assignees

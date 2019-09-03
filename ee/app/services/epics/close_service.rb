@@ -13,6 +13,7 @@ module Epics
     def close_epic(epic)
       if epic.close
         epic.update(closed_by: current_user)
+        event_service.close_epic(epic, current_user)
         SystemNoteService.change_status(epic, nil, current_user, epic.state)
         notification_service.close_epic(epic, current_user)
       end
