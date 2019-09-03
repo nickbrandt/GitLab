@@ -17,10 +17,8 @@ describe Projects::Alerting::NotifyService do
     let(:service) { described_class.new(project, nil, payload) }
     let(:payload_raw) do
       {
-        'annotations' => {
-          'title' => 'annotation title'
-        },
-        'startsAt' => starts_at.rfc3339
+        'title' => 'alert title',
+        'starts_at' => starts_at.rfc3339
       }
     end
     let(:payload) { ActionController::Parameters.new(payload_raw).permit! }

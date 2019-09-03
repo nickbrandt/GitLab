@@ -27,7 +27,11 @@ module Projects
 
       def process_incident_issues
         IncidentManagement::ProcessAlertWorker
-          .perform_async(project.id, params.to_h)
+          .perform_async(project.id, parsed_payload)
+      end
+
+      def parsed_payload
+        Gitlab::Alerting::NotificationPayloadParser.call(params.to_h)
       end
     end
   end
