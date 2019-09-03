@@ -192,11 +192,6 @@ Rails.application.routes.draw do
   draw :user
   draw :project
 
-  Gitlab.ee do
-    draw :trial_registration
-    draw :trial
-  end
-
   root to: "root#index"
 
   get '*unmatched_route', to: 'application#route_not_found'
