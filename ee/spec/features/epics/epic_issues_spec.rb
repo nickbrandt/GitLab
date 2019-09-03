@@ -129,7 +129,7 @@ describe 'Epic Issues', :js do
     it 'user cannot add new issues to the epic from another group' do
       add_issues("#{issue_invalid.to_reference(full: true)}")
 
-      expect(page).to have_selector('.content-wrapper .alert-wrapper .flash-text')
+      expect(page).to have_selector('.content-wrapper .flash-text')
       expect(find('.flash-alert')).to have_text("We can't find an issue that matches what you are looking for.")
     end
 
@@ -138,7 +138,7 @@ describe 'Epic Issues', :js do
 
       add_issues(references)
 
-      expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
+      expect(page).not_to have_selector('.content-wrapper .flash-text')
       expect(page).not_to have_content("We can't find an issue that matches what you are looking for.")
 
       within('.related-items-tree-container ul.related-items-list') do
@@ -150,7 +150,7 @@ describe 'Epic Issues', :js do
       references = "#{epic_to_add.to_reference(full: true)}"
       add_epics(references)
 
-      expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
+      expect(page).not_to have_selector('.content-wrapper .flash-text')
       expect(page).not_to have_content("We can't find an epic that matches what you are looking for.")
 
       within('.related-items-tree-container ul.related-items-list') do
