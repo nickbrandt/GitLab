@@ -42,6 +42,10 @@ describe NewEpicWorker do
         stub_licensed_features(epics: true)
       end
 
+      it 'creates an event' do
+        expect { worker.perform(epic.id, user.id) }.to change { Event.count }.from(0).to(1)
+      end
+
       context 'user watches group' do
         before do
           create(

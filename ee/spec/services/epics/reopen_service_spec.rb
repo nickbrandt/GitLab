@@ -59,6 +59,10 @@ describe Epics::ReopenService do
 
             subject.execute(epic)
           end
+
+          it "creates new event" do
+            expect { subject.execute(epic) }.to change { Event.count }
+          end
         end
 
         context 'when trying to reopen an opened epic' do
@@ -86,6 +90,10 @@ describe Epics::ReopenService do
             expect(NotificationService).not_to receive(:new)
 
             subject.execute(epic)
+          end
+
+          it "does not create an event" do
+            expect { subject.execute(epic) }.not_to change { Event.count }
           end
         end
       end

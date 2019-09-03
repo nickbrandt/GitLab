@@ -59,6 +59,10 @@ describe Epics::CloseService do
 
             subject.execute(epic)
           end
+
+          it "creates new event" do
+            expect { subject.execute(epic) }.to change { Event.count }
+          end
         end
 
         context 'when trying to close a closed epic' do
@@ -86,6 +90,10 @@ describe Epics::CloseService do
             expect(NotificationService).not_to receive(:new)
 
             subject.execute(epic)
+          end
+
+          it "does not create an event" do
+            expect { subject.execute(epic) }.not_to change { Event.count }
           end
         end
       end

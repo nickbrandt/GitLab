@@ -58,6 +58,7 @@ module EE
     def parent
       for_epic? ? noteable.group : super
     end
+    alias_method :resource_parent, :parent
 
     def notify_after_create
       noteable&.after_note_created(self)
