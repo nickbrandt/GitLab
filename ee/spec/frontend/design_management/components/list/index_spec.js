@@ -10,10 +10,11 @@ const createMockDesign = id => ({
 });
 
 describe('Design management list component', () => {
-  let vm;
+  let wrapper;
 
   function createComponent() {
-    vm = shallowMount(List, {
+    wrapper = shallowMount(List, {
+      sync: false,
       propsData: {
         designs: [createMockDesign(1), createMockDesign(2)],
       },
@@ -21,12 +22,12 @@ describe('Design management list component', () => {
   }
 
   afterEach(() => {
-    vm.destroy();
+    wrapper.destroy();
   });
 
   it('renders list', () => {
     createComponent();
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 });

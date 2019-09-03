@@ -2,6 +2,7 @@
 import { s__ } from '~/locale';
 import createFlash from '~/flash';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
+import allVersionsMixin from '../../mixins/all_versions';
 import createNoteMutation from '../../graphql/mutations/createNote.mutation.graphql';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import DesignNote from './design_note.vue';
@@ -14,6 +15,7 @@ export default {
     ReplyPlaceholder,
     DesignReplyForm,
   },
+  mixins: [allVersionsMixin],
   props: {
     discussion: {
       type: Object,
@@ -67,6 +69,7 @@ export default {
               query: getDesignQuery,
               variables: {
                 id: this.designId,
+                version: this.designsVersion,
               },
             });
             const currentDiscussion = extractCurrentDiscussion(

@@ -3,6 +3,7 @@ import Mousetrap from 'mousetrap';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import { GlLoadingIcon } from '@gitlab/ui';
+import allVersionsMixin from '../../mixins/all_versions';
 import Toolbar from '../../components/toolbar/index.vue';
 import DesignImage from '../../components/image.vue';
 import DesignOverlay from '../../components/design_overlay.vue';
@@ -10,7 +11,6 @@ import DesignDiscussion from '../../components/design_notes/design_discussion.vu
 import DesignReplyForm from '../../components/design_notes/design_reply_form.vue';
 import getDesignQuery from '../../graphql/queries/getDesign.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/createImageDiffNote.mutation.graphql';
-import appDataQuery from '../../graphql/queries/appData.query.graphql';
 import { extractDiscussions } from '../../utils/design_management_utils';
 
 export default {
@@ -22,6 +22,7 @@ export default {
     DesignReplyForm,
     GlLoadingIcon,
   },
+  mixins: [allVersionsMixin],
   props: {
     id: {
       type: String,
@@ -47,20 +48,18 @@ export default {
       variables() {
         return {
           id: this.id,
+          version: this.designsVersion,
         };
       },
       result({ data }) {
         if (!data) {
           createFlash(s__('DesignManagement|Could not find design, please try again.'));
-          this.$router.push('/designs');
+          this.$router.push({ name: 'designs' });
         }
-      },
-    },
-    appData: {
-      query: appDataQuery,
-      manual: true,
-      result({ data: { projectPath } }) {
-        this.projectPath = projectPath;
+        if (this.$route.query.version && !this.hasValidVersion) {
+          createFlash(s__('DesignManagement|Requested design version does not exist'));
+          this.$router.push({ name: 'designs' });
+        }
       },
     },
   },
@@ -120,6 +119,7 @@ export default {
               query: getDesignQuery,
               variables: {
                 id: this.id,
+                version: this.designsVersion,
               },
             });
             const newDiscussion = {
@@ -175,9 +175,10 @@ export default {
       this.overlayDimensions.height = position.height;
     },
     closeDesign() {
-      // This needs to be changed to take a design version into account as soon as
-      // https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15119 is merged
-      this.$router.push('/designs');
+      this.$router.push({
+        name: 'designs',
+        query: this.$route.query,
+      });
     },
   },
   beforeRouteUpdate(to, from, next) {

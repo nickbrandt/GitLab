@@ -17,10 +17,13 @@ describe('Design management design version dropdown component', () => {
       propsData: {
         projectPath: '',
         issueIid: '',
-        allVersions: mockAllVersions,
       },
       localVue,
       router,
+    });
+
+    wrapper.setData({
+      allVersions: mockAllVersions,
     });
   }
 

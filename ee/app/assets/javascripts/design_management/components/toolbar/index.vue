@@ -47,7 +47,10 @@ export default {
 <template>
   <header class="d-flex w-100 p-2 bg-white align-items-center js-design-header">
     <router-link
-      :to="{ name: 'designs' }"
+      :to="{
+        name: 'designs',
+        query: $route.query,
+      }"
       :aria-label="s__('DesignManagement|Go back to designs')"
       class="mr-3 text-plain"
     >

@@ -1,5 +1,10 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import VueRouter from 'vue-router';
 import Toolbar from 'ee/design_management/components/toolbar/index.vue';
+
+const localVue = createLocalVue();
+localVue.use(VueRouter);
+const router = new VueRouter();
 
 const RouterLinkStub = {
   props: {
@@ -13,13 +18,16 @@ const RouterLinkStub = {
 };
 
 describe('Design management toolbar component', () => {
-  let vm;
+  let wrapper;
 
   function createComponent(isLoading = false) {
     const updatedAt = new Date();
     updatedAt.setHours(updatedAt.getHours() - 1);
 
-    vm = shallowMount(Toolbar, {
+    wrapper = shallowMount(Toolbar, {
+      sync: false,
+      localVue,
+      router,
       propsData: {
         id: '1',
         isLoading,
@@ -38,16 +46,19 @@ describe('Design management toolbar component', () => {
   it('renders design and updated data', () => {
     createComponent();
 
-    expect(vm.element).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('links back to designs list', () => {
     createComponent();
 
-    const link = vm.find('a');
+    const link = wrapper.find('a');
 
     expect(link.props('to')).toEqual({
       name: 'designs',
+      query: {
+        version: undefined,
+      },
     });
   });
 });
