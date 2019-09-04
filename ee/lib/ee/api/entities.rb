@@ -122,6 +122,17 @@ module EE
         end
       end
 
+      module Issue
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :epic_iid,
+                 if: -> (issue, options) { ::Ability.allowed?(options[:current_user], :read_epic, issue.project&.group) } do |issue|
+            issue.epic&.iid
+          end
+        end
+      end
+
       module MergeRequestBasic
         extend ActiveSupport::Concern
 
@@ -194,9 +205,11 @@ module EE
         extend ActiveSupport::Concern
 
         def todo_target_class(target_type)
-          ::EE::API::Entities.const_get(target_type, false)
-        rescue NameError
           super
+        rescue NameError
+          # false as second argument prevents looking up in module hierarchy
+          # see also https://gitlab.com/gitlab-org/gitlab-ce/issues/59719
+          ::EE::API::Entities.const_get(target_type, false)
         end
       end
 

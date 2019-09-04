@@ -5,6 +5,9 @@ describe API::Issues, :mailer do
   set(:project) do
     create(:project, :public, creator_id: user.id, namespace: user.namespace)
   end
+  set(:group) { create(:group) }
+  set(:epic) { create(:epic, group: group) }
+  set(:group_project) { create(:project, :public, creator_id: user.id, namespace: group) }
 
   let(:user2)       { create(:user) }
   set(:author)      { create(:author) }
@@ -26,6 +29,34 @@ describe API::Issues, :mailer do
 
   before(:all) do
     project.add_reporter(user)
+  end
+
+  shared_examples 'exposes epic_iid' do
+    context 'with epics feature' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'contains epic_iid in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(epic_issue_response_for(epic_issue)['epic_iid']).to eq(epic.iid)
+      end
+    end
+
+    context 'without epics feature' do
+      before do
+        stub_licensed_features(epics: false)
+      end
+
+      it 'does not contain epic_iid in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+      end
+    end
   end
 
   describe "GET /issues" do
@@ -77,8 +108,7 @@ describe API::Issues, :mailer do
   end
 
   describe 'GET /groups/:id/issues' do
-    let!(:group)            { create(:group) }
-    let!(:group_project)    { create(:project, :public, creator_id: user.id, namespace: group) }
+    subject { get api("/groups/#{group.id}/issues", user) }
 
     context 'filtering by assignee_username' do
       let(:another_assignee) { create(:assignee) }
@@ -86,28 +116,92 @@ describe API::Issues, :mailer do
       let!(:issue2) { create(:issue, author: user2, project: group_project, weight: 5, created_at: 2.days.ago) }
       let!(:issue3) { create(:issue, author: user2, assignees: [assignee, another_assignee], project: group_project, weight: 3, created_at: 1.day.ago) }
 
-      it 'returns issues with multiple assignees' do
+      subject do
         get api("/groups/#{group.id}/issues", user),
-             params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+            params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+      end
+
+      it 'returns issues with multiple assignees' do
+        subject
 
         expect_paginated_array_response(issue3.id)
       end
     end
+
+    include_examples 'exposes epic_iid' do
+      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+    end
   end
 
   describe "GET /projects/:id/issues" do
+    subject { get api("/projects/#{project.id}/issues", user) }
+
     context 'filtering by assignee_username' do
       let(:another_assignee) { create(:assignee) }
       let!(:issue1) { create(:issue, author: user2, project: project, weight: 1, created_at: 3.days.ago) }
       let!(:issue2) { create(:issue, author: user2, project: project, weight: 5, created_at: 2.days.ago) }
       let!(:issue3) { create(:issue, author: user2, assignees: [assignee, another_assignee], project: project, weight: 3, created_at: 1.day.ago) }
 
-      it 'returns issues with multiple assignees' do
+      subject do
         get api("/projects/#{project.id}/issues", user),
-             params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+            params: { assignee_username: [assignee.username, another_assignee.username], scope: 'all' }
+      end
+
+      it 'returns issues with multiple assignees' do
+        subject
 
         expect_paginated_array_response(issue3.id)
       end
+    end
+
+    context 'on personal project' do
+      let!(:epic_issue) { create(:issue, project: project, epic: epic) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'does not contain epic_iid in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+      end
+    end
+
+    context 'on group project' do
+      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+
+      subject { get api("/projects/#{group_project.id}/issues", user) }
+
+      include_examples 'exposes epic_iid'
+    end
+  end
+
+  describe 'GET /project/:id/issues/:issue_id' do
+    context 'on personal project' do
+      let!(:epic_issue) { create(:issue, project: project, epic: epic) }
+
+      subject { get api("/projects/#{project.id}/issues/#{epic_issue.iid}", user) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      it 'does not contain epic_iid in response' do
+        subject
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(epic_issue_response_for(epic_issue)).not_to have_key('epic_iid')
+      end
+    end
+
+    context 'on group project' do
+      let!(:epic_issue) { create(:issue, project: group_project, epic: epic) }
+
+      subject { get api("/projects/#{group_project.id}/issues/#{epic_issue.iid}", user) }
+
+      include_examples 'exposes epic_iid'
     end
   end
 
@@ -173,5 +267,11 @@ describe API::Issues, :mailer do
         expect(issue.reload.read_attribute(:weight)).to be_nil
       end
     end
+  end
+
+  private
+
+  def epic_issue_response_for(epic_issue)
+    Array.wrap(json_response).find { |issue| issue['id'] == epic_issue.id }
   end
 end
