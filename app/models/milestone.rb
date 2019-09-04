@@ -16,6 +16,7 @@ class Milestone < ApplicationRecord
   include Referable
   include StripAttribute
   include Milestoneish
+  include FromUnion
   include Gitlab::SQL::Pattern
 
   prepend_if_ee('::EE::Milestone') # rubocop: disable Cop/InjectEnterpriseEditionModule
