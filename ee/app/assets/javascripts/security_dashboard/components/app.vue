@@ -148,12 +148,12 @@ export default {
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />
 
     <div class="row mt-4">
-      <main role="main" class="col" :class="{ 'col-xl-7': !isLockedToProject }">
+      <article class="col" :class="{ 'col-xl-7': !isLockedToProject }">
         <security-dashboard-table
           :dashboard-documentation="dashboardDocumentation"
           :empty-state-svg-path="emptyStateSvgPath"
         />
-      </main>
+      </article>
 
       <aside v-if="shouldShowChart" class="col-xl-5">
         <vulnerability-chart />
