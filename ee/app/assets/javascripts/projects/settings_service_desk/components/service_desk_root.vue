@@ -62,8 +62,7 @@ export default {
 
       this.service
         .fetchIncomingEmail()
-        .then(res => res.json())
-        .then(data => {
+        .then(({ data }) => {
           const email = data.service_desk_address;
           if (!email) {
             throw new Error(__("Response didn't include `service_desk_address`"));
@@ -90,8 +89,7 @@ export default {
 
       this.service
         .toggleServiceDesk(isChecked)
-        .then(res => res.json())
-        .then(data => {
+        .then(({ data }) => {
           const email = data.service_desk_address;
           if (isChecked && !email) {
             throw new Error(__("Response didn't include `service_desk_address`"));
