@@ -30,6 +30,22 @@ module Geo
         end
       end
 
+      def initialize
+        @scheduled_jobs = []
+        @loops = 0
+      end
+
+      def perform(shard_name)
+        @shard_name = shard_name
+        @start_time = Time.now.utc
+
+        return unless healthy_node?
+
+        try_obtain_lease do
+          schedule_jobs
+        end
+      end
+
       private
 
       def base_log_data(message)

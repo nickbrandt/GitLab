@@ -5,56 +5,6 @@ module Geo
     class RepositoryBackfillWorker
       include Geo::Secondary::BackfillWorker
 
-      def initialize
-        @scheduled_jobs = []
-      end
-
-      def perform(shard_name)
-        @shard_name = shard_name
-        @start_time = Time.now.utc
-        @loops = 0
-
-        return unless healthy_node?
-
-        try_obtain_lease do
-          log_info('Repository backfilling started')
-          reason = :unknown
-
-          begin
-            connection.send_query("#{projects_ids_unsynced.to_sql};#{project_ids_updated_recently.to_sql}")
-            connection.set_single_row_mode
-
-            reason = loop do
-              break :node_disabled unless node_enabled?
-              break :over_time if over_time?
-              break :lease_lost unless renew_lease!
-
-              update_jobs_in_progress
-
-              unless over_capacity?
-                # This will stream the results one by one
-                # until there are no more results to fetch.
-                result = connection.get_result
-                break :complete if result.nil?
-
-                result.check
-                result.each do |row|
-                  schedule_job(row['id'])
-                end
-              else
-                sleep(1)
-              end
-            end
-          rescue => error
-            reason = :error
-            log_error('Repository backfilling error', error)
-            raise error
-          ensure
-            log_info('Repository backfilling finished', total_loops: loops, duration: Time.now.utc - start_time, reason: reason)
-          end
-        end
-      end
-
       private
 
       attr_reader :scheduled_jobs
@@ -83,6 +33,44 @@ module Geo
         scheduled_jobs.size >= max_capacity
       end
 
+      def schedule_jobs
+        log_info('Repository backfilling started')
+        reason = :unknown
+
+        begin
+          connection.send_query("#{projects_ids_unsynced.to_sql};#{project_ids_updated_recently.to_sql}")
+          connection.set_single_row_mode
+
+          reason = loop do
+            break :node_disabled unless node_enabled?
+            break :over_time if over_time?
+            break :lease_lost unless renew_lease!
+
+            update_jobs_in_progress
+
+            unless over_capacity?
+              # This will stream the results one by one
+              # until there are no more results to fetch.
+              result = connection.get_result
+              break :complete if result.nil?
+
+              result.check
+              result.each do |row|
+                schedule_job(row['id'])
+              end
+            else
+              sleep(1)
+            end
+          end
+        rescue => error
+          reason = :error
+          log_error('Repository backfilling error', error)
+          raise error
+        ensure
+          log_info('Repository backfilling finished', total_loops: loops, duration: Time.now.utc - start_time, reason: reason)
+        end
+      end
+
       def schedule_job(project_id)
         job_id = Geo::ProjectSyncWorker.perform_async(project_id, sync_repository: true, sync_wiki: true)
 
@@ -92,6 +80,10 @@ module Geo
         else
           log_info("Repository could not be scheduled for backfilling", project_id: project_id)
         end
+      end
+
+      def scheduled_job_ids
+        scheduled_jobs.map { |data| data[:job_id] }
       end
 
       def update_jobs_in_progress
@@ -104,10 +96,6 @@ module Geo
         @scheduled_jobs = Gitlab::SidekiqStatus.job_status(scheduled_job_ids).then do |status|
           @scheduled_jobs.zip(status).map { |(job, running)| job if running }.compact
         end
-      end
-
-      def scheduled_job_ids
-        scheduled_jobs.map { |data| data[:job_id] }
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
