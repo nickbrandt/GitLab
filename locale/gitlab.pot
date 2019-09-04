@@ -13482,6 +13482,9 @@ msgstr ""
 msgid "Select a group to invite"
 msgstr ""
 
+msgid "Select a label"
+msgstr ""
+
 msgid "Select a namespace to fork the project"
 msgstr ""
 
