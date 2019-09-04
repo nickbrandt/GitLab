@@ -17,12 +17,8 @@ module Projects
       private
 
       def project_without_auth
-        return @project if @project
-
-        namespace = params[:namespace_id]
-        id = params[:project_id]
-
-        @project = Project.find_by_full_path("#{namespace}/#{id}")
+        @project ||= Project
+          .find_by_full_path("#{params[:namespace_id]}/#{params[:project_id]}")
       end
 
       def check_generic_alert_endpoint_feature_flag!
