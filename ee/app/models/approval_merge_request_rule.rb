@@ -43,7 +43,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
   enum rule_type: {
     regular: 1,
     code_owner: 2,
-    report_approver: 3
+    report_approver: 3,
+    any_approver: 4
   }
 
   enum report_type: {
