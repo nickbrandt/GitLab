@@ -9,8 +9,7 @@ module API
     resource :container_registry_event do
       helpers do
         def authenticate_registry_notification!
-          endpoint = Gitlab.config.registry.notifications.find { |e| e['name'] == 'geo_event'}
-          secret_token = endpoint['headers']['Authorization']
+          secret_token = Gitlab.config.registry.notification_secret
 
           unauthorized! unless Devise.secure_compare(secret_token, headers['Authorization'])
         end
