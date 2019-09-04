@@ -21,6 +21,7 @@ describe PostReceive do
       let(:fake_hook_data) { Hash.new(event_name: 'repository_update') }
 
       before do
+        allow(RepositoryPushAuditEventWorker).to receive(:perform_async)
         allow_any_instance_of(Gitlab::DataBuilder::Repository).to receive(:update).and_return(fake_hook_data)
         # silence hooks so we can isolate
         allow_any_instance_of(Key).to receive(:post_create_hook).and_return(true)
@@ -31,6 +32,48 @@ describe PostReceive do
 
         expect_next_instance_of(Git::BranchPushService) do |service|
           expect(service).to receive(:execute).and_return(true)
+        end
+      end
+
+      context 'when DB is readonly' do
+        before do
+          allow(Gitlab::Database).to receive(:read_only?) { true }
+        end
+
+        it 'does not call RepositoryPushAuditEventWorker' do
+          expect(::RepositoryPushAuditEventWorker).not_to receive(:perform_async)
+
+          described_class.new.perform(gl_repository, key_id, base64_changes)
+        end
+      end
+
+      context 'when DB is not readonly' do
+        before do
+          allow(Gitlab::Database).to receive(:read_only?) { false }
+        end
+
+        it 'calls RepositoryPushAuditEventWorker' do
+          expected_changes = [
+            { after: '789012', before: '123456', ref: 'refs/heads/tést' },
+            { after: '210987', before: '654321', ref: 'refs/tags/tag' }
+          ]
+
+          expect(::RepositoryPushAuditEventWorker).to receive(:perform_async)
+            .with(expected_changes, project.id, project.owner.id)
+
+          described_class.new.perform(gl_repository, key_id, base64_changes)
+        end
+
+        context 'when feature flag is off' do
+          before do
+            stub_feature_flags(repository_push_audit_event: false)
+          end
+
+          it 'does not call RepositoryPushAuditEventWorker' do
+            expect(::RepositoryPushAuditEventWorker).not_to receive(:perform_async)
+
+            described_class.new.perform(gl_repository, key_id, base64_changes)
+          end
         end
       end
 

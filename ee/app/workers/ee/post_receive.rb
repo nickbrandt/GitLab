@@ -13,8 +13,14 @@ module EE
     def after_project_changes_hooks(post_received, user, refs, changes)
       super
 
+      project = post_received.project
+
+      if audit_push?(project)
+        ::RepositoryPushAuditEventWorker.perform_async(changes, project.id, user.id)
+      end
+
       if ::Gitlab::Geo.primary?
-        ::Geo::RepositoryUpdatedService.new(post_received.project.repository, refs: refs, changes: changes).execute
+        ::Geo::RepositoryUpdatedService.new(project.repository, refs: refs, changes: changes).execute
       end
     end
 
@@ -24,6 +30,10 @@ module EE
       if ::Gitlab::Geo.primary?
         ::Geo::RepositoryUpdatedService.new(post_received.project.wiki.repository).execute
       end
+    end
+
+    def audit_push?(project)
+      project.push_audit_events_enabled? && !::Gitlab::Database.read_only?
     end
   end
 end

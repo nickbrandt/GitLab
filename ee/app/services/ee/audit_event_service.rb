@@ -84,13 +84,15 @@ module EE
     end
 
     def security_event
+      prepare_security_event
+
+      super if enabled?
+    end
+
+    def prepare_security_event
       if admin_audit_log_enabled?
         add_security_event_admin_details!
-
-        return super
       end
-
-      super if audit_events_enabled? || entity_audit_events_enabled?
     end
 
     def unauth_security_event
@@ -113,6 +115,12 @@ module EE
 
     def for_group
       for_custom_model('group', @entity.full_path)
+    end
+
+    def enabled?
+      admin_audit_log_enabled? ||
+        audit_events_enabled? ||
+        entity_audit_events_enabled?
     end
 
     def entity_audit_events_enabled?

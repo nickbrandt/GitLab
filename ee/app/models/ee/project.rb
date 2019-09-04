@@ -237,6 +237,10 @@ module EE
         (::Feature.enabled?(feature) && feature_available?(feature))
     end
 
+    def push_audit_events_enabled?
+      ::Feature.enabled?(:repository_push_audit_event, self)
+    end
+
     def feature_available?(feature, user = nil)
       if ::ProjectFeature::FEATURES.include?(feature)
         super
