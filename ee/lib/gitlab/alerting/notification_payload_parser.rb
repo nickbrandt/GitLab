@@ -42,12 +42,14 @@ module Gitlab
         payload[:hosts] && Array(payload[:hosts])
       end
 
-      def starts_at
-        payload[:start_time].presence || current_time
+      def current_time
+        Time.current.change(usec: 0).rfc3339
       end
 
-      def current_time
-        Time.now.change(usec: 0).rfc3339
+      def starts_at
+        DateTime.parse(payload[:start_time].to_s).rfc3339
+      rescue ArgumentError
+        current_time
       end
     end
   end

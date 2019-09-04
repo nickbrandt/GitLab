@@ -4,7 +4,7 @@ require 'fast_spec_helper'
 
 describe Gitlab::Alerting::NotificationPayloadParser do
   describe '.call' do
-    let(:starts_at) { Time.now.change(usec: 0) }
+    let(:starts_at) { Time.current.change(usec: 0) }
     let(:payload) do
       {
         'title' => 'alert title',
@@ -50,6 +50,16 @@ describe Gitlab::Alerting::NotificationPayloadParser do
 
       it 'returns hosts as an array of one element' do
         expect(subject['annotations']['hosts']).to eq(['gitlab.com'])
+      end
+    end
+
+    context 'when the time is in unsupported format' do
+      before do
+        payload[:start_time] = 'invalid/date/format'
+      end
+
+      it 'sets startsAt to a currurrent time in RFC3339 format' do
+        expect(subject['startsAt']).to eq(starts_at.rfc3339)
       end
     end
 
