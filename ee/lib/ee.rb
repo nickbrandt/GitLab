@@ -3,4 +3,5 @@
 module EE
   SUBSCRIPTIONS_URL = 'https://customers.gitlab.com'.freeze
   SUBSCRIPTIONS_PLANS_URL = "#{SUBSCRIPTIONS_URL}/plans".freeze
+  SUBSCRIPTIONS_MORE_MINUTES_URL = "#{SUBSCRIPTIONS_URL}/buy_pipeline_minutes".freeze
 end

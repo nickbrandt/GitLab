@@ -22,7 +22,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
         visit project_job_path(project, job)
         wait_for_requests
 
-        expect(page).to have_content('You have used all your shared Runners pipeline minutes.')
+        expect(page).to have_content('You have used 1000 out of 500 of your shared Runners pipeline minutes.')
       end
     end
 
@@ -34,7 +34,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
         visit project_job_path(project, job)
         wait_for_requests
 
-        expect(page).not_to have_content('You have used all your shared Runners pipeline minutes.')
+        expect(page).not_to have_content('You have used 1000 out of 500 of your shared Runners pipeline minutes.')
       end
     end
   end

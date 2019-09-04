@@ -1,54 +1,87 @@
-import Vue from 'vue';
 import component from 'ee/jobs/components/shared_runner_limit_block.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlButton } from '@gitlab/ui';
 import { trimText } from 'spec/helpers/text_helper';
 
+const localVue = createLocalVue();
+
 describe('Shared Runner Limit Block', () => {
-  const Component = Vue.extend(component);
-  let vm;
+  let wrapper;
+
+  const Component = localVue.extend(component);
+  const runnersPath = 'root/project/runners';
+  const projectPath = 'h5bp/html5-boilerplate';
+  const subscriptionsMoreMinutesUrl = 'https://customers.gitlab.com/buy_pipeline_minutes';
+
+  const factory = (options = {}) => {
+    wrapper = shallowMount(Component, {
+      localVue,
+      sync: false,
+      ...options,
+    });
+  };
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('quota information', () => {
-    it('renders provided quota limit and used quota', () => {
-      vm = mountComponent(Component, {
-        quotaUsed: 1000,
-        quotaLimit: 4000,
-        runnersPath: 'root/project/runners',
+    beforeEach(() => {
+      factory({
+        propsData: {
+          quotaUsed: 1000,
+          quotaLimit: 4000,
+          runnersPath,
+          projectPath,
+          subscriptionsMoreMinutesUrl,
+        },
       });
+    });
 
-      expect(vm.$el.textContent).toContain(
-        'You have used all your shared Runners pipeline minutes.',
+    it('renders provided quota limit and used quota', () => {
+      expect(wrapper.text()).toContain(
+        'You have used 1000 out of 4000 of your shared Runners pipeline minutes',
       );
+    });
 
-      expect(vm.$el.textContent).toContain('1000 of 4000');
+    it('renders call to action gl-button with the right href', () => {
+      const glButton = wrapper.find(GlButton);
+
+      expect(glButton.isVisible()).toBe(true);
+      expect(glButton.attributes('variant')).toBe('danger');
+      expect(glButton.attributes('href')).toBe(subscriptionsMoreMinutesUrl);
     });
   });
 
   describe('with runnersPath', () => {
     it('renders runner link', () => {
-      vm = mountComponent(Component, {
-        quotaUsed: 1000,
-        quotaLimit: 4000,
-        runnersPath: 'root/project/runners',
+      factory({
+        propsData: {
+          quotaUsed: 1000,
+          quotaLimit: 4000,
+          projectPath,
+          runnersPath,
+          subscriptionsMoreMinutesUrl,
+        },
       });
 
-      expect(trimText(vm.$el.textContent)).toContain(
-        'For more information, go to the Runners page.',
-      );
+      expect(trimText(wrapper.text())).toContain('For more information, go to the Runners page.');
     });
   });
 
   describe('without runnersPath', () => {
-    it('does not renbder runner link', () => {
-      vm = mountComponent(Component, {
-        quotaUsed: 1000,
-        quotaLimit: 4000,
+    it('does not render runner link', () => {
+      factory({
+        propsData: {
+          quotaUsed: 1000,
+          quotaLimit: 4000,
+          projectPath,
+          subscriptionsMoreMinutesUrl,
+        },
       });
 
-      expect(trimText(vm.$el.textContent)).not.toContain(
+      expect(trimText(wrapper.element.textContent)).not.toContain(
         'For more information, go to the Runners page.',
       );
     });
