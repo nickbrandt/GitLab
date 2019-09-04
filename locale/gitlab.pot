@@ -3861,6 +3861,9 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
+msgid "Configure"
+msgstr ""
+
 msgid "Configure GitLab runners to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
@@ -4795,6 +4798,9 @@ msgstr ""
 msgid "Deploy key was successfully updated."
 msgstr ""
 
+msgid "Deploy progress not found. To see pods, ensure your environment matches %{linkStart}deploy board criteria%{linkEnd}."
+msgstr ""
+
 msgid "Deploy to..."
 msgstr ""
 
@@ -5512,6 +5518,9 @@ msgstr ""
 msgid "Ensure connectivity is available from the GitLab server to the Prometheus server"
 msgstr ""
 
+msgid "Ensure your %{linkStart}environment is part of the deploy stage%{linkEnd} of your CI pipeline to track deployments to your cluster."
+msgstr ""
+
 msgid "Enter IP address range"
 msgstr ""
 
@@ -5555,6 +5564,9 @@ msgid "Enter zen mode"
 msgstr ""
 
 msgid "EnviornmentDashboard|You are looking at the last updated environment"
+msgstr ""
+
+msgid "Environment"
 msgstr ""
 
 msgid "Environment variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. Additionally, they can be masked so they are hidden in job logs, though they must match certain regexp requirements to do so. You can use environment variables for passwords, secret keys, or whatever you want."
@@ -8823,6 +8835,9 @@ msgstr ""
 msgid "Learn more about custom project templates"
 msgstr ""
 
+msgid "Learn more about deploying to a cluster"
+msgstr ""
+
 msgid "Learn more about group-level project templates"
 msgstr ""
 
@@ -10079,6 +10094,9 @@ msgstr ""
 msgid "No data to display"
 msgstr ""
 
+msgid "No deployments found"
+msgstr ""
+
 msgid "No details available"
 msgstr ""
 
@@ -11141,6 +11159,9 @@ msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
+msgstr ""
+
+msgid "Pods in use"
 msgstr ""
 
 msgid "Preferences"
@@ -18291,6 +18312,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "deleted"
+msgstr ""
+
+msgid "deploy"
 msgstr ""
 
 msgid "design"

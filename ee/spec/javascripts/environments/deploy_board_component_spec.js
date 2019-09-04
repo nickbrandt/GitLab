@@ -44,7 +44,7 @@ describe('Deploy Board', () => {
 
       expect(
         instances[2].classList.contains(
-          `deploy-board-instance-${deployBoardMockData.instances[2].status}`,
+          `deployment-instance-${deployBoardMockData.instances[2].status}`,
         ),
       ).toBe(true);
     });

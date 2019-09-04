@@ -58,10 +58,10 @@ export default {
 
   computed: {
     cssClass() {
-      let cssClassName = `deploy-board-instance-${this.status}`;
+      let cssClassName = `deployment-instance-${this.status}`;
 
       if (!this.stable) {
-        cssClassName = `${cssClassName} deploy-board-instance-canary`;
+        cssClassName = `${cssClassName} deployment-instance-canary`;
       }
 
       return cssClassName;
@@ -79,7 +79,7 @@ export default {
     :class="cssClass"
     :data-title="tooltipText"
     :href="computedLogPath"
-    class="deploy-board-instance"
+    class="deployment-instance d-flex justify-content-center align-items-center"
     data-placement="top"
   >
   </a>

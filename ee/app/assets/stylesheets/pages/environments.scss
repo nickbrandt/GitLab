@@ -70,55 +70,6 @@
   }
 }
 
-.deploy-board-instance {
-  width: 15px;
-  height: 15px;
-  border-radius: 3px;
-  border-width: 1px;
-  border-style: solid;
-  margin: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &-running {
-    background-color: $green-100;
-    border-color: $green-400;
-
-    &:hover {
-      background-color: $green-300;
-      border-color: $green-500;
-    }
-  }
-
-  &-succeeded {
-    background-color: $green-50;
-    border-color: $green-400;
-  }
-
-  &-failed,
-  &-unknown {
-    background-color: $red-200;
-    border-color: $red-500;
-  }
-
-  &-pending {
-    background-color: $white-light;
-    border-color: $border-color;
-  }
-
-  &.deploy-board-instance-canary {
-    &::after {
-      width: 7px;
-      height: 7px;
-      border: 1px solid $white-light;
-      background-color: $orange-300;
-      border-radius: 50%;
-      content: '';
-    }
-  }
-}
-
 .deploy-board-icon {
   display: none;
 
