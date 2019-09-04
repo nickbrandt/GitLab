@@ -4,8 +4,6 @@ require 'fast_spec_helper'
 
 describe Gitlab::Alerting::NotificationPayloadParser do
   describe '.call' do
-    subject { described_class.call(payload) }
-
     let(:starts_at) { Time.now.change(usec: 0) }
     let(:payload) do
       {
@@ -17,6 +15,8 @@ describe Gitlab::Alerting::NotificationPayloadParser do
         'hosts' => ['gitlab.com']
       }
     end
+
+    subject { described_class.call(payload) }
 
     it 'returns Prometheus-like payload' do
       is_expected.to eq(

@@ -11,8 +11,6 @@ describe Projects::Alerting::NotifyService do
   end
 
   describe '#execute' do
-    subject { service.execute }
-
     let(:starts_at) { Time.now.change(usec: 0) }
     let(:service) { described_class.new(project, nil, payload) }
     let(:payload_raw) do
@@ -22,6 +20,8 @@ describe Projects::Alerting::NotifyService do
       }
     end
     let(:payload) { ActionController::Parameters.new(payload_raw).permit! }
+
+    subject { service.execute }
 
     context 'with license' do
       before do
