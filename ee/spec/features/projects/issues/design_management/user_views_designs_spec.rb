@@ -3,8 +3,8 @@ require 'spec_helper'
 describe 'User views issue designs', :js do
   include DesignManagementTestHelpers
 
-  let(:project) { create(:project_empty_repo, :public) }
-  let(:issue) { create(:issue, project: project) }
+  set(:project) { create(:project_empty_repo, :public) }
+  set(:issue) { create(:issue, project: project) }
 
   before do
     enable_design_management

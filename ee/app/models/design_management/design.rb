@@ -130,10 +130,18 @@ module DesignManagement
       strong_memoize(:head_sha) { versions.ordered.first }
     end
 
+    def allow_dangerous_images?
+      Feature.enabled?(:design_management_allow_dangerous_images, project)
+    end
+
+    def valid_file_extensions
+      allow_dangerous_images? ? (SAFE_IMAGE_EXT + DANGEROUS_IMAGE_EXT) : SAFE_IMAGE_EXT
+    end
+
     def validate_file_is_image
-      unless image?
+      unless image? || (dangerous_image? && allow_dangerous_images?)
         message = _("Only these extensions are supported: %{extension_list}") % {
-          extension_list: Gitlab::FileTypeDetection::IMAGE_EXT.join(", ")
+          extension_list: valid_file_extensions.to_sentence
         }
         errors.add(:filename, message)
       end
