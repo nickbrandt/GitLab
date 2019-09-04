@@ -21,32 +21,34 @@ describe API::MergeRequestApprovals do
       end
 
       it 'returns source rule details' do
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['rules'].size).to eq(1)
-
-        rule_response = json_response['rules'].first
-
-        expect(rule_response['source_rule']['approvals_required']).to eq(source_rule.approvals_required)
+        expect(json_response['rules'].first['source_rule']['approvals_required']).to eq(source_rule.approvals_required)
       end
     end
 
-    context 'when user cannot view a group included in groups' do
-      let(:private_group) { create(:group, :private) }
-
+    context 'when rule has groups' do
       before do
-        rule.groups << private_group
+        rule.groups << group
 
         get api(url, user)
       end
 
-      it 'excludes private groups' do
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['rules'].size).to eq(1)
+      context 'when user can view a group' do
+        let(:group) { create(:group) }
 
-        rule_response = json_response['rules'].first
+        it 'includes group' do
+          rule = json_response['rules'].first
 
-        expect(rule_response['id']).to eq(rule.id)
-        expect(rule_response['groups'].size).to eq(0)
+          expect(rule['groups'].size).to eq(1)
+          expect(rule['groups']).to match([hash_including('id' => group.id)])
+        end
+      end
+
+      context 'when user cannot view a group included in groups' do
+        let(:group) { create(:group, :private) }
+
+        it 'excludes private groups' do
+          expect(json_response['rules'].first['groups'].size).to eq(0)
+        end
       end
     end
   end
