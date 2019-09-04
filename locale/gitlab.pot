@@ -1028,6 +1028,9 @@ msgstr ""
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
 msgstr ""
 
+msgid "AdminDashboard|Error loading the statistics. Please try again"
+msgstr ""
+
 msgid "AdminNote|Note"
 msgstr ""
 
@@ -1074,6 +1077,30 @@ msgid "AdminSettings|The required pipeline configuration can be selected from th
 msgstr ""
 
 msgid "AdminSettings|When creating a new environment variable it will be protected by default."
+msgstr ""
+
+msgid "AdminStatistics|Active Users"
+msgstr ""
+
+msgid "AdminStatistics|Forks"
+msgstr ""
+
+msgid "AdminStatistics|Issues"
+msgstr ""
+
+msgid "AdminStatistics|Merge Requests"
+msgstr ""
+
+msgid "AdminStatistics|Milestones"
+msgstr ""
+
+msgid "AdminStatistics|Notes"
+msgstr ""
+
+msgid "AdminStatistics|SSH Keys"
+msgstr ""
+
+msgid "AdminStatistics|Snippets"
 msgstr ""
 
 msgid "AdminUsers|2FA Disabled"
@@ -14381,6 +14408,9 @@ msgstr ""
 msgid "Star a label to make it a priority label. Order the prioritized labels to change their relative priority, by dragging."
 msgstr ""
 
+msgid "Star labels to start sorting by priority"
+msgstr ""
+
 msgid "Star toggle failed. Try again later."
 msgstr ""
 
@@ -14481,6 +14511,9 @@ msgid "Starts at (UTC)"
 msgstr ""
 
 msgid "State your message to activate"
+msgstr ""
+
+msgid "Statistics"
 msgstr ""
 
 msgid "Status"
