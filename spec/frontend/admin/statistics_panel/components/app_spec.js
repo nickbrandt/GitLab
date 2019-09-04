@@ -1,5 +1,7 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import StatisticsPanelApp from '~/admin/statistics_panel/components/app.vue';
 import statisticsLabels from '~/admin/statistics_panel/constants';
@@ -13,6 +15,7 @@ localVue.use(Vuex);
 describe('Admin statistics app', () => {
   let wrapper;
   let store;
+  let axiosMock;
 
   const createComponent = () => {
     wrapper = shallowMount(StatisticsPanelApp, {
@@ -23,6 +26,8 @@ describe('Admin statistics app', () => {
   };
 
   beforeEach(() => {
+    axiosMock = new AxiosMockAdapter(axios);
+    axiosMock.onGet(/api\/(.*)\/application\/statistics/).reply(200);
     store = createStore();
   });
 
