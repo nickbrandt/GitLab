@@ -14,11 +14,10 @@ import { n__, s__, sprintf } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
 import { GlLoadingIcon, GlLink } from '@gitlab/ui';
-import instanceComponent from './deploy_board_instance_component.vue';
 
 export default {
   components: {
-    instanceComponent,
+    instanceComponent: () => import('ee_component/vue_shared/components/deployment_instance.vue'),
     GlLoadingIcon,
     GlLink,
   },

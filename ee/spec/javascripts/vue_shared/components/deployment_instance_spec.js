@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import DeployBoardInstance from 'ee/environments/components/deploy_board_instance_component.vue';
-import { folder } from './mock_data';
+import DeployBoardInstance from 'ee/vue_shared/components/deployment_instance.vue';
+import { folder } from '../../environments/mock_data';
 
 describe('Deploy Board Instance', () => {
   let DeployBoardInstanceComponent;
@@ -18,7 +18,7 @@ describe('Deploy Board Instance', () => {
       },
     }).$mount();
 
-    expect(component.$el.classList.contains('deploy-board-instance-ready')).toBe(true);
+    expect(component.$el.classList.contains('deployment-instance-ready')).toBe(true);
     expect(component.$el.getAttribute('data-title')).toEqual('This is a pod');
   });
 
@@ -30,7 +30,7 @@ describe('Deploy Board Instance', () => {
       },
     }).$mount();
 
-    expect(component.$el.classList.contains('deploy-board-instance-deploying')).toBe(true);
+    expect(component.$el.classList.contains('deployment-instance-deploying')).toBe(true);
     expect(component.$el.getAttribute('data-title')).toEqual('');
   });
 
@@ -43,7 +43,7 @@ describe('Deploy Board Instance', () => {
       },
     }).$mount();
 
-    expect(component.$el.classList.contains('deploy-board-instance-canary')).toBe(true);
+    expect(component.$el.classList.contains('deployment-instance-canary')).toBe(true);
   });
 
   it('should have a log path computed with a pod name as a parameter', () => {
