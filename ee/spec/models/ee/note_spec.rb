@@ -80,4 +80,14 @@ describe Note do
       expect(note).to be_for_design
     end
   end
+
+  describe '.by_humans' do
+    it 'return human notes only' do
+      user_note = create(:note)
+      create(:system_note)
+      create(:note, author: create(:user, :bot))
+
+      expect(described_class.by_humans).to match_array([user_note])
+    end
+  end
 end
