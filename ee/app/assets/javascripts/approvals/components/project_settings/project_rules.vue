@@ -4,10 +4,12 @@ import { n__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import VulnerabilityCheckPopover from '../vulnerability_check_popover.vue';
+import LicenseCheckPopover from '../license_check_popover.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
 
 const VULNERABILITY_CHECK_NAME = 'Vulnerability-Check';
+const LICENSE_CHECK_NAME = 'License-Check';
 
 export default {
   components: {
@@ -16,6 +18,7 @@ export default {
     Rules,
     UserAvatarList,
     VulnerabilityCheckPopover,
+    LicenseCheckPopover,
   },
   computed: {
     ...mapState(['settings']),
@@ -61,6 +64,9 @@ export default {
     showVulnerabilityCheckPopover(rule) {
       return rule.name === VULNERABILITY_CHECK_NAME;
     },
+    showLicenseCheckPopover(rule) {
+      return rule.name === LICENSE_CHECK_NAME;
+    },
   },
 };
 </script>
@@ -80,6 +86,7 @@ export default {
       <td v-if="settings.allowMultiRule" class="d-none d-sm-table-cell js-name">
         {{ rule.name }}
         <vulnerability-check-popover v-if="showVulnerabilityCheckPopover(rule)" />
+        <license-check-popover v-if="showLicenseCheckPopover(rule)" />
       </td>
       <td class="d-none d-sm-table-cell js-members">
         <user-avatar-list :items="rule.approvers" :img-size="24" />
