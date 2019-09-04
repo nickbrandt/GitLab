@@ -14,6 +14,14 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
     stub_healthy_shards(shard_name)
   end
 
+  it 'disables Sidekiq retries' do
+    expect(subject.sidekiq_options_hash).to eq(
+      'retry' => false,
+      'queue' => 'geo:geo_secondary_repository_backfill',
+      'queue_namespace' => :geo
+    )
+  end
+
   describe '#perform' do
     it 'does not schedule jobs when Geo database is not configured' do
       create(:project)
