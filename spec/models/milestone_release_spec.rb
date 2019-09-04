@@ -15,7 +15,14 @@ describe MilestoneRelease do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_uniqueness_of(:milestone_id).scoped_to(:release_id) }
+    context 'when trying to create the same record in milestone_releases twice' do
+      it 'is not committing on the second time' do
+        described_class.create!(milestone_id: milestone.id, release_id: release.id)
+        expect do
+          described_class.create!(milestone_id: milestone.id, release_id: release.id)
+        end.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
 
     context 'when milestone and release do not have the same project' do
       it 'is not valid' do
