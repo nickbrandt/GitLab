@@ -1,6 +1,7 @@
 import createState from 'ee/security_dashboard/store/modules/filters/state';
 import * as types from 'ee/security_dashboard/store/modules/filters/mutation_types';
 import mutations from 'ee/security_dashboard/store/modules/filters/mutations';
+import { ALL } from 'ee/security_dashboard/store/modules/filters/constants';
 
 describe('filters module mutations', () => {
   let state;
@@ -32,7 +33,7 @@ describe('filters module mutations', () => {
         optionId: criticalOption.id,
       });
 
-      expect(state.filters[0].selection).toEqual(new Set(['all']));
+      expect(state.filters[0].selection).toEqual(new Set([ALL]));
     });
 
     describe('on subsequent changes', () => {
@@ -69,7 +70,7 @@ describe('filters module mutations', () => {
     it('should set options to `all` if no payload is given', () => {
       mutations[types.SET_ALL_FILTERS](state);
 
-      const expected = new Set(['all']);
+      const expected = new Set([ALL]);
 
       state.filters.forEach(filter => {
         expect(filter.selection).toEqual(expected);
@@ -81,7 +82,7 @@ describe('filters module mutations', () => {
         [severityFilter.id]: [],
       });
 
-      const expected = new Set(['all']);
+      const expected = new Set([ALL]);
 
       expect(state.filters[0].selection).toEqual(expected);
     });

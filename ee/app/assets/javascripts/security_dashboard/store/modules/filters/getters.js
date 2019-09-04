@@ -1,4 +1,5 @@
 import { sprintf, __ } from '~/locale';
+import { isBaseFilterOption } from './utils';
 
 export const getFilter = state => filterId => state.filters.find(filter => filter.id === filterId);
 
@@ -22,13 +23,13 @@ export const getSelectedOptionNames = (state, getters) => filterId => {
 
 /**
  * Loops through all the filters and returns all the active ones
- * stripping out any that are set to 'all'
+ * stripping out base filter options.
  * @returns Object
  * e.g. { type: ['sast'], severity: ['high', 'medium'] }
  */
 export const activeFilters = state => {
   const filters = state.filters.reduce((acc, filter) => {
-    acc[filter.id] = [...Array.from(filter.selection)].filter(option => option !== 'all');
+    acc[filter.id] = [...Array.from(filter.selection)].filter(id => !isBaseFilterOption(id));
     return acc;
   }, {});
   // hide_dismissed is hardcoded as it currently is an edge-case, more info in the MR:
