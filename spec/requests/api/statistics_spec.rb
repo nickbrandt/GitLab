@@ -4,7 +4,19 @@ require 'spec_helper'
 
 describe API::Statistics, 'Statistics' do
   include ProjectForksHelper
-  TABLES_TO_ANALYZE = %w[projects users namespaces issues merge_requests notes snippets fork_networks fork_network_members keys milestones].freeze
+  TABLES_TO_ANALYZE = %w[
+    projects
+    users
+    namespaces
+    issues
+    merge_requests
+    notes
+    snippets
+    fork_networks
+    fork_network_members
+    keys
+    milestones
+  ].freeze
 
   let(:path) { "/application/statistics" }
 
