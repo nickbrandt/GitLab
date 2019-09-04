@@ -25,7 +25,9 @@ module Resolvers
     type Types::EpicType, null: true
 
     def resolve(**args)
-      return [] unless object.present?
+      @resolver_object = object.respond_to?(:sync) ? object.sync : object
+
+      return [] unless resolver_object.present?
       return [] unless epic_feature_enabled?
 
       validate_date_params!(args)
@@ -34,6 +36,8 @@ module Resolvers
     end
 
     private
+
+    attr_reader :resolver_object
 
     def find_epics(args)
       EpicsFinder.new(context[:current_user], args).execute
@@ -62,17 +66,17 @@ module Resolvers
       transformed
     end
 
-    # `object` refers to the object we're currently querying on, and is usually a `Group`
+    # `resolver_object` refers to the object we're currently querying on, and is usually a `Group`
     # when querying an Epic.  In the case of field that uses this resolver, for example
-    # an Epic's `children` field, then `object` is an `EpicPresenter` (rather than an Epic).
+    # an Epic's `children` field, then `resolver_object` is an `EpicPresenter` (rather than an Epic).
     # But that's the epic we need in order to scope the find to only children of this epic,
     # using the `parent_id`
     def parent
-      object if object.is_a?(EpicPresenter)
+      resolver_object if resolver_object.is_a?(EpicPresenter)
     end
 
     def group
-      return object if object.is_a?(Group)
+      return resolver_object if resolver_object.is_a?(Group)
 
       parent.group
     end

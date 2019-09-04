@@ -10,7 +10,7 @@ module Resolvers
                             'If argument is omitted or nil then all designs will reflect the latest version.'
 
       def resolve(at_version: nil)
-        version = at_version ? GitlabSchema.object_from_id(at_version) : nil
+        version = at_version ? GitlabSchema.object_from_id(at_version)&.sync : nil
 
         ::DesignManagement::DesignsFinder.new(
           object.issue,
