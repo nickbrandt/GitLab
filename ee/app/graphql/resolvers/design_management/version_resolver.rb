@@ -15,7 +15,7 @@ module Resolvers
         # for consistency we should only present versions up to the given
         # version here.
         at_version = Gitlab::Graphql::FindArgumentInParent.find(parent, :at_version, limit_depth: 4)
-        version = at_version ? GitlabSchema.object_from_id(at_version) : nil
+        version = at_version ? GitlabSchema.object_from_id(at_version).sync : nil
 
         ::DesignManagement::VersionsFinder.new(
           design_or_collection,

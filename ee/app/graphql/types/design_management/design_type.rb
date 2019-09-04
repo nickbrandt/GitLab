@@ -35,9 +35,10 @@ module Types
         # If no argument is found then a nil value for sha is fine
         # and the image displayed will be the latest version
         version_id = Gitlab::Graphql::FindArgumentInParent.find(parent, :at_version, limit_depth: 4)
-        sha = version_id ? GitlabSchema.object_from_id(version_id).sha : nil
+        sha = version_id ? GitlabSchema.object_from_id(version_id)&.sync&.sha : nil
 
         project = Gitlab::Graphql::Loaders::BatchModelLoader.new(Project, design.project_id).find
+        project = project&.sync
 
         Gitlab::Routing.url_helpers.project_design_url(project, design, sha)
       end
