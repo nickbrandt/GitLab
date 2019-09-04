@@ -9,18 +9,10 @@ module EE
       if ::Gitlab.com? && can?(current_user, :admin_project, project)
         message += " #{purchase_shared_runner_minutes_link}"
       elsif namespace.shared_runners_minutes_used?
-        message += s_('Pipelines|Pipelines will not run anymore on shared Runners.')
+        message += " #{s_('Pipelines|Pipelines will not run anymore on shared Runners.')}"
       end
 
       message.html_safe
-    end
-
-    def ci_usage_warning_class(namespace)
-      if EE::Namespace::CI_USAGE_ALERT_LEVELS.min == namespace.last_ci_minutes_usage_notification_level
-        'alert-danger'
-      else
-        'alert-warning'
-      end
     end
 
     private

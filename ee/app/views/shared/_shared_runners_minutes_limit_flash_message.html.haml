@@ -1,2 +1,3 @@
 = content_for :flash_message do
-  = render 'shared/shared_runners_minutes_limit', project: @project
+  %div{ class: container_class }
+    = render 'shared/shared_runners_minutes_limit', project: @project

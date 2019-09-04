@@ -10918,9 +10918,6 @@ msgstr ""
 msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
-msgid "Pipelines|Pipelines will not run anymore on shared Runners."
-msgstr ""
-
 msgid "Pipelines|Project cache successfully reset."
 msgstr ""
 
@@ -12307,6 +12304,9 @@ msgstr ""
 msgid "Pull"
 msgstr ""
 
+msgid "Purchase more minutes"
+msgstr ""
+
 msgid "Push"
 msgstr ""
 
@@ -13098,7 +13098,7 @@ msgstr ""
 msgid "Runners page."
 msgstr ""
 
-msgid "Runners|You have used all your shared Runners pipeline minutes."
+msgid "Runners|You have used %{quotaUsed} out of %{quotaLimit} of your shared Runners pipeline minutes."
 msgstr ""
 
 msgid "Running"
