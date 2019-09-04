@@ -111,10 +111,16 @@ describe Git::BranchPushService do
 
   context 'Jira Connect hooks' do
     set(:project) { create(:project, :repository) }
+    let(:branch_to_sync) { nil }
+    let(:commits_to_sync) { [] }
 
     shared_examples 'enqueues Jira sync worker' do
       it do
         Sidekiq::Testing.fake! do
+          expect(JiraConnect::SyncBranchWorker).to receive(:perform_async)
+            .with(project.id, branch_to_sync, commits_to_sync)
+            .and_call_original
+
           expect { subject.execute }.to change(JiraConnect::SyncBranchWorker.jobs, :size).by(1)
         end
       end
@@ -144,12 +150,15 @@ describe Git::BranchPushService do
           end
 
           context 'branch name contains Jira issue key' do
-            let(:ref) { 'refs/heads/branch-JIRA-123' }
+            let(:branch_to_sync) { 'branch-JIRA-123' }
+            let(:ref) { "refs/heads/#{branch_to_sync}" }
 
             it_behaves_like 'enqueues Jira sync worker'
           end
 
           context 'commit message contains Jira issue key' do
+            let(:commits_to_sync) { [newrev] }
+
             before do
               allow_any_instance_of(Commit).to receive(:safe_message).and_return('Commit with key JIRA-123')
             end
