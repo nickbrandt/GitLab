@@ -132,7 +132,7 @@ export default {
       <ul
         v-if="!isLoading"
         :class="{
-          'has-linked-pipelines': hasTriggered || hasTriggeredBy,
+          'inline js-has-linked-pipelines': hasTriggered || hasTriggeredBy,
         }"
         class="stage-column-list align-top"
       >
@@ -140,9 +140,10 @@ export default {
           v-for="(stage, index) in graph"
           :key="stage.name"
           :class="{
-            'has-upstream': index === 0 && hasTriggeredBy,
+            'has-upstream prepend-left-64': index === 0 && hasTriggeredBy,
             'has-downstream': index === graph.length - 1 && hasTriggered,
             'has-only-one-job': hasOnlyOneJob(stage),
+            'append-right-46': shouldAddRightMargin(index),
           }"
           :title="capitalizeStageName(stage.name)"
           :groups="stage.groups"

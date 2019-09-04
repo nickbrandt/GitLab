@@ -76,8 +76,8 @@ describe('graph component', () => {
         expect(firstStageColumnElement.classList.contains('left-margin')).toEqual(true);
       });
 
-      it('should include the has-linked-pipelines flag', () => {
-        expect(component.$el.querySelector('.has-linked-pipelines')).not.toBeNull();
+      it('should include the js-has-linked-pipelines flag', () => {
+        expect(component.$el.querySelector('.js-has-linked-pipelines')).not.toBeNull();
       });
     });
 

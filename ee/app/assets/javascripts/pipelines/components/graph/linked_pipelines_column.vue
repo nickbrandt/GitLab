@@ -21,7 +21,11 @@ export default {
   },
   computed: {
     columnClass() {
-      return `graph-position-${this.graphPosition}`;
+      const positionValues = {
+        right: 'prepend-left-64',
+        left: 'append-right-32',
+      };
+      return `graph-position-${this.graphPosition} ${positionValues[this.graphPosition]}`;
     },
   },
 };
