@@ -90,10 +90,14 @@ describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_gitlab
 
     it 'respects Geo secondary node max capacity per shard' do
       stub_healthy_shards([shard_name, 'shard2', 'shard3', 'shard4', 'shard5'])
-      allow(Geo::ProjectSyncWorker).to receive(:perform_async).twice.and_return('jid-123')
-      create_list(:project, 2)
+      project_1 = create(:project)
+      project_2 = create(:project)
+      allow(Geo::ProjectSyncWorker).to receive(:perform_async).with(project_1.id, anything).and_return('jid-1')
+      allow(Geo::ProjectSyncWorker).to receive(:perform_async).with(project_2.id, anything).and_return('jid-2')
+      allow(Gitlab::SidekiqStatus).to receive(:job_status).with(['jid-2']).and_return([true], [false])
+      allow(Gitlab::SidekiqStatus).to receive(:job_status).with(['jid-1']).and_return([false])
 
-      expect(subject).to receive(:sleep).twice.and_call_original
+      expect(subject).to receive(:sleep).once.and_call_original
 
       subject.perform(shard_name)
     end

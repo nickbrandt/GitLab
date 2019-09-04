@@ -31,17 +31,19 @@ module Geo
 
               update_jobs_in_progress
 
-              # This will stream the results one by one
-              # until there are no more results to fetch.
-              result = connection.get_result
-              break :complete if result.nil?
+              unless over_capacity?
+                # This will stream the results one by one
+                # until there are no more results to fetch.
+                result = connection.get_result
+                break :complete if result.nil?
 
-              result.check
-              result.each do |row|
-                schedule_job(row['id'])
+                result.check
+                result.each do |row|
+                  schedule_job(row['id'])
+                end
+              else
+                sleep(1)
               end
-
-              sleep(1) if over_capacity?
             end
           rescue => error
             reason = :error
@@ -93,12 +95,15 @@ module Geo
       end
 
       def update_jobs_in_progress
-        status = Gitlab::SidekiqStatus.job_status(scheduled_job_ids)
+        job_ids = scheduled_job_ids
+        return if job_ids.empty?
 
         # SidekiqStatus returns an array of booleans: true if the job is still running, false otherwise.
         # For each entry, first use `zip` to make { job_id: 123 } -> [ { job_id: 123 }, bool ]
         # Next, filter out the jobs that have completed.
-        @scheduled_jobs = @scheduled_jobs.zip(status).map { |(job, running)| job if running }.compact
+        @scheduled_jobs = Gitlab::SidekiqStatus.job_status(scheduled_job_ids).then do |status|
+          @scheduled_jobs.zip(status).map { |(job, running)| job if running }.compact
+        end
       end
 
       def scheduled_job_ids
