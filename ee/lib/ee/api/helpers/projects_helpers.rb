@@ -46,8 +46,7 @@ module EE
               :external_authorization_classification_label,
               :import_url,
               :packages_enabled,
-              :fallback_approvals_required,
-              :external_authorization_classification_label
+              :fallback_approvals_required
             ]
           end
         end
