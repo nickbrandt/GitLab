@@ -15,7 +15,7 @@ export const saveDraft = ({ dispatch }, draft) =>
 export const addDraftToDiscussion = ({ commit }, { endpoint, data }) =>
   service
     .addDraftToDiscussion(endpoint, data)
-    .then(res => res.json())
+    .then(res => res.data)
     .then(res => {
       commit(types.ADD_NEW_DRAFT, res);
       return res;
@@ -27,7 +27,7 @@ export const addDraftToDiscussion = ({ commit }, { endpoint, data }) =>
 export const createNewDraft = ({ commit }, { endpoint, data }) =>
   service
     .createNewDraft(endpoint, data)
-    .then(res => res.json())
+    .then(res => res.data)
     .then(res => {
       commit(types.ADD_NEW_DRAFT, res);
       return res;
@@ -47,7 +47,7 @@ export const deleteDraft = ({ commit, getters }, draft) =>
 export const fetchDrafts = ({ commit, getters }) =>
   service
     .fetchDrafts(getters.getNotesData.draftsPath)
-    .then(res => res.json())
+    .then(res => res.data)
     .then(data => commit(types.SET_BATCH_COMMENTS_DRAFTS, data))
     .catch(() => flash(__('An error occurred while fetching pending comments')));
 
@@ -95,7 +95,7 @@ export const updateDraft = ({ commit, getters }, { note, noteText, resolveDiscus
       note: noteText,
       resolveDiscussion,
     })
-    .then(res => res.json())
+    .then(res => res.data)
     .then(data => commit(types.RECEIVE_DRAFT_UPDATE_SUCCESS, data))
     .then(callback)
     .catch(() => flash(__('An error occurred while updating the comment')));
