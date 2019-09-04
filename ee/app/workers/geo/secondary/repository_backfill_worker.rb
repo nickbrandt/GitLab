@@ -48,7 +48,9 @@ module Geo
 
             update_jobs_in_progress
 
-            unless over_capacity?
+            if over_capacity?
+              sleep(1)
+            else
               # This will stream the results one by one
               # until there are no more results to fetch.
               result = connection.get_result
@@ -58,8 +60,6 @@ module Geo
               result.each do |row|
                 schedule_job(row['id'])
               end
-            else
-              sleep(1)
             end
           end
         rescue => error

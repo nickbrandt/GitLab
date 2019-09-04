@@ -37,6 +37,7 @@ module Geo
         @loops = 0
       end
 
+      # rubocop:disable Gitlab/ModuleWithInstanceVariables
       def perform(shard_name)
         @shard_name = shard_name
         @start_time = Time.now.utc
@@ -47,6 +48,7 @@ module Geo
           schedule_jobs
         end
       end
+      # rubocop:enable Gitlab/ModuleWithInstanceVariables
 
       private
 
