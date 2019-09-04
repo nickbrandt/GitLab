@@ -6,7 +6,7 @@ export default ({ container }) =>
   new Vue({
     el: container,
     components: {
-      performanceBarApp: () => import('./components/performance_bar_app.vue'),
+      PerformanceBarApp: () => import('./components/performance_bar_app.vue'),
     },
     data() {
       const performanceBarData = document.querySelector(this.$options.el).dataset;
