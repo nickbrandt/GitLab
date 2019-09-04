@@ -8404,16 +8404,13 @@ msgstr ""
 msgid "Issues, merge requests, pushes, and comments."
 msgstr ""
 
-msgid "IssuesAnalytics | Issues created"
-msgstr ""
-
 msgid "IssuesAnalytics|After you begin creating issues for your projects, we can start tracking and displaying metrics for them"
 msgstr ""
 
 msgid "IssuesAnalytics|Avg/Month:"
 msgstr ""
 
-msgid "IssuesAnalytics|Issues Created"
+msgid "IssuesAnalytics|Issues created"
 msgstr ""
 
 msgid "IssuesAnalytics|Issues created per month"

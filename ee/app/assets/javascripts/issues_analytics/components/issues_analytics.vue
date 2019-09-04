@@ -32,7 +32,7 @@ export default {
       seriesInfo: [
         {
           type: 'solid',
-          name: s__('IssuesAnalytics | Issues created'),
+          name: s__('IssuesAnalytics|Issues created'),
           color: '#1F78D1',
         },
       ],
@@ -146,7 +146,7 @@ export default {
         data-qa-selector="issues_analytics_graph"
         :data="{ Full: data }"
         :option="chartOptions"
-        :y-axis-title="s__('IssuesAnalytics|Issues Created')"
+        :y-axis-title="s__('IssuesAnalytics|Issues created')"
         :x-axis-title="s__('IssuesAnalytics|Last 12 months') + ' (' + chartDateRange + ')'"
         x-axis-type="category"
         @created="onCreated"
