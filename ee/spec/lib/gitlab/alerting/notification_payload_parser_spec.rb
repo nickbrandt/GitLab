@@ -56,9 +56,10 @@ describe Gitlab::Alerting::NotificationPayloadParser do
     context 'when payload is blank' do
       let(:payload) { {} }
 
-      it 'returns only default title' do
+      it 'returns default parameters' do
         is_expected.to eq(
-          'annotations' => { 'title' => 'New: Incident' }
+          'annotations' => { 'title' => 'New: Incident' },
+          'startsAt' => starts_at.rfc3339
         )
       end
     end

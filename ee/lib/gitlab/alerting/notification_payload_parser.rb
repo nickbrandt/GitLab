@@ -16,7 +16,7 @@ module Gitlab
       def call
         {
           'annotations' => annotations,
-          'startsAt' => payload[:start_time]
+          'startsAt' => starts_at
         }.compact
       end
 
@@ -40,6 +40,14 @@ module Gitlab
 
       def hosts
         payload[:hosts] && Array(payload[:hosts])
+      end
+
+      def starts_at
+        payload[:start_time].presence || current_time
+      end
+
+      def current_time
+        Time.now.change(usec: 0).rfc3339
       end
     end
   end
