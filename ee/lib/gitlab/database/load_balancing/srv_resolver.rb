@@ -3,6 +3,12 @@
 module Gitlab
   module Database
     module LoadBalancing
+      # Hostnames returned in SRV records cannot sometimes be resolved by a local
+      # resolver, however, there's a possibility that their A/AAAA records are
+      # returned as part of the SRV query in the additional section, so we try
+      # to extract the IPs from there first, failing back to querying the
+      # hostnames A/AAAA records one by one, using the same resolver that
+      # queried the SRV record.
       class SrvResolver
         include Gitlab::Utils::StrongMemoize
 
