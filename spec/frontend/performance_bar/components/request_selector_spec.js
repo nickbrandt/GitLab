@@ -1,6 +1,5 @@
-import Vue from 'vue';
-import requestSelector from '~/performance_bar/components/request_selector.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import RequestSelector from '~/performance_bar/components/request_selector.vue';
+import { shallowMount } from '@vue/test-utils';
 
 describe('request selector', () => {
   const requests = [
@@ -26,21 +25,18 @@ describe('request selector', () => {
     },
   ];
 
-  let vm;
-
-  beforeEach(() => {
-    vm = mountComponent(Vue.extend(requestSelector), {
+  const wrapper = shallowMount(RequestSelector, {
+    propsData: {
       requests,
       currentRequest: requests[1],
-    });
-  });
-
-  afterEach(() => {
-    vm.$destroy();
+    },
   });
 
   function optionText(requestId) {
-    return vm.$el.querySelector(`[value='${requestId}']`).innerText.trim();
+    return wrapper
+      .find(`[value='${requestId}']`)
+      .text()
+      .trim();
   }
 
   it('displays the last component of the path', () => {
@@ -56,13 +52,13 @@ describe('request selector', () => {
   });
 
   it('has a warning icon if any requests have warnings', () => {
-    expect(vm.$el.querySelector('span > gl-emoji').dataset.name).toEqual('warning');
+    expect(wrapper.find('span > gl-emoji').element.dataset.name).toEqual('warning');
   });
 
   it('adds a warning icon to requests with warnings', () => {
-    const option = vm.$el.querySelector('[value="abc"]');
+    const option = wrapper.find('[value="abc"]');
 
-    expect(option.querySelector('gl-emoji').dataset.name).toEqual('warning');
-    expect(option.innerText).toContain('discussions.json');
+    expect(option.find('gl-emoji').element.dataset.name).toEqual('warning');
+    expect(option.text()).toContain('discussions.json');
   });
 });
