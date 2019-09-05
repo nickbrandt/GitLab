@@ -3,6 +3,19 @@
 class JiraConnect::SubscriptionsController < JiraConnect::ApplicationController
   layout 'jira_connect'
 
+  content_security_policy do |p|
+    next if p.directives.blank?
+
+    # rubocop: disable Lint/PercentStringArray
+    script_src_values = Array.wrap(p.directives['script-src']) | %w('self' https://connect-cdn.atl-paas.net https://unpkg.com/jquery@3.3.1/)
+    style_src_values = Array.wrap(p.directives['style-src']) | %w('self' 'unsafe-inline' https://unpkg.com/@atlaskit/)
+    # rubocop: enable Lint/PercentStringArray
+
+    p.frame_ancestors :self, 'https://*.atlassian.net'
+    p.script_src(*script_src_values)
+    p.style_src(*style_src_values)
+  end
+
   before_action :allow_rendering_in_iframe, only: :index
   before_action :verify_qsh_claim!, only: :index
   before_action :authenticate_user!, only: :create
