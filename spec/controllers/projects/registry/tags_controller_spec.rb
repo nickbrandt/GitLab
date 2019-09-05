@@ -41,6 +41,7 @@ describe Projects::Registry::TagsController do
 
       it 'tracks the event' do
         expect(Gitlab::Tracking).to receive(:event).with(anything, 'list_tags', {})
+
         get_tags
       end
     end
@@ -107,8 +108,9 @@ describe Projects::Registry::TagsController do
         end
 
         it 'tracks the event' do
-          allow_any_instance_of(ContainerRegistry::Tag).to receive(:delete) { true }
-          expect(Gitlab::Tracking).to receive(:event).with(anything, 'delete_tag', {})
+          expect_delete_tags(%w[test.])
+          expect(controller).to receive(:track_event).with(:delete_tag)
+
           destroy_tag('test.')
         end
       end

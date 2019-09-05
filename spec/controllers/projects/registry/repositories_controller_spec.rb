@@ -42,6 +42,7 @@ describe Projects::Registry::RepositoriesController do
 
           it 'tracks the event' do
             expect(Gitlab::Tracking).to receive(:event).with(anything, 'list_repositories', {})
+
             go_to_index
           end
 
@@ -97,6 +98,7 @@ describe Projects::Registry::RepositoriesController do
           expect(DeleteContainerRepositoryWorker).to receive(:perform_async).with(user.id, repository.id)
 
           delete_repository(repository)
+
           expect(response).to have_gitlab_http_status(:no_content)
         end
 
