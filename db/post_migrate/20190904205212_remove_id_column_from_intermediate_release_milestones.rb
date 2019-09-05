@@ -6,6 +6,6 @@ class RemoveIdColumnFromIntermediateReleaseMilestones < ActiveRecord::Migration[
   DOWNTIME = false
 
   def change
-    remove_column :milestone_releases, :id
+    remove_column :milestone_releases, :id, :bigint
   end
 end
