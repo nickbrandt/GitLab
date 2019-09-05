@@ -3,9 +3,9 @@
 
 - if pipeline.expose_security_dashboard?
   %li.js-security-tab-link
-    = link_to security_project_pipeline_path(project, pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab qa-security-tab' do
+    = link_to security_project_pipeline_path(project, pipeline), data: { target: '#js-tab-security', action: 'security', toggle: 'tab' }, class: 'security-tab', 'data-qa-selector': 'security_tab' do
       = _("Security")
-      %span.badge.badge-pill.js-security-counter.hidden
+      %span.badge.badge-pill.js-security-counter.hidden{ 'data-qa-selector': 'security_counter' }
 
 - if pipeline.expose_license_management_data?
   %li.js-licenses-tab-link

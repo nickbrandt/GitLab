@@ -7,14 +7,12 @@ module QA::EE::Page
         page.module_eval do
           view 'ee/app/views/projects/pipelines/_tabs_holder.html.haml' do
             element :security_tab
+            element :security_counter
           end
 
-          view 'ee/app/assets/javascripts/vue_shared/security_reports/split_security_reports_app.vue' do
-            element :dependency_scanning_report
-          end
-
-          view 'app/assets/javascripts/reports/components/report_section.vue' do
-            element :expand_report_button
+          view 'ee/app/assets/javascripts/security_dashboard/components/filter.vue' do
+            element :filter_dropdown, ':data-qa-selector="qaSelector"' # rubocop:disable QA/ElementWithPattern
+            element :filter_dropdown_content
           end
         end
       end
@@ -23,13 +21,14 @@ module QA::EE::Page
         click_element(:security_tab)
       end
 
-      def has_dependency_report?
-        find_element(:dependency_scanning_report)
+      def has_vulnerability_count_of?(count)
+        find_element(:security_counter).has_content?(count)
       end
 
-      def expand_dependency_report
-        within_element(:dependency_scanning_report) do
-          click_element(:expand_report_button)
+      def filter_report_type(report)
+        find_element(:filter_report_type_dropdown).click
+        within_element(:filter_dropdown_content) do
+          click_on report
         end
       end
     end
