@@ -49,7 +49,6 @@ module Releases
 
       success(tag: tag, release: release)
     rescue => e
-      binding.pry
       error(e.message, 400)
     end
 

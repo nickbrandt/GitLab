@@ -83,5 +83,27 @@ describe Releases::UpdateService do
         expect(release.milestones).not_to be_present
       end
     end
+
+    context "when multiple new milestones are passed in" do
+      let(:old_title) { 'v1.0' }
+      let(:new_title_1) { 'v2.0' }
+      let(:new_title_2) { 'v2.0-rc' }
+      let(:milestone) { create(:milestone, project: project, title: old_title) }
+      let(:new_milestone_1) { create(:milestone, project: project, title: new_title_1) }
+      let!(:new_milestone_2) { create(:milestone, project: project, title: new_title_2) }
+      let(:params_with_milestones) { params.merge!({ milestones: [new_title_1, new_title_2] }) }
+
+      before do
+        release.milestones << milestone
+
+        described_class.new(new_milestone_1.project, user, params_with_milestones).execute
+        release.reload
+      end
+
+      it 'removes the old milestone and update the release with the new ones' do
+        expect(release.milestones.map(&:title)).to include(new_title_1, new_title_2)
+        expect(release.milestones.map(&:title)).not_to include(old_title)
+      end
+    end
   end
 end
