@@ -38,7 +38,7 @@ describe('CI Template Dropdown (ee/pages/admin/application_settings/ci_cd/ci_tem
   describe('Format dropdown list', () => {
     it('Adds a reset option and divider', () => {
       const expected = {
-        Reset: [{ name: 'No required pipeline', id: null }, 'divider'],
+        Reset: [{ name: 'No required pipeline', id: null }, { type: 'divider' }],
         ...DROPDOWN_DATA,
       };
       const actual = CiTemplateInstance.formatDropdownList();
