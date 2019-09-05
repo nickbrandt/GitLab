@@ -15,34 +15,49 @@ module Gitlab
 
           private
 
-          def endpoint_for_metric(metric)
-            proxy_path = query_type(metric)
-            query = query_for_metric(metric)
+          def admin_url(metric)
+            Gitlab::Routing.url_helpers.prometheus_api_admin_cluster_path(
+              params[:cluster],
+              proxy_path: query_type(metric),
+              query: query_for_metric(metric)
+            )
+          end
 
+          def endpoint_for_metric(metric)
             case params[:cluster_type]
             when :admin
-              Gitlab::Routing.url_helpers.prometheus_api_admin_cluster_path(
-                params[:cluster],
-                proxy_path: proxy_path,
-                query: query
-              )
+              admin_url(metric)
             when :group
-              Gitlab::Routing.url_helpers.prometheus_api_group_cluster_path(
-                params[:group],
-                params[:cluster],
-                proxy_path: proxy_path,
-                query: query
-              )
+              error!('Group is required when cluster_type is :group') unless params[:group]
+              group_url(metric)
             when :project
-              Gitlab::Routing.url_helpers.prometheus_api_project_cluster_path(
-                project,
-                params[:cluster],
-                proxy_path: proxy_path,
-                query: query
-              )
+              error!('Project is required when cluster_type is :project') unless project
+              project_url(metric)
             else
-              Errors::DashboardProcessingError.new('Unrecognized cluster type')
+              error!('Unrecognized cluster type')
             end
+          end
+
+          def error!(message)
+            raise Errors::DashboardProcessingError.new(message)
+          end
+
+          def group_url(metric)
+            Gitlab::Routing.url_helpers.prometheus_api_group_cluster_path(
+              params[:group],
+              params[:cluster],
+              proxy_path: query_type(metric),
+              query: query_for_metric(metric)
+            )
+          end
+
+          def project_url(metric)
+            Gitlab::Routing.url_helpers.prometheus_api_project_cluster_path(
+              project,
+              params[:cluster],
+              proxy_path: query_type(metric),
+              query: query_for_metric(metric)
+            )
           end
 
           def query_type(metric)
@@ -60,17 +75,6 @@ module Gitlab
           def verify_params
             raise Errors::DashboardProcessingError.new('Cluster is required for Stages::ClusterEndpointInserter') unless params[:cluster]
             raise Errors::DashboardProcessingError.new('Cluster type must be specificed for Stages::ClusterEndpointInserter') unless params[:cluster_type]
-
-            verify_type_params
-          end
-
-          def verify_type_params
-            case params[:cluster_type]
-            when :group
-              raise Errors::DashboardProcessingError.new('Group is required when cluster_type is :group') unless params[:group]
-            when :project
-              raise Errors::DashboardProcessingError.new('Project is required when cluster_type is :project') unless project
-            end
           end
         end
       end

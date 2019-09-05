@@ -31,22 +31,8 @@ describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_st
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }
 
-      # We want to alwaus return the system dashboard.
+      # We want to alwaus return the cluster dashboard.
       it_behaves_like 'valid dashboard service response'
-    end
-  end
-
-  describe '::all_dashboard_paths' do
-    it 'returns the dashboard attributes' do
-      all_dashboards = described_class.all_dashboard_paths(project)
-
-      expect(all_dashboards).to eq(
-        [{
-          path: described_class::CLUSTER_DASHBOARD_PATH,
-          display_name: described_class::CLUSTER_DASHBOARD_NAME,
-          default: true
-        }]
-      )
     end
   end
 end

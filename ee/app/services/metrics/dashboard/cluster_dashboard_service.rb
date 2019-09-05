@@ -8,17 +8,17 @@ module Metrics
       CLUSTER_DASHBOARD_PATH = 'ee/config/prometheus/cluster_metrics_new.yml'
       CLUSTER_DASHBOARD_NAME = 'Cluster'
 
-      class << self
-        def all_dashboard_paths(_project)
-          [{
-            path: CLUSTER_DASHBOARD_PATH,
-            display_name: CLUSTER_DASHBOARD_NAME,
-            default: true
-          }]
-        end
-      end
+      SEQUENCE = [
+        STAGES::CommonMetricsInserter,
+        STAGES::ClusterEndpointInserter,
+        STAGES::Sorter
+      ].freeze
 
       private
+
+      def cache_key
+        "metrics_dashboard_#{dashboard_path}"
+      end
 
       def dashboard_path
         CLUSTER_DASHBOARD_PATH
@@ -31,12 +31,8 @@ module Metrics
         YAML.safe_load(yml)
       end
 
-      def cache_key
-        "metrics_dashboard_#{dashboard_path}"
-      end
-
-      def insert_project_metrics?
-        false
+      def sequence
+        SEQUENCE
       end
     end
   end

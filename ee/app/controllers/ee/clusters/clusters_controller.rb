@@ -52,18 +52,18 @@ module EE
       
       def metrics_dashboard
         project_for_dashboard = defined?(project) ? project : nil
-        dashboard = dashboard_finder.find(project_for_dashboard, current_user, nil, metrics_dashboard_params)
+        dashboard = ::Gitlab::Metrics::Dashboard::Finder.find(project_for_dashboard, current_user, metrics_dashboard_params)
 
         respond_to do |format|
           if dashboard[:status] == :success
             format.json do
-              render status: :ok, json: dashboard.slice(:all_dashboards, :dashboard, :status)
+              render status: :ok, json: dashboard.slice(:dashboard, :status)
             end
           else
             format.json do
               render(
                 status: dashboard[:http_status],
-                json: dashboard.slice(:all_dashboards, :message, :status)
+                json: dashboard.slice(:message, :status)
               )
             end
           end
@@ -71,10 +71,6 @@ module EE
       end
 
       private
-
-      def dashboard_finder
-        ::Gitlab::Metrics::Dashboard::Finder
-      end
 
       def prometheus_adapter
         return unless cluster&.application_prometheus_available?

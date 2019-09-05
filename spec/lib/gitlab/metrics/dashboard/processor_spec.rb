@@ -8,8 +8,16 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
 
   describe 'process' do
-    let(:process_params) { [project, dashboard_yml, { environment: environment }] }
-    let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: true) }
+    let(:sequence) do
+      [
+        Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+        Gitlab::Metrics::Dashboard::Stages::ProjectMetricsInserter,
+        Gitlab::Metrics::Dashboard::Stages::EndpointInserter,
+        Gitlab::Metrics::Dashboard::Stages::Sorter
+      ]
+    end
+    let(:process_params) { [project, dashboard_yml, sequence, { environment: environment }] }
+    let(:dashboard) { described_class.new(*process_params).process }
 
     it 'includes a path for the prometheus endpoint with each metric' do
       expect(all_metrics).to satisfy_all do |metric|
@@ -54,7 +62,14 @@ describe Gitlab::Metrics::Dashboard::Processor do
       end
 
       context 'when the dashboard should not include project metrics' do
-        let(:dashboard) { described_class.new(*process_params).process(insert_project_metrics: false) }
+        let(:sequence) do
+          [
+            Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+            Gitlab::Metrics::Dashboard::Stages::EndpointInserter,
+            Gitlab::Metrics::Dashboard::Stages::Sorter
+          ]
+        end
+        let(:dashboard) { described_class.new(*process_params).process }
 
         it 'includes only dashboard metrics' do
           metrics = all_metrics.map { |m| m[:id] }
