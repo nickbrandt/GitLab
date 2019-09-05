@@ -243,7 +243,7 @@ export default class LabelsSelect {
             })
             .catch(() => flash(__('Error fetching labels.')));
         },
-        renderRow: function(label, instance) {
+        renderRow: function(label) {
           var linkEl,
             listItemEl,
             color,
