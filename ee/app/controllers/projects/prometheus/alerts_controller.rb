@@ -127,12 +127,8 @@ module Projects
       end
 
       def project_without_auth
-        return @project if @project
-
-        namespace = params[:namespace_id]
-        id = params[:project_id]
-
-        @project = Project.find_by_full_path("#{namespace}/#{id}")
+        @project ||= Project
+          .find_by_full_path("#{params[:namespace_id]}/#{params[:project_id]}")
       end
 
       def prometheus_alerts
