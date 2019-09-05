@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe API::Internal do
+describe API::Internal::Base do
+  include EE::GeoHelpers
+
   describe "POST /internal/allowed" do
     set(:user) { create(:user) }
     set(:key) { create(:key, user: user) }
@@ -142,6 +144,42 @@ describe API::Internal do
           expect(response).to have_gitlab_http_status(200)
         end
       end
+    end
+  end
+
+  describe "POST /internal/lfs_authenticate" do
+    let(:user) { create(:user) }
+    let(:project) { create(:project, :repository) }
+    let(:secret_token) { Gitlab::Shell.secret_token }
+
+    context 'for a secondary node' do
+      let!(:primary) { create(:geo_node, :primary) }
+      let!(:secondary) { create(:geo_node) }
+
+      before do
+        stub_current_geo_node(secondary)
+        project.add_developer(user)
+      end
+
+      it 'returns the repository_http_path at the primary node' do
+        expect(Project).to receive(:find_by_full_path).and_return(project)
+
+        lfs_auth_user(user.id, project)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['repository_http_path']).to eq(geo_primary_http_url_to_repo(project))
+      end
+    end
+
+    def lfs_auth_user(user_id, project)
+      post(
+        api("/internal/lfs_authenticate"),
+        params: {
+          user_id: user_id,
+          secret_token: secret_token,
+          project: project.full_path
+        }
+      )
     end
   end
 end
