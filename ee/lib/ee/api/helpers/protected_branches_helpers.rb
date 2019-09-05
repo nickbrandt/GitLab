@@ -29,6 +29,8 @@ module EE
               optional :user_id, type: Integer
               optional :group_id, type: Integer
             end
+
+            optional :code_owner_approval_required, type: Grape::API::Boolean, default: false, desc: 'Prevent pushes to this branch if it matches an item in CODEOWNERS'
           end
         end
       end

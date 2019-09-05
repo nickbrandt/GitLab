@@ -25,6 +25,10 @@ module Gitlab
         parsed_data[matching_pattern].dup if matching_pattern
       end
 
+      def path
+        @blob&.path
+      end
+
       private
 
       def data

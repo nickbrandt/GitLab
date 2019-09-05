@@ -126,6 +126,22 @@ describe Gitlab::CodeOwners::Loader do
     end
   end
 
+  describe "#code_owners_path" do
+    context "when the file exists" do
+      it "returns the path to the code_owners file" do
+        expect(loader.code_owners_path).to eq("CODEOWNERS")
+      end
+    end
+
+    context "when the file does not exist" do
+      let(:codeowner_blob) { nil }
+
+      it "returns nil" do
+        expect(loader.code_owners_path).to be_nil
+      end
+    end
+  end
+
   describe '#empty_code_owners?' do
     context 'when file does not exist' do
       let(:codeowner_blob) { nil }

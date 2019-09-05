@@ -1,0 +1,5 @@
+---
+title: Add ability to block API pushes to protected branches when contents match CODEOWNERS rule
+merge_request: 14900
+author:
+type: changed

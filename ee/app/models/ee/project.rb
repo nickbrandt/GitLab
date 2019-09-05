@@ -379,6 +379,12 @@ module EE
       super && code_owner_approval_required_available?
     end
 
+    def branch_requires_code_owner_approval?(branch_name)
+      return false unless code_owner_approval_required_available?
+
+      protected_branches.requiring_code_owner_approval.matching(branch_name).any?
+    end
+
     def require_password_to_approve
       super && password_authentication_enabled_for_web?
     end

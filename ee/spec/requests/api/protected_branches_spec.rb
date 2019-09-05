@@ -113,6 +113,55 @@ describe API::ProtectedBranches do
         expect(json_response['unprotect_access_levels'][0]['access_level']).to eq(Gitlab::Access::ADMIN)
       end
 
+      context "code_owner_approval_required" do
+        context "when feature is enabled" do
+          before do
+            stub_licensed_features(code_owner_approval_required: true)
+          end
+
+          it "sets :code_owner_approval_required to true when the param is true" do
+            expect(project.protected_branches.find_by_name(branch_name)).to be_nil
+
+            post post_endpoint, params: { name: branch_name, code_owner_approval_required: true }
+
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response["code_owner_approval_required"]).to eq(true)
+
+            new_branch = project.protected_branches.find_by_name(branch_name)
+            expect(new_branch.code_owner_approval_required).to be_truthy
+            expect(new_branch[:code_owner_approval_required]).to be_truthy
+          end
+
+          it "sets :code_owner_approval_required to false when the param is false" do
+            expect(project.protected_branches.find_by_name(branch_name)).to be_nil
+
+            post post_endpoint, params: { name: branch_name, code_owner_approval_required: false }
+
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response["code_owner_approval_required"]).to eq(false)
+
+            new_branch = project.protected_branches.find_by_name(branch_name)
+            expect(new_branch.code_owner_approval_required).to be_falsy
+            expect(new_branch[:code_owner_approval_required]).to be_falsy
+          end
+        end
+
+        context "when feature is not enabled" do
+          it "sets :code_owner_approval_required to false when the param is false" do
+            expect(project.protected_branches.find_by_name(branch_name)).to be_nil
+
+            post post_endpoint, params: { name: branch_name, code_owner_approval_required: true }
+
+            expect(response).to have_gitlab_http_status(201)
+            expect(json_response["code_owner_approval_required"]).to eq(false)
+
+            new_branch = project.protected_branches.find_by_name(branch_name)
+            expect(new_branch.code_owner_approval_required).to be_falsy
+            expect(new_branch[:code_owner_approval_required]).to be_falsy
+          end
+        end
+      end
+
       context 'with granular access' do
         let(:invited_group) do
           create(:project_group_link, project: project).group

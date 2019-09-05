@@ -9,6 +9,15 @@ module EE
       def protected_branch_params
         super.tap do |hash|
           hash[:unprotect_access_levels_attributes] = ::ProtectedBranches::AccessLevelParams.new(:unprotect, params).access_levels
+          hash[:code_owner_approval_required] = code_owner_approval_required?
+        end
+      end
+
+      def code_owner_approval_required?
+        if project.code_owner_approval_required_available?
+          params[:code_owner_approval_required] || false
+        else
+          false
         end
       end
     end
