@@ -60,7 +60,10 @@ module Geo
 
     def primary_tags
       @primary_tags ||= begin
-        client.repository_tags(name)['tags'].map do |tag|
+        tags = client.repository_tags(name)['tags']
+        return [] if tags.nil?
+
+        tags.map do |tag|
           { name: tag, digest: client.repository_tag_digest(name, tag) }
         end
       end

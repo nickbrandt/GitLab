@@ -10,20 +10,26 @@ module ContainerRegistry
 
     def execute
       events.each do |event|
-        handle_push_event(event) if event['action'] == 'push'
+        handle_event(event) if %w(push delete).include?(event['action'])
       end
     end
 
     private
 
-    def handle_push_event(event)
-      return unless manifest_push?(event)
+    def handle_event(event)
+      return unless manifest_push?(event) || manifest_delete?(event)
 
       ::Geo::ContainerRepositoryUpdatedEventStore.new(find_repository!(event)).create!
     end
 
     def manifest_push?(event)
       event['target']['mediaType'] =~ /manifest/
+    end
+
+    def manifest_delete?(event)
+      # There is no clear indication in the event structure when we delete a top-level manifest
+      # except existance of "tag" key
+      event['target'].has_key?('tag')
     end
 
     def find_repository!(event)
