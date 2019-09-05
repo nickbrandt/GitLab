@@ -42,7 +42,7 @@ module QA
               push.file_name = file_name
               push.file_content = "# #{file_content}"
               push.commit_message = 'Add README.md'
-            end
+            end.project.visit!
 
             # Validate git push worked and file exists with content
             Page::Project::Show.perform do |show|
@@ -121,6 +121,7 @@ module QA
             expect(push.output).to match(/Locking support detected on remote/)
 
             # Validate git push worked and file exists with content
+            push.project.visit!
             Page::Project::Show.perform do |show|
               show.wait_for_repository_replication
 

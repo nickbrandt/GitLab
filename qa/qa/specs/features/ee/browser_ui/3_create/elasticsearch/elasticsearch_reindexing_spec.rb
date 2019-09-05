@@ -23,7 +23,7 @@ module QA
           push.project = @project
           push.file_name = @project_file_name
           push.file_content = @project_file_content
-        end
+        end.project.visit!
       end
 
       it 'tests reindexing after push' do
