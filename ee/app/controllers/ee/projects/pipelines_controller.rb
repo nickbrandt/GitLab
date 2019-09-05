@@ -31,7 +31,8 @@ module EE
           if report_exists
             format.html { render_show }
             format.json do
-              render json: LicenseManagementReportLicenseEntity.licenses_payload(pipeline.license_management_report), status: :ok
+              data = LicenseManagementReportsSerializer.new(project: project, current_user: current_user).represent(pipeline&.license_management_report&.licenses)
+              render json: data, status: :ok
             end
           else
             format.html { redirect_to pipeline_path(pipeline) }

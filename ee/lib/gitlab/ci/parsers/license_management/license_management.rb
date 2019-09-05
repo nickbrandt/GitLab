@@ -18,9 +18,11 @@ module Gitlab
                 license_dependencies = root['dependencies'].select do |dependency|
                   uses_license?(dependency['license']['name'], license_name)
                 end
-
                 license_dependencies.each do |dependency|
-                  license_management_report.add_dependency(license_name, dependency['dependency']['name'])
+                  license_management_report.add_dependency(license_name,
+                                                           license_hash['count'],
+                                                           dependency['license']['url'],
+                                                           dependency['dependency']['name'])
                 end
               end
             end

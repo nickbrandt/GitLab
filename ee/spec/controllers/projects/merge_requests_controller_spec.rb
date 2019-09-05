@@ -679,7 +679,7 @@ describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareLicenseManagementReportsService).and_return(comparison_status)
+        .with(::Ci::CompareLicenseManagementReportsService, project.users.first).and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
