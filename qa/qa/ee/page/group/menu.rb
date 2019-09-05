@@ -30,17 +30,30 @@ module QA
             element :group_insights_link
           end
 
+          view 'app/views/layouts/nav/sidebar/_group.html.haml' do
+            element :group_issue_boards_link
+            element :group_issues_item
+          end
+
+          def go_to_issue_boards
+            hover_element(:group_issues_item) do
+              within_submenu(:group_issues_sidebar_submenu) do
+                click_element(:group_issue_boards_link)
+              end
+            end
+          end
+
           def go_to_saml_sso_group_settings
-            hover_settings do
-              within_submenu do
+            hover_element(:group_settings_item) do
+              within_submenu(:group_sidebar_submenu) do
                 click_element(:group_saml_sso_link)
               end
             end
           end
 
           def go_to_ldap_sync_settings
-            hover_settings do
-              within_submenu do
+            hover_element(:group_settings_item) do
+              within_submenu(:group_sidebar_submenu) do
                 click_element(:ldap_synchronization_link)
               end
             end
@@ -59,8 +72,8 @@ module QA
           end
 
           def click_group_general_settings_item
-            hover_settings do
-              within_submenu do
+            hover_element(:group_settings_item) do
+              within_submenu(:group_sidebar_submenu) do
                 click_element(:general_settings_link)
               end
             end
@@ -80,9 +93,9 @@ module QA
 
           private
 
-          def hover_settings
+          def hover_element(element)
             within_sidebar do
-              find_element(:group_settings_item).hover
+              find_element(element).hover
               yield
             end
           end
@@ -93,8 +106,8 @@ module QA
             end
           end
 
-          def within_submenu
-            within_element(:group_sidebar_submenu) do
+          def within_submenu(element)
+            within_element(element) do
               yield
             end
           end
