@@ -3,11 +3,6 @@
 module QA
   context 'Plan' do
     describe 'Group issue boards' do
-      before do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_credentials)
-      end
-
       let(:board_1) { 'Upstream 1' }
       let(:board_2) { 'Upstream 2' }
       let(:board_3) { 'Upstream 3' }
@@ -17,6 +12,9 @@ module QA
       end
 
       before do
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
+
         create_group_board(board_1)
         create_group_board(board_2)
         create_group_board(board_3)
