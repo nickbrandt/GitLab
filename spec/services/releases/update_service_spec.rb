@@ -54,35 +54,33 @@ describe Releases::UpdateService do
       let(:new_title) { 'v2.0' }
       let(:milestone) { create(:milestone, project: project, title: old_title) }
       let(:new_milestone) { create(:milestone, project: project, title: new_title) }
-      let(:params_with_milestone) { params.merge!({ milestone: new_title }) }
+      let(:params_with_milestone) { params.merge!({ milestones: [new_title] }) }
 
       before do
-        release.milestone = milestone
-        release.save!
+        release.milestones << milestone
 
         described_class.new(new_milestone.project, user, params_with_milestone).execute
         release.reload
       end
 
       it 'updates the related milestone accordingly' do
-        expect(release.milestone.title).to eq(new_title)
+        expect(release.milestones.first.title).to eq(new_title)
       end
     end
 
     context "when an 'empty' milestone is passed in" do
       let(:milestone) { create(:milestone, project: project, title: 'v1.0') }
-      let(:params_with_empty_milestone) { params.merge!({ milestone: '' }) }
+      let(:params_with_empty_milestone) { params.merge!({ milestones: [] }) }
 
       before do
-        release.milestone = milestone
-        release.save!
+        release.milestones << milestone
 
         described_class.new(milestone.project, user, params_with_empty_milestone).execute
         release.reload
       end
 
       it 'removes the old milestone and does not associate any new milestone' do
-        expect(release.milestone).to be_nil
+        expect(release.milestones).not_to be_present
       end
     end
   end

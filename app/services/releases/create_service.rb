@@ -7,7 +7,7 @@ module Releases
     def execute
       return error('Access Denied', 403) unless allowed?
       return error('Release already exists', 409) if release
-      return error('Milestone does not exist', 400) if inexistent_milestone?
+      return error("Inexistent milestone(s): #{inexistent_milestones}", 400) if inexistent_milestones.present?
 
       tag = ensure_tag
 
@@ -49,6 +49,7 @@ module Releases
 
       success(tag: tag, release: release)
     rescue => e
+      binding.pry
       error(e.message, 400)
     end
 
@@ -61,7 +62,7 @@ module Releases
         sha: tag.dereferenced_target.sha,
         released_at: released_at,
         links_attributes: params.dig(:assets, 'links') || [],
-        milestone: milestone
+        milestones: milestones
       )
     end
   end
