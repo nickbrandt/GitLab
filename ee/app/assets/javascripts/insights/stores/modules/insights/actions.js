@@ -33,6 +33,7 @@ export const fetchChartData = ({ dispatch }, { endpoint, chart }) =>
     .post(endpoint, {
       query: chart.query,
       chart_type: chart.type,
+      projects: chart.projects,
     })
     .then(({ data }) => dispatch('receiveChartDataSuccess', { chart, data }))
     .catch(error => {

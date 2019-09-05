@@ -7,7 +7,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     Timecop.freeze(Time.utc(2019, 3, 5)) { example.run }
   end
 
-  let(:base_opts) do
+  let(:base_query) do
     {
       state: 'opened',
       group_by: 'months'
@@ -15,8 +15,8 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
   end
 
   describe '#find' do
-    def find(entity, opts)
-      described_class.new(entity, nil, opts).find
+    def find(entity, query)
+      described_class.new(entity, nil, query: query).find
     end
 
     it 'raises an error for an invalid :issuable_type option' do
@@ -32,7 +32,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
     end
 
     it 'defaults to the "days" period if no :group_by is given' do
-      expect(described_class.new(build(:project), nil, issuable_type: 'issue').__send__(:period)).to eq(:days)
+      expect(described_class.new(build(:project), nil, query: { issuable_type: 'issue' }).__send__(:period)).to eq(:days)
     end
 
     it 'raises an error for an invalid :period_limit option' do
@@ -51,26 +51,26 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       let!(:issuable2) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 2, 6), labels: [label_bug, label_plan], project_association_key => project, **extra_issuable_attrs[2]) }
       let!(:issuable3) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 2, 20), labels: [label_bug, label_create], project_association_key => project, **extra_issuable_attrs[3]) }
       let!(:issuable4) { create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug, label_quality], project_association_key => project, **extra_issuable_attrs[4]) }
-      let(:opts) do
-        base_opts.merge(
+      let(:query) do
+        base_query.merge(
           issuable_type: issuable_type,
           filter_labels: [label_bug.title],
           collection_labels: [label_manage.title, label_plan.title, label_create.title])
       end
 
-      subject { find(entity, opts) }
+      subject { find(entity, query) }
 
       it 'avoids N + 1 queries' do
         control_queries = ActiveRecord::QueryRecorder.new { subject.map { |issuable| issuable.labels.map(&:title) } }
         create(:"labeled_#{issuable_type}", :opened, created_at: Time.utc(2019, 3, 5), labels: [label_bug], project_association_key => project, **extra_issuable_attrs[5])
 
-        expect { find(entity, opts).map { |issuable| issuable.labels.map(&:title) } }.not_to exceed_query_limit(control_queries)
+        expect { find(entity, query).map { |issuable| issuable.labels.map(&:title) } }.not_to exceed_query_limit(control_queries)
       end
 
       context ':period_limit option' do
         context 'with group_by: "day"' do
           before do
-            opts.merge!(group_by: 'day')
+            query.merge!(group_by: 'day')
           end
 
           it 'returns issuable created after 30 days ago' do
@@ -80,7 +80,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
         context 'with group_by: "day", period_limit: 1' do
           before do
-            opts.merge!(group_by: 'day', period_limit: 1)
+            query.merge!(group_by: 'day', period_limit: 1)
           end
 
           it 'returns issuable created after one day ago' do
@@ -90,7 +90,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
         context 'with group_by: "week"' do
           before do
-            opts.merge!(group_by: 'week')
+            query.merge!(group_by: 'week')
           end
 
           it 'returns issuable created after 12 weeks ago' do
@@ -100,7 +100,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
         context 'with group_by: "week", period_limit: 1' do
           before do
-            opts.merge!(group_by: 'week', period_limit: 1)
+            query.merge!(group_by: 'week', period_limit: 1)
           end
 
           it 'returns issuable created after one week ago' do
@@ -110,7 +110,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
         context 'with group_by: "month"' do
           before do
-            opts.merge!(group_by: 'month')
+            query.merge!(group_by: 'month')
           end
 
           it 'returns issuable created after 12 months ago' do
@@ -120,7 +120,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
         context 'with group_by: "month", period_limit: 1' do
           before do
-            opts.merge!(group_by: 'month', period_limit: 1)
+            query.merge!(group_by: 'month', period_limit: 1)
           end
 
           it 'returns issuable created after one month ago' do
@@ -205,11 +205,11 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
   end
 
   describe '#period_limit' do
-    subject { described_class.new(create(:project, :public), nil, opts).period_limit }
+    subject { described_class.new(create(:project, :public), nil, query: query).period_limit }
 
     describe 'default values' do
       context 'with group_by: "day"' do
-        let(:opts) { base_opts.merge!(group_by: 'day') }
+        let(:query) { base_query.merge!(group_by: 'day') }
 
         it 'returns 30' do
           expect(subject).to eq(30)
@@ -217,7 +217,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       end
 
       context 'with group_by: "week"' do
-        let(:opts) { base_opts.merge!(group_by: 'week') }
+        let(:query) { base_query.merge!(group_by: 'week') }
 
         it 'returns 12' do
           expect(subject).to eq(12)
@@ -225,7 +225,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       end
 
       context 'with group_by: "month"' do
-        let(:opts) { base_opts.merge!(group_by: 'month') }
+        let(:query) { base_query.merge!(group_by: 'month') }
 
         it 'returns 12' do
           expect(subject).to eq(12)
@@ -235,7 +235,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
 
     describe 'custom values' do
       context 'with period_limit: 42' do
-        let(:opts) { base_opts.merge!(period_limit: 42) }
+        let(:query) { base_query.merge!(period_limit: 42) }
 
         it 'returns 42' do
           expect(subject).to eq(42)
@@ -243,7 +243,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
       end
 
       context 'with an invalid period_limit' do
-        let(:opts) { base_opts.merge!(period_limit: 'many') }
+        let(:query) { base_query.merge!(period_limit: 'many') }
 
         it 'raises an error' do
           expect { subject }.to raise_error(described_class::InvalidPeriodLimitError, "Invalid `:period_limit` option: `many`. Expected an integer!")

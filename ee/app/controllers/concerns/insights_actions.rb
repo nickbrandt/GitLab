@@ -51,6 +51,10 @@ module InsightsActions
     @period_param ||= query_param[:group_by]
   end
 
+  def projects_param
+    @projects_param ||= params[:projects] || {}
+  end
+
   def collection_labels_param
     @collection_labels_param ||= query_param[:collection_labels]
   end
@@ -77,7 +81,8 @@ module InsightsActions
   def finder
     @finder ||=
       Gitlab::Insights::Finders::IssuableFinder
-        .new(insights_entity, current_user, query_param)
+        .new(insights_entity, current_user,
+          query: query_param, projects: projects_param)
   end
 
   def serializer
