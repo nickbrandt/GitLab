@@ -48,7 +48,7 @@ module EE
       end
 
       def license_management_reports
-        reports_response(merge_request.compare_license_management_reports)
+        reports_response(merge_request.compare_license_management_reports(current_user))
       end
 
       def container_scanning_reports

@@ -256,6 +256,9 @@ describe Projects::PipelinesController do
   describe 'GET licenses' do
     let(:licenses_with_html) {get :licenses, format: :html, params: { namespace_id: project.namespace, project_id: project, id: pipeline }}
     let(:licenses_with_json) {get :licenses, format: :json, params: { namespace_id: project.namespace, project_id: project, id: pipeline }}
+    let!(:mit_license) { create(:software_license, :mit) }
+    let!(:software_license_policy) { create(:software_license_policy, software_license: mit_license, project: project) }
+
     let(:payload) { JSON.parse(licenses_with_json.body) }
 
     context 'with a license management artifact' do
@@ -283,7 +286,19 @@ describe Projects::PipelinesController do
 
         it 'will return license management report in json format' do
           expect(payload.size).to eq(pipeline.license_management_report.licenses.size)
-          expect(payload.first.keys).to eq(%w(name dependencies count))
+          expect(payload.first.keys).to eq(%w(name classification dependencies count url))
+        end
+
+        it 'will return mit license approved status' do
+          payload_mit = payload.find { |l| l['name'] == 'MIT' }
+          expect(payload_mit['count']).to eq(pipeline.license_management_report.found_licenses['MIT'].count)
+          expect(payload_mit['url']).to eq('http://opensource.org/licenses/mit-license')
+          expect(payload_mit['classification']['approval_status']).to eq('approved')
+        end
+
+        it 'will return sorted by name' do
+          expect(payload.first['name']).to eq('Apache 2.0')
+          expect(payload.last['name']).to eq('unknown')
         end
       end
 

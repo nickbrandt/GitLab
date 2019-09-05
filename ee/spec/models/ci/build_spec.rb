@@ -191,8 +191,8 @@ describe Ci::Build do
           expect { subject }.not_to raise_error
 
           expect(license_management_report.licenses.count).to eq(4)
-          expect(license_management_report.licenses[0].name).to eq('MIT')
-          expect(license_management_report.licenses[0].dependencies.count).to eq(52)
+          expect(license_management_report.found_licenses['MIT'].name).to eq('MIT')
+          expect(license_management_report.found_licenses['MIT'].dependencies.count).to eq(52)
         end
       end
 

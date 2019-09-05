@@ -5,7 +5,7 @@ module LicenseManagementReportHelper
     Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |report|
       dependencies.each do |license_name, dependencies|
         dependencies.each do |dependency_name|
-          report.add_dependency(license_name.to_s, dependency_name)
+          report.add_dependency(license_name.to_s, 1, "https://opensource.org/licenses/license1", dependency_name)
         end
       end
     end
@@ -32,7 +32,7 @@ module LicenseManagementReportHelper
   end
 
   def create_license
-    Gitlab::Ci::Reports::LicenseManagement::License.new('License1').tap do |license|
+    Gitlab::Ci::Reports::LicenseManagement::License.new('License1', 1, "https://opensource.org/licenses/license1").tap do |license|
       license.add_dependency('Dependency1')
       license.add_dependency('Dependency2')
     end

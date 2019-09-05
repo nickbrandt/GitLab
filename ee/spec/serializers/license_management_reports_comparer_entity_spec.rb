@@ -5,8 +5,16 @@ require 'spec_helper'
 describe LicenseManagementReportsComparerEntity do
   include LicenseManagementReportHelper
 
+  let(:user) { build(:user) }
+  let(:project) { build(:project, :repository) }
+  let(:request) { double('request') }
   let(:comparer) { create_comparer }
-  let(:entity) { described_class.new(comparer) }
+  let(:entity) { described_class.new(comparer, request: request) }
+
+  before do
+    allow(request).to receive(:current_user).and_return(user)
+    allow(request).to receive(:project).and_return(project)
+  end
 
   describe '#as_json' do
     subject { entity.as_json }
