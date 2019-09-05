@@ -21,6 +21,13 @@ module QA
             end
           end
 
+          def filter_report_type(report)
+            find_element(:filter_report_type_dropdown).click
+            within_element(:filter_dropdown_content) do
+              click_on report
+            end
+          end
+
           def has_low_vulnerability_count_of?(expected)
             find_element(:vulnerability_count_low).has_content?(expected)
           end
