@@ -5,10 +5,17 @@ module Projects
     class NotifyService < BaseService
       include Gitlab::Utils::StrongMemoize
 
-      def execute
-        process_incident_issues if create_issue?
+      # Prevents users to use WIP feature on private GitLab instances
+      # by enabling 'generic_alert_endpoint' feature manually.
+      DEV_TOKEN = :development_token
 
-        true
+      def execute(token)
+        return unauthorized unless valid_token?(token)
+        return forbidden unless create_issue?
+
+        process_incident_issues
+
+        ServiceResponse.success
       end
 
       private
@@ -32,6 +39,18 @@ module Projects
 
       def parsed_payload
         Gitlab::Alerting::NotificationPayloadParser.call(params.to_h)
+      end
+
+      def valid_token?(token)
+        token == DEV_TOKEN
+      end
+
+      def unauthorized
+        ServiceResponse.error(message: 'Unauthorized', http_status: 401)
+      end
+
+      def forbidden
+        ServiceResponse.error(message: 'Forbidden', http_status: 403)
       end
     end
   end
