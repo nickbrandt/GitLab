@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/prefer-default-export
 export const projects = {
+  totalUsage: 'N/A',
   projects: [
     {
       id: '24',
@@ -35,3 +35,7 @@ export const projects = {
     },
   ],
 };
+
+export const withRootStorageStatistics = Object.assign({}, projects, {
+  totalUsage: 3261070,
+});
