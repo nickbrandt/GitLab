@@ -13,6 +13,8 @@ class ApprovalProjectRule < ApplicationRecord
 
   alias_method :code_owner, :code_owner?
 
+  validates :name, uniqueness: { scope: :project_id }
+
   def source_rule
     nil
   end
