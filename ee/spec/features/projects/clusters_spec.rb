@@ -12,6 +12,10 @@ describe 'EE Clusters', :js do
   end
 
   context 'when user has a cluster' do
+    before do
+      stub_feature_flags(create_eks_clusters: false)
+    end
+
     context 'when license has multiple clusters feature' do
       before do
         allow(License).to receive(:feature_available?).and_call_original
