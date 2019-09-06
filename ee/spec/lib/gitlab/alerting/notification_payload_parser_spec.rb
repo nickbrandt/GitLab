@@ -58,13 +58,33 @@ describe Gitlab::Alerting::NotificationPayloadParser do
         payload[:start_time] = 'invalid/date/format'
       end
 
-      it 'sets startsAt to a currurrent time in RFC3339 format' do
+      it 'sets startsAt to a current time in RFC3339 format' do
         expect(subject['startsAt']).to eq(starts_at.rfc3339)
       end
     end
 
     context 'when payload is blank' do
       let(:payload) { {} }
+
+      it 'returns default parameters' do
+        is_expected.to eq(
+          'annotations' => { 'title' => 'New: Incident' },
+          'startsAt' => starts_at.rfc3339
+        )
+      end
+    end
+
+    context 'when payload attributes have blank lines' do
+      let(:payload) do
+        {
+          'title' => '',
+          'start_time' => '',
+          'description' => '',
+          'monitoring_tool' => '',
+          'service' => '',
+          'hosts' => ['']
+        }
+      end
 
       it 'returns default parameters' do
         is_expected.to eq(

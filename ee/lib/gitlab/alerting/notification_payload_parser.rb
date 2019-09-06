@@ -31,15 +31,15 @@ module Gitlab
       def annotations
         {
           'title' => title,
-          'description' => payload[:description],
-          'monitoring_tool' => payload[:monitoring_tool],
-          'service' => payload[:service],
+          'description' => payload[:description].presence,
+          'monitoring_tool' => payload[:monitoring_tool].presence,
+          'service' => payload[:service].presence,
           'hosts' => hosts
         }.compact
       end
 
       def hosts
-        payload[:hosts].presence && Array(payload[:hosts])
+        Array(payload[:hosts]).reject(&:blank?).presence
       end
 
       def current_time
