@@ -184,7 +184,11 @@ describe('EpicsSelect', () => {
             dispatch: () => {},
           });
 
-          expect(Api.groupEpics).toHaveBeenCalledWith({ groupId: state.groupId });
+          expect(Api.groupEpics).toHaveBeenCalledWith({
+            groupId: state.groupId,
+            includeDescendantGroups: false,
+            includeAncestorGroups: true,
+          });
         });
       });
 

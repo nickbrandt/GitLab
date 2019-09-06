@@ -17,14 +17,12 @@ export const setSelectedEpic = ({ commit }, selectedEpic) =>
   commit(types.SET_SELECTED_EPIC, selectedEpic);
 
 export const requestEpics = ({ commit }) => commit(types.REQUEST_EPICS);
-export const receiveEpicsSuccess = ({ state, commit }, data) => {
-  const epics = data
-    .filter(rawEpic => rawEpic.group_id === state.groupId)
-    .map(rawEpic =>
-      convertObjectPropsToCamelCase(Object.assign(rawEpic, { url: rawEpic.web_edit_url }), {
-        dropKeys: ['web_edit_url'],
-      }),
-    );
+export const receiveEpicsSuccess = ({ commit }, data) => {
+  const epics = data.map(rawEpic =>
+    convertObjectPropsToCamelCase(Object.assign({}, rawEpic, { url: rawEpic.web_edit_url }), {
+      dropKeys: ['web_edit_url'],
+    }),
+  );
 
   commit(types.RECEIVE_EPICS_SUCCESS, { epics });
 };
@@ -37,6 +35,8 @@ export const fetchEpics = ({ state, dispatch }) => {
 
   Api.groupEpics({
     groupId: state.groupId,
+    includeDescendantGroups: false,
+    includeAncestorGroups: true,
   })
     .then(({ data }) => {
       dispatch('receiveEpicsSuccess', data);
