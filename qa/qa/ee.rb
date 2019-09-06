@@ -97,6 +97,10 @@ module QA
           autoload :Show, 'qa/ee/page/project/wiki/show'
         end
 
+        module Milestone
+          autoload :Index, 'qa/ee/page/project/milestone/index'
+        end
+
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
           autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
