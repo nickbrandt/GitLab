@@ -45,6 +45,16 @@ module API
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
+
+      # pull_request params
+      optional :action, type: String, desc: 'Pull Request action'
+      optional 'pull_request.id', type: Integer, desc: 'Pull request ID'
+      optional 'pull_request.head.ref', type: String, desc: 'Source branch'
+      optional 'pull_request.head.sha', type: String, desc: 'Source sha'
+      optional 'pull_request.head.repo.full_name', type: String, desc: 'Source repository'
+      optional 'pull_request.base.ref', type: String, desc: 'Target branch'
+      optional 'pull_request.base.sha', type: String, desc: 'Target sha'
+      optional 'pull_request.base.repo.full_name', type: String, desc: 'Target repository'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Triggers a pull mirror operation'
@@ -53,7 +63,15 @@ module API
 
         break render_api_error!('The project is not mirrored', 400) unless project.mirror?
 
-        project.import_state.force_import_job!
+        if params[:pull_request]
+          if external_pull_request = ProcessGithubPullRequestEventService.new(project, current_user).execute(params)
+            render_validation_error!(external_pull_request)
+          else
+            render_api_error!('The pull request event is not processable', 422)
+          end
+        else
+          project.import_state.force_import_job!
+        end
 
         status 200
       end

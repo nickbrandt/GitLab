@@ -32,7 +32,7 @@ describe CreateGithubWebhookWorker do
             insecure_ssl: 1
           },
           {
-            events: ['push'],
+            events: %w[push pull_request],
             active: true
           }
         )
