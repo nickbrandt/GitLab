@@ -215,6 +215,7 @@ export default {
           :class="{ 'btn-inverted': action.inverted }"
           size="sm"
           class="mr-3"
+          data-qa-selector="approve_button"
           @click="action.action"
         >
           <gl-loading-icon v-if="isApproving" inline />
