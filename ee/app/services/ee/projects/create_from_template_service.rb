@@ -10,6 +10,11 @@ module EE
       def execute
         return super unless use_custom_template?
 
+        if subgroup_id && !valid_project_namespace?
+          project.errors.add(:namespace, _("is not a descendant of the Group owning the template"))
+          return project
+        end
+
         override_params = params.dup
         params[:custom_template] = template_project if template_project
 
@@ -34,7 +39,21 @@ module EE
       end
 
       def subgroup_id
-        params[:group_with_project_templates_id].presence
+        @subgroup_id ||= params.delete(:group_with_project_templates_id).presence
+      end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def valid_project_namespace?
+        templates_owner = ::Group.find(subgroup_id).parent
+
+        return false unless templates_owner
+
+        templates_owner.self_and_descendants.exists?(id: project.namespace_id)
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
+      def project
+        @project ||= ::Project.new(namespace_id: params[:namespace_id])
       end
     end
   end
