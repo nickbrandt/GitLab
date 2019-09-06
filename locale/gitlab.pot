@@ -13997,6 +13997,12 @@ msgstr ""
 msgid "Sign in with Google"
 msgstr ""
 
+msgid "Sign in with Single Sign-On"
+msgstr ""
+
+msgid "Sign in with smart card"
+msgstr ""
+
 msgid "Sign out"
 msgstr ""
 
