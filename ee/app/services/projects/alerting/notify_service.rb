@@ -7,6 +7,7 @@ module Projects
 
       # Prevents users to use WIP feature on private GitLab instances
       # by enabling 'generic_alert_endpoint' feature manually.
+      # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/14792
       DEV_TOKEN = :development_token
 
       def execute(token)
