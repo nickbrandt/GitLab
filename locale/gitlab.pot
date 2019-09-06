@@ -9765,7 +9765,7 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
-msgid "Monitor your errors by integrating with Sentry"
+msgid "Monitor your errors by integrating with Sentry."
 msgstr ""
 
 msgid "Monitoring"
@@ -17289,6 +17289,9 @@ msgid "When this merge request is accepted"
 msgid_plural "When these merge requests are accepted"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "When using the <code>http://</code> or <code>https://</code> protocols, please provide the exact URL to the repository. HTTP redirects will not be followed."
+msgstr ""
 
 msgid "When:"
 msgstr ""
