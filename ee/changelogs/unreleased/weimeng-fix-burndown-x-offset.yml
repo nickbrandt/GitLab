@@ -1,0 +1,5 @@
+---
+title: Fix x-axis burndown chart offset by timezone
+merge_request: 15690
+author:
+type: fixed
