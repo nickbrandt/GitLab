@@ -6,8 +6,8 @@ describe "Getting designs related to an issue" do
   include GraphqlHelpers
   include DesignManagementTestHelpers
 
-  let(:design) { create(:design, :with_file, versions_count: 1) }
-  let(:current_user) { design.project.owner }
+  set(:design) { create(:design, :with_file, versions_count: 1) }
+  set(:current_user) { design.project.owner }
   let(:design_query) do
     <<~NODE
     designs {
@@ -70,7 +70,7 @@ describe "Getting designs related to an issue" do
     end
 
     context "with versions" do
-      let(:version) { design.versions.take }
+      set(:version) { design.versions.take }
       let(:design_query) do
         <<~NODE
         designs {
@@ -109,15 +109,18 @@ describe "Getting designs related to an issue" do
     end
 
     describe "viewing a design board at a particular version" do
-      let(:issue) { design.issue }
-      let(:all_versions) { issue.design_collection.versions.ordered }
-      let!(:second_design) { create(:design, :with_file, issue: issue, versions_count: 1) }
+      set(:issue) { design.issue }
+      set(:second_design) { create(:design, :with_file, issue: issue, versions_count: 1) }
+      set(:deleted_design) { create(:design, :with_versions, issue: issue, deleted: true, versions_count: 1) }
+      let(:all_versions) { issue.design_versions.ordered.reverse }
       let(:design_query) do
         <<~NODE
         designs(atVersion: "#{version.to_global_id}") {
           edges {
             node {
+              id
               image
+              event
               versions {
                 edges {
                   node {
@@ -138,14 +141,14 @@ describe "Getting designs related to an issue" do
         Gitlab::Routing.url_helpers.project_design_url(design.project, design, sha)
       end
 
-      def version_global_id(version)
-        version.to_global_id.to_s
+      def global_id(object)
+        object.to_global_id.to_s
       end
 
       # Filters just design nodes from the larger `design_response`
       def design_nodes
-        design_response.each do |response|
-          response['node'].delete('versions')
+        design_response.map do |response|
+          response['node']
         end
       end
 
@@ -156,57 +159,124 @@ describe "Getting designs related to an issue" do
         end
       end
 
-      context "viewing the original version" do
-        let(:version) { all_versions.last }
+      context "viewing the original version, when one design was created" do
+        let(:version) { all_versions.first }
 
-        it "only returns the first design, with the correct version of the design image" do
+        before do
           post_graphql(query, current_user: current_user)
+        end
 
-          expect(design_nodes).to eql(
-            [{ "node" => { "image" => image_url(design, version.sha) } }]
+        it "only returns the first design" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("id" => global_id(design))
+          )
+        end
+
+        it "returns the correct version of the design image" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("image" => image_url(design, version.sha))
+          )
+        end
+
+        it "returns the correct event for the design in this version" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("event" => "CREATION")
           )
         end
 
         it "only returns one version record for the design (the original version)" do
-          post_graphql(query, current_user: current_user)
-
-          expect(version_nodes).to eq(
-            [
-              [{ "node" => { "id" => version_global_id(version) } }]
-            ]
-          )
+          expect(version_nodes).to eq([
+            [{ "node" => { "id" => global_id(version) } }]
+          ])
         end
       end
 
-      context "viewing the newest version" do
-        let(:version) { all_versions.first }
+      context "viewing the second version, when one design was created" do
+        let(:version) { all_versions.second }
 
-        it "returns both designs, with the correct version of the design images" do
+        before do
           post_graphql(query, current_user: current_user)
+        end
 
-          expect(design_nodes).to eq(
-            [
-              { "node" => { "image" => image_url(design, version.sha) } },
-              { "node" => { "image" => image_url(second_design, version.sha) } }
-            ]
+        it "only returns the first two designs" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("id" => global_id(design)),
+            a_hash_including("id" => global_id(second_design))
+          )
+        end
+
+        it "returns the correct versions of the design images" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("image" => image_url(design, version.sha)),
+            a_hash_including("image" => image_url(second_design, version.sha))
+          )
+        end
+
+        it "returns the correct events for the designs in this version" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("event" => "NONE"),
+            a_hash_including("event" => "CREATION")
           )
         end
 
         it "returns the correct versions records for both designs" do
-          post_graphql(query, current_user: current_user)
+          expect(version_nodes).to eq([
+            [{ "node" => { "id" => global_id(design.versions.first) } }],
+            [{ "node" => { "id" => global_id(second_design.versions.first) } }]
+          ])
+        end
+      end
 
-          expect(version_nodes).to eq(
-            [
-              [{ "node" => { "id" => version_global_id(design.versions.first) } }],
-              [{ "node" => { "id" => version_global_id(second_design.versions.first) } }]
-            ]
+      context "viewing the last version, when one design was deleted and one was updated" do
+        let(:version) { all_versions.last }
+
+        before do
+          second_design.design_versions.create!(version: version, event: "modification")
+
+          post_graphql(query, current_user: current_user)
+        end
+
+        it "does not include the deleted design" do
+          # The design does exist in the version
+          expect(version.designs).to include(deleted_design)
+
+          # But the GraphQL API does not include it in these results
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("id" => global_id(design)),
+            a_hash_including("id" => global_id(second_design))
           )
+        end
+
+        it "returns the correct versions of the design images" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("image" => image_url(design, version.sha)),
+            a_hash_including("image" => image_url(second_design, version.sha))
+          )
+        end
+
+        it "returns the correct events for the designs in this version" do
+          expect(design_nodes).to contain_exactly(
+            a_hash_including("event" => "NONE"),
+            a_hash_including("event" => "MODIFICATION")
+          )
+        end
+
+        it "returns all versions records for the designs" do
+          expect(version_nodes).to eq([
+            [
+              { "node" => { "id" => global_id(design.versions.first) } }
+            ],
+            [
+              { "node" => { "id" => global_id(second_design.versions.second) } },
+              { "node" => { "id" => global_id(second_design.versions.first) } }
+            ]
+          ])
         end
       end
     end
 
     describe 'a design with note annotations' do
-      let!(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
+      set(:note) { create(:diff_note_on_design, noteable: design, project: design.project) }
 
       let(:design_query) do
         <<~NODE
