@@ -47,7 +47,7 @@ module Gitlab
       end
 
       def starts_at
-        DateTime.parse(payload[:start_time].to_s).rfc3339
+        Time.parse(payload[:start_time].to_s).rfc3339
       rescue ArgumentError
         current_time
       end
