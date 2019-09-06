@@ -1207,7 +1207,7 @@ curl --data "value=true" --header "PRIVATE-TOKEN: personal_access_token" https:/
 [kubernetes-clusters]: ../../user/project/clusters/index.md
 [docker-in-docker]: ../../docker/using_docker_build.md#use-docker-in-docker-executor
 [review-app]: ../../ci/review_apps/index.md
-[container-registry]: ../../user/project/container_registry.md
+[container-registry]: ../../user/packages/container_registry/index.md
 [postgresql]: https://www.postgresql.org/
 [Auto DevOps template]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
 [ee]: https://about.gitlab.com/pricing/
