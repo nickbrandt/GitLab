@@ -98,14 +98,6 @@ module API
         token = ::Gitlab::ConanToken.from_personal_access_token(access_token)
         token.to_jwt
       end
-
-      desc 'Check for valid user credentials' do
-        detail 'This feature was introduced in GitLab 12.3'
-      end
-      get 'check_credentials' do
-        # credentials are checked in authorize! "before" callback
-        :ok
-      end
     end
 
     namespace 'packages/conan/v1/conans/*url_recipe' do

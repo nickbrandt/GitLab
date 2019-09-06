@@ -124,14 +124,6 @@ describe API::ConanPackages do
     end
   end
 
-  describe 'GET /api/v4/packages/conan/v1/users/check_credentials' do
-    it 'responds with a 200 OK' do
-      get api('/packages/conan/v1/users/check_credentials')
-
-      expect(response).to have_gitlab_http_status(200)
-    end
-  end
-
   context 'recipe endpoints' do
     let(:recipe) { 'my-package-name/1.0/username/channel' }
 
