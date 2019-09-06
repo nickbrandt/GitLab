@@ -167,9 +167,8 @@ export default {
         class="float-right js-weight-edit-link"
         href="#"
         @click="onEditClick(!shouldShowEditField)"
+        >{{ __('Edit') }}</a
       >
-        {{ __('Edit') }}
-      </a>
     </div>
     <div v-if="shouldShowEditField" class="hide-collapsed">
       <input
@@ -188,15 +187,17 @@ export default {
     </div>
     <div v-if="shouldShowWeight" class="value hide-collapsed js-weight-weight-label">
       <span v-if="!isNoValue">
-        <strong class="js-weight-weight-label-value" data-qa-selector="weight_label_value">{{ weight }}</strong>
+        <strong class="js-weight-weight-label-value" data-qa-selector="weight_label_value">{{
+          weight
+        }}</strong>
         <span v-if="editable">
           -
-          <a class="btn-default-hover-link js-weight-remove-link" href="#" @click="removeWeight">
-            {{ __('remove weight') }}
-          </a>
+          <a class="btn-default-hover-link js-weight-remove-link" href="#" @click="removeWeight">{{
+            __('remove weight')
+          }}</a>
         </span>
       </span>
-      <span v-else class="no-value"> {{ noValueLabel }} </span>
+      <span v-else class="no-value">{{ noValueLabel }}</span>
     </div>
   </div>
 </template>
