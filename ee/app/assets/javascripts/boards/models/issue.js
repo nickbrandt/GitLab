@@ -7,8 +7,6 @@ class ListIssueEE extends ListIssue {
       IssueProject,
     });
 
-    this.isFetching.weight = true;
-    this.isLoading.weight = false;
     this.weight = obj.weight;
 
     if (obj.project) {
