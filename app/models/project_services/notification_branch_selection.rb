@@ -4,10 +4,10 @@
 # PipelinesEmailService classes. Not to be used directly.
 module NotificationBranchSelection
   BRANCH_CHOICES = [
-    ['All branches', 'all'],
-    ['Default branch', 'default'],
-    ['Protected branches', 'protected'],
-    ['Default branch and protected branches', 'default_and_protected']
+    [_('All branches'), 'all'],
+    [_('Default branch'), 'default'],
+    [_('Protected branches'), 'protected'],
+    [_('Default branch and protected branches'), 'default_and_protected']
   ].freeze
 
   def notify_for_branch?(data)
