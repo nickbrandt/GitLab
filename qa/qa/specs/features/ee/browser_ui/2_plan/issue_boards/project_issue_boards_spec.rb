@@ -2,19 +2,19 @@
 
 module QA
   context 'Plan' do
-    describe 'Issue boards' do
-      let(:issue_title) { 'Issue to test board list' }
-
+    describe 'Project issue boards' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
       end
 
+      let(:issue_title) { 'Issue to test board list' }
+
       context 'Label issue board' do
         let(:label) { 'Doing' }
 
         let(:label_board_list) do
-          EE::Resource::BoardList::LabelBoardList.fabricate_via_api!
+          EE::Resource::Board::BoardList::Project::LabelBoardList.fabricate_via_api!
         end
 
         before do
@@ -40,7 +40,7 @@ module QA
 
       context 'Milestone issue board' do
         let(:milestone_board_list) do
-          EE::Resource::BoardList::MilestoneBoardList.fabricate_via_api!
+          EE::Resource::Board::BoardList::Project::MilestoneBoardList.fabricate_via_api!
         end
 
         before do
