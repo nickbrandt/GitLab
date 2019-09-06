@@ -59,7 +59,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div data-qa-selector="approvals_summary_content">
     <strong>{{ message }}</strong>
     <template v-if="hasApprovers">
       <span>{{ s__('mrWidget|Approved by') }}</span>

@@ -229,6 +229,7 @@ export default {
             class="form-control"
             name="name"
             type="text"
+            data-qa-selector="rule_name_field"
           />
           <span class="invalid-feedback">{{ validation.name }}</span>
           <span class="text-secondary">{{ s__('ApprovalRule|e.g. QA, Security, etc.') }}</span>
@@ -236,9 +237,7 @@ export default {
       </div>
       <div class="form-group col-sm-6">
         <label class="label-wrapper">
-          <span class="mb-2 bold inline">
-            {{ s__('ApprovalRule|No. approvals required') }}
-          </span>
+          <span class="mb-2 bold inline">{{ s__('ApprovalRule|No. approvals required') }}</span>
           <input
             v-model.number="approvalsRequired"
             :class="{ 'is-invalid': validation.approvalsRequired }"
@@ -246,6 +245,7 @@ export default {
             name="approvals_required"
             type="number"
             :min="minApprovalsRequired"
+            data-qa-selector="approvals_required_field"
           />
           <span class="invalid-feedback">{{ validation.approvalsRequired }}</span>
         </label>
@@ -254,7 +254,7 @@ export default {
     <div class="form-group">
       <label class="label-bold">{{ s__('ApprovalRule|Approvers') }}</label>
       <div class="d-flex align-items-start">
-        <div class="w-100">
+        <div class="w-100" data-qa-selector="member_select_field">
           <approvers-select
             v-model="approversToAdd"
             :project-id="settings.projectId"
@@ -264,9 +264,14 @@ export default {
           />
           <div class="invalid-feedback">{{ validation.approvers }}</div>
         </div>
-        <gl-button variant="success" class="btn-inverted prepend-left-8" @click="addSelection">{{
-          __('Add')
-        }}</gl-button>
+        <gl-button
+          variant="success"
+          class="btn-inverted prepend-left-8"
+          data-qa-selector="add_member_button"
+          @click="addSelection"
+        >
+          {{ __('Add') }}
+        </gl-button>
       </div>
     </div>
     <div class="bordered-box overflow-auto h-12em">

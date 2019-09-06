@@ -111,6 +111,7 @@ module QA
       end
 
       module MergeRequest
+        autoload :New, 'qa/ee/page/merge_request/new'
         autoload :Show, 'qa/ee/page/merge_request/show'
       end
 

@@ -42,15 +42,21 @@ export default {
     <gl-loading-icon v-if="!hasLoaded" :size="2" />
     <template v-else>
       <div class="border-bottom">
-        <slot v-if="isEmpty" name="fallback"> <fallback-rules /> </slot>
+        <slot v-if="isEmpty" name="fallback">
+          <fallback-rules />
+        </slot>
         <slot v-else name="rules"></slot>
       </div>
       <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div v-if="settings.allowMultiRule" class="d-flex">
-          <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null)">{{
-            __('Add approval rule')
-          }}</gl-button>
+          <gl-button
+            class="ml-auto btn-info btn-inverted"
+            data-qa-selector="add_approvers_button"
+            @click="openCreateModal(null)"
+          >
+            {{ __('Add approval rule') }}
+          </gl-button>
         </div>
       </div>
       <slot name="footer"></slot>
