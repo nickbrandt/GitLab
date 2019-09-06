@@ -19,6 +19,11 @@ module EE
       has_one :epic_issue
       has_one :epic, through: :epic_issue
       has_many :designs, class_name: "DesignManagement::Design", inverse_of: :issue
+      has_many :design_versions, class_name: "DesignManagement::Version", inverse_of: :issue do
+        def most_recent
+          ordered.first
+        end
+      end
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end

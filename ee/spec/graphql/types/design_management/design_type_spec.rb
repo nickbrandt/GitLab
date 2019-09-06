@@ -11,6 +11,7 @@ describe GitlabSchema.types['Design'] do
     expected_fields = %i[
       diff_refs
       discussions
+      event
       filename
       full_path
       id

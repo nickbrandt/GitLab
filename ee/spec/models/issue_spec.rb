@@ -30,8 +30,19 @@ describe Issue do
     end
   end
 
-  describe "relations" do
+  describe 'relations' do
     it { is_expected.to have_many(:designs) }
+    it { is_expected.to have_many(:design_versions) }
+
+    describe 'versions.most_recent' do
+      it 'returns the most recent version' do
+        issue = create(:issue)
+        create_list(:design_version, 2, issue: issue)
+        last_version = create(:design_version, issue: issue)
+
+        expect(issue.design_versions.most_recent).to eq(last_version)
+      end
+    end
   end
 
   it_behaves_like 'an editable mentionable with EE-specific mentions' do
