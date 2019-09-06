@@ -326,14 +326,6 @@ module EE
         expose :contains_hidden_groups?, as: :contains_hidden_groups
       end
 
-      # Being used in private project-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers`.
-      #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
-      class ApprovalSettingRule < ApprovalRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
-      end
-
       class MergeRequestApprovalRule < ApprovalRule
         class SourceRule < Grape::Entity
           expose :approvals_required
@@ -342,32 +334,50 @@ module EE
         expose :source_rule, using: SourceRule
       end
 
-      # Being used in private MR-level approvals API.
-      # This overrides the `eligible_approvers` to be exposed as `approvers` and
-      # include additional properties.
-      #
-      # To be made public in https://gitlab.com/gitlab-org/gitlab-ee/issues/13712
-      # and the `approvers` override can be removed.
-      class MergeRequestApprovalSettingRule < MergeRequestApprovalRule
-        expose :approvers, using: ::API::Entities::UserBasic, override: true
+      class MergeRequestApprovalStateRule < MergeRequestApprovalRule
         expose :code_owner
         expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
         expose :approved?, as: :approved
       end
 
-      # Decorates ApprovalState
-      class MergeRequestApprovalSettings < Grape::Entity
+      class MergeRequestApprovalState < Grape::Entity
         expose :approval_rules_overwritten do |approval_state|
           approval_state.approval_rules_overwritten?
         end
 
-        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule
+        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalStateRule
       end
 
-      # Decorates Project
+      # Being used in private project-level approvals API.
+      # This overrides the `eligible_approvers` to be exposed as `approvers`.
+      #
+      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      class ApprovalSettingRule < ApprovalRule
+        expose :approvers, using: ::API::Entities::UserBasic, override: true
+      end
+
+      # Being used in private project-level approvals API.
+      #
+      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
       class ProjectApprovalSettings < Grape::Entity
         expose :visible_approval_rules, as: :rules, using: ApprovalSettingRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
+      end
+
+      # Being used in private MR-level approvals API.
+      # This overrides the `eligible_approvers` to be exposed as `approvers`.
+      #
+      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      class MergeRequestApprovalSettingRule < MergeRequestApprovalStateRule
+        expose :approvers, using: ::API::Entities::UserBasic, override: true
+      end
+
+      # Being used in private MR-level approvals API.
+      # This overrides the `rules` to be exposed using MergeRequestApprovalSettingRule.
+      #
+      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      class MergeRequestApprovalSettings < MergeRequestApprovalState
+        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule, override: true
       end
 
       # @deprecated
