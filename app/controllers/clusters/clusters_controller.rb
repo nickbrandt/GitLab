@@ -105,7 +105,7 @@ class Clusters::ClustersController < Clusters::BaseController
       validate_gcp_token
       user_cluster
 
-      render :new, locals: { active_tab: 'gcp' }
+      render :new, locals: { active_tab: 'create' }
     end
   end
 
@@ -122,7 +122,7 @@ class Clusters::ClustersController < Clusters::BaseController
       validate_gcp_token
       gcp_cluster
 
-      render :new, locals: { active_tab: 'user' }
+      render :new, locals: { active_tab: 'add' }
     end
   end
 
