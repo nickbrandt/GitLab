@@ -1,5 +1,24 @@
 # frozen_string_literal: true
 
+# Params:
+#   iids: integer[]
+#   state: 'open' or 'closed' or 'all'
+#   group_id: integer
+#   parent_id: integer
+#   author_id: integer
+#   author_username: string
+#   label_name: string
+#   search: string
+#   sort: string
+#   start_date: datetime
+#   end_date: datetime
+#   created_after: datetime
+#   created_before: datetime
+#   updated_after: datetime
+#   updated_before: datetime
+#   include_ancestor_groups: boolean
+#   include_descendant_groups: boolean
+
 class EpicsFinder < IssuableFinder
   def self.scalar_params
     @scalar_params ||= %i[
@@ -59,7 +78,7 @@ class EpicsFinder < IssuableFinder
                # The `group` method takes care of checking permissions
                [group]
              else
-               groups_user_can_read_epics(group.self_and_descendants)
+               groups_user_can_read_epics(related_groups)
              end
 
     Epic.where(group: groups)
@@ -67,6 +86,21 @@ class EpicsFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   private
+
+  def related_groups
+    include_ancestors = params.fetch(:include_ancestor_groups, false)
+    include_descendants = params.fetch(:include_descendant_groups, true)
+
+    if include_ancestors && include_descendants
+      group.self_and_hierarchy
+    elsif include_ancestors
+      group.self_and_ancestors
+    elsif include_descendants
+      group.self_and_descendants
+    else
+      Group.id_in(group.id)
+    end
+  end
 
   def count_key(value)
     last_value = Array(value).last
