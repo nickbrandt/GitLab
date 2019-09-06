@@ -39,7 +39,7 @@ module Gitlab
       end
 
       def hosts
-        payload[:hosts] && Array(payload[:hosts])
+        payload[:hosts].presence && Array(payload[:hosts])
       end
 
       def current_time

@@ -39,7 +39,7 @@ describe Gitlab::Alerting::NotificationPayloadParser do
       end
 
       it 'sets a predefined title' do
-        expect(subject['annotations']['title']).to eq('New: Incident')
+        expect(subject.dig('annotations', 'title')).to eq('New: Incident')
       end
     end
 
@@ -49,7 +49,7 @@ describe Gitlab::Alerting::NotificationPayloadParser do
       end
 
       it 'returns hosts as an array of one element' do
-        expect(subject['annotations']['hosts']).to eq(['gitlab.com'])
+        expect(subject.dig('annotations', 'hosts')).to eq(['gitlab.com'])
       end
     end
 
