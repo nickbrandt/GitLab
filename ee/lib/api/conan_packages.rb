@@ -86,16 +86,6 @@ module API
       get 'ping' do
         header 'X-Conan-Server-Capabilities', [].join(',')
       end
-
-      desc 'Search for packages' do
-        detail 'This feature was introduced in GitLab 12.3'
-      end
-      params do
-        requires :q, type: String, desc: 'Search query'
-      end
-      get 'conans/search' do
-        ::Packages::ConanPackageSearchService.new(params[:q], current_user).execute
-      end
     end
 
     namespace 'packages/conan/v1/users' do
