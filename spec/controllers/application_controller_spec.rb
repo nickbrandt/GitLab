@@ -171,16 +171,30 @@ describe ApplicationController do
   end
 
   describe '#route_not_found' do
-    it 'renders 404 if authenticated' do
-      allow(controller).to receive(:current_user).and_return(user)
-      expect(controller).to receive(:not_found)
-      controller.send(:route_not_found)
+    controller(described_class) do
+      def index
+        route_not_found
+      end
     end
 
-    it 'does redirect to login page via authenticate_user! if not authenticated' do
-      allow(controller).to receive(:current_user).and_return(nil)
-      expect(controller).to receive(:authenticate_user!)
-      controller.send(:route_not_found)
+    it 'renders 404 if authenticated' do
+      sign_in(user)
+
+      get :index
+
+      expect(response).to have_gitlab_http_status(404)
+    end
+
+    it 'redirects to login page via authenticate_user! if not authenticated' do
+      get :index
+
+      expect(response).to redirect_to new_user_session_path
+    end
+
+    it 'redirects if unauthenticated and request format is unknown' do
+      get :index, format: 'unknown'
+
+      expect(response).to redirect_to new_user_session_path
     end
   end
 
