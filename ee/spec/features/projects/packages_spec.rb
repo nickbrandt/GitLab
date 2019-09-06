@@ -64,7 +64,7 @@ describe 'Packages' do
       expect(page).not_to have_content(package.name)
     end
 
-    it 'shows a single package' do
+    it 'shows a single package', :js do
       click_on package.name
 
       expect(page).to have_content(package.name)

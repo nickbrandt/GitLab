@@ -18,20 +18,18 @@ describe 'PackageFiles' do
       project.add_master(user)
     end
 
-    it 'allows file download from package page' do
-      visit project_package_path(project, package)
-
-      click_link package_file.file_name
-
-      expect(status_code).to eq(200)
-      expect(page.response_headers['Content-Type']).to eq 'application/xml'
-      expect(page.response_headers['Content-Transfer-Encoding']).to eq 'binary'
-    end
-
     it 'allows direct download by url' do
       visit download_project_package_file_path(project, package_file)
 
       expect(status_code).to eq(200)
+    end
+
+    it 'renders the download link with the correct url', :js do
+      visit project_package_path(project, package)
+
+      download_url = download_project_package_file_path(project, package_file)
+
+      expect(page).to have_link(package_file.file_name, href: download_url)
     end
 
     it 'does not allow download of package belonging to different project' do
