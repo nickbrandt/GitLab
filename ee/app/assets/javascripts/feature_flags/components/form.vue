@@ -193,7 +193,7 @@ export default {
     <fieldset>
       <div class="row">
         <div class="form-group col-md-4">
-          <label for="feature-flag-name" class="label-bold">{{ s__('FeatureFlags|Name') }}</label>
+          <label for="feature-flag-name" class="label-bold">{{ s__('FeatureFlags|Name') }} *</label>
           <input
             id="feature-flag-name"
             v-model="formName"
