@@ -51,7 +51,7 @@ module EE
       end
       
       def metrics_dashboard
-        project_for_dashboard = defined?(project) ? project : nil
+        project_for_dashboard = defined?(project) ? project : nil # Project is not defined for group and admin level clusters
         dashboard = ::Gitlab::Metrics::Dashboard::Finder.find(project_for_dashboard, current_user, metrics_dashboard_params)
 
         respond_to do |format|

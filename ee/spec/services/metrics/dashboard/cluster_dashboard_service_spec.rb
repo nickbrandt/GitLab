@@ -31,7 +31,7 @@ describe Metrics::Dashboard::ClusterDashboardService, :use_clean_rails_memory_st
     context 'when called with a non-system dashboard' do
       let(:dashboard_path) { 'garbage/dashboard/path' }
 
-      # We want to alwaus return the cluster dashboard.
+      # We want to always return the cluster dashboard.
       it_behaves_like 'valid dashboard service response'
     end
   end
