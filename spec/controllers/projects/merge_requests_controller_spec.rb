@@ -1255,7 +1255,7 @@ describe Projects::MergeRequestsController do
             expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
               note_diff_file = commit_diff_note.note_diff_file
 
-              expect(collection).to receive(:load_highlight).with([note_diff_file.id]).and_call_original
+              expect(collection).to receive(:load_highlight).and_call_original
               expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
             end
 
@@ -1272,7 +1272,7 @@ describe Projects::MergeRequestsController do
             expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
               note_diff_file = diff_note.note_diff_file
 
-              expect(collection).to receive(:load_highlight).with([note_diff_file.id]).and_call_original
+              expect(collection).to receive(:load_highlight).and_call_original
               expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
             end
 
@@ -1285,7 +1285,7 @@ describe Projects::MergeRequestsController do
             expect_next_instance_of(Gitlab::DiscussionsDiff::FileCollection) do |collection|
               note_diff_file = diff_note.note_diff_file
 
-              expect(collection).to receive(:load_highlight).with([]).and_call_original
+              expect(collection).to receive(:load_highlight).and_call_original
               expect(collection).to receive(:find_by_id).with(note_diff_file.id).and_call_original
             end
 
