@@ -2,6 +2,7 @@
 
 class TrialRegistrationsController < RegistrationsController
   before_action :check_if_gl_com
+  before_action :check_if_improved_trials_enabled
 
   private
 
@@ -15,5 +16,9 @@ class TrialRegistrationsController < RegistrationsController
 
   def check_if_gl_com
     render_404 unless Gitlab.com?
+  end
+
+  def check_if_improved_trials_enabled
+    render_404 unless Feature.enabled?(:improved_trial_signup)
   end
 end

@@ -31,6 +31,19 @@ describe TrialRegistrationsController do
       end
     end
 
+    context 'when feature is turned off' do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(true)
+        stub_feature_flags(improved_trial_signup: false)
+      end
+
+      it 'returns not found' do
+        post :create, params: { user: user_params }
+
+        expect(response.status).to eq(404)
+      end
+    end
+
     context 'when valid' do
       before do
         allow(Gitlab).to receive(:com?).and_return(true)
