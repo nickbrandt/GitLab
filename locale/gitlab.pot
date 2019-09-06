@@ -2674,7 +2674,7 @@ msgstr ""
 msgid "Change Weight"
 msgstr ""
 
-msgid "Change assignee"
+msgid "Change label"
 msgstr ""
 
 msgid "Change assignee(s)"
