@@ -141,6 +141,7 @@ Rails.application.routes.draw do
       member do
         Gitlab.ee do
           get :metrics, format: :json
+          get '/prometheus/api/v1/*proxy_path', to: 'clusters#prometheus_proxy', as: :prometheus_api
         end
 
         scope :applications do

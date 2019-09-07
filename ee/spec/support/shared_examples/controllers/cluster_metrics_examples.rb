@@ -11,10 +11,7 @@ shared_examples 'cluster metrics' do
     end
 
     describe 'functionality' do
-      let(:user) { create(:user) }
-
       before do
-        clusterable.add_maintainer(user)
         sign_in(user)
       end
 
@@ -77,24 +74,123 @@ shared_examples 'cluster metrics' do
         end
       end
     end
+  end
 
-    describe 'security' do
-      let(:prometheus_adapter) { double(:prometheus_adapter, can_query?: true, query: nil) }
-
-      it { expect { go }.to be_allowed_for(:admin) }
-      it { expect { go }.to be_allowed_for(:owner).of(clusterable) }
-      it { expect { go }.to be_allowed_for(:maintainer).of(clusterable) }
-      it { expect { go }.to be_denied_for(:developer).of(clusterable) }
-      it { expect { go }.to be_denied_for(:reporter).of(clusterable) }
-      it { expect { go }.to be_denied_for(:guest).of(clusterable) }
-      it { expect { go }.to be_denied_for(:user) }
-      it { expect { go }.to be_denied_for(:external) }
+  describe 'GET #prometheus_proxy' do
+    let(:prometheus_proxy_service) { instance_double(Prometheus::ProxyService) }
+    let(:expected_params) do
+      ActionController::Parameters.new(
+        prometheus_proxy_params(
+          proxy_path: 'query',
+          controller: subject.controller_path,
+          action: 'prometheus_proxy'
+        )
+      ).permit!
     end
 
-    private
-
-    def go
-      get :metrics, params: metrics_params, format: :json
+    before do
+      sign_in(user)
     end
+
+    context 'with valid requests' do
+      before do
+        allow(Prometheus::ProxyService).to receive(:new)
+          .with(clusterable, 'GET', 'query', expected_params)
+          .and_return(prometheus_proxy_service)
+
+        allow(prometheus_proxy_service).to receive(:execute)
+          .and_return(service_result)
+      end
+
+      context 'with success result' do
+        let(:service_result) { { status: :success, body: prometheus_body } }
+        let(:prometheus_body) { '{"status":"success"}' }
+
+        it 'returns prometheus response' do
+          prometheus_json_body = JSON.parse(prometheus_body)
+
+          get :prometheus_proxy, params: prometheus_proxy_params
+
+          expect(Prometheus::ProxyService).to have_received(:new)
+            .with(clusterable, 'GET', 'query', expected_params)
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response).to eq(prometheus_json_body)
+        end
+      end
+
+      context 'with nil result' do
+        let(:service_result) { nil }
+
+        it 'returns 204 no content' do
+          get :prometheus_proxy, params: prometheus_proxy_params
+
+          expect(json_response['status']).to eq('processing')
+          expect(json_response['message']).to eq('Not ready yet. Try again later.')
+          expect(response).to have_gitlab_http_status(:no_content)
+        end
+      end
+
+      context 'with 404 result' do
+        let(:service_result) { { http_status: 404, status: :success, body: '{"body": "value"}' } }
+
+        it 'returns body' do
+          get :prometheus_proxy, params: prometheus_proxy_params
+
+          expect(response).to have_gitlab_http_status(:not_found)
+          expect(json_response['body']).to eq('value')
+        end
+      end
+
+      context 'with error result' do
+        context 'with http_status' do
+          let(:service_result) do
+            { http_status: :service_unavailable, status: :error, message: 'error message' }
+          end
+
+          it 'sets the http response status code' do
+            get :prometheus_proxy, params: prometheus_proxy_params
+
+            expect(response).to have_gitlab_http_status(:service_unavailable)
+            expect(json_response['status']).to eq('error')
+            expect(json_response['message']).to eq('error message')
+          end
+        end
+
+        context 'without http_status' do
+          let(:service_result) { { status: :error, message: 'error message' } }
+
+          it 'returns bad_request' do
+            get :prometheus_proxy, params: prometheus_proxy_params
+
+            expect(response). to have_gitlab_http_status(:bad_request)
+            expect(json_response['status']).to eq('error')
+            expect(json_response['message']).to eq('error message')
+          end
+        end
+      end
+    end
+
+    context 'with inappropriate requests' do
+      context 'without correct permissions' do
+        let(:user2) { create(:user) }
+
+        before do
+          sign_out(user)
+          sign_in(user2)
+        end
+
+        it 'returns 404' do
+          get :prometheus_proxy, params: prometheus_proxy_params
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  private
+
+  def go
+    get :metrics, params: metrics_params, format: :json
   end
 end
