@@ -48,6 +48,7 @@ module EE
       rule { reporter }.policy do
         enable :admin_list
         enable :admin_board
+        enable :read_prometheus
       end
 
       rule { maintainer }.policy do
