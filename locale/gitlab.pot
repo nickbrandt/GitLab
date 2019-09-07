@@ -1171,6 +1171,12 @@ msgid_plural "Alerts"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "AlertService|%{linkStart}Learn more%{linkEnd} about configuring this endpoint to receive alerts."
+msgstr ""
+
+msgid "AlertService|Each alert source must be authorized using the following URL and authorization key."
+msgstr ""
+
 msgid "Alerts"
 msgstr ""
 
@@ -12931,6 +12937,9 @@ msgstr ""
 msgid "Reset template"
 msgstr ""
 
+msgid "Resetting the authorization key for this project will require updating the authorization key in every alert source it is enabled in."
+msgstr ""
+
 msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
 msgstr ""
 
@@ -16470,6 +16479,9 @@ msgid "Update approval rule"
 msgstr ""
 
 msgid "Update failed"
+msgstr ""
+
+msgid "Update failed. Please try again."
 msgstr ""
 
 msgid "Update it"
