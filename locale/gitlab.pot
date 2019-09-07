@@ -1189,9 +1189,6 @@ msgstr ""
 msgid "All changes are committed"
 msgstr ""
 
-msgid "All cross-project dependencies have merged"
-msgstr ""
-
 msgid "All email addresses will be used to identify your commits."
 msgstr ""
 
@@ -7536,10 +7533,7 @@ msgstr ""
 msgid "Group was successfully updated."
 msgstr ""
 
-msgid "Group: %{group_name}"
-msgstr ""
-
-msgid "Group: %{name}"
+msgid "Group:"
 msgstr ""
 
 msgid "GroupRoadmap|%{startDateInWords} &ndash; %{endDateInWords}"

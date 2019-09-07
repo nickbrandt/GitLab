@@ -10,7 +10,6 @@ describe API::ComposerPackages do
   let(:token) {create(:oauth_access_token, scopes: 'api', resource_owner: user)}
   let(:personal_access_token) { create(:personal_access_token, user: user) }
   let(:headers_with_token) { { 'Private-Token' => personal_access_token.token } }
-  let(:sha) {'783ff466fb16ed4a22a0dcd03c4191e2714d094d'}
   let(:sha_empty) {'52f6fd0d18e08b13132da4adaeb804766d6e0bf3'}
 
   before do
@@ -18,65 +17,73 @@ describe API::ComposerPackages do
     stub_licensed_features(packages: true)
   end
 
-  describe 'GET /group/*group/-/packages/composer/packages.json' do
-    it 'returns the package includes on group endpoint' do
-      get_group_packages
+  describe 'GET /namespace/*namespace/-/packages/composer/packages.json' do
+    let(:sha) {'d8d023b6259f0e9a7f2fd11df293718ba3d799ec'}
+
+    it 'returns the package includes on namespace endpoint' do
+      get_namespace_packages
       json = JSON.parse(response.body)
 
       expect(json['includes'].first[1]['sha1']).to eq(sha_empty)
       expect_a_valid_package_response
     end
 
-    it 'returns the package includes on group endpoint with token' do
-      get_group_packages_with_token
+    it 'returns the package includes on namespace endpoint with token' do
+      get_namespace_packages_with_token
       json = JSON.parse(response.body)
 
       expect(json['includes'].first[1]['sha1']).to eq(sha)
       expect_a_valid_package_response
     end
 
-    def get_group_packages(params = {})
-      get api("/group/#{group.id}/-/packages/composer/packages.json"), params: params
+    def get_namespace_packages(params = {})
+      get api("/namespace/#{group.id}/-/packages/composer/packages.json"), params: params
     end
 
-    def get_group_packages_with_token(params = {})
-      get_group_packages(params.merge(access_token: token.token))
+    def get_namespace_packages_with_token(params = {})
+      get_namespace_packages(params.merge(access_token: token.token))
     end
   end
 
-  describe 'GET /group/1/-/packages/composer/include/all$*sha.json' do
-    it 'returns the packages info on empty group endpoint' do
-      get_group_packages_includes(sha_empty)
+  describe 'GET /namespace/*namespace/-/packages/composer/include/all$*sha.json' do
+    let(:sha) {'f4052b58b0d2b9f33c5c62c1b8a2f0273fec5da4'}
+
+    it 'returns the packages info on empty namespace endpoint' do
+      get_namespace_packages_includes(sha_empty)
       json = JSON.parse(response.body)
 
       expect(json['packages']).to be_empty
       expect_a_valid_package_response
     end
 
-    it 'returns the packages info on group endpoint with token' do
-      get_group_packages_includes_with_token(sha)
+    it 'returns the packages info on namespace endpoint with token' do
+      get_namespace_packages_includes_with_token(sha)
       json = JSON.parse(response.body)
+      version = upload_params(package.name)
 
       expect(json['packages'].first[0]).to eq("#{group.name}/#{project.name}")
+      expect(json['packages']["#{group.name}/#{project.name}"][version[:version]]).not_to be_blank
       expect_a_valid_package_response
     end
 
     it 'returns 404 NotFound if path json does not exist' do
-      get_group_packages_includes("non-existing-sha-value")
+      get_namespace_packages_includes("non-existing-sha-value")
 
       expect(response).to have_gitlab_http_status(404)
     end
 
-    def get_group_packages_includes(sha, params = {})
-      get api("/group/#{group.id}/-/packages/composer/include/all$#{sha}.json"), params: params
+    def get_namespace_packages_includes(sha, params = {})
+      get api("/namespace/#{group.id}/-/packages/composer/include/all$#{sha}.json"), params: params
     end
 
-    def get_group_packages_includes_with_token(sha, params = {})
-      get_group_packages_includes(sha, params.merge(access_token: token.token))
+    def get_namespace_packages_includes_with_token(sha, params = {})
+      get_namespace_packages_includes(sha, params.merge(access_token: token.token))
     end
   end
 
   describe 'GET /packages/composer/packages.json' do
+    let(:sha) {'7716160b6c75020445aed3c1c16cf0992fce461a'}
+
     it 'returns the packages info on instance endpoint' do
       get_instance_packages
       json = JSON.parse(response.body)
@@ -93,10 +100,10 @@ describe API::ComposerPackages do
       expect_a_valid_package_response
     end
 
-    context 'package name not matching namespace/group name' do
-      let!(:package) {create(:composer_package, project: project, name: "not-matching/#{project.name}")}
+    context 'package name not matching namespace name' do
+      let(:package) {create(:composer_package, project: project, name: "not-matching/#{project.name}")}
 
-      it 'returns empty packages info on instance endpoint with token if not package name not matching' do
+      it 'returns empty packages info on instance endpoint with token' do
         get_instance_packages_with_token
         json = JSON.parse(response.body)
 
@@ -115,6 +122,8 @@ describe API::ComposerPackages do
   end
 
   describe 'GET /packages/composer/include/all$*sha.json' do
+    let(:sha) {'d9713aa862ce1516bf8de840d89def833535bac9'}
+
     it 'returns the package info/includes on instance endpoint' do
       get_instance_packages_includes(sha_empty)
       json = JSON.parse(response.body)
@@ -233,12 +242,12 @@ describe API::ComposerPackages do
         shasum: '',
         'attachments' => [
             {
-                'contents' => 'aGVsbG8K',
+                'contents' => Base64.encode64('aGVsbG8K'),
                 'filename' => 'ochorocho-gitlab-composer-2.0.0-19c3ec.tar',
                 'length' => 8
             },
             {
-                'contents' => 'aGVsbG8K',
+                'contents' => Base64.encode64('aGVsbG8K'),
                 'filename' => 'version-dev-develop.json',
                 'length' => 8
             }

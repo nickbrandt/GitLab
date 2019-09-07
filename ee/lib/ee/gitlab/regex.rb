@@ -14,9 +14,9 @@ module EE
           @environment_scope_regex ||= /\A[#{environment_scope_regex_chars}]+\z/.freeze
         end
 
-      def package_name_regex
-        @package_name_regex ||= %r{\A(([\w\-\.\@]*)/)*([\w\-\.]*)\z}.freeze
-      end
+        def environment_scope_regex_message
+          "can contain only letters, digits, '-', '_', '/', '$', '{', '}', '.', '*' and spaces"
+        end
 
         def package_name_regex
           @package_name_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.]*)\z}.freeze

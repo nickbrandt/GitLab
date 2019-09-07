@@ -414,6 +414,10 @@ module EE
 
         expose :approvals_left
 
+        expose :require_password_to_approve do |approval_state|
+          approval_state.project.require_password_to_approve?
+        end
+
         expose :approved_by, using: EE::API::Entities::Approvals do |approval_state|
           approval_state.merge_request.approvals
         end
@@ -730,6 +734,7 @@ module EE
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
+        expose :dist_tags, as: 'dist-tags'
       end
 
       class ComposerPackage < Grape::Entity
@@ -737,56 +742,31 @@ module EE
         expose :versions
       end
 
-      class ComposerPackage < Grape::Entity
+      class Package < Grape::Entity
+        expose :id
         expose :name
-        expose :versions
+        expose :version
+        expose :package_type
       end
 
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
+      class PackageFile < Grape::Entity
+        expose :id, :package_id, :created_at
+        expose :file_name, :size
+        expose :file_md5, :file_sha1
       end
 
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
+      class ManagedLicense < Grape::Entity
+        expose :id, :name, :approval_status
       end
 
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
-      end
-
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
-      end
-
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
-      end
-
-      class ComposerPackage < Grape::Entity
-        expose :name
-        expose :versions
+      class ProjectAlias < Grape::Entity
+        expose :id, :project_id, :name
       end
 
       class Dependency < Grape::Entity
-        class Vulnerability < Grape::Entity
-          expose :name, :severity
-        end
-
         expose :name, :version, :package_manager, :dependency_file_path
         expose :dependency_file_path do |dependency|
           dependency[:location][:path]
-        end
-        expose :vulnerabilities, using: Vulnerability, if: ->(_, opts) { can_read_vulnerabilities?(opts[:user], opts[:project]) }
-
-        private
-
-        def can_read_vulnerabilities?(user, project)
-          Ability.allowed?(user, :read_project_security_dashboard, project)
         end
       end
     end

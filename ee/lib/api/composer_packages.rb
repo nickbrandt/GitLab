@@ -13,7 +13,7 @@ module API
     helpers ::API::Helpers::PackagesHelpers
 
     desc 'Composer packages endpoint at instance level' do
-      detail 'This feature was introduced in GitLab 11.10'
+      detail 'This feature was introduced in GitLab 12.1'
     end
     route_setting :authentication, job_token_allowed: true
     get 'packages/composer/packages.json' do
@@ -25,7 +25,7 @@ module API
     end
 
     desc 'Composer registry endpoint at instance level for include/all${sha}.json' do
-      detail 'This feature was introduced in GitLab 11.10'
+      detail 'This feature was introduced in GitLab 12.1'
     end
     params do
       requires :sha, type: String, desc: 'Shasum of current packages.json'
@@ -40,32 +40,32 @@ module API
     end
 
     params do
-      requires :id, type: String, desc: 'The ID of a group'
+      requires :id, type: String, desc: 'The ID of a namespace'
     end
-    resource :group, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
-      desc 'Composer packages endpoint at group level' do
-        detail 'This feature was introduced in GitLab 11.8'
+    resource :namespace, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      desc 'Composer packages endpoint at namespace level' do
+        detail 'This feature was introduced in GitLab 12.1'
       end
       route_setting :authentication, job_token_allowed: true
       get ':id/-/packages/composer/packages.json' do
-        group = find_group(params[:id])
-        packages = ::Packages::ComposerPackagesFinder.new(current_user, group).execute
+        namespace = find_namespace(params[:id])
+        packages = ::Packages::ComposerPackagesFinder.new(current_user, namespace).execute
         presenter = ComposerPackagePresenter.new(packages)
         sha = Digest::SHA1.hexdigest(presenter.versions.to_json)
 
         presenter.packages_root(sha)
       end
 
-      desc 'Composer packages endpoint at group level for include/all${sha}.json' do
-        detail 'This feature was introduced in GitLab 11.8'
+      desc 'Composer packages endpoint at namespace level for include/all${sha}.json' do
+        detail 'This feature was introduced in GitLab 12.1'
       end
       params do
         requires :sha, type: String, desc: 'Shasum of current packages.json'
       end
       route_setting :authentication, job_token_allowed: true
       get ':id/-/packages/composer/include/all$*sha.json', requirements: COMPOSER_ENDPOINT_REQUIREMENTS do
-        group = find_group(params[:id])
-        packages = ::Packages::ComposerPackagesFinder.new(current_user, group).execute
+        namespace = find_namespace(params[:id])
+        packages = ::Packages::ComposerPackagesFinder.new(current_user, namespace).execute
         presenter = ComposerPackagePresenter.new(packages)
         json = presenter.versions
 
@@ -82,7 +82,7 @@ module API
       end
 
       desc 'Download the Composer archive, can be zip or tar' do
-        detail 'This feature was introduced in GitLab 11.10'
+        detail 'This feature was introduced in GitLab 12.1'
       end
       params do
         requires :package_name, type: String, desc: 'Package name'
@@ -91,7 +91,7 @@ module API
       route_setting :authentication, job_token_allowed: true
       get ':id/packages/composer/*package_name/-/*file_name', format: false do
         authorize_download_package!
-        package = user_project.packages
+        package = user_project.packages.find_composer_packages
                       .by_name_and_file_name(params[:package_name], params[:file_name])
 
         package_file = ::Packages::PackageFileFinder
@@ -101,7 +101,7 @@ module API
       end
 
       desc 'Upload and create Composer package' do
-        detail 'This feature was introduced in GitLab 11.10'
+        detail 'This feature was introduced in GitLab 12.1'
       end
       params do
         requires :package_name, type: String, desc: 'Package name'

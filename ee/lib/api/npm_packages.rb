@@ -5,10 +5,6 @@ module API
       package_name: API::NO_SLASH_URL_PART_REGEX
     }.freeze
 
-    rescue_from ActiveRecord::RecordInvalid do |e|
-      render_api_error!(e.message, 400)
-    end
-
     before do
       require_packages_enabled!
       authenticate_non_get!
@@ -20,6 +16,14 @@ module API
       def find_project_by_package_name(name)
         Project.find_by_full_path(name.sub('@', ''))
       end
+
+      def project_package_name_match?
+        "@#{user_project.full_path}" == params[:package_name]
+      end
+
+      def ensure_project_package_match!
+        bad_request!(:package_name) unless project_package_name_match?
+      end
     end
 
     desc 'NPM registry endpoint at instance level' do
@@ -28,19 +32,17 @@ module API
     params do
       requires :package_name, type: String, desc: 'Package name'
     end
-    route_setting :authentication, job_token_allowed: true
-    get 'packages/npm/*package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
+    get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
       # To avoid name collision we require project path and project package be the same.
-      # For packages that have different name from the project we should use
-      # the endpoint that includes project id
       project = find_project_by_package_name(package_name)
 
       authorize!(:read_package, project)
       forbidden! unless project.feature_available?(:packages)
 
-      packages = project.packages.with_name(package_name)
+      packages = ::Packages::NpmPackagesFinder
+        .new(project, package_name).execute
 
       present NpmPackagePresenter.new(project, package_name, packages),
         with: EE::API::Entities::NpmPackage
@@ -52,6 +54,7 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_packages_feature!
+        ensure_project_package_match!
       end
 
       desc 'Download the NPM tarball' do
@@ -61,11 +64,10 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :file_name, type: String, desc: 'Package file name'
       end
-      route_setting :authentication, job_token_allowed: true
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_download_package!
 
-        package = user_project.packages
+        package = user_project.packages.npm
           .by_name_and_file_name(params[:package_name], params[:file_name])
 
         package_file = ::Packages::PackageFileFinder
@@ -79,19 +81,13 @@ module API
       end
       params do
         requires :package_name, type: String, desc: 'Package name'
+        requires :versions, type: Hash, desc: 'Package version info'
       end
-      route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 
-        created_package = ::Packages::CreateNpmPackageService
+        ::Packages::CreateNpmPackageService
           .new(user_project, current_user, params).execute
-
-        if created_package[:status] == :error
-          render_api_error!(created_package[:message], created_package[:http_status])
-        else
-          created_package
-        end
       end
     end
   end

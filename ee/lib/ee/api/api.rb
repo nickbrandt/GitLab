@@ -29,6 +29,7 @@ module EE
         mount ::API::ConanPackages
         mount ::API::MavenPackages
         mount ::API::NpmPackages
+        mount ::API::ComposerPackages
         mount ::API::Packages
         mount ::API::PackageFiles
         mount ::API::Scim

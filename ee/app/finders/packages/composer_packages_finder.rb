@@ -2,7 +2,7 @@
 class Packages::ComposerPackagesFinder
   attr_reader :current_user, :group
 
-  COMPOSER_NAME_MATCH_REGEX = %r{^(.*?)/}
+  COMPOSER_NAME_MATCH_REGEX = %r{^(.*?)/}.freeze
 
   def initialize(current_user, group = nil)
     @current_user = current_user
@@ -13,14 +13,25 @@ class Packages::ComposerPackagesFinder
     if group
       packages_for_multiple_projects_in_group.find_composer_packages
     else
-      packages_for_multiple_projects.find_composer_packages
+      packages_for_multiple_projects_matching_namespace
     end
   end
 
   private
 
-  def packages_for_multiple_projects
-    ::Packages::Package.for_projects(version_match_namespace(projects_visible_to_current_user))
+  def packages_for_multiple_projects_matching_namespace
+    @packages = []
+    projects_visible_to_current_user.each do |project|
+      project.packages.find_composer_packages.each do |package|
+        package_namespace = package.name.match(COMPOSER_NAME_MATCH_REGEX)[1]
+
+        next unless project.namespace.path == package_namespace
+
+        @packages << package
+      end
+    end
+
+    @packages
   end
 
   def projects_visible_to_current_user
@@ -33,14 +44,5 @@ class Packages::ComposerPackagesFinder
 
   def projects_visible_in_group_to_current_user(group, user = nil)
     ::Project.in_namespace(group.self_and_descendants.select(:id)).public_or_visible_to_user(user)
-  end
-
-  def version_match_namespace(projects)
-    projects.each do |project|
-      next unless project.packages.first
-
-      match = project.packages.first.name.match(COMPOSER_NAME_MATCH_REGEX)
-      match.present? && project.namespace.name == match[1]
-    end
   end
 end

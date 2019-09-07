@@ -11,7 +11,7 @@ module Packages
 
       body['attachments'].each do |file|
         file_params = {
-            file: CarrierWaveStringFile.new(file['contents']),
+            file: CarrierWaveStringFile.new(Base64.decode64(file['contents'])),
             size: file['length'].to_i,
             file_sha1: body['version_data']['dist']['shasum'],
             file_name: file['filename']
@@ -22,7 +22,7 @@ module Packages
     end
 
     def create_or_update_package(body)
-      package_exists = project.packages.version_exists(body['version'])
+      package_exists = project.packages.version_exists(body['name'], body['version'])
 
       package_exists.empty? ? create_package(body) : update_package(package_exists)
     end

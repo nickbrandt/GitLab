@@ -13,13 +13,18 @@ class Packages::Package < ApplicationRecord
     presence: true,
     format: { with: Gitlab::Regex.package_name_regex }
 
+  validate :valid_npm_package_name, if: :npm?
+  validate :package_already_taken, if: :npm?
+
   enum package_type: { maven: 1, npm: 2, composer: 3 }
 
   scope :with_name, ->(name) { where(name: name) }
+  scope :with_version, ->(version) { where(version: version) }
+  scope :has_version, -> { where.not(version: nil) }
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
   scope :find_composer_packages, -> { where(package_type: 3) }
-  scope :version_exists, ->(version) { where(version: version) }
+  scope :version_exists, -> (name, version) { where(name: name, version: version) }
 
   def self.for_projects(projects)
     return none unless projects.any?
