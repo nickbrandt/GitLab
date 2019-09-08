@@ -28,6 +28,17 @@ module QA
                 element :board_list_header
               end
 
+              view 'ee/app/assets/javascripts/boards/toggle_focus.js' do
+                element :focus_mode_button
+              end
+
+              # The `focused_board` method does not use `find_element` with an element defined
+              # with the attribute `data-qa-selector` since such element is not unique when the
+              # `is-focused` class is not set, and it was not possible to find a better solution.
+              def focused_board
+                find('.issue-boards-content.js-focus-mode-board.is-focused')
+              end
+
               def boards_dropdown
                 find_element(:boards_dropdown)
               end
@@ -54,6 +65,10 @@ module QA
                     find_element(:board_card)
                   end
                 end
+              end
+
+              def click_focus_mode_button
+                click_element(:focus_mode_button)
               end
 
               private
