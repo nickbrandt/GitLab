@@ -3,7 +3,7 @@
 module GitlabSubscriptions
   class CreateLeadService
     def execute(company_params)
-      response = subscription_app_client.create_trial_account(company_params)
+      response = subscription_app_client.generate_trial(company_params)
 
       if response.success
         { success: true }

@@ -3,7 +3,7 @@
 module Gitlab
   module SubscriptionPortal
     class Client
-      def create_trial_account(params)
+      def generate_trial(params)
         parse_response(Gitlab::HTTP.post("#{base_url}/trials",
                                          body: params.to_json,
                                          headers: headers))

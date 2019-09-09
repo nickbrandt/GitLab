@@ -8,7 +8,7 @@ describe Gitlab::SubscriptionPortal::Client do
     let(:httparty_response) { double(code: http_response.code, response: http_response, body: {}.to_json) }
 
     subject do
-      described_class.new.create_trial_account({})
+      described_class.new.generate_trial({})
     end
 
     context 'when response is successful' do
@@ -31,7 +31,7 @@ describe Gitlab::SubscriptionPortal::Client do
       end
     end
 
-    context 'when response code is generic' do
+    context 'when response code is 500' do
       let(:http_response) { Net::HTTPServerError.new(1.0, '500', 'Error') }
 
       it 'has a server error status' do
