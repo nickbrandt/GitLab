@@ -183,6 +183,65 @@ describe API::Projects do
   end
 
   describe 'POST /projects' do
+    shared_examples 'creates projects with templates' do
+      before do
+        group.add_maintainer(user)
+        stub_licensed_features(custom_project_templates: true)
+        stub_ee_application_setting(custom_project_templates_group_id: group.id)
+      end
+
+      it 'creates a project using a template' do
+        expect(ProjectExportWorker).to receive(:perform_async).and_call_original
+
+        Sidekiq::Testing.fake! do
+          expect { post api('/projects', user), params: project_params }
+            .to change { Project.count }.by(1)
+        end
+
+        expect(response).to have_gitlab_http_status(201)
+
+        project = Project.find(json_response['id'])
+        expect(project.name).to eq(new_project_name)
+      end
+    end
+
+    context 'with instance-level templates' do
+      let(:group) { create(:group) }
+      let!(:project) { create(:project, :public, namespace: group) }
+      let(:new_project_name) { "project-#{SecureRandom.hex}" }
+      let(:project_params) do
+        {
+          template_name: project.name,
+          name: new_project_name,
+          path: new_project_name,
+          use_custom_template: true,
+          namespace_id: group.id
+        }
+      end
+
+      it_behaves_like 'creates projects with templates'
+    end
+
+    context 'with group templates' do
+      let(:parent_group) { create(:group) }
+      let(:subgroup) { create(:group, :public, parent: parent_group) }
+      let(:group) { subgroup }
+      let!(:project) { create(:project, :public, namespace: subgroup) }
+      let(:new_project_name) { "project-#{SecureRandom.hex}" }
+      let(:project_params) do
+        {
+          template_name: project.name,
+          name: new_project_name,
+          path: new_project_name,
+          use_custom_template: true,
+          group_with_project_templates_id: subgroup.id,
+          namespace_id: subgroup.id
+        }
+      end
+
+      it_behaves_like 'creates projects with templates'
+    end
+
     context 'when importing with mirror attributes' do
       let(:import_url) { generate(:url) }
       let(:mirror_params) do
