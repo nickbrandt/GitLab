@@ -5,15 +5,16 @@
 - if current_plan
   = render 'shared/billings/billing_plan_header', namespace: namespace, plan: current_plan
 
-- if namespace.upgradable?
-  .gl-p-4.center
-    = link_to s_('BillingPlan|Upgrade plan'), plan_upgrade_url(namespace, current_plan), class: 'btn btn-success'
+- unless namespace.gold_plan?
+  - if namespace.upgradable?
+    .gl-p-4.center
+      = link_to s_('BillingPlan|Upgrade plan'), plan_upgrade_url(namespace, current_plan), class: 'btn btn-success'
 
-- else
-  .billing-plans
-    - plans_data.each do |plan|
-      = render 'shared/billings/billing_plan', namespace: namespace, plan: plan
+  - else
+    .billing-plans
+      - plans_data.each do |plan|
+        = render 'shared/billings/billing_plan', namespace: namespace, plan: plan
 
 - if namespace.actual_plan
   .center
-    = s_('BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}.').html_safe % { support_link_start: support_link_start, support_link_end: support_link_end }
+    &= s_('BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}.').html_safe % { support_link_start: support_link_start, support_link_end: support_link_end }
