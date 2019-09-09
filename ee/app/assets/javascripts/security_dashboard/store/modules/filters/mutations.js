@@ -53,4 +53,7 @@ export default {
       hiddenFilter.hidden = true;
     }
   },
+  [types.SET_TOGGLE_VALUE](state, { key, value }) {
+    state[key] = value;
+  },
 };

@@ -1,0 +1,5 @@
+---
+title: Added a toggle to show/hide dismissed vulnerabilities in the security dashboard
+merge_request: 15333
+author:
+type: added

@@ -74,4 +74,28 @@ describe('moderator', () => {
       activeFilters,
     );
   });
+
+  it('triggers fetching vulnerabilities after "Hide dismissed" toggle changes', () => {
+    spyOn(store, 'dispatch');
+
+    const activeFilters = store.getters['filters/activeFilters'];
+
+    store.commit(`filters/${filtersMutationTypes.SET_TOGGLE_VALUE}`, {});
+
+    expect(store.dispatch).toHaveBeenCalledTimes(3);
+    expect(store.dispatch).toHaveBeenCalledWith(
+      'vulnerabilities/fetchVulnerabilities',
+      activeFilters,
+    );
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      'vulnerabilities/fetchVulnerabilitiesCount',
+      activeFilters,
+    );
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      'vulnerabilities/fetchVulnerabilitiesHistory',
+      activeFilters,
+    );
+  });
 });
