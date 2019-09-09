@@ -1933,6 +1933,9 @@ msgstr ""
 msgid "Audit Events"
 msgstr ""
 
+msgid "Audit Events is a way to keep track of important events that happened in GitLab."
+msgstr ""
+
 msgid "Aug"
 msgstr ""
 
@@ -16202,6 +16205,9 @@ msgstr ""
 msgid "Track your GitLab projects with GitLab for Slack."
 msgstr ""
 
+msgid "Track your project with Audit Events."
+msgstr ""
+
 msgid "Transfer project"
 msgstr ""
 
@@ -16560,6 +16566,9 @@ msgid "Upgrade your plan"
 msgstr ""
 
 msgid "Upgrade your plan to activate Advanced Global Search."
+msgstr ""
+
+msgid "Upgrade your plan to activate Audit Events."
 msgstr ""
 
 msgid "Upgrade your plan to activate Contribution Analytics."
