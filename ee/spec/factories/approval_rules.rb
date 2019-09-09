@@ -19,6 +19,10 @@ FactoryBot.define do
     report_type :security
     sequence(:name) { |n| "*-#{n}.js" }
 
+    trait :requires_approval do
+      approvals_required { rand(1..ApprovalProjectRule::APPROVALS_REQUIRED_MAX) }
+    end
+
     trait :license_management do
       name ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT
       report_type :license_management
