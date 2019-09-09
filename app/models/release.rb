@@ -12,9 +12,6 @@ class Release < ApplicationRecord
 
   has_many :links, class_name: 'Releases::Link'
 
-  # A one-to-one relationship is set up here as part of a MVC: https://gitlab.com/gitlab-org/gitlab-ce/issues/62402
-  # However, on the long term, we will want a many-to-many relationship between Release and Milestone.
-  # The "has_one through" allows us today to set up this one-to-one relationship while setting up the architecture for the long-term (ie intermediate table).
   has_many :milestone_releases
   has_many :milestones, through: :milestone_releases
 

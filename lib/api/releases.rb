@@ -54,7 +54,7 @@ module API
             requires :url, type: String
           end
         end
-        optional :milestones, type: Array, desc: 'The titles of the related milestones'
+        optional :milestones, type: Array, desc: 'The titles of the related milestones', default: []
         optional :released_at, type: DateTime, desc: 'The date when the release will be/was ready. Defaults to the current time.'
       end
       post ':id/releases' do

@@ -50,16 +50,16 @@ describe Releases::UpdateService do
     end
 
     context 'when a milestone is passed in' do
-      let(:old_title) { 'v1.0' }
       let(:new_title) { 'v2.0' }
-      let(:milestone) { create(:milestone, project: project, title: old_title) }
+      let(:milestone) { create(:milestone, project: project, title: 'v1.0') }
       let(:new_milestone) { create(:milestone, project: project, title: new_title) }
       let(:params_with_milestone) { params.merge!({ milestones: [new_title] }) }
+      let(:service) { described_class.new(new_milestone.project, user, params_with_milestone) }
 
       before do
         release.milestones << milestone
 
-        described_class.new(new_milestone.project, user, params_with_milestone).execute
+        service.execute
         release.reload
       end
 
@@ -75,7 +75,8 @@ describe Releases::UpdateService do
       before do
         release.milestones << milestone
 
-        described_class.new(milestone.project, user, params_with_empty_milestone).execute
+        service.params = params_with_empty_milestone
+        service.execute
         release.reload
       end
 
@@ -85,24 +86,24 @@ describe Releases::UpdateService do
     end
 
     context "when multiple new milestones are passed in" do
-      let(:old_title) { 'v1.0' }
       let(:new_title_1) { 'v2.0' }
       let(:new_title_2) { 'v2.0-rc' }
-      let(:milestone) { create(:milestone, project: project, title: old_title) }
-      let(:new_milestone_1) { create(:milestone, project: project, title: new_title_1) }
-      let!(:new_milestone_2) { create(:milestone, project: project, title: new_title_2) }
+      let(:milestone) { create(:milestone, project: project, title: 'v1.0') }
       let(:params_with_milestones) { params.merge!({ milestones: [new_title_1, new_title_2] }) }
+      let(:service) { described_class.new(project, user, params_with_milestones) }
 
       before do
+        create(:milestone, project: project, title: new_title_1)
+        create(:milestone, project: project, title: new_title_2)
         release.milestones << milestone
 
-        described_class.new(new_milestone_1.project, user, params_with_milestones).execute
+        service.execute
         release.reload
       end
 
       it 'removes the old milestone and update the release with the new ones' do
-        expect(release.milestones.map(&:title)).to include(new_title_1, new_title_2)
-        expect(release.milestones.map(&:title)).not_to include(old_title)
+        milestone_titles = release.milestones.map(&:title)
+        expect(milestone_titles).to match_array([new_title_1, new_title_2])
       end
     end
   end

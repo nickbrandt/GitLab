@@ -27,9 +27,6 @@ class Milestone < ApplicationRecord
   belongs_to :project
   belongs_to :group
 
-  # A one-to-one relationship is set up here as part of a MVC: https://gitlab.com/gitlab-org/gitlab-ce/issues/62402
-  # However, on the long term, we will want a many-to-many relationship between Release and Milestone.
-  # The "has_one through" allows us today to set up this one-to-one relationship while setting up the architecture for the long-term (ie intermediate table).
   has_many :milestone_releases
   has_many :releases, through: :milestone_releases
 

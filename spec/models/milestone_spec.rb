@@ -79,6 +79,7 @@ describe Milestone do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to have_many(:issues) }
     it { is_expected.to have_many(:releases) }
+    it { is_expected.to have_many(:milestone_releases) }
   end
 
   let(:project) { create(:project, :public) }
