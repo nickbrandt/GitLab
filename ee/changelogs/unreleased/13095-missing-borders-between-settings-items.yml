@@ -1,0 +1,5 @@
+---
+title: Fix missing borders between settings items
+merge_request: 14877
+author:
+type: fixed
