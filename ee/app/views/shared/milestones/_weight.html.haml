@@ -13,7 +13,7 @@
         None
   .title.hide-collapsed
     Total issue weight
-  .value.hide-collapsed
+  .value.hide-collapsed{ data: { qa_selector: 'total_issue_weight_value' } }
     - unless total_weight.zero?
       %strong.bold= total_weight
     - else

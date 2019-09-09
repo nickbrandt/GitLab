@@ -11,6 +11,10 @@ module QA
                 view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
                   element :related_issues_loading_icon
                 end
+
+                view 'ee/app/assets/javascripts/sidebar/components/weight/weight.vue' do
+                  element :weight_label_value
+                end
               end
             end
 
@@ -18,6 +22,10 @@ module QA
               wait(reload: false) do
                 has_no_element?(:related_issues_loading_icon)
               end
+            end
+
+            def weight_label_value
+              find_element(:weight_label_value)
             end
           end
         end
