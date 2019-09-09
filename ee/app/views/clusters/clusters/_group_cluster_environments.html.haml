@@ -2,7 +2,7 @@
 - is_group_type = @cluster.cluster_type.in? 'group_type'
 - is_creating = @cluster.status_name.in? %i/scheduled creating/
 
-- if is_group_type && !is_creating
+- if is_group_type && !is_creating && Feature.enabled?(:view_group_cluster_deployments)
   .js-toggle-container
     %ul.nav-links.mobile-separator.nav.nav-tabs{ role: 'tablist' }
       %li.nav-item{ role: 'presentation' }
