@@ -134,7 +134,7 @@ export default {
 };
 </script>
 <template>
-  <div class="issues-analytics-wrapper">
+  <div class="issues-analytics-wrapper" data-qa-selector="issues_analytics_wrapper">
     <div v-if="loading" class="issues-analytics-loading text-center">
       <gl-loading-icon :inline="true" :size="4" />
     </div>
