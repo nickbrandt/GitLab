@@ -175,8 +175,8 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
     context 'with an A record' do
       let(:record_type) { 'A' }
 
-      let(:res1) { double(:resource, address: '255.255.255.0', ttl: 90) }
-      let(:res2) { double(:resource, address: '127.0.0.1', ttl: 90) }
+      let(:res1) { double(:resource, address: IPAddr.new('255.255.255.0'), ttl: 90) }
+      let(:res2) { double(:resource, address: IPAddr.new('127.0.0.1'), ttl: 90) }
 
       it 'returns a TTL and ordered list of IP addresses' do
         addresses = [
@@ -198,8 +198,8 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
 
       before do
         expect_next_instance_of(Gitlab::Database::LoadBalancing::SrvResolver) do |resolver|
-          allow(resolver).to receive(:address_for).with('foo1.service.consul.').and_return('255.255.255.0')
-          allow(resolver).to receive(:address_for).with('foo2.service.consul.').and_return('127.0.0.1')
+          allow(resolver).to receive(:address_for).with('foo1.service.consul.').and_return(IPAddr.new('255.255.255.0'))
+          allow(resolver).to receive(:address_for).with('foo2.service.consul.').and_return(IPAddr.new('127.0.0.1'))
           allow(resolver).to receive(:address_for).with('foo3.service.consul.').and_return(nil)
         end
       end

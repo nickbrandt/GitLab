@@ -174,7 +174,7 @@ module Gitlab
             address = srv_resolver.address_for(r.host.to_s)
             next unless address
 
-            Address.new(address, r.port)
+            Address.new(address.to_s, r.port)
           end.compact
         end
 
