@@ -8,6 +8,11 @@
       - master@gitlab/gitlabhq
       - master@gitlab/gitlab-ee
 
+.only-gitlab-ee:
+  only:
+    - branches@gitlab-org/gitlab-ee
+    - tags@gitlab-org/gitlab-ee
+
 .rake-exec:
   extends:
     - .default-tags
@@ -317,7 +322,9 @@ coverage:
 
 ## EE-specific content
 .rspec-base-ee:
-  extends: .rspec-base
+  extends:
+    - .rspec-base
+    - .only-gitlab-ee
   script:
     - JOB_NAME=( $CI_JOB_NAME )
     - TEST_TOOL=${JOB_NAME[0]}
@@ -356,7 +363,9 @@ rspec system pg ee:
   parallel: 5
 
 .rspec-base-pg-geo:
-  extends: .rspec-base
+  extends:
+    - .rspec-base
+    - .only-gitlab-ee
   script:
     - JOB_NAME=( $CI_JOB_NAME )
     - TEST_TOOL=${JOB_NAME[0]}
@@ -434,7 +443,9 @@ migration:upgrade-pg-ce-to-ee:
     - bundle exec rake db:migrate
 
 db:rollback geo:
-  extends: db:rollback
+  extends:
+    - db:rollback
+    - .only-gitlab-ee
   script:
     - bundle exec rake geo:db:migrate VERSION=20170627195211
     - bundle exec rake geo:db:migrate
