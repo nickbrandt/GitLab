@@ -12,6 +12,11 @@ describe API::ConanPackages do
     )
   end
 
+  let(:personal_access_token) { create(:personal_access_token) }
+  let(:headers) do
+    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
+  end
+
   before do
     stub_licensed_features(packages: true)
     allow(Settings).to receive(:attr_encrypted_db_key_base).and_return(base_secret)
@@ -45,7 +50,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 200 OK when valid token is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
 
@@ -56,7 +60,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when invalid access token ID is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(double(id: 12345), user_id: personal_access_token.user_id)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -65,7 +68,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when invalid user is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token, user_id: 12345)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -74,7 +76,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when the provided JWT is signed with different secret' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token, secret: SecureRandom.base64(32))
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -109,8 +110,6 @@ describe API::ConanPackages do
     end
 
     it 'responds with 200 OK and JWT when valid access token is provided' do
-      personal_access_token = create(:personal_access_token)
-      headers = { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
       get api('/packages/conan/v1/users/authenticate'), headers: headers
 
       expect(response).to have_gitlab_http_status(200)
