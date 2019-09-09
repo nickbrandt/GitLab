@@ -1,6 +1,9 @@
 query getStorageCounter($fullPath: ID!) {
   namespace(fullPath: $fullPath) {
     id
+    rootStorageStatistics {
+      storageSize
+    }
     projects(includeSubgroups: true) {
       edges {
         node {
