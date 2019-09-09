@@ -67,5 +67,6 @@
 - project_import_schedule
 - project_update_repository_storage
 - rebase
+- refresh_license_compliance_checks
 - repository_update_mirror
 - repository_push_audit_event

@@ -280,4 +280,36 @@ describe ApprovalMergeRequestRule do
       end
     end
   end
+
+  describe "#refresh_required_approvals!" do
+    before do
+      stub_licensed_features(license_management: true)
+    end
+
+    context "when the rule is a `#{ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT}` rule" do
+      subject { create(:report_approver_rule, :requires_approval, :license_management, merge_request: open_merge_request) }
+      let(:open_merge_request) { create(:merge_request, :opened, target_project: project, source_project: project) }
+      let!(:project_approval_rule) { create(:approval_project_rule, :requires_approval, :license_management, project: project) }
+      let(:project) { create(:project) }
+      let!(:open_pipeline) { create(:ee_ci_pipeline, :success, :with_license_management_report, project: project, merge_requests_as_head_pipeline: [open_merge_request]) }
+      let!(:blacklist_policy) { create(:software_license_policy, project: project, software_license: license, approval_status: :blacklisted) }
+
+      before do
+        subject.refresh_required_approvals!(project_approval_rule)
+      end
+
+      context "when the latest license report violates the compliance policy" do
+        let(:license) { create(:software_license, name: license_report.license_names[0]) }
+        let(:license_report) { open_pipeline.license_management_report }
+
+        specify { expect(subject.approvals_required).to be(project_approval_rule.approvals_required) }
+      end
+
+      context "when the latest license report adheres to the compliance policy" do
+        let(:license) { create(:software_license, name: SecureRandom.uuid) }
+
+        specify { expect(subject.approvals_required).to be_zero }
+      end
+    end
+  end
 end

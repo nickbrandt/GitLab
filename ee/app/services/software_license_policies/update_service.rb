@@ -15,6 +15,7 @@ module SoftwareLicensePolicies
 
       begin
         software_license_policy.update(params)
+        RefreshLicenseComplianceChecksWorker.perform_async(project.id)
       rescue ArgumentError => ex
         return error(ex.message, 400)
       end

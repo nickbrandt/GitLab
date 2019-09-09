@@ -48,10 +48,12 @@ describe SoftwareLicensePolicies::UpdateService do
 
       context 'with a user allowed to admin' do
         it 'updates the software license policy correctly' do
+          allow(RefreshLicenseComplianceChecksWorker).to receive(:perform_async)
           update_software_license_policy(opts)
 
           expect(software_license_policy).to be_valid
           expect(software_license_policy.approval_status).to eq(opts[:approval_status])
+          expect(RefreshLicenseComplianceChecksWorker).to have_received(:perform_async).with(project.id)
         end
       end
 

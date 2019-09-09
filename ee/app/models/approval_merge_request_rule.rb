@@ -55,6 +55,10 @@ class ApprovalMergeRequestRule < ApplicationRecord
   # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
   scope :code_owner, -> { where(code_owner: true).or(where(rule_type: :code_owner)) }
   scope :security_report, -> { report_approver.where(report_type: :security) }
+  scope :license_compliance, -> { report_approver.where(report_type: :license_management) }
+  scope :with_head_pipeline, -> { includes(merge_request: [:head_pipeline]) }
+  scope :open_merge_requests, -> { merge(MergeRequest.opened) }
+  scope :for_checks_that_can_be_refreshed, -> { license_compliance.open_merge_requests.with_head_pipeline }
 
   def self.find_or_create_code_owner_rule(merge_request, pattern)
     merge_request.approval_rules.code_owner.where(name: pattern).first_or_create do |rule|
@@ -114,6 +118,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
     self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
   end
 
+  def refresh_required_approvals!(project_approval_rule)
+    return unless report_approver?
+
+    refresh_license_management_approvals(project_approval_rule) if license_management?
+  end
+
   private
 
   def validate_approval_project_rule
@@ -121,5 +131,16 @@ class ApprovalMergeRequestRule < ApplicationRecord
     return if merge_request.project == approval_project_rule.project
 
     errors.add(:approval_project_rule, 'must be for the same project')
+  end
+
+  def refresh_license_management_approvals(project_approval_rule)
+    license_report = merge_request.head_pipeline&.license_management_report
+    return if license_report.blank?
+
+    if license_report.violates?(project.software_license_policies)
+      update!(approvals_required: project_approval_rule.approvals_required)
+    else
+      update!(approvals_required: 0)
+    end
   end
 end
