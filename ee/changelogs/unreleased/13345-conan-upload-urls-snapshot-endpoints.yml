@@ -1,0 +1,5 @@
+---
+title: Add Conan upload_urls, manifest, and snapshot API endpoints
+merge_request: 16344
+author:
+type: added

@@ -12,6 +12,11 @@ describe API::ConanPackages do
     )
   end
 
+  let(:personal_access_token) { create(:personal_access_token) }
+  let(:headers) do
+    { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
+  end
+
   before do
     stub_licensed_features(packages: true)
     allow(Settings).to receive(:attr_encrypted_db_key_base).and_return(base_secret)
@@ -45,7 +50,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 200 OK when valid token is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
 
@@ -56,7 +60,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when invalid access token ID is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(double(id: 12345), user_id: personal_access_token.user_id)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -65,7 +68,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when invalid user is provided' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token, user_id: 12345)
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -74,7 +76,6 @@ describe API::ConanPackages do
       end
 
       it 'responds with 401 Unauthorized when the provided JWT is signed with different secret' do
-        personal_access_token = create(:personal_access_token)
         jwt = build_jwt(personal_access_token, secret: SecureRandom.base64(32))
         headers = { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" }
         get api('/packages/conan/v1/ping'), headers: headers
@@ -109,8 +110,6 @@ describe API::ConanPackages do
     end
 
     it 'responds with 200 OK and JWT when valid access token is provided' do
-      personal_access_token = create(:personal_access_token)
-      headers = { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('foo', personal_access_token.token) }
       get api('/packages/conan/v1/users/authenticate'), headers: headers
 
       expect(response).to have_gitlab_http_status(200)
@@ -121,6 +120,89 @@ describe API::ConanPackages do
 
       duration = payload['exp'] - payload['iat']
       expect(duration).to eq(1.hour)
+    end
+  end
+
+  describe 'GET /api/v4/packages/conan/v1/users/check_credentials' do
+    it 'responds with a 200 OK' do
+      get api('/packages/conan/v1/users/check_credentials'), headers: headers
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+  end
+
+  context 'recipe endpoints' do
+    let(:jwt) { build_jwt(personal_access_token) }
+    let(:headers) { { 'HTTP_AUTHORIZATION' => "Bearer #{jwt.encoded}" } }
+    let(:recipe) { 'my-package-name/1.0/username/channel' }
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe' do
+      it 'responds with an empty response' do
+        get api("/packages/conan/v1/conans/#{recipe}"), headers: headers
+
+        expect(response.body).to be {}
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/digest' do
+      it 'responds with a 404' do
+        get api("/packages/conan/v1/conans/#{recipe}/digest"), headers: headers
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/upload_urls' do
+      let(:params) do
+        { "conanfile.py": 24,
+          "conanmanifext.txt": 123 }
+      end
+      it 'returns a set of upload urls for the files requested' do
+        post api("/packages/conan/v1/conans/#{recipe}/upload_urls"), params: params, headers: headers
+
+        expected_response = {
+          'conanfile.py':      "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/export/conanfile.py",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/export/conanmanifest.txt"
+        }
+
+        expect(response.body).to eq expected_response.to_json
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id' do
+      it 'responds with an empty response' do
+        get api("/packages/conan/v1/conans/#{recipe}/packages/123456789"), headers: headers
+
+        expect(response.body).to be {}
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/digest' do
+      it 'responds with a 404' do
+        get api("/packages/conan/v1/conans/#{recipe}/packages/123456789/digest"), headers: headers
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    describe 'GET /api/v4/packages/conan/v1/conans/*recipe/packages/:package_id/upload_urls' do
+      let(:params) do
+        { "conaninfo.txt": 24,
+          "conanmanifext.txt": 123,
+          "conan_package.tgz": 523 }
+      end
+
+      it 'returns a set of upload urls for the files requested' do
+        post api("/packages/conan/v1/conans/#{recipe}/packages/123456789/upload_urls"), params: params, headers: headers
+
+        expected_response = {
+          'conaninfo.txt':     "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conaninfo.txt",
+          'conanmanifest.txt': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conanmanifest.txt",
+          'conan_package.tgz': "#{Settings.gitlab.base_url}/api/v4/packages/conan/v1/files/#{recipe}/-/0/package/123456789/0/conan_package.tgz"
+        }
+
+        expect(response.body).to eq expected_response.to_json
+      end
     end
   end
 end
