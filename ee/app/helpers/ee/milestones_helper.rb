@@ -20,7 +20,7 @@ module EE
       return false if cookies['hide_burndown_message'].present?
       return false unless milestone.supports_burndown_charts?
 
-      warning.nil? && can?(current_user, :admin_milestone, milestone.parent)
+      warning.nil? && can?(current_user, :admin_milestone, milestone.resource_parent)
     end
 
     def data_warning_for(burndown)
