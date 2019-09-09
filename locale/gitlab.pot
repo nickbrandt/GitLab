@@ -4538,9 +4538,6 @@ msgstr ""
 msgid "CustomCycleAnalytics|Add stage"
 msgstr ""
 
-msgid "CustomCycleAnalytics|Choose which object types will trigger this stage"
-msgstr ""
-
 msgid "CustomCycleAnalytics|Enter a name for the stage"
 msgstr ""
 
@@ -4550,13 +4547,7 @@ msgstr ""
 msgid "CustomCycleAnalytics|New stage"
 msgstr ""
 
-msgid "CustomCycleAnalytics|Object type"
-msgstr ""
-
 msgid "CustomCycleAnalytics|Please select a start event first"
-msgstr ""
-
-msgid "CustomCycleAnalytics|Select one or more objects"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Select start event"
@@ -4568,7 +4559,13 @@ msgstr ""
 msgid "CustomCycleAnalytics|Start event"
 msgstr ""
 
+msgid "CustomCycleAnalytics|Start event label"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Stop event"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Stop event label"
 msgstr ""
 
 msgid "Customize colors"
@@ -15711,6 +15708,9 @@ msgid "There was an error deleting the To Do."
 msgstr ""
 
 msgid "There was an error fetching configuration for charts"
+msgstr ""
+
+msgid "There was an error fetching the form data"
 msgstr ""
 
 msgid "There was an error gathering the chart data"

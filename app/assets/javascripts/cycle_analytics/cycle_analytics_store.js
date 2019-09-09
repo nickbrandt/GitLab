@@ -35,7 +35,6 @@ export default {
     analytics: '',
     events: [],
     stages: [],
-    groupLabels: [],
   },
   setCycleAnalyticsData(data) {
     this.state = Object.assign(this.state, this.decorateData(data));
@@ -112,14 +111,5 @@ export default {
   },
   currentActiveStage() {
     return this.state.stages.find(stage => stage.active);
-  },
-  setGroupLabels(labels) {
-    this.state.groupLabels = labels.map(({ id, title, color, textColor, description }) => ({
-      id,
-      title,
-      color,
-      textColor,
-      description,
-    }));
   },
 };

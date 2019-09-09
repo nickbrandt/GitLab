@@ -497,7 +497,6 @@ describe('CustomStageForm', () => {
         });
       });
     });
-
     describe('Add stage button', () => {
       it('is disabled by default', () => {
         expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');
