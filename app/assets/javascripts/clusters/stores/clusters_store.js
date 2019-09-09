@@ -220,7 +220,7 @@ export default class ClusterStore {
       rolloutStatus: {
         instances: environment.rollout_status ? environment.rollout_status.instances : [],
       },
-      updatedAt: environment.updatedAt,
+      updatedAt: environment.updated_at,
     }));
   }
 }
