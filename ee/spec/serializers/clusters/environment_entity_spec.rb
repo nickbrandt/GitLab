@@ -34,6 +34,10 @@ describe Clusters::EnvironmentEntity do
       expect(subject).to include(:environment_path)
     end
 
+    it 'exposes updated_at' do
+      expect(subject).to include(:updated_at)
+    end
+
     context 'deploy board available' do
       before do
         allow(group).to receive(:feature_available?).and_call_original
