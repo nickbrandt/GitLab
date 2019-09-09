@@ -26,11 +26,16 @@ export const getSelectedOptionNames = (state, getters) => filterId => {
  * @returns Object
  * e.g. { type: ['sast'], severity: ['high', 'medium'] }
  */
-export const activeFilters = state =>
-  state.filters.reduce((acc, filter) => {
+export const activeFilters = state => {
+  const filters = state.filters.reduce((acc, filter) => {
     acc[filter.id] = [...Array.from(filter.selection)].filter(option => option !== 'all');
     return acc;
   }, {});
+  // hide_dismissed is hardcoded as it currently is an edge-case, more info in the MR:
+  // https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15333#note_208301144
+  filters.hide_dismissed = state.hide_dismissed;
+  return filters;
+};
 
 export const visibleFilters = ({ filters }) => filters.filter(({ hidden }) => !hidden);
 

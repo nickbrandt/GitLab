@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
+import { getParameterValues } from '~/lib/utils/url_utility';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
@@ -18,6 +19,10 @@ const projectsEndpoint = `${TEST_HOST}/projects`;
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
 const vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilities_history`;
+
+jest.mock('~/lib/utils/url_utility', () => ({
+  getParameterValues: jest.fn().mockReturnValue([]),
+}));
 
 describe('Security Dashboard app', () => {
   let wrapper;
@@ -160,6 +165,28 @@ describe('Security Dashboard app', () => {
 
     it(`does not show the ${Component.name}`, () => {
       expect(wrapper.find(Component).exists()).toBe(false);
+    });
+  });
+
+  describe('dismissed vulnerabilities', () => {
+    beforeEach(() => {
+      getParameterValues.mockImplementation(() => [true]);
+      setup();
+    });
+
+    afterEach(() => {
+      getParameterValues.mockRestore();
+    });
+
+    it('hides dismissed vulnerabilities by default', () => {
+      createComponent();
+      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(true);
+    });
+
+    it('shows dismissed vulnerabilities if param is specified in URL', () => {
+      getParameterValues.mockImplementation(() => [false]);
+      createComponent();
+      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(false);
     });
   });
 });

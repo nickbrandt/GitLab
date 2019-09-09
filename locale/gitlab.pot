@@ -13530,6 +13530,9 @@ msgstr ""
 msgid "SecurityDashboard|Confidence"
 msgstr ""
 
+msgid "SecurityDashboard|Hide dismissed"
+msgstr ""
+
 msgid "SecurityDashboard|Monitor vulnerabilities in your code"
 msgstr ""
 

@@ -34,4 +34,5 @@ export default () => ({
       selection: new Set(['all']),
     },
   ],
+  hide_dismissed: true,
 });
