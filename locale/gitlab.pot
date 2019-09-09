@@ -3915,7 +3915,7 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
-msgid "Configure"
+msgid "Configuration"
 msgstr ""
 
 msgid "Configure GitLab runners to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
