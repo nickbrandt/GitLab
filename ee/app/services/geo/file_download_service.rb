@@ -37,10 +37,7 @@ module Geo
       return Gitlab::Geo::Replication::JobArtifactDownloader if job_artifact?
       return Gitlab::Geo::Replication::LfsDownloader if lfs?
 
-      error_message = "Cannot find a Gitlab::Geo Downloader for object_type = '#{object_type}'"
-
-      log_error(error_message)
-      raise NotImplementedError, error_message
+      fail_unimplemented_klass!(type: 'Downloader')
     end
 
     def log_file_download(mark_as_synced, download_result, start_time)

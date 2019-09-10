@@ -24,6 +24,14 @@ module Geo
 
     private
 
+    def fail_unimplemented_klass!(type:)
+      error_message = "Cannot find a handler for Gitlab::Geo #{type} for object_type = '#{object_type}'"
+
+      log_error(error_message)
+
+      raise NotImplementedError, error_message
+    end
+
     def user_upload?
       Gitlab::Geo::Replication.object_type_from_user_uploads?(object_type)
     end

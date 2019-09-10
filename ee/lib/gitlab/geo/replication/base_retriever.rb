@@ -5,6 +5,7 @@ module Gitlab
     module Replication
       class BaseRetriever
         include LogHelpers
+        include Gitlab::Utils::StrongMemoize
 
         attr_reader :object_db_id, :message
 

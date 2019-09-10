@@ -41,10 +41,7 @@ module Geo
       return Gitlab::Geo::Replication::JobArtifactRetriever if job_artifact?
       return Gitlab::Geo::Replication::LfsRetriever if lfs?
 
-      error_message = "Cannot find a Gitlab::Geo Uploader for object_type = '#{object_type}'"
-
-      log_error(error_message)
-      raise NotImplementedError, error_message
+      fail_unimplemented_klass!(type: 'Retriever')
     end
   end
 end
