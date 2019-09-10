@@ -19,13 +19,9 @@ module Gitlab
 
         private
 
-        # rubocop: disable CodeReuse/ActiveRecord
-
         def find_resource
-          LfsObject.find_by(id: object_db_id)
+          LfsObject.find_by_id(object_db_id)
         end
-
-        # rubocop: enable CodeReuse/ActiveRecord
       end
     end
   end

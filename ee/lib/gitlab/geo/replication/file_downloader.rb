@@ -24,13 +24,9 @@ module Gitlab
 
         private
 
-        # rubocop: disable CodeReuse/ActiveRecord
-
         def find_resource
-          Upload.find_by(id: object_db_id)
+          Upload.find_by_id(object_db_id)
         end
-
-        # rubocop: enable CodeReuse/ActiveRecord
       end
     end
   end
