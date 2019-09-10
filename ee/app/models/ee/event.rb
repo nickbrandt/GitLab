@@ -13,5 +13,13 @@ module EE
       scope :totals_by_author, -> { group(:author_id).count }
       scope :totals_by_author_target_type_action, -> { group(:author_id, :target_type, :action).count }
     end
+
+    def epic_note?
+      note? && note_target.is_a?(::Epic)
+    end
+
+    def epic?
+      target_type == 'Epic'
+    end
   end
 end
