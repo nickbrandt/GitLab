@@ -80,6 +80,15 @@ export default {
       return `${desc}${learnMoreDesc}`;
     },
   },
+  watch: {
+    activated() {
+      const inactive = document.querySelector('.fa-power-off');
+      const active = document.querySelector('.fa-circle');
+      this.activated
+        ? inactive && inactive.setAttribute('class', 'fa fa-circle cgreen')
+        : active && active.setAttribute('class', 'fa fa-power-off clgray');
+    },
+  },
   methods: {
     resetKey() {
       return axios
