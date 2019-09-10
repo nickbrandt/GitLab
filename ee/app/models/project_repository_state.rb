@@ -3,8 +3,6 @@
 class ProjectRepositoryState < ApplicationRecord
   include ShaAttribute
 
-  self.ignored_columns += %i[last_repository_verification_failed last_wiki_verification_failed]
-
   sha_attribute :repository_verification_checksum
   sha_attribute :wiki_verification_checksum
 
