@@ -44,6 +44,23 @@ describe Vulnerabilities::FeedbackEntity do
         end
       end
 
+      context 'when there is no current user' do
+        let(:entity) { described_class.represent(feedback, request: request) }
+
+        before do
+          allow(request).to receive(:current_user).and_return(nil)
+          allow(feedback).to receive(:author).and_return(nil)
+        end
+
+        subject { entity.as_json }
+
+        it 'does not include fields related to current user' do
+          is_expected.not_to include(:issue_url)
+          is_expected.not_to include(:destroy_vulnerability_feedback_dismissal_path)
+          is_expected.not_to include(:merge_request_path)
+        end
+      end
+
       context 'when issue is not present' do
         let(:feedback) { build(:vulnerability_feedback, feedback_type: :issue, project: project, issue: nil) }
 
