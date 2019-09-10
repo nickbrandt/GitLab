@@ -116,7 +116,7 @@ func TestAcceleratedUpload(t *testing.T) {
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	resources := []string{`/example`, `/uploads/personal_snippet`, `/uploads/user`}
+	resources := []string{`/example`, `/uploads/personal_snippet`, `/uploads/user`, `/api/v4/projects/1/wikis/attachments`}
 	for _, resource := range resources {
 		reqBody, contentType, err := multipartBodyWithFile()
 		require.NoError(t, err)
