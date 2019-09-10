@@ -16291,6 +16291,9 @@ msgstr ""
 msgid "is invalid because there is upstream lock"
 msgstr ""
 
+msgid "is not a descendant of the Group owning the template"
+msgstr ""
+
 msgid "is not a valid X509 certificate."
 msgstr ""
 
