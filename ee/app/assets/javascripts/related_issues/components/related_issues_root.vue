@@ -114,8 +114,7 @@ export default {
 
       if (issueToRemove) {
         RelatedIssuesService.remove(issueToRemove.relation_path)
-          .then(res => res.json())
-          .then(data => {
+          .then(({ data }) => {
             this.store.setRelatedIssues(data.issuables);
           })
           .catch(res => {
@@ -140,8 +139,7 @@ export default {
         this.isSubmitting = true;
         this.service
           .addRelatedIssues(this.state.pendingReferences)
-          .then(res => res.json())
-          .then(data => {
+          .then(({ data }) => {
             // We could potentially lose some pending issues in the interim here
             this.store.setPendingReferences([]);
             this.store.setRelatedIssues(data.issuables);
@@ -169,9 +167,8 @@ export default {
       this.isFetching = true;
       this.service
         .fetchRelatedIssues()
-        .then(res => res.json())
-        .then(issues => {
-          this.store.setRelatedIssues(issues);
+        .then(({ data }) => {
+          this.store.setRelatedIssues(data);
           this.isFetching = false;
         })
         .catch(() => {
@@ -189,9 +186,8 @@ export default {
           move_before_id: beforeId,
           move_after_id: afterId,
         })
-          .then(res => res.json())
-          .then(res => {
-            if (!res.message) {
+          .then(({ data }) => {
+            if (!data.message) {
               this.store.updateIssueOrder(oldIndex, newIndex);
             }
           })
