@@ -70,6 +70,17 @@ describe Projects::ClustersController do
       it { expect { go }.to be_denied_for(:user) }
       it { expect { go }.to be_denied_for(:external) }
     end
+
+    describe 'GET #metrics_dashboard' do
+      let(:user) { create(:user) }
+
+      before do
+        clusterable.add_maintainer(user)
+        sign_in(user)
+      end
+
+      it_behaves_like 'the default dashboard'
+    end
   end
 
   private
