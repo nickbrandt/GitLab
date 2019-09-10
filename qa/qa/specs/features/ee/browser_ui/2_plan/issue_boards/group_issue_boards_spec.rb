@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require 'securerandom'
+
 module QA
   context 'Plan' do
     describe 'Group issue boards' do
-      let(:board_1) { 'Upstream 1' }
-      let(:board_2) { 'Upstream 2' }
-      let(:board_3) { 'Upstream 3' }
+      let(:board_1) { "Board-#{SecureRandom.hex(4)}" }
+      let(:board_2) { "Board-#{SecureRandom.hex(4)}" }
+      let(:board_3) { "Board-#{SecureRandom.hex(4)}" }
 
       let(:group) do
         QA::Resource::Group.fabricate_via_api!
