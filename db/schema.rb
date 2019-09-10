@@ -2291,7 +2291,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.index ["runners_token_encrypted"], name: "index_namespaces_on_runners_token_encrypted", unique: true
     t.index ["shared_runners_minutes_limit", "extra_shared_runners_minutes_limit"], name: "index_namespaces_on_shared_and_extra_runners_minutes_limit"
     t.index ["trial_ends_on"], name: "index_namespaces_on_trial_ends_on", where: "(trial_ends_on IS NOT NULL)"
-    t.index ["type"], name: "index_namespaces_on_type"
+    t.index ["type"], name: "index_namespaces_on_type_partial", where: "(type IS NOT NULL)"
   end
 
   create_table "note_diff_files", id: :serial, force: :cascade do |t|
