@@ -4469,6 +4469,9 @@ msgstr ""
 msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
 msgstr ""
 
+msgid "CustomCycleAnalytics|Add a stage"
+msgstr ""
+
 msgid "Customize colors"
 msgstr ""
 
@@ -10065,6 +10068,9 @@ msgid "New schedule"
 msgstr ""
 
 msgid "New snippet"
+msgstr ""
+
+msgid "New stage"
 msgstr ""
 
 msgid "New subgroup"
