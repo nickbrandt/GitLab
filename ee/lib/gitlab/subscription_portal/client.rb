@@ -4,9 +4,11 @@ module Gitlab
   module SubscriptionPortal
     class Client
       def generate_trial(params)
-        parse_response(Gitlab::HTTP.post("#{base_url}/trials",
-                                         body: params.to_json,
-                                         headers: headers))
+        response = Gitlab::HTTP.post("#{base_url}/trials", body: params.to_json, headers: headers)
+
+        parse_response(response)
+      rescue *Gitlab::HTTP::HTTP_ERRORS => e
+        { success: false, data: { errors: e.message } }
       end
 
       private
@@ -25,16 +27,16 @@ module Gitlab
       end
 
       def parse_response(http_response)
-        response = Hashie::Mash.new(success: false)
+        response = { success: false }
 
         case http_response.response
         when Net::HTTPSuccess
-          response.success = true
-          response.data = JSON.parse(http_response.body) rescue nil
+          response[:success] = true
+          response[:data] = http_response.parsed_response
         when Net::HTTPUnprocessableEntity
-          response.data = JSON.parse(http_response.body) rescue nil
+          response[:data] = http_response.parsed_response
         else
-          response.data = { errors: "HTTP status code: #{http_response.code}" }
+          response[:data] = { errors: "HTTP status code: #{http_response.code}" }
         end
 
         response

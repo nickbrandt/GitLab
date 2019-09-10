@@ -17,7 +17,7 @@ describe Gitlab::SubscriptionPortal::Client do
       it 'has a successful status' do
         allow(Gitlab::HTTP).to receive(:post).and_return(httparty_response)
 
-        expect(subject.success).to eq(true)
+        expect(subject[:success]).to eq(true)
       end
     end
 
@@ -27,7 +27,7 @@ describe Gitlab::SubscriptionPortal::Client do
       it 'has a unprocessable entity status' do
         allow(Gitlab::HTTP).to receive(:post).and_return(httparty_response)
 
-        expect(subject.success).to eq(false)
+        expect(subject[:success]).to eq(false)
       end
     end
 
@@ -37,7 +37,7 @@ describe Gitlab::SubscriptionPortal::Client do
       it 'has a server error status' do
         allow(Gitlab::HTTP).to receive(:post).and_return(httparty_response)
 
-        expect(subject.success).to eq(false)
+        expect(subject[:success]).to eq(false)
       end
     end
   end

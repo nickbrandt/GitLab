@@ -3,18 +3,18 @@
 module GitlabSubscriptions
   class CreateLeadService
     def execute(company_params)
-      response = subscription_app_client.generate_trial(company_params)
+      response = client.generate_trial(company_params)
 
-      if response.success
+      if response[:success]
         { success: true }
       else
-        { success: false, errors: response.data&.errors }
+        { success: false, errors: response[:data]&.errors }
       end
     end
 
     private
 
-    def subscription_app_client
+    def client
       Gitlab::SubscriptionPortal::Client.new
     end
   end
