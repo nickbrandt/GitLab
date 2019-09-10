@@ -33,7 +33,7 @@ describe Gitlab::Geo::LogCursor::Lease, :clean_gitlab_redis_shared_state do
     end
   end
 
-  describe '.try_obtain_lease_with_ttl' do
+  describe '.try_obtain_with_ttl' do
     it 'returns zero when there is no lease' do
       result = described_class.try_obtain_with_ttl {}
 
@@ -78,6 +78,7 @@ describe Gitlab::Geo::LogCursor::Lease, :clean_gitlab_redis_shared_state do
 
       expect(result[:ttl]).to be > 0
       expect(result[:uuid]).to be false
+      expect(result[:error]).to be true
     end
   end
 end

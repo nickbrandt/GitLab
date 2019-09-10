@@ -22,16 +22,26 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     allow(daemon).to receive(:arbitrary_sleep).and_return(0.1)
   end
 
+  # WARNINGS
+  #
+  # 1. Ensure an exit condition for the main run! loop, or RSpec will not stop
+  #    without an interrupt.
+  #
+  #    I recommend using `ensure_exit_on`.
+  #
+  # 2. run! occasionally spawns git processes that run forever at 100% CPU.
+  #
+  #    I don't know why this happens.
   describe '#run!' do
     it 'traps signals' do
-      is_expected.to receive(:exit?).and_return(true)
+      ensure_exit_on(1)
       is_expected.to receive(:trap_signals)
 
       daemon.run!
     end
 
     it 'delegates to #run_once! in a loop' do
-      is_expected.to receive(:exit?).and_return(false, false, false, true)
+      ensure_exit_on(4)
       is_expected.to receive(:run_once!).twice
 
       daemon.run!
@@ -44,7 +54,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
       allow(lease).to receive(:same_uuid?).and_return(false)
       allow(Gitlab::Geo::LogCursor::Lease).to receive(:exclusive_lease).and_return(lease)
 
-      is_expected.to receive(:exit?).and_return(false, true)
+      ensure_exit_on(2)
       is_expected.not_to receive(:run_once!)
 
       daemon.run!
@@ -53,7 +63,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     it 'skips execution if not a Geo node' do
       stub_current_geo_node(nil)
 
-      is_expected.to receive(:exit?).and_return(false, true)
+      ensure_exit_on(2)
       is_expected.to receive(:sleep_break).with(1.minute)
       is_expected.not_to receive(:run_once!)
 
@@ -63,11 +73,60 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     it 'skips execution if the current node is a primary' do
       stub_current_geo_node(primary)
 
-      is_expected.to receive(:exit?).and_return(false, true)
+      ensure_exit_on(2)
       is_expected.to receive(:sleep_break).with(1.minute)
       is_expected.not_to receive(:run_once!)
 
       daemon.run!
+    end
+
+    context 'when run! has handled an error every call for over the allowed duration' do
+      it 'exits' do
+        # Can't use ensure_exit_on here since the logic we are testing depends on `exit?` behavior.
+        # If `exit?` is called a third time, then the "exit if failing for too long" behavior is broken.
+        expect(daemon).to receive(:exit?).and_call_original.twice
+
+        Timecop.freeze do
+          daemon.send(:handle_error, true)
+
+          Timecop.travel(described_class::MAX_ERROR_DURATION + 1.second) do
+            expect(daemon).to receive(:gap_tracking).and_raise('boom')
+
+            is_expected.to receive(:run_once!).and_call_original.once
+
+            daemon.run!
+          end
+        end
+      end
+    end
+
+    context 'when run_once! has returned one call without raising an error before the allowed duration' do
+      it 'does not exit' do
+        # Can't use ensure_exit_on here since the logic we are testing depends on `exit?` behavior
+        expect(daemon).to receive(:exit?).and_call_original.exactly(5).times
+
+        # Force exit on 6th call
+        # If `exit?` is not called 6 times, then the daemon stopped too early.
+        expect(daemon).to receive(:exit?).and_return(true)
+
+        Timecop.freeze do
+          # As if an error occurred
+          daemon.send(:handle_error, true)
+
+          Timecop.travel(described_class::MAX_ERROR_DURATION + 1.second) do
+            # First, a successful run to reset the timer
+            expect(daemon).to receive(:gap_tracking).and_call_original
+
+            # Then more errors
+            expect(daemon).to receive(:gap_tracking).and_raise('boom').twice
+
+            # It should continue running until we force it to exit
+            is_expected.to receive(:run_once!).and_call_original.exactly(3).times
+
+            daemon.run!
+          end
+        end
+      end
     end
   end
 
@@ -258,5 +317,21 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     end
 
     gaps
+  end
+
+  # It is extremely easy to get run! into an infinite loop.
+  #
+  # Regardless of `allow` or `expect`, this method ensures that the loop will
+  # exit at the specified number of exit? calls.
+  def ensure_exit_on(num_calls = 3, expect = true)
+    # E.g. If num_calls is `3`, returns is set to `[false, false, true]`.
+    returns = Array.new(num_calls) { false }
+    returns[-1] = true
+
+    if expect
+      expect(daemon).to receive(:exit?).and_return(*returns)
+    else
+      allow(daemon).to receive(:exit?).and_return(*returns)
+    end
   end
 end

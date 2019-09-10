@@ -7,12 +7,14 @@ module Gitlab
         VERSION = '0.2.0'.freeze
         BATCH_SIZE = 250
         SECONDARY_CHECK_INTERVAL = 60
+        MAX_ERROR_DURATION = 1800
 
         attr_reader :options
 
         def initialize(options = {})
           @options = options
           @exit = false
+          @failing_since = nil
         end
 
         def run!
@@ -28,6 +30,9 @@ module Gitlab
             end
 
             lease = Lease.try_obtain_with_ttl { run_once! }
+
+            handle_error(lease[:error])
+
             return if exit?
 
             # When no new event is found sleep for a few moments
@@ -48,6 +53,29 @@ module Gitlab
         end
 
         private
+
+        def handle_error(did_error)
+          track_failing_since(did_error)
+
+          if excessive_errors?
+            logger.error("#run!: Exiting due to consecutive errors for over #{MAX_ERROR_DURATION} seconds")
+            @exit = true
+          end
+        end
+
+        def track_failing_since(did_error)
+          if did_error
+            @failing_since ||= Time.now
+          else
+            @failing_since = nil
+          end
+        end
+
+        def excessive_errors?
+          return if @failing_since.nil?
+
+          MAX_ERROR_DURATION < (Time.now - @failing_since)
+        end
 
         def sleep_break(seconds)
           while seconds > 0

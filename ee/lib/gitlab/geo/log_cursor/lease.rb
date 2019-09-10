@@ -43,7 +43,7 @@ module Gitlab
 
             Gitlab::ExclusiveLease.cancel(LEASE_KEY, lease[:uuid])
 
-            { uuid: false, ttl: LEASE_TIMEOUT }
+            { uuid: false, ttl: LEASE_TIMEOUT, error: true }
           end
         end
 
