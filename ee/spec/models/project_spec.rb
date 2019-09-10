@@ -962,61 +962,31 @@ describe Project do
     end
   end
 
-  shared_examples 'project with disabled services' do
-    it 'has some disabled services' do
-      stub_const('License::ANY_PLAN_FEATURES', [])
-
-      expect(project.disabled_services).to match_array(disabled_services)
-    end
-  end
-
-  shared_examples 'project without disabled services' do
-    it 'has some disabled services' do
-      expect(project.disabled_services).to be_empty
-    end
-  end
-
   describe '#disabled_services' do
-    let(:namespace) { create(:group, :private) }
-    let(:project) { create(:project, :private, namespace: namespace) }
-    let(:disabled_services) { %w(jenkins jenkins_deprecated github) }
+    let(:project) { build(:project) }
 
-    context 'without a license key' do
-      before do
-        License.destroy_all # rubocop: disable DestroyAll
-      end
+    subject { project.disabled_services }
 
-      it_behaves_like 'project with disabled services'
+    where(:license_feature, :disabled_services) do
+      :jenkins_integration                | %w(jenkins jenkins_deprecated)
+      :github_project_service_integration | %w(github)
     end
 
-    context 'with a license key' do
-      before do
-        allow_any_instance_of(License).to receive(:plan).and_return(License::PREMIUM_PLAN)
+    with_them do
+      context 'when feature is available' do
+        before do
+          stub_licensed_features(license_feature => true)
+        end
+
+        it { is_expected.not_to include(*disabled_services) }
       end
 
-      context 'when checking of namespace plan is enabled' do
+      context 'when feature is unavailable' do
         before do
-          stub_application_setting_on_object(project, should_check_namespace_plan: true)
+          stub_licensed_features(license_feature => false)
         end
 
-        context 'and namespace does not have a plan' do
-          it_behaves_like 'project with disabled services'
-        end
-
-        context 'and namespace has a plan' do
-          let(:namespace) { create(:group, :private, plan: :silver_plan) }
-          let!(:gitlab_subscription) { create(:gitlab_subscription, :silver, namespace: namespace) }
-
-          it_behaves_like 'project without disabled services'
-        end
-      end
-
-      context 'when checking of namespace plan is not enabled' do
-        before do
-          stub_application_setting_on_object(project, should_check_namespace_plan: false)
-        end
-
-        it_behaves_like 'project without disabled services'
+        it { is_expected.to include(*disabled_services) }
       end
     end
   end
