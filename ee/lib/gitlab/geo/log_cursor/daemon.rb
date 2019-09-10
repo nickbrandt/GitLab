@@ -21,28 +21,28 @@ module Gitlab
           logger.debug('#run!: start')
           trap_signals
 
-          until exit?
-            # Prevent the node from processing events unless it's a secondary
-            unless Geo.secondary?
-              logger.debug("#run!: not a secondary, sleeping for #{SECONDARY_CHECK_INTERVAL} secs")
-              sleep_break(SECONDARY_CHECK_INTERVAL)
-              next
-            end
-
-            lease = Lease.try_obtain_with_ttl { run_once! }
-
-            handle_error(lease[:error])
-
-            return if exit?
-
-            # When no new event is found sleep for a few moments
-            arbitrary_sleep(lease[:ttl])
-          end
+          run_once! until exit?
 
           logger.debug('#run!: finish')
         end
 
         def run_once!
+          # Prevent the node from processing events unless it's a secondary
+          unless Geo.secondary?
+            logger.debug("#run!: not a secondary, sleeping for #{SECONDARY_CHECK_INTERVAL} secs")
+            sleep_break(SECONDARY_CHECK_INTERVAL)
+            return
+          end
+
+          lease = Lease.try_obtain_with_ttl { find_and_handle_events! }
+
+          handle_error(lease[:error])
+
+          # When no new event is found sleep for a few moments
+          arbitrary_sleep(lease[:ttl])
+        end
+
+        def find_and_handle_events!
           gap_tracking.fill_gaps { |event_log| handle_single_event(event_log) }
 
           # Wrap this with the connection to make it possible to reconnect if
@@ -58,8 +58,7 @@ module Gitlab
           track_failing_since(did_error)
 
           if excessive_errors?
-            logger.error("#run!: Exiting due to consecutive errors for over #{MAX_ERROR_DURATION} seconds")
-            @exit = true
+            exit!("Consecutive errors for over #{MAX_ERROR_DURATION} seconds")
           end
         end
 
@@ -75,14 +74,6 @@ module Gitlab
           return if @failing_since.nil?
 
           MAX_ERROR_DURATION < (Time.now - @failing_since)
-        end
-
-        def sleep_break(seconds)
-          while seconds > 0
-            sleep(1)
-            seconds -= 1
-            break if exit?
-          end
         end
 
         def handle_events(batch, previous_batch_last_id)
@@ -140,6 +131,12 @@ module Gitlab
           @exit = true
         end
 
+        def exit!(error_message)
+          logger.error("Exiting due to: #{error_message}") if error_message
+
+          @exit = true
+        end
+
         def exit?
           @exit
         end
@@ -160,7 +157,18 @@ module Gitlab
         # This allows multiple GeoLogCursors to randomly process a batch of events,
         # without favouring the shortest path (or latency).
         def arbitrary_sleep(delay)
-          sleep(delay + rand(1..20) * 0.1)
+          jitter = rand(1..20) * 0.1
+
+          sleep_break(delay + jitter)
+        end
+
+        def sleep_break(seconds)
+          while seconds > 0.0
+            to_sleep = seconds > 1.0 ? 1.0 : seconds
+            seconds -= to_sleep
+            sleep(to_sleep)
+            break if exit?
+          end
         end
 
         def gap_tracking
