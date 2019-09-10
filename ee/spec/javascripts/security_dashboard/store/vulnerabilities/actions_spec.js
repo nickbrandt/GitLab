@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -709,6 +710,31 @@ describe('vulnerability dismissal', () => {
           done,
         );
       });
+
+      it('should show the dismissal toast message', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkToastMessage = () => {
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          done();
+        };
+
+        testAction(
+          actions.dismissVulnerability,
+          { vulnerability, comment },
+          {},
+          [],
+          [
+            { type: 'requestDismissVulnerability' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDismissVulnerabilitySuccess',
+              payload: { data, vulnerability },
+            },
+          ],
+          checkToastMessage,
+        );
+      });
     });
 
     describe('on error', () => {
@@ -811,9 +837,35 @@ describe('add vulnerability dismissal comment', () => {
       it('should dispatch the request and success actions', done => {
         const checkPassedData = () => {
           const { project_id, id } = vulnerability.dismissal_feedback;
-          const expected = { project_id, id, comment };
+          const expected = JSON.stringify({ project_id, id, comment });
 
-          expect(mock.history.patch[0].data).toBe(JSON.stringify(expected));
+          expect(mock.history.patch[0].data).toBe(expected);
+          done();
+        };
+
+        testAction(
+          actions.addDismissalComment,
+          { vulnerability, comment },
+          {},
+          [],
+          [
+            { type: 'requestAddDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            { type: 'receiveAddDismissalCommentSuccess', payload: { data, vulnerability } },
+          ],
+          checkPassedData,
+        );
+      });
+
+      it('should show the add dismissal toast message', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkPassedData = () => {
+          const { project_id, id } = vulnerability.dismissal_feedback;
+          const expected = JSON.stringify({ project_id, id, comment });
+
+          expect(mock.history.patch[0].data).toBe(expected);
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
           done();
         };
 
@@ -912,9 +964,38 @@ describe('add vulnerability dismissal comment', () => {
       it('should dispatch the request and success actions', done => {
         const checkPassedData = () => {
           const { project_id } = vulnerability.dismissal_feedback;
-          const expected = { project_id, comment };
+          const expected = JSON.stringify({ project_id, comment });
 
-          expect(mock.history.patch[0].data).toBe(JSON.stringify(expected));
+          expect(mock.history.patch[0].data).toBe(expected);
+          done();
+        };
+
+        testAction(
+          actions.deleteDismissalComment,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDeleteDismissalCommentSuccess',
+              payload: { data, id: vulnerability.id },
+            },
+          ],
+          checkPassedData,
+        );
+      });
+
+      it('should show the delete dismissal comment toast message', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkPassedData = () => {
+          const { project_id } = vulnerability.dismissal_feedback;
+          const expected = JSON.stringify({ project_id, comment });
+
+          expect(mock.history.patch[0].data).toBe(expected);
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
           done();
         };
 

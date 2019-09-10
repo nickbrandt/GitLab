@@ -1,10 +1,11 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
 import downloadPatchHelper from 'ee/vue_shared/security_reports/store/utils/download_patch_helper';
-import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import createFlash from '~/flash';
+import toast from '~/vue_shared/plugins/global_toast';
+import * as types from './mutation_types';
 
 /**
  * A lot of this file has duplicate actions in
@@ -153,6 +154,10 @@ export const dismissVulnerability = (
 ) => {
   dispatch('requestDismissVulnerability');
 
+  const toastMsg = sprintf(s__("Security Reports|Dismissed '%{vulnerabilityName}'"), {
+    vulnerabilityName: vulnerability.name,
+  });
+
   axios
     .post(vulnerability.create_vulnerability_feedback_dismissal_path, {
       vulnerability_feedback: {
@@ -170,6 +175,7 @@ export const dismissVulnerability = (
     .then(({ data }) => {
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDismissVulnerabilitySuccess', { vulnerability, data });
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch('receiveDismissVulnerabilityError', { flashError });
@@ -198,9 +204,19 @@ export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => 
 
 export const addDismissalComment = ({ dispatch }, { vulnerability, comment }) => {
   dispatch('requestAddDismissalComment');
-
   const { dismissal_feedback } = vulnerability;
   const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${dismissal_feedback.id}`;
+
+  const editingDismissalContent =
+    dismissal_feedback.comment_details && dismissal_feedback.comment_details.comment;
+
+  const toastMsg = editingDismissalContent
+    ? sprintf(s__("Security Reports|Comment edited on '%{vulnerabilityName}'"), {
+        vulnerabilityName: vulnerability.name,
+      })
+    : sprintf(s__("Security Reports|Comment added to '%{vulnerabilityName}'"), {
+        vulnerabilityName: vulnerability.name,
+      });
 
   axios
     .patch(url, {
@@ -211,6 +227,7 @@ export const addDismissalComment = ({ dispatch }, { vulnerability, comment }) =>
     .then(({ data }) => {
       dispatch('closeDismissalCommentBox');
       dispatch('receiveAddDismissalCommentSuccess', { vulnerability, data });
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch('receiveAddDismissalCommentError');
@@ -222,6 +239,9 @@ export const deleteDismissalComment = ({ dispatch }, { vulnerability }) => {
 
   const { dismissal_feedback } = vulnerability;
   const url = `${vulnerability.create_vulnerability_feedback_dismissal_path}/${dismissal_feedback.id}`;
+  const toastMsg = sprintf(s__("Security Reports|Comment deleted on '%{vulnerabilityName}'"), {
+    vulnerabilityName: vulnerability.name,
+  });
 
   axios
     .patch(url, {
@@ -232,6 +252,7 @@ export const deleteDismissalComment = ({ dispatch }, { vulnerability }) => {
       const { id } = vulnerability;
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDeleteDismissalCommentSuccess', { id, data });
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch('receiveDeleteDismissalCommentError');

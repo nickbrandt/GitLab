@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import axios from '~/lib/utils/axios_utils';
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
+import toast from '~/vue_shared/plugins/global_toast';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
 import { pollUntilComplete } from './utils';
@@ -290,6 +291,10 @@ export const receiveDismissVulnerabilityError = ({ commit }, error) =>
 export const dismissVulnerability = ({ state, dispatch }, comment) => {
   dispatch('requestDismissVulnerability');
 
+  const toastMsg = sprintf(s__("Security Reports|Dismissed '%{vulnerabilityName}'"), {
+    vulnerabilityName: state.modal.vulnerability.name,
+  });
+
   axios
     .post(state.createVulnerabilityFeedbackDismissalPath, {
       vulnerability_feedback: {
@@ -310,8 +315,8 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
 
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDismissVulnerability', updatedIssue);
-
       hideModal();
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch(
@@ -328,6 +333,17 @@ export const addDismissalComment = ({ state, dispatch }, { comment }) => {
   const { dismissalFeedback } = vulnerability;
   const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
 
+  const editingDismissalContent =
+    dismissalFeedback.comment_details && dismissalFeedback.comment_details.comment;
+
+  const toastMsg = editingDismissalContent
+    ? sprintf(s__("Security Reports|Comment edited on '%{vulnerabilityName}'"), {
+        vulnerabilityName: vulnerability.name,
+      })
+    : sprintf(s__("Security Reports|Comment added to '%{vulnerabilityName}'"), {
+        vulnerabilityName: vulnerability.name,
+      });
+
   axios
     .patch(url, {
       project_id: dismissalFeedback.project_id,
@@ -337,6 +353,7 @@ export const addDismissalComment = ({ state, dispatch }, { comment }) => {
     .then(({ data }) => {
       dispatch('closeDismissalCommentBox');
       dispatch('receiveAddDismissalCommentSuccess', { data });
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch(
@@ -352,6 +369,9 @@ export const deleteDismissalComment = ({ state, dispatch }) => {
   const { vulnerability } = state.modal;
   const { dismissalFeedback } = vulnerability;
   const url = `${state.createVulnerabilityFeedbackDismissalPath}/${dismissalFeedback.id}`;
+  const toastMsg = sprintf(s__("Security Reports|Comment deleted on '%{vulnerabilityName}'"), {
+    vulnerabilityName: vulnerability.name,
+  });
 
   axios
     .patch(url, {
@@ -361,6 +381,7 @@ export const deleteDismissalComment = ({ state, dispatch }) => {
     .then(({ data }) => {
       dispatch('closeDismissalCommentBox');
       dispatch('receiveDeleteDismissalCommentSuccess', { data });
+      toast(toastMsg);
     })
     .catch(() => {
       dispatch(
