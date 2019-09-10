@@ -47,7 +47,7 @@ export default {
 </script>
 <template>
   <div>
-    <h3 class="page-title">{{ s__('FeatureFlags|New Feature Flag') }}</h3>
+    <h3 class="page-title">{{ s__('FeatureFlags|New feature flag') }}</h3>
 
     <div v-if="error.length" class="alert alert-danger">
       <p v-for="(message, index) in error" :key="index" class="mb-0">{{ message }}</p>

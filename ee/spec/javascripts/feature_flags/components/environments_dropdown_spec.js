@@ -7,7 +7,7 @@ import { TEST_HOST } from 'spec/test_constants';
 
 const localVue = createLocalVue();
 
-describe('Feature Flags > Environments dropdown ', () => {
+describe('Feature flags > Environments dropdown ', () => {
   let wrapper;
   let mock;
 
