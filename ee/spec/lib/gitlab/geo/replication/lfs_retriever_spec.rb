@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Gitlab::Geo::Replication::LfsRetriever, :geo do
   context '#execute' do
-    subject { uploader.execute }
+    subject { retriever.execute }
 
     context 'when the LFS object exists' do
-      let(:uploader) { described_class.new(lfs_object.id, message) }
+      let(:retriever) { described_class.new(lfs_object.id, message) }
 
       before do
         expect(LfsObject).to receive(:find_by).with(id: lfs_object.id).and_return(lfs_object)
@@ -39,7 +39,7 @@ describe Gitlab::Geo::Replication::LfsRetriever, :geo do
         end
 
         it 'logs the missing file' do
-          expect(uploader).to receive(:log_error).with("Could not upload LFS object because it does not have a file", id: lfs_object.id)
+          expect(retriever).to receive(:log_error).with("Could not upload LFS object because it does not have a file", id: lfs_object.id)
 
           subject
         end
@@ -47,7 +47,7 @@ describe Gitlab::Geo::Replication::LfsRetriever, :geo do
     end
 
     context 'when the LFS object does not exist' do
-      let(:uploader) { described_class.new(10000, {}) }
+      let(:retriever) { described_class.new(10000, {}) }
 
       it 'returns an error hash' do
         expect(subject).to eq(code: :not_found, message: 'LFS object not found')

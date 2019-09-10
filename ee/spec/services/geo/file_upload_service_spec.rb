@@ -12,25 +12,25 @@ describe Geo::FileUploadService do
     stub_current_geo_node(node)
   end
 
-  describe '#uploader' do
+  describe '#retriever' do
     Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES.each do |file_type|
-      it "returns a FileUploader given type is #{file_type}" do
+      it "returns a FileRetriever given type is #{file_type}" do
         subject = described_class.new({ type: file_type, id: 1 }, 'request-data')
 
-        expect(subject.uploader).to be_a(Gitlab::Geo::Replication::FileRetriever)
+        expect(subject.retriever).to be_a(Gitlab::Geo::Replication::FileRetriever)
       end
     end
 
-    it "returns a LfsUploader given object_type is lfs" do
+    it "returns a LfsRetriever given object_type is lfs" do
       subject = described_class.new({ type: 'lfs', id: 1 }, 'request-data')
 
-      expect(subject.uploader).to be_a(Gitlab::Geo::Replication::LfsRetriever)
+      expect(subject.retriever).to be_a(Gitlab::Geo::Replication::LfsRetriever)
     end
 
-    it "returns a JobArtifactUploader given object_type is job_artifact" do
+    it "returns a JobArtifactRetriever given object_type is job_artifact" do
       subject = described_class.new({ type: 'job_artifact', id: 1 }, 'request-data')
 
-      expect(subject.uploader).to be_a(Gitlab::Geo::Replication::JobArtifactRetriever)
+      expect(subject.retriever).to be_a(Gitlab::Geo::Replication::JobArtifactRetriever)
     end
   end
 

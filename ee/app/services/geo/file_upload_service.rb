@@ -17,11 +17,11 @@ module Geo
     def execute
       return unless decoded_authorization.present? && jwt_scope_valid?
 
-      uploader.execute
+      retriever.execute
     end
 
-    def uploader
-      uploader_klass.new(object_db_id, decoded_authorization)
+    def retriever
+      retriever_klass.new(object_db_id, decoded_authorization)
     end
 
     private
@@ -36,7 +36,7 @@ module Geo
       end
     end
 
-    def uploader_klass
+    def retriever_klass
       return Gitlab::Geo::Replication::FileRetriever if user_upload?
       return Gitlab::Geo::Replication::JobArtifactRetriever if job_artifact?
       return Gitlab::Geo::Replication::LfsRetriever if lfs?

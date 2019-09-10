@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Gitlab::Geo::Replication::FileRetriever, :geo do
   shared_examples_for 'returns necessary params for sending a file from an API endpoint' do
-    subject { @subject ||= uploader.execute }
+    subject { @subject ||= retriever.execute }
 
     context 'when the upload exists' do
-      let(:uploader) { described_class.new(upload.id, message) }
+      let(:retriever) { described_class.new(upload.id, message) }
 
       before do
         expect(Upload).to receive(:find_by).with(id: upload.id).and_return(upload)
