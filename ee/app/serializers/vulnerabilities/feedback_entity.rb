@@ -57,14 +57,18 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
   end
 
   def can_destroy_feedback?
-    can?(request.current_user, :destroy_vulnerability_feedback, feedback)
+    can?(current_user, :destroy_vulnerability_feedback, feedback)
   end
 
   def can_read_issue?
-    feedback.issue.present? && can?(request.current_user, :read_issue, feedback.issue)
+    feedback.issue.present? && can?(current_user, :read_issue, feedback.issue)
   end
 
   def can_read_merge_request?
-    feedback.merge_request.present? && can?(request.current_user, :read_merge_request, feedback.merge_request)
+    feedback.merge_request.present? && can?(current_user, :read_merge_request, feedback.merge_request)
+  end
+
+  def current_user
+    return request.current_user if request.respond_to?(:current_user)
   end
 end
