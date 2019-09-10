@@ -2,6 +2,7 @@
 import _ from 'underscore';
 import { sprintf, __ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import ApprovalCheckRulePopover from 'ee/approvals/components/approval_check_rule_popover.vue';
 import { RULE_TYPE_CODE_OWNER } from 'ee/approvals/constants';
 import ApprovedIcon from './approved_icon.vue';
 
@@ -9,11 +10,17 @@ export default {
   components: {
     UserAvatarList,
     ApprovedIcon,
+    ApprovalCheckRulePopover,
   },
   props: {
     approvalRules: {
       type: Array,
       required: true,
+    },
+    securityApprovalsHelpPagePath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   computed: {
@@ -72,7 +79,7 @@ export default {
     <thead class="thead-white text-nowrap">
       <tr class="d-none d-sm-table-row">
         <th class="w-0"></th>
-        <th>{{ s__('MRApprovals|Approvers') }}</th>
+        <th class="w-25">{{ s__('MRApprovals|Approvers') }}</th>
         <th class="w-50"></th>
         <th>{{ s__('MRApprovals|Pending approvals') }}</th>
         <th>{{ s__('MRApprovals|Approved by') }}</th>
@@ -88,7 +95,13 @@ export default {
       <tr v-for="rule in rules" :key="rule.id">
         <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
         <td :colspan="rule.fallback ? 2 : 1">
-          <div class="d-none d-sm-block js-name" :class="rule.nameClass">{{ rule.name }}</div>
+          <div class="d-none d-sm-block js-name" :class="rule.nameClass">
+            {{ rule.name }}
+            <approval-check-rule-popover
+              :rule="rule"
+              :security-approvals-help-page-path="securityApprovalsHelpPagePath"
+            />
+          </div>
           <div class="d-flex d-sm-none flex-column js-summary">
             <span>{{ summaryText(rule) }}</span>
             <user-avatar-list

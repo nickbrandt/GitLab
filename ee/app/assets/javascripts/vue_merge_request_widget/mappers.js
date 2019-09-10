@@ -4,6 +4,7 @@ import {
   RULE_TYPE_REGULAR,
   RULE_TYPE_FALLBACK,
   RULE_TYPE_CODE_OWNER,
+  RULE_TYPE_REPORT_APPROVER,
 } from 'ee/approvals/constants';
 
 function mapApprovalRule(rule, settings) {
@@ -35,11 +36,14 @@ function getApprovalRuleNamesLeft(data) {
   // Filter out empty names (fallback rule has no name) because the empties would look weird.
   const regularRules = (rulesLeft[RULE_TYPE_REGULAR] || []).map(x => x.name).filter(x => x);
 
+  // Report Approvals
+  const reportApprovalRules = (rulesLeft[RULE_TYPE_REPORT_APPROVER] || []).map(x => x.name);
+
   // If there are code owners that need to approve, only mention that once.
   // As the names of code owner rules are patterns that don't mean much out of context.
   const codeOwnerRules = rulesLeft[RULE_TYPE_CODE_OWNER] ? [__('Code Owners')] : [];
 
-  return [...regularRules, ...codeOwnerRules];
+  return [...regularRules, ...reportApprovalRules, ...codeOwnerRules];
 }
 
 /**

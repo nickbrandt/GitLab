@@ -242,6 +242,7 @@ export default {
       :suggested-approvers="approvals.suggested_approvers"
       :approval-rules="mr.approvalRules"
       :is-loading-rules="isLoadingRules"
+      :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
     />
   </mr-widget-container>
 </template>

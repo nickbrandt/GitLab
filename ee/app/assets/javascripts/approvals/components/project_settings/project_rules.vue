@@ -3,11 +3,9 @@ import { mapState } from 'vuex';
 import { n__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import VulnerabilityCheckPopover from '../vulnerability_check_popover.vue';
+import ApprovalCheckRulePopover from '../approval_check_rule_popover.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
-
-const VULNERABILITY_CHECK_NAME = 'Vulnerability-Check';
 
 export default {
   components: {
@@ -15,7 +13,7 @@ export default {
     RuleControls,
     Rules,
     UserAvatarList,
-    VulnerabilityCheckPopover,
+    ApprovalCheckRulePopover,
   },
   computed: {
     ...mapState(['settings']),
@@ -58,9 +56,6 @@ export default {
         { name: rule.name, count: rule.approvalsRequired },
       );
     },
-    showVulnerabilityCheckPopover(rule) {
-      return rule.name === VULNERABILITY_CHECK_NAME;
-    },
   },
 };
 </script>
@@ -69,7 +64,7 @@ export default {
   <rules :rules="rules">
     <template slot="thead" slot-scope="{ name, members, approvalsRequired }">
       <tr class="d-none d-sm-table-row">
-        <th v-if="settings.allowMultiRule">{{ name }}</th>
+        <th v-if="settings.allowMultiRule" class="w-25">{{ name }}</th>
         <th class="w-50">{{ members }}</th>
         <th>{{ approvalsRequired }}</th>
         <th></th>
@@ -79,7 +74,10 @@ export default {
       <td class="d-table-cell d-sm-none js-summary">{{ summaryText(rule) }}</td>
       <td v-if="settings.allowMultiRule" class="d-none d-sm-table-cell js-name">
         {{ rule.name }}
-        <vulnerability-check-popover v-if="showVulnerabilityCheckPopover(rule)" />
+        <approval-check-rule-popover
+          :rule="rule"
+          :security-approvals-help-page-path="settings.securityApprovalsHelpPagePath"
+        />
       </td>
       <td class="d-none d-sm-table-cell js-members">
         <user-avatar-list :items="rule.approvers" :img-size="24" />

@@ -653,6 +653,12 @@ msgstr ""
 msgid "A member of the abuse team will review your report as soon as possible."
 msgstr ""
 
+msgid "A merge request approval is required when a security report contains a new vulnerability of high, critical, or unknown severity."
+msgstr ""
+
+msgid "A merge request approval is required when the license compliance report contains a blacklisted license."
+msgstr ""
+
 msgid "A new branch will be created in your fork and a new merge request will be started."
 msgstr ""
 
@@ -9419,6 +9425,12 @@ msgstr ""
 msgid "Learn more about Kubernetes"
 msgstr ""
 
+msgid "Learn more about License-Check"
+msgstr ""
+
+msgid "Learn more about Vulnerability-Check"
+msgstr ""
+
 msgid "Learn more about Web Terminal"
 msgstr ""
 
@@ -9441,9 +9453,6 @@ msgid "Learn more about signing commits"
 msgstr ""
 
 msgid "Learn more about the dependency list"
-msgstr ""
-
-msgid "Learn more about vulnerability check"
 msgstr ""
 
 msgid "Learn more in the"
@@ -9480,6 +9489,9 @@ msgid "License"
 msgstr ""
 
 msgid "License Compliance"
+msgstr ""
+
+msgid "License-Check"
 msgstr ""
 
 msgid "LicenseCompliance|Add a license"
@@ -18151,7 +18163,7 @@ msgstr ""
 msgid "Vulnerabilities over time"
 msgstr ""
 
-msgid "Vulnerability-Check requires one or more merge request approvals only if high or critical security vulnerabilities are detected."
+msgid "Vulnerability-Check"
 msgstr ""
 
 msgid "VulnerabilityChart|%{formattedStartDate} to today"
