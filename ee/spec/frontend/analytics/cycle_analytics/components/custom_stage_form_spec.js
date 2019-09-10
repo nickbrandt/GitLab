@@ -476,6 +476,7 @@ describe('CustomStageForm', () => {
     afterEach(() => {
       wrapper.destroy();
     });
+
     describe('Cancel button', () => {
       it('will reset the fields to initial state when clicked', () => {
         wrapper.setData({
@@ -497,6 +498,7 @@ describe('CustomStageForm', () => {
         });
       });
     });
+
     describe('Add stage button', () => {
       it('is disabled by default', () => {
         expect(wrapper.find(sel.submit).attributes('disabled')).toEqual('disabled');

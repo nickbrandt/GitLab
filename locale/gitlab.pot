@@ -4532,6 +4532,9 @@ msgstr ""
 msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
 msgstr ""
 
+msgid "CustomCycleAnalyticsStart event changed, please select a valid stop event"
+msgstr ""
+
 msgid "CustomCycleAnalytics|Add a stage"
 msgstr ""
 
@@ -8563,10 +8566,25 @@ msgstr ""
 msgid "Issue Boards"
 msgstr ""
 
+msgid "Issue Label Added"
+msgstr ""
+
+msgid "Issue Label Removed"
+msgstr ""
+
 msgid "Issue board focus mode"
 msgstr ""
 
+msgid "Issue created"
+msgstr ""
+
 msgid "Issue events"
+msgstr ""
+
+msgid "Issue first associated with a milestone or issue first added to a board"
+msgstr ""
+
+msgid "Issue first mentioned in a commit"
 msgstr ""
 
 msgid "Issue template (optional)"
@@ -9613,6 +9631,21 @@ msgid "Merge request approvals"
 msgstr ""
 
 msgid "Merge request approvals allow you to set the number of necessary approvals and predefine a list of approvers that will need to approve every merge request in a project."
+msgstr ""
+
+msgid "Merge request created"
+msgstr ""
+
+msgid "Merge request first deployed to production"
+msgstr ""
+
+msgid "Merge request last build finish time"
+msgstr ""
+
+msgid "Merge request last build start time"
+msgstr ""
+
+msgid "Merge request merged"
 msgstr ""
 
 msgid "Merge requests"
