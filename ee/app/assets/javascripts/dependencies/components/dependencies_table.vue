@@ -26,13 +26,14 @@ export default {
   data() {
     const tableSections = [
       { className: 'section-20', label: s__('Dependencies|Component') },
-      { className: 'section-15', label: s__('Dependencies|Version') },
+      { className: 'section-10', label: s__('Dependencies|Version') },
       { className: 'section-20', label: s__('Dependencies|Packager') },
-      { className: 'flex-grow-1', label: s__('Dependencies|Location') },
+      { className: 'section-15', label: s__('Dependencies|Location') },
+      { className: 'section-15', label: s__('Dependencies|License') },
     ];
 
     if (this.dependencyListVulnerabilities) {
-      tableSections.unshift({ className: 'section-15', label: s__('Dependencies|Status') });
+      tableSections.unshift({ className: 'section-20', label: s__('Dependencies|Status') });
     }
 
     return { tableSections };

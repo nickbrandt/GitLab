@@ -4765,6 +4765,9 @@ msgid_plural "Dependencies|%d vulnerabilities"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Dependencies|%{remainingLicensesCount} more"
+msgstr ""
+
 msgid "Dependencies|All"
 msgstr ""
 
@@ -4778,6 +4781,9 @@ msgid "Dependencies|Export as JSON"
 msgstr ""
 
 msgid "Dependencies|Job failed to generate the dependency list"
+msgstr ""
+
+msgid "Dependencies|License"
 msgstr ""
 
 msgid "Dependencies|Location"
@@ -13690,6 +13696,9 @@ msgid "Separate topics with commas."
 msgstr ""
 
 msgid "September"
+msgstr ""
+
+msgid "SeriesFinalConjunction|and"
 msgstr ""
 
 msgid "Server supports batch API only, please update your Git LFS client to version 1.0.1 and up."
