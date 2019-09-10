@@ -32,7 +32,7 @@ class Gitlab::Seeder::Packages
 end
 
 Gitlab::Seeder.quiet do
-  Project.all.sample(5).each do |project|
+  Project.not_mass_generated.sample(5).each do |project|
     Gitlab::Seeder::Packages.new(project.owner, project).seed
   end
 end

@@ -128,7 +128,7 @@ class Gitlab::Seeder::Vulnerabilities
 end
 
 Gitlab::Seeder.quiet do
-  Project.joins(:ci_pipelines).distinct.all.sample(5).each do |project|
+  Project.joins(:ci_pipelines).not_mass_generated.distinct.all.sample(5).each do |project|
     seeder = Gitlab::Seeder::Vulnerabilities.new(project)
     seeder.seed!
   end
