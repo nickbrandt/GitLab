@@ -47,6 +47,24 @@ describe 'Merge request > User sees merge widget', :js do
       end
     end
 
+    context 'when the head pipeline is merge train pipeline' do
+      let(:traits) { [:with_merge_train_pipeline] }
+      let(:options) { { merge_sha: project.commit.sha } }
+      let(:pipeline) { merge_request.all_pipelines.first }
+
+      before do
+        merge_request.update_head_pipeline
+      end
+
+      it 'shows head pipeline information' do
+        visit project_merge_request_path(project, merge_request)
+
+        within '.ci-widget-content' do
+          expect(page).to have_content("Merge train pipeline ##{pipeline.id} pending for #{pipeline.short_sha}")
+        end
+      end
+    end
+
     context 'when merge request is submitted from a forked project' do
       let(:source_project) { fork_project(project, user, repository: true) }
       let(:traits) { [:with_detached_merge_request_pipeline] }

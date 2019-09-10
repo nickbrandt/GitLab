@@ -24,6 +24,15 @@ FactoryBot.modify do
       end
     end
 
+    trait :with_merge_train_pipeline do
+      with_merge_request_pipeline
+
+      after(:create) do |merge_request, evaluator|
+        merge_request.pipelines_for_merge_request.last
+          .update(ref: merge_request.train_ref_path)
+      end
+    end
+
     trait :add_to_merge_train_when_pipeline_succeeds do
       auto_merge_enabled true
       auto_merge_strategy AutoMergeService::STRATEGY_ADD_TO_MERGE_TRAIN_WHEN_PIPELINE_SUCCEEDS
