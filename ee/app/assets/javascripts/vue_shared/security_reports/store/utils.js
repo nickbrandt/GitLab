@@ -1,7 +1,10 @@
 import sha1 from 'sha1';
 import _ from 'underscore';
+import axios from 'axios';
 import { stripHtml } from '~/lib/utils/text_utility';
 import { n__, s__, sprintf } from '~/locale';
+import Poll from '~/lib/utils/poll';
+import httpStatusCodes from '~/lib/utils/http_status';
 
 /**
  * Returns the index of an issue in given list
@@ -441,3 +444,32 @@ export const parseDiff = (diff, enrichData) => {
     existing: diff.existing ? diff.existing.map(enrichVulnerability) : [],
   };
 };
+
+/**
+ * Polls an endpoint untill it returns either an error or a 200.
+ * Resolving or rejecting the promise accordingly.
+ *
+ * @param {String} endpoint the endpoint to poll.
+ * @returns {Promise}
+ */
+export const pollUntilComplete = endpoint =>
+  new Promise((resolve, reject) => {
+    const eTagPoll = new Poll({
+      resource: {
+        getReports(url) {
+          return axios.get(url);
+        },
+      },
+      data: endpoint,
+      method: 'getReports',
+      successCallback: response => {
+        if (response.status === httpStatusCodes.OK) {
+          resolve(response);
+          eTagPoll.stop();
+        }
+      },
+      errorCallback: reject,
+    });
+
+    eTagPoll.makeRequest();
+  });

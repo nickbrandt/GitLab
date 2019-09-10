@@ -183,6 +183,11 @@ export default {
 
       return head || diffEndpoint;
     },
+    shouldRenderSast() {
+      const { head, diffEndpoint } = this.sast.paths;
+
+      return head || diffEndpoint;
+    },
   },
 
   created() {
@@ -202,7 +207,12 @@ export default {
     this.setCanCreateIssuePermission(this.canCreateIssue);
     this.setCanCreateFeedbackPermission(this.canCreateFeedback);
 
-    if (this.sastHeadPath) {
+    const sastDiffEndpoint = gl && gl.mrWidgetData && gl.mrWidgetData.sast_comparison_path;
+
+    if (gon.features && gon.features.sastMergeRequestReportApi && sastDiffEndpoint) {
+      this.setSastDiffEndpoint(sastDiffEndpoint);
+      this.fetchSastDiff();
+    } else if (this.sastHeadPath) {
       this.setSastHeadPath(this.sastHeadPath);
 
       if (this.sastBasePath) {
@@ -307,7 +317,9 @@ export default {
     ...mapActions('sast', {
       setSastHeadPath: 'setHeadPath',
       setSastBasePath: 'setBasePath',
+      setSastDiffEndpoint: 'setDiffEndpoint',
       fetchSastReports: 'fetchReports',
+      fetchSastDiff: 'fetchDiff',
     }),
   },
 };
@@ -333,7 +345,7 @@ export default {
     </div>
 
     <div slot="body" class="mr-widget-grouped-section report-block">
-      <template v-if="sastHeadPath">
+      <template v-if="shouldRenderSast">
         <summary-row
           :summary="groupedSastText"
           :status-icon="sastStatusIcon"
