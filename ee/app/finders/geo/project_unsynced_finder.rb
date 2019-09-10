@@ -10,7 +10,7 @@
 #       .execute.
 module Geo
   class ProjectUnsyncedFinder
-    def initialize(current_node:, shard_name:, batch_size:)
+    def initialize(current_node:, shard_name:, batch_size: nil)
       @current_node = Geo::Fdw::GeoNode.find(current_node.id)
       @shard_name = shard_name
       @batch_size = batch_size
@@ -20,10 +20,9 @@ module Geo
     def execute
       return Geo::Fdw::Project.none unless valid_shard?
 
-      projects
-        .missing_project_registry
-        .within_shards(shard_name)
-        .limit(batch_size)
+      relation = projects.missing_project_registry.within_shards(shard_name)
+      relation = relation.limit(batch_size) unless batch_size.nil?
+      relation
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
