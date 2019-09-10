@@ -7,7 +7,7 @@ import { trimText } from 'spec/helpers/text_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import { getRequestData } from '../mock_data';
 
-describe('Feature Flags', () => {
+describe('Feature flags', () => {
   const mockData = {
     endpoint: `${TEST_HOST}/endpoint.json`,
     csrfToken: 'testToken',
@@ -82,7 +82,7 @@ describe('Feature Flags', () => {
 
       expect(loadingElement).not.toBeNull();
       expect(loadingElement.querySelector('span').getAttribute('aria-label')).toEqual(
-        'Loading Feature Flags',
+        'Loading feature flags',
       );
 
       setTimeout(() => {
@@ -130,7 +130,7 @@ describe('Feature Flags', () => {
         it('renders generic title', () => {
           expect(
             component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-          ).toEqual('Get started with Feature Flags');
+          ).toEqual('Get started with feature flags');
         });
       });
 
@@ -141,7 +141,7 @@ describe('Feature Flags', () => {
           Vue.nextTick(() => {
             expect(
               component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-            ).toEqual('There are no inactive Feature Flags');
+            ).toEqual('There are no inactive feature flags');
             done();
           });
         });
@@ -154,7 +154,7 @@ describe('Feature Flags', () => {
           Vue.nextTick(() => {
             expect(
               component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
-            ).toEqual('There are no active Feature Flags');
+            ).toEqual('There are no active feature flags');
             done();
           });
         });

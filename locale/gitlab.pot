@@ -6460,13 +6460,13 @@ msgstr ""
 msgid "FeatureFlags|Feature Flags"
 msgstr ""
 
-msgid "FeatureFlags|Feature Flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
-msgstr ""
-
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
 msgstr ""
 
-msgid "FeatureFlags|Get started with Feature Flags"
+msgid "FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
+msgstr ""
+
+msgid "FeatureFlags|Get started with feature flags"
 msgstr ""
 
 msgid "FeatureFlags|Inactive"
@@ -6481,10 +6481,10 @@ msgstr ""
 msgid "FeatureFlags|Instance ID"
 msgstr ""
 
-msgid "FeatureFlags|Loading Feature Flags"
+msgid "FeatureFlags|Loading feature flags"
 msgstr ""
 
-msgid "FeatureFlags|More Information"
+msgid "FeatureFlags|More information"
 msgstr ""
 
 msgid "FeatureFlags|Name"
@@ -6494,6 +6494,9 @@ msgid "FeatureFlags|New"
 msgstr ""
 
 msgid "FeatureFlags|New Feature Flag"
+msgstr ""
+
+msgid "FeatureFlags|New feature flag"
 msgstr ""
 
 msgid "FeatureFlags|Percent rollout (logged in users)"
@@ -6526,10 +6529,10 @@ msgstr ""
 msgid "FeatureFlags|Target user behaviour is built up by creating a list of active user IDs. These IDs should be the users in the system in which the feature flag is set, not GitLab ids. Target users apply across %{strong_start}All Environments%{strong_end} and are not affected by Target Environment rules."
 msgstr ""
 
-msgid "FeatureFlags|There are no active Feature Flags"
+msgid "FeatureFlags|There are no active feature flags"
 msgstr ""
 
-msgid "FeatureFlags|There are no inactive Feature Flags"
+msgid "FeatureFlags|There are no inactive feature flags"
 msgstr ""
 
 msgid "FeatureFlags|There was an error fetching the feature flags."

@@ -1,7 +1,7 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 import _ from 'underscore';
-import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective } from '@gitlab/ui';
+import { GlEmptyState, GlLoadingIcon, GlButton, GlModalDirective, GlLink } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __, s__ } from '~/locale';
@@ -26,6 +26,7 @@ export default {
     GlEmptyState,
     GlLoadingIcon,
     GlButton,
+    GlLink,
     ConfigureFeatureFlagsModal,
   },
   directives: {
@@ -151,11 +152,11 @@ export default {
     },
     emptyStateTitle() {
       if (this.scope === this.$options.scopes.disabled) {
-        return s__(`FeatureFlags|There are no inactive Feature Flags`);
+        return s__(`FeatureFlags|There are no inactive feature flags`);
       } else if (this.scope === this.$options.scopes.enabled) {
-        return s__(`FeatureFlags|There are no active Feature Flags`);
+        return s__(`FeatureFlags|There are no active feature flags`);
       }
-      return s__(`FeatureFlags|Get started with Feature Flags`);
+      return s__(`FeatureFlags|Get started with feature flags`);
     },
   },
   created() {
@@ -234,7 +235,7 @@ export default {
           :href="newFeatureFlagPath"
           variant="success"
           class="js-ff-new"
-          >{{ s__('FeatureFlags|New Feature Flag') }}</gl-button
+          >{{ s__('FeatureFlags|New feature flag') }}</gl-button
         >
       </div>
     </h3>
@@ -245,7 +246,7 @@ export default {
 
     <gl-loading-icon
       v-if="isLoading"
-      :label="s__('FeatureFlags|Loading Feature Flags')"
+      :label="s__('FeatureFlags|Loading feature flags')"
       :size="3"
       class="js-loading-state prepend-top-20"
     />
@@ -261,15 +262,19 @@ export default {
       v-else-if="shouldShowEmptyState"
       class="js-feature-flags-empty-state"
       :title="emptyStateTitle"
-      :description="
-        s__(
-          `FeatureFlags|Feature Flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
-        )
-      "
       :svg-path="errorStateSvgPath"
-      :primary-button-link="featureFlagsHelpPagePath"
-      :primary-button-text="s__(`FeatureFlags|More Information`)"
-    />
+    >
+      <template v-slot:description>
+        {{
+          s__(
+            'FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.',
+          )
+        }}
+        <gl-link :href="featureFlagsHelpPagePath" target="_blank" rel="noopener noreferrer">
+          {{ s__('FeatureFlags|More information') }}
+        </gl-link>
+      </template>
+    </gl-empty-state>
 
     <feature-flags-table
       v-else-if="shouldRenderTable"

@@ -8,7 +8,7 @@ import {
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 
-describe('Feature Flag table', () => {
+describe('Feature flag table', () => {
   let Component;
   let vm;
 
