@@ -28,6 +28,12 @@ module EE
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end
 
+    class_methods do
+      def with_api_entity_associations
+        super.preload(:epic)
+      end
+    end
+
     # override
     def check_for_spam?
       author.bot? || super
