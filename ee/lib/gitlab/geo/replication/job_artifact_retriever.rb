@@ -7,7 +7,7 @@ module Gitlab
       #   * Finding an ::Ci::JobArtifact record
       #   * Returning the necessary response data to send the file back
       #
-      class JobArtifactUploader < BaseUploader
+      class JobArtifactRetriever < BaseRetriever
         def execute
           job_artifact = fetch_resource
 

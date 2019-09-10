@@ -3,7 +3,7 @@
 module Gitlab
   module Geo
     module Replication
-      class BaseUploader
+      class BaseRetriever
         include LogHelpers
 
         attr_reader :object_db_id, :message

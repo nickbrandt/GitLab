@@ -37,9 +37,9 @@ module Geo
     end
 
     def uploader_klass
-      return Gitlab::Geo::Replication::FileUploader if user_upload?
-      return Gitlab::Geo::Replication::JobArtifactUploader if job_artifact?
-      return Gitlab::Geo::Replication::LfsUploader if lfs?
+      return Gitlab::Geo::Replication::FileRetriever if user_upload?
+      return Gitlab::Geo::Replication::JobArtifactRetriever if job_artifact?
+      return Gitlab::Geo::Replication::LfsRetriever if lfs?
 
       error_message = "Cannot find a Gitlab::Geo Uploader for object_type = '#{object_type}'"
 

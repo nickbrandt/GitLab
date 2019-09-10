@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::Replication::LfsUploader, :geo do
+describe Gitlab::Geo::Replication::LfsRetriever, :geo do
   context '#execute' do
     subject { uploader.execute }
 

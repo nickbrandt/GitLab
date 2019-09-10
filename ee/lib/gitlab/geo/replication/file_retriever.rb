@@ -7,7 +7,7 @@ module Gitlab
       #   * Finding an Upload record
       #   * Returning the necessary response data to send the file back
       #
-      class FileUploader < BaseUploader
+      class FileRetriever < BaseRetriever
         def execute
           recorded_file = fetch_resource
 

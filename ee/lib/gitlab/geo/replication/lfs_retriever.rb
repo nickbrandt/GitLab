@@ -7,7 +7,7 @@ module Gitlab
       #   * Finding an LfsObject record
       #   * Returning the necessary response data to send the file back
       #
-      class LfsUploader < BaseUploader
+      class LfsRetriever < BaseRetriever
         def execute
           lfs_object = fetch_resource
 
