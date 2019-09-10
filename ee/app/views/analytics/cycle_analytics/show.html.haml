@@ -1,4 +1,5 @@
 - page_title _('Cycle Analytics')
+- customizable_cycle_analytics = Feature.enabled?(:customizable_cycle_analytics)
 
 - if cookies[:cycle_analytics_app] == 'true'
   #js-cycle-analytics-app
@@ -63,13 +64,17 @@
             %nav.stage-nav
               %ul
                 %stage-nav-item{ "v-for" => "stage in state.stages", ":key" => '`ca-stage-title-${stage.title}`', '@select' => 'selectStage(stage)', ":title" => "stage.title", ":is-user-allowed" => "stage.isUserAllowed", ":value" => "stage.value", ":is-active" => "stage.active" }
+                - if customizable_cycle_analytics
+                  %add-stage-button{ '@showform' => 'showAddStageForm', ":active" => 'isCustomStageForm' }
             .section.stage-events
               %template{ "v-if" => "isLoadingStage" }
                 = icon("spinner spin")
               %template{ "v-if" => "currentStage && !currentStage.isUserAllowed" }
                 = render partial: "projects/cycle_analytics/no_access"
               %template{ "v-else" => true }
-                %template{ "v-if" => "isEmptyStage && !isLoadingStage" }
+                %template{ "v-if" => "isEmptyStage && !isLoadingStage && !isCustomStageForm" }
                   = render partial: "projects/cycle_analytics/empty_stage"
-                %template{ "v-if" => "state.events.length && !isLoadingStage && !isEmptyStage" }
+                %template{ "v-if" => "state.events.length && !isLoadingStage && !isEmptyStage && !isCustomStageForm" }
                   %component{ ":is" => "currentStage.component", ":stage" => "currentStage", ":items" => "state.events" }
+                - if customizable_cycle_analytics
+                  %custom-stage-form{ "v-if" => "isCustomStageForm" }
