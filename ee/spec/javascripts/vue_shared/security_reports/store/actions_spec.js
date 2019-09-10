@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import actions, {
@@ -987,6 +988,35 @@ describe('security reports actions', () => {
           done,
         );
       });
+
+      it('show dismiss vulnerability toast message', done => {
+        spyOn(Vue.toasted, 'show');
+
+        const checkToastMessage = () => {
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          done();
+        };
+
+        testAction(
+          dismissVulnerability,
+          payload,
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestDismissVulnerability',
+            },
+            {
+              type: 'closeDismissalCommentBox',
+            },
+            {
+              type: 'receiveDismissVulnerability',
+              payload,
+            },
+          ],
+          checkToastMessage,
+        );
+      });
     });
 
     it('with error should dispatch `receiveDismissVulnerabilityError`', done => {
@@ -1042,6 +1072,31 @@ describe('security reports actions', () => {
             },
           ],
           done,
+        );
+      });
+
+      it('should show added dismissal comment toast message', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkToastMessage = () => {
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          done();
+        };
+
+        testAction(
+          addDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestAddDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveAddDismissalCommentSuccess',
+              payload: { data },
+            },
+          ],
+          checkToastMessage,
         );
       });
     });
@@ -1144,6 +1199,31 @@ describe('security reports actions', () => {
             },
           ],
           done,
+        );
+      });
+
+      it('should show deleted dismissal comment toast message', done => {
+        spyOn(Vue.toasted, 'show').and.callThrough();
+
+        const checkToastMessage = () => {
+          expect(Vue.toasted.show).toHaveBeenCalledTimes(1);
+          done();
+        };
+
+        testAction(
+          deleteDismissalComment,
+          { comment },
+          { modal: { vulnerability } },
+          [],
+          [
+            { type: 'requestDeleteDismissalComment' },
+            { type: 'closeDismissalCommentBox' },
+            {
+              type: 'receiveDeleteDismissalCommentSuccess',
+              payload: { data },
+            },
+          ],
+          checkToastMessage,
         );
       });
     });
