@@ -28,6 +28,14 @@ describe('sast module mutations', () => {
     });
   });
 
+  describe(types.SET_DIFF_ENDPOINT, () => {
+    it('should set the SAST diff endpoint', () => {
+      mutations[types.SET_DIFF_ENDPOINT](state, path);
+
+      expect(state.paths.diffEndpoint).toBe(path);
+    });
+  });
+
   describe(types.REQUEST_REPORTS, () => {
     it('should set the `isLoading` status to `true`', () => {
       mutations[types.REQUEST_REPORTS](state);
@@ -175,6 +183,55 @@ describe('sast module mutations', () => {
       it('should have the relevant `all` issues', () => {
         expect(state.allIssues.length).toBe(1);
       });
+    });
+  });
+
+  describe(types.RECEIVE_DIFF_SUCCESS, () => {
+    beforeEach(() => {
+      const reports = {
+        diff: {
+          added: [
+            createIssue({ cve: 'CVE-1' }),
+            createIssue({ cve: 'CVE-2' }),
+            createIssue({ cve: 'CVE-3' }),
+          ],
+          fixed: [createIssue({ cve: 'CVE-4' }), createIssue({ cve: 'CVE-5' })],
+          existing: [createIssue({ cve: 'CVE-6' })],
+        },
+      };
+      state.isLoading = true;
+      mutations[types.RECEIVE_DIFF_SUCCESS](state, reports);
+    });
+
+    it('should set the `isLoading` status to `false`', () => {
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('should have the relevant `new` issues', () => {
+      expect(state.newIssues.length).toBe(3);
+    });
+
+    it('should have the relevant `resolved` issues', () => {
+      expect(state.resolvedIssues.length).toBe(2);
+    });
+
+    it('should have the relevant `all` issues', () => {
+      expect(state.allIssues.length).toBe(1);
+    });
+  });
+
+  describe(types.RECEIVE_DIFF_ERROR, () => {
+    beforeEach(() => {
+      state.isLoading = true;
+      mutations[types.RECEIVE_DIFF_ERROR](state);
+    });
+
+    it('should set the `isLoading` status to `false`', () => {
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('should set the `hasError` status to `true`', () => {
+      expect(state.hasError).toBe(true);
     });
   });
 });

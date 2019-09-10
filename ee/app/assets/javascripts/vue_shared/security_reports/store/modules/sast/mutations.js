@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation_types';
-import { parseSastIssues, findIssueIndex } from '../../utils';
+import { parseSastIssues, findIssueIndex, parseDiff } from '../../utils';
 import filterByKey from '../../utils/filter_by_key';
 
 export default {
@@ -10,6 +10,10 @@ export default {
 
   [types.SET_BASE_PATH](state, path) {
     Vue.set(state.paths, 'base', path);
+  },
+
+  [types.SET_DIFF_ENDPOINT](state, path) {
+    Vue.set(state.paths, 'diffEndpoint', path);
   },
 
   [types.REQUEST_REPORTS](state) {
@@ -53,6 +57,20 @@ export default {
       state.newIssues = newIssues;
       state.isLoading = false;
     }
+  },
+
+  [types.RECEIVE_DIFF_SUCCESS](state, { diff, enrichData }) {
+    const { added, fixed, existing } = parseDiff(diff, enrichData);
+
+    state.isLoading = false;
+    state.newIssues = added;
+    state.resolvedIssues = fixed;
+    state.allIssues = existing;
+  },
+
+  [types.RECEIVE_DIFF_ERROR](state) {
+    state.isLoading = false;
+    state.hasError = true;
   },
 
   [types.RECEIVE_REPORTS_ERROR](state) {

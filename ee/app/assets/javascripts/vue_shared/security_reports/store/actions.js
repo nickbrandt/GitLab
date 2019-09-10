@@ -4,8 +4,7 @@ import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import downloadPatchHelper from './utils/download_patch_helper';
-import Poll from '~/lib/utils/poll';
-import httpStatusCodes from '~/lib/utils/http_status';
+import { pollUntilComplete } from './utils';
 
 /**
  * A lot of this file has duplicate actions to
@@ -17,28 +16,6 @@ import httpStatusCodes from '~/lib/utils/http_status';
  */
 
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
-
-const pollUntilComplete = endpoint =>
-  new Promise((resolve, reject) => {
-    const eTagPoll = new Poll({
-      resource: {
-        getReports(url) {
-          return axios.get(url);
-        },
-      },
-      data: endpoint,
-      method: 'getReports',
-      successCallback: response => {
-        if (response.status === httpStatusCodes.OK) {
-          resolve(response);
-          eTagPoll.stop();
-        }
-      },
-      errorCallback: reject,
-    });
-
-    eTagPoll.makeRequest();
-  });
 
 export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_BLOB_PATH, blobPath);
 

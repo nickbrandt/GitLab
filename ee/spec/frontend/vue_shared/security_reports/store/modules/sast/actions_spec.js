@@ -8,11 +8,13 @@ import * as actions from 'ee/vue_shared/security_reports/store/modules/sast/acti
 
 const headPath = 'head-path.json';
 const basePath = 'base-path.json';
+const diffEndpoint = 'diff-endpoint.json';
 const blobPath = 'blob-path.json';
 const reports = {
   base: 'base',
   head: 'head',
   enrichData: 'enrichData',
+  diff: 'diff',
 };
 const error = 'Something went wrong';
 const issue = {};
@@ -54,6 +56,24 @@ describe('sast report actions', () => {
           {
             type: types.SET_BASE_PATH,
             payload: basePath,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setDiffEndpoint', () => {
+    it(`should commit ${types.SET_DIFF_ENDPOINT} with the correct path`, done => {
+      testAction(
+        actions.setDiffEndpoint,
+        diffEndpoint,
+        state,
+        [
+          {
+            type: types.SET_DIFF_ENDPOINT,
+            payload: diffEndpoint,
           },
         ],
         [],
@@ -129,6 +149,8 @@ describe('sast report actions', () => {
       });
 
       it('should dispatch the `receiveReports` action', done => {
+        const { head, base, enrichData } = reports;
+
         testAction(
           actions.fetchReports,
           {},
@@ -140,7 +162,7 @@ describe('sast report actions', () => {
               type: 'receiveReports',
               payload: {
                 blobPath,
-                reports,
+                reports: { head, base, enrichData },
               },
             },
           ],
@@ -167,6 +189,128 @@ describe('sast report actions', () => {
           { ...rootState, ...state },
           [],
           [{ type: 'requestReports' }, { type: 'receiveError' }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveDiffSuccess', () => {
+    it(`should commit ${types.RECEIVE_DIFF_SUCCESS} with the correct response`, done => {
+      testAction(
+        actions.receiveDiffSuccess,
+        reports,
+        state,
+        [
+          {
+            type: types.RECEIVE_DIFF_SUCCESS,
+            payload: reports,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveDiffError', () => {
+    it(`should commit ${types.RECEIVE_DIFF_ERROR} with the correct response`, done => {
+      testAction(
+        actions.receiveDiffError,
+        error,
+        state,
+        [
+          {
+            type: types.RECEIVE_DIFF_ERROR,
+            payload: error,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchDiff', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+      state.paths.diffEndpoint = diffEndpoint;
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('when diff and vulnerability feedback endpoints respond successfully', () => {
+      beforeEach(() => {
+        mock
+          .onGet(diffEndpoint)
+          .replyOnce(200, reports.diff)
+          .onGet(vulnerabilityFeedbackPath)
+          .replyOnce(200, reports.enrichData);
+      });
+
+      it('should dispatch the `receiveDiffSuccess` action', done => {
+        const { diff, enrichData } = reports;
+        testAction(
+          actions.fetchDiff,
+          {},
+          { ...rootState, ...state },
+          [],
+          [
+            { type: 'requestReports' },
+            {
+              type: 'receiveDiffSuccess',
+              payload: {
+                diff,
+                enrichData,
+              },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when the vulnerability feedback endpoint fails', () => {
+      beforeEach(() => {
+        mock
+          .onGet(diffEndpoint)
+          .replyOnce(200, reports.diff)
+          .onGet(vulnerabilityFeedbackPath)
+          .replyOnce(404);
+      });
+
+      it('should dispatch the `receiveError` action', done => {
+        testAction(
+          actions.fetchDiff,
+          {},
+          { ...rootState, ...state },
+          [],
+          [{ type: 'requestReports' }, { type: 'receiveDiffError' }],
+          done,
+        );
+      });
+    });
+
+    describe('when the diff endpoint fails', () => {
+      beforeEach(() => {
+        mock
+          .onGet(diffEndpoint)
+          .replyOnce(404)
+          .onGet(vulnerabilityFeedbackPath)
+          .replyOnce(200, reports.enrichData);
+      });
+
+      it('should dispatch the `receiveDiffError` action', done => {
+        testAction(
+          actions.fetchDiff,
+          {},
+          { ...rootState, ...state },
+          [],
+          [{ type: 'requestReports' }, { type: 'receiveDiffError' }],
           done,
         );
       });
