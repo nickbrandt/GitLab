@@ -82,6 +82,7 @@ module QA
 
         module SubMenus
           autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
+          autoload :Repository, 'qa/ee/page/project/sub_menus/repository'
         end
 
         module Issue
@@ -121,6 +122,10 @@ module QA
         module Secure
           autoload :Show, 'qa/ee/page/project/secure/show'
           autoload :DependencyList, 'qa/ee/page/project/secure/dependency_list'
+        end
+
+        module PathLocks
+          autoload :Index, 'qa/ee/page/project/path_locks/index'
         end
       end
 
