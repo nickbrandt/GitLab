@@ -9,10 +9,8 @@ module Gitlab
       #
       class LfsRetriever < BaseRetriever
         def execute
-          lfs_object = fetch_resource
-
           return error('LFS object not found') unless lfs_object
-          return error('LFS object not found') if message[:checksum] != lfs_object.oid
+          return error('LFS object not found') unless matches_checksum?
 
           unless lfs_object.file.present? && lfs_object.file.exists?
             log_error("Could not upload LFS object because it does not have a file", id: lfs_object.id)
@@ -25,13 +23,15 @@ module Gitlab
 
         private
 
-        # rubocop: disable CodeReuse/ActiveRecord
-
-        def fetch_resource
-          LfsObject.find_by(id: object_db_id)
+        def lfs_object
+          strong_memoize(:lfs_object) do
+            LfsObject.find_by_id(object_db_id)
+          end
         end
 
-        # rubocop: enable CodeReuse/ActiveRecord
+        def matches_checksum?
+          message[:checksum] == lfs_object.oid
+        end
       end
     end
   end

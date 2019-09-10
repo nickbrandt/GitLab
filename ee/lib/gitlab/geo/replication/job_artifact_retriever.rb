@@ -9,8 +9,6 @@ module Gitlab
       #
       class JobArtifactRetriever < BaseRetriever
         def execute
-          job_artifact = fetch_resource
-
           unless job_artifact.present?
             return error('Job artifact not found')
           end
@@ -26,13 +24,11 @@ module Gitlab
 
         private
 
-        # rubocop: disable CodeReuse/ActiveRecord
-
-        def fetch_resource
-          ::Ci::JobArtifact.find_by(id: object_db_id)
+        def job_artifact
+          strong_memoize(:job_artifact) do
+            ::Ci::JobArtifact.find_by_id(object_db_id)
+          end
         end
-
-        # rubocop: enable CodeReuse/ActiveRecord
       end
     end
   end
