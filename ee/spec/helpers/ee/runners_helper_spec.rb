@@ -30,7 +30,7 @@ describe EE::RunnersHelper do
       let(:minutes_used) { 40 }
 
       it 'does not return a message' do
-        expect(subject).to be_nil
+        expect(subject).to be_empty
       end
     end
 
