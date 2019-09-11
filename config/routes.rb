@@ -113,6 +113,7 @@ Rails.application.routes.draw do
       draw :username
       draw :trial
       draw :trial_registration
+      draw :country
     end
 
     Gitlab.ee do
