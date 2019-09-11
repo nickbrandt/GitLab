@@ -3,6 +3,7 @@ import pipelineComponent from '~/vue_merge_request_widget/components/mr_widget_p
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import mockData from 'ee_spec/vue_mr_widget/mock_data';
 import mockLinkedPipelines from 'ee_spec/pipelines/graph/linked_pipelines_mock_data';
+import { trimText } from 'spec/helpers/text_helper';
 
 describe('MRWidgetPipeline', () => {
   let vm;
@@ -52,6 +53,55 @@ describe('MRWidgetPipeline', () => {
 
       it('should render the linked pipelines mini list', () => {
         expect(vm.$el.querySelector('.linked-pipeline-mini-list.is-downstream')).not.toBeNull();
+      });
+    });
+  });
+
+  describe('for each type of pipeline', () => {
+    let pipeline;
+
+    beforeEach(() => {
+      ({ pipeline } = JSON.parse(JSON.stringify(mockData)));
+
+      pipeline.ref.tag = false;
+      pipeline.ref.branch = false;
+    });
+
+    const factory = () => {
+      vm = mountComponent(Component, {
+        pipeline,
+        hasCi: true,
+        ciStatus: 'success',
+        troubleshootingDocsPath: 'help',
+        sourceBranchLink: mockData.source_branch_link,
+      });
+    };
+
+    describe('for a merge train pipeline', () => {
+      it('renders a pipeline widget that reads "Merge train pipeline <ID> <status> for <SHA>"', () => {
+        pipeline.details.name = 'Merge train pipeline';
+        pipeline.merge_request_event_type = 'merge_train';
+
+        factory();
+
+        const expected = `Merge train pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
+        const actual = trimText(vm.$el.querySelector('.js-pipeline-info-container').innerText);
+
+        expect(actual).toBe(expected);
+      });
+    });
+
+    describe('for a merged result pipeline', () => {
+      it('renders a pipeline widget that reads "Merged result pipeline <ID> <status> for <SHA>"', () => {
+        pipeline.details.name = 'Merged result pipeline';
+        pipeline.merge_request_event_type = 'merged_result';
+
+        factory();
+
+        const expected = `Merged result pipeline #${pipeline.id} ${pipeline.details.status.label} for ${pipeline.commit.short_id}`;
+        const actual = trimText(vm.$el.querySelector('.js-pipeline-info-container').innerText);
+
+        expect(actual).toBe(expected);
       });
     });
   });
