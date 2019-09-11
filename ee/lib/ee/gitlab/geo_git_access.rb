@@ -51,7 +51,7 @@ module EE
           }
         }
 
-        ::Gitlab::GitAccessResult::CustomAction.new(payload, 'Attempting to proxy to primary.', messages)
+        ::Gitlab::GitAccessResult::CustomAction.new(payload, messages)
       end
 
       def messages

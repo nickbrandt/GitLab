@@ -50,8 +50,8 @@ shared_examples 'a read-only GitLab instance' do
         project.add_maintainer(user)
 
         expect(push_changes).to be_a(Gitlab::GitAccessResult::CustomAction)
-        expect(push_changes.message).to eql('Attempting to proxy to primary.')
         expect(push_changes.payload).to eql(payload)
+        expect(push_changes.console_messages).to include(*console_messages)
       end
     end
   end
