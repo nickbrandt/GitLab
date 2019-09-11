@@ -82,14 +82,19 @@ export default {
   },
   watch: {
     activated() {
-      const inactive = document.querySelector('.fa-power-off');
-      const active = document.querySelector('.fa-circle');
-      this.activated
-        ? inactive && inactive.setAttribute('class', 'fa fa-circle cgreen')
-        : active && active.setAttribute('class', 'fa fa-power-off clgray');
+      this.updateIcon();
     },
   },
   methods: {
+    updateIcon() {
+      return document.querySelectorAll('.js-service-active-status').forEach(icon => {
+        if (icon.dataset.value === this.activated.toString()) {
+          icon.classList.remove('d-none');
+        } else {
+          icon.classList.add('d-none');
+        }
+      });
+    },
     resetKey() {
       return axios
         .put(this.formPath, { service: { token: '' } })
