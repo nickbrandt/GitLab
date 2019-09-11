@@ -6,17 +6,7 @@ describe ApprovalProjectRule do
   subject { create(:approval_project_rule) }
 
   describe 'validations' do
-    it 'enforces uniqueness of rule names scoped to a project' do
-      new_rule = build(:approval_project_rule, name: subject.name, project: subject.project)
-
-      expect(new_rule).to_not be_valid
-    end
-
-    it 'does not enforce uniqueness of rule names across projects' do
-      new_rule = build(:approval_project_rule, name: subject.name)
-
-      expect(new_rule).to be_valid
-    end
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
   end
 
   describe '.regular' do
