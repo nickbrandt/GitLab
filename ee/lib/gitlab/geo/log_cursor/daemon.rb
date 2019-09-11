@@ -39,7 +39,7 @@ module Gitlab
           handle_error(lease[:error])
 
           # When no new event is found sleep for a few moments
-          arbitrary_sleep(lease[:ttl])
+          sleep_break(lease[:ttl])
         end
 
         def find_and_handle_events!
@@ -54,26 +54,26 @@ module Gitlab
 
         private
 
-        def handle_error(did_error)
-          track_failing_since(did_error)
+        def handle_error(error)
+          track_failing_since(error)
 
           if excessive_errors?
             exit!("Consecutive errors for over #{MAX_ERROR_DURATION} seconds")
           end
         end
 
-        def track_failing_since(did_error)
-          if did_error
-            @failing_since ||= Time.now
+        def track_failing_since(error)
+          if error
+            @failing_since ||= Time.now.utc
           else
             @failing_since = nil
           end
         end
 
         def excessive_errors?
-          return if @failing_since.nil?
+          return unless @failing_since
 
-          MAX_ERROR_DURATION < (Time.now - @failing_since)
+          (Time.now.utc - @failing_since) > MAX_ERROR_DURATION
         end
 
         def handle_events(batch, previous_batch_last_id)
@@ -152,23 +152,25 @@ module Gitlab
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
-        # Sleeps for the expired TTL that remains on the lease plus some random seconds.
+        # Sleeps for the specified duration plus some random seconds.
         #
         # This allows multiple GeoLogCursors to randomly process a batch of events,
         # without favouring the shortest path (or latency).
-        def arbitrary_sleep(delay)
-          jitter = rand(1..20) * 0.1
+        #
+        # Exits early if needed.
+        def sleep_break(seconds)
+          sleep(random_jitter_time)
 
-          sleep_break(delay + jitter)
+          seconds.to_i.times do
+            break if exit?
+
+            sleep(1)
+          end
         end
 
-        def sleep_break(seconds)
-          while seconds > 0.0
-            to_sleep = seconds > 1.0 ? 1.0 : seconds
-            seconds -= to_sleep
-            sleep(to_sleep)
-            break if exit?
-          end
+        # Returns a random float from 0.1 to 2.0
+        def random_jitter_time
+          rand(1..20) * 0.1
         end
 
         def gap_tracking
