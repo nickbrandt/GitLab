@@ -120,7 +120,7 @@ describe('actions', () => {
     });
 
     const errorMessage =
-      'This dashboard is available for public projects, and private projects in groups with a Gold plan.';
+      'This dashboard is available for public projects, and private projects in groups with a Silver plan.';
     const selectProjects = count => {
       for (let i = 0; i < count; i += 1) {
         store.dispatch('toggleSelectedProject', {
