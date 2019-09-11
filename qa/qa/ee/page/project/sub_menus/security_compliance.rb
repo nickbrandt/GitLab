@@ -6,8 +6,6 @@ module QA
       module Project
         module SubMenus
           module SecurityCompliance
-            include QA::Page::Project::SubMenus::Common
-
             def self.included(page)
               page.class_eval do
                 view 'ee/app/views/layouts/nav/sidebar/_project_security_link.html.haml' do
