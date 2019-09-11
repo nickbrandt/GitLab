@@ -22,7 +22,7 @@ FactoryBot.define do
 
   factory :approval_project_rule do
     project
-    name ApprovalRuleLike::DEFAULT_NAME
+    sequence(:name) { |n| "#{ApprovalRuleLike::DEFAULT_NAME}-#{n}" }
     rule_type :regular
 
     trait :security_report do
