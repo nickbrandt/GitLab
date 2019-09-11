@@ -25,7 +25,7 @@ module EE
           .with_pagination(request, response)
           .represent(environments)
       end
-      
+
       def metrics_dashboard_params
         {
           cluster: cluster,
