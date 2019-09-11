@@ -8,7 +8,7 @@ module GitlabSubscriptions
       if response[:success]
         { success: true }
       else
-        { success: false, errors: response.dig(:data, 'errors') }
+        { success: false, errors: response.dig(:data, :errors) }
       end
     end
 

@@ -27,13 +27,15 @@ module Gitlab
       end
 
       def parse_response(http_response)
+        parsed_response = http_response.parsed_response
+
         case http_response.response
         when Net::HTTPSuccess
-          { success: true, data: http_response.parsed_response }
+          { success: true, data: parsed_response }
         when Net::HTTPUnprocessableEntity
-          { success: false, data: http_response.parsed_response }
+          { success: false, data: { errors: parsed_response['errors'] } }
         else
-          { success: false, data: "HTTP status code: #{http_response.code}" }
+          { success: false, data: { errors: "HTTP status code: #{http_response.code}" } }
         end
       end
     end
