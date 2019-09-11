@@ -19,27 +19,22 @@ module Gitlab
 
       def headers
         {
-          "Accept" => 'application/json',
+          'Accept' => 'application/json',
           'Content-Type' => 'application/json',
-          "X-Admin-Email" => ENV['SUBSCRIPTION_PORTAL_ADMIN_EMAIL'],
-          "X-Admin-Token" => ENV['SUBSCRIPTION_PORTAL_ADMIN_TOKEN']
+          'X-Admin-Email' => ENV['SUBSCRIPTION_PORTAL_ADMIN_EMAIL'],
+          'X-Admin-Token' => ENV['SUBSCRIPTION_PORTAL_ADMIN_TOKEN']
         }
       end
 
       def parse_response(http_response)
-        response = { success: false }
-
         case http_response.response
         when Net::HTTPSuccess
-          response[:success] = true
-          response[:data] = http_response.parsed_response
+          { success: true, data: http_response.parsed_response }
         when Net::HTTPUnprocessableEntity
-          response[:data] = http_response.parsed_response
+          { success: false, data: http_response.parsed_response }
         else
-          response[:data] = { errors: "HTTP status code: #{http_response.code}" }
+          { success: false, data: "HTTP status code: #{http_response.code}" }
         end
-
-        response
       end
     end
   end
