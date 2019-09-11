@@ -305,6 +305,7 @@ export default {
       :has-issues="sastContainer.newIssues.length > 0"
       :popover-options="sastContainerPopover"
       class="js-dependency-scanning-widget split-report-section"
+      data-qa-selector="container_scanning_report"
     />
 
     <report-section
