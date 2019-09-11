@@ -5,6 +5,10 @@ require 'spec_helper'
 describe ApprovalProjectRule do
   subject { create(:approval_project_rule) }
 
+  describe 'validations' do
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
+  end
+
   describe '.regular' do
     it 'returns non-report_approver records' do
       rules = create_list(:approval_project_rule, 2)
