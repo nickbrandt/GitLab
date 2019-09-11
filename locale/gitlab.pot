@@ -10993,6 +10993,9 @@ msgstr ""
 msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
+msgid "Pipelines|Pipelines will not run anymore on shared Runners."
+msgstr ""
+
 msgid "Pipelines|Project cache successfully reset."
 msgstr ""
 

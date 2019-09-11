@@ -2,17 +2,17 @@
 module EE
   module RunnersHelper
     def ci_usage_warning_message(namespace, project)
-      message = ci_usage_base_message(namespace)
+      message = [ci_usage_base_message(namespace)]
 
       return unless message
 
       if ::Gitlab.com? && can?(current_user, :admin_project, project)
-        message += " #{purchase_shared_runner_minutes_link}"
+        message << purchase_shared_runner_minutes_link
       elsif namespace.shared_runners_minutes_used?
-        message += " #{s_('Pipelines|Pipelines will not run anymore on shared Runners.')}"
+        message << s_('Pipelines|Pipelines will not run anymore on shared Runners.')
       end
 
-      message.html_safe
+      message.join(' ').html_safe
     end
 
     private
