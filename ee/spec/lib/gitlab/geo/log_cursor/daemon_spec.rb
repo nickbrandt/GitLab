@@ -22,21 +22,26 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     allow(daemon).to receive(:arbitrary_sleep).and_return(0.1)
   end
 
+  # Warning: Ensure an exit condition for the main run! loop, or RSpec will not
+  # stop without an interrupt. You can use `ensure_exit_on` to specify the exact
+  # number of calls to `exit?`, with the last call returning `true`.
   describe '#run!' do
     it 'traps signals' do
-      is_expected.to receive(:exit?).and_return(true)
+      ensure_exit_on(1)
       is_expected.to receive(:trap_signals)
 
       daemon.run!
     end
 
     it 'delegates to #run_once! in a loop' do
-      is_expected.to receive(:exit?).and_return(false, false, false, true)
+      ensure_exit_on(3)
       is_expected.to receive(:run_once!).twice
 
       daemon.run!
     end
+  end
 
+  describe '#run_once!' do
     it 'skips execution if cannot achieve a lease' do
       lease = stub_exclusive_lease_taken('geo_log_cursor_processed')
 
@@ -44,34 +49,68 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
       allow(lease).to receive(:same_uuid?).and_return(false)
       allow(Gitlab::Geo::LogCursor::Lease).to receive(:exclusive_lease).and_return(lease)
 
-      is_expected.to receive(:exit?).and_return(false, true)
-      is_expected.not_to receive(:run_once!)
+      is_expected.not_to receive(:find_and_handle_events!)
 
-      daemon.run!
+      daemon.run_once!
     end
 
     it 'skips execution if not a Geo node' do
       stub_current_geo_node(nil)
 
-      is_expected.to receive(:exit?).and_return(false, true)
       is_expected.to receive(:sleep_break).with(1.minute)
-      is_expected.not_to receive(:run_once!)
+      is_expected.not_to receive(:find_and_handle_events!)
 
-      daemon.run!
+      daemon.run_once!
     end
 
     it 'skips execution if the current node is a primary' do
       stub_current_geo_node(primary)
 
-      is_expected.to receive(:exit?).and_return(false, true)
       is_expected.to receive(:sleep_break).with(1.minute)
-      is_expected.not_to receive(:run_once!)
+      is_expected.not_to receive(:find_and_handle_events!)
 
-      daemon.run!
+      daemon.run_once!
+    end
+
+    context 'when the lease block rescues an error' do
+      context 'when this error is the final straw' do
+        it 'calls `#exit!`' do
+          is_expected.to receive(:exit!)
+
+          is_expected.to receive(:find_and_handle_events!).and_raise('any error').twice
+
+          Timecop.freeze do
+            daemon.run_once!
+
+            Timecop.travel(described_class::MAX_ERROR_DURATION + 1.second) do
+              daemon.run_once!
+            end
+          end
+        end
+      end
+
+      context 'when this error is not the final straw' do
+        it 'does not call `#exit!`' do
+          is_expected.not_to receive(:exit!)
+
+          Timecop.freeze do
+            is_expected.to receive(:find_and_handle_events!).and_raise('any error')
+            daemon.run_once!
+
+            Timecop.travel(described_class::MAX_ERROR_DURATION + 1.second) do
+              is_expected.to receive(:find_and_handle_events!) # successful
+              daemon.run_once!
+
+              is_expected.to receive(:find_and_handle_events!).and_raise('any error')
+              daemon.run_once!
+            end
+          end
+        end
+      end
     end
   end
 
-  describe '#run_once!' do
+  describe '#find_and_handle_events!' do
     context 'with some event logs' do
       let(:project) { create(:project) }
       let(:repository_updated_event) { create(:geo_repository_updated_event, project: project) }
@@ -82,7 +121,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
       it 'handles events' do
         expect(daemon).to receive(:handle_events).with(batch, anything)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
 
       it 'calls #handle_gap_event for each gap the gap tracking finds' do
@@ -94,7 +133,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
         expect(daemon).to receive(:handle_single_event).with(event_log)
         expect(daemon).to receive(:handle_single_event).with(second_event_log)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
     end
 
@@ -117,7 +156,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
 
         expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(project.id, anything).once
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
 
       it 'does not replay events for projects that do not belong to selected namespaces to replicate' do
@@ -125,14 +164,14 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
 
         expect(Geo::ProjectSyncWorker).not_to receive(:perform_async).with(project.id, anything)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
 
       it 'detects when an event was skipped' do
         updated_event = create(:geo_repository_updated_event, project: project)
         new_event = create(:geo_event_log, id: event_log.id + 2, repository_updated_event: updated_event)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
 
         create(:geo_event_log, id: event_log.id + 1)
 
@@ -145,11 +184,11 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
         updated_event = create(:geo_repository_updated_event, project: project)
         new_event = create(:geo_event_log, repository_updated_event: updated_event)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
 
         create(:geo_event_log, id: new_event.id + 3, repository_updated_event: updated_event)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
 
         create(:geo_event_log, id: new_event.id + 1, repository_updated_event: updated_event)
         create(:geo_event_log, id: new_event.id + 2, repository_updated_event: updated_event)
@@ -166,7 +205,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
                                                 message: '#handle_single_event: unknown event',
                                                 event_log_id: new_event.id))
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
 
         expect(::Geo::EventLogState.last_processed.id).to eq(new_event.id)
       end
@@ -184,7 +223,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
                                                              event_type: 'Geo::RepositoryUpdatedEvent',
                                                              project_id: project.id))
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
 
       it 'does not replay events for projects that do not belong to selected shards to replicate' do
@@ -192,7 +231,7 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
 
         expect(Geo::ProjectSyncWorker).not_to receive(:perform_async).with(project.id, anything)
 
-        daemon.run_once!
+        daemon.find_and_handle_events!
       end
     end
   end
@@ -258,5 +297,21 @@ describe Gitlab::Geo::LogCursor::Daemon, :clean_gitlab_redis_shared_state do
     end
 
     gaps
+  end
+
+  # It is extremely easy to get run! into an infinite loop.
+  #
+  # Regardless of `allow` or `expect`, this method ensures that the loop will
+  # exit at the specified number of exit? calls.
+  def ensure_exit_on(num_calls = 3, expect = true)
+    # E.g. If num_calls is `3`, returns is set to `[false, false, true]`.
+    returns = Array.new(num_calls) { false }
+    returns[-1] = true
+
+    if expect
+      expect(daemon).to receive(:exit?).and_return(*returns)
+    else
+      allow(daemon).to receive(:exit?).and_return(*returns)
+    end
   end
 end
