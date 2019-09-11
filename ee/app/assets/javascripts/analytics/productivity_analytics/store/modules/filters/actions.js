@@ -3,24 +3,28 @@ import * as types from './mutation_types';
 export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   commit(types.SET_GROUP_NAMESPACE, groupNamespace);
 
+  dispatch('charts/fetchAllChartData', null, { root: true });
   dispatch('table/fetchMergeRequests', null, { root: true });
 };
 
 export const setProjectPath = ({ commit, dispatch }, projectPath) => {
   commit(types.SET_PROJECT_PATH, projectPath);
 
+  dispatch('charts/fetchAllChartData', null, { root: true });
   dispatch('table/fetchMergeRequests', null, { root: true });
 };
 
 export const setPath = ({ commit, dispatch }, path) => {
   commit(types.SET_PATH, path);
 
+  dispatch('charts/fetchAllChartData', null, { root: true });
   dispatch('table/fetchMergeRequests', null, { root: true });
 };
 
 export const setDaysInPast = ({ commit, dispatch }, days) => {
   commit(types.SET_DAYS_IN_PAST, days);
 
+  dispatch('charts/fetchAllChartData', null, { root: true });
   dispatch('table/fetchMergeRequests', null, { root: true });
 };
 

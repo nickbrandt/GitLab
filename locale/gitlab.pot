@@ -4611,6 +4611,9 @@ msgstr ""
 msgid "DayTitle|W"
 msgstr ""
 
+msgid "Days"
+msgstr ""
+
 msgid "Days to merge"
 msgstr ""
 
@@ -7923,6 +7926,9 @@ msgid "Hook was successfully created."
 msgstr ""
 
 msgid "Hook was successfully updated."
+msgstr ""
+
+msgid "Hours"
 msgstr ""
 
 msgid "Housekeeping"
@@ -17687,6 +17693,9 @@ msgid "You can easily contribute to them by requesting to join these groups."
 msgstr ""
 
 msgid "You can easily install a Runner on a Kubernetes cluster. %{link_to_help_page}"
+msgstr ""
+
+msgid "You can filter by \"days to merge\" by clicking on the columns in the chart."
 msgstr ""
 
 msgid "You can invite a new member to <strong>%{project_name}</strong> or invite another group."

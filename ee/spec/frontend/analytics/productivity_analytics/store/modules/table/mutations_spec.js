@@ -2,7 +2,7 @@ import * as types from 'ee/analytics/productivity_analytics/store/modules/table/
 import mutations from 'ee/analytics/productivity_analytics/store/modules/table/mutations';
 import getInitialState from 'ee/analytics/productivity_analytics/store/modules/table/state';
 import { tableSortOrder } from 'ee/analytics/productivity_analytics/constants';
-import mockMergeRequests from '../../../mock_data';
+import { mockMergeRequests } from '../../../mock_data';
 
 describe('Productivity analytics table mutations', () => {
   let state;

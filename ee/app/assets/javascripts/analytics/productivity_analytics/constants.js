@@ -7,6 +7,11 @@ export const chartKeys = {
   scatterplot: 'scatterplot',
 };
 
+export const chartTypes = {
+  histogram: 'histogram',
+  scatterplot: 'scatterplot',
+};
+
 export const metricTypes = [
   {
     key: 'time_to_first_comment',
@@ -40,6 +45,17 @@ export const metricTypes = [
   },
 ];
 
+export const tableSortFields = metricTypes.reduce(
+  (acc, curr) => {
+    const { key, label, chart } = curr;
+    if (chart === chartKeys.timeBasedHistogram) {
+      acc[key] = label;
+    }
+    return acc;
+  },
+  { days_to_merge: __('Days to merge') },
+);
+
 export const tableSortOrder = {
   asc: {
     title: s__('ProductivityAnalytics|Ascending'),
@@ -54,3 +70,28 @@ export const tableSortOrder = {
 };
 
 export const timeToMergeMetric = 'time_to_merge';
+
+export const defaultMaxColumnChartItemsPerPage = 20;
+
+export const maxColumnChartItemsPerPage = {
+  [chartKeys.main]: 40,
+};
+
+export const dataZoomOptions = [
+  {
+    type: 'slider',
+    bottom: 10,
+    start: 0,
+  },
+  {
+    type: 'inside',
+    start: 0,
+  },
+];
+
+/**
+ * #418cd8 --> $blue-400 (see variables.scss)
+ */
+export const columnHighlightStyle = { color: '#418cd8', opacity: 0.8 };
+
+export const accessLevelReporter = 20;

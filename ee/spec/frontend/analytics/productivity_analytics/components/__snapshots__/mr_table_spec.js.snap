@@ -46,25 +46,55 @@ exports[`MergeRequestTable component matches the snapshot 1`] = `
                 active-class="is-active"
                 class="w-100"
               >
+                <span
+                  class="d-flex"
+                >
+                  <icon-stub
+                    class="flex-shrink-0 append-right-4 invisible"
+                    cssclasses=""
+                    name="mobile-issue-close"
+                    size="16"
+                  />
+                  
+                  Time from first commit until first comment
                 
-                Time from first commit until first comment
-              
+                </span>
               </gldropdownitem-stub>
               <gldropdownitem-stub
                 active-class="is-active"
                 class="w-100"
               >
+                <span
+                  class="d-flex"
+                >
+                  <icon-stub
+                    class="flex-shrink-0 append-right-4"
+                    cssclasses=""
+                    name="mobile-issue-close"
+                    size="16"
+                  />
+                  
+                  Time from first comment to last commit
                 
-                Time from first comment to last commit
-              
+                </span>
               </gldropdownitem-stub>
               <gldropdownitem-stub
                 active-class="is-active"
                 class="w-100"
               >
+                <span
+                  class="d-flex"
+                >
+                  <icon-stub
+                    class="flex-shrink-0 append-right-4 invisible"
+                    cssclasses=""
+                    name="mobile-issue-close"
+                    size="16"
+                  />
+                  
+                  Time from last commit to merge
                 
-                Time from last commit to merge
-              
+                </span>
               </gldropdownitem-stub>
             </gldropdown-stub>
           </div>

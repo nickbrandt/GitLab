@@ -16,5 +16,7 @@ export const getColumnOptions = state =>
 
 export const columnMetricLabel = (state, getters) => getters.getColumnOptions[state.columnMetric];
 
+export const isSelectedSortField = state => sortField => state.sortField === sortField;
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

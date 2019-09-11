@@ -83,6 +83,7 @@ class License < ApplicationRecord
     object_storage
     operations_dashboard
     packages
+    productivity_analytics
     project_aliases
     protected_environments
     reject_unsigned_commits
