@@ -123,6 +123,23 @@ describe Projects::CreateFromTemplateService do
           expect(project).to be_saved
           expect(project.import_scheduled?).to be(true)
         end
+
+        context 'when project is created outside of group hierarchy' do
+          let(:user) { create(:user) }
+          let(:project) { create(:project, :public, namespace: user.namespace) }
+          let(:namespace_id) { user.namespace_id }
+
+          it_behaves_like 'a project that isn\'t persisted'
+        end
+      end
+
+      shared_examples 'a project that isn\'t persisted' do
+        it "isn't persisted" do
+          project = subject.execute
+
+          expect(project).not_to be_saved
+          expect(project.repository.empty?).to eq(true)
+        end
       end
 
       context 'when project is created under a top level group' do
