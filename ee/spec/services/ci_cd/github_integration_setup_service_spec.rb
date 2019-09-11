@@ -27,5 +27,9 @@ describe CiCd::GithubIntegrationSetupService do
     specify 'with repo URL' do
       expect(integration.repository_url).to eq 'https://github.com/MyUser/my-project'
     end
+
+    specify 'with static_context' do
+      expect(integration.static_context).to eq true
+    end
   end
 end

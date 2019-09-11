@@ -14,6 +14,10 @@ class GithubService < Service
 
   default_value_for :pipeline_events, true
 
+  def initialize_properties
+    self.properties ||= { static_context: true }
+  end
+
   def title
     'GitHub'
   end
