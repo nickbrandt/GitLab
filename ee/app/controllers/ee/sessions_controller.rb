@@ -20,6 +20,17 @@ module EE
       end
     end
 
+    protected
+
+    override :auth_options
+    def auth_options
+      if params[:trial]
+        { scope: resource_name, recall: "trial_registrations#new" }
+      else
+        super
+      end
+    end
+
     private
 
     def gitlab_geo_logout

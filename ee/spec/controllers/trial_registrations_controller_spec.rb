@@ -49,20 +49,10 @@ describe TrialRegistrationsController do
         allow(Gitlab).to receive(:com?).and_return(true)
       end
 
-      context 'with skip_confirmation' do
-        it 'creates the account as confirmed' do
-          post :create, params: { user: user_params.merge(skip_confirmation: true) }
+      it 'marks the account as confirmed' do
+        post :create, params: { user: user_params }
 
-          expect(User.last).to be_confirmed
-        end
-      end
-
-      context 'without skip_confirmation' do
-        it 'creates the account with pending confirmation' do
-          post :create, params: { user: user_params }
-
-          expect(User.last).not_to be_confirmed
-        end
+        expect(User.last).to be_confirmed
       end
 
       context 'derivation of name' do
