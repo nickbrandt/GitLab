@@ -5,6 +5,8 @@ require 'pathname'
 module QA
   context 'Secure', :docker do
     describe 'Security Reports in a Merge Request' do
+      let(:total_vuln_count) { 12 }
+
       after do
         Service::Runner.new(@executor).remove!
       end
@@ -51,7 +53,7 @@ module QA
       it 'displays the Security report in the merge request' do
         Page::MergeRequest::Show.perform do |mergerequest|
           expect(mergerequest).to have_vulnerability_report(timeout: 60)
-          expect(mergerequest).to have_detected_vulnerability_count_of "4"
+          expect(mergerequest).to have_detected_vulnerability_count_of total_vuln_count
         end
       end
 

@@ -15,10 +15,12 @@ module QA
           end
 
           def filter_report_type(report)
-            find_element(:filter_report_type_dropdown).click
+            click_element(:filter_report_type_dropdown)
             within_element(:filter_dropdown_content) do
               click_on report
             end
+            # Click the dropdown to close the modal and ensure it isn't open if this function is called again
+            click_element(:filter_report_type_dropdown)
           end
 
           def has_low_vulnerability_count_of?(expected)
