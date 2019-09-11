@@ -230,11 +230,11 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
     "Create a new merge request for Z.".
 
 - Avoid use of the future tense.
-  - Instead of, "After you execute this command, the result will be displayed", say "After you execute this command, the result is displayed."
+  - Instead of, "After you execute this command, the result will be displayed," say "After you execute this command, the result is displayed."
   - Only use the future tense to convey when the action or result will actually occur at a future time.
 - Do not use contractions.
-  - Say "do not", "cannot", or "does not" instead of "don't", "can't", "doesn't", and so on.
-  - Possible exceptions are cases when a more familiar tone is desired, such as a blog post or other conversational context.
+  - Instead of "don't", "can't", "doesn't", and so on, say "do not", "cannot", or "does not."
+  - Possible exceptions are cases when a more familiar tone is desired, such as a blog post or other casual context.
 - Do not use slashes to clump different words together.
   - Instead of "and/or", consider saying "or", or use another sensible construction.
   - Other examples include "author/asignee" and "namespace/repository name". Break apart any such instances in an appropriate way.
