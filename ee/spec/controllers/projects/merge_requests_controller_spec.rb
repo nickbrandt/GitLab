@@ -409,7 +409,7 @@ describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareDependencyScanningReportsService).and_return(comparison_status)
+        .with(::Ci::CompareDependencyScanningReportsService, project.users.first).and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -494,7 +494,7 @@ describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareContainerScanningReportsService).and_return(comparison_status)
+        .with(::Ci::CompareContainerScanningReportsService, project.users.first).and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do
@@ -579,7 +579,7 @@ describe Projects::MergeRequestsController do
 
     before do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
-        .with(::Ci::CompareSastReportsService).and_return(comparison_status)
+        .with(::Ci::CompareSastReportsService, project.users.first).and_return(comparison_status)
     end
 
     context 'when comparison is being processed' do

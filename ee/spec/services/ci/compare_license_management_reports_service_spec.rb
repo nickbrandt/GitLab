@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe Ci::CompareLicenseManagementReportsService do
-  let(:service) { described_class.new(project, project.users.take) }
+  let(:current_user) { project.users.take }
+  let(:service) { described_class.new(project, current_user) }
   let(:project) { create(:project, :repository) }
 
   before do

@@ -116,12 +116,12 @@ module EE
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.dependency_list_reports)
     end
 
-    def compare_dependency_scanning_reports
+    def compare_dependency_scanning_reports(current_user)
       unless has_dependency_scanning_reports?
         return { status: :error, status_reason: 'This merge request does not have dependency scanning reports' }
       end
 
-      compare_reports(::Ci::CompareDependencyScanningReportsService)
+      compare_reports(::Ci::CompareDependencyScanningReportsService, current_user)
     end
 
     def has_license_management_reports?
@@ -132,24 +132,24 @@ module EE
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.container_scanning_reports)
     end
 
-    def compare_container_scanning_reports
+    def compare_container_scanning_reports(current_user)
       unless has_container_scanning_reports?
         return { status: :error, status_reason: 'This merge request does not have container scanning reports' }
       end
 
-      compare_reports(::Ci::CompareContainerScanningReportsService)
+      compare_reports(::Ci::CompareContainerScanningReportsService, current_user)
     end
 
     def has_sast_reports?
       actual_head_pipeline&.has_reports?(::Ci::JobArtifact.sast_reports)
     end
 
-    def compare_sast_reports
+    def compare_sast_reports(current_user)
       unless has_sast_reports?
         return { status: :error, status_reason: 'This merge request does not have SAST reports' }
       end
 
-      compare_reports(::Ci::CompareSastReportsService)
+      compare_reports(::Ci::CompareSastReportsService, current_user)
     end
 
     def compare_license_management_reports(current_user)

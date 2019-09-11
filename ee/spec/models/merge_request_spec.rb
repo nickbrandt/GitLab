@@ -223,10 +223,28 @@ describe MergeRequest do
     end
   end
 
+  describe '#calculate_reactive_cache with current_user' do
+    let(:project) { create(:project, :repository) }
+    let(:current_user) { project.users.take }
+    let(:merge_request) { create(:merge_request, source_project: project) }
+    subject { merge_request.calculate_reactive_cache(service_class_name, current_user&.id) }
+
+    context 'when given a known service class name' do
+      let(:service_class_name) { 'Ci::CompareDependencyScanningReportsService' }
+
+      it 'does not raises a NameError exception' do
+        allow_any_instance_of(service_class_name.constantize).to receive(:execute).and_return(nil)
+
+        expect { subject }.not_to raise_error
+      end
+    end
+  end
+
   describe '#compare_container_scanning_reports' do
-    subject { merge_request.compare_container_scanning_reports }
+    subject { merge_request.compare_container_scanning_reports(current_user) }
 
     let(:project) { create(:project, :repository) }
+    let(:current_user) { project.users.first }
     let(:merge_request) { create(:merge_request, source_project: project) }
 
     let!(:base_pipeline) do
@@ -283,9 +301,10 @@ describe MergeRequest do
   end
 
   describe '#compare_sast_reports' do
-    subject { merge_request.compare_sast_reports }
+    subject { merge_request.compare_sast_reports(current_user) }
 
     let(:project) { create(:project, :repository) }
+    let(:current_user) { project.users.first }
     let(:merge_request) { create(:merge_request, source_project: project) }
 
     let!(:base_pipeline) do
@@ -342,9 +361,10 @@ describe MergeRequest do
   end
 
   describe '#compare_license_management_reports' do
-    subject { merge_request.compare_license_management_reports(project.users.first) }
+    subject { merge_request.compare_license_management_reports(current_user) }
 
     let(:project) { create(:project, :repository) }
+    let(:current_user) { project.users.first }
     let(:merge_request) { create(:merge_request, source_project: project) }
 
     let!(:base_pipeline) do
