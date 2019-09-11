@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.9
+
+### Security (1 change)
+
+- Do not allow creation of projects from group templates if project is not descendant of that group.
+
+
 ## 12.1.8
 
 ### Security (2 changes)
