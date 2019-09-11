@@ -2,11 +2,10 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::FileDownloader, :geo do
+describe Gitlab::Geo::Replication::FileDownloader, :geo do
   include EE::GeoHelpers
 
   set(:primary_node) { create(:geo_node, :primary) }
-  set(:secondary_node) { create(:geo_node) }
 
   subject { downloader.execute }
 
@@ -25,15 +24,19 @@ describe Gitlab::Geo::FileDownloader, :geo do
   end
 
   context 'when in a secondary geo node' do
-    before do
-      stub_current_geo_node(secondary_node)
+    context 'with local storage only' do
+      let(:secondary_node) { create(:geo_node, :local_storage_only) }
 
-      stub_geo_file_transfer(:file, upload)
-    end
+      before do
+        stub_current_geo_node(secondary_node)
 
-    it 'downloads the file' do
-      expect(subject.success).to be_truthy
-      expect(subject.primary_missing_file).to be_falsey
+        stub_geo_file_transfer(:file, upload)
+      end
+
+      it 'downloads the file' do
+        expect(subject.success).to be_truthy
+        expect(subject.primary_missing_file).to be_falsey
+      end
     end
   end
 
@@ -43,7 +46,7 @@ describe Gitlab::Geo::FileDownloader, :geo do
     stub_request(:get, url).to_return(status: 200, body: upload.build_uploader.file.read, headers: {})
   end
 
-  def stub_geo_file_transfer_object_storage
+  def stub_geo_file_transfer_object_storage(file_type, upload)
     url = primary_node.geo_transfers_url(file_type, upload.id.to_s)
 
     stub_request(:get, url).to_return(status: 307, body: upload.build_uploader.url, headers: {})

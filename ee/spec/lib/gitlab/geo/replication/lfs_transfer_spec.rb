@@ -1,29 +1,14 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::FileTransfer do
+describe Gitlab::Geo::Replication::LfsTransfer do
   include ::EE::GeoHelpers
 
   set(:primary_node) { create(:geo_node, :primary) }
   set(:secondary_node) { create(:geo_node) }
-  let(:user) { create(:user, :with_avatar) }
-  let(:upload) { Upload.find_by(model: user, uploader: 'AvatarUploader') }
+  set(:lfs_object) { create(:lfs_object, :with_file, :correct_oid) }
 
-  subject { described_class.new(:file, upload) }
-
-  describe '#execute' do
-    context 'user avatar' do
-      it 'sets an absolute path' do
-        expect(subject.file_type).to eq(:file)
-        expect(subject.file_id).to eq(upload.id)
-        expect(subject.filename).to eq(upload.absolute_path)
-        expect(Pathname.new(subject.filename).absolute?).to be_truthy
-        expect(subject.request_data).to eq({ id: upload.model_id,
-                                             type: 'User',
-                                             checksum: upload.checksum,
-                                             file_id: upload.id,
-                                             file_type: :file })
-      end
-    end
+  subject do
+    described_class.new(lfs_object)
   end
 
   context '#download_from_primary' do
@@ -33,7 +18,7 @@ describe Gitlab::Geo::FileTransfer do
 
     context 'when the destination filename is a directory' do
       it 'returns a failed result' do
-        expect(upload).to receive(:absolute_path).and_return('/tmp')
+        expect(lfs_object).to receive(:file).and_return(double(path: '/tmp'))
 
         result = subject.download_from_primary
 
@@ -43,29 +28,28 @@ describe Gitlab::Geo::FileTransfer do
 
     context 'when the HTTP response is successful' do
       it 'returns a successful result' do
-        content = upload.build_uploader.file.read
+        content = lfs_object.file.read
         size = content.bytesize
-
-        expect(FileUtils).to receive(:mv).with(anything, upload.absolute_path).and_call_original
+        expect(FileUtils).to receive(:mv).with(anything, lfs_object.file.path).and_call_original
         response = double(:response, success?: true)
         expect(Gitlab::HTTP).to receive(:get).and_yield(content.to_s).and_return(response)
 
         result = subject.download_from_primary
 
         expect_result(result, success: true, bytes_downloaded: size, primary_missing_file: false)
-        stat = File.stat(upload.absolute_path)
+        stat = File.stat(lfs_object.file.path)
         expect(stat.size).to eq(size)
         expect(stat.mode & 0777).to eq(0666 - File.umask)
-        expect(File.binread(upload.absolute_path)).to eq(content)
+        expect(File.binread(lfs_object.file.path)).to eq(content)
       end
     end
 
     context 'when the HTTP response is unsuccessful' do
       context 'when the HTTP response indicates a missing file on the primary' do
         it 'returns a failed result indicating primary_missing_file' do
-          expect(FileUtils).not_to receive(:mv).with(anything, upload.absolute_path).and_call_original
+          expect(FileUtils).not_to receive(:mv).with(anything, lfs_object.file.path).and_call_original
           response = double(:response, success?: false, code: 404, msg: "No such file")
-          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE}\"}")
+          expect(File).to receive(:read).and_return("{\"geo_code\":\"#{Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE}\"}")
           expect(Gitlab::HTTP).to receive(:get).and_return(response)
 
           result = subject.download_from_primary
@@ -76,7 +60,7 @@ describe Gitlab::Geo::FileTransfer do
 
       context 'when the HTTP response does not indicate a missing file on the primary' do
         it 'returns a failed result' do
-          expect(FileUtils).not_to receive(:mv).with(anything, upload.absolute_path).and_call_original
+          expect(FileUtils).not_to receive(:mv).with(anything, lfs_object.file.path).and_call_original
           response = double(:response, success?: false, code: 404, msg: 'No such file')
           expect(Gitlab::HTTP).to receive(:get).and_return(response)
 
@@ -89,8 +73,6 @@ describe Gitlab::Geo::FileTransfer do
 
     context 'when Tempfile fails' do
       it 'returns a failed result' do
-        upload # load this eagerly, since this triggers Tempfile.new
-
         expect(Tempfile).to receive(:new).and_raise(Errno::ENAMETOOLONG)
 
         result = subject.download_from_primary
@@ -102,7 +84,7 @@ describe Gitlab::Geo::FileTransfer do
 
     context "invalid path" do
       it 'logs an error if the destination directory could not be created' do
-        expect(upload).to receive(:absolute_path).and_return('/foo/bar')
+        expect(lfs_object).to receive(:file).and_return(double(path: '/foo/bar'))
 
         allow(FileUtils).to receive(:mkdir_p) { raise Errno::EEXIST }
 
@@ -123,19 +105,6 @@ describe Gitlab::Geo::FileTransfer do
         result = subject.download_from_primary
 
         expect_result(result, success: false, bytes_downloaded: bad_content.bytesize, primary_missing_file: false)
-      end
-    end
-
-    context 'when the primary has not stored a checksum for the file' do
-      it 'returns a successful result' do
-        upload.update_column(:checksum, nil)
-        content = 'foo'
-        response = double(:response, success?: true)
-        expect(Gitlab::HTTP).to receive(:get).and_yield(content).and_return(response)
-
-        result = subject.download_from_primary
-
-        expect_result(result, success: true, bytes_downloaded: content.bytesize, primary_missing_file: false)
       end
     end
   end

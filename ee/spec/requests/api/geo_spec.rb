@@ -41,7 +41,7 @@ describe API::Geo do
     describe 'allowed IPs' do
       let(:note) { create(:note, :with_attachment) }
       let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
-      let(:transfer) { Gitlab::Geo::FileTransfer.new(:attachment, upload) }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, upload) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       it 'responds with 401 when IP is not allowed' do
@@ -64,7 +64,7 @@ describe API::Geo do
     describe 'GET /geo/transfers/attachment/1' do
       let(:note) { create(:note, :with_attachment) }
       let(:upload) { Upload.find_by(model: note, uploader: 'AttachmentUploader') }
-      let(:transfer) { Gitlab::Geo::FileTransfer.new(:attachment, upload) }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:attachment, upload) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
@@ -103,7 +103,7 @@ describe API::Geo do
     describe 'GET /geo/transfers/avatar/1' do
       let(:user) { create(:user, avatar: fixture_file_upload('spec/fixtures/dk.png', 'image/png')) }
       let(:upload) { Upload.find_by(model: user, uploader: 'AvatarUploader') }
-      let(:transfer) { Gitlab::Geo::FileTransfer.new(:avatar, upload) }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:avatar, upload) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
@@ -142,7 +142,7 @@ describe API::Geo do
     describe 'GET /geo/transfers/file/1' do
       let(:project) { create(:project) }
       let(:upload) { Upload.find_by(model: project, uploader: 'FileUploader') }
-      let(:transfer) { Gitlab::Geo::FileTransfer.new(:file, upload) }
+      let(:transfer) { Gitlab::Geo::Replication::FileTransfer.new(:file, upload) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
@@ -178,7 +178,7 @@ describe API::Geo do
             get api("/geo/transfers/file/#{upload.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(404)
-            expect(json_response['geo_code']).to eq(Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE)
+            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
       end
@@ -194,7 +194,7 @@ describe API::Geo do
 
     describe 'GET /geo/transfers/lfs/1' do
       let(:lfs_object) { create(:lfs_object, :with_file) }
-      let(:transfer) { Gitlab::Geo::LfsTransfer.new(lfs_object) }
+      let(:transfer) { Gitlab::Geo::Replication::LfsTransfer.new(lfs_object) }
       let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
@@ -229,7 +229,7 @@ describe API::Geo do
             get api("/geo/transfers/lfs/#{lfs_object.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(404)
-            expect(json_response['geo_code']).to eq(Gitlab::Geo::FileUploader::FILE_NOT_FOUND_GEO_CODE)
+            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
           end
         end
       end

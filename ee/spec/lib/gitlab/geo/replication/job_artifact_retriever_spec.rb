@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Gitlab::Geo::JobArtifactUploader, :geo do
+describe Gitlab::Geo::Replication::JobArtifactRetriever, :geo do
   context '#execute' do
-    let(:uploader) { described_class.new(job_artifact.id, {}) }
-    subject { uploader.execute }
+    let(:retriever) { described_class.new(job_artifact.id, {}) }
+    subject { retriever.execute }
 
     context 'when the job artifact exists' do
       before do
@@ -34,7 +34,7 @@ describe Gitlab::Geo::JobArtifactUploader, :geo do
         end
 
         it 'logs the missing file' do
-          expect(uploader).to receive(:log_error).with("Could not upload job artifact because it does not have a file", id: job_artifact.id)
+          expect(retriever).to receive(:log_error).with("Could not upload job artifact because it does not have a file", id: job_artifact.id)
 
           subject
         end

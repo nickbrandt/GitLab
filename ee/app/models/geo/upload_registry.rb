@@ -10,7 +10,7 @@ class Geo::UploadRegistry < Geo::FileRegistry
 
   def self.type_condition(table = arel_table)
     sti_column = arel_attribute(inheritance_column, table)
-    sti_names  = Geo::FileService::DEFAULT_OBJECT_TYPES
+    sti_names  = Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES
 
     sti_column.in(sti_names)
   end

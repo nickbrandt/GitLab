@@ -11,6 +11,28 @@ describe Geo::FileDownloadService do
     stub_current_geo_node(secondary)
   end
 
+  describe '#downloader' do
+    Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES.each do |object_type|
+      it "returns a FileDownloader given object_type is #{object_type}" do
+        subject = described_class.new(object_type, 1)
+
+        expect(subject.downloader).to be_a(Gitlab::Geo::Replication::FileDownloader)
+      end
+    end
+
+    it "returns a LfsDownloader given object_type is lfs" do
+      subject = described_class.new('lfs', 1)
+
+      expect(subject.downloader).to be_a(Gitlab::Geo::Replication::LfsDownloader)
+    end
+
+    it "returns a JobArtifactDownloader given object_type is job_artifact" do
+      subject = described_class.new('job_artifact', 1)
+
+      expect(subject.downloader).to be_a(Gitlab::Geo::Replication::JobArtifactDownloader)
+    end
+  end
+
   context 'retry time' do
     before do
       stub_transfer_result(bytes_downloaded: 0, success: false)
@@ -413,7 +435,7 @@ describe Geo::FileDownloadService do
 
     context 'bad object type' do
       it 'raises an error' do
-        expect { described_class.new(:bad, 1).execute }.to raise_error(NameError)
+        expect { described_class.new(:bad, 1).execute }.to raise_error(NotImplementedError)
       end
     end
   end
@@ -423,7 +445,7 @@ describe Geo::FileDownloadService do
                     bytes_downloaded: bytes_downloaded,
                     success: success,
                     primary_missing_file: primary_missing_file)
-    instance = double("(instance of Gitlab::Geo::Transfer)", download_from_primary: result)
-    allow(Gitlab::Geo::Transfer).to receive(:new).and_return(instance)
+    instance = double("(instance of Gitlab::Geo::Replication::Transfer)", download_from_primary: result)
+    allow(Gitlab::Geo::Replication::BaseTransfer).to receive(:new).and_return(instance)
   end
 end

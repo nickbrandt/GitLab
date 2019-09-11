@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Geo
-  class FileRegistryRemovalService < FileService
+  class FileRegistryRemovalService < BaseFileService
     include ::Gitlab::Utils::StrongMemoize
 
     LEASE_TIMEOUT = 8.hours.freeze
@@ -62,7 +62,7 @@ module Geo
         next file_uploader.file.path if file_uploader.object_store == ObjectStorage::Store::LOCAL
 
         # For remote storage more juggling is needed to actually get the full path on disk
-        if upload?
+        if user_upload?
           upload = file_uploader.upload
           file_uploader.class.absolute_path(upload)
         else
@@ -78,7 +78,7 @@ module Geo
           LfsObject.find(object_db_id).file
         when :job_artifact
           Ci::JobArtifact.find(object_db_id).file
-        when *Geo::FileService::DEFAULT_OBJECT_TYPES
+        when *Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES
           Upload.find(object_db_id).build_uploader
         else
           raise NameError, "Unrecognized type: #{object_type}"

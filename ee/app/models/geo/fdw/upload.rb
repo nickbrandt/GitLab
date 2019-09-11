@@ -49,7 +49,7 @@ module Geo
           join_statement =
             arel_table
               .join(file_registry_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]).and(file_registry_table[:file_type].in(Geo::FileService::DEFAULT_OBJECT_TYPES)))
+              .on(arel_table[:id].eq(file_registry_table[:file_id]).and(file_registry_table[:file_type].in(Gitlab::Geo::Replication::USER_UPLOADS_OBJECT_TYPES)))
 
           joins(join_statement.join_sources)
         end
