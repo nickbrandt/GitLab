@@ -23,7 +23,7 @@ module QA
         add_to_project user: @user_one
         add_to_project user: @user_two
 
-        Resource::Branch.unprotect_via_api! do |branch|
+        Resource::ProtectedBranch.unprotect_via_api! do |branch|
           branch.project = @project
           branch.branch_name = 'master'
         end

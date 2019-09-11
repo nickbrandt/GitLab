@@ -40,7 +40,7 @@ module QA
             .new(__dir__)
             .join('../../../../../ee/fixtures/secure_premade_reports')
           push.commit_message = 'Create Secure compatible application to serve premade reports'
-        end
+        end.project.visit!
 
         Page::Project::Menu.perform(&:click_ci_cd_pipelines)
         Page::Project::Pipeline::Index.perform(&:click_on_latest_pipeline)
