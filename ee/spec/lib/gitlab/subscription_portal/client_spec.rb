@@ -5,7 +5,9 @@ require 'spec_helper'
 describe Gitlab::SubscriptionPortal::Client do
   describe '#create_trial_account' do
     let(:http_response) { nil }
-    let(:httparty_response) { double(code: http_response.code, response: http_response, body: {}.to_json) }
+    let(:httparty_response) do
+      double(code: http_response.code, response: http_response, body: {}, parsed_response: {})
+    end
 
     subject do
       described_class.new.generate_trial({})
