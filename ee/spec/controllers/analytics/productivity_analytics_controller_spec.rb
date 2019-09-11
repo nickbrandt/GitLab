@@ -35,6 +35,15 @@ describe Analytics::ProductivityAnalyticsController do
 
       expect(response).to render_template :show
     end
+
+    it 'renders `404` when feature flag is disabled' do
+      stub_licensed_features(productivity_analytics: true)
+      stub_feature_flags(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => false)
+
+      get :show
+
+      expect(response).to have_gitlab_http_status(404)
+    end
   end
 
   describe 'GET show.json' do
