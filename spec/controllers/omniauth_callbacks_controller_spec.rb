@@ -10,11 +10,7 @@ describe OmniauthCallbacksController, type: :controller do
     let(:additional_info) { {} }
 
     before do
-<<<<<<< HEAD
-      @original_env_config_omniauth_auth = mock_auth_hash(provider.to_s, extern_uid, user.email, additional_info: additional_info )
-=======
-      @original_env_config_omniauth_auth = mock_auth_hash(provider.to_s, String.new(extern_uid), user.email, additional_info: additional_info )
->>>>>>> e75057cea66... Switch unary operator to more verbose way
+      @original_env_config_omniauth_auth = mock_auth_hash(provider.to_s, +extern_uid, user.email, additional_info: additional_info )
       stub_omniauth_provider(provider, context: request)
     end
 
@@ -115,7 +111,7 @@ describe OmniauthCallbacksController, type: :controller do
 
     context 'strategies' do
       shared_context 'sign_up' do
-        let(:user) { double(email: String.new("new@example.com")) }
+        let(:user) { double(email: +'new@example.com') }
 
         before do
           stub_omniauth_setting(block_auto_created_users: false)
