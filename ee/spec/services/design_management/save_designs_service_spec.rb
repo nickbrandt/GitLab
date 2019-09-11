@@ -21,10 +21,24 @@ describe DesignManagement::SaveDesignsService do
   end
 
   def run_service(files_to_upload = nil)
+    design_files = files_to_upload || files
+    design_files.each(&:rewind)
+
     service = described_class.new(project, user,
                                   issue: issue,
-                                  files: files_to_upload || files)
+                                  files: design_files)
     service.execute
+  end
+
+  # Randomly alter the content of files.
+  # This allows the files to be updated by the service, as unmodified
+  # files are rejected.
+  def touch_files(files_to_touch = nil)
+    design_files = files_to_touch || files
+
+    design_files.each do |f|
+      f.tempfile.write(SecureRandom.random_bytes)
+    end
   end
 
   let(:response) { run_service }
@@ -126,11 +140,10 @@ describe DesignManagement::SaveDesignsService do
           end
         end
 
-        context 'when a design already exists' do
+        context 'when a design is being updated' do
           before do
-            # This makes sure the file is created in the repository.
-            # otherwise we'd have a database & repository that are not in sync.
             run_service
+            touch_files
           end
 
           it 'creates a new version for the existing design and updates the file' do
@@ -161,12 +174,30 @@ describe DesignManagement::SaveDesignsService do
           end
         end
 
+        context 'when a design has not changed since its previous version' do
+          before do
+            run_service
+          end
+
+          it 'does not create a new version' do
+            expect { run_service }.not_to change { issue.design_versions.count }
+          end
+
+          it 'returns the design in `skipped_designs` instead of `designs`' do
+            response = run_service
+
+            expect(response[:designs]).to be_empty
+            expect(response[:skipped_designs].size).to eq(1)
+          end
+        end
+
         context 'when doing a mixture of updates and creations' do
           let(:files) { [rails_sample, dk_png] }
 
           before do
             # Create just the first one, which we will later update.
             run_service([files.first])
+            touch_files([files.first])
           end
 
           it 'counts one creation and one update' do

@@ -63,6 +63,19 @@ describe "uploading designs" do
     )
   end
 
+  it "can respond with skipped designs" do
+    2.times do
+      post_graphql_mutation(mutation, current_user: current_user)
+      files.each(&:rewind)
+    end
+
+    expect(mutation_response).to include(
+      "skippedDesigns" => a_collection_containing_exactly(
+        a_hash_including("filename" => "dk.png")
+      )
+    )
+  end
+
   context "when the issue does not exist" do
     let(:variables) { { iid: "123" } }
 
