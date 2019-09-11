@@ -26,7 +26,7 @@ module QA
         group = Resource::Group.fabricate_via_api!
         group.visit!
 
-        EE::Page::Group::Menu.perform(&:click_group_insights_link)
+        Page::Group::Menu.perform(&:click_group_insights_link)
       end
 
       it_behaves_like 'default insights page'

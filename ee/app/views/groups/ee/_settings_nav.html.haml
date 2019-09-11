@@ -18,7 +18,7 @@
 
 - if @group.feature_available?(:audit_events)
   = nav_link(path: 'audit_events#index') do
-    = link_to group_audit_events_path(@group), title: 'Audit Events' do
+    = link_to group_audit_events_path(@group), title: 'Audit Events', data: { qa_selector: 'audit_events_settings_link' } do
       %span
         Audit Events
 

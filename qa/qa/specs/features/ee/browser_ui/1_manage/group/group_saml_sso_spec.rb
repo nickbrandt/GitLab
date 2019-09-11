@@ -21,7 +21,7 @@ module QA
       end
 
       it 'User logs in to group with SAML SSO' do
-        EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
+        Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
         EE::Page::Group::Settings::SamlSSO.perform do |page|
           page.set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
@@ -35,7 +35,7 @@ module QA
 
         login_to_idp_if_required_and_expect_success
 
-        EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
+        Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
         EE::Page::Group::Settings::SamlSSO.perform(&:click_user_login_url_link)
 
@@ -45,7 +45,7 @@ module QA
       end
 
       it 'Lets group admin test settings' do
-        EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
+        Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
         EE::Page::Group::Settings::SamlSSO.perform do |page|
           page.set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
@@ -84,7 +84,7 @@ module QA
 
           @group.visit!
 
-          EE::Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
+          Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
           EE::Page::Group::Settings::SamlSSO.perform do |page|
             page.enforce_sso
