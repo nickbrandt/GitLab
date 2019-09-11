@@ -36,7 +36,7 @@ module EE
     override :get_dashboard_nav_links
     def get_dashboard_nav_links
       super.tap do |links|
-        links << :analytics if ::Feature.enabled?(:analytics)
+        links << :analytics if ::Gitlab::Analytics.any_features_enabled?
       end
     end
   end

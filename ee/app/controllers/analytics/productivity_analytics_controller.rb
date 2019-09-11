@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Analytics::ProductivityAnalyticsController < Analytics::ApplicationController
+  check_feature_flag Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG
+
   before_action :load_group
   before_action :load_project
   before_action :check_feature_availability!

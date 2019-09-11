@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe DashboardHelper, type: :helper do
+  include AnalyticsHelpers
+
   let(:user) { build(:user) }
 
   before do
@@ -11,9 +13,9 @@ describe DashboardHelper, type: :helper do
   end
 
   describe '#dashboard_nav_links' do
-    context 'when analytics is enabled' do
+    context 'when at least one analytics feature is enabled' do
       before do
-        stub_feature_flags(analytics: true)
+        enable_only_one_analytics_feature_flag
       end
 
       it 'includes analytics' do
@@ -21,9 +23,9 @@ describe DashboardHelper, type: :helper do
       end
     end
 
-    context 'when analytics is disabled' do
+    context 'when all analytics features are disabled' do
       before do
-        stub_feature_flags(analytics: false)
+        disable_all_analytics_feature_flags
       end
 
       it 'does not include analytics' do

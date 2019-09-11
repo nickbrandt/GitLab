@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 namespace :analytics do
-  constraints(::Constraints::FeatureConstrainer.new(:productivity_analytics)) do
-    root to: redirect('-/analytics/productivity_analytics')
+  root to: 'analytics#index'
 
+  constraints(::Constraints::FeatureConstrainer.new(:productivity_analytics)) do
     resource :productivity_analytics, only: :show
   end
 

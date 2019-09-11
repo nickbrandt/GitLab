@@ -11,9 +11,19 @@ describe Analytics::CycleAnalyticsController do
 
   describe 'GET show' do
     it 'renders `show` template' do
+      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
+
       get :show
 
       expect(response).to render_template :show
+    end
+
+    it 'renders `404` when feature flag is disabled' do
+      stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => false)
+
+      get :show
+
+      expect(response).to have_gitlab_http_status(404)
     end
   end
 end
