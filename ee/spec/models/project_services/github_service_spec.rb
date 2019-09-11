@@ -76,6 +76,58 @@ describe GithubService do
     end
   end
 
+  describe '#properties' do
+    let(:properties) { subject.reload.properties.symbolize_keys }
+
+    it 'does not overwrite existing integrations' do
+      subject.update(service_params.slice(:properties))
+
+      expect(properties).to match(service_params[:properties])
+      expect(subject.static_context).to be_nil
+    end
+
+    context 'when initialized without properties' do
+      let(:service_params) do
+        {
+          active: false,
+          project: project
+        }
+      end
+
+      it 'static_context defaults to true' do
+        expect(properties).to match(static_context: true)
+      end
+    end
+
+    context 'when initialized with static_context as false' do
+      let(:service_params) do
+        {
+          active: false,
+          project: project,
+          static_context: false
+        }
+      end
+
+      it 'static_context remains false' do
+        expect(properties).to match(static_context: false)
+      end
+    end
+
+    context 'when initialized with static_context as false' do
+      let(:service_params) do
+        {
+          active: false,
+          project: project,
+          properties: { static_context: false }
+        }
+      end
+
+      it 'static_context remains false' do
+        expect(properties).to match(static_context: false)
+      end
+    end
+  end
+
   describe '#execute' do
     let(:remote_repo_path) { "#{owner}/#{repository_name}" }
     let(:sha) { pipeline.sha }

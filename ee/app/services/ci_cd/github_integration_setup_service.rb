@@ -35,7 +35,8 @@ module CiCd
         {
           active: true,
           repository_url: repository_url,
-          token: github_access_token
+          token: github_access_token,
+          static_context: true
         }
       end
 
