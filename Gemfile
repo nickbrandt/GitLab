@@ -465,3 +465,6 @@ gem 'grape_logging', '~> 1.7'
 
 # DNS Lookup
 gem 'net-dns', '~> 0.9.0'
+
+# Countries list
+gem 'countries', '~> 3.0'
