@@ -160,6 +160,14 @@ describe Projects::CreateFromTemplateService do
 
           it_behaves_like 'a project that isn\'t persisted'
         end
+
+        context 'when project is created outside of group hierarchy' do
+          let(:user) { create(:user) }
+          let(:project) { create(:project, :public, namespace: user.namespace) }
+          let(:namespace_id) { user.namespace_id }
+
+          it_behaves_like 'a project that isn\'t persisted'
+        end
       end
 
       context 'when the namespace is inside the hierarchy of the Group owning the template' do
