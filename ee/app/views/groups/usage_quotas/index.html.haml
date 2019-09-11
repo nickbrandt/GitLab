@@ -15,9 +15,6 @@
     %li.nav-item
       %a.nav-link#storage-quota{ data: { toggle: "tab", action: '#storage-quota-tab' }, href: '#storage-quota-tab', 'aria-controls': '#storage-quota-tab', 'aria-selected': false }
         = s_('UsageQuota|Storage')
-  .nav-controls
-    = link_to s_('UsageQuota|Buy additional minutes'), EE::SUBSCRIPTIONS_PLANS_URL, target: '_blank', class: 'btn btn-inverted btn-success float-right' if ::Gitlab.com?
-
 .tab-content
   .tab-pane#pipelines-quota-tab
     = render "namespaces/pipelines_quota/list",
