@@ -105,11 +105,8 @@ module API
 
           status 200
 
-          present :totalResults, results.count
-          present :startIndex, params[:startIndex].presence || 1
-          present :itemsPerPage, per_page(params[:count])
-          present :schemas, ['urn:ietf:params:scim:api:messages:2.0:ListResponse']
-          present :Resources, response_page, with: ::EE::Gitlab::Scim::User
+          result_set = { resources: response_page, total_results: results.count, items_per_page: per_page(params[:count]), start_index: params[:startIndex] }
+          present result_set, with: ::EE::Gitlab::Scim::Users
         end
 
         desc 'Get a SAML user' do
