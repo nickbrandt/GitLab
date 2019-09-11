@@ -2224,25 +2224,16 @@ msgstr ""
 msgid "BillingPlans|%{group_name} is currently using the %{plan_link} plan."
 msgstr ""
 
-msgid "BillingPlans|@%{user_name} you are currently on the %{plan_link} plan."
-msgstr ""
-
-msgid "BillingPlans|Automatic downgrade and upgrade to some plans is currently not available."
-msgstr ""
-
-msgid "BillingPlans|Contact Support"
+msgid "BillingPlans|@%{user_name} you are currently using the %{plan_link} plan."
 msgstr ""
 
 msgid "BillingPlans|Current plan"
 msgstr ""
 
-msgid "BillingPlans|Customer Support"
-msgstr ""
-
 msgid "BillingPlans|Downgrade"
 msgstr ""
 
-msgid "BillingPlans|If you would like to downgrade your plan please %{support_link}."
+msgid "BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}."
 msgstr ""
 
 msgid "BillingPlans|Learn more about each plan by reading our %{faq_link}, or start a free 30-day trial of GitLab.com Gold."
@@ -2252,9 +2243,6 @@ msgid "BillingPlans|Learn more about each plan by visiting our %{pricing_page_li
 msgstr ""
 
 msgid "BillingPlans|Manage plan"
-msgstr ""
-
-msgid "BillingPlans|Please contact %{customer_support_link} in that case."
 msgstr ""
 
 msgid "BillingPlans|Pricing page"
@@ -2291,6 +2279,9 @@ msgid "BillingPlans|paid annually at %{price_per_year}"
 msgstr ""
 
 msgid "BillingPlans|per user"
+msgstr ""
+
+msgid "BillingPlan|Upgrade plan"
 msgstr ""
 
 msgid "Bitbucket Server Import"

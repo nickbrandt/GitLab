@@ -1,5 +1,6 @@
 .billing-plan-header {
   border-bottom: 0;
+  padding-bottom: 0;
 
   .billing-plan-logo svg {
     height: 100px;
@@ -16,10 +17,6 @@
       margin-bottom: 16px;
     }
   }
-}
-
-.billing-plans-alert {
-  margin: 0;
 }
 
 .billing-plans {

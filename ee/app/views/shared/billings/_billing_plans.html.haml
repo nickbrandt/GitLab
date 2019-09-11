@@ -1,16 +1,20 @@
-- current_plan = subscription_plan_info(plans_data, namespace.actual_plan_name)
+- current_plan       = subscription_plan_info(plans_data, namespace.actual_plan_name)
+- support_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: EE::CUSTOMER_SUPPORT_URL }
+- support_link_end   = '</a>'.html_safe
 
 - if current_plan
   = render 'shared/billings/billing_plan_header', namespace: namespace, plan: current_plan
 
-  - unless has_plan_purchase_link?(plans_data)
-    .billing-plans-alert.card.prepend-top-10
-      .card-header.bg-warning.text-white
-        = s_("BillingPlans|Automatic downgrade and upgrade to some plans is currently not available.")
-        - customer_support_url = 'https://about.gitlab.com/sales/';
-        - customer_support_link = link_to s_("BillingPlans|Customer Support"), customer_support_url
-        = s_("BillingPlans|Please contact %{customer_support_link} in that case.").html_safe % { customer_support_link: customer_support_link }
+- unless namespace.gold_plan?
+  - if namespace.upgradable?
+    .gl-p-4.center
+      = link_to s_('BillingPlan|Upgrade plan'), plan_upgrade_url(namespace, current_plan), class: 'btn btn-success'
 
-.billing-plans
-  - plans_data.each do |plan|
-    = render 'shared/billings/billing_plan', namespace: namespace, plan: plan
+  - else
+    .billing-plans
+      - plans_data.each do |plan|
+        = render 'shared/billings/billing_plan', namespace: namespace, plan: plan
+
+- if namespace.actual_plan
+  .center
+    &= s_('BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}.').html_safe % { support_link_start: support_link_start, support_link_end: support_link_end }
