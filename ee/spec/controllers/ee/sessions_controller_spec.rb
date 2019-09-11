@@ -6,11 +6,11 @@ describe SessionsController, :geo do
   include DeviseHelpers
   include EE::GeoHelpers
 
-  describe '#new' do
-    before do
-      set_devise_mapping(context: @request)
-    end
+  before do
+    set_devise_mapping(context: @request)
+  end
 
+  describe '#new' do
     context 'on a Geo secondary node' do
       set(:primary_node) { create(:geo_node, :primary) }
       set(:secondary_node) { create(:geo_node) }
@@ -50,6 +50,30 @@ describe SessionsController, :geo do
 
       context 'without a tampered header' do
         it_behaves_like 'a valid oauth authentication redirect'
+      end
+    end
+  end
+
+  describe '#create' do
+    before do
+      allow(::Gitlab).to receive(:com?).and_return(true)
+    end
+
+    context 'with wrong credentials' do
+      context 'when is a trial form' do
+        it 'redirects to new trial sign in page' do
+          post :create, params: { trial: true, user: { login: 'foo@bar.com', password: '11111' } }
+
+          expect(response).to render_template("trial_registrations/new")
+        end
+      end
+
+      context 'when is a regular form' do
+        it 'redirects to the regular sign in page' do
+          post :create, params: { user: { login: 'foo@bar.com', password: '11111' } }
+
+          expect(response).to render_template("devise/sessions/new")
+        end
       end
     end
   end
