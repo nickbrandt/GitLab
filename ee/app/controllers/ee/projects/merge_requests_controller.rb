@@ -52,15 +52,15 @@ module EE
       end
 
       def container_scanning_reports
-        reports_response(merge_request.compare_container_scanning_reports)
+        reports_response(merge_request.compare_container_scanning_reports(current_user))
       end
 
       def dependency_scanning_reports
-        reports_response(merge_request.compare_dependency_scanning_reports)
+        reports_response(merge_request.compare_dependency_scanning_reports(current_user))
       end
 
       def sast_reports
-        reports_response(merge_request.compare_sast_reports)
+        reports_response(merge_request.compare_sast_reports(current_user))
       end
 
       def metrics_reports

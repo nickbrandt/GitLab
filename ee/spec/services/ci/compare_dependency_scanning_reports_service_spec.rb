@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe Ci::CompareDependencyScanningReportsService do
-  let(:service) { described_class.new(project) }
+  let(:current_user) { project.users.take }
+  let(:service) { described_class.new(project, current_user) }
   let(:project) { create(:project, :repository) }
 
   before do
@@ -31,6 +32,15 @@ describe Ci::CompareDependencyScanningReportsService do
 
       it 'reports status as parsed' do
         expect(subject[:status]).to eq(:parsed)
+      end
+
+      it 'populates fields based on current_user' do
+        payload = subject[:data]['existing'].first
+        expect(payload['create_vulnerability_feedback_issue_path']).not_to be_empty
+        expect(payload['create_vulnerability_feedback_merge_request_path']).not_to be_empty
+        expect(payload['create_vulnerability_feedback_dismissal_path']).not_to be_empty
+        expect(payload['create_vulnerability_feedback_issue_path']).not_to be_empty
+        expect(service.current_user).to eq(current_user)
       end
 
       it 'reports fixed vulnerability' do
