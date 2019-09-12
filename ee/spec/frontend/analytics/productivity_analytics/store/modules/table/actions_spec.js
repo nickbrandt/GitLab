@@ -123,15 +123,22 @@ describe('Productivity analytics table actions', () => {
         mock.onGet(mockedState.endpoint).replyOnce(500);
       });
 
-      it('dispatches error', done =>
+      it('dispatches error', done => {
         testAction(
           actions.fetchMergeRequests,
           null,
           mockedState,
           [],
-          [{ type: 'requestMergeRequests' }, { type: 'receiveMergeRequestsError' }],
+          [
+            { type: 'requestMergeRequests' },
+            {
+              type: 'receiveMergeRequestsError',
+              payload: new Error('Request failed with status code 500'),
+            },
+          ],
           done,
-        ));
+        );
+      });
     });
   });
 
@@ -168,9 +175,9 @@ describe('Productivity analytics table actions', () => {
     it('should commit error', done =>
       testAction(
         actions.receiveMergeRequestsError,
-        null,
+        { response: { status: 500 } },
         mockedContext.state,
-        [{ type: types.RECEIVE_MERGE_REQUESTS_ERROR }],
+        [{ type: types.RECEIVE_MERGE_REQUESTS_ERROR, payload: 500 }],
         [],
         done,
       ));

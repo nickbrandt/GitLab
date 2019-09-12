@@ -11,9 +11,9 @@ export default {
     state.pageInfo = pageInfo;
     state.mergeRequests = mergeRequests;
   },
-  [types.RECEIVE_MERGE_REQUESTS_ERROR](state) {
+  [types.RECEIVE_MERGE_REQUESTS_ERROR](state, errCode) {
     state.isLoadingTable = false;
-    state.hasError = true;
+    state.hasError = errCode;
     state.pageInfo = {};
     state.mergeRequests = [];
   },

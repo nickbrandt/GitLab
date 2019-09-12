@@ -36,6 +36,10 @@ export default {
       type: String,
       required: true,
     },
+    noAccessSvgPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -65,7 +69,11 @@ export default {
       'getColumnOptions',
       'columnMetricLabel',
       'isSelectedSortField',
+      'hasNoAccessError',
     ]),
+    showAppContent() {
+      return this.groupNamespace && !this.hasNoAccessError;
+    },
   },
   mounted() {
     this.setEndpoint(this.endpoint);
@@ -106,7 +114,18 @@ export default {
         )
       "
     />
-    <template v-else>
+    <gl-empty-state
+      v-if="hasNoAccessError"
+      class="js-empty-state"
+      :title="__('You don’t have acces to Productivity Analaytics in this group')"
+      :svg-path="noAccessSvgPath"
+      :description="
+        __(
+          'Only ‘Reporter’ roles and above on tiers Premium / Silver and above can see Productivity Analytics.',
+        )
+      "
+    />
+    <template v-if="showAppContent">
       <h4>{{ __('Merge Requests') }}</h4>
       <div class="qa-time-to-merge mb-4">
         <h5>{{ __('Time to merge') }}</h5>

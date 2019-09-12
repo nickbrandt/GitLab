@@ -16,7 +16,7 @@ export default () => {
   const timeframeContainer = container.querySelector('.js-timeframe-container');
   const appContainer = container.querySelector('.js-productivity-analytics-app-container');
 
-  const { endpoint, emptyStateSvgPath } = appContainer.dataset;
+  const { endpoint, emptyStateSvgPath, noAccessSvgPath } = appContainer.dataset;
 
   let filterManager;
 
@@ -100,6 +100,7 @@ export default () => {
         props: {
           endpoint,
           emptyStateSvgPath,
+          noAccessSvgPath,
         },
       });
     },
