@@ -15,7 +15,7 @@ module EE
           jenkins_deprecated
         ]
 
-        if ::Gitlab.com? || Rails.env.development?
+        if ::Gitlab.dev_env_or_com?
           ee_service_names.push('gitlab_slack_application')
         end
 

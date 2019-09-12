@@ -4,21 +4,19 @@ require 'spec_helper'
 
 describe Explore::OnboardingController do
   let(:user) { create(:user, username: 'gitlab-org') }
-  let(:project) { create(:project, path: 'gitlab-ce', namespace: user.namespace) }
 
   before do
-    allow(Gitlab).to receive(:com?) { true }
     sign_in(user)
-
-    project.add_guest(user)
   end
 
-  describe 'GET #index' do
-    context 'when the feature is enabled' do
-      before do
-        stub_feature_flags(user_onboarding: true)
-      end
+  shared_examples_for 'when the feature is enabled' do
+    before do
+      stub_feature_flags(user_onboarding: true)
 
+      project.add_guest(user)
+    end
+
+    context 'feature enabled' do
       it 'renders index with 200 status code and sets the session variable if the user is authenticated' do
         get :index
 
@@ -38,6 +36,31 @@ describe Explore::OnboardingController do
 
         expect(response).to have_gitlab_http_status(404)
         expect(session[:onboarding_project]).to be_nil
+      end
+    end
+  end
+
+  context 'when on .com' do
+    describe 'GET #index' do
+      before do
+        allow(Gitlab).to receive(:com?) { true }
+      end
+
+      it_behaves_like 'when the feature is enabled' do
+        let(:project) { create(:project, path: 'gitlab-ce', namespace: user.namespace) }
+      end
+    end
+  end
+
+  context 'is dev env' do
+    describe 'GET #index' do
+      before do
+        allow(Gitlab).to receive(:com?) { false }
+        allow(Gitlab).to receive(:dev_env_or_com?) { true }
+      end
+
+      it_behaves_like 'when the feature is enabled' do
+        let(:project) { create(:project, path: 'gitlab-test', namespace: user.namespace) }
       end
     end
   end

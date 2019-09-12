@@ -19,6 +19,13 @@ class Explore::OnboardingController < Explore::ApplicationController
   end
 
   def get_onboarding_demo_project
-    Project.find_by_full_path("gitlab-org/gitlab-ce") if allow_access_to_onboarding?
+    demo_project if allow_access_to_onboarding?
+  end
+
+  def demo_project
+    # gdk instances may not have the 'gitlab-ce' project seeded, so we will fallback
+    # to 'gitlab-test'
+    Project.find_by_full_path('gitlab-org/gitlab-ce') ||
+      Project.find_by_full_path('gitlab-org/gitlab-test')
   end
 end
