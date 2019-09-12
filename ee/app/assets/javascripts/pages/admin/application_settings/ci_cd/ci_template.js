@@ -33,7 +33,9 @@ export default class CiTemplate {
           name: __('No required pipeline'),
           id: null,
         },
-        'divider',
+        {
+          type: 'divider',
+        },
       ],
       ...this.$dropdown.data('data'),
     };
