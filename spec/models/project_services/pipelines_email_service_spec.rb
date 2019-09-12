@@ -53,9 +53,10 @@ describe PipelinesEmailService, :mailer do
     end
   end
 
-  shared_examples 'sending email' do
+  shared_examples 'sending email' do |branches_to_be_notified: nil|
     before do
       subject.recipients = recipients
+      subject.branches_to_be_notified = branches_to_be_notified if branches_to_be_notified
 
       perform_enqueued_jobs do
         run
@@ -69,9 +70,10 @@ describe PipelinesEmailService, :mailer do
     end
   end
 
-  shared_examples 'not sending email' do
+  shared_examples 'not sending email' do |branches_to_be_notified: nil|
     before do
       subject.recipients = recipients
+      subject.branches_to_be_notified = branches_to_be_notified if branches_to_be_notified
 
       perform_enqueued_jobs do
         run
@@ -109,35 +111,19 @@ describe PipelinesEmailService, :mailer do
         end
 
         context 'notifications are enabled only for default branch' do
-          before do
-            subject.branches_to_be_notified = "default"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default"
         end
 
         context 'notifications are enabled only for protected branch' do
-          before do
-            subject.branches_to_be_notified = "protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "protected"
         end
 
         context 'notifications are enabled only for default and protected branches ' do
-          before do
-            subject.branches_to_be_notified = "default_and_protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default_and_protected"
         end
 
         context 'notifications are enabled only for all branches' do
-          before do
-            subject.branches_to_be_notified = "all"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "all"
         end
       end
 
@@ -149,35 +135,19 @@ describe PipelinesEmailService, :mailer do
         end
 
         context 'notifications are enabled only for default branch' do
-          before do
-            subject.branches_to_be_notified = "default"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default"
         end
 
         context 'notifications are enabled only for protected branch' do
-          before do
-            subject.branches_to_be_notified = "protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "protected"
         end
 
         context 'notifications are enabled only for default and protected branches ' do
-          before do
-            subject.branches_to_be_notified = "default_and_protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default_and_protected"
         end
 
         context 'notifications are enabled only for all branches' do
-          before do
-            subject.branches_to_be_notified = "all"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "all"
         end
       end
 
@@ -188,35 +158,19 @@ describe PipelinesEmailService, :mailer do
         end
 
         context 'notifications are enabled only for default branch' do
-          before do
-            subject.branches_to_be_notified = "default"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default"
         end
 
         context 'notifications are enabled only for protected branch' do
-          before do
-            subject.branches_to_be_notified = "protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "protected"
         end
 
         context 'notifications are enabled only for default and protected branches ' do
-          before do
-            subject.branches_to_be_notified = "default_and_protected"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "default_and_protected"
         end
 
         context 'notifications are enabled only for all branches' do
-          before do
-            subject.branches_to_be_notified = "all"
-          end
-
-          it_behaves_like 'sending email'
+          it_behaves_like 'sending email', branches_to_be_notified: "all"
         end
       end
     end
@@ -265,42 +219,26 @@ describe PipelinesEmailService, :mailer do
       end
 
       context 'when the pipeline failed' do
-        context 'on a default branch' do
+        context 'on default branch' do
           before do
             data[:object_attributes][:ref] = project.default_branch
             pipeline.update(ref: project.default_branch)
           end
 
           context 'notifications are enabled only for default branch' do
-            before do
-              subject.branches_to_be_notified = "default"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "default"
           end
 
           context 'notifications are enabled only for protected branch' do
-            before do
-              subject.branches_to_be_notified = "protected"
-            end
-
-            it_behaves_like 'not sending email'
+            it_behaves_like 'not sending email', branches_to_be_notified: "protected"
           end
 
           context 'notifications are enabled only for default and protected branches ' do
-            before do
-              subject.branches_to_be_notified = "default_and_protected"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "default_and_protected"
           end
 
           context 'notifications are enabled only for all branches' do
-            before do
-              subject.branches_to_be_notified = "all"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "all"
           end
         end
 
@@ -312,35 +250,19 @@ describe PipelinesEmailService, :mailer do
           end
 
           context 'notifications are enabled only for default branch' do
-            before do
-              subject.branches_to_be_notified = "default"
-            end
-
-            it_behaves_like 'not sending email'
+            it_behaves_like 'not sending email', branches_to_be_notified: "default"
           end
 
           context 'notifications are enabled only for protected branch' do
-            before do
-              subject.branches_to_be_notified = "protected"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "protected"
           end
 
           context 'notifications are enabled only for default and protected branches ' do
-            before do
-              subject.branches_to_be_notified = "default_and_protected"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "default_and_protected"
           end
 
           context 'notifications are enabled only for all branches' do
-            before do
-              subject.branches_to_be_notified = "all"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "all"
           end
         end
 
@@ -351,35 +273,19 @@ describe PipelinesEmailService, :mailer do
           end
 
           context 'notifications are enabled only for default branch' do
-            before do
-              subject.branches_to_be_notified = "default"
-            end
-
-            it_behaves_like 'not sending email'
+            it_behaves_like 'not sending email', branches_to_be_notified: "default"
           end
 
           context 'notifications are enabled only for protected branch' do
-            before do
-              subject.branches_to_be_notified = "protected"
-            end
-
-            it_behaves_like 'not sending email'
+            it_behaves_like 'not sending email', branches_to_be_notified: "protected"
           end
 
           context 'notifications are enabled only for default and protected branches ' do
-            before do
-              subject.branches_to_be_notified = "default_and_protected"
-            end
-
-            it_behaves_like 'not sending email'
+            it_behaves_like 'not sending email', branches_to_be_notified: "default_and_protected"
           end
 
           context 'notifications are enabled only for all branches' do
-            before do
-              subject.branches_to_be_notified = "all"
-            end
-
-            it_behaves_like 'sending email'
+            it_behaves_like 'sending email', branches_to_be_notified: "all"
           end
         end
       end
