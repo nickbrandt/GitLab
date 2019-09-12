@@ -23,6 +23,7 @@ class License < ApplicationRecord
     issue_weights
     jenkins_integration
     ldap_group_sync
+    max_pages_size
     member_lock
     merge_request_approvers
     multiple_issue_assignees
