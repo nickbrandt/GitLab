@@ -23,7 +23,6 @@ class License < ApplicationRecord
     issue_weights
     jenkins_integration
     ldap_group_sync
-    max_pages_size
     member_lock
     merge_request_approvers
     multiple_issue_assignees
@@ -74,6 +73,7 @@ class License < ApplicationRecord
     issues_analytics
     jira_dev_panel_integration
     ldap_group_sync_filter
+    max_pages_size
     merge_pipelines
     merge_request_performance_metrics
     merge_trains
@@ -193,6 +193,7 @@ class License < ApplicationRecord
     geo
     ldap_group_sync
     ldap_group_sync_filter
+    max_pages_size
     multiple_ldap_servers
     object_storage
     project_aliases
