@@ -369,24 +369,27 @@ export default class AccessDropdown {
     });
 
     if (roles.length) {
-      consolidatedData = consolidatedData.concat([{ header: s__('AccessDropdown|Roles') }], roles);
+      consolidatedData = consolidatedData.concat(
+        [{ type: 'header', content: s__('AccessDropdown|Roles') }],
+        roles,
+      );
     }
 
     if (groups.length) {
       if (roles.length) {
-        consolidatedData = consolidatedData.concat(['divider']);
+        consolidatedData = consolidatedData.concat([{ type: 'divider' }]);
       }
 
       consolidatedData = consolidatedData.concat(
-        [{ header: s__('AccessDropdown|Groups') }],
+        [{ type: 'header', content: s__('AccessDropdown|Groups') }],
         groups,
       );
     }
 
     if (users.length) {
       consolidatedData = consolidatedData.concat(
-        ['divider'],
-        [{ header: s__('AccessDropdown|Users') }],
+        [{ type: 'divider' }],
+        [{ type: 'header', content: s__('AccessDropdown|Users') }],
         users,
       );
     }
