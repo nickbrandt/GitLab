@@ -48,7 +48,7 @@ module API
 
       # pull_request params
       optional :action, type: String, desc: 'Pull Request action'
-      optional 'pull_request.id', type: Integer, desc: 'Pull request ID'
+      optional 'pull_request.number', type: Integer, desc: 'Pull request IID'
       optional 'pull_request.head.ref', type: String, desc: 'Source branch'
       optional 'pull_request.head.sha', type: String, desc: 'Source sha'
       optional 'pull_request.head.repo.full_name', type: String, desc: 'Source repository'
