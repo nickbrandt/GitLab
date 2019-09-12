@@ -11,6 +11,30 @@ describe Analytics::ProductivityAnalyticsController do
     stub_licensed_features(productivity_analytics: true)
   end
 
+  describe 'usage counter' do
+    let(:group) { create :group }
+
+    before do
+      group.add_owner(current_user)
+    end
+
+    it 'increments usage counter' do
+      expect(Gitlab::UsageDataCounters::ProductivityAnalyticsCounter).to receive(:count).with(:views)
+
+      get :show, format: :html
+
+      expect(response).to be_successful
+    end
+
+    it "doesn't increment the usage counter when JSON request is sent" do
+      expect(Gitlab::UsageDataCounters::ProductivityAnalyticsCounter).not_to receive(:count).with(:views)
+
+      get :show, format: :json
+
+      expect(response).to be_successful
+    end
+  end
+
   describe 'GET show' do
     subject { get :show }
 
@@ -19,7 +43,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       subject
 
-      expect(response.code).to eq '404'
+      expect(response).to have_gitlab_http_status(404)
     end
 
     it 'authorizes for ability to view analytics' do
@@ -27,12 +51,13 @@ describe Analytics::ProductivityAnalyticsController do
 
       subject
 
-      expect(response.code).to eq '403'
+      expect(response).to have_gitlab_http_status(403)
     end
 
     it 'renders show template' do
       subject
 
+      expect(response).to be_successful
       expect(response).to render_template :show
     end
 
@@ -66,7 +91,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       it 'renders 404' do
         subject
-        expect(response.code).to eq '404'
+        expect(response).to have_gitlab_http_status(404)
       end
     end
 
@@ -76,7 +101,7 @@ describe Analytics::ProductivityAnalyticsController do
 
       it 'renders 404' do
         subject
-        expect(response.code).to eq '404'
+        expect(response).to have_gitlab_http_status(404)
       end
     end
 
