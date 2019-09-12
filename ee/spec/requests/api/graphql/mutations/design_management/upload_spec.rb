@@ -4,6 +4,7 @@ require "spec_helper"
 describe "uploading designs" do
   include GraphqlHelpers
   include DesignManagementTestHelpers
+  include WorkhorseHelpers
 
   let(:current_user) { create(:user) }
   let(:issue) { create(:issue) }
@@ -34,8 +35,20 @@ describe "uploading designs" do
     expect(graphql_errors).to be_present
   end
 
-  it 'succeeds' do
+  it 'succeeds (backward compatibility)' do
     post_graphql_mutation(mutation, current_user: current_user)
+
+    expect(graphql_errors).not_to be_present
+  end
+
+  it 'succeeds' do
+    file_path_in_params = ['designManagementUploadInput', 'files', 0]
+    params = mutation_to_apollo_uploads_param(mutation, files: [file_path_in_params])
+
+    workhorse_post_with_file(api('/', current_user, version: 'graphql'),
+                             params: params,
+                             file_key: '1'
+                            )
 
     expect(graphql_errors).not_to be_present
   end
