@@ -21,9 +21,7 @@ export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) 
       const { headers, data } = response;
       dispatch('receiveMergeRequestsSuccess', { headers, data });
     })
-    .catch(() => {
-      dispatch('receiveMergeRequestsError');
-    });
+    .catch(err => dispatch('receiveMergeRequestsError', err));
 };
 
 export const requestMergeRequests = ({ commit }) => commit(types.REQUEST_MERGE_REQUESTS);
@@ -35,7 +33,10 @@ export const receiveMergeRequestsSuccess = ({ commit }, { headers, data: mergeRe
   commit(types.RECEIVE_MERGE_REQUESTS_SUCCESS, { pageInfo, mergeRequests });
 };
 
-export const receiveMergeRequestsError = ({ commit }) => commit(types.RECEIVE_MERGE_REQUESTS_ERROR);
+export const receiveMergeRequestsError = ({ commit }, { response }) => {
+  const { status } = response;
+  commit(types.RECEIVE_MERGE_REQUESTS_ERROR, status);
+};
 
 export const setSortField = ({ commit, dispatch }, data) => {
   commit(types.SET_SORT_FIELD, data);

@@ -26,9 +26,7 @@ export const fetchChartData = ({ dispatch, getters, rootState }, chartKey) => {
       const { data } = response;
       dispatch('receiveChartDataSuccess', { chartKey, data });
     })
-    .catch(() => {
-      dispatch('receiveChartDataError', chartKey);
-    });
+    .catch(() => dispatch('receiveChartDataError', chartKey));
 };
 
 export const receiveChartDataSuccess = ({ commit }, { chartKey, data = {} }) => {

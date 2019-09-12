@@ -8,29 +8,32 @@ describe('Productivity analytics filter actions', () => {
   const projectPath = 'gitlab-test';
 
   describe('setGroupNamespace', () => {
-    it('commits the SET_GROUP_NAMESPACE mutation', done =>
-      testAction(
-        actions.setGroupNamespace,
-        groupNamespace,
-        getInitialState(),
-        [
-          {
-            type: types.SET_GROUP_NAMESPACE,
-            payload: groupNamespace,
-          },
-        ],
-        [
-          {
-            type: 'charts/fetchAllChartData',
-            payload: null,
-          },
-          {
-            type: 'table/fetchMergeRequests',
-            payload: null,
-          },
-        ],
-        done,
-      ));
+    it('commits the SET_GROUP_NAMESPACE mutation', done => {
+      const store = {
+        commit: jest.fn(),
+        dispatch: jest.fn(() => Promise.resolve()),
+      };
+
+      actions
+        .setGroupNamespace(store, groupNamespace)
+        .then(() => {
+          expect(store.commit).toHaveBeenCalledWith(types.SET_GROUP_NAMESPACE, groupNamespace);
+
+          expect(store.dispatch.mock.calls[0]).toEqual([
+            'table/fetchMergeRequests',
+            jasmine.any(Object),
+            { root: true },
+          ]);
+
+          expect(store.dispatch.mock.calls[1]).toEqual([
+            'charts/fetchAllChartData',
+            jasmine.any(Object),
+            { root: true },
+          ]);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
   });
 
   describe('setProjectPath', () => {

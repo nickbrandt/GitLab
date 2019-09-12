@@ -1,3 +1,4 @@
+import httpStatus from '~/lib/utils/http_status';
 import { tableSortOrder } from './../../../constants';
 
 export const sortIcon = state => tableSortOrder[state.sortOrder].icon;
@@ -17,6 +18,8 @@ export const getColumnOptions = state =>
 export const columnMetricLabel = (state, getters) => getters.getColumnOptions[state.columnMetric];
 
 export const isSelectedSortField = state => sortField => state.sortField === sortField;
+
+export const hasNoAccessError = state => state.hasError === httpStatus.FORBIDDEN;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

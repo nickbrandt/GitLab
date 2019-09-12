@@ -3,8 +3,11 @@ import * as types from './mutation_types';
 export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   commit(types.SET_GROUP_NAMESPACE, groupNamespace);
 
-  dispatch('charts/fetchAllChartData', null, { root: true });
-  dispatch('table/fetchMergeRequests', null, { root: true });
+  // let's fetch the merge requests first to see if the user has access to the selected group
+  // if there's no 403, then we fetch all chart data
+  return dispatch('table/fetchMergeRequests', null, { root: true }).then(() =>
+    dispatch('charts/fetchAllChartData', null, { root: true }),
+  );
 };
 
 export const setProjectPath = ({ commit, dispatch }, projectPath) => {
