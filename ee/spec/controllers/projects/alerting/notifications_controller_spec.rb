@@ -15,7 +15,7 @@ describe Projects::Alerting::NotificationsController do
     end
 
     def make_request(opts = {})
-      post :create, params: project_params, session: { as: :json }
+      post :create, params: project_params(opts), session: { as: :json }
     end
 
     context 'when feature flag is on' do
@@ -24,10 +24,26 @@ describe Projects::Alerting::NotificationsController do
       end
 
       context 'when notification service succeeds' do
+        let(:payload) do
+          {
+            title: 'Alert title',
+            hosts: 'https://gitlab.com'
+          }
+        end
+        let(:permitted_params) { ActionController::Parameters.new(payload).permit! }
+
         it 'responds with ok' do
           make_request
 
           expect(response).to have_gitlab_http_status(:ok)
+        end
+
+        it 'does not pass forbidden parameters to the notify service' do
+          make_request(payload)
+
+          expect(Projects::Alerting::NotifyService)
+            .to have_received(:new)
+            .with(project, nil, permitted_params)
         end
       end
 

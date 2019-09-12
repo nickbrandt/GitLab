@@ -19,6 +19,8 @@ module Projects
 
       private
 
+      FORBIDDEN_PARAMS = %w(controller action namespace_id project_id).freeze
+
       def project_without_auth
         @project ||= Project
           .find_by_full_path("#{params[:namespace_id]}/#{params[:project_id]}")
@@ -34,7 +36,7 @@ module Projects
 
       def notify_service
         Projects::Alerting::NotifyService
-          .new(project, current_user, params.permit!)
+          .new(project, current_user, permitted_params)
       end
 
       def response_status(result)
@@ -46,6 +48,10 @@ module Projects
         else
           :ok
         end
+      end
+
+      def permitted_params
+        params.reject! { |param| param.in?(FORBIDDEN_PARAMS) }.permit!
       end
     end
   end
