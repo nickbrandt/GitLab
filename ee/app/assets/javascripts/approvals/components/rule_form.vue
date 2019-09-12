@@ -8,6 +8,8 @@ import ApproversSelect from './approvers_select.vue';
 import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from '../constants';
 
 const DEFAULT_NAME = 'Default';
+const DEFAULT_NAME_FOR_LICENSE_REPORT = 'License-Check';
+const READONLY_NAMES = [DEFAULT_NAME_FOR_LICENSE_REPORT];
 
 export default {
   components: {
@@ -102,6 +104,12 @@ export default {
       return (
         this.settings.allowMultiRule && this.isFallback && !this.name && !this.approvers.length
       );
+    },
+    isPersisted() {
+      return this.initRule && this.initRule.id;
+    },
+    isNameDisabled() {
+      return this.isPersisted && READONLY_NAMES.includes(this.name);
     },
     removeHiddenGroups() {
       return this.containsHiddenGroups && !this.approversByType[TYPE_HIDDEN_GROUPS];
@@ -226,6 +234,7 @@ export default {
           <input
             v-model="name"
             :class="{ 'is-invalid': validation.name }"
+            :disabled="isNameDisabled"
             class="form-control"
             name="name"
             type="text"
