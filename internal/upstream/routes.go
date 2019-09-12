@@ -206,6 +206,7 @@ func (u *upstream) configureRoutes() {
 		// we need to declare each routes until we have fixed all the routes on the rails codebase.
 		// Overall status can be seen at https://gitlab.com/groups/gitlab-org/-/epics/1802#current-status
 		route("POST", apiPattern+`v4/projects/[0-9]+/wikis/attachments\z`, uploadAccelerateProxy),
+		route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
