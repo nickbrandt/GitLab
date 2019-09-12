@@ -3,6 +3,7 @@
 module Operations
   class FeatureFlagScope < ApplicationRecord
     prepend HasEnvironmentScope
+    include Gitlab::Utils::StrongMemoize
 
     self.table_name = 'operations_feature_flag_scopes'
 
@@ -24,6 +25,12 @@ module Operations
     scope :ordered, -> { order(:id) }
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
+
+    def userwithid_strategy
+      strong_memoize(:userwithid_strategy) do
+        strategies.select { |s| s['name'] == FeatureFlagStrategiesValidator::STRATEGY_USERWITHID }
+      end
+    end
 
     def self.with_name_and_description
       joins(:feature_flag)
