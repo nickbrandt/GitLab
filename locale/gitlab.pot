@@ -18148,6 +18148,9 @@ msgstr ""
 msgid "cannot be in the same project"
 msgstr ""
 
+msgid "cannot be modified"
+msgstr ""
+
 msgid "cannot block others"
 msgstr ""
 

@@ -88,4 +88,39 @@ describe ApprovalProjectRule do
       end
     end
   end
+
+  describe "validation" do
+    let(:project_approval_rule) { create(:approval_project_rule) }
+    let(:license_compliance_rule) { create(:approval_project_rule, :license_management) }
+    let(:vulnerability_check_rule) { create(:approval_project_rule, :security) }
+
+    context "when creating a new rule" do
+      specify { expect(project_approval_rule).to be_valid }
+      specify { expect(license_compliance_rule).to be_valid }
+      specify { expect(vulnerability_check_rule).to be_valid }
+    end
+
+    context "when attempting to edit the name of the rule" do
+      subject { project_approval_rule }
+
+      before do
+        subject.name = SecureRandom.uuid
+      end
+
+      specify { expect(subject).to be_valid }
+
+      context "with a `License-Check` rule" do
+        subject { license_compliance_rule }
+
+        specify { expect(subject).not_to be_valid }
+        specify { expect { subject.valid? }.to change { subject.errors[:name].present? } }
+      end
+
+      context "with a `Vulnerability-Check` rule" do
+        subject { vulnerability_check_rule }
+
+        specify { expect(subject).to be_valid }
+      end
+    end
+  end
 end
