@@ -1,4 +1,4 @@
-- return unless Gitlab.com? || Rails.env.development?
+- return unless Gitlab.dev_env_or_com?
 
 %section.settings.as-slack.no-animate#js-slack-settings{ class: ('expanded' if expanded) }
   .settings-header

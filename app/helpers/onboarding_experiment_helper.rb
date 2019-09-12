@@ -2,7 +2,7 @@
 
 module OnboardingExperimentHelper
   def allow_access_to_onboarding?
-    ::Gitlab.com? && Feature.enabled?(:user_onboarding)
+    ::Gitlab.dev_env_or_com? && Feature.enabled?(:user_onboarding)
   end
 end
 
