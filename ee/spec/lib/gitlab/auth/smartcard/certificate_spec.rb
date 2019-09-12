@@ -117,6 +117,24 @@ describe Gitlab::Auth::Smartcard::Certificate do
           end
         end
       end
+
+      context 'san email defined' do
+        let(:san_defined_email) { 'san@domain.email' }
+
+        before do
+          allow(Gitlab.config.smartcard).to receive(:san_extensions).and_return(true)
+
+          expect_next_instance_of(Gitlab::Auth::Smartcard::SANExtension) do |san_extension|
+            expect(san_extension).to receive(:email_identity).and_return(san_defined_email)
+          end
+        end
+
+        it 'creates user' do
+          expect { subject }.to change { User.count }.from(0).to(1)
+
+          expect(User.first.email).to eql(san_defined_email)
+        end
+      end
     end
 
     it_behaves_like 'a valid certificate is required'

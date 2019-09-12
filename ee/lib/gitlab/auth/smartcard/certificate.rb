@@ -4,6 +4,8 @@ module Gitlab
   module Auth
     module Smartcard
       class Certificate < Gitlab::Auth::Smartcard::Base
+        include Gitlab::Utils::StrongMemoize
+
         def auth_method
           'smartcard'
         end
@@ -53,7 +55,21 @@ module Gitlab
         end
 
         def email
-          subject.split('/').find { |part| part =~ /emailAddress=/ }&.remove('emailAddress=')&.strip
+          strong_memoize(:email) do
+            if san_enabled?
+              san_extension.email_identity
+            else
+              subject.split('/').find { |part| part =~ /emailAddress=/ }&.remove('emailAddress=')&.strip
+            end
+          end
+        end
+
+        def san_enabled?
+          Gitlab.config.smartcard.san_extensions
+        end
+
+        def san_extension
+          @san_extension ||= SANExtension.new(@certificate, Gitlab.config.gitlab.host)
         end
 
         def username
