@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -262,4 +263,70 @@ func TestLfsUpload(t *testing.T) {
 	// Expect the (eventual) response to be proxied through, untouched
 	require.Equal(t, 200, resp.StatusCode)
 	require.Equal(t, rspBody, string(rspData))
+}
+
+func packageUploadTestServer(t *testing.T, resource string, reqBody string, rspBody string) *httptest.Server {
+	return testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, r.Method, "PUT")
+		apiResponse := fmt.Sprintf(
+			`{"TempPath":%q, "Size": %d}`, scratchDir, len(reqBody),
+		)
+		switch r.RequestURI {
+		case resource + "/authorize":
+			// Expect the authorization call to be signed
+			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
+			require.NoError(t, err)
+
+			// Instruct workhorse to accept the upload
+			w.Header().Set("Content-Type", api.ResponseContentType)
+			_, err = fmt.Fprint(w, apiResponse)
+			require.NoError(t, err)
+
+		case resource:
+			// Expect the request to point to a file on disk containing the data
+			require.NoError(t, r.ParseForm())
+
+			len := strconv.Itoa(len(reqBody))
+			require.Equal(t, len, r.Form.Get("file.size"), "Invalid size populated")
+
+			tmpFilePath := r.Form.Get("file.path")
+			fileData, err := ioutil.ReadFile(tmpFilePath)
+			defer os.Remove(tmpFilePath)
+
+			require.NoError(t, err)
+			require.Equal(t, reqBody, string(fileData), "Temporary file has the wrong body")
+
+			fmt.Fprint(w, rspBody)
+		default:
+			t.Fatalf("Unexpected request to upstream! %v %q", r.Method, r.RequestURI)
+		}
+	})
+}
+
+func testPackageFileUpload(t *testing.T, resource string) {
+	reqBody := "test data"
+	rspBody := "test success"
+
+	ts := packageUploadTestServer(t, resource, reqBody, rspBody)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	req, err := http.NewRequest("PUT", ws.URL+resource, strings.NewReader(reqBody))
+	require.NoError(t, err)
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+
+	respData, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	require.Equal(t, rspBody, string(respData), "Temporary file has the wrong body")
+	defer resp.Body.Close()
+
+	require.Equal(t, 200, resp.StatusCode)
+}
+
+func TestPackageFilesUpload(t *testing.T) {
+	testPackageFileUpload(t, `/api/v4/packages/conan/v1/files`)
 }
