@@ -22,26 +22,14 @@ describe Clusters::EnvironmentEntity do
 
     subject { described_class.new(environment, request: request).as_json }
 
-    it 'exposes project' do
-      expect(subject).to include(:project)
-    end
-
-    it 'exposes last_deployment' do
-      expect(subject).to include(:last_deployment)
-    end
-
-    it 'exposes environment_path' do
-      expect(subject).to include(:environment_path)
-    end
-
-    it 'exposes updated_at' do
-      expect(subject).to include(:updated_at)
-    end
-
     context 'deploy board available' do
       before do
         allow(group).to receive(:feature_available?).and_call_original
         allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(true)
+      end
+
+      it 'matches expected schema' do
+        expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
       end
 
       it 'exposes rollout_status' do
@@ -52,6 +40,10 @@ describe Clusters::EnvironmentEntity do
     context 'deploy board not available' do
       before do
         allow(group).to receive(:feature_available?).with(:cluster_deployments).and_return(false)
+      end
+
+      it 'matches expected schema' do
+        expect(subject.with_indifferent_access).to match_schema('clusters/environment', dir: 'ee')
       end
 
       it 'does not expose rollout_status' do
