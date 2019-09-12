@@ -39,6 +39,10 @@ module Gitlab
             super.merge(project: project&.full_path)
           end
 
+          def metrics_event
+            :receive_email_service_desk
+          end
+
           private
 
           attr_reader :project_id, :project_path

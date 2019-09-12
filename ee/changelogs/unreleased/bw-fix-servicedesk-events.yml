@@ -1,0 +1,5 @@
+---
+title: Fix service desk emails not creating issues intermittently
+merge_request: 16577
+author:
+type: fixed
