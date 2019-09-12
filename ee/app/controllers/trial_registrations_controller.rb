@@ -10,7 +10,7 @@ class TrialRegistrationsController < RegistrationsController
 
   def create
     super do |new_user|
-      new_user.system_hook_service.execute_hooks_for(new_user, :create)
+      new_user.system_hook_service.execute_hooks_for(new_user, :create) if new_user.persisted?
     end
   end
 

@@ -61,7 +61,7 @@ describe TrialsController do
         it 'redirects user to Step 3' do
           post :create_lead
 
-          expect(response).to redirect_to(select_namespace_trials_url)
+          expect(response).to redirect_to(select_trials_url)
         end
       end
 
@@ -73,6 +73,44 @@ describe TrialsController do
 
           expect(response).to render_template(:new)
         end
+      end
+    end
+  end
+
+  describe '#select' do
+    it_behaves_like 'an authenticated endpoint', :get, :select
+  end
+
+  describe '#apply' do
+    let(:user) { create(:user) }
+    let(:namespace) { create(:namespace, owner_id: user.id, path: 'namespace-test') }
+    let(:apply_trial_result) { nil }
+
+    before do
+      sign_in(user)
+
+      expect_any_instance_of(GitlabSubscriptions::ApplyTrialService).to receive(:execute) do
+        { success: apply_trial_result }
+      end
+    end
+
+    context 'on success' do
+      let(:apply_trial_result) { true }
+
+      it "redirects to group's path with the parameter trial as true" do
+        post :apply, params: { namespace_id: namespace.id }
+
+        expect(response).to redirect_to("/#{namespace.path}?trial=true")
+      end
+    end
+
+    context 'on failure' do
+      let(:apply_trial_result) { false }
+
+      it 'redirects to new select namespaces for trials path' do
+        post :apply, params: { namespace_id: namespace.id }
+
+        expect(response).to redirect_to(select_trials_path)
       end
     end
   end

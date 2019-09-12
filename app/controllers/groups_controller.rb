@@ -133,7 +133,7 @@ class GroupsController < Groups::ApplicationController
   protected
 
   def render_show_html
-    render 'groups/show'
+    render 'groups/show', locals: { trial: params[:trial] }
   end
 
   def render_details_html
