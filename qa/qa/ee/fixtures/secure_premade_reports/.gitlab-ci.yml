@@ -24,3 +24,13 @@ container_scanning:
   artifacts:
     reports:
       container_scanning: gl-container-scanning-report.json
+
+sast:
+  tags:
+    - qa
+    - test
+  script:
+    - echo "Skipped"
+  artifacts:
+    reports:
+      sast: gl-sast-report.json

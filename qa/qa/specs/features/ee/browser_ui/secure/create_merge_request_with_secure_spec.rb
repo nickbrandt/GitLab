@@ -5,7 +5,7 @@ require 'pathname'
 module QA
   context 'Secure', :docker do
     describe 'Security Reports in a Merge Request' do
-      let(:total_vuln_count) { 12 }
+      let(:total_vuln_count) { 45 }
 
       after do
         Service::Runner.new(@executor).remove!
