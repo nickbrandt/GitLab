@@ -10,6 +10,8 @@ module QA
     let(:dependency_scan_example_vuln) { 'jQuery before 3.4.0' }
     let(:container_scan_vuln_count) { 8 }
     let(:container_scan_example_vuln) { 'CVE-2017-18269 in glibc' }
+    let(:sast_scan_vuln_count) { 33 }
+    let(:sast_scan_example_vuln) { 'Cipher with no integrity' }
 
     describe 'Security Reports' do
       after do
@@ -64,6 +66,11 @@ module QA
             expect(pipeline).to have_vulnerability_count_of container_scan_vuln_count
             expect(pipeline).to have_content container_scan_example_vuln
           end
+
+          filter_report_and_perform(pipeline, "SAST") do
+            expect(pipeline).to have_vulnerability_count_of sast_scan_vuln_count
+            expect(pipeline).to have_content sast_scan_example_vuln
+          end
         end
       end
 
@@ -78,6 +85,10 @@ module QA
 
           filter_report_and_perform(dashboard, "Container Scanning") do
             expect(dashboard).to have_low_vulnerability_count_of 2
+          end
+
+          filter_report_and_perform(dashboard, "SAST") do
+            expect(dashboard).to have_low_vulnerability_count_of 17
           end
         end
       end
@@ -98,6 +109,10 @@ module QA
 
           filter_report_and_perform(dashboard, "Container Scanning") do
             expect(dashboard).to have_content container_scan_example_vuln
+          end
+
+          filter_report_and_perform(dashboard, "SAST") do
+            expect(dashboard).to have_content sast_scan_example_vuln
           end
         end
       end
