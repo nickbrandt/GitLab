@@ -1,8 +1,7 @@
 <script>
 import { isEqual } from 'underscore';
 import { GlButton, GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
-import { s__, __ } from '~/locale';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { s__ } from '~/locale';
 
 import LabelsSelector from './labels_selector.vue';
 
@@ -34,96 +33,7 @@ export default {
   props: {
     events: {
       type: Array,
-      required: true,
-      // required: false,
-      // default: () =>
-      //   [
-      //     {
-      //       name: __('Issue created'),
-      //       identifier: 'issue_created',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['issue_stage_end'],
-      //     },
-      //     {
-      //       name: __('Issue first mentioned in a commit'),
-      //       identifier: 'issue_first_mentioned_in_commit',
-      //       type: 'simple',
-      //       can_be_start_event: false,
-      //       allowed_end_events: [],
-      //     },
-      //     {
-      //       name: __('Merge request created'),
-      //       identifier: 'merge_request_created',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['merge_request_merged'],
-      //     },
-
-      //     {
-      //       name: __('Merge request first deployed to production'),
-      //       identifier: 'merge_request_first_deployed_to_production',
-      //       type: 'simple',
-      //       can_be_start_event: false,
-      //       allowed_end_events: [],
-      //     },
-      //     {
-      //       name: __('Merge request last build finish time'),
-      //       identifier: 'merge_request_last_build_finished',
-      //       type: 'simple',
-      //       can_be_start_event: false,
-      //       allowed_end_events: [],
-      //     },
-      //     {
-      //       name: __('Merge request last build start time'),
-      //       identifier: 'merge_request_last_build_started',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['merge_request_last_build_finished'],
-      //     },
-      //     {
-      //       name: __('Merge request merged'),
-      //       identifier: 'merge_request_merged',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['merge_request_first_deployed_to_production'],
-      //     },
-      //     {
-      //       name: __('Issue first mentioned in a commit'),
-      //       identifier: 'code_stage_start',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['merge_request_created'],
-      //     },
-      //     {
-      //       name: __('Issue first associated with a milestone or issue first added to a board'),
-      //       identifier: 'issue_stage_end',
-      //       type: 'simple',
-      //       can_be_start_event: false,
-      //       allowed_end_events: [],
-      //     },
-      //     {
-      //       name: __('Issue first associated with a milestone or issue first added to a board'),
-      //       identifier: 'plan_stage_start',
-      //       type: 'simple',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['issue_first_mentioned_in_commit'],
-      //     },
-      //     {
-      //       identifier: 'issue_label_added',
-      //       name: __('Issue Label Added'),
-      //       type: 'label',
-      //       can_be_start_event: true,
-      //       allowed_end_events: ['issue_closed', 'issue_label_removed'],
-      //     },
-      //     {
-      //       identifier: 'issue_label_removed',
-      //       name: __('Issue Label Removed'),
-      //       type: 'label',
-      //       can_be_start_event: false,
-      //       allowed_end_events: [],
-      //     },
-      //   ].map(e => convertObjectPropsToCamelCase(e)),
+      required: true,      
     },
     labels: {
       type: Array,

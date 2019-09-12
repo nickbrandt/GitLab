@@ -2,10 +2,11 @@ const EVENT_TYPE_LABEL = 'label';
 
 export const isStartEvent = ev => Boolean(ev) && Boolean(ev.canBeStartEvent) && ev.canBeStartEvent;
 
-export const eventToOption = ({ name: text = '', identifier: value = null }) => ({
-  text,
-  value,
-});
+export const eventToOption = (obj = null) => {
+  if (!obj || (!obj.text && !obj.identifier)) return null;
+  const { name: text = '', identifier: value = null } = obj;
+  return { text, value };
+};
 
 export const getAllowedEndEvents = (events = [], targetIdentifier = null) => {
   if (!targetIdentifier || !events.length) return [];

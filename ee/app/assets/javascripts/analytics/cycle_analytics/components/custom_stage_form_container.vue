@@ -22,11 +22,14 @@ export default {
   },
   data() {
     return {
+      events: [],
       labels: [],
       isLoading: false,
     };
   },
   created() {
+    // NOTE: events will be part of the response from the new cycle analytics backend
+    // https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31535
     this.isLoading = true;
     Api.groupLabels(this.namespace)
       .then(labels => {
@@ -43,5 +46,5 @@ export default {
 </script>
 <template>
   <gl-loading-icon v-if="isLoading" size="md" class="my-3" />
-  <custom-stage-form v-else :labels="labels" />
+  <custom-stage-form v-else :labels="labels" :events="events" />
 </template>

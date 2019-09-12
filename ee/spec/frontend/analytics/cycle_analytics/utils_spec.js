@@ -39,8 +39,10 @@ describe('Cycle analytics utils', () => {
   });
 
   describe('eventToOption', () => {
-    it('will return an empty array if no events are passed in', () => {
-      expect([]).toEqual([]);
+    it('will return null if no valid object is passed in', () => {
+      [{}, [], null, undefined].forEach(i => {
+        expect(eventToOption(i)).toEqual(null);
+      });
     });
 
     it('will set the "value" property to the events identifier', () => {
