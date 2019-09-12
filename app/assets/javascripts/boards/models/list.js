@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow, no-param-reassign */
+/* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow */
 
 import { __ } from '~/locale';
 import ListLabel from './label';
@@ -259,12 +259,7 @@ class List {
   }
 
   onNewIssueResponse(issue, data) {
-    issue.id = data.id;
-    issue.iid = data.iid;
-    issue.project = data.project;
-    issue.path = data.real_path;
-    issue.referencePath = data.reference_path;
-    issue.assignableLabelsEndpoint = data.assignable_labels_endpoint;
+    issue.refreshData(data);
 
     if (this.issuesSize > 1) {
       const moveBeforeId = this.issues[1].id;
