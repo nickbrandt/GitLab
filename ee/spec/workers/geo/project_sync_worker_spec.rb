@@ -21,15 +21,6 @@ RSpec.describe Geo::ProjectSyncWorker do
         .with(instance_of(Project)).once.and_return(wiki_sync_service)
     end
 
-    context 'backward compatibility' do
-      it 'performs sync for the given project when time is passed' do
-        subject.perform(project.id, Time.now)
-
-        expect(repository_sync_service).to have_received(:execute)
-        expect(wiki_sync_service).to have_received(:execute)
-      end
-    end
-
     context 'when project could not be found' do
       it 'logs an error and returns' do
         expect(subject).to receive(:log_error).with("Couldn't find project, skipping syncing", project_id: 999)
