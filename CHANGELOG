@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.11.0
+
+- Accelerate GraphQL uploads !403
+- Add route for handling Conan package uploads !412
+- Accelerate wiki attachments !422
+
 v8.10.0
 
 - Use accelerated uploads for users/personal snippets
