@@ -9,6 +9,16 @@ describe Analytics::CycleAnalyticsController do
     sign_in(user)
   end
 
+  describe 'usage counter' do
+    it 'increments usage counter' do
+      expect(Gitlab::UsageDataCounters::CycleAnalyticsCounter).to receive(:count).with(:views)
+
+      get(:show)
+
+      expect(response).to be_successful
+    end
+  end
+
   describe 'GET show' do
     it 'renders `show` template' do
       stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)

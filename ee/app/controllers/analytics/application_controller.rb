@@ -11,5 +11,9 @@ class Analytics::ApplicationController < ApplicationController
     before_action(*args) { render_404 unless Feature.enabled?(flag) }
   end
 
-  private_class_method :check_feature_flag
+  def self.increment_usage_counter(counter_klass, counter, *args)
+    before_action(*args) { counter_klass.count(counter) }
+  end
+
+  private_class_method :check_feature_flag, :increment_usage_counter
 end

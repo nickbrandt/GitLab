@@ -2,6 +2,8 @@
 
 class Analytics::ProductivityAnalyticsController < Analytics::ApplicationController
   check_feature_flag Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG
+  increment_usage_counter Gitlab::UsageDataCounters::ProductivityAnalyticsCounter,
+    :views, only: :show, if: -> { request.format.html? }
 
   before_action :load_group
   before_action :load_project
