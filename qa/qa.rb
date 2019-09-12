@@ -222,6 +222,7 @@ module QA
         autoload :MergeRequest, 'qa/page/project/settings/merge_request'
         autoload :Members, 'qa/page/project/settings/members'
         autoload :MirroringRepositories, 'qa/page/project/settings/mirroring_repositories'
+        autoload :VisibilityFeaturesPermissions, 'qa/page/project/settings/visibility_features_permissions'
       end
 
       module SubMenus

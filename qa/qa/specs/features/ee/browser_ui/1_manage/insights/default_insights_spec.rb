@@ -41,7 +41,7 @@ module QA
 
         project.visit!
 
-        EE::Page::Project::Menu.perform(&:click_project_insights_link)
+        Page::Project::Menu.perform(&:click_project_insights_link)
       end
 
       it_behaves_like 'default insights page'

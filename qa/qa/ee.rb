@@ -83,6 +83,8 @@ module QA
         module SubMenus
           autoload :SecurityCompliance, 'qa/ee/page/project/sub_menus/security_compliance'
           autoload :Repository, 'qa/ee/page/project/sub_menus/repository'
+          autoload :Settings, 'qa/ee/page/project/sub_menus/settings'
+          autoload :Project, 'qa/ee/page/project/sub_menus/project'
         end
 
         module Issue
