@@ -42,6 +42,26 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def welcome
+    return redirect_to new_user_registration_path unless current_user
+    return redirect_to stored_location_or_dashboard(current_user) if current_user.role.present?
+
+    flash[:notice] = nil
+    current_user.name = nil
+    render layout: 'devise_experimental_separate_sign_up_flow'
+  end
+
+  def update_role
+    user_params = params.require(:user).permit(:name, :role)
+    result = ::Users::UpdateService.new(current_user, user_params.merge(user: current_user)).execute
+
+    if result[:status] == :success
+      redirect_to stored_location_or_dashboard(current_user)
+    else
+      redirect_to users_sign_up_welcome_path, alert: result[:message]
+    end
+  end
+
   protected
 
   def persist_accepted_terms_if_required(new_user)
@@ -76,6 +96,9 @@ class RegistrationsController < Devise::RegistrationsController
 
   def after_sign_up_path_for(user)
     Gitlab::AppLogger.info(user_created_message(confirmed: user.confirmed?))
+
+    return users_sign_up_welcome_path if helpers.use_experimental_separate_sign_up_flow?
+
     confirmed_or_unconfirmed_access_allowed(user) ? stored_location_or_dashboard(user) : users_almost_there_path
   end
 
@@ -114,7 +137,13 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def sign_up_params
-    params.require(:user).permit(:username, :email, :email_confirmation, :name, :password)
+    clean_params = params.require(:user).permit(:username, :email, :email_confirmation, :name, :password)
+
+    if helpers.use_experimental_separate_sign_up_flow?
+      clean_params[:name] = clean_params[:username]
+    end
+
+    clean_params
   end
 
   def resource_name
