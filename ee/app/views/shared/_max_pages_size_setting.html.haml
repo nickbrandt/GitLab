@@ -1,0 +1,11 @@
+- return unless current_user.admin? && License.feature_available?(:max_pages_size)
+
+- form = local_assigns.fetch(:form)
+
+.row
+  .form-group.col-md-9
+    = form.label :max_pages_size, class: 'label-bold' do
+      Maximum size of pages (MB)
+    = form.number_field :max_pages_size, value: form.object.max_pages_size.try(:to_mb), class: 'form-control', min: 0
+    %span.form-text.text-muted#repository_size_limit_help_block
+      0 for unlimited
