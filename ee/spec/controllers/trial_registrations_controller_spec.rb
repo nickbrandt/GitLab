@@ -69,6 +69,14 @@ describe TrialRegistrationsController do
 
           post :create, params: { user: user_params }
         end
+
+        it 'does not trigger user_create event when data is invalid' do
+          user_params[:email] = ''
+
+          expect_any_instance_of(SystemHooksService).not_to receive(:execute_hooks_for).with(an_instance_of(User), :create)
+
+          post :create, params: { user: user_params }
+        end
       end
     end
   end

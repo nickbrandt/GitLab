@@ -4,6 +4,7 @@ class TrialsController < ApplicationController
   before_action :check_if_gl_com
   before_action :check_if_improved_trials_enabled
   before_action :authenticate_user!
+  before_action :fetch_namespace, only: :apply
 
   def new
   end
@@ -15,9 +16,19 @@ class TrialsController < ApplicationController
     result = GitlabSubscriptions::CreateLeadService.new.execute({ trial_user: company_params })
 
     if result[:success]
-      redirect_to select_namespace_trials_url
+      redirect_to select_trials_url
     else
       render :new
+    end
+  end
+
+  def apply
+    result = GitlabSubscriptions::ApplyTrialService.new.execute(apply_trial_params)
+
+    if result[:success]
+      redirect_to group_url(@namespace, { trial: true })
+    else
+      redirect_to select_trials_url
     end
   end
 
@@ -47,5 +58,20 @@ class TrialsController < ApplicationController
 
   def check_if_improved_trials_enabled
     render_404 unless Feature.enabled?(:improved_trial_signup)
+  end
+
+  def apply_trial_params
+    gl_com_params = { gitlab_com_trial: true, sync_to_gl: true }
+
+    {
+      trial_user: params.permit(:namespace_id).merge(gl_com_params),
+      uid: current_user.id
+    }
+  end
+
+  def fetch_namespace
+    @namespace = current_user.namespaces.find(params[:namespace_id])
+
+    render_404 unless @namespace
   end
 end
