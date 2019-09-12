@@ -3722,6 +3722,7 @@ ActiveRecord::Schema.define(version: 2019_10_16_072826) do
     t.string "first_name", limit: 255
     t.string "last_name", limit: 255
     t.string "static_object_token", limit: 255
+    t.integer "role"
     t.index "lower((name)::text)", name: "index_on_users_name_lower"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id"
     t.index ["admin"], name: "index_users_on_admin"
