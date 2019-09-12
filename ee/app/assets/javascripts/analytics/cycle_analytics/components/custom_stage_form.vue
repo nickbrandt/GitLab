@@ -34,96 +34,96 @@ export default {
   props: {
     events: {
       type: Array,
-      // required: true,
-      required: false,
-      default: () =>
-        [
-          {
-            name: __('Issue created'),
-            identifier: 'issue_created',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['issue_stage_end'],
-          },
-          {
-            name: __('Issue first mentioned in a commit'),
-            identifier: 'issue_first_mentioned_in_commit',
-            type: 'simple',
-            can_be_start_event: false,
-            allowed_end_events: [],
-          },
-          {
-            name: __('Merge request created'),
-            identifier: 'merge_request_created',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['merge_request_merged'],
-          },
+      required: true,
+      // required: false,
+      // default: () =>
+      //   [
+      //     {
+      //       name: __('Issue created'),
+      //       identifier: 'issue_created',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['issue_stage_end'],
+      //     },
+      //     {
+      //       name: __('Issue first mentioned in a commit'),
+      //       identifier: 'issue_first_mentioned_in_commit',
+      //       type: 'simple',
+      //       can_be_start_event: false,
+      //       allowed_end_events: [],
+      //     },
+      //     {
+      //       name: __('Merge request created'),
+      //       identifier: 'merge_request_created',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['merge_request_merged'],
+      //     },
 
-          {
-            name: __('Merge request first deployed to production'),
-            identifier: 'merge_request_first_deployed_to_production',
-            type: 'simple',
-            can_be_start_event: false,
-            allowed_end_events: [],
-          },
-          {
-            name: __('Merge request last build finish time'),
-            identifier: 'merge_request_last_build_finished',
-            type: 'simple',
-            can_be_start_event: false,
-            allowed_end_events: [],
-          },
-          {
-            name: __('Merge request last build start time'),
-            identifier: 'merge_request_last_build_started',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['merge_request_last_build_finished'],
-          },
-          {
-            name: __('Merge request merged'),
-            identifier: 'merge_request_merged',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['merge_request_first_deployed_to_production'],
-          },
-          {
-            name: __('Issue first mentioned in a commit'),
-            identifier: 'code_stage_start',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['merge_request_created'],
-          },
-          {
-            name: __('Issue first associated with a milestone or issue first added to a board'),
-            identifier: 'issue_stage_end',
-            type: 'simple',
-            can_be_start_event: false,
-            allowed_end_events: [],
-          },
-          {
-            name: __('Issue first associated with a milestone or issue first added to a board'),
-            identifier: 'plan_stage_start',
-            type: 'simple',
-            can_be_start_event: true,
-            allowed_end_events: ['issue_first_mentioned_in_commit'],
-          },
-          {
-            identifier: 'issue_label_added',
-            name: __('Issue Label Added'),
-            type: 'label',
-            can_be_start_event: true,
-            allowed_end_events: ['issue_closed', 'issue_label_removed'],
-          },
-          {
-            identifier: 'issue_label_removed',
-            name: __('Issue Label Removed'),
-            type: 'label',
-            can_be_start_event: false,
-            allowed_end_events: [],
-          },
-        ].map(e => convertObjectPropsToCamelCase(e)),
+      //     {
+      //       name: __('Merge request first deployed to production'),
+      //       identifier: 'merge_request_first_deployed_to_production',
+      //       type: 'simple',
+      //       can_be_start_event: false,
+      //       allowed_end_events: [],
+      //     },
+      //     {
+      //       name: __('Merge request last build finish time'),
+      //       identifier: 'merge_request_last_build_finished',
+      //       type: 'simple',
+      //       can_be_start_event: false,
+      //       allowed_end_events: [],
+      //     },
+      //     {
+      //       name: __('Merge request last build start time'),
+      //       identifier: 'merge_request_last_build_started',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['merge_request_last_build_finished'],
+      //     },
+      //     {
+      //       name: __('Merge request merged'),
+      //       identifier: 'merge_request_merged',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['merge_request_first_deployed_to_production'],
+      //     },
+      //     {
+      //       name: __('Issue first mentioned in a commit'),
+      //       identifier: 'code_stage_start',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['merge_request_created'],
+      //     },
+      //     {
+      //       name: __('Issue first associated with a milestone or issue first added to a board'),
+      //       identifier: 'issue_stage_end',
+      //       type: 'simple',
+      //       can_be_start_event: false,
+      //       allowed_end_events: [],
+      //     },
+      //     {
+      //       name: __('Issue first associated with a milestone or issue first added to a board'),
+      //       identifier: 'plan_stage_start',
+      //       type: 'simple',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['issue_first_mentioned_in_commit'],
+      //     },
+      //     {
+      //       identifier: 'issue_label_added',
+      //       name: __('Issue Label Added'),
+      //       type: 'label',
+      //       can_be_start_event: true,
+      //       allowed_end_events: ['issue_closed', 'issue_label_removed'],
+      //     },
+      //     {
+      //       identifier: 'issue_label_removed',
+      //       name: __('Issue Label Removed'),
+      //       type: 'label',
+      //       can_be_start_event: false,
+      //       allowed_end_events: [],
+      //     },
+      //   ].map(e => convertObjectPropsToCamelCase(e)),
     },
     labels: {
       type: Array,
@@ -170,7 +170,15 @@ export default {
     isComplete() {
       if (!this.hasValidStartAndStopEventPair) return false;
       const requiredFields = [this.fields.startEvent, this.fields.stopEvent, this.fields.name];
-      return requiredFields.every(fieldValue => fieldValue && fieldValue.length > 0);
+      if (this.startEventRequiresLabel) {
+        requiredFields.push(this.fields.startEventLabel);
+      }
+      if (this.stopEventRequiresLabel) {
+        requiredFields.push(this.fields.stopEventLabel);
+      }
+      return requiredFields.every(
+        fieldValue => fieldValue && (fieldValue.length > 0 || fieldValue > 0),
+      );
     },
     isDirty() {
       return !isEqual(this.initialFields, this.fields);
@@ -244,7 +252,7 @@ export default {
             :selected-label-id="fields.startEventLabel"
             name="add-stage-start-event-label"
             @selectLabel="labelId => handleSelectLabel('startEventLabel', labelId)"
-            @clearLabel="handleClearLabel"
+            @clearLabel="handleClearLabel('startEventLabel')"
           />
         </gl-form-group>
       </div>
@@ -275,7 +283,7 @@ export default {
             :selected-label-id="fields.stopEventLabel"
             name="add-stage-stop-event-label"
             @selectLabel="labelId => handleSelectLabel('stopEventLabel', labelId)"
-            @clearLabel="handleClearLabel"
+            @clearLabel="handleClearLabel('stopEventLabel')"
           />
         </gl-form-group>
       </div>

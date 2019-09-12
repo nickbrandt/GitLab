@@ -2,44 +2,46 @@
 // NOTE: this is a temporary component while cycle-analytics is being refactored
 //        post refactor we will have a vuex store and functionality to fetch data
 // https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15039
-import createFlash from '~/flash';
-import axios from '~/lib/utils/axios_utils';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
+import createFlash from '~/flash';
+import Api from '~/api';
 import CustomStageForm from './custom_stage_form.vue';
-
-function fetchGroupLabels(groupId, query = {}) {
-  const { api_version: apiVersion } = window.gon;
-  const url = `/api/${apiVersion}/groups/${groupId}/labels`;
-  return axios.get(url, { ...query }).then(response => response.data);
-}
 
 export default {
   name: 'CustomStageFormContainer',
   components: {
     CustomStageForm,
+    GlLoadingIcon,
   },
   props: {
-    groupId: {
-      type: Number,
+    namespace: {
+      type: String,
       required: true,
     },
   },
   data() {
     return {
       labels: [],
+      isLoading: false,
     };
   },
   created() {
-    fetchGroupLabels(this.groupId)
+    this.isLoading = true;
+    Api.groupLabels(this.namespace)
       .then(labels => {
-        this.labels = labels;
+        this.labels = labels.map(({ title, ...rest }) => ({ ...rest, name: title }));
       })
       .catch(() => {
         createFlash(__('There was an error fetching the form data'));
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
   },
 };
 </script>
 <template>
-  <custom-stage-form :labels="labels" />
+  <gl-loading-icon v-if="isLoading" size="md" class="my-3" />
+  <custom-stage-form v-else :labels="labels" />
 </template>
