@@ -155,7 +155,13 @@ module EE
       end
 
       def primary_full_url
-        ::Gitlab::Utils.append_path(::Gitlab::Geo.primary_node.internal_url, request_fullpath_for_primary)
+        path = File.join(secondary_referrer_path_prefix, request_fullpath_for_primary)
+
+        ::Gitlab::Utils.append_path(::Gitlab::Geo.primary_node.internal_url, path)
+      end
+
+      def secondary_referrer_path_prefix
+        File.join(::Gitlab::Geo::GitPushHttp::PATH_PREFIX, ::Gitlab::Geo.current_node.id.to_s)
       end
 
       def redirect?
