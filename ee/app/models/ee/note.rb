@@ -52,7 +52,7 @@ module EE
     end
 
     def for_design?
-      noteable.is_a?(DesignManagement::Design)
+      noteable_type == DesignManagement::Design.name
     end
 
     override :parent

@@ -34,8 +34,8 @@ describe 'Dashboard todos' do
       expect(page).to have_selector('.todos-list .todo', count: 1)
     end
 
-    it 'has a link that will take me to the design page', :js do
-      click_link "design #{target.filename}"
+    it 'has a link that will take me to the design page' do
+      click_link "design #{target.to_reference}"
 
       expectation = Gitlab::Routing.url_helpers.designs_project_issue_path(
         target.project, target.issue, target.filename

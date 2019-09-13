@@ -5,6 +5,7 @@ module DesignManagement
     include Noteable
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
+    include Referable
 
     belongs_to :project, inverse_of: :designs
     belongs_to :issue
@@ -67,8 +68,17 @@ module DesignManagement
       strong_memoize(:most_recent_design_version) { design_versions.ordered.last }
     end
 
+    # A reference for a design is the issue reference, indexed by the filename
+    # with an optional infix when full.
+    #
+    # e.g.
+    #   #123[homescreen.png]
+    #   other-project#72[sidebar.jpg]
+    #   #38/designs[transition.gif]
     def to_reference(from = nil, full: false)
-      filename
+      infix = full ? '/designs' : ''
+
+      "%s%s[%s]" % [issue.to_reference(from, full: full), infix, filename]
     end
 
     def to_ability_name
