@@ -237,6 +237,10 @@
 }
 
 .project-repo-buttons {
+  .notifications-btn {
+    @include btn-xs;
+  }
+
   .btn {
     &:last-child {
       margin-left: 0;
@@ -252,6 +256,7 @@
 
     .fa-caret-down {
       margin-left: 3px;
+      line-height: 0;
 
       &.dropdown-btn-icon {
         margin-left: 0;
@@ -269,7 +274,7 @@
   }
 
   .count-badge,
-  .btn-xs {
+  .btn {
     height: 24px;
   }
 
