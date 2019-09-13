@@ -127,6 +127,17 @@ through Slack). If you can't assign a merge request, `@` mentioning a maintainer
 This
 [saves reviewers time and helps authors catch mistakes earlier](https://www.ibm.com/developerworks/rational/library/11-proven-practices-for-peer-review/index.html#__RefHeading__97_174136755).
 
+### The responsibility of the reviewer
+
+[Review the merge request](#reviewing-code) thoroughly. When you are confident
+that it meets all requirements, you should:
+
+- Click the Approve button.
+- Advise the author their merge request has been reviewed and approved.
+- Assign the merge request to a maintainer. [Reviewer roulette](#reviewer-roulette)
+should have made a suggestion, but feel free to override if someone else is a
+better choice.
+
 ### The responsibility of the maintainer
 
 Maintainers are responsible for the overall health, quality, and consistency of
