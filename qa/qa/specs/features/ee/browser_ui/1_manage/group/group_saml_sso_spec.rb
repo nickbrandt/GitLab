@@ -60,11 +60,14 @@ module QA
         expect(page).to have_content("Test SAML SSO")
       end
 
-      # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/129
-      context 'Enforced SSO', :quarantine do
+      context 'Enforced SSO' do
         before do
-          Runtime::Feature.enable("enforced_sso")
-          Runtime::Feature.enable("enforced_sso_requires_session")
+          %w[enforced_sso enforced_sso_requires_session].each do |flag|
+            QA::Support::Retrier.retry_until(exit_on_failure: true) do
+              Runtime::Feature.enable(flag)
+              Runtime::Feature.enabled?(flag)
+            end
+          end
         end
 
         it 'user clones and pushes to project within a group using Git HTTP' do
