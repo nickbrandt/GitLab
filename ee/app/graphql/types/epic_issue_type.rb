@@ -8,9 +8,9 @@ module Types
 
     present_using EpicIssuePresenter
 
-    field :epic_issue_id, GraphQL::ID_TYPE, null: false
+    field :epic_issue_id, GraphQL::ID_TYPE, null: false # rubocop:disable Graphql/Descriptions
 
-    field :relation_path, GraphQL::STRING_TYPE, null: true, resolve: -> (issue, args, ctx) do
+    field :relation_path, GraphQL::STRING_TYPE, null: true, resolve: -> (issue, args, ctx) do # rubocop:disable Graphql/Descriptions
       issue.group_epic_issue_path(ctx[:current_user])
     end
     # rubocop: enable Graphql/AuthorizeTypes
