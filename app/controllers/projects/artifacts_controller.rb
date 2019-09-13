@@ -8,9 +8,30 @@ class Projects::ArtifactsController < Projects::ApplicationController
   layout 'project'
   before_action :authorize_read_build!
   before_action :authorize_update_build!, only: [:keep]
+  before_action :authorize_destroy_artifacts!, only: [:destroy]
   before_action :extract_ref_name_and_path
-  before_action :validate_artifacts!, except: [:download]
+  before_action :validate_artifacts!, except: [:index, :download, :destroy]
   before_action :entry, only: [:file]
+
+  MAX_PER_PAGE = 20
+
+  def index
+    finder = ArtifactsFinder.new(@project, artifacts_params)
+    all_artifacts = finder.execute
+
+    @artifacts = all_artifacts.page(params[:page]).per(MAX_PER_PAGE)
+    @total_size = all_artifacts.total_size
+  end
+
+  def destroy
+    notice = if artifact.destroy
+               _('Artifact was successfully deleted.')
+             else
+               _('Artifact could not be deleted.')
+             end
+
+    redirect_to project_artifacts_path(@project), status: :see_other, notice: notice
+  end
 
   def download
     return render_404 unless artifacts_file
@@ -74,6 +95,10 @@ class Projects::ArtifactsController < Projects::ApplicationController
     @ref_name, @path = extract_ref(params[:ref_name_and_path])
   end
 
+  def artifacts_params
+    params.permit(:sort, :search)
+  end
+
   def validate_artifacts!
     render_404 unless build&.artifacts?
   end
@@ -83,6 +108,11 @@ class Projects::ArtifactsController < Projects::ApplicationController
       build = build_from_id || build_from_ref
       build&.present(current_user: current_user)
     end
+  end
+
+  def artifact
+    @artifact ||=
+      project.job_artifacts.find(params[:id])
   end
 
   def build_from_id
