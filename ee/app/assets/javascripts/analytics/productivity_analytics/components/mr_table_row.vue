@@ -50,7 +50,7 @@ export default {
     <div
       class="table-section section-50 d-flex flex-row-reverse flex-md-row justify-content-between justify-content-md-start qa-mr-details"
     >
-      <div>
+      <div class="d-flex mr-md-2">
         <gl-avatar :src="mergeRequest.author_avatar_url" :size="16" />
       </div>
       <div class="mw-90p">
