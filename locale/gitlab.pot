@@ -3184,6 +3184,9 @@ msgstr ""
 msgid "Closes this %{quick_action_target}."
 msgstr ""
 
+msgid "Cluster %{cluster} was used."
+msgstr ""
+
 msgid "Cluster Health"
 msgstr ""
 
