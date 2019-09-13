@@ -202,14 +202,14 @@ export default {
       :items="filesTableRows"
       tbody-tr-class="js-file-row"
     >
-      <template slot="name" slot-scope="items">
+      <template v-slot:name="items">
         <icon name="doc-code" class="space-right" />
         <gl-link :href="items.item.downloadPath" class="js-file-download">{{
           items.item.name
         }}</gl-link>
       </template>
 
-      <template slot="created" slot-scope="items">
+      <template v-slot:created="items">
         <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
           timeFormated(items.item.created)
         }}</span>
