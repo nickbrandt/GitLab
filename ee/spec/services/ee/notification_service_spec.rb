@@ -3,13 +3,65 @@ require 'spec_helper'
 describe EE::NotificationService, :mailer do
   include EmailSpec::Matchers
   include NotificationHelpers
+  include DesignManagementTestHelpers
 
   let(:subject) { NotificationService.new }
+
+  let(:mailer) { double(deliver_later: true) }
+
+  context 'when notified of a new design diff note' do
+    set(:design) { create(:design, :with_file) }
+    set(:project) { design.project }
+    set(:dev) { create(:user) }
+    set(:stranger) { create(:user) }
+    set(:note) do
+      create(:diff_note_on_design,
+         noteable: design,
+         project: project,
+         note: "Hello #{dev.to_reference}, G'day #{stranger.to_reference}")
+    end
+
+    context 'design management is enabled' do
+      before do
+        enable_design_management
+        project.add_developer(dev)
+        allow(Notify).to receive(:note_design_email) { mailer }
+      end
+
+      it 'sends new note notifications' do
+        expect(subject).to receive(:send_new_note_notifications).with(note)
+
+        subject.new_note(note)
+      end
+
+      it 'sends a mail to the developer' do
+        expect(Notify)
+          .to receive(:note_design_email).with(dev.id, note.id, "mentioned")
+
+        subject.new_note(note)
+      end
+
+      it 'does not notify non-developers' do
+        expect(Notify)
+          .not_to receive(:note_design_email).with(stranger.id, note.id)
+
+        subject.new_note(note)
+      end
+    end
+
+    context 'design management is disabled' do
+      it 'does not notify the user' do
+        expect(Notify).not_to receive(:note_design_email)
+
+        subject.new_note(note)
+      end
+    end
+  end
 
   context 'service desk issues' do
     before do
       allow(Notify).to receive(:service_desk_new_note_email)
-                         .with(kind_of(Integer), kind_of(Integer)).and_return(double(deliver_later: true))
+                         .with(Integer, Integer).and_return(mailer)
 
       allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).and_return(true)
       allow(::Gitlab::IncomingEmail).to receive(:enabled?) { true }
@@ -17,7 +69,8 @@ describe EE::NotificationService, :mailer do
     end
 
     def should_email!
-      expect(Notify).to receive(:service_desk_new_note_email).with(issue.id, kind_of(Integer))
+      expect(Notify).to receive(:service_desk_new_note_email)
+        .with(issue.id, note.id)
     end
 
     def should_not_email!

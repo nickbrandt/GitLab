@@ -36,6 +36,30 @@ describe Notify do
                            description: 'Awesome description')
   end
 
+  describe '.note_design_email' do
+    set(:design) { create(:design, :with_file) }
+    set(:recipient) { create(:user) }
+    set(:note) do
+      create(:diff_note_on_design,
+         noteable: design,
+         project: design.project,
+         note: "Hello #{recipient.to_reference}")
+    end
+
+    let(:header_name) { 'X-Gitlab-DesignManagement-Design-ID' }
+    let(:refer_to_design) do
+      have_attributes(subject: a_string_including(design.filename))
+    end
+
+    subject { described_class.note_design_email(recipient.id, note.id) }
+
+    it { is_expected.to have_header(header_name, design.id.to_s) }
+
+    it { is_expected.to have_body_text(design.filename) }
+
+    it { is_expected.to refer_to_design }
+  end
+
   context 'for a project' do
     context 'for service desk issues' do
       before do
@@ -90,7 +114,7 @@ describe Notify do
         end
 
         it "contains the approvers list" do
-          is_expected.to have_body_text /#{merge_request.approvers.first.user.name}/
+          is_expected.to have_body_text %r[#{merge_request.approvers.first.user.name}]
         end
       end
 
@@ -117,26 +141,32 @@ describe Notify do
         end
 
         it 'has the correct subject' do
-          is_expected.to have_subject /#{merge_request.title} \(#{merge_request.to_reference}\)/
+          is_expected.to have_attributes(
+            subject: a_string_including("#{merge_request.title} (#{merge_request.to_reference})")
+          )
         end
 
         it 'contains the new status' do
-          is_expected.to have_body_text /approved/i
+          is_expected.to have_body_text('approved')
         end
 
         it 'contains a link to the merge request' do
-          is_expected.to have_body_text /#{project_merge_request_path project, merge_request}/
+          is_expected.to have_body_text("#{project_merge_request_path project, merge_request}")
         end
 
         it 'contains the names of all of the approvers' do
-          merge_request.approvals.each do |approval|
-            is_expected.to have_body_text /#{approval.user.name}/
+          names = merge_request.approvals.map { |a| a.user.name }
+
+          aggregate_failures do
+            names.each { |name| is_expected.to have_body_text(name) }
           end
         end
 
         it 'contains the names of all assignees' do
-          merge_request.assignees.each do |assignee|
-            is_expected.to have_body_text /#{assignee.name}/
+          names = merge_request.assignees.map(&:name)
+
+          aggregate_failures do
+            names.each { |name| is_expected.to have_body_text(name) }
           end
         end
 
@@ -173,26 +203,32 @@ describe Notify do
         end
 
         it 'has the correct subject' do
-          is_expected.to have_subject /#{merge_request.title} \(#{merge_request.to_reference}\)/
+          is_expected.to have_attributes(
+            subject: a_string_including("#{merge_request.title} (#{merge_request.to_reference})")
+          )
         end
 
         it 'contains the new status' do
-          is_expected.to have_body_text /unapproved/i
+          is_expected.to have_body_text('unapproved')
         end
 
         it 'contains a link to the merge request' do
-          is_expected.to have_body_text /#{project_merge_request_path project, merge_request}/
+          is_expected.to have_body_text("#{project_merge_request_path project, merge_request}")
         end
 
         it 'contains the names of all of the approvers' do
-          merge_request.approvals.each do |approval|
-            is_expected.to have_body_text /#{approval.user.name}/
+          names = merge_request.approvals.map { |a| a.user.name }
+
+          aggregate_failures do
+            names.each { |name| is_expected.to have_body_text(name) }
           end
         end
 
         it 'contains the names of all assignees' do
-          merge_request.assignees.each do |assignee|
-            is_expected.to have_body_text /#{assignee.name}/
+          names = merge_request.assignees.map(&:name)
+
+          aggregate_failures do
+            names.each { |name| is_expected.to have_body_text(name) }
           end
         end
       end
@@ -208,7 +244,7 @@ describe Notify do
         end
 
         it 'contains the new status' do
-          is_expected.to have_body_text /unapproved/i
+          is_expected.to have_body_text('unapproved')
         end
       end
     end

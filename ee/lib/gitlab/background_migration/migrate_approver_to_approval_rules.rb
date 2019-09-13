@@ -87,12 +87,16 @@ module Gitlab
           approvals_before_merge || target_project.approvals_before_merge
         end
 
+        def distinct(column)
+          Arel.sql("distinct #{column}")
+        end
+
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).joins(:user).pluck('distinct user_id')
+          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).joins(:user).pluck(distinct(:user_id))
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).joins(:group).pluck('distinct group_id')
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).joins(:group).pluck(distinct(:group_id))
         end
 
         def sync_code_owners_with_approvers
