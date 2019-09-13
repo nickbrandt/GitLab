@@ -68,7 +68,7 @@ module QA
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page|
+          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.set_sync_method('LDAP Group cn')
             page.set_group_cn('Engineering')
             page.click_add_sync_button
@@ -118,7 +118,7 @@ module QA
 
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-          EE::Page::Group::Settings::LDAPSync.perform do |page|
+          EE::Page::Group::Settings::LDAPSync.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.set_user_filter('(&(objectClass=person)(cn=HR*))')
             page.click_add_sync_button
           end
@@ -171,7 +171,7 @@ module QA
       end
 
       def verify_users_synced(expected_users)
-        EE::Page::Group::Members.perform do |page|
+        EE::Page::Group::Members.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.click_sync_now
           users_synchronised = page.retry_until(reload: true) do
             expected_users.map { |user| page.has_content?(user) }.all?

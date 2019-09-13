@@ -29,7 +29,7 @@ module QA
 
           QA::Page::Group::Menu.perform(&:click_group_epics_link)
 
-          QA::EE::Page::Group::Epic::Index.perform do |page|
+          QA::EE::Page::Group::Epic::Index.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.click_new_epic
             page.set_title(@title)
             page.create_new_epic

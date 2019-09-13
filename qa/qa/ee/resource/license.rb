@@ -9,7 +9,7 @@ module QA
           QA::Page::Main::Menu.perform(&:click_admin_area)
           QA::Page::Admin::Menu.perform(&:click_license_menu_link)
 
-          EE::Page::Admin::License.perform do |page|
+          EE::Page::Admin::License.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.add_new_license(license) unless page.license?
           end
 

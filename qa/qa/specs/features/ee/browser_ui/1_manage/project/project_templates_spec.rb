@@ -56,7 +56,7 @@ module QA
 
           @group.visit!
           Page::Group::Show.perform(&:go_to_new_project)
-          Page::Project::New.perform do |page|
+          Page::Project::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.click_create_from_template_tab
 
             expect(page).to have_text(built_in)
@@ -86,13 +86,13 @@ module QA
           Page::Main::Menu.perform(&:click_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          Page::Admin::Settings::Templates.perform do |page|
+          Page::Admin::Settings::Templates.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.choose_custom_project_template("#{@template_container_group_name}")
           end
 
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          Page::Admin::Settings::Templates.perform do |page|
+          Page::Admin::Settings::Templates.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             expect(page.current_custom_project_template).to include @template_container_group_name
           end
 
@@ -105,7 +105,7 @@ module QA
         end
 
         it 'successfully imports the project using template' do
-          Page::Project::New.perform do |page|
+          Page::Project::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             expect(page.instance_template_tab_badge_text).to eq "1"
             expect(page).to have_text(@template_project.name)
           end
@@ -133,7 +133,7 @@ module QA
           Page::Main::Login.perform(&:sign_in_using_credentials)
 
           Page::Main::Menu.perform(&:go_to_groups)
-          Page::Dashboard::Groups.perform { |page| page.click_group(Runtime::Namespace.sandbox_name) }
+          Page::Dashboard::Groups.perform { |page| page.click_group(Runtime::Namespace.sandbox_name) } # rubocop:disable QA/AmbiguousPageObjectName
           Page::Project::Menu.perform(&:click_settings)
 
           Page::Group::Settings::General.perform do |settings|
@@ -155,7 +155,7 @@ module QA
         end
 
         it 'successfully imports the project using template' do
-          Page::Project::New.perform do |page|
+          Page::Project::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             expect(page.group_template_tab_badge_text).to eq "1"
             expect(page).to have_text(@template_container_group_name)
             expect(page).to have_text(@template_project.name)
@@ -173,7 +173,7 @@ module QA
       end
 
       def create_project_using_template(project_name:, namespace:, template_name:)
-        Page::Project::New.perform do |page|
+        Page::Project::New.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.use_template_for_project(template_name)
           page.choose_namespace(namespace)
           page.choose_name("#{project_name} #{SecureRandom.hex(8)}")
