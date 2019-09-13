@@ -1,5 +1,5 @@
 <script>
-import { GlTable, GlLink, GlEmptyState } from '@gitlab/ui';
+import { GlTable, GlLink, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -11,9 +11,14 @@ export default {
     GlLink,
     Icon,
     TimeAgo,
+    GlLoadingIcon,
     deploymentInstance: () => import('ee_component/vue_shared/components/deployment_instance.vue'),
   },
   props: {
+    isFetching: {
+      type: Boolean,
+      required: true,
+    },
     environments: {
       type: Array,
       required: true,
@@ -33,7 +38,7 @@ export default {
   },
   computed: {
     isEmpty() {
-      return this.environments.length === 0;
+      return !this.isFetching && this.environments.length === 0;
     },
     tableEmptyStateText() {
       const text = __(
@@ -57,7 +62,9 @@ export default {
       let podsInUse = 0;
 
       this.environments.forEach(environment => {
-        podsInUse += environment.rolloutStatus.instances.length;
+        if (this.hasInstances(environment.rolloutStatus)) {
+          podsInUse += environment.rolloutStatus.instances.length;
+        }
       });
 
       return podsInUse;
@@ -76,6 +83,9 @@ export default {
       },
     ];
   },
+  methods: {
+    hasInstances: rolloutStatus => rolloutStatus.instances && rolloutStatus.instances.length,
+  },
 };
 </script>
 
@@ -90,7 +100,12 @@ export default {
       <div slot="description" v-html="tableEmptyStateText"></div>
     </gl-empty-state>
 
-    <gl-table v-else :fields="$options.fields" :items="environments" head-variant="white">
+    <gl-table
+      v-if="!isFetching && !isEmpty"
+      :fields="$options.fields"
+      :items="environments"
+      head-variant="white"
+    >
       <!-- column: Project -->
       <template slot="project" slot-scope="data">
         <a :href="`/${data.value.path_with_namespace}`">{{ data.value.name }}</a>
@@ -112,7 +127,7 @@ export default {
       </template>
 
       <template slot="rolloutStatus" slot-scope="row">
-        <div v-if="row.item.rolloutStatus.instances.length" class="d-flex flex-wrap flex-row">
+        <div v-if="hasInstances(row.item.rolloutStatus)" class="d-flex flex-wrap flex-row">
           <template v-for="(instance, i) in row.item.rolloutStatus.instances">
             <deployment-instance
               :key="i"
@@ -141,5 +156,7 @@ export default {
         <time-ago :time="data.value" />
       </template>
     </gl-table>
+
+    <gl-loading-icon v-if="isFetching" :size="2" class="mt-3" />
   </div>
 </template>

@@ -17,6 +17,7 @@ describe('Environments', () => {
       environmentsHelpPath: 'path/to/environments',
       clustersHelpPath: 'path/to/clusters',
       deployBoardsHelpPath: 'path/to/clusters',
+      isFetching: false,
     };
 
     wrapper = mount(Component, {

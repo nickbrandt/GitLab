@@ -19,8 +19,12 @@
       ]
     },
     "rollout_status": {
-      "$ref": "../rollout_status.json"
-    }
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "../rollout_status.json" }
+      ]
+    },
+    "updated_at": { "type": "date" }
   },
   "additionalProperties": false
 }

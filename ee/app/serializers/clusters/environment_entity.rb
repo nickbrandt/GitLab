@@ -14,6 +14,8 @@ module Clusters
 
     expose :rollout_status, if: -> (*) { can_read_cluster_deployments? }, using: ::RolloutStatusEntity
 
+    expose :updated_at
+
     private
 
     alias_method :environment, :object
