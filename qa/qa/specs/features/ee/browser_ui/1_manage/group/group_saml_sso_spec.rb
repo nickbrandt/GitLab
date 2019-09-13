@@ -23,7 +23,7 @@ module QA
       it 'User logs in to group with SAML SSO' do
         Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
-        EE::Page::Group::Settings::SamlSSO.perform do |page|
+        EE::Page::Group::Settings::SamlSSO.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
           page.set_cert_fingerprint(QA::EE::Runtime::Saml.idp_certificate_fingerprint)
           page.click_save_changes
@@ -47,7 +47,7 @@ module QA
       it 'Lets group admin test settings' do
         Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
-        EE::Page::Group::Settings::SamlSSO.perform do |page|
+        EE::Page::Group::Settings::SamlSSO.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
           page.set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
           page.set_cert_fingerprint(QA::EE::Runtime::Saml.idp_certificate_fingerprint)
           page.click_save_changes
@@ -86,7 +86,7 @@ module QA
 
           Page::Group::Menu.perform(&:go_to_saml_sso_group_settings)
 
-          EE::Page::Group::Settings::SamlSSO.perform do |page|
+          EE::Page::Group::Settings::SamlSSO.perform do |page| # rubocop:disable QA/AmbiguousPageObjectName
             page.enforce_sso
             page.set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
             page.set_cert_fingerprint(QA::EE::Runtime::Saml.idp_certificate_fingerprint)
