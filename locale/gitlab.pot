@@ -16623,9 +16623,6 @@ msgstr ""
 msgid "Timeago|right now"
 msgstr ""
 
-msgid "Timeframe"
-msgstr ""
-
 msgid "Timeout"
 msgstr ""
 

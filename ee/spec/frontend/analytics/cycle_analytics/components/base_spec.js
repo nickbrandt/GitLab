@@ -3,12 +3,11 @@ import Vuex from 'vuex';
 import Vue from 'vue';
 import store from 'ee/analytics/cycle_analytics/store';
 import Component from 'ee/analytics/cycle_analytics/components/base.vue';
-import { GlEmptyState } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker } from '@gitlab/ui';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import GroupsDropdownFilter from 'ee/analytics/shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
-import DateRangeDropdown from 'ee/analytics/shared/components/date_range_dropdown.vue';
 import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import 'bootstrap';
@@ -66,8 +65,8 @@ describe('Cycle Analytics component', () => {
     expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
   };
 
-  const displaysDateRangeDropdown = flag => {
-    expect(wrapper.find(DateRangeDropdown).exists()).toBe(flag);
+  const displaysDateRangePicker = flag => {
+    expect(wrapper.find(GlDaterangePicker).exists()).toBe(flag);
   };
 
   const displaysSummaryTable = flag => {
@@ -86,6 +85,27 @@ describe('Cycle Analytics component', () => {
   afterEach(() => {
     wrapper.destroy();
     mock.restore();
+  });
+
+  describe('mounted', () => {
+    const actionSpies = {
+      setDateRange: jest.fn(),
+    };
+
+    beforeEach(() => {
+      jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(mockData.endDate));
+      wrapper = createComponent({ opts: { methods: actionSpies } });
+    });
+
+    describe('initDateRange', () => {
+      it('dispatches setDateRange with skipFetch=true', () => {
+        expect(actionSpies.setDateRange).toHaveBeenCalledWith({
+          skipFetch: true,
+          startDate: mockData.startDate,
+          endDate: mockData.endDate,
+        });
+      });
+    });
   });
 
   describe('displays the components as required', () => {
@@ -108,8 +128,8 @@ describe('Cycle Analytics component', () => {
         displaysProjectsDropdownFilter(false);
       });
 
-      it('does not display the date range dropdown', () => {
-        displaysDateRangeDropdown(false);
+      it('does not display the date range picker', () => {
+        displaysDateRangePicker(false);
       });
 
       it('does not display the summary table', () => {
@@ -143,8 +163,8 @@ describe('Cycle Analytics component', () => {
           );
         });
 
-        it('displays the date range dropdown', () => {
-          displaysDateRangeDropdown(true);
+        it('displays the date range picker', () => {
+          displaysDateRangePicker(true);
         });
 
         it('displays the summary table', () => {
@@ -224,8 +244,8 @@ describe('Cycle Analytics component', () => {
           displaysProjectsDropdownFilter(false);
         });
 
-        it('does not display the date range dropdown', () => {
-          displaysDateRangeDropdown(false);
+        it('does not display the date range picker', () => {
+          displaysDateRangePicker(false);
         });
 
         it('does not display the summary table', () => {

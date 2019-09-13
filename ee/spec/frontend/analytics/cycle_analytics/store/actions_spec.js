@@ -4,7 +4,14 @@ import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'helpers/test_constants';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { group, cycleAnalyticsData, allowedStages as stages, groupLabels } from '../mock_data';
+import {
+  group,
+  cycleAnalyticsData,
+  allowedStages as stages,
+  groupLabels,
+  startDate,
+  endDate,
+} from '../mock_data';
 
 const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
@@ -41,7 +48,6 @@ describe('Cycle analytics actions', () => {
     ${'setSelectedGroup'}              | ${'SET_SELECTED_GROUP'}                | ${'selectedGroup'}                | ${'someNewGroup'}
     ${'setSelectedProjects'}           | ${'SET_SELECTED_PROJECTS'}             | ${'selectedProjectIds'}           | ${[10, 20, 30, 40]}
     ${'setSelectedStageName'}          | ${'SET_SELECTED_STAGE_NAME'}           | ${'selectedStageName'}            | ${'someNewGroup'}
-    ${'setSelectedTimeframe'}          | ${'SET_SELECTED_TIMEFRAME'}            | ${'dataTimeframe'}                | ${20}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     testAction(
       actions[action],
@@ -55,6 +61,21 @@ describe('Cycle analytics actions', () => {
       ],
       [],
     );
+  });
+
+  describe('setDateRange', () => {
+    it('sets the dates as expected and dispatches fetchCycleAnalyticsData', done => {
+      const dispatch = expect.any(Function);
+
+      testAction(
+        actions.setDateRange,
+        { startDate, endDate },
+        state,
+        [{ type: types.SET_DATE_RANGE, payload: { startDate, endDate } }],
+        [{ type: 'fetchCycleAnalyticsData', payload: { dispatch, state } }],
+        done,
+      );
+    });
   });
 
   describe('fetchStageData', () => {

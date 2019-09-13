@@ -17,11 +17,12 @@ export default {
   [types.SET_SELECTED_PROJECTS](state, projectIds) {
     state.selectedProjectIds = projectIds;
   },
-  [types.SET_SELECTED_TIMEFRAME](state, timeframe) {
-    state.dataTimeframe = timeframe;
-  },
   [types.SET_SELECTED_STAGE_NAME](state, stageName) {
     state.selectedStageName = stageName;
+  },
+  [types.SET_DATE_RANGE](state, { startDate, endDate }) {
+    state.startDate = startDate;
+    state.endDate = endDate;
   },
   [types.REQUEST_CYCLE_ANALYTICS_DATA](state) {
     state.isLoading = true;

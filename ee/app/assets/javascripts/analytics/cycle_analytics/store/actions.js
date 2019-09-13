@@ -1,9 +1,11 @@
+import dateFormat from 'dateformat';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
 import Api from '~/api';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
+import { dateFormats } from '../../shared/constants';
 
 export const setCycleAnalyticsDataEndpoint = ({ commit }, groupPath) =>
   commit(types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT, groupPath);
@@ -13,10 +15,19 @@ export const setStageDataEndpoint = ({ commit }, stageSlug) =>
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
 export const setSelectedProjects = ({ commit }, projectIds) =>
   commit(types.SET_SELECTED_PROJECTS, projectIds);
-export const setSelectedTimeframe = ({ commit }, timeframe) =>
-  commit(types.SET_SELECTED_TIMEFRAME, timeframe);
 export const setSelectedStageName = ({ commit }, stageName) =>
   commit(types.SET_SELECTED_STAGE_NAME, stageName);
+
+export const setDateRange = (
+  { commit, dispatch, state },
+  { skipFetch = false, startDate, endDate },
+) => {
+  commit(types.SET_DATE_RANGE, { startDate, endDate });
+
+  if (skipFetch) return false;
+
+  return dispatch('fetchCycleAnalyticsData', { state, dispatch });
+};
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
 export const receiveStageDataSuccess = ({ commit }, data) =>
@@ -33,7 +44,8 @@ export const fetchStageData = ({ state, dispatch }) => {
   axios
     .get(state.endpoints.stageData, {
       params: {
-        'cycle_analytics[start_date]': state.dataTimeframe,
+        'cycle_analytics[created_after]': dateFormat(state.startDate, dateFormats.isoDate),
+        'cycle_analytics[created_before]': dateFormat(state.endDate, dateFormats.isoDate),
         'cycle_analytics[project_ids]': state.selectedProjectIds,
       },
     })
@@ -68,7 +80,8 @@ export const fetchCycleAnalyticsData = ({ state, dispatch }) => {
   axios
     .get(state.endpoints.cycleAnalyticsData, {
       params: {
-        'cycle_analytics[start_date]': state.dataTimeframe,
+        'cycle_analytics[created_after]': dateFormat(state.startDate, dateFormats.isoDate),
+        'cycle_analytics[created_before]': dateFormat(state.endDate, dateFormats.isoDate),
         'cycle_analytics[project_ids]': state.selectedProjectIds,
       },
     })
