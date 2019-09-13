@@ -52,8 +52,8 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
   end
 
   def check_feature_availability!
-    return render_404 unless ::License.feature_available?(:productivity_analytics)
-    return render_404 if @group && !@group.root_ancestor.feature_available?(:productivity_analytics)
+    return render_403 unless ::License.feature_available?(:productivity_analytics)
+    return render_403 if @group && !@group.root_ancestor.feature_available?(:productivity_analytics)
   end
 
   def load_group
