@@ -17,6 +17,7 @@ export default {
 
       return { ...filter, selection };
     });
+    state.hide_dismissed = payload.scope !== 'all';
   },
   [types.SET_FILTER](state, payload) {
     const { filterId, optionId } = payload;

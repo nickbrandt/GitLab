@@ -73,32 +73,43 @@ describe('filters actions', () => {
   });
 
   describe('setHideDismissedToggleInitialState', () => {
-    it('should not do anything if hide_dismissed param is not present', done => {
-      spyOnDependency(module, 'getParameterValues').and.returnValue([]);
-      const state = createState();
-      testAction(actions.setHideDismissedToggleInitialState, {}, state, [], [], done);
-    });
-
-    it('should commit the SET_TOGGLE_VALUE mutation if hide_dismissed param is present', done => {
-      const state = createState();
-      spyOnDependency(module, 'getParameterValues').and.returnValue([false]);
-
-      testAction(
-        actions.setHideDismissedToggleInitialState,
-        {},
-        state,
-        [
-          {
-            type: types.SET_TOGGLE_VALUE,
-            payload: {
-              key: 'hide_dismissed',
-              value: false,
+    [
+      {
+        description: 'should set hide_dismissed to true if scope param is not present',
+        returnValue: [],
+        hideDismissedValue: true,
+      },
+      {
+        description: 'should set hide_dismissed to false if scope param is "all"',
+        returnValue: ['all'],
+        hideDismissedValue: false,
+      },
+      {
+        description: 'should set hide_dismissed to true if scope param is "dismissed"',
+        returnValue: ['dismissed'],
+        hideDismissedValue: true,
+      },
+    ].forEach(testCase => {
+      it(testCase.description, done => {
+        spyOnDependency(module, 'getParameterValues').and.returnValue(testCase.returnValue);
+        const state = createState();
+        testAction(
+          actions.setHideDismissedToggleInitialState,
+          {},
+          state,
+          [
+            {
+              type: types.SET_TOGGLE_VALUE,
+              payload: {
+                key: 'hide_dismissed',
+                value: testCase.hideDismissedValue,
+              },
             },
-          },
-        ],
-        [],
-        done,
-      );
+          ],
+          [],
+          done,
+        );
+      });
     });
   });
 
