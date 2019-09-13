@@ -38,7 +38,7 @@ describe Projects::Alerting::NotificationsController do
           expect(response).to have_gitlab_http_status(:ok)
         end
 
-        it 'does not pass forbidden parameters to the notify service' do
+        it 'does not pass excluded parameters to the notify service' do
           make_request(payload)
 
           expect(Projects::Alerting::NotifyService)

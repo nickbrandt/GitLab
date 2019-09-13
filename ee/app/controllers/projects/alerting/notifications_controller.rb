@@ -19,7 +19,7 @@ module Projects
 
       private
 
-      FORBIDDEN_PARAMS = %w(controller action namespace_id project_id).freeze
+      PARAMS_TO_EXCLUDE = %w(controller action namespace_id project_id).freeze
 
       def project_without_auth
         @project ||= Project
@@ -51,7 +51,7 @@ module Projects
       end
 
       def permitted_params
-        params.reject! { |param| param.in?(FORBIDDEN_PARAMS) }.permit!
+        params.except(*PARAMS_TO_EXCLUDE).permit! # rubocop:disable CodeReuse/ActiveRecord
       end
     end
   end
