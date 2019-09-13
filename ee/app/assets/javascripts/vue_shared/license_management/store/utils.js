@@ -87,41 +87,33 @@ export const parseLicenseReportMetrics = (headMetrics, baseMetrics, managedLicen
   const baseLicenses = baseMetrics.licenses || [];
   const managedLicenseList = managedLicenses || [];
 
-  if (headLicenses.length > 0 && headDependencies.length > 0) {
-    const report = [];
-    const knownLicenses = baseLicenses.map(license => license.name);
+  if (!headLicenses.length && !headDependencies.length) return [];
 
-    headLicenses.forEach(license => {
-      const { name, count } = license;
+  const knownLicenses = baseLicenses.map(license => license.name.toLowerCase());
+  const identityMap = license => knownLicenses.includes(license.name.toLowerCase());
+  const mapper = license => {
+    const { name, count } = license;
+    const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
+    const dependencies = getDependenciesByLicenseName(headDependencies, name);
+    const url =
+      (dependencies && dependencies[0] && dependencies[0].license && dependencies[0].license.url) ||
+      '';
 
-      if (!knownLicenses.includes(name)) {
-        const { id, approvalStatus } = getLicenseStatusByName(managedLicenseList, name);
+    return {
+      name,
+      count,
+      url,
+      packages: dependencies.map(dependencyItem => dependencyItem.dependency),
+      status: getIssueStatusFromLicenseStatus(approvalStatus),
+      approvalStatus,
+      id,
+    };
+  };
 
-        const dependencies = getDependenciesByLicenseName(headDependencies, name);
-
-        const url =
-          (dependencies &&
-            dependencies[0] &&
-            dependencies[0].license &&
-            dependencies[0].license.url) ||
-          '';
-
-        report.push({
-          name,
-          count,
-          url,
-          packages: dependencies.map(dependencyItem => dependencyItem.dependency),
-          status: getIssueStatusFromLicenseStatus(approvalStatus),
-          approvalStatus,
-          id,
-        });
-      }
-    });
-
-    return report.sort(byLicenseNameComparator);
-  }
-
-  return [];
+  return headLicenses
+    .filter(license => !identityMap(license))
+    .map(mapper)
+    .sort(byLicenseNameComparator);
 };
 
 export const getPackagesString = (packages, truncate, maxPackages) => {

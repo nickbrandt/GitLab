@@ -61,6 +61,14 @@ describe('utils', () => {
       expect(result[1].approvalStatus).toBe(blacklistedLicense.approvalStatus);
       expect(result[1].id).toBe(blacklistedLicense.id);
     });
+
+    it('matches using a case insensitive match on license name', () => {
+      const headReport = { licenses: [{ count: 1, name: 'BSD' }], dependencies: [] };
+      const baseReport = { licenses: [{ count: 1, name: 'bsd' }], dependencies: [] };
+      const result = parseLicenseReportMetrics(headReport, baseReport, []);
+
+      expect(result.length).toBe(0);
+    });
   });
 
   describe('byLicenseNameComparator', () => {

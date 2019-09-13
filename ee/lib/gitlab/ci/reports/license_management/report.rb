@@ -28,6 +28,28 @@ module Gitlab
           def violates?(software_license_policies)
             software_license_policies.blacklisted.with_license_by_name(license_names).exists?
           end
+
+          def diff_with(other_report)
+            base = self.license_names.map { |name| canonicalize(name) }
+            head = other_report.license_names.map { |name| canonicalize(name) }
+
+            {
+              added: other_report.find_by_names(head - base),
+              unchanged: find_by_names(base & head),
+              removed: find_by_names(base - head)
+            }
+          end
+
+          def find_by_names(names)
+            names = names.map { |name| canonicalize(name) }
+            licenses.select { |license| names.include?(canonicalize(license.name)) }
+          end
+
+          private
+
+          def canonicalize(name)
+            name.downcase
+          end
         end
       end
     end

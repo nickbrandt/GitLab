@@ -15,23 +15,22 @@ module Gitlab
           end
 
           def new_licenses
-            strong_memoize(:new_licenses) do
-              names = @head_report.license_names - @base_report.license_names
-              @head_report.licenses.select { |license| names.include?(license.name) }
-            end
+            diff[:added]
           end
 
           def existing_licenses
-            strong_memoize(:existing_licenses) do
-              names = @base_report.license_names & @head_report.license_names
-              @head_report.licenses.select { |license| names.include?(license.name) }
-            end
+            diff[:unchanged]
           end
 
           def removed_licenses
-            strong_memoize(:removed_licenses) do
-              names = @base_report.license_names - @head_report.license_names
-              @base_report.licenses.select { |license| names.include?(license.name) }
+            diff[:removed]
+          end
+
+          private
+
+          def diff
+            strong_memoize(:diff) do
+              base_report.diff_with(head_report)
             end
           end
         end
