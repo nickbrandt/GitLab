@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-# This module will be included in ChatNotificationService and
-# PipelinesEmailService classes. Not to be used directly.
+# Concern handling functionality around deciding whether to send notification
+# for activities on a specified branch or not. Will be included in
+# ChatNotificationService and PipelinesEmailService classes.
 module NotificationBranchSelection
+  extend ActiveSupport::Concern
+
   BRANCH_CHOICES = [
     [_('All branches'), 'all'],
     [_('Default branch'), 'default'],
