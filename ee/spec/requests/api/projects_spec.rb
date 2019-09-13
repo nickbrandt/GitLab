@@ -203,6 +203,16 @@ describe API::Projects do
         project = Project.find(json_response['id'])
         expect(project.name).to eq(new_project_name)
       end
+
+      it 'returns a 400 error for an invalid template name' do
+        project_params[:template_name] = 'bogus-template'
+
+        expect { post api('/projects', user), params: project_params }
+          .not_to change { Project.count }
+
+        expect(response).to have_gitlab_http_status(400)
+        expect(json_response['message']['template_name']).to eq(["'bogus-template' is unknown or invalid"])
+      end
     end
 
     context 'with instance-level templates' do

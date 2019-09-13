@@ -642,6 +642,14 @@ describe API::Projects do
       expect(project.import_type).to eq('gitlab_project')
     end
 
+    it 'returns 400 for an invalid template' do
+      expect { post api('/projects', user), params: { template_name: 'unknown', name: 'rails-test' } }
+        .not_to change { Project.count }
+
+      expect(response).to have_gitlab_http_status(400)
+      expect(json_response['message']['template_name']).to eq(["'unknown' is unknown or invalid"])
+    end
+
     it 'disallows creating a project with an import_url and template' do
       project_params = { import_url: 'http://example.com', template_name: 'rails', name: 'rails-test' }
       expect { post api('/projects', user), params: project_params }

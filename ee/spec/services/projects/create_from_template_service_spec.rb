@@ -55,7 +55,7 @@ describe Projects::CreateFromTemplateService do
       after do
         project = subject.execute
 
-        expect(project).to be_saved
+        expect(project).not_to be_saved
         expect(project.repository.empty?).to be true
       end
 
@@ -80,9 +80,8 @@ describe Projects::CreateFromTemplateService do
       context 'when custom_project_template does not exist' do
         let(:project_name) { 'whatever' }
 
-        it 'creates an empty project' do
-          expect(::Projects::GitlabProjectsImportService)
-            .to receive(:new).with(user, hash_excluding(:custom_template), anything).and_call_original
+        it 'does not attempt to import a project' do
+          expect(::Projects::GitlabProjectsImportService).not_to receive(:new)
         end
       end
     end
