@@ -37,13 +37,9 @@ module Clusters
 
     has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
-    has_one :application_helm, class_name: 'Clusters::Applications::Helm'
-    has_one :application_ingress, class_name: 'Clusters::Applications::Ingress'
-    has_one :application_cert_manager, class_name: 'Clusters::Applications::CertManager'
-    has_one :application_prometheus, class_name: 'Clusters::Applications::Prometheus'
-    has_one :application_runner, class_name: 'Clusters::Applications::Runner'
-    has_one :application_jupyter, class_name: 'Clusters::Applications::Jupyter'
-    has_one :application_knative, class_name: 'Clusters::Applications::Knative'
+    APPLICATIONS.values.each do |application|
+      has_one application.association_name, class_name: application.to_s # rubocop:disable Rails/ReflectionClassName
+    end
 
     has_many :kubernetes_namespaces
 
@@ -127,15 +123,9 @@ module Clusters
     end
 
     def applications
-      [
-        application_helm || build_application_helm,
-        application_ingress || build_application_ingress,
-        application_cert_manager || build_application_cert_manager,
-        application_prometheus || build_application_prometheus,
-        application_runner || build_application_runner,
-        application_jupyter || build_application_jupyter,
-        application_knative || build_application_knative
-      ]
+      APPLICATIONS.values.map do |application|
+        public_send(application.association_name) || public_send("build_#{application.association_name}") # rubocop:disable GitlabSecurity/PublicSend
+      end
     end
 
     def provider
