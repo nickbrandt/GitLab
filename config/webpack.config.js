@@ -20,6 +20,8 @@ const WEBPACK_REPORT = process.env.WEBPACK_REPORT;
 const WEBPACK_MEMORY_TEST = process.env.WEBPACK_MEMORY_TEST;
 const NO_COMPRESSION = process.env.NO_COMPRESSION;
 const NO_SOURCEMAPS = process.env.NO_SOURCEMAPS;
+const LEGACY = 'legacy';
+const MODERN = 'modern';
 
 const VUE_VERSION = require('vue/package.json').version;
 const VUE_LOADER_VERSION = require('vue-loader/package.json').version;
@@ -120,13 +122,13 @@ module.exports = {
   output: {
     path: path.join(ROOT_PATH, 'public/assets/webpack'),
     publicPath: '/assets/webpack/',
-    filename: IS_PRODUCTION ? '[name].[chunkhash:8].bundle.js' : '[name].bundle.js',
-    chunkFilename: IS_PRODUCTION ? '[name].[chunkhash:8].chunk.js' : '[name].chunk.js',
+    filename: IS_PRODUCTION ? '[name].[chunkhash:8].bundle.mjs' : '[name].bundle.mjs',
+    chunkFilename: IS_PRODUCTION ? '[name].[chunkhash:8].chunk.mjs' : '[name].chunk.mjs',
     globalObject: 'this', // allow HMR and web workers to play nice
   },
 
   resolve: {
-    extensions: ['.js', '.gql', '.graphql'],
+    extensions: ['.mjs', '.js', '.gql', '.graphql'],
     alias,
   },
 
@@ -135,11 +137,7 @@ module.exports = {
     rules: [
       {
         type: 'javascript/auto',
-        test: /\.mjs$/,
-        use: [],
-      },
-      {
-        test: /\.js$/,
+        test: /\.m?js$/,
         exclude: path => /node_modules|vendor[\\/]assets/.test(path) && !/\.vue\.js/.test(path),
         loader: 'babel-loader',
         options: {

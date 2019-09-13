@@ -19,7 +19,7 @@ module WebpackHelper
     until chunks.any? || route.empty?
       entrypoint = "pages.#{route.join('.')}"
       begin
-        chunks = webpack_entrypoint_paths(entrypoint, extension: 'js')
+        chunks = webpack_entrypoint_paths(entrypoint, extension: 'mjs')
       rescue Gitlab::Webpack::Manifest::AssetMissingError
         # no bundle exists for this path
       end
@@ -27,9 +27,8 @@ module WebpackHelper
     end
 
     if chunks.empty?
-      chunks = webpack_entrypoint_paths("default", extension: 'js')
+      chunks = webpack_entrypoint_paths("default", extension: 'mjs')
     end
-
     javascript_include_tag(*chunks)
   end
 

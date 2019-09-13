@@ -8,7 +8,7 @@ const presets = [
     {
       modules: false,
       targets: {
-        ie: '11',
+        esmodules: true
       },
     },
   ],
