@@ -98,7 +98,7 @@ module QA
         Page::Dashboard::Groups.perform do |page|
           page.click_group @project.group.path
         end
-        EE::Page::Group::Menu.perform(&:click_group_security_link)
+        Page::Group::Menu.perform(&:click_group_security_link)
 
         EE::Page::Group::Secure::Show.perform do |dashboard|
           dashboard.filter_project(@project.name)

@@ -33,9 +33,9 @@ module QA
         it 'denies access' do
           @group.sandbox.visit!
 
-          EE::Page::Group::Menu.perform(&:click_group_general_settings_item)
+          Page::Group::Menu.perform(&:click_group_general_settings_item)
 
-          EE::Page::Group::Settings::General.perform do |settings|
+          Page::Group::Settings::General.perform do |settings|
             settings.set_ip_address_restriction(get_next_ip_address)
           end
 
@@ -61,9 +61,9 @@ module QA
         it 'allows access' do
           @group.sandbox.visit!
 
-          EE::Page::Group::Menu.perform(&:click_group_general_settings_item)
+          Page::Group::Menu.perform(&:click_group_general_settings_item)
 
-          EE::Page::Group::Settings::General.perform do |settings|
+          Page::Group::Settings::General.perform do |settings|
             settings.set_ip_address_restriction(get_current_ip_address)
           end
 

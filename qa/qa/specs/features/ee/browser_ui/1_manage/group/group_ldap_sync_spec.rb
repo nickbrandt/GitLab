@@ -66,7 +66,7 @@ module QA
           group = create_group_and_add_user_via_api(owner_user, 'Synched-engineering-group')
           signin_and_visit_group_as_user(owner_user, group)
 
-          EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+          Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
           EE::Page::Group::Settings::LDAPSync.perform do |page|
             page.set_sync_method('LDAP Group cn')
@@ -74,7 +74,7 @@ module QA
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:click_group_members_item)
+          Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do
@@ -116,14 +116,14 @@ module QA
           group = create_group_and_add_user_via_api(owner_user, 'Synched-human-resources-group')
           signin_and_visit_group_as_user(owner_user, group)
 
-          EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+          Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
           EE::Page::Group::Settings::LDAPSync.perform do |page|
             page.set_user_filter('(&(objectClass=person)(cn=HR*))')
             page.click_add_sync_button
           end
 
-          EE::Page::Group::Menu.perform(&:click_group_members_item)
+          Page::Group::Menu.perform(&:click_group_members_item)
         end
 
         it 'has LDAP users synced' do

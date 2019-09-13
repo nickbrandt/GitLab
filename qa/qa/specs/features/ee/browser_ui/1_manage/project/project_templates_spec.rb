@@ -86,13 +86,13 @@ module QA
           Page::Main::Menu.perform(&:click_admin_area)
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          EE::Page::Admin::Settings::Templates.perform do |page|
+          Page::Admin::Settings::Templates.perform do |page|
             page.choose_custom_project_template("#{@template_container_group_name}")
           end
 
           Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          EE::Page::Admin::Settings::Templates.perform do |page|
+          Page::Admin::Settings::Templates.perform do |page|
             expect(page.current_custom_project_template).to include @template_container_group_name
           end
 
@@ -136,13 +136,13 @@ module QA
           Page::Dashboard::Groups.perform { |page| page.click_group(Runtime::Namespace.sandbox_name) }
           Page::Project::Menu.perform(&:click_settings)
 
-          EE::Page::Group::Settings::General.perform do |settings|
+          Page::Group::Settings::General.perform do |settings|
             settings.choose_custom_project_template("#{@template_container_group_name}")
           end
 
           Page::Project::Menu.perform(&:click_settings)
 
-          EE::Page::Group::Settings::General.perform do |settings|
+          Page::Group::Settings::General.perform do |settings|
             expect(settings.current_custom_project_template).to include @template_container_group_name
           end
 
