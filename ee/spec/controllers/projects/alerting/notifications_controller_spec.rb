@@ -11,7 +11,7 @@ describe Projects::Alerting::NotificationsController do
     let(:notify_service) { instance_double(Projects::Alerting::NotifyService, execute: service_response) }
 
     before do
-      allow(Projects::Alerting::NotifyService).to receive(:new).and_return notify_service
+      allow(Projects::Alerting::NotifyService).to receive(:new).and_return(notify_service)
     end
 
     def make_request(opts = {})
@@ -30,6 +30,7 @@ describe Projects::Alerting::NotificationsController do
             hosts: 'https://gitlab.com'
           }
         end
+
         let(:permitted_params) { ActionController::Parameters.new(payload).permit! }
 
         it 'responds with ok' do
