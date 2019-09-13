@@ -87,9 +87,9 @@ Before assigning a merge request to a maintainer for approval and merge, they
 should be confident that it actually solves the problem it was meant to solve,
 that it does so in the most appropriate way, that it satisfies all requirements,
 and that there are no remaining bugs, logical problems, uncovered edge cases,
-or known vulnerabilities. The merge request should also have a completed task
-list in its description and a passing CI pipeline to avoid unnecessary back and
-forth.
+or known vulnerabilities. The best way to do this, and to avoid unnecessary
+back-and-forth with reviewers, is to perform a self-review of your own merge
+request, following the [Code Review](#reviewing-code) guidelines.
 
 To reach the required level of confidence in their solution, an author is expected
 to involve other people in the investigation and implementation processes as
