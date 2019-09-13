@@ -11,10 +11,15 @@ module Projects
       before_action :check_generic_alert_endpoint_feature_flag!
 
       def create
-        head :ok
+        token = extract_alert_manager_token(request)
+        result = notify_service.execute(token)
+
+        head(response_status(result))
       end
 
       private
+
+      PARAMS_TO_EXCLUDE = %w(controller action namespace_id project_id).freeze
 
       def project_without_auth
         @project ||= Project
@@ -23,6 +28,25 @@ module Projects
 
       def check_generic_alert_endpoint_feature_flag!
         render_404 unless Feature.enabled?(:generic_alert_endpoint, @project)
+      end
+
+      def extract_alert_manager_token(request)
+        Doorkeeper::OAuth::Token.from_bearer_authorization(request)
+      end
+
+      def notify_service
+        Projects::Alerting::NotifyService
+          .new(project, current_user, permitted_params)
+      end
+
+      def response_status(result)
+        return :ok if result.success?
+
+        result.http_status
+      end
+
+      def permitted_params
+        params.except(*PARAMS_TO_EXCLUDE).permit! # rubocop:disable CodeReuse/ActiveRecord
       end
     end
   end
