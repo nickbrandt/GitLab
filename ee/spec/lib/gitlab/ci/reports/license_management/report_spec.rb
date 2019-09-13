@@ -41,4 +41,23 @@ describe Gitlab::Ci::Reports::LicenseManagement::Report do
       specify { expect(subject.violates?(project.software_license_policies)).to be(false) }
     end
   end
+
+  describe "#diff_with" do
+    let(:report_1) { build(:ci_reports_license_management_report, :report_1) }
+    let(:report_2) { build(:ci_reports_license_management_report, :report_2) }
+    subject { report_1.diff_with(report_2) }
+
+    before do
+      report_1.add_dependency('BSD', 1, 'https://opensource.org/licenses/0BSD', 'Library1')
+      report_2.add_dependency('bsd', 1, 'https://opensource.org/licenses/0BSD', 'Library1')
+    end
+
+    def names_from(licenses)
+      licenses.map(&:name)
+    end
+
+    it { expect(names_from(subject[:added])).to contain_exactly('Apache 2.0') }
+    it { expect(names_from(subject[:unchanged])).to contain_exactly('MIT', 'BSD') }
+    it { expect(names_from(subject[:removed])).to contain_exactly('WTFPL') }
+  end
 end
