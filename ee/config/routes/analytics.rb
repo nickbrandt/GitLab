@@ -3,11 +3,11 @@
 namespace :analytics do
   root to: 'analytics#index'
 
-  constraints(::Constraints::FeatureConstrainer.new(:productivity_analytics)) do
+  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::PRODUCTIVITY_ANALYTICS_FEATURE_FLAG)) do
     resource :productivity_analytics, only: :show
   end
 
-  constraints(::Constraints::FeatureConstrainer.new(:cycle_analytics)) do
+  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG)) do
     resource :cycle_analytics, only: :show
   end
 end
