@@ -26,6 +26,15 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.integer "cached_markdown_version"
   end
 
+  create_table "alerts_service_data", force: :cascade do |t|
+    t.integer "service_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.string "encrypted_token", limit: 255
+    t.string "encrypted_token_iv", limit: 255
+    t.index ["service_id"], name: "index_alerts_service_data_on_service_id"
+  end
+
   create_table "allowed_email_domains", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -3740,6 +3749,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.index ["type"], name: "index_web_hooks_on_type"
   end
 
+  add_foreign_key "alerts_service_data", "services", on_delete: :cascade
   add_foreign_key "allowed_email_domains", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "analytics_cycle_analytics_group_stages", "labels", column: "end_event_label_id", on_delete: :cascade
   add_foreign_key "analytics_cycle_analytics_group_stages", "labels", column: "start_event_label_id", on_delete: :cascade
