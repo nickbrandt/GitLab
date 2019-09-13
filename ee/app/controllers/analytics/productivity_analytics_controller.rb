@@ -7,8 +7,12 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
 
   before_action :load_group
   before_action :load_project
-  before_action :check_feature_availability!
-  before_action :authorize_view_productivity_analytics!
+  before_action -> {
+    check_feature_availability!(:productivity_analytics)
+  }
+  before_action -> {
+    authorize_view_productivity_analytics!(:view_productivity_analytics)
+  }
 
   include IssuableCollections
 
@@ -45,27 +49,6 @@ class Analytics::ProductivityAnalyticsController < Analytics::ApplicationControl
       response.set_header('X-Total', paginated_data.total_count.to_s)
       response.set_header('X-Total-Pages', paginated_data.total_pages.to_s)
     end
-  end
-
-  def authorize_view_productivity_analytics!
-    return render_403 unless can?(current_user, :view_productivity_analytics, @group || :global)
-  end
-
-  def check_feature_availability!
-    return render_403 unless ::License.feature_available?(:productivity_analytics)
-    return render_403 if @group && !@group.root_ancestor.feature_available?(:productivity_analytics)
-  end
-
-  def load_group
-    return unless params['group_id']
-
-    @group = find_routable!(Group, params['group_id'])
-  end
-
-  def load_project
-    return unless @group && params['project_id']
-
-    @project = find_routable!(@group.projects, params['project_id'])
   end
 
   def serializer
