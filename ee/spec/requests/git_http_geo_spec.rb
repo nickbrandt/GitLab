@@ -113,7 +113,7 @@ describe "Git HTTP requests (Geo)", :geo do
 
         it 'redirects to the primary' do
           is_expected.to have_gitlab_http_status(:redirect)
-          redirect_location = "#{primary.url.chomp('/')}#{url}?service=git-receive-pack"
+          redirect_location = "#{redirected_primary_url}?service=git-receive-pack"
           expect(subject.header['Location']).to eq(redirect_location)
         end
       end
@@ -166,7 +166,7 @@ describe "Git HTTP requests (Geo)", :geo do
 
               it 'redirects to the primary' do
                 is_expected.to have_gitlab_http_status(:redirect)
-                redirect_location = "#{primary.url.chomp('/')}#{url}"
+                redirect_location = "#{redirected_primary_url}"
                 expect(subject.header['Location']).to eq(redirect_location)
               end
             end
@@ -254,97 +254,136 @@ describe "Git HTTP requests (Geo)", :geo do
 
             it 'redirects to the primary' do
               is_expected.to have_gitlab_http_status(:redirect)
-              redirect_location = "#{primary.url.chomp('/')}#{url}"
+              redirect_location = "#{redirected_primary_url}"
               expect(subject.header['Location']).to eq(redirect_location)
             end
           end
         end
       end
     end
+
+    def redirected_primary_url
+      "#{primary.url.chomp('/')}#{::Gitlab::Geo::GitPushHttp::PATH_PREFIX}/#{secondary.id}#{url}"
+    end
   end
 
-  context 'when current node is the primary' do
+  context 'when current node is the primary', :use_clean_rails_memory_store_caching do
     let(:current_node) { primary }
 
     describe 'POST git_receive_pack' do
-      def make_request
-        post url, params: {}, headers: env
-      end
-
-      let(:url) { "/#{project.full_path}.git/git-receive-pack" }
-
-      before do
-        env['Geo-GL-Id'] = geo_gl_id
-      end
-
       subject do
         make_request
         response
       end
 
-      context 'when gl_id is incorrectly provided via HTTP headers' do
-        where(:geo_gl_id) do
-          [
-            nil,
-            ''
-          ]
+      context 'when HTTP redirected from a secondary node' do
+        def make_request
+          post url, headers: auth_env(user.username, user.password, nil)
         end
 
-        with_them do
-          it 'returns a 403' do
-            is_expected.to have_gitlab_http_status(:forbidden)
-            expect(response.body).to eql('You are not allowed to upload code for this project.')
-          end
+        let(:identifier) { "user-#{user.id}" }
+        let(:gl_repository) { "project-#{project.id}" }
+        let(:url) { "#{::Gitlab::Geo::GitPushHttp::PATH_PREFIX}/#{secondary.id}/#{project.full_path}.git/git-receive-pack" }
+
+        # The bigger picture request flow relevant to this feature is:
+        #
+        #   * The HTTP request hits NGINX
+        #   * Then Workhorse
+        #   * Then Rails (the scope of request tests is limited to this line item)
+        #   * Rails responds OK to Workhorse
+        #   * Workhorse connects to Gitaly: SmartHTTP Service, ReceivePack RPC
+        #   * In a pre-receive hook, Gitaly makes a request to Rails' POST /api/v4/internal/allowed
+        #   * Rails says OK
+        #   * In a post-receive hook, Gitaly makes a request to Rails' POST /api/v4/internal/post_receive
+        #   * Rails responds to Gitaly, including a collection of messages, which includes the replication lag message
+        #   * Gitaly outputs the messages in the stream of Proto messages
+        #   * Pipe the output through Workhorse and NGINX
+        #
+        # See https://gitlab.com/gitlab-org/gitlab-ee/issues/9195
+        #
+        it 'stores the secondary node ID so the internal API post_receive request can generate the replication lag message' do
+          is_expected.to have_gitlab_http_status(:ok)
+
+          stored_node = ::Gitlab::Geo::GitPushHttp.new(identifier, gl_repository).fetch_referrer_node
+          expect(stored_node).to eq(secondary)
         end
       end
 
-      context 'when gl_id is provided via HTTP headers' do
-        context 'but is invalid' do
+      context 'when proxying an SSH request from a secondary node' do
+        def make_request
+          post url, params: {}, headers: env
+        end
+
+        let(:url) { "/#{project.full_path}.git/git-receive-pack" }
+
+        before do
+          env['Geo-GL-Id'] = geo_gl_id
+        end
+
+        context 'when gl_id is incorrectly provided via HTTP headers' do
           where(:geo_gl_id) do
             [
-              'key-999',
-              'key-1',
-              'key-999',
-              'junk',
-              'junk-1',
-              'kkey-1'
+              nil,
+              ''
             ]
           end
 
           with_them do
             it 'returns a 403' do
               is_expected.to have_gitlab_http_status(:forbidden)
-              expect(response.body).to eql('Geo push user is invalid.')
+              expect(response.body).to eql('You are not allowed to upload code for this project.')
             end
           end
         end
 
-        context 'and is valid' do
-          context 'but the user has no access' do
-            let(:geo_gl_id) { "key-#{key_for_user_without_any_access.id}" }
+        context 'when gl_id is provided via HTTP headers' do
+          context 'but is invalid' do
+            where(:geo_gl_id) do
+              [
+                'key-999',
+                'key-1',
+                'key-999',
+                'junk',
+                'junk-1',
+                'kkey-1'
+              ]
+            end
 
-            it 'returns a 404' do
-              is_expected.to have_gitlab_http_status(:not_found)
-              expect(response.body).to eql('The project you were looking for could not be found.')
+            with_them do
+              it 'returns a 403' do
+                is_expected.to have_gitlab_http_status(:forbidden)
+                expect(response.body).to eql('Geo push user is invalid.')
+              end
             end
           end
 
-          context 'but the user does not have push access' do
-            let(:geo_gl_id) { "key-#{key_for_user_without_push_access.id}" }
+          context 'and is valid' do
+            context 'but the user has no access' do
+              let(:geo_gl_id) { "key-#{key_for_user_without_any_access.id}" }
 
-            it 'returns a 403' do
-              is_expected.to have_gitlab_http_status(:forbidden)
-              expect(response.body).to eql('You are not allowed to push code to this project.')
+              it 'returns a 404' do
+                is_expected.to have_gitlab_http_status(:not_found)
+                expect(response.body).to eql('The project you were looking for could not be found.')
+              end
             end
-          end
 
-          context 'and the user has push access' do
-            let(:geo_gl_id) { "key-#{key.id}" }
+            context 'but the user does not have push access' do
+              let(:geo_gl_id) { "key-#{key_for_user_without_push_access.id}" }
 
-            it 'returns a 200' do
-              is_expected.to have_gitlab_http_status(:ok)
-              expect(json_response['GL_ID']).to match("user-#{user.id}")
-              expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository::PROJECT.identifier_for_subject(project))
+              it 'returns a 403' do
+                is_expected.to have_gitlab_http_status(:forbidden)
+                expect(response.body).to eql('You are not allowed to push code to this project.')
+              end
+            end
+
+            context 'and the user has push access' do
+              let(:geo_gl_id) { "key-#{key.id}" }
+
+              it 'returns a 200' do
+                is_expected.to have_gitlab_http_status(:ok)
+                expect(json_response['GL_ID']).to match("user-#{user.id}")
+                expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository::PROJECT.identifier_for_subject(project))
+              end
             end
           end
         end
