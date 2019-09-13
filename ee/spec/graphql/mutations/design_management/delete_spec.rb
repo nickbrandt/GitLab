@@ -18,9 +18,24 @@ describe Mutations::DesignManagement::Delete do
 
   let(:mutation) { described_class.new(object: nil, context: { current_user: user }) }
 
-  def run_mutation
+  def run_mutation(files = filenames)
     mutation = described_class.new(object: nil, context: { current_user: user })
-    mutation.resolve(project_path: project.full_path, iid: issue.iid, filenames: filenames)
+    mutation.resolve(project_path: project.full_path, iid: issue.iid, filenames: files)
+  end
+
+  describe 'running requests in parallel' do
+    before do
+      enable_design_management(true)
+    end
+
+    it 'does not cause errors' do
+      expect do
+        threads = filenames.map do |fn|
+          Thread.new { run_mutation([fn]) }
+        end
+        threads.each(&:join)
+      end.not_to raise_error
+    end
   end
 
   describe '#resolve' do

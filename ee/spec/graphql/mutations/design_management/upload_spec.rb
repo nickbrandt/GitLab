@@ -12,6 +12,11 @@ describe Mutations::DesignManagement::Upload do
     described_class.new(object: nil, context: { current_user: user })
   end
 
+  def run_mutation(fs = files)
+    mutation = described_class.new(object: nil, context: { current_user: user })
+    mutation.resolve(project_path: project.full_path, iid: issue.iid, files: fs)
+  end
+
   describe "#resolve" do
     let(:files) { [fixture_file_upload('spec/fixtures/dk.png')] }
 
@@ -32,6 +37,25 @@ describe Mutations::DesignManagement::Upload do
     context "when the feature is available" do
       before do
         enable_design_management
+      end
+
+      describe 'running requests in parallel' do
+        let(:files) do
+          [
+            fixture_file_upload('spec/fixtures/dk.png'),
+            fixture_file_upload('spec/fixtures/rails_sample.jpg'),
+            fixture_file_upload('spec/fixtures/banana_sample.gif')
+          ]
+        end
+
+        it 'does not cause errors' do
+          expect do
+            threads = files.map do |f|
+              Thread.new { run_mutation([f]) }
+            end
+            threads.each(&:join)
+          end.not_to raise_error
+        end
       end
 
       context "when the user is not allowed to upload designs" do
