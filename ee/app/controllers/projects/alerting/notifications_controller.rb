@@ -40,14 +40,9 @@ module Projects
       end
 
       def response_status(result)
-        case result.http_status
-        when 401
-          :unauthorized
-        when 403
-          :forbidden
-        else
-          :ok
-        end
+        return :ok if result.success?
+
+        result.http_status
       end
 
       def permitted_params
