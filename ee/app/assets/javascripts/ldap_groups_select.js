@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, no-var, one-var, object-shorthand, consistent-return, no-unused-vars, func-names */
+/* eslint-disable prefer-arrow-callback, no-var, one-var, object-shorthand, consistent-return, func-names */
 
 import $ from 'jquery';
 import Api from 'ee/api';
@@ -44,7 +44,7 @@ export default function initLDAPGroupsSelect() {
           formatResult: ldapGroupResult,
           formatSelection: groupFormatSelection,
           dropdownCssClass: 'ajax-groups-dropdown',
-          formatNoMatches: function(nomatch) {
+          formatNoMatches: function() {
             return __('Match not found; try refining your search query.');
           },
         });

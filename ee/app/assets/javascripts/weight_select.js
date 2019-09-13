@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, one-var, no-var, object-shorthand, no-shadow, no-unused-vars, no-else-return, func-names */
+/* eslint-disable prefer-arrow-callback, one-var, no-var, object-shorthand, no-shadow, no-else-return, func-names */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -7,23 +7,12 @@ function WeightSelect(els, options = {}) {
   const $els = $(els || '.js-weight-select');
 
   $els.each(function(i, dropdown) {
-    var $block,
-      $dropdown,
-      $loading,
-      $selectbox,
-      $sidebarCollapsedValue,
-      $value,
-      abilityName,
-      updateUrl,
-      updateWeight;
+    var $block, $dropdown, $selectbox, $value;
     $dropdown = $(dropdown);
-    updateUrl = $dropdown.data('issueUpdate');
     $selectbox = $dropdown.closest('.selectbox');
     $block = $selectbox.closest('.block');
-    $sidebarCollapsedValue = $block.find('.sidebar-collapsed-icon span');
     $value = $block.find('.value');
-    abilityName = $dropdown.data('abilityName');
-    $loading = $block.find('.block-loading').fadeOut();
+    $block.find('.block-loading').fadeOut();
     const fieldName = options.fieldName || $dropdown.data('fieldName');
     const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);
 
@@ -37,7 +26,7 @@ function WeightSelect(els, options = {}) {
       toggleLabel: function(selected, el) {
         return $(el).data('id');
       },
-      hidden: function(e) {
+      hidden: function() {
         $selectbox.hide();
         return $value.css('display', '');
       },
