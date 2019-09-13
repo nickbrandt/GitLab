@@ -1808,10 +1808,12 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.datetime_with_timezone "closed_at"
     t.integer "closed_by_id"
     t.integer "state_id", limit: 2
+    t.integer "duplicated_to_id"
     t.index ["author_id"], name: "index_issues_on_author_id"
     t.index ["closed_by_id"], name: "index_issues_on_closed_by_id"
     t.index ["confidential"], name: "index_issues_on_confidential"
     t.index ["description"], name: "index_issues_on_description_trigram", opclass: :gin_trgm_ops, using: :gin
+    t.index ["duplicated_to_id"], name: "index_issues_on_duplicated_to_id", where: "(duplicated_to_id IS NOT NULL)"
     t.index ["milestone_id"], name: "index_issues_on_milestone_id"
     t.index ["moved_to_id"], name: "index_issues_on_moved_to_id", where: "(moved_to_id IS NOT NULL)"
     t.index ["project_id", "created_at", "id", "state"], name: "index_issues_on_project_id_and_created_at_and_id_and_state"
@@ -3934,6 +3936,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
   add_foreign_key "issue_links", "issues", column: "target_id", name: "fk_e71bb44f1f", on_delete: :cascade
   add_foreign_key "issue_metrics", "issues", on_delete: :cascade
   add_foreign_key "issue_tracker_data", "services", on_delete: :cascade
+  add_foreign_key "issues", "issues", column: "duplicated_to_id", name: "fk_9c4516d665", on_delete: :nullify
   add_foreign_key "issues", "issues", column: "moved_to_id", name: "fk_a194299be1", on_delete: :nullify
   add_foreign_key "issues", "milestones", name: "fk_96b1dd429c", on_delete: :nullify
   add_foreign_key "issues", "projects", name: "fk_899c8f3231", on_delete: :cascade
