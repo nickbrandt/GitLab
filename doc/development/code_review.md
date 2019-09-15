@@ -294,9 +294,8 @@ experience, refactors the existing code). Then:
 - Seek to understand the author's perspective.
 - If you don't understand a piece of code, _say so_. There's a good chance
   someone else would be confused by it as well.
-- If you have an improvement you wish to suggest based on personal
-  preference, do prefix your comment with "Nit:" to let the author know
-  it is not a mandatory improvement.
+- Do prefix your comment with "Nit:" if you have a small, non-mandatory
+  improvement you wish to suggest.
 - After a round of line notes, it can be helpful to post a summary note such as
   "LGTM :thumbsup:", or "Just a couple things to address."
 - Assign the merge request to the author if changes are required following your
