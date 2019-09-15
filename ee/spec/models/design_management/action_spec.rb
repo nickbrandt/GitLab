@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe DesignManagement::DesignVersion do
+describe DesignManagement::Action do
   describe 'relations' do
     it { is_expected.to belong_to(:design) }
     it { is_expected.to belong_to(:version) }

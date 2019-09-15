@@ -10,7 +10,7 @@ module Types
 
       value NONE, 'No change'
 
-      ::DesignManagement::DesignVersion.events.keys.each do |event_name|
+      ::DesignManagement::Action.events.keys.each do |event_name|
         value event_name.upcase, value: event_name, description: "A #{event_name} event"
       end
     end

@@ -3,8 +3,8 @@ require 'spec_helper'
 
 describe DesignManagement::Version do
   describe 'relations' do
-    it { is_expected.to have_many(:design_versions) }
-    it { is_expected.to have_many(:designs).through(:design_versions) }
+    it { is_expected.to have_many(:actions) }
+    it { is_expected.to have_many(:designs).through(:actions) }
 
     it 'constrains the designs relation correctly' do
       design = create(:design)
@@ -139,7 +139,7 @@ describe DesignManagement::Version do
       actions = as_actions(designs)
       expect do
         described_class.create_for_designs(actions, '') rescue nil
-      end.not_to change { DesignManagement::DesignVersion.count }
+      end.not_to change { DesignManagement::Action.count }
     end
 
     it "creates a version and links it to multiple designs" do
@@ -156,7 +156,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(actions, "abc")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_creation)
+      expect(designs.map(&:most_recent_action)).to all(be_creation)
     end
 
     it 'correctly associates the version with the issue' do
@@ -172,7 +172,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(actions, "abc")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_modification)
+      expect(designs.map(&:most_recent_action)).to all(be_modification)
     end
 
     it 'deletes designs when the git action was delete' do
@@ -191,7 +191,7 @@ describe DesignManagement::Version do
 
       described_class.create_for_designs(as_actions(designs, :create), "ghi")
 
-      expect(designs.map(&:most_recent_design_version)).to all(be_creation)
+      expect(designs.map(&:most_recent_action)).to all(be_creation)
       expect(designs).not_to include(be_deleted)
     end
 

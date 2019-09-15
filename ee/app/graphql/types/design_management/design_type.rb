@@ -43,9 +43,9 @@ module Types
       def event(parent:)
         version = cached_stateful_version(parent)
 
-        design_version = cached_design_versions_for_version(version)[design.id]
+        action = cached_actions_for_version(version)[design.id]
 
-        design_version&.event || Types::DesignManagement::DesignVersionEventEnum::NONE
+        action&.event || Types::DesignManagement::DesignVersionEventEnum::NONE
       end
 
       # Returns a `DesignManagement::Version` for this query based on the
@@ -65,9 +65,9 @@ module Types
         end
       end
 
-      def cached_design_versions_for_version(version)
-        Gitlab::SafeRequestStore.fetch([request_cache_base_key, 'design_versions_for_version', version.id]) do
-          version.design_versions.to_h { |dv| [dv.design_id, dv] }
+      def cached_actions_for_version(version)
+        Gitlab::SafeRequestStore.fetch([request_cache_base_key, 'actions_for_version', version.id]) do
+          version.actions.to_h { |dv| [dv.design_id, dv] }
         end
       end
 
