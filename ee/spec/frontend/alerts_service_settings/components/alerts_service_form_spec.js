@@ -36,9 +36,16 @@ describe('AlertsServiceForm', () => {
   const findUrl = () => wrapper.find('#url');
   const findAuthorizationKey = () => wrapper.find('#authorization-key');
   const findDescription = () => wrapper.find('p');
+  const findActiveStatusIcon = val =>
+    document.querySelector(`.js-service-active-status[data-value=${val.toString()}]`);
 
   beforeEach(() => {
     mockAxios = new MockAdapter(axios);
+    setFixtures(`
+    <div>
+      <span class="js-service-active-status fa fa-circle" data-value="true"></span>
+      <span class="js-service-active-status fa fa-power-off" data-value="false"></span>
+    </div>`);
   });
 
   afterEach(() => {
@@ -127,25 +134,33 @@ describe('AlertsServiceForm', () => {
     });
 
     describe('successfully completes', () => {
-      const formPath = 'some/path';
+      describe.each`
+        initialActivated | value
+        ${false}         | ${true}
+        ${true}          | ${false}
+      `(
+        'when initialActivated=$initialActivated and value=$value',
+        ({ initialActivated, value }) => {
+          beforeEach(() => {
+            const formPath = 'some/path';
+            mockAxios
+              .onPut(formPath, { service: { active: value } })
+              .replyOnce(200, { active: value });
+            createComponent({ initialActivated, formPath });
 
-      it('enables toggle when initialActivated=false', () => {
-        mockAxios.onPut(formPath, { service: { active: true } }).replyOnce(200, { active: true });
-        createComponent({ initialActivated: false, formPath });
+            return wrapper.vm.toggleActivated(value);
+          });
 
-        return wrapper.vm.toggleActivated(true).then(() => {
-          expect(wrapper.find(ToggleButton).props('value')).toBe(true);
-        });
-      });
+          it(`updates toggle button value to ${value}`, () => {
+            expect(wrapper.find(ToggleButton).props('value')).toBe(value);
+          });
 
-      it('disables toggle when initialActivated=true', () => {
-        mockAxios.onPut(formPath, { service: { active: false } }).replyOnce(200, { active: false });
-        createComponent({ initialActivated: true, formPath });
-
-        return wrapper.vm.toggleActivated(false).then(() => {
-          expect(wrapper.find(ToggleButton).props('value')).toBe(false);
-        });
-      });
+          it('updates visible status icons', () => {
+            expect(findActiveStatusIcon(!value)).toHaveClass('d-none');
+            expect(findActiveStatusIcon(value)).not.toHaveClass('d-none');
+          });
+        },
+      );
     });
 
     describe('error is encountered', () => {
