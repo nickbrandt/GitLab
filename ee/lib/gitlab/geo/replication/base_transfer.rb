@@ -197,7 +197,7 @@ module Gitlab
             file_size = temp_file.size
 
             # Upload file to Object Storage
-            uploader.send(:storage).store! CarrierWave::SanitizedFile.new(temp_file)
+            uploader.replace_file_without_saving!(CarrierWave::SanitizedFile.new(temp_file))
 
             log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
           rescue => e
