@@ -9,6 +9,9 @@ class IssueLink < ApplicationRecord
   validates :source, uniqueness: { scope: :target_id, message: 'is already related' }
   validate :check_self_relation
 
+  scope :for_source_issue, ->(issue) { where(source_id: issue.id) }
+  scope :for_target_issue, ->(issue) { where(target_id: issue.id) }
+
   private
 
   def check_self_relation
