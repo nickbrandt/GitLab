@@ -30,10 +30,15 @@ export default {
       this.setGroupNamespace(full_path);
       this.$emit('groupSelected', full_path);
     },
-    onProjectsSelected([selectedProject]) {
-      const { path } = selectedProject;
-      this.setProjectPath(path);
-      this.$emit('projectSelected', { namespacePath: this.groupNamespace, project: path });
+    onProjectsSelected(selectedProjects) {
+      const pathWithNamespace = selectedProjects.length
+        ? selectedProjects[0].path_with_namespace
+        : null;
+      this.setProjectPath(pathWithNamespace);
+      this.$emit('projectSelected', {
+        namespacePath: this.groupNamespace,
+        project: pathWithNamespace,
+      });
     },
   },
 };

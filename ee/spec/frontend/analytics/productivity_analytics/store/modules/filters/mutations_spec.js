@@ -20,7 +20,7 @@ describe('Productivity analytics filter mutations', () => {
 
   describe(types.SET_PROJECT_PATH, () => {
     it('sets the projectPath', () => {
-      const projectPath = 'gitlab-test';
+      const projectPath = 'gitlab-org/gitlab-test';
       mutations[types.SET_PROJECT_PATH](state, projectPath);
 
       expect(state.projectPath).toBe(projectPath);

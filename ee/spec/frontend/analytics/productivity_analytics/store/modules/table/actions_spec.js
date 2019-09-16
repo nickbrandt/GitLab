@@ -13,7 +13,7 @@ describe('Productivity analytics table actions', () => {
   let mock;
 
   const groupNamespace = 'gitlab-org';
-  const projectPath = 'gitlab-test';
+  const projectPath = 'gitlab-org/gitlab-test';
 
   const filterParams = {
     days_to_merge: [5],
