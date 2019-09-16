@@ -294,7 +294,7 @@ experience, refactors the existing code). Then:
 - Seek to understand the author's perspective.
 - If you don't understand a piece of code, _say so_. There's a good chance
   someone else would be confused by it as well.
-- Do prefix your comment with "Nit:" if you have a small, non-mandatory
+- Do prefix your comment with "Not blocking:" if you have a small, non-mandatory
   improvement you wish to suggest.
 - After a round of line notes, it can be helpful to post a summary note such as
   "LGTM :thumbsup:", or "Just a couple things to address."
