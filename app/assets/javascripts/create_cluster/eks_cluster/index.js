@@ -12,6 +12,7 @@ export default () =>
     components: {
       CreateEksCluster,
     },
+    data() {},
     render(createElement) {
       return createElement('create-eks-cluster');
     },

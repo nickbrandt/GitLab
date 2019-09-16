@@ -19,6 +19,10 @@ const createStore = () =>
         namespaced: true,
         ...clusterDropdownStore(awsServices.fetchRegions),
       },
+      vpcs: {
+        namespaced: true,
+        ...clusterDropdownStore(awsServices.fetchVpcs),
+      },
     },
   });
 

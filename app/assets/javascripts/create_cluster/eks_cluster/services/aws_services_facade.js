@@ -17,4 +17,21 @@ export const fetchRegions = () =>
       .send();
   });
 
+export const fetchVpcs = () =>
+  new Promise((resolve, reject) => {
+    const ec2 = new EC2();
+
+    ec2
+      .describeVpcs()
+      .on('success', ({ data: { Vpcs: vpcs } }) => {
+        const transformedVpcs = vpcs.map(({ VpcId: name }) => ({ name }));
+
+        resolve(transformedVpcs);
+      })
+      .on('error', error => {
+        reject(error);
+      })
+      .send();
+  });
+
 export default () => {};

@@ -4,4 +4,7 @@ export default {
   [types.SET_REGION](state, { region }) {
     state.selectedRegion = region;
   },
+  [types.SET_VPC](state, { vpc }) {
+    state.selectedVpc = vpc;
+  },
 };

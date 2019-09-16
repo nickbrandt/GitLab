@@ -25,15 +25,28 @@ export default {
       isLoadingRegions: 'isLoadingItems',
       loadingRegionsError: 'loadingItemsError',
     }),
+    ...mapState('vpcs', {
+      vpcs: ({ items }) => items,
+      isLoadingVpcs: ({ isLoadingItems }) => isLoadingItems,
+      loadingVpcsError: ({ loadingItemsError }) => loadingItemsError,
+    }),
+    vpcDropdownDisabled() {
+      return !Boolean(this.selectedRegion);
+    },
   },
   mounted() {
     this.fetchRegions();
   },
   methods: {
-    ...mapActions(['setRegion']),
-    ...mapRegionsActions({
-      fetchRegions: 'fetchItems',
+    ...mapActions(['setRegion', 'setVpc']),
+    ...mapActions({
+      fetchRegions: 'regions/fetchItems',
+      fetchVpcs: 'vpcs/fetchItems',
     }),
+    setRegionAndFetchVpcs(region) {
+      this.setRegion({ region });
+      this.fetchVpcs({ region });
+    },
   },
 };
 </script>
@@ -54,7 +67,20 @@ export default {
         :regions="regions"
         :error="loadingRegionsError"
         :loading="isLoadingRegions"
-        @input="setRegion({ region: $event })"
+        @input="setRegionAndFetchVpcs($event)"
+      />
+    </div>
+    <div class="form-group">
+      <label class="label-bold" name="role" for="eks-role">{{
+        s__('ClusterIntegration|VPC')
+      }}</label>
+      <vpc-dropdown
+        :input="selectedVpc"
+        :vpcs="vpcs"
+        :error="loadingVpcsError"
+        :loading="isLoadingVpcs"
+        :disabled="vpcDropdownDisabled"
+        @input="setVpc({ vpc: $event })"
       />
     </div>
   </form>

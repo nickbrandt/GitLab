@@ -14,4 +14,14 @@ describe('EKS Cluster Store Actions', () => {
       ]);
     });
   });
+
+  describe('setVpc', () => {
+    it(`commits ${types.SET_VPC} mutation`, () => {
+      const vpc = { name: 'west-1' };
+
+      testAction(actions.setVpc, { vpc }, createState(), [
+        { type: types.SET_VPC, payload: { vpc } },
+      ]);
+    });
+  });
 });
