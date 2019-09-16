@@ -11329,6 +11329,9 @@ msgstr ""
 msgid "Preferences|Project overview content"
 msgstr ""
 
+msgid "Preferences|Show whitespace in diffs"
+msgstr ""
+
 msgid "Preferences|Syntax highlighting theme"
 msgstr ""
 
