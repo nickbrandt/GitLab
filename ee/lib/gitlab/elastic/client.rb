@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-# This file is required by `bin/elastic_repo_indexer` as well as from within
-# Rails, so needs to explicitly require its dependencies
-require 'elasticsearch'
-require 'aws-sdk'
-require 'faraday_middleware/aws_signers_v4'
-
 module Gitlab
   module Elastic
     module Client

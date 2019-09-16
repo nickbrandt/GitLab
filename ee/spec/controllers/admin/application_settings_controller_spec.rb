@@ -29,7 +29,6 @@ describe Admin::ApplicationSettingsController do
           repository_size_limit: 1024,
           shared_runners_minutes: 60,
           geo_status_timeout: 30,
-          elasticsearch_experimental_indexer: true,
           check_namespace_plan: true,
           authorized_keys_enabled: true,
           slack_app_enabled: true,

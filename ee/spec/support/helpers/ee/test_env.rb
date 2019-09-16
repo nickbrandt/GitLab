@@ -30,7 +30,7 @@ module EE
     end
 
     def indexer_version
-      @indexer_version ||= ::Gitlab::Elastic::Indexer.experimental_indexer_version
+      @indexer_version ||= ::Gitlab::Elastic::Indexer.indexer_version
     end
 
     def indexer_url

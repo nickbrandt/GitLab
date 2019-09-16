@@ -148,8 +148,7 @@ describe 'GlobalSearch', :elastic do
       # Going through the project ensures its elasticsearch document is updated
       project.update!(project_feature_attributes: feature_settings) if feature_settings
 
-      project.repository.index_blobs
-      project.repository.index_commits
+      project.repository.index_commits_and_blobs
       project.wiki.index_wiki_blobs
 
       Gitlab::Elastic::Helper.refresh_index

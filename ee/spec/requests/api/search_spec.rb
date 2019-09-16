@@ -54,7 +54,7 @@ describe API::Search do
 
     context 'for commits scope' do
       before do
-        repo_project.repository.index_commits
+        repo_project.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
 
         get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
@@ -65,7 +65,7 @@ describe API::Search do
 
     context 'for blobs scope' do
       before do
-        repo_project.repository.index_blobs
+        repo_project.repository.index_commits_and_blobs
         Gitlab::Elastic::Helper.refresh_index
 
         get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
