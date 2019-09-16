@@ -37,7 +37,7 @@ module Clusters
 
     has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
-    def self.has_one_cluster_application(name)
+    def self.has_one_cluster_application(name) # rubocop:disable Naming/PredicateName
       application = APPLICATIONS[name.to_s]
       has_one application.association_name, class_name: application.to_s # rubocop:disable Rails/ReflectionClassName
     end
