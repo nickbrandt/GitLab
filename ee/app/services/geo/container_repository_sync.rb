@@ -35,9 +35,10 @@ module Geo
 
     def sync_tag(tag)
       file = nil
-      manifest = client.repository_manifest(name, tag)
+      manifest = client.repository_raw_manifest(name, tag)
+      manifest_parsed = JSON.parse(manifest)
 
-      list_blobs(manifest).each do |digest|
+      list_blobs(manifest_parsed).each do |digest|
         next if container_repository.blob_exists?(digest)
 
         file = client.pull_blob(name, digest)
@@ -45,7 +46,7 @@ module Geo
         file.unlink
       end
 
-      container_repository.push_manifest(tag, manifest, manifest['mediaType'])
+      container_repository.push_manifest(tag, manifest, manifest_parsed['mediaType'])
     ensure
       file.try(:unlink)
     end
