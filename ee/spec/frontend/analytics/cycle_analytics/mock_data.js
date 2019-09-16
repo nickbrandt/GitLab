@@ -52,7 +52,9 @@ export const testEvents = stageFixtures.test;
 export const stagingEvents = stageFixtures.staging;
 export const productionEvents = stageFixtures.production;
 
-const apiResponse = {
+// NOTE: once the backend is complete, we can generate this as a JSON fixture
+// https://gitlab.com/gitlab-org/gitlab/issues/32112
+export const apiResponse = {
   events: [
     {
       name: 'Issue created',
@@ -75,7 +77,6 @@ const apiResponse = {
       canBeStartEvent: true,
       allowedEndEvents: ['merge_request_merged'],
     },
-
     {
       name: 'Merge request first deployed to production',
       identifier: 'merge_request_first_deployed_to_production',
@@ -244,52 +245,6 @@ const apiResponse = {
   },
 };
 
-export const rawEvents = [
-  {
-    name: 'Issue created',
-    identifier: 'issue_created',
-    type: 'simple',
-    canBeStartEvent: true,
-    allowedEndEvents: ['issue_closed', 'issue_merged'],
-  },
-  {
-    name: 'Merge request closed',
-    identifier: 'merge_request_closed',
-    type: 'simple',
-    canBeStartEvent: false,
-    allowedEndEvents: [],
-  },
-  {
-    name: 'Issue closed',
-    identifier: 'issue_closed',
-    type: 'simple',
-    canBeStartEvent: false,
-    allowedEndEvents: [],
-  },
-  {
-    name: 'Issue merged',
-    identifier: 'issue_merged',
-    type: 'simple',
-    canBeStartEvent: false,
-    allowedEndEvents: [],
-  },
-  {
-    identifier: 'issue_label_added',
-    name: 'Issue Label Added',
-    type: 'label',
-    canBeStartEvent: true,
-    allowedEndEvents: ['issue_closed', 'issue_label_removed'],
-  },
-  {
-    identifier: 'issue_label_removed',
-    name: 'Issue Label Removed',
-    type: 'label',
-    canBeStartEvent: false,
-    allowedEndEvents: [],
-  },
-];
-
 export default {
   apiResponse,
-  rawEvents,
 };

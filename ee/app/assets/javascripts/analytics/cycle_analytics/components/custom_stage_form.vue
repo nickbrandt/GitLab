@@ -33,7 +33,7 @@ export default {
   props: {
     events: {
       type: Array,
-      required: true,      
+      required: true,
     },
     labels: {
       type: Array,
@@ -105,7 +105,7 @@ export default {
     },
     stopEventError() {
       return !this.hasValidStartAndStopEventPair
-        ? s__('CustomCycleAnalyticsStart event changed, please select a valid stop event')
+        ? s__('CustomCycleAnalytics|Start event changed, please select a valid stop event')
         : null;
     },
   },

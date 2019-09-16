@@ -4532,9 +4532,6 @@ msgstr ""
 msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
 msgstr ""
 
-msgid "CustomCycleAnalyticsStart event changed, please select a valid stop event"
-msgstr ""
-
 msgid "CustomCycleAnalytics|Add a stage"
 msgstr ""
 
@@ -4560,6 +4557,9 @@ msgid "CustomCycleAnalytics|Select stop event"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Start event"
+msgstr ""
+
+msgid "CustomCycleAnalytics|Start event changed, please select a valid stop event"
 msgstr ""
 
 msgid "CustomCycleAnalytics|Start event label"

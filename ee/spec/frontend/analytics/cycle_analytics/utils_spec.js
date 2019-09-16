@@ -6,12 +6,14 @@ import {
   eventsByIdentifier,
   getLabelEventsIdentifiers,
 } from 'ee/analytics/cycle_analytics/utils';
-import { rawEvents } from './mock_data';
+import { apiResponse } from './mock_data';
 
-const startEvent = rawEvents[0];
-const endEvent = rawEvents[1];
-const labelEvent = rawEvents[5];
-const labelEvents = [rawEvents[4], rawEvents[5]].map(i => i.identifier);
+const { events } = apiResponse;
+
+const startEvent = events[0];
+const endEvent = events[1];
+const labelEvent = events[11];
+const labelEvents = [events[10], events[11]].map(i => i.identifier);
 
 describe('Cycle analytics utils', () => {
   describe('isStartEvent', () => {
@@ -46,14 +48,14 @@ describe('Cycle analytics utils', () => {
     });
 
     it('will set the "value" property to the events identifier', () => {
-      rawEvents.forEach(ev => {
+      events.forEach(ev => {
         const res = eventToOption(ev);
         expect(res.value).toEqual(ev.identifier);
       });
     });
 
     it('will set the "text" property to the events name', () => {
-      rawEvents.forEach(ev => {
+      events.forEach(ev => {
         const res = eventToOption(ev);
         expect(res.text).toEqual(ev.name);
       });
@@ -62,7 +64,7 @@ describe('Cycle analytics utils', () => {
 
   describe('getLabelEventsIdentifiers', () => {
     it('will return an array of identifiers for the label events', () => {
-      const res = getLabelEventsIdentifiers(rawEvents);
+      const res = getLabelEventsIdentifiers(events);
       expect(res.length).toEqual(labelEvents.length);
       expect(res).toEqual(labelEvents);
     });
@@ -75,25 +77,25 @@ describe('Cycle analytics utils', () => {
 
   describe('getAllowedEndEvents', () => {
     it('will return the relevant end events for a given start event identifier', () => {
-      const se = rawEvents[4].allowedEndEvents;
-      expect(getAllowedEndEvents(rawEvents, 'issue_label_added')).toEqual(se);
+      const se = events[10].allowedEndEvents;
+      expect(getAllowedEndEvents(events, 'issue_label_added')).toEqual(se);
     });
 
     it('will return an empty array if there are no end events available', () => {
       ['cool_issue_label_added', [], {}, null, undefined].forEach(ev => {
-        expect(getAllowedEndEvents(rawEvents, ev)).toEqual([]);
+        expect(getAllowedEndEvents(events, ev)).toEqual([]);
       });
     });
   });
 
   describe('eventsByIdentifier', () => {
     it('will return the events with an identifier in the provided array', () => {
-      expect(eventsByIdentifier(rawEvents, labelEvents)).toEqual([rawEvents[4], rawEvents[5]]);
+      expect(eventsByIdentifier(events, labelEvents)).toEqual([events[10], events[11]]);
     });
 
     it('will return an empty array if there are no matching events', () => {
       [['lol', 'bad'], [], {}, null, undefined].forEach(items => {
-        expect(eventsByIdentifier(rawEvents, items)).toEqual([]);
+        expect(eventsByIdentifier(events, items)).toEqual([]);
       });
       expect(eventsByIdentifier([], labelEvents)).toEqual([]);
     });

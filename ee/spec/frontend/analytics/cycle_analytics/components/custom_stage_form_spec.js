@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { mount } from '@vue/test-utils';
 import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import { mockLabels } from '../../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
-import { apiResponse, rawEvents } from '../mock_data';
+import { apiResponse } from '../mock_data';
 
 const labels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
 
@@ -159,7 +159,7 @@ describe('CustomStageForm', () => {
       beforeEach(() => {
         wrapper = createComponent(
           {
-            events: rawEvents,
+            events,
           },
           false,
         );
@@ -192,7 +192,7 @@ describe('CustomStageForm', () => {
 
         Vue.nextTick(() => {
           stopOptions = wrapper.find(sel.stopEvent).findAll('option');
-          expect(stopOptions.length).toEqual(3);
+          expect(stopOptions.length).toEqual(2);
         });
       });
 
@@ -206,8 +206,10 @@ describe('CustomStageForm', () => {
           stopOptions = wrapper.find(sel.stopEvent).findAll('option');
           [
             { name: 'Select stop event', identifier: '' },
-            { name: 'Issue closed', identifier: 'issue_closed' },
-            { name: 'Issue merged', identifier: 'issue_merged' },
+            {
+              name: 'Issue first associated with a milestone or issue first added to a board',
+              identifier: 'issue_stage_end',
+            },
           ].forEach(({ name, identifier }, i) => {
             expect(stopOptions.at(i).html()).toEqual(
               `<option value="${identifier}">${name}</option>`,
