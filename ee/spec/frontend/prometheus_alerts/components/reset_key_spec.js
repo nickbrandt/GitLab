@@ -4,6 +4,7 @@ import axios from '~/lib/utils/axios_utils';
 import ResetKey from 'ee/prometheus_alerts/components/reset_key.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { GlModal } from '@gitlab/ui';
+import waitForPromises from 'helpers/wait_for_promises';
 
 describe('ResetKey', () => {
   let Component;
@@ -47,23 +48,23 @@ describe('ResetKey', () => {
       expect(vm.find('.js-reset-auth-key').text()).toEqual('Reset key');
     });
 
-    it('reset updates key', done => {
+    it('reset updates key', () => {
       mock.onPost(propsData.changeKeyUrl).replyOnce(200, { token: 'newToken' });
 
       vm.find(GlModal).vm.$emit('ok');
 
-      setTimeout(() => {
+      return waitForPromises().then(() => {
+        expect(vm.vm.authorizationKey).toEqual('newToken');
         expect(vm.find('#authorization-key').attributes('value')).toEqual('newToken');
-        done();
       });
     });
 
-    it('reset key failure shows error', done => {
+    it('reset key failure shows error', () => {
       mock.onPost(propsData.changeKeyUrl).replyOnce(500);
 
       vm.find(GlModal).vm.$emit('ok');
 
-      setTimeout(() => {
+      return waitForPromises().then(() => {
         expect(vm.find('#authorization-key').attributes('value')).toEqual(
           propsData.initialAuthorizationKey,
         );
@@ -71,7 +72,6 @@ describe('ResetKey', () => {
         expect(document.querySelector('.flash-container').innerText.trim()).toEqual(
           'Failed to reset key. Please try again.',
         );
-        done();
       });
     });
   });
@@ -89,14 +89,13 @@ describe('ResetKey', () => {
       expect(vm.find('#authorization-key').attributes('value')).toEqual('');
     });
 
-    it('Generate key button triggers key change', done => {
+    it('Generate key button triggers key change', () => {
       mock.onPost(propsData.changeKeyUrl).replyOnce(200, { token: 'newToken' });
 
       vm.find('.js-reset-auth-key').vm.$emit('click');
 
-      setTimeout(() => {
+      return waitForPromises().then(() => {
         expect(vm.find('#authorization-key').attributes('value')).toEqual('newToken');
-        done();
       });
     });
   });
