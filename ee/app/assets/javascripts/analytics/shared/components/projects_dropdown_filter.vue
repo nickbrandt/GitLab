@@ -80,10 +80,13 @@ export default {
         ? this.selectedProjects.concat([selectedProject])
         : this.selectedProjects.filter(project => project.id !== selectedProject.id);
     },
+    singleSelectedProject(selectedObj, isMarking) {
+      return isMarking ? [selectedObj] : [];
+    },
     setSelectedProjects(selectedObj, isMarking) {
       this.selectedProjects = this.multiSelect
         ? this.getSelectedProjects(selectedObj, isMarking)
-        : [selectedObj];
+        : this.singleSelectedProject(selectedObj, isMarking);
     },
     onClick({ selectedObj, e, isMarking }) {
       e.preventDefault();
