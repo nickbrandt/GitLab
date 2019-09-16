@@ -88,6 +88,9 @@ export default {
     shouldShowCountList() {
       return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
     },
+    showHideDismissedToggle() {
+      return Boolean(gon.features && gon.features.hideDismissedVulnerabilities);
+    },
   },
   watch: {
     'pageInfo.total': 'emitVulnerabilitiesCountChanged',
@@ -100,7 +103,9 @@ export default {
       });
     }
     this.setPipelineId(this.pipelineId);
-    this.setHideDismissedToggleInitialState();
+    if (this.showHideDismissedToggle) {
+      this.setHideDismissedToggleInitialState();
+    }
     this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
@@ -143,7 +148,7 @@ export default {
 <template>
   <section>
     <header>
-      <filters />
+      <filters :show-hide-dismissed-toggle="showHideDismissedToggle" />
     </header>
 
     <vulnerability-count-list v-if="shouldShowCountList" class="mb-0" />

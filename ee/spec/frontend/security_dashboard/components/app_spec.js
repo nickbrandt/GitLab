@@ -170,6 +170,8 @@ describe('Security Dashboard app', () => {
 
   describe('dismissed vulnerabilities', () => {
     beforeEach(() => {
+      gon.features = gon.features || {};
+      gon.features.hideDismissedVulnerabilities = true;
       getParameterValues.mockImplementation(() => [true]);
       setup();
     });
