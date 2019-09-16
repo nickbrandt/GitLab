@@ -1,9 +1,15 @@
 require 'spec_helper'
 
-describe Gitlab::Ci::Status::CompositeStatus do
+describe Gitlab::Ci::Status::Composite do
   set(:pipeline) { create(:ci_pipeline) }
 
-  let(:composite_status) { described_class.new(all_statuses) }
+  let(:composite_status) do
+    described_class.new(
+      all_statuses.pluck(:status, :allow_failure),
+      status_key: 0,
+      allow_failure_key: 0
+    )
+  end
 
   before(:all) do
     @statuses = HasStatus::STATUSES_ENUM.map do |status, idx|
@@ -16,11 +22,11 @@ describe Gitlab::Ci::Status::CompositeStatus do
   end
 
   describe '#status' do
-    subject { composite_status.status.to_s }
+    subject { composite_status.status }
 
     shared_examples 'compares composite with SQL status' do
       it 'returns exactly the same result' do
-        is_expected.to eq(Ci::Build.where(id: all_statuses).legacy_status.to_s)
+        is_expected.to eq(Ci::Build.where(id: all_statuses).legacy_status)
       end
     end
 

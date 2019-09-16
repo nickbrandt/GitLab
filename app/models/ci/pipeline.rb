@@ -406,16 +406,21 @@ module Ci
     end
 
     def legacy_stages_using_composite_status
-      stages = Gitlab::Ci::Status::GroupedStatuses
-        .new(statuses.latest, :stage, :stage_idx)
-        .group(:stage, :stage_idx)
-        .sort_by { |stage| stage[:stage_idx] }
+      stages = statuses.latest
+        .group_by(&:stage_idx)
+        .sort_by(&:first)
 
-      stages.map do |stage|
+      stages.map do |stage_idx, jobs|
+        stage_name = jobs.first.stage
+        jobs_statuses = jobs.pluck(:status, :allow_failure)
+
+        composite_status = Gitlab::Ci::Status::Composite
+          .new(jobs_statuses, status_key: 0, allow_failure_key: 1)
+
         Ci::LegacyStage.new(self,
-          name: stage[:stage],
-          status: stage[:status],
-          warnings: stage[:warnings])
+          name: stage_name,
+          status: composite_status.status,
+          warnings: composite_status.warnings?)
       end
     end
 
@@ -423,7 +428,7 @@ module Ci
       if Feature.enabled?(:ci_composite_status, default_enabled: true)
         legacy_stages_using_composite_status
       else
-        legacy_status_using_sql
+        legacy_stages_using_sql
       end
     end
 

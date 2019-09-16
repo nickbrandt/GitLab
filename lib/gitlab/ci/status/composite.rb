@@ -3,13 +3,18 @@
 module Gitlab
   module Ci
     module Status
-      class CompositeStatus
+      class Composite
         attr_reader :warnings
 
-        def initialize(all_statuses)
+        # This class accepts an array of arrays or array of hashes
+        # The `status_key` and `allow_failure_key` define an index
+        # or key in each entry
+        def initialize(all_statuses, status_key:, allow_failure_key:)
           @count = 0
           @warnings = 0
           @status_set = Set.new
+          @status_key = status_key
+          @allow_failure_key = allow_failure_key
 
           build_status_set(all_statuses)
         end
@@ -19,29 +24,29 @@ module Gitlab
           when @count.zero?
             nil
           when none? || only_of?(:skipped)
-            warnings? ? :success : :skipped
+            warnings? ? 'success' : 'skipped'
           when only_of?(:success, :skipped)
-            :success
+            'success'
           when only_of?(:created)
-            :created
+            'created'
           when only_of?(:preparing)
-            :preparing
+            'preparing'
           when only_of?(:success, :skipped, :canceled)
-            :canceled
+            'canceled'
           when only_of?(:created, :skipped, :pending)
-            :pending
+            'pending'
           when any_of?(:running, :pending)
-            :running
+            'running'
           when any_of?(:manual)
-            :manual
+            'manual'
           when any_of?(:scheduled)
-            :scheduled
+            'scheduled'
           when any_of?(:preparing)
-            :preparing
+            'preparing'
           when any_of?(:created)
-            :running
+            'running'
           else
-            :failed
+            'failed'
           end
         end
 
@@ -67,18 +72,23 @@ module Gitlab
         def build_status_set(all_statuses)
           all_statuses.each do |status|
             @count += 1
-            if status[:allow_failure]
-              if HasStatus::PASSED_WITH_WARNINGS_STATUSES.include?(status[:status])
-                @warnings += 1
-              end
+            @warnings += 1 if count_as_warning?(status)
+            next if exclude_from_calculation?(status)
 
-              if HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[:status])
-                next
-              end
-            end
-
-            @status_set.add(status[:status].to_sym)
+            @status_set.add(status[@status_key].to_sym)
           end
+        end
+
+        def count_as_warning?(status)
+          @allow_failure_key &&
+            status[@allow_failure_key] &&
+            HasStatus::PASSED_WITH_WARNINGS_STATUSES.include?(status[@status_key])
+        end
+        
+        def exclude_from_calculation?(status)
+          @allow_failure_key &&
+            status[@allow_failure_key] &&
+            HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[@status_key])
         end
       end
     end

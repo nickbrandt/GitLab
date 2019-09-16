@@ -61,9 +61,14 @@ module HasStatus
 
     def slow_composite_status
       if Feature.enabled?(:ci_composite_status, default_enabled: true)
-        Gitlab::Ci::Status::GroupedStatuses
-          .new(all)
-          .one[:status]
+        columns = [:status]
+        columns << :allow_failure if column_names.include?('allow_failure')
+
+        all_statuses = all.pluck(*columns)
+
+        Gitlab::Ci::Status::Composite
+          .new(all_statuses, status_key: 0, allow_failure_key: 1)
+          .status
       else
         legacy_status
       end
