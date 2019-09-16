@@ -47,7 +47,7 @@ module Gitlab
           columns << :allow_failure if !subject.respond_to?(:column_names) || subject.column_names.include?('allow_failure')
 
           subject
-            .pluck(*columns)
+            .pluck(*columns) # rubocop: disable CodeReuse/ActiveRecord
             .map { |attrs| columns.zip(attrs).to_h }
         end
 

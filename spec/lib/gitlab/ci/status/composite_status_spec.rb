@@ -50,6 +50,5 @@ describe Gitlab::Ci::Status::CompositeStatus do
     it_behaves_like 'validate all combinations', 0
     it_behaves_like 'validate all combinations', 1
     it_behaves_like 'validate all combinations', 2
-    #it_behaves_like 'validate all combinations', 3
   end
 end

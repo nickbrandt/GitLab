@@ -94,10 +94,7 @@ module Ci
 
     def created_processables_in_stage_without_needs(index)
       created_processables_without_needs
-        .preload(:project)
-        .preload(:taggings)
-        .preload(:deployment)
-        .preload(:user)
+        .with_preloads
         .for_stage(index)
     end
 

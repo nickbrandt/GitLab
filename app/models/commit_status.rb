@@ -48,6 +48,10 @@ class CommitStatus < ApplicationRecord
   scope :processables, -> { where(type: %w[Ci::Build Ci::Bridge]) }
   scope :for_ids, -> (ids) { where(id: ids) }
 
+  scope :with_preloads, -> do
+    preload(:project, :taggings, :deployment, :user)
+  end
+
   scope :with_needs, -> (names = nil) do
     needs = Ci::BuildNeed.scoped_build.select(1)
     needs = needs.where(name: names) if names
