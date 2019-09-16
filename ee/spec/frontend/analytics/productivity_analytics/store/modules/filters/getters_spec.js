@@ -12,7 +12,7 @@ describe('Productivity analytics filter getters', () => {
     it('returns an object with group_id, project_id and all relevant params from the filters string', () => {
       state = {
         groupNamespace: 'gitlab-org',
-        projectPath: 'gitlab-test',
+        projectPath: 'gitlab-org/gitlab-test',
         filters: '?author_username=root&milestone_title=foo&label_name[]=labelxyz',
       };
 
@@ -23,7 +23,7 @@ describe('Productivity analytics filter getters', () => {
         label_name: ['labelxyz'],
         merged_at_after: '2019-07-16T00:00:00.00Z',
         milestone_title: 'foo',
-        project_id: 'gitlab-test',
+        project_id: 'gitlab-org/gitlab-test',
       };
 
       const result = getters.getCommonFilterParams(state, mockGetters);

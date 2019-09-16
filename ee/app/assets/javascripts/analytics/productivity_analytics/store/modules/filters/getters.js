@@ -7,7 +7,7 @@ import { urlParamsToObject } from '~/lib/utils/common_utils';
  *
  * {
  *   group_id: 'gitlab-org',
- *   project_id: 'gitlab-test',
+ *   project_id: 'gitlab-org/gitlab-test',
  *   author_username: 'author',
  *   milestone_title: 'my milestone',
  *   label_name: ['my label', 'yet another label'],

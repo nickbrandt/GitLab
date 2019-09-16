@@ -18,7 +18,7 @@ describe('FilterDropdowns component', () => {
   };
 
   const groupNamespace = 'gitlab-org';
-  const projectPath = 'gitlab-test';
+  const projectPath = 'gitlab-org/gitlab-test';
 
   beforeEach(() => {
     wrapper = shallowMount(localVue.extend(FilterDropdowns), {
@@ -80,19 +80,39 @@ describe('FilterDropdowns component', () => {
     });
 
     describe('onProjectsSelected', () => {
-      beforeEach(() => {
-        store.state.filters.groupNamespace = groupNamespace;
-        wrapper.vm.onProjectsSelected([{ id: 1, path: `${projectPath}` }]);
+      describe('when the list of selected projects is not empty', () => {
+        beforeEach(() => {
+          store.state.filters.groupNamespace = groupNamespace;
+          wrapper.vm.onProjectsSelected([{ id: 1, path_with_namespace: `${projectPath}` }]);
+        });
+
+        it('invokes setProjectPath action', () => {
+          expect(actionSpies.setProjectPath).toHaveBeenCalledWith(projectPath);
+        });
+
+        it('emits the "projectSelected" event', () => {
+          expect(wrapper.emitted().projectSelected[0][0]).toEqual({
+            namespacePath: groupNamespace,
+            project: projectPath,
+          });
+        });
       });
 
-      it('invokes setProjectPath action', () => {
-        expect(actionSpies.setProjectPath).toHaveBeenCalledWith(projectPath);
-      });
+      describe('when the list of selected projects is empty', () => {
+        beforeEach(() => {
+          store.state.filters.groupNamespace = groupNamespace;
+          wrapper.vm.onProjectsSelected([]);
+        });
 
-      it('emits the "projectSelected" event', () => {
-        expect(wrapper.emitted().projectSelected[0][0]).toEqual({
-          namespacePath: groupNamespace,
-          project: projectPath,
+        it('invokes setProjectPath action with null', () => {
+          expect(actionSpies.setProjectPath).toHaveBeenCalledWith(null);
+        });
+
+        it('emits the "projectSelected" event', () => {
+          expect(wrapper.emitted().projectSelected[0][0]).toEqual({
+            namespacePath: groupNamespace,
+            project: null,
+          });
         });
       });
     });

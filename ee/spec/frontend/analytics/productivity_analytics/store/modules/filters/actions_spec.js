@@ -5,7 +5,7 @@ import getInitialState from 'ee/analytics/productivity_analytics/store/modules/f
 
 describe('Productivity analytics filter actions', () => {
   const groupNamespace = 'gitlab-org';
-  const projectPath = 'gitlab-test';
+  const projectPath = 'gitlab-org/gitlab-test';
 
   describe('setGroupNamespace', () => {
     it('commits the SET_GROUP_NAMESPACE mutation', done => {

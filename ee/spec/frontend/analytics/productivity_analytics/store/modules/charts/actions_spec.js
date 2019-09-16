@@ -16,7 +16,7 @@ describe('Productivity analytics chart actions', () => {
   const chartKey = 'main';
   const globalParams = {
     group_id: 'gitlab-org',
-    project_id: 'gitlab-test',
+    project_id: 'gitlab-org/gitlab-test',
   };
 
   beforeEach(() => {

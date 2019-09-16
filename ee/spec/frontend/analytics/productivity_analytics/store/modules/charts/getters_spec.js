@@ -11,7 +11,7 @@ describe('Productivity analytics chart getters', () => {
   let state;
 
   const groupNamespace = 'gitlab-org';
-  const projectPath = 'gitlab-test';
+  const projectPath = 'gitlab-org/gitlab-test';
 
   beforeEach(() => {
     state = createState();
