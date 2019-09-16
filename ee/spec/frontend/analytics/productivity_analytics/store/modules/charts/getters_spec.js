@@ -142,7 +142,7 @@ describe('Productivity analytics chart getters', () => {
     });
   });
 
-  describe('getColumnChartOption', () => {
+  describe('getColumnChartDatazoomOption', () => {
     const chartKey = chartKeys.main;
 
     describe(`data exceeds threshold of ${maxColumnChartItemsPerPage[chartKey]} items`, () => {
@@ -167,7 +167,7 @@ describe('Productivity analytics chart getters', () => {
           ],
         };
 
-        expect(getters.getColumnChartOption(state)(chartKeys.main)).toEqual(expected);
+        expect(getters.getColumnChartDatazoomOption(state)(chartKeys.main)).toEqual(expected);
       });
     });
 
@@ -175,7 +175,7 @@ describe('Productivity analytics chart getters', () => {
       it('returns an empty dataZoom property', () => {
         state.charts[chartKey].data = { '1': 1, '2': 2, '3': 3 };
 
-        expect(getters.getColumnChartOption(state)(chartKeys.main)).toEqual({});
+        expect(getters.getColumnChartDatazoomOption(state)(chartKeys.main)).toEqual({});
       });
     });
   });

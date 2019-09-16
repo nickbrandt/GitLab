@@ -58,7 +58,7 @@ export default {
     ...mapGetters('charts', [
       'chartLoading',
       'getChartData',
-      'getColumnChartOption',
+      'getColumnChartDatazoomOption',
       'getMetricDropdownLabel',
       'isSelectedMetric',
     ]),
@@ -94,6 +94,16 @@ export default {
     },
     getMetricTypes(chartKey) {
       return metricTypes.filter(m => m.chart === chartKey);
+    },
+    getColumnChartOption(chartKey) {
+      return {
+        yAxis: {
+          axisLabel: {
+            formatter: value => value,
+          },
+        },
+        ...this.getColumnChartDatazoomOption(chartKey),
+      };
     },
   },
 };
