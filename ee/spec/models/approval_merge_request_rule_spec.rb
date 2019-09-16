@@ -88,6 +88,20 @@ describe ApprovalMergeRequestRule do
         expect(rule).not_to be_valid
       end
     end
+
+    context 'any_approver rules' do
+      let(:rule) { build(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver) }
+
+      it 'is valid' do
+        expect(rule).to be_valid
+      end
+
+      it 'creating more than one any_approver rule raises an error' do
+        create(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver)
+
+        expect { rule.save }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
   end
 
   context 'scopes'  do

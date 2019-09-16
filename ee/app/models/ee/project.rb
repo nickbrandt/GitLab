@@ -20,6 +20,7 @@ module EE
       include EachBatch
       include InsightsFeature
       include Vulnerable
+      include DeprecatedApprovalsBeforeMerge
 
       self.ignored_columns += %i[
         mirror_last_update_at

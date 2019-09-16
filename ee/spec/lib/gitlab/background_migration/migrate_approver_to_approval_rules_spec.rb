@@ -117,7 +117,15 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
 
     context 'merge request' do
-      let(:target) { create(:merge_request, approvals_before_merge: 2) }
+      let(:target) do
+        merge_request = build(:merge_request, approvals_before_merge: 2)
+
+        allow(merge_request).to receive(:update_any_approver_rule)
+
+        merge_request.save!
+        merge_request
+      end
+
       let(:target_type) { 'MergeRequest' }
       let(:approval_rule) { create(:approval_merge_request_rule, merge_request: target) }
 
@@ -243,7 +251,15 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
 
     context 'project' do
-      let(:target) { create(:project, approvals_before_merge: 2) }
+      let(:target) do
+        project = build(:project, approvals_before_merge: 2)
+
+        allow(project).to receive(:update_any_approver_rule)
+
+        project.save!
+        project
+      end
+
       let(:target_type) { 'Project' }
       let(:approval_rule) { create(:approval_project_rule, project: target) }
 
