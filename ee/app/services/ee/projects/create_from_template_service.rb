@@ -9,11 +9,7 @@ module EE
       override :execute
       def execute
         return super unless use_custom_template?
-
-        if subgroup_id && !valid_project_namespace?
-          project.errors.add(:namespace, _("is not a descendant of the Group owning the template"))
-          return project
-        end
+        return project unless validate_group_template!
 
         override_params = params.dup
         params[:custom_template] = template_project if template_project
@@ -22,6 +18,18 @@ module EE
       end
 
       private
+
+      def validate_group_template!
+        if subgroup_id && !valid_project_namespace?
+          project.errors.add(:namespace, _("is not a descendant of the Group owning the template"))
+          return false
+        end
+
+        return true if template_project.present?
+
+        project.errors.add(:template_name, _("'%{template_name}' is unknown or invalid" % { template_name: template_name }))
+        false
+      end
 
       def use_custom_template?
         strong_memoize(:use_custom_template) do
@@ -51,10 +59,6 @@ module EE
         templates_owner.self_and_descendants.exists?(id: project.namespace_id)
       end
       # rubocop: enable CodeReuse/ActiveRecord
-
-      def project
-        @project ||= ::Project.new(namespace_id: params[:namespace_id])
-      end
     end
   end
 end
