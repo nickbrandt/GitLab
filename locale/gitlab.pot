@@ -18577,9 +18577,6 @@ msgstr ""
 msgid "entries cannot contain HTML tags"
 msgstr ""
 
-msgid "epic"
-msgstr ""
-
 msgid "error"
 msgstr ""
 
