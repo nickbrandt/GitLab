@@ -29,7 +29,7 @@ module WebpackHelper
     if chunks.empty?
       chunks = webpack_entrypoint_paths("default", extension: 'mjs')
     end
-    javascript_include_tag(*chunks)
+    javascript_include_tag *chunks, defer: true, extname: false, type: "module"
   end
 
   def webpack_entrypoint_paths(source, extension: nil, exclude_duplicates: true)
