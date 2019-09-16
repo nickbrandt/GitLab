@@ -4,7 +4,7 @@ module World
   include ::Gitlab::Utils::StrongMemoize
   extend self
 
-  DENYLIST = ['Iran (Islamic Republic of)', 'Sudan', 'Syrian Arab Republic', 'Korea', 'Democratic People\'s Republic of', 'Cuba'].freeze
+  DENYLIST = ['Iran (Islamic Republic of)', 'Sudan', 'Syrian Arab Republic', 'Korea (Democratic People\'s Republic of)', 'Cuba'].freeze
 
   def countries_for_select
     strong_memoize(:countries_for_select) { all_countries.sort_by(&:name).map { |c| [c.name, c.alpha2] } }
