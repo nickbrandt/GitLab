@@ -141,6 +141,23 @@ describe('ProjectsDropdownFilter component', () => {
         ]);
       });
 
+      it('selection should be emptied when a project is deselected', () => {
+        const project = findDropdownItems().at(0);
+        project.trigger('click');
+        project.trigger('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          {
+            name: 'selected',
+            args: [[projects[0]]],
+          },
+          {
+            name: 'selected',
+            args: [[]],
+          },
+        ]);
+      });
+
       it('renders an avatar in the dropdown button when the project has an avatar_url', done => {
         findDropdownItems()
           .at(0)
