@@ -2,7 +2,7 @@
 
 module QA
   context 'Plan' do
-    describe 'Issues weights' do
+    describe 'Issues weight visualization' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)

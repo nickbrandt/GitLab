@@ -165,6 +165,7 @@ export default {
       <a
         v-if="editable"
         class="float-right js-weight-edit-link"
+        data-qa-selector="edit_weight_link"
         href="#"
         @click="onEditClick(!shouldShowEditField)"
         >{{ __('Edit') }}</a
@@ -175,6 +176,7 @@ export default {
         ref="editableField"
         :value="weight"
         class="form-control"
+        data-qa-selector="weight_input_field"
         type="text"
         :placeholder="__('Enter a number')"
         @blur="onSubmit"
@@ -192,12 +194,18 @@ export default {
         }}</strong>
         <span v-if="editable">
           -
-          <a class="btn-default-hover-link js-weight-remove-link" href="#" @click="removeWeight">{{
-            __('remove weight')
-          }}</a>
+          <a
+            class="btn-default-hover-link js-weight-remove-link"
+            data-qa-selector="remove_weight_link"
+            href="#"
+            @click="removeWeight"
+            >{{ __('remove weight') }}</a
+          >
         </span>
       </span>
-      <span v-else class="no-value">{{ noValueLabel }}</span>
+      <span v-else class="no-value" data-qa-selector="weight_no_value_content">{{
+        noValueLabel
+      }}</span>
     </div>
   </div>
 </template>
