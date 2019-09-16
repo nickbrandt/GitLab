@@ -21,7 +21,8 @@ class Analytics::ApplicationController < ApplicationController
 
   def check_feature_availability!(feature)
     return render_403 unless ::License.feature_available?(feature)
-    return render_403 if @group && !@group.root_ancestor.feature_available?(feature)
+    return unless @group
+    return render_403 unless @group.root_ancestor.feature_available?(feature)
   end
 
   def load_group
