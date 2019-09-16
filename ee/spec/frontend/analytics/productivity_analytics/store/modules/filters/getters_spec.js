@@ -18,7 +18,7 @@ describe('Productivity analytics filter getters', () => {
 
       const mockGetters = { mergedOnAfterDate: '2019-07-16T00:00:00.00Z' };
       const expected = {
-        author_username: 'root',
+        author_id: 'root',
         group_id: 'gitlab-org',
         label_name: ['labelxyz'],
         merged_at_after: '2019-07-16T00:00:00.00Z',
