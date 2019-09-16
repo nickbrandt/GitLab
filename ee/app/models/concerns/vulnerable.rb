@@ -3,7 +3,7 @@
 module Vulnerable
   def latest_vulnerabilities
     Vulnerabilities::Occurrence
-      .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
+      .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project).joins(:identifiers)
   end
 
   def latest_vulnerabilities_with_sha

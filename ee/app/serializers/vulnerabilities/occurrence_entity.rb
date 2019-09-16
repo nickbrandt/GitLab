@@ -19,6 +19,7 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
   end
 
   expose :project, using: ::ProjectEntity
+  # expose :group, using: ::GroupEntity
   expose :dismissal_feedback, using: Vulnerabilities::FeedbackEntity
   expose :issue_feedback, using: Vulnerabilities::FeedbackEntity
   expose :merge_request_feedback, using: Vulnerabilities::FeedbackEntity
