@@ -78,8 +78,9 @@ export const getFilterParams = (state, getters, rootState, rootGetters) => chart
  *
  * If the number of data items being displayed is below the MAX_ITEMS_PER_PAGE threshold,
  * it will return an empty dataZoom property.
+ *
  */
-export const getColumnChartOption = state => chartKey => {
+export const getColumnChartDatazoomOption = state => chartKey => {
   const { data } = state.charts[chartKey];
   const totalItems = Object.keys(data).length;
   const MAX_ITEMS_PER_PAGE = maxColumnChartItemsPerPage[chartKey]
