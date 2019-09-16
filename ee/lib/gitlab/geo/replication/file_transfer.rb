@@ -8,6 +8,10 @@ module Gitlab
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
       class FileTransfer < BaseTransfer
+        # Initialize a transfer service for a specified Upload
+        #
+        # @param [Symbol] file_type
+        # @param [Upload] upload
         def initialize(file_type, upload)
           if upload.local?
             super(local_file_attributes(file_type, upload))

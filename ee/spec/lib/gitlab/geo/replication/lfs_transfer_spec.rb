@@ -20,7 +20,7 @@ describe Gitlab::Geo::Replication::LfsTransfer do
 
     context 'when the destination filename is a directory' do
       it 'returns a failed result' do
-        expect(lfs_object).to receive(:file).and_return(double(path: '/tmp'))
+        allow(lfs_object).to receive(:file).and_return(double(path: '/tmp'))
 
         result = subject.download_from_primary
 
@@ -84,7 +84,7 @@ describe Gitlab::Geo::Replication::LfsTransfer do
 
     context "invalid path" do
       it 'logs an error if the destination directory could not be created' do
-        expect(lfs_object).to receive(:file).and_return(double(path: '/foo/bar'))
+        allow(lfs_object).to receive(:file).and_return(double(path: '/foo/bar'))
 
         allow(FileUtils).to receive(:mkdir_p) { raise Errno::EEXIST }
 

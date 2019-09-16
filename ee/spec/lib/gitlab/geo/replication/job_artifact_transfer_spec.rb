@@ -42,7 +42,7 @@ describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
 
     context 'when the destination filename is a directory' do
       it 'returns a failed result' do
-        expect(job_artifact).to receive(:file).and_return(double(path: '/tmp'))
+        allow(job_artifact).to receive(:file).and_return(double(path: '/tmp'))
 
         result = subject.download_from_primary
 
@@ -106,7 +106,7 @@ describe Gitlab::Geo::Replication::JobArtifactTransfer, :geo do
 
     context "invalid path" do
       it 'logs an error if the destination directory could not be created' do
-        expect(job_artifact).to receive(:file).and_return(double(path: '/foo/bar'))
+        allow(job_artifact).to receive(:file).and_return(double(path: '/foo/bar'))
 
         allow(FileUtils).to receive(:mkdir_p) { raise Errno::EEXIST }
 
