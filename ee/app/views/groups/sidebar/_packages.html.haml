@@ -6,6 +6,11 @@
       %span.nav-item-name
         = _('Packages')
     %ul.sidebar-sub-level-items
+      = nav_link(controller: [:packages, :repositories], html_options: { class: "fly-out-top-item" } ) do
+        = link_to group_packages_path(@group) do
+          %strong.fly-out-top-item-name
+            = _('Packages')
+      %li.divider.fly-out-top-item
       - if group_packages_list_nav?
         = nav_link(controller: 'groups/packages') do
           = link_to group_packages_path(@group), title: _('Packages') do
