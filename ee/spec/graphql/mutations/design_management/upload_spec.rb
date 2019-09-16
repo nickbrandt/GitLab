@@ -39,7 +39,7 @@ describe Mutations::DesignManagement::Upload do
         enable_design_management
       end
 
-      describe 'running requests in parallel' do
+      describe 'contention in the design repo' do
         let(:files) do
           [
             fixture_file_upload('spec/fixtures/dk.png'),
@@ -48,13 +48,25 @@ describe Mutations::DesignManagement::Upload do
           ]
         end
 
-        it 'does not cause errors' do
-          expect do
-            threads = files.map do |f|
-              Thread.new { run_mutation([f]) }
-            end
-            threads.each(&:join)
-          end.not_to raise_error
+        describe 'running requests in parallel' do
+          it 'does not cause errors' do
+            expect do
+              threads = files.map do |f|
+                Thread.new { run_mutation([f]) }
+              end
+              threads.each(&:join)
+            end.not_to raise_error
+          end
+        end
+
+        describe 'running requests in serial' do
+          it 'does not cause errors' do
+            expect do
+              files.each do |f|
+                run_mutation([f])
+              end
+            end.not_to raise_error
+          end
         end
       end
 
