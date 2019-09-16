@@ -93,7 +93,7 @@ class Todo < ApplicationRecord
     #
     # target - The value of the `target_type` column, such as `Issue`.
     def any_for_target?(target)
-      exists?(target: target)
+      exists?(target: target, state: :pending)
     end
 
     # Updates the state of a relation of todos to the new state.
