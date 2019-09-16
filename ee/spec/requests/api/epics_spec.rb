@@ -330,6 +330,33 @@ describe API::Epics do
       end
     end
 
+    context 'with hierarchy params' do
+      let(:subgroup) { create(:group, parent: group) }
+      let(:subgroup2) { create(:group, parent: subgroup) }
+      let!(:subgroup_epic) { create(:epic, group: subgroup) }
+      let!(:subgroup2_epic) { create(:epic, group: subgroup2) }
+
+      let(:url) { "/groups/#{subgroup.id}/epics" }
+
+      before do
+        stub_licensed_features(epics: true)
+
+        epic
+      end
+
+      it 'excludes descendant group epics' do
+        get api(url), params: { include_descendant_groups: false }
+
+        expect_paginated_array_response(subgroup_epic.id)
+      end
+
+      it 'includes ancestor group epics' do
+        get api(url), params: { include_ancestor_groups: true }
+
+        expect_paginated_array_response([epic.id, subgroup2_epic.id, subgroup_epic.id])
+      end
+    end
+
     context 'with pagination params' do
       let(:page) { 1 }
       let(:per_page) { 2 }
