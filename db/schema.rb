@@ -2208,7 +2208,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_061145) do
     t.index ["user_id"], name: "index_merge_trains_on_user_id"
   end
 
-  create_table "milestone_releases", force: :cascade do |t|
+  create_table "milestone_releases", id: false, force: :cascade do |t|
     t.bigint "milestone_id", null: false
     t.bigint "release_id", null: false
     t.index ["milestone_id", "release_id"], name: "index_miletone_releases_on_milestone_and_release", unique: true
