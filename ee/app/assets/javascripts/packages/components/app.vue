@@ -202,14 +202,14 @@ export default {
       :items="filesTableRows"
       tbody-tr-class="js-file-row"
     >
-      <template v-slot:name="items">
+      <template #name="items">
         <icon name="doc-code" class="space-right" />
         <gl-link :href="items.item.downloadPath" class="js-file-download">{{
           items.item.name
         }}</gl-link>
       </template>
 
-      <template v-slot:created="items">
+      <template #created="items">
         <span v-gl-tooltip :title="tooltipTitle(items.item.created)">{{
           timeFormated(items.item.created)
         }}</span>
@@ -217,7 +217,7 @@ export default {
     </gl-table>
 
     <gl-modal ref="deleteModal" class="js-delete-modal" modal-id="delete-modal">
-      <template v-slot:modal-title>{{ $options.i18n.deleteModalTitle }}</template>
+      <template #modal-title>{{ $options.i18n.deleteModalTitle }}</template>
       <p v-html="deleteModalDescription"></p>
 
       <div slot="modal-footer" class="w-100">
