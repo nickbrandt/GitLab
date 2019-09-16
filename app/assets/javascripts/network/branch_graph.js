@@ -238,6 +238,7 @@ export default (function() {
       'fill-opacity': 0.5,
       stroke: 'none',
     });
+    // Generate the triangle right of the tag box
     r.path(['M', x - 5, y, 'L', x - 15, y - 4, 'L', x - 15, y + 4, 'Z']).attr({
       fill: '#000',
       'fill-opacity': 0.5,
