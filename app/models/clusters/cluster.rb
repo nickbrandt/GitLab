@@ -37,9 +37,18 @@ module Clusters
 
     has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
-    APPLICATIONS.values.each do |application|
+    def self.has_one_cluster_application(name)
+      application = APPLICATIONS[name.to_s]
       has_one application.association_name, class_name: application.to_s # rubocop:disable Rails/ReflectionClassName
     end
+
+    has_one_cluster_application :helm
+    has_one_cluster_application :ingress
+    has_one_cluster_application :cert_manager
+    has_one_cluster_application :prometheus
+    has_one_cluster_application :runner
+    has_one_cluster_application :jupyter
+    has_one_cluster_application :knative
 
     has_many :kubernetes_namespaces
 
@@ -123,8 +132,8 @@ module Clusters
     end
 
     def applications
-      APPLICATIONS.values.map do |application|
-        public_send(application.association_name) || public_send("build_#{application.association_name}") # rubocop:disable GitlabSecurity/PublicSend
+      APPLICATIONS.values.map do |application_class|
+        public_send(application_class.association_name) || public_send("build_#{application_class.association_name}") # rubocop:disable GitlabSecurity/PublicSend
       end
     end
 
