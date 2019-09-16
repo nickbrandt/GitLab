@@ -8,7 +8,7 @@ import { urlParamsToObject } from '~/lib/utils/common_utils';
  * {
  *   group_id: 'gitlab-org',
  *   project_id: 'gitlab-org/gitlab-test',
- *   author_username: 'author',
+ *   author_id: 'author',
  *   milestone_title: 'my milestone',
  *   label_name: ['my label', 'yet another label'],
  *   merged_at_after: '2019-05-09T16:20:18.393Z'
@@ -22,7 +22,9 @@ export const getCommonFilterParams = (state, getters) => {
   return {
     group_id: groupNamespace,
     project_id: projectPath,
-    author_username,
+    // The productivity analytics endpoint accepts an "author_id", however we get "author_username" from the filtered search
+    // As a result, we need to map the two values here.
+    author_id: author_username,
     milestone_title,
     label_name,
     merged_at_after: getters.mergedOnAfterDate,
