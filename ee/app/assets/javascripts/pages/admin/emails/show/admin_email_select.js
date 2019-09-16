@@ -1,4 +1,4 @@
-/* eslint-disable no-var, func-names, camelcase, no-unused-vars, object-shorthand, one-var, prefer-arrow-callback, prefer-template, no-else-return */
+/* eslint-disable no-var, func-names, object-shorthand, one-var, prefer-arrow-callback, prefer-template, no-else-return */
 
 import $ from 'jquery';
 import Api from '~/api';
@@ -10,8 +10,6 @@ function AdminEmailSelect() {
       $('.ajax-admin-email-select').each(
         (function(_this) {
           return function(i, select) {
-            var skip_ldap;
-            skip_ldap = $(select).hasClass('skip_ldap');
             return $(select).select2({
               placeholder: __('Select group or project'),
               multiple: $(select).hasClass('multiselect'),
