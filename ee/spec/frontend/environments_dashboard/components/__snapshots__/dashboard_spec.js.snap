@@ -5,6 +5,7 @@ exports[`dashboard should match the snapshot 1`] = `
   class="operations-dashboard"
 >
   <glmodal-stub
+    modalclass=""
     modalid="add-projects-modal"
     ok-disabled="true"
     ok-title="Add projects"
