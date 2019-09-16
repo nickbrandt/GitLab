@@ -1,5 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import MergeRequestTableRow from 'ee/analytics/productivity_analytics/components/mr_table_row.vue';
+import MetricColumn from 'ee/analytics/productivity_analytics/components/metric_column.vue';
 import { GlAvatar } from '@gitlab/ui';
 import { mockMergeRequests } from '../mock_data';
 
@@ -24,7 +25,7 @@ describe('MergeRequestTableRow component', () => {
 
   const findMrDetails = () => wrapper.find('.qa-mr-details');
   const findMrMetrics = () => wrapper.find('.qa-mr-metrics');
-  const findMetricColumns = () => findMrMetrics().findAll('.metric-col');
+  const findMetricColumns = () => findMrMetrics().findAll(MetricColumn);
 
   afterEach(() => {
     wrapper.destroy();
@@ -68,8 +69,8 @@ describe('MergeRequestTableRow component', () => {
         expect(
           findMetricColumns()
             .at(0)
-            .text(),
-        ).toContain(defaultProps.mergeRequest.time_to_merge);
+            .props('value'),
+        ).toBe(defaultProps.mergeRequest.time_to_merge);
       });
     });
   });

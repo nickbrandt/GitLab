@@ -58,47 +58,17 @@ exports[`MergeRequestTableRow component on creation matches the snapshot 1`] = `
   <div
     class="table-section section-50 d-flex flex-row align-items-start qa-mr-metrics"
   >
-    <div
-      class="metric-col"
-    >
-      <span
-        class="time"
-      >
-        
-        0
-        
-        <span>
-           hrs 
-        </span>
-      </span>
-       
-      <span
-        class="d-flex d-md-none text-secondary metric-label"
-      >
-        Time to merge
-      </span>
-    </div>
+    <metriccolumn-stub
+      label="Time to merge"
+      type="time_to_merge"
+      value="0"
+    />
      
-    <div
-      class="metric-col"
-    >
-      <span
-        class="time"
-      >
-        
-        0
-        
-        <span>
-           hrs 
-        </span>
-      </span>
-       
-      <span
-        class="d-flex d-md-none text-secondary metric-label"
-      >
-        Time from first comment to last commit
-      </span>
-    </div>
+    <metriccolumn-stub
+      label="Time from first comment to last commit"
+      type="time_to_last_commit"
+      value="0"
+    />
   </div>
 </div>
 `;
