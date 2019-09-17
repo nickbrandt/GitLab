@@ -5,9 +5,20 @@
 CAUTION: **Caution:**
 Serverless is currently in [alpha](https://about.gitlab.com/handbook/product/#alpha).
 
-Run serverless workloads on Kubernetes using [Knative](https://cloud.google.com/knative/).
-
 ## Overview
+
+Serverless architectures offer Operators and Developers the ability write highly scalable applications without provisioning a single server.
+
+Gitlab supports several ways deploy Serverless applications in both Kubernetes Environments and also major cloud FAAS environments.
+
+Currently we support:
+
+- [Knative](#knative): Build Knative applications with Knative and gitlabktl on GKE
+- [AWS Lambda](aws.md): Create serverless applications via the Serverless Framework and gitlab-ci
+
+## Knative
+
+Run serverless workloads on Kubernetes using [Knative](https://cloud.google.com/knative/).
 
 Knative extends Kubernetes to provide a set of middleware components that are useful to build modern, source-centric, container-based applications. Knative brings some significant benefits out of the box through its main components:
 
