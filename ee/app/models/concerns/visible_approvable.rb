@@ -5,12 +5,6 @@
 module VisibleApprovable
   include ::Gitlab::Utils::StrongMemoize
 
-  # Users in the list of approvers who have not already approved this MR.
-  #
-  def approvers_left
-    approval_state.unactioned_approvers
-  end
-
   # The list of approvers from either this MR (if they've been set on the MR) or the
   # target project. Excludes the author if 'self-approval' isn't explicitly
   # enabled on project settings.
@@ -42,7 +36,6 @@ module VisibleApprovable
     approved_by_users.reset
     approval_rules.reset
 
-    clear_memoization(:approvers_left)
     clear_memoization(:all_approvers_including_groups)
     clear_memoization(:approval_state)
   end
