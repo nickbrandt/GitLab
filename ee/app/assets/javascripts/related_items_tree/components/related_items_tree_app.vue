@@ -109,7 +109,7 @@ export default {
     </div>
     <div
       v-else
-      class="related-items-tree card card-slim mt-2"
+      class="related-items-tree card card-slim border-top-0"
       :class="{
         'disabled-content': disableContents,
         'overflow-auto': directChildren.length > $options.OVERFLOW_AFTER,

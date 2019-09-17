@@ -15,6 +15,7 @@ import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_u
 import { ActionType, ChildType, ChildState } from '../constants';
 
 import epicChildren from '../queries/epicChildren.query.graphql';
+import epicChildReorder from '../queries/epicChildReorder.mutation.graphql';
 
 import * as types from './mutation_types';
 
@@ -266,7 +267,7 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { actionTyp
   );
 
   commit(types.RECEIVE_ADD_ITEM_SUCCESS, {
-    insertAt: isEpic ? getters.epicsBeginAtIndex : 0,
+    insertAt: isEpic ? 0 : getters.issuesBeginAtIndex,
     items,
   });
 
@@ -314,17 +315,23 @@ export const addItem = ({ state, dispatch }) => {
 
 export const requestCreateItem = ({ commit }) => commit(types.REQUEST_CREATE_ITEM);
 export const receiveCreateItemSuccess = (
-  { commit, dispatch, getters },
+  { state, commit, dispatch, getters },
   { actionType, rawItem },
 ) => {
   const isEpic = actionType === ActionType.Epic;
   const item = formatChildItem({
     ...convertObjectPropsToCamelCase(rawItem, { deep: !isEpic }),
     type: isEpic ? ChildType.Epic : ChildType.Issue,
+    // This is needed since Rails API to create Epic
+    // doesn't return global ID, we can remove this
+    // change once create epic action is moved to
+    // GraphQL.
+    id: `gid://gitlab/Epic/${rawItem.id}`,
+    reference: `${state.parentItem.fullPath}${rawItem.reference}`,
   });
 
   commit(types.RECEIVE_CREATE_ITEM_SUCCESS, {
-    insertAt: isEpic ? getters.epicsBeginAtIndex : 0,
+    insertAt: getters.issuesBeginAtIndex > 0 ? getters.issuesBeginAtIndex - 1 : 0,
     item,
   });
 
@@ -368,6 +375,51 @@ export const createItem = ({ state, dispatch }, { itemTitle }) => {
     })
     .catch(() => {
       dispatch('receiveCreateItemFailure');
+    });
+};
+
+export const receiveReorderItemFailure = ({ commit }, data) => {
+  commit(types.REORDER_ITEM, data);
+  flash(s__('Epics|Something went wrong while ordering item.'));
+};
+export const reorderItem = (
+  { dispatch, commit },
+  { treeReorderMutation, parentItem, targetItem, oldIndex, newIndex },
+) => {
+  // We proactively update the store to reflect new order of item
+  commit(types.REORDER_ITEM, { parentItem, targetItem, oldIndex, newIndex });
+
+  return gqClient
+    .mutate({
+      mutation: epicChildReorder,
+      variables: {
+        epicTreeReorderInput: {
+          baseEpicId: parentItem.id,
+          moved: treeReorderMutation,
+        },
+      },
+    })
+    .then(({ data }) => {
+      // Mutation was unsuccessful;
+      // revert to original order and show flash error
+      if (data.epicTreeReorder.errors.length) {
+        dispatch('receiveReorderItemFailure', {
+          parentItem,
+          targetItem,
+          oldIndex: newIndex,
+          newIndex: oldIndex,
+        });
+      }
+    })
+    .catch(() => {
+      // Mutation was unsuccessful;
+      // revert to original order and show flash error
+      dispatch('receiveReorderItemFailure', {
+        parentItem,
+        targetItem,
+        oldIndex: newIndex,
+        newIndex: oldIndex,
+      });
     });
 };
 

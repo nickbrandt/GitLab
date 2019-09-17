@@ -22,6 +22,16 @@ export const ActionType = {
   Issue: 'issue',
 };
 
+export const idProp = {
+  Epic: 'id',
+  Issue: 'epicIssueId',
+};
+
+export const relativePositions = {
+  Before: 'before',
+  After: 'after',
+};
+
 export const RemoveItemModalProps = {
   Epic: {
     title: s__('Epics|Remove epic'),

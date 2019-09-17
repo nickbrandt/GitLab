@@ -173,4 +173,12 @@ export default {
   [types.RECEIVE_CREATE_ITEM_FAILURE](state) {
     state.itemCreateInProgress = false;
   },
+
+  [types.REORDER_ITEM](state, { parentItem, targetItem, oldIndex, newIndex }) {
+    // Remove from old position
+    state.children[parentItem.reference].splice(oldIndex, 1);
+
+    // Insert at new position
+    state.children[parentItem.reference].splice(newIndex, 0, targetItem);
+  },
 };

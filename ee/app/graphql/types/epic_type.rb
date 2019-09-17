@@ -52,6 +52,7 @@ module Types
 
     field :web_path, GraphQL::STRING_TYPE, null: false, method: :group_epic_path # rubocop:disable Graphql/Descriptions
     field :web_url, GraphQL::STRING_TYPE, null: false, method: :group_epic_url # rubocop:disable Graphql/Descriptions
+    field :relative_position, GraphQL::INT_TYPE, null: true, description: 'The relative position of the epic in the Epic tree'
     field :relation_path, GraphQL::STRING_TYPE, null: true, method: :group_epic_link_path # rubocop:disable Graphql/Descriptions
     field :reference, GraphQL::STRING_TYPE, null: false, method: :epic_reference do # rubocop:disable Graphql/Descriptions
       argument :full, GraphQL::BOOLEAN_TYPE, required: false, default_value: false # rubocop:disable Graphql/Descriptions

@@ -1,5 +1,6 @@
 fragment IssueNode on EpicIssue {
   iid
+  epicIssueId
   title
   closedAt
   state
@@ -10,6 +11,7 @@ fragment IssueNode on EpicIssue {
   webPath
   reference
   relationPath
+  relativePosition
   assignees {
     edges {
       node {
