@@ -93,8 +93,8 @@ class Todo < ApplicationRecord
     #
     # target - The value of the `target_type` column, such as `Issue`.
     # state - The value of the `state` column, such as `pending` or `done`.
-    def any_for_target?(target, *state)
-      state.empty? ? exists?(target: target) : exists?(target: target, state: state)
+    def any_for_target?(target, state = nil)
+      state.nil? ? exists?(target: target) : exists?(target: target, state: state)
     end
 
     # Updates the state of a relation of todos to the new state.

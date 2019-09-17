@@ -51,7 +51,7 @@ class TodosFinder
   #
   # target - The value of the `target_type` column, such as `Issue`.
   # state - The value of the `state` column, such as `pending` or `done`.
-  def any_for_target?(target, *state)
+  def any_for_target?(target, state = nil)
     current_user.todos.any_for_target?(target, state)
   end
 
