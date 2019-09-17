@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Translate from '~/vue_shared/translate';
 import { config as testUtilsConfig } from '@vue/test-utils';
 import { initializeTestTimeout } from './helpers/timeout';
-import { loadHTMLFixture, setHTMLFixture } from './helpers/fixtures';
+import { getJSONFixture, loadHTMLFixture, setHTMLFixture } from './helpers/fixtures';
 import { setupManualMocks } from './mocks/mocks_helper';
 import customMatchers from './matchers';
 
@@ -43,6 +43,7 @@ Object.defineProperty(global.Element.prototype, 'innerText', {
 
 // convenience wrapper for migration from Karma
 Object.assign(global, {
+  getJSONFixture,
   loadFixtures: loadHTMLFixture,
   setFixtures: setHTMLFixture,
 
