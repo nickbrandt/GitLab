@@ -8,15 +8,8 @@ class ArtifactsFinder
 
   def execute
     artifacts = @project.job_artifacts
-    artifacts = by_job_name(artifacts)
 
     sort(artifacts)
-  end
-
-  def by_job_name(artifacts)
-    return artifacts unless @params[:search].present?
-
-    artifacts.search_by_job_name(@params[:search])
   end
 
   private

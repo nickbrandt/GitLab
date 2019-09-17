@@ -27,15 +27,5 @@ describe ArtifactsFinder do
         expect(subject).to eq(project.job_artifacts.order_by('size_desc'))
       end
     end
-
-    context 'with job_name param' do
-      let(:params) { { search: 'unique_name' } }
-
-      it 'filters the artifacts by job name' do
-        build = create(:ci_build, :artifacts, project: project, name: 'unique_name')
-
-        expect(subject).to contain_exactly(*build.job_artifacts)
-      end
-    end
   end
 end

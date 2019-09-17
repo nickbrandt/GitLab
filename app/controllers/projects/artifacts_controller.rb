@@ -96,7 +96,7 @@ class Projects::ArtifactsController < Projects::ApplicationController
   end
 
   def artifacts_params
-    params.permit(:sort, :search)
+    params.permit(:sort)
   end
 
   def validate_artifacts!
