@@ -95,3 +95,5 @@ export const dataZoomOptions = [
 export const columnHighlightStyle = { color: '#418cd8', opacity: 0.8 };
 
 export const accessLevelReporter = 20;
+
+export const projectsPerPage = 50;
