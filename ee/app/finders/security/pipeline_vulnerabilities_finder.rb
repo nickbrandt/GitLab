@@ -47,7 +47,7 @@ module Security
     def normalize_report_occurrences(report_occurrences)
       report_occurrences.map do |report_occurrence|
         occurrence_hash = report_occurrence.to_hash
-          .except(:compare_key, :identifiers, :location, :scanner) # rubocop:disable CodeReuse/ActiveRecord
+          .except(:compare_key, :identifiers, :location, :scanner)
 
         occurrence = Vulnerabilities::Occurrence.new(occurrence_hash)
 

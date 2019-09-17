@@ -27,7 +27,6 @@ module RuboCop
           create_with: true,
           distinct: false,
           eager_load: true,
-          except: true,
           exists?: true,
           find_by: true,
           find_by!: true,

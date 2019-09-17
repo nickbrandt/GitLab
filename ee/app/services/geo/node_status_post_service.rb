@@ -27,7 +27,7 @@ module Geo
     private
 
     def payload(status)
-      status.attributes.except('id') # rubocop: disable CodeReuse/ActiveRecord
+      status.attributes.except('id')
     end
 
     def handle_failure_for(response)
