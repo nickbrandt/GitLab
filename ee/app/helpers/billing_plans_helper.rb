@@ -40,4 +40,11 @@ module BillingPlansHelper
 
     "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
   end
+
+  def show_trial_banner?(namespace)
+    return false unless params[:trial]
+
+    root = namespace.has_parent? ? namespace.root_ancestor : namespace
+    root.trial_active?
+  end
 end
