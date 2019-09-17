@@ -321,8 +321,7 @@ it('waits for an Ajax call', done => {
 });
 ```
 
-If you are not able to register handlers to the `Promise`—for example because it is executed in a synchronous Vue life
-cycle hook—you can flush all pending `Promise`s:
+If you are not able to register handlers to the `Promise`, for example because it is executed in a synchronous Vue life cycle hook, please take a look at the [waitFor](#wait-until-axios-requests-finish) helpers or you can flush all pending `Promise`s:
 
 **in Jest:**
 
@@ -1087,6 +1086,16 @@ afterEach(() => {
   vm.$destroy();
 });
 ```
+
+### Wait until axios requests finish
+
+The axios utils mock module located in `spec/frontend/mocks/ce/lib/utils/axios_utils.js` contains two helper methods for Jest tests that spawn HTTP requests.
+These are very useful if you don't have a handle to the request's Promise, for example when a Vue component does a request as part of its life cycle.
+
+- `waitFor(url, callback)`: Runs `callback` after a request to `url` finishes (either successfully or unsuccessfully).
+- `waitForAll(callback)`: Runs `callback` once all pending requests have finished. If no requests are pending, runs `callback` on the next tick.
+
+Both functions run `callback` on the next tick after the requests finish (using `setImmediate()`), to allow any `.then()` or `.catch()` handlers to run.
 
 ## Testing with older browsers
 
