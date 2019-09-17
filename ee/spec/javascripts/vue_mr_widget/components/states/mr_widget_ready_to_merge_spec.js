@@ -5,6 +5,8 @@ import {
   MT_MERGE_STRATEGY,
   MTWPS_MERGE_STRATEGY,
 } from '~/vue_merge_request_widget/constants';
+import { MERGE_DISABLED_TEXT } from '~/vue_merge_request_widget/mixins/ready_to_merge';
+import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
 
 describe('ReadyToMerge', () => {
   const localVue = createLocalVue();
@@ -50,6 +52,9 @@ describe('ReadyToMerge', () => {
 
     ({ vm } = wrapper);
   };
+
+  const findResolveItemsMessage = () => wrapper.find('.js-resolve-mr-widget-items-message');
+  const findMergeButton = () => wrapper.find('.qa-merge-button');
 
   afterEach(() => {
     wrapper.destroy();
@@ -178,6 +183,40 @@ describe('ReadyToMerge', () => {
       });
 
       expect(vm.shouldShowMergeImmediatelyDropdown).toBe(true);
+    });
+  });
+
+  describe('cannot merge', () => {
+    describe('when isMergeAllowed=false', () => {
+      beforeEach(() => {
+        factory({ isMergeAllowed: false, availableAutoMergeStrategies: [] });
+      });
+
+      it('should show cannot merge text', () => {
+        expect(findResolveItemsMessage().text()).toEqual(MERGE_DISABLED_TEXT);
+      });
+
+      it('should show disabled merge button', () => {
+        const button = findMergeButton();
+
+        expect(button.exists()).toBe(true);
+        expect(button.attributes('disabled')).toBe('disabled');
+      });
+    });
+  });
+
+  describe('when needs approval', () => {
+    beforeEach(() => {
+      factory({
+        isMergeAllowed: false,
+        availableAutoMergeStrategies: [],
+        hasApprovalsAvailable: true,
+        isApproved: false,
+      });
+    });
+
+    it('should show approvals needed text', () => {
+      expect(findResolveItemsMessage().text()).toEqual(MERGE_DISABLED_TEXT_UNAPPROVED);
     });
   });
 });
