@@ -3,14 +3,6 @@ require 'spec_helper'
 describe Gitlab::Ci::Status::Composite do
   set(:pipeline) { create(:ci_pipeline) }
 
-  let(:composite_status) do
-    described_class.new(
-      all_statuses.pluck(:status, :allow_failure),
-      status_key: 0,
-      allow_failure_key: 0
-    )
-  end
-
   before(:all) do
     @statuses = HasStatus::STATUSES_ENUM.map do |status, idx|
       [status, create(:ci_build, pipeline: pipeline, status: status, importing: true)]
@@ -37,6 +29,14 @@ describe Gitlab::Ci::Status::Composite do
             let(:all_statuses) do
               statuses.map { |status| @statuses[status] }
             end
+
+            let(:composite_status) do
+              described_class.new(
+                all_statuses.pluck(:status),
+                status_key: 0,
+                allow_failure_key: nil
+              )
+            end
           end
 
           HasStatus::STATUSES_ENUM.each do |allow_failure_status, _|
@@ -45,6 +45,14 @@ describe Gitlab::Ci::Status::Composite do
                 let(:all_statuses) do
                   statuses.map { |status| @statuses[status] } +
                     [@statuses_with_allow_failure[allow_failure_status]]
+                end
+
+                let(:composite_status) do
+                  described_class.new(
+                    all_statuses.pluck(:status, :allow_failure),
+                    status_key: 0,
+                    allow_failure_key: 1
+                  )
                 end
               end
             end

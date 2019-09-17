@@ -4,12 +4,16 @@ module Gitlab
   module Ci
     module Status
       class Composite
+        include Gitlab::Utils::StrongMemoize
+
         attr_reader :warnings
 
-        # This class accepts an array of arrays or array of hashes
+        # This class accepts an array of arrays
         # The `status_key` and `allow_failure_key` define an index
         # or key in each entry
         def initialize(all_statuses, status_key:, allow_failure_key:)
+          raise ArgumentError, "all_statuses needs to be an Array" unless all_statuses.is_a?(Array)
+
           @count = 0
           @warnings = 0
           @status_set = Set.new
@@ -19,34 +23,41 @@ module Gitlab
           build_status_set(all_statuses)
         end
 
+        # The status calculation is order dependent,
+        # 1. In some cases we assume that that status is exact
+        #    if the we only have given statues,
+        # 2. In other cases we assume that status is of that type
+        #    based on what statuses are no longer valid based on the
+        #    data set that we have
         def status
-          case
-          when @count.zero?
-            nil
-          when none? || only_of?(:skipped)
-            warnings? ? 'success' : 'skipped'
-          when only_of?(:success, :skipped)
-            'success'
-          when only_of?(:created)
-            'created'
-          when only_of?(:preparing)
-            'preparing'
-          when only_of?(:success, :skipped, :canceled)
-            'canceled'
-          when only_of?(:created, :skipped, :pending)
-            'pending'
-          when any_of?(:running, :pending)
-            'running'
-          when any_of?(:manual)
-            'manual'
-          when any_of?(:scheduled)
-            'scheduled'
-          when any_of?(:preparing)
-            'preparing'
-          when any_of?(:created)
-            'running'
-          else
-            'failed'
+          strong_memoize(:status) do
+            next if @count.zero?
+
+            if none? || only_of?(:skipped)
+              warnings? ? 'success' : 'skipped'
+            elsif only_of?(:success, :skipped)
+              'success'
+            elsif only_of?(:created)
+              'created'
+            elsif only_of?(:preparing)
+              'preparing'
+            elsif only_of?(:canceled, :success, :skipped)
+              'canceled'
+            elsif only_of?(:pending, :created, :skipped)
+              'pending'
+            elsif any_of?(:running, :pending)
+              'running'
+            elsif any_of?(:manual)
+              'manual'
+            elsif any_of?(:scheduled)
+              'scheduled'
+            elsif any_of?(:preparing)
+              'preparing'
+            elsif any_of?(:created)
+              'running'
+            else
+              'failed'
+            end
           end
         end
 
@@ -71,6 +82,8 @@ module Gitlab
 
         def build_status_set(all_statuses)
           all_statuses.each do |status|
+            status = Array(status)
+
             @count += 1
             @warnings += 1 if count_as_warning?(status)
             next if exclude_from_calculation?(status)

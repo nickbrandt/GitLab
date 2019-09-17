@@ -49,7 +49,7 @@ class CommitStatus < ApplicationRecord
   scope :for_ids, -> (ids) { where(id: ids) }
 
   scope :with_preloads, -> do
-    preload(:project, :taggings, :deployment, :user)
+    preload(:project, :user)
   end
 
   scope :with_needs, -> (names = nil) do
