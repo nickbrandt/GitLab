@@ -45,17 +45,6 @@ export const metricTypes = [
   },
 ];
 
-export const tableSortFields = metricTypes.reduce(
-  (acc, curr) => {
-    const { key, label, chart } = curr;
-    if (chart === chartKeys.timeBasedHistogram) {
-      acc[key] = label;
-    }
-    return acc;
-  },
-  { days_to_merge: __('Days to merge') },
-);
-
 export const tableSortOrder = {
   asc: {
     title: s__('ProductivityAnalytics|Ascending'),
@@ -69,7 +58,10 @@ export const tableSortOrder = {
   },
 };
 
-export const timeToMergeMetric = 'time_to_merge';
+export const daysToMergeMetric = {
+  key: 'days_to_merge',
+  label: s__('ProductivityAnalytics|Days to merge'),
+};
 
 export const defaultMaxColumnChartItemsPerPage = 20;
 

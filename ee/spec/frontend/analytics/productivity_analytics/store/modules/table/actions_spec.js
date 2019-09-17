@@ -197,12 +197,12 @@ describe('Productivity analytics table actions', () => {
         done,
       ));
 
-    it('should not dispatch setColumnMetric when metric is "time_to_merge"', done =>
+    it('should not dispatch setColumnMetric when metric is "days_to_merge"', done =>
       testAction(
         actions.setSortField,
-        'time_to_merge',
+        'days_to_merge',
         mockedContext.state,
-        [{ type: types.SET_SORT_FIELD, payload: 'time_to_merge' }],
+        [{ type: types.SET_SORT_FIELD, payload: 'days_to_merge' }],
         [{ type: 'fetchMergeRequests' }],
         done,
       ));

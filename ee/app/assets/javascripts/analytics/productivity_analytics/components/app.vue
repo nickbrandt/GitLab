@@ -11,7 +11,7 @@ import {
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import Icon from '~/vue_shared/components/icon.vue';
 import MergeRequestTable from './mr_table.vue';
-import { chartKeys, metricTypes } from '../constants';
+import { chartKeys } from '../constants';
 
 export default {
   components: {
@@ -48,13 +48,8 @@ export default {
   },
   computed: {
     ...mapState('filters', ['groupNamespace', 'projectPath']),
-    ...mapState('table', [
-      'isLoadingTable',
-      'mergeRequests',
-      'pageInfo',
-      'sortFields',
-      'columnMetric',
-    ]),
+    ...mapState('table', ['isLoadingTable', 'mergeRequests', 'pageInfo', 'columnMetric']),
+    ...mapGetters(['getMetricTypes']),
     ...mapGetters('charts', [
       'chartLoading',
       'getChartData',
@@ -66,7 +61,7 @@ export default {
       'sortFieldDropdownLabel',
       'sortIcon',
       'sortTooltipTitle',
-      'getColumnOptions',
+      'tableSortOptions',
       'columnMetricLabel',
       'isSelectedSortField',
       'hasNoAccessError',
@@ -91,9 +86,6 @@ export default {
     onMainChartItemClicked({ params }) {
       const itemValue = params.data.value[0];
       this.chartItemClicked({ chartKey: this.chartKeys.main, item: itemValue });
-    },
-    getMetricTypes(chartKey) {
-      return metricTypes.filter(m => m.chart === chartKey);
     },
     getColumnChartOption(chartKey) {
       return {
@@ -262,21 +254,21 @@ export default {
               :text="sortFieldDropdownLabel"
             >
               <gl-dropdown-item
-                v-for="(value, key) in sortFields"
-                :key="key"
+                v-for="metric in tableSortOptions"
+                :key="metric.key"
                 active-class="is-active"
                 class="w-100"
-                @click="setSortField(key)"
+                @click="setSortField(metric.key)"
               >
                 <span class="d-flex">
                   <icon
                     class="flex-shrink-0 append-right-4"
                     :class="{
-                      invisible: !isSelectedSortField(key),
+                      invisible: !isSelectedSortField(metric.key),
                     }"
                     name="mobile-issue-close"
                   />
-                  {{ value }}
+                  {{ metric.label }}
                 </span>
               </gl-dropdown-item>
             </gl-dropdown>
@@ -292,7 +284,7 @@ export default {
           v-else
           :merge-requests="mergeRequests"
           :page-info="pageInfo"
-          :column-options="getColumnOptions"
+          :column-options="getMetricTypes(chartKeys.timeBasedHistogram)"
           :metric-type="columnMetric"
           :metric-label="columnMetricLabel"
           @columnMetricChange="setColumnMetric"

@@ -1,7 +1,7 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
-import { timeToMergeMetric } from '../../../constants';
+import { daysToMergeMetric } from '../../../constants';
 
 export const fetchMergeRequests = ({ dispatch, state, rootState, rootGetters }) => {
   dispatch('requestMergeRequests');
@@ -41,8 +41,8 @@ export const receiveMergeRequestsError = ({ commit }, { response }) => {
 export const setSortField = ({ commit, dispatch }, data) => {
   commit(types.SET_SORT_FIELD, data);
 
-  // let's make sure we update the column that we sort on (except for 'time_to_merge')
-  if (data !== timeToMergeMetric) {
+  // let's make sure we update the column that we sort on (except for 'days_to_merge')
+  if (data !== daysToMergeMetric.key) {
     dispatch('setColumnMetric', data);
   }
 

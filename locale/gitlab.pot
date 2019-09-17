@@ -4656,9 +4656,6 @@ msgstr ""
 msgid "Days"
 msgstr ""
 
-msgid "Days to merge"
-msgstr ""
-
 msgid "Debug"
 msgstr ""
 
@@ -11465,6 +11462,9 @@ msgid "Productivity analytics can help identify the problems that are delaying y
 msgstr ""
 
 msgid "ProductivityAnalytics|Ascending"
+msgstr ""
+
+msgid "ProductivityAnalytics|Days to merge"
 msgstr ""
 
 msgid "ProductivityAnalytics|Descending"
