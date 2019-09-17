@@ -904,6 +904,41 @@ describe ApprovalState do
         end
       end
     end
+
+    describe '#suggested_approvers' do
+      let(:user) { create(:user) }
+      let(:public_group) { create(:group, :public) }
+      let(:private_group) { create(:group, :private) }
+
+      let!(:private_user) { create(:group_member, group: private_group).user }
+      let!(:public_user) { create(:group_member, group: public_group).user }
+      let!(:rule1) { create_rule(groups: [private_group], users: []) }
+      let!(:rule2) { create_rule(groups: [public_group], users: []) }
+
+      subject { merge_request.approval_state.suggested_approvers(current_user: user) }
+
+      context 'user cannot see private group' do
+        it 'shows public users' do
+          is_expected.to contain_exactly(public_user)
+        end
+
+        it 'does not show users who have already approved' do
+          create(:approval, merge_request: merge_request, user: public_user)
+
+          is_expected.to be_empty
+        end
+      end
+
+      context 'user can see private group' do
+        before do
+          create(:group_member, group: private_group, user: user)
+        end
+
+        it 'shows private users' do
+          is_expected.to contain_exactly(public_user, private_user, user)
+        end
+      end
+    end
   end
 
   context 'when only a single rule is allowed' do
