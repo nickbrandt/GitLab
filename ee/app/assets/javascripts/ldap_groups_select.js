@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, no-var, one-var, object-shorthand, consistent-return, func-names */
+/* eslint-disable prefer-arrow-callback, no-var, one-var, consistent-return, func-names */
 
 import $ from 'jquery';
 import Api from 'ee/api';
@@ -16,12 +16,12 @@ export default function initLDAPGroupsSelect() {
     .then(() => {
       $('.ajax-ldap-groups-select').each(function(i, select) {
         return $(select).select2({
-          id: function(group) {
+          id(group) {
             return group.cn;
           },
           placeholder: __('Search for a LDAP group'),
           minimumInputLength: 1,
-          query: function(query) {
+          query(query) {
             var provider;
             provider = $('#ldap_group_link_provider').val();
             return Api.ldapGroups(query.term, provider, function(groups) {
@@ -32,7 +32,7 @@ export default function initLDAPGroupsSelect() {
               return query.callback(data);
             });
           },
-          initSelection: function(element, callback) {
+          initSelection(element, callback) {
             var id;
             id = $(element).val();
             if (id !== '') {
@@ -44,7 +44,7 @@ export default function initLDAPGroupsSelect() {
           formatResult: ldapGroupResult,
           formatSelection: groupFormatSelection,
           dropdownCssClass: 'ajax-groups-dropdown',
-          formatNoMatches: function() {
+          formatNoMatches() {
             return __('Match not found; try refining your search query.');
           },
         });
