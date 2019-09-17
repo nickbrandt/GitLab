@@ -1,7 +1,7 @@
 import Tracking from '~/tracking';
 
 export const initSidebarTracking = () => {
-  new Tracking().bind('.js-issuable-sidebar');
+  new Tracking().bind(document.querySelector('.js-issuable-sidebar'));
 };
 
 export const trackEvent = (eventType, property, value = '') => {
