@@ -84,7 +84,7 @@ module Gitlab
             status[@allow_failure_key] &&
             HasStatus::PASSED_WITH_WARNINGS_STATUSES.include?(status[@status_key])
         end
-        
+
         def exclude_from_calculation?(status)
           @allow_failure_key &&
             status[@allow_failure_key] &&

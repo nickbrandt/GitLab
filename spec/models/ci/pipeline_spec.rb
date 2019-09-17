@@ -1143,12 +1143,12 @@ describe Ci::Pipeline, :mailer do
         where(:ci_composite_status) do
           [false, true]
         end
-    
+
         with_them do
           before do
             stub_feature_flags(ci_composite_status: ci_composite_status)
           end
-      
+
           context 'stages list' do
             it 'returns ordered list of stages' do
               expect(subject.map(&:name)).to eq(%w[build test deploy])
