@@ -3,7 +3,7 @@
 module EE
   module VersionCheckHelper
     def source_code_project
-      'gitlab-ee'
+      'gitlab'
     end
   end
 end
