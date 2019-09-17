@@ -48,6 +48,16 @@ describe Admin::ClustersController do
         end
       end
     end
+
+    describe 'GET #metrics_dashboard' do
+      let(:user) { create(:admin) }
+
+      before do
+        sign_in(user)
+      end
+
+      it_behaves_like 'the default dashboard'
+    end
   end
 
   private

@@ -50,6 +50,26 @@ module EE
         end
       end
 
+      def metrics_dashboard
+        project_for_dashboard = defined?(project) ? project : nil # Project is not defined for group and admin level clusters
+        dashboard = ::Gitlab::Metrics::Dashboard::Finder.find(project_for_dashboard, current_user, metrics_dashboard_params)
+
+        respond_to do |format|
+          if dashboard[:status] == :success
+            format.json do
+              render status: :ok, json: dashboard.slice(:dashboard, :status)
+            end
+          else
+            format.json do
+              render(
+                status: dashboard[:http_status],
+                json: dashboard.slice(:message, :status)
+              )
+            end
+          end
+        end
+      end
+
       private
 
       def prometheus_adapter

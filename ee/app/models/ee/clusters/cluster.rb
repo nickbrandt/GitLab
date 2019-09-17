@@ -24,6 +24,10 @@ module EE
 
         true
       end
+
+      def prometheus_adapter
+        application_prometheus
+      end
     end
   end
 end

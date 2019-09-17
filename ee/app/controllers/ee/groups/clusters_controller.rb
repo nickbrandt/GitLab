@@ -42,6 +42,14 @@ module EE
           .with_pagination(request, response)
           .represent(environments)
       end
+
+      def metrics_dashboard_params
+        {
+          cluster: cluster,
+          cluster_type: :group,
+          group: group
+        }
+      end
     end
   end
 end

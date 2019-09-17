@@ -6,19 +6,19 @@ describe Gitlab::Metrics::Dashboard::Processor do
   let(:project) { build(:project) }
   let(:environment) { create(:environment, project: project) }
   let(:dashboard_yml) { YAML.load_file('spec/fixtures/lib/gitlab/metrics/dashboard/sample_dashboard.yml') }
-  let(:params) { [project, environment, dashboard_yml] }
-
-  describe 'sequence' do
-    let(:environment) { build(:environment) }
-    let(:sequence) { described_class.new(*params).__send__(:sequence, insert_project_metrics: true) }
-
-    it 'includes the alerts processing stage' do
-      expect(sequence.length).to eq(5)
-    end
-  end
+  let(:params) { [project, dashboard_yml, sequence, { environment: environment }] }
 
   describe 'process' do
-    let(:dashboard) { described_class.new(*params).process(insert_project_metrics: true) }
+    let(:dashboard) { described_class.new(*params).process }
+    let(:sequence) do
+      [
+        Gitlab::Metrics::Dashboard::Stages::CommonMetricsInserter,
+        Gitlab::Metrics::Dashboard::Stages::ProjectMetricsInserter,
+        Gitlab::Metrics::Dashboard::Stages::EndpointInserter,
+        Gitlab::Metrics::Dashboard::Stages::Sorter,
+        ::EE::Gitlab::Metrics::Dashboard::Stages::AlertsInserter
+      ]
+    end
 
     context 'when the dashboard references persisted metrics with alerts' do
       let!(:alert) do
