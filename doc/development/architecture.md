@@ -78,11 +78,11 @@ graph TB
   PgBouncerExporter[PgBouncer Exporter] --> PgBouncer
   Prometheus -- TCP 9187 --> PostgreSQLExporter
   Prometheus -- TCP 9100 --> NodeExporter[Node Exporter]
-  Prometheus -- TCP 9168 --> GitLabMonitor[GitLab Monitor]
+  Prometheus -- TCP 9168 --> GitLabExporter[GitLab Exporter]
   Prometheus -- TCP 9127 --> PgBouncerExporter
-  GitLabMonitor --> PostgreSQL
-  GitLabMonitor --> GitLabShell
-  GitLabMonitor --> Sidekiq
+  GitLabExporter --> PostgreSQL
+  GitLabExporter --> GitLabShell
+  GitLabExporter --> Sidekiq
   PgBouncer --> Consul
   PostgreSQL --> Consul
   PgBouncer --> PostgreSQL
@@ -147,7 +147,7 @@ Component statuses are linked to configuration documentation for each component.
 | [Redis Exporter](#redis-exporter) | Prometheus endpoint with Redis metrics | [✅][redis-exporter-omnibus] | [✅][redis-exporter-charts] | [✅][redis-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
 | [Postgres Exporter](#postgres-exporter) | Prometheus endpoint with PostgreSQL metrics | [✅][postgres-exporter-omnibus] | [✅][postgres-exporter-charts] | [✅][postgres-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
 | [PgBouncer Exporter](#pgbouncer-exporter) | Prometheus endpoint with PgBouncer metrics | [⚙][pgbouncer-exporter-omnibus] | [❌][pgbouncer-exporter-charts] | [❌][pgbouncer-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
-| [GitLab Monitor](#gitlab-monitor) | Generates a variety of GitLab metrics | [✅][gitlab-monitor-omnibus] | [✅][gitlab-monitor-charts] | [✅][gitlab-monitor-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
+| [GitLab Exporter](#gitlab-exporter) | Generates a variety of GitLab metrics | [✅][gitlab-exporter-omnibus] | [✅][gitlab-exporter-charts] | [✅][gitlab-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
 | [Node Exporter](#node-exporter) | Prometheus endpoint with system metrics | [✅][node-exporter-omnibus] | [❌][node-exporter-charts] | [❌][node-exporter-charts] | [✅](https://about.gitlab.com/handbook/engineering/monitoring/) | ❌ | ❌ | CE & EE |
 | [Mattermost](#mattermost) | Open-source Slack alternative | [⚙][mattermost-omnibus] | [⤓][mattermost-charts] | [⤓][mattermost-charts] | [⤓](../user/project/integrations/mattermost.md) | ❌ | ❌ | CE & EE |
 | [MinIO](#minio) | Object storage service | [⤓][minio-omnibus] | [✅][minio-charts] | [✅][minio-charts] | [✅](https://about.gitlab.com/handbook/engineering/infrastructure/production-architecture/#storage-architecture) | ❌ | [⚙][minio-gdk] | CE & EE |
@@ -228,14 +228,14 @@ Gitaly is a service designed by GitLab to remove our need for NFS for Git storag
 - Configuration: [Omnibus][geo-omnibus], [Charts][geo-charts], [GDK][geo-gdk]
 - Layer: Core Service (Processor)
 
-#### GitLab Monitor
+#### Gitlab Exporter
 
-- [Project page](https://gitlab.com/gitlab-org/gitlab-monitor)
-- Configuration: [Omnibus][gitlab-monitor-omnibus], [Charts][gitlab-monitor-charts]
+- [Project page](https://gitlab.com/gitlab-org/gitlab-exporter)
+- Configuration: [Omnibus][gitlab-exporter-omnibus], [Charts][gitlab-exporter-charts]
 - Layer: Monitoring
-- Process: `gitlab-monitor`
+- Process: `gitlab-exporter`
 
-GitLab Monitor is a process designed in house that allows us to export metrics about GitLab application internals to Prometheus. You can read more [in the project's readme](https://gitlab.com/gitlab-org/gitlab-monitor).
+GitLab Exporter is a process designed in house that allows us to export metrics about GitLab application internals to Prometheus. You can read more [in the project's readme](https://gitlab.com/gitlab-org/gitlab-exporter).
 
 #### GitLab Pages
 
@@ -684,8 +684,8 @@ We've also detailed [our architecture of GitLab.com](https://about.gitlab.com/ha
 [postgres-exporter-charts]: https://github.com/helm/charts/tree/master/stable/postgresql
 [pgbouncer-exporter-omnibus]: ../administration/monitoring/prometheus/pgbouncer_exporter.md
 [pgbouncer-exporter-charts]: https://docs.gitlab.com/charts/installation/deployment.html#postgresql
-[gitlab-monitor-omnibus]: ../administration/monitoring/prometheus/gitlab_monitor_exporter.md
-[gitlab-monitor-charts]: https://docs.gitlab.com/charts/charts/gitlab/gitlab-monitor/index.html
+[gitlab-exporter-omnibus]: ../administration/monitoring/prometheus/gitlab_exporter.md
+[gitlab-exporter-charts]: https://docs.gitlab.com/charts/charts/gitlab/gitlab-exporter/index.html
 [node-exporter-omnibus]: ../administration/monitoring/prometheus/node_exporter.md
 [node-exporter-charts]: https://gitlab.com/gitlab-org/charts/gitlab/issues/1332
 [mattermost-omnibus]: https://docs.gitlab.com/omnibus/gitlab-mattermost/

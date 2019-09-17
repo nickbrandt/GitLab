@@ -64,7 +64,7 @@ Omnibus:
    prometheus['enable'] = false
    alertmanager['enable'] = false
    pgbouncer_exporter['enable'] = false
-   gitlab_monitor['enable'] = false
+   gitlab_exporter['enable'] = false
    gitaly['enable'] = false
 
    redis['bind'] = '0.0.0.0'
