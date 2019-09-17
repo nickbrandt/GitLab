@@ -190,8 +190,8 @@ that the `review-apps-ce/ee` cluster is unhealthy. Leading indicators may be hea
 
 The following items may help diagnose this:
 
-- [Instance group CPU Utilization in GCP](https://console.cloud.google.com/compute/instanceGroups/details/us-central1-a/gke-review-apps-ce-preemp-n1-standard-a4c9571c-grp?project=gitlab-review-apps&tab=monitoring&graph=GCE_CPU&duration=PT12H) - helpful to identify if nodes are problematic or the entire cluster is trending towards unhealthy
-- [Instance Group size in GCP](https://console.cloud.google.com/compute/instanceGroups/details/us-central1-a/gke-review-apps-ce-preemp-n1-standard-a4c9571c-grp?project=gitlab-review-apps&tab=monitoring&graph=GCE_SIZE&duration=PT12H) - aids in identifying load spikes on the cluster. Kubernetes will add nodes up to 220 based on total resource requests.
+- [Instance group CPU Utilization in GCP](https://console.cloud.google.com/compute/instanceGroups/details/us-central1-b/gke-review-apps-ee-preemp-n1-standard-8affc0f5-grp?project=gitlab-review-apps&tab=monitoring&graph=GCE_CPU&duration=P30D) - helpful to identify if nodes are problematic or the entire cluster is trending towards unhealthy
+- [Instance Group size in GCP](https://console.cloud.google.com/compute/instanceGroups/details/us-central1-b/gke-review-apps-ee-preemp-n1-standard-8affc0f5-grp?project=gitlab-review-apps&tab=monitoring&graph=GCE_SIZE&duration=P30D) - aids in identifying load spikes on the cluster. Kubernetes will add nodes up to 220 based on total resource requests.
 - `kubectl top nodes --sort-by=cpu` - can identify if node spikes are common or load on specific nodes which may get rebalanced by the Kubernetes scheduler.
 - `kubectl top pods --sort-by=cpu` -
 - [K9s] - K9s is a powerful command line dashboard which allows you to filter by labels. This can help identify trends with apps exceeding the [review-app resource requests](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/review_apps/base-config.yaml). Kubernetes will schedule pods to nodes based on resource requests and allow for CPU usage up to the limits.
