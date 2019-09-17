@@ -41,6 +41,7 @@ module.exports = {
     '^vendor(/.*)$': '<rootDir>/vendor/assets/javascripts$1',
     '\\.(jpg|jpeg|png|svg)$': '<rootDir>/spec/frontend/__mocks__/file_mock.js',
     'emojis(/.*).json': '<rootDir>/fixtures/emojis$1.json',
+    '^spec/test_constants$': '<rootDir>/spec/frontend/helpers/test_constants',
   },
   collectCoverageFrom: ['<rootDir>/app/assets/javascripts/**/*.{js,vue}'],
   coverageDirectory: '<rootDir>/coverage-frontend/',
