@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 describe ProtectedBranches::CreateService do
   include ProjectForksHelper
@@ -50,6 +50,18 @@ describe ProtectedBranches::CreateService do
             expect { service.execute }.to change(ProtectedBranch, :count).by(1)
           end
         end
+      end
+    end
+
+    it 'adds a security audit event entry' do
+      expect { service.execute }.to change(::SecurityEvent, :count).by(1)
+    end
+
+    context 'with invalid params' do
+      let(:params) { nil }
+
+      it "doesn't add a security audit event entry" do
+        expect { service.execute }.not_to change(::SecurityEvent, :count)
       end
     end
   end

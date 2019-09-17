@@ -5,6 +5,14 @@ module EE
     module CreateService
       extend ::Gitlab::Utils::Override
       include ::Gitlab::Utils::StrongMemoize
+      include Loggable
+
+      override :execute
+      def execute(skip_authorization: false)
+        super(skip_authorization: skip_authorization).tap do |protected_branch_service|
+          log_audit_event(protected_branch_service, :add)
+        end
+      end
 
       private
 
