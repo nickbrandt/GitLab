@@ -98,7 +98,7 @@ describe Groups::ClustersController do
       create(:deployment, :success, cluster: cluster)
     end
 
-    def go
+    def get_cluster_environments
       get :environments,
         params: {
           group_id: group.to_param,
@@ -109,21 +109,44 @@ describe Groups::ClustersController do
 
     describe 'functionality' do
       it 'responds successfully' do
-        go
+        get_cluster_environments
 
         expect(response).to have_gitlab_http_status(:ok)
+        expect(response.headers['Poll-Interval']).to eq("5000")
       end
     end
 
     describe 'security' do
-      it { expect { go }.to be_allowed_for(:admin) }
-      it { expect { go }.to be_allowed_for(:owner).of(group) }
-      it { expect { go }.to be_allowed_for(:maintainer).of(group) }
-      it { expect { go }.to be_denied_for(:developer).of(group) }
-      it { expect { go }.to be_denied_for(:reporter).of(group) }
-      it { expect { go }.to be_denied_for(:guest).of(group) }
-      it { expect { go }.to be_denied_for(:user) }
-      it { expect { go }.to be_denied_for(:external) }
+      it { expect { get_cluster_environments }.to be_allowed_for(:admin) }
+      it { expect { get_cluster_environments }.to be_allowed_for(:owner).of(group) }
+      it { expect { get_cluster_environments }.to be_allowed_for(:maintainer).of(group) }
+      it { expect { get_cluster_environments }.to be_denied_for(:developer).of(group) }
+      it { expect { get_cluster_environments }.to be_denied_for(:reporter).of(group) }
+      it { expect { get_cluster_environments }.to be_denied_for(:guest).of(group) }
+      it { expect { get_cluster_environments }.to be_denied_for(:user) }
+      it { expect { get_cluster_environments }.to be_denied_for(:external) }
+    end
+  end
+
+  describe 'GET show' do
+    let(:cluster) { create(:cluster_for_group, groups: [group]) }
+
+    def get_cluster
+      get :show,
+        params: {
+          group_id: group,
+          id: cluster
+        }
+    end
+
+    it 'expires etag cache to force reload environments list' do
+      expect_next_instance_of(Gitlab::EtagCaching::Store) do |store|
+        expect(store).to receive(:touch)
+          .with(environments_group_cluster_path(cluster.group, cluster))
+          .and_call_original
+      end
+
+      get_cluster
     end
   end
 end

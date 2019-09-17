@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import Environments from 'ee/clusters/components/environments.vue';
-import { GlTable, GlEmptyState } from '@gitlab/ui';
+import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import environments from './mock_data';
 
@@ -58,7 +58,7 @@ describe('Environments', () => {
     });
 
     it('renders the correct table headers', () => {
-      const tableHeaders = ['Project', 'Environment', 'Job', 'Pods in use 3', 'Last updated'];
+      const tableHeaders = ['Project', 'Environment', 'Job', `Pods in use 2`, 'Last updated'];
       const headers = table.findAll('th');
 
       expect(headers.length).toBe(tableHeaders.length);
@@ -71,6 +71,18 @@ describe('Environments', () => {
 
       beforeAll(() => {
         tableRows = table.findAll('tbody tr');
+      });
+
+      it('renders a loader if the rollout status is loading', () => {
+        environments.forEach((environment, i) => {
+          const { status } = environment.rolloutStatus;
+
+          if (status === 'loading') {
+            const loader = tableRows.at(i).find(GlLoadingIcon);
+
+            expect(loader.exists()).toBe(true);
+          }
+        });
       });
 
       it('renders deployment instances', () => {
@@ -86,9 +98,9 @@ describe('Environments', () => {
           'Deploy progress not found. To see pods, ensure your environment matches deploy board criteria.';
 
         environments.forEach((environment, i) => {
-          const { instances } = environment.rolloutStatus;
+          const { status, instances } = environment.rolloutStatus;
 
-          if (instances.length === 0) {
+          if (status !== 'loading' && instances.length === 0) {
             const emptyState = tableRows.at(i).find('.deployments-empty');
             const emptyStateIcon = emptyState.find(Icon);
 

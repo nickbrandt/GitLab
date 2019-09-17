@@ -137,6 +137,10 @@ The result will then be:
 - The Staging cluster will be used for the `deploy to staging` job.
 - The Production cluster will be used for the `deploy to production` job.
 
+## Cluster environments **(PREMIUM)**
+
+Please see the documentation for [cluster environments](../../clusters/environments.md).
+
 ## Security of Runners
 
 For important information about securely configuring GitLab Runners, see
