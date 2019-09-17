@@ -55,9 +55,5 @@ FactoryBot.modify do
     trait :random_last_repository_updated_at do
       last_repository_updated_at { rand(1.year).seconds.ago }
     end
-
-    trait :requiring_code_owner_approval do
-      merge_requests_require_code_owner_approval true
-    end
   end
 end

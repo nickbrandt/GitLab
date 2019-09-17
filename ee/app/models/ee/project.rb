@@ -102,7 +102,7 @@ module EE
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
-            -> { where(merge_requests_require_code_owner_approval: true) }
+            -> { joins(:protected_branches).where(protected_branches: { code_owner_approval_required: true }) }
 
       scope :with_security_reports_stored, -> { where('EXISTS (?)', ::Vulnerabilities::Occurrence.scoped_project.select(1)) }
       scope :with_security_reports, -> { where('EXISTS (?)', ::Ci::JobArtifact.security_reports.scoped_project.select(1)) }
@@ -377,13 +377,14 @@ module EE
     end
 
     def merge_requests_require_code_owner_approval?
-      super && code_owner_approval_required_available?
+      code_owner_approval_required_available? &&
+        protected_branches.requiring_code_owner_approval.any?
     end
 
     def branch_requires_code_owner_approval?(branch_name)
       return false unless code_owner_approval_required_available?
 
-      protected_branches.requiring_code_owner_approval.matching(branch_name).any?
+      ::ProtectedBranch.branch_requires_code_owner_approval?(self, branch_name)
     end
 
     def require_password_to_approve
