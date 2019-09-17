@@ -54,10 +54,6 @@ export default {
   },
   computed: {
     learnMoreDescription() {
-      if (!this.learnMoreUrl) {
-        return '';
-      }
-
       return sprintf(
         s__(
           'AlertService|%{linkStart}Learn more%{linkEnd} about configuring this endpoint to receive alerts.',
