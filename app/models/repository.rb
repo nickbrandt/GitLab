@@ -560,7 +560,7 @@ class Repository
   cache_method :has_visible_content?, fallback: false
 
   def avatar
-    # n+1: https://gitlab.com/gitlab-org/gitlab-ce/issues/38327
+    # n+1: https://gitlab.com/gitlab-org/gitlab-foss/issues/38327
     Gitlab::GitalyClient.allow_n_plus_1_calls do
       if tree = file_on_head(:avatar)
         tree.path
@@ -1099,7 +1099,7 @@ class Repository
   private
 
   # TODO Generice finder, later split this on finders by Ref or Oid
-  # gitlab-org/gitlab-ce#39239
+  # https://gitlab.com/gitlab-org/gitlab-foss/issues/39239
   def find_commit(oid_or_ref)
     commit = if oid_or_ref.is_a?(Gitlab::Git::Commit)
                oid_or_ref

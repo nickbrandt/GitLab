@@ -227,7 +227,7 @@ describe Projects::CreateService, '#execute' do
       it 'creates the project' do
         opts = {
           name: 'GitLab',
-          import_url: 'https://www.gitlab.com/gitlab-org/gitlab-ce',
+          import_url: 'https://www.gitlab.com/gitlab-org/gitlab-foss',
           visibility_level: Gitlab::VisibilityLevel::PRIVATE,
           namespace_id: user.namespace.id,
           mirror: true,

@@ -6,7 +6,7 @@ table_display_block: true
 
 ## Software delivery
 
-There are two software distributions of GitLab: the open source [Community Edition](https://gitlab.com/gitlab-org/gitlab-ce/) (CE), and the open core [Enterprise Edition](https://gitlab.com/gitlab-org/gitlab-ee/) (EE). GitLab is available under [different subscriptions](https://about.gitlab.com/pricing/).
+There are two software distributions of GitLab: the open source [Community Edition](https://gitlab.com/gitlab-org/gitlab-foss/) (CE), and the open core [Enterprise Edition](https://gitlab.com/gitlab-org/gitlab/) (EE). GitLab is available under [different subscriptions](https://about.gitlab.com/pricing/).
 
 New versions of GitLab are released in stable branches and the master branch is for bleeding edge development.
 
@@ -16,7 +16,7 @@ Both EE and CE require some add-on components called GitLab Shell and Gitaly. Th
 
 ## Components
 
-A typical install of GitLab will be on GNU/Linux. It uses Nginx or Apache as a web front end to proxypass the Unicorn web server. By default, communication between Unicorn and the front end is via a Unix domain socket but forwarding requests via TCP is also supported. The web front end accesses `/home/git/gitlab/public` bypassing the Unicorn server to serve static pages, uploads (e.g. avatar images or attachments), and precompiled assets. GitLab serves web pages and a [GitLab API](https://gitlab.com/gitlab-org/gitlab-ce/tree/master/doc/api) using the Unicorn web server. It uses Sidekiq as a job queue which, in turn, uses redis as a non-persistent database backend for job information, meta data, and incoming jobs.
+A typical install of GitLab will be on GNU/Linux. It uses Nginx or Apache as a web front end to proxypass the Unicorn web server. By default, communication between Unicorn and the front end is via a Unix domain socket but forwarding requests via TCP is also supported. The web front end accesses `/home/git/gitlab/public` bypassing the Unicorn server to serve static pages, uploads (e.g. avatar images or attachments), and precompiled assets. GitLab serves web pages and a [GitLab API](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/doc/api) using the Unicorn web server. It uses Sidekiq as a job queue which, in turn, uses redis as a non-persistent database backend for job information, meta data, and incoming jobs.
 
 We also support deploying GitLab on Kubernetes using our [GitLab Helm chart](https://docs.gitlab.com/charts/).
 
@@ -185,7 +185,7 @@ GitLab can be considered to have two layers from a process perspective:
 - Layer: Monitoring
 - Process: `alertmanager`
 
-[Alert manager](https://prometheus.io/docs/alerting/alertmanager/) is a tool provided by Prometheus that _"handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie. It also takes care of silencing and inhibition of alerts."_ You can read more in [issue #45740](https://gitlab.com/gitlab-org/gitlab-ce/issues/45740) about what we will be alerting on.
+[Alert manager](https://prometheus.io/docs/alerting/alertmanager/) is a tool provided by Prometheus that _"handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie. It also takes care of silencing and inhibition of alerts."_ You can read more in [issue #45740](https://gitlab.com/gitlab-org/gitlab-foss/issues/45740) about what we will be alerting on.
 
 #### Certificate management
 
@@ -432,7 +432,7 @@ Sidekiq is a Ruby background job processor that pulls jobs from the redis queue 
 
 #### Unicorn
 
-- [Project page](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/README.md)
+- [Project page](https://gitlab.com/gitlab-org/gitlab/blob/master/README.md)
 - Configuration: [Omnibus][unicorn-omnibus], [Charts][unicorn-charts], [Source][unicorn-source], [GDK][gitlab-yml]
 - Layer: Core Service (Processor)
 - Process: `unicorn`
@@ -614,7 +614,7 @@ GitLab Shell has a configuration file at `/home/git/gitlab-shell/config.yml`.
 
 ### Maintenance Tasks
 
-[GitLab](https://gitlab.com/gitlab-org/gitlab-ce/tree/master) provides rake tasks with which you see version information and run a quick check on your configuration to ensure it is configured properly within the application. See [maintenance rake tasks](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/raketasks/maintenance.md).
+[GitLab](https://gitlab.com/gitlab-org/gitlab/tree/master) provides rake tasks with which you see version information and run a quick check on your configuration to ensure it is configured properly within the application. See [maintenance rake tasks](https://gitlab.com/gitlab-org/gitlab-foss/blob/master/doc/raketasks/maintenance.md).
 In a nutshell, do the following:
 
 ```
@@ -638,7 +638,7 @@ We've also detailed [our architecture of GitLab.com](https://about.gitlab.com/ha
 [unicorn-omnibus]: https://docs.gitlab.com/omnibus/settings/unicorn.html
 [unicorn-charts]: https://docs.gitlab.com/charts/charts/gitlab/unicorn/
 [unicorn-source]: ../install/installation.md#configure-it
-[gitlab-yml]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/gitlab.yml.example
+[gitlab-yml]: https://gitlab.com/gitlab-org/gitlab-foss/blob/master/config/gitlab.yml.example
 [sidekiq-omnibus]: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template
 [sidekiq-charts]: https://docs.gitlab.com/charts/charts/gitlab/sidekiq/
 [gitaly-omnibus]: ../administration/gitaly/index.md

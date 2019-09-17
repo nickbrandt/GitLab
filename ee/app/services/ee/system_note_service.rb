@@ -22,7 +22,7 @@ module EE
     #
     # Example Note text:
     #
-    #   "marked this issue as related to gitlab-ce#9001"
+    #   "marked this issue as related to gitlab-foss#9001"
     #
     # Returns the created Note object
     def relate_issue(noteable, noteable_ref, user)
@@ -38,7 +38,7 @@ module EE
     #
     # Example Note text:
     #
-    #   "removed the relation with gitlab-ce#9001"
+    #   "removed the relation with gitlab-foss#9001"
     #
     # Returns the created Note object
     def unrelate_issue(noteable, noteable_ref, user)
@@ -216,7 +216,7 @@ module EE
 
       ##
       # TODO: Abort message should be sent by the system, not a particular user.
-      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/63187.
+      # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
 
@@ -240,7 +240,7 @@ module EE
 
       ##
       # TODO: Abort message should be sent by the system, not a particular user.
-      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/63187.
+      # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
     end
   end

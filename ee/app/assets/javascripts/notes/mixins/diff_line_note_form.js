@@ -89,7 +89,7 @@ export default {
           clearDraft(this.autosaveKey);
         } else {
           // TODO: remove the following after replacing the autosave mixin
-          // https://gitlab.com/gitlab-org/gitlab-ce/issues/60587
+          // https://gitlab.com/gitlab-org/gitlab-foss/issues/60587
           this.resetAutoSave();
         }
       });

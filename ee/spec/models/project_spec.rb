@@ -1630,7 +1630,7 @@ describe Project do
 
               # The following expectaction should be changed to
               # expect(project.insights_config).to eq(config_project.insights_config)
-              # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+              # once https://gitlab.com/gitlab-org/gitlab/issues/11340 is implemented.
               it 'returns the project default config' do
                 expect(project.insights_config).to eq(project.default_insights_config)
               end

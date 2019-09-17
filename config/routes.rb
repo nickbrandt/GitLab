@@ -28,7 +28,7 @@ Rails.application.routes.draw do
   end
 
   # This prefixless path is required because Jira gets confused if we set it up with a path
-  # More information: https://gitlab.com/gitlab-org/gitlab-ee/issues/6752
+  # More information: https://gitlab.com/gitlab-org/gitlab/issues/6752
   scope path: '/login/oauth', controller: 'oauth/jira/authorizations', as: :oauth_jira do
     Gitlab.ee do
       get :authorize, action: :new

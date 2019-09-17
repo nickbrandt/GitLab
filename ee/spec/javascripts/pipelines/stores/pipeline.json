@@ -141,7 +141,7 @@
       "781d78fcd3d6c17ccf208f0cf0ab47c3e5397118",
       "d227a0bb858c48eeee7393fcade1a33748f35183"
     ],
-    "message": "Merge branch 'gl-cli-startt' into 'master'\n\nFirst iteration of the CLI\n\nCloses gitlab-ce#53657\n\nSee merge request gitlab-org/gl-vue-cli!2",
+    "message": "Merge branch 'gl-cli-startt' into 'master'\n\nFirst iteration of the CLI\n\nCloses gitlab-foss#53657\n\nSee merge request gitlab-org/gl-vue-cli!2",
     "author_name": "Phil Hughes",
     "author_email": "me@iamphill.com",
     "authored_date": "2018-11-20T10:22:51.000Z",

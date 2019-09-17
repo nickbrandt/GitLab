@@ -22,8 +22,8 @@ module EE
           override :find_todos
           def find_todos
             # Todos for Designs are intentionally not supported yet.
-            # https://gitlab.com/gitlab-org/gitlab-ee/issues/13543
-            # https://gitlab.com/gitlab-org/gitlab-ee/issues/13494#note_203518559
+            # https://gitlab.com/gitlab-org/gitlab/issues/13543
+            # https://gitlab.com/gitlab-org/gitlab/issues/13494#note_203518559
             super.where.not(target_type: ::DesignManagement::Design.name) # rubocop: disable CodeReuse/ActiveRecord
           end
         end

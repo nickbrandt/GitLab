@@ -187,7 +187,7 @@ describe GeoNode, :geo, type: :model do
 
         context 'when it has an oauth_application' do
           # TODO Should it instead be destroyed?
-          # https://gitlab.com/gitlab-org/gitlab-ee/issues/10225
+          # https://gitlab.com/gitlab-org/gitlab/issues/10225
           it 'disassociates the oauth_application' do
             primary_node.oauth_application = create(:oauth_application)
 

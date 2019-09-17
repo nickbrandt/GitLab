@@ -24,7 +24,7 @@ module Groups
 
     def epics
       # TODO: change to EpicsFinder once frontend supports epics from external groups.
-      # See https://gitlab.com/gitlab-org/gitlab-ee/issues/6837
+      # See https://gitlab.com/gitlab-org/gitlab/issues/6837
       DeclarativePolicy.user_scope do
         if Ability.allowed?(current_user, :read_epic, group)
           group.epics.select(:iid, :title)

@@ -48,7 +48,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       post ':id/pipeline' do
-        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42124')
+        Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42124')
 
         authorize! :create_pipeline, user_project
 

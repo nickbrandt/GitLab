@@ -191,7 +191,7 @@ module EE
           super
         rescue NameError
           # false as second argument prevents looking up in module hierarchy
-          # see also https://gitlab.com/gitlab-org/gitlab-ce/issues/59719
+          # see also https://gitlab.com/gitlab-org/gitlab-foss/issues/59719
           ::EE::API::Entities.const_get(target_type, false)
         end
       end
@@ -351,14 +351,14 @@ module EE
       # Being used in private project-level approvals API.
       # This overrides the `eligible_approvers` to be exposed as `approvers`.
       #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class ApprovalSettingRule < ApprovalRule
         expose :approvers, using: ::API::Entities::UserBasic, override: true
       end
 
       # Being used in private project-level approvals API.
       #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class ProjectApprovalSettings < Grape::Entity
         expose :visible_approval_rules, as: :rules, using: ApprovalSettingRule
         expose :min_fallback_approvals, as: :fallback_approvals_required
@@ -367,7 +367,7 @@ module EE
       # Being used in private MR-level approvals API.
       # This overrides the `eligible_approvers` to be exposed as `approvers`.
       #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class MergeRequestApprovalSettingRule < MergeRequestApprovalStateRule
         expose :approvers, using: ::API::Entities::UserBasic, override: true
       end
@@ -375,7 +375,7 @@ module EE
       # Being used in private MR-level approvals API.
       # This overrides the `rules` to be exposed using MergeRequestApprovalSettingRule.
       #
-      # To be removed in https://gitlab.com/gitlab-org/gitlab-ee/issues/13574.
+      # To be removed in https://gitlab.com/gitlab-org/gitlab/issues/13574.
       class MergeRequestApprovalSettings < MergeRequestApprovalState
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalSettingRule, override: true
       end
@@ -710,7 +710,7 @@ module EE
         # However, the user can also directly toggle the active field of a scope.
         # So if the user has entered user ids, and disabled the scope, we need to send an enabled scope with
         # the list of user ids.
-        # See: https://gitlab.com/gitlab-org/gitlab-ee/issues/14011
+        # See: https://gitlab.com/gitlab-org/gitlab/issues/14011
         expose :active, as: :enabled do |feature|
           feature.active || feature.userwithid_strategy.present?
         end

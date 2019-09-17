@@ -53,7 +53,7 @@ describe Projects::ForkService do
 
           # This test is here because we had a bug where the from-project lost its
           # avatar after being forked.
-          # https://gitlab.com/gitlab-org/gitlab-ce/issues/26158
+          # https://gitlab.com/gitlab-org/gitlab-foss/issues/26158
           it "after forking the from-project still has its avatar" do
             # If we do not fork the project first we cannot detect the bug.
             expect(to_project).to be_persisted

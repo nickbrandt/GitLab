@@ -45,7 +45,7 @@ module EE
           # `API::Helpers::ProjectsHelpers`.
           #
           # Likely this is related to
-          # https://gitlab.com/gitlab-org/gitlab-ce/issues/50911.
+          # https://gitlab.com/gitlab-org/gitlab-foss/issues/50911.
           def update_params_at_least_one_of
             super.concat [
               :approvals_before_merge,

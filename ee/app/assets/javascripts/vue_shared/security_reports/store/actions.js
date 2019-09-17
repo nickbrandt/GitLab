@@ -12,8 +12,8 @@ import { pollUntilComplete } from './utils';
  * ee/app/assets/javascripts/security_dashboard/store/modules/vulnerabilities/actions.js
  * This is being addressed in the following issues:
  *
- * https://gitlab.com/gitlab-org/gitlab-ee/issues/8146
- * https://gitlab.com/gitlab-org/gitlab-ee/issues/8519
+ * https://gitlab.com/gitlab-org/gitlab/issues/8146
+ * https://gitlab.com/gitlab-org/gitlab/issues/8519
  */
 
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');

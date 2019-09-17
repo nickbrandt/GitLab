@@ -1,8 +1,7 @@
 # Review Apps
 
-Review Apps are automatically deployed by each pipeline, both in
-[CE](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22010) and
-[EE](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6665).
+Review Apps are automatically deployed by [the
+pipeline](https://gitlab.com/gitlab-org/gitlab/merge_requests/6665).
 
 ## How does it work?
 
@@ -206,7 +205,7 @@ The following items may help diagnose this:
 
 #### Finding the problem
 
-[In the past](https://gitlab.com/gitlab-org/gitlab-ce/issues/62834), it happened
+[In the past](https://gitlab.com/gitlab-org/gitlab-foss/issues/62834), it happened
 that the `dns-gitlab-review-app-external-dns` Deployment was in a pending state,
 effectively preventing all the Review Apps from getting a DNS record assigned,
 making them unreachable via domain name.
@@ -299,10 +298,10 @@ find a way to limit it to only us.**
 - [Stern](https://github.com/wercker/stern) - enables cross pod log tailing based on label/field selectors
 
 [charts-1068]: https://gitlab.com/gitlab-org/charts/gitlab/issues/1068
-[gitlab-pipeline]: https://gitlab.com/gitlab-org/gitlab-ce/pipelines/44362587
-[gitlab:assets:compile]: https://gitlab.com/gitlab-org/gitlab-ce/-/jobs/149511610
-[review-build-cng]: https://gitlab.com/gitlab-org/gitlab-ce/-/jobs/149511623
-[review-deploy]: https://gitlab.com/gitlab-org/gitlab-ce/-/jobs/149511624
+[gitlab-pipeline]: https://gitlab.com/gitlab-org/gitlab-foss/pipelines/44362587
+[gitlab:assets:compile]: https://gitlab.com/gitlab-org/gitlab-foss/-/jobs/149511610
+[review-build-cng]: https://gitlab.com/gitlab-org/gitlab-foss/-/jobs/149511623
+[review-deploy]: https://gitlab.com/gitlab-org/gitlab-foss/-/jobs/149511624
 [cng-mirror]: https://gitlab.com/gitlab-org/build/CNG-mirror
 [cng]: https://gitlab.com/gitlab-org/build/CNG
 [cng-mirror-pipeline]: https://gitlab.com/gitlab-org/build/CNG-mirror/pipelines/44364657
@@ -310,13 +309,13 @@ find a way to limit it to only us.**
 [helm-chart]: https://gitlab.com/gitlab-org/charts/gitlab/
 [review-apps-ce]: https://console.cloud.google.com/kubernetes/clusters/details/us-central1-a/review-apps-ce?project=gitlab-review-apps
 [review-apps-ee]: https://console.cloud.google.com/kubernetes/clusters/details/us-central1-b/review-apps-ee?project=gitlab-review-apps
-[review-apps.sh]: https://gitlab.com/gitlab-org/gitlab-ee/blob/master/scripts/review_apps/review-apps.sh
-[automated_cleanup.rb]: https://gitlab.com/gitlab-org/gitlab-ee/blob/master/scripts/review_apps/automated_cleanup.rb
-[Auto-DevOps.gitlab-ci.yml]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
-[gitlab-ci-yml]: https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml
+[review-apps.sh]: https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/review_apps/review-apps.sh
+[automated_cleanup.rb]: https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/review_apps/automated_cleanup.rb
+[Auto-DevOps.gitlab-ci.yml]: https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
+[gitlab-ci-yml]: https://gitlab.com/gitlab-org/gitlab-foss/blob/master/.gitlab-ci.yml
 [gitlab-k8s-integration]: ../../user/project/clusters/index.md
-[password-bug]: https://gitlab.com/gitlab-org/gitlab-ce/issues/53621
 [K9s]: https://github.com/derailed/k9s
+[password-bug]: https://gitlab.com/gitlab-org/gitlab-foss/issues/53621
 
 ---
 

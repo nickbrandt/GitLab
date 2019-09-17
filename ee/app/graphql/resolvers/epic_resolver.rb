@@ -83,7 +83,7 @@ module Resolvers
 
     # If we're querying for multiple iids and selecting issues, then ideally
     # we want to batch the epic and issue queries into one to reduce N+1 and memory.
-    # https://gitlab.com/gitlab-org/gitlab-ee/issues/11841
+    # https://gitlab.com/gitlab-org/gitlab/issues/11841
     # Until we do that, add in child_complexity for each iid requested
     # (minus one for the automatically added child_complexity in the BaseField)
     def self.resolver_complexity(args, child_complexity:)

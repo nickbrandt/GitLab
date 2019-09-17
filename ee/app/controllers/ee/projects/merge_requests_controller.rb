@@ -108,11 +108,11 @@ module EE
       end
 
       def whitelist_query_limiting_ee_merge
-        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4792')
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4792')
       end
 
       def whitelist_query_limiting_ee_show
-        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4793')
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4793')
       end
     end
   end

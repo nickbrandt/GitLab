@@ -10,7 +10,7 @@ import customMatchers from './matchers';
 
 // Expose jQuery so specs using jQuery plugins can be imported nicely.
 // Here is an issue to explore better alternatives:
-// https://gitlab.com/gitlab-org/gitlab-ee/issues/12448
+// https://gitlab.com/gitlab-org/gitlab/issues/12448
 window.jQuery = $;
 
 process.on('unhandledRejection', global.promiseRejectionHandler);

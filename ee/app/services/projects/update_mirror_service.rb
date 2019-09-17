@@ -100,7 +100,7 @@ module Projects
 
       if result[:status] == :error
         log_error(result[:message])
-        # Uncomment once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+        # Uncomment once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
         # raise UpdateError, result[:message]
       end
     end

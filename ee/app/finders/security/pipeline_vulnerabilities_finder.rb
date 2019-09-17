@@ -33,7 +33,7 @@ module Security
         occurrences.concat(filtered_occurrences)
       end
 
-    # Created follow-up issue to better handle exception case - https://gitlab.com/gitlab-org/gitlab-ee/issues/14007
+    # Created follow-up issue to better handle exception case - https://gitlab.com/gitlab-org/gitlab/issues/14007
     rescue NoMethodError => _ # propagate error for CompareReportsBaseService
       raise ParseError, 'JSON parsing failed'
     end
