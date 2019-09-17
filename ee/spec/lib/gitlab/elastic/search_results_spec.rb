@@ -1,4 +1,3 @@
-# coding: utf-8
 require 'spec_helper'
 
 describe Gitlab::Elastic::SearchResults, :elastic do
