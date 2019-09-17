@@ -14,7 +14,7 @@ const defaultProps = {
   initialAuthorizationKey: 'abcedfg123',
   formPath: 'http://invalid',
   url: 'https://gitlab.com/endpoint-url',
-  learnMoreUrl: 'example.com/learn-more',
+  learnMoreUrl: 'https://docs.gitlab.com/ee/user/project/integrations/generic_alerts.md',
   initialActivated: false,
 };
 
@@ -71,16 +71,6 @@ describe('AlertsServiceForm', () => {
     });
 
     it('shows description and "Learn More" link', () => {
-      expect(findDescription().element.innerHTML).toMatchSnapshot();
-    });
-  });
-
-  describe('without learnMoreUrl', () => {
-    beforeEach(() => {
-      createComponent({ learnMoreUrl: '' });
-    });
-
-    it('shows description but not "Learn More" link', () => {
       expect(findDescription().element.innerHTML).toMatchSnapshot();
     });
   });
