@@ -67,7 +67,7 @@ deploy the bundled PostgreSQL.
    alertmanager['enable'] = false
    pgbouncer_exporter['enable'] = false
    redis_exporter['enable'] = false
-   gitlab_monitor['enable'] = false
+   gitlab_exporter['enable'] = false
 
    postgresql['listen_address'] = '0.0.0.0'
    postgresql['port'] = 5432
