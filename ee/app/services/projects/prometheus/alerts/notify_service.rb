@@ -35,7 +35,7 @@ module Projects
           # This is done in order to keep the old behavior of sending emails for
           # any project which does not have the new `incident_management` feature.
           # See point 3 in
-          # https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9830#what-does-this-mr-do
+          # https://gitlab.com/gitlab-org/gitlab/merge_requests/9830#what-does-this-mr-do
           return firings.any? unless incident_management_available?
 
           incident_management_setting.send_email && firings.any?

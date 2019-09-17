@@ -254,7 +254,7 @@ even when this may negatively impact their other tasks and priorities.
 Doing so allows everyone involved in the merge request to iterate faster as the
 context is fresh in memory, improves contributors' experiences significantly,
 and gives authors more time to address feedback and iterate on their work before
-the [feature freeze](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/PROCESS.md#feature-freeze-on-the-7th-for-the-release-on-the-22nd).
+the [feature freeze](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md#feature-freeze-on-the-7th-for-the-release-on-the-22nd).
 
 A turnaround time of two working days is usually acceptable, since engineers
 will typically have other things to work on while they're waiting for review,
@@ -262,7 +262,7 @@ but don't hesitate to ask the author if it's unclear what time frame would be
 acceptable, how urgent the review is, or how significant the blockage. Authors
 are also encouraged to provide this information up-front to reviewers, but are
 expected to be mindful of the [guidelines on when to ask for review on MRs that
-are intended to go in before the feature freeze](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/PROCESS.md#between-the-1st-and-the-7th),
+are intended to go in before the feature freeze](https://gitlab.com/gitlab-org/gitlab/blob/master/PROCESS.md#between-the-1st-and-the-7th),
 and realistic in their expectations if these were not followed.
 
 If you don't think you'll be able to review a merge request within a reasonable
@@ -393,25 +393,25 @@ Enterprise Edition instance. This has some implications:
 
 How code reviews are conducted can surprise new contributors. Here are some examples of code reviews that should help to orient you as to what to expect.
 
-**["Modify `DiffNote` to reuse it for Designs"](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/13703):**
+**["Modify `DiffNote` to reuse it for Designs"](https://gitlab.com/gitlab-org/gitlab/merge_requests/13703):**
 It contained everything from nitpicks around newlines to reasoning
 about what versions for designs are, how we should compare them
 if there was no previous version of a certain file (parent vs.
 blank `sha` vs empty tree).
 
-**["Support multi-line suggestions"](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/25211)**:
+**["Support multi-line suggestions"](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/25211)**:
 The MR itself consists of a collaboration between FE and BE,
 and documenting comments from the author for the reviewer.
 There's some nitpicks, some questions for information, and
 towards the end, a security vulnerability.
 
-**["Allow multiple repositories per project"](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/10251)**:
+**["Allow multiple repositories per project"](https://gitlab.com/gitlab-org/gitlab/merge_requests/10251)**:
 ZJ referred to the other projects (workhorse) this might impact,
 suggested some improvements for consistency. And James' comments
 helped us with overall code quality (using delegation, `&.` those
 types of things), and making the code more robust.
 
-**["Support multiple assignees for merge requests"](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/10161)**:
+**["Support multiple assignees for merge requests"](https://gitlab.com/gitlab-org/gitlab/merge_requests/10161)**:
 A  good example of collaboration on an MR touching multiple parts of the codebase. Nick pointed out interesting edge cases, James Lopes also joined in raising concerns on import/export feature.
 
 ### Credits

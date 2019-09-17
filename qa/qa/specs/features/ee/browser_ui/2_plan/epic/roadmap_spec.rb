@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # https://gitlab.com/gitlab-org/gitlab-ee/issues/13360
+  # https://gitlab.com/gitlab-org/gitlab/issues/13360
   context 'Plan', :quarantine do
     describe 'Epics roadmap' do
       let(:epic) do

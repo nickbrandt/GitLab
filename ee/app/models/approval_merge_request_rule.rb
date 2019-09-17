@@ -26,7 +26,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
   validates :report_type, presence: true, if: :report_approver?
   # Temporary validations until `code_owner` can be dropped in favor of `rule_type`
-  # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
+  # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
   validates :code_owner, inclusion: { in: [true], if: :code_owner? }
   validates :code_owner, inclusion: { in: [false], if: :regular? }
 
@@ -53,7 +53,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   }
 
   # Deprecated scope until code_owner column has been migrated to rule_type
-  # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
+  # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
   scope :code_owner, -> { where(code_owner: true).or(where(rule_type: :code_owner)) }
   scope :security_report, -> { report_approver.where(report_type: :security) }
   scope :license_compliance, -> { report_approver.where(report_type: :license_management) }
@@ -76,14 +76,14 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   # ApprovalRuleLike interface
   # Temporary override to handle legacy records that have not yet been migrated
-  # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
+  # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
   def regular?
     read_attribute(:rule_type) == 'regular' || (!report_approver? && !code_owner)
   end
   alias_method :regular, :regular?
 
   # Temporary override to handle legacy records that have not yet been migrated
-  # To be removed with https://gitlab.com/gitlab-org/gitlab-ee/issues/11834
+  # To be removed with https://gitlab.com/gitlab-org/gitlab/issues/11834
   def code_owner?
     read_attribute(:rule_type) == 'code_owner' || code_owner
   end

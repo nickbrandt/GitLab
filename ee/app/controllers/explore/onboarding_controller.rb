@@ -23,9 +23,9 @@ class Explore::OnboardingController < Explore::ApplicationController
   end
 
   def demo_project
-    # gdk instances may not have the 'gitlab-ce' project seeded, so we will fallback
+    # gdk instances may not have the 'gitlab-foss' project seeded, so we will fallback
     # to 'gitlab-test'
-    Project.find_by_full_path('gitlab-org/gitlab-ce') ||
+    Project.find_by_full_path('gitlab-org/gitlab-foss') ||
       Project.find_by_full_path('gitlab-org/gitlab-test')
   end
 end

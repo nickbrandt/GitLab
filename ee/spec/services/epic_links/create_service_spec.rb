@@ -171,7 +171,7 @@ describe EpicLinks::CreateService do
             # 2. we have to update the  record (2 including releasing savepoint)
             # 3. we have to update start and due dates for all updated epics
             # 4. we temporarily increased this from 6 due to
-            #    https://gitlab.com/gitlab-org/gitlab-ee/issues/11539
+            #    https://gitlab.com/gitlab-org/gitlab/issues/11539
             expect do
               ActiveRecord::QueryRecorder.new { add_epic(new_epics.map { |epic| epic.to_reference(full: true) }) }
             end.not_to exceed_query_limit(control).with_threshold(8)

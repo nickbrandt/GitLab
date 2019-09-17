@@ -34,7 +34,7 @@ module IncidentManagement
 
       # Create an unlabelled issue if we couldn't create the issue
       # due to labels errors.
-      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/65042
+      # See https://gitlab.com/gitlab-org/gitlab-foss/issues/65042
       if issue.errors.include?(:labels)
         log_label_error(issue)
         issue = do_create_issue

@@ -34,7 +34,7 @@ describe 'User approves a merge request', :js do
       project.add_developer(user3)
     end
 
-    # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+    # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
     xit 'shows multiple approvers beyond the needed count' do
       visit(merge_request_path(merge_request))
 

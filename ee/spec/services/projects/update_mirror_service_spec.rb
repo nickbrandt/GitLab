@@ -301,7 +301,7 @@ describe Projects::UpdateMirrorService do
             expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: error_message)
           end
 
-          # Uncomment once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+          # Uncomment once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
           # it 'fails mirror operation' do
           #   expect_any_instance_of(Projects::LfsPointers::LfsImportService).to receive(:execute).and_return(status: :error, message: 'error message')
 
@@ -311,7 +311,7 @@ describe Projects::UpdateMirrorService do
           #   expect(result[:message]).to eq 'error message'
           # end
 
-          # Remove once https://gitlab.com/gitlab-org/gitlab-ce/issues/61834 is closed
+          # Remove once https://gitlab.com/gitlab-org/gitlab-foss/issues/61834 is closed
           it 'does not fail mirror operation' do
             result = subject.execute
 

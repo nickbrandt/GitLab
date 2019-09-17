@@ -7,7 +7,7 @@ module Elastic
 
     attr_reader :data_class, :data_target
 
-    # TODO: remove once multi-version is functional https://gitlab.com/gitlab-org/gitlab-ee/issues/10156
+    # TODO: remove once multi-version is functional https://gitlab.com/gitlab-org/gitlab/issues/10156
     TARGET_VERSION = 'V12p1'
 
     # @params version [String, Module] can be a string "V12p1" or module (Elastic::V12p1)
@@ -18,14 +18,14 @@ module Elastic
 
     private
 
-    # TODO: load from db table https://gitlab.com/gitlab-org/gitlab-ee/issues/12555
+    # TODO: load from db table https://gitlab.com/gitlab-org/gitlab/issues/12555
     def elastic_reading_target
       strong_memoize(:elastic_reading_target) do
         version(TARGET_VERSION)
       end
     end
 
-    # TODO: load from db table https://gitlab.com/gitlab-org/gitlab-ee/issues/12555
+    # TODO: load from db table https://gitlab.com/gitlab-org/gitlab/issues/12555
     def elastic_writing_targets
       strong_memoize(:elastic_writing_targets) do
         [elastic_reading_target]

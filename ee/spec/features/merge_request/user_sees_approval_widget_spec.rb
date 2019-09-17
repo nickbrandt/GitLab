@@ -20,7 +20,7 @@ describe 'Merge request > User sees approval widget', :js do
       visit project_merge_request_path(project, merge_request)
     end
 
-    # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
+    # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
     xit 'does not show checking ability text' do
       expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
       expect(find('.js-mr-approvals')).to have_selector('.approvals-body')

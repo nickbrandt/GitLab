@@ -309,7 +309,7 @@ describe 'Related issues', :js do
         end
 
         it 'allows us to remove pending issues' do
-          # Tests against https://gitlab.com/gitlab-org/gitlab-ee/issues/11625
+          # Tests against https://gitlab.com/gitlab-org/gitlab/issues/11625
           find('.js-issue-count-badge-add-button').click
           find('.js-add-issuable-form-input').set 'issue1 issue2 issue3 '
 

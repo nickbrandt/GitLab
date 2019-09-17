@@ -35,7 +35,7 @@ module EE
 
     class_methods do
       # We can't specify `override` here:
-      #   https://gitlab.com/gitlab-org/gitlab-ce/issues/50911
+      #   https://gitlab.com/gitlab-org/gitlab-foss/issues/50911
       def allowed_access_levels
         [
           *super,

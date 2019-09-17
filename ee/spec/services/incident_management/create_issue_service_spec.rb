@@ -248,7 +248,7 @@ describe IncidentManagement::CreateIssueService do
         it_behaves_like 'new label'
       end
 
-      context 'with duplicate labels', issue: 'https://gitlab.com/gitlab-org/gitlab-ce/issues/65042' do
+      context 'with duplicate labels', issue: 'https://gitlab.com/gitlab-org/gitlab-foss/issues/65042' do
         before do
           # Replicate race condition to create duplicates
           build(:label, project: project, title: title).save!(validate: false)

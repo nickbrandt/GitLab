@@ -9,7 +9,7 @@ module Gitlab
 
     # TODO: Dynamically determine mirror update interval based on total number
     # of mirrors, average update time, and available concurrency.
-    # Issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/5258
+    # Issue: https://gitlab.com/gitlab-org/gitlab/issues/5258
     MIN_DELAY = 30.minutes
     # MAX RETRY value was calculated based on the triangular number with a 15 minutes factor
     # https://en.wikipedia.org/wiki/Triangular_number in order to make sure the mirror

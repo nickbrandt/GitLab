@@ -12,8 +12,8 @@ import * as types from './mutation_types';
  * ee/app/assets/javascripts/vue_shared/security_reports/store/actions.js
  * This is being addressed in the following issues:
  *
- * https://gitlab.com/gitlab-org/gitlab-ee/issues/8146
- * https://gitlab.com/gitlab-org/gitlab-ee/issues/8519
+ * https://gitlab.com/gitlab-org/gitlab/issues/8146
+ * https://gitlab.com/gitlab-org/gitlab/issues/8519
  */
 
 const hideModal = () => $('#modal-mrwidget-security-issue').modal('hide');
@@ -440,5 +440,5 @@ export const closeDismissalCommentBox = ({ commit }) => {
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
-// This is no longer needed after gitlab-ce#52179 is merged
+// This is no longer needed after gitlab-foss#52179 is merged
 export default () => {};

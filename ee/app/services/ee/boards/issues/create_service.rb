@@ -18,7 +18,7 @@ module EE
             options.merge!(
               milestone_id: milestone_id,
               # This can be removed when boards have multiple assignee support.
-              # See https://gitlab.com/gitlab-org/gitlab-ee/issues/3786
+              # See https://gitlab.com/gitlab-org/gitlab/issues/3786
               assignee_ids: assignee_ids)
           end
         end

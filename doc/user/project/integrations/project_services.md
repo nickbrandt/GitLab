@@ -74,5 +74,5 @@ For an overview of what projects services are available, please see the
 
 Contributions are welcome!
 
-[projects-code]: https://gitlab.com/gitlab-org/gitlab-ce/tree/master/app/models/project_services
+[projects-code]: https://gitlab.com/gitlab-org/gitlab-foss/tree/master/app/models/project_services
 [permissions]: ../../permissions.md

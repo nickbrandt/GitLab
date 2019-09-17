@@ -35,7 +35,7 @@ class Groups::CycleAnalyticsController < Groups::ApplicationController
   end
 
   def whitelist_query_limiting
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42671')
+    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/42671')
   end
 
   def authorize_group_cycle_analytics!

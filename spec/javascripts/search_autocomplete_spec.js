@@ -30,9 +30,9 @@ describe('Search autocomplete dropdown', () => {
 
   dashboardMRsPath = '/dashboard/merge_requests';
 
-  projectIssuesPath = '/gitlab-org/gitlab-ce/issues';
+  projectIssuesPath = '/gitlab-org/gitlab-foss/issues';
 
-  projectMRsPath = '/gitlab-org/gitlab-ce/merge_requests';
+  projectMRsPath = '/gitlab-org/gitlab-foss/merge_requests';
 
   groupIssuesPath = '/groups/gitlab-org/issues';
 

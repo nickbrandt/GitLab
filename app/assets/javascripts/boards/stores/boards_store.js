@@ -82,7 +82,7 @@ const boardsStore = {
         this.state.lists = _.sortBy(this.state.lists, 'position');
       })
       .catch(() => {
-        // https://gitlab.com/gitlab-org/gitlab-ce/issues/30821
+        // https://gitlab.com/gitlab-org/gitlab-foss/issues/30821
       });
     this.removeBlankState();
   },

@@ -1,6 +1,6 @@
 # Analytics workspace
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/12077) in GitLab 12.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/12077) in GitLab 12.2.
 
 The Analytics workspace will make it possible to aggregate analytics across
 GitLab, so that users can view information across multiple projects and groups

@@ -32,7 +32,7 @@ export const activeFilters = state => {
     return acc;
   }, {});
   // hide_dismissed is hardcoded as it currently is an edge-case, more info in the MR:
-  // https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15333#note_208301144
+  // https://gitlab.com/gitlab-org/gitlab/merge_requests/15333#note_208301144
   if (gon.features && gon.features.hideDismissedVulnerabilities) {
     filters.hide_dismissed = state.hide_dismissed;
   }
@@ -42,5 +42,5 @@ export const activeFilters = state => {
 export const visibleFilters = ({ filters }) => filters.filter(({ hidden }) => !hidden);
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
-// This is no longer needed after gitlab-ce#52179 is merged
+// This is no longer needed after gitlab-foss#52179 is merged
 export default () => {};

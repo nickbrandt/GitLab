@@ -98,7 +98,7 @@ describe 'Milestones on EE' do
       it 'has a link to upgrade to Bronze when checking the namespace plan' do
         # Not using `stub_application_setting` because the method is prepended in
         # `EE::ApplicationSetting` which breaks when using `any_instance`
-        # https://gitlab.com/gitlab-org/gitlab-ce/issues/33587
+        # https://gitlab.com/gitlab-org/gitlab-foss/issues/33587
         allow(Gitlab::CurrentSettings.current_application_settings)
           .to receive(:should_check_namespace_plan?) { true }
 

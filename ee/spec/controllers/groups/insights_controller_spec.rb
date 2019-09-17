@@ -60,7 +60,7 @@ describe Groups::InsightsController do
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
-        # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+        # once https://gitlab.com/gitlab-org/gitlab/issues/11340 is implemented.
         it_behaves_like '200 status'
       end
 
@@ -69,11 +69,11 @@ describe Groups::InsightsController do
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
-        # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+        # once https://gitlab.com/gitlab-org/gitlab/issues/11340 is implemented.
         it_behaves_like '200 status'
 
         # The following expectation should be removed
-        # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+        # once https://gitlab.com/gitlab-org/gitlab/issues/11340 is implemented.
         it 'does return the default config' do
           subject
 
@@ -86,7 +86,7 @@ describe Groups::InsightsController do
 
         # The following expectation should be changed to
         # it_behaves_like '404 status'
-        # once https://gitlab.com/gitlab-org/gitlab-ee/issues/11340 is implemented.
+        # once https://gitlab.com/gitlab-org/gitlab/issues/11340 is implemented.
         it_behaves_like '200 status'
       end
     end
