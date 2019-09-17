@@ -5,7 +5,8 @@ const createMockDesign = id => ({
   id,
   filename: 'test',
   image: 'test',
-  commentsCount: 2,
+  event: 'NONE',
+  notesCount: 2,
   updatedAt: '01-01-2019',
 });
 

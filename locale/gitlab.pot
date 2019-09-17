@@ -992,6 +992,9 @@ msgstr ""
 msgid "Added at"
 msgstr ""
 
+msgid "Added in this version"
+msgstr ""
+
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
 msgstr ""
 
@@ -4780,6 +4783,9 @@ msgid "Deleted"
 msgstr ""
 
 msgid "Deleted chat nickname: %{chat_name}!"
+msgstr ""
+
+msgid "Deleted in this version"
 msgstr ""
 
 msgid "Deleting the license failed."
@@ -9895,6 +9901,9 @@ msgid "Modal|Cancel"
 msgstr ""
 
 msgid "Modal|Close"
+msgstr ""
+
+msgid "Modified in this version"
 msgstr ""
 
 msgid "Modify commit message"
