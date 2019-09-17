@@ -448,45 +448,6 @@ describe MergeRequest do
     end
   end
 
-  describe "#approvers_left" do
-    let(:merge_request) {create :merge_request}
-
-    it "returns correct value" do
-      user = create(:user)
-      user1 = create(:user)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-
-    it "returns correct value when there is a group approver" do
-      user = create(:user)
-      user1 = create(:user)
-      user2 = create(:user)
-      group = create(:group)
-
-      group.add_developer(user2)
-      create(:approver_group, target: merge_request, group: group)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to match_array [user, user2]
-    end
-
-    it "returns correct value when there is only a group approver" do
-      user = create(:user)
-      group = create(:group)
-      group.add_developer(user)
-
-      merge_request.approver_groups.create(group: group)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-  end
-
   describe '#all_approvers_including_groups' do
     it 'returns correct set of users' do
       user = create :user
