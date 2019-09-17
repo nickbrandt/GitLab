@@ -1,4 +1,4 @@
-import { tableSortFields, tableSortOrder } from './../../../constants';
+import { tableSortOrder } from '../../../constants';
 
 export default () => ({
   isLoadingTable: false,
@@ -6,7 +6,6 @@ export default () => ({
   mergeRequests: [],
   pageInfo: {},
   sortOrder: tableSortOrder.asc.value,
-  sortFields: tableSortFields,
   sortField: 'time_to_merge',
   columnMetric: 'time_to_first_comment',
 });

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import state from './state';
+import * as getters from './getters';
 import * as actions from './actions';
 import mutations from './mutations';
 import filters from './modules/filters/index';
@@ -12,6 +13,7 @@ Vue.use(Vuex);
 const createStore = () =>
   new Vuex.Store({
     state: state(),
+    getters,
     actions,
     mutations,
     modules: {

@@ -9,11 +9,11 @@ describe('MergeRequestTable component', () => {
 
   const defaultProps = {
     mergeRequests: mockMergeRequests,
-    columnOptions: {
-      time_to_first_comment: 'Time from first commit until first comment',
-      time_to_last_commit: 'Time from first comment to last commit',
-      time_to_merge: 'Time from last commit to merge',
-    },
+    columnOptions: [
+      { key: 'time_to_first_comment', label: 'Time from first commit until first comment' },
+      { key: 'time_to_last_commit', label: 'Time from first comment to last commit' },
+      { key: 'time_to_merge', label: 'Time from last commit to merge' },
+    ],
     metricType: 'time_to_last_commit',
     metricLabel: 'Time from first comment to last commit',
     pageInfo: {},

@@ -71,8 +71,8 @@ export default {
     </div>
     <div class="table-section section-50 d-flex flex-row align-items-start qa-mr-metrics">
       <metric-column
-        type="time_to_merge"
-        :value="mergeRequest.time_to_merge"
+        type="days_to_merge"
+        :value="mergeRequest.days_to_merge"
         :label="__('Time to merge')"
       />
       <metric-column :type="metricType" :value="selectedMetric" :label="metricLabel" />
