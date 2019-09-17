@@ -752,14 +752,14 @@ In projects:
   1. Activate the experimental `Dockerfile` syntax by adding the following
      to the top of the file:
 
-     ```Dockerfile
+     ```docker
      # syntax = docker/dockerfile:experimental
      ```
 
   1. To make secrets available in any `RUN $COMMAND` in the `Dockerfile`, mount
      the secret file and source it prior to running `$COMMAND`:
 
-     ```Dockerfile
+     ```docker
      RUN --mount=type=secret,id=auto-devops-build-secrets . /run/secrets/auto-devops-build-secrets && $COMMAND
      ```
 
