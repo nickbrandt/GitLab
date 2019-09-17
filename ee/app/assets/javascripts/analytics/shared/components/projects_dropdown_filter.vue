@@ -145,7 +145,7 @@ export default {
           :size="16"
           shape="rect"
           :alt="selectedProjects[0].name"
-          class="prepend-top-2"
+          class="d-inline-flex align-text-bottom"
         />
         {{ selectedProjectsLabel }}
         <icon name="chevron-down" />
