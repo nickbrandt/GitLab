@@ -116,6 +116,12 @@ describe Dashboard::Operations::ProjectsService do
         else
           it_behaves_like 'project not found'
         end
+
+        context 'if :include_unavailable option is provided' do
+          let(:result) { service.execute(projects, include_unavailable: true) }
+
+          it_behaves_like 'project found'
+        end
       end
     end
 

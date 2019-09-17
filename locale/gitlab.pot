@@ -16217,6 +16217,12 @@ msgstr ""
 msgid "To see all the user's personal access tokens you must impersonate them first."
 msgstr ""
 
+msgid "To see this project's operational details, %{linkStart}upgrade its group plan to Silver%{linkEnd}. You can also remove the project from the dashboard."
+msgstr ""
+
+msgid "To see this project's operational details, contact an owner of group %{groupName} to upgrade the plan. You can also remove the project from the dashboard."
+msgstr ""
+
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
 msgstr ""
 

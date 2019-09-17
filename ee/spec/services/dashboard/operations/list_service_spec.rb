@@ -60,7 +60,9 @@ describe Dashboard::Operations::ListService do
         user.ops_dashboard_projects << project
 
         allow(projects_service)
-          .to receive(:execute).with([project]).and_return([project])
+          .to receive(:execute)
+          .with([project], include_unavailable: true)
+          .and_return([project])
       end
 
       it 'returns a list of projects' do
@@ -120,7 +122,7 @@ describe Dashboard::Operations::ListService do
 
               allow(projects_service)
                 .to receive(:execute)
-                .with([project, project2])
+                .with([project, project2], include_unavailable: true)
                 .and_return([project, project2])
             end
 
@@ -145,7 +147,9 @@ describe Dashboard::Operations::ListService do
     context 'without added projects' do
       before do
         allow(projects_service)
-          .to receive(:execute).with([]).and_return([])
+          .to receive(:execute)
+          .with([], include_unavailable: true)
+          .and_return([])
       end
 
       it_behaves_like 'no projects'

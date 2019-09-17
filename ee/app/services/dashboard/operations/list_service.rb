@@ -27,7 +27,7 @@ module Dashboard
 
         ProjectsService
           .new(user)
-          .execute(projects)
+          .execute(projects, include_unavailable: true)
           .to_a # 1 query
       end
 

@@ -20,4 +20,66 @@ describe 'Dashboard operations', :js do
     expect(page).to have_text('Alerts')
     expect(page).to have_text(pipeline.status)
   end
+
+  context 'when opened on gitlab.com' do
+    before do
+      stub_application_setting(check_namespace_plan: true)
+      stub_licensed_features(operations_dashboard: true)
+    end
+
+    it 'masks projects without valid license' do
+      user = create(:user)
+
+      gold_group = create(:group)
+      bronze_group = create(:group)
+
+      create(:gitlab_subscription, :gold, namespace: gold_group)
+      create(:gitlab_subscription, :bronze, namespace: bronze_group)
+
+      gold_project = create(:project, :repository, namespace: gold_group, name: 'Gold Project')
+      bronze_project = create(:project, :repository, namespace: bronze_group, name: 'Bronze Project')
+      public_project = create(:project, :repository, :public, namespace: bronze_group, name: 'Public Bronze Project')
+
+      gold_pipeline = create(:ci_pipeline, project: gold_project, sha: gold_project.commit.sha, status: :running)
+      bronze_pipeline = create(:ci_pipeline, project: bronze_project, sha: bronze_project.commit.sha, status: :running)
+      public_pipeline = create(:ci_pipeline, project: public_project, sha: public_project.commit.sha, status: :running)
+
+      gold_project.add_developer(user)
+      bronze_group.add_developer(user)
+
+      user.update(ops_dashboard_projects: [gold_project, bronze_project, public_project])
+      sign_in(user)
+
+      visit operations_path
+
+      bronze_card = project_card(bronze_project)
+      gold_card = project_card(gold_project)
+      public_card = project_card(public_project)
+
+      assert_masked(bronze_card, bronze_project, bronze_pipeline, bronze_group)
+      assert_available(gold_card, gold_project, gold_pipeline)
+      assert_available(public_card, public_project, public_pipeline)
+    end
+
+    def project_card(project)
+      page.find('.js-dashboard-project', text: "#{project.namespace.name} / #{project.name}")
+    end
+
+    def assert_available(card, project, pipeline)
+      expect(card).to have_text(project.name)
+      expect(card).to have_text(pipeline.ref)
+      expect(card).to have_text(pipeline.short_sha)
+      expect(card).to have_text('Alerts')
+      expect(card).to have_text(pipeline.status)
+    end
+
+    def assert_masked(card, project, pipeline, group)
+      expect(card).to have_text(project.name)
+      expect(card).to have_text("To see this project's operational details, contact an owner of group #{group.path} to upgrade the plan. You can also remove the project from the dashboard.")
+      expect(card).not_to have_text(pipeline.ref)
+      expect(card).not_to have_text(pipeline.short_sha)
+      expect(card).not_to have_text('Alerts')
+      expect(card).not_to have_text(pipeline.status)
+    end
+  end
 end
