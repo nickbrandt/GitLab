@@ -49,6 +49,8 @@ module EE
         enable :admin_list
         enable :admin_board
         enable :read_prometheus
+        enable :view_code_analytics
+        enable :view_productivity_analytics
       end
 
       rule { maintainer }.policy do
@@ -131,8 +133,6 @@ module EE
       rule { ip_enforcement_prevents_access & ~owner }.policy do
         prevent :read_group
       end
-
-      rule { reporter }.enable :view_productivity_analytics
     end
 
     override :lookup_access_level!
