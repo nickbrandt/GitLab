@@ -52,10 +52,12 @@ export default {
     ...mapGetters(['getMetricTypes']),
     ...mapGetters('charts', [
       'chartLoading',
+      'chartHasData',
       'getChartData',
       'getColumnChartDatazoomOption',
       'getMetricDropdownLabel',
       'isSelectedMetric',
+      'hasNoAccessError',
     ]),
     ...mapGetters('table', [
       'sortFieldDropdownLabel',
@@ -64,10 +66,15 @@ export default {
       'tableSortOptions',
       'columnMetricLabel',
       'isSelectedSortField',
-      'hasNoAccessError',
     ]),
     showAppContent() {
       return this.groupNamespace && !this.hasNoAccessError;
+    },
+    showMergeRequestTable() {
+      return !this.isLoadingTable && this.mergeRequests.length;
+    },
+    showSecondaryCharts() {
+      return !this.chartLoading(chartKeys.main) && this.chartHasData(chartKeys.main);
     },
   },
   mounted() {
@@ -133,164 +140,201 @@ export default {
         <h5>{{ __('Time to merge') }}</h5>
         <gl-loading-icon v-if="chartLoading(chartKeys.main)" size="md" class="my-4 py-4" />
         <template v-else>
-          <p class="text-muted">
-            {{ __('You can filter by "days to merge" by clicking on the columns in the chart.') }}
-          </p>
-          <gl-column-chart
-            :data="getChartData(chartKeys.main)"
-            :option="getColumnChartOption(chartKeys.main)"
-            :y-axis-title="__('Merge requests')"
-            :x-axis-title="__('Days')"
-            x-axis-type="category"
-            @chartItemClicked="onMainChartItemClicked"
-          />
+          <div v-if="!chartHasData(chartKeys.main)" class="bs-callout bs-callout-info">
+            {{ __('There is no data available. Please change your selection.') }}
+          </div>
+          <template v-else>
+            <p class="text-muted">
+              {{ __('You can filter by "days to merge" by clicking on the columns in the chart.') }}
+            </p>
+            <gl-column-chart
+              :data="{ full: getChartData(chartKeys.main) }"
+              :option="getColumnChartOption(chartKeys.main)"
+              :y-axis-title="__('Merge requests')"
+              :x-axis-title="__('Days')"
+              x-axis-type="category"
+              @chartItemClicked="onMainChartItemClicked"
+            />
+          </template>
         </template>
       </div>
 
-      <div class="row">
-        <div class="qa-time-based col-lg-6 col-sm-12 mb-4">
-          <gl-dropdown
-            class="mb-4 metric-dropdown"
-            toggle-class="dropdown-menu-toggle w-100"
-            menu-class="w-100 mw-100"
-            :text="getMetricDropdownLabel(chartKeys.timeBasedHistogram)"
-          >
-            <gl-dropdown-item
-              v-for="metric in getMetricTypes(chartKeys.timeBasedHistogram)"
-              :key="metric.key"
-              active-class="is-active"
-              class="w-100"
-              @click="
-                setMetricType({ metricType: metric.key, chartKey: chartKeys.timeBasedHistogram })
-              "
-            >
-              <span class="d-flex">
-                <icon
-                  class="flex-shrink-0 append-right-4"
-                  :class="{
-                    invisible: !isSelectedMetric({
-                      metric: metric.key,
-                      chartKey: chartKeys.timeBasedHistogram,
-                    }),
-                  }"
-                  name="mobile-issue-close"
-                />
-                {{ metric.label }}
-              </span>
-            </gl-dropdown-item>
-          </gl-dropdown>
-          <gl-loading-icon
-            v-if="chartLoading(chartKeys.timeBasedHistogram)"
-            size="md"
-            class="my-4 py-4"
-          />
-          <gl-column-chart
-            v-else
-            :data="getChartData(chartKeys.timeBasedHistogram)"
-            :option="getColumnChartOption(chartKeys.timeBasedHistogram)"
-            :y-axis-title="__('Merge requests')"
-            :x-axis-title="__('Hours')"
-            x-axis-type="category"
-          />
-        </div>
-
-        <div class="qa-commit-based col-lg-6 col-sm-12 mb-4">
-          <gl-dropdown
-            class="mb-4 metric-dropdown"
-            toggle-class="dropdown-menu-toggle w-100"
-            menu-class="w-100 mw-100"
-            :text="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
-          >
-            <gl-dropdown-item
-              v-for="metric in getMetricTypes(chartKeys.commitBasedHistogram)"
-              :key="metric.key"
-              active-class="is-active"
-              class="w-100"
-              @click="
-                setMetricType({ metricType: metric.key, chartKey: chartKeys.commitBasedHistogram })
-              "
-            >
-              <span class="d-flex">
-                <icon
-                  class="flex-shrink-0 append-right-4"
-                  :class="{
-                    invisible: !isSelectedMetric({
-                      metric: metric.key,
-                      chartKey: chartKeys.commitBasedHistogram,
-                    }),
-                  }"
-                  name="mobile-issue-close"
-                />
-                {{ metric.label }}
-              </span>
-            </gl-dropdown-item>
-          </gl-dropdown>
-          <gl-loading-icon
-            v-if="chartLoading(chartKeys.commitBasedHistogram)"
-            size="md"
-            class="my-4 py-4"
-          />
-          <gl-column-chart
-            v-else
-            :data="getChartData(chartKeys.commitBasedHistogram)"
-            :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
-            :y-axis-title="__('Merge requests')"
-            :x-axis-title="__('Commits')"
-            x-axis-type="category"
-          />
-        </div>
-      </div>
-
-      <div
-        class="qa-mr-table-sort d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
-      >
-        <h5>{{ __('List') }}</h5>
-        <div v-if="mergeRequests" class="d-flex flex-column flex-md-row align-items-md-center">
-          <strong class="mr-2">{{ __('Sort by') }}</strong>
-          <div class="d-flex">
-            <gl-dropdown
-              class="mr-2 flex-grow"
-              toggle-class="dropdown-menu-toggle"
-              :text="sortFieldDropdownLabel"
-            >
-              <gl-dropdown-item
-                v-for="metric in tableSortOptions"
-                :key="metric.key"
-                active-class="is-active"
-                class="w-100"
-                @click="setSortField(metric.key)"
+      <template v-if="showSecondaryCharts">
+        <div class="row">
+          <div class="qa-time-based col-lg-6 col-sm-12 mb-4">
+            <gl-loading-icon
+              v-if="chartLoading(chartKeys.timeBasedHistogram)"
+              size="md"
+              class="my-4 py-4"
+            />
+            <template v-else>
+              <div
+                v-if="!chartHasData(chartKeys.timeBasedHistogram)"
+                class="bs-callout bs-callout-info"
               >
-                <span class="d-flex">
-                  <icon
-                    class="flex-shrink-0 append-right-4"
-                    :class="{
-                      invisible: !isSelectedSortField(metric.key),
-                    }"
-                    name="mobile-issue-close"
-                  />
-                  {{ metric.label }}
-                </span>
-              </gl-dropdown-item>
-            </gl-dropdown>
-            <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">
-              <icon :name="sortIcon" />
-            </gl-button>
+                {{ __('There is no data for the selected metric. Please change your selection.') }}
+              </div>
+              <template v-else>
+                <gl-dropdown
+                  class="mb-4 metric-dropdown"
+                  toggle-class="dropdown-menu-toggle w-100"
+                  menu-class="w-100 mw-100"
+                  :text="getMetricDropdownLabel(chartKeys.timeBasedHistogram)"
+                >
+                  <gl-dropdown-item
+                    v-for="metric in getMetricTypes(chartKeys.timeBasedHistogram)"
+                    :key="metric.key"
+                    active-class="is-active"
+                    class="w-100"
+                    @click="
+                      setMetricType({
+                        metricType: metric.key,
+                        chartKey: chartKeys.timeBasedHistogram,
+                      })
+                    "
+                  >
+                    <span class="d-flex">
+                      <icon
+                        class="flex-shrink-0 append-right-4"
+                        :class="{
+                          invisible: !isSelectedMetric({
+                            metric: metric.key,
+                            chartKey: chartKeys.timeBasedHistogram,
+                          }),
+                        }"
+                        name="mobile-issue-close"
+                      />
+                      {{ metric.label }}
+                    </span>
+                  </gl-dropdown-item>
+                </gl-dropdown>
+                <gl-column-chart
+                  :data="{ full: getChartData(chartKeys.timeBasedHistogram) }"
+                  :option="getColumnChartOption(chartKeys.timeBasedHistogram)"
+                  :y-axis-title="__('Merge requests')"
+                  :x-axis-title="__('Hours')"
+                  x-axis-type="category"
+                />
+              </template>
+            </template>
+          </div>
+
+          <div class="qa-commit-based col-lg-6 col-sm-12 mb-4">
+            <gl-loading-icon
+              v-if="chartLoading(chartKeys.commitBasedHistogram)"
+              size="md"
+              class="my-4 py-4"
+            />
+            <template v-else>
+              <div
+                v-if="!chartHasData(chartKeys.commitBasedHistogram)"
+                class="bs-callout bs-callout-info"
+              >
+                {{ __('There is no data for the selected metric. Please change your selection.') }}
+              </div>
+              <template v-else>
+                <gl-dropdown
+                  class="mb-4 metric-dropdown"
+                  toggle-class="dropdown-menu-toggle w-100"
+                  menu-class="w-100 mw-100"
+                  :text="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
+                >
+                  <gl-dropdown-item
+                    v-for="metric in getMetricTypes(chartKeys.commitBasedHistogram)"
+                    :key="metric.key"
+                    active-class="is-active"
+                    class="w-100"
+                    @click="
+                      setMetricType({
+                        metricType: metric.key,
+                        chartKey: chartKeys.commitBasedHistogram,
+                      })
+                    "
+                  >
+                    <span class="d-flex">
+                      <icon
+                        class="flex-shrink-0 append-right-4"
+                        :class="{
+                          invisible: !isSelectedMetric({
+                            metric: metric.key,
+                            chartKey: chartKeys.commitBasedHistogram,
+                          }),
+                        }"
+                        name="mobile-issue-close"
+                      />
+                      {{ metric.label }}
+                    </span>
+                  </gl-dropdown-item>
+                </gl-dropdown>
+                <gl-column-chart
+                  :data="{ full: getChartData(chartKeys.commitBasedHistogram) }"
+                  :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
+                  :y-axis-title="__('Merge requests')"
+                  :x-axis-title="__('Commits')"
+                  x-axis-type="category"
+                />
+              </template>
+            </template>
           </div>
         </div>
-      </div>
-      <div class="qa-mr-table">
-        <gl-loading-icon v-if="isLoadingTable" size="md" class="my-4 py-4" />
-        <merge-request-table
-          v-else
-          :merge-requests="mergeRequests"
-          :page-info="pageInfo"
-          :column-options="getMetricTypes(chartKeys.timeBasedHistogram)"
-          :metric-type="columnMetric"
-          :metric-label="columnMetricLabel"
-          @columnMetricChange="setColumnMetric"
-          @pageChange="setMergeRequestsPage"
-        />
-      </div>
+
+        <div
+          class="qa-mr-table-sort d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
+        >
+          <h5>{{ __('List') }}</h5>
+          <div
+            v-if="showMergeRequestTable"
+            class="d-flex flex-column flex-md-row align-items-md-center"
+          >
+            <strong class="mr-2">{{ __('Sort by') }}</strong>
+            <div class="d-flex">
+              <gl-dropdown
+                class="mr-2 flex-grow"
+                toggle-class="dropdown-menu-toggle"
+                :text="sortFieldDropdownLabel"
+              >
+                <gl-dropdown-item
+                  v-for="metric in tableSortOptions"
+                  :key="metric.key"
+                  active-class="is-active"
+                  class="w-100"
+                  @click="setSortField(metric.key)"
+                >
+                  <span class="d-flex">
+                    <icon
+                      class="flex-shrink-0 append-right-4"
+                      :class="{
+                        invisible: !isSelectedSortField(metric.key),
+                      }"
+                      name="mobile-issue-close"
+                    />
+                    {{ metric.label }}
+                  </span>
+                </gl-dropdown-item>
+              </gl-dropdown>
+              <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">
+                <icon :name="sortIcon" />
+              </gl-button>
+            </div>
+          </div>
+        </div>
+        <div class="qa-mr-table">
+          <gl-loading-icon v-if="isLoadingTable" size="md" class="my-4 py-4" />
+          <merge-request-table
+            v-if="showMergeRequestTable"
+            :merge-requests="mergeRequests"
+            :page-info="pageInfo"
+            :column-options="getMetricTypes(chartKeys.timeBasedHistogram)"
+            :metric-type="columnMetric"
+            :metric-label="columnMetricLabel"
+            @columnMetricChange="setColumnMetric"
+            @pageChange="setMergeRequestsPage"
+          />
+          <div v-else class="bs-callout bs-callout-info">
+            {{ __('There is no data available. Please change your selection.') }}
+          </div>
+        </div>
+      </template>
     </template>
   </div>
 </template>

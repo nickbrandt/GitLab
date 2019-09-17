@@ -79,7 +79,7 @@ describe('Productivity analytics chart actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        mock.onGet(mockedState.endpoint).replyOnce(500, chartKey);
+        mock.onGet(mockedState.endpoint).replyOnce(500);
       });
 
       it('dispatches error', done => {
@@ -95,7 +95,10 @@ describe('Productivity analytics chart actions', () => {
             },
             {
               type: 'receiveChartDataError',
-              payload: chartKey,
+              payload: {
+                chartKey,
+                error: new Error('Request failed with status code 500'),
+              },
             },
           ],
           done,
@@ -137,14 +140,18 @@ describe('Productivity analytics chart actions', () => {
 
   describe('receiveChartDataError', () => {
     it('should commit error', done => {
+      const error = { response: { status: 500 } };
       testAction(
         actions.receiveChartDataError,
-        chartKey,
+        { chartKey, error },
         mockedContext.state,
         [
           {
             type: types.RECEIVE_CHART_DATA_ERROR,
-            payload: chartKey,
+            payload: {
+              chartKey,
+              status: 500,
+            },
           },
         ],
         [],

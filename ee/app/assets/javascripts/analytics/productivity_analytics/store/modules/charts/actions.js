@@ -26,15 +26,18 @@ export const fetchChartData = ({ dispatch, getters, rootState }, chartKey) => {
       const { data } = response;
       dispatch('receiveChartDataSuccess', { chartKey, data });
     })
-    .catch(() => dispatch('receiveChartDataError', chartKey));
+    .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
 };
 
 export const receiveChartDataSuccess = ({ commit }, { chartKey, data = {} }) => {
   commit(types.RECEIVE_CHART_DATA_SUCCESS, { chartKey, data });
 };
 
-export const receiveChartDataError = ({ commit }, chartKey) => {
-  commit(types.RECEIVE_CHART_DATA_ERROR, chartKey);
+export const receiveChartDataError = ({ commit }, { chartKey, error }) => {
+  const {
+    response: { status },
+  } = error;
+  commit(types.RECEIVE_CHART_DATA_ERROR, { chartKey, status });
 };
 
 export const setMetricType = ({ commit, dispatch }, { chartKey, metricType }) => {

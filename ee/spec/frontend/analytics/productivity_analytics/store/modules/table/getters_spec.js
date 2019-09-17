@@ -76,16 +76,4 @@ describe('Productivity analytics table getters', () => {
       expect(getters.tableSortOptions(null, null, null, rootGetters)).toEqual(expected);
     });
   });
-
-  describe('hasNoAccessError', () => {
-    it('returns true if "hasError" is set to 403', () => {
-      state.hasError = 403;
-      expect(getters.hasNoAccessError(state)).toEqual(true);
-    });
-
-    it('returns false if "hasError" is not set to 403', () => {
-      state.hasError = false;
-      expect(getters.hasNoAccessError(state)).toEqual(false);
-    });
-  });
 });

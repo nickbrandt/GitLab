@@ -40,11 +40,12 @@ describe('Productivity analytics chart mutations', () => {
   });
 
   describe(types.RECEIVE_CHART_DATA_ERROR, () => {
-    it('sets isError and clears data', () => {
-      mutations[types.RECEIVE_CHART_DATA_ERROR](state, chartKey);
+    it('sets isError to error code and clears data', () => {
+      const status = 500;
+      mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
 
       expect(state.charts[chartKey].isLoading).toBe(false);
-      expect(state.charts[chartKey].hasError).toBe(true);
+      expect(state.charts[chartKey].hasError).toBe(status);
       expect(state.charts[chartKey].data).toEqual({});
     });
   });
