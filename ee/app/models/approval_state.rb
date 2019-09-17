@@ -123,7 +123,6 @@ class ApprovalState
     filter_approvers(rules.flat_map(&target), unactioned: unactioned)
   end
 
-  # approvers_left
   def unactioned_approvers
     strong_memoize(:unactioned_approvers) { approvers - approved_approvers }
   end
