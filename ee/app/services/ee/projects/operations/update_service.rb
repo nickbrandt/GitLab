@@ -37,7 +37,7 @@ module EE
           if regenerate_token
             attr[:token] = nil
           else
-            attr = attr.except(:token) # rubocop: disable CodeReuse/ActiveRecord
+            attr = attr.except(:token)
           end
 
           { alerting_setting_attributes: attr }

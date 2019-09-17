@@ -46,7 +46,7 @@ module Projects
       end
 
       def permitted_params
-        params.except(*PARAMS_TO_EXCLUDE).permit! # rubocop:disable CodeReuse/ActiveRecord
+        params.except(*PARAMS_TO_EXCLUDE).permit!
       end
     end
   end

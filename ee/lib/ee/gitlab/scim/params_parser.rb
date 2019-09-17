@@ -72,7 +72,6 @@ module EE
           parse_params.merge(overwrites)
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def parse_params
           # compact can remove :active if the value for that is nil
           @params.except(:email, :name).compact.each_with_object({}) do |(param, value), hash|
@@ -81,7 +80,6 @@ module EE
             hash[attribute] = coerce(value) if attribute
           end
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def parse_emails
           emails = @params[:emails]
