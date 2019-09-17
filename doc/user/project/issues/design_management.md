@@ -53,7 +53,7 @@ to be enabled:
 
 Navigate to the **Design Management** page from any issue by clicking the **Designs** tab:
 
-![Designs tab](img/design_management_v12_2.png)
+![Designs tab](img/design_management_v12_3.png)
 
 ## Adding designs
 
@@ -64,7 +64,19 @@ of the design, and will replace the previous version.
 
 ## Viewing designs
 
-Images on the Design Management page can be enlarged by clicking on them.
+Images on the Design Management page can be enlarged by clicking on them.  
+
+The number of comments on a design — if any — is listed to the right
+of the design filename. Clicking on this number enlarges the design
+just like clicking anywhere else on the design.
+When a design is added or modified, an icon is displayed on the item
+to help summarize changes between versions.  
+
+| Indicator | Example |
+| --------- | ------- |
+| Comments | ![Comments Icon](img/design_comments_v12_3.png) |
+| Modified (in the selected version) | ![Design Modified](img/design_modified_v12_3.png) |
+| Added (in the selected version) | ![Design Added](img/design_added_v12_3.png) |
 
 ## Adding annotations to designs
 

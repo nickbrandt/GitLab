@@ -4,11 +4,13 @@
 fragment DesignListItem on Design {
   id
   image
+  event
   filename
   fullPath
   diffRefs {
     ...DesignDiffRefs
   }
+  notesCount
   discussions {
     edges {
       node {
