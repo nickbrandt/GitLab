@@ -32,15 +32,27 @@ describe GlobalPolicy do
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:read_licenses) }
   it { expect(described_class.new(create(:admin), [user])).to be_allowed(:destroy_licenses) }
 
-  describe 'view_productivity_analytics' do
-    context 'for anonymous' do
+  shared_examples 'analytics policy' do |action|
+    context 'anonymous user' do
       let(:current_user) { nil }
 
-      it { is_expected.not_to be_allowed(:view_productivity_analytics) }
+      it 'is not allowed' do
+        is_expected.not_to be_allowed(action)
+      end
     end
 
-    context 'for authenticated users' do
-      it { is_expected.to be_allowed(:view_productivity_analytics) }
+    context 'authenticated user' do
+      it 'is allowed' do
+        is_expected.to be_allowed(action)
+      end
     end
+  end
+
+  describe 'view_code_analytics' do
+    include_examples 'analytics policy', :view_code_analytics
+  end
+
+  describe 'view_productivity_analytics' do
+    include_examples 'analytics policy', :view_productivity_analytics
   end
 end

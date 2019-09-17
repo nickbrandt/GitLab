@@ -404,21 +404,35 @@ describe GroupPolicy do
     end
   end
 
-  describe 'view_productivity_analytics' do
+  shared_examples 'analytics policy' do |action|
+    shared_examples 'policy by role' do |role|
+      context role do
+        let(:current_user) { public_send(role) }
+
+        it 'is allowed' do
+          is_expected.to be_allowed(action)
+        end
+      end
+    end
+
     %w[admin owner maintainer developer reporter].each do |role|
-      context "for #{role}" do
-        let(:current_user) { public_send(role) }
-
-        it { is_expected.to be_allowed(:view_productivity_analytics) }
-      end
+      include_examples 'policy by role', role
     end
 
-    %w[guest].each do |role|
-      context "for #{role}" do
-        let(:current_user) { public_send(role) }
+    context 'guest' do
+      let(:current_user) { guest }
 
-        it { is_expected.to be_disallowed(:view_productivity_analytics) }
+      it 'is not allowed' do
+        is_expected.to be_disallowed(action)
       end
     end
+  end
+
+  describe 'view_code_analytics' do
+    include_examples 'analytics policy', :view_code_analytics
+  end
+
+  describe 'view_productivity_analytics' do
+    include_examples 'analytics policy', :view_productivity_analytics
   end
 end
