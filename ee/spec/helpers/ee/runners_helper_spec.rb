@@ -29,14 +29,24 @@ describe EE::RunnersHelper do
     context 'when CI minutes quota is above the warning limits' do
       let(:minutes_used) { 40 }
 
-      it 'does not return a message' do
-        expect(subject).to be_empty
+      it 'returns nil' do
+        expect(subject).to be_nil
       end
     end
 
     context 'when current user is an owner' do
       before do
         allow(helper).to receive(:can?).with(user, :admin_project, project) { true }
+      end
+
+      context 'when base message is not present' do
+        before do
+          allow(helper).to receive(:ci_usage_base_message).with(namespace).and_return(nil)
+        end
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
       end
 
       context 'when usage has reached first level of notification' do
@@ -61,6 +71,16 @@ describe EE::RunnersHelper do
     end
 
     context 'when current user is not an owner' do
+      context 'when base message is not present' do
+        before do
+          allow(helper).to receive(:ci_usage_base_message).with(namespace).and_return(nil)
+        end
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+
       context 'when usage has reached first level of notification' do
         before do
           namespace.update_attribute(:last_ci_minutes_usage_notification_level, 50)
