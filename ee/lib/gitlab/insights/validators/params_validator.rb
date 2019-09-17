@@ -6,6 +6,7 @@ module Gitlab
       class ParamsValidator
         ParamsValidatorError = Class.new(StandardError)
         InvalidTypeError = Class.new(ParamsValidatorError)
+        InvalidProjectsError = Class.new(ParamsValidatorError)
 
         SUPPORTER_TYPES = %w[bar line stacked-bar pie].freeze
 
@@ -16,6 +17,16 @@ module Gitlab
         def validate!
           unless SUPPORTER_TYPES.include?(params[:type])
             raise InvalidTypeError, "Invalid `:type`: `#{params[:type]}`. Allowed values are #{SUPPORTER_TYPES}!"
+          end
+
+          if params[:projects]
+            unless params[:projects].is_a?(Hash)
+              raise InvalidProjectsError, "Invalid `:projects`: `#{params[:projects]}`. It should be a hash."
+            end
+
+            unless params.dig(:projects, :only).is_a?(Array)
+              raise InvalidProjectsError, "Invalid `:projects`.`only`: `#{params.dig(:projects, :only)}`. It should be an array."
+            end
           end
         end
 

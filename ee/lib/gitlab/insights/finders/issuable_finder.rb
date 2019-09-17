@@ -4,6 +4,8 @@ module Gitlab
   module Insights
     module Finders
       class IssuableFinder
+        include Gitlab::Utils::StrongMemoize
+
         IssuableFinderError = Class.new(StandardError)
         InvalidIssuableTypeError = Class.new(IssuableFinderError)
         InvalidGroupByError = Class.new(IssuableFinderError)
@@ -69,15 +71,19 @@ module Gitlab
             sort: 'created_asc',
             created_after: created_after_argument,
             projects: finder_projects
-          }.merge(entity_key => entity.id)
+          }.merge(entity_arg)
         end
 
-        def entity_key
+        def entity_arg
           case entity
           when ::Project
-            :project_id
+            if finder_projects
+              {} # We just rely on projects argument
+            else
+              { project_id: entity.id }
+            end
           when ::Namespace
-            :group_id
+            { group_id: entity.id }
           else
             raise InvalidEntityError, "Entity class `#{entity.class}` is not supported. Supported classes are Project and Namespace!"
           end
@@ -105,9 +111,17 @@ module Gitlab
         end
 
         def finder_projects
-          return if projects.empty?
-
-          Project.from_union([finder_projects_ids, finder_projects_paths])
+          strong_memoize(:finder_projects) do
+            if projects.empty?
+              nil
+            elsif finder_projects_options[:ids] && finder_projects_options[:paths]
+              Project.from_union([finder_projects_ids, finder_projects_paths])
+            elsif finder_projects_options[:ids]
+              finder_projects_ids
+            elsif finder_projects_options[:paths]
+              finder_projects_paths
+            end
+          end
         end
 
         def finder_projects_ids
