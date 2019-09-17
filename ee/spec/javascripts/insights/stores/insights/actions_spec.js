@@ -174,12 +174,7 @@ describe('Insights store actions', () => {
 
     describe('successful request', () => {
       beforeEach(() => {
-        mock
-          .onPost(`${gl.TEST_HOST}/query`, {
-            query: chart.query,
-            chart_type: chart.type,
-          })
-          .reply(200, chartData);
+        mock.onPost(`${gl.TEST_HOST}/query`, chart).reply(200, chartData);
       });
 
       it('calls receiveChartDataSuccess with chart data', done => {
@@ -202,12 +197,7 @@ describe('Insights store actions', () => {
 
     describe('failed request', () => {
       beforeEach(() => {
-        mock
-          .onPost(`${gl.TEST_HOST}/query`, {
-            query: chart.query,
-            chart_type: chart.type,
-          })
-          .reply(500);
+        mock.onPost(`${gl.TEST_HOST}/query`, chart).reply(500);
       });
 
       it('calls receiveChartDataError with error message', done => {

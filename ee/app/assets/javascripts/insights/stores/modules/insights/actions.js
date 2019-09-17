@@ -30,11 +30,7 @@ export const receiveChartDataError = ({ commit }, { chart, error }) =>
 
 export const fetchChartData = ({ dispatch }, { endpoint, chart }) =>
   axios
-    .post(endpoint, {
-      query: chart.query,
-      chart_type: chart.type,
-      projects: chart.projects,
-    })
+    .post(endpoint, chart)
     .then(({ data }) => dispatch('receiveChartDataSuccess', { chart, data }))
     .catch(error => {
       let message = `${__('There was an error gathering the chart data')}`;

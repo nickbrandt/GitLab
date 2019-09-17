@@ -8,7 +8,7 @@ describe Groups::InsightsController do
   set(:project) { create(:project, :private) }
   set(:insight) { create(:insight, group: parent_group, project: project) }
   set(:user) { create(:user) }
-  let(:query_params) { { chart_type: 'bar', query: { issuable_type: 'issue', collection_labels: ['bug'] } } }
+  let(:query_params) { { type: 'bar', query: { issuable_type: 'issue', collection_labels: ['bug'] } } }
 
   before do
     stub_licensed_features(insights: true)
