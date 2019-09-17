@@ -60,4 +60,12 @@ describe Gitlab::Ci::Reports::LicenseManagement::Report do
     it { expect(names_from(subject[:unchanged])).to contain_exactly('MIT', 'BSD') }
     it { expect(names_from(subject[:removed])).to contain_exactly('WTFPL') }
   end
+
+  describe "#empty?" do
+    let(:completed_report) { build(:ci_reports_license_management_report, :report_1) }
+    let(:empty_report) { build(:ci_reports_license_management_report) }
+
+    it { expect(empty_report).to be_empty }
+    it { expect(completed_report).not_to be_empty }
+  end
 end

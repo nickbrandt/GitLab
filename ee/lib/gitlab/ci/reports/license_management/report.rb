@@ -45,6 +45,10 @@ module Gitlab
             licenses.select { |license| names.include?(canonicalize(license.name)) }
           end
 
+          def empty?
+            found_licenses.empty?
+          end
+
           private
 
           def canonicalize(name)
