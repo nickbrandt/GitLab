@@ -26,7 +26,7 @@ describe('RelatedItemsTree', () => {
         };
 
         mockGetters = {
-          directChildren: [mockIssue1, mockIssue2, mockEpic1, mockEpic2].map(item => ({
+          directChildren: [mockEpic1, mockEpic2, mockIssue1, mockIssue2].map(item => ({
             ...item,
             type: item.reference.indexOf('&') > -1 ? ChildType.Epic : ChildType.Issue,
           })),
@@ -102,9 +102,9 @@ describe('RelatedItemsTree', () => {
         });
       });
 
-      describe('epicsBeginAtIndex', () => {
-        it('returns number representing index at which epics begin in direct children array', () => {
-          expect(getters.epicsBeginAtIndex(state, mockGetters)).toBe(2);
+      describe('issuesBeginAtIndex', () => {
+        it('returns number representing index at which Issues begin in direct children array', () => {
+          expect(getters.issuesBeginAtIndex(state, mockGetters)).toBe(2);
         });
       });
 

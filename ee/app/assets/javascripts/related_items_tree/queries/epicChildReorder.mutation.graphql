@@ -1,0 +1,6 @@
+mutation epicReorder($epicTreeReorderInput: EpicTreeReorderInput!) {
+  epicTreeReorder(input: $epicTreeReorderInput) {
+    clientMutationId
+    errors
+  }
+}

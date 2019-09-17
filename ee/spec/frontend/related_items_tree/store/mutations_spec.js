@@ -501,6 +501,26 @@ describe('RelatedItemsTree', () => {
           expect(state.itemCreateInProgress).toBe(false);
         });
       });
+
+      describe(types.REORDER_ITEM, () => {
+        it('should reorder an item within children of provided parent based on provided indices', () => {
+          state.parentItem = { reference: '&1' };
+          state.children[state.parentItem.reference] = ['foo', 'bar'];
+
+          mutations[types.REORDER_ITEM](state, {
+            parentItem: {
+              reference: '&1',
+            },
+            targetItem: 'bar',
+            oldIndex: 1,
+            newIndex: 0,
+          });
+
+          expect(state.children[state.parentItem.reference]).toEqual(
+            expect.arrayContaining(['bar', 'foo']),
+          );
+        });
+      });
     });
   });
 });

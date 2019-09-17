@@ -6,7 +6,7 @@ import TreeRoot from 'ee/related_items_tree/components/tree_root.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 
-import { mockQueryResponse, mockParentItem } from '../mock_data';
+import { mockQueryResponse, mockParentItem, mockEpic1, mockIssue1 } from '../mock_data';
 
 const { epic } = mockQueryResponse.data.group;
 
@@ -59,6 +59,223 @@ describe('RelatedItemsTree', () => {
 
     afterEach(() => {
       wrapper.destroy();
+    });
+
+    describe('mixins', () => {
+      describe('TreeDragAndDropMixin', () => {
+        const containedDragClassOriginally = document.body.classList.contains('is-dragging');
+        const containedNoDropClassOriginally = document.body.classList.contains('no-drop');
+
+        beforeEach(() => {
+          document.body.classList.remove('is-dragging');
+          document.body.classList.remove('no-drop');
+        });
+
+        afterAll(() => {
+          // Prevent side-effects of this test.
+          document.body.classList.toggle('is-dragging', containedDragClassOriginally);
+          document.body.classList.toggle('no-drop', containedNoDropClassOriginally);
+        });
+
+        describe('computed', () => {
+          describe('dragOptions', () => {
+            it('should return object containing Vue.Draggable config extended from `defaultSortableConfig`', () => {
+              expect(wrapper.vm.dragOptions).toEqual(
+                jasmine.objectContaining({
+                  animation: 200,
+                  forceFallback: true,
+                  fallbackClass: 'is-dragging',
+                  fallbackOnBody: false,
+                  ghostClass: 'is-ghost',
+                  group: mockParentItem.reference,
+                }),
+              );
+            });
+          });
+        });
+
+        describe('methods', () => {
+          describe('getTreeReorderMutation', () => {
+            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 0 and targetItem is Epic', () => {
+              const targetItem = wrapper.vm.children[1]; // 2nd Epic position
+              const newIndex = 0; // We're moving targetItem to top of Epics list & Epics begin at 0
+
+              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
+                targetItem,
+                newIndex,
+              });
+
+              expect(treeReorderMutation).toEqual(
+                jasmine.objectContaining({
+                  id: targetItem.id,
+                  adjacentReferenceId: mockEpic1.id,
+                  relativePosition: 'before',
+                }),
+              );
+            });
+
+            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 1 and targetItem is Epic', () => {
+              const targetItem = wrapper.vm.children[0];
+              const newIndex = 1;
+
+              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
+                targetItem,
+                newIndex,
+              });
+
+              expect(treeReorderMutation).toEqual(
+                jasmine.objectContaining({
+                  id: targetItem.id,
+                  adjacentReferenceId: mockEpic1.id,
+                  relativePosition: 'after',
+                }),
+              );
+            });
+
+            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 0 and targetItem is Issue', () => {
+              const targetItem = wrapper.vm.children[3]; // 2nd Issue position
+              const newIndex = 2; // We're moving targetItem to top of Issues list & Issues begin at 2
+
+              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
+                targetItem,
+                newIndex,
+              });
+
+              expect(treeReorderMutation).toEqual(
+                jasmine.objectContaining({
+                  id: targetItem.epicIssueId,
+                  adjacentReferenceId: mockIssue1.epicIssueId,
+                  relativePosition: 'before',
+                }),
+              );
+            });
+
+            it('returns an object containing `id`, `adjacentReferenceId` & `relativePosition` when newIndex param is 1 and targetItem is Issue', () => {
+              const targetItem = wrapper.vm.children[2];
+              const newIndex = 3; // Here 3 is first issue of the list, hence spec descripton says `newIndex` as 1.
+
+              const treeReorderMutation = wrapper.vm.getTreeReorderMutation({
+                targetItem,
+                newIndex,
+              });
+
+              expect(treeReorderMutation).toEqual(
+                jasmine.objectContaining({
+                  id: targetItem.epicIssueId,
+                  adjacentReferenceId: mockIssue1.epicIssueId,
+                  relativePosition: 'after',
+                }),
+              );
+            });
+          });
+
+          describe('handleDragOnStart', () => {
+            it('adds a class `is-dragging` to document body', () => {
+              expect(document.body.classList.contains('is-dragging')).toBe(false);
+
+              wrapper.vm.handleDragOnStart();
+
+              expect(document.body.classList.contains('is-dragging')).toBe(true);
+            });
+          });
+
+          describe('handleDragOnMove', () => {
+            let dragged;
+            let related;
+            let mockEvent;
+
+            beforeEach(() => {
+              dragged = document.createElement('li');
+              related = document.createElement('li');
+              mockEvent = {
+                dragged,
+                related,
+              };
+            });
+
+            it('returns `true` when an epic is reordered within epics list', () => {
+              dragged.classList.add('js-item-type-epic');
+              related.classList.add('js-item-type-epic');
+
+              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(true);
+            });
+
+            it('returns `true` when an issue is reordered within issues list', () => {
+              dragged.classList.add('js-item-type-issue');
+              related.classList.add('js-item-type-issue');
+
+              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(true);
+            });
+
+            it('returns `false` when an issue is reordered within epics list', () => {
+              dragged.classList.add('js-item-type-issue');
+              related.classList.add('js-item-type-epic');
+
+              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(false);
+            });
+
+            it('returns `false` when an epic is reordered within issues list', () => {
+              dragged.classList.add('js-item-type-epic');
+              related.classList.add('js-item-type-issue');
+
+              expect(wrapper.vm.handleDragOnMove(mockEvent)).toBe(false);
+            });
+
+            it('adds class `no-drop` to body element when reordering is not allowed', () => {
+              dragged.classList.add('js-item-type-epic');
+              related.classList.add('js-item-type-issue');
+
+              wrapper.vm.handleDragOnMove(mockEvent);
+
+              expect(document.body.classList.contains('no-drop')).toBe(true);
+            });
+          });
+
+          describe('handleDragOnEnd', () => {
+            it('removes class `is-dragging` from document body', () => {
+              spyOn(wrapper.vm, 'reorderItem').and.stub();
+              document.body.classList.add('is-dragging');
+
+              wrapper.vm.handleDragOnEnd({
+                oldIndex: 1,
+                newIndex: 0,
+              });
+
+              expect(document.body.classList.contains('is-dragging')).toBe(false);
+            });
+
+            it('does not call `reorderItem` action when newIndex is same as oldIndex', () => {
+              spyOn(wrapper.vm, 'reorderItem').and.stub();
+
+              wrapper.vm.handleDragOnEnd({
+                oldIndex: 0,
+                newIndex: 0,
+              });
+
+              expect(wrapper.vm.reorderItem).not.toHaveBeenCalled();
+            });
+
+            it('calls `reorderItem` action when newIndex is different from oldIndex', () => {
+              spyOn(wrapper.vm, 'reorderItem').and.stub();
+
+              wrapper.vm.handleDragOnEnd({
+                oldIndex: 1,
+                newIndex: 0,
+              });
+
+              expect(wrapper.vm.reorderItem).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                  treeReorderMutation: jasmine.any(Object),
+                  parentItem: wrapper.vm.parentItem,
+                  targetItem: wrapper.vm.children[1],
+                  oldIndex: 1,
+                  newIndex: 0,
+                }),
+              );
+            });
+          });
+        });
+      });
     });
 
     describe('computed', () => {
