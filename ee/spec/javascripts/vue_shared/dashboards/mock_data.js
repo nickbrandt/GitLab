@@ -107,5 +107,7 @@ export function mockProjectData(
       upstream_pipeline: mockPipelineData(upstreamStatus),
       downstream_pipelines: [],
       alert_count: alertCount,
+      upgrade_required: false,
+      upgrade_path: '/groups/test/-/billings',
     }));
 }

@@ -2,7 +2,7 @@
 import { mapActions } from 'vuex';
 import _ from 'underscore';
 import { GlTooltip } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -36,6 +36,28 @@ export default {
     triggerer: __('Triggerer'),
   },
   computed: {
+    unlicensedMessage() {
+      if (this.project.upgrade_path) {
+        return sprintf(
+          __(
+            "To see this project's operational details, %{linkStart}upgrade its group plan to Silver%{linkEnd}. You can also remove the project from the dashboard.",
+          ),
+          {
+            linkStart: `<a href="${this.project.upgrade_path}" target="_blank" rel="noopener noreferrer">`,
+            linkEnd: '</a>',
+          },
+          false,
+        );
+      }
+      return sprintf(
+        __(
+          "To see this project's operational details, contact an owner of group %{groupName} to upgrade the plan. You can also remove the project from the dashboard.",
+        ),
+        {
+          groupName: this.project.namespace.name,
+        },
+      );
+    },
     hasPipelineFailed() {
       return (
         this.lastPipeline &&
@@ -105,7 +127,13 @@ export default {
       @remove="removeProject"
     />
 
-    <div :class="cardClasses" class="dashboard-card-body card-body">
+    <div
+      v-if="project.upgrade_required"
+      class="dashboard-card-body card-body bg-secondary"
+      v-html="unlicensedMessage"
+    ></div>
+
+    <div v-else :class="cardClasses" class="dashboard-card-body card-body">
       <div v-if="lastPipeline" class="row">
         <div class="col-1 align-self-center">
           <user-avatar-link
