@@ -107,6 +107,16 @@ describe Upload do
     end
   end
 
+  describe '#build_uploader' do
+    it 'returns a uploader object with current upload associated with it' do
+      subject = build(:upload)
+      uploader = subject.build_uploader
+
+      expect(uploader.upload).to eq(subject)
+      expect(uploader.mounted_as).to eq(subject.send(:mount_point))
+    end
+  end
+
   describe '#needs_checksum??' do
     context 'with local storage' do
       it 'returns true when no checksum exists' do

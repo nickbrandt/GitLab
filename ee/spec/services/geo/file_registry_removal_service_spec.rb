@@ -120,7 +120,7 @@ describe Geo::FileRegistryRemovalService do
     context 'with avatar' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
       let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 
@@ -137,7 +137,7 @@ describe Geo::FileRegistryRemovalService do
     context 'with attachment' do
       let!(:upload) { create(:note, :with_attachment).attachment.upload }
       let!(:file_registry) { create(:geo_file_registry, :attachment, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 
@@ -154,7 +154,7 @@ describe Geo::FileRegistryRemovalService do
     context 'with file' do
       let!(:upload) { create(:user, :with_avatar).avatar.upload }
       let!(:file_registry) { create(:geo_file_registry, :avatar, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 
@@ -177,7 +177,7 @@ describe Geo::FileRegistryRemovalService do
       end
 
       let!(:file_registry) { create(:geo_file_registry, :namespace_file, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 
@@ -199,7 +199,7 @@ describe Geo::FileRegistryRemovalService do
         Upload.find_by(model: snippet, uploader: PersonalFileUploader.name)
       end
       let!(:file_registry) { create(:geo_file_registry, :personal_file, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 
@@ -221,7 +221,7 @@ describe Geo::FileRegistryRemovalService do
         Upload.find_by(model: appearance, uploader: FaviconUploader.name)
       end
       let!(:file_registry) { create(:geo_file_registry, :favicon, file_id: upload.id) }
-      let!(:file_path) { upload.build_uploader.file.path }
+      let!(:file_path) { upload.retrieve_uploader.file.path }
 
       it_behaves_like 'removes'
 

@@ -44,7 +44,7 @@ describe Gitlab::Geo::Replication::FileTransfer do
 
     context 'when the HTTP response is successful' do
       it 'returns a successful result' do
-        content = upload.build_uploader.file.read
+        content = upload.retrieve_uploader.file.read
         size = content.bytesize
         stub_request(:get, subject.resource_url).to_return(status: 200, body: content)
 

@@ -43,12 +43,12 @@ describe Gitlab::Geo::Replication::FileDownloader, :geo do
   def stub_geo_file_transfer(file_type, upload)
     url = primary_node.geo_transfers_url(file_type, upload.id.to_s)
 
-    stub_request(:get, url).to_return(status: 200, body: upload.build_uploader.file.read, headers: {})
+    stub_request(:get, url).to_return(status: 200, body: upload.retrieve_uploader.file.read, headers: {})
   end
 
   def stub_geo_file_transfer_object_storage(file_type, upload)
     url = primary_node.geo_transfers_url(file_type, upload.id.to_s)
 
-    stub_request(:get, url).to_return(status: 307, body: upload.build_uploader.url, headers: {})
+    stub_request(:get, url).to_return(status: 307, body: upload.retrieve_uploader.url, headers: {})
   end
 end

@@ -30,7 +30,7 @@ module Gitlab
             file_type: file_type,
             file_id: upload.id,
             filename: upload.absolute_path,
-            uploader: upload.build_uploader,
+            uploader: upload.retrieve_uploader,
             expected_checksum: upload.checksum,
             request_data: build_request_data(file_type, upload)
           }
@@ -40,7 +40,7 @@ module Gitlab
           {
             file_type: file_type,
             file_id: upload.id,
-            uploader: upload.build_uploader,
+            uploader: upload.retrieve_uploader,
             request_data: build_request_data(file_type, upload)
           }
         end

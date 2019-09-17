@@ -58,9 +58,23 @@ class Upload < ApplicationRecord
     self.checksum = Digest::SHA256.file(absolute_path).hexdigest
   end
 
+  # Initialize the associated Uploader class with current model
+  #
+  # @param [String] mounted_as
+  # @return [GitlabUploader] one of the subclasses, defined at the model's uploader attribute
   def build_uploader(mounted_as = nil)
     uploader_class.new(model, mounted_as || mount_point).tap do |uploader|
       uploader.upload = self
+    end
+  end
+
+  # Initialize the associated Uploader class with current model and
+  # retrieve existing file from the store to a local cache
+  #
+  # @param [String] mounted_as
+  # @return [GitlabUploader] one of the subclasses, defined at the model's uploader attribute
+  def retrieve_uploader(mounted_as = nil)
+    build_uploader(mounted_as).tap do |uploader|
       uploader.retrieve_from_store!(identifier)
     end
   end
@@ -72,7 +86,7 @@ class Upload < ApplicationRecord
     exist = if local?
               File.exist?(absolute_path)
             else
-              build_uploader.exists?
+              retrieve_uploader.exists?
             end
 
     # Help sysadmins find missing upload files
@@ -111,7 +125,7 @@ class Upload < ApplicationRecord
   private
 
   def delete_file!
-    build_uploader.remove!
+    retrieve_uploader.remove!
   end
 
   def foreground_checksummable?

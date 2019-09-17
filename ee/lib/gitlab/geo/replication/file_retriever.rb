@@ -13,7 +13,7 @@ module Gitlab
           return file_not_found(recorded_file) unless recorded_file.exist?
           return error('Upload not found') unless valid?
 
-          success(recorded_file.build_uploader)
+          success(recorded_file.retrieve_uploader)
         end
 
         private
