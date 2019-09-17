@@ -38,12 +38,10 @@ describe('Productivity analytics chart getters', () => {
         selected: ['5'],
       };
 
-      const chartData = {
-        full: [
-          { value: ['1', 32], itemStyle: {} },
-          { value: ['5', 17], itemStyle: columnHighlightStyle },
-        ],
-      };
+      const chartData = [
+        { value: ['1', 32], itemStyle: {} },
+        { value: ['5', 17], itemStyle: columnHighlightStyle },
+      ];
 
       expect(getters.getChartData(state)(chartKey)).toEqual(chartData);
     });
@@ -177,6 +175,18 @@ describe('Productivity analytics chart getters', () => {
 
         expect(getters.getColumnChartDatazoomOption(state)(chartKeys.main)).toEqual({});
       });
+    });
+  });
+
+  describe('hasNoAccessError', () => {
+    it('returns true if "hasError" is set to 403', () => {
+      state.charts[chartKeys.main].hasError = 403;
+      expect(getters.hasNoAccessError(state)).toEqual(true);
+    });
+
+    it('returns false if "hasError" is not set to 403', () => {
+      state.charts[chartKeys.main].hasError = false;
+      expect(getters.hasNoAccessError(state)).toEqual(false);
     });
   });
 });

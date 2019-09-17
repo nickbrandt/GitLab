@@ -15547,6 +15547,12 @@ msgstr ""
 msgid "There is already a repository with that name on disk"
 msgstr ""
 
+msgid "There is no data available. Please change your selection."
+msgstr ""
+
+msgid "There is no data for the selected metric. Please change your selection."
+msgstr ""
+
 msgid "There was a problem communicating with your device."
 msgstr ""
 

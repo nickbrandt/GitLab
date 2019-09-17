@@ -75,7 +75,7 @@ describe('ProductivityApp component', () => {
 
       describe('and user has no access to the group', () => {
         beforeEach(() => {
-          store.state.table.hasError = 403;
+          store.state.charts.charts[chartKeys.main].hasError = 403;
         });
 
         it('renders the no access illustration', () => {
@@ -88,7 +88,7 @@ describe('ProductivityApp component', () => {
 
       describe('and user has access to the group', () => {
         beforeEach(() => {
-          store.state.table.hasError = false;
+          store.state.charts.charts[chartKeys.main].hasError = false;
         });
 
         describe('Time to merge chart', () => {
@@ -115,34 +115,57 @@ describe('ProductivityApp component', () => {
               store.state.charts.charts[chartKeys.main].isLoading = false;
             });
 
-            it('renders a column chart', () => {
-              expect(
+            describe('and the chart has data', () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.main].data = { 1: 2, 2: 3 };
+              });
+
+              it('renders a column chart', () => {
+                expect(
+                  findTimeToMergeSection()
+                    .find(GlColumnChart)
+                    .exists(),
+                ).toBe(true);
+              });
+
+              it('calls onMainChartItemClicked when chartItemClicked is emitted on the column chart ', () => {
+                const data = {
+                  chart: null,
+                  params: {
+                    data: {
+                      value: [0, 1],
+                    },
+                  },
+                };
+
                 findTimeToMergeSection()
                   .find(GlColumnChart)
-                  .exists(),
-              ).toBe(true);
+                  .vm.$emit('chartItemClicked', data);
+
+                expect(onMainChartItemClickedMock).toHaveBeenCalledWith(data);
+              });
             });
 
-            it('calls onMainChartItemClicked when chartItemClicked is emitted on the column chart ', () => {
-              const data = {
-                chart: null,
-                params: {
-                  data: {
-                    value: [0, 1],
-                  },
-                },
-              };
+            describe("and the chart doesn't have any data", () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.main].data = null;
+              });
 
-              findTimeToMergeSection()
-                .find(GlColumnChart)
-                .vm.$emit('chartItemClicked', data);
-
-              expect(onMainChartItemClickedMock).toHaveBeenCalledWith(data);
+              it('renders a "no data" message', () => {
+                expect(findTimeToMergeSection().text()).toContain(
+                  'There is no data available. Please change your selection.',
+                );
+              });
             });
           });
         });
 
         describe('Time based histogram', () => {
+          beforeEach(() => {
+            store.state.charts.charts[chartKeys.main].isLoading = false;
+            store.state.charts.charts[chartKeys.main].data = { 1: 2, 2: 3 };
+          });
+
           describe('when chart is loading', () => {
             beforeEach(() => {
               store.state.charts.charts[chartKeys.timeBasedHistogram].isLoading = true;
@@ -162,37 +185,60 @@ describe('ProductivityApp component', () => {
               store.state.charts.charts[chartKeys.timeBasedHistogram].isLoading = false;
             });
 
-            it('renders a metric type dropdown', () => {
-              expect(
+            describe('and the chart has data', () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.timeBasedHistogram].data = { 1: 2, 2: 3 };
+              });
+
+              it('renders a metric type dropdown', () => {
+                expect(
+                  findTimeBasedSection()
+                    .find(GlDropdown)
+                    .exists(),
+                ).toBe(true);
+              });
+
+              it('should change the metric type', () => {
                 findTimeBasedSection()
-                  .find(GlDropdown)
-                  .exists(),
-              ).toBe(true);
-            });
+                  .findAll(GlDropdownItem)
+                  .at(0)
+                  .vm.$emit('click');
 
-            it('should change the metric type', () => {
-              findTimeBasedSection()
-                .findAll(GlDropdownItem)
-                .at(0)
-                .vm.$emit('click');
+                expect(actionSpies.setMetricType).toHaveBeenCalledWith({
+                  metricType: 'time_to_first_comment',
+                  chartKey: chartKeys.timeBasedHistogram,
+                });
+              });
 
-              expect(actionSpies.setMetricType).toHaveBeenCalledWith({
-                metricType: 'time_to_first_comment',
-                chartKey: chartKeys.timeBasedHistogram,
+              it('renders a column chart', () => {
+                expect(
+                  findTimeBasedSection()
+                    .find(GlColumnChart)
+                    .exists(),
+                ).toBe(true);
               });
             });
 
-            it('renders a column chart', () => {
-              expect(
-                findTimeBasedSection()
-                  .find(GlColumnChart)
-                  .exists(),
-              ).toBe(true);
+            describe("and the chart doesn't have any data", () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.timeBasedHistogram].data = null;
+              });
+
+              it('renders a "no data" message', () => {
+                expect(findTimeBasedSection().text()).toContain(
+                  'There is no data for the selected metric. Please change your selection.',
+                );
+              });
             });
           });
         });
 
         describe('Commit based histogram', () => {
+          beforeEach(() => {
+            store.state.charts.charts[chartKeys.main].isLoading = false;
+            store.state.charts.charts[chartKeys.main].data = { 1: 2, 2: 3 };
+          });
+
           describe('when chart is loading', () => {
             beforeEach(() => {
               store.state.charts.charts[chartKeys.commitBasedHistogram].isLoading = true;
@@ -212,37 +258,60 @@ describe('ProductivityApp component', () => {
               store.state.charts.charts[chartKeys.commitBasedHistogram].isLoading = false;
             });
 
-            it('renders a metric type dropdown', () => {
-              expect(
+            describe('and the chart has data', () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.commitBasedHistogram].data = { 1: 2, 2: 3 };
+              });
+
+              it('renders a metric type dropdown', () => {
+                expect(
+                  findCommitBasedSection()
+                    .find(GlDropdown)
+                    .exists(),
+                ).toBe(true);
+              });
+
+              it('should change the metric type', () => {
                 findCommitBasedSection()
-                  .find(GlDropdown)
-                  .exists(),
-              ).toBe(true);
-            });
+                  .findAll(GlDropdownItem)
+                  .at(0)
+                  .vm.$emit('click');
 
-            it('should change the metric type', () => {
-              findCommitBasedSection()
-                .findAll(GlDropdownItem)
-                .at(0)
-                .vm.$emit('click');
+                expect(actionSpies.setMetricType).toHaveBeenCalledWith({
+                  metricType: 'commits_count',
+                  chartKey: chartKeys.commitBasedHistogram,
+                });
+              });
 
-              expect(actionSpies.setMetricType).toHaveBeenCalledWith({
-                metricType: 'commits_count',
-                chartKey: chartKeys.commitBasedHistogram,
+              it('renders a column chart', () => {
+                expect(
+                  findCommitBasedSection()
+                    .find(GlColumnChart)
+                    .exists(),
+                ).toBe(true);
               });
             });
 
-            it('renders a column chart', () => {
-              expect(
-                findCommitBasedSection()
-                  .find(GlColumnChart)
-                  .exists(),
-              ).toBe(true);
+            describe("and the chart doesn't have any data", () => {
+              beforeEach(() => {
+                store.state.charts.charts[chartKeys.commitBasedHistogram].data = null;
+              });
+
+              it('renders a "no data" message', () => {
+                expect(findTimeBasedSection().text()).toContain(
+                  'There is no data for the selected metric. Please change your selection.',
+                );
+              });
             });
           });
         });
 
         describe('MR table', () => {
+          beforeEach(() => {
+            store.state.charts.charts[chartKeys.main].isLoading = false;
+            store.state.charts.charts[chartKeys.main].data = { 1: 2, 2: 3 };
+          });
+
           describe('when isLoadingTable is true', () => {
             beforeEach(() => {
               store.state.table.isLoadingTable = true;
@@ -260,6 +329,7 @@ describe('ProductivityApp component', () => {
           describe('when isLoadingTable is false', () => {
             beforeEach(() => {
               store.state.table.isLoadingTable = false;
+              store.state.table.mergeRequests = [{ id: 1, title: 'This is a test MR' }];
             });
 
             it('renders the MR table', () => {
