@@ -423,8 +423,7 @@ module EE
         end
 
         expose :suggested_approvers, using: ::API::Entities::UserBasic do |approval_state, options|
-          # TODO order by relevance
-          approval_state.unactioned_approvers
+          approval_state.suggested_approvers(current_user: options[:current_user])
         end
 
         # @deprecated, reads from first regular rule instead
