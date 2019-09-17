@@ -1,6 +1,6 @@
 ---
 title: Changed confidential quick action to only be available on non confidential
   issues
-merge_request: 
+merge_request: 16902
 author: Marc Schwede
 type: fixed
