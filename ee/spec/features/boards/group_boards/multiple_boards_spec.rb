@@ -19,28 +19,23 @@ describe 'Multiple Issue Boards', :js do
       login_as(user)
     end
 
-    it 'hides the link to create a new board' do
+    it 'does not show board switcher' do
       visit boards_path
       wait_for_requests
 
-      click_button board.name
-
-      page.within('.js-boards-selector .dropdown-menu') do
-        expect(page).not_to have_content('Create new board')
-        expect(page).not_to have_content('Delete board')
-      end
+      expect(page).not_to have_css('.boards-switcher')
     end
 
-    it 'does not show license warning when there is one board created' do
+    it 'shows the board switcher when group has more than one board' do
+      create(:board, parent: parent)
+
       visit boards_path
       wait_for_requests
 
-      click_button board.name
-
-      expect(page).not_to have_content('Some of your boards are hidden, activate a license to see them again.')
+      expect(page).to have_css('.boards-switcher')
     end
 
-    it 'shows a license warning when group has more than one board' do
+    it 'shows license warning when group has more than one board' do
       create(:board, parent: parent)
 
       visit boards_path
