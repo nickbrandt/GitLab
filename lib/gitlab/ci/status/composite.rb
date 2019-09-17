@@ -6,21 +6,17 @@ module Gitlab
       class Composite
         include Gitlab::Utils::StrongMemoize
 
-        attr_reader :warnings
-
         # This class accepts an array of arrays
         # The `status_key` and `allow_failure_key` define an index
         # or key in each entry
         def initialize(all_statuses, status_key:, allow_failure_key:)
           raise ArgumentError, "all_statuses needs to be an Array" unless all_statuses.is_a?(Array)
 
-          @count = 0
-          @warnings = 0
           @status_set = Set.new
           @status_key = status_key
           @allow_failure_key = allow_failure_key
 
-          build_status_set(all_statuses)
+          consume_all_statuses(all_statuses)
         end
 
         # The status calculation is order dependent,
@@ -30,20 +26,20 @@ module Gitlab
         #    based on what statuses are no longer valid based on the
         #    data set that we have
         def status
-          strong_memoize(:status) do
-            next if @count.zero?
+          return if none?
 
-            if none? || only_of?(:skipped)
-              warnings? ? 'success' : 'skipped'
-            elsif only_of?(:success, :skipped)
+          strong_memoize(:status) do
+            if only_of?(:skipped, :ignored)
+              'skipped'
+            elsif only_of?(:success, :skipped, :success_with_warnings, :ignored)
               'success'
-            elsif only_of?(:created)
+            elsif only_of?(:created, :success_with_warnings, :ignored)
               'created'
-            elsif only_of?(:preparing)
+            elsif only_of?(:preparing, :success_with_warnings, :ignored)
               'preparing'
-            elsif only_of?(:canceled, :success, :skipped)
+            elsif only_of?(:canceled, :success, :skipped, :success_with_warnings, :ignored)
               'canceled'
-            elsif only_of?(:pending, :created, :skipped)
+            elsif only_of?(:pending, :created, :skipped, :success_with_warnings, :ignored)
               'pending'
             elsif any_of?(:running, :pending)
               'running'
@@ -62,7 +58,7 @@ module Gitlab
         end
 
         def warnings?
-          @warnings > 0
+          @status_set.include?(:success_with_warnings)
         end
 
         private
@@ -77,28 +73,37 @@ module Gitlab
 
         def only_of?(*names)
           matching = names.count { |name| @status_set.include?(name) }
-          matching == @status_set.size
+          matching > 0 && \
+            matching == @status_set.size
         end
 
-        def build_status_set(all_statuses)
-          all_statuses.each do |status|
-            status = Array(status)
-
-            @count += 1
-            @warnings += 1 if count_as_warning?(status)
-            next if exclude_from_calculation?(status)
-
-            @status_set.add(status[@status_key].to_sym)
-          end
+        def consume_all_statuses(all_statuses)
+          all_statuses.each(&method(:consume_status))
         end
 
-        def count_as_warning?(status)
+        def consume_status(description)
+          # convert `"status"` into `["status"]`
+          description = Array(description)
+
+          status =
+            if success_with_warnings?(description)
+              :success_with_warnings
+            elsif ignored_status?(description)
+              :ignored
+            else
+              description[@status_key].to_sym
+            end
+
+          @status_set.add(status)
+        end
+
+        def success_with_warnings?(status)
           @allow_failure_key &&
             status[@allow_failure_key] &&
             HasStatus::PASSED_WITH_WARNINGS_STATUSES.include?(status[@status_key])
         end
 
-        def exclude_from_calculation?(status)
+        def ignored_status?(status)
           @allow_failure_key &&
             status[@allow_failure_key] &&
             HasStatus::EXCLUDE_IGNORED_STATUSES.include?(status[@status_key])

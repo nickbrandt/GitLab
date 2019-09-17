@@ -59,8 +59,12 @@ module HasStatus
       all.pluck(legacy_status_sql).first
     end
 
+    # This method should not be used.
+    # This method performs expensive calculation of status:
+    # 1. By plucking all related objects,
+    # 2. Or executes expensive SQL query
     def slow_composite_status
-      if Feature.enabled?(:ci_composite_status, default_enabled: true)
+      if Feature.enabled?(:ci_composite_status, default_enabled: false)
         columns = [:status]
         columns << :allow_failure if column_names.include?('allow_failure')
 

@@ -23,7 +23,7 @@ module Ci
 
     def status
       strong_memoize(:status) do
-        if Feature.enabled?(:ci_composite_status, default_enabled: true)
+        if Feature.enabled?(:ci_composite_status, default_enabled: false)
           all_statuses = @jobs.pluck(:status, :allow_failure)
 
           Gitlab::Ci::Status::Composite
@@ -50,12 +50,6 @@ module Ci
         .map do |group_name, grouped_statuses|
           self.new(stage, name: group_name, jobs: grouped_statuses)
         end
-    end
-
-    private
-
-    def commit_statuses
-      @commit_statuses ||= CommitStatus.where(id: jobs.map(&:id))
     end
   end
 end
