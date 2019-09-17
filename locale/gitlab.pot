@@ -17818,7 +17818,10 @@ msgstr ""
 msgid "You can only edit files when you are on a branch"
 msgstr ""
 
-msgid "You can only merge once the items above are resolved"
+msgid "You can only merge once the items above are resolved."
+msgstr ""
+
+msgid "You can only merge once this merge request is approved."
 msgstr ""
 
 msgid "You can only transfer the project to namespaces you manage."
