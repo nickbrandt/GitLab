@@ -119,6 +119,16 @@ describe MergeRequestPresenter do
     end
   end
 
+  describe '#suggested_approvers' do
+    subject { described_class.new(merge_request, current_user: user).suggested_approvers }
+
+    it 'delegates to the approval state' do
+      expect(merge_request.approval_state).to receive(:suggested_approvers).with(current_user: user) { [:ok] }
+
+      is_expected.to contain_exactly(:ok)
+    end
+  end
+
   describe 'create vulnerability feedback paths' do
     where(:create_feedback_path) do
       [
