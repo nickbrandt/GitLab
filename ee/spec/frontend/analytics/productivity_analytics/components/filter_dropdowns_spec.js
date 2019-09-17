@@ -17,8 +17,10 @@ describe('FilterDropdowns component', () => {
     setProjectPath: jest.fn(),
   };
 
+  const groupId = 1;
   const groupNamespace = 'gitlab-org';
   const projectPath = 'gitlab-org/gitlab-test';
+  const projectId = 10;
 
   beforeEach(() => {
     wrapper = shallowMount(localVue.extend(FilterDropdowns), {
@@ -54,7 +56,7 @@ describe('FilterDropdowns component', () => {
 
     describe('with a group selected', () => {
       beforeEach(() => {
-        wrapper.vm.groupId = 1;
+        wrapper.vm.groupId = groupId;
       });
 
       it('renders the projects dropdown', () => {
@@ -66,7 +68,7 @@ describe('FilterDropdowns component', () => {
   describe('methods', () => {
     describe('onGroupSelected', () => {
       beforeEach(() => {
-        wrapper.vm.onGroupSelected({ id: 1, full_path: groupNamespace });
+        wrapper.vm.onGroupSelected({ id: groupId, full_path: groupNamespace });
       });
 
       it('updates the groupId and invokes setGroupNamespace action', () => {
@@ -75,15 +77,22 @@ describe('FilterDropdowns component', () => {
       });
 
       it('emits the "groupSelected" event', () => {
-        expect(wrapper.emitted().groupSelected[0][0]).toBe(groupNamespace);
+        expect(wrapper.emitted().groupSelected[0][0]).toEqual({
+          groupNamespace,
+          groupId,
+        });
       });
     });
 
     describe('onProjectsSelected', () => {
+      beforeEach(() => {
+        wrapper.vm.groupId = groupId;
+      });
+
       describe('when the list of selected projects is not empty', () => {
         beforeEach(() => {
           store.state.filters.groupNamespace = groupNamespace;
-          wrapper.vm.onProjectsSelected([{ id: 1, path_with_namespace: `${projectPath}` }]);
+          wrapper.vm.onProjectsSelected([{ id: projectId, path_with_namespace: `${projectPath}` }]);
         });
 
         it('invokes setProjectPath action', () => {
@@ -92,8 +101,10 @@ describe('FilterDropdowns component', () => {
 
         it('emits the "projectSelected" event', () => {
           expect(wrapper.emitted().projectSelected[0][0]).toEqual({
-            namespacePath: groupNamespace,
-            project: projectPath,
+            groupNamespace,
+            groupId,
+            projectNamespace: projectPath,
+            projectId,
           });
         });
       });
@@ -110,8 +121,10 @@ describe('FilterDropdowns component', () => {
 
         it('emits the "projectSelected" event', () => {
           expect(wrapper.emitted().projectSelected[0][0]).toEqual({
-            namespacePath: groupNamespace,
-            project: null,
+            groupNamespace,
+            groupId,
+            projectNamespace: null,
+            projectId: null,
           });
         });
       });

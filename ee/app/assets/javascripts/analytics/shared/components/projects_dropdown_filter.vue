@@ -30,6 +30,11 @@ export default {
       required: false,
       default: s__('CycleAnalytics|project dropdown filter'),
     },
+    queryParams: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -95,7 +100,7 @@ export default {
     },
     fetchData(term, callback) {
       this.loading = true;
-      return Api.groupProjects(this.groupId, term, {}, projects => {
+      return Api.groupProjects(this.groupId, term, this.queryParams, projects => {
         this.loading = false;
         callback(projects);
       });
