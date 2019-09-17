@@ -2,6 +2,8 @@
 
 module QA
   context 'Geo', :orchestrated, :geo do
+    let(:git_push_http_path_prefix) { '/-/push_from_secondary' }
+
     describe 'GitLab Geo HTTP push secondary' do
       let(:file_content_primary) { 'This is a Geo project!  Commit from primary.' }
       let(:file_content_secondary) { 'This is a Geo project!  Commit from secondary.' }
@@ -77,9 +79,14 @@ module QA
             primary_uri = project.repository_http_location.uri
             primary_uri.user = nil
 
+            # The secondary inserts a special path prefix.
+            # See `Gitlab::Geo::GitPushHttp::PATH_PREFIX`.
+            path = File.join(git_push_http_path_prefix, '\d+', primary_uri.path)
+            absolute_path = primary_uri.to_s.sub(primary_uri.path, path)
+
             # The git cli produces the 'warning: redirecting to..' output
             # internally.
-            expect(push.output).to match(/warning: redirecting to #{primary_uri.to_s}/)
+            expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
@@ -158,9 +165,14 @@ module QA
             primary_uri = project.repository_http_location.uri
             primary_uri.user = nil
 
+            # The secondary inserts a special path prefix.
+            # See `Gitlab::Geo::GitPushHttp::PATH_PREFIX`.
+            path = File.join(git_push_http_path_prefix, '\d+', primary_uri.path)
+            absolute_path = primary_uri.to_s.sub(primary_uri.path, path)
+
             # The git cli produces the 'warning: redirecting to..' output
             # internally.
-            expect(push.output).to match(/warning: redirecting to #{primary_uri.to_s}/)
+            expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
             expect(push.output).to match(/Locking support detected on remote "#{location.uri.to_s}"/)
 
             # Validate git push worked and new content is visible
