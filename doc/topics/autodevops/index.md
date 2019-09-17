@@ -1168,6 +1168,27 @@ There is no documented way of using private container registry with Auto DevOps.
 We strongly advise using GitLab Container Registry with Auto DevOps in order to
 simplify configuration and prevent any unforeseen issues.
 
+### Installing Helm behind a proxy
+
+GitLab does not yet support installing [Helm as a GitLab-managed App](../../user/clusters/applications.md#helm) when
+behind a proxy. Users who wish to do so must inject their proxy settings
+into the installation pods at runtime, for example by using a
+[`PodPreset`](https://kubernetes.io/docs/concepts/workloads/pods/podpreset/):
+
+```yml
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: gitlab-managed-apps-default-proxy
+  namespace: gitlab-managed-apps
+spec:
+   env:
+    - name: http_proxy
+      value: "PUT_YOUR_HTTP_PROXY_HERE"
+    - name: https_proxy
+      value: "PUT_YOUR_HTTPS_PROXY_HERE"
+```
+
 ## Troubleshooting
 
 - Auto Build and Auto Test may fail in detecting your language/framework. There
