@@ -46,6 +46,18 @@ module EE
       ::Gitlab::EtagCaching::Store.new.tap do |store|
         store.touch(
           ::Gitlab::Routing.url_helpers.project_environments_path(project, format: :json))
+
+        store.touch(cluster_environments_etag_key) if cluster_environments_etag_key
+      end
+    end
+
+    def cluster_environments_etag_key
+      strong_memoize(:cluster_environments_key) do
+        cluster = last_deployment&.cluster
+
+        if cluster&.group_type?
+          ::Gitlab::Routing.url_helpers.environments_group_cluster_path(cluster.group, cluster)
+        end
       end
     end
 
