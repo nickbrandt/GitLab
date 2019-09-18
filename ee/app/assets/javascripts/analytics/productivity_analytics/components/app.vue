@@ -119,7 +119,7 @@ export default {
       :svg-path="emptyStateSvgPath"
       :description="
         __(
-          'Start by choosing a group to start exploring the merge requests in that group. You can then proceed to filter by projects, labels, milestones, authors and assignees.',
+          'Start by choosing a group to start exploring the merge requests in that group. You can then proceed to filter by projects, labels, milestones and authors.',
         )
       "
     />
