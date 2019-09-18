@@ -251,7 +251,7 @@ See more information in [!19581](https://gitlab.com/gitlab-org/gitlab-foss/merge
 
 - Support for removing unreferenced LFS objects was added in 8.14 onwards.
 - LFS authentications via SSH was added with GitLab 8.12.
-- Only compatible with the GitLFS client versions 1.1.0 and up, or 1.0.2.
+- Only compatible with the Git LFS client versions 1.1.0 and up, or 1.0.2.
 - The storage statistics currently count each LFS object multiple times for
   every project linking to it.
 
