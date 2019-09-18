@@ -16,12 +16,11 @@ module Dashboard
       attr_reader :user
 
       def load_projects(user)
-        projects = user.ops_dashboard_projects
-
-        ::Dashboard::Operations::ProjectsService
+        projects = ::Dashboard::Operations::ProjectsService
           .new(user)
-          .execute(projects)
-          .to_a
+          .execute(user.ops_dashboard_projects)
+
+        EnvironmentFolder.find_for_projects(projects)
       end
     end
   end

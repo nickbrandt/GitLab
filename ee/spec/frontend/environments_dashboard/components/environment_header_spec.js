@@ -17,6 +17,8 @@ describe('Environment Header', () => {
         environment_path: '/enivronment/1',
         name: 'staging',
         external_url: 'http://example.com',
+        size: 1,
+        within_folder: false,
       },
     };
   });
@@ -37,8 +39,12 @@ describe('Environment Header', () => {
       expect(wrapper.find('.js-environment-name').text()).toBe(propsData.environment.name);
     });
 
-    it('renders a link to the enivironment page', () => {
+    it('renders a link to the environment page', () => {
       expect(wrapper.find(GlLink).attributes('href')).toBe(propsData.environment.environment_path);
+    });
+
+    it('does not show a badge with the number of environments in the folder', () => {
+      expect(wrapper.find(GlBadge).exists()).toBe(false);
     });
 
     it('renders a link to the external app', () => {
@@ -52,9 +58,10 @@ describe('Environment Header', () => {
     });
   });
 
-  describe('with children', () => {
+  describe('with environments grouped into a folder', () => {
     beforeEach(() => {
-      propsData.environment.children = [{}, {}, {}, {}, {}];
+      propsData.environment.size = 5;
+      propsData.environment.within_folder = true;
       propsData.environment.name = 'review/testing';
 
       wrapper = shallowMount(Component, {
@@ -64,7 +71,7 @@ describe('Environment Header', () => {
     });
 
     it('shows a badge with the number of other environments in the folder', () => {
-      const expected = propsData.environment.children.length.toString();
+      const expected = propsData.environment.size.toString();
       expect(wrapper.find(GlBadge).text()).toBe(expected);
     });
 

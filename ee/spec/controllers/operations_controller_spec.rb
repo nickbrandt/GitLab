@@ -164,7 +164,7 @@ describe OperationsController do
     end
   end
 
-  describe 'GET #environment_list' do
+  describe 'GET #environments_list' do
     it_behaves_like 'unlicensed', :get, :environments_list
 
     context 'with an anonymous user' do
@@ -218,20 +218,177 @@ describe OperationsController do
         expect(json_response['projects']).to eq([])
       end
 
-      it 'returns a list with one project when the developer has added that project to the dashboard' do
-        project = create(:project, :with_avatar)
-        project.add_developer(user)
-        user.update!(ops_dashboard_projects: [project])
+      context 'with a project in the dashboard' do
+        let(:project) { create(:project, :with_avatar) }
 
-        get :environments_list
+        before do
+          project.add_developer(user)
+          user.update!(ops_dashboard_projects: [project])
+        end
 
-        project_json = json_response['projects'].first
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
-        expect(project_json['id']).to eq(project.id)
-        expect(project_json['name']).to eq(project.name)
-        expect(project_json['namespace']['id']).to eq(project.namespace.id)
-        expect(project_json['namespace']['name']).to eq(project.namespace.name)
+        it 'returns a project without an environment' do
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['id']).to eq(project.id)
+          expect(project_json['name']).to eq(project.name)
+          expect(project_json['namespace']['id']).to eq(project.namespace.id)
+          expect(project_json['namespace']['name']).to eq(project.namespace.name)
+          expect(project_json['environments']).to eq([])
+        end
+
+        it 'returns one project with one environment' do
+          environment = create(:environment, project: project, name: 'staging')
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['id']).to eq(project.id)
+          expect(project_json['name']).to eq(project.name)
+          expect(project_json['namespace']['id']).to eq(project.namespace.id)
+          expect(project_json['namespace']['name']).to eq(project.namespace.name)
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+          expect(project_json['environments'].first['environment_path']).to eq(project_environment_path(project, environment))
+        end
+
+        it 'returns multiple projects and environments' do
+          project2 = create(:project)
+          project2.add_developer(user)
+          user.update!(ops_dashboard_projects: [project, project2])
+          environment1 = create(:environment, project: project)
+          environment2 = create(:environment, project: project)
+          environment3 = create(:environment, project: project2)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+          expect(json_response['projects'].count).to eq(2)
+          expect(json_response['projects'].map { |p| p['id'] }.sort).to eq([project.id, project2.id])
+
+          project_json = json_response['projects'].find { |p| p['id'] == project.id }
+          project2_json = json_response['projects'].find { |p| p['id'] == project2.id }
+
+          expect(project_json['environments'].map { |e| e['id'] }.sort).to eq([environment1.id, environment2.id])
+          expect(project2_json['environments'].map { |e| e['id'] }).to eq([environment3.id])
+        end
+
+        it 'groups like environments together in a folder' do
+          create(:environment, project: project, name: 'review/test-feature')
+          environment = create(:environment, project: project, name: 'review/another-feature')
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+          expect(project_json['environments'].first['size']).to eq(2)
+          expect(project_json['environments'].first['within_folder']).to eq(true)
+        end
+
+        it 'returns an environment not in a folder' do
+          environment = create(:environment, project: project, name: 'production')
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+          expect(project_json['environments'].first['size']).to eq(1)
+          expect(project_json['environments'].first['within_folder']).to eq(false)
+        end
+
+        it 'returns true for within_folder when a folder contains only a single environment' do
+          environment = create(:environment, project: project, name: 'review/test-feature')
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+          expect(project_json['environments'].first['size']).to eq(1)
+          expect(project_json['environments'].first['within_folder']).to eq(true)
+        end
+
+        it 'counts only available environments' do
+          create(:environment, project: project, name: 'review/test-feature', state: :available)
+          environment = create(:environment, project: project, name: 'review/another-feature', state: :available)
+          create(:environment, project: project, name: 'review/great-feature', state: :stopped)
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['size']).to eq(2)
+          expect(project_json['environments'].first['within_folder']).to eq(true)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+        end
+
+        it "excludes environments with the same folder name for other projects" do
+          project2 = create(:project)
+          create(:environment, project: project, name: 'review/test')
+          create(:environment, project: project2, name: 'review/test')
+          environment = create(:environment, project: project, name: 'review/something')
+          user.update!(ops_dashboard_projects: [project])
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].first
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['size']).to eq(2)
+          expect(project_json['environments'].first['within_folder']).to eq(true)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+        end
+
+        it "groups environments scoped to projects for multiple projects included in the user's ops dashboard" do
+          project2 = create(:project)
+          project2.add_developer(user)
+          environment = create(:environment, project: project, name: 'review/test')
+          create(:environment, project: project2, name: 'review/test')
+          create(:environment, project: project2, name: 'review/thing')
+          user.update!(ops_dashboard_projects: [project, project2])
+
+          get :environments_list
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('dashboard/operations/environments_list', dir: 'ee')
+
+          project_json = json_response['projects'].find { |p| p['id'] == project.id }
+
+          expect(project_json['environments'].count).to eq(1)
+          expect(project_json['environments'].first['size']).to eq(1)
+          expect(project_json['environments'].first['within_folder']).to eq(true)
+          expect(project_json['environments'].first['id']).to eq(environment.id)
+        end
       end
     end
   end
