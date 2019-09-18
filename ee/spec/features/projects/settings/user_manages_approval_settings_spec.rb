@@ -35,12 +35,6 @@ describe 'EE > Projects > Settings > User manages approval rule settings' do
   context 'when `code_owner_approval_required` is available' do
     let(:licensed_features) { { code_owner_approval_required: true } }
 
-    before do
-      create(:protected_branch,
-        code_owner_approval_required: true,
-        project: project)
-    end
-
     it_behaves_like 'dirty submit form', [{ form: '#js-merge-request-approval-settings', input: '#project_merge_requests_author_approval' }]
 
     it 'allows the user to enforce code owner approval' do
