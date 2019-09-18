@@ -4,7 +4,7 @@ class AddCreatedAtToEventLogStates < ActiveRecord::Migration[5.2]
   DOWNTIME = false
 
   def up
-    add_column(:event_log_states, :created_at, :datetime, null: true)
+    add_column(:event_log_states, :created_at, :datetime, null: true) # rubocop:disable Migration/Datetime
 
     # There should only be 1 record in the event_log_states table
     execute('UPDATE event_log_states SET created_at = (
