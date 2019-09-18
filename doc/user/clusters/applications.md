@@ -154,8 +154,8 @@ false by running the following command within the Rails console:
 Feature.disable(:ingress_modsecurity)
 ```
 
-Once disabled, you must reinstall your ingress application for the changes to
-take effect.
+Once disabled, you must [uninstall](#uninstalling-applications) and reinstall your Ingress
+application for the changes to take effect.
 
 ### JupyterHub
 
