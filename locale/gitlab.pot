@@ -2659,6 +2659,9 @@ msgstr ""
 msgid "CLOSED"
 msgstr ""
 
+msgid "CLOSED (MOVED)"
+msgstr ""
+
 msgid "CONTRIBUTING"
 msgstr ""
 
