@@ -25,7 +25,7 @@ shared_examples 'dashboard gold trial callout' do
 
       expect(page).to have_selector '.promotion-callout'
 
-      find('.js-close').click
+      find('.promotion-callout .js-close').click
 
       expect(page).not_to have_selector '.promotion-callout'
     end
@@ -72,7 +72,7 @@ shared_examples 'billings gold trial callout' do
 
     it 'renders an undismissable gold trial callout' do
       expect(page).to have_selector '.promotion-callout'
-      expect(page).not_to have_selector '.js-close'
+      expect(page).not_to have_selector '.promotion-callout .js-close'
     end
   end
 
@@ -95,7 +95,7 @@ shared_examples 'billings gold trial callout' do
       it 'renders a dismissable gold trial callout' do
         expect(page).to have_selector '.promotion-callout'
 
-        find('.js-close').click
+        find('.promotion-callout .js-close').click
 
         expect(page).not_to have_selector '.promotion-callout'
       end
