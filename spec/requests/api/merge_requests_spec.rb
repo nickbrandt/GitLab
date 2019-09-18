@@ -777,6 +777,15 @@ describe API::MergeRequests do
       expect(json_response).not_to include('rebase_in_progress')
     end
 
+    it 'exposes squash commit sha when using ff-merge with squash commit' do
+      project.update(merge_requests_ff_only_enabled: true)
+      merge_request = create(:merge_request, :rebased, source_project: project, squash: true)
+      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user)
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response['merge_commit_sha'].length).to eq(40)
+    end
+
     it 'exposes description and title html when render_html is true' do
       get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user), params: { render_html: true }
 
