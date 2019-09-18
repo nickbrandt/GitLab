@@ -185,6 +185,7 @@ without duly verifying them.
 
 ### Everyone
 
+- Be kind.
 - Accept that many programming decisions are opinions. Discuss tradeoffs, which
   you prefer, and reach a resolution quickly.
 - Ask questions; don't make demands. ("What do you think about naming this
@@ -231,6 +232,9 @@ first time.
 - Push commits based on earlier rounds of feedback as isolated commits to the
   branch. Do not squash until the branch is ready to merge. Reviewers should be
   able to read individual updates based on their earlier feedback.
+- Assign the merge request back to the reviewer once you are ready for another round of
+  review. If you do not have the ability to assign merge requests, `@`
+  mention the reviewer instead.
 
 ### Assigning a merge request for a review
 
@@ -290,6 +294,10 @@ experience, refactors the existing code). Then:
 - Seek to understand the author's perspective.
 - If you don't understand a piece of code, _say so_. There's a good chance
   someone else would be confused by it as well.
+- Do prefix your comment with "Not blocking:" if you have a small,
+  non-mandatory improvement you wish to suggest. This lets the author
+  know that they can optionally resolve this issue in this merge request
+  or follow-up at a later stage.
 - After a round of line notes, it can be helpful to post a summary note such as
   "LGTM :thumbsup:", or "Just a couple things to address."
 - Assign the merge request to the author if changes are required following your
