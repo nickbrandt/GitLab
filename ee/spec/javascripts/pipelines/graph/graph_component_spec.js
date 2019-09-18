@@ -14,6 +14,12 @@ describe('graph component', () => {
 
   let component;
 
+  beforeEach(() => {
+    setFixtures(`
+      <div class="layout-page"></div>
+    `);
+  });
+
   afterEach(() => {
     component.$destroy();
   });
@@ -130,7 +136,7 @@ describe('graph component', () => {
         });
 
         describe('with expanded pipeline', () => {
-          it('should render expanded pipeline', () => {
+          it('should render expanded pipeline', done => {
             // expand the pipeline
             store.state.pipeline.triggered_by[0].isExpanded = true;
 
@@ -140,7 +146,12 @@ describe('graph component', () => {
               mediator,
             });
 
-            expect(component.$el.querySelector('.js-upstream-pipeline-12')).not.toBeNull();
+            Vue.nextTick()
+              .then(() => {
+                expect(component.$el.querySelector('.js-upstream-pipeline-12')).not.toBeNull();
+              })
+              .then(done)
+              .catch(done.fail);
           });
         });
       });
@@ -161,7 +172,7 @@ describe('graph component', () => {
         });
 
         describe('with expanded pipeline', () => {
-          it('should render expanded pipeline', () => {
+          it('should render expanded pipeline', done => {
             // expand the pipeline
             store.state.pipeline.triggered[0].isExpanded = true;
 
@@ -171,7 +182,14 @@ describe('graph component', () => {
               mediator,
             });
 
-            expect(component.$el.querySelector('.js-downstream-pipeline-34993051')).not.toBeNull();
+            Vue.nextTick()
+              .then(() => {
+                expect(
+                  component.$el.querySelector('.js-downstream-pipeline-34993051'),
+                ).not.toBeNull();
+              })
+              .then(done)
+              .catch(done.fail);
           });
         });
       });
