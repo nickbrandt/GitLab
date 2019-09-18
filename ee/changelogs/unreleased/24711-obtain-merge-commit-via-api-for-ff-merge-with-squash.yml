@@ -1,0 +1,5 @@
+---
+title: Obtain merge commit via API for fast-forward plus squash merge
+merge_request: !17052
+author: minghuan lei
+type: added
