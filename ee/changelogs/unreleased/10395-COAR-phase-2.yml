@@ -1,5 +1,0 @@
----
-title: Move Require code owner approval setting from Project to ProtectedBranches
-merge_request: 16187
-author:
-type: changed

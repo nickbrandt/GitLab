@@ -45,15 +45,11 @@ describe Project do
 
   context 'scopes' do
     describe '.requiring_code_owner_approval' do
-      let!(:project) { create(:project) }
-      let!(:expected_project) { protected_branch_needing_approval.project }
-      let!(:protected_branch_needing_approval) { create(:protected_branch, code_owner_approval_required: true) }
-
       it 'only includes the right projects' do
-        scoped_query_result = described_class.requiring_code_owner_approval
+        create(:project)
+        expected_project = create(:project, merge_requests_require_code_owner_approval: true)
 
-        expect(described_class.count).to eq(2)
-        expect(scoped_query_result).to contain_exactly(expected_project)
+        expect(described_class.requiring_code_owner_approval).to contain_exactly(expected_project)
       end
     end
 
@@ -910,17 +906,13 @@ describe Project do
       true  | true  | true
       false | true  | false
       true  | false | false
+      true  | nil   | false
     end
 
     with_them do
       before do
         stub_licensed_features(code_owner_approval_required: feature_available)
-
-        if feature_enabled
-          create(:protected_branch,
-            project: project,
-            code_owner_approval_required: true)
-        end
+        project.merge_requests_require_code_owner_approval = feature_enabled
       end
 
       it 'requires code owner approval when needed' do

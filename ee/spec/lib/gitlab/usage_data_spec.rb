@@ -195,15 +195,9 @@ describe Gitlab::UsageData do
 
   describe 'code owner approval required' do
     before do
-      create(:protected_branch, code_owner_approval_required: true)
-
-      create(:protected_branch,
-        code_owner_approval_required: true,
-        project: create(:project, :archived))
-
-      create(:protected_branch,
-        code_owner_approval_required: true,
-        project: create(:project, pending_delete: true))
+      create(:project, :archived, :requiring_code_owner_approval)
+      create(:project, :requiring_code_owner_approval, pending_delete: true)
+      create(:project, :requiring_code_owner_approval)
     end
 
     it 'counts the projects actively requiring code owner approval' do
