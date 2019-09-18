@@ -208,6 +208,13 @@ export default {
                     </span>
                   </gl-dropdown-item>
                 </gl-dropdown>
+                <p class="text-muted">
+                  {{
+                    __(
+                      'Not all data has been processed yet, the accuracy of the chart for the selected timeframe is limited.',
+                    )
+                  }}
+                </p>
                 <gl-column-chart
                   :data="{ full: getChartData(chartKeys.timeBasedHistogram) }"
                   :option="getColumnChartOption(chartKeys.timeBasedHistogram)"
@@ -266,6 +273,13 @@ export default {
                     </span>
                   </gl-dropdown-item>
                 </gl-dropdown>
+                <p class="text-muted">
+                  {{
+                    __(
+                      'Not all data has been processed yet, the accuracy of the chart for the selected timeframe is limited.',
+                    )
+                  }}
+                </p>
                 <gl-column-chart
                   :data="{ full: getChartData(chartKeys.commitBasedHistogram) }"
                   :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
