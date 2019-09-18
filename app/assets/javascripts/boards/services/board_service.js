@@ -32,8 +32,8 @@ export default class BoardService {
     return boardsStore.createList(entityId, entityType);
   }
 
-  updateList(id, position) {
-    return boardsStore.updateList(id, position);
+  updateList(id, position, collapsed) {
+    return boardsStore.updateList(id, position, collapsed);
   }
 
   destroyList(id) {

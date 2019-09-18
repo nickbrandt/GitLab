@@ -278,10 +278,11 @@ const boardsStore = {
     });
   },
 
-  updateList(id, position) {
+  updateList(id, position, collapsed) {
     return axios.put(`${this.state.endpoints.listsEndpoint}/${id}`, {
       list: {
         position,
+        collapsed,
       },
     });
   },
