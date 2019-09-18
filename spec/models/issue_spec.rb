@@ -899,4 +899,6 @@ describe Issue do
       let(:default_params) { { project: project } }
     end
   end
+
+  it_behaves_like 'versioned description'
 end

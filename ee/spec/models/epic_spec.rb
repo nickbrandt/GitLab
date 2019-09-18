@@ -794,4 +794,6 @@ describe Epic do
       let(:default_params) { {} }
     end
   end
+
+  it_behaves_like 'versioned description'
 end

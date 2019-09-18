@@ -3331,4 +3331,6 @@ describe MergeRequest do
 
     it { expect(query).to contain_exactly(merge_request1, merge_request2) }
   end
+
+  it_behaves_like 'versioned description'
 end

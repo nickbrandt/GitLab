@@ -1266,6 +1266,18 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
     t.index ["project_id", "status"], name: "index_deployments_on_project_id_and_status"
   end
 
+  create_table "description_versions", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "issue_id"
+    t.integer "merge_request_id"
+    t.integer "epic_id"
+    t.text "description"
+    t.index ["epic_id"], name: "index_description_versions_on_epic_id", where: "(epic_id IS NOT NULL)"
+    t.index ["issue_id"], name: "index_description_versions_on_issue_id", where: "(issue_id IS NOT NULL)"
+    t.index ["merge_request_id"], name: "index_description_versions_on_merge_request_id", where: "(merge_request_id IS NOT NULL)"
+  end
+
   create_table "design_management_designs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "issue_id"
@@ -3494,6 +3506,8 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
     t.string "action"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "description_version_id"
+    t.index ["description_version_id"], name: "index_system_note_metadata_on_description_version_id", unique: true, where: "(description_version_id IS NOT NULL)"
     t.index ["note_id"], name: "index_system_note_metadata_on_note_id", unique: true
   end
 
@@ -4089,6 +4103,9 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "clusters", name: "fk_289bba3222", on_delete: :nullify
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
+  add_foreign_key "description_versions", "epics", on_delete: :cascade
+  add_foreign_key "description_versions", "issues", on_delete: :cascade
+  add_foreign_key "description_versions", "merge_requests", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
   add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade
@@ -4325,6 +4342,7 @@ ActiveRecord::Schema.define(version: 2019_10_16_220135) do
   add_foreign_key "software_license_policies", "software_licenses", on_delete: :cascade
   add_foreign_key "subscriptions", "projects", on_delete: :cascade
   add_foreign_key "suggestions", "notes", on_delete: :cascade
+  add_foreign_key "system_note_metadata", "description_versions", name: "fk_fbd87415c9", on_delete: :nullify
   add_foreign_key "system_note_metadata", "notes", name: "fk_d83a918cb1", on_delete: :cascade
   add_foreign_key "term_agreements", "application_setting_terms", column: "term_id"
   add_foreign_key "term_agreements", "users", on_delete: :cascade
