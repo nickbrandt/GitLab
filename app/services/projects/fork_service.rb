@@ -51,7 +51,8 @@ module Projects
         # been instantiated to avoid ActiveRecord trying to create it when
         # initializing the project, as that would cause a foreign key constraint
         # exception.
-        relations_block:           -> (project) { build_fork_network_member(project) }
+        relations_block:           -> (project) { build_fork_network_member(project) },
+        skip_disk_validation:      skip_disk_validation
       }
 
       if @project.avatar.present? && @project.avatar.image?
@@ -108,6 +109,10 @@ module Projects
 
     def target_namespace
       @target_namespace ||= @params[:namespace] || current_user.namespace
+    end
+
+    def skip_disk_validation
+      @skip_disk_validation ||= @params[:skip_disk_validation] || false
     end
 
     def allowed_visibility_level
