@@ -19,7 +19,7 @@
                 "name": "actioncable",
                 "url": "http://rubyonrails.org",
                 "description": "WebSocket framework for Rails.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -33,7 +33,7 @@
                 "name": "wtfpl_init",
                 "url": "https://rubygems.org/gems/wtfpl_init",
                 "description": "Download WTFPL license file and rename to LICENSE.md or something",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }

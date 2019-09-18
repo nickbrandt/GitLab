@@ -27,7 +27,7 @@
                 "name": "actioncable",
                 "url": "http://rubyonrails.org",
                 "description": "WebSocket framework for Rails.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -41,7 +41,7 @@
                 "name": "actionmailer",
                 "url": "http://rubyonrails.org",
                 "description": "Email composition, delivery, and receiving framework (part of Rails).",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -55,7 +55,7 @@
                 "name": "actionpack",
                 "url": "http://rubyonrails.org",
                 "description": "Web-flow and rendering framework putting the VC in MVC (part of Rails).",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -69,7 +69,7 @@
                 "name": "actionview",
                 "url": "http://rubyonrails.org",
                 "description": "Rendering framework putting the V in MVC (part of Rails).",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -83,7 +83,7 @@
                 "name": "activejob",
                 "url": "http://rubyonrails.org",
                 "description": "Job framework with pluggable queues.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -97,7 +97,7 @@
                 "name": "activemodel",
                 "url": "http://rubyonrails.org",
                 "description": "A toolkit for building modeling frameworks (part of Rails).",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -111,7 +111,7 @@
                 "name": "activerecord",
                 "url": "http://rubyonrails.org",
                 "description": "Object-relational mapper framework (part of Rails).",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -125,7 +125,7 @@
                 "name": "activesupport",
                 "url": "http://rubyonrails.org",
                 "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -139,7 +139,7 @@
                 "name": "arel",
                 "url": "https://github.com/rails/arel",
                 "description": "Arel Really Exasperates Logicians  Arel is a SQL AST manager for Ruby",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -153,7 +153,7 @@
                 "name": "builder",
                 "url": "http://onestepback.org",
                 "description": "Builders for MarkUp.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -167,7 +167,7 @@
                 "name": "bundler",
                 "url": "http://bundler.io",
                 "description": "The best way to manage your application's dependencies",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -181,7 +181,7 @@
                 "name": "coffee-rails",
                 "url": "https://github.com/rails/coffee-rails",
                 "description": "CoffeeScript adapter for the Rails asset pipeline.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -195,7 +195,7 @@
                 "name": "coffee-script",
                 "url": "http://github.com/josh/ruby-coffee-script",
                 "description": "Ruby CoffeeScript Compiler",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -209,7 +209,7 @@
                 "name": "coffee-script-source",
                 "url": "http://coffeescript.org",
                 "description": "The CoffeeScript Compiler",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -223,7 +223,7 @@
                 "name": "concurrent-ruby",
                 "url": "http://www.concurrent-ruby.com",
                 "description": "Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -237,7 +237,7 @@
                 "name": "crass",
                 "url": "https://github.com/rgrove/crass/",
                 "description": "CSS parser based on the CSS Syntax Level 3 spec.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -251,7 +251,7 @@
                 "name": "erubis",
                 "url": "http://www.kuwata-lab.com/erubis/",
                 "description": "a fast and extensible eRuby implementation which supports multi-language",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -265,7 +265,7 @@
                 "name": "execjs",
                 "url": "https://github.com/rails/execjs",
                 "description": "Run JavaScript code from Ruby",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -279,7 +279,7 @@
                 "name": "ffi",
                 "url": "http://wiki.github.com/ffi/ffi",
                 "description": "Ruby FFI",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -293,7 +293,7 @@
                 "name": "globalid",
                 "url": "http://www.rubyonrails.org",
                 "description": "Refer to any model with a URI: gid://app/class/id",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -307,7 +307,7 @@
                 "name": "i18n",
                 "url": "http://github.com/svenfuchs/i18n",
                 "description": "New wave Internationalization support for Ruby",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -321,7 +321,7 @@
                 "name": "jbuilder",
                 "url": "https://github.com/rails/jbuilder",
                 "description": "Create JSON structures via a Builder-style DSL",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -334,7 +334,7 @@
             "dependency": {
                 "name": "loofah",
                 "description": "",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -348,7 +348,7 @@
                 "name": "mail",
                 "url": "https://github.com/mikel/mail",
                 "description": "Mail provides a nice Ruby DSL for making, sending and reading emails.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -362,7 +362,7 @@
                 "name": "method_source",
                 "url": "http://banisterfiend.wordpress.com",
                 "description": "retrieve the sourcecode for a method",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -376,7 +376,7 @@
                 "name": "mini_mime",
                 "url": "https://github.com/discourse/mini_mime",
                 "description": "A lightweight mime type lookup toy",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -390,7 +390,7 @@
                 "name": "mini_portile2",
                 "url": "http://github.com/flavorjones/mini_portile",
                 "description": "Simplistic port-like solution for developers",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -404,7 +404,7 @@
                 "name": "minitest",
                 "url": "https://github.com/seattlerb/minitest",
                 "description": "minitest provides a complete suite of testing facilities supporting TDD, BDD, mocking, and benchmarking",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -418,7 +418,7 @@
                 "name": "multi_json",
                 "url": "http://github.com/intridea/multi_json",
                 "description": "A common interface to multiple JSON libraries.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -432,7 +432,7 @@
                 "name": "nio4r",
                 "url": "https://github.com/celluloid/nio4r",
                 "description": "NIO provides a high performance selector API for monitoring IO objects",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -446,7 +446,7 @@
                 "name": "nokogiri",
                 "url": "http://nokogiri.org",
                 "description": "Nokogiri (鋸) is an HTML, XML, SAX, and Reader parser",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -460,7 +460,7 @@
                 "name": "puma",
                 "url": "http://puma.io",
                 "description": "Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server for Ruby/Rack applications",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -474,7 +474,7 @@
                 "name": "rack",
                 "url": "https://rack.github.io/",
                 "description": "a modular Ruby webserver interface",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -488,7 +488,7 @@
                 "name": "rack-test",
                 "url": "http://github.com/brynary/rack-test",
                 "description": "Simple testing API built on Rack",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -502,7 +502,7 @@
                 "name": "rails",
                 "url": "http://rubyonrails.org",
                 "description": "Full-stack web application framework.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -516,7 +516,7 @@
                 "name": "rails-dom-testing",
                 "url": "https://github.com/rails/rails-dom-testing",
                 "description": "Dom and Selector assertions for Rails applications",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -530,7 +530,7 @@
                 "name": "rails-html-sanitizer",
                 "url": "https://github.com/rails/rails-html-sanitizer",
                 "description": "This gem is responsible to sanitize HTML fragments in Rails applications.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -544,7 +544,7 @@
                 "name": "railties",
                 "url": "http://rubyonrails.org",
                 "description": "Tools for creating, working with, and running Rails applications.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -558,7 +558,7 @@
                 "name": "rake",
                 "url": "https://github.com/ruby/rake",
                 "description": "Rake is a Make-like program implemented in Ruby",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -572,7 +572,7 @@
                 "name": "rb-fsevent",
                 "url": "http://rubygems.org/gems/rb-fsevent",
                 "description": "Very simple & usable FSEvents API",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -586,7 +586,7 @@
                 "name": "rb-inotify",
                 "url": "https://github.com/guard/rb-inotify",
                 "description": "A Ruby wrapper for Linux inotify, using FFI",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -598,7 +598,7 @@
             "dependency": {
                 "name": "ruby-bundler-rails",
                 "description": "",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -612,7 +612,7 @@
                 "name": "sass",
                 "url": "http://sass-lang.com/",
                 "description": "A powerful but elegant CSS compiler that makes CSS fun again.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -626,7 +626,7 @@
                 "name": "sass-listen",
                 "url": "https://github.com/sass/listen",
                 "description": "Fork of guard/listen",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -640,7 +640,7 @@
                 "name": "sass-rails",
                 "url": "https://github.com/rails/sass-rails",
                 "description": "Sass adapter for the Rails asset pipeline.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -654,7 +654,7 @@
                 "name": "sprockets",
                 "url": "https://github.com/rails/sprockets",
                 "description": "Rack-based asset packaging system",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -668,7 +668,7 @@
                 "name": "sprockets-rails",
                 "url": "https://github.com/rails/sprockets-rails",
                 "description": "Sprockets Rails integration",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -682,7 +682,7 @@
                 "name": "sqlite3",
                 "url": "https://github.com/sparklemotion/sqlite3-ruby",
                 "description": "This module allows Ruby programs to interface with the SQLite3 database engine (http://www.sqlite.org)",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -696,7 +696,7 @@
                 "name": "thor",
                 "url": "http://whatisthor.com/",
                 "description": "Thor is a toolkit for building powerful command-line interfaces.",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -710,7 +710,7 @@
                 "name": "thread_safe",
                 "url": "https://github.com/ruby-concurrency/thread_safe",
                 "description": "Thread-safe collections and utilities for Ruby",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -724,7 +724,7 @@
                 "name": "tilt",
                 "url": "http://github.com/rtomayko/tilt/",
                 "description": "Generic interface to multiple Ruby template engines",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -738,7 +738,7 @@
                 "name": "turbolinks",
                 "url": "https://github.com/turbolinks/turbolinks",
                 "description": "Turbolinks makes navigating your web application faster",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -752,7 +752,7 @@
                 "name": "turbolinks-source",
                 "url": "https://github.com/turbolinks/turbolinks-source-gem",
                 "description": "Turbolinks JavaScript assets",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -766,7 +766,7 @@
                 "name": "tzinfo",
                 "url": "http://tzinfo.github.io",
                 "description": "Daylight savings aware timezone library",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -780,7 +780,7 @@
                 "name": "uglifier",
                 "url": "http://github.com/lautis/uglifier",
                 "description": "Ruby wrapper for UglifyJS JavaScript compressor",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -794,7 +794,7 @@
                 "name": "websocket-driver",
                 "url": "http://github.com/faye/websocket-driver-ruby",
                 "description": "WebSocket protocol handler with pluggable I/O",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }
@@ -808,7 +808,7 @@
                 "name": "websocket-extensions",
                 "url": "https://github.com/faye/websocket-extensions-ruby",
                 "description": "Generic extension manager for WebSocket connections",
-                "pathes": [
+                "paths": [
                     "."
                 ]
             }

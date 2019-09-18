@@ -29,7 +29,7 @@ export const licenseBaseIssues = {
         name: 'bundler',
         url: 'http://bundler.io',
         description: "The best way to manage your application's dependencies",
-        pathes: ['.'],
+        paths: ['.'],
       },
     },
   ],
@@ -57,7 +57,7 @@ export const licenseHeadIssues = {
         url: 'https://bitbucket.org/ged/ruby-pg',
         description:
           'Pg is the Ruby interface to the {PostgreSQL RDBMS}[http://www.postgresql.org/]',
-        pathes: ['.'],
+        paths: ['.'],
       },
     },
     {
@@ -70,7 +70,7 @@ export const licenseHeadIssues = {
         url: 'http://puma.io',
         description:
           'Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server for Ruby/Rack applications',
-        pathes: ['.'],
+        paths: ['.'],
       },
     },
     {
@@ -83,7 +83,7 @@ export const licenseHeadIssues = {
         url: 'http://foo.io',
         description:
           'Foo is a simple, fast, threaded, and highly concurrent HTTP 1.1 server for Ruby/Rack applications',
-        pathes: ['.'],
+        paths: ['.'],
       },
     },
     {
@@ -95,7 +95,7 @@ export const licenseHeadIssues = {
         name: 'execjs',
         url: 'https://github.com/rails/execjs',
         description: 'Run JavaScript code from Ruby',
-        pathes: ['.'],
+        paths: ['.'],
       },
     },
   ],
@@ -112,35 +112,35 @@ export const licenseReport = [
         url: 'https://bitbucket.org/ged/ruby-pg',
         description:
           'Pg is the Ruby interface to the {PostgreSQL RDBMS}[http://www.postgresql.org/]',
-        pathes: ['.'],
+        paths: ['.'],
       },
       {
         name: 'puma',
         url: 'http://puma.io',
         description:
           'Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server for Ruby/Rack applications',
-        pathes: ['.'],
+        paths: ['.'],
       },
       {
         name: 'foo',
         url: 'https://bitbucket.org/ged/ruby-pg',
         description:
           'Pg is the Ruby interface to the {PostgreSQL RDBMS}[http://www.postgresql.org/]',
-        pathes: ['.'],
+        paths: ['.'],
       },
       {
         name: 'bar',
         url: 'http://puma.io',
         description:
           'Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server for Ruby/Rack applications',
-        pathes: ['.'],
+        paths: ['.'],
       },
       {
         name: 'baz',
         url: 'https://bitbucket.org/ged/ruby-pg',
         description:
           'Pg is the Ruby interface to the {PostgreSQL RDBMS}[http://www.postgresql.org/]',
-        pathes: ['.'],
+        paths: ['.'],
       },
     ],
   },
