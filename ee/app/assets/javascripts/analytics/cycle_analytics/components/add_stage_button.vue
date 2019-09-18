@@ -20,7 +20,7 @@ export default {
   <li
     :class="[active ? activeClass : inactiveClass]"
     class="js-add-stage-button stage-nav-item ml-2 mb-1 rounded d-flex justify-content-center border-width-1px"
-    @click="$emit('showform')"
+    @click.prevent="$emit('showform')"
   >
     {{ s__('CustomCycleAnalytics|Add a stage') }}
   </li>

@@ -1,5 +1,5 @@
 import initCycleAnalytics from '~/cycle_analytics/cycle_analytics_bundle';
-import initCycleAnalyticsApp from 'ee/analytics/cycle_analytics/cycle_analytics_app';
+import initCycleAnalyticsApp from 'ee/analytics/cycle_analytics/index';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import Cookies from 'js-cookie';
 
