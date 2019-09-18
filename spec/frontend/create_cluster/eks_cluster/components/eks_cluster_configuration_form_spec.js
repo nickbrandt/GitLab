@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 import Vue from 'vue';
 import EksClusterConfigurationForm from '~/create_cluster/eks_cluster/components/eks_cluster_configuration_form.vue';
 import RegionDropdown from '~/create_cluster/eks_cluster/components/region_dropdown.vue';
-import VpcDropdown from '~/create_cluster/eks_cluster/components/vpc_dropdown.vue';
 
 import clusterDropdownStoreState from '~/create_cluster/eks_cluster/store/cluster_dropdown/state';
 
@@ -65,7 +64,7 @@ describe('EksClusterConfigurationForm', () => {
   });
 
   const findRegionDropdown = () => vm.find(RegionDropdown);
-  const findVpcDropdown = () => vm.find(VpcDropdown);
+  const findVpcDropdown = () => vm.find('[field-id="eks-vpc"]');
 
   describe('when mounted', () => {
     it('fetches available regions', () => {
@@ -117,12 +116,12 @@ describe('EksClusterConfigurationForm', () => {
     });
   });
 
-  it('sets vpcs to VpcDropdown vpcs property', () => {
-    expect(findVpcDropdown().props('vpcs')).toEqual(vpcsState.items);
+  it('sets vpcs to VpcDropdown items property', () => {
+    expect(findVpcDropdown().props('items')).toEqual(vpcsState.items);
   });
 
-  it('sets loadingVpcsError to VpcDropdown error property', () => {
-    expect(findVpcDropdown().props('error')).toEqual(vpcsState.loadingItemsError);
+  it('sets loadingVpcsError to VpcDropdown hasErrors property', () => {
+    expect(findVpcDropdown().props('hasErrors')).toEqual(vpcsState.loadingItemsError);
   });
 
   it('dispatches setVpc action when vpc is selected', () => {
@@ -131,5 +130,5 @@ describe('EksClusterConfigurationForm', () => {
     findVpcDropdown().vm.$emit('input', vpc);
 
     expect(actions.setVpc).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
-  })
+  });
 });
