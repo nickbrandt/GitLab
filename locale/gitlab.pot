@@ -17974,7 +17974,7 @@ msgstr ""
 msgid "You don't have any recent searches"
 msgstr ""
 
-msgid "You don’t have acces to Productivity Analaytics in this group"
+msgid "You don’t have access to Productivity Analytics in this group"
 msgstr ""
 
 msgid "You have been granted %{access_level} access to the %{source_link} %{source_type}."
