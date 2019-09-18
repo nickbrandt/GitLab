@@ -62,8 +62,11 @@
   - if content_for?(:page_specific_javascripts)
     = yield :page_specific_javascripts
 
-  = webpack_controller_bundle_tags
-  = legacy_webpack_controller_bundle_tags
+  - webpack_out = webpack_controller_bundle_tags()
+  - modern = webpack_out[0]
+  - legacy = webpack_out[1]
+  = javascript_include_tag *modern, extname: false, type: "module"
+  = javascript_include_tag *legacy, defer: true, nomodule: true
 
   = yield :project_javascripts
 
