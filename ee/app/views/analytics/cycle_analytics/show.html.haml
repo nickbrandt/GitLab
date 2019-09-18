@@ -1,11 +1,12 @@
-- page_title _('Cycle Analytics')
+- page_title _("Cycle Analytics")
 - customizable_cycle_analytics = Feature.enabled?(:customizable_cycle_analytics)
 
 - if cookies[:cycle_analytics_app] == 'true'
-  #js-cycle-analytics-app
+  #js-cycle-analytics-app{ data: { "empty-state-svg-path" => image_path("illustrations/analytics/cycle-analytics-empty-chart.svg"), "no-data-svg-path" => image_path("illustrations/analytics/cycle-analytics-empty-chart.svg"), "no-access-svg-path" => image_path("illustrations/analytics/no-access.svg") } }
 - else
   .page-title-holder.d-flex.align-items-center
-    %h1.page-title= _('Cycle Analytics')
+    %h1.page-title
+      = page_title
 
   #cycle-analytics.m-0.mw-100
     .mt-3.py-2.px-3.d-flex.bg-gray-light.border-top.border-bottom.flex-column.flex-md-row.justify-content-between

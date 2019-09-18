@@ -7923,9 +7923,6 @@ msgstr ""
 msgid "HealthCheck|Unhealthy"
 msgstr ""
 
-msgid "Hello World!"
-msgstr ""
-
 msgid "Hello there"
 msgstr ""
 
@@ -9538,6 +9535,9 @@ msgid "Merge in progress"
 msgstr ""
 
 msgid "Merge request"
+msgstr ""
+
+msgid "Merge request %{iid} authored by %{authorName}"
 msgstr ""
 
 msgid "Merge request approvals"
