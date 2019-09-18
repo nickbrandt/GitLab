@@ -45,7 +45,7 @@ class List {
     const typeInfo = this.getTypeInfo(this.type);
     this.preset = Boolean(typeInfo.isPreset);
     this.isExpandable = Boolean(typeInfo.isExpandable);
-    this.isExpanded = true;
+    this.isExpanded = !obj.collapsed;
     this.page = 1;
     this.loading = true;
     this.loadingMore = false;
@@ -113,7 +113,8 @@ class List {
   }
 
   update() {
-    gl.boardService.updateList(this.id, this.position).catch(() => {
+    const collapsed = !this.isExpanded;
+    return gl.boardService.updateList(this.id, this.position, collapsed).catch(() => {
       // TODO: handle request error
     });
   }
