@@ -27,9 +27,9 @@ module DesignManagement
     end
 
     belongs_to :issue
-    has_many :design_versions
+    has_many :actions
     has_many :designs,
-             through: :design_versions,
+             through: :actions,
              class_name: "DesignManagement::Design",
              source: :design,
              inverse_of: :versions
@@ -45,7 +45,7 @@ module DesignManagement
     sha_attribute :sha
 
     scope :for_designs, -> (designs) do
-      where(id: DesignVersion.where(design_id: designs).select(:version_id)).distinct
+      where(id: Action.where(design_id: designs).select(:version_id)).distinct
     end
     scope :earlier_or_equal_to, -> (version) { where('id <= ?', version) }
     scope :ordered, -> { order(id: :desc) }
@@ -73,7 +73,7 @@ module DesignManagement
 
         rows = design_actions.map { |action| action.row_attrs(version) }
 
-        Gitlab::Database.bulk_insert(DesignVersion.table_name, rows)
+        Gitlab::Database.bulk_insert(Action.table_name, rows)
         version.designs.reset
         version.validate!
         design_actions.each(&:performed)

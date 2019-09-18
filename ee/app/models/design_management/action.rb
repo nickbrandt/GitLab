@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
 module DesignManagement
-  class DesignVersion < ApplicationRecord
+  class Action < ApplicationRecord
     self.table_name = "#{DesignManagement.table_name_prefix}designs_versions"
 
-    belongs_to :design, class_name: "DesignManagement::Design", inverse_of: :design_versions
-    belongs_to :version, class_name: "DesignManagement::Version", inverse_of: :design_versions
+    belongs_to :design, class_name: "DesignManagement::Design", inverse_of: :actions
+    belongs_to :version, class_name: "DesignManagement::Version", inverse_of: :actions
 
     enum event: [:creation, :modification, :deletion]
 
     # we assume sequential ordering.
     scope :ordered, -> { order(version_id: :asc) }
 
-    # For each design, only select the most recent design_version
+    # For each design, only select the most recent action
     scope :most_recent, -> do
       selection = Arel.sql("DISTINCT ON (#{table_name}.design_id) #{table_name}.*")
 

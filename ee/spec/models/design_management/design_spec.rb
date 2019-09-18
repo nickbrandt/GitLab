@@ -14,7 +14,7 @@ describe DesignManagement::Design do
   describe 'relations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:issue) }
-    it { is_expected.to have_many(:design_versions) }
+    it { is_expected.to have_many(:actions) }
     it { is_expected.to have_many(:versions) }
     it { is_expected.to have_many(:notes).dependent(:delete_all) }
   end
@@ -205,8 +205,8 @@ describe DesignManagement::Design do
       expect(deleted_design).not_to be_new_design
     end
 
-    it "does not cause extra queries when versions are loaded" do
-      design.design_versions.map(&:id)
+    it "does not cause extra queries when actions are loaded" do
+      design.actions.map(&:id)
 
       expect { design.new_design? }.not_to exceed_query_limit(0)
     end

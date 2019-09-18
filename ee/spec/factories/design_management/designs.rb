@@ -11,7 +11,7 @@ FactoryBot.define do
         project = design.project
         repository = project.design_repository
         repository.create_if_not_exists
-        dv_table_name = DesignManagement::DesignVersion.table_name
+        dv_table_name = DesignManagement::Action.table_name
         updates = [0, evaluator.versions_count - (evaluator.deleted ? 2 : 1)].max
 
         run_action = ->(action) do

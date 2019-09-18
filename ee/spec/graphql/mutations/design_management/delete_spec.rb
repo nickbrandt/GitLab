@@ -111,7 +111,7 @@ describe Mutations::DesignManagement::Delete do
           # 22.   leave transaction 2
           # 23.   create version with sha and issue
           # 24.   create design-version links
-          # 25.   validate version.design_versions.present?
+          # 25.   validate version.actions.present?
           # 26.   validate version.sha is unique
           # 27. leave transaction 1
           #
