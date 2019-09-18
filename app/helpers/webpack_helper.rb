@@ -48,21 +48,11 @@ module WebpackHelper
 
     route = [*controller.controller_path.split('/'), action].compact
 
-    until chunks.any? || route.empty?
-      entrypoint = "pages.#{route.join('.')}"
-      begin
-        chunks = webpack_entrypoint_paths(entrypoint, extension: 'js')
-      rescue Gitlab::Webpack::Manifest::AssetMissingError
-        # no bundle exists for this path
-      end
-      route.pop
+    legacyChunks = chunks.map do |chunk|
+      chunk.sub('.mjs', '.js')
     end
 
-    if chunks.empty?
-      chunks = webpack_entrypoint_paths("default", extension: 'js')
-    end
-
-    javascript_include_tag *chunks, defer: true, nomodule: true
+    return chunks, legacyChunks
   end
 
   def webpack_entrypoint_paths(source, extension: nil, exclude_duplicates: true)
