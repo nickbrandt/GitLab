@@ -115,7 +115,10 @@ you can read and write comments as you normally do:
 
 ![Service Desk issue thread](img/service_desk_thread.png)
 
-> Note that the project's visibility (private, internal, public) does not affect Service Desk.
+Note that:
+
+- The project's visibility (private, internal, public) does not affect Service Desk.
+- The path to the project, including its group or namespace, will be shown on emails.
 
 ### Support Bot user
 
