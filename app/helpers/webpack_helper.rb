@@ -37,6 +37,34 @@ module WebpackHelper
     return chunks, legacyChunks
   end
 
+  def legacy_webpack_controller_bundle_tags
+    chunks = []
+
+    action = case controller.action_name
+             when 'create' then 'new'
+             when 'update' then 'edit'
+             else controller.action_name
+             end
+
+    route = [*controller.controller_path.split('/'), action].compact
+
+    until chunks.any? || route.empty?
+      entrypoint = "pages.#{route.join('.')}"
+      begin
+        chunks = webpack_entrypoint_paths(entrypoint, extension: 'js')
+      rescue Gitlab::Webpack::Manifest::AssetMissingError
+        # no bundle exists for this path
+      end
+      route.pop
+    end
+
+    if chunks.empty?
+      chunks = webpack_entrypoint_paths("default", extension: 'js')
+    end
+
+    javascript_include_tag *chunks, defer: true, nomodule: true
+  end
+
   def webpack_entrypoint_paths(source, extension: nil, exclude_duplicates: true)
     return "" unless source.present?
 
