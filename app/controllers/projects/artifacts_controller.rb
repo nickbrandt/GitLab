@@ -16,6 +16,12 @@ class Projects::ArtifactsController < Projects::ApplicationController
   MAX_PER_PAGE = 20
 
   def index
+    # Loading artifacts is very expensive in projects with a lot of artifacts.
+    # This feature flag prevents a DOS attack vector.
+    # It should be removed only after resolving the underlying performance
+    # issues: https://gitlab.com/gitlab-org/gitlab/issues/32281
+    return head :no_content unless Feature.enabled?(:artifacts_management_page, @project)
+
     finder = ArtifactsFinder.new(@project, artifacts_params)
     all_artifacts = finder.execute
 
