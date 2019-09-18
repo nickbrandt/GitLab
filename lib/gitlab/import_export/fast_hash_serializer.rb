@@ -46,7 +46,7 @@ module Gitlab
         end
 
         def to_json(options = {})
-          result = String.new
+          result = +''
           items = 0
 
           batch = @relation
