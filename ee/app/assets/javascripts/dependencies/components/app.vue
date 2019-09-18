@@ -20,12 +20,6 @@ export default {
     DependencyListJobFailedAlert,
     PaginatedDependenciesTable,
   },
-  inject: {
-    dependencyListVulnerabilities: {
-      from: 'dependencyListVulnerabilities',
-      default: false,
-    },
-  },
   props: {
     endpoint: {
       type: String,
@@ -115,44 +109,27 @@ export default {
       @close="dismissJobFailedAlert"
     />
 
-    <template v-if="dependencyListVulnerabilities">
-      <h3 class="h5">{{ __('Dependencies') }}</h3>
+    <h3 class="h5">{{ __('Dependencies') }}</h3>
 
-      <gl-tabs v-model="currentListIndex" content-class="pt-0">
-        <gl-tab
-          v-for="listType in listTypes"
-          :key="listType.namespace"
-          :disabled="isTabDisabled(listType.namespace)"
-        >
-          <template v-slot:title>
-            {{ listType.label }}
-            <gl-badge pill :data-qa-selector="qaCountSelector(listType.label)">{{
-              totals[listType.namespace]
-            }}</gl-badge>
-          </template>
-          <paginated-dependencies-table :namespace="listType.namespace" />
-        </gl-tab>
-        <template v-slot:tabs>
-          <li class="d-flex align-items-center ml-sm-auto">
-            <dependencies-actions :namespace="currentList" class="my-2 my-sm-0" />
-          </li>
-        </template>
-      </gl-tabs>
-    </template>
-
-    <template v-else>
-      <div class="d-sm-flex justify-content-between align-items-baseline my-2">
-        <h3 class="h5">
-          {{ __('Dependencies') }}
-          <gl-badge v-if="pageInfo.total" pill data-qa-selector="dependency_list_total_count">{{
-            pageInfo.total
+    <gl-tabs v-model="currentListIndex" content-class="pt-0">
+      <gl-tab
+        v-for="listType in listTypes"
+        :key="listType.namespace"
+        :disabled="isTabDisabled(listType.namespace)"
+      >
+        <template #title>
+          {{ listType.label }}
+          <gl-badge pill :data-qa-selector="qaCountSelector(listType.label)">{{
+            totals[listType.namespace]
           }}</gl-badge>
-        </h3>
-
-        <dependencies-actions :namespace="currentList" />
-      </div>
-
-      <paginated-dependencies-table :namespace="currentList" />
-    </template>
+        </template>
+        <paginated-dependencies-table :namespace="listType.namespace" />
+      </gl-tab>
+      <template #tabs>
+        <li class="d-flex align-items-center ml-sm-auto">
+          <dependencies-actions :namespace="currentList" class="my-2 my-sm-0" />
+        </li>
+      </template>
+    </gl-tabs>
   </div>
 </template>

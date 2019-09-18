@@ -14,12 +14,6 @@ export default {
     GlSkeletonLoading,
     Icon,
   },
-  inject: {
-    dependencyListVulnerabilities: {
-      from: 'dependencyListVulnerabilities',
-      default: false,
-    },
-  },
   props: {
     dependency: {
       type: Object,
@@ -74,10 +68,7 @@ export default {
 </script>
 
 <template>
-  <div
-    v-if="dependencyListVulnerabilities"
-    class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2"
-  >
+  <div class="gl-responsive-table-row flex-md-column align-items-md-stretch px-2">
     <gl-skeleton-loading
       v-if="isLoading"
       :lines="1"
@@ -160,48 +151,5 @@ export default {
         }}
       </li>
     </ul>
-  </div>
-
-  <div v-else class="gl-responsive-table-row p-2">
-    <gl-skeleton-loading
-      v-if="isLoading"
-      :lines="1"
-      class="d-flex flex-column justify-content-center"
-    />
-    <template v-else>
-      <!-- name-->
-      <div class="table-section section-20 section-wrap pr-md-3">
-        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Component') }}</div>
-        <div class="table-mobile-content">{{ dependency.name }}</div>
-      </div>
-
-      <!-- version -->
-      <div class="table-section section-10 pr-md-3">
-        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Version') }}</div>
-        <div class="table-mobile-content">{{ dependency.version }}</div>
-      </div>
-
-      <!-- packager -->
-      <div class="table-section section-20 section-wrap pr-md-3">
-        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Packager') }}</div>
-        <div class="table-mobile-content">{{ dependency.packager }}</div>
-      </div>
-
-      <!-- location -->
-      <div class="table-section section-15 section-wrap pr-md-3">
-        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|Location') }}</div>
-        <div class="table-mobile-content">
-          <a :href="dependency.location.blob_path">{{ dependency.location.path }}</a>
-        </div>
-      </div>
-
-      <!-- license -->
-      <div class="table-section section-15">
-        <div class="table-mobile-header" role="rowheader">{{ s__('Dependencies|License') }}</div>
-        <div class="table-mobile-content">
-          <dependency-license-links :licenses="dependency.licenses" :title="dependency.name" />
-        </div>
-      </div>
-    </template>
   </div>
 </template>
