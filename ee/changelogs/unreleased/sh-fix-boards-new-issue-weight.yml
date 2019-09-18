@@ -1,0 +1,5 @@
+---
+title: Fix setting of weight of a new issue in board list
+merge_request: 16299
+author:
+type: fixed
