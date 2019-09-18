@@ -4,7 +4,6 @@ module Gitlab
   module Ci
     module Build
       class Rules::Rule::Clause::Exists < Rules::Rule::Clause
-
         # The maximum number of patterned glob comparisons that will be
         # performed before the rule assumes that it has a match
         MAX_PATTERN_COMPARISONS = 10_000
@@ -26,9 +25,9 @@ module Gitlab
 
         def worktree_paths(pipeline)
           if @top_level_only
-            pipeline.project.repository.tree(pipeline.sha).blobs.map(&:path)
+            pipeline.top_level_worktree_paths
           else
-            pipeline.project.repository.ls_files(pipeline.sha)
+            pipeline.all_worktree_paths
           end
         end
 
