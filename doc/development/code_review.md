@@ -294,8 +294,10 @@ experience, refactors the existing code). Then:
 - Seek to understand the author's perspective.
 - If you don't understand a piece of code, _say so_. There's a good chance
   someone else would be confused by it as well.
-- Do prefix your comment with "Not blocking:" if you have a small, non-mandatory
-  improvement you wish to suggest.
+- Do prefix your comment with "Not blocking:" if you have a small,
+  non-mandatory improvement you wish to suggest. This lets the author
+  know that they can optionally resolve this issue in this merge request
+  or follow-up at a later stage.
 - After a round of line notes, it can be helpful to post a summary note such as
   "LGTM :thumbsup:", or "Just a couple things to address."
 - Assign the merge request to the author if changes are required following your
