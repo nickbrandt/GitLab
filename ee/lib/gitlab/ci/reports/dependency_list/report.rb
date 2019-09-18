@@ -18,6 +18,7 @@ module Gitlab
           def apply_license(license)
             dependencies.each do |dependency|
               next unless dependency[:name] == license[:dependency][:name]
+              next if dependency[:licenses].include?(license[:license])
 
               dependency[:licenses] << license[:license]
             end
