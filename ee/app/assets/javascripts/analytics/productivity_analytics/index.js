@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import Api from '~/api';
 import store from './store';
 import FilterDropdowns from './components/filter_dropdowns.vue';
 import TimeFrameDropdown from './components/timeframe_dropdown.vue';
 import ProductivityAnalyticsApp from './components/app.vue';
 import FilteredSearchProductivityAnalytics from './filtered_search_productivity_analytics';
+import { getLabelsEndpoint, getMilestonesEndpoint } from './utils';
 
 export default () => {
   const container = document.getElementById('js-productivity-analytics');
@@ -41,8 +41,8 @@ export default () => {
         searchBarContainer.classList.remove('hide');
 
         const filteredSearchInput = searchBarContainer.querySelector('.filtered-search');
-        const labelsEndpoint = this.getLabelsEndpoint(groupNamespace, projectNamespace);
-        const milestonesEndpoint = this.getMilestonesEndpoint(groupNamespace, projectNamespace);
+        const labelsEndpoint = getLabelsEndpoint(groupNamespace, projectNamespace);
+        const milestonesEndpoint = getMilestonesEndpoint(groupNamespace, projectNamespace);
 
         filteredSearchInput.setAttribute('data-group-id', groupId);
 
@@ -54,22 +54,6 @@ export default () => {
         filteredSearchInput.setAttribute('data-milestones-endpoint', milestonesEndpoint);
         filterManager = new FilteredSearchProductivityAnalytics({ isGroup: false });
         filterManager.setup();
-      },
-      getLabelsEndpoint(namespacePath, projectPath) {
-        if (projectPath) {
-          return Api.buildUrl(Api.projectLabelsPath)
-            .replace(':namespace_path', namespacePath)
-            .replace(':project_path', projectPath);
-        }
-
-        return Api.buildUrl(Api.groupLabelsPath).replace(':namespace_path', namespacePath);
-      },
-      getMilestonesEndpoint(namespacePath, projectPath) {
-        if (projectPath) {
-          return `/${namespacePath}/${projectPath}/-/milestones`;
-        }
-
-        return `/groups/${namespacePath}/-/milestones`;
       },
     },
     render(h) {
