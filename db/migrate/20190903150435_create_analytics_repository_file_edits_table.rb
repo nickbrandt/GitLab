@@ -14,9 +14,7 @@ class CreateAnalyticsRepositoryFileEditsTable < ActiveRecord::Migration[5.2]
         index: false,
         foreign_key: { on_delete: :cascade },
         null: false
-      t.references :analytics_repository_commit,
-        index: { name: 'index_analytics_repository_file_edits_on_commit_id' },
-        foreign_key: { on_delete: :cascade },
+      t.date :committed_date,
         null: false
       t.integer :num_edits,
         null: false,
@@ -24,8 +22,8 @@ class CreateAnalyticsRepositoryFileEditsTable < ActiveRecord::Migration[5.2]
     end
 
     add_index :analytics_repository_file_edits,
-      [:analytics_repository_file_id, :analytics_repository_commit_id, :project_id],
-      name: 'index_analytics_file_edits_on_commit_id_file_id_and_project_id',
+      [:analytics_repository_file_id, :committed_date, :project_id],
+      name: 'index_file_edits_on_committed_date_file_id_and_project_id',
       unique: true
   end
 end
