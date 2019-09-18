@@ -1,4 +1,4 @@
-/* eslint-disable no-var, one-var, no-unused-expressions, consistent-return, no-param-reassign, default-case, no-return-assign, object-shorthand, vars-on-top */
+/* eslint-disable no-var, one-var, no-unused-expressions, consistent-return, no-param-reassign, default-case, no-return-assign, vars-on-top */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -91,7 +91,7 @@ describe('Search autocomplete dropdown', () => {
       'gitlab-ce': {
         issuesPath: projectIssuesPath,
         mrPath: projectMRsPath,
-        projectName: projectName,
+        projectName,
       },
     });
   };

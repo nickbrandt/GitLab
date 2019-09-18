@@ -1,4 +1,4 @@
-/* eslint-disable no-var, func-names, object-shorthand, one-var, prefer-arrow-callback, prefer-template, no-else-return */
+/* eslint-disable no-var, func-names, one-var, prefer-arrow-callback, prefer-template, no-else-return */
 
 import $ from 'jquery';
 import Api from '~/api';
@@ -14,7 +14,7 @@ function AdminEmailSelect() {
               placeholder: __('Select group or project'),
               multiple: $(select).hasClass('multiselect'),
               minimumInputLength: 0,
-              query: function(query) {
+              query(query) {
                 const groupsFetch = Api.groups(query.term, {});
                 const projectsFetch = Api.projects(query.term, {
                   order_by: 'id',
@@ -31,7 +31,7 @@ function AdminEmailSelect() {
                   });
                 });
               },
-              id: function(object) {
+              id(object) {
                 if (object.path_with_namespace) {
                   return 'project-' + object.id;
                 } else if (object.path) {
@@ -47,7 +47,7 @@ function AdminEmailSelect() {
                 return _this.formatSelection(...args);
               },
               dropdownCssClass: 'ajax-admin-email-dropdown',
-              escapeMarkup: function(m) {
+              escapeMarkup(m) {
                 return m;
               },
             });

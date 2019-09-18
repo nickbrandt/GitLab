@@ -1,4 +1,4 @@
-/* eslint-disable prefer-arrow-callback, one-var, no-var, object-shorthand, no-shadow, no-else-return, func-names */
+/* eslint-disable prefer-arrow-callback, one-var, no-var, no-shadow, no-else-return, func-names */
 
 import $ from 'jquery';
 import '~/gl_dropdown';
@@ -23,21 +23,21 @@ function WeightSelect(els, options = {}) {
     return $dropdown.glDropdown({
       selectable: true,
       fieldName,
-      toggleLabel: function(selected, el) {
+      toggleLabel(selected, el) {
         return $(el).data('id');
       },
-      hidden: function() {
+      hidden() {
         $selectbox.hide();
         return $value.css('display', '');
       },
-      id: function(obj, el) {
+      id(obj, el) {
         if ($(el).data('none') == null) {
           return $(el).data('id');
         } else {
           return '';
         }
       },
-      clicked: function(glDropdownEvt) {
+      clicked(glDropdownEvt) {
         const { e } = glDropdownEvt;
         let selected = glDropdownEvt.selectedObj;
         const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);
