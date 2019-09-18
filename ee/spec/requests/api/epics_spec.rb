@@ -415,6 +415,15 @@ describe API::Epics do
         expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
       end
 
+      it 'exposes closed_at attribute' do
+        epic.close
+
+        get api(url)
+
+        expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
+        expect(json_response['closed_at']).to be_present
+      end
+
       it_behaves_like 'can admin epics'
     end
   end

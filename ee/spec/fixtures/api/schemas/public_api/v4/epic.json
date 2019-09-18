@@ -39,6 +39,7 @@
     "state": { "type": "string" },
     "created_at": { "type": ["string", "null"] },
     "updated_at": { "type": ["string", "null"] },
+    "closed_at": { "type": ["string", "null"] },
     "web_edit_url": { "type":  "string" },
     "reference": { "type":  "string" }
   },
