@@ -2,18 +2,6 @@
 
 const BABEL_ENV = process.env.BABEL_ENV || process.env.NODE_ENV || null;
 
-const presets = [
-  [
-    '@babel/preset-env',
-    {
-      modules: false,
-      targets: {
-        esmodules: true
-      },
-    },
-  ],
-];
-
 // include stage 3 proposals
 const plugins = [
   '@babel/plugin-syntax-dynamic-import',
@@ -49,4 +37,4 @@ if (isJest) {
   plugins.push('babel-plugin-dynamic-import-node');
 }
 
-module.exports = { presets, plugins };
+module.exports = { plugins };
