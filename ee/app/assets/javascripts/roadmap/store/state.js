@@ -4,11 +4,14 @@ export default () => ({
   epicsState: '',
   filterQueryString: '',
   initialEpicsPath: '',
+  filterParams: null,
 
   // Data
+  epicIid: '',
   epics: [],
   epicIds: [],
   currentGroupId: -1,
+  fullPath: '',
   timeframe: [],
   extendedTimeframe: [],
   presetType: '',

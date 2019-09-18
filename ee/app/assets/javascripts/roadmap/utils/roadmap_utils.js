@@ -366,6 +366,46 @@ export const getTimeframeForPreset = (
   return timeframe;
 };
 
+/**
+ * Returns timeframe range in string based on provided config.
+ *
+ * @param {object} config
+ * @param {string} config.presetType String representing preset type
+ * @param {array} config.timeframe Array of dates representing timeframe
+ *
+ * @returns {object} Returns an object containing `startDate` & `dueDate` strings
+ *                   Computed using presetType and timeframe.
+ */
+export const getEpicsTimeframeRange = ({ presetType = '', timeframe = [] }) => {
+  let start;
+  let due;
+
+  const firstTimeframe = timeframe[0];
+  const lastTimeframe = timeframe[timeframe.length - 1];
+
+  // Compute start and end dates from timeframe
+  // based on provided presetType.
+  if (presetType === PRESET_TYPES.QUARTERS) {
+    [start] = firstTimeframe.range;
+    due = lastTimeframe.range[lastTimeframe.range.length - 1];
+  } else if (presetType === PRESET_TYPES.MONTHS) {
+    start = firstTimeframe;
+    due = lastTimeframe;
+  } else if (presetType === PRESET_TYPES.WEEKS) {
+    start = firstTimeframe;
+    due = newDate(lastTimeframe);
+    due.setDate(due.getDate() + 6);
+  }
+
+  const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
+  const dueDate = `${due.getFullYear()}-${due.getMonth() + 1}-${due.getDate()}`;
+
+  return {
+    startDate,
+    dueDate,
+  };
+};
+
 export const getEpicsPathForPreset = ({
   basePath = '',
   filterQueryString = '',
@@ -373,37 +413,19 @@ export const getEpicsPathForPreset = ({
   timeframe = [],
   epicsState = 'all',
 }) => {
-  let start;
-  let end;
   let epicsPath = basePath;
 
   if (!basePath || !timeframe.length) {
     return null;
   }
 
-  const firstTimeframe = timeframe[0];
-  const lastTimeframe = timeframe[timeframe.length - 1];
-
-  // Construct Epic API path to include
-  // `start_date` & `end_date` query params to get list of
-  // epics only for timeframe.
-  if (presetType === PRESET_TYPES.QUARTERS) {
-    [start] = firstTimeframe.range;
-    end = lastTimeframe.range[lastTimeframe.range.length - 1];
-  } else if (presetType === PRESET_TYPES.MONTHS) {
-    start = firstTimeframe;
-    end = lastTimeframe;
-  } else if (presetType === PRESET_TYPES.WEEKS) {
-    start = firstTimeframe;
-    end = newDate(lastTimeframe);
-    end.setDate(end.getDate() + 6);
-  }
+  const range = getEpicsTimeframeRange({
+    presetType,
+    timeframe,
+  });
 
   epicsPath += epicsPath.indexOf('?') === -1 ? '?' : '&';
-
-  const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
-  const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-  epicsPath += `state=${epicsState}&start_date=${startDate}&end_date=${endDate}`;
+  epicsPath += `state=${epicsState}&start_date=${range.startDate}&end_date=${range.dueDate}`;
 
   if (filterQueryString) {
     epicsPath += `&${filterQueryString}`;

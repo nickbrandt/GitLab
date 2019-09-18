@@ -8,6 +8,9 @@ module Groups
     before_action :check_epics_available!
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]
+    before_action do
+      push_frontend_feature_flag(:roadmap_graphql, @group)
+    end
 
     # show roadmap for a group
     def show

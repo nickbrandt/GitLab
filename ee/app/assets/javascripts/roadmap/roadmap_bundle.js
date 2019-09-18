@@ -3,12 +3,16 @@ import { mapActions } from 'vuex';
 
 import Translate from '~/vue_shared/translate';
 
-import { parseBoolean } from '~/lib/utils/common_utils';
+import {
+  parseBoolean,
+  urlParamsToObject,
+  convertObjectPropsToCamelCase,
+} from '~/lib/utils/common_utils';
 import { visitUrl, mergeUrlParams } from '~/lib/utils/url_utility';
 
 import { PRESET_TYPES, EPIC_DETAILS_CELL_WIDTH } from './constants';
 
-import { getTimeframeForPreset, getEpicsPathForPreset } from './utils/roadmap_utils';
+import { getEpicsPathForPreset, getTimeframeForPreset } from './utils/roadmap_utils';
 
 import createStore from './store';
 
@@ -48,6 +52,11 @@ export default () => {
           ? dataset.presetType
           : PRESET_TYPES.MONTHS;
       const filterQueryString = window.location.search.substring(1);
+      const filterParams = Object.assign(
+        convertObjectPropsToCamelCase(urlParamsToObject(filterQueryString), {
+          dropKeys: ['scope', 'utf8', 'state', 'sort', 'layout'], // These keys are unsupported/unnecessary
+        }),
+      );
       const timeframe = getTimeframeForPreset(
         presetType,
         window.innerWidth - el.offsetLeft - EPIC_DETAILS_CELL_WIDTH,
@@ -66,12 +75,15 @@ export default () => {
         defaultInnerHeight: Number(dataset.innerHeight),
         isChildEpics: parseBoolean(dataset.childEpics),
         currentGroupId: parseInt(dataset.groupId, 0),
+        basePath: dataset.epicsPath,
+        fullPath: dataset.fullPath,
+        epicIid: dataset.iid,
         newEpicEndpoint: dataset.newEpicEndpoint,
         epicsState: dataset.epicsState,
-        basePath: dataset.epicsPath,
         sortedBy: dataset.sortedBy,
         filterQueryString,
         initialEpicsPath,
+        filterParams,
         presetType,
         timeframe,
       };
@@ -79,11 +91,15 @@ export default () => {
     created() {
       this.setInitialData({
         currentGroupId: this.currentGroupId,
+        fullPath: this.fullPath,
+        epicIid: this.epicIid,
         sortedBy: this.sortedBy,
         presetType: this.presetType,
+        epicsState: this.epicsState,
         timeframe: this.timeframe,
         basePath: this.basePath,
         filterQueryString: this.filterQueryString,
+        filterParams: this.filterParams,
         initialEpicsPath: this.initialEpicsPath,
         defaultInnerHeight: this.defaultInnerHeight,
         isChildEpics: this.isChildEpics,

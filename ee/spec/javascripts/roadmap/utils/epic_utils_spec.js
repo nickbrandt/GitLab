@@ -2,7 +2,7 @@ import * as epicUtils from 'ee/roadmap/utils/epic_utils';
 
 import { parsePikadayDate } from '~/lib/utils/datetime_utility';
 
-import { rawEpics } from '../mock_data';
+import { rawEpics, mockGroupEpicsQueryResponse } from '../mock_data';
 
 describe('processEpicDates', () => {
   const timeframeStartDate = new Date(2017, 0, 1);
@@ -87,5 +87,21 @@ describe('formatEpicDetails', () => {
     expect(epic.originalEndDate).toBeUndefined();
     expect(epic.startDateUndefined).toBe(true);
     expect(epic.endDateUndefined).toBe(true);
+  });
+});
+
+describe('extractGroupEpics', () => {
+  it('returns array of epics with `edges->nodes` nesting removed', () => {
+    const { edges } = mockGroupEpicsQueryResponse.data.group.epics;
+    const extractedEpics = epicUtils.extractGroupEpics(edges);
+
+    expect(extractedEpics.length).toBe(edges.length);
+    expect(extractedEpics[0]).toEqual(
+      jasmine.objectContaining({
+        ...edges[0].node,
+        groupName: edges[0].node.group.name,
+        groupFullName: edges[0].node.group.fullName,
+      }),
+    );
   });
 });

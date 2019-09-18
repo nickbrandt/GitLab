@@ -32,8 +32,16 @@ export default {
     },
   },
   data() {
+    const roadmapGraphQL = gon.features && gon.features.roadmapGraphql;
     return {
       handleResizeThrottled: {},
+      // TODO
+      // Remove these method alias and call actual
+      // method once feature flag is removed.
+      fetchEpicsFn: roadmapGraphQL ? this.fetchEpicsGQL : this.fetchEpics,
+      fetchEpicsForTimeframeFn: roadmapGraphQL
+        ? this.fetchEpicsForTimeframeGQL
+        : this.fetchEpicsForTimeframe,
     };
   },
   computed: {
@@ -78,7 +86,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchEpics();
+    this.fetchEpicsFn();
     this.handleResizeThrottled = _.throttle(this.handleResize, 600);
     window.addEventListener('resize', this.handleResizeThrottled, false);
   },
@@ -89,7 +97,9 @@ export default {
     ...mapActions([
       'setWindowResizeInProgress',
       'fetchEpics',
+      'fetchEpicsGQL',
       'fetchEpicsForTimeframe',
+      'fetchEpicsForTimeframeGQL',
       'extendTimeframe',
       'refreshEpicDates',
     ]),
@@ -146,7 +156,7 @@ export default {
       this.refreshEpicDates();
 
       this.$nextTick(() => {
-        this.fetchEpicsForTimeframe({
+        this.fetchEpicsForTimeframeFn({
           timeframe: this.extendedTimeframe,
         })
           .then(() => {

@@ -62,6 +62,46 @@ describe('Roadmap AppComponent', () => {
     it('returns default data props', () => {
       expect(vm.handleResizeThrottled).toBeDefined();
     });
+
+    describe('when `gon.feature.roadmapGraphql` is true', () => {
+      const originalGonFeatures = Object.assign({}, gon.features);
+
+      beforeAll(() => {
+        gon.features = { roadmapGraphql: true };
+      });
+
+      afterAll(() => {
+        gon.features = originalGonFeatures;
+      });
+
+      it('returns data prop containing `fetchEpicsFn` mapped to `fetchEpicsGQL`', () => {
+        expect(vm.fetchEpicsFn).toBe(vm.fetchEpicsGQL);
+      });
+
+      it('returns data prop containing `fetchEpicsForTimeframeFn` mapped to `fetchEpicsForTimeframeGQL`', () => {
+        expect(vm.fetchEpicsForTimeframeFn).toBe(vm.fetchEpicsForTimeframeGQL);
+      });
+    });
+
+    describe('when `gon.feature.roadmapGraphql` is false', () => {
+      const originalGonFeatures = Object.assign({}, gon.features);
+
+      beforeAll(() => {
+        gon.features = { roadmapGraphql: false };
+      });
+
+      afterAll(() => {
+        gon.features = originalGonFeatures;
+      });
+
+      it('returns data prop containing `fetchEpicsFn` mapped to `fetchEpics`', () => {
+        expect(vm.fetchEpicsFn).toBe(vm.fetchEpics);
+      });
+
+      it('returns data prop containing `fetchEpicsForTimeframeFn` mapped to `fetchEpicsForTimeframe`', () => {
+        expect(vm.fetchEpicsForTimeframeFn).toBe(vm.fetchEpicsForTimeframe);
+      });
+    });
   });
 
   describe('computed', () => {
@@ -192,7 +232,7 @@ describe('Roadmap AppComponent', () => {
       it('calls `fetchEpicsForTimeframe` with extended timeframe array', done => {
         spyOn(vm, 'extendTimeframe').and.stub();
         spyOn(vm, 'refreshEpicDates').and.stub();
-        spyOn(vm, 'fetchEpicsForTimeframe').and.callFake(() => new Promise(() => {}));
+        spyOn(vm, 'fetchEpicsForTimeframeFn').and.callFake(() => new Promise(() => {}));
 
         const extendType = EXTEND_AS.PREPEND;
 
@@ -200,7 +240,7 @@ describe('Roadmap AppComponent', () => {
 
         vm.$nextTick()
           .then(() => {
-            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
+            expect(vm.fetchEpicsForTimeframeFn).toHaveBeenCalledWith(
               jasmine.objectContaining({
                 timeframe: vm.extendedTimeframe,
               }),
