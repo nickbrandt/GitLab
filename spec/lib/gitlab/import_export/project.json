@@ -6157,7 +6157,7 @@
       ]
     }
   ],
-  "pipelines": [
+  "ci_pipelines": [
     {
       "id": 36,
       "project_id": 5,
