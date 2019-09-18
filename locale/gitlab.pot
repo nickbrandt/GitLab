@@ -1860,6 +1860,12 @@ msgstr ""
 msgid "Artifact ID"
 msgstr ""
 
+msgid "Artifact could not be deleted."
+msgstr ""
+
+msgid "Artifact was successfully deleted."
+msgstr ""
+
 msgid "Artifacts"
 msgstr ""
 
@@ -14483,6 +14489,9 @@ msgstr ""
 msgid "SortOptions|Due soon"
 msgstr ""
 
+msgid "SortOptions|Expired date"
+msgstr ""
+
 msgid "SortOptions|Label priority"
 msgstr ""
 
@@ -14571,6 +14580,9 @@ msgid "SortOptions|Recent sign in"
 msgstr ""
 
 msgid "SortOptions|Recently starred"
+msgstr ""
+
+msgid "SortOptions|Size"
 msgstr ""
 
 msgid "SortOptions|Sort direction"
