@@ -23,13 +23,12 @@ describe('ProductivityApp component', () => {
 
   const actionSpies = {
     setMetricType: jest.fn(),
+    chartItemClicked: jest.fn(),
     setSortField: jest.fn(),
     setMergeRequestsPage: jest.fn(),
     toggleSortOrder: jest.fn(),
     setColumnMetric: jest.fn(),
   };
-
-  const onMainChartItemClickedMock = jest.fn();
 
   beforeEach(() => {
     wrapper = shallowMount(localVue.extend(ProductivityApp), {
@@ -38,10 +37,11 @@ describe('ProductivityApp component', () => {
       sync: false,
       propsData,
       methods: {
-        onMainChartItemClicked: onMainChartItemClickedMock,
         ...actionSpies,
       },
     });
+
+    jest.spyOn(store, 'dispatch').mockImplementation();
   });
 
   afterEach(() => {
@@ -128,21 +128,32 @@ describe('ProductivityApp component', () => {
                 ).toBe(true);
               });
 
-              it('calls onMainChartItemClicked when chartItemClicked is emitted on the column chart ', () => {
-                const data = {
-                  chart: null,
-                  params: {
-                    data: {
-                      value: [0, 1],
+              describe('when an item on the chart is clicked', () => {
+                beforeEach(() => {
+                  const data = {
+                    chart: null,
+                    params: {
+                      data: {
+                        value: [0, 1],
+                      },
                     },
-                  },
-                };
+                  };
 
-                findTimeToMergeSection()
-                  .find(GlColumnChart)
-                  .vm.$emit('chartItemClicked', data);
+                  findTimeToMergeSection()
+                    .find(GlColumnChart)
+                    .vm.$emit('chartItemClicked', data);
+                });
 
-                expect(onMainChartItemClickedMock).toHaveBeenCalledWith(data);
+                it('dispatches chartItemClicked action', () => {
+                  expect(actionSpies.chartItemClicked).toHaveBeenCalledWith({
+                    chartKey: chartKeys.main,
+                    item: 0,
+                  });
+                });
+
+                it('dispatches setMergeRequestsPage action', () => {
+                  expect(actionSpies.setMergeRequestsPage).toHaveBeenCalledWith(0);
+                });
               });
             });
 
@@ -312,7 +323,7 @@ describe('ProductivityApp component', () => {
             store.state.charts.charts[chartKeys.main].data = { 1: 2, 2: 3 };
           });
 
-          describe('when isLoadingTable is true', () => {
+          describe('when table is loading', () => {
             beforeEach(() => {
               store.state.table.isLoadingTable = true;
             });
@@ -326,51 +337,87 @@ describe('ProductivityApp component', () => {
             });
           });
 
-          describe('when isLoadingTable is false', () => {
+          describe('when table finished loading', () => {
             beforeEach(() => {
               store.state.table.isLoadingTable = false;
-              store.state.table.mergeRequests = [{ id: 1, title: 'This is a test MR' }];
             });
 
-            it('renders the MR table', () => {
-              expect(findMrTable().exists()).toBe(true);
-            });
-
-            it('should change the column metric', () => {
-              findMrTable().vm.$emit('columnMetricChange', 'time_to_first_comment');
-              expect(actionSpies.setColumnMetric).toHaveBeenCalledWith('time_to_first_comment');
-            });
-
-            it('should change the page', () => {
-              const page = 2;
-              findMrTable().vm.$emit('pageChange', page);
-              expect(actionSpies.setMergeRequestsPage).toHaveBeenCalledWith(page);
-            });
-
-            describe('and there are merge requests available', () => {
+            describe('and the table has data', () => {
               beforeEach(() => {
-                store.state.table.mergeRequests = [{ id: 1 }];
+                store.state.table.mergeRequests = [{ id: 1, title: 'This is a test MR' }];
               });
 
-              describe('sort controls', () => {
-                it('renders the sort dropdown and button', () => {
-                  expect(findSortFieldDropdown().exists()).toBe(true);
-                  expect(findSortOrderToggle().exists()).toBe(true);
+              it('renders the MR table', () => {
+                expect(findMrTable().exists()).toBe(true);
+              });
+
+              it('doesn’t render a "no data" message', () => {
+                expect(
+                  findMrTableSection()
+                    .find('.js-no-data')
+                    .exists(),
+                ).toBe(false);
+              });
+
+              it('should change the column metric', () => {
+                findMrTable().vm.$emit('columnMetricChange', 'time_to_first_comment');
+                expect(actionSpies.setColumnMetric).toHaveBeenCalledWith('time_to_first_comment');
+              });
+
+              it('should change the page', () => {
+                const page = 2;
+                findMrTable().vm.$emit('pageChange', page);
+                expect(actionSpies.setMergeRequestsPage).toHaveBeenCalledWith(page);
+              });
+
+              describe('and there are merge requests available', () => {
+                beforeEach(() => {
+                  store.state.table.mergeRequests = [{ id: 1 }];
                 });
 
-                it('should change the sort field', () => {
-                  findSortFieldDropdown()
-                    .findAll(GlDropdownItem)
-                    .at(0)
-                    .vm.$emit('click');
+                describe('sort controls', () => {
+                  it('renders the sort dropdown and button', () => {
+                    expect(findSortFieldDropdown().exists()).toBe(true);
+                    expect(findSortOrderToggle().exists()).toBe(true);
+                  });
 
-                  expect(actionSpies.setSortField).toHaveBeenCalled();
-                });
+                  it('should change the sort field', () => {
+                    findSortFieldDropdown()
+                      .findAll(GlDropdownItem)
+                      .at(0)
+                      .vm.$emit('click');
 
-                it('should toggle the sort order', () => {
-                  findSortOrderToggle().vm.$emit('click');
-                  expect(actionSpies.toggleSortOrder).toHaveBeenCalled();
+                    expect(actionSpies.setSortField).toHaveBeenCalled();
+                  });
+
+                  it('should toggle the sort order', () => {
+                    findSortOrderToggle().vm.$emit('click');
+                    expect(actionSpies.toggleSortOrder).toHaveBeenCalled();
+                  });
                 });
+              });
+            });
+
+            describe("and the table doesn't have any data", () => {
+              beforeEach(() => {
+                store.state.table.mergeRequests = [];
+              });
+
+              it('renders a "no data" message', () => {
+                expect(
+                  findMrTableSection()
+                    .find('.js-no-data')
+                    .exists(),
+                ).toBe(true);
+              });
+
+              it('doesn`t render the MR table', () => {
+                expect(findMrTable().exists()).not.toBe(true);
+              });
+
+              it('doesn`t render the sort dropdown and button', () => {
+                expect(findSortFieldDropdown().exists()).not.toBe(true);
+                expect(findSortOrderToggle().exists()).not.toBe(true);
               });
             });
           });
