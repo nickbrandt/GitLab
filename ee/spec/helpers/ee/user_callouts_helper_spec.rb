@@ -168,6 +168,26 @@ describe EE::UserCalloutsHelper do
     end
   end
 
+  describe '.show_privacy_policy_update?' do
+    subject { helper.show_privacy_policy_update? }
+
+    context 'when user has not dismissed' do
+      before do
+        allow(helper).to receive(:user_dismissed?).and_return(false)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'when user dismissed' do
+      before do
+        allow(helper).to receive(:user_dismissed?).and_return(true)
+      end
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe '#render_dashboard_gold_trial' do
     using RSpec::Parameterized::TableSyntax
 
