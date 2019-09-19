@@ -125,6 +125,7 @@ export default {
           </pre>
         </div>
         <div class="commit-actions flex-row">
+          <div v-if="commit.signatureHtml" v-html="commit.signatureHtml"></div>
           <gl-link
             v-if="commit.latestPipeline"
             v-gl-tooltip
