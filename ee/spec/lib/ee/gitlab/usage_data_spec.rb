@@ -152,6 +152,24 @@ describe Gitlab::UsageData do
         end
       end
 
+      context 'for release' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user = create(:user)
+          create(:deployment, :failed, user: user)
+          create(:project, :mirror, mirror_trigger_builds: true)
+          create(:release, author: user)
+          create(:deployment, :success, user: user)
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:release]).to eq(
+            deployments: 1,
+            failed_deployments: 1,
+            projects_mirrored_with_pipelines_enabled: 1,
+            releases: 1,
+            successful_deployments: 1
+          )
+        end
+      end
+
       context 'for verify' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
