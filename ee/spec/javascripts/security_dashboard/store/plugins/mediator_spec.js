@@ -35,24 +35,24 @@ describe('mediator', () => {
   it('triggers fetching vulnerabilities after filters change', () => {
     spyOn(store, 'dispatch');
 
-    const activeFilters = store.getters['filters/activeFilters'];
+    const payload = {
+      ...store.getters['filters/activeFilters'],
+      page: store.state.vulnerabilities.pageInfo.page,
+    };
 
     store.commit(`filters/${filtersMutationTypes.SET_ALL_FILTERS}`, {});
 
     expect(store.dispatch).toHaveBeenCalledTimes(3);
-    expect(store.dispatch).toHaveBeenCalledWith(
-      'vulnerabilities/fetchVulnerabilities',
-      activeFilters,
-    );
+    expect(store.dispatch).toHaveBeenCalledWith('vulnerabilities/fetchVulnerabilities', payload);
 
     expect(store.dispatch).toHaveBeenCalledWith(
       'vulnerabilities/fetchVulnerabilitiesCount',
-      activeFilters,
+      payload,
     );
 
     expect(store.dispatch).toHaveBeenCalledWith(
       'vulnerabilities/fetchVulnerabilitiesHistory',
-      activeFilters,
+      payload,
     );
   });
 

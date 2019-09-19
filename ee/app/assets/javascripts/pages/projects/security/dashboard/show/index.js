@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import createStore from 'ee/security_dashboard/store';
+import router from 'ee/security_dashboard/store/router';
 import SecurityReportApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
 
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   return new Vue({
     el: securityTab,
     store,
+    router,
     components: {
       SecurityReportApp,
     },

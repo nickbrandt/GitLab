@@ -1,17 +1,8 @@
-import {
-  SET_VULNERABILITIES_HISTORY_DAY_RANGE,
-  RECEIVE_VULNERABILITIES_SUCCESS,
-} from '../modules/vulnerabilities/mutation_types';
-
 /**
  * Vuex store plugin to sync some Group Security Dashboard view settings with the URL.
  */
 export default router => store => {
   let syncingRouter = false;
-  const MUTATION_TYPES = [
-    `vulnerabilities/${SET_VULNERABILITIES_HISTORY_DAY_RANGE}`,
-    `vulnerabilities/${RECEIVE_VULNERABILITIES_SUCCESS}`,
-  ];
 
   // Update store from routing events
   router.beforeEach((to, from, next) => {
@@ -19,15 +10,13 @@ export default router => store => {
 
     if (to.name === 'dashboard' && !updatedFromState) {
       syncingRouter = true;
-      store.dispatch(`filters/setAllFilters`, to.query);
-      const page = parseInt(to.query.page, 10);
-      if (Number.isFinite(page)) {
-        store.dispatch(`vulnerabilities/setVulnerabilitiesPage`, page);
-      }
+      const page = parseInt(to.query.page, 10) || 1;
+      store.dispatch(`vulnerabilities/setVulnerabilitiesPage`, page);
       const dayRange = parseInt(to.query.days, 10);
       if (Number.isFinite(dayRange)) {
         store.dispatch(`vulnerabilities/setVulnerabilitiesHistoryDayRange`, dayRange);
       }
+      store.dispatch(`filters/setAllFilters`, to.query);
       syncingRouter = false;
     }
 
@@ -35,16 +24,36 @@ export default router => store => {
   });
 
   // Update router from store mutations
-  store.subscribe(({ type }) => {
-    if (!syncingRouter && MUTATION_TYPES.includes(type)) {
-      const activeFilters = store.getters['filters/activeFilters'];
-      const { page } = store.state.vulnerabilities.pageInfo;
-      const days = store.state.vulnerabilities.vulnerabilitiesHistoryDayRange;
-      store.$router.push({
-        name: 'dashboard',
-        query: { ...activeFilters, page, days },
-        params: { updatedFromState: true },
-      });
+  const updateRouter = (queryParams = {}) => {
+    const activeFilters = store.getters['filters/activeFilters'];
+    const routePayload = {
+      name: 'dashboard',
+      query: {
+        ...activeFilters,
+        page: store.state.vulnerabilities.pageInfo.page,
+        days: store.state.vulnerabilities.vulnerabilitiesHistoryDayRange,
+        ...queryParams,
+      },
+      params: { updatedFromState: true },
+    };
+    const resolvedRoute = router.resolve(routePayload);
+    if (resolvedRoute.route.fullPath !== router.currentRoute.fullPath) {
+      router.push(routePayload);
+    }
+  };
+
+  store.subscribeAction(({ type, payload }) => {
+    if (syncingRouter) {
+      return;
+    }
+    switch (type) {
+      case `vulnerabilities/fetchVulnerabilities`:
+        updateRouter({ page: payload.page });
+        break;
+      case `vulnerabilities/setVulnerabilitiesHistoryDayRange`:
+        updateRouter({ days: payload });
+        break;
+      default:
     }
   });
 };
