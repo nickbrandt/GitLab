@@ -4,7 +4,7 @@
 - push_rule = local_assigns.fetch(:push_rule)
 
 .form-check
-  = form.check_box :commit_committer_check, class: "form-check-input", disabled: !can_change_push_rule?(form.object, :commit_committer_check)
+  = form.check_box :commit_committer_check, class: "form-check-input", disabled: !can_change_push_rule?(form.object, :commit_committer_check), data: { qa_selector: 'committer_restriction_checkbox' }
   = form.label :commit_committer_check, class: "label-bold form-check-label" do
     = s_("PushRule|Committer restriction")
   %p.text-muted

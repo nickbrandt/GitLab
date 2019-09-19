@@ -1,7 +1,7 @@
 - return unless @project.feature_available?(:push_rules)
 
 - expanded = expanded_by_default?
-%section.settings.no-animate#js-push-rules{ class: ('expanded' if expanded) }
+%section.settings.no-animate#js-push-rules{ class: ('expanded' if expanded), data: { qa_selector: 'push_rules_content' } }
   .settings-header
     %h4
       Push Rules
