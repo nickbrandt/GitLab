@@ -14044,10 +14044,10 @@ msgstr ""
 msgid "Set up CI/CD"
 msgstr ""
 
-msgid "Set up a %{type} Runner manually"
+msgid "Set up a %{type} Runner automatically"
 msgstr ""
 
-msgid "Set up a specific Runner automatically"
+msgid "Set up a %{type} Runner manually"
 msgstr ""
 
 msgid "Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}"
