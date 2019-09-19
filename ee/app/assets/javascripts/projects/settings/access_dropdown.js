@@ -445,7 +445,7 @@ export default class AccessDropdown {
         break;
     }
 
-    const isActive = _.findWhere(this.getSelectedItems(), criteria) ? 'is-active' : '';
+    const isActive = _.find(this.getSelectedItems(), criteria) ? 'is-active' : '';
 
     switch (item.type) {
       case LEVEL_TYPES.USER:
