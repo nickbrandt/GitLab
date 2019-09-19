@@ -33,19 +33,25 @@ describe('Productivity analytics table mutations', () => {
       });
 
       expect(state.isLoadingTable).toBe(false);
-      expect(state.hasError).toBe(false);
+      expect(state.errorCode).toBe(null);
       expect(state.mergeRequests).toEqual(mockMergeRequests);
       expect(state.pageInfo).toEqual(pageInfo);
     });
   });
 
   describe(types.RECEIVE_MERGE_REQUESTS_ERROR, () => {
-    it('sets hasError to error code and clears data', () => {
-      const errorCode = 500;
+    const errorCode = 500;
+    beforeEach(() => {
       mutations[types.RECEIVE_MERGE_REQUESTS_ERROR](state, errorCode);
+    });
 
+    it('sets errorCode to 500', () => {
       expect(state.isLoadingTable).toBe(false);
-      expect(state.hasError).toBe(errorCode);
+      expect(state.errorCode).toBe(errorCode);
+    });
+
+    it('clears data', () => {
+      expect(state.isLoadingTable).toBe(false);
       expect(state.mergeRequests).toEqual([]);
       expect(state.pageInfo).toEqual({});
     });

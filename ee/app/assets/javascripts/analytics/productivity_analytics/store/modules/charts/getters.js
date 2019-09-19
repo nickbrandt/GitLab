@@ -111,7 +111,7 @@ export const isSelectedMetric = state => ({ metric, chartKey }) =>
   state.charts[chartKey].params.metricType === metric;
 
 export const hasNoAccessError = state =>
-  state.charts[chartKeys.main].hasError === httpStatus.FORBIDDEN;
+  state.charts[chartKeys.main].errorCode === httpStatus.FORBIDDEN;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

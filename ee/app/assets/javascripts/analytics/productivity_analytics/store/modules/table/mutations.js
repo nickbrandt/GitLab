@@ -7,13 +7,13 @@ export default {
   },
   [types.RECEIVE_MERGE_REQUESTS_SUCCESS](state, { pageInfo, mergeRequests }) {
     state.isLoadingTable = false;
-    state.hasError = false;
+    state.errorCode = null;
     state.pageInfo = pageInfo;
     state.mergeRequests = mergeRequests;
   },
   [types.RECEIVE_MERGE_REQUESTS_ERROR](state, errCode) {
     state.isLoadingTable = false;
-    state.hasError = errCode;
+    state.errorCode = errCode;
     state.pageInfo = {};
     state.mergeRequests = [];
   },

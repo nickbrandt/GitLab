@@ -10,12 +10,12 @@ export default {
   },
   [types.RECEIVE_CHART_DATA_SUCCESS](state, { chartKey, data }) {
     state.charts[chartKey].isLoading = false;
-    state.charts[chartKey].hasError = false;
+    state.charts[chartKey].errorCode = null;
     state.charts[chartKey].data = data;
   },
   [types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status }) {
     state.charts[chartKey].isLoading = false;
-    state.charts[chartKey].hasError = status;
+    state.charts[chartKey].errorCode = status;
     state.charts[chartKey].data = {};
   },
   [types.SET_METRIC_TYPE](state, { chartKey, metricType }) {

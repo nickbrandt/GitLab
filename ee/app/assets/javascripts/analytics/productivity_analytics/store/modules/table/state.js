@@ -2,7 +2,7 @@ import { tableSortOrder } from '../../../constants';
 
 export default () => ({
   isLoadingTable: false,
-  hasError: false,
+  errorCode: null,
   mergeRequests: [],
   pageInfo: {},
   sortOrder: tableSortOrder.asc.value,

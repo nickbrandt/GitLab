@@ -179,13 +179,13 @@ describe('Productivity analytics chart getters', () => {
   });
 
   describe('hasNoAccessError', () => {
-    it('returns true if "hasError" is set to 403', () => {
-      state.charts[chartKeys.main].hasError = 403;
+    it('returns true if errorCode is set to 403', () => {
+      state.charts[chartKeys.main].errorCode = 403;
       expect(getters.hasNoAccessError(state)).toEqual(true);
     });
 
-    it('returns false if "hasError" is not set to 403', () => {
-      state.charts[chartKeys.main].hasError = false;
+    it('returns false if errorCode is not set to 403', () => {
+      state.charts[chartKeys.main].errorCode = null;
       expect(getters.hasNoAccessError(state)).toEqual(false);
     });
   });

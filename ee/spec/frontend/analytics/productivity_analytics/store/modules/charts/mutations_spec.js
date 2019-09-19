@@ -34,18 +34,24 @@ describe('Productivity analytics chart mutations', () => {
       mutations[types.RECEIVE_CHART_DATA_SUCCESS](state, { chartKey, data: mockHistogramData });
 
       expect(state.charts[chartKey].isLoading).toBe(false);
-      expect(state.charts[chartKey].hasError).toBe(false);
+      expect(state.charts[chartKey].errorCode).toBe(null);
       expect(state.charts[chartKey].data).toEqual(mockHistogramData);
     });
   });
 
   describe(types.RECEIVE_CHART_DATA_ERROR, () => {
-    it('sets isError to error code and clears data', () => {
-      const status = 500;
+    const status = 500;
+    beforeEach(() => {
       mutations[types.RECEIVE_CHART_DATA_ERROR](state, { chartKey, status });
+    });
 
+    it('sets errorCode to 500', () => {
       expect(state.charts[chartKey].isLoading).toBe(false);
-      expect(state.charts[chartKey].hasError).toBe(status);
+      expect(state.charts[chartKey].errorCode).toBe(status);
+    });
+
+    it('clears data', () => {
+      expect(state.charts[chartKey].isLoading).toBe(false);
       expect(state.charts[chartKey].data).toEqual({});
     });
   });
