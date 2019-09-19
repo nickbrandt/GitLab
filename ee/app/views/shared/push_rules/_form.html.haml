@@ -3,7 +3,7 @@
 = render 'shared/push_rules/reject_unsigned_commits_setting', form: f, push_rule: f.object
 
 .form-check
-  = f.check_box :deny_delete_tag, class: "form-check-input"
+  = f.check_box :deny_delete_tag, class: "form-check-input", data: { qa_selector: 'deny_delete_tag_checkbox' }
   = f.label :deny_delete_tag, class: "label-bold form-check-label" do
     Do not allow users to remove git tags with
     %code git push
@@ -11,14 +11,14 @@
     Tags can still be deleted through the web UI.
 
 .form-check
-  = f.check_box :member_check, class: "form-check-input"
+  = f.check_box :member_check, class: "form-check-input", data: { qa_selector: 'restrict_author_checkbox' }
   = f.label :member_check, "Check whether author is a GitLab user", class: "label-bold form-check-label"
   %p.text-muted
     Restrict commits by author (email) to existing GitLab users
 
 
 .form-check
-  = f.check_box :prevent_secrets, class: "form-check-input"
+  = f.check_box :prevent_secrets, class: "form-check-input", data: { qa_selector: 'prevent_secrets_checkbox' }
   = f.label :prevent_secrets, "Prevent committing secrets to Git", class: "label-bold form-check-label"
   %p.text-muted
     GitLab will reject any files that are likely to contain secrets.
@@ -26,7 +26,7 @@
 
 .form-group
   = f.label :commit_message_regex, "Commit message", class: "label-bold"
-  = f.text_field :commit_message_regex, class: "form-control", placeholder: 'Example: Fixes \d+\..*'
+  = f.text_field :commit_message_regex, class: "form-control", placeholder: 'Example: Fixes \d+\..*', data: { qa_selector: 'commit_message_field' }
   .form-text.text-muted
     All commit messages must match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
@@ -36,7 +36,7 @@
 
 .form-group
   = f.label :commit_message_negative_regex, "Commit message negative match", class: 'label-bold'
-  = f.text_field :commit_message_negative_regex, class: "form-control", placeholder: 'Example: ssh\:\/\/'
+  = f.text_field :commit_message_negative_regex, class: "form-control", placeholder: 'Example: ssh\:\/\/', data: { qa_selector: 'deny_commit_message_field' }
   .form-text.text-muted
     No commit message is allowed to match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
@@ -46,7 +46,7 @@
 
 .form-group
   = f.label :branch_name_regex, "Branch name", class: "label-bold"
-  = f.text_field :branch_name_regex, class: "form-control", placeholder: 'Example: (feature|hotfix)\/*'
+  = f.text_field :branch_name_regex, class: "form-control", placeholder: 'Example: (feature|hotfix)\/*', data: { qa_selector: 'branch_name_field' }
   .form-text.text-muted
     All branch names must match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
@@ -55,7 +55,7 @@
 
 .form-group
   = f.label :author_email_regex, "Commit author's email", class: "label-bold"
-  = f.text_field :author_email_regex, class: "form-control", placeholder: 'Example: @my-company.com$'
+  = f.text_field :author_email_regex, class: "form-control", placeholder: 'Example: @my-company.com$', data: { qa_selector: 'author_email_field' }
   .form-text.text-muted
     All commit author's email must match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
@@ -64,7 +64,7 @@
 
 .form-group
   = f.label :file_name_regex, "Prohibited file names", class: "label-bold"
-  = f.text_field :file_name_regex, class: "form-control", placeholder: 'Example: (jar|exe)$'
+  = f.text_field :file_name_regex, class: "form-control", placeholder: 'Example: (jar|exe)$', data: { qa_selector: 'file_name_field' }
   .form-text.text-muted
     All commited filenames must not match this
     = link_to 'regular expression', 'https://github.com/google/re2/wiki/Syntax'
@@ -73,9 +73,9 @@
 
 .form-group
   = f.label :max_file_size, "Maximum file size (MB)", class: "label-bold"
-  = f.number_field :max_file_size, class: "form-control", min: 0
+  = f.number_field :max_file_size, class: "form-control", min: 0, data: { qa_selector: 'file_size_field' }
   .form-text.text-muted
     Pushes that contain added or updated files that exceed this file size are rejected.
     Set to 0 to allow files of any size.
 
-= f.submit "Save Push Rules", class: "btn btn-success"
+= f.submit "Save Push Rules", class: "btn btn-success", data: { qa_selector: 'submit_settings_button' }
