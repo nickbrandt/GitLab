@@ -75,12 +75,6 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
       end
     end
 
-    it 'invoke rss_within_range? twice' do
-      expect(memory_killer).to receive(:rss_within_range?).twice
-
-      subject
-    end
-
     it 'not invoke restart_sidekiq when rss in range' do
       expect(memory_killer).to receive(:rss_within_range?).twice.and_return(true)
 
