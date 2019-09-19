@@ -150,7 +150,7 @@ function getBaseConfig (type) {
     },
   
     resolve: {
-      extensions: isLegacy ? ['.js', '.gql', '.graphql'] : ['.mjs', '.js', '.gql', '.graphql'],
+      extensions: isLegacy ? ['.js', '.gql', '.graphql'] : ['*', '.mjs', '.js', '.vue', '.gql', '.graphql'],
       alias,
     },
   
@@ -177,7 +177,7 @@ function getBaseConfig (type) {
               webpack.version,
               VUE_VERSION,
               VUE_LOADER_VERSION,
-            ].join('|'),
+            ].join('|')
           },
         },
         {
