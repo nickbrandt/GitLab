@@ -246,14 +246,14 @@ describe 'Group Cycle Analytics', :js do
           expect(page).to have_text('Add a stage')
         end
 
-        it 'becomes active when clicked ' do
-          btn = page.find('.js-add-stage-button')
+        it 'becomes active when clicked' do
+          button_class = '.js-add-stage-button'
 
-          expect(btn[:class]).not_to include('active')
+          expect(page).not_to have_selector("#{button_class}.active")
 
-          btn.click
+          page.find(button_class).click
 
-          expect(btn[:class]).to include('active')
+          expect(page).to have_selector("#{button_class}.active")
         end
 
         it 'displays the custom stage form when clicked' do
