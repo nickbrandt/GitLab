@@ -1,4 +1,5 @@
 export const SET_INITIAL_DATA = 'SET_INITIAL_DATA';
+export const SET_ISSUE_ID = 'SET_ISSUE_ID';
 
 export const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
 

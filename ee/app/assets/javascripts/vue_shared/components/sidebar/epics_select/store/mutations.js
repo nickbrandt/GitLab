@@ -8,6 +8,10 @@ export default {
     state.selectedEpicIssueId = selectedEpicIssueId;
   },
 
+  [types.SET_ISSUE_ID](state, issueId) {
+    state.issueId = issueId;
+  },
+
   [types.SET_SEARCH_QUERY](state, searchQuery) {
     state.searchQuery = searchQuery;
   },
