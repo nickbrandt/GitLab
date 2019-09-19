@@ -1,14 +1,14 @@
 <script>
 import { s__ } from '~/locale';
 import { mapActions, mapState } from 'vuex';
-import GlModal from '~/vue_shared/components/gl_modal.vue';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 import LicensePackages from './license_packages.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 
 export default {
   name: 'LicenseSetApprovalStatusModal',
-  components: { SafeLink, LicensePackages, GlModal },
+  components: { SafeLink, LicensePackages, GlModal: DeprecatedModal2 },
   computed: {
     ...mapState(['currentLicenseInModal', 'canManageLicenses']),
     headerTitleText() {

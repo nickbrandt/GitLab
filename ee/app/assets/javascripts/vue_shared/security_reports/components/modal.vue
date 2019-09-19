@@ -1,6 +1,6 @@
 <script>
 import { __ } from '~/locale';
-import Modal from '~/vue_shared/components/gl_modal.vue';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 
 import DismissalNote from 'ee/vue_shared/security_reports/components/dismissal_note.vue';
@@ -22,7 +22,7 @@ export default {
     ExpandButton,
     IssueNote,
     MergeRequestNote,
-    Modal,
+    Modal: DeprecatedModal2,
     ModalFooter,
     SolutionCard,
     VulnerabilityDetails,
