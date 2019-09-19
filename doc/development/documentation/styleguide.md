@@ -235,9 +235,10 @@ Do not include the same information in multiple places. [Link to a SSOT instead.
 - Do not use contractions.
   - Instead of "don't", "can't", "doesn't", and so on, say "do not", "cannot", or "does not."
   - Possible exceptions are cases when a more familiar tone is desired, such as a blog post or other casual context.
-- Do not use slashes to clump different words together.
+- Do not use slashes to clump different words together or as a replacement for the word "or."
   - Instead of "and/or", consider saying "or", or use another sensible construction.
-  - Other examples include "author/asignee" and "namespace/repository name". Break apart any such instances in an appropriate way.
+  - Other examples include "clone/fetch," author/asignee," and "namespace/repository name." Break apart any such instances in an appropriate way.
+  - Exceptions to this rule include commonly accepted technical terms such as CI/CD, TCP/IP, and so on.
 - Do not use "may" and "might" interchangeably.
   - Use "might" to indicate the probability of something occurring. "If you skip this step, the import process might fail."
   - Use "may" to indicate giving permission for someone to do something, or consider using "can", instead. "You may select either option on this screen." Or, "you can select either option on this screen."
