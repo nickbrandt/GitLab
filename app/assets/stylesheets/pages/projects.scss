@@ -882,6 +882,10 @@ pre.light-well {
 
     .project-row {
       display: block;
+
+      .description > p {
+        margin-bottom: 0;
+      }
     }
   }
 
