@@ -152,6 +152,16 @@ describe Project do
         expect(described_class.with_github_service_pipeline_events).not_to include(project_without_github_service_pipeline_events)
       end
     end
+
+    describe '.with_active_prometheus_service' do
+      it 'returns the correct project' do
+        project_with_active_prometheus_service = create(:prometheus_project)
+        project_without_active_prometheus_service = create(:project)
+
+        expect(described_class.with_active_prometheus_service).to include(project_with_active_prometheus_service)
+        expect(described_class.with_active_prometheus_service).not_to include(project_without_active_prometheus_service)
+      end
+    end
   end
 
   describe 'validations' do

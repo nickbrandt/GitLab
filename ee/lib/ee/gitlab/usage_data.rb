@@ -185,6 +185,7 @@ module EE
             usage_activity_by_stage: {
               create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
+              monitor: usage_activity_by_stage_monitor,
               plan: usage_activity_by_stage_plan,
               verify: usage_activity_by_stage_verify
             }
@@ -213,6 +214,18 @@ module EE
             groups: ::GroupMember.distinct_count_by(:user_id),
             ldap_keys: ::LDAPKey.distinct_count_by(:user_id),
             ldap_users: ::GroupMember.of_ldap_type.distinct_count_by(:user_id)
+          }
+        end
+
+        def usage_activity_by_stage_monitor
+          {
+            clusters: ::Clusters::Cluster.distinct_count_by(:user_id),
+            clusters_applications_prometheus: ::Clusters::Applications::Prometheus.distinct_by_user,
+            operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations')),
+            operations_dashboard_users_with_projects_added: count(UsersOpsDashboardProject.distinct_users(::User.active)),
+            projects_prometheus_active: ::Project.with_active_prometheus_service.distinct_count_by(:creator_id),
+            projects_with_error_tracking_enabled: ::Project.with_enabled_error_tracking.distinct_count_by(:creator_id),
+            projects_with_tracing_enabled: ::Project.with_tracing_enabled.distinct_count_by(:creator_id)
           }
         end
 
