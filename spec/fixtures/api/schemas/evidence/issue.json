@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "description",
+    "author",
+    "state",
+    "confidential",
+    "created_at",
+    "due_date"
+  ],
+  "properties": {
+    "id": { "type": "integer" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "author": { "$ref": "author.json" },
+    "state": { "type": "string" },
+    "confidential": { "type": "boolean" },
+    "created_at": { "type": "date" },
+    "due_date": { "type": "date" }
+  }
+}
