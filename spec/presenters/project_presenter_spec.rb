@@ -429,5 +429,22 @@ describe ProjectPresenter do
         a_string_including('CONTRIBUTING')
       )
     end
+
+    context 'empty repo' do
+      let(:project) { create(:project, :repository) }
+
+      it 'orders the items correctly in an empty project' do
+        project.add_developer(user)
+        allow(project).to receive(:auto_devops_enabled?).and_return(false)
+        buttons = presenter.empty_repo_statistics_buttons
+        expect(buttons.map(&:label)).to start_with(
+          a_string_including('New'),
+          a_string_including('README'),
+          a_string_including('CHANGELOG'),
+          a_string_including('CONTRIBUTING'),
+          a_string_including('CI/CD')
+        )
+      end
+    end
   end
 end
