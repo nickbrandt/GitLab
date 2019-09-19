@@ -14,14 +14,13 @@ import {
 
 describe('Cycle analytics mutations', () => {
   it.each`
-    mutation                                    | stateKey                 | value
-    ${types.REQUEST_STAGE_DATA}                 | ${'isLoadingStage'}      | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}           | ${'isEmptyStage'}        | ${true}
-    ${types.RECEIVE_STAGE_DATA_ERROR}           | ${'isLoadingStage'}      | ${false}
-    ${types.REQUEST_CYCLE_ANALYTICS_DATA}       | ${'isLoading'}           | ${true}
-    ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR} | ${'isLoading'}           | ${false}
-    ${types.SHOW_CUSTOM_STAGE_FORM}             | ${'isAddingCustomStage'} | ${true}
-    ${types.HIDE_CUSTOM_STAGE_FORM}             | ${'isAddingCustomStage'} | ${false}
+    mutation                              | stateKey                 | value
+    ${types.REQUEST_STAGE_DATA}           | ${'isLoadingStage'}      | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}     | ${'isEmptyStage'}        | ${true}
+    ${types.RECEIVE_STAGE_DATA_ERROR}     | ${'isLoadingStage'}      | ${false}
+    ${types.REQUEST_CYCLE_ANALYTICS_DATA} | ${'isLoading'}           | ${true}
+    ${types.SHOW_CUSTOM_STAGE_FORM}       | ${'isAddingCustomStage'} | ${true}
+    ${types.HIDE_CUSTOM_STAGE_FORM}       | ${'isAddingCustomStage'} | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     const state = {};
     mutations[mutation](state);
@@ -60,7 +59,7 @@ describe('Cycle analytics mutations', () => {
   });
 
   describe(`${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS}`, () => {
-    it('will set isLoading=false', () => {
+    it('will set isLoading=false and errorCode=null', () => {
       const state = {};
 
       mutations[types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS](state, {
@@ -69,6 +68,7 @@ describe('Cycle analytics mutations', () => {
         stages: [],
       });
 
+      expect(state.errorCode).toBe(null);
       expect(state.isLoading).toBe(false);
     });
 
@@ -108,6 +108,18 @@ describe('Cycle analytics mutations', () => {
           { value: '-', title: 'Deploys' },
         ]);
       });
+    });
+  });
+
+  describe(`${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR}`, () => {
+    it('sets errorCode correctly', () => {
+      const state = {};
+      const errorCode = 403;
+
+      mutations[types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR](state, errorCode);
+
+      expect(state.isLoading).toBe(false);
+      expect(state.errorCode).toBe(errorCode);
     });
   });
 });

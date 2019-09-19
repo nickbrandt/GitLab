@@ -12,6 +12,7 @@ export default () => ({
   isLoadingStage: false,
 
   isEmptyStage: false,
+  errorCode: null,
 
   isAddingCustomStage: false,
 

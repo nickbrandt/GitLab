@@ -47,9 +47,12 @@ export default {
       const { name } = state.stages[0];
       state.selectedStageName = name;
     }
+
+    state.errorCode = null;
     state.isLoading = false;
   },
-  [types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR](state) {
+  [types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR](state, errCode) {
+    state.errorCode = errCode;
     state.isLoading = false;
   },
   [types.REQUEST_STAGE_DATA](state) {

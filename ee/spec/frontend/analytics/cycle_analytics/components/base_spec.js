@@ -10,18 +10,18 @@ import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_drop
 import DateRangeDropdown from 'ee/analytics/shared/components/date_range_dropdown.vue';
 import SummaryTable from 'ee/analytics/cycle_analytics/components/summary_table.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
-import { TEST_HOST } from 'helpers/test_constants';
 import 'bootstrap';
 import '~/gl_dropdown';
 import * as mockData from '../mock_data';
 
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
+const emptyStateSvgPath = 'path/to/empty/state';
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('Cycle Analytics component', () => {
-  const emptyStateSvgPath = `${TEST_HOST}/images/home/nasa.svg`;
   let wrapper;
   let mock;
 
@@ -47,7 +47,10 @@ describe('Cycle Analytics component', () => {
   describe('displays the components as required', () => {
     describe('before a filter has been selected', () => {
       it('displays an empty state', () => {
-        expect(wrapper.find(GlEmptyState).exists()).toBe(true);
+        const emptyState = wrapper.find(GlEmptyState);
+
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.props('svgPath')).toBe(emptyStateSvgPath);
       });
 
       it('displays the groups filter', () => {
@@ -61,35 +64,54 @@ describe('Cycle Analytics component', () => {
     });
 
     describe('after a filter has been selected', () => {
-      beforeEach(() => {
-        wrapper.vm.$store.dispatch('setSelectedGroup', {
-          ...mockData.group,
+      describe('the user has access to the group', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.dispatch('setSelectedGroup', {
+            ...mockData.group,
+          });
+
+          wrapper.vm.$store.dispatch('receiveCycleAnalyticsDataSuccess', {
+            ...mockData.cycleAnalyticsData,
+          });
+
+          wrapper.vm.$store.dispatch('receiveStageDataSuccess', {
+            events: mockData.issueEvents,
+          });
         });
 
-        wrapper.vm.$store.dispatch('receiveCycleAnalyticsDataSuccess', {
-          ...mockData.cycleAnalyticsData,
+        it('hides the empty state', () => {
+          expect(wrapper.find(GlEmptyState).exists()).toBe(false);
         });
 
-        wrapper.vm.$store.dispatch('receiveStageDataSuccess', {
-          events: mockData.issueEvents,
+        it('displays the projects and timeframe filters', () => {
+          expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(true);
+          expect(wrapper.find(DateRangeDropdown).exists()).toBe(true);
+        });
+
+        it('displays summary table', () => {
+          expect(wrapper.find(SummaryTable).exists()).toBe(true);
+        });
+
+        it('displays the stage table', () => {
+          expect(wrapper.find(StageTable).exists()).toBe(true);
         });
       });
 
-      it('hides the empty state', () => {
-        expect(wrapper.find(GlEmptyState).exists()).toBe(false);
-      });
+      describe('the user does not have access to the group', () => {
+        beforeEach(() => {
+          wrapper.vm.$store.dispatch('setSelectedGroup', {
+            ...mockData.group,
+          });
 
-      it('displays the projects and timeframe filters', () => {
-        expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(true);
-        expect(wrapper.find(DateRangeDropdown).exists()).toBe(true);
-      });
+          wrapper.vm.$store.state.errorCode = 403;
+        });
 
-      it('displays summary table', () => {
-        expect(wrapper.find(SummaryTable).exists()).toBe(true);
-      });
+        it('renders the no access information', () => {
+          const emptyState = wrapper.find(GlEmptyState);
 
-      it('displays the stage table', () => {
-        expect(wrapper.find(StageTable).exists()).toBe(true);
+          expect(emptyState.exists()).toBe(true);
+          expect(emptyState.props('svgPath')).toBe(noAccessSvgPath);
+        });
       });
     });
   });
