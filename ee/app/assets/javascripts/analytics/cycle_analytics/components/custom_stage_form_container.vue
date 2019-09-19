@@ -1,7 +1,7 @@
 <script>
 // NOTE: this is a temporary component while cycle-analytics is being refactored
 //        post refactor we will have a vuex store and functionality to fetch data
-// https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/15039
+// https://gitlab.com/gitlab-org/gitlab/issues/32019
 import { GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import createFlash from '~/flash';

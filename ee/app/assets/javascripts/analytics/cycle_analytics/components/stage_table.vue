@@ -6,7 +6,7 @@ import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
-import CustomStageForm from './custom_stage_form.vue';
+import CustomStageFormContainer from './custom_stage_form_container.vue';
 
 export default {
   name: 'StageTable',
@@ -18,7 +18,7 @@ export default {
     StageNavItem,
     StageTableHeader,
     AddStageButton,
-    CustomStageForm,
+    CustomStageFormContainer,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -59,6 +59,11 @@ export default {
     canEditStages: {
       type: Boolean,
       required: true,
+    },
+    groupPath: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   computed: {
@@ -149,7 +154,11 @@ export default {
             :description="__('Want to see the data? Please ask an administrator for access.')"
             :svg-path="noAccessSvgPath"
           />
-          <custom-stage-form v-else-if="isAddingCustomStage" />
+          <custom-stage-form-container
+            v-else-if="isAddingCustomStage"
+            :events="events"
+            :namespace="groupPath"
+          />
           <template v-else>
             <stage-event-list v-if="shouldDisplayStage" :stage="currentStage" :events="events" />
             <gl-empty-state
