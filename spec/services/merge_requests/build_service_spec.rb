@@ -202,13 +202,13 @@ describe MergeRequests::BuildService do
       end
 
       context 'when the source branch matches an issue' do
-        where(:issue_tracker, :source_branch, :closing_message) do
-          :jira                 | 'FOO-123-fix-issue' | 'Closes FOO-123'
-          :jira                 | 'fix-issue'         | nil
-          :custom_issue_tracker | '123-fix-issue'     | 'Closes #123'
-          :custom_issue_tracker | 'fix-issue'         | nil
-          :internal             | '123-fix-issue'     | 'Closes #123'
-          :internal             | 'fix-issue'         | nil
+        where(:issue_tracker, :source_branch, :title, :closing_message) do
+          :jira                 | 'FOO-123-fix-issue' | 'FOO-123 Initial commit' | 'Closes FOO-123'
+          :jira                 | 'fix-issue'         | 'Initial commit'         | nil
+          :custom_issue_tracker | '123-fix-issue'     | '#123 Initial commit'    | 'Closes #123'
+          :custom_issue_tracker | 'fix-issue'         | 'Initial commit'         | nil
+          :internal             | '123-fix-issue'     | 'Initial commit'         | 'Closes #123'
+          :internal             | 'fix-issue'         | 'Initial commit'         | nil
         end
 
         with_them do
@@ -221,7 +221,7 @@ describe MergeRequests::BuildService do
           end
 
           it 'uses the title of the commit as the title of the merge request' do
-            expect(merge_request.title).to eq('Initial commit')
+            expect(merge_request.title).to eq(title)
           end
 
           it 'appends the closing description' do

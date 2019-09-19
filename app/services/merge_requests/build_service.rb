@@ -222,12 +222,13 @@ module MergeRequests
     end
 
     def assign_title_and_description_from_single_commit
-      commits = compare_commits
+      return unless compare_commits&.size == 1
 
-      return unless commits&.count == 1
+      commit = compare_commits.first
+      title_parts = [commit.title]
+      title_parts.prepend(issue.to_reference) if external_issue_reference?
 
-      commit = commits.first
-      merge_request.title ||= commit.title
+      merge_request.title ||= title_parts.join(' ')
       merge_request.description ||= commit.description.try(:strip)
     end
 
@@ -247,6 +248,10 @@ module MergeRequests
 
     def issue_tracker_enabled?
       target_project.issues_enabled? || target_project.external_issue_tracker
+    end
+
+    def external_issue_reference?
+      target_project.external_issue_tracker && issue&.to_reference.present?
     end
 
     def issue_iid
