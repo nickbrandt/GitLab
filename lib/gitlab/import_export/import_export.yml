@@ -34,6 +34,7 @@ tree:
         - :author
     - releases:
       - :links
+      - :evidences
     - project_members:
       - :user
     - merge_requests:

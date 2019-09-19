@@ -15,6 +15,8 @@ class Release < ApplicationRecord
   has_many :milestone_releases
   has_many :milestones, through: :milestone_releases
 
+  has_many :evidences
+
   default_value_for :released_at, allows_nil: false do
     Time.zone.now
   end

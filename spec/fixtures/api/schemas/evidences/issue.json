@@ -14,13 +14,13 @@
   "properties": {
     "id": { "type": "integer" },
     "title": { "type": "string" },
-    "description": { "type": "string" },
+    "description": { "type": ["string", "null"] },
     "author": { "$ref": "author.json" },
     "state": { "type": "string" },
     "iid": { "type": "integer" },
     "confidential": { "type": "boolean" },
     "created_at": { "type": "date" },
-    "due_date": { "type": "date" }
+    "due_date": { "type": ["date", "null"] }
   },
   "additionalProperties": false
 }

@@ -81,6 +81,7 @@ releases:
 - links
 - milestone_releases
 - milestones
+- evidences
 links:
 - release
 project_members:
@@ -505,6 +506,8 @@ lists:
 - list_user_preferences
 milestone_releases:
 - milestone
+- release
+evidences:
 - release
 design: &design
 - issue

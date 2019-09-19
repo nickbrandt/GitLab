@@ -15,6 +15,7 @@ RSpec.describe Release do
     it { is_expected.to have_many(:links).class_name('Releases::Link') }
     it { is_expected.to have_many(:milestones) }
     it { is_expected.to have_many(:milestone_releases) }
+    it { is_expected.to have_many(:evidences) }
   end
 
   describe 'validation' do
