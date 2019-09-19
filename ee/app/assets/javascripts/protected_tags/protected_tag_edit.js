@@ -78,7 +78,7 @@ export default class ProtectedTagEdit {
         // Do this only for users for now
         // get the current data for selected items
         const selectedItems = this[dropdownName].getSelectedItems();
-        const currentSelectedItem = _.findWhere(selectedItems, {
+        const currentSelectedItem = _.find(selectedItems, {
           user_id: currentItem.user_id,
         });
 

@@ -33,7 +33,7 @@ export const addProjectsToDashboard = ({ state, dispatch }) =>
     .catch(() => dispatch('receiveAddProjectsToDashboardError'));
 
 export const toggleSelectedProject = ({ commit, state }, project) => {
-  if (!_.findWhere(state.selectedProjects, { id: project.id })) {
+  if (!_.find(state.selectedProjects, { id: project.id })) {
     commit(types.ADD_SELECTED_PROJECT, project);
   } else {
     commit(types.REMOVE_SELECTED_PROJECT, project);
