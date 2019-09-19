@@ -187,7 +187,7 @@ module MergeRequests
     #
     def assign_title_and_description
       assign_title_and_description_from_single_commit
-      merge_request.title ||= title_from_issue if target_project.issues_enabled? || target_project.external_issue_tracker
+      merge_request.title ||= title_from_issue if issue_tracker_enabled?
       merge_request.title ||= source_branch.titleize.humanize
       merge_request.title = wip_title if compare_commits.empty?
 
@@ -243,6 +243,10 @@ module MergeRequests
 
       title_parts << "\"#{branch_title}\"" if branch_title.present?
       title_parts.join(' ')
+    end
+
+    def issue_tracker_enabled?
+      target_project.issues_enabled? || target_project.external_issue_tracker
     end
 
     def issue_iid
