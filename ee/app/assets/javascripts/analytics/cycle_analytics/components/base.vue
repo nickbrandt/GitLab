@@ -55,7 +55,7 @@ export default {
       'summary',
       'dataTimeframe',
     ]),
-    ...mapGetters(['currentStage', 'defaultStage']),
+    ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -150,22 +150,35 @@ export default {
       :svg-path="emptyStateSvgPath"
     />
     <div v-else class="cycle-analytics mt-0">
-      <summary-table class="js-summary-table" :items="summary" />
-      <stage-table
-        v-if="currentStage"
-        class="js-stage-table"
-        :current-stage="currentStage"
-        :stages="stages"
-        :is-loading-stage="isLoadingStage"
-        :is-empty-stage="isEmptyStage"
-        :is-adding-custom-stage="isAddingCustomStage"
-        :events="events"
-        :no-data-svg-path="noDataSvgPath"
-        :no-access-svg-path="noAccessSvgPath"
-        :can-edit-stages="hasCustomizableCycleAnalytics"
-        @selectStage="onStageSelect"
-        @showAddStageForm="onShowAddStageForm"
+      <gl-empty-state
+        v-if="hasNoAccessError"
+        class="js-empty-state"
+        :title="__('You don’t have access to Cycle Analytics for this group')"
+        :svg-path="noAccessSvgPath"
+        :description="
+          __(
+            'Only \'Reporter\' roles and above on tiers Premium / Silver and above can see Cycle Analytics.',
+          )
+        "
       />
+      <div v-else class="cycle-analytics mt-0">
+        <summary-table class="js-summary-table" :items="summary" />
+        <stage-table
+          v-if="currentStage"
+          class="js-stage-table"
+          :current-stage="currentStage"
+          :stages="stages"
+          :is-loading-stage="isLoadingStage"
+          :is-empty-stage="isEmptyStage"
+          :is-adding-custom-stage="isAddingCustomStage"
+          :events="events"
+          :no-data-svg-path="noDataSvgPath"
+          :no-access-svg-path="noAccessSvgPath"
+          :can-edit-stages="hasCustomizableCycleAnalytics"
+          @selectStage="onStageSelect"
+          @showAddStageForm="onShowAddStageForm"
+        />
+      </div>
     </div>
   </div>
 </template>

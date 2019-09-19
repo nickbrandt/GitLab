@@ -72,4 +72,21 @@ describe('Cycle analytics getters', () => {
       });
     });
   });
+
+  describe('hasNoAccessError', () => {
+    beforeEach(() => {
+      state = {
+        errorCode: null,
+      };
+    });
+
+    it('returns true if "hasError" is set to 403', () => {
+      state.errorCode = 403;
+      expect(getters.hasNoAccessError(state)).toEqual(true);
+    });
+
+    it('returns false if "hasError" is not set to 403', () => {
+      expect(getters.hasNoAccessError(state)).toEqual(false);
+    });
+  });
 });

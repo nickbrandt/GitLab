@@ -50,8 +50,9 @@ export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }, da
     createFlash(__('There was an error while fetching cycle analytics data.'));
   }
 };
-export const receiveCycleAnalyticsDataError = ({ commit }) => {
-  commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR);
+export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
+  const { status } = response;
+  commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
   createFlash(__('There was an error while fetching cycle analytics data.'));
 };
 

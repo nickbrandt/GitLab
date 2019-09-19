@@ -271,7 +271,7 @@ describe('Cycle analytics actions', () => {
     it(`commits the ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR} mutation`, done => {
       testAction(
         actions.receiveCycleAnalyticsDataError,
-        null,
+        { response: 403 },
         state,
         [
           {
@@ -288,7 +288,7 @@ describe('Cycle analytics actions', () => {
         {
           commit: () => {},
         },
-        {},
+        { response: 403 },
       );
 
       shouldFlashAnError();
