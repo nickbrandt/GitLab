@@ -113,42 +113,30 @@ describe 'Clusterable > Show page' do
   end
 
   context 'when clusterable is a project' do
-    it_behaves_like 'editing domain' do
-      let(:clusterable) { create(:project) }
-      let(:cluster) { create(:cluster, :provided_by_gcp, :project, projects: [clusterable]) }
-      let(:cluster_path) { project_cluster_path(clusterable, cluster) }
-    end
+    let(:clusterable) { create(:project) }
+    let(:cluster_path) { project_cluster_path(clusterable, cluster) }
+    let(:cluster) { create(:cluster, :provided_by_gcp, :project, projects: [clusterable]) }
 
-    it_behaves_like 'editing a GCP cluster' do
-      let(:clusterable) { create(:project) }
-      let(:cluster) { create(:cluster, :provided_by_gcp, :project, projects: [clusterable]) }
-      let(:cluster_path) { project_cluster_path(clusterable, cluster) }
-    end
+    it_behaves_like 'editing domain'
+
+    it_behaves_like 'editing a GCP cluster'
 
     it_behaves_like 'editing a user-provided cluster' do
-      let(:clusterable) { create(:project) }
       let(:cluster) { create(:cluster, :provided_by_user, :project, projects: [clusterable]) }
-      let(:cluster_path) { project_cluster_path(clusterable, cluster) }
     end
   end
 
   context 'when clusterable is a group' do
-    it_behaves_like 'editing domain' do
-      let(:clusterable) { create(:group) }
-      let(:cluster) { create(:cluster, :provided_by_gcp, :group, groups: [clusterable]) }
-      let(:cluster_path) { group_cluster_path(clusterable, cluster) }
-    end
+    let(:clusterable) { create(:group) }
+    let(:cluster_path) { group_cluster_path(clusterable, cluster) }
+    let(:cluster) { create(:cluster, :provided_by_gcp, :group, groups: [clusterable]) }
 
-    it_behaves_like 'editing a GCP cluster' do
-      let(:clusterable) { create(:group) }
-      let(:cluster) { create(:cluster, :provided_by_gcp, :group, groups: [clusterable]) }
-      let(:cluster_path) { group_cluster_path(clusterable, cluster) }
-    end
+    it_behaves_like 'editing domain'
+
+    it_behaves_like 'editing a GCP cluster'
 
     it_behaves_like 'editing a user-provided cluster' do
-      let(:clusterable) { create(:group) }
       let(:cluster) { create(:cluster, :provided_by_user, :group, groups: [clusterable]) }
-      let(:cluster_path) { group_cluster_path(clusterable, cluster) }
     end
   end
 end
