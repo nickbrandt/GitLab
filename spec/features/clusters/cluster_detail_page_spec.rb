@@ -13,7 +13,7 @@ describe 'Clusterable > Show page' do
     sign_in(current_user)
   end
 
-  shared_examples 'editing domain' do
+  shared_examples 'show page' do
     before do
       clusterable.add_maintainer(current_user)
     end
@@ -52,6 +52,12 @@ describe 'Clusterable > Show page' do
           expect(find(cluster_ingress_help_text_selector)).to match_css(hide_modifier_selector)
         end
       end
+    end
+
+    it 'does not show the environments tab' do
+      visit cluster_path
+
+      expect(page).not_to have_selector('.js-cluster-nav-environments', text: 'Environments')
     end
   end
 
@@ -117,7 +123,7 @@ describe 'Clusterable > Show page' do
     let(:cluster_path) { project_cluster_path(clusterable, cluster) }
     let(:cluster) { create(:cluster, :provided_by_gcp, :project, projects: [clusterable]) }
 
-    it_behaves_like 'editing domain'
+    it_behaves_like 'show page'
 
     it_behaves_like 'editing a GCP cluster'
 
@@ -131,7 +137,7 @@ describe 'Clusterable > Show page' do
     let(:cluster_path) { group_cluster_path(clusterable, cluster) }
     let(:cluster) { create(:cluster, :provided_by_gcp, :group, groups: [clusterable]) }
 
-    it_behaves_like 'editing domain'
+    it_behaves_like 'show page'
 
     it_behaves_like 'editing a GCP cluster'
 
