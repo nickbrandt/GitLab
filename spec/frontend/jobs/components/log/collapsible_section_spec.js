@@ -7,6 +7,8 @@ describe('Job Log Collapsible Section', () => {
 
   const traceEndpoint = 'jobs/335';
 
+  const findCollapsibleLine = () => wrapper.find('.collapsible-line');
+
   const createComponent = (props = {}) => {
     wrapper = mount(CollpasibleSection, {
       sync: true,
@@ -15,8 +17,6 @@ describe('Job Log Collapsible Section', () => {
       },
     });
   };
-
-  beforeEach(() => {});
 
   afterEach(() => {
     wrapper.destroy();
@@ -31,7 +31,7 @@ describe('Job Log Collapsible Section', () => {
     });
 
     it('renders clickable header line', () => {
-      expect(wrapper.find('.collapsible-line').attributes('role')).toBe('button');
+      expect(findCollapsibleLine().attributes('role')).toBe('button');
     });
   });
 
@@ -48,13 +48,13 @@ describe('Job Log Collapsible Section', () => {
     });
   });
 
-  it('emits handleOnClickCollapsibleLine on click', () => {
+  it('emits onClickCollapsibleLine on click', () => {
     createComponent({
       section: nestedSectionOpened,
       traceEndpoint,
     });
 
-    wrapper.find('.collapsible-line').trigger('click');
-    expect(wrapper.emitted('handleOnClickCollapsibleLine').length).toBe(1);
+    findCollapsibleLine().trigger('click');
+    expect(wrapper.emitted('onClickCollapsibleLine').length).toBe(1);
   });
 });

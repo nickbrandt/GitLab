@@ -27,7 +27,7 @@ export default {
         :key="`collapsible-${index}`"
         :section="section"
         :trace-endpoint="traceEndpoint"
-        @handleOnClickCollapsibleLine="handleOnClickCollapsibleLine"
+        @onClickCollapsibleLine="handleOnClickCollapsibleLine"
       />
       <log-line v-else :key="section.offset" :line="section" :path="traceEndpoint" />
     </template>

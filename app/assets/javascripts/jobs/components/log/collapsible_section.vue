@@ -18,9 +18,14 @@ export default {
       required: true,
     },
   },
+  computed: {
+    badgeDuration() {
+      return this.section.line && this.section.line.section_duration;
+    },
+  },
   methods: {
     handleOnClickCollapsibleLine(section) {
-      this.$emit('handleOnClickCollapsibleLine', section);
+      this.$emit('onClickCollapsibleLine', section);
     },
   },
 };
@@ -29,7 +34,7 @@ export default {
   <div>
     <log-line-header
       :line="section.line"
-      :duration="section.line.section_duration"
+      :duration="badgeDuration"
       :path="traceEndpoint"
       :is-closed="section.isClosed"
       @toggleLine="handleOnClickCollapsibleLine(section)"
@@ -41,7 +46,7 @@ export default {
           :key="`collapsible-nested-${line.offset}`"
           :section="line"
           :trace-endpoint="traceEndpoint"
-          @handleOnClickCollapsibleLine="handleOnClickCollapsibleLine"
+          @toggleLine="handleOnClickCollapsibleLine"
         />
         <log-line v-else :key="line.offset" :line="line" :path="traceEndpoint" />
       </template>
