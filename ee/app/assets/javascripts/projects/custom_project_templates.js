@@ -120,10 +120,12 @@ export default () => {
   $groupTabContent.on('ajax:success', bindEvents);
 
   $navElement.one('click', () => {
+    // eslint-disable-next-line no-jquery/no-ajax
     $.get($tabContent.data('initialTemplates'));
   });
 
   $groupNavElement.one('click', () => {
+    // eslint-disable-next-line no-jquery/no-ajax
     $.get($groupTabContent.data('initialTemplates'));
   });
 

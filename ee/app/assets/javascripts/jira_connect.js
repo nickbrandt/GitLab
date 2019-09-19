@@ -24,6 +24,7 @@
       e.preventDefault();
 
       AP.context.getToken(function(token) {
+        // eslint-disable-next-line no-jquery/no-ajax
         $.post(actionUrl, {
           jwt: token,
           namespace_path: $('#namespace-input').val(),
@@ -39,6 +40,7 @@
       e.preventDefault();
 
       AP.context.getToken(function(token) {
+        // eslint-disable-next-line no-jquery/no-ajax
         $.ajax({
           url: href,
           method: 'DELETE',
