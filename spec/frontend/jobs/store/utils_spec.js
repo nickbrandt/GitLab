@@ -1,4 +1,10 @@
-import { logLinesParser, updateIncrementalTrace } from '~/jobs/store/utils';
+import {
+  logLinesParser,
+  updateIncrementalTrace,
+  parseLine,
+  parseHeaderLine,
+  parseNestedSection,
+} from '~/jobs/store/utils';
 import {
   utilsMockData,
   originalTrace,
@@ -8,9 +14,79 @@ import {
   headerTraceIncremental,
   collapsibleTrace,
   collapsibleTraceIncremental,
+  nestedSectionInput,
+  nestedSectionOutput,
 } from '../components/log/mock_data';
 
 describe('Jobs Store Utils', () => {
+  describe('parseLine', () => {
+    it('returns a new object with the lineNumber key added to the provided line object', () => {
+      const line = { content: [{ text: 'foo' }] };
+      const parsed = parseLine(line, 1);
+      expect(parsed.content).toEqual(line.content);
+      expect(parsed.lineNumber).toEqual(1);
+    });
+  });
+
+  describe('parseHeaderLine', () => {
+    it('returns a new object with the header keys and the provided line parsed', () => {
+      const headerLine = { content: [{ text: 'foo' }] };
+      const parsedHeaderLine = parseHeaderLine(headerLine, 2);
+
+      expect(parsedHeaderLine).toEqual({
+        isClosed: true,
+        isHeader: true,
+        line: {
+          ...headerLine,
+          lineNumber: 2,
+        },
+        lines: [],
+      });
+    });
+  });
+
+  describe('parseNestedSection', () => {
+    it('pushes a parsed header line when content has data', () => {
+      const headerLine = { content: [{ text: 'foo' }] };
+      const parsedHeaderLine = parseHeaderLine(headerLine, 2);
+      const parent = {
+        isClosed: true,
+        isHeader: true,
+        line: {
+          content: [{ text: 'bar' }],
+          lineNumber: 1,
+        },
+        lines: [],
+      };
+
+      parseNestedSection(parent, headerLine, 2);
+      expect(parent.lines).toEqual([parsedHeaderLine]);
+    });
+
+    it('does not push when content has no data', () => {
+      const headerLine = { content: [] };
+      const parent = {
+        isClosed: true,
+        isHeader: true,
+        line: {
+          content: [{ text: 'bar' }],
+          lineNumber: 1,
+        },
+        lines: [],
+      };
+
+      parseNestedSection(parent, headerLine, 2);
+
+      expect(parent).toEqual(parent);
+    });
+  });
+
+  describe('addDurationToHeader', () => {
+
+  });
+
+  describe('addNestedLine', () => {});
+
   describe('logLinesParser', () => {
     let result;
 
@@ -48,6 +124,12 @@ describe('Jobs Store Utils', () => {
 
       it('does not add section duration as a line', () => {
         expect(result[1].lines.includes(utilsMockData[4])).toEqual(false);
+      });
+    });
+
+    describe('nested sections', () => {
+      it('parses the log with nested sections', () => {
+        expect(logLinesParser(nestedSectionInput)).toEqual(nestedSectionOutput);
       });
     });
   });

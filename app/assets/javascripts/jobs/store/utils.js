@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 /**
  * Adds the line number property
  * @param Object line
@@ -7,6 +9,69 @@ export const parseLine = (line = {}, lineNumber) => ({
   ...line,
   lineNumber,
 });
+
+/**
+ * When a line has `section_header` set to true, we create a new
+ * structure to allow to nest the lines that belong to the
+ * collpasible section
+ *
+ * @param Object line
+ * @param Number lineNumber
+ */
+export const parseHeaderLine = (line = {}, lineNumber) => ({
+  isClosed: true,
+  isHeader: true,
+  line: parseLine(line, lineNumber),
+  lines: [],
+});
+
+/**
+ * Parses a nested collapsible section
+ *
+ * @param Object parent
+ * @param Object line
+ * @param Number lineNumber
+ */
+export const parseNestedSection = (parent, line, lineNumber) => {
+  if (line.content.length) {
+    parent.lines.push(parseHeaderLine(line, lineNumber));
+  }
+};
+
+/**
+ * Some `section_duration` information are sent in the end
+ * of the sections.
+ *
+ * This function finds the section it belongs too and adds it to the correct
+ * object
+ *
+ * @param Array data
+ * @param Object durationLine
+ */
+export const addDurationToHeader = (data, durationLine) => {
+  _.flatten(data).find(el => {
+    if (_.intersection(el.sections, durationLine.sections)) {
+      el.line.section_duration = durationLine.section_duration;
+    }
+  });
+};
+
+/**
+ * Parses the lines of a nested collapsible section
+ *
+ * @param Object last
+ * @param Object line
+ * @param Number lineNumber
+ */
+export const addNestedLine = (last, line, lineNumber) => {
+  _.flatten(last.lines).find(el => {
+    if (_.intersection(el.sections, line.sections)) {
+      if (line.content.length) {
+        el.lines.push(parseLine(line, lineNumber));
+      }
+    }
+  });
+};
 
 /**
  * Parses the job log content into a structure usable by the template
@@ -19,31 +84,30 @@ export const parseLine = (line = {}, lineNumber) => ({
  * For each line:
  *    - adds the index as  lineNumber
  *
- * @param {Array} lines
- * @returns {Array}
+ * @param Array lines
+ * @returns Array
  */
-export const logLinesParser = (lines = [], lineNumberStart) =>
+export const logLinesParser = (lines = [], lineNumberStart, accumulator = []) =>
   lines.reduce((acc, line, index) => {
     const lineNumber = lineNumberStart ? lineNumberStart + index : index;
     const last = acc[acc.length - 1];
 
     if (line.section_header) {
-      acc.push({
-        isClosed: true,
-        isHeader: true,
-        line: parseLine(line, lineNumber),
-        lines: [],
-      });
-    } else if (acc.length && last.isHeader && !line.section_duration && line.content.length) {
-      last.lines.push(parseLine(line, lineNumber));
-    } else if (acc.length && last.isHeader && line.section_duration) {
-      last.section_duration = line.section_duration;
+      if (last && last.isHeader && _.intersection(line.sections, last.line.sections)) {
+        parseNestedSection(last, line, lineNumber);
+      } else {
+        acc.push(parseHeaderLine(line, lineNumber));
+      }
+    } else if (last && last.isHeader) {
+      addNestedLine(last, line, lineNumber);
+    } else if (line.section_duration) {
+      addDurationToHeader(acc, line);
     } else if (line.content.length) {
       acc.push(parseLine(line, lineNumber));
     }
 
     return acc;
-  }, []);
+  }, accumulator);
 
 /**
  * When the trace is not complete, backend may send the last received line
