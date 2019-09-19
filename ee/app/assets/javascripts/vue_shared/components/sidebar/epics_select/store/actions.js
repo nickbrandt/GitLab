@@ -9,6 +9,7 @@ import { noneEpic } from 'ee/vue_shared/constants';
 import * as types from './mutation_types';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
+export const setIssueId = ({ commit }, issueId) => commit(types.SET_ISSUE_ID, issueId);
 
 export const setSearchQuery = ({ commit }, searchQuery) =>
   commit(types.SET_SEARCH_QUERY, searchQuery);

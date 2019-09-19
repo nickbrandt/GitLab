@@ -32,6 +32,16 @@ describe('EpicsSelect', () => {
         });
       });
 
+      describe(types.SET_ISSUE_ID, () => {
+        it('should set provided `issueId` param to state.issueId', () => {
+          const issueId = mockIssue.id;
+
+          mutations[types.SET_ISSUE_ID](state, issueId);
+
+          expect(state).toHaveProperty('issueId', issueId);
+        });
+      });
+
       describe(types.SET_SEARCH_QUERY, () => {
         it('should set `searchQuery` param to state', () => {
           const searchQuery = 'foo';
