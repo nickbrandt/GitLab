@@ -877,7 +877,8 @@ pre.light-well {
   flex-direction: column;
 
   // Disable Flexbox for admin page
-  &.admin-projects, &.group-settings-projects {
+  &.admin-projects,
+  &.group-settings-projects {
     display: block;
 
     .project-row {
