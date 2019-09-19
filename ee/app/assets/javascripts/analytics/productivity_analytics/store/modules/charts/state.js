@@ -4,7 +4,7 @@ export default () => ({
   charts: {
     [chartKeys.main]: {
       isLoading: false,
-      hasError: false,
+      errorCode: null,
       data: {},
       selected: [],
       params: {
@@ -13,7 +13,7 @@ export default () => ({
     },
     [chartKeys.timeBasedHistogram]: {
       isLoading: false,
-      hasError: false,
+      errorCode: null,
       data: {},
       selected: [],
       params: {
@@ -23,7 +23,7 @@ export default () => ({
     },
     [chartKeys.commitBasedHistogram]: {
       isLoading: false,
-      hasError: false,
+      errorCode: null,
       data: {},
       selected: [],
       params: {
@@ -33,7 +33,7 @@ export default () => ({
     },
     [chartKeys.scatterplot]: {
       isLoading: false,
-      hasError: false,
+      errorCode: null,
       data: {},
       selected: [],
       params: {

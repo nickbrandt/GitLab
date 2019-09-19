@@ -75,7 +75,7 @@ describe('ProductivityApp component', () => {
 
       describe('and user has no access to the group', () => {
         beforeEach(() => {
-          store.state.charts.charts[chartKeys.main].hasError = 403;
+          store.state.charts.charts[chartKeys.main].errorCode = 403;
         });
 
         it('renders the no access illustration', () => {
@@ -88,7 +88,7 @@ describe('ProductivityApp component', () => {
 
       describe('and user has access to the group', () => {
         beforeEach(() => {
-          store.state.charts.charts[chartKeys.main].hasError = false;
+          store.state.charts.charts[chartKeys.main].errorCode = null;
         });
 
         describe('Time to merge chart', () => {
