@@ -7,4 +7,7 @@ export default {
   [types.SET_VPC](state, { vpc }) {
     state.selectedVpc = vpc;
   },
+  [types.SET_SUBNET](state, { subnet }) {
+    state.selectedSubnet = subnet;
+  },
 };

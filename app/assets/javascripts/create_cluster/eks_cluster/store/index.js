@@ -23,6 +23,10 @@ const createStore = () =>
         namespaced: true,
         ...clusterDropdownStore(awsServices.fetchVpcs),
       },
+      subnets: {
+        namespaced: true,
+        ...clusterDropdownStore(awsServices.fetchSubnets),
+      },
     },
   });
 

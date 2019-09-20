@@ -24,9 +24,33 @@ export const fetchVpcs = () =>
     ec2
       .describeVpcs()
       .on('success', ({ data: { Vpcs: vpcs } }) => {
-        const transformedVpcs = vpcs.map(({ VpcId: name }) => ({ name }));
+        const transformedVpcs = vpcs.map(({ VpcId: id }) => ({ id, name: id }));
 
         resolve(transformedVpcs);
+      })
+      .on('error', error => {
+        reject(error);
+      })
+      .send();
+  });
+
+export const fetchSubnets = ({ vpc }) =>
+  new Promise((resolve, reject) => {
+    const ec2 = new EC2();
+
+    ec2
+      .describeSubnets({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [vpc.id],
+          },
+        ],
+      })
+      .on('success', ({ data: { Subnets: subnets } }) => {
+        const transformedSubnets = subnets.map(({ SubnetId: id }) => ({ id, name: id }));
+
+        resolve(transformedSubnets);
       })
       .on('error', error => {
         reject(error);
