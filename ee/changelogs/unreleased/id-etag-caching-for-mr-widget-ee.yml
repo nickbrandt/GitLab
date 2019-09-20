@@ -1,5 +1,0 @@
----
-title: Send only necessary fields on mr-widget auto-refresh
-merge_request: 15495
-author:
-type: performance

@@ -1,6 +1,0 @@
----
-title: Do not allow creation of projects from group templates if project is not descendant
-  of that group
-merge_request:
-author:
-type: security

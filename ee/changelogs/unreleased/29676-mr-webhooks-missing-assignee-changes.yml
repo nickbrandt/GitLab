@@ -1,5 +1,0 @@
----
-title: Restores data for assignee changes in merge request webhooks.
-merge_request: 16812
-author: Jesse Hall @jessehall3
-type: fixed

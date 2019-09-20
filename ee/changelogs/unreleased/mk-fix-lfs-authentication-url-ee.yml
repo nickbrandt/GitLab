@@ -1,5 +1,0 @@
----
-title: Fix LFS authentication URL in EE
-merge_request: 16146
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Wait until pipeline is completed before checking for software license violations
-merge_request: 16853
-author:
-type: fixed

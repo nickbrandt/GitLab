@@ -1,5 +1,0 @@
----
-title: 'DB Load Balancing: Support SRV lookups'
-merge_request: 15558
-author:
-type: changed

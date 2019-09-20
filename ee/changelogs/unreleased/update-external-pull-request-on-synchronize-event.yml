@@ -1,5 +1,0 @@
----
-title: Update ExternalPullRequest on :synchronize action to ensure source_sha is updated locally
-merge_request: 16318
-author:
-type: fixed

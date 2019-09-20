@@ -1,5 +1,0 @@
----
-title: 'Geo: Exit LogCursor if it has been failing for too long'
-merge_request: 16408
-author:
-type: added
