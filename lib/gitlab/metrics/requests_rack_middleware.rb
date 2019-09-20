@@ -3,6 +3,9 @@
 module Gitlab
   module Metrics
     class RequestsRackMiddleware
+      METHODS = %w(delete get head options patch post put trace).freeze
+      STATUSES = %w(200 301 304 400 401 403 404 500).freeze
+
       def initialize(app)
         @app = app
       end
@@ -18,6 +21,14 @@ module Gitlab
       def self.http_request_duration_seconds
         @http_request_duration_seconds ||= ::Gitlab::Metrics.histogram(:http_request_duration_seconds, 'Request handling execution time',
                                                            {}, [0.05, 0.1, 0.25, 0.5, 0.7, 1, 2.5, 5, 10, 25])
+      end
+
+      def self.initialize_http_request_duration_seconds
+        METHODS.each do |method|
+          STATUSES.each do |status|
+            ::Gitlab::Metrics.histogram(:http_request_duration_seconds, 'Request handling execution time').get({ method: method, status: status })
+          end
+        end
       end
 
       def call(env)

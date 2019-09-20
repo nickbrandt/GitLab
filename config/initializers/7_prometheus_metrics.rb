@@ -30,6 +30,8 @@ Gitlab::Application.configure do |config|
   config.middleware.insert(1, Gitlab::Metrics::RequestsRackMiddleware)
 end
 
+Gitlab::Metrics::RequestsRackMiddleware.initialize_http_request_duration_seconds
+
 Sidekiq.configure_server do |config|
   config.on(:startup) do
     # webserver metrics are cleaned up in config.ru: `warmup` block
