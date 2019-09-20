@@ -12,6 +12,37 @@ jest.mock('~/lib/graphql', () => jest.fn());
 
 describe('RelatedItemsTree', () => {
   describe('epicUtils', () => {
+    describe('sortChildren', () => {
+      const paramA = {};
+      const paramB = {};
+
+      beforeEach(() => {
+        paramA.relativePosition = -1;
+        paramB.relativePosition = -1;
+      });
+
+      it('returns non-zero positive integer when paramA.relativePosition is greater than paramB.relativePosition', () => {
+        paramA.relativePosition = 10;
+        paramB.relativePosition = 5;
+
+        expect(epicUtils.sortChildren(paramA, paramB) > -1).toBe(true);
+      });
+
+      it('returns non-zero negative integer when paramA.relativePosition is smaller than paramB.relativePosition', () => {
+        paramA.relativePosition = 5;
+        paramB.relativePosition = 10;
+
+        expect(epicUtils.sortChildren(paramA, paramB) < 0).toBe(true);
+      });
+
+      it('returns zero when paramA.relativePosition is same as paramB.relativePosition', () => {
+        paramA.relativePosition = 5;
+        paramB.relativePosition = 5;
+
+        expect(epicUtils.sortChildren(paramA, paramB)).toBe(0);
+      });
+    });
+
     describe('formatChildItem', () => {
       it('returns new object from provided item object with pathIdSeparator assigned', () => {
         const item = {
