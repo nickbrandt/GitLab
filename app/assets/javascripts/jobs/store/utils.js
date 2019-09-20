@@ -34,9 +34,9 @@ export const parseHeaderLine = (line = {}, lineNumber) => ({
  * @param Object durationLine
  */
 export function addDurationToHeader(data, durationLine) {
-  return data.find(el => {
+  data.forEach(el => {
     if (el.line && el.line.section === durationLine.section) {
-      el.line.section_duration = durationLine.section_duration;
+       el.line.section_duration = durationLine.section_duration;
     }
   });
 }
