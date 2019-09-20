@@ -168,6 +168,22 @@ describe('mutations', () => {
 
       expect(localState.messages.minimumQuery).toBe(false);
     });
+
+    it('decrements the search count by one', () => {
+      localState.searchCount = 1;
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](localState, []);
+
+      expect(localState.searchCount).toBe(0);
+    });
+
+    it('does not decrement the search count to be negative', () => {
+      localState.searchCount = 0;
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_SUCCESS](localState, []);
+
+      expect(localState.searchCount).toBe(0);
+    });
   });
 
   describe('RECEIVE_SEARCH_RESULTS_ERROR', () => {
@@ -182,6 +198,22 @@ describe('mutations', () => {
 
       expect(localState.messages.minimumQuery).toBe(false);
     });
+
+    it('decrements the search count by one', () => {
+      localState.searchCount = 1;
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_ERROR](localState);
+
+      expect(localState.searchCount).toBe(0);
+    });
+
+    it('does not decrement the search count to be negative', () => {
+      localState.searchCount = 0;
+
+      mutations[types.RECEIVE_SEARCH_RESULTS_ERROR](localState);
+
+      expect(localState.searchCount).toBe(0);
+    });
   });
 
   describe('REQUEST_PROJECTS', () => {
@@ -189,6 +221,43 @@ describe('mutations', () => {
       mutations[types.REQUEST_PROJECTS](localState);
 
       expect(localState.isLoadingProjects).toEqual(true);
+    });
+  });
+
+  describe('MINIMUM_QUERY_MESSAGE', () => {
+    beforeEach(() => {
+      localState.projectSearchResults = ['result'];
+      localState.messages.noResults = true;
+      localState.messages.searchError = true;
+      localState.messages.minimumQuery = false;
+      localState.searchCount = 1;
+
+      mutations[types.MINIMUM_QUERY_MESSAGE](localState);
+    });
+
+    it('clears the search results', () => {
+      expect(localState.projectSearchResults).toEqual([]);
+      expect(localState.messages.noResults).toBe(false);
+    });
+
+    it('turns off the search error message', () => {
+      expect(localState.messages.searchError).toBe(false);
+    });
+
+    it('turns on the minimum length message', () => {
+      expect(localState.messages.minimumQuery).toBe(true);
+    });
+
+    it('decrements the search count by one', () => {
+      expect(localState.searchCount).toBe(0);
+    });
+
+    it('does not decrement the search count to be negative', () => {
+      localState.searchCount = 0;
+
+      mutations[types.MINIMUM_QUERY_MESSAGE](localState);
+
+      expect(localState.searchCount).toBe(0);
     });
   });
 });

@@ -1,0 +1,5 @@
+---
+title: 'Operations Dashboard: fix minimum query message'
+merge_request: 17574
+author:
+type: fixed
