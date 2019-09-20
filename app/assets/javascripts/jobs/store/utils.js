@@ -9,6 +9,39 @@ export const parseLine = (line = {}, lineNumber) => ({
 });
 
 /**
+ * When a line has `section_header` set to true, we create a new
+ * structure to allow to nest the lines that belong to the
+ * collpasible section
+ *
+ * @param Object line
+ * @param Number lineNumber
+ */
+export const parseHeaderLine = (line = {}, lineNumber) => ({
+  isClosed: true,
+  isHeader: true,
+  line: parseLine(line, lineNumber),
+  lines: [],
+});
+
+/**
+ * `section_duration` is sent in the end of the
+ * collpasibl;e section
+ *
+ * Finds the section it belongs to and adds it to the correct
+ * object
+ *
+ * @param Array data
+ * @param Object durationLine
+ */
+export function addDurationToHeader(data, durationLine) {
+  return data.find(el => {
+    if (el.line && el.line.section === durationLine.section) {
+      el.line.section_duration = durationLine.section_duration;
+    }
+  });
+}
+
+/**
  * Parses the job log content into a structure usable by the template
  *
  * For collaspible lines (section_header = true):
@@ -17,75 +50,80 @@ export const parseLine = (line = {}, lineNumber) => ({
  *    - adds a isHeader property to handle template logic
  *    - adds the section_duration
  * For each line:
- *    - adds the index as  lineNumber
+ *    - adds the index as lineNumber
  *
  * @param {Array} lines
  * @returns {Array}
  */
-export const logLinesParser = (lines = [], lineNumberStart) =>
+export const logLinesParser = (lines = [], lineNumberStart, accumulator = []) =>
   lines.reduce((acc, line, index) => {
     const lineNumber = lineNumberStart ? lineNumberStart + index : index;
     const last = acc[acc.length - 1];
 
     if (line.section_header) {
-      acc.push({
-        isClosed: true,
-        isHeader: true,
-        line: parseLine(line, lineNumber),
-        lines: [],
-      });
-    } else if (acc.length && last.isHeader && !line.section_duration && line.content.length) {
+      acc.push(parseHeaderLine(line, lineNumber));
+    } else if (
+      last &&
+      last.isHeader &&
+      !line.section_duration &&
+      line.section === last.line.section
+    ) {
       last.lines.push(parseLine(line, lineNumber));
-    } else if (acc.length && last.isHeader && line.section_duration) {
-      last.section_duration = line.section_duration;
-    } else if (line.content.length) {
+    } else if (line.section_duration) {
+      addDurationToHeader(acc, line);
+    } else {
       acc.push(parseLine(line, lineNumber));
     }
 
     return acc;
-  }, []);
+  }, accumulator);
 
 /**
- * When the trace is not complete, backend may send the last received line
- * in the new response.
+ * Finds the repeated offset, removes the old one
+ * Returns a new object with the updated log without
+ * the repeated offset and the last line number.
  *
- * We need to check if that is the case by looking for the offset property
- * before parsing the incremental part
+ * @param Array newLog
+ * @param Array oldParsed
+ * @returns Object
  *
- * @param array originalTrace
- * @param array oldLog
- * @param array newLog
  */
-export const updateIncrementalTrace = (originalTrace = [], oldLog = [], newLog = []) => {
-  const firstLine = newLog[0];
-  const firstLineOffset = firstLine.offset;
-
-  // We are going to return a new array,
-  // let's make a shallow copy to make sure we
-  // are not updating the state outside of a mutation first.
-  const cloneOldLog = [...oldLog];
-
+export const findOffsetAndRemove = (newLog, oldParsed) => {
+  const cloneOldLog = [...oldParsed];
   const lastIndex = cloneOldLog.length - 1;
-  const lastLine = cloneOldLog[lastIndex];
+  const last = cloneOldLog[lastIndex];
 
-  // The last line may be inside a collpasible section
-  // If it is, we use the not parsed saved log, remove the last element
-  // and parse the first received part togheter with the incremental log
-  if (
-    lastLine.isHeader &&
-    (lastLine.line.offset === firstLineOffset ||
-      (lastLine.lines.length &&
-        lastLine.lines[lastLine.lines.length - 1].offset === firstLineOffset))
-  ) {
-    const cloneOriginal = [...originalTrace];
-    cloneOriginal.splice(cloneOriginal.length - 1);
-    return logLinesParser(cloneOriginal.concat(newLog));
-  } else if (lastLine.offset === firstLineOffset) {
+  const firstNew = newLog[0];
+  const parsed = {};
+
+  if (last.line.offset === firstNew.offset) {
     cloneOldLog.splice(lastIndex);
-    return cloneOldLog.concat(logLinesParser(newLog, cloneOldLog.length));
+    parsed.lastLine = last.lineNumber;
+  } else if (last.lines.length) {
+    const lastNestedIndex = last.lines.length - 1;
+    const lastNested = last.lines[lastNestedIndex];
+    if (lastNested.offset === firstNew.offset) {
+      last.lines.splice(lastNestedIndex);
+      parsed.lastLine = lastNested.lineNumber;
+    }
   }
-  // there are no matches, let's parse the new log and return them together
-  return cloneOldLog.concat(logLinesParser(newLog, cloneOldLog.length));
+  parsed.log = cloneOldLog;
+  return parsed;
+};
+
+/**
+ * The first line of the new log may already exist
+ *
+ * Removes the old line if the offset is the same
+ * Parses the new incremented log
+ *
+ * @param Arrary newLog
+ * @param Array oldParsed
+ * @returns Array
+ */
+export const updateIncrementalTrace = (newLog, oldParsed = []) => {
+  const parsedLog = findOffsetAndRemove(newLog, oldParsed);
+  return logLinesParser(newLog, parsedLog.lastLine, parsedLog.log);
 };
 
 export const isNewJobLogActive = () => gon && gon.features && gon.features.jobLogJson;
