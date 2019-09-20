@@ -13,6 +13,8 @@ module QA
 
     module Page
       module Component
+        autoload :DesignManagement, 'qa/ee/page/component/design_management'
+
         module WebIDE
           autoload :WebTerminalPanel, 'qa/ee/page/component/web_ide/web_terminal_panel'
         end
