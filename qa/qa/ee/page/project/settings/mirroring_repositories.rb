@@ -17,6 +17,8 @@ module QA
                   element :mirror_repository_url_cell
                   element :mirrored_repository_row
                   element :update_now_button
+                  element :updating_button
+                  element :copy_public_key_button
                 end
               end
             end
