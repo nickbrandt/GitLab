@@ -57,13 +57,8 @@ describe SystemNoteService do
     let(:n_designs) { 3 }
     let(:designs) { create_list(:design, n_designs, issue: issue) }
     let(:user) { build(:user) }
-    let(:version) do
+    let!(:version) do
       create(:design_version, issue: issue, designs: designs)
-    end
-
-    before do
-      # Avoid needing to call into gitaly
-      allow(version).to receive(:author).and_return(user)
     end
 
     context 'with one kind of event' do

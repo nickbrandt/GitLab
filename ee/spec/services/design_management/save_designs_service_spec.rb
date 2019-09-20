@@ -131,6 +131,12 @@ describe DesignManagement::SaveDesignsService do
           expect(updated_designs.first.versions.size).to eq(1)
         end
 
+        it 'saves the user as the author' do
+          updated_designs = response[:designs]
+
+          expect(updated_designs.first.versions.first.author).to eq(user)
+        end
+
         describe 'saving the file to LFS' do
           before do
             expect_next_instance_of(Lfs::FileTransformer) do |transformer|

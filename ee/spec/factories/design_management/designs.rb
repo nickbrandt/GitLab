@@ -9,6 +9,7 @@ FactoryBot.define do
     create_versions = ->(design, evaluator, commit_version) do
       unless evaluator.versions_count.zero?
         project = design.project
+        issue = design.issue
         repository = project.design_repository
         repository.create_if_not_exists
         dv_table_name = DesignManagement::Action.table_name
@@ -16,7 +17,7 @@ FactoryBot.define do
 
         run_action = ->(action) do
           sha = commit_version[action]
-          version = DesignManagement::Version.new(sha: sha, issue: design.issue)
+          version = DesignManagement::Version.new(sha: sha, issue: issue, author: issue.author)
           version.save(validate: false) # We need it to have an ID, validate later
           Gitlab::Database.bulk_insert(dv_table_name, [action.row_attrs(version)])
         end

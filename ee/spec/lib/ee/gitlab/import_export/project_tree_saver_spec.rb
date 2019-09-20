@@ -43,6 +43,9 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
         end.flatten
 
         expect(issue_json['design_versions'].size).to eq(2)
+        issue_json['design_versions'].each do |version|
+          expect(version['author_id']).to eq(issue.author_id)
+        end
         expect(actions.size).to eq(2)
         actions.each do |action|
           expect(action['design']).to be_present

@@ -5,7 +5,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
   include ImportExport::CommonUtil
   using RSpec::Parameterized::TableSyntax
 
-  set(:user) { create(:user) }
+  set(:user) { create(:admin) }
   set(:project) { create(:project, :builds_disabled, :issues_disabled, name: 'project', path: 'project') }
   let(:shared) { project.import_export_shared }
   let(:project_tree_restorer) { described_class.new(user: user, shared: shared, project: project) }
@@ -31,15 +31,16 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
       describe 'restores issue associations correctly' do
         let(:issue) { project.issues.offset(index).first }
 
-        where(:index, :design_filenames, :version_shas) do
-          0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
-          1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
+        where(:index, :design_filenames, :version_shas, :author_ids) do
+          0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6] | [1, 1, 2]
+          1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8] | [1, 2, 2]
         end
 
         with_them do
           it do
             expect(issue.designs.pluck(:filename)).to contain_exactly(*design_filenames)
             expect(issue.design_versions.pluck(:sha)).to contain_exactly(*version_shas)
+            expect(issue.design_versions.pluck(:author_id)).to contain_exactly(*author_ids)
           end
         end
       end
