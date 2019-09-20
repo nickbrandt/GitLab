@@ -6,6 +6,15 @@ module QA
       let(:wiki_content) { 'This tests wiki pushes via HTTP to secondary.' }
       let(:push_content) { 'This is from the Geo wiki push to secondary!' }
       let(:project_name) { "geo-wiki-project-#{SecureRandom.hex(8)}" }
+      let(:git_push_http_path_prefix) { '/-/push_from_secondary' }
+
+      after do
+        Runtime::Browser.visit(:geo_secondary, QA::Page::Dashboard::Projects) do
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+        end
+      end
 
       context 'wiki commit' do
         it 'is redirected to the primary and ultimately replicated to the secondary' do
@@ -70,7 +79,13 @@ module QA
 
             # Check that the git cli produces the 'warning: redirecting to..(primary node)' output
             primary_uri = wiki.repository_http_location.uri
-            expect(push.output).to match(/warning: redirecting to #{primary_uri.to_s}/)
+
+            # The secondary inserts a special path prefix.
+            # See `Gitlab::Geo::GitPushHttp::PATH_PREFIX`.
+            path = File.join(git_push_http_path_prefix, '\d+', primary_uri.path)
+            absolute_path = primary_uri.to_s.sub(primary_uri.path, path)
+
+            expect(push.output).to match(/warning: redirecting to #{absolute_path}/)
 
             # Validate git push worked and new content is visible
             Page::Project::Menu.perform(&:click_wiki)
