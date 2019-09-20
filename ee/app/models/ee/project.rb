@@ -127,6 +127,9 @@ module EE
         joins(:project_feature).mirror.where(mirror_trigger_builds: true,
                                              project_features: { builds_access_level: ::ProjectFeature::ENABLED })
       end
+      scope :with_slack_service, -> { joins(:slack_service) }
+      scope :with_slack_slash_commands_service, -> { joins(:slack_slash_commands_service) }
+      scope :with_prometheus_service, -> { joins(:prometheus_service) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true

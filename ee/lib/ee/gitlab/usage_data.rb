@@ -169,6 +169,7 @@ module EE
         def usage_activity_by_stage
           {
             usage_activity_by_stage: {
+              configure: usage_activity_by_stage_configure,
               create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
               monitor: usage_activity_by_stage_monitor,
@@ -177,6 +178,28 @@ module EE
               release: usage_activity_by_stage_release,
               verify: usage_activity_by_stage_verify
             }
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `auto_devops_disabled`, `auto_devops_enabled`
+        # Omitted because not in use anymore: `gcp_clusters`, `gcp_clusters_disabled`, `gcp_clusters_enabled`
+        def usage_activity_by_stage_configure
+          {
+            clusters_applications_cert_managers: ::Clusters::Applications::CertManager.distinct_by_user,
+            clusters_applications_helm: ::Clusters::Applications::Helm.distinct_by_user,
+            clusters_applications_ingress: ::Clusters::Applications::Ingress.distinct_by_user,
+            clusters_applications_knative: ::Clusters::Applications::Knative.distinct_by_user,
+            clusters_disabled: ::Clusters::Cluster.disabled.distinct_count_by(:user_id),
+            clusters_enabled: ::Clusters::Cluster.enabled.distinct_count_by(:user_id),
+            clusters_platforms_gke: ::Clusters::Cluster.gcp_installed.enabled.distinct_count_by(:user_id),
+            clusters_platforms_user: ::Clusters::Cluster.user_provided.enabled.distinct_count_by(:user_id),
+            group_clusters_disabled: ::Clusters::Cluster.disabled.group_type.distinct_count_by(:user_id),
+            group_clusters_enabled: ::Clusters::Cluster.enabled.group_type.distinct_count_by(:user_id),
+            project_clusters_disabled: ::Clusters::Cluster.disabled.project_type.distinct_count_by(:user_id),
+            project_clusters_enabled: ::Clusters::Cluster.enabled.project_type.distinct_count_by(:user_id),
+            projects_slack_notifications_active: ::Project.with_slack_service.distinct_count_by(:creator_id),
+            projects_slack_slash_active: ::Project.with_slack_slash_commands_service.distinct_count_by(:creator_id),
+            projects_with_prometheus_alerts: ::Project.with_prometheus_service.distinct_count_by(:creator_id)
           }
         end
 
