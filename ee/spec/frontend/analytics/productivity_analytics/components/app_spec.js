@@ -274,32 +274,43 @@ describe('ProductivityApp component', () => {
                 store.state.charts.charts[chartKeys.commitBasedHistogram].data = { 1: 2, 2: 3 };
               });
 
-              it('renders a metric type dropdown', () => {
-                expect(
-                  findCommitBasedSection()
-                    .find(GlDropdown)
-                    .exists(),
-                ).toBe(true);
-              });
-
-              it('should change the metric type', () => {
-                findCommitBasedSection()
-                  .findAll(GlDropdownItem)
-                  .at(0)
-                  .vm.$emit('click');
-
-                expect(actionSpies.setMetricType).toHaveBeenCalledWith({
-                  metricType: 'commits_count',
-                  chartKey: chartKeys.commitBasedHistogram,
-                });
-              });
-
               it('renders a column chart', () => {
                 expect(
                   findCommitBasedSection()
                     .find(GlColumnChart)
                     .exists(),
                 ).toBe(true);
+              });
+
+              describe('metric dropdown', () => {
+                it('renders a metric type dropdown', () => {
+                  expect(
+                    findCommitBasedSection()
+                      .find(GlDropdown)
+                      .exists(),
+                  ).toBe(true);
+                });
+
+                describe('when the user changes the metric', () => {
+                  beforeEach(() => {
+                    findCommitBasedSection()
+                      .findAll(GlDropdownItem)
+                      .at(0)
+                      .vm.$emit('click');
+                  });
+
+                  it('should dispatch setMetricType action', () => {
+                    expect(actionSpies.setMetricType).toHaveBeenCalledWith({
+                      metricType: 'commits_count',
+                      chartKey: chartKeys.commitBasedHistogram,
+                    });
+                  });
+
+                  it("should update the chart's x axis label", () => {
+                    const columnChart = findCommitBasedSection().find(GlColumnChart);
+                    expect(columnChart.props('xAxisTitle')).toBe('Number of commits per MR');
+                  });
+                });
               });
             });
 
