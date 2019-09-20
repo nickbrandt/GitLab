@@ -84,7 +84,7 @@ export default {
     </div>
     <div class="card-footer d-flex w-100">
       <div class="d-flex flex-column str-truncated-100">
-        <span class="bold str-truncated-100">{{ name }}</span>
+        <span class="bold str-truncated-100" data-qa-selector="design_file_name">{{ name }}</span>
         <span v-if="updatedAt" class="str-truncated-100">
           {{ __('Updated') }} <timeago :time="updatedAt" tooltip-placement="bottom" />
         </span>

@@ -50,10 +50,10 @@ export default {
         slot="textarea"
         ref="textarea"
         :value="value"
-        class="note-textarea js-gfm-input js-autosize markdown-area
-        qa-description-textarea"
+        class="note-textarea js-gfm-input js-autosize markdown-area"
         dir="auto"
         data-supports-quick-actions="false"
+        data-qa-selector="note_textarea"
         :aria-label="__('Description')"
         :placeholder="__('Write a comment…')"
         @input="$emit('input', $event.target.value)"
@@ -66,10 +66,10 @@ export default {
     <div class="note-form-actions">
       <button
         :disabled="!hasValue || isSaving"
-        class="btn btn-success js-comment-button js-comment-submit-button
-                    qa-comment-button"
+        class="btn btn-success js-comment-button js-comment-submit-button"
         type="submit"
         data-track-event="click_button"
+        data-qa-selector="save_comment_button"
         @click.prevent="$emit('submitForm')"
       >
         {{ __('Save comment') }}
