@@ -5,11 +5,10 @@ import ClusterFormDropdown from './cluster_form_dropdown.vue';
 import RegionDropdown from './region_dropdown.vue';
 import RoleNameDropdown from './role_name_dropdown.vue';
 import SecurityGroupDropdown from './security_group_dropdown.vue';
-import SubnetDropdown from './subnet_dropdown.vue';
 
-const { mapState: mapRegionsState, mapActions: mapRegionsActions } = createNamespacedHelpers(
-  'regions',
-);
+const { mapState: mapRegionsState } = createNamespacedHelpers('regions');
+const { mapState: mapVpcsState } = createNamespacedHelpers('vpcs');
+const { mapState: mapSubnetsState } = createNamespacedHelpers('subnets');
 
 export default {
   components: {
@@ -17,22 +16,29 @@ export default {
     RegionDropdown,
     RoleNameDropdown,
     SecurityGroupDropdown,
-    SubnetDropdown,
   },
   computed: {
-    ...mapState(['selectedRegion']),
+    ...mapState(['selectedRegion', 'selectedVpc', 'selectedSubnet']),
     ...mapRegionsState({
       regions: 'items',
       isLoadingRegions: 'isLoadingItems',
       loadingRegionsError: 'loadingItemsError',
     }),
-    ...mapState('vpcs', {
-      vpcs: ({ items }) => items,
-      isLoadingVpcs: ({ isLoadingItems }) => isLoadingItems,
-      loadingVpcsError: ({ loadingItemsError }) => loadingItemsError,
+    ...mapVpcsState({
+      vpcs: 'items',
+      isLoadingVpcs: 'isLoadingItems',
+      loadingVpcsError: 'loadingItemsError',
+    }),
+    ...mapSubnetsState({
+      subnets: 'items',
+      isLoadingSubnets: 'isLoadingItems',
+      loadingSubnetsError: 'loadingItemsError',
     }),
     vpcDropdownDisabled() {
-      return !Boolean(this.selectedRegion);
+      return !this.selectedRegion;
+    },
+    subnetDropdownDisabled() {
+      return !this.selectedVpc;
     },
     vpcDropdownHelpText() {
       return sprintf(
@@ -56,10 +62,15 @@ export default {
     ...mapActions({
       fetchRegions: 'regions/fetchItems',
       fetchVpcs: 'vpcs/fetchItems',
+      fetchSubnets: 'subnets/fetchItems',
     }),
     setRegionAndFetchVpcs(region) {
       this.setRegion({ region });
       this.fetchVpcs({ region });
+    },
+    setVpcAndFetchSubnets(vpc) {
+      this.setVpc({ vpc });
+      this.fetchSubnets({ vpc });
     },
   },
 };
@@ -102,7 +113,29 @@ export default {
         :empty-text="s__('ClusterIntegration|No VPCs found')"
         :has-errors="loadingVpcsError"
         :error-message="s__('ClusterIntegration|Could not load VPCs for the selected region')"
-        @input="setVpc({ vpc: $event })"
+        @input="setVpcAndFetchSubnets($event)"
+      />
+      <p class="form-text text-muted" v-html="vpcDropdownHelpText"></p>
+    </div>
+    <div class="form-group">
+      <label class="label-bold" name="role" for="eks-role">{{
+        s__('ClusterIntegration|Subnet')
+      }}</label>
+      <cluster-form-dropdown
+        field-id="eks-subnet"
+        field-name="eks-subnet"
+        :input="selectedSubnet"
+        :items="subnets"
+        :loading="isLoadingSubnets"
+        :disabled="subnetDropdownDisabled"
+        :disabled-text="s__('ClusterIntegration|Select a VPC to choose a subnet')"
+        :loading-text="s__('ClusterIntegration|Loading subnets')"
+        :placeholder="s__('ClusterIntergation|Select a subnet')"
+        :search-field-placeholder="s__('ClusterIntegration|Search subnets')"
+        :empty-text="s__('ClusterIntegration|No subnet found')"
+        :has-errors="loadingSubnetsError"
+        :error-message="s__('ClusterIntegration|Could not load subnets for the selected VPC')"
+        @input="setVpcAndFetchSubnets($event)"
       />
       <p class="form-text text-muted" v-html="vpcDropdownHelpText"></p>
     </div>
