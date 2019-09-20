@@ -30,7 +30,7 @@ module EE
                   required: false,
                   name: :static_context,
                   type: ::API::Services::Boolean,
-                  desc: ""
+                  desc: 'Append instance name instead of branch to status check name'
                 }
               ],
               'jenkins' => [
