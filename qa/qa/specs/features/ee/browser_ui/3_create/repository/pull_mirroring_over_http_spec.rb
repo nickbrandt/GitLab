@@ -26,8 +26,8 @@ module QA
           settings.expand_mirroring_repositories do |mirror_settings|
             # Configure the target project to pull from the source project
             mirror_settings.repository_url = source_project_uri
-            mirror_settings.mirror_direction = :pull
-            mirror_settings.authentication_method = :password
+            mirror_settings.mirror_direction = 'Pull'
+            mirror_settings.authentication_method = 'Password'
             mirror_settings.password = Runtime::User.password
             mirror_settings.mirror_repository
             mirror_settings.update source_project_uri

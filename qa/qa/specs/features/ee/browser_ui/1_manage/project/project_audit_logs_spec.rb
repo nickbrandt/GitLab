@@ -70,7 +70,7 @@ module QA
           Page::Project::Settings::Main.perform do |settings|
             # Change visibility from public to internal
             settings.expand_visibility_project_features_permissions do |page|
-              page.set_project_visibility "internal"
+              page.set_project_visibility "Internal"
             end
           end
         end
