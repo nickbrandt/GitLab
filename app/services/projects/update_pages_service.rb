@@ -131,7 +131,12 @@ module Projects
     end
 
     def max_size
-      max_pages_size = Gitlab::CurrentSettings.max_pages_size.megabytes
+      max_pages_size = project.max_pages_size
+      max_pages_size ||= project.namespace.self_and_ancestors(hierarchy_order: :asc)
+                           .find(&:max_pages_size)&.max_pages_size
+      max_pages_size ||= Gitlab::CurrentSettings.max_pages_size
+
+      max_pages_size = max_pages_size.megabytes
 
       return MAX_SIZE if max_pages_size.zero?
 
