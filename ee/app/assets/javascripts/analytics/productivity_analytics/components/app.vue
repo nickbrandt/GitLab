@@ -289,7 +289,7 @@ export default {
                   :data="{ full: getChartData(chartKeys.commitBasedHistogram) }"
                   :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
                   :y-axis-title="__('Merge requests')"
-                  :x-axis-title="__('Commits')"
+                  :x-axis-title="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
                   x-axis-type="category"
                 />
               </template>
