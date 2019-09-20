@@ -1,5 +1,0 @@
----
-title: Fix issue redirects going to /issues/:id/designs
-merge_request: 16638
-author:
-type: fixed

@@ -1,6 +1,0 @@
----
-title: Fix the group's epic page. The Paste issue link placeholder shown as 'undefinedundefinedundefined'
-  in Chinese environment. And the error message showed nothing.
-merge_request: 16628
-author: wdmcheng
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Expose a new events property of DesignType in GraphQL that represents the change that happened to a Design within a given version.
-merge_request: 15561
-author:
-type: added

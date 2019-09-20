@@ -1,5 +1,0 @@
----
-title: Properly delete files when a package is removed
-merge_request: 15634
-author:
-type: fixed

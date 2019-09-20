@@ -1,5 +1,0 @@
----
-title: Fix Docker Registry access when Group SAML session enforcement is active
-merge_request: 14843
-author:
-type: fixed

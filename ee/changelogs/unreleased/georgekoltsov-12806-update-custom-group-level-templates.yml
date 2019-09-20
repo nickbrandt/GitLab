@@ -1,5 +1,0 @@
----
-title: Allow developer role to access group-level templates when creating a new project
-merge_request: 15364
-author:
-type: fixed

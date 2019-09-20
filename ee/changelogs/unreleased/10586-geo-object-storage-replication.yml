@@ -1,5 +1,0 @@
----
-title: ' Geo: Refactor data-sources to allow for replication of content in Object Storage'
-merge_request: 13997
-author:
-type: changed

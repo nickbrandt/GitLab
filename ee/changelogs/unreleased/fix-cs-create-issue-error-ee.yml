@@ -1,5 +1,0 @@
----
-title: Fix create issue for container scanning from security dashboard
-merge_request: 16226
-author:
-type: fixed
