@@ -172,6 +172,14 @@ describe DesignManagement::SaveDesignsService do
               expect(updated_designs.first.versions.size).to eq(1)
             end
           end
+
+          it 'calls repository#log_geo_updated_event' do
+            expect(design_repository).to receive(:log_geo_updated_event)
+
+            allow_any_instance_of(described_class).to receive(:repository).and_return(design_repository)
+
+            run_service
+          end
         end
 
         context 'when a design has not changed since its previous version' do

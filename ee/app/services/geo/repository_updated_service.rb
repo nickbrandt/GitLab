@@ -11,11 +11,15 @@ module Geo
       @params  = params
       @refs    = params.fetch(:refs, [])
       @changes = params.fetch(:changes, [])
-      @source  = repository.geo_updated_event_source
+      @source  = Geo::RepositoryUpdatedEvent.source_for(repository)
     end
 
     def execute
       return false unless Gitlab::Geo.primary?
+
+      if source == Geo::RepositoryUpdatedEvent::DESIGN && Feature.disabled?(:enable_geo_design_sync)
+        return false
+      end
 
       reset_repository_checksum!
       create_repository_updated_event!
@@ -36,6 +40,9 @@ module Geo
     end
 
     def reset_repository_checksum!
+      # We don't yet support verification for Design repositories
+      return if source == Geo::RepositoryUpdatedEvent::DESIGN
+
       return if repository_state.nil?
 
       repository_state.update!(

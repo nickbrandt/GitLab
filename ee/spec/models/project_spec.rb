@@ -1318,6 +1318,7 @@ describe Project do
     let(:project) { create(:project) }
     let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
     let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+    let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
 
     before do
       create(:import_state, project: project)
@@ -1331,6 +1332,11 @@ describe Project do
         .to receive(:new)
         .with(project.wiki.repository)
         .and_return(wiki_updated_service)
+
+      allow(::Geo::RepositoryUpdatedService)
+        .to receive(:new)
+        .with(project.design_repository)
+        .and_return(design_updated_service)
     end
 
     it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
@@ -1338,6 +1344,7 @@ describe Project do
 
       expect(repository_updated_service).to receive(:execute).once
       expect(wiki_updated_service).to receive(:execute).once
+      expect(design_updated_service).to receive(:execute).once
 
       project.after_import
     end
