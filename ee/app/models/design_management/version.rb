@@ -28,6 +28,7 @@ module DesignManagement
     end
 
     belongs_to :issue
+    belongs_to :author, class_name: 'User'
     has_many :actions
     has_many :designs,
              through: :actions,
@@ -38,6 +39,7 @@ module DesignManagement
     validates :designs, presence: true, unless: :importing?
     validates :sha, presence: true
     validates :sha, uniqueness: { case_sensitive: false, scope: :issue_id }
+    validates :author, presence: true
     # We are not validating the issue object as it incurs an extra query to fetch
     # the record from the DB. Instead, we rely on the foreign key constraint to
     # ensure referential integrity.
@@ -61,18 +63,20 @@ module DesignManagement
     # method inserts designs in bulk, rather than one by one.
     #
     # Parameters:
-    # - designs [DesignManagement::DesignAction]:
+    # - design_actions [DesignManagement::DesignAction]:
     #     the actions that have been performed in the repository.
     # - sha [String]:
     #     the SHA of the commit that performed them
+    # - author [User]:
+    #     the user who performed the commit
     # returns [DesignManagement::Version]
-    def self.create_for_designs(design_actions, sha)
+    def self.create_for_designs(design_actions, sha, author)
       issue_id, not_uniq = design_actions.map(&:issue_id).compact.uniq
       raise NotSameIssue, 'All designs must belong to the same issue!' if not_uniq
 
       transaction do
-        version = safe_find_or_create_by(sha: sha, issue_id: issue_id)
-        version.save(validate: false) # We need it to have an ID, validate later
+        version = new(sha: sha, issue_id: issue_id, author: author)
+        version.save(validate: false) # We need it to have an ID. Validate later when designs are present
 
         rows = design_actions.map { |action| action.row_attrs(version) }
 
@@ -95,10 +99,14 @@ module DesignManagement
     end
 
     def author
-      commit&.author
+      super || (commit_author if persisted?)
     end
 
     private
+
+    def commit_author
+      commit&.author
+    end
 
     def commit
       @commit ||= issue.project.design_repository.commit(sha)

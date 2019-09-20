@@ -5,8 +5,9 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
   include ImportExport::CommonUtil
   using RSpec::Parameterized::TableSyntax
 
-  set(:user) { create(:user) }
-  set(:project) { create(:project, :builds_disabled, :issues_disabled, name: 'project', path: 'project') }
+  let_it_be(:project) { create(:project, :builds_disabled, :issues_disabled, name: 'project', path: 'project') }
+  let_it_be(:user) { create(:admin, username: 'user_1') }
+  let_it_be(:second_user) { create(:user, username: 'user_2' )}
   let(:shared) { project.import_export_shared }
   let(:project_tree_restorer) { described_class.new(user: user, shared: shared, project: project) }
   let(:restored_project_json) { project_tree_restorer.restore }
@@ -29,15 +30,16 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     describe 'restores issue associations correctly' do
       let(:issue) { project.issues.offset(index).first }
 
-      where(:index, :design_filenames, :version_shas) do
-        0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6]
-        1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8]
+      where(:index, :design_filenames, :version_shas, :author_usernames) do
+        0 | %w[chirrido3.jpg jonathan_richman.jpg mariavontrap.jpeg] | %w[27702d08f5ee021ae938737f84e8fe7c38599e85 9358d1bac8ff300d3d2597adaa2572a20f7f8703 e1a4a501bcb42f291f84e5d04c8f927821542fb6] | %w[user_1 user_1 user_2]
+        1 | ['1 (1).jpeg', '2099743.jpg', 'a screenshot (1).jpg', 'chirrido3.jpg'] | %w[73f871b4c8c1d65c62c460635e023179fb53abc4 8587e78ab6bda3bc820a9f014c3be4a21ad4fcc8 c9b5f067f3e892122a4b12b0a25a8089192f3ac8] | %w[user_1 user_2 user_2]
       end
 
       with_them do
         it do
           expect(issue.designs.pluck(:filename)).to contain_exactly(*design_filenames)
           expect(issue.design_versions.pluck(:sha)).to contain_exactly(*version_shas)
+          expect(issue.design_versions.map(&:author).map(&:username)).to contain_exactly(*author_usernames)
         end
       end
     end
