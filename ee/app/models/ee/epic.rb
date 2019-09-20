@@ -77,7 +77,7 @@ module EE
         reorder('relative_position ASC', 'id DESC')
       end
 
-      scope :with_api_entity_associations, -> { preload(:author, :labels, :group) }
+      scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
 
       MAX_HIERARCHY_DEPTH = 5
 
