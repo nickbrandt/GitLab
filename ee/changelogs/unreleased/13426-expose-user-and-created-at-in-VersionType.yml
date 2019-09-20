@@ -1,0 +1,5 @@
+---
+title: Expose Design Management Version author and createdAt in GraphQL API
+merge_request: 17325
+author:
+type: added

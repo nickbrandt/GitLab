@@ -9,6 +9,7 @@ module EE
         migrate_epics
         migrate_vulnerabilities_feedback
         migrate_reviews
+        migrate_design_management_versions
         super
       end
 
@@ -27,6 +28,12 @@ module EE
       def migrate_reviews
         user.reviews.update_all(author_id: ghost_user.id)
       end
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def migrate_design_management_versions
+      DesignManagement::Version.where(author_id: user.id).update_all(author_id: ghost_user.id)
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
     end
   end
 end

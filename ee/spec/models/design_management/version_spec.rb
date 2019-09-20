@@ -282,4 +282,34 @@ describe DesignManagement::Version do
       expect(version.author).to eq(User.ghost)
     end
   end
+
+  describe '#lazy_author' do
+    it 'batch loads all user records' do
+      versions = create_list(:design_version, 5)
+
+      expect { versions.map(&:lazy_author).map(&:id) }.not_to exceed_query_limit(1)
+    end
+
+    it 'returns the author' do
+      version = create(:design_version)
+
+      expect(version.lazy_author).to eq(version.author)
+    end
+
+    it 'returns nil if author_id is nil and version is not persisted' do
+      version = build(:design_version, author: nil)
+
+      expect(version.author_id).to eq(nil)
+      expect(version.lazy_author).to eq(nil)
+    end
+
+    it 'returns the ghost user if author is deleted and version has been persisted' do
+      author = create(:user)
+      version = create(:design_version, author: author)
+      author.destroy
+      version.reload
+
+      expect(version.lazy_author).to eq(User.ghost)
+    end
+  end
 end

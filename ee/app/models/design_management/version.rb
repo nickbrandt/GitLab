@@ -100,5 +100,11 @@ module DesignManagement
     def author
       super || (User.ghost if persisted?)
     end
+
+    def lazy_author
+      return author unless author_id
+
+      User.lazy_find(author_id)
+    end
   end
 end

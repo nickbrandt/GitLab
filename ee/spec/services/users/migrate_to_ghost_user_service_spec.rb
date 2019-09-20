@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Users::MigrateToGhostUserService do
-  context 'epics' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
+  set(:user)      { create(:user) }
+  let(:service)    { described_class.new(user) }
 
+  context 'epics' do
     context 'deleted user is present as both author and edited_user' do
       include_examples "migrating a deleted user's associated records to the ghost user", Epic, [:author, :last_edited_by] do
         let(:created_record) do
@@ -23,29 +23,26 @@ describe Users::MigrateToGhostUserService do
   end
 
   context 'vulnerability_feedback author' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
-
     include_examples "migrating a deleted user's associated records to the ghost user", Vulnerabilities::Feedback, [:author] do
       let(:created_record) { create(:vulnerability_feedback, author: user) }
     end
   end
 
   context 'vulnerability_feedback comment author' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
-
     include_examples "migrating a deleted user's associated records to the ghost user", Vulnerabilities::Feedback, [:comment_author] do
       let(:created_record) { create(:vulnerability_feedback, comment_author: user) }
     end
   end
 
   context 'reviews' do
-    let!(:user)      { create(:user) }
-    let(:service)    { described_class.new(user) }
-
     include_examples "migrating a deleted user's associated records to the ghost user", Review, [:author] do
       let(:created_record) { create(:review, author: user) }
+    end
+  end
+
+  context 'design versions' do
+    include_examples "migrating a deleted user's associated records to the ghost user", DesignManagement::Version, [:author] do
+      let(:created_record) { create(:design_version, author: user) }
     end
   end
 end
