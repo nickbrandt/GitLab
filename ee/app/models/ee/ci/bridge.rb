@@ -115,7 +115,11 @@ module EE
       end
 
       def target_ref
-        options&.dig(:trigger, :branch)
+        return unless options&.dig(:trigger, :branch)
+
+        scoped_variables.to_runner_variables.yield_self do |all_variables|
+          ::ExpandVariables.expand(options&.dig(:trigger, :branch), all_variables)
+        end
       end
 
       def dependent?
