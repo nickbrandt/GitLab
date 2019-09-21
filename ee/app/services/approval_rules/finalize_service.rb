@@ -26,7 +26,7 @@ module ApprovalRules
 
     def merge_group_members_into_users
       merge_request.approval_rules.each do |rule|
-        rule.users += rule.group_users
+        rule.users |= rule.group_users
       end
     end
 

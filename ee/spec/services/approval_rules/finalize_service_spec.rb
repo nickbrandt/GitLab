@@ -94,6 +94,20 @@ describe ApprovalRules::FinalizeService do
           expect(rule.approved_approvers).to contain_exactly(user3, group2_user)
           expect(subject).not_to have_received(:copy_project_approval_rules)
         end
+
+        # Test for https://gitlab.com/gitlab-org/gitlab/issues/13488
+        it 'gracefully merges duplicate users' do
+          group2.add_developer(user2)
+
+          expect do
+            subject.execute
+          end.not_to change { ApprovalMergeRequestRule.count }
+
+          rule = merge_request.approval_rules.regular.first
+
+          expect(rule.name).to eq('bar')
+          expect(rule.users).to contain_exactly(user2, user3, group2_user)
+        end
       end
     end
   end
