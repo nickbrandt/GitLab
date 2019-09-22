@@ -60,7 +60,19 @@ describe Projects::Alerting::NotifyService do
         end
 
         context 'with valid token' do
-          it_behaves_like 'processes incident issues', 1
+          context 'with a valid payload' do
+            it_behaves_like 'processes incident issues', 1
+          end
+
+          context 'with an invalid payload' do
+            before do
+              allow(Gitlab::Alerting::NotificationPayloadParser)
+                .to receive(:call)
+                .and_raise(Gitlab::Alerting::NotificationPayloadParser::BadPayloadError)
+            end
+
+            it_behaves_like 'does not process incident issues', http_status: 400
+          end
         end
 
         context 'with invalid token' do
