@@ -17,6 +17,8 @@ module Projects
         process_incident_issues
 
         ServiceResponse.success
+      rescue Gitlab::Alerting::NotificationPayloadParser::BadPayloadError
+        bad_request
       end
 
       private
@@ -44,6 +46,10 @@ module Projects
 
       def valid_token?(token)
         token == DEV_TOKEN
+      end
+
+      def bad_request
+        ServiceResponse.error(message: 'Bad Request', http_status: 400)
       end
 
       def unauthorized

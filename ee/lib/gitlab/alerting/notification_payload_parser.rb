@@ -3,6 +3,8 @@
 module Gitlab
   module Alerting
     class NotificationPayloadParser
+      BadPayloadError = Class.new(StandardError)
+
       DEFAULT_TITLE = 'New: Incident'
 
       def initialize(payload)
@@ -29,17 +31,24 @@ module Gitlab
       end
 
       def annotations
+        primary_params
+          .reverse_merge(flatten_secondary_params)
+          .transform_values(&:presence)
+          .compact
+      end
+
+      def primary_params
         {
           'title' => title,
-          'description' => payload[:description].presence,
-          'monitoring_tool' => payload[:monitoring_tool].presence,
-          'service' => payload[:service].presence,
-          'hosts' => hosts
-        }.compact
+          'description' => payload[:description],
+          'monitoring_tool' => payload[:monitoring_tool],
+          'service' => payload[:service],
+          'hosts' => hosts.presence
+        }
       end
 
       def hosts
-        Array(payload[:hosts]).reject(&:blank?).presence
+        Array(payload[:hosts]).reject(&:blank?)
       end
 
       def current_time
@@ -50,6 +59,16 @@ module Gitlab
         Time.parse(payload[:start_time].to_s).rfc3339
       rescue ArgumentError
         current_time
+      end
+
+      def secondary_params
+        payload.except(:start_time)
+      end
+
+      def flatten_secondary_params
+        Gitlab::Utils::SafeInlineHash.merge_keys!(secondary_params)
+      rescue ArgumentError
+        raise BadPayloadError, 'The payload is too big'
       end
     end
   end
