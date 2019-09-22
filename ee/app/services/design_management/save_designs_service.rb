@@ -33,7 +33,10 @@ module DesignManagement
 
     def upload_designs!
       actions = build_actions
-      run_actions(actions) unless actions.empty?
+      return [] if actions.empty?
+
+      version = run_actions(actions)
+      ::DesignManagement::NewVersionWorker.perform_async(version.id)
 
       actions.map(&:design)
     end

@@ -18,6 +18,18 @@ describe DesignManagement::SaveDesignsService do
 
   before do
     project.add_developer(developer)
+
+    allow(::DesignManagement::NewVersionWorker).to receive(:perform_async)
+  end
+
+  RSpec::Matchers.define :enqueue_worker do
+    match do |action|
+      expect(::DesignManagement::NewVersionWorker)
+        .to receive(:perform_async).once.with(Integer)
+      action.call
+    end
+
+    supports_block_expectations
   end
 
   def run_service(files_to_upload = nil)
@@ -98,11 +110,10 @@ describe DesignManagement::SaveDesignsService do
         it 'creates a commit in the repository' do
           run_service
 
-          commit = design_repository.commit # Get the HEAD
-
-          expect(commit).not_to be_nil
-          expect(commit.author).to eq(user)
-          expect(commit.message).to include(rails_sample_name)
+          expect(design_repository.commit).to have_attributes(
+            author: user,
+            message: include(rails_sample_name)
+          )
         end
 
         it 'causes diff_refs not to be nil' do
@@ -215,6 +226,10 @@ describe DesignManagement::SaveDesignsService do
 
             expect { run_service }.to change { commit_count.call }.by(1)
           end
+
+          it 'enqueues just one new version worker' do
+            expect { run_service }.to enqueue_worker
+          end
         end
 
         context 'when uploading multiple files' do
@@ -233,6 +248,10 @@ describe DesignManagement::SaveDesignsService do
           it 'increments the creation count by 2' do
             counter = Gitlab::UsageCounters::DesignsCounter
             expect { run_service }.to change { counter.read(:create) }.by 2
+          end
+
+          it 'enqueues a new version worker' do
+            expect { run_service }.to enqueue_worker
           end
 
           it 'creates a single commit' do

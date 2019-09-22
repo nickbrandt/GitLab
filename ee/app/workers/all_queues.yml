@@ -57,6 +57,7 @@
 
 - admin_emails
 - create_github_webhook
+- design_management_new_version
 - elastic_batch_project_indexer
 - elastic_namespace_indexer
 - elastic_commit_indexer

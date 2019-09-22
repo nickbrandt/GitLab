@@ -44,6 +44,8 @@ module DesignManagement
 
     sha_attribute :sha
 
+    delegate :project, to: :issue
+
     scope :for_designs, -> (designs) do
       where(id: Action.where(design_id: designs).select(:version_id)).distinct
     end
@@ -82,6 +84,23 @@ module DesignManagement
       end
     rescue
       raise CouldNotCreateVersion.new(sha, issue_id, design_actions)
+    end
+
+    def designs_by_event
+      actions
+        .includes(:design)
+        .group_by(&:event)
+        .transform_values { |group| group.map(&:design) }
+    end
+
+    def author
+      commit&.author
+    end
+
+    private
+
+    def commit
+      @commit ||= issue.project.design_repository.commit(sha)
     end
   end
 end
