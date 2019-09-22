@@ -233,25 +233,32 @@ describe 'Group Cycle Analytics', :js do
   end
 
   describe 'Customizable cycle analytics', :js do
+    let(:button_class) { '.js-add-stage-button' }
+
     context 'enabled' do
       before do
         dropdown = page.find('.dropdown-groups')
         dropdown.click
         dropdown.find('a').click
+
+        # Make capybara wait until all the .stage-nav-item elements are rendered
+        # We should have NUMBER_OF_STAGES + 1 (button)
+        expect(page).to have_selector(
+          '.stage-nav-item',
+          count: Gitlab::Analytics::CycleAnalytics::DefaultStages.all.size + 1
+        )
       end
 
       context 'Add a stage button' do
         it 'is visible' do
-          expect(page).to have_selector('.js-add-stage-button', visible: true)
+          expect(page).to have_selector(button_class, visible: true)
           expect(page).to have_text('Add a stage')
         end
 
         it 'becomes active when clicked' do
-          button_class = '.js-add-stage-button'
-
           expect(page).not_to have_selector("#{button_class}.active")
 
-          page.find(button_class).click
+          find(button_class).click
 
           expect(page).to have_selector("#{button_class}.active")
         end
@@ -259,7 +266,7 @@ describe 'Group Cycle Analytics', :js do
         it 'displays the custom stage form when clicked' do
           expect(page).not_to have_text('New stage')
 
-          page.find('.js-add-stage-button').click
+          page.find(button_class).click
 
           expect(page).to have_text('New stage')
         end
