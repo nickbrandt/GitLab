@@ -25,7 +25,7 @@ module EE
       override :boards
       # rubocop: disable CodeReuse/ActiveRecord
       def boards
-        super.order('LOWER(name) ASC')
+        super.order(Arel.sql('LOWER(name) ASC'))
       end
       # rubocop: enable CodeReuse/ActiveRecord
     end

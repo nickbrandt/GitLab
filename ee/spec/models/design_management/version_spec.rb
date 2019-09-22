@@ -204,4 +204,53 @@ describe DesignManagement::Version do
       end.to change { current_version_id(design_a) }
     end
   end
+
+  describe '#author' do
+    let(:author) { create(:user) }
+    subject(:version) { create(:design_version, :committed, author: author) }
+
+    it { is_expected.to have_attributes(author: author) }
+  end
+
+  describe '#designs_by_event' do
+    context 'there is a single design' do
+      set(:design) { create(:design) }
+
+      shared_examples :a_correctly_categorised_design do |kind, category|
+        let(:version) { create(:design_version, kind => [design]) }
+
+        it 'returns a hash with a single key and the single design in that bucket' do
+          expect(version.designs_by_event).to eq(category => [design])
+        end
+      end
+
+      it_behaves_like :a_correctly_categorised_design, :created_designs, 'creation'
+      it_behaves_like :a_correctly_categorised_design, :modified_designs, 'modification'
+      it_behaves_like :a_correctly_categorised_design, :deleted_designs, 'deletion'
+    end
+
+    context 'there are a bunch of different designs in a variety of states' do
+      let(:version) do
+        create(:design_version,
+               created_designs: create_list(:design, 3),
+               modified_designs: create_list(:design, 4),
+               deleted_designs: create_list(:design, 5))
+      end
+
+      it 'puts them in the right buckets' do
+        expect(version.designs_by_event).to match(
+          a_hash_including(
+            'creation' =>  have_attributes(size: 3),
+            'modification' => have_attributes(size: 4),
+            'deletion' => have_attributes(size: 5)
+          )
+        )
+      end
+
+      it 'does not suffer from N+1 queries' do
+        version.designs.map(&:id) # we don't care about the set-up queries
+        expect { version.designs_by_event }.not_to exceed_query_limit(2)
+      end
+    end
+  end
 end

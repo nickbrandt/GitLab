@@ -47,6 +47,33 @@ module EE
       create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unrelate'))
     end
 
+    # Parameters:
+    #   - version [DesignManagement::Version]
+    #
+    # Example Note text:
+    #
+    #   "added [1 designs](link-to-version)"
+    #   "changed [2 designs](link-to-version)"
+    #
+    # Returns [Array<Note>]: the created Note objects
+    def design_version_added(version)
+      events = DesignManagement::Action.events
+      issue = version.issue
+      project = issue.project
+      user = version.author
+      link_href = design_version_path(version)
+
+      version.designs_by_event.map do |(event_name, designs)|
+        note_data = design_event_note_data(events[event_name])
+        icon_name = note_data[:icon]
+        n = designs.size
+
+        body = "%s [%d %s](%s)" % [note_data[:past_tense], n, 'design'.pluralize(n), link_href]
+
+        create_note(NoteSummary.new(issue, project, user, body, action: icon_name))
+      end
+    end
+
     def epic_issue(epic, issue, user, type)
       return unless validate_epic_issue_action_type(type)
 
@@ -242,6 +269,41 @@ module EE
       # TODO: Abort message should be sent by the system, not a particular user.
       # See https://gitlab.com/gitlab-org/gitlab-foss/issues/63187.
       create_note(NoteSummary.new(noteable, project, author, body, action: 'merge'))
+    end
+
+    private
+
+    # We do not have a named route for DesignManagement::Version, instead
+    # we route to `/designs`, with the version in the query parameters.
+    # This is because this route is not managed by Rails, but Vue:
+    def design_version_path(version)
+      ::Gitlab::Routing.url_helpers.designs_project_issue_path(
+        version.project,
+        version.issue,
+        version: version.id
+      )
+    end
+
+    # Take one of the `DesignManagement::Action.events` and
+    # return:
+    #   * an English past-tense verb.
+    #   * the name of an icon used in renderin a system note
+    #
+    # We do not currently internationalize our system notes,
+    # instead we just produce English-language descriptions.
+    # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/65076
+    # See: https://gitlab.com/gitlab-org/gitlab-ee/issues/14056
+    def design_event_note_data(event)
+      case event
+      when DesignManagement::Action.events[:creation]
+        { icon: 'designs_added', past_tense: 'added' }
+      when DesignManagement::Action.events[:modification]
+        { icon: 'designs_modified', past_tense: 'updated' }
+      when DesignManagement::Action.events[:deletion]
+        { icon: 'designs_removed', past_tense: 'removed' }
+      else
+        raise "Unknown event: #{event}"
+      end
     end
   end
 end
