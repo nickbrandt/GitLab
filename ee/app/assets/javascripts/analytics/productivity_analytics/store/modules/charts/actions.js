@@ -2,13 +2,14 @@ import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { chartKeys } from '../../../constants';
 
-export const fetchAllChartData = ({ commit, state, dispatch }) => {
-  // let's reset any data on the main chart first
-  // since any selected items will be used as query params for other charts)
-  commit(types.RESET_CHART_DATA, chartKeys.main);
-
+/**
+ * Fetches data for all charts except for the main chart
+ */
+export const fetchSecondaryChartData = ({ state, dispatch }) => {
   Object.keys(state.charts).forEach(chartKey => {
-    dispatch('fetchChartData', chartKey);
+    if (chartKey !== chartKeys.main) {
+      dispatch('fetchChartData', chartKey);
+    }
   });
 };
 

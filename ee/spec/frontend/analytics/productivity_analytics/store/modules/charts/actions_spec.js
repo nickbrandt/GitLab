@@ -160,15 +160,14 @@ describe('Productivity analytics chart actions', () => {
     });
   });
 
-  describe('fetchAllChartData', () => {
-    it('commits reset for the main chart and dispatches fetchChartData for all chart types', done => {
+  describe('fetchSecondaryChartData', () => {
+    it('dispatches fetchChartData for all chart types except for the main chart', done => {
       testAction(
-        actions.fetchAllChartData,
+        actions.fetchSecondaryChartData,
         null,
         mockedContext.state,
-        [{ type: types.RESET_CHART_DATA, payload: chartKeys.main }],
+        [],
         [
-          { type: 'fetchChartData', payload: chartKeys.main },
           { type: 'fetchChartData', payload: chartKeys.timeBasedHistogram },
           { type: 'fetchChartData', payload: chartKeys.commitBasedHistogram },
           { type: 'fetchChartData', payload: chartKeys.scatterplot },
