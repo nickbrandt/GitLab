@@ -56,8 +56,7 @@ describe 'Labels Hierarchy', :js do
 
   context 'scoped boards' do
     context 'for group boards' do
-      let!(:board) { create(:board, group: parent) }
-      let!(:board_2) { create(:board, group: parent) }
+      let(:board) { create(:board, group: parent) }
 
       before do
         visit group_board_path(parent, board)
