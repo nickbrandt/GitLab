@@ -18,6 +18,18 @@ module QA
               view 'ee/app/views/layouts/nav/sidebar/_licenses_link.html.haml' do
                 element :link_license_menu
               end
+
+              view 'ee/app/views/layouts/nav/ee/admin/_new_monitoring_sidebar.html.haml' do
+                element :admin_monitoring_audit_logs_link
+              end
+            end
+          end
+
+          def go_to_monitoring_audit_logs
+            hover_element(:admin_monitoring_link) do
+              within_submenu(:admin_sidebar_monitoring_submenu_content) do
+                click_element :admin_monitoring_audit_logs_link
+              end
             end
           end
 
@@ -30,7 +42,7 @@ module QA
           end
 
           def go_to_template_settings
-            hover_settings do
+            hover_element(:admin_settings_item) do
               within_submenu do
                 click_element :admin_settings_template_item
               end

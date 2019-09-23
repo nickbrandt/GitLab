@@ -103,7 +103,7 @@ module QA
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform do |login|
-          login.sign_in_using_credentials(as_user)
+          login.sign_in_using_credentials(user: as_user)
         end
       end
 
