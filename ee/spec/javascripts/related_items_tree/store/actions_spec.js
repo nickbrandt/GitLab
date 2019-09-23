@@ -732,13 +732,13 @@ describe('RelatedItemTree', () => {
         });
       });
 
-      describe('toggleCreateItemForm', () => {
-        it('should set `state.showCreateItemForm` to true', done => {
+      describe('toggleCreateEpicForm', () => {
+        it('should set `state.showCreateEpicForm` to true', done => {
           testAction(
-            actions.toggleCreateItemForm,
+            actions.toggleCreateEpicForm,
             {},
             {},
-            [{ type: types.TOGGLE_CREATE_ITEM_FORM, payload: {} }],
+            [{ type: types.TOGGLE_CREATE_EPIC_FORM, payload: {} }],
             [],
             done,
           );
@@ -997,7 +997,7 @@ describe('RelatedItemTree', () => {
                 payload: { children: [createdEpic], isSubItem: false },
               },
               {
-                type: 'toggleCreateItemForm',
+                type: 'toggleCreateEpicForm',
                 payload: { actionType: ActionType.Epic, toggleState: false },
               },
             ],

@@ -244,8 +244,8 @@ export const removeItem = ({ dispatch }, { parentItem, item }) => {
 };
 
 export const toggleAddItemForm = ({ commit }, data) => commit(types.TOGGLE_ADD_ITEM_FORM, data);
-export const toggleCreateItemForm = ({ commit }, data) =>
-  commit(types.TOGGLE_CREATE_ITEM_FORM, data);
+export const toggleCreateEpicForm = ({ commit }, data) =>
+  commit(types.TOGGLE_CREATE_EPIC_FORM, data);
 
 export const setPendingReferences = ({ commit }, data) =>
   commit(types.SET_PENDING_REFERENCES, data);
@@ -342,7 +342,7 @@ export const receiveCreateItemSuccess = (
     isSubItem: false,
   });
 
-  dispatch('toggleCreateItemForm', {
+  dispatch('toggleCreateEpicForm', {
     actionType,
     toggleState: false,
   });
