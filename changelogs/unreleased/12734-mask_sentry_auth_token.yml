@@ -1,0 +1,5 @@
+---
+title: Mask Sentry auth token in Operations Setttings
+merge_request: 17548
+author:
+type: security
