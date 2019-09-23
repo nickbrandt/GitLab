@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import { GlEmptyState } from '@gitlab/ui';
-import { s__ } from '~/locale';
-import Translate from '~/vue_shared/translate';
 import createDashboardStore from 'ee/security_dashboard/store';
 import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
 import SecurityReportApp from 'ee/vue_shared/security_reports/split_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
+import { s__ } from '~/locale';
+import Translate from '~/vue_shared/translate';
 
 Vue.use(Translate);
 
