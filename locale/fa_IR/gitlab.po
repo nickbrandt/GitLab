@@ -3,17 +3,17 @@ msgstr ""
 "Project-Id-Version: gitlab-ee\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: GitLab (gitlab)\n"
-"Language-Team: Dutch\n"
-"Language: nl_NL\n"
+"Language-Team: Persian\n"
+"Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: gitlab-ee\n"
-"X-Crowdin-Language: nl\n"
+"X-Crowdin-Language: fa\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2019-09-24 10:22\n"
+"PO-Revision-Date: 2019-09-24 10:10\n"
 
 msgid " (from %{timeoutSource})"
 msgstr ""
@@ -28,7 +28,7 @@ msgid " You need to do this before %{grace_period_deadline}."
 msgstr ""
 
 msgid " and"
-msgstr " en"
+msgstr ""
 
 msgid " and "
 msgstr ""
@@ -38,13 +38,13 @@ msgstr ""
 
 msgid " degraded on %d point"
 msgid_plural " degraded on %d points"
-msgstr[0] " gedegradeerd op %d punt"
-msgstr[1] " gedegradeerd op %d punten"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid " improved on %d point"
 msgid_plural " improved on %d points"
-msgstr[0] " verbeterd op %d punt"
-msgstr[1] " verbeterd op %d punten"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid " or "
 msgstr ""
@@ -68,13 +68,13 @@ msgstr[1] ""
 
 msgid "%d commit"
 msgid_plural "%d commits"
-msgstr[0] "%d commit"
-msgstr[1] "%d commits"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d commit behind"
 msgid_plural "%d commits behind"
-msgstr[0] "%d commit achterlopend"
-msgstr[1] "%d commits achterlopend"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d commit,"
 msgid_plural "%d commits,"
@@ -91,18 +91,18 @@ msgstr[1] ""
 
 msgid "%d exporter"
 msgid_plural "%d exporters"
-msgstr[0] "%d exporter"
-msgstr[1] "%d exporters"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d failed test result"
 msgid_plural "%d failed test results"
-msgstr[0] "%d mislukt testresultaat"
-msgstr[1] "%d mislukte testresultaten"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d fixed test result"
 msgid_plural "%d fixed test results"
-msgstr[0] "%d opgelost testresultaat"
-msgstr[1] "%d opgeloste testresultaten"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d inaccessible merge request"
 msgid_plural "%d inaccessible merge requests"
@@ -111,8 +111,8 @@ msgstr[1] ""
 
 msgid "%d issue"
 msgid_plural "%d issues"
-msgstr[0] "%d probleem"
-msgstr[1] "%d problemen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d issue selected"
 msgid_plural "%d issues selected"
@@ -121,13 +121,13 @@ msgstr[1] ""
 
 msgid "%d layer"
 msgid_plural "%d layers"
-msgstr[0] "%d laag"
-msgstr[1] "%d lagen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d merge request"
 msgid_plural "%d merge requests"
-msgstr[0] "%d merge request"
-msgstr[1] "%d merge requests"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d merge request that you don't have access to."
 msgid_plural "%d merge requests that you don't have access to."
@@ -136,8 +136,8 @@ msgstr[1] ""
 
 msgid "%d metric"
 msgid_plural "%d metrics"
-msgstr[0] "%d metriek"
-msgstr[1] "%d statistieken"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -156,27 +156,27 @@ msgstr[1] ""
 
 msgid "%d staged change"
 msgid_plural "%d staged changes"
-msgstr[0] "%d bepaalde wijziging"
-msgstr[1] "%d bepaalde wijzigingen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%d unstaged change"
 msgid_plural "%d unstaged changes"
-msgstr[0] "%d onbepaalde wijziging"
-msgstr[1] "%d onbepaalde wijzigingen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%s additional commit has been omitted to prevent performance issues."
 msgid_plural "%s additional commits have been omitted to prevent performance issues."
-msgstr[0] "%s andere commit is weggelaten om prestatieproblemen te voorkomen."
-msgstr[1] "%s andere commits zijn weggelaten om prestatieproblemen te voorkomen."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{actionText} & %{openOrClose} %{noteable}"
-msgstr "%{actionText} & %{openOrClose} %{noteable}"
+msgstr ""
 
 msgid "%{authorsName}'s thread"
 msgstr ""
 
 msgid "%{commit_author_link} authored %{commit_timeago}"
-msgstr "%{commit_author_link} schreef %{commit_timeago}"
+msgstr ""
 
 msgid "%{count} LOC/commit"
 msgstr ""
@@ -196,7 +196,7 @@ msgid "%{count} more"
 msgstr ""
 
 msgid "%{count} more assignees"
-msgstr "%{count} andere toebedeelden"
+msgstr ""
 
 msgid "%{count} of %{required} approvals from %{name}"
 msgstr ""
@@ -206,13 +206,13 @@ msgstr ""
 
 msgid "%{count} participant"
 msgid_plural "%{count} participants"
-msgstr[0] "%{count} deelnemer"
-msgstr[1] "%{count} deelnemers"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{count} pending comment"
 msgid_plural "%{count} pending comments"
-msgstr[0] "%{count} openstaande reactie"
-msgstr[1] "%{count} openstaande reacties"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{duration}ms"
 msgstr ""
@@ -233,16 +233,16 @@ msgid "%{extra} more downstream pipelines"
 msgstr ""
 
 msgid "%{filePath} deleted"
-msgstr "%{filePath} verwijderd"
+msgstr ""
 
 msgid "%{firstLabel} +%{labelCount} more"
-msgstr "%{firstLabel} +%{labelCount} meer"
+msgstr ""
 
 msgid "%{gitlab_ci_yml} not found in this commit"
 msgstr ""
 
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
-msgstr "%{group_docs_link_start}Groepen%{group_docs_link_end} stellen u in staat over meerdere projecten samen te werken en te beheren. Leden van een groep hebben toegang tot alle projecten."
+msgstr ""
 
 msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
 msgstr ""
@@ -251,7 +251,7 @@ msgid "%{icon}You are about to add %{usersTag} people to the discussion. Proceed
 msgstr ""
 
 msgid "%{issuableType} will be removed! Are you sure?"
-msgstr "%{issuableType} wordt verwijderd! Weet je het zeker?"
+msgstr ""
 
 msgid "%{label_for_message} unavailable"
 msgstr ""
@@ -272,10 +272,10 @@ msgid "%{listToShow}, and %{awardsListLength} more."
 msgstr ""
 
 msgid "%{loadingIcon} Started"
-msgstr "%{loadingIcon} Gestart"
+msgstr ""
 
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
-msgstr "%{lock_path} is vergrendeld door GitLab Gebruiker %{lock_user_id}"
+msgstr ""
 
 msgid "%{mergeLength}/%{usersLength} can merge"
 msgstr ""
@@ -290,16 +290,16 @@ msgid "%{name} found %{resultsString}"
 msgstr ""
 
 msgid "%{name}'s avatar"
-msgstr "%{name};'s avatar"
+msgstr ""
 
 msgid "%{number_commits_behind} commits behind %{default_branch}, %{number_commits_ahead} commits ahead"
-msgstr "%{number_commits_behind} commits achter %{default_branch}, %{number_commits_ahead} commits voor"
+msgstr ""
 
 msgid "%{openOrClose} %{noteable}"
-msgstr "%{openOrClose} %{noteable}"
+msgstr ""
 
 msgid "%{percent}%% complete"
-msgstr "%{percent}%% compleet"
+msgstr ""
 
 msgid "%{service_title} activated."
 msgstr ""
@@ -348,23 +348,23 @@ msgstr ""
 
 msgid "%{text} %{files}"
 msgid_plural "%{text} %{files} files"
-msgstr[0] "%{text}%{files}"
-msgstr[1] "%{text}%{files} bestanden"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{text} is available"
-msgstr "%{text} is beschikbaar"
+msgstr ""
 
 msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
 msgid "%{title} changes"
-msgstr "%{title} wijzigingen"
+msgstr ""
 
 msgid "%{unstaged} unstaged and %{staged} staged changes"
-msgstr "%{unstaged} unstaged en %{staged} staged wijzigingen"
+msgstr ""
 
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
-msgstr "%{usage_ping_link_start}Lees meer%{usage_ping_link_end} over welke informatie gedeeld wordt met GitLab Inc."
+msgstr ""
 
 msgid "%{userName} (cannot merge)"
 msgstr ""
@@ -420,10 +420,10 @@ msgid "+ %{amount} more"
 msgstr ""
 
 msgid "+ %{count} more"
-msgstr "+ %{count} meer"
+msgstr ""
 
 msgid "+ %{moreCount} more"
-msgstr "+ %{moreCount} meer"
+msgstr ""
 
 msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
@@ -435,26 +435,26 @@ msgid ", or "
 msgstr ""
 
 msgid "- Runner is active and can process any new jobs"
-msgstr "- Runner is actief en kan nieuwe taken verwerken"
+msgstr ""
 
 msgid "- Runner is paused and will not receive any new jobs"
-msgstr "- Runner is onderbroken en zal geen nieuwe taken ontvangen"
+msgstr ""
 
 msgid "- show less"
-msgstr "- toon minder"
+msgstr ""
 
 msgid "0 for unlimited"
 msgstr ""
 
 msgid "1 %{type} addition"
 msgid_plural "%{count} %{type} additions"
-msgstr[0] "1 %{type} toevoeging"
-msgstr[1] "%{count} %{type} toevoegingen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 %{type} modification"
 msgid_plural "%{count} %{type} modifications"
-msgstr[0] "1 %{type} aanpassing"
-msgstr[1] "%{count} %{type} aanpassingen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 Day"
 msgid_plural "%d Days"
@@ -476,8 +476,8 @@ msgstr ""
 
 msgid "1 group"
 msgid_plural "%d groups"
-msgstr[0] "1 groep"
-msgstr[1] "%d groepen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 merged merge request"
 msgid_plural "%{merge_requests} merged merge requests"
@@ -496,18 +496,18 @@ msgstr[1] ""
 
 msgid "1 pipeline"
 msgid_plural "%d pipelines"
-msgstr[0] "1 pipeline"
-msgstr[1] "%d pipelines"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 role"
 msgid_plural "%d roles"
-msgstr[0] "1 rol"
-msgstr[1] "%d rollen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 user"
 msgid_plural "%d users"
-msgstr[0] "1 gebruiker"
-msgstr[1] "%d gebruikers"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "1 week"
 msgstr ""
@@ -519,7 +519,7 @@ msgid "10-19 contributions"
 msgstr ""
 
 msgid "1st contribution!"
-msgstr "1e bijdrage!"
+msgstr ""
 
 msgid "20-29 contributions"
 msgstr ""
@@ -669,34 +669,34 @@ msgid "Abort"
 msgstr ""
 
 msgid "About GitLab"
-msgstr "Over GitLab"
+msgstr ""
 
 msgid "About GitLab CE"
-msgstr "Over GitLab CE"
+msgstr ""
 
 msgid "About auto deploy"
-msgstr "Over auto deploy"
+msgstr ""
 
 msgid "About this feature"
-msgstr "Over deze functie"
+msgstr ""
 
 msgid "Abuse Reports"
-msgstr "Misbruik rapporten"
+msgstr ""
 
 msgid "Abuse reports"
-msgstr "Misbruik rapporten"
+msgstr ""
 
 msgid "Accept invitation"
 msgstr ""
 
 msgid "Accept terms"
-msgstr "Voorwaarden accepteren"
+msgstr ""
 
 msgid "Accepted MR"
 msgstr ""
 
 msgid "Access Tokens"
-msgstr "Toegangstokens"
+msgstr ""
 
 msgid "Access denied for your LDAP account."
 msgstr ""
@@ -783,10 +783,10 @@ msgid "AccessTokens|reset it"
 msgstr ""
 
 msgid "Account"
-msgstr "Account"
+msgstr ""
 
 msgid "Account and limit"
-msgstr "Account en limiet"
+msgstr ""
 
 msgid "Account: %{account}"
 msgstr ""
@@ -798,7 +798,7 @@ msgid "Activate Service Desk"
 msgstr ""
 
 msgid "Active"
-msgstr "Actief"
+msgstr ""
 
 msgid "Active %{type} Tokens (%{token_length})"
 msgstr ""
@@ -807,7 +807,7 @@ msgid "Active Sessions"
 msgstr ""
 
 msgid "Activity"
-msgstr "Activiteit"
+msgstr ""
 
 msgid "Add"
 msgstr ""
@@ -929,7 +929,7 @@ msgid "Add new application"
 msgstr ""
 
 msgid "Add new directory"
-msgstr "Nieuwe map toevoegen"
+msgstr ""
 
 msgid "Add new member to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
@@ -1234,7 +1234,7 @@ msgid "Alerts"
 msgstr ""
 
 msgid "All"
-msgstr "Alles"
+msgstr ""
 
 msgid "All Members"
 msgstr ""
@@ -1630,7 +1630,7 @@ msgid "Any user"
 msgstr ""
 
 msgid "Appearance"
-msgstr "Uiterlijk"
+msgstr ""
 
 msgid "Appearance was successfully created."
 msgstr ""
@@ -1645,7 +1645,7 @@ msgid "Append the comment with %{shrug}"
 msgstr ""
 
 msgid "Application"
-msgstr "Applicatie"
+msgstr ""
 
 msgid "Application ID"
 msgstr ""
@@ -1666,7 +1666,7 @@ msgid "Application: %{name}"
 msgstr ""
 
 msgid "Applications"
-msgstr "Applicaties"
+msgstr ""
 
 msgid "Applied"
 msgstr ""
@@ -2008,7 +2008,7 @@ msgid "Authentication via U2F device failed."
 msgstr ""
 
 msgid "Author"
-msgstr "Auteur"
+msgstr ""
 
 msgid "Authorization code:"
 msgstr ""
@@ -2401,13 +2401,13 @@ msgid "Branch not loaded - %{branchId}"
 msgstr ""
 
 msgid "BranchSwitcherPlaceholder|Search branches"
-msgstr "BranchSwitcherPlaceholder|Zoek branches"
+msgstr ""
 
 msgid "BranchSwitcherTitle|Switch branch"
-msgstr "BranchSwitcherTitle|Ga naar branch"
+msgstr ""
 
 msgid "Branches"
-msgstr "Branches"
+msgstr ""
 
 msgid "Branches|Active"
 msgstr ""
@@ -2419,10 +2419,10 @@ msgid "Branches|All"
 msgstr ""
 
 msgid "Branches|Cant find HEAD commit for this branch"
-msgstr "Branches|Kan geen HEAD-commit vinden voor deze branch"
+msgstr ""
 
 msgid "Branches|Compare"
-msgstr "Branches|Vergelijk"
+msgstr ""
 
 msgid "Branches|Delete all branches that are merged into '%{default_branch}'"
 msgstr ""
@@ -2536,19 +2536,19 @@ msgid "Broadcast Message was successfully updated."
 msgstr ""
 
 msgid "Browse Directory"
-msgstr "Bladeren in map"
+msgstr ""
 
 msgid "Browse File"
-msgstr "Bekijk bestand"
+msgstr ""
 
 msgid "Browse Files"
-msgstr "Door bestanden bladeren"
+msgstr ""
 
 msgid "Browse artifacts"
 msgstr ""
 
 msgid "Browse files"
-msgstr "Door bestanden bladeren"
+msgstr ""
 
 msgid "Built-in"
 msgstr ""
@@ -2590,13 +2590,13 @@ msgid "By default, all projects and groups will use the global notifications set
 msgstr ""
 
 msgid "ByAuthor|by"
-msgstr "door"
+msgstr ""
 
 msgid "CHANGELOG"
 msgstr ""
 
 msgid "CI / CD"
-msgstr "CI / CD"
+msgstr ""
 
 msgid "CI / CD Charts"
 msgstr ""
@@ -2701,7 +2701,7 @@ msgid "Canary Deployments is a popular CI strategy, where a small portion of the
 msgstr ""
 
 msgid "Cancel"
-msgstr "Annuleren"
+msgstr ""
 
 msgid "Cancel running"
 msgstr ""
@@ -2824,10 +2824,10 @@ msgid "Changes won't take place until the index is %{link_start}recreated%{link_
 msgstr ""
 
 msgid "Charts"
-msgstr "Grafieken"
+msgstr ""
 
 msgid "Chat"
-msgstr "Chat"
+msgstr ""
 
 msgid "ChatMessage|%{project_link}: Pipeline %{pipeline_link} of %{ref_type} %{branch_link} by %{user_combined_name} %{humanized_status} in %{duration}"
 msgstr ""
@@ -2905,7 +2905,7 @@ msgid "Checking username availability..."
 msgstr ""
 
 msgid "Cherry-pick this commit"
-msgstr "Cherry-pick deze commit"
+msgstr ""
 
 msgid "Cherry-pick this merge request"
 msgstr ""
@@ -2962,16 +2962,16 @@ msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
 msgid "CiStatusLabel|canceled"
-msgstr "geannuleerd"
+msgstr ""
 
 msgid "CiStatusLabel|created"
-msgstr "gemaakt"
+msgstr ""
 
 msgid "CiStatusLabel|delayed"
 msgstr ""
 
 msgid "CiStatusLabel|failed"
-msgstr "mislukt"
+msgstr ""
 
 msgid "CiStatusLabel|manual action"
 msgstr ""
@@ -2989,7 +2989,7 @@ msgid "CiStatusLabel|preparing"
 msgstr ""
 
 msgid "CiStatusLabel|skipped"
-msgstr "overgeslagen"
+msgstr ""
 
 msgid "CiStatusLabel|waiting for delayed job"
 msgstr ""
@@ -2998,13 +2998,13 @@ msgid "CiStatusLabel|waiting for manual action"
 msgstr ""
 
 msgid "CiStatusText|blocked"
-msgstr "geblokkeerd"
+msgstr ""
 
 msgid "CiStatusText|canceled"
 msgstr ""
 
 msgid "CiStatusText|created"
-msgstr "gemaakt"
+msgstr ""
 
 msgid "CiStatusText|delayed"
 msgstr ""
@@ -3013,10 +3013,10 @@ msgid "CiStatusText|failed"
 msgstr ""
 
 msgid "CiStatusText|manual"
-msgstr "handmatig"
+msgstr ""
 
 msgid "CiStatusText|passed"
-msgstr "geslaagd"
+msgstr ""
 
 msgid "CiStatusText|pending"
 msgstr ""
@@ -3025,7 +3025,7 @@ msgid "CiStatusText|preparing"
 msgstr ""
 
 msgid "CiStatusText|skipped"
-msgstr "overgeslagen"
+msgstr ""
 
 msgid "CiStatus|running"
 msgstr ""
@@ -3883,7 +3883,7 @@ msgid "Comment/Reply (quoting selected text)"
 msgstr ""
 
 msgid "Comments"
-msgstr "Opmerkingen"
+msgstr ""
 
 msgid "Commit"
 msgid_plural "Commits"
@@ -3915,16 +3915,16 @@ msgid "Commit to %{branchName} branch"
 msgstr ""
 
 msgid "CommitBoxTitle|Commit"
-msgstr "Commit"
+msgstr ""
 
 msgid "CommitMessage|Add %{file_name}"
-msgstr "%{file_name} toevoegen"
+msgstr ""
 
 msgid "CommitWidget|authored"
 msgstr ""
 
 msgid "Commits"
-msgstr "Commits"
+msgstr ""
 
 msgid "Commits feed"
 msgstr ""
@@ -3945,13 +3945,13 @@ msgid "Commits|Commit: %{commitText}"
 msgstr ""
 
 msgid "Commits|History"
-msgstr "Geschiedenis"
+msgstr ""
 
 msgid "Commits|No related merge requests found"
 msgstr ""
 
 msgid "Committed by"
-msgstr "Gecommit door"
+msgstr ""
 
 msgid "Commit…"
 msgstr ""
@@ -3960,7 +3960,7 @@ msgid "Company"
 msgstr ""
 
 msgid "Compare"
-msgstr "Vergelijk"
+msgstr ""
 
 msgid "Compare Git revisions"
 msgstr ""
@@ -4400,7 +4400,7 @@ msgid "Create confidential merge request and branch"
 msgstr ""
 
 msgid "Create directory"
-msgstr "Maak map aan"
+msgstr ""
 
 msgid "Create empty repository"
 msgstr ""
@@ -4658,7 +4658,7 @@ msgid "CycleAnalyticsEvent|Merge request merged"
 msgstr ""
 
 msgid "CycleAnalyticsStage|Code"
-msgstr "Code"
+msgstr ""
 
 msgid "CycleAnalyticsStage|Issue"
 msgstr ""
@@ -4667,7 +4667,7 @@ msgid "CycleAnalyticsStage|Plan"
 msgstr ""
 
 msgid "CycleAnalyticsStage|Production"
-msgstr "Productie"
+msgstr ""
 
 msgid "CycleAnalyticsStage|Review"
 msgstr ""
@@ -10177,8 +10177,8 @@ msgstr ""
 
 msgid "New Issue"
 msgid_plural "New Issues"
-msgstr[0] "Nieuwe issue"
-msgstr[1] "Nieuwe issues"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "New Label"
 msgstr ""
@@ -10801,7 +10801,7 @@ msgid "Opened issues"
 msgstr ""
 
 msgid "OpenedNDaysAgo|Opened"
-msgstr "Geopend"
+msgstr ""
 
 msgid "Opens in a new window"
 msgstr ""
@@ -16293,7 +16293,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Time|s"
-msgstr "s"
+msgstr ""
 
 msgid "Tip:"
 msgstr ""
@@ -17520,7 +17520,7 @@ msgid "VisibilityLevel|Internal"
 msgstr ""
 
 msgid "VisibilityLevel|Private"
-msgstr "Privé"
+msgstr ""
 
 msgid "VisibilityLevel|Public"
 msgstr ""
