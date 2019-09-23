@@ -1,9 +1,9 @@
 import testAction from 'spec/helpers/vuex_action_helper';
-import Tracking from '~/tracking';
 import createState from 'ee/security_dashboard/store/modules/filters/state';
 import * as types from 'ee/security_dashboard/store/modules/filters/mutation_types';
 import module, * as actions from 'ee/security_dashboard/store/modules/filters/actions';
 import { ALL } from 'ee/security_dashboard/store/modules/filters/constants';
+import Tracking from '~/tracking';
 
 describe('filters actions', () => {
   beforeEach(() => {

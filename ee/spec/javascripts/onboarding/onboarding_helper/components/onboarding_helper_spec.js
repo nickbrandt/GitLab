@@ -1,8 +1,8 @@
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { GlProgressBar, GlLoadingIcon } from '@gitlab/ui';
 import component from 'ee/onboarding/onboarding_helper/components/onboarding_helper.vue';
 import TourPartsList from 'ee/onboarding/onboarding_helper/components/tour_parts_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlProgressBar, GlLoadingIcon } from '@gitlab/ui';
 import Tracking from '~/tracking';
 
 const localVue = createLocalVue();

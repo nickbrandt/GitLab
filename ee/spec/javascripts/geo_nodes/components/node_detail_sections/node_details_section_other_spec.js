@@ -2,8 +2,8 @@ import Vue from 'vue';
 
 import NodeDetailsSectionOtherComponent from 'ee/geo_nodes/components/node_detail_sections/node_details_section_other.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { mockNode, mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
+import { numberToHumanSize } from '~/lib/utils/number_utils';
 
 const createComponent = (
   node = Object.assign({}, mockNode),

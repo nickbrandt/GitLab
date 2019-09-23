@@ -1,4 +1,3 @@
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
 import * as actions from 'ee/vue_shared/license_management/store/actions';
 import * as mutationTypes from 'ee/vue_shared/license_management/store/mutation_types';
@@ -12,6 +11,7 @@ import {
   licenseHeadIssues,
   licenseBaseIssues,
 } from 'ee_spec/license_management/mock_data';
+import axios from '~/lib/utils/axios_utils';
 
 describe('License store actions', () => {
   const apiUrlManageLicenses = `${TEST_HOST}/licenses/management`;
