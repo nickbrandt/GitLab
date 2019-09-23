@@ -11,8 +11,8 @@ module Gitlab
         def initialize(globs)
           globs = Array(globs)
 
-          @top_level_only = globs.all? { |glob| top_level_glob?(glob) }
-          @exact_globs, @pattern_globs = globs.partition { |glob| exact_glob?(glob) }
+          @top_level_only = globs.all?(&method(:top_level_glob?))
+          @exact_globs, @pattern_globs = globs.partition(&method(:exact_glob?))
         end
 
         def satisfied_by?(pipeline, seed)
