@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "required": ["title", "legend", "description", "id", "custom"],
+  "properties": {
+    "title": { 
+      "type": "string" 
+    },
+    "legend": { 
+      "type": "string" 
+    },
+    "description": { 
+      "type": "string" 
+    },
+    "id": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "integer" }
+      ]
+    },
+    "custom": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

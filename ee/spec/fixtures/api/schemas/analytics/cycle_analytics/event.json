@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": ["name", "identifier", "type", "can_be_start_event", "allowed_end_events"],
+  "properties": {
+    "name": { 
+      "type": "string" 
+    },
+    "identifier": { 
+      "type": "string" 
+    },
+    "type": { 
+      "type": "string" ,
+      "enum": ["simple"]
+    },
+    "can_be_start_event": {
+      "type": "boolean"
+    },
+    "allowed_end_events": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}
