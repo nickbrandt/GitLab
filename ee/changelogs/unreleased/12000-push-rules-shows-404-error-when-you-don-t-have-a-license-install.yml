@@ -1,0 +1,5 @@
+---
+title: Hide Push rules link when you dont have a license installed
+merge_request: 17530
+author:
+type: fixed
