@@ -4,6 +4,8 @@ import store from '../store/index';
 import FeatureFlagForm from './form.vue';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
 
+import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
 const { mapState, mapActions } = createNamespacedHelpers('new');
 
 export default {
@@ -11,6 +13,7 @@ export default {
   components: {
     FeatureFlagForm,
   },
+  mixins: [featureFlagsMixin()],
   props: {
     endpoint: {
       type: String,
@@ -29,10 +32,13 @@ export default {
     ...mapState(['error']),
     scopes() {
       return [
-        createNewEnvironmentScope({
-          environmentScope: '*',
-          active: true,
-        }),
+        createNewEnvironmentScope(
+          {
+            environmentScope: '*',
+            active: true,
+          },
+          this.glFeatures.featureFlagsPermissions,
+        ),
       ];
     },
   },

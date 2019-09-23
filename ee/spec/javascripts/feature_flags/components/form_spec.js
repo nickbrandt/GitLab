@@ -25,17 +25,12 @@ describe('feature flag form', () => {
     wrapper = mount(localVue.extend(Form), {
       localVue,
       propsData: props,
+      provide: {
+        glFeatures: { featureFlagPermissions: true },
+      },
       sync: false,
     });
   };
-
-  beforeAll(() => {
-    gon.features = { featureFlagPermissions: true };
-  });
-
-  afterAll(() => {
-    gon.features = null;
-  });
 
   afterEach(() => {
     wrapper.destroy();
