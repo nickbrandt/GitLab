@@ -8,7 +8,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            'UserOnboardingTour|Welcome to the project overview of the %{emphasisStart}%{projectName}%{emphasisEnd} project. This is the project that we uese to work on GitLab. At first, a project seems like a simple repository, but at GitLab, a project is so much more.%{lineBreak}%{lineBreak}You can create projects for hosting your codebase, use it as an issue tracker, collaboreate on code, and continuously build, test, and deploy your app with built-in GitLab CI/CD.',
+            'UserOnboardingTour|Welcome to the project overview of the %{emphasisStart}%{projectName}%{emphasisEnd} project. This is the project that we use to work on GitLab. At first, a project seems like a simple repository, but at GitLab, a project is so much more.%{lineBreak}%{lineBreak}You can create projects for hosting your codebase, use it as an issue tracker, collaboreate on code, and continuously build, test, and deploy your app with built-in GitLab CI/CD.',
           ),
           {
             emphasisStart: '<strong>',
@@ -41,7 +41,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|This is the repository for the %{emphasisStart}%{projectName}%{emphasisEnd} project. All our code is stored here. Feel free to explore around and take a closer look at folders and files.%{lineBreak}%{lineBreak}Above the file structure, you can see the latest commit, who the author is and the status of the CI/CD pipeline.%{lineBreak}%{lineBreak}If you scroll down, below the file strcture, you'll find the Readme of this project. This is defined in the README.md file at the root of the repository.",
+            "UserOnboardingTour|This is the repository for the %{emphasisStart}%{projectName}%{emphasisEnd} project. All our code is stored here. Feel free to explore around and take a closer look at folders and files.%{lineBreak}%{lineBreak}Above the file structure, you can see the latest commit, who the author is and the status of the CI/CD pipeline.%{lineBreak}%{lineBreak}If you scroll down, below the file structure, you'll find the Readme of this project. This is defined in the README.md file at the root of the repository.",
           ),
           {
             emphasisStart: '<strong>',
@@ -275,7 +275,7 @@ const GUIDED_GITLAB_TOUR = [
       {
         text: sprintf(
           s__(
-            "UserOnboardingTour|The structure of this page is very similar to the onfe of issues. Status, description, discussion and the sidebar are all here.%{lineBreak}%{lineBreak}But take a look below the description and you'll notice that there's more information about the merge request, the CI/CD pipeline and the options for approving it.%{lineBreak}%{lineBreak}Below, alongside the discussion you can also see more information about commits in this merge request, the status of pipelines and review all changes that were made.",
+            "UserOnboardingTour|The structure of this page is very similar to the one of issues. Status, description, discussion and the sidebar are all here.%{lineBreak}%{lineBreak}But take a look below the description and you'll notice that there's more information about the merge request, the CI/CD pipeline and the options for approving it.%{lineBreak}%{lineBreak}Below, alongside the discussion you can also see more information about commits in this merge request, the status of pipelines and review all changes that were made.",
           ),
           {
             lineBreak: '</br>',
