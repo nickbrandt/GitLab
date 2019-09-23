@@ -3,9 +3,9 @@ require 'spec_helper'
 describe 'User uploads new design', :js do
   include DesignManagementTestHelpers
 
-  let(:user) { project.owner }
-  let(:project) { create(:project_empty_repo, :public) }
-  let(:issue) { create(:issue, project: project) }
+  set(:project) { create(:project_empty_repo, :public) }
+  set(:user) { project.owner }
+  set(:issue) { create(:issue, project: project) }
 
   before do
     sign_in(user)

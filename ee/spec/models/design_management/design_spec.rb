@@ -28,12 +28,35 @@ describe DesignManagement::Design do
     it { is_expected.to validate_presence_of(:filename) }
     it { is_expected.to validate_uniqueness_of(:filename).scoped_to(:issue_id) }
 
-    it "validates that the file is an image" do
+    it "validates that the extension is an image" do
       design.filename = "thing.txt"
+      extensions = described_class::SAFE_IMAGE_EXT + described_class::DANGEROUS_IMAGE_EXT
 
       expect(design).not_to be_valid
-      expect(design.errors[:filename].first)
-        .to match %r/Only these extensions are supported/
+      expect(design.errors[:filename].first).to eq(
+        "Only these extensions are supported: #{extensions.to_sentence}"
+      )
+    end
+
+    describe 'validating files with .svg extension' do
+      before do
+        design.filename = "thing.svg"
+      end
+
+      it "allows .svg files when feature flag is enabled" do
+        stub_feature_flags(design_management_allow_dangerous_images: true)
+
+        expect(design).to be_valid
+      end
+
+      it "does not allow .svg files when feature flag is disabled" do
+        stub_feature_flags(design_management_allow_dangerous_images: false)
+
+        expect(design).not_to be_valid
+        expect(design.errors[:filename].first).to eq(
+          "Only these extensions are supported: #{described_class::SAFE_IMAGE_EXT.to_sentence}"
+        )
+      end
     end
   end
 

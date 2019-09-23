@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'Users views raw design image files' do
   include DesignManagementTestHelpers
 
-  let(:project) { create(:project, :public) }
-  let(:issue) { create(:issue, project: project) }
-  let(:design) { create(:design, :with_file, issue: issue, versions_count: 2) }
+  set(:project) { create(:project, :public) }
+  set(:issue) { create(:issue, project: project) }
+  set(:design) { create(:design, :with_file, issue: issue, versions_count: 2) }
   let(:newest_version) { design.versions.ordered.first }
   let(:oldest_version) { design.versions.ordered.last }
 
