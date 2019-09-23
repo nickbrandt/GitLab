@@ -33,10 +33,10 @@ export default {
   },
   methods: {
     onFormSubmit() {
-      this.$emit('createItemFormSubmit', this.inputValue.trim());
+      this.$emit('createEpicFormSubmit', this.inputValue.trim());
     },
     onFormCancel() {
-      this.$emit('createItemFormCancel');
+      this.$emit('createEpicFormCancel');
     },
   },
 };

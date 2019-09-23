@@ -105,12 +105,12 @@ describe('RelatedItemsTreeApp', () => {
       });
     });
 
-    describe('handleCreateItemFormSubmit', () => {
+    describe('handleCreateEpicFormSubmit', () => {
       it('calls `createItem` action with `itemTitle` param', () => {
         const newValue = 'foo';
         spyOn(wrapper.vm, 'createItem');
 
-        wrapper.vm.handleCreateItemFormSubmit(newValue);
+        wrapper.vm.handleCreateEpicFormSubmit(newValue);
 
         expect(wrapper.vm.createItem).toHaveBeenCalledWith({
           itemTitle: newValue,
@@ -147,13 +147,13 @@ describe('RelatedItemsTreeApp', () => {
       });
     });
 
-    describe('handleCreateItemFormCancel', () => {
-      it('calls `toggleCreateItemForm` actions with params `toggleState` and `actionType`', () => {
-        spyOn(wrapper.vm, 'toggleCreateItemForm');
+    describe('handleCreateEpicFormCancel', () => {
+      it('calls `toggleCreateEpicForm` actions with params `toggleState` and `actionType`', () => {
+        spyOn(wrapper.vm, 'toggleCreateEpicForm');
 
-        wrapper.vm.handleCreateItemFormCancel();
+        wrapper.vm.handleCreateEpicFormCancel();
 
-        expect(wrapper.vm.toggleCreateItemForm).toHaveBeenCalledWith({
+        expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({
           toggleState: false,
           actionType: '',
         });
@@ -162,7 +162,7 @@ describe('RelatedItemsTreeApp', () => {
       it('calls `setItemInputValue` action with empty string', () => {
         spyOn(wrapper.vm, 'setItemInputValue');
 
-        wrapper.vm.handleCreateItemFormCancel();
+        wrapper.vm.handleCreateEpicFormCancel();
 
         expect(wrapper.vm.setItemInputValue).toHaveBeenCalledWith('');
       });

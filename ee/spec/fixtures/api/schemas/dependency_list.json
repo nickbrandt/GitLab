@@ -13,7 +13,8 @@
     },
     "report": {
       "status": { "type": "string" },
-      "job_path": { "type": "string" }
+      "job_path": { "type": "string" },
+      "generated_at": { "type": "string" }
     }
   },
   "additionalProperties": false

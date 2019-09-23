@@ -1,12 +1,12 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
 
-import CreateItemForm from 'ee/related_items_tree/components/create_item_form.vue';
+import CreateEpicForm from 'ee/related_items_tree/components/create_epic_form.vue';
 
 const createComponent = (isSubmitting = false) => {
   const localVue = createLocalVue();
 
-  return mount(CreateItemForm, {
+  return mount(CreateEpicForm, {
     localVue,
     propsData: {
       isSubmitting,
@@ -15,7 +15,7 @@ const createComponent = (isSubmitting = false) => {
 };
 
 describe('RelatedItemsTree', () => {
-  describe('CreateItemForm', () => {
+  describe('CreateEpicForm', () => {
     let wrapper;
 
     beforeEach(() => {
@@ -68,22 +68,22 @@ describe('RelatedItemsTree', () => {
 
     describe('methods', () => {
       describe('onFormSubmit', () => {
-        it('emits `createItemFormSubmit` event on component with input value as param', () => {
+        it('emits `createEpicFormSubmit` event on component with input value as param', () => {
           const value = 'foo';
           wrapper.find('input.form-control').setValue(value);
 
           wrapper.vm.onFormSubmit();
 
-          expect(wrapper.emitted().createItemFormSubmit).toBeTruthy();
-          expect(wrapper.emitted().createItemFormSubmit[0]).toEqual([value]);
+          expect(wrapper.emitted().createEpicFormSubmit).toBeTruthy();
+          expect(wrapper.emitted().createEpicFormSubmit[0]).toEqual([value]);
         });
       });
 
       describe('onFormCancel', () => {
-        it('emits `createItemFormCancel` event on component', () => {
+        it('emits `createEpicFormCancel` event on component', () => {
           wrapper.vm.onFormCancel();
 
-          expect(wrapper.emitted().createItemFormCancel).toBeTruthy();
+          expect(wrapper.emitted().createEpicFormCancel).toBeTruthy();
         });
       });
     });
