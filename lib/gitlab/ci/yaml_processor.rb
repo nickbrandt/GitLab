@@ -40,7 +40,7 @@ module Gitlab
           environment: job[:environment_name],
           coverage_regex: job[:coverage],
           yaml_variables: yaml_variables(name),
-          needs_attributes: job[:needs]&.map { |need| { name: need } },
+          needs_attributes: job[:needs][:pipeline]&.map { |need| { name: need } },
           interruptible: job[:interruptible],
           rules: job[:rules],
           options: {
@@ -59,7 +59,7 @@ module Gitlab
             instance: job[:instance],
             start_in: job[:start_in],
             trigger: job[:trigger],
-            bridge_needs: job[:needs]
+            bridge_needs: job[:needs][:bridge]
           }.compact }.compact
       end
 
@@ -159,11 +159,11 @@ module Gitlab
       end
 
       def validate_job_needs!(name, job)
-        return unless job[:needs]
+        return unless job[:needs][:pipeline]
 
         stage_index = @stages.index(job[:stage])
 
-        job[:needs].each do |need|
+        job[:needs][:pipeline].each do |need|
           raise ValidationError, "#{name} job: undefined need: #{need}" unless @jobs[need.to_sym]
 
           needs_stage_index = @stages.index(@jobs[need.to_sym][:stage])
