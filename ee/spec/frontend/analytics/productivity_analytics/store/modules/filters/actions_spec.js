@@ -27,20 +27,14 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[1]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.timeBasedHistogram,
+            'charts/fetchSecondaryChartData',
+            null,
             { root: true },
           ]);
 
           expect(store.dispatch.mock.calls[2]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.commitBasedHistogram,
-            { root: true },
-          ]);
-
-          expect(store.dispatch.mock.calls[3]).toEqual([
             'table/fetchMergeRequests',
-            jasmine.any(Object),
+            null,
             { root: true },
           ]);
         })
@@ -68,20 +62,14 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[1]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.timeBasedHistogram,
+            'charts/fetchSecondaryChartData',
+            null,
             { root: true },
           ]);
 
           expect(store.dispatch.mock.calls[2]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.commitBasedHistogram,
-            { root: true },
-          ]);
-
-          expect(store.dispatch.mock.calls[3]).toEqual([
             'table/fetchMergeRequests',
-            jasmine.any(Object),
+            null,
             { root: true },
           ]);
         })
@@ -109,20 +97,14 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[1]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.timeBasedHistogram,
+            'charts/fetchSecondaryChartData',
+            null,
             { root: true },
           ]);
 
           expect(store.dispatch.mock.calls[2]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.commitBasedHistogram,
-            { root: true },
-          ]);
-
-          expect(store.dispatch.mock.calls[3]).toEqual([
             'table/fetchMergeRequests',
-            jasmine.any(Object),
+            null,
             { root: true },
           ]);
         })
@@ -150,20 +132,14 @@ describe('Productivity analytics filter actions', () => {
           ]);
 
           expect(store.dispatch.mock.calls[1]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.timeBasedHistogram,
+            'charts/fetchSecondaryChartData',
+            null,
             { root: true },
           ]);
 
           expect(store.dispatch.mock.calls[2]).toEqual([
-            'charts/fetchChartData',
-            chartKeys.commitBasedHistogram,
-            { root: true },
-          ]);
-
-          expect(store.dispatch.mock.calls[3]).toEqual([
             'table/fetchMergeRequests',
-            jasmine.any(Object),
+            null,
             { root: true },
           ]);
         })
