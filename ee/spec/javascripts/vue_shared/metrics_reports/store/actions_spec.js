@@ -1,5 +1,4 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import {
   setEndpoint,
   requestMetrics,
@@ -10,6 +9,7 @@ import {
 import * as types from 'ee/vue_shared/metrics_reports/store/mutation_types';
 import state from 'ee/vue_shared/metrics_reports/store/state';
 import testAction from 'spec/helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 
 describe('metrics reports actions', () => {
   let mockedState;

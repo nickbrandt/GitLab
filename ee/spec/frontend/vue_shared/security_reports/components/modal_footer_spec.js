@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
 import component from 'ee/vue_shared/security_reports/components/modal_footer.vue';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import DismissButton from 'ee/vue_shared/security_reports/components/dismiss_button.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 describe('Security Reports modal footer', () => {
   let wrapper;

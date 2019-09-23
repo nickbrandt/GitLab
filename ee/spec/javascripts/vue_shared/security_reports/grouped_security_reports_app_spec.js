@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import component from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
@@ -9,6 +8,7 @@ import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mu
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { waitForMutation } from 'spec/helpers/vue_test_utils_helper';
 import { trimText } from 'spec/helpers/text_helper';
+import axios from '~/lib/utils/axios_utils';
 import {
   sastIssues,
   sastIssuesBase,
