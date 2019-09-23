@@ -1,7 +1,3 @@
-import {
-  components as componentsCE,
-  componentNames as componentNamesCE,
-} from '~/reports/components/issue_body';
 import PerformanceIssueBody from 'ee/vue_merge_request_widget/components/performance_issue_body.vue';
 import CodequalityIssueBody from 'ee/vue_merge_request_widget/components/codequality_issue_body.vue';
 import BlockingMergeRequestsBody from 'ee/vue_merge_request_widget/components/blocking_merge_requests/blocking_merge_request_body.vue';
@@ -10,6 +6,10 @@ import SastIssueBody from 'ee/vue_shared/security_reports/components/sast_issue_
 import SastContainerIssueBody from 'ee/vue_shared/security_reports/components/sast_container_issue_body.vue';
 import DastIssueBody from 'ee/vue_shared/security_reports/components/dast_issue_body.vue';
 import MetricsReportsIssueBody from 'ee/vue_shared/metrics_reports/components/metrics_reports_issue_body.vue';
+import {
+  components as componentsCE,
+  componentNames as componentNamesCE,
+} from '~/reports/components/issue_body';
 
 export const components = {
   ...componentsCE,

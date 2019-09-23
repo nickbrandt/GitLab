@@ -1,9 +1,9 @@
 import $ from 'jquery';
 import _ from 'underscore';
+import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
-import AccessDropdown from 'ee/projects/settings/access_dropdown';
 import { ACCESS_LEVELS, LEVEL_TYPES } from './constants';
 
 export default class ProtectedTagEdit {
