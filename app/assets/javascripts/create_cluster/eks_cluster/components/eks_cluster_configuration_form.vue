@@ -53,6 +53,19 @@ export default {
         false,
       );
     },
+    subnetDropdownHelpText() {
+      return sprintf(
+        s__(
+          'ClusterIntegration|Choose the %{startLink}subnets%{endLink} in your VPC where your worker nodes will run.',
+        ),
+        {
+          startLink:
+            '<a href="https://console.aws.amazon.com/vpc/home?#subnets" target="_blank" rel="noopener noreferrer">',
+          endLink: '</a>',
+        },
+        false,
+      );
+    },
   },
   mounted() {
     this.fetchRegions();
@@ -96,7 +109,7 @@ export default {
       />
     </div>
     <div class="form-group">
-      <label class="label-bold" name="role" for="eks-role">{{
+      <label class="label-bold" name="eks-vpc" for="eks-vpc">{{
         s__('ClusterIntegration|VPC')
       }}</label>
       <cluster-form-dropdown
@@ -118,7 +131,7 @@ export default {
       <p class="form-text text-muted" v-html="vpcDropdownHelpText"></p>
     </div>
     <div class="form-group">
-      <label class="label-bold" name="role" for="eks-role">{{
+      <label class="label-bold" name="eks-subnet" for="eks-subnet">{{
         s__('ClusterIntegration|Subnet')
       }}</label>
       <cluster-form-dropdown
@@ -137,7 +150,7 @@ export default {
         :error-message="s__('ClusterIntegration|Could not load subnets for the selected VPC')"
         @input="setVpcAndFetchSubnets($event)"
       />
-      <p class="form-text text-muted" v-html="vpcDropdownHelpText"></p>
+      <p class="form-text text-muted" v-html="subnetDropdownHelpText"></p>
     </div>
   </form>
 </template>
