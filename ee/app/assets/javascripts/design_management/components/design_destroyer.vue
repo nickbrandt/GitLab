@@ -1,6 +1,6 @@
 <script>
-import createFlash from '~/flash';
 import { ApolloMutation } from 'vue-apollo';
+import createFlash from '~/flash';
 import projectQuery from '../graphql/queries/project.query.graphql';
 import destroyDesignMutation from '../graphql/mutations/destroyDesign.mutation.graphql';
 import { updateStoreAfterDesignsDelete } from '../utils/cache_update';

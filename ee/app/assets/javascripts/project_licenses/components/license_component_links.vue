@@ -1,8 +1,7 @@
 <script>
 import { uniqueId } from 'underscore';
-import { sprintf, s__ } from '~/locale';
-
 import { GlLink, GlIntersperse, GlModal, GlButton, GlModalDirective } from '@gitlab/ui';
+import { sprintf, s__ } from '~/locale';
 
 const MODAL_ID_PREFIX = 'license-component-link-modal-';
 export const VISIBLE_COMPONENT_COUNT = 2;
