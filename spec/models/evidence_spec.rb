@@ -95,6 +95,16 @@ describe Evidence do
     end
   end
 
+  describe '#sha' do
+    it 'returns nil if summary is nil' do
+      expect(build(:evidence, summary: nil).sha).to be_nil
+    end
+
+    it 'returns the correct SHA256 checksum for a given summary json' do
+      expect(build(:evidence, :with_summary).sha).to eq('xiDS1AOTlWvj9K7WMRQJCO6uNbVdC6jf4TPE4AYtkT8=')
+    end
+  end
+
   describe '#generate_summary' do
     before do
       described_class.create!(release: release)

@@ -11,11 +11,17 @@ class Evidence < ApplicationRecord
   validate :milestone_fields
   validate :issue_fields
 
-  def generate_summary
-    self.summary = EvidenceReleaseSerializer.new.represent(release) # rubocop: disable CodeReuse/Serializer
+  def sha
+    return unless summary
+
+    Gitlab::CryptoHelper.sha256(summary)
   end
 
   private
+
+  def generate_summary
+    self.summary = EvidenceReleaseSerializer.new.represent(release) # rubocop: disable CodeReuse/Serializer
+  end
 
   def release_fields
     return unless release.present?
