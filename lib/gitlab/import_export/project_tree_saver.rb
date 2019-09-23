@@ -18,10 +18,7 @@ module Gitlab
       def save
         mkdir_p(@shared.export_path)
 
-        project_tree = serialize_project_tree
-        fix_project_tree(project_tree)
-        project_tree_json = JSON.generate(project_tree)
-        File.write(full_path, project_tree_json)
+        File.write(full_path, serialize_project_tree)
 
         true
       rescue => e
@@ -41,13 +38,26 @@ module Gitlab
         RelationRenameService.add_new_associations(project_tree)
       end
 
+      # TODO: add comment, DRY with `fix_project_tree`
+      def additional_attributes
+        {}.tap do |attrs|
+          if @params[:description].present?
+            attrs['description'] = @params[:description]
+          end
+
+          attrs['project_members'] = group_members_array
+        end
+      end
+
       def serialize_project_tree
         if Feature.enabled?(:export_fast_serialize, default_enabled: true)
           Gitlab::ImportExport::FastHashSerializer
-            .new(@project, reader.project_tree)
+            .new(@project, reader.project_tree, additional_attributes: additional_attributes)
             .execute
         else
-          @project.as_json(reader.project_tree)
+          project_tree = @project.as_json(reader.project_tree)
+          fix_project_tree(project_tree)
+          JSON.generate(project_tree)
         end
       end
 

@@ -47,14 +47,12 @@ module Gitlab
 
         def to_json(options = {})
           result = +''
-          items = 0
 
           batch = @relation
           batch = batch.preload(@preloads) if @preloads
           batch.each do |item|
             result.concat(",") unless result.empty?
             result.concat(item.to_json(@options))
-            items += 1
           end
 
           result
@@ -67,16 +65,30 @@ module Gitlab
 
       BATCH_SIZE = 100
 
-      def initialize(subject, tree, batch_size: BATCH_SIZE)
+      def initialize(subject, tree, additional_attributes: {}, batch_size: BATCH_SIZE)
         @subject = subject
         @batch_size = batch_size
         @tree = tree
+        @additional_attributes = additional_attributes
       end
 
-      # Serializes the subject into a Hash for the given option tree
-      # (e.g. Project#as_json)
+      # Serializes the subject into JSON for the given option tree
       def execute
-        simple_serialize.merge(serialize_includes)
+        serialized_hash = simple_serialize.merge(serialize_includes)
+
+        # TODO: move into separate method
+        serialized_hash.deep_merge!(@additional_attributes) do |key, this_val, other_val|
+          # for Project, we need to add `group_members` from @additional_attributes, not replace,
+          if this_val.is_a?(Array) && other_val.is_a?(Array)
+            this_val + other_val
+          else
+            other_val
+          end
+        end
+
+        RelationRenameService.add_new_associations(serialized_hash) # TODO: could it passed into @additional_attributes?
+
+        JSON.generate(serialized_hash)
       end
 
       private
