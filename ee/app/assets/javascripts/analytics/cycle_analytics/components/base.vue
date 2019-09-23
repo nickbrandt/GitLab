@@ -55,7 +55,7 @@ export default {
       'summary',
       'dataTimeframe',
     ]),
-    ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError']),
+    ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -161,24 +161,22 @@ export default {
           )
         "
       />
-      <div v-else class="cycle-analytics mt-0">
-        <summary-table class="js-summary-table" :items="summary" />
-        <stage-table
-          v-if="currentStage"
-          class="js-stage-table"
-          :current-stage="currentStage"
-          :stages="stages"
-          :is-loading-stage="isLoadingStage"
-          :is-empty-stage="isEmptyStage"
-          :is-adding-custom-stage="isAddingCustomStage"
-          :events="events"
-          :no-data-svg-path="noDataSvgPath"
-          :no-access-svg-path="noAccessSvgPath"
-          :can-edit-stages="hasCustomizableCycleAnalytics"
-          @selectStage="onStageSelect"
-          @showAddStageForm="onShowAddStageForm"
-        />
-      </div>
+      <summary-table class="js-summary-table" :items="summary" />
+      <stage-table
+        v-if="currentStage"
+        class="js-stage-table"
+        :current-stage="currentStage"
+        :stages="stages"
+        :is-loading-stage="isLoadingStage"
+        :is-empty-stage="isEmptyStage"
+        :is-adding-custom-stage="isAddingCustomStage"
+        :events="events"
+        :no-data-svg-path="noDataSvgPath"
+        :no-access-svg-path="noAccessSvgPath"
+        :can-edit-stages="hasCustomizableCycleAnalytics"
+        @selectStage="onStageSelect"
+        @showAddStageForm="onShowAddStageForm"
+      />
     </div>
   </div>
 </template>
