@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import environmentsComponent from '~/environments/components/environments_app.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { environment, folder } from 'spec/environments/mock_data';
+import axios from '~/lib/utils/axios_utils';
+import environmentsComponent from '~/environments/components/environments_app.vue';
 
 describe('Environment', () => {
   const mockData = {

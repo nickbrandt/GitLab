@@ -1,7 +1,7 @@
 import Vue from 'vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import environmentTableComp from '~/environments/components/environments_table.vue';
 import eventHub from '~/environments/event_hub';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { deployBoardMockData } from './mock_data';
 
 describe('Environment table', () => {

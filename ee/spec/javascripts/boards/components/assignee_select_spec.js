@@ -1,10 +1,12 @@
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
+
+import AssigneeSelect from 'ee/boards/components/assignee_select.vue';
+import { boardObj } from 'spec/boards/mock_data';
+
 import axios from '~/lib/utils/axios_utils';
 import boardsStore from '~/boards/stores/boards_store';
 import IssuableContext from '~/issuable_context';
-import AssigneeSelect from 'ee/boards/components/assignee_select.vue';
-import { boardObj } from 'spec/boards/mock_data';
 
 let vm;
 
