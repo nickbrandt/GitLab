@@ -220,7 +220,7 @@ export default {
     <div class="value">
       <div
         :class="{ 'is-option-selected': selectedDateIsFixed, 'd-flex': !editing }"
-        class="value-type-fixed"
+        class="value-type-fixed text-secondary"
       >
         <input
           v-if="canUpdate && !editing"
@@ -237,7 +237,7 @@ export default {
           @newDateSelected="newDateSelected"
           @hidePicker="stopEditing"
         />
-        <span v-else class="d-flex value-content">
+        <span v-else class="d-flex value-content prepend-left-2">
           <template v-if="dateFixed">
             <span>{{ dateFixedWords }}</span>
             <icon
@@ -265,7 +265,7 @@ export default {
         v-tooltip
         :title="dateFromMilestonesTooltip"
         :class="{ 'is-option-selected': !selectedDateIsFixed }"
-        class="value-type-dynamic d-flex prepend-top-10"
+        class="value-type-dynamic text-secondary d-flex prepend-top-10"
         data-placement="bottom"
         data-html="true"
       >
@@ -277,7 +277,7 @@ export default {
           @click="toggleDateType(false)"
         />
         <span class="prepend-left-5">{{ __('From milestones:') }}</span>
-        <span class="value-content">{{ dateFromMilestonesWords }}</span>
+        <span class="value-content prepend-left-2">{{ dateFromMilestonesWords }}</span>
         <icon
           v-if="isDateInvalid && !selectedDateIsFixed"
           v-popover="dateInvalidPopoverOptions"
