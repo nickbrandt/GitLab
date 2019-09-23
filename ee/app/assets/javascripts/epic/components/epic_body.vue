@@ -3,9 +3,9 @@ import { mapState, mapGetters } from 'vuex';
 
 import { PathIdSeparator } from 'ee/related_issues/constants';
 
+import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
 import IssuableBody from '~/issue_show/components/app.vue';
 import IssuableSidebar from '~/issuable_sidebar/components/sidebar_app.vue';
-import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
 
 import EpicSidebar from './epic_sidebar.vue';
 

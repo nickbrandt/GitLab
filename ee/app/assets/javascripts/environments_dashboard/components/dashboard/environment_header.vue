@@ -1,9 +1,9 @@
 <script>
+import { GlButton, GlLink, GlBadge, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import ReviewAppLink from '~/vue_merge_request_widget/components/review_app_link.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
-import { GlButton, GlLink, GlBadge, GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
