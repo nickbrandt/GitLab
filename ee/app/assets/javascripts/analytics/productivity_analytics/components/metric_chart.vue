@@ -1,7 +1,7 @@
 <script>
 import _ from 'underscore';
-import { s__ } from '~/locale';
 import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {

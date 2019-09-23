@@ -1,9 +1,9 @@
 <script>
-import { s__, __ } from '~/locale';
 import $ from 'jquery';
 import _ from 'underscore';
-import Icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon, GlButton, GlAvatar } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
+import { s__, __ } from '~/locale';
 import Api from '~/api';
 import { renderAvatar, renderIdenticon } from '~/helpers/avatar_helper';
 

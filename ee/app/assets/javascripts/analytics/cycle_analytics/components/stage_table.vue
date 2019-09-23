@@ -1,6 +1,6 @@
 <script>
-import { __, s__ } from '~/locale';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
+import { __, s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
