@@ -28,6 +28,8 @@ module Gitlab
 
       private
 
+      # TODO: remove alongside with `:export_fast_serialize` feature toggle,
+      # when FastHashSerializer will be verified on production
       def fix_project_tree(project_tree)
         if @params[:description].present?
           project_tree['description'] = @params[:description]
@@ -38,7 +40,6 @@ module Gitlab
         RelationRenameService.add_new_associations(project_tree)
       end
 
-      # TODO: add comment, DRY with `fix_project_tree`
       def additional_attributes
         {}.tap do |attrs|
           if @params[:description].present?
