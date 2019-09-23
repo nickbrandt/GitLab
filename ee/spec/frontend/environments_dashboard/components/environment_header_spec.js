@@ -1,8 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlLink, GlBadge } from '@gitlab/ui';
+import component from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ReviewAppLink from '~/vue_merge_request_widget/components/review_app_link.vue';
-import component from 'ee/environments_dashboard/components/dashboard/environment_header.vue';
 
 const localVue = createLocalVue();
 

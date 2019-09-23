@@ -1,7 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
-import { getParameterValues } from '~/lib/utils/url_utility';
 import { TEST_HOST } from 'helpers/test_constants';
 
 import SecurityDashboardApp from 'ee/security_dashboard/components/app.vue';
@@ -11,6 +9,8 @@ import VulnerabilityChart from 'ee/security_dashboard/components/vulnerability_c
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 
 import createStore from 'ee/security_dashboard/store';
+import { getParameterValues } from '~/lib/utils/url_utility';
+import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
 

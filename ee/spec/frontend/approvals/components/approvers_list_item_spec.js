@@ -1,9 +1,9 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import Avatar from '~/vue_shared/components/project_avatar/default.vue';
 import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from 'ee/approvals/constants';
 import ApproversListItem from 'ee/approvals/components/approvers_list_item.vue';
 import HiddenGroupsItem from 'ee/approvals/components/hidden_groups_item.vue';
+import Avatar from '~/vue_shared/components/project_avatar/default.vue';
 
 const localVue = createLocalVue();
 const TEST_USER = {

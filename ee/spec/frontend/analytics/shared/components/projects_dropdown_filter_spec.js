@@ -1,11 +1,11 @@
-import { mount } from '@vue/test-utils';
 import $ from 'jquery';
 import 'bootstrap';
-import '~/gl_dropdown';
+import { mount } from '@vue/test-utils';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
 import { LAST_ACTIVITY_AT } from 'ee/analytics/shared/constants';
-import Api from '~/api';
 import { TEST_HOST } from 'helpers/test_constants';
+import Api from '~/api';
+import '~/gl_dropdown';
 
 jest.mock('~/api', () => ({
   groupProjects: jest.fn(),
