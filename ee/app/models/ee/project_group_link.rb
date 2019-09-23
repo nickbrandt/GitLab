@@ -5,14 +5,18 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      before_destroy :delete_branch_protection
+      before_destroy :delete_related_access_levels
     end
 
-    def delete_branch_protection
-      if group.present? && project.present?
-        project.protected_branches.merge_access_by_group(group).destroy_all # rubocop: disable DestroyAll
-        project.protected_branches.push_access_by_group(group).destroy_all # rubocop: disable DestroyAll
-      end
+    def delete_related_access_levels
+      return unless group.present? && project.present?
+
+      # For protected branches
+      project.protected_branches.merge_access_by_group(group).destroy_all # rubocop: disable DestroyAll
+      project.protected_branches.push_access_by_group(group).destroy_all # rubocop: disable DestroyAll
+
+      # For protected environments
+      project.protected_environments.deploy_access_levels_by_group(group).delete_all
     end
   end
 end

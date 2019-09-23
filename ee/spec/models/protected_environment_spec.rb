@@ -116,6 +116,21 @@ describe ProtectedEnvironment do
     end
   end
 
+  describe '.deploy_access_levels_by_group' do
+    let(:group) { create(:group) }
+    let(:project) { create(:project) }
+    let(:environment) { create(:environment, project: project, name: 'production') }
+    let(:protected_environment) { create(:protected_environment, project: project, name: 'production') }
+
+    it 'returns matching deploy access levels for the given group' do
+      _deploy_access_level_for_different_group = create_deploy_access_level(group: create(:group))
+      _deploy_access_level_for_user = create_deploy_access_level(user: create(:user))
+      deploy_access_level = create_deploy_access_level(group: group)
+
+      expect(described_class.deploy_access_levels_by_group(group)).to contain_exactly(deploy_access_level)
+    end
+  end
+
   def create_deploy_access_level(**opts)
     protected_environment.deploy_access_levels.create(**opts)
   end
