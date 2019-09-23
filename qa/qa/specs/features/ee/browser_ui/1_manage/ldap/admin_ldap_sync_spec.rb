@@ -9,7 +9,7 @@ module QA
         Page::Main::Login.perform do |login_page|
           user = Struct.new(:ldap_username, :ldap_password).new('adminuser1', 'password')
 
-          login_page.sign_in_using_ldap_credentials(user)
+          login_page.sign_in_using_ldap_credentials(user: user)
         end
 
         Page::Main::Menu.perform do |menu|

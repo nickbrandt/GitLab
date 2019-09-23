@@ -36,7 +36,7 @@
         %th Date
     %tbody
       - @events.map(&:present).each do |event|
-        %tr
+        %tr{ data: { qa_selector: 'admin_audit_log_row_content' } }
           %td
             - if (author_link = event.author_name)
               = author_link
