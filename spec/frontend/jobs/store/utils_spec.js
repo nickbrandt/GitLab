@@ -66,7 +66,7 @@ describe('Jobs Store Utils', () => {
 
       addDurationToHeader(parsed, duration);
 
-      expect(parsed.section_duration).toEqual(duration.section_duration);
+      expect(parsed[0].line.section_duration).toEqual(duration.section_duration);
     });
 
     describe('without matching section', () => {
@@ -127,7 +127,7 @@ describe('Jobs Store Utils', () => {
 
     describe('section duration', () => {
       it('adds the section information to the header section', () => {
-        expect(result[1].section_duration).toEqual(utilsMockData[4].section_duration);
+        expect(result[1].line.section_duration).toEqual(utilsMockData[4].section_duration);
       });
 
       it('does not add section duration as a line', () => {
@@ -141,7 +141,7 @@ describe('Jobs Store Utils', () => {
       it('adds new line', () => {
         const oldLog = logLinesParser(originalTrace);
 
-        const result = updateIncrementalTrace(regularIncremental, 0, oldLog);
+        const result = updateIncrementalTrace(regularIncremental, oldLog);
 
         expect(result).toEqual([
           {
@@ -169,7 +169,7 @@ describe('Jobs Store Utils', () => {
     describe('with regular line repeated offset', () => {
       it('updates the last line and formats with the incremental part', () => {
         const oldLog = logLinesParser(originalTrace);
-        const result = updateIncrementalTrace(regularIncrementalRepeated, 0, oldLog);
+        const result = updateIncrementalTrace(regularIncrementalRepeated, oldLog);
 
         expect(result).toEqual([
           {
@@ -188,7 +188,7 @@ describe('Jobs Store Utils', () => {
     describe('with header line repeated', () => {
       it('updates the header line and formats with the incremental part', () => {
         const oldLog = logLinesParser(headerTrace);
-        const result = updateIncrementalTrace(headerTraceIncremental, 0, oldLog);
+        const result = updateIncrementalTrace(headerTraceIncremental, oldLog);
 
         expect(result).toEqual([
           {
@@ -214,7 +214,7 @@ describe('Jobs Store Utils', () => {
     describe('with collapsible line repeated', () => {
       it('updates the collapsible line and formats with the incremental part', () => {
         const oldLog = logLinesParser(collapsibleTrace);
-        const result = updateIncrementalTrace(collapsibleTraceIncremental, 1, oldLog);
+        const result = updateIncrementalTrace(collapsibleTraceIncremental, oldLog);
 
         expect(result).toEqual([
           {
@@ -253,10 +253,9 @@ describe('Jobs Store Utils', () => {
     describe('when last item matches the offset', () => {
       it('returns an object with the item removed and the lastLine', () => {
         const newData = [{ offset: 10, content: [{ text: 'foobar' }] }];
-        const existingLog = [{ offset: 10, content: [{ text: 'bar' }], lineNumber: 1 }];
+        const existingLog = [{ line: { content: [{ text: 'bar' }], offset: 10, lineNumber: 1 } }];
         const result = findOffsetAndRemove(newData, existingLog);
-        expect(result.log).toEqual([]);
-        expect(result.lineNumber).toEqual(1);
+        expect(result).toEqual([]);
       });
     });
 
@@ -265,24 +264,24 @@ describe('Jobs Store Utils', () => {
         const newData = [{ offset: 101, content: [{ text: 'foobar' }] }];
         const existingLog = [
           {
-            offset: 10,
             lines: [{ offset: 101, content: [{ text: 'foobar' }], lineNumber: 2 }],
-            lineNumber: 1,
+            line: {
+              offset: 10,
+              lineNumber: 1,
+            },
           },
         ];
         const result = findOffsetAndRemove(newData, existingLog);
-        expect(result.log).toEqual([{ offset: 10, lines: [], lineNumber: 1 }]);
-        expect(result.lineNumber).toEqual(1);
+        expect(result).toEqual([{ offset: 10, lines: [], lineNumber: 1 }]);
       });
     });
 
     describe('when it does not match the offset', () => {
       it('returns an object with the complete old log and the last line number', () => {
         const newData = [{ offset: 101, content: [{ text: 'foobar' }] }];
-        const existingLog = [{ offset: 10, content: [{ text: 'bar' }], lineNumber: 1 }];
+        const existingLog = [{ line: { content: [{ text: 'bar' }], offset: 10, lineNumber: 1 } }];
         const result = findOffsetAndRemove(newData, existingLog);
-        expect(result.log).toEqual(existingLog);
-        expect(result.lineNumber).toEqual(1);
+        expect(result).toEqual(existingLog);
       });
     });
   });

@@ -36,7 +36,7 @@ export const parseHeaderLine = (line = {}, lineNumber) => ({
 export function addDurationToHeader(data, durationLine) {
   data.forEach(el => {
     if (el.line && el.line.section === durationLine.section) {
-       el.line.section_duration = durationLine.section_duration;
+      el.line.section_duration = durationLine.section_duration;
     }
   });
 }
@@ -96,10 +96,10 @@ export const findOffsetAndRemove = (newLog, oldParsed) => {
   const firstNew = newLog[0];
   const parsed = {};
 
-  if (last.line.offset === firstNew.offset) {
+  if((last.offset === firstNew.offset) || (last.line && last.line.offset === firstNew.offset)) {
     cloneOldLog.splice(lastIndex);
     parsed.lastLine = last.lineNumber;
-  } else if (last.lines.length) {
+  } else if (last.lines && last.lines.length) {
     const lastNestedIndex = last.lines.length - 1;
     const lastNested = last.lines[lastNestedIndex];
     if (lastNested.offset === firstNew.offset) {
@@ -107,9 +107,20 @@ export const findOffsetAndRemove = (newLog, oldParsed) => {
       parsed.lastLine = lastNested.lineNumber;
     }
   }
-  parsed.log = cloneOldLog;
-  return parsed;
+  return cloneOldLog;
 };
+
+export const findLastLineNumber = (oldLog) => {
+  const lastIndex = oldLog.length - 1;
+
+  if (oldLog[lastIndex].lines && oldLog[lastIndex].lines.length) {
+    return oldLog[lastIndex].lines.length -1
+  } else if (oldLog.length === 1) {
+    return 1;
+  } else {
+    return lastIndex;
+  }
+}
 
 /**
  * The first line of the new log may already exist
@@ -123,7 +134,9 @@ export const findOffsetAndRemove = (newLog, oldParsed) => {
  */
 export const updateIncrementalTrace = (newLog, oldParsed = []) => {
   const parsedLog = findOffsetAndRemove(newLog, oldParsed);
-  return logLinesParser(newLog, parsedLog.lastLine, parsedLog.log);
+  const lineNumber = findLastLineNumber(oldParsed);
+  console.log('lineNumber', lineNumber);
+  return logLinesParser(newLog, lineNumber, parsedLog);
 };
 
 export const isNewJobLogActive = () => gon && gon.features && gon.features.jobLogJson;
