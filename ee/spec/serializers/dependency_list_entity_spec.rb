@@ -33,6 +33,7 @@ describe DependencyListEntity do
           expect(subject[:dependencies][0][:name]).to eq('nokogiri')
           expect(subject[:report][:status]).to eq(:ok)
           expect(subject[:report][:job_path]).to eq(job_path)
+          expect(subject[:report][:generated_at]).to eq(ci_build.finished_at)
         end
       end
 
@@ -69,6 +70,7 @@ describe DependencyListEntity do
         it 'has only status failed_job' do
           expect(subject[:report][:status]).to eq(:job_failed)
           expect(subject[:report]).not_to include(:job_path)
+          expect(subject[:report]).not_to include(:generated_at)
         end
       end
     end
@@ -81,6 +83,7 @@ describe DependencyListEntity do
       it 'has status job_not_set_up and no job_path' do
         expect(subject[:report][:status]).to eq(:job_not_set_up)
         expect(subject[:report][:job_path]).not_to be_present
+        expect(subject[:report][:generated_at]).not_to be_present
       end
     end
   end
