@@ -9,7 +9,7 @@
         = _('Select the custom project template source group.')
     .settings-content
 
-      = form_for @application_setting, url: admin_application_settings_path(anchor: 'js-custom-project-templates-settings') do |f|
+      = form_for @application_setting, url: templates_admin_application_settings_path(anchor: 'js-custom-project-templates-settings') do |f|
         = form_errors(@application_setting)
 
         %fieldset

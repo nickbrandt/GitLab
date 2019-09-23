@@ -9,7 +9,7 @@
         = _('Geo allows you to replicate your GitLab instance to other geographical locations.')
     .settings-content
 
-      = form_for @application_setting, url: admin_application_settings_path(anchor: 'js-geo-settings'), html: { class: 'fieldset-form' } do |f|
+      = form_for @application_setting, url: geo_admin_application_settings_path(anchor: 'js-geo-settings'), html: { class: 'fieldset-form' } do |f|
         = form_errors(@application_setting)
 
         %fieldset

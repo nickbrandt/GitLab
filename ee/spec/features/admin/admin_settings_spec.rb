@@ -38,8 +38,8 @@ describe 'Admin updates EE-only settings' do
     end
   end
 
-  it 'Enable external authentication' do
-    visit admin_application_settings_path
+  it 'Enables external authentication' do
+    visit general_admin_application_settings_path
     page.within('.as-external-auth') do
       check 'Enable classification control using an external service'
       fill_in 'Default classification label', with: 'default'
@@ -183,11 +183,16 @@ describe 'Admin updates EE-only settings' do
   end
 
   describe 'LDAP settings' do
-    context 'with LDAP enabled' do
-      it 'Change allow group owners to manage ldap' do
-        allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(true)
-        visit admin_application_settings_path
+    before do
+      allow(Gitlab::Auth::LDAP::Config).to receive(:enabled?).and_return(ldap_setting)
 
+      visit general_admin_application_settings_path
+    end
+
+    context 'with LDAP enabled' do
+      let(:ldap_setting) { true }
+
+      it 'Changes to allow group owners to manage ldap' do
         page.within('.as-visibility-access') do
           find('#application_setting_allow_group_owners_to_manage_ldap').set(false)
           click_button 'Save'
@@ -199,9 +204,9 @@ describe 'Admin updates EE-only settings' do
     end
 
     context 'with LDAP disabled' do
-      it 'Does not show option to allow group owners to manage ldap' do
-        visit admin_application_settings_path
+      let(:ldap_setting) { false }
 
+      it 'Does not show option to allow group owners to manage ldap' do
         expect(page).not_to have_css('#application_setting_allow_group_owners_to_manage_ldap')
       end
     end
