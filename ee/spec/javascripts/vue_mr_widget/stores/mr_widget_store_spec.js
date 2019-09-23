@@ -1,12 +1,12 @@
 import MergeRequestStore from 'ee/vue_merge_request_widget/stores/mr_widget_store';
 import filterByKey from 'ee/vue_shared/security_reports/store/utils/filter_by_key';
-import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
 import mockData, {
   headIssues,
   baseIssues,
   parsedBaseIssues,
   parsedHeadIssues,
 } from 'ee_spec/vue_mr_widget/mock_data';
+import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
 
 describe('MergeRequestStore', () => {
   let store;
