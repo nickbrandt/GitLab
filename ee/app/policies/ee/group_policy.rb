@@ -51,6 +51,7 @@ module EE
         enable :read_prometheus
         enable :view_code_analytics
         enable :view_productivity_analytics
+        enable :view_type_of_work_charts
       end
 
       rule { maintainer }.policy do
