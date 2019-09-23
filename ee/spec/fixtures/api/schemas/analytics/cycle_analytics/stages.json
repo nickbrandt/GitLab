@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "events": { 
+      "type": "array" ,
+      "items": {
+        "$ref": "event.json"
+      }
+    },
+    "stages": { 
+      "type": "array" ,
+      "items": {
+        "$ref": "stage.json"
+      }
+    }
+  },
+  "required": ["events", "stages"],
+  "additionalProperties": false
+}
