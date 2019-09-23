@@ -1,10 +1,9 @@
+import Api from 'ee/api';
+import { noneEpic } from 'ee/vue_shared/constants';
 import flash from '~/flash';
 import { s__ } from '~/locale';
-import Api from 'ee/api';
 
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
-import { noneEpic } from 'ee/vue_shared/constants';
 
 import * as types from './mutation_types';
 

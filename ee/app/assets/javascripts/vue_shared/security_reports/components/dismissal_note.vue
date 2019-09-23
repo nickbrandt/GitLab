@@ -1,8 +1,8 @@
 <script>
 import _ from 'underscore';
-import { __, sprintf } from '~/locale';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { GlButton } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {

@@ -1,8 +1,8 @@
 <script>
-import { s__ } from '~/locale';
 import { mapActions, mapState } from 'vuex';
-import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
+import { s__ } from '~/locale';
+import DeprecatedModal2 from '~/vue_shared/components/deprecated_modal_2.vue';
 import LicensePackages from './license_packages.vue';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 

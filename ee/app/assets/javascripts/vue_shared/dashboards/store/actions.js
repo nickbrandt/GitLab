@@ -1,10 +1,10 @@
 import Visibility from 'visibilityjs';
+import _ from 'underscore';
 import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
-import _ from 'underscore';
 import * as types from './mutation_types';
 
 const API_MINIMUM_QUERY_LENGTH = 3;

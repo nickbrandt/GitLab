@@ -1,9 +1,9 @@
 <script>
 import { mapActions, mapState } from 'vuex';
+import { componentNames } from 'ee/reports/components/issue_body';
 import { s__, sprintf, n__ } from '~/locale';
 import createFlash from '~/flash';
 import ReportSection from '~/reports/components/report_section.vue';
-import { componentNames } from 'ee/reports/components/issue_body';
 import IssueModal from './components/modal.vue';
 import mixin from './mixins/security_report_mixin';
 import reportsMixin from './mixins/reports_mixin';
