@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Gitlab::ImportExport::FastHashSerializer do
-  # JSONBatchRelation uses delayed serialization, we need to trigger it
-  # TODO: remove JSON.parse?
   subject { JSON.parse(described_class.new(project, tree).execute) }
 
   let!(:project) { setup_project }

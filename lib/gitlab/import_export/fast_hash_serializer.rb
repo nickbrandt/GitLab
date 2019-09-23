@@ -76,17 +76,9 @@ module Gitlab
       def execute
         serialized_hash = simple_serialize.merge(serialize_includes)
 
-        # TODO: move into separate method
-        serialized_hash.deep_merge!(@additional_attributes) do |key, this_val, other_val|
-          # for Project, we need to add `group_members` from @additional_attributes, not replace,
-          if this_val.is_a?(Array) && other_val.is_a?(Array)
-            this_val + other_val
-          else
-            other_val
-          end
-        end
+        merge_additional_attributes!(serialized_hash)
 
-        RelationRenameService.add_new_associations(serialized_hash) # TODO: could it passed into @additional_attributes?
+        RelationRenameService.add_new_associations(serialized_hash) if subject.is_a?(Project)
 
         JSON.generate(serialized_hash)
       end
@@ -143,6 +135,17 @@ module Gitlab
         end
 
         data
+      end
+
+      def merge_additional_attributes!(serialized_hash)
+        serialized_hash.deep_merge!(@additional_attributes) do |key, this_val, other_val|
+          # when serializing Project, we need to append `group_members` from `additional_attributes`, not to replace
+          if this_val.is_a?(Array) && other_val.is_a?(Array)
+            this_val + other_val
+          else
+            other_val
+          end
+        end
       end
 
       def includes
