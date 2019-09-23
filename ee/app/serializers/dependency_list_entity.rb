@@ -14,6 +14,10 @@ class DependencyListEntity < Grape::Entity
     expose :job_path, if: ->(_, options) { options[:build] && can_read_job_path? } do |_, options|
       project_build_path(project, options[:build].id)
     end
+
+    expose :generated_at, if: ->(_, options) { options[:build] && can_read_job_path? } do |_, options|
+      options[:build].finished_at
+    end
   end
 
   private
