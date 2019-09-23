@@ -34,7 +34,7 @@ export const activeFilters = state => {
   // hide_dismissed is hardcoded as it currently is an edge-case, more info in the MR:
   // https://gitlab.com/gitlab-org/gitlab/merge_requests/15333#note_208301144
   if (gon.features && gon.features.hideDismissedVulnerabilities) {
-    filters.hide_dismissed = state.hide_dismissed;
+    filters.scope = state.hide_dismissed ? 'dismissed' : 'all';
   }
   return filters;
 };

@@ -180,15 +180,15 @@ describe('Security Dashboard app', () => {
       getParameterValues.mockRestore();
     });
 
-    it('hides dismissed vulnerabilities by default', () => {
+    it.each`
+      description                                                        | getParameterValuesReturnValue | expected
+      ${'hides dismissed vulnerabilities by default'}                    | ${[]}                         | ${true}
+      ${'shows dismissed vulnerabilities if scope param is "all"'}       | ${['all']}                    | ${false}
+      ${'hides dismissed vulnerabilities if scope param is "dismissed"'} | ${['dismissed']}              | ${true}
+    `('$description', ({ getParameterValuesReturnValue, expected }) => {
+      getParameterValues.mockImplementation(() => getParameterValuesReturnValue);
       createComponent();
-      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(true);
-    });
-
-    it('shows dismissed vulnerabilities if param is specified in URL', () => {
-      getParameterValues.mockImplementation(() => [false]);
-      createComponent();
-      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(false);
+      expect(wrapper.vm.$store.state.filters.hide_dismissed).toBe(expected);
     });
   });
 });
