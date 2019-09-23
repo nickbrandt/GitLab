@@ -11,7 +11,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
     end
 
     context 'when entry config value is correct' do
-      let(:config) { ['job_name', pipeline: 'some/project'] }
+      let(:config) { ['job_name'] }
 
       describe '#valid?' do
         it { is_expected.to be_valid }
@@ -19,7 +19,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
     end
 
     context 'when wrong needs type is used' do
-      let(:config) { ['job_name', { pipeline: 'some/project' }, 123] }
+      let(:config) { [123] }
 
       describe '#valid?' do
         it { is_expected.not_to be_valid }
@@ -34,19 +34,11 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
         end
       end
     end
-
-    context 'when bridge needs has wrong attributes' do
-      let(:config) { ['job_name', project: 'some/project'] }
-
-      describe '#valid?' do
-        it { is_expected.not_to be_valid }
-      end
-    end
   end
 
   describe '.compose!' do
     context 'when valid job entries composed' do
-      let(:config) { ['first_job_name', pipeline: 'some/project'] }
+      let(:config) { %w[first_job_name second_job_name] }
 
       before do
         needs.compose!
@@ -54,7 +46,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#value' do
         it 'returns key value' do
-          expect(needs.value).to eq(pipeline: ['first_job_name'], bridge: { pipeline: 'some/project' })
+          expect(needs.value).to eq(pipeline: %w[first_job_name second_job_name])
         end
       end
 

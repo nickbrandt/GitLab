@@ -41,7 +41,7 @@ module EE
               description: 'CI/CD Bridge downstream trigger definition.',
               inherit: false
 
-            entry :needs, ::EE::Gitlab::Ci::Config::Entry::Needs,
+            entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
               description: 'CI/CD Bridge needs dependency definition.',
               inherit: false
 
