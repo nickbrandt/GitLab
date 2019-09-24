@@ -2,7 +2,7 @@
 
 module QA
   # https://gitlab.com/gitlab-org/gitlab/issues/13360
-  context 'Plan', :quarantine do
+  context 'Plan', :skip do
     describe 'Epics roadmap' do
       let(:epic) do
         EE::Resource::Epic.fabricate_via_api! do |epic|
