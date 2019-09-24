@@ -375,6 +375,9 @@ module.exports = {
         openAnalyzer: false,
         reportFilename: path.join(ROOT_PATH, 'webpack-report/index.html'),
         statsFilename: path.join(ROOT_PATH, 'webpack-report/stats.json'),
+        statsOptions: {
+          source: false,
+        },
       }),
 
     new webpack.DefinePlugin({
