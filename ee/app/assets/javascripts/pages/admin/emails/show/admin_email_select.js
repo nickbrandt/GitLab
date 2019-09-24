@@ -1,4 +1,4 @@
-/* eslint-disable no-var, func-names, one-var, prefer-template, no-else-return */
+/* eslint-disable no-var, func-names, one-var, no-else-return */
 
 import $ from 'jquery';
 import Api from '~/api';
@@ -33,9 +33,9 @@ function AdminEmailSelect() {
               },
               id(object) {
                 if (object.path_with_namespace) {
-                  return 'project-' + object.id;
+                  return `project-${object.id}`;
                 } else if (object.path) {
-                  return 'group-' + object.id;
+                  return `group-${object.id}`;
                 } else {
                   return 'all';
                 }
@@ -60,21 +60,9 @@ function AdminEmailSelect() {
 
 AdminEmailSelect.prototype.formatResult = function(object) {
   if (object.path_with_namespace) {
-    return (
-      "<div class='project-result'> <div class='project-name'>" +
-      object.name +
-      "</div> <div class='project-path'>" +
-      object.path_with_namespace +
-      '</div> </div>'
-    );
+    return `<div class='project-result'> <div class='project-name'>${object.name}</div> <div class='project-path'>${object.path_with_namespace}</div> </div>`;
   } else if (object.path) {
-    return (
-      "<div class='group-result'> <div class='group-name'>" +
-      object.name +
-      "</div> <div class='group-path'>" +
-      object.path +
-      '</div> </div>'
-    );
+    return `<div class='group-result'> <div class='group-name'>${object.name}</div> <div class='group-path'>${object.path}</div> </div>`;
   } else {
     return `<div class='group-result'> <div class='group-name'>${__(
       'All',
