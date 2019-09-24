@@ -730,6 +730,64 @@ describe ProjectPolicy do
     end
   end
 
+  describe 'read_licenses_list' do
+    context 'when licenses list feature available' do
+      context 'when license management feature available' do
+        before do
+          stub_licensed_features(licenses_list: true, license_management: true)
+        end
+
+        context 'with public project' do
+          let(:current_user) { create(:user) }
+
+          context 'with public access to repository' do
+            it { is_expected.to be_allowed(:read_licenses_list) }
+          end
+        end
+
+        context 'with private project' do
+          let(:project) { create(:project, :private, namespace: owner.namespace) }
+
+          where(role: %w[admin owner maintainer developer reporter guest])
+
+          with_them do
+            let(:current_user) { public_send(role) }
+
+            it { is_expected.to be_allowed(:read_licenses_list) }
+          end
+
+          context 'with not member' do
+            let(:current_user) { create(:user) }
+
+            it { is_expected.to be_disallowed(:read_licenses_list) }
+          end
+
+          context 'with anonymous' do
+            let(:current_user) { nil }
+
+            it { is_expected.to be_disallowed(:read_licenses_list) }
+          end
+        end
+      end
+
+      context 'when license management feature in not available' do
+        let(:current_user) { admin }
+
+        before do
+          stub_licensed_features(licenses_list: true)
+        end
+
+        it { is_expected.to be_disallowed(:read_licenses_list) }
+      end
+    end
+
+    context 'when licenses list feature not available' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:read_licenses_list) }
+    end
+  end
+
   describe 'create_web_ide_terminal' do
     before do
       stub_licensed_features(web_ide_terminal: true)
