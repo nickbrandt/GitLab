@@ -5,6 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import IssuableContext from '~/issuable_context';
 import LabelsSelect from '~/labels_select';
+import _ from 'underscore';
 
 import '~/gl_dropdown';
 import 'select2';
@@ -29,7 +30,7 @@ describe('Issue dropdown sidebar', () => {
     mock.onGet('/root/test/labels.json').reply(() => {
       const labels = Array(10)
         .fill()
-        .map((_, i) => ({
+        .map((_val, i) => ({
           id: i,
           title: `test ${i}`,
           color: '#5CB85C',
@@ -41,7 +42,7 @@ describe('Issue dropdown sidebar', () => {
     mock.onPut('/root/test/issues/2.json').reply(() => {
       const labels = Array(saveLabelCount)
         .fill()
-        .map((_, i) => ({
+        .map((_val, i) => ({
           id: i,
           title: `test ${i}`,
           color: '#5CB85C',
@@ -62,13 +63,15 @@ describe('Issue dropdown sidebar', () => {
       .click();
 
     setTimeout(() => {
-      expect($('.dropdown-content a').length).toBe(10);
+      const labelsInDropdown = $('.dropdown-content a');
 
-      $('.dropdown-content a').each(function(i) {
+      expect(labelsInDropdown.length).toBe(10);
+
+      const arrayOfLabels = labelsInDropdown.get();
+      const randomArrayOfLabels = _.shuffle(arrayOfLabels);
+      randomArrayOfLabels.forEach((label, i) => {
         if (i < saveLabelCount) {
-          $(this)
-            .get(0)
-            .click();
+          $(label).click();
         }
       });
 
@@ -92,13 +95,15 @@ describe('Issue dropdown sidebar', () => {
       .click();
 
     setTimeout(() => {
-      expect($('.dropdown-content a').length).toBe(10);
+      const labelsInDropdown = $('.dropdown-content a');
 
-      $('.dropdown-content a').each(function(i) {
+      expect(labelsInDropdown.length).toBe(10);
+
+      const arrayOfLabels = labelsInDropdown.get();
+      const randomArrayOfLabels = _.shuffle(arrayOfLabels);
+      randomArrayOfLabels.forEach((label, i) => {
         if (i < saveLabelCount) {
-          $(this)
-            .get(0)
-            .click();
+          $(label).click();
         }
       });
 
