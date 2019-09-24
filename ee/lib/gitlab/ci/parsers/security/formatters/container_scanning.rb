@@ -20,7 +20,7 @@ module Gitlab
                 'cve' => formatted_vulnerability.cve,
                 'severity' => formatted_vulnerability.severity,
                 'solution' => formatted_vulnerability.solution,
-                'confidence' => 'Medium',
+                'confidence' => 'Unknown',
                 'location' => {
                   'image' => image,
                   'operating_system' => formatted_vulnerability.operating_system,
