@@ -15728,9 +15728,6 @@ msgstr ""
 msgid "There is no data available. Please change your selection."
 msgstr ""
 
-msgid "There is no data for the selected metric. Please change your selection."
-msgstr ""
-
 msgid "There was a problem communicating with your device."
 msgstr ""
 
@@ -17981,7 +17978,7 @@ msgstr ""
 msgid "You can easily install a Runner on a Kubernetes cluster. %{link_to_help_page}"
 msgstr ""
 
-msgid "You can filter by \"days to merge\" by clicking on the columns in the chart."
+msgid "You can filter by 'days to merge' by clicking on the columns in the chart."
 msgstr ""
 
 msgid "You can invite a new member to <strong>%{project_name}</strong> or invite another group."

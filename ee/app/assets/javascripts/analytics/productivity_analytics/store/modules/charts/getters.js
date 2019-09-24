@@ -107,8 +107,7 @@ export const getColumnChartDatazoomOption = state => chartKey => {
   };
 };
 
-export const isSelectedMetric = state => ({ metric, chartKey }) =>
-  state.charts[chartKey].params.metricType === metric;
+export const getSelectedMetric = state => chartKey => state.charts[chartKey].params.metricType;
 
 export const hasNoAccessError = state =>
   state.charts[chartKeys.main].errorCode === httpStatus.FORBIDDEN;
