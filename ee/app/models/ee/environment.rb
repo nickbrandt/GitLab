@@ -25,7 +25,7 @@ module EE
           .on(join_conditions)
 
         model
-          .joins(:deployments)
+          .joins(:successful_deployments)
           .joins(join.join_sources)
           .where(later_deployments[:id].eq(nil))
           .where(deployments[:cluster_id].eq(cluster.id))
