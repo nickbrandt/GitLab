@@ -52,7 +52,7 @@
       - "{babel.config,jest.config}.js"
       - "config.ru"
       - "{package.json,yarn.lock}"
-      - "{app,bin,config,danger,db,ee,fixtures,haml_lint,lib,public,rubocop,scripts,spec,symbol,vendor}/**/*"
+      - "{app,bin,config,danger,db,ee,fixtures,haml_lint,lib,locale,public,rubocop,scripts,spec,symbol,vendor}/**/*"
       - "doc/README.md"  # Some RSpec test rely on this file
 
 .only-qa-changes:
@@ -83,7 +83,7 @@
       - "{babel.config,jest.config}.js"
       - "config.ru"
       - "{package.json,yarn.lock}"
-      - "{app,bin,config,danger,db,ee,fixtures,haml_lint,lib,public,rubocop,scripts,spec,symbol,vendor}/**/*"
+      - "{app,bin,config,danger,db,ee,fixtures,haml_lint,lib,locale,public,rubocop,scripts,spec,symbol,vendor}/**/*"
       - "doc/README.md"  # Some RSpec test rely on this file
       - ".dockerignore"
       - "qa/**/*"
