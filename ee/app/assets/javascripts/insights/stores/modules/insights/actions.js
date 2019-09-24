@@ -6,20 +6,27 @@ import { __ } from '~/locale';
 export const requestConfig = ({ commit }) => commit(types.REQUEST_CONFIG);
 export const receiveConfigSuccess = ({ commit }, data) =>
   commit(types.RECEIVE_CONFIG_SUCCESS, data);
-export const receiveConfigError = ({ commit }) => commit(types.RECEIVE_CONFIG_ERROR);
+export const receiveConfigError = ({ commit }, errorMessage) => {
+  const error = errorMessage || __('Unknown Error');
+  const message = `${__('There was an error fetching configuration for charts')}: ${error}`;
+  createFlash(message);
+  commit(types.RECEIVE_CONFIG_ERROR);
+};
 
 export const fetchConfigData = ({ dispatch }, endpoint) => {
   dispatch('requestConfig');
 
   return axios
     .get(endpoint)
-    .then(({ data }) => dispatch('receiveConfigSuccess', data))
+    .then(({ data }) => {
+      if (data) {
+        dispatch('receiveConfigSuccess', data);
+      } else {
+        dispatch('receiveConfigError');
+      }
+    })
     .catch(error => {
-      const message = `${__('There was an error fetching configuration for charts')}: ${
-        error.response.data.message
-      }`;
-      createFlash(message);
-      dispatch('receiveConfigError');
+      dispatch('receiveConfigError', error.response.data.message);
     });
 };
 
