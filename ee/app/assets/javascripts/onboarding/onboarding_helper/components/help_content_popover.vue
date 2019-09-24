@@ -38,6 +38,9 @@ export default {
     callButtonAction(button) {
       this.$emit('clickActionButton', button);
     },
+    submitFeedback(button) {
+      this.$emit('clickFeedbackButton', button);
+    },
   },
 };
 </script>
@@ -75,10 +78,8 @@ export default {
             v-for="feedbackValue in helpContent.feedbackSize"
             :key="feedbackValue"
             @click="
-              callButtonAction({
+              submitFeedback({
                 feedbackResult: feedbackValue,
-                showExitTourContent: true,
-                exitTour: true,
               })
             "
           >

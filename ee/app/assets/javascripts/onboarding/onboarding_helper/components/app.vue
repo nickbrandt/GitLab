@@ -144,7 +144,6 @@ export default {
         redirectPath,
         nextPart,
         dismissPopover,
-        feedbackResult,
         showFeedbackTourContent,
       } = button;
       const helpContentItems = this.stepContent
@@ -154,15 +153,6 @@ export default {
         helpContentItems &&
         helpContentItems.length > 1 &&
         this.helpContentIndex < helpContentItems.length - 1;
-
-      // track feedback
-      if (feedbackResult) {
-        Tracking.event(TRACKING_CATEGORY, 'click_link', {
-          label: 'feedback',
-          property: 'feedback_result',
-          value: feedbackResult,
-        });
-      }
 
       // display feedback content after user hits the exit button
       if (showFeedbackTourContent) {
@@ -213,6 +203,22 @@ export default {
 
       this.showActionPopover();
     },
+    handleFeedbackButton(button) {
+      const { feedbackResult } = button;
+
+      // track feedback
+      if (feedbackResult) this.trackFeedback(feedbackResult);
+
+      // display exit tour content
+      this.handleShowExitTourContent(true);
+    },
+    trackFeedback(feedbackResult) {
+      Tracking.event(TRACKING_CATEGORY, 'click_link', {
+        label: 'feedback',
+        property: 'feedback_result',
+        value: feedbackResult,
+      });
+    },
     handleShowExitTourContent(showExitTour) {
       Tracking.event(TRACKING_CATEGORY, 'click_link', {
         label: this.getTrackingLabel(),
@@ -262,6 +268,7 @@ export default {
       :dismiss-popover="dismissPopover"
       :golden-tanuki-svg-path="goldenTanukiSvgPath"
       @clickPopoverButton="handleClickPopoverButton"
+      @clickFeedbackButton="handleFeedbackButton"
       @restartStep="handleRestartStep"
       @skipStep="handleSkipStep"
       @showFeedbackContent="handleFeedbackTourContent"

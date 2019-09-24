@@ -1,5 +1,6 @@
 import component from 'ee/onboarding/onboarding_helper/components/help_content_popover.vue';
 import { shallowMount } from '@vue/test-utils';
+import { GlButton } from '@gitlab/ui';
 
 describe('User onboarding help content popover', () => {
   let wrapper;
@@ -16,6 +17,17 @@ describe('User onboarding help content popover', () => {
     placement: 'top',
     show: false,
     disabled: false,
+  };
+
+  const feedbackContent = {
+    text: 'some help content',
+    feedbackButtons: true,
+    feedbackSize: 5,
+  };
+
+  const feedbackProps = {
+    ...defaultProps,
+    helpContent: feedbackContent,
   };
 
   function createComponent(propsData) {
@@ -35,6 +47,18 @@ describe('User onboarding help content popover', () => {
 
         expect(wrapper.emittedByOrder()).toEqual([
           { name: 'clickActionButton', args: [defaultProps.helpContent.buttons[0]] },
+        ]);
+      });
+    });
+
+    describe('submitFeedback', () => {
+      it('emits clickFeedbackButton when called', () => {
+        createComponent(feedbackProps);
+
+        wrapper.find(GlButton).vm.$emit('click');
+
+        expect(wrapper.emittedByOrder()).toEqual([
+          { name: 'clickFeedbackButton', args: [{ feedbackResult: 1 }] },
         ]);
       });
     });
