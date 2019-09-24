@@ -1,4 +1,4 @@
-/* eslint-disable no-var, func-names, one-var, prefer-arrow-callback, prefer-template, no-else-return */
+/* eslint-disable no-var, func-names, one-var, prefer-template, no-else-return */
 
 import $ from 'jquery';
 import Api from '~/api';
@@ -20,7 +20,7 @@ function AdminEmailSelect() {
                   order_by: 'id',
                   membership: false,
                 });
-                return Promise.all([projectsFetch, groupsFetch]).then(function([projects, groups]) {
+                return Promise.all([projectsFetch, groupsFetch]).then(([projects, groups]) => {
                   var all, data;
                   all = {
                     id: 'all',
