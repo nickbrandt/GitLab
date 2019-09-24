@@ -15,10 +15,33 @@ module Gitlab
         @saved = true
       end
 
+      # TODO: move to `private` or into separate utility module/service
+      def dedup_hash(item, map = {})
+        return map[item] if map.key?(item)
+
+        new_item =
+          case item
+          when String
+            item
+          when Array
+            item.map { |a| dedup_hash(a, map) }
+          when Hash
+            item.map { |k, v| [dedup_hash(k, map), dedup_hash(v, map)] }.to_h
+          else
+            item
+          end
+
+        map[item] = new_item
+
+        new_item
+      end
+
       def restore
         begin
           json = IO.read(@path)
-          @tree_hash = ActiveSupport::JSON.decode(json)
+          decoded_json = ActiveSupport::JSON.decode(json)
+          @tree_hash = dedup_hash(decoded_json)
+
         rescue => e
           Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
           raise Gitlab::ImportExport::Error.new('Incorrect JSON format')
@@ -212,13 +235,15 @@ module Gitlab
 
       def create_relation(relation_key, relation_hash_list)
         relation_array = [relation_hash_list].flatten.map do |relation_hash|
-          Gitlab::ImportExport::RelationFactory.create(
-            relation_sym: relation_key.to_sym,
-            relation_hash: relation_hash,
-            members_mapper: members_mapper,
-            user: @user,
-            project: @restored_project,
-            excluded_keys: excluded_keys_for_relation(relation_key))
+          if relation_hash.is_a?(Hash)
+            Gitlab::ImportExport::RelationFactory.create(
+              relation_sym: relation_key.to_sym,
+              relation_hash: relation_hash,
+              members_mapper: members_mapper,
+              user: @user,
+              project: @restored_project,
+              excluded_keys: excluded_keys_for_relation(relation_key))
+          end
         end.compact
 
         relation_hash_list.is_a?(Array) ? relation_array : relation_array.first
