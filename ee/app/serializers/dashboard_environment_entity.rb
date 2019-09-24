@@ -10,4 +10,19 @@ class DashboardEnvironmentEntity < Grape::Entity
   end
 
   expose :external_url
+
+  expose :last_deployment, expose_nil: false do |environment|
+    DeploymentEntity.represent(environment.last_deployment, options.merge(request: new_request))
+  end
+
+  private
+
+  alias_method :environment, :object
+
+  def new_request
+    EntityRequest.new(
+      current_user: request.current_user,
+      project: environment.project
+    )
+  end
 end
