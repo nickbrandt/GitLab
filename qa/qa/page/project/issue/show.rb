@@ -159,7 +159,7 @@ module QA
           def wait_assignees_block_finish_loading
             within_element(:assignee_block) do
               wait(reload: false, max: 10, interval: 1) do
-                finished_loading?
+                finished_loading_block?
                 yield
               end
             end
