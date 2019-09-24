@@ -323,6 +323,24 @@ coverage:
       - coverage/assets/
       - tmp/memory_test/
 
+feature-report:
+  extends: .only-code-rails-job-base
+  cache:
+    policy: pull
+  variables:
+    SETUP_DB: "false"
+  stage: post-test
+  script:
+    - mkdir -p feature-report
+    - bundle exec rspec --dry-run -f html -- spec/ > feature-report/index.html
+    - bundle exec rspec --dry-run -f html -- ee/spec/ > feature-report/ee.html
+  artifacts:
+    name: feature-report
+    expire_in: 31d
+    paths:
+      - feature-report/index.html
+      - feature-report/ee.html
+
 db:rollback geo:
   extends:
     - db:rollback

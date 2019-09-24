@@ -11,13 +11,14 @@ pages:
     variables:
       - $CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE == "gitlab-org"
   stage: pages
-  dependencies: ["coverage", "karma", "gitlab:assets:compile"]
+  dependencies: ["coverage", "karma", "gitlab:assets:compile", "feature-report"]
   script:
     - mv public/ .public/
     - mkdir public/
     - mv coverage/ public/coverage-ruby/ || true
     - mv coverage-javascript/ public/coverage-javascript/ || true
     - mv webpack-report/ public/webpack-report/ || true
+    - mv feature-report/ public/feature-report/ || true
     - cp .public/assets/application-*.css public/application.css || true
     - cp .public/assets/application-*.css.gz public/application.css.gz || true
   artifacts:
