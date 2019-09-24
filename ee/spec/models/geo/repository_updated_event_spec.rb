@@ -12,6 +12,6 @@ RSpec.describe Geo::RepositoryUpdatedEvent, type: :model do
   end
 
   describe '#source' do
-    it { is_expected.to define_enum_for(:source).with([:repository, :wiki]) }
+    it { is_expected.to define_enum_for(:source).with([:repository, :wiki, :design]) }
   end
 end

@@ -537,6 +537,7 @@ module EE
       super
       repository.log_geo_updated_event
       wiki.repository.log_geo_updated_event
+      design_repository.log_geo_updated_event
     end
 
     override :import?
