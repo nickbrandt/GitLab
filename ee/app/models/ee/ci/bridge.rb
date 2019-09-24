@@ -115,10 +115,11 @@ module EE
       end
 
       def target_ref
-        return unless options&.dig(:trigger, :branch)
+        branch = options&.dig(:trigger, :branch)
+        return unless branch
 
         scoped_variables.to_runner_variables.yield_self do |all_variables|
-          ::ExpandVariables.expand(options&.dig(:trigger, :branch), all_variables)
+          ::ExpandVariables.expand(branch, all_variables)
         end
       end
 
