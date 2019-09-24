@@ -3367,6 +3367,9 @@ msgstr ""
 msgid "ClusterIntegration|Copy Service Token"
 msgstr ""
 
+msgid "ClusterIntegration|Could not load regions from your AWS account"
+msgstr ""
+
 msgid "ClusterIntegration|Create Kubernetes cluster"
 msgstr ""
 
@@ -3532,6 +3535,9 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about %{help_link_start}zones%{help_link_end}."
 msgstr ""
 
+msgid "ClusterIntegration|Learn more about %{startLink}Regions%{endLink}."
+msgstr ""
+
 msgid "ClusterIntegration|Learn more about Kubernetes"
 msgstr ""
 
@@ -3545,6 +3551,9 @@ msgid "ClusterIntegration|Let's Encrypt"
 msgstr ""
 
 msgid "ClusterIntegration|Loading IAM Roles"
+msgstr ""
+
+msgid "ClusterIntegration|Loading Regions"
 msgstr ""
 
 msgid "ClusterIntegration|Machine type"
@@ -3566,6 +3575,9 @@ msgid "ClusterIntegration|No projects found"
 msgstr ""
 
 msgid "ClusterIntegration|No projects matched your search"
+msgstr ""
+
+msgid "ClusterIntegration|No region found"
 msgstr ""
 
 msgid "ClusterIntegration|No zones matched your search"
@@ -3607,6 +3619,9 @@ msgstr ""
 msgid "ClusterIntegration|Read our %{link_to_help_page} on Kubernetes cluster integration."
 msgstr ""
 
+msgid "ClusterIntegration|Region"
+msgstr ""
+
 msgid "ClusterIntegration|Remove Kubernetes cluster integration"
 msgstr ""
 
@@ -3638,6 +3653,9 @@ msgid "ClusterIntegration|Search machine types"
 msgstr ""
 
 msgid "ClusterIntegration|Search projects"
+msgstr ""
+
+msgid "ClusterIntegration|Search regions"
 msgstr ""
 
 msgid "ClusterIntegration|Search zones"
@@ -3788,6 +3806,9 @@ msgid "ClusterIntegration|pricing"
 msgstr ""
 
 msgid "ClusterIntegration|sign up"
+msgstr ""
+
+msgid "ClusterIntergation|Select a region"
 msgstr ""
 
 msgid "ClusterIntergation|Select role name"
