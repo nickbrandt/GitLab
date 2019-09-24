@@ -122,3 +122,4 @@
   only:
     variables:
       - $CI_PROJECT_NAME == "gitlab"
+      - $CI_PROJECT_NAME == "gitlab-ee"  # Support former project name for forks/mirrors
