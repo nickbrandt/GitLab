@@ -55,10 +55,10 @@ describe('request selector', () => {
     expect(wrapper.find('span > gl-emoji').element.dataset.name).toEqual('warning');
   });
 
-  it('adds a warning icon to requests with warnings', () => {
-    const option = wrapper.find('[value="abc"]');
+  it('adds a warning glyph to requests with warnings', () => {
+    const requestValue = wrapper.find('[value="abc"]').text();
 
-    expect(option.find('gl-emoji').element.dataset.name).toEqual('warning');
-    expect(option.text()).toContain('discussions.json');
+    expect(requestValue).toContain('discussions.json');
+    expect(requestValue).toContain('(!)');
   });
 });
