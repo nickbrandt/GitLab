@@ -49,6 +49,21 @@ export function addDurationToHeader(data, durationLine) {
 }
 
 /**
+ * Check is the current section belongs to a collapsible section
+ *
+ * @param Array acc
+ * @param Object last
+ * @param Object section
+ *
+ * @returns Boolean
+ */
+export const isCollapsibleSection = (acc = [], last = {}, section = {}) =>
+  acc.length > 0 &&
+  last.isHeader === true &&
+  !section.section_duration &&
+  section.section === last.line.section;
+
+/**
  * Parses the job log content into a structure usable by the template
  *
  * For collaspible lines (section_header = true):
@@ -72,14 +87,9 @@ export const logLinesParser = (lines = [], lineNumberStart, accumulator = []) =>
     // If the object is an header, we parse it into another structure
     if (line.section_header) {
       acc.push(parseHeaderLine(line, lineNumber));
-    } else if (
-      acc.length &&
-      last.isHeader &&
-      !line.section_duration &&
-      line.section === last.line.section
-    ) {
+    } else if (isCollapsibleSection(acc, last, line)) {
       // if the object belongs to a nested section, we append it to the new `lines` array of the
-      // previously formated headere
+      // previously formated header
       last.lines.push(parseLine(line, lineNumber));
     } else if (line.section_duration) {
       // if the line has section_duration, we look for the correct header to add it

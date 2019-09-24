@@ -4,6 +4,7 @@ import {
   parseHeaderLine,
   parseLine,
   addDurationToHeader,
+  isCollapsibleSection,
 } from '~/jobs/store/utils';
 import {
   utilsMockData,
@@ -127,6 +128,43 @@ describe('Jobs Store Utils', () => {
     });
   });
 
+  describe('isCollapsibleSection', () => {
+    const header = {
+      isHeader: true,
+      line: {
+        section: 'foo',
+      },
+    };
+    const line = {
+      lineNumber: 1,
+      section: 'foo',
+      content: [],
+    };
+
+    it('returns true when line belongs to the last section', () => {
+      expect(isCollapsibleSection([header], header, { section: 'foo', content: [] })).toEqual(true);
+    });
+
+    it('returns false when last line was not an header', () => {
+      expect(isCollapsibleSection([line], line, { section: 'bar' })).toEqual(false);
+    });
+
+    it('returns false when accumulator is empty', () => {
+      expect(isCollapsibleSection([], { isHeader: true }, { section: 'bar' })).toEqual(false);
+    });
+
+    it('returns false when section_duration is defined', () => {
+      expect(isCollapsibleSection([header], header, { section_duration: '10:00' })).toEqual(false);
+    });
+
+    it('returns false when `section` is not a match', () => {
+      expect(isCollapsibleSection([header], header, { section: 'bar' })).toEqual(false);
+    });
+
+    it('returns false when no parameters are provided', () => {
+      expect(isCollapsibleSection()).toEqual(false);
+    });
+  });
   describe('logLinesParser', () => {
     let result;
 
