@@ -20,7 +20,7 @@ module Gitlab
           end
 
           if params[:projects]
-            unless params[:projects].is_a?(Hash)
+            unless params[:projects].is_a?(Hash) || params[:projects].is_a?(ActionController::Parameters)
               raise InvalidProjectsError, "Invalid `:projects`: `#{params[:projects]}`. It should be a hash."
             end
 
