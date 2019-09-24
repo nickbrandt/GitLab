@@ -72,4 +72,17 @@ describe Note do
       end
     end
   end
+
+  describe '#cross_reference?' do
+    [:relate_epic, :unrelate_epic].each do |type|
+      it "delegates #{type} system note to the cross-reference regex" do
+        note = create(:note, :system)
+        create(:system_note_metadata, note: note, action: type)
+
+        expect(note).to receive(:matches_cross_reference_regex?).and_return(false)
+
+        note.cross_reference?
+      end
+    end
+  end
 end
