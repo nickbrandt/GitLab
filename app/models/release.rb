@@ -3,6 +3,7 @@
 class Release < ApplicationRecord
   include CacheMarkdownField
   include Gitlab::Utils::StrongMemoize
+  include Evidenceable
 
   cache_markdown_field :description
 
@@ -14,7 +15,6 @@ class Release < ApplicationRecord
 
   has_many :milestone_releases
   has_many :milestones, through: :milestone_releases
-
   has_many :evidences
 
   default_value_for :released_at, allows_nil: false do
@@ -29,6 +29,8 @@ class Release < ApplicationRecord
   scope :sorted, -> { order(released_at: :desc) }
 
   delegate :repository, to: :project
+
+  after_create :create_evidence!
 
   def commit
     strong_memoize(:commit) do
@@ -57,6 +59,10 @@ class Release < ApplicationRecord
     released_at.present? && released_at > Time.zone.now
   end
 
+  def latest_evidences
+    Array(evidences.last)
+  end
+
   private
 
   def actual_sha
@@ -67,6 +73,10 @@ class Release < ApplicationRecord
     strong_memoize(:actual_tag) do
       repository.find_tag(tag)
     end
+  end
+
+  def create_evidence!
+    Evidence.create!(release: self)
   end
 end
 

@@ -18,6 +18,7 @@ class Milestone < ApplicationRecord
   include Milestoneish
   include FromUnion
   include Gitlab::SQL::Pattern
+  include Evidenceable
 
   prepend_if_ee('::EE::Milestone') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
@@ -268,6 +269,14 @@ class Milestone < ApplicationRecord
 
   def project_milestone?
     project_id.present?
+  end
+
+  def latest_evidences
+    return [] if releases.empty?
+
+    releases.map do |release|
+      release.evidences.last
+    end
   end
 
   private

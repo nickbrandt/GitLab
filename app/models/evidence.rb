@@ -3,7 +3,7 @@
 class Evidence < ApplicationRecord
   belongs_to :release
 
-  before_create :generate_summary
+  before_validation :generate_summary
 
   validates :release, presence: true
 
@@ -34,8 +34,8 @@ class Evidence < ApplicationRecord
   def milestone_fields
     return unless milestones.any?
 
-    errors.add(:base, ' - all milestones must have titles') if milestones.map(&:title).any?(&:blank?)
-    errors.add(:base, ' - all milestones must have states') if milestones.map(&:state).any?(&:blank?)
+    errors.add(:base, 'all milestones must have titles') if milestones.map(&:title).any?(&:blank?)
+    errors.add(:base, 'all milestones must have states') if milestones.map(&:state).any?(&:blank?)
   end
 
   def issue_fields
@@ -44,9 +44,8 @@ class Evidence < ApplicationRecord
     issues = milestones.map(&:issues).flatten
     return unless issues.any?
 
-    errors.add(:base, '- all issues must have titles') if issues.map(&:title).any?(&:blank?)
-    errors.add(:base, '- all issues must have states') if issues.map(&:state).any?(&:blank?)
-    errors.add(:base, '- all issues must have an author') if issues.map(&:author_id).any?(&:blank?)
+    errors.add(:base, 'all issues must have titles') if issues.map(&:title).any?(&:blank?)
+    errors.add(:base, 'all issues must have states') if issues.map(&:state).any?(&:blank?)
   end
 
   def milestones

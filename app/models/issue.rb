@@ -14,6 +14,7 @@ class Issue < ApplicationRecord
   include TimeTrackable
   include ThrottledTouch
   include LabelEventable
+  include Evidenceable
 
   DueDateStruct                   = Struct.new(:title, :name).freeze
   NoDueDate                       = DueDateStruct.new('No Due Date', '0').freeze
@@ -258,6 +259,12 @@ class Issue < ApplicationRecord
 
   def labels_hook_attrs
     labels.map(&:hook_attrs)
+  end
+
+  def latest_evidences
+    return [] unless milestone.present?
+
+    milestone.latest_evidences
   end
 
   private

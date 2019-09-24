@@ -535,4 +535,28 @@ describe Milestone do
     it { is_expected.not_to match("#{Gitlab.config.gitlab.url}/gitlab-org/gitlab-foss/issues/123") }
     it { is_expected.not_to match("gitlab-org/gitlab-ce/milestones/123") }
   end
+
+  describe '#latest_evidences' do
+    context 'when there is no release tied to this milestone' do
+      it 'returns an empty array' do
+        expect(build(:milestone, releases: []).latest_evidences).to be_empty
+      end
+    end
+
+    context 'when there are releases tied to this milestone, and evidences tied to these releases' do
+      let(:project) { create(:project) }
+      let(:release_1) { create(:release, project: project) }
+      let(:release_2) { create(:release, project: project) }
+
+      it 'returns the expected evidences' do
+        milestone = build(:milestone, releases: [release_1, release_2])
+        new_evidence_1 = create(:evidence, release: release_1)
+        new_evidence_2 = create(:evidence, release: release_2)
+
+        expect(release_1.evidences.count).to eq(2)
+        expect(release_2.evidences.count).to eq(2)
+        expect(milestone.latest_evidences).to contain_exactly(new_evidence_1, new_evidence_2)
+      end
+    end
+  end
 end

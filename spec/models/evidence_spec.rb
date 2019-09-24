@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Evidence do
-  set(:project) { create(:project) }
+  set(:project) { create(:project, creator: create(:user)) }
   let(:release) { create(:release, project: project) }
   let(:schema_file) { 'evidence/release' }
   let(:summary_json) { described_class.last.summary.to_json }
@@ -63,21 +63,12 @@ describe Evidence do
       end
 
       context 'when each milestone has associated issues' do
-        let!(:issue) { create(:issue, project: project) }
+        let!(:issue) { create(:issue, project: project, state: 'closed') }
 
         context 'when an issue has a missing title' do
           it 'is not valid' do
-            allow(issue).to receive(:title).and_return(nil)
             milestone_1.issues << issue
-
-            expect(subject).not_to be_valid
-          end
-        end
-
-        context 'when an issue has a missing author' do
-          it 'is not valid' do
-            allow(issue).to receive(:author_id).and_return(nil)
-            milestone_1.issues << issue
+            allow(release.milestones.first.issues.first).to receive(:title).and_return(nil)
 
             expect(subject).not_to be_valid
           end
@@ -85,8 +76,8 @@ describe Evidence do
 
         context 'when an issue has a missing state' do
           it 'is not valid' do
-            allow(issue).to receive(:state).and_return(nil)
             milestone_1.issues << issue
+            allow(release.milestones.first.issues.first).to receive(:state).and_return(nil)
 
             expect(subject).not_to be_valid
           end
@@ -101,7 +92,11 @@ describe Evidence do
     end
 
     it 'returns the correct SHA256 checksum for a given summary json' do
-      expect(build(:evidence, :with_summary).sha).to eq('xiDS1AOTlWvj9K7WMRQJCO6uNbVdC6jf4TPE4AYtkT8=')
+      summary_sample = { id: 123, summary: 'description' }
+      checksum = Gitlab::CryptoHelper.sha256(summary_sample.as_json)
+      evidence = build(:evidence, summary: summary_sample)
+
+      expect(evidence.sha).to eq(checksum)
     end
   end
 
@@ -149,7 +144,7 @@ describe Evidence do
 
       context 'when a milestone has an issue' do
         context 'when the issue has no description' do
-          let(:issue) { create(:issue, project: project, description: nil) }
+          let!(:issue) { create(:issue, project: project, description: nil, state: 'closed') }
 
           before do
             milestone.issues << issue
