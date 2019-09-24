@@ -330,7 +330,6 @@ class JiraService < IssueTrackerService
   # Handle errors when doing Jira API calls
   def jira_request
     yield
-
   rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, URI::InvalidURIError, JIRA::HTTPError, OpenSSL::SSL::SSLError => e
     @error = e.message
     log_error("Error sending message", client_url: client_url, error: @error)
