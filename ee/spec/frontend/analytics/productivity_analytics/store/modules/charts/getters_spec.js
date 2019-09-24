@@ -178,6 +178,19 @@ describe('Productivity analytics chart getters', () => {
     });
   });
 
+  describe('getSelectedMetric', () => {
+    it('returns the currently selected metric for a given chartKey', () => {
+      const metricType = 'time_to_last_commit';
+      state.charts[chartKeys.timeBasedHistogram].params = {
+        metricType,
+      };
+
+      expect(getters.getSelectedMetric(state)(chartKeys.timeBasedHistogram)).toBe(
+        'time_to_last_commit',
+      );
+    });
+  });
+
   describe('hasNoAccessError', () => {
     it('returns true if errorCode is set to 403', () => {
       state.charts[chartKeys.main].errorCode = 403;
