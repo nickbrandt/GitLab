@@ -13,6 +13,8 @@
 .default-before_script:
   before_script:
     - date
+    - export GOPATH=$CI_PROJECT_DIR/.go
+    - mkdir -p $GOPATH
     - source scripts/utils.sh
     - source scripts/prepare_build.sh
     - date
@@ -22,6 +24,7 @@
   cache:
     key: "debian-stretch-ruby-2.6.3-node-12.x"
     paths:
+      - .go/pkg/mod
       - vendor/ruby
       - .yarn-cache/
       - vendor/gitaly-ruby
