@@ -239,6 +239,16 @@ describe('User onboarding tour parts list', () => {
         expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickPopoverButton', args: [button] }]);
       });
     });
+
+    describe('submitFeedback', () => {
+      it('emits the "clickFeedbackButton" event when feedback on tour is clicked', () => {
+        const button = defaultProps.helpContent.buttons[0];
+
+        wrapper.vm.submitFeedback(button);
+
+        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickFeedbackButton', args: [button] }]);
+      });
+    });
   });
 
   describe('template', () => {

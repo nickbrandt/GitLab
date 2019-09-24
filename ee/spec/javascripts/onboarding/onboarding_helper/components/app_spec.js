@@ -4,6 +4,7 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 import eventHub from 'ee/onboarding/onboarding_helper/event_hub';
 import createStore from 'ee/onboarding/onboarding_helper/store';
 import actionPopoverUtils from 'ee/onboarding/onboarding_helper/action_popover_utils';
+import Tracking from '~/tracking';
 import { mockTourData } from '../mock_data';
 
 describe('User onboarding helper app', () => {
@@ -303,6 +304,32 @@ describe('User onboarding helper app', () => {
         vm.handleClickPopoverButton(button);
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setHelpContentIndex', 1);
+      });
+    });
+
+    describe('handleFeedbackButton', () => {
+      beforeEach(() => {
+        spyOn(Tracking, 'event');
+        spyOn(vm.$store, 'dispatch');
+      });
+
+      it('tracks feedback and shows the exit tour content', () => {
+        vm.handleFeedbackButton({ feedbackResult: 1 });
+
+        expect(Tracking.event).toHaveBeenCalledWith('onboarding', 'click_link', {
+          label: 'feedback',
+          property: 'feedback_result',
+          value: 1,
+        });
+
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setExitTour', true);
+      });
+
+      it('shows the exit tour content but does not track feedback', () => {
+        vm.handleFeedbackButton({ feedbackResult: null });
+
+        expect(Tracking.event).not.toHaveBeenCalledWith();
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('setExitTour', true);
       });
     });
 
