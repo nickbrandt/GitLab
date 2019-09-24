@@ -62,6 +62,31 @@ describe ApprovalRules::FinalizeService do
 
           expect(rule.approved_approvers).to contain_exactly(user1, group1_user)
         end
+
+        shared_examples 'idempotent approval tests' do |rule_type|
+          before do
+            project_rule.destroy
+
+            rule = create(:approval_project_rule, project: project, name: 'another rule', approvals_required: 2, rule_type: rule_type)
+            rule.users = [user1]
+            rule.groups << group1
+
+            # Emulate merge requests approval rules synced with project rule
+            mr_rule = create(:approval_merge_request_rule, merge_request: merge_request, name: rule.name, approvals_required: 2, rule_type: rule_type)
+            mr_rule.users = rule.users
+            mr_rule.groups = rule.groups
+          end
+
+          it 'does not create a new rule if one exists' do
+            expect do
+              2.times { subject.execute }
+            end.not_to change { ApprovalMergeRequestRule.count }
+          end
+        end
+
+        ApprovalProjectRule.rule_types.except(:code_owner, :report_approver).each do |rule_type, _value|
+          it_behaves_like 'idempotent approval tests', rule_type
+        end
       end
     end
 
@@ -93,6 +118,20 @@ describe ApprovalRules::FinalizeService do
 
           expect(rule.approved_approvers).to contain_exactly(user3, group2_user)
           expect(subject).not_to have_received(:copy_project_approval_rules)
+        end
+
+        # Test for https://gitlab.com/gitlab-org/gitlab/issues/13488
+        it 'gracefully merges duplicate users' do
+          group2.add_developer(user2)
+
+          expect do
+            subject.execute
+          end.not_to change { ApprovalMergeRequestRule.count }
+
+          rule = merge_request.approval_rules.regular.first
+
+          expect(rule.name).to eq('bar')
+          expect(rule.users).to contain_exactly(user2, user3, group2_user)
         end
       end
     end
