@@ -168,6 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
+          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
         end
       end
 

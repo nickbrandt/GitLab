@@ -36,6 +36,7 @@ class License < ApplicationRecord
     scoped_issue_board
     usage_quotas
     visual_review_app
+    wip_limits
   ].freeze
 
   EEP_FEATURES = EES_FEATURES + %i[

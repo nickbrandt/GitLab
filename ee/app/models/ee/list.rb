@@ -18,6 +18,7 @@ module EE
       base.validates :milestone, presence: true, if: :milestone?
       base.validates :user_id, uniqueness: { scope: :board_id }, if: :assignee?
       base.validates :milestone_id, uniqueness: { scope: :board_id }, if: :milestone?
+      base.validates :max_issue_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
       base.validates :list_type,
         exclusion: { in: %w[assignee], message: _('Assignee lists not available with your current license') },
         unless: -> { board&.parent&.feature_available?(:board_assignee_lists) }
