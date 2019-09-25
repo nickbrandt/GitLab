@@ -23,9 +23,9 @@ ActiveRecord::Schema.define(version: 2019_08_02_200655) do
     t.datetime "retry_at"
     t.datetime "last_synced_at"
     t.datetime "created_at", null: false
-    t.index ["container_repository_id"], name: "index_container_repository_registry_on_repository_id", using: :btree
-    t.index ["retry_at"], name: "index_container_repository_registry_on_retry_at", using: :btree
-    t.index ["state"], name: "index_container_repository_registry_on_state", using: :btree
+    t.index ["container_repository_id"], name: "index_container_repository_registry_on_repository_id"
+    t.index ["retry_at"], name: "index_container_repository_registry_on_retry_at"
+    t.index ["state"], name: "index_container_repository_registry_on_state"
   end
 
   create_table "event_log_states", primary_key: "event_id", force: :cascade do |t|
@@ -42,10 +42,10 @@ ActiveRecord::Schema.define(version: 2019_08_02_200655) do
     t.integer "retry_count"
     t.datetime "retry_at"
     t.boolean "missing_on_primary", default: false, null: false
-    t.index ["file_type", "file_id"], name: "index_file_registry_on_file_type_and_file_id", unique: true, using: :btree
-    t.index ["file_type"], name: "index_file_registry_on_file_type", using: :btree
-    t.index ["retry_at"], name: "index_file_registry_on_retry_at", using: :btree
-    t.index ["success"], name: "index_file_registry_on_success", using: :btree
+    t.index ["file_type", "file_id"], name: "index_file_registry_on_file_type_and_file_id", unique: true
+    t.index ["file_type"], name: "index_file_registry_on_file_type"
+    t.index ["retry_at"], name: "index_file_registry_on_retry_at"
+    t.index ["success"], name: "index_file_registry_on_success"
   end
 
   create_table "job_artifact_registry", id: :serial, force: :cascade do |t|
@@ -57,9 +57,9 @@ ActiveRecord::Schema.define(version: 2019_08_02_200655) do
     t.boolean "success"
     t.string "sha256"
     t.boolean "missing_on_primary", default: false, null: false
-    t.index ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id", using: :btree
-    t.index ["retry_at"], name: "index_job_artifact_registry_on_retry_at", using: :btree
-    t.index ["success"], name: "index_job_artifact_registry_on_success", using: :btree
+    t.index ["artifact_id"], name: "index_job_artifact_registry_on_artifact_id"
+    t.index ["retry_at"], name: "index_job_artifact_registry_on_retry_at"
+    t.index ["success"], name: "index_job_artifact_registry_on_success"
   end
 
   create_table "project_registry", id: :serial, force: :cascade do |t|
@@ -97,24 +97,24 @@ ActiveRecord::Schema.define(version: 2019_08_02_200655) do
     t.datetime_with_timezone "last_wiki_verification_ran_at"
     t.binary "repository_verification_checksum_mismatched"
     t.binary "wiki_verification_checksum_mismatched"
-    t.index ["last_repository_successful_sync_at"], name: "idx_project_registry_synced_repositories_partial", where: "((resync_repository = false) AND (repository_retry_count IS NULL) AND (repository_verification_checksum_sha IS NOT NULL))", using: :btree
-    t.index ["last_repository_successful_sync_at"], name: "index_project_registry_on_last_repository_successful_sync_at", using: :btree
-    t.index ["last_repository_synced_at"], name: "index_project_registry_on_last_repository_synced_at", using: :btree
-    t.index ["project_id"], name: "idx_project_registry_on_repo_checksums_and_failure_partial", where: "((repository_verification_checksum_sha IS NULL) AND (last_repository_verification_failure IS NULL))", using: :btree
-    t.index ["project_id"], name: "idx_project_registry_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
-    t.index ["project_id"], name: "idx_project_registry_on_wiki_checksums_and_failure_partial", where: "((wiki_verification_checksum_sha IS NULL) AND (last_wiki_verification_failure IS NULL))", using: :btree
-    t.index ["project_id"], name: "idx_project_registry_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
-    t.index ["project_id"], name: "idx_repository_checksum_mismatch", where: "(repository_checksum_mismatch = true)", using: :btree
-    t.index ["project_id"], name: "idx_wiki_checksum_mismatch", where: "(wiki_checksum_mismatch = true)", using: :btree
-    t.index ["project_id"], name: "index_project_registry_on_project_id", unique: true, using: :btree
-    t.index ["repository_retry_at"], name: "index_project_registry_on_repository_retry_at", using: :btree
-    t.index ["repository_retry_count"], name: "idx_project_registry_failed_repositories_partial", where: "((repository_retry_count > 0) OR (last_repository_verification_failure IS NOT NULL) OR repository_checksum_mismatch)", using: :btree
-    t.index ["repository_retry_count"], name: "idx_project_registry_pending_repositories_partial", where: "((repository_retry_count IS NULL) AND (last_repository_successful_sync_at IS NOT NULL) AND ((resync_repository = true) OR ((repository_verification_checksum_sha IS NULL) AND (last_repository_verification_failure IS NULL))))", using: :btree
-    t.index ["repository_verification_checksum_sha"], name: "idx_project_registry_on_repository_checksum_sha_partial", where: "(repository_verification_checksum_sha IS NULL)", using: :btree
-    t.index ["resync_repository"], name: "index_project_registry_on_resync_repository", using: :btree
-    t.index ["resync_wiki"], name: "index_project_registry_on_resync_wiki", using: :btree
-    t.index ["wiki_retry_at"], name: "index_project_registry_on_wiki_retry_at", using: :btree
-    t.index ["wiki_verification_checksum_sha"], name: "idx_project_registry_on_wiki_checksum_sha_partial", where: "(wiki_verification_checksum_sha IS NULL)", using: :btree
+    t.index ["last_repository_successful_sync_at"], name: "idx_project_registry_synced_repositories_partial", where: "((resync_repository = false) AND (repository_retry_count IS NULL) AND (repository_verification_checksum_sha IS NOT NULL))"
+    t.index ["last_repository_successful_sync_at"], name: "index_project_registry_on_last_repository_successful_sync_at"
+    t.index ["last_repository_synced_at"], name: "index_project_registry_on_last_repository_synced_at"
+    t.index ["project_id"], name: "idx_project_registry_on_repo_checksums_and_failure_partial", where: "((repository_verification_checksum_sha IS NULL) AND (last_repository_verification_failure IS NULL))"
+    t.index ["project_id"], name: "idx_project_registry_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)"
+    t.index ["project_id"], name: "idx_project_registry_on_wiki_checksums_and_failure_partial", where: "((wiki_verification_checksum_sha IS NULL) AND (last_wiki_verification_failure IS NULL))"
+    t.index ["project_id"], name: "idx_project_registry_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)"
+    t.index ["project_id"], name: "idx_repository_checksum_mismatch", where: "(repository_checksum_mismatch = true)"
+    t.index ["project_id"], name: "idx_wiki_checksum_mismatch", where: "(wiki_checksum_mismatch = true)"
+    t.index ["project_id"], name: "index_project_registry_on_project_id", unique: true
+    t.index ["repository_retry_at"], name: "index_project_registry_on_repository_retry_at"
+    t.index ["repository_retry_count"], name: "idx_project_registry_failed_repositories_partial", where: "((repository_retry_count > 0) OR (last_repository_verification_failure IS NOT NULL) OR repository_checksum_mismatch)"
+    t.index ["repository_retry_count"], name: "idx_project_registry_pending_repositories_partial", where: "((repository_retry_count IS NULL) AND (last_repository_successful_sync_at IS NOT NULL) AND ((resync_repository = true) OR ((repository_verification_checksum_sha IS NULL) AND (last_repository_verification_failure IS NULL))))"
+    t.index ["repository_verification_checksum_sha"], name: "idx_project_registry_on_repository_checksum_sha_partial", where: "(repository_verification_checksum_sha IS NULL)"
+    t.index ["resync_repository"], name: "index_project_registry_on_resync_repository"
+    t.index ["resync_wiki"], name: "index_project_registry_on_resync_wiki"
+    t.index ["wiki_retry_at"], name: "index_project_registry_on_wiki_retry_at"
+    t.index ["wiki_verification_checksum_sha"], name: "idx_project_registry_on_wiki_checksum_sha_partial", where: "(wiki_verification_checksum_sha IS NULL)"
   end
 
 end
