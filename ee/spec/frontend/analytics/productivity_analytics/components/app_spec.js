@@ -56,6 +56,7 @@ describe('ProductivityApp component', () => {
   const findSecondaryChartsSection = () => wrapper.find({ ref: 'secondaryCharts' });
   const findTimeBasedMetricChart = () => wrapper.find({ ref: 'timeBasedChart' });
   const findCommitBasedMetricChart = () => wrapper.find({ ref: 'commitBasedChart' });
+  const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
   const findSortFieldDropdown = () => findMrTableSortSection().find(GlDropdown);
   const findSortOrderToggle = () => findMrTableSortSection().find(GlButton);
@@ -240,6 +241,47 @@ describe('ProductivityApp component', () => {
                     it("should update the chart's x axis label", () => {
                       const columnChart = findCommitBasedMetricChart().find(GlColumnChart);
                       expect(columnChart.props('xAxisTitle')).toBe('Number of commits per MR');
+                    });
+                  });
+                });
+              });
+            });
+
+            describe('Scatterplot', () => {
+              it('renders a metric chart component', () => {
+                expect(findScatterplotMetricChart().exists()).toBe(true);
+              });
+
+              describe('when chart finished loading', () => {
+                describe('and the chart has data', () => {
+                  beforeEach(() => {
+                    wrapper.vm.$store.dispatch('charts/receiveChartDataSuccess', {
+                      chartKey: chartKeys.scatterplot,
+                      data: {
+                        1: { metric: 2, merged_at: '2019-07-01T07:06:23.193Z' },
+                        2: { metric: 3, merged_at: '2019-07-05T08:27:42.411Z' },
+                      },
+                    });
+                  });
+
+                  it('sets isLoading=false on the metric chart', () => {
+                    expect(findScatterplotMetricChart().props('isLoading')).toBe(false);
+                  });
+
+                  it('passes non-empty chartData to the metric chart', () => {
+                    expect(findScatterplotMetricChart().props('chartData')).not.toEqual([]);
+                  });
+
+                  describe('when the user changes the metric', () => {
+                    beforeEach(() => {
+                      findScatterplotMetricChart().vm.$emit('metricTypeChange', 'loc_per_commit');
+                    });
+
+                    it('should call setMetricType  when `metricTypeChange` is emitted on the metric chart', () => {
+                      expect(actionSpies.setMetricType).toHaveBeenCalledWith({
+                        metricType: 'loc_per_commit',
+                        chartKey: chartKeys.scatterplot,
+                      });
                     });
                   });
                 });

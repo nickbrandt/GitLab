@@ -56,9 +56,12 @@ describe('Productivity analytics table actions', () => {
       },
       rootGetters: {
         // eslint-disable-next-line no-useless-computed-key
-        ['filters/getCommonFilterParams']: {
-          group_id: groupNamespace,
-          project_id: projectPath,
+        ['filters/getCommonFilterParams']: () => {
+          const params = {
+            group_id: groupNamespace,
+            project_id: projectPath,
+          };
+          return params;
         },
       },
       state: getInitialState(),

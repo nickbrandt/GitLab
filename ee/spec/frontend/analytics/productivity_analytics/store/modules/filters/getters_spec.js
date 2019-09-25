@@ -1,5 +1,6 @@
 import createState from 'ee/analytics/productivity_analytics/store/modules/filters/state';
 import * as getters from 'ee/analytics/productivity_analytics/store/modules/filters/getters';
+import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
 
 describe('Productivity analytics filter getters', () => {
   let state;
@@ -9,42 +10,47 @@ describe('Productivity analytics filter getters', () => {
   });
 
   describe('getCommonFilterParams', () => {
-    it('returns an object with group_id, project_id and all relevant params from the filters string', () => {
+    beforeEach(() => {
       state = {
         groupNamespace: 'gitlab-org',
         projectPath: 'gitlab-org/gitlab-test',
         filters: '?author_username=root&milestone_title=foo&label_name[]=labelxyz',
+        daysInPast: 30,
       };
-
-      const mockGetters = { mergedOnAfterDate: '2019-07-16T00:00:00.00Z' };
-      const expected = {
-        author_username: 'root',
-        group_id: 'gitlab-org',
-        label_name: ['labelxyz'],
-        merged_at_after: '2019-07-16T00:00:00.00Z',
-        milestone_title: 'foo',
-        project_id: 'gitlab-org/gitlab-test',
-      };
-
-      const result = getters.getCommonFilterParams(state, mockGetters);
-
-      expect(result).toEqual(expected);
     });
-  });
 
-  describe('mergedOnAfterDate', () => {
-    beforeEach(() => {
-      const mockedTimestamp = 1563235200000; // 2019-07-16T00:00:00.00Z
-      jest.spyOn(Date.prototype, 'getTime').mockReturnValue(mockedTimestamp);
+    describe('when chart is not scatterplot', () => {
+      it('returns an object with common filter params', () => {
+        const expected = {
+          author_username: 'root',
+          group_id: 'gitlab-org',
+          label_name: ['labelxyz'],
+          merged_at_after: '30days',
+          milestone_title: 'foo',
+          project_id: 'gitlab-org/gitlab-test',
+        };
+
+        const result = getters.getCommonFilterParams(state)(chartKeys.main);
+
+        expect(result).toEqual(expected);
+      });
     });
-    it('returns the correct date in the past', () => {
-      state = {
-        daysInPast: 90,
-      };
 
-      const mergedOnAfterDate = getters.mergedOnAfterDate(state);
+    describe('when chart is scatterplot', () => {
+      it('returns an object with common filter params and adds additional days to the merged_at_after property', () => {
+        const expected = {
+          author_username: 'root',
+          group_id: 'gitlab-org',
+          label_name: ['labelxyz'],
+          merged_at_after: '60days',
+          milestone_title: 'foo',
+          project_id: 'gitlab-org/gitlab-test',
+        };
 
-      expect(mergedOnAfterDate).toBe('2019-04-17T00:00:00.000Z');
+        const result = getters.getCommonFilterParams(state)(chartKeys.scatterplot);
+
+        expect(result).toEqual(expected);
+      });
     });
   });
 });

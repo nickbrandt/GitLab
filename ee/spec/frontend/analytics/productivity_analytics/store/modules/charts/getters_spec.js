@@ -4,8 +4,15 @@ import {
   chartKeys,
   columnHighlightStyle,
   maxColumnChartItemsPerPage,
+  scatterPlotAddonQueryDays,
 } from 'ee/analytics/productivity_analytics/constants';
-import { mockHistogramData } from '../../../mock_data';
+import { getScatterPlotData, getMedianLineData } from 'ee/analytics/productivity_analytics/utils';
+import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
+
+jest.mock('ee/analytics/productivity_analytics/utils');
+jest.mock('~/lib/utils/datetime_utility', () => ({
+  getDateInPast: jest.fn().mockReturnValue('2019-07-16T00:00:00.00Z'),
+}));
 
 describe('Productivity analytics chart getters', () => {
   let state;
@@ -27,8 +34,8 @@ describe('Productivity analytics chart getters', () => {
     });
   });
 
-  describe('getChartData', () => {
-    it("parses the chart's data and adds a color property to selected items", () => {
+  describe('getColumnChartData', () => {
+    it("parses the column chart's data and adds a color property to selected items", () => {
       const chartKey = chartKeys.main;
       state.charts[chartKey] = {
         data: {
@@ -43,7 +50,44 @@ describe('Productivity analytics chart getters', () => {
         { value: ['5', 17], itemStyle: columnHighlightStyle },
       ];
 
-      expect(getters.getChartData(state)(chartKey)).toEqual(chartData);
+      expect(getters.getColumnChartData(state)(chartKey)).toEqual(chartData);
+    });
+  });
+
+  describe('getScatterPlotMainData', () => {
+    it('calls getScatterPlotData with the raw scatterplot data and the date in past', () => {
+      state.charts.scatterplot.data = mockScatterplotData;
+
+      const rootState = {
+        filters: {
+          daysInPast: 30,
+        },
+      };
+
+      getters.getScatterPlotMainData(state, null, rootState);
+
+      expect(getScatterPlotData).toHaveBeenCalledWith(
+        mockScatterplotData,
+        '2019-07-16T00:00:00.00Z',
+      );
+    });
+  });
+
+  describe('getScatterPlotMedianData', () => {
+    it('calls getMedianLineData with the raw scatterplot data, the getScatterPlotMainData getter and the an additional days offset', () => {
+      state.charts.scatterplot.data = mockScatterplotData;
+
+      const mockGetters = {
+        getScatterPlotMainData: jest.fn(),
+      };
+
+      getters.getScatterPlotMedianData(state, mockGetters);
+
+      expect(getMedianLineData).toHaveBeenCalledWith(
+        mockScatterplotData,
+        mockGetters.getScatterPlotMainData,
+        scatterPlotAddonQueryDays,
+      );
     });
   });
 
@@ -62,9 +106,12 @@ describe('Productivity analytics chart getters', () => {
   describe('getFilterParams', () => {
     const rootGetters = {};
 
-    rootGetters['filters/getCommonFilterParams'] = {
-      group_id: groupNamespace,
-      project_id: projectPath,
+    rootGetters['filters/getCommonFilterParams'] = () => {
+      const params = {
+        group_id: groupNamespace,
+        project_id: projectPath,
+      };
+      return params;
     };
 
     describe('main chart', () => {
@@ -154,11 +201,6 @@ describe('Productivity analytics chart getters', () => {
             {
               type: 'slider',
               bottom: 10,
-              start: 0,
-              end: intervalEnd,
-            },
-            {
-              type: 'inside',
               start: 0,
               end: intervalEnd,
             },

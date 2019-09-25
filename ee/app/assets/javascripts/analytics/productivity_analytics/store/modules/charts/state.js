@@ -38,6 +38,7 @@ export default () => ({
       selected: [],
       params: {
         chartType: chartTypes.scatterplot,
+        metricType: 'days_to_merge',
       },
     },
   },
