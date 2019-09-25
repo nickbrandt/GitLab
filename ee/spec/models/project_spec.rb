@@ -970,6 +970,7 @@ describe Project do
     where(:license_feature, :disabled_services) do
       :jenkins_integration                | %w(jenkins jenkins_deprecated)
       :github_project_service_integration | %w(github)
+      :incident_management                | %w(alerts)
     end
 
     with_them do
@@ -987,6 +988,20 @@ describe Project do
         end
 
         it { is_expected.to include(*disabled_services) }
+      end
+    end
+
+    context 'when incident_management is available' do
+      before do
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'when feature flag generic_alert_endpoint is disabled' do
+        before do
+          stub_feature_flags(generic_alert_endpoint: false)
+        end
+
+        it { is_expected.to include('alerts') }
       end
     end
   end
