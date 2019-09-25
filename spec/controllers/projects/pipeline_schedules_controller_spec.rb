@@ -5,9 +5,9 @@ require 'spec_helper'
 describe Projects::PipelineSchedulesController do
   include AccessMatchersForController
 
-  set(:user) { create(:user) }
-  set(:project) { create(:project, :public, :repository) }
-  set(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public, :repository) }
+  let_it_be(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project) }
 
   before do
     project.add_developer(user)
@@ -60,7 +60,7 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'GET #new' do
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
 
     before do
       project.add_developer(user)
@@ -77,7 +77,7 @@ describe Projects::PipelineSchedulesController do
 
   describe 'POST #create' do
     describe 'functionality' do
-      set(:user) { create(:user) }
+      let_it_be(:user) { create(:user) }
 
       before do
         project.add_developer(user)
@@ -149,7 +149,7 @@ describe Projects::PipelineSchedulesController do
 
   describe 'PUT #update' do
     describe 'functionality' do
-      set(:user) { create(:user) }
+      let_it_be(:user) { create(:user) }
       let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: user) }
 
       before do
@@ -383,7 +383,7 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'POST #play', :clean_gitlab_redis_cache do
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
     let(:ref) { 'master' }
 
     before do
@@ -442,7 +442,7 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'DELETE #destroy' do
-    set(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
 
     context 'when a developer makes the request' do
       before do

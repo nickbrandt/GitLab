@@ -4,9 +4,9 @@ require 'spec_helper'
 
 describe Projects::ArtifactsController do
   let(:user) { project.owner }
-  set(:project) { create(:project, :repository, :public) }
+  let_it_be(:project) { create(:project, :repository, :public) }
 
-  set(:pipeline) do
+  let_it_be(:pipeline) do
     create(:ci_pipeline,
             project: project,
             sha: project.commit.sha,
