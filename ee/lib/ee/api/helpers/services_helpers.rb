@@ -12,6 +12,7 @@ module EE
           override :services
           def services
             super.merge(
+              'alerts' => [],
               'github' => [
                 {
                   required: true,
