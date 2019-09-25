@@ -64,21 +64,6 @@ describe('MetricColumn component', () => {
   });
 
   describe('computed', () => {
-    describe('isNumericValue', () => {
-      it('returns true when the value is neither null nor undefined', () => {
-        factory();
-        expect(wrapper.vm.isNumericValue).toBe(true);
-      });
-
-      it('returns false when the value is null', () => {
-        factory({
-          ...defaultProps,
-          value: null,
-        });
-        expect(wrapper.vm.isNumericValue).toBe(false);
-      });
-    });
-
     describe('unit', () => {
       it('returns "days" for the "days_to_merge" metric', () => {
         factory({
