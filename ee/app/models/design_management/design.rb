@@ -47,6 +47,9 @@ module DesignManagement
       joins(join.join_sources).where(actions[:event].not_eq(deletion))
     end
 
+    # Scope called by our REST API to avoid N+1 problems
+    scope :with_api_entity_associations, -> { preload(:issue) }
+
     # A design is current if the most recent event is not a deletion
     scope :current, -> { visible_at_version(nil) }
 
