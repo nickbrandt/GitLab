@@ -11,12 +11,16 @@ module Gitlab
       DEFAULT_MAX_SIZE = 1.megabyte
       DEFAULT_MAX_DEPTH = 100
 
-      def initialize(root, max_size: DEFAULT_MAX_SIZE, max_depth: DEFAULT_MAX_DEPTH)
+      attr_reader :size
+
+      def initialize(root, max_size: DEFAULT_MAX_SIZE, max_depth: DEFAULT_MAX_DEPTH, dedup_objects: false)
         @root = root
         @max_size = max_size
         @max_depth = max_depth
         @size = 0
         @depth = 0
+        @objects = Set.new
+        @dedup_objects = dedup_objects
 
         evaluate
       end
@@ -42,6 +46,8 @@ module Gitlab
       end
 
       def add_object(object)
+        return if @dedup_objects && !@objects.add?(object.object_id)
+
         @size += ObjectSpace.memsize_of(object)
         raise TooMuchDataError if @size > @max_size
 
