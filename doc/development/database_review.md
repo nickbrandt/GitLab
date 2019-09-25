@@ -94,12 +94,11 @@ and details for a database reviewer:
   - Check queries timing (If any): Queries executed in a migration
     need to fit comfortably within `15s` - preferably much less than that - on GitLab.com.
 - Check [background migrations](background_migrations.md):
-  - For data migrations, establish a time estimate for execution
+  - Establish a time estimate for execution
   - They should only be used when migrating data in larger tables.
     - If a single `update` is below than `1s` the query can be placed
       directly in a regular migration (inside `db/migrate`).
   - Review queries (for example, make sure batch sizes are fine)
-  - Establish a time estimate for execution
   - Because execution time can be longer than for a regular migration,
     it's suggested to treat background migrations as post migrations:
     place them in `db/post_migrate` instead of `db/migrate`. Keep in mind
