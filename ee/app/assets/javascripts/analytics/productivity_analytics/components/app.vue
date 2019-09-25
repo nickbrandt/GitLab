@@ -61,8 +61,9 @@ export default {
       'getColumnChartDatazoomOption',
       'getScatterPlotMainData',
       'getScatterPlotMedianData',
-      'getMetricDropdownLabel',
+      'getMetricLabel',
       'getSelectedMetric',
+      'scatterplotYaxisLabel',
       'hasNoAccessError',
     ]),
     ...mapGetters('table', [
@@ -216,7 +217,7 @@ export default {
                 :data="{ full: getColumnChartData(chartKeys.commitBasedHistogram) }"
                 :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
                 :y-axis-title="s__('ProductivityAanalytics|Merge requests')"
-                :x-axis-title="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
+                :x-axis-title="getMetricLabel(chartKeys.commitBasedHistogram)"
                 x-axis-type="category"
               />
             </metric-chart>
@@ -236,7 +237,7 @@ export default {
           >
             <scatterplot
               :x-axis-title="s__('ProductivityAnalytics|Merge date')"
-              :y-axis-title="s__('ProductivityAnalytics|Days')"
+              :y-axis-title="scatterplotYaxisLabel"
               :scatter-data="getScatterPlotMainData"
               :median-line-data="getScatterPlotMedianData"
             />
