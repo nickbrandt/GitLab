@@ -100,6 +100,8 @@ describe('ProductivityApp component', () => {
       describe('user has access to the group', () => {
         beforeEach(() => {
           wrapper.vm.$store.state.charts.charts[chartKeys.main].errorCode = null;
+
+          return wrapper.vm.$nextTick();
         });
 
         describe('when the main chart is loading', () => {
