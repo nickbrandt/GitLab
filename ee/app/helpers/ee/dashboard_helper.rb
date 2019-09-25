@@ -37,6 +37,15 @@ module EE
     def get_dashboard_nav_links
       super.tap do |links|
         links << :analytics if ::Gitlab::Analytics.any_features_enabled?
+
+        if can?(current_user, :read_operations_dashboard)
+          links << :environments if ::Feature.enabled?(:environments_dashboard)
+          links << :operations
+        end
+
+        if ::Feature.enabled?(:security_dashboard) && can?(current_user, :read_security_dashboard)
+          links << :security
+        end
       end
     end
   end
