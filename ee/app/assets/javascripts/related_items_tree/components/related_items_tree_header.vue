@@ -40,10 +40,7 @@ export default {
           toggleState: true,
         });
       } else {
-        this.toggleCreateEpicForm({
-          actionType,
-          toggleState: true,
-        });
+        this.toggleCreateEpicForm({ toggleState: true });
       }
     },
   },
