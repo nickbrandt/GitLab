@@ -5,7 +5,7 @@ exports[`MergeRequestTableRow component on creation matches the snapshot 1`] = `
   class="gl-responsive-table-row-layout gl-responsive-table-row"
 >
   <div
-    class="table-section section-50 d-flex flex-row-reverse flex-md-row justify-content-between justify-content-md-start qa-mr-details"
+    class="table-section section-50 d-flex flex-row-reverse flex-md-row justify-content-between justify-content-md-start js-mr-details"
   >
     <div
       class="d-flex mr-md-2"
@@ -20,10 +20,10 @@ exports[`MergeRequestTableRow component on creation matches the snapshot 1`] = `
     </div>
      
     <div
-      class="mw-90p"
+      class="d-flex flex-column flex-grow mw-90p"
     >
       <h5
-        class="item-title mr-title my-0 mw-90p d-block str-truncated"
+        class="item-title mr-title my-0 d-block str-truncated"
       >
         <gllink-stub
           href="http://gitlab.example.com/gitlab-org/gitlab-test/merge_requests/10"
@@ -34,7 +34,7 @@ exports[`MergeRequestTableRow component on creation matches the snapshot 1`] = `
       </h5>
        
       <ul
-        class="horizontal-list list-items-separated text-secondary"
+        class="horizontal-list list-items-separated text-secondary mb-0"
       >
         <li>
           !10
@@ -45,18 +45,22 @@ exports[`MergeRequestTableRow component on creation matches the snapshot 1`] = `
         </li>
          
         <li>
+          
           3 LOC/commit
+        
         </li>
          
         <li>
+          
           1 files touched
+        
         </li>
       </ul>
     </div>
   </div>
    
   <div
-    class="table-section section-50 d-flex flex-row align-items-start qa-mr-metrics"
+    class="table-section section-50 d-flex flex-row align-items-start js-mr-metrics"
   >
     <metriccolumn-stub
       label="Time to merge"

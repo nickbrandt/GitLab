@@ -22,8 +22,8 @@ export default {
     },
   },
   computed: {
-    isNumericValue() {
-      return this.value !== null && !Number.isNaN(Number(this.value));
+    isNumber() {
+      return typeof this.value === 'number';
     },
     unit() {
       return this.type === 'days_to_merge'
@@ -36,7 +36,7 @@ export default {
 <template>
   <div class="metric-col">
     <span class="time">
-      <template v-if="isNumericValue">
+      <template v-if="isNumber">
         {{ value }}
         <span> {{ unit }} </span>
       </template>

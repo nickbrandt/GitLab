@@ -23,8 +23,8 @@ describe('MergeRequestTableRow component', () => {
     });
   };
 
-  const findMrDetails = () => wrapper.find('.qa-mr-details');
-  const findMrMetrics = () => wrapper.find('.qa-mr-metrics');
+  const findMrDetails = () => wrapper.find('.js-mr-details');
+  const findMrMetrics = () => wrapper.find('.js-mr-metrics');
   const findMetricColumns = () => findMrMetrics().findAll(MetricColumn);
 
   afterEach(() => {
@@ -58,6 +58,26 @@ describe('MergeRequestTableRow component', () => {
 
       expect(title.exists()).toBe(true);
       expect(title.text()).toContain(defaultProps.mergeRequest.title);
+    });
+
+    describe('metric list', () => {
+      it.each`
+        metric              | selector
+        ${'commits_count'}  | ${'commitCount'}
+        ${'loc_per_commit'} | ${'locPerCommitCount'}
+        ${'files_touched'}  | ${'filesTouchedCount'}
+      `("metric '$metric' won't be rendered if null", ({ metric, selector }) => {
+        // let's update our test data and set the metric to null
+        const props = {
+          ...defaultProps,
+          mergeRequest: {
+            ...defaultProps.mergeRequest,
+            [metric]: null,
+          },
+        };
+        factory(props);
+        expect(wrapper.find({ ref: selector }).exists()).toBe(false);
+      });
     });
 
     describe('metric columns', () => {
@@ -127,34 +147,6 @@ describe('MergeRequestTableRow component', () => {
 
       it("returns the selected metric's key", () => {
         expect(wrapper.vm.selectedMetric).toBe(defaultProps.mergeRequest[defaultProps.metricType]);
-      });
-    });
-
-    describe('metricTimeUnit', () => {
-      describe('when metricType is "days_to_merge"', () => {
-        beforeEach(() => {
-          factory({
-            ...defaultProps,
-            metricType: 'days_to_merge',
-          });
-        });
-
-        it('returns "days"', () => {
-          expect(wrapper.vm.metricTimeUnit).toBe('days');
-        });
-      });
-
-      describe('when metricType is not "days_to_merge"', () => {
-        beforeEach(() => {
-          factory({
-            ...defaultProps,
-            metricType: 'time_to_last_commit',
-          });
-        });
-
-        it('returns "hrs"', () => {
-          expect(wrapper.vm.metricTimeUnit).toBe('hrs');
-        });
       });
     });
   });
