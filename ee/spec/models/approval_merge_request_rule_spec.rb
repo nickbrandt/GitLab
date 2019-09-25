@@ -191,6 +191,13 @@ describe ApprovalMergeRequestRule do
       expect(subject.regular).to eq(false)
       expect(subject.regular?).to eq(false)
     end
+
+    it 'returns false for any approver records' do
+      subject = create(:approval_merge_request_rule, merge_request: merge_request, rule_type: :any_approver)
+
+      expect(subject.regular).to eq(false)
+      expect(subject.regular?).to eq(false)
+    end
   end
 
   describe '#code_owner?' do
