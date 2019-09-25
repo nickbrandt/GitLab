@@ -102,7 +102,7 @@ describe Gitlab::ImportExport::RelationRenameService do
 
     it 'adds old relationships to the exported file' do
       # we inject relations with new names that should be rewritten
-      expect(project_tree_saver).to receive(:additional_attributes).and_wrap_original do |method, *args|
+      expect(project_tree_saver).to receive(:serialize_project_tree).and_wrap_original do |method, *args|
         method.call(*args).merge(injected_hash)
       end
 

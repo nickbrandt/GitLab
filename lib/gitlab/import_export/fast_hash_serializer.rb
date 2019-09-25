@@ -39,23 +39,31 @@ module Gitlab
       # that returns raw JSON content that is written
       # directly to file.
       class JSONBatchRelation
+        include Gitlab::Utils::StrongMemoize
+
         def initialize(relation, options, preloads)
           @relation = relation
           @options = options
           @preloads = preloads
         end
 
-        def to_json(options = {})
-          result = +''
+        def raw_json
+          strong_memoize(:raw_json) do
+            result = +''
 
-          batch = @relation
-          batch = batch.preload(@preloads) if @preloads
-          batch.each do |item|
-            result.concat(",") unless result.empty?
-            result.concat(item.to_json(@options))
+            batch = @relation
+            batch = batch.preload(@preloads) if @preloads
+            batch.each do |item|
+              result.concat(",") unless result.empty?
+              result.concat(item.to_json(@options))
+            end
+
+            result
           end
+        end
 
-          result
+        def to_json(options = {})
+          raw_json
         end
 
         def as_json(*)
@@ -65,22 +73,14 @@ module Gitlab
 
       BATCH_SIZE = 100
 
-      def initialize(subject, tree, additional_attributes: {}, batch_size: BATCH_SIZE)
+      def initialize(subject, tree, batch_size: BATCH_SIZE)
         @subject = subject
         @batch_size = batch_size
         @tree = tree
-        @additional_attributes = additional_attributes
       end
 
-      # Serializes the subject into JSON for the given option tree
       def execute
-        serialized_hash = simple_serialize.merge(serialize_includes)
-
-        merge_additional_attributes!(serialized_hash)
-
-        RelationRenameService.add_new_associations(serialized_hash) if subject.is_a?(Project)
-
-        JSON.generate(serialized_hash)
+        simple_serialize.merge(serialize_includes)
       end
 
       private
@@ -131,21 +131,10 @@ module Gitlab
         data = []
 
         record.in_batches(of: @batch_size) do |batch| # rubocop:disable Cop/InBatches
-          data.append(JSONBatchRelation.new(batch, options, preloads[key]))
+          data.append(JSONBatchRelation.new(batch, options, preloads[key]).tap(&:raw_json))
         end
 
         data
-      end
-
-      def merge_additional_attributes!(serialized_hash)
-        serialized_hash.deep_merge!(@additional_attributes) do |key, this_val, other_val|
-          # when serializing Project, we need to append `group_members` from `additional_attributes`, not to replace
-          if this_val.is_a?(Array) && other_val.is_a?(Array)
-            this_val + other_val
-          else
-            other_val
-          end
-        end
       end
 
       def includes

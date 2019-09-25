@@ -3,11 +3,10 @@ require 'spec_helper'
 describe Gitlab::ImportExport::ProjectTreeSaver do
   describe 'saves the project tree into a json object' do
     let(:shared) { project.import_export_shared }
-    let(:project_tree_saver) { described_class.new(project: project, current_user: user, shared: shared, params: params) }
+    let(:project_tree_saver) { described_class.new(project: project, current_user: user, shared: shared) }
     let(:export_path) { "#{Dir.tmpdir}/project_tree_saver_spec" }
     let(:user) { create(:user) }
     let!(:project) { setup_project }
-    let(:params) { {} }
 
     before do
       project.add_maintainer(user)
@@ -40,24 +39,14 @@ describe Gitlab::ImportExport::ProjectTreeSaver do
       end
 
       context 'when :export_fast_serialize feature is enabled' do
-        let(:params) { { description: 'new description' } }
-        let(:group_members_tree) { [] }
-
         before do
           stub_feature_flags(export_fast_serialize: true)
-
-          expect(reader).to receive(:group_members_tree).and_return(group_members_tree)
         end
 
         it 'uses FastHashSerializer' do
           expect(Gitlab::ImportExport::FastHashSerializer)
             .to receive(:new)
-            .with(project,
-                  project_tree,
-                  additional_attributes: {
-                    'description' => 'new description',
-                    'project_members' => []
-                  })
+            .with(project, project_tree)
             .and_return(serializer)
 
           expect(serializer).to receive(:execute)
