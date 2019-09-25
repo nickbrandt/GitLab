@@ -27,6 +27,7 @@ describe('EksClusterConfigurationForm', () => {
     actions = {
       setRegion: jest.fn(),
       setVpc: jest.fn(),
+      setSubnet: jest.fn(),
     };
     regionsActions = {
       fetchItems: jest.fn(),
@@ -191,6 +192,18 @@ describe('EksClusterConfigurationForm', () => {
 
     it('dispatches fetchSubnets action', () => {
       expect(subnetsActions.fetchItems).toHaveBeenCalledWith(expect.anything(), { vpc }, undefined);
+    });
+  });
+
+  describe('when a subnet is selected', () => {
+    const subnet = { name: 'subnet-1' };
+
+    beforeEach(() => {
+      findSubnetDropdown().vm.$emit('input', subnet);
+    });
+
+    it('dispatches setSubnet action', () => {
+      expect(actions.setSubnet).toHaveBeenCalledWith(expect.anything(), { subnet }, undefined);
     });
   });
 });

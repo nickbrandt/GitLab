@@ -71,7 +71,7 @@ export default {
     this.fetchRegions();
   },
   methods: {
-    ...mapActions(['setRegion', 'setVpc']),
+    ...mapActions(['setRegion', 'setVpc', 'setSubnet']),
     ...mapActions({
       fetchRegions: 'regions/fetchItems',
       fetchVpcs: 'vpcs/fetchItems',
@@ -148,7 +148,7 @@ export default {
         :empty-text="s__('ClusterIntegration|No subnet found')"
         :has-errors="loadingSubnetsError"
         :error-message="s__('ClusterIntegration|Could not load subnets for the selected VPC')"
-        @input="setVpcAndFetchSubnets($event)"
+        @input="setSubnet({ subnet: $event })"
       />
       <p class="form-text text-muted" v-html="subnetDropdownHelpText"></p>
     </div>
