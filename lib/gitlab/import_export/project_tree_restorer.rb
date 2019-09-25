@@ -40,7 +40,6 @@ module Gitlab
         begin
           json = IO.read(@path)
           @tree_hash = ActiveSupport::JSON.decode(json)
-          @tree_hash = dedup_hash(@tree_hash)
 
         rescue => e
           Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
@@ -50,6 +49,8 @@ module Gitlab
         @project_members = @tree_hash.delete('project_members')
 
         RelationRenameService.rename(@tree_hash)
+
+        @tree_hash = dedup_hash(@tree_hash)
 
         ActiveRecord::Base.uncached do
           ActiveRecord::Base.no_touching do
