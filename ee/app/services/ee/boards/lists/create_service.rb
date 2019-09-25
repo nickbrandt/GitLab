@@ -33,6 +33,19 @@ module EE
           end
         end
 
+        override :create_list_attributes
+        def create_list_attributes(type, target, position)
+          max_issue_count = if wip_limits_available?
+                              params[:max_issue_count] || 0
+                            else
+                              0
+                            end
+
+          super.merge(max_issue_count: max_issue_count)
+        end
+
+        private
+
         def find_milestone(board)
           milestones = milestone_finder(board).execute
           milestones.find(params['milestone_id'])
@@ -51,6 +64,10 @@ module EE
 
         def user_finder(board)
           @user_finder ||= ::Boards::UsersFinder.new(board, current_user)
+        end
+
+        def wip_limits_available?
+          parent.feature_available?(:wip_limits)
         end
       end
     end
