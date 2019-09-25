@@ -6,7 +6,7 @@ describe Projects::ArtifactsController do
   let(:user) { project.owner }
   let_it_be(:project) { create(:project, :repository, :public) }
 
-  let_it_be(:pipeline) do
+  let_it_be(:pipeline, reload: true) do
     create(:ci_pipeline,
             project: project,
             sha: project.commit.sha,
@@ -48,7 +48,7 @@ describe Projects::ArtifactsController do
         it 'paginates artifacts' do
           subject
 
-          expect(assigns(:artifacts)).to contain_exactly(project.job_artifacts.last)
+          expect(assigns(:artifacts)).to contain_exactly(project.reload.job_artifacts.last)
         end
       end
     end
