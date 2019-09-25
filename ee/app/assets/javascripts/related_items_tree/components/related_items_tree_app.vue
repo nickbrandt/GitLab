@@ -10,11 +10,10 @@ import TreeItemRemoveModal from './tree_item_remove_modal.vue';
 import RelatedItemsTreeHeader from './related_items_tree_header.vue';
 import RelatedItemsTreeBody from './related_items_tree_body.vue';
 
-import { PathIdSeparator, ActionType, OVERFLOW_AFTER } from '../constants';
+import { PathIdSeparator, OVERFLOW_AFTER } from '../constants';
 
 export default {
   PathIdSeparator,
-  ActionType,
   OVERFLOW_AFTER,
   components: {
     GlLoadingIcon,
@@ -37,7 +36,7 @@ export default {
       'autoCompleteIssues',
       'pendingReferences',
       'itemInputValue',
-      'actionType',
+      'issuableType',
       'epicsEndpoint',
       'issuesEndpoint',
     ]),
@@ -90,12 +89,12 @@ export default {
       });
     },
     handleAddItemFormCancel() {
-      this.toggleAddItemForm({ toggleState: false, actionType: this.actionType });
+      this.toggleAddItemForm({ toggleState: false });
       this.setPendingReferences([]);
       this.setItemInputValue('');
     },
     handleCreateEpicFormCancel() {
-      this.toggleCreateEpicForm({ toggleState: false, actionType: this.actionType });
+      this.toggleCreateEpicForm({ toggleState: false });
       this.setItemInputValue('');
     },
   },
@@ -123,7 +122,7 @@ export default {
       >
         <add-item-form
           v-if="showAddItemForm"
-          :issuable-type="actionType"
+          :issuable-type="issuableType"
           :input-value="itemInputValue"
           :is-submitting="itemAddInProgress"
           :pending-references="pendingReferences"
