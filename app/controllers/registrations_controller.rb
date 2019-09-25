@@ -16,6 +16,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def new
     if experiment_enabled?(:signup_flow)
+      track_experiment_event(:signup_flow, 'start')
       @resource = build_resource
     else
       redirect_to new_user_session_path(anchor: 'register-pane')
@@ -23,6 +24,8 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def create
+    track_experiment_event(:signup_flow, 'end') unless experiment_enabled?(:signup_flow)
+
     accept_pending_invitations
 
     super do |new_user|
@@ -61,6 +64,7 @@ class RegistrationsController < Devise::RegistrationsController
     result = ::Users::UpdateService.new(current_user, user_params.merge(user: current_user)).execute
 
     if result[:status] == :success
+      track_experiment_event(:signup_flow, 'end')
       set_flash_message! :notice, :signed_up
       redirect_to stored_location_or_dashboard_or_almost_there_path(current_user)
     else

@@ -14,7 +14,8 @@ module Gitlab
       signup_flow: {
         feature_toggle: :experimental_separate_sign_up_flow,
         environment: ::Gitlab.dev_env_or_com?,
-        enabled_ratio: 0.1
+        enabled_ratio: 0.1,
+        tracking_category: 'Growth::Acquisition::Experiment::SignUpFlow'
       }
     }.freeze
 
@@ -44,13 +45,43 @@ module Gitlab
         Experimentation.enabled?(experiment_key, experimentation_subject_index)
       end
 
+      def track_experiment_event(experiment_key, action)
+        tracking_data = experimentation_tracking_data(experiment_key, action)
+        ::Gitlab::Tracking.event(tracking_data.delete(:category), tracking_data.delete(:action), tracking_data)
+      end
+
+      def frontend_experimentation_tracking_data(experiment_key, action)
+        tracking_data = experimentation_tracking_data(experiment_key, action)
+        gon.push(tracking_data: tracking_data)
+      end
+
       private
 
+      def experimentation_subject_id
+        cookies.signed[:experimentation_subject_id]
+      end
+
       def experimentation_subject_index
-        experimentation_subject_id = cookies.signed[:experimentation_subject_id]
         return if experimentation_subject_id.blank?
 
         experimentation_subject_id.delete('-').hex % 100
+      end
+
+      def experimentation_tracking_data(experiment_key, action)
+        {
+          category: tracking_category(experiment_key),
+          action: action,
+          property: tracking_group(experiment_key),
+          label: experimentation_subject_id
+        }
+      end
+
+      def tracking_category(experiment_key)
+        Experimentation.experiment(experiment_key).tracking_category
+      end
+
+      def tracking_group(experiment_key)
+        experiment_enabled?(experiment_key) ? 'experimental_group' : 'control_group'
       end
     end
 
@@ -70,7 +101,7 @@ module Gitlab
       end
     end
 
-    Experiment = Struct.new(:key, :feature_toggle, :environment, :enabled_ratio, keyword_init: true) do
+    Experiment = Struct.new(:key, :feature_toggle, :environment, :enabled_ratio, :tracking_category, keyword_init: true) do
       def feature_toggle_enabled?
         return Feature.enabled?(key, default_enabled: true) if feature_toggle.nil?
 

@@ -34,6 +34,38 @@ describe SessionsController do
         end
       end
     end
+
+    describe 'tracking data' do
+      context 'with the experimental signup flow enabled' do
+        before do
+          stub_experiment(signup_flow: true)
+        end
+
+        it 'doesn\'t pass tracking parameters to the frontend' do
+          get(:new)
+          expect(Gon.tracking_data).to be_nil
+        end
+      end
+
+      context 'with the experimental signup flow disabled' do
+        before do
+          stub_experiment(signup_flow: false)
+          allow_any_instance_of(described_class).to receive(:experimentation_subject_id).and_return('uuid')
+        end
+
+        it 'passes the right tracking parameters to the frontend' do
+          get(:new)
+          expect(Gon.tracking_data).to eq(
+            {
+              category: 'Growth::Acquisition::Experiment::SignUpFlow',
+              action: 'start',
+              label: 'uuid',
+              property: 'control_group'
+            }
+          )
+        end
+      end
+    end
   end
 
   describe '#create' do
