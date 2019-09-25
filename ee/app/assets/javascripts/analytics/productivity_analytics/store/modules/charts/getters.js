@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import { s__ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import {
@@ -9,6 +10,7 @@ import {
   maxColumnChartItemsPerPage,
   dataZoomOptions,
   scatterPlotAddonQueryDays,
+  daysToMergeMetric,
 } from '../../../constants';
 import { getScatterPlotData, getMedianLineData } from '../../../utils';
 
@@ -91,7 +93,7 @@ export const getScatterPlotMedianData = (state, getters) =>
     scatterPlotAddonQueryDays,
   );
 
-export const getMetricDropdownLabel = state => chartKey =>
+export const getMetricLabel = state => chartKey =>
   metricTypes.find(m => m.key === state.charts[chartKey].params.metricType).label;
 
 export const getFilterParams = (state, getters, rootState, rootGetters) => chartKey => {
@@ -149,6 +151,20 @@ export const getColumnChartDatazoomOption = state => chartKey => {
 };
 
 export const getSelectedMetric = state => chartKey => state.charts[chartKey].params.metricType;
+
+/**
+ * Returns the y axis label for the scatterplot.
+ * This can either be "Days", "Hours" or some other metric label from the state's metricTypes.
+ */
+export const scatterplotYaxisLabel = (_state, getters, rootState) => {
+  const selectedMetric = getters.getSelectedMetric(chartKeys.scatterplot);
+  const metricTypesInHours = rootState.metricTypes
+    .filter(metric => metric.charts.indexOf(chartKeys.timeBasedHistogram) !== -1)
+    .map(metric => metric.key);
+  if (selectedMetric === daysToMergeMetric.key) return s__('ProductivityAnalytics|Days');
+  if (metricTypesInHours.indexOf(selectedMetric) !== -1) return s__('ProductivityAnalytics|Hours');
+  return getters.getMetricLabel(chartKeys.scatterplot);
+};
 
 export const hasNoAccessError = state =>
   state.charts[chartKeys.main].errorCode === httpStatus.FORBIDDEN;

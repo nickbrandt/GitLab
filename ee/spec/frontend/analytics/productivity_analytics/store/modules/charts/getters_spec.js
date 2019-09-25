@@ -1,6 +1,7 @@
 import createState from 'ee/analytics/productivity_analytics/store/modules/charts/state';
 import * as getters from 'ee/analytics/productivity_analytics/store/modules/charts/getters';
 import {
+  metricTypes,
   chartKeys,
   columnHighlightStyle,
   maxColumnChartItemsPerPage,
@@ -91,13 +92,13 @@ describe('Productivity analytics chart getters', () => {
     });
   });
 
-  describe('getMetricDropdownLabel', () => {
+  describe('getMetricLabel', () => {
     it('returns the correct label for the "time_to_last_commit" metric', () => {
       state.charts[chartKeys.timeBasedHistogram].params = {
         metricType: 'time_to_last_commit',
       };
 
-      expect(getters.getMetricDropdownLabel(state)(chartKeys.timeBasedHistogram)).toBe(
+      expect(getters.getMetricLabel(state)(chartKeys.timeBasedHistogram)).toBe(
         'Time from first comment to last commit',
       );
     });
@@ -230,6 +231,44 @@ describe('Productivity analytics chart getters', () => {
       expect(getters.getSelectedMetric(state)(chartKeys.timeBasedHistogram)).toBe(
         'time_to_last_commit',
       );
+    });
+  });
+
+  describe('scatterplotYaxisLabel', () => {
+    const metricsInHours = ['time_to_first_comment', 'time_to_last_commit', 'time_to_merge'];
+
+    const mockRootState = {
+      metricTypes,
+    };
+
+    it('returns "Days" for "days_to_merge" metric', () => {
+      const mockGetters = {
+        getSelectedMetric: () => 'days_to_merge',
+      };
+      expect(getters.scatterplotYaxisLabel(null, mockGetters, mockRootState)).toBe('Days');
+    });
+
+    it.each(metricsInHours)('returns "Hours" for the "%s" metric', metric => {
+      const mockGetters = {
+        getSelectedMetric: () => metric,
+      };
+      expect(getters.scatterplotYaxisLabel(null, mockGetters, mockRootState)).toBe('Hours');
+    });
+
+    it.each`
+      metric              | label
+      ${'commits_count'}  | ${'Number of commits per MR'}
+      ${'loc_per_commit'} | ${'Number of LOCs per commit'}
+      ${'files_touched'}  | ${'Number of files touched'}
+    `('calls getMetricLabel for the "$metric" metric', ({ metric }) => {
+      const mockGetters = {
+        getSelectedMetric: () => metric,
+        getMetricLabel: jest.fn(),
+      };
+
+      getters.scatterplotYaxisLabel(null, mockGetters, mockRootState);
+
+      expect(mockGetters.getMetricLabel).toHaveBeenCalled();
     });
   });
 
