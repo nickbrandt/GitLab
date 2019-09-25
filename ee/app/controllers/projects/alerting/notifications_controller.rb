@@ -19,8 +19,6 @@ module Projects
 
       private
 
-      PARAMS_TO_EXCLUDE = %w(controller action namespace_id project_id).freeze
-
       def project_without_auth
         @project ||= Project
           .find_by_full_path("#{params[:namespace_id]}/#{params[:project_id]}")
@@ -36,7 +34,7 @@ module Projects
 
       def notify_service
         Projects::Alerting::NotifyService
-          .new(project, current_user, permitted_params)
+          .new(project, current_user, notification_payload)
       end
 
       def response_status(result)
@@ -45,8 +43,8 @@ module Projects
         result.http_status
       end
 
-      def permitted_params
-        params.except(*PARAMS_TO_EXCLUDE).permit!
+      def notification_payload
+        params.permit![:notification]
       end
     end
   end
