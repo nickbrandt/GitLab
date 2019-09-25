@@ -50,11 +50,8 @@ export const setMetricType = ({ commit, dispatch }, { chartKey, metricType }) =>
 export const chartItemClicked = ({ commit, dispatch }, { chartKey, item }) => {
   commit(types.UPDATE_SELECTED_CHART_ITEMS, { chartKey, item });
 
-  // update histograms
-  dispatch('fetchChartData', chartKeys.timeBasedHistogram);
-  dispatch('fetchChartData', chartKeys.commitBasedHistogram);
-
-  // TODO: update scatterplot
+  // update secondary charts
+  dispatch('fetchSecondaryChartData');
 
   // update table
   dispatch('table/fetchMergeRequests', null, { root: true });

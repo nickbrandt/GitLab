@@ -11,6 +11,7 @@ import {
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import Icon from '~/vue_shared/components/icon.vue';
 import MetricChart from './metric_chart.vue';
+import Scatterplot from '../../shared/components/scatterplot.vue';
 import MergeRequestTable from './mr_table.vue';
 import { chartKeys } from '../constants';
 
@@ -24,6 +25,7 @@ export default {
     GlButton,
     Icon,
     MetricChart,
+    Scatterplot,
     MergeRequestTable,
   },
   directives: {
@@ -55,8 +57,10 @@ export default {
     ...mapGetters('charts', [
       'chartLoading',
       'chartHasData',
-      'getChartData',
+      'getColumnChartData',
       'getColumnChartDatazoomOption',
+      'getScatterPlotMainData',
+      'getScatterPlotMedianData',
       'getMetricDropdownLabel',
       'getSelectedMetric',
       'hasNoAccessError',
@@ -141,19 +145,19 @@ export default {
       "
     />
     <template v-if="showAppContent">
-      <h4>{{ __('Merge Requests') }}</h4>
+      <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
       <metric-chart
         ref="mainChart"
         class="mb-4"
-        :title="__('Time to merge')"
+        :title="s__('ProductivityAnalytics|Time to merge')"
         :description="
           __('You can filter by \'days to merge\' by clicking on the columns in the chart.')
         "
         :is-loading="chartLoading(chartKeys.main)"
-        :chart-data="getChartData(chartKeys.main)"
+        :chart-data="getColumnChartData(chartKeys.main)"
       >
         <gl-column-chart
-          :data="{ full: getChartData(chartKeys.main) }"
+          :data="{ full: getColumnChartData(chartKeys.main) }"
           :option="getColumnChartOption(chartKeys.main)"
           :y-axis-title="__('Merge requests')"
           :x-axis-title="__('Days')"
@@ -176,17 +180,17 @@ export default {
               :is-loading="chartLoading(chartKeys.timeBasedHistogram)"
               :metric-types="getMetricTypes(chartKeys.timeBasedHistogram)"
               :selected-metric="getSelectedMetric(chartKeys.timeBasedHistogram)"
-              :chart-data="getChartData(chartKeys.timeBasedHistogram)"
+              :chart-data="getColumnChartData(chartKeys.timeBasedHistogram)"
               @metricTypeChange="
                 metric =>
                   setMetricType({ metricType: metric, chartKey: chartKeys.timeBasedHistogram })
               "
             >
               <gl-column-chart
-                :data="{ full: getChartData(chartKeys.timeBasedHistogram) }"
+                :data="{ full: getColumnChartData(chartKeys.timeBasedHistogram) }"
                 :option="getColumnChartOption(chartKeys.timeBasedHistogram)"
-                :y-axis-title="__('Merge requests')"
-                :x-axis-title="__('Hours')"
+                :y-axis-title="s__('ProductivityAnalytics|Merge requests')"
+                :x-axis-title="s__('ProductivityAnalytics|Hours')"
                 x-axis-type="category"
               />
             </metric-chart>
@@ -202,26 +206,46 @@ export default {
               :is-loading="chartLoading(chartKeys.commitBasedHistogram)"
               :metric-types="getMetricTypes(chartKeys.commitBasedHistogram)"
               :selected-metric="getSelectedMetric(chartKeys.commitBasedHistogram)"
-              :chart-data="getChartData(chartKeys.commitBasedHistogram)"
+              :chart-data="getColumnChartData(chartKeys.commitBasedHistogram)"
               @metricTypeChange="
                 metric =>
                   setMetricType({ metricType: metric, chartKey: chartKeys.commitBasedHistogram })
               "
             >
               <gl-column-chart
-                :data="{ full: getChartData(chartKeys.commitBasedHistogram) }"
+                :data="{ full: getColumnChartData(chartKeys.commitBasedHistogram) }"
                 :option="getColumnChartOption(chartKeys.commitBasedHistogram)"
-                :y-axis-title="__('Merge requests')"
+                :y-axis-title="s__('ProductivityAanalytics|Merge requests')"
                 :x-axis-title="getMetricDropdownLabel(chartKeys.commitBasedHistogram)"
                 x-axis-type="category"
               />
             </metric-chart>
           </div>
 
+          <metric-chart
+            ref="scatterplot"
+            class="mb-4"
+            :title="s__('ProductivityAnalytics|Trendline')"
+            :is-loading="chartLoading(chartKeys.scatterplot)"
+            :metric-types="getMetricTypes(chartKeys.scatterplot)"
+            :chart-data="getScatterPlotMainData"
+            :selected-metric="getSelectedMetric(chartKeys.scatterplot)"
+            @metricTypeChange="
+              metric => setMetricType({ metricType: metric, chartKey: chartKeys.scatterplot })
+            "
+          >
+            <scatterplot
+              :x-axis-title="s__('ProductivityAnalytics|Merge date')"
+              :y-axis-title="s__('ProductivityAnalytics|Days')"
+              :scatter-data="getScatterPlotMainData"
+              :median-line-data="getScatterPlotMedianData"
+            />
+          </metric-chart>
+
           <div
             class="js-mr-table-sort d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
           >
-            <h5>{{ __('List') }}</h5>
+            <h5>{{ s__('ProductivityAnalytics|List') }}</h5>
             <div
               v-if="showMergeRequestTable"
               class="d-flex flex-column flex-md-row align-items-md-center"
@@ -261,7 +285,6 @@ export default {
         </div>
 
         <div class="js-mr-table">
-          <div ref="foo"></div>
           <gl-loading-icon v-if="isLoadingTable" size="md" class="my-4 py-4" />
           <merge-request-table
             v-if="showMergeRequestTable"
