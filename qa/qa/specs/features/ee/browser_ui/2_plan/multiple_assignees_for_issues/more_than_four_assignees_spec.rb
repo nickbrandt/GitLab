@@ -1,0 +1,70 @@
+# frozen_string_literal: true
+
+module QA
+  context 'Plan' do
+    describe 'Multiple assignees per issue' do
+      before do
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
+
+        user_1 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+        user_2 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
+        user_3 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_3, Runtime::Env.gitlab_qa_password_3)
+        user_4 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_4, Runtime::Env.gitlab_qa_password_4)
+        user_5 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_5, Runtime::Env.gitlab_qa_password_5)
+        user_6 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_6, Runtime::Env.gitlab_qa_password_6)
+
+        @project = Resource::Project.fabricate_via_api! do |resource|
+          resource.name = 'project-to-test-issue-with-multiple-assignees'
+        end
+
+        @project.add_member(user_1)
+        @project.add_member(user_2)
+        @project.add_member(user_3)
+        @project.add_member(user_4)
+        @project.add_member(user_5)
+        @project.add_member(user_6)
+
+        @issue = Resource::Issue.fabricate_via_api! do |issue|
+          issue.title = issue.title = 'issue-to-test-multiple-assignees'
+          issue.project = @project
+          issue.assignee_ids = [
+            user_1.id,
+            user_2.id,
+            user_3.id,
+            user_4.id,
+            user_5.id,
+            user_6.id
+          ]
+        end
+      end
+
+      it 'shows the first three assignees and a +n sign in the issues list' do
+        @project.visit!
+
+        Page::Project::Menu.perform(&:click_issues)
+
+        Page::Project::Issue::Index.perform do |index|
+          expect(index.assignee_link_count).to be 3
+          expect(index.avatar_counter).to be_visible
+          expect(index.avatar_counter).to have_content('+3')
+        end
+      end
+
+      it 'shows the first five assignees and a +n more link in the issue page' do
+        @issue.visit!
+
+        Page::Project::Issue::Show.perform do |show|
+          expect(show.avatar_image_count).to be 5
+          expect(show.more_assignees_link).to be_visible
+          expect(show.more_assignees_link).to have_content('+ 1 more')
+
+          show.toggle_more_assignees_link
+
+          expect(show.avatar_image_count).to be 6
+          expect(show.more_assignees_link).to have_content('- show less')
+        end
+      end
+    end
+  end
+end
