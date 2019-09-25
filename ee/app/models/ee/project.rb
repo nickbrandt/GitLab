@@ -39,10 +39,13 @@ module EE
       has_one :project_registry, class_name: 'Geo::ProjectRegistry', inverse_of: :project
       has_one :push_rule, ->(project) { project&.feature_available?(:push_rules) ? all : none }
       has_one :index_status
+
       has_one :jenkins_service
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
+      has_one :alerts_service
+
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
       has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :incident_management_setting, inverse_of: :project, class_name: 'IncidentManagement::ProjectIncidentManagementSetting'
@@ -487,17 +490,11 @@ module EE
     override :disabled_services
     def disabled_services
       strong_memoize(:disabled_services) do
-        disabled_services = []
-
-        unless feature_available?(:jenkins_integration)
-          disabled_services.push('jenkins', 'jenkins_deprecated')
+        [].tap do |services|
+          services.push('jenkins', 'jenkins_deprecated') unless feature_available?(:jenkins_integration)
+          services.push('github') unless feature_available?(:github_project_service_integration)
+          services.push('alerts') unless alerts_service_available?
         end
-
-        unless feature_available?(:github_project_service_integration)
-          disabled_services.push('github')
-        end
-
-        disabled_services
       end
     end
 
@@ -611,6 +608,11 @@ module EE
 
     def design_repository
       @design_repository ||= DesignManagement::Repository.new(self)
+    end
+
+    def alerts_service_available?
+      ::Feature.enabled?(:generic_alert_endpoint, self) &&
+        feature_available?(:incident_management)
     end
 
     def package_already_taken?(package_name)
