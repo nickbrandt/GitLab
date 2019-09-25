@@ -39,8 +39,8 @@ module Gitlab
       def restore
         begin
           json = IO.read(@path)
-          decoded_json = ActiveSupport::JSON.decode(json)
-          @tree_hash = dedup_hash(decoded_json)
+          @tree_hash = ActiveSupport::JSON.decode(json)
+          @tree_hash = dedup_hash(@tree_hash)
 
         rescue => e
           Rails.logger.error("Import/Export error: #{e.message}") # rubocop:disable Gitlab/RailsLogger
