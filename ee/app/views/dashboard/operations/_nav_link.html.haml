@@ -1,8 +1,0 @@
-- if can?(current_user, :read_operations_dashboard)
-  %button#js-dashboards-menu.btn-link{ type: 'button', data: { toggle: 'dropdown' }, 'aria-label': _('Operations Dashboard'), 'aria-haspopup': true, 'aria-expanded': false }
-    = sprite_icon('dashboard', size: 18)
-    = sprite_icon('angle-down', css_class: 'caret-down')
-  .dropdown-menu{ 'aria-labelledby': "js-dashboards-menu" }
-    .dropdown-bold-header
-      = _('Dashboards')
-    = render_if_exists 'dashboard/operations/nav_link_list'
