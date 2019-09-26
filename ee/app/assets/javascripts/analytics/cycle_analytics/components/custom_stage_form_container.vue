@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       // NOTE: events will be part of the response from the new cycle analytics backend
-      // https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/31535
+      // https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/31535
       events: [],
       labels: [],
       isLoading: false,
