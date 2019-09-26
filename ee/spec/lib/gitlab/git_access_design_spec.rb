@@ -7,9 +7,10 @@ describe Gitlab::GitAccessDesign do
   set(:project) { create(:project) }
   set(:user) { project.owner }
   let(:protocol) { 'web' }
+  let(:actor) { user }
 
   subject(:access) do
-    described_class.new(user, project, protocol, authentication_abilities: [:read_project, :download_code, :push_code])
+    described_class.new(actor, project, protocol, authentication_abilities: [:read_project, :download_code, :push_code])
   end
 
   describe "#check!" do
@@ -36,6 +37,16 @@ describe Gitlab::GitAccessDesign do
 
       it "raises an error " do
         expect { subject }.to raise_error(::Gitlab::GitAccess::UnauthorizedError)
+      end
+    end
+
+    context 'Geo' do
+      let(:actor) { :geo }
+
+      context 'http protocol' do
+        let(:protocol) { 'http' }
+
+        it { is_expected.to be_a(::Gitlab::GitAccessResult::Success) }
       end
     end
   end

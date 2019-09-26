@@ -3,8 +3,10 @@
 module Gitlab
   class GitAccessDesign < GitAccess
     def check(cmd, _changes)
-      check_protocol!
-      check_can_create_design!
+      unless geo?
+        check_protocol!
+        check_can_create_design!
+      end
 
       success_result(cmd)
     end
