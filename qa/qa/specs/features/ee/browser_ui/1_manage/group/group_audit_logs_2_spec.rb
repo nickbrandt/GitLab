@@ -63,7 +63,7 @@ module QA
         it_behaves_like 'group audit event logs', ["Change request access enabled from true to false", "Change request access enabled from false to true"]
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/67283
+      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/31764
       context 'Enable and disable 2FA requirement', :quarantine do
         before do
           sign_in
