@@ -265,6 +265,17 @@ module EE
         end
       end
 
+      class AuditEvent < Grape::Entity
+        expose :id
+        expose :author_id
+        expose :entity_id
+        expose :entity_type
+        expose :details do |audit_event|
+          audit_event.formatted_details
+        end
+        expose :created_at
+      end
+
       class Epic < Grape::Entity
         can_admin_epic = ->(epic, opts) { Ability.allowed?(opts[:user], :admin_epic, epic) }
 

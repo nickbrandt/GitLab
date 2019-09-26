@@ -1,38 +1,38 @@
 # frozen_string_literal: true
 
 class LogFinder
-  PER_PAGE = 25
-  ENTITY_COLUMN_TYPES = {
-    'User' => :user_id,
-    'Group' => :group_id,
-    'Project' => :project_id
-  }.freeze
+  include CreatedAtFilter
+  VALID_ENTITY_TYPES = %w[Project User Group].freeze
 
   def initialize(params)
     @params = params
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def execute
-    AuditEvent.order(id: :desc).where(conditions).page(@params[:page]).per(PER_PAGE)
+    audit_events = AuditEvent.order(id: :desc) # rubocop: disable CodeReuse/ActiveRecord
+    audit_events = by_entity(audit_events)
+    audit_events = by_created_at(audit_events)
+
+    audit_events
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   private
 
-  def conditions
-    return unless entity_column
+  attr_reader :params
 
-    { entity_type: @params[:event_type] }.tap do |hash|
-      hash[:entity_id] = @params[entity_column] if entity_present?
+  def by_entity(audit_events)
+    return audit_events unless valid_entity_type?
+
+    audit_events = audit_events.by_entity_type(params[:entity_type])
+
+    if params[:entity_id].present? && params[:entity_id] != '0'
+      audit_events = audit_events.by_entity_id(params[:entity_id])
     end
+
+    audit_events
   end
 
-  def entity_column
-    @entity_column ||= ENTITY_COLUMN_TYPES[@params[:event_type]]
-  end
-
-  def entity_present?
-    @params[entity_column] && @params[entity_column] != '0'
+  def valid_entity_type?
+    VALID_ENTITY_TYPES.include? params[:entity_type]
   end
 end
