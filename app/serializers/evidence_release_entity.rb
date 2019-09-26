@@ -2,7 +2,7 @@
 
 class EvidenceReleaseEntity < Grape::Entity
   expose :id
-  expose :tag
+  expose :tag, as: :tag_name
   expose :name
   expose :description
   expose :created_at

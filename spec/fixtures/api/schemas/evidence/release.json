@@ -1,6 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://example.com/release.schema.json",
   "type": "object",
   "required": [
     "id",
@@ -22,5 +20,6 @@
       "type": "array",
       "items": { "$ref": "milestone.json" }
     }
-  }
+  },
+  "additionalProperties": false
 }

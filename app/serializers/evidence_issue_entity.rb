@@ -6,6 +6,7 @@ class EvidenceIssueEntity < Grape::Entity
   expose :description
   expose :author, using: EvidenceAuthorEntity
   expose :state
+  expose :iid
   expose :confidential
   expose :created_at
   expose :due_date

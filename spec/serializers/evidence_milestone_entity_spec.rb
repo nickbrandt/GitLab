@@ -9,7 +9,7 @@ describe EvidenceMilestoneEntity do
   subject { entity.as_json }
 
   it 'exposes the expected fields' do
-    expect(subject.keys).to contain_exactly(:id, :title, :description, :state, :created_at, :due_date, :issues)
+    expect(subject.keys).to contain_exactly(:id, :title, :description, :state, :iid, :created_at, :due_date, :issues)
   end
 
   context 'when there issues linked to this milestone' do

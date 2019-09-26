@@ -5,6 +5,7 @@ class EvidenceMilestoneEntity < Grape::Entity
   expose :title
   expose :description
   expose :state
+  expose :iid
   expose :created_at
   expose :due_date
   expose :issues, using: EvidenceIssueEntity

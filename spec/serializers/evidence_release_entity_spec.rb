@@ -9,7 +9,7 @@ describe EvidenceReleaseEntity do
   subject { entity.as_json }
 
   it 'exposes the expected fields' do
-    expect(subject.keys).to contain_exactly(:id, :tag, :name, :description, :created_at, :project, :milestones)
+    expect(subject.keys).to contain_exactly(:id, :tag_name, :name, :description, :created_at, :project, :milestones)
   end
 
   context 'when the release has milestones' do
