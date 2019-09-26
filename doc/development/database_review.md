@@ -105,7 +105,7 @@ and details for a database reviewer:
     that post migrations are executed post-deployment in production.
 - Check [timing guidelines for migrations](#timing-guidelines-for-migrations)
 - Check migrations are reversible and implement a `#down` method
-- Data migrations should be reversible, too or come with a description of how to reverse.
+- Data migrations should be reversible too or come with a description of how to reverse, when possible. This applies to all types of migrations (regular, post-deploy, background).
 - Query performance
   - Check for any obviously complex queries and queries the author specifically
     points out for review (if any)
