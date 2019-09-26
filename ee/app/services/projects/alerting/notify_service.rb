@@ -11,8 +11,8 @@ module Projects
       DEV_TOKEN = :development_token
 
       def execute(token)
+        return forbidden unless alerts_service_activated?
         return unauthorized unless valid_token?(token)
-        return forbidden unless create_issue?
 
         process_incident_issues
 
@@ -31,8 +31,10 @@ module Projects
         project.feature_available?(:incident_management)
       end
 
-      def create_issue?
-        incident_management_available? && generic_alert_endpoint_enabled?
+      def alerts_service_activated?
+        incident_management_available? &&
+          generic_alert_endpoint_enabled? &&
+          project.alerts_service.try(:active?)
       end
 
       def process_incident_issues
