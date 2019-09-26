@@ -1,5 +1,14 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.2.6
+
+### Security (3 changes)
+
+- Hide approvers if a rule has any hidden groups.
+- Fix Gitaly SearchBlobs flag RPC injection [Gitaly v1.59.3].
+- Prevent IDOR when adding groups to protected environments.
+
+
 ## 12.2.5
 
 ### Security (1 change)
