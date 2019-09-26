@@ -20,7 +20,7 @@ module QA
         end
       end
 
-      # Bug issue: https://gitlab.com/gitlab-org/gitlab-ee/issues/14756
+      # Bug issue: https://gitlab.com/gitlab-org/gitlab/issues/14756
       context 'Disable and Enable LFS', :quarantine do
         before do
           sign_in
