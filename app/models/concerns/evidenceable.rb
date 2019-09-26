@@ -14,13 +14,12 @@ module Evidenceable
     def evidence_summary_keys
       return [] unless latest_evidences.any?
 
-      entity_class = "Evidence#{self.class.name}Entity".safe_constantize
-      return [] unless entity_class
-
-      entity_class.root_exposures.map(&:attribute)
+      entity_class&.root_exposures&.map(&:attribute)
     end
 
     def ensure_evidence
+      check_entity_class
+
       saved_changes.keys.each do |key|
         if evidence_summary_keys.include?(key.to_sym)
           impacted_releases.each do |release|
@@ -29,6 +28,20 @@ module Evidenceable
           break
         end
       end
+    end
+
+    def check_entity_class
+      raise "Evidenceable module detected in #{self.class.name} - please create an '#{entity_class_name}' class and expose the fields that are relevant to an Evidence summary." unless entity_class
+    end
+
+    private
+
+    def entity_class_name
+      "Evidences::#{self.class.name}Entity"
+    end
+
+    def entity_class
+      entity_class_name.safe_constantize
     end
 
     def impacted_releases

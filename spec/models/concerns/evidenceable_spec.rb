@@ -16,7 +16,7 @@ describe Evidenceable do
         context 'when the updated field is part of the evidence JSON summary' do
           let(:updated_field) { :description }
           let(:updated_value) { 'updated description' }
-          let(:updated_json_field) { Evidence.last.summary['description'] }
+          let(:updated_json_field) { Evidence.last.summary['release']['description'] }
 
           it_behaves_like 'updated exposed field'
         end
@@ -40,7 +40,7 @@ describe Evidenceable do
         context 'when the updated field is part of the evidence JSON summary' do
           let(:updated_field) { :description }
           let(:updated_value) { 'updated description' }
-          let(:updated_json_field) { Evidence.last.summary['milestones'][0]['description'] }
+          let(:updated_json_field) { Evidence.last.summary['release']['milestones'][0]['description'] }
 
           it_behaves_like 'updated exposed field'
         end
@@ -64,6 +64,12 @@ describe Evidenceable do
     describe 'issue' do
       let(:model) { issue }
 
+      context 'when checking for the existance of EvidenceIssueEntity' do
+        it 'does not raise an error' do
+          expect { model.save! }.not_to raise_error
+        end
+      end
+
       context 'when an issue is part of a milestone that is linked to a release' do
         before do
           milestone.issues << issue
@@ -72,7 +78,7 @@ describe Evidenceable do
         context 'when the updated field is part of the evidence JSON summary' do
           let(:updated_field) { :state }
           let(:updated_value) { 'closed' }
-          let(:updated_json_field) { Evidence.last.summary['milestones'][0]['issues'][0]['state'] }
+          let(:updated_json_field) { Evidence.last.summary['release']['milestones'][0]['issues'][0]['state'] }
 
           it_behaves_like 'updated exposed field'
         end

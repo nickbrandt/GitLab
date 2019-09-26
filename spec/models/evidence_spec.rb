@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 describe Evidence do
-  set(:project) { create(:project, creator: create(:user)) }
+  set(:project) { create(:project) }
   let(:release) { create(:release, project: project) }
-  let(:schema_file) { 'evidence/release' }
+  let(:schema_file) { 'evidences/evidence' }
   let(:summary_json) { described_class.last.summary.to_json }
 
   describe 'associations' do
@@ -63,7 +63,7 @@ describe Evidence do
       end
 
       context 'when each milestone has associated issues' do
-        let!(:issue) { create(:issue, project: project, state: 'closed') }
+        let(:issue) { create(:issue, project: project, state: 'closed') }
 
         context 'when an issue has a missing title' do
           it 'is not valid' do
@@ -107,6 +107,7 @@ describe Evidence do
 
     context 'when a release name is not provided' do
       let(:release) { create(:release, project: project, name: nil) }
+
       it 'creates a valid JSON object' do
         expect(release.name).to be_nil
         expect(summary_json).to match_schema(schema_file)
@@ -144,7 +145,7 @@ describe Evidence do
 
       context 'when a milestone has an issue' do
         context 'when the issue has no description' do
-          let!(:issue) { create(:issue, project: project, description: nil, state: 'closed') }
+          let(:issue) { create(:issue, project: project, description: nil, state: 'closed') }
 
           before do
             milestone.issues << issue

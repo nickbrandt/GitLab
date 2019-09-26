@@ -90,4 +90,42 @@ RSpec.describe Release do
       end
     end
   end
+
+  describe '#latest_evidences' do
+    context 'when there is no evidence tied to this release' do
+      it 'is empty' do
+        release.evidences.first.destroy
+
+        expect(release.latest_evidences).to be_empty
+      end
+    end
+
+    context 'when there are evidences tied to this release' do
+      it 'returns the latest evidence in an array' do
+        newer_evidence = create(:evidence, release: release)
+
+        expect(release.evidences.count).to eq(2)
+        expect(release.latest_evidences).to eq(Array(newer_evidence))
+      end
+    end
+  end
+
+  describe 'evidences' do
+    describe '#create_evidence!' do
+      context 'when a release is created' do
+        it 'creates one Evidence object too' do
+          expect { release }.to change(Evidence, :count).by(1)
+        end
+      end
+    end
+
+    context 'when a release is deleted' do
+      it 'also deletes the associated evidences' do
+        release = create(:release)
+        create(:evidence, release: release)
+
+        expect { release.destroy }.to change(Evidence, :count).by(-2)
+      end
+    end
+  end
 end

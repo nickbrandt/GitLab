@@ -6,7 +6,6 @@ class Evidence < ApplicationRecord
   before_validation :generate_summary
 
   validates :release, presence: true
-
   validate :release_fields
   validate :milestone_fields
   validate :issue_fields
@@ -20,7 +19,7 @@ class Evidence < ApplicationRecord
   private
 
   def generate_summary
-    self.summary = EvidenceReleaseSerializer.new.represent(release) # rubocop: disable CodeReuse/Serializer
+    self.summary = Evidences::EvidenceSerializer.new.represent(self) # rubocop: disable CodeReuse/Serializer
   end
 
   def release_fields

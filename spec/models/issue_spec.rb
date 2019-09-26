@@ -899,4 +899,42 @@ describe Issue do
       let(:default_params) { { project: project } }
     end
   end
+
+  describe '#latest_evidences' do
+    context 'when this issue is not tied to any milestone' do
+      it 'is empty' do
+        issue = build(:issue, milestone: nil)
+
+        expect(issue.latest_evidences).to be_empty
+      end
+    end
+
+    context 'when this issue it tied to one milestone' do
+      let(:project) { create(:project) }
+      let(:issue) { create(:issue, project: project) }
+      let(:milestone) { create(:milestone, project: project) }
+      let(:release_1) { create(:release, project: project) }
+      let(:release_2) { create(:release, project: project) }
+      let(:latest_evidence_2) { release_2.latest_evidences.first }
+
+      before do
+        milestone.issues << issue
+        release_1.milestones << milestone
+        release_2.milestones << milestone
+      end
+      it 'returns the latest evidences for each releases tied to this milestone' do
+        latest_evidence_1 = release_1.latest_evidences.first
+
+        expect(issue.latest_evidences).to contain_exactly(latest_evidence_1, latest_evidence_2)
+      end
+
+      context 'when a new evidence is created for one release' do
+        it 'returns this new evidence, as well as the other relevant evidences' do
+          latest_evidence_3 = create(:evidence, release: release_1)
+
+          expect(issue.latest_evidences).to contain_exactly(latest_evidence_2, latest_evidence_3)
+        end
+      end
+    end
+  end
 end
