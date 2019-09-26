@@ -2250,7 +2250,21 @@ class Project < ApplicationRecord
     Pages::LookupPath.new(self, trim_prefix: trim_prefix, domain: domain)
   end
 
+  def closest_setting(name)
+    setting = read_attribute(name)
+    setting ||= closest_namespace_setting(name)
+    setting ||= Gitlab::CurrentSettings.send(name) # rubocop:disable GitlabSecurity/PublicSend
+    setting
+  end
+
   private
+
+  def closest_namespace_setting(name)
+    namespace
+      .self_and_ancestors
+      .detect { |n| !n.read_attribute(name).nil? }
+      .try(name)
+  end
 
   def merge_requests_allowing_collaboration(source_branch = nil)
     relation = source_of_merge_requests.opened.where(allow_collaboration: true)

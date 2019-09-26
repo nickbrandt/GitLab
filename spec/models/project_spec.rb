@@ -5121,6 +5121,60 @@ describe Project do
     end
   end
 
+  describe '#closest_setting' do
+    let(:root_namespace) { create(:namespace) }
+    let(:namespace) { create(:namespace, parent: root_namespace) }
+    let(:project) { create(:project, namespace: namespace) }
+    let(:setting) { project.closest_setting(:max_artifacts_size) }
+
+    before do
+      stub_application_setting(max_artifacts_size: 100)
+      root_namespace.update!(max_artifacts_size: 200)
+      namespace.update!(max_artifacts_size: 300)
+      project.update!(max_artifacts_size: 400)
+    end
+
+    context 'when project has non-nil value for setting' do
+      it 'returns project level setting' do
+        expect(setting).to eq(400)
+      end
+    end
+
+    context 'when project has nil value for setting' do
+      before do
+        project.update!(max_artifacts_size: nil)
+      end
+
+      context 'and namespace has non-nil value for setting' do
+        it 'returns namespace level setting' do
+          expect(setting).to eq(300)
+        end
+      end
+
+      context 'and namespace has nil value for setting' do
+        before do
+          namespace.update!(max_artifacts_size: nil)
+        end
+
+        context 'and root namespace has non-nil value for setting' do
+          it 'returns root namespace level setting' do
+            expect(setting).to eq(200)
+          end
+        end
+
+        context 'and root namespace has nil value for setting' do
+          before do
+            root_namespace.update!(max_artifacts_size: nil)
+          end
+
+          it 'returns application level setting' do
+            expect(setting).to eq(100)
+          end
+        end
+      end
+    end
+  end
+
   def rugged_config
     rugged_repo(project.repository).config
   end
