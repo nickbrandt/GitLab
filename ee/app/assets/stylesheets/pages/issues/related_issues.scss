@@ -19,17 +19,6 @@ $token-spacing-bottom: 0.5em;
 
 .related-issues-token-body {
   padding: 0;
-  transition-property: max-height, padding, opacity;
-  transition-duration: $general-hover-transition-duration;
-  transition-timing-function: $general-hover-transition-curve;
-
-  &.collapsed {
-    overflow: hidden;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    opacity: 0;
-  }
 
   li .issuable-info-container {
     padding-left: $gl-padding;

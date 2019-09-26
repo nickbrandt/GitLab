@@ -217,10 +217,8 @@ export default {
         />
       </div>
       <div
-        :class="{
-          collapsed: !shouldShowTokenBody,
-          'sortable-container': canReorder,
-        }"
+        v-if="shouldShowTokenBody"
+        :class="{ 'sortable-container': canReorder }"
         class="related-issues-token-body"
       >
         <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
