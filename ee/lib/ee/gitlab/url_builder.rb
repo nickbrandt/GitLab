@@ -7,9 +7,22 @@ module EE
 
       override :url
       def url
-        return project_design_url(object.project, object) if object.is_a?(DesignManagement::Design)
+        case object
+        when DesignManagement::Design
+          project_design_url(object.project, object)
+        when Epic
+          group_epic_url(object.group, object)
+        else
+          super
+        end
+      end
 
-        super
+      override :note_url
+      def note_url
+        return super unless object.for_epic?
+
+        epic = object.noteable
+        group_epic_url(epic.group, epic, anchor: dom_id(object))
       end
     end
   end
