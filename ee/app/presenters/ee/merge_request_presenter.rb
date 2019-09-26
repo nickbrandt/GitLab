@@ -61,6 +61,10 @@ module EE
       project_vulnerability_feedback_index_path(merge_request.project)
     end
 
+    def suggested_approvers
+      merge_request.approval_state.suggested_approvers(current_user: current_user)
+    end
+
     private
 
     def expose_mr_approval_path?
