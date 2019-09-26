@@ -67,6 +67,20 @@ describe MergeTrain do
     end
   end
 
+  describe '.first_in_trains' do
+    let!(:first_on_master) { create_merge_request_on_train(target_branch: 'master', source_branch: 'feature-1') }
+    let!(:second_on_master) { create_merge_request_on_train(target_branch: 'master', source_branch: 'feature-2') }
+
+    let!(:first_on_stable) { create_merge_request_on_train(target_branch: 'stable', source_branch: 'feature-1-backport') }
+    let!(:second_on_stable) { create_merge_request_on_train(target_branch: 'stable', source_branch: 'feature-2-backport') }
+
+    subject { described_class.first_in_trains(project) }
+
+    it 'returns only first merge requests per merge train' do
+      is_expected.to contain_exactly(first_on_master, first_on_stable)
+    end
+  end
+
   describe '.first_in_train_from' do
     subject { described_class.first_in_train_from(merge_request_ids) }
 
