@@ -5,11 +5,10 @@ describe 'User views issue designs', :js do
 
   set(:project) { create(:project_empty_repo, :public) }
   set(:issue) { create(:issue, project: project) }
+  set(:design) { create(:design, :with_file, issue: issue) }
 
   before do
     enable_design_management
-
-    create(:design, :with_file, issue: issue)
   end
 
   context 'navigates from the issue view' do
