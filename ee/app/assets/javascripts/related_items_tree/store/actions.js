@@ -256,18 +256,17 @@ export const removePendingReference = ({ commit }, data) =>
 export const setItemInputValue = ({ commit }, data) => commit(types.SET_ITEM_INPUT_VALUE, data);
 
 export const requestAddItem = ({ commit }) => commit(types.REQUEST_ADD_ITEM);
-export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { actionType, rawItems }) => {
-  const isEpic = actionType === ActionType.Epic;
+export const receiveAddItemSuccess = ({ dispatch, commit, getters, state }, { rawItems }) => {
   const items = rawItems.map(item =>
     formatChildItem({
-      ...convertObjectPropsToCamelCase(item, { deep: !isEpic }),
-      type: isEpic ? ChildType.Epic : ChildType.Issue,
-      userPermissions: isEpic ? { adminEpic: item.can_admin } : {},
+      ...convertObjectPropsToCamelCase(item, { deep: !getters.isEpic }),
+      type: getters.isEpic ? ChildType.Epic : ChildType.Issue,
+      userPermissions: getters.isEpic ? { adminEpic: item.can_admin } : {},
     }),
   );
 
   commit(types.RECEIVE_ADD_ITEM_SUCCESS, {
-    insertAt: isEpic ? 0 : getters.issuesBeginAtIndex,
+    insertAt: getters.isEpic ? 0 : getters.issuesBeginAtIndex,
     items,
   });
 
@@ -281,7 +280,7 @@ export const receiveAddItemSuccess = ({ dispatch, commit, getters }, { actionTyp
   dispatch('setPendingReferences', []);
   dispatch('setItemInputValue', '');
   dispatch('toggleAddItemForm', {
-    actionType,
+    actionType: state.actionType,
     toggleState: false,
   });
 };
@@ -294,16 +293,15 @@ export const receiveAddItemFailure = ({ commit, state }, data = {}) => {
   }
   flash(errorMessage);
 };
-export const addItem = ({ state, dispatch }) => {
+export const addItem = ({ state, dispatch, getters }) => {
   dispatch('requestAddItem');
 
   axios
-    .post(state.actionType === ActionType.Epic ? state.epicsEndpoint : state.issuesEndpoint, {
+    .post(getters.isEpic ? state.epicsEndpoint : state.issuesEndpoint, {
       issuable_references: state.pendingReferences,
     })
     .then(({ data }) => {
       dispatch('receiveAddItemSuccess', {
-        actionType: state.actionType,
         // Newly added item is always first in the list
         rawItems: data.issuables.slice(0, state.pendingReferences.length),
       });
@@ -314,14 +312,10 @@ export const addItem = ({ state, dispatch }) => {
 };
 
 export const requestCreateItem = ({ commit }) => commit(types.REQUEST_CREATE_ITEM);
-export const receiveCreateItemSuccess = (
-  { state, commit, dispatch, getters },
-  { actionType, rawItem },
-) => {
-  const isEpic = actionType === ActionType.Epic;
+export const receiveCreateItemSuccess = ({ state, commit, dispatch, getters }, { rawItem }) => {
   const item = formatChildItem({
-    ...convertObjectPropsToCamelCase(rawItem, { deep: !isEpic }),
-    type: isEpic ? ChildType.Epic : ChildType.Issue,
+    ...convertObjectPropsToCamelCase(rawItem, { deep: !getters.isEpic }),
+    type: getters.isEpic ? ChildType.Epic : ChildType.Issue,
     // This is needed since Rails API to create Epic
     // doesn't return global ID, we can remove this
     // change once create epic action is moved to
@@ -343,7 +337,7 @@ export const receiveCreateItemSuccess = (
   });
 
   dispatch('toggleCreateEpicForm', {
-    actionType,
+    actionType: state.actionType,
     toggleState: false,
   });
 };
@@ -368,10 +362,7 @@ export const createItem = ({ state, dispatch }, { itemTitle }) => {
         created_at: '',
       });
 
-      dispatch('receiveCreateItemSuccess', {
-        actionType: state.actionType,
-        rawItem: data,
-      });
+      dispatch('receiveCreateItemSuccess', { rawItem: data });
     })
     .catch(() => {
       dispatch('receiveCreateItemFailure');
