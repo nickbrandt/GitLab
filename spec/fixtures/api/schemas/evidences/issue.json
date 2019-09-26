@@ -15,7 +15,6 @@
     "id": { "type": "integer" },
     "title": { "type": "string" },
     "description": { "type": ["string", "null"] },
-    "author": { "$ref": "author.json" },
     "state": { "type": "string" },
     "iid": { "type": "integer" },
     "confidential": { "type": "boolean" },
