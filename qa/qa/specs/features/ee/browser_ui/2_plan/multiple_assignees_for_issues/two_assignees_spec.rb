@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  # https://gitlab.com/gitlab-org/quality/nightly/issues/146
+  context 'Plan', :quarantine do
     describe 'Multiple assignees per issue' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
