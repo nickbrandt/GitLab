@@ -36,7 +36,7 @@ describe Projects::Alerting::NotifyService do
   end
 
   describe '#execute' do
-    let(:token) { :development_token }
+    let(:token) { 'invalid-token' }
     let(:starts_at) { Time.now.change(usec: 0) }
     let(:service) { described_class.new(project, nil, payload) }
     let(:payload_raw) do
@@ -63,6 +63,8 @@ describe Projects::Alerting::NotifyService do
           let!(:alerts_service) { create(:alerts_service, project: project) }
 
           context 'with valid token' do
+            let(:token) { alerts_service.token }
+
             context 'with a valid payload' do
               it_behaves_like 'processes incident issues', 1
             end
@@ -79,8 +81,6 @@ describe Projects::Alerting::NotifyService do
           end
 
           context 'with invalid token' do
-            let(:token) { 'invalid-token' }
-
             it_behaves_like 'does not process incident issues', http_status: 401
           end
         end
