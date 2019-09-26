@@ -27,7 +27,7 @@ module EE
 
       def prometheus_proxy
         result = ::Prometheus::ProxyService.new(
-          clusterable.clusterable,
+          cluster.cluster,
           proxy_method,
           proxy_path,
           proxy_params
