@@ -32,4 +32,27 @@ describe ProtectedEnvironments::CreateService, '#execute' do
       expect(subject.persisted?).to be_falsy
     end
   end
+
+  context 'deploy access level by group' do
+    let(:params) do
+      attributes_for(:protected_environment,
+                     deploy_access_levels_attributes: [{ group_id: group.id }])
+    end
+
+    context 'invalid group' do
+      it_behaves_like 'invalid protected environment group' do
+        it 'does not create protected environment' do
+          expect { subject }.not_to change(ProtectedEnvironment, :count)
+        end
+      end
+    end
+
+    context 'valid group' do
+      it_behaves_like 'valid protected environment group' do
+        it 'creates protected environment' do
+          expect { subject }.to change(ProtectedEnvironment, :count).by(1)
+        end
+      end
+    end
+  end
 end
