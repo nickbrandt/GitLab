@@ -74,6 +74,10 @@ module EE
       end
     end
 
+    def suggested_approvers
+      merge_request.approval_state.suggested_approvers(current_user: current_user)
+    end
+
     private
 
     def expose_mr_approval_path?
