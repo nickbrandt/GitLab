@@ -12,8 +12,8 @@ describe Epics::TreeReorderService do
     let(:issue2) { create(:issue, project: project) }
     let(:epic1) { create(:epic, group: group, parent: epic, relative_position: 10) }
     let(:epic2) { create(:epic, group: group, parent: epic, relative_position: 20) }
-    let(:epic_issue1) { create(:epic_issue, epic: epic, issue: issue1, relative_position: 10) }
-    let(:epic_issue2) { create(:epic_issue, epic: epic, issue: issue2, relative_position: 20) }
+    let(:epic_issue1) { create(:epic_issue, epic: epic, issue: issue1, relative_position: 30) }
+    let(:epic_issue2) { create(:epic_issue, epic: epic, issue: issue2, relative_position: 40) }
 
     let(:relative_position) { :after }
     let!(:tree_object_1) { epic1 }
@@ -32,10 +32,8 @@ describe Epics::TreeReorderService do
 
     shared_examples 'error for the tree update' do |expected_error|
       it 'does not change relative_positions' do
-        subject
-
-        expect(tree_object_1.relative_position).to eq(10)
-        expect(tree_object_2.relative_position).to eq(20)
+        expect { subject }.not_to change { tree_object_1.relative_position }
+        expect { subject }.not_to change { tree_object_2.relative_position }
       end
 
       it 'returns error status' do
@@ -69,12 +67,16 @@ describe Epics::TreeReorderService do
           let!(:tree_object_1) { epic_issue1 }
           let!(:tree_object_2) { epic_issue2 }
 
-          # for now we support only ordering within the same type
-          # Follow-up issue: https://gitlab.com/gitlab-org/gitlab/issues/13633
           context 'when object being moved is not the same type as the switched object' do
+            let!(:tree_object_3) { epic1 }
+            let!(:tree_object_4) { epic2 }
             let(:adjacent_reference_id) { GitlabSchema.id_from_object(epic2) }
 
-            it_behaves_like 'error for the tree update', 'Provided objects are not the same type.'
+            it 'reorders the objects' do
+              subject
+
+              expect(epic2.reload.relative_position).to be > tree_object_2.reload.relative_position
+            end
           end
 
           context 'when no object to switch is provided' do
@@ -116,14 +118,6 @@ describe Epics::TreeReorderService do
         context 'when moving Epic' do
           let!(:tree_object_1) { epic1 }
           let!(:tree_object_2) { epic2 }
-
-          # for now we support only ordering within the same type
-          # Follow-up issue: https://gitlab.com/gitlab-org/gitlab/issues/13633
-          context 'when object being moved is not the same type as the switched object' do
-            let(:adjacent_reference_id) { GitlabSchema.id_from_object(epic_issue2) }
-
-            it_behaves_like 'error for the tree update', 'Provided objects are not the same type.'
-          end
 
           context 'when the reordered epics are not subepics of the base epic' do
             let(:another_group) { create(:group) }
