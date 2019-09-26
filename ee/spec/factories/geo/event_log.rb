@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :geo_event_log, class: Geo::EventLog do
     trait :created_event do

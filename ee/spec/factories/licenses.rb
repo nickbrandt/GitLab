@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :gitlab_license, class: "Gitlab::License" do
     skip_create

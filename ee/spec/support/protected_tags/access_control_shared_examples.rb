@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples "protected tags > access control > EE" do
   let(:users) { create_list(:user, 5) }
   let(:groups) { create_list(:group, 5) }

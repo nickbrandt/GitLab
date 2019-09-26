@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'milestone board list' do
   context 'when milestone_id is sent' do
     it 'returns 400 if milestone is not found' do

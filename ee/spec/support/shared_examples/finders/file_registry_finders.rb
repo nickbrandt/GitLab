@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'a file registry finder' do
   it 'responds to file registry finder methods' do
     file_registry_finder_methods = %i{

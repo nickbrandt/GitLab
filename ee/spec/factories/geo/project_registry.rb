@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :geo_project_registry, class: Geo::ProjectRegistry do
     project

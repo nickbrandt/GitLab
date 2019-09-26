@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # This module is monkey-patched in config/initializers/elastic_client_setup.rb

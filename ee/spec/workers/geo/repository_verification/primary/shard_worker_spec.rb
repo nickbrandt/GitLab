@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::RepositoryVerification::Primary::ShardWorker, :clean_gitlab_redis_cache do

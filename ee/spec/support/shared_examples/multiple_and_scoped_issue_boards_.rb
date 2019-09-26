@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'multiple and scoped issue boards' do |route_definition|
   let(:root_url) { route_definition.gsub(":id", board_parent.id.to_s) }
 

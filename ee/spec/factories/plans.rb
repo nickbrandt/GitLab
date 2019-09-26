@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # EE-only
 FactoryBot.define do
   factory :plan do
