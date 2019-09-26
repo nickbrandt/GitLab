@@ -1,7 +1,10 @@
 <script>
-import { GlEmptyState, GlDaterangePicker, GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState, GlDaterangePicker,GlLoadingIcon } from '@gitlab/ui';
+import { GlStackedColumnChart } from '@gitlab/ui/dist/charts';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
+import { __ } from '~/locale';
+import createFlash from '~/flash';
+import { getDateInPast, getDayDifference } from '~/lib/utils/datetime_utility';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { PROJECTS_PER_PAGE, DEFAULT_DAYS_IN_PAST } from '../constants';
@@ -12,12 +15,39 @@ import StageDropdownFilter from './stage_dropdown_filter.vue';
 import SummaryTable from './summary_table.vue';
 import StageTable from './stage_table.vue';
 import { LAST_ACTIVITY_AT } from '../../shared/constants';
+import { toYmd } from '../../shared/utils';
+
+const generateDatesBetweenStartAndEnd = (start, end) => {
+  const dayDifference = getDayDifference(start, end);
+  return [...Array(dayDifference).keys()].map(i => {
+    const d = getDateInPast(end, i);
+    return toYmd(new Date(d));
+  });
+};
+
+const prepareDataset = ({ dataset, range }) =>
+  dataset.reduce(
+    (acc, curr) => {
+      const {
+        label: { title },
+        series: [datapoints],
+      } = curr;
+      acc.seriesNames = [...acc.seriesNames, title];
+      acc.data = [...acc.data, range.map(index => (datapoints[index] ? datapoints[index] : 0))];
+      return acc;
+    },
+    { data: [], seriesNames: [] },
+  );
 
 export default {
   name: 'CycleAnalytics',
   components: {
     GlLoadingIcon,
+<<<<<<< HEAD
     GlEmptyState,
+=======
+    GlStackedColumnChart,
+>>>>>>> Scaffold ui for type of work chart
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
     SummaryTable,
@@ -45,6 +75,14 @@ export default {
     return {
       multiProjectSelect: true,
       dateOptions: [7, 30, 90],
+      groupsQueryParams: {
+        min_access_level: featureAccessLevel.EVERYONE,
+      },
+      projectsQueryParams: {
+        per_page: PROJECTS_PER_PAGE,
+        with_shared: false,
+        order_by: 'last_activity_at',
+      },
     };
   },
   computed: {
@@ -71,7 +109,7 @@ export default {
       'tasksByType',
       'medians',
     ]),
-    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData']),
+    ...mapGetters(['hasNoAccessError', 'currentGroupPath', 'durationChartPlottableData','tasksByTypeData']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
@@ -94,6 +132,20 @@ export default {
           endDate,
         });
       },
+    },
+    hasDateRangeSet() {
+      return this.startDate && this.endDate;
+    },
+    typeOfWork() {
+      if (!this.hasDateRangeSet) {
+        return { option: { legend: false }, datatset: [], range: [] };
+      }
+      const range = generateDatesBetweenStartAndEnd(this.startDate, this.endDate).reverse();
+      return {
+        option: { legend: false },
+        range,
+        ...prepareDataset({ dataset: this.tasksByTypeData, range }),
+      };
     },
   },
   mounted() {
@@ -288,6 +340,32 @@ export default {
         </template>
         <gl-loading-icon v-else-if="!isLoading" size="md" class="my-4 py-4" />
       </template>
+    </div>
+    <div v-if="hasDateRangeSet">
+      <div class="row">
+        <div class="col-12">
+          <h2>{{ __('Type of work') }}</h2>
+          <p>{{ __('Showing data for __ groups and __ projects from __ to __') }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <header>
+            <h3>{{ __('Tasks by type') }}</h3>
+          </header>
+          <section>
+            <gl-stacked-column-chart
+              :option="typeOfWork.option"
+              :data="typeOfWork.data"
+              :group-by="typeOfWork.range"
+              x-axis-type="category"
+              x-axis-title="Date"
+              y-axis-title="Number of tasks"
+              :series-names="typeOfWork.seriesNames"
+            />
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 </template>

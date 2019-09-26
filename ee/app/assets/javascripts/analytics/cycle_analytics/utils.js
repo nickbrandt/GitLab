@@ -189,3 +189,5 @@ export const getDurationChartData = (data, startDate, endDate) => {
 
   return eventData;
 };
+// takes the type of work data and converts to a k:v structure
+export const transformRawTypeOfWorkData = raw => {};
