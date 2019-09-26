@@ -4,20 +4,16 @@ module Gitlab
   module Auth
     module GroupSaml
       class IdentityLinker < Gitlab::Auth::Saml::IdentityLinker
-        attr_reader :saml_provider, :session
+        attr_reader :saml_provider
 
-        UnverifiedRequest = Class.new(StandardError)
-
-        def initialize(current_user, oauth, saml_provider, session)
-          super(current_user, oauth)
+        def initialize(current_user, oauth, session, saml_provider)
+          super(current_user, oauth, session)
 
           @saml_provider = saml_provider
-          @session = session
         end
 
+        override :link
         def link
-          raise_unless_request_is_gitlab_initiated! if unlinked?
-
           super
 
           update_group_membership unless failed?
@@ -36,18 +32,6 @@ module Gitlab
 
         def update_group_membership
           MembershipUpdater.new(current_user, saml_provider).execute
-        end
-
-        def raise_unless_request_is_gitlab_initiated!
-          raise UnverifiedRequest unless valid_gitlab_initated_request?
-        end
-
-        def valid_gitlab_initated_request?
-          SamlOriginValidator.new(session).gitlab_initiated?(saml_response)
-        end
-
-        def saml_response
-          oauth.extra.response_object
         end
       end
     end
