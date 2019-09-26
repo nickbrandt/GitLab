@@ -53,8 +53,8 @@ describe('AlertWidget', () => {
     let resolveReadAlert;
 
     spyOn(AlertsService.prototype, 'readAlert').and.returnValue(
-      new Promise(cb => {
-        resolveReadAlert = cb;
+      new Promise(resolve => {
+        resolveReadAlert = resolve;
       }),
     );
     vm = mountComponent(AlertWidgetComponent, propsWithAlert, '#alert-widget');
