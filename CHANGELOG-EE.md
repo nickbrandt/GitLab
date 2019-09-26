@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.1.12
+
+### Security (4 changes)
+
+- Hide approvers if a rule has any hidden groups.
+- Fix Gitaly SearchBlobs flag RPC injection [Gitaly v1.53.4].
+- Prevent IDOR when adding groups to protected environments.
+- Upgrade mermaid to prevent XSS.
+
+
 ## 12.1.11
 
 - No changes.
