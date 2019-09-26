@@ -78,7 +78,7 @@ describe('Grouped security reports app', () => {
         waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_ERROR),
       ])
         .then(done)
-        .catch();
+        .catch(done.fail);
     });
 
     it('renders error state', () => {
@@ -192,7 +192,7 @@ describe('Grouped security reports app', () => {
         waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_REPORTS),
       ])
         .then(done)
-        .catch();
+        .catch(done.fail);
     });
 
     it('renders reports', () => {
@@ -355,7 +355,7 @@ describe('Grouped security reports app', () => {
 
         waitForMutation(vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS)
           .then(done)
-          .catch();
+          .catch(done.fail);
       });
 
       it('should set setDependencyScanningDiffEndpoint', () => {
