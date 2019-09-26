@@ -1,5 +1,4 @@
 <script>
-/* eslint-disable @gitlab/vue-i18n/no-bare-strings */
 import { GlTooltipDirective, GlLink, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import Icon from '../../vue_shared/components/icon.vue';
@@ -113,7 +112,7 @@ export default {
             >
               {{ commit.author.name }}
             </gl-link>
-            authored
+            {{ s__('LastCommit|authored') }}
             <timeago-tooltip :time="commit.authoredDate" tooltip-placement="bottom" />
           </div>
           <pre
