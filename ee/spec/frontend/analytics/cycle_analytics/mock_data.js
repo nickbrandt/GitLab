@@ -56,4 +56,23 @@ export const stagingEvents = stageFixtures.staging;
 export const productionEvents = stageFixtures.production;
 
 const { events: rawCustomStageEvents } = getJSONFixture('analytics/cycle_analytics/stages.json');
-export const customStageEvents = rawCustomStageEvents.map(deepCamelCase);
+const camelCasedStageEvents = rawCustomStageEvents.map(deepCamelCase);
+
+export const customStageStartEvents = camelCasedStageEvents.filter(ev => ev.canBeStartEvent);
+export const customStageStopEvents = camelCasedStageEvents.filter(ev => !ev.canBeStartEvent);
+
+// TODO: the shim below should be removed once we have label events seeding
+export const labelStartEvent = { ...customStageStartEvents[0], type: 'label' };
+const firstAllowedStopEvent = labelStartEvent.allowedEndEvents[0];
+// We need to enusre that the stop event can be applied to the start event
+export const labelStopEvent = {
+  ...customStageStopEvents.find(ev => ev.identifier === firstAllowedStopEvent),
+  type: 'label',
+};
+
+export const customStageEvents = [
+  ...customStageStartEvents.filter(ev => ev.identifier !== labelStartEvent.identifier),
+  ...customStageStopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
+  labelStartEvent,
+  labelStopEvent,
+];

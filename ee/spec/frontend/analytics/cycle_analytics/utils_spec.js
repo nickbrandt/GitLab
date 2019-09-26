@@ -6,32 +6,24 @@ import {
   eventsByIdentifier,
   getLabelEventsIdentifiers,
 } from 'ee/analytics/cycle_analytics/utils';
-import { customStageEvents } from './mock_data';
-
-const startEvents = customStageEvents.filter(ev => ev.canBeStartEvent);
-const stopEvents = customStageEvents.filter(ev => !ev.canBeStartEvent);
-
-const startEvent = customStageEvents.find(ev => ev.canBeStartEvent);
-const endEvent = customStageEvents.find(ev => !ev.canBeStartEvent);
-const labelStartEvent = { ...startEvent, type: 'label' };
-const labelStopEvent = { ...endEvent, type: 'label' };
-const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
-
-const events = [
-  ...startEvents.filter(ev => ev.identifier !== labelStartEvent.identifier),
-  ...stopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
+import {
+  customStageEvents as events,
   labelStartEvent,
   labelStopEvent,
-];
+  customStageStartEvents as startEvents,
+  customStageStopEvents as stopEvents,
+} from './mock_data';
+
+const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
 
 describe('Cycle analytics utils', () => {
   describe('isStartEvent', () => {
     it('will return true for a valid start event', () => {
-      expect(isStartEvent(startEvent)).toEqual(true);
+      expect(isStartEvent(startEvents[0])).toEqual(true);
     });
 
     it('will return false for input that is not a start event', () => {
-      [endEvent, {}, [], null, undefined].forEach(ev => {
+      [stopEvents[0], {}, [], null, undefined].forEach(ev => {
         expect(isStartEvent(ev)).toEqual(false);
       });
     });

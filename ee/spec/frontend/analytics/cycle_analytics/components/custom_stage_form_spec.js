@@ -1,34 +1,20 @@
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
 import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
-import { customStageEvents, groupLabels } from '../mock_data';
-
-const startEvents = customStageEvents.filter(ev => ev.canBeStartEvent);
-const stopEvents = customStageEvents.filter(ev => !ev.canBeStartEvent);
-// const labelStartEvent = startEvents.find(({ type }) => type === 'label'); // returning 0, currently no label events seeded
-// TODO: the shim below should be removed once we have label events seeding
-const labelStartEvent = { ...startEvents[0], type: 'label' };
-const firstAllowedStopEvent = labelStartEvent.allowedEndEvents[0];
-// We need to enusre that the stop event can be applied to the start event
-const labelStopEvent = {
-  ...stopEvents.find(ev => ev.identifier === firstAllowedStopEvent),
-  type: 'label',
-};
-
-const events = [
-  ...startEvents.slice(1),
-  ...stopEvents.filter(ev => ev.identifier !== firstAllowedStopEvent),
+import {
+  groupLabels,
+  customStageEvents as events,
   labelStartEvent,
   labelStopEvent,
-];
-
-// console.log('events', events);
+  customStageStartEvents as startEvents,
+  customStageStopEvents as stopEvents,
+} from '../mock_data';
 
 const initData = {
   name: 'Cool stage pre',
-  startEvent: 'issue_label_added',
+  startEvent: labelStartEvent.identifier,
   startEventLabel: groupLabels[0].id,
-  stopEvent: 'issue_label_removed',
+  stopEvent: labelStopEvent.identifier,
   stopEventLabel: groupLabels[1].id,
 };
 
