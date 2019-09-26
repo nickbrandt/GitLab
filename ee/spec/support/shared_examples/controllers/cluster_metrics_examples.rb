@@ -95,7 +95,7 @@ shared_examples 'cluster metrics' do
     context 'with valid requests' do
       before do
         allow(Prometheus::ProxyService).to receive(:new)
-          .with(clusterable, 'GET', 'query', expected_params)
+          .with(cluster, 'GET', 'query', expected_params)
           .and_return(prometheus_proxy_service)
 
         allow(prometheus_proxy_service).to receive(:execute)
@@ -112,7 +112,7 @@ shared_examples 'cluster metrics' do
           get :prometheus_proxy, params: prometheus_proxy_params
 
           expect(Prometheus::ProxyService).to have_received(:new)
-            .with(clusterable, 'GET', 'query', expected_params)
+            .with(cluster, 'GET', 'query', expected_params)
           expect(response).to have_gitlab_http_status(:ok)
           expect(json_response).to eq(prometheus_json_body)
         end

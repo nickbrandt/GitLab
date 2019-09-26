@@ -8,6 +8,10 @@ module EE
       raise NotImplementedError
     end
 
+    def metrics_dashboard_path(cluster)
+      raise NotImplementedError
+    end
+
     private
 
     override :multiple_clusters_available?
