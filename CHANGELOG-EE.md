@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.3.2
+
+### Security (2 changes)
+
+- Hide approvers if a rule has any hidden groups.
+- Prevent IDOR when adding groups to protected environments.
+
+
 ## 12.3.1
 
 - No changes.
