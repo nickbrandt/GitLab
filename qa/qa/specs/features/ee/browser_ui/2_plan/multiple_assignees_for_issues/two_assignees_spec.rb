@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  # https://gitlab.com/gitlab-org/quality/nightly/issues/146
+  context 'Plan', :quarantine do
     describe 'Multiple assignees per issue' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
@@ -30,6 +31,7 @@ module QA
         Page::Project::Issue::Show.perform do |show|
           show.assign(@user_2)
 
+          expect(show).to have_content "assigned to @#{@user_2.username}"
           expect(show.avatar_image_count).to be 2
           expect(show.assignee_title).to have_content '2 Assignees'
         end
