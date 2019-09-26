@@ -4,6 +4,8 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
   include ApiHelpers
   include ::EE::GeoHelpers
 
+  include_context 'custom session'
+
   set(:primary) { create(:geo_node, :primary) }
   set(:secondary) { create(:geo_node) }
   set(:secondary_status) { create(:geo_node_status, :healthy, geo_node: secondary) }
