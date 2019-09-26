@@ -138,23 +138,23 @@ module QA
 
           def has_total_vulnerability_count_of?(expected)
             # Match text cut off in order to find both "1 vulnerability" and "X vulnerabilities"
-            find_element(:vulnerability_report_grouped).has_content?("Security scanning detected #{expected} vulnerabilit")
+            find_element(:vulnerability_report_grouped).has_content?(/Security scanning detected #{expected}( new)? vulnerabilit/)
           end
 
           def has_sast_vulnerability_count_of?(expected)
-            find_element(:sast_scan_report).has_content?("SAST detected #{expected} vulnerabilit")
+            find_element(:sast_scan_report).has_content?(/SAST detected #{expected}( new)? vulnerabilit/)
           end
 
           def has_dependency_vulnerability_count_of?(expected)
-            find_element(:dependency_scan_report).has_content?("Dependency scanning detected #{expected} vulnerabilit")
+            find_element(:dependency_scan_report).has_content?(/Dependency scanning detected #{expected}( new)? vulnerabilit/)
           end
 
           def has_container_vulnerability_count_of?(expected)
-            find_element(:container_scan_report).has_content?("Container scanning detected #{expected} vulnerabilit")
+            find_element(:container_scan_report).has_content?(/Container scanning detected #{expected}( new)? vulnerabilit/)
           end
 
           def has_dast_vulnerability_count_of?(expected)
-            find_element(:dast_scan_report).has_content?("DAST detected #{expected} vulnerabilit")
+            find_element(:dast_scan_report).has_content?(/DAST detected #{expected}( new)? vulnerabilit/)
           end
 
           def num_approvals_required

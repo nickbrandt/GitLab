@@ -124,10 +124,7 @@ describe('RelatedItemsTreeApp', () => {
 
         wrapper.vm.handleAddItemFormCancel();
 
-        expect(wrapper.vm.toggleAddItemForm).toHaveBeenCalledWith({
-          toggleState: false,
-          actionType: '',
-        });
+        expect(wrapper.vm.toggleAddItemForm).toHaveBeenCalledWith({ toggleState: false });
       });
 
       it('calls `setPendingReferences` action with empty array', () => {
@@ -152,11 +149,6 @@ describe('RelatedItemsTreeApp', () => {
         spyOn(wrapper.vm, 'toggleCreateEpicForm');
 
         wrapper.vm.handleCreateEpicFormCancel();
-
-        expect(wrapper.vm.toggleCreateEpicForm).toHaveBeenCalledWith({
-          toggleState: false,
-          actionType: '',
-        });
       });
 
       it('calls `setItemInputValue` action with empty string', () => {

@@ -1,11 +1,19 @@
 import createState from 'ee/analytics/productivity_analytics/store/modules/charts/state';
 import * as getters from 'ee/analytics/productivity_analytics/store/modules/charts/getters';
 import {
+  metricTypes,
   chartKeys,
   columnHighlightStyle,
   maxColumnChartItemsPerPage,
+  scatterPlotAddonQueryDays,
 } from 'ee/analytics/productivity_analytics/constants';
-import { mockHistogramData } from '../../../mock_data';
+import { getScatterPlotData, getMedianLineData } from 'ee/analytics/productivity_analytics/utils';
+import { mockHistogramData, mockScatterplotData } from '../../../mock_data';
+
+jest.mock('ee/analytics/productivity_analytics/utils');
+jest.mock('~/lib/utils/datetime_utility', () => ({
+  getDateInPast: jest.fn().mockReturnValue('2019-07-16T00:00:00.00Z'),
+}));
 
 describe('Productivity analytics chart getters', () => {
   let state;
@@ -27,8 +35,8 @@ describe('Productivity analytics chart getters', () => {
     });
   });
 
-  describe('getChartData', () => {
-    it("parses the chart's data and adds a color property to selected items", () => {
+  describe('getColumnChartData', () => {
+    it("parses the column chart's data and adds a color property to selected items", () => {
       const chartKey = chartKeys.main;
       state.charts[chartKey] = {
         data: {
@@ -43,17 +51,54 @@ describe('Productivity analytics chart getters', () => {
         { value: ['5', 17], itemStyle: columnHighlightStyle },
       ];
 
-      expect(getters.getChartData(state)(chartKey)).toEqual(chartData);
+      expect(getters.getColumnChartData(state)(chartKey)).toEqual(chartData);
     });
   });
 
-  describe('getMetricDropdownLabel', () => {
+  describe('getScatterPlotMainData', () => {
+    it('calls getScatterPlotData with the raw scatterplot data and the date in past', () => {
+      state.charts.scatterplot.data = mockScatterplotData;
+
+      const rootState = {
+        filters: {
+          daysInPast: 30,
+        },
+      };
+
+      getters.getScatterPlotMainData(state, null, rootState);
+
+      expect(getScatterPlotData).toHaveBeenCalledWith(
+        mockScatterplotData,
+        '2019-07-16T00:00:00.00Z',
+      );
+    });
+  });
+
+  describe('getScatterPlotMedianData', () => {
+    it('calls getMedianLineData with the raw scatterplot data, the getScatterPlotMainData getter and the an additional days offset', () => {
+      state.charts.scatterplot.data = mockScatterplotData;
+
+      const mockGetters = {
+        getScatterPlotMainData: jest.fn(),
+      };
+
+      getters.getScatterPlotMedianData(state, mockGetters);
+
+      expect(getMedianLineData).toHaveBeenCalledWith(
+        mockScatterplotData,
+        mockGetters.getScatterPlotMainData,
+        scatterPlotAddonQueryDays,
+      );
+    });
+  });
+
+  describe('getMetricLabel', () => {
     it('returns the correct label for the "time_to_last_commit" metric', () => {
       state.charts[chartKeys.timeBasedHistogram].params = {
         metricType: 'time_to_last_commit',
       };
 
-      expect(getters.getMetricDropdownLabel(state)(chartKeys.timeBasedHistogram)).toBe(
+      expect(getters.getMetricLabel(state)(chartKeys.timeBasedHistogram)).toBe(
         'Time from first comment to last commit',
       );
     });
@@ -62,9 +107,12 @@ describe('Productivity analytics chart getters', () => {
   describe('getFilterParams', () => {
     const rootGetters = {};
 
-    rootGetters['filters/getCommonFilterParams'] = {
-      group_id: groupNamespace,
-      project_id: projectPath,
+    rootGetters['filters/getCommonFilterParams'] = () => {
+      const params = {
+        group_id: groupNamespace,
+        project_id: projectPath,
+      };
+      return params;
     };
 
     describe('main chart', () => {
@@ -157,11 +205,6 @@ describe('Productivity analytics chart getters', () => {
               start: 0,
               end: intervalEnd,
             },
-            {
-              type: 'inside',
-              start: 0,
-              end: intervalEnd,
-            },
           ],
         };
 
@@ -188,6 +231,44 @@ describe('Productivity analytics chart getters', () => {
       expect(getters.getSelectedMetric(state)(chartKeys.timeBasedHistogram)).toBe(
         'time_to_last_commit',
       );
+    });
+  });
+
+  describe('scatterplotYaxisLabel', () => {
+    const metricsInHours = ['time_to_first_comment', 'time_to_last_commit', 'time_to_merge'];
+
+    const mockRootState = {
+      metricTypes,
+    };
+
+    it('returns "Days" for "days_to_merge" metric', () => {
+      const mockGetters = {
+        getSelectedMetric: () => 'days_to_merge',
+      };
+      expect(getters.scatterplotYaxisLabel(null, mockGetters, mockRootState)).toBe('Days');
+    });
+
+    it.each(metricsInHours)('returns "Hours" for the "%s" metric', metric => {
+      const mockGetters = {
+        getSelectedMetric: () => metric,
+      };
+      expect(getters.scatterplotYaxisLabel(null, mockGetters, mockRootState)).toBe('Hours');
+    });
+
+    it.each`
+      metric              | label
+      ${'commits_count'}  | ${'Number of commits per MR'}
+      ${'loc_per_commit'} | ${'Number of LOCs per commit'}
+      ${'files_touched'}  | ${'Number of files touched'}
+    `('calls getMetricLabel for the "$metric" metric', ({ metric }) => {
+      const mockGetters = {
+        getSelectedMetric: () => metric,
+        getMetricLabel: jest.fn(),
+      };
+
+      getters.scatterplotYaxisLabel(null, mockGetters, mockRootState);
+
+      expect(mockGetters.getMetricLabel).toHaveBeenCalled();
     });
   });
 

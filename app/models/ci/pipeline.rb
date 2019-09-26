@@ -584,11 +584,7 @@ module Ci
     def ci_yaml_file_path
       return unless repository_source? || unknown_source?
 
-      if project.ci_config_path.blank?
-        '.gitlab-ci.yml'
-      else
-        project.ci_config_path
-      end
+      project.ci_config_path.presence || '.gitlab-ci.yml'
     end
 
     def ci_yaml_file
@@ -768,6 +764,18 @@ module Ci
         elsif branch_updated?
           push_details.modified_paths
         end
+      end
+    end
+
+    def all_worktree_paths
+      strong_memoize(:all_worktree_paths) do
+        project.repository.ls_files(sha)
+      end
+    end
+
+    def top_level_worktree_paths
+      strong_memoize(:top_level_worktree_paths) do
+        project.repository.tree(sha).blobs.map(&:path)
       end
     end
 

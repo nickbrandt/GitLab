@@ -68,6 +68,21 @@ describe('Insights component', () => {
         done();
       });
     });
+
+    describe('when loading page', () => {
+      beforeEach(() => {
+        vm.$store.state.insights.pageLoading = true;
+      });
+
+      it('disables the tab selector', done => {
+        vm.$nextTick(() => {
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
+          ).toBe('disabled');
+          done();
+        });
+      });
+    });
   });
 
   describe('empty config', () => {

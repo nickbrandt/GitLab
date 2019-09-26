@@ -20,7 +20,7 @@ describe Gitlab::Ci::Parsers::Security::Formatters::ContainerScanning do
       expect(formatter.format(vulnerability)).to eq( {
         'category' => 'container_scanning',
         'message' => 'CVE-2017-18269 in glibc',
-        'confidence' => 'Medium',
+        'confidence' => 'Unknown',
         'cve' => 'CVE-2017-18269',
         'identifiers' => [
           {

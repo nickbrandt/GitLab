@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_19_162036) do
+ActiveRecord::Schema.define(version: 2019_09_26_041216) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
@@ -1232,8 +1232,11 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
   create_table "design_management_versions", force: :cascade do |t|
     t.binary "sha", null: false
     t.bigint "issue_id"
+    t.integer "user_id"
+    t.datetime_with_timezone "created_at"
     t.index ["issue_id"], name: "index_design_management_versions_on_issue_id"
     t.index ["sha", "issue_id"], name: "index_design_management_versions_on_sha_and_issue_id", unique: true
+    t.index ["user_id"], name: "index_design_management_versions_on_user_id", where: "(user_id IS NOT NULL)"
   end
 
   create_table "draft_notes", force: :cascade do |t|
@@ -2014,6 +2017,7 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "milestone_id"
+    t.integer "max_issue_count", default: 0, null: false
     t.index ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true
     t.index ["label_id"], name: "index_lists_on_label_id"
     t.index ["list_type"], name: "index_lists_on_list_type"
@@ -2317,6 +2321,8 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
     t.integer "last_ci_minutes_usage_notification_level"
     t.integer "subgroup_creation_level", default: 1
     t.boolean "emails_disabled"
+    t.integer "max_pages_size"
+    t.integer "max_artifacts_size"
     t.index ["created_at"], name: "index_namespaces_on_created_at"
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)"
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id"
@@ -2774,6 +2780,13 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
     t.index ["status"], name: "index_project_mirror_data_on_status"
   end
 
+  create_table "project_pages_metadata", id: false, force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.boolean "deployed", default: false, null: false
+    t.index ["project_id"], name: "index_project_pages_metadata_on_project_id", unique: true
+    t.index ["project_id"], name: "index_project_pages_metadata_on_project_id_and_deployed_is_true", where: "(deployed = true)"
+  end
+
   create_table "project_repositories", force: :cascade do |t|
     t.integer "shard_id", null: false
     t.string "disk_path", null: false
@@ -2902,6 +2915,8 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
     t.boolean "merge_requests_disable_committers_approval"
     t.boolean "require_password_to_approve"
     t.boolean "emails_disabled"
+    t.integer "max_pages_size"
+    t.integer "max_artifacts_size"
     t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))"
     t.index ["created_at"], name: "index_projects_on_created_at"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
@@ -3918,6 +3933,7 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
   add_foreign_key "design_management_designs_versions", "design_management_designs", column: "design_id", name: "fk_03c671965c", on_delete: :cascade
   add_foreign_key "design_management_designs_versions", "design_management_versions", column: "version_id", name: "fk_f4d25ba00c", on_delete: :cascade
   add_foreign_key "design_management_versions", "issues", on_delete: :cascade
+  add_foreign_key "design_management_versions", "users", name: "fk_ee16b939e5", on_delete: :nullify
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "elasticsearch_indexed_namespaces", "namespaces", on_delete: :cascade
@@ -4084,6 +4100,7 @@ ActiveRecord::Schema.define(version: 2019_09_19_162036) do
   add_foreign_key "project_incident_management_settings", "projects", on_delete: :cascade
   add_foreign_key "project_metrics_settings", "projects", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
+  add_foreign_key "project_pages_metadata", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade

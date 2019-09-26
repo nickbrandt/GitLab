@@ -121,13 +121,14 @@ export default {
   },
 
   [types.TOGGLE_ADD_ITEM_FORM](state, { actionType, toggleState }) {
-    state.actionType = actionType;
+    if (actionType) {
+      state.actionType = actionType;
+    }
     state.showAddItemForm = toggleState;
     state.showCreateEpicForm = false;
   },
 
-  [types.TOGGLE_CREATE_EPIC_FORM](state, { actionType, toggleState }) {
-    state.actionType = actionType;
+  [types.TOGGLE_CREATE_EPIC_FORM](state, { toggleState }) {
     state.showCreateEpicForm = toggleState;
     state.showAddItemForm = false;
   },

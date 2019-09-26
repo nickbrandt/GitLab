@@ -200,11 +200,7 @@ describe('Productivity analytics chart actions', () => {
         { chartKey, item },
         mockedContext.state,
         [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
-        [
-          { type: 'fetchChartData', payload: chartKeys.timeBasedHistogram },
-          { type: 'fetchChartData', payload: chartKeys.commitBasedHistogram },
-          { type: 'table/fetchMergeRequests', payload: null },
-        ],
+        [{ type: 'fetchSecondaryChartData' }, { type: 'table/fetchMergeRequests', payload: null }],
         done,
       );
     });

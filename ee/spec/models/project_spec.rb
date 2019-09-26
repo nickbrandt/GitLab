@@ -970,6 +970,7 @@ describe Project do
     where(:license_feature, :disabled_services) do
       :jenkins_integration                | %w(jenkins jenkins_deprecated)
       :github_project_service_integration | %w(github)
+      :incident_management                | %w(alerts)
     end
 
     with_them do
@@ -987,6 +988,20 @@ describe Project do
         end
 
         it { is_expected.to include(*disabled_services) }
+      end
+    end
+
+    context 'when incident_management is available' do
+      before do
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'when feature flag generic_alert_endpoint is disabled' do
+        before do
+          stub_feature_flags(generic_alert_endpoint: false)
+        end
+
+        it { is_expected.to include('alerts') }
       end
     end
   end
@@ -1318,6 +1333,7 @@ describe Project do
     let(:project) { create(:project) }
     let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
     let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+    let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
 
     before do
       create(:import_state, project: project)
@@ -1331,6 +1347,11 @@ describe Project do
         .to receive(:new)
         .with(project.wiki.repository)
         .and_return(wiki_updated_service)
+
+      allow(::Geo::RepositoryUpdatedService)
+        .to receive(:new)
+        .with(project.design_repository)
+        .and_return(design_updated_service)
     end
 
     it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
@@ -1338,6 +1359,7 @@ describe Project do
 
       expect(repository_updated_service).to receive(:execute).once
       expect(wiki_updated_service).to receive(:execute).once
+      expect(design_updated_service).to receive(:execute).once
 
       project.after_import
     end

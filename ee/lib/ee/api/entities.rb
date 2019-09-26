@@ -168,6 +168,7 @@ module EE
         prepended do
           expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
           expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
+          expose :max_issue_count, if: -> (list, _) { list.board.parent.feature_available?(:wip_limits) }
         end
       end
 
@@ -185,8 +186,10 @@ module EE
       end
 
       module Todo
+        extend ::Gitlab::Utils::Override
         extend ActiveSupport::Concern
 
+        override :todo_target_class
         def todo_target_class(target_type)
           super
         rescue NameError
@@ -194,11 +197,35 @@ module EE
           # see also https://gitlab.com/gitlab-org/gitlab-foss/issues/59719
           ::EE::API::Entities.const_get(target_type, false)
         end
+
+        override :todo_target_url
+        def todo_target_url(todo)
+          return super unless todo.target_type == ::DesignManagement::Design.name
+
+          design = todo.target
+          path_options = {
+            anchor: todo_target_anchor(todo),
+            vueroute: design.filename
+          }
+
+          ::Gitlab::Routing.url_helpers.designs_project_issue_url(design.project, design.issue, path_options)
+        end
       end
 
       ########################
       # EE-specific entities #
       ########################
+      module DesignManagement
+        class Design < Grape::Entity
+          expose :id
+          expose :project_id
+          expose :filename
+          expose :image_url do |design|
+            ::Gitlab::UrlBuilder.build(design)
+          end
+        end
+      end
+
       class ProjectPushRule < Grape::Entity
         extend EntityHelpers
         expose :id, :project_id, :created_at
@@ -236,6 +263,17 @@ module EE
         expose :relation_url do |epic|
           ::Gitlab::Routing.url_helpers.group_epic_link_url(epic.parent.group, epic.parent.iid, epic.id)
         end
+      end
+
+      class AuditEvent < Grape::Entity
+        expose :id
+        expose :author_id
+        expose :entity_id
+        expose :entity_type
+        expose :details do |audit_event|
+          audit_event.formatted_details
+        end
+        expose :created_at
       end
 
       class Epic < Grape::Entity

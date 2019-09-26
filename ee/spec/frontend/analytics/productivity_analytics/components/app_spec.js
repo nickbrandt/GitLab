@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import ProductivityApp from 'ee/analytics/productivity_analytics/components/app.vue';
+import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import MergeRequestTable from 'ee/analytics/productivity_analytics/components/mr_table.vue';
 import store from 'ee/analytics/productivity_analytics/store';
 import { chartKeys } from 'ee/analytics/productivity_analytics/constants';
@@ -24,7 +25,6 @@ describe('ProductivityApp component', () => {
   };
 
   const actionSpies = {
-    setMetricType: jest.fn(),
     chartItemClicked: jest.fn(),
     setSortField: jest.fn(),
     setMergeRequestsPage: jest.fn(),
@@ -56,6 +56,7 @@ describe('ProductivityApp component', () => {
   const findSecondaryChartsSection = () => wrapper.find({ ref: 'secondaryCharts' });
   const findTimeBasedMetricChart = () => wrapper.find({ ref: 'timeBasedChart' });
   const findCommitBasedMetricChart = () => wrapper.find({ ref: 'commitBasedChart' });
+  const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
   const findSortFieldDropdown = () => findMrTableSortSection().find(GlDropdown);
   const findSortOrderToggle = () => findMrTableSortSection().find(GlButton);
@@ -191,12 +192,17 @@ describe('ProductivityApp component', () => {
                     expect(findTimeBasedMetricChart().props('chartData')).not.toEqual([]);
                   });
 
-                  it('should call setMetricType  when `metricTypeChange` is emitted on the metric chart', () => {
-                    findTimeBasedMetricChart().vm.$emit('metricTypeChange', 'time_to_merge');
+                  describe('when the user changes the metric', () => {
+                    beforeEach(() => {
+                      jest.spyOn(store, 'dispatch');
+                      findTimeBasedMetricChart().vm.$emit('metricTypeChange', 'time_to_merge');
+                    });
 
-                    expect(actionSpies.setMetricType).toHaveBeenCalledWith({
-                      metricType: 'time_to_merge',
-                      chartKey: chartKeys.timeBasedHistogram,
+                    it('should call setMetricType  when `metricTypeChange` is emitted on the metric chart', () => {
+                      expect(store.dispatch).toHaveBeenCalledWith('charts/setMetricType', {
+                        metricType: 'time_to_merge',
+                        chartKey: chartKeys.timeBasedHistogram,
+                      });
                     });
                   });
                 });
@@ -227,11 +233,12 @@ describe('ProductivityApp component', () => {
 
                   describe('when the user changes the metric', () => {
                     beforeEach(() => {
+                      jest.spyOn(store, 'dispatch');
                       findCommitBasedMetricChart().vm.$emit('metricTypeChange', 'loc_per_commit');
                     });
 
                     it('should call setMetricType  when `metricTypeChange` is emitted on the metric chart', () => {
-                      expect(actionSpies.setMetricType).toHaveBeenCalledWith({
+                      expect(store.dispatch).toHaveBeenCalledWith('charts/setMetricType', {
                         metricType: 'loc_per_commit',
                         chartKey: chartKeys.commitBasedHistogram,
                       });
@@ -239,7 +246,54 @@ describe('ProductivityApp component', () => {
 
                     it("should update the chart's x axis label", () => {
                       const columnChart = findCommitBasedMetricChart().find(GlColumnChart);
-                      expect(columnChart.props('xAxisTitle')).toBe('Number of commits per MR');
+                      expect(columnChart.props('xAxisTitle')).toBe('Number of LOCs per commit');
+                    });
+                  });
+                });
+              });
+            });
+
+            describe('Scatterplot', () => {
+              it('renders a metric chart component', () => {
+                expect(findScatterplotMetricChart().exists()).toBe(true);
+              });
+
+              describe('when chart finished loading', () => {
+                describe('and the chart has data', () => {
+                  beforeEach(() => {
+                    wrapper.vm.$store.dispatch('charts/receiveChartDataSuccess', {
+                      chartKey: chartKeys.scatterplot,
+                      data: {
+                        1: { metric: 2, merged_at: '2019-07-01T07:06:23.193Z' },
+                        2: { metric: 3, merged_at: '2019-07-05T08:27:42.411Z' },
+                      },
+                    });
+                  });
+
+                  it('sets isLoading=false on the metric chart', () => {
+                    expect(findScatterplotMetricChart().props('isLoading')).toBe(false);
+                  });
+
+                  it('passes non-empty chartData to the metric chart', () => {
+                    expect(findScatterplotMetricChart().props('chartData')).not.toEqual([]);
+                  });
+
+                  describe('when the user changes the metric', () => {
+                    beforeEach(() => {
+                      jest.spyOn(store, 'dispatch');
+                      findScatterplotMetricChart().vm.$emit('metricTypeChange', 'loc_per_commit');
+                    });
+
+                    it('should call setMetricType  when `metricTypeChange` is emitted on the metric chart', () => {
+                      expect(store.dispatch).toHaveBeenCalledWith('charts/setMetricType', {
+                        metricType: 'loc_per_commit',
+                        chartKey: chartKeys.scatterplot,
+                      });
+                    });
+
+                    it("should update the chart's y axis label", () => {
+                      const scatterplot = findScatterplotMetricChart().find(Scatterplot);
+                      expect(scatterplot.props('yAxisTitle')).toBe('Number of LOCs per commit');
                     });
                   });
                 });

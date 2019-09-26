@@ -2,6 +2,7 @@ import * as getters from 'ee/related_items_tree/store/getters';
 
 import createDefaultState from 'ee/related_items_tree/store/state';
 
+import { issuableTypesMap } from 'ee/related_issues/constants';
 import { ChildType, ActionType } from 'ee/related_items_tree/constants';
 
 import {
@@ -139,6 +140,17 @@ describe('RelatedItemsTree', () => {
           expect(getters.itemAutoCompleteSources(state, mockGetter)).toEqual(
             expect.objectContaining({}),
           );
+        });
+      });
+
+      describe('issuableType', () => {
+        it.each`
+          actionType          | expectedValue
+          ${null}             | ${null}
+          ${ActionType.Epic}  | ${issuableTypesMap.EPIC}
+          ${ActionType.Issue} | ${issuableTypesMap.ISSUE}
+        `('for $actionType returns $expectedValue', ({ actionType, expectedValue }) => {
+          expect(getters.issuableType({ actionType })).toBe(expectedValue);
         });
       });
 

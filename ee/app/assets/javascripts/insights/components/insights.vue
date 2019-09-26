@@ -23,7 +23,13 @@ export default {
     },
   },
   computed: {
-    ...mapState('insights', ['configData', 'configLoading', 'activeTab', 'activePage']),
+    ...mapState('insights', [
+      'configData',
+      'configLoading',
+      'activeTab',
+      'activePage',
+      'pageLoading',
+    ]),
     pages() {
       const { configData, activeTab } = this;
 
@@ -68,6 +74,7 @@ export default {
         menu-class="w-100 mw-100"
         toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
         :text="__('Select Page')"
+        :disabled="pageLoading"
       >
         <gl-dropdown-item
           v-for="page in pages"

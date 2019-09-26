@@ -1,4 +1,4 @@
-/* eslint-disable func-names, one-var, no-var, prefer-rest-params, vars-on-top, consistent-return, no-shadow, no-else-return, no-self-compare, prefer-template, no-unused-expressions, yoda, prefer-spread, camelcase, no-param-reassign */
+/* eslint-disable func-names, one-var, no-var, prefer-rest-params, vars-on-top, consistent-return, no-shadow, no-else-return, no-self-compare, no-unused-expressions, yoda, prefer-spread, camelcase, no-param-reassign */
 /* global Issuable */
 /* global emitSidebarEvent */
 
@@ -7,6 +7,7 @@ import _ from 'underscore';
 import axios from './lib/utils/axios_utils';
 import { s__, __, sprintf } from './locale';
 import ModalStore from './boards/stores/modal_store';
+import { parseBoolean } from './lib/utils/common_utils';
 
 // TODO: remove eventHub hack after code splitting refactor
 window.emitSidebarEvent = window.emitSidebarEvent || $.noop;
@@ -275,12 +276,13 @@ function UsersSelect(currentUser, els, options = {}) {
                 })
                 .map(input => {
                   const userId = parseInt(input.value, 10);
-                  const { avatarUrl, avatar_url, name, username } = input.dataset;
+                  const { avatarUrl, avatar_url, name, username, canMerge } = input.dataset;
                   return {
                     avatar_url: avatarUrl || avatar_url,
                     id: userId,
                     name,
                     username,
+                    can_merge: parseBoolean(canMerge),
                   };
                 });
 
@@ -428,8 +430,7 @@ function UsersSelect(currentUser, els, options = {}) {
               const isActive = $el.hasClass('is-active');
               const previouslySelected = $dropdown
                 .closest('.selectbox')
-                /* eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings */
-                .find("input[name='" + $dropdown.data('fieldName') + "'][value!=0]");
+                .find(`input[name='${$dropdown.data('fieldName')}'][value!=0]`);
 
               // Enables support for limiting the number of users selected
               // Automatically removes the first on the list if more users are selected
@@ -448,7 +449,7 @@ function UsersSelect(currentUser, els, options = {}) {
                 // Remove unassigned selection (if it was previously selected)
                 const unassignedSelected = $dropdown
                   .closest('.selectbox')
-                  .find("input[name='" + $dropdown.data('fieldName') + "'][value=0]");
+                  .find(`input[name='${$dropdown.data('fieldName')}'][value=0]`);
 
                 if (unassignedSelected) {
                   unassignedSelected.remove();
@@ -502,7 +503,7 @@ function UsersSelect(currentUser, els, options = {}) {
             } else if (!$dropdown.hasClass('js-multiselect')) {
               selected = $dropdown
                 .closest('.selectbox')
-                .find("input[name='" + $dropdown.data('fieldName') + "']")
+                .find(`input[name='${$dropdown.data('fieldName')}']`)
                 .val();
               return assignTo(selected);
             }
@@ -544,7 +545,7 @@ function UsersSelect(currentUser, els, options = {}) {
           updateLabel: $dropdown.data('dropdownTitle'),
           renderRow(user) {
             var avatar, img, username;
-            username = user.username ? '@' + user.username : '';
+            username = user.username ? `@${user.username}` : '';
             avatar = user.avatar_url ? user.avatar_url : gon.default_avatar_url;
 
             let selected = false;
@@ -555,7 +556,7 @@ function UsersSelect(currentUser, els, options = {}) {
               const { fieldName } = this;
               const field = $dropdown
                 .closest('.selectbox')
-                .find("input[name='" + fieldName + "'][value='" + user.id + "']");
+                .find(`input[name='${fieldName}'][value='${user.id}']`);
 
               if (field.length) {
                 selected = true;
@@ -571,7 +572,7 @@ function UsersSelect(currentUser, els, options = {}) {
               )}</a></li>`;
             } else {
               // 0 margin, because it's now handled by a wrapper
-              img = "<img src='" + avatar + "' class='avatar avatar-inline m-0' width='32' />";
+              img = `<img src='${avatar}' class='avatar avatar-inline m-0' width='32' />`;
             }
 
             return _this.renderRow(options.issuableType, user, selected, username, img);
@@ -715,7 +716,7 @@ UsersSelect.prototype.formatResult = function(user) {
           ${_.escape(user.name)}
         </div>
         <div class='user-username dropdown-menu-user-username text-secondary'>
-          ${!user.invite ? '@' + _.escape(user.username) : ''}
+          ${!user.invite ? `@${_.escape(user.username)}` : ''}
         </div>
       </div>
     </div>

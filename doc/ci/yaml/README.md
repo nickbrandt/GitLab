@@ -1013,6 +1013,11 @@ a user wants to trigger an action. In other words, in order to trigger a manual
 action assigned to a branch that the pipeline is running for, the user needs to
 have the ability to merge to this branch.
 
+NOTE: **Note:**
+Using `when:manual` and `trigger` together results in the error `jobs:#{job-name} when
+should be on_success, on_failure or always`, because `when:manual` prevents triggers
+being used.
+
 #### `when:delayed`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/merge_requests/21767) in GitLab 11.4.
@@ -2070,6 +2075,11 @@ created.
 
 Learn more about [multi-project pipelines](../multi_project_pipelines.md#creating-multi-project-pipelines-from-gitlab-ciyml).
 
+NOTE: **Note:**
+Using a `trigger` with `when:manual` together results in the error `jobs:#{job-name}
+when should be on_success, on_failure or always`, because `when:manual` prevents
+triggers being used.
+
 #### Simple `trigger` syntax
 
 The most simple way to configure a downstream trigger to use `trigger` keyword
@@ -2288,6 +2298,10 @@ or public project, or template is allowed.
 Nested includes allow you to compose a set of includes.
 A total of 50 includes is allowed.
 Duplicate includes are considered a configuration error.
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/28212) in GitLab 12.4.
+
+A hard limit of 30 seconds was set for resolving all files.
 
 #### `include` examples
 
