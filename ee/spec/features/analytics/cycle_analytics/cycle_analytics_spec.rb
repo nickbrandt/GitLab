@@ -49,11 +49,6 @@ describe 'Group Cycle Analytics', :js do
     it 'shows the date filter' do
       expect(page).to have_selector('.js-timeframe-filter', visible: true)
     end
-
-    it 'smoke test' do
-      expect(page).not_to have_selector('.cycle-analytics', visible: true)
-      expect(page).to have_selector('#cycle-analytics', visible: true)
-    end
   end
 
   # TODO: Followup should have tests for stub_licensed_features(cycle_analytics_for_groups: false)
@@ -72,162 +67,142 @@ describe 'Group Cycle Analytics', :js do
     dropdown.click
   end
 
-  context 'with cycle_analytics_app cookie set', :js do
+  it 'displays empty text' do
+    [
+      'Cycle Analytics can help you determine your team’s velocity',
+      'Start by choosing a group to see how your team is spending time. You can then drill down to the project level.'
+    ].each do |content|
+      expect(page).to have_content(content)
+    end
+  end
+
+  context 'with a group selected' do
     before do
-      set_cookie('cycle_analytics_app', 'true')
-
-      group.add_owner(user)
-      project.add_maintainer(user)
-
-      sign_in(user)
-
-      visit analytics_cycle_analytics_path
+      select_group
     end
 
-    it 'displays empty text' do
-      [
-        'Cycle Analytics can help you determine your team’s velocity',
-        'Start by choosing a group to see how your team is spending time. You can then drill down to the project level.'
-      ].each do |content|
-        expect(page).to have_content(content)
-      end
-    end
-
-    context 'with a group selected' do
-      before do
-        select_group
-      end
-
-      it 'smoke test' do
-        expect(page).to have_selector('.cycle-analytics', visible: true)
-        expect(page).not_to have_selector('#cycle-analytics', visible: true)
-      end
-
-      context 'summary table', :js do
-        it 'will display recent activity' do
-          page.within(find('.js-summary-table')) do
-            expect(page).to have_selector('.card-header')
-            expect(page).to have_content('Recent Activity')
-          end
-        end
-
-        it 'displays the number of issues' do
-          expect(page).to have_content('New Issues')
-
-          issue_count = find(".card .header", match: :first)
-          expect(issue_count).to have_content('3')
-        end
-
-        it 'displays the number of deploys' do
-          expect(page).to have_content('Deploys')
-
-          deploys_count = page.all(".card .header").last
-          expect(deploys_count).to have_content('-')
+    context 'summary table', :js do
+      it 'will display recent activity' do
+        page.within(find('.js-summary-table')) do
+          expect(page).to have_selector('.card-header')
+          expect(page).to have_content('Recent Activity')
         end
       end
 
-      # These should probably move to more unit / integration type tests
-      # should have a group set and some data
-      context 'stage panel' do
-        it 'displays the stage table headers' do
-          expect(page).to have_selector('.stage-header', visible: true)
-          expect(page).to have_selector('.median-header', visible: true)
-          expect(page).to have_selector('.event-header', visible: true)
-          expect(page).to have_selector('.total-time-header', visible: true)
-        end
+      it 'displays the number of issues' do
+        expect(page).to have_content('New Issues')
+
+        issue_count = find(".card .header", match: :first)
+        expect(issue_count).to have_content('3')
       end
 
-      context 'stage nav' do
-        it 'displays the list of stages' do
-          expect(page).to have_selector('.stage-nav', visible: true)
-        end
+      it 'displays the number of deploys' do
+        expect(page).to have_content('Deploys')
 
-        it 'displays the default list of stages' do
-          stage_nav = page.find('.stage-nav')
-
-          %w[Issue Plan Code Test Review Staging Production].each do |item|
-            expect(stage_nav).to have_content(item)
-          end
-        end
+        deploys_count = page.all(".card .header").last
+        expect(deploys_count).to have_content('-')
       end
     end
 
-    def select_stage(name)
-      page.find('.stage-nav .stage-nav-item .stage-name', text: name, match: :prefer_exact).click
-
-      wait_for_requests
+    context 'stage panel' do
+      it 'displays the stage table headers' do
+        expect(page).to have_selector('.stage-header', visible: true)
+        expect(page).to have_selector('.median-header', visible: true)
+        expect(page).to have_selector('.event-header', visible: true)
+        expect(page).to have_selector('.total-time-header', visible: true)
+      end
     end
 
-    def create_merge_request(id, extra_params = {})
-      params = {
-        id: id,
-        target_branch: 'master',
-        source_project: project2,
-        source_branch: "feature-branch-#{id}",
-        title: "mr name#{id}",
-        created_at: 2.days.ago
-      }.merge(extra_params)
+    context 'stage nav' do
+      it 'displays the list of stages' do
+        expect(page).to have_selector('.stage-nav', visible: true)
+      end
 
-      create(:merge_request, params)
+      it 'displays the default list of stages' do
+        stage_nav = page.find('.stage-nav')
+
+        %w[Issue Plan Code Test Review Staging Production].each do |item|
+          expect(stage_nav).to have_content(item)
+        end
+      end
+    end
+  end
+
+  def select_stage(name)
+    page.find('.stage-nav .stage-nav-item .stage-name', text: name, match: :prefer_exact).click
+
+    wait_for_requests
+  end
+
+  def create_merge_request(id, extra_params = {})
+    params = {
+      id: id,
+      target_branch: 'master',
+      source_project: project2,
+      source_branch: "feature-branch-#{id}",
+      title: "mr name#{id}",
+      created_at: 2.days.ago
+    }.merge(extra_params)
+
+    create(:merge_request, params)
+  end
+
+  context 'with lots of data', :js do
+    let!(:issue) { create(:issue, project: project, created_at: 5.days.ago) }
+
+    before do
+      create_cycle(user, project, issue, mr, milestone, pipeline)
+
+      deploy_master(user, project, environment: 'staging')
+      deploy_master(user, project)
+
+      select_group
     end
 
-    context 'with lots of data', :js do
-      let!(:issue) { create(:issue, project: project, created_at: 5.days.ago) }
+    dummy_stages = [
+      { title: "Issue", description: "Time before an issue gets scheduled", events_count: 1, median: "5 days" },
+      { title: "Plan", description: "Time before an issue starts implementation", events_count: 1, median: "Not enough data" },
+      { title: "Code", description: "Time until first merge request", events_count: 1, median: "less than a minute" },
+      { title: "Test", description: "Total test time for all commits/merges", events_count: 1, median: "Not enough data" },
+      { title: "Review", description: "Time between merge request creation and merge/close", events_count: 1, median: "less than a minute" },
+      { title: "Staging", description: "From merge request merge until deploy to production", events_count: 1, median: "less than a minute" },
+      { title: "Production", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
+    ]
 
-      before do
-        create_cycle(user, project, issue, mr, milestone, pipeline)
+    it 'each stage will have median values' do
+      stages = page.all(".stage-nav .stage-median").collect(&:text)
 
-        deploy_master(user, project, environment: 'staging')
-        deploy_master(user, project)
-
-        select_group
+      stages.each_with_index do |median, index|
+        expect(median).to eq(dummy_stages[index][:median])
       end
+    end
 
-      dummy_stages = [
-        { title: "Issue", description: "Time before an issue gets scheduled", events_count: 1, median: "5 days" },
-        { title: "Plan", description: "Time before an issue starts implementation", events_count: 1, median: "Not enough data" },
-        { title: "Code", description: "Time until first merge request", events_count: 1, median: "less than a minute" },
-        { title: "Test", description: "Total test time for all commits/merges", events_count: 1, median: "Not enough data" },
-        { title: "Review", description: "Time between merge request creation and merge/close", events_count: 1, median: "less than a minute" },
-        { title: "Staging", description: "From merge request merge until deploy to production", events_count: 1, median: "less than a minute" },
-        { title: "Production", description: "From issue creation until deploy to production", events_count: 1, median: "5 days" }
-      ]
+    it 'each stage will display the events description when selected' do
+      dummy_stages.each do |stage|
+        select_stage(stage[:title])
 
-      it 'each stage will have median values' do
-        stages = page.all(".stage-nav .stage-median").collect(&:text)
+        expect(page.find('.stage-events .events-description').text).to have_text(stage[:description])
+      end
+    end
 
-        stages.each_with_index do |median, index|
-          expect(median).to eq(dummy_stages[index][:median])
+    it 'each stage with events will display the stage events list when selected' do
+      dummy_stages.each do |stage|
+        select_stage(stage[:title])
+
+        if stage[:events_count] == 0
+          expect(page).not_to have_selector('.stage-events .stage-event-item')
+        else
+          expect(page).to have_selector('.stage-events .stage-event-list')
+          expect(page.all('.stage-events .stage-event-item').length).to eq(stage[:events_count])
         end
       end
+    end
 
-      it 'each stage will display the events description when selected' do
-        dummy_stages.each do |stage|
-          select_stage(stage[:title])
+    it 'each stage will be selectable' do
+      dummy_stages.each do |stage|
+        select_stage(stage[:title])
 
-          expect(page.find('.stage-events .events-description').text).to have_text(stage[:description])
-        end
-      end
-
-      it 'each stage with events will display the stage events list when selected' do
-        dummy_stages.each do |stage|
-          select_stage(stage[:title])
-
-          if stage[:events_count] == 0
-            expect(page).not_to have_selector('.stage-events .stage-event-item')
-          else
-            expect(page).to have_selector('.stage-events .stage-event-list')
-            expect(page.all('.stage-events .stage-event-item').length).to eq(stage[:events_count])
-          end
-        end
-      end
-
-      it 'each stage will be selectable' do
-        dummy_stages.each do |stage|
-          select_stage(stage[:title])
-
-          expect(page.find('.stage-nav .active .stage-name').text).to eq(stage[:title])
-        end
+        expect(page.find('.stage-nav .active .stage-name').text).to eq(stage[:title])
       end
     end
   end
