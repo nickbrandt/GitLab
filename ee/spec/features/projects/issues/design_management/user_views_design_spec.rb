@@ -15,12 +15,10 @@ describe 'User views issue designs', :js do
     visit project_issue_path(project, issue)
 
     click_link 'Designs'
-
-    wait_for_requests
   end
 
   it 'opens design detail' do
-    find('.js-design-list-item', match: :first).click
+    click_link design.filename
 
     page.within(find('.js-design-header')) do
       expect(page).to have_content(design.filename)
