@@ -23,9 +23,13 @@ func NewRoundTripper(developmentMode bool, next http.RoundTripper) http.RoundTri
 	return &roundTripper{next: next, developmentMode: developmentMode}
 }
 
-func (t *roundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
+func (t *roundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	start := time.Now()
-	res, err = t.next.RoundTrip(r)
+
+	res, err := t.next.RoundTrip(r)
+	if err == nil {
+		return res, err
+	}
 
 	// httputil.ReverseProxy translates all errors from this
 	// RoundTrip function into 500 errors. But the most likely error
@@ -33,31 +37,29 @@ func (t *roundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 	// and administrators expect to see a 502 error. To show 502s
 	// instead of 500s we catch the RoundTrip error here and inject a
 	// 502 response.
-	if err != nil {
-		helper.LogError(
-			r,
-			&sentryError{fmt.Errorf("badgateway: failed after %.fs: %v", time.Since(start).Seconds(), err)},
-		)
+	helper.LogError(
+		r,
+		&sentryError{fmt.Errorf("badgateway: failed after %.fs: %v", time.Since(start).Seconds(), err)},
+	)
 
-		message := "GitLab is not responding"
-		if t.developmentMode {
-			message = err.Error()
-		}
-
-		res = &http.Response{
-			StatusCode: http.StatusBadGateway,
-			Status:     http.StatusText(http.StatusBadGateway),
-
-			Request:    r,
-			ProtoMajor: r.ProtoMajor,
-			ProtoMinor: r.ProtoMinor,
-			Proto:      r.Proto,
-			Header:     make(http.Header),
-			Trailer:    make(http.Header),
-			Body:       ioutil.NopCloser(bytes.NewBufferString(message)),
-		}
-		res.Header.Set("Content-Type", "text/plain")
-		err = nil
+	message := "GitLab is not responding"
+	if t.developmentMode {
+		message = err.Error()
 	}
-	return
+
+	injectedResponse := &http.Response{
+		StatusCode: http.StatusBadGateway,
+		Status:     http.StatusText(http.StatusBadGateway),
+
+		Request:    r,
+		ProtoMajor: r.ProtoMajor,
+		ProtoMinor: r.ProtoMinor,
+		Proto:      r.Proto,
+		Header:     make(http.Header),
+		Trailer:    make(http.Header),
+		Body:       ioutil.NopCloser(bytes.NewBufferString(message)),
+	}
+	injectedResponse.Header.Set("Content-Type", "text/plain")
+
+	return injectedResponse, nil
 }
