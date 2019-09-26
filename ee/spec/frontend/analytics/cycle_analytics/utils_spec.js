@@ -6,14 +6,23 @@ import {
   eventsByIdentifier,
   getLabelEventsIdentifiers,
 } from 'ee/analytics/cycle_analytics/utils';
-import { apiResponse } from './mock_data';
+import { customStageEvents } from './mock_data';
 
-const { events } = apiResponse;
+const startEvents = customStageEvents.filter(ev => ev.canBeStartEvent);
+const stopEvents = customStageEvents.filter(ev => !ev.canBeStartEvent);
 
-const startEvent = events[0];
-const endEvent = events[1];
-const labelEvent = events[11];
-const labelEvents = [events[10], events[11]].map(i => i.identifier);
+const startEvent = customStageEvents.find(ev => ev.canBeStartEvent);
+const endEvent = customStageEvents.find(ev => !ev.canBeStartEvent);
+const labelStartEvent = { ...startEvent, type: 'label' };
+const labelStopEvent = { ...endEvent, type: 'label' };
+const labelEvents = [labelStartEvent, labelStopEvent].map(i => i.identifier);
+
+const events = [
+  ...startEvents.filter(ev => ev.identifier !== labelStartEvent.identifier),
+  ...stopEvents.filter(ev => ev.identifier !== labelStopEvent.identifier),
+  labelStartEvent,
+  labelStopEvent,
+];
 
 describe('Cycle analytics utils', () => {
   describe('isStartEvent', () => {
@@ -30,10 +39,10 @@ describe('Cycle analytics utils', () => {
 
   describe('isLabelEvent', () => {
     it('will return true if the given event identifier is in the labelEvents array', () => {
-      expect(isLabelEvent(labelEvents, labelEvent.identifier)).toEqual(true);
+      expect(isLabelEvent(labelEvents, labelStartEvent.identifier)).toEqual(true);
     });
     it('will return false if the given event identifier is not in the labelEvents array', () => {
-      [startEvent.identifier, null, undefined, ''].forEach(ev => {
+      [startEvents[1].identifier, null, undefined, ''].forEach(ev => {
         expect(isLabelEvent(labelEvents, ev)).toEqual(false);
       });
       expect(isLabelEvent(labelEvents)).toEqual(false);
@@ -68,6 +77,7 @@ describe('Cycle analytics utils', () => {
       expect(res.length).toEqual(labelEvents.length);
       expect(res).toEqual(labelEvents);
     });
+
     it('will return an empty array when there are no matches', () => {
       const ev = [{ _type: 'simple' }, { type: 'simple' }, { t: 'simple' }];
       expect(getLabelEventsIdentifiers(ev)).toEqual([]);
@@ -77,8 +87,8 @@ describe('Cycle analytics utils', () => {
 
   describe('getAllowedEndEvents', () => {
     it('will return the relevant end events for a given start event identifier', () => {
-      const se = events[10].allowedEndEvents;
-      expect(getAllowedEndEvents(events, 'issue_label_added')).toEqual(se);
+      const se = events[0];
+      expect(getAllowedEndEvents(events, se.identifier)).toEqual(se.allowedEndEvents);
     });
 
     it('will return an empty array if there are no end events available', () => {
@@ -90,7 +100,7 @@ describe('Cycle analytics utils', () => {
 
   describe('eventsByIdentifier', () => {
     it('will return the events with an identifier in the provided array', () => {
-      expect(eventsByIdentifier(events, labelEvents)).toEqual([events[10], events[11]]);
+      expect(eventsByIdentifier(events, labelEvents)).toEqual([labelStartEvent, labelStopEvent]);
     });
 
     it('will return an empty array if there are no matching events', () => {
