@@ -38,6 +38,6 @@ describe Gitlab::Auth::OAuth::AuthHash do
   end
 
   def ascii(text)
-    text.force_encoding(Encoding::ASCII_8BIT)
+    text.dup.force_encoding(Encoding::ASCII_8BIT)
   end
 end
