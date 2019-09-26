@@ -131,7 +131,7 @@ export default {
         >
           <label class="text-bold mb-0 mr-1">{{ __('Timeframe') }}</label>
           <date-range-dropdown
-            class="js-timeframe-dropdown"
+            class="js-timeframe-filter"
             :available-days-in-past="dateOptions"
             :default-selected="dataTimeframe"
             @selected="onTimeframeSelect"
