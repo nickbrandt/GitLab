@@ -27,7 +27,7 @@ export const issuesBeginAtIndex = (state, getters) =>
   getters.directChildren.findIndex(item => item.type === ChildType.Issue);
 
 export const itemAutoCompleteSources = (state, getters) => {
-  if (state.actionType === ActionType.Epic) {
+  if (getters.isEpic) {
     return state.autoCompleteEpics ? getters.autoCompleteSources : {};
   }
   return state.autoCompleteIssues ? getters.autoCompleteSources : {};
@@ -45,8 +45,10 @@ export const issuableType = state => {
   return null;
 };
 
-export const itemPathIdSeparator = state =>
-  state.actionType === ActionType.Epic ? PathIdSeparator.Epic : PathIdSeparator.Issue;
+export const itemPathIdSeparator = (state, getters) =>
+  getters.isEpic ? PathIdSeparator.Epic : PathIdSeparator.Issue;
+
+export const isEpic = state => state.actionType === ActionType.Epic;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

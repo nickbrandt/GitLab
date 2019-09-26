@@ -113,6 +113,7 @@ describe('RelatedItemsTree', () => {
         it('returns autoCompleteSources value when `actionType` is set to `Epic` and `autoCompleteEpics` is true', () => {
           const mockGetter = {
             autoCompleteSources: 'foo',
+            isEpic: true,
           };
           state.actionType = ActionType.Epic;
           state.autoCompleteEpics = true;
@@ -155,16 +156,23 @@ describe('RelatedItemsTree', () => {
       });
 
       describe('itemPathIdSeparator', () => {
-        it('returns string containing pathIdSeparator for `Epic` when `state.actionType` is set to `Epic`', () => {
-          state.actionType = ActionType.Epic;
-
-          expect(getters.itemPathIdSeparator(state)).toBe('&');
+        it('returns string containing pathIdSeparator for `Epic`  when isEpic is truee', () => {
+          expect(getters.itemPathIdSeparator({}, { isEpic: true })).toBe('&');
         });
 
-        it('returns string containing pathIdSeparator for `Issue` when `state.actionType` is set to `Issue`', () => {
-          state.actionType = ActionType.Issue;
+        it('returns string containing pathIdSeparator for `Issue` when isEpic is false', () => {
+          expect(getters.itemPathIdSeparator({}, { isEpic: false })).toBe('#');
+        });
+      });
 
-          expect(getters.itemPathIdSeparator(state)).toBe('#');
+      describe('isEpic', () => {
+        it.each`
+          actionType          | expectedValue
+          ${null}             | ${false}
+          ${ActionType.Issue} | ${false}
+          ${ActionType.Epic}  | ${true}
+        `('for actionType = $actionType is $expectedValue', ({ actionType, expectedValue }) => {
+          expect(getters.isEpic({ actionType })).toBe(expectedValue);
         });
       });
     });
