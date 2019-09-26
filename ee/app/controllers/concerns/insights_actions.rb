@@ -39,8 +39,8 @@ module InsightsActions
     Gitlab::Insights::Validators::ParamsValidator.new(params).validate!
   end
 
-  def chart_type_param
-    @chart_type_param ||= params[:chart_type]
+  def type_param
+    @type_param ||= params[:type]
   end
 
   def query_param
@@ -49,6 +49,10 @@ module InsightsActions
 
   def period_param
     @period_param ||= query_param[:group_by]
+  end
+
+  def projects_param
+    @projects_param ||= params[:projects] || {}
   end
 
   def collection_labels_param
@@ -62,7 +66,7 @@ module InsightsActions
   end
 
   def reduce(issuables:, period_limit: nil)
-    case chart_type_param
+    case type_param
     when 'stacked-bar', 'line'
       Gitlab::Insights::Reducers::LabelCountPerPeriodReducer.reduce(issuables, period: period_param, period_limit: period_limit, labels: collection_labels_param)
     when 'bar', 'pie'
@@ -77,11 +81,12 @@ module InsightsActions
   def finder
     @finder ||=
       Gitlab::Insights::Finders::IssuableFinder
-        .new(insights_entity, current_user, query_param)
+        .new(insights_entity, current_user,
+          query: query_param, projects: projects_param)
   end
 
   def serializer
-    case chart_type_param
+    case type_param
     when 'stacked-bar'
       Gitlab::Insights::Serializers::Chartjs::MultiSeriesSerializer
     when 'bar', 'pie'
