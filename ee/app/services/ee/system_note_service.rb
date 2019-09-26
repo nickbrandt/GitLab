@@ -292,7 +292,7 @@ module EE
     # We do not currently internationalize our system notes,
     # instead we just produce English-language descriptions.
     # See: https://gitlab.com/gitlab-org/gitlab/issues/30408
-    # See: https://gitlab.com/gitlab-org/gitlab-ee/issues/14056
+    # See: https://gitlab.com/gitlab-org/gitlab/issues/14056
     def design_event_note_data(event)
       case event
       when DesignManagement::Action.events[:creation]
