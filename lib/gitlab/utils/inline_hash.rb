@@ -35,7 +35,12 @@ module Gitlab
       def merge_keys(hash, prefix: nil, connector: '.')
         result = {}
         base_prefix = prefix ? "#{prefix}#{connector}" : ''
-        pairs = hash.map { |key, value| ["#{base_prefix}#{key}", value] }
+        pairs =
+          if prefix
+            hash.map { |key, value| ["#{base_prefix}#{key}", value] }
+          else
+            hash.to_a
+          end
 
         until pairs.empty?
           key, value = pairs.shift
