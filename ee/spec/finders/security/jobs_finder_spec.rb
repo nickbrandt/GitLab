@@ -19,25 +19,33 @@ describe Security::JobsFinder do
       end
 
       context 'with non secure jobs' do
-        let!(:build) { create(:ci_build, pipeline: pipeline) }
+        before do
+          create(:ci_build, pipeline: pipeline)
+        end
 
         it { is_expected.to be_empty }
       end
 
       context 'with jobs having report artifacts' do
-        let!(:build) { create(:ci_build, pipeline: pipeline, options: { artifacts: { file: 'test.file' } }) }
+        before do
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { file: 'test.file' } })
+        end
 
         it { is_expected.to be_empty }
       end
 
       context 'with jobs having non secure report artifacts' do
-        let!(:build) { create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'test.file' } } }) }
+        before do
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'test.file' } } })
+        end
 
         it { is_expected.to be_empty }
       end
 
-      context 'with jobs having almost secure like report artifacts' do
-        let!(:build) { create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'sast.file' } } }) }
+      context 'with jobs having report artifacts that are similar to secure artifacts' do
+        before do
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'sast.file' } } })
+        end
 
         it { is_expected.to be_empty }
       end
@@ -67,8 +75,9 @@ describe Security::JobsFinder do
       end
 
       context 'with many secure pipelines' do
-        let!(:another_pipeline) { create(:ci_pipeline) }
-        let!(:another_build) { create(:ci_build, :dast, pipeline: another_pipeline) }
+        before do
+          create(:ci_build, :dast, pipeline: create(:ci_pipeline))
+        end
 
         let!(:build) { create(:ci_build, :dast, pipeline: pipeline) }
 
@@ -78,16 +87,16 @@ describe Security::JobsFinder do
       end
 
       context 'with specific secure job types' do
-        let!(:build_a) { create(:ci_build, :sast, pipeline: pipeline) }
-        let!(:build_b) { create(:ci_build, :container_scanning, pipeline: pipeline) }
-        let!(:build_c) { create(:ci_build, :dast, pipeline: pipeline) }
+        let!(:sast_build) { create(:ci_build, :sast, pipeline: pipeline) }
+        let!(:container_scanning_build) { create(:ci_build, :container_scanning, pipeline: pipeline) }
+        let!(:dast_build) { create(:ci_build, :dast, pipeline: pipeline) }
 
         let(:finder) { described_class.new(pipeline, { sast: true, container_scanning: true }) }
 
         it 'returns only those requested' do
-          is_expected.to include(build_a)
-          is_expected.to include(build_b)
-          is_expected.not_to include(build_c)
+          is_expected.to include(sast_build)
+          is_expected.to include(container_scanning_build)
+          is_expected.not_to include(dast_build)
         end
       end
     end
@@ -102,19 +111,25 @@ describe Security::JobsFinder do
       end
 
       context 'with non secure jobs' do
-        let!(:build) { create(:ci_build, pipeline: pipeline) }
+        before do
+          create(:ci_build, pipeline: pipeline)
+        end
 
         it { is_expected.to be_empty }
       end
 
       context 'with jobs having report artifacts' do
-        let!(:build) { create(:ci_build, pipeline: pipeline, options: { artifacts: { file: 'test.file' } }) }
+        before do
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { file: 'test.file' } })
+        end
 
         it { is_expected.to be_empty }
       end
 
       context 'with jobs having non secure report artifacts' do
-        let!(:build) { create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'test.file' } } }) }
+        before do
+          create(:ci_build, pipeline: pipeline, options: { artifacts: { reports: { file: 'test.file' } } })
+        end
 
         it { is_expected.to be_empty }
       end
@@ -144,8 +159,9 @@ describe Security::JobsFinder do
       end
 
       context 'with many secure pipelines' do
-        let!(:another_pipeline) { create(:ci_pipeline) }
-        let!(:another_build) { create(:ci_build, :dast, pipeline: another_pipeline) }
+        before do
+          create(:ci_build, :dast, pipeline: create(:ci_pipeline))
+        end
 
         let!(:build) { create(:ci_build, :dast, pipeline: pipeline) }
 
@@ -155,16 +171,16 @@ describe Security::JobsFinder do
       end
 
       context 'with specific secure job types' do
-        let!(:build_a) { create(:ci_build, :sast, pipeline: pipeline) }
-        let!(:build_b) { create(:ci_build, :container_scanning, pipeline: pipeline) }
-        let!(:build_c) { create(:ci_build, :dast, pipeline: pipeline) }
+        let!(:sast_build) { create(:ci_build, :sast, pipeline: pipeline) }
+        let!(:container_scanning_build) { create(:ci_build, :container_scanning, pipeline: pipeline) }
+        let!(:dast_build) { create(:ci_build, :dast, pipeline: pipeline) }
 
         let(:finder) { described_class.new(pipeline, { sast: true, container_scanning: true }) }
 
         it 'returns only those requested' do
-          is_expected.to include(build_a)
-          is_expected.to include(build_b)
-          is_expected.not_to include(build_c)
+          is_expected.to include(sast_build)
+          is_expected.to include(container_scanning_build)
+          is_expected.not_to include(dast_build)
         end
       end
     end

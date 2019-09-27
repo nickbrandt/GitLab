@@ -15,7 +15,11 @@
 
 module Security
   class JobsFinder
+    include Gitlab::Utils::StrongMemoize
+
     attr_reader :pipeline
+
+    JOB_TYPES = [:sast, :dast, :dependency_scanning, :container_scanning].freeze
 
     def initialize(pipeline, params = { all: true })
       @pipeline = pipeline
@@ -23,31 +27,27 @@ module Security
     end
 
     def execute
-      job_types = all_secure_jobs
-      job_types = by_specific_job_type(job_types, :sast)
-      job_types = by_specific_job_type(job_types, :dast)
-      job_types = by_specific_job_type(job_types, :dependency_scanning)
-      job_types = by_specific_job_type(job_types, :container_scanning)
+      return [] if job_types_for_processing.empty?
 
-      return [] if job_types.empty?
-
-      Feature.enabled?(:ci_build_metadata_config) ? find_jobs(job_types) : find_jobs_legacy(job_types)
+      if Feature.enabled?(:ci_build_metadata_config)
+        find_jobs(job_types_for_processing)
+      else
+        find_jobs_legacy(job_types_for_processing)
+      end
     end
 
-    def all_secure_jobs
-      if @params[:all]
-        return [:sast, :dast, :dependency_scanning, :container_scanning]
+    private
+
+    def job_types_for_processing
+      strong_memoize(:job_types_for_processing) do
+        if @params[:all]
+          JOB_TYPES
+        else
+          JOB_TYPES.each_with_object([]) do |job_type, job_types|
+            job_types << job_type if @params[job_type]
+          end
+        end
       end
-
-      []
-    end
-
-    def by_specific_job_type(job_types, job_type)
-      if @params[job_type]
-        return job_types + [job_type]
-      end
-
-      job_types
     end
 
     def find_jobs(job_types)
@@ -55,12 +55,15 @@ module Security
     end
 
     def find_jobs_legacy(job_types)
+      # first job type is added as a WHERE statement
       query = @pipeline.builds.with_secure_report_legacy(job_types.first)
 
+      # following job types are added as OR statements
       jobs = job_types.drop(1).reduce(query) do |qry, job_type|
         qry.or(@pipeline.builds.with_secure_report_legacy(job_type))
       end
 
+      # the query doesn't guarantee accuracy, so we verify it here
       jobs.select do |job|
         job_types.find { |job_type| job.options.dig(:artifacts, :reports, job_type) }
       end
