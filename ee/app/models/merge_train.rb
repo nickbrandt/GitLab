@@ -22,11 +22,7 @@ class MergeTrain < ApplicationRecord
     end
 
     def first_in_trains(project)
-      merge_request_ids = MergeTrain.where(target_project: project)
-                            .select('DISTINCT ON (target_branch) merge_request_id')
-                            .order(:target_branch, :id)
-
-      MergeRequest.preload(:target_project).where(id: merge_request_ids)
+      MergeRequest.preload(:target_project).where(id: first_merge_request_ids(project))
     end
 
     def first_in_train_from(merge_request_ids)
@@ -42,6 +38,14 @@ class MergeTrain < ApplicationRecord
       MergeRequest.joins(:merge_train)
         .where('merge_requests.target_project_id = ?', merge_request.target_project_id)
         .where('merge_requests.target_branch = ?', merge_request.target_branch)
+    end
+
+    private
+
+    def first_merge_request_ids(project)
+      MergeTrain.where(target_project: project)
+        .select('DISTINCT ON (target_branch) merge_request_id')
+        .order(:target_branch, :id)
     end
   end
 
