@@ -241,8 +241,6 @@ module EE
       class Epic < Grape::Entity
         can_admin_epic = ->(epic, opts) { Ability.allowed?(opts[:user], :admin_epic, epic) }
 
-        epic_url = ->(epic) { ::Gitlab::Routing.url_helpers.group_epic_path(epic.group, epic) }
-
         expose :id
         expose :iid
         expose :group_id
@@ -258,14 +256,8 @@ module EE
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
         expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
         expose :state
-        expose :web_edit_url, if: can_admin_epic do |epic|
-          epic_url.call(epic)
-        end
-        # web_edit_url is already exposed and has the same value of web_url
-        # this field has been added again with other name to be consistent with other API responses
-        expose :web_url do |epic|
-          epic_url.call(epic)
-        end
+        expose :web_url, as: :web_edit_url, if: can_admin_epic # @deprecated
+        expose :web_url
         expose :reference, if: { with_reference: true } do |epic|
           epic.to_reference(full: true)
         end
@@ -290,6 +282,10 @@ module EE
           else
             epic.downvotes
           end
+        end
+
+        def web_url
+          ::Gitlab::Routing.url_helpers.group_epic_path(object.group, object)
         end
       end
 
