@@ -15,7 +15,6 @@ import createStore from 'ee/security_dashboard/store';
 const localVue = createLocalVue();
 
 const pipelineId = 123;
-const projectsEndpoint = `${TEST_HOST}/projects`;
 const vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities`;
 const vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_summary`;
 const vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilities_history`;
@@ -27,14 +26,12 @@ jest.mock('~/lib/utils/url_utility', () => ({
 describe('Security Dashboard app', () => {
   let wrapper;
   let mock;
-  let fetchProjectsSpy;
   let lockFilterSpy;
   let setPipelineIdSpy;
   let store;
 
   const setup = () => {
     mock = new MockAdapter(axios);
-    fetchProjectsSpy = jest.fn();
     lockFilterSpy = jest.fn();
     setPipelineIdSpy = jest.fn();
   };
@@ -47,13 +44,11 @@ describe('Security Dashboard app', () => {
       sync: false,
       methods: {
         lockFilter: lockFilterSpy,
-        fetchProjects: fetchProjectsSpy,
         setPipelineId: setPipelineIdSpy,
       },
       propsData: {
         dashboardDocumentation: '',
         emptyStateSvgPath: '',
-        projectsEndpoint,
         vulnerabilitiesEndpoint,
         vulnerabilitiesCountEndpoint,
         vulnerabilitiesHistoryEndpoint,
@@ -95,10 +90,6 @@ describe('Security Dashboard app', () => {
       expect(wrapper.vm.isLockedToProject).toBe(false);
     });
 
-    it('fetches projects', () => {
-      expect(fetchProjectsSpy).toHaveBeenCalled();
-    });
-
     it('does not lock project filters', () => {
       expect(lockFilterSpy).not.toHaveBeenCalled();
     });
@@ -137,10 +128,6 @@ describe('Security Dashboard app', () => {
 
     it('locks to a given project', () => {
       expect(wrapper.vm.isLockedToProject).toBe(true);
-    });
-
-    it('fetches projects', () => {
-      expect(fetchProjectsSpy).toHaveBeenCalled();
     });
 
     it('locks the filters to a given project', () => {

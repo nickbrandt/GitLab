@@ -1,7 +1,7 @@
 import {
   SET_VULNERABILITIES_HISTORY_DAY_RANGE,
   RECEIVE_VULNERABILITIES_SUCCESS,
-} from './modules/vulnerabilities/mutation_types';
+} from '../modules/vulnerabilities/mutation_types';
 
 /**
  * Vuex store plugin to sync some Group Security Dashboard view settings with the URL.
