@@ -476,6 +476,21 @@ describe Projects::MergeRequestsController do
         expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
       end
     end
+
+    context 'public project with private builds' do
+      let(:comparison_status) { {} }
+      let(:project) { create(:project, :public, :builds_private) }
+
+      before do
+        sign_out user
+      end
+
+      it 'restricts unauthorized access' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
   end
 
   describe 'GET #container_scanning_reports' do
@@ -559,6 +574,21 @@ describe Projects::MergeRequestsController do
 
         expect(response).to have_gitlab_http_status(:internal_server_error)
         expect(json_response).to eq({ 'status_reason' => 'Unknown error' })
+      end
+    end
+
+    context 'public project with private builds' do
+      let(:comparison_status) { {} }
+      let(:project) { create(:project, :public, :builds_private) }
+
+      before do
+        sign_out user
+      end
+
+      it 'restricts unauthorized access' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end
