@@ -57,9 +57,17 @@ module Geo
     def mark_sync_as_successful(missing_on_primary: false)
       log_info("Marking design sync as successful")
 
-      registry.finish_sync!(missing_on_primary)
+      persisted = registry.finish_sync!(missing_on_primary)
+
+      reschedule_sync unless persisted
 
       log_info("Finished design sync", download_time_s: download_time_in_seconds)
+    end
+
+    def reschedule_sync
+      log_info("Reschedule design sync because a RepositoryUpdateEvent was processed during the sync")
+
+      ::Geo::DesignRepositorySyncWorker.perform_async(project.id)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord

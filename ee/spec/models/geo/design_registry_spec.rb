@@ -14,9 +14,9 @@ describe Geo::DesignRegistry, :geo do
   end
 
   describe '#finish_sync!' do
-    it 'finishes registry record' do
-      design_registry = create(:geo_design_registry, :sync_started)
+    let(:design_registry) { create(:geo_design_registry, :sync_started) }
 
+    it 'finishes registry record' do
       design_registry.finish_sync!
 
       expect(design_registry.reload).to have_attributes(
@@ -27,6 +27,35 @@ describe Geo::DesignRegistry, :geo do
         missing_on_primary: false,
         force_to_redownload: false
       )
+    end
+
+    context 'when a design sync was scheduled after the last sync began' do
+      before do
+        design_registry.update!(
+          state: 'pending',
+          retry_count: 2,
+          retry_at: 1.hour.ago,
+          force_to_redownload: true,
+          last_sync_failure: 'error',
+          missing_on_primary: true
+        )
+
+        design_registry.finish_sync!
+      end
+
+      it 'does not reset state' do
+        expect(design_registry.reload.state).to eq 'pending'
+      end
+
+      it 'resets the other sync state fields' do
+        expect(design_registry.reload).to have_attributes(
+          retry_count: 0,
+          retry_at: nil,
+          force_to_redownload: false,
+          last_sync_failure: nil,
+          missing_on_primary: false
+        )
+      end
     end
   end
 
