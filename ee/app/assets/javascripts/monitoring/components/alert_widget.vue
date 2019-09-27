@@ -54,9 +54,6 @@ export default {
         .map(this.formatAlertSummary)
         .join(', ');
     },
-    formDisabled() {
-      return Boolean(this.errorMessage || this.isLoading);
-    },
     supportsComputedAlerts() {
       return gon.features && gon.features.prometheusComputedAlerts;
     },
@@ -103,6 +100,7 @@ export default {
       return `${alertQuery.label} ${alert.operator} ${alert.threshold}`;
     },
     hideModal() {
+      this.errorMessage = null;
       this.$root.$emit('bv::hide::modal', this.modalId);
     },
     handleSetApiAction(apiAction) {
@@ -165,7 +163,7 @@ export default {
     </span>
     <alert-widget-form
       ref="widgetForm"
-      :disabled="formDisabled"
+      :disabled="isLoading"
       :alerts-to-manage="alertsToManage"
       :relevant-queries="relevantQueries"
       :error-message="errorMessage"

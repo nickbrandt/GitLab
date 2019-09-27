@@ -61,6 +61,8 @@ describe('AlertWidget', () => {
 
     // expect loading spinner to exist during fetch
     expect(vm.isLoading).toBeTruthy();
+    expect(vm.$refs.widgetForm.$props.disabled).toBe(true);
+
     expect(vm.$el.querySelector('.loading-container')).toBeVisible();
 
     resolveReadAlert({ operator: '=', threshold: 42 });
@@ -70,6 +72,7 @@ describe('AlertWidget', () => {
       vm.$nextTick(() => {
         expect(vm.isLoading).toEqual(false);
         expect(vm.$el.querySelector('.loading-container')).toBeHidden();
+        expect(vm.$refs.widgetForm.$props.disabled).toBe(false);
         done();
       }),
     );
@@ -153,6 +156,17 @@ describe('AlertWidget', () => {
         done();
       })
       .catch(done.fail);
+  });
+
+  it('dismisses error message when action is cancelled', () => {
+    vm = mountComponent(AlertWidgetComponent, props);
+    vm.$on('setAlerts', mockSetAlerts);
+    vm.errorMessage = 'Mock error message.';
+
+    // widget modal is dismissed
+    vm.$refs.widgetForm.$emit('cancel');
+
+    expect(vm.errorMessage).toBe(null);
   });
 
   it('updates an alert with an appropriate handler', done => {

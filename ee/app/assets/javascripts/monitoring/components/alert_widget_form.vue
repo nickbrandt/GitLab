@@ -152,17 +152,18 @@ export default {
         this.threshold = existingAlert.threshold;
       } else {
         this.selectedAlert = {};
-        this.operator = null;
+        this.operator = this.operators.greaterThan;
         this.threshold = null;
       }
 
       this.prometheusMetricId = queryId;
     },
-    handleCancel() {
+    handleHidden() {
       this.resetAlertData();
       this.$emit('cancel');
     },
-    handleSubmit() {
+    handleSubmit(e) {
+      e.preventDefault();
       this.$emit(this.submitAction, {
         alert: this.selectedAlert.alert_path,
         operator: this.operator,
@@ -196,19 +197,20 @@ export default {
     :ok-variant="submitAction === 'delete' ? 'danger' : 'success'"
     :ok-title="submitActionText"
     :ok-disabled="formDisabled"
-    class="prometheus-alert-widget d-flex align-items-center"
     @ok="handleSubmit"
+    @hidden="handleHidden"
   >
-    <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
+    <div v-if="errorMessage" class="alert-modal-message danger_message">{{ errorMessage }}</div>
     <div class="alert-form">
       <gl-form-group
         v-if="supportsComputedAlerts"
         :label="$options.alertQueryText.label"
+        label-for="alert-query-input"
         :valid-feedback="$options.alertQueryText.validFeedback"
         :invalid-feedback="$options.alertQueryText.invalidFeedback"
         :state="isValidQuery"
       >
-        <gl-form-input v-model.trim="alertQuery" :state="isValidQuery" />
+        <gl-form-input id="alert-query-input" v-model.trim="alertQuery" :state="isValidQuery" />
         <template #description>
           <div class="d-flex align-items-center">
             {{ __('Single or combined queries') }}
@@ -220,20 +222,21 @@ export default {
           </div>
         </template>
       </gl-form-group>
-      <gl-dropdown
-        v-else
-        :text="queryDropdownLabel"
-        class="form-group"
-        toggle-class="dropdown-menu-toggle"
-      >
-        <gl-dropdown-item
-          v-for="query in relevantQueries"
-          :key="query.metricId"
-          @click="selectQuery(query.metricId)"
+      <gl-form-group v-else label-for="alert-query-dropdown" :label="$options.alertQueryText.label">
+        <gl-dropdown
+          id="alert-query-dropdown"
+          :text="queryDropdownLabel"
+          toggle-class="dropdown-menu-toggle"
         >
-          {{ query.label }}
-        </gl-dropdown-item>
-      </gl-dropdown>
+          <gl-dropdown-item
+            v-for="query in relevantQueries"
+            :key="query.metricId"
+            @click="selectQuery(query.metricId)"
+          >
+            {{ query.label }}
+          </gl-dropdown-item>
+        </gl-dropdown>
+      </gl-form-group>
       <gl-button-group class="mb-2" :label="s__('PrometheusAlerts|Operator')">
         <gl-button
           :class="{ active: operator === operators.greaterThan }"
