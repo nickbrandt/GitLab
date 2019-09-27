@@ -44,4 +44,16 @@ describe ProtectedEnvironments::UpdateService, '#execute' do
       end.not_to change { ProtectedEnvironment::DeployAccessLevel.count }
     end
   end
+
+  context 'deploy access level by group' do
+    let(:params) { { deploy_access_levels_attributes: [{ group_id: group.id }] } }
+
+    context 'invalid group' do
+      it_behaves_like 'invalid protected environment group'
+    end
+
+    context 'valid group' do
+      it_behaves_like 'valid protected environment group'
+    end
+  end
 end
