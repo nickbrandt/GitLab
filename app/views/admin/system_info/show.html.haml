@@ -7,7 +7,7 @@
       %h4= _('CPU')
       .data
         - if @cpus
-          %h2= _('%{cores} cores') %  { cores: @cpus.length }
+          %h2= _('%{cores} cores') % { cores: @cpus.length }
         - else
           = icon('warning', class: 'text-warning')
           = _('Unable to collect CPU info')

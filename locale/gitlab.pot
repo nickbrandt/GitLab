@@ -179,6 +179,9 @@ msgstr ""
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
+msgid "%{cores} cores"
+msgstr ""
+
 msgid "%{count} LOC/commit"
 msgstr ""
 
@@ -2693,6 +2696,9 @@ msgid "CLOSED (MOVED)"
 msgstr ""
 
 msgid "CONTRIBUTING"
+msgstr ""
+
+msgid "CPU"
 msgstr ""
 
 msgid "Callback URL"
@@ -5345,6 +5351,9 @@ msgid "Discuss a specific suggestion or question."
 msgstr ""
 
 msgid "Discussion"
+msgstr ""
+
+msgid "Disk Usage"
 msgstr ""
 
 msgid "Dismiss"
@@ -9649,6 +9658,9 @@ msgid "Members with access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "Members with pending access to %{strong_start}%{group_name}%{strong_end}"
+msgstr ""
+
+msgid "Memory Usage"
 msgstr ""
 
 msgid "Merge"
@@ -16773,6 +16785,12 @@ msgstr ""
 msgid "Unable to build Slack link."
 msgstr ""
 
+msgid "Unable to collect CPU info"
+msgstr ""
+
+msgid "Unable to collect memory info"
+msgstr ""
+
 msgid "Unable to connect to Prometheus server"
 msgstr ""
 
@@ -17047,6 +17065,9 @@ msgid "Uploads"
 msgstr ""
 
 msgid "Upstream"
+msgstr ""
+
+msgid "Uptime"
 msgstr ""
 
 msgid "Upvotes"
