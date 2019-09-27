@@ -36,6 +36,13 @@ describe('AlertWidgetForm', () => {
   const modal = () => wrapper.find(GlModal);
   const modalTitle = () => modal().attributes('title');
   const submitText = () => modal().attributes('ok-title');
+  const e = {
+    preventDefault: jest.fn(),
+  };
+
+  beforeEach(() => {
+    e.preventDefault.mockReset();
+  });
 
   afterEach(() => {
     if (wrapper) wrapper.destroy();
@@ -62,10 +69,9 @@ describe('AlertWidgetForm', () => {
     createComponent();
 
     wrapper.vm.selectQuery('9');
-    wrapper.vm.operator = '>';
     wrapper.vm.threshold = 900;
 
-    wrapper.vm.handleSubmit();
+    wrapper.vm.handleSubmit(e);
 
     expect(wrapper.emitted().create[0]).toEqual([
       {
@@ -75,6 +81,22 @@ describe('AlertWidgetForm', () => {
         prometheus_metric_id: '9',
       },
     ]);
+    expect(e.preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets form when modal is dismissed (hidden)', () => {
+    createComponent();
+
+    wrapper.vm.selectQuery('9');
+    wrapper.vm.selectQuery('>');
+    wrapper.vm.threshold = 800;
+
+    wrapper.find(GlModal).vm.$emit('hidden');
+
+    expect(wrapper.vm.selectedAlert).toEqual({});
+    expect(wrapper.vm.operator).toBe(null);
+    expect(wrapper.vm.threshold).toBe(null);
+    expect(wrapper.vm.prometheusMetricId).toBe(null);
   });
 
   describe('with existing alert', () => {
@@ -90,7 +112,7 @@ describe('AlertWidgetForm', () => {
     });
 
     it('emits "delete" event when form values unchanged', () => {
-      wrapper.vm.handleSubmit();
+      wrapper.vm.handleSubmit(e);
 
       expect(wrapper.emitted().delete[0]).toEqual([
         {
@@ -100,12 +122,13 @@ describe('AlertWidgetForm', () => {
           prometheus_metric_id: '8',
         },
       ]);
+      expect(e.preventDefault).toHaveBeenCalledTimes(1);
     });
 
     it('emits "update" event when form changed', () => {
       wrapper.vm.threshold = 11;
 
-      wrapper.vm.handleSubmit();
+      wrapper.vm.handleSubmit(e);
 
       expect(wrapper.emitted().update[0]).toEqual([
         {
@@ -115,6 +138,7 @@ describe('AlertWidgetForm', () => {
           prometheus_metric_id: '8',
         },
       ]);
+      expect(e.preventDefault).toHaveBeenCalledTimes(1);
     });
   });
 });
