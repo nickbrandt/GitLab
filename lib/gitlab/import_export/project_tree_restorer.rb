@@ -58,12 +58,16 @@ module Gitlab
       # the configuration yaml file too.
       # Finally, it updates each attribute in the newly imported project.
       def create_relations
+        binding.pry
+
         project_relations_without_project_members.each do |relation_key, relation_definition|
           relation_key_s = relation_key.to_s
 
           if relation_definition.present?
+            binding.pry
             create_sub_relations(relation_key_s, relation_definition, @tree_hash)
           elsif @tree_hash[relation_key_s].present?
+            binding.pry
             save_relation_hash(relation_key_s, @tree_hash[relation_key_s])
           end
         end
@@ -74,6 +78,7 @@ module Gitlab
       end
 
       def save_relation_hash(relation_key, relation_hash_batch)
+        binding.pry
         relation_hash = create_relation(relation_key, relation_hash_batch)
 
         remove_group_models(relation_hash) if relation_hash.is_a?(Array)
@@ -160,6 +165,7 @@ module Gitlab
       #
       # Recursively calls this method if the sub-relation is a hash containing more sub-relations
       def create_sub_relations(relation_key, relation_definition, tree_hash, save: true)
+        binding.pry
         return if tree_hash[relation_key].blank?
 
         tree_array = [tree_hash[relation_key]].flatten
@@ -167,6 +173,7 @@ module Gitlab
 
         # Avoid keeping a possible heavy object in memory once we are done with it
         while relation_item = (tree_array.shift || null_iid_pipelines.shift)
+          binding.pry
           if nil_iid_pipeline?(relation_key, relation_item) && tree_array.any?
             # Move pipelines with NULL IIDs to the end
             # so they don't clash with existing IIDs.
@@ -180,6 +187,7 @@ module Gitlab
           # The transaction at this level is less speedy than one single transaction
           # But we can't have it in the upper level or GC won't get rid of the AR objects
           # after we save the batch.
+          binding.pry
           Project.transaction do
             process_sub_relation(relation_key, relation_definition, relation_item)
 
@@ -197,6 +205,7 @@ module Gitlab
       end
 
       def process_sub_relation(relation_key, relation_definition, relation_item)
+        binding.pry
         relation_definition.each do |sub_relation_key, sub_relation_definition|
           # We just use author to get the user ID, do not attempt to create an instance.
           next if sub_relation_key == :author
@@ -204,12 +213,14 @@ module Gitlab
           sub_relation_key_s = sub_relation_key.to_s
 
           # create dependent relations if present
+          binding.pry
           if sub_relation_definition.present?
             create_sub_relations(sub_relation_key_s, sub_relation_definition, relation_item, save: false)
           end
 
           # transform relation hash to actual object
           sub_relation_hash = relation_item[sub_relation_key_s]
+          binding.pry
           if sub_relation_hash.present?
             relation_item[sub_relation_key_s] = create_relation(sub_relation_key, sub_relation_hash)
           end
@@ -217,6 +228,7 @@ module Gitlab
       end
 
       def create_relation(relation_key, relation_hash_list)
+        binding.pry
         relation_array = [relation_hash_list].flatten.map do |relation_hash|
           Gitlab::ImportExport::RelationFactory.create(
             relation_sym: relation_key.to_sym,
@@ -227,6 +239,7 @@ module Gitlab
             excluded_keys: excluded_keys_for_relation(relation_key))
         end.compact
 
+        binding.pry
         relation_hash_list.is_a?(Array) ? relation_array : relation_array.first
       end
 
