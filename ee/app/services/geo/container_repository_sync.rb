@@ -4,10 +4,7 @@ require 'tempfile'
 
 module Geo
   class ContainerRepositorySync
-    include ExclusiveLeaseGuard
     include Gitlab::Utils::StrongMemoize
-
-    LEASE_TIMEOUT = 1.hour.freeze
 
     attr_reader :name, :container_repository
 
@@ -17,19 +14,15 @@ module Geo
     end
 
     def execute
-      try_obtain_lease do
-        # It makes sense to do this sequentially because in most cases images
-        # share some layers so it can save IO ops.
-        tags_to_sync.each do |tag|
-          sync_tag(tag[:name])
-        end
-
-        tags_to_remove.each do |tag|
-          container_repository.delete_tag_by_digest(tag[:digest])
-        end
-
-        true
+      tags_to_sync.each do |tag|
+        sync_tag(tag[:name])
       end
+
+      tags_to_remove.each do |tag|
+        container_repository.delete_tag_by_digest(tag[:digest])
+      end
+
+      true
     end
 
     private
@@ -85,14 +78,6 @@ module Geo
 
     def tags_to_remove
       secondary_tags - primary_tags
-    end
-
-    def lease_key
-      @lease_key ||= "#{self.class.name}:#{name}"
-    end
-
-    def lease_timeout
-      LEASE_TIMEOUT
     end
 
     # The client for primary registry

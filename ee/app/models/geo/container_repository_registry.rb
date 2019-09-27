@@ -20,12 +20,6 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
       registry.last_synced_at = Time.now
     end
 
-    before_transition any => :synced do |registry, _|
-      registry.retry_count       = 0
-      registry.retry_at          = nil
-      registry.last_sync_failure = nil
-    end
-
     before_transition any => :pending do |registry, _|
       registry.retry_at    = 0
       registry.retry_count = 0
@@ -33,10 +27,6 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
 
     event :start_sync! do
       transition [:synced, :failed, :pending] => :started
-    end
-
-    event :finish_sync! do
-      transition started: :synced
     end
 
     event :repository_updated! do
@@ -57,5 +47,27 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
       retry_count: new_retry_count,
       retry_at: next_retry_time(new_retry_count)
     )
+  end
+
+  def finish_sync!
+    update!(
+      retry_count: 0,
+      last_sync_failure: nil,
+      retry_at: nil
+    )
+
+    mark_synced_atomically
+  end
+
+  def mark_synced_atomically
+    # We can only update registry if state is started.
+    # If state is set to pending that means that repository_updated! was called
+    # during the sync so we need to reschedule new sync
+    num_rows = self.class
+                   .where(container_repository_id: container_repository_id)
+                   .where(state: 'started')
+                   .update_all(state: 'synced')
+
+    num_rows > 0
   end
 end
