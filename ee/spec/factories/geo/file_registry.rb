@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :geo_file_registry, class: Geo::FileRegistry do
     sequence(:file_id)

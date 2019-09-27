@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Geo::AttachmentRegistryFinder, :geo, :geo_fdw do

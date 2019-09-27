@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples 'geo base sync execution' do
   describe '#execute' do
     let(:project) { build('project')}

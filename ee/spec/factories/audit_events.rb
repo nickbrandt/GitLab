@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :audit_event, class: 'SecurityEvent', aliases: [:user_audit_event] do
     user

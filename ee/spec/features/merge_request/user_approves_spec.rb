@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430

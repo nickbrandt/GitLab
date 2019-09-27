@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require Rails.root.join("spec/support/helpers/stub_requests.rb")
 
 Dir[Rails.root.join("ee/spec/support/helpers/*.rb")].each { |f| require f }

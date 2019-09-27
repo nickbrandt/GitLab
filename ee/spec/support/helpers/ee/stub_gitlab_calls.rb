@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module StubGitlabCalls
     def stub_webide_config_file(content, sha: anything)
