@@ -1,8 +1,9 @@
 import Vue from 'vue';
-import GroupSecurityDashboardApp from './components/app.vue';
+import GroupSecurityDashboardApp from './components/group_security_dashboard.vue';
 import UnavailableState from './components/unavailable_state.vue';
 import createStore from './store';
 import router from './store/router';
+import projectsPlugin from './store/plugins/projects';
 
 export default function() {
   const el = document.getElementById('js-group-security-dashboard');
@@ -22,7 +23,7 @@ export default function() {
     });
   }
 
-  const store = createStore();
+  const store = createStore({ plugins: [projectsPlugin] });
   return new Vue({
     el,
     store,

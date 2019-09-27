@@ -32,7 +32,7 @@ describe('syncWithRouter', () => {
     );
   });
 
-  it("doesn't update the store if the URL update originated from the moderator", () => {
+  it("doesn't update the store if the URL update originated from the mediator", () => {
     const query = { example: ['test'] };
 
     jest.spyOn(store, 'commit').mockImplementation(noop);
