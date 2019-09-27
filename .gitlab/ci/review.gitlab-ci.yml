@@ -23,7 +23,7 @@
 build-qa-image:
   extends:
     - .review-docker
-    - .only-code-qa-changes
+    - .only:changes-code-qa
   only:
     variables:
       - $CI_SERVER_HOST == "gitlab.com" && $CI_PROJECT_NAMESPACE == "gitlab-org"
@@ -35,14 +35,12 @@ build-qa-image:
     - echo "${CI_JOB_TOKEN}" | docker login --username gitlab-ci-token --password-stdin ${CI_REGISTRY}
     - time docker push ${QA_IMAGE}
 
-schedule:review-cleanup:
+.base-review-cleanup:
   extends:
     - .default-tags
     - .default-retry
     - .default-only
-    - .only-code-qa-changes
-    - .only-review-schedules
-    - .except-deploys
+    - .only:changes-code-qa
   stage: prepare
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
   allow_failure: true
@@ -55,10 +53,20 @@ schedule:review-cleanup:
   script:
     - ruby -rrubygems scripts/review_apps/automated_cleanup.rb
 
+schedule:review-cleanup:
+  extends:
+    - .base-review-cleanup
+    - .only-review-schedules
+
+manual:review-cleanup:
+  extends:
+    - .base-review-cleanup
+  when: manual
+
 .review-build-cng-base:
   extends:
     - .default-only
-    - .only-code-qa-changes
+    - .only:changes-code-qa
     - .except-deploys
   image: ruby:2.6-alpine
   stage: review-prepare
@@ -87,7 +95,7 @@ schedule:review-build-cng:
     - .default-tags
     - .default-retry
     - .default-only
-    - .only-code-qa-changes
+    - .only:changes-code-qa
     - .except-deploys
   stage: review
   image: registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-charts-build-base
@@ -96,7 +104,10 @@ schedule:review-build-cng:
   variables:
     HOST_SUFFIX: "${CI_ENVIRONMENT_SLUG}"
     DOMAIN: "-${CI_ENVIRONMENT_SLUG}.${REVIEW_APPS_DOMAIN}"
-    GITLAB_HELM_CHART_REF: "v2.3.7"
+    # v2.3.7 + some stability improvements not yet released:
+    # - sidekiq readinessProbe should be `pgrep -f sidekiq`: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/991
+    # - Allows livenessProbe and readinessProbe to be configured for unicorn: https://gitlab.com/gitlab-org/charts/gitlab/merge_requests/985
+    GITLAB_HELM_CHART_REF: "df7c52dc69df441909880b8f2fd15e938cdb2047"
     GITLAB_EDITION: "ce"
   environment:
     name: review/${CI_COMMIT_REF_NAME}
@@ -145,9 +156,7 @@ schedule:review-deploy:
   needs: ["schedule:review-build-cng"]
 
 review-stop:
-  extends:
-    - .review-deploy-base
-    - .only-review
+  extends: review-deploy
   when: manual
   environment:
     action: stop
@@ -170,6 +179,7 @@ review-cleanup-failed-deployment:
   extends: review-stop
   stage: prepare
   when: on_success
+  needs: []
   allow_failure: false
   script:
     - delete_failed_release
@@ -178,7 +188,7 @@ review-cleanup-failed-deployment:
   extends:
     - .review-docker
     - .only-review
-    - .only-code-qa-changes
+    - .only:changes-code-qa
   stage: qa
   allow_failure: true
   variables:
@@ -225,7 +235,7 @@ review-qa-all:
 .review-performance-base:
   extends:
     - .review-docker
-    - .only-code-qa-changes
+    - .only:changes-code-qa
   stage: qa
   allow_failure: true
   before_script:
@@ -277,7 +287,7 @@ parallel-spec-reports:
   extends:
     - .default-tags
     - .default-only
-    - .only-code-qa-changes
+    - .only:changes-code-qa
     - .only-review
     - .except-deploys
   image: ruby:2.6-alpine
