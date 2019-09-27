@@ -2261,8 +2261,8 @@ class Project < ApplicationRecord
 
   def closest_namespace_setting(name)
     namespace
-      .self_and_ancestors
-      .detect { |n| !n.read_attribute(name).nil? }
+      .self_and_ancestors(hierarchy_order: :asc)
+      .find { |n| !n.read_attribute(name).nil? }
       .try(name)
   end
 
