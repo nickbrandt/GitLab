@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Projects::WikisController do
   let_it_be(:project) { create(:project, :public, :repository) }
-  let_it_be(:user) { project.owner }
+  let(:user) { project.owner }
   let(:project_wiki) { ProjectWiki.new(project, user) }
   let(:wiki) { project_wiki.wiki }
   let(:wiki_title) { 'page title test' }

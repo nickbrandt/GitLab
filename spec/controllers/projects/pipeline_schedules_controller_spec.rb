@@ -60,8 +60,6 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'GET #new' do
-    let_it_be(:user) { create(:user) }
-
     before do
       project.add_developer(user)
       sign_in(user)
@@ -77,8 +75,6 @@ describe Projects::PipelineSchedulesController do
 
   describe 'POST #create' do
     describe 'functionality' do
-      let_it_be(:user) { create(:user) }
-
       before do
         project.add_developer(user)
         sign_in(user)
@@ -149,7 +145,6 @@ describe Projects::PipelineSchedulesController do
 
   describe 'PUT #update' do
     describe 'functionality' do
-      let_it_be(:user) { create(:user) }
       let!(:pipeline_schedule) { create(:ci_pipeline_schedule, project: project, owner: user) }
 
       before do
@@ -383,7 +378,6 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'POST #play', :clean_gitlab_redis_cache do
-    let_it_be(:user) { create(:user) }
     let(:ref) { 'master' }
 
     before do
@@ -442,8 +436,6 @@ describe Projects::PipelineSchedulesController do
   end
 
   describe 'DELETE #destroy' do
-    let_it_be(:user) { create(:user) }
-
     context 'when a developer makes the request' do
       before do
         project.add_developer(user)
