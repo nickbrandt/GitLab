@@ -114,7 +114,7 @@ describe SystemNoteService do
         end
 
         let(:anchor_tag) { %r{ <a[^>]*>#{link}</a>} }
-        let(:href) { described_class.send(:design_version_path, version) }
+        let(:href) { EE::SystemNotes::DesignManagementService.send(:design_version_path, version) }
         let(:link) { "#{n_designs} designs" }
 
         subject(:note) { described_class.design_version_added(version).first }
