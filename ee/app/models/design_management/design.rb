@@ -2,6 +2,7 @@
 
 module DesignManagement
   class Design < ApplicationRecord
+    include Importable
     include Noteable
     include Gitlab::FileTypeDetection
     include Gitlab::Utils::StrongMemoize
@@ -16,7 +17,8 @@ module DesignManagement
     # data
     has_many :notes, as: :noteable, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
 
-    validates :project, :issue, :filename, presence: true
+    validates :project, :filename, presence: true
+    validates :issue, presence: true, unless: :importing?
     validates :filename, uniqueness: { scope: :issue_id }
     validate :validate_file_is_image
 

@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-describe Gitlab::ImportExport::WikiRepoSaver do
-  describe 'bundle a wiki Git repo' do
+describe Gitlab::ImportExport::DesignRepoSaver do
+  describe 'bundle a design Git repo' do
     set(:user) { create(:user) }
-    let!(:project) { create(:project, :wiki_repo) }
+    set(:design) { create(:design, :with_file, versions_count: 1) }
+    let!(:project) { create(:project, :design_repo) }
     let(:export_path) { "#{Dir.tmpdir}/project_tree_saver_spec" }
     let(:shared) { project.import_export_shared }
-    let(:wiki_bundler) { described_class.new(project: project, shared: shared) }
-    let!(:project_wiki) { ProjectWiki.new(project, user) }
+    let(:design_bundler) { described_class.new(project: project, shared: shared) }
 
     before do
       project.add_maintainer(user)
       allow_any_instance_of(Gitlab::ImportExport).to receive(:storage_path).and_return(export_path)
-      project_wiki.wiki
-      project_wiki.create_page("index", "test content")
     end
 
     after do
@@ -21,14 +21,14 @@ describe Gitlab::ImportExport::WikiRepoSaver do
     end
 
     it 'bundles the repo successfully' do
-      expect(wiki_bundler.save).to be true
+      expect(design_bundler.save).to be true
     end
 
     context 'when the repo is empty' do
       let!(:project) { create(:project) }
 
       it 'bundles the repo successfully' do
-        expect(wiki_bundler.save).to be true
+        expect(design_bundler.save).to be true
       end
     end
   end

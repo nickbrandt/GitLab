@@ -49,7 +49,6 @@ describe Security::PipelineVulnerabilitiesFinder do
         let(:params) { { report_type: %w[dast] } }
 
         it 'includes only dast' do
-          # binding.pry
           expect(subject.count).to eq dast_count
         end
       end
