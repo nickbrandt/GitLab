@@ -2296,7 +2296,7 @@ or public project, or template is allowed.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/issues/56836) in GitLab 11.9.
 
 Nested includes allow you to compose a set of includes.
-A total of 50 includes is allowed.
+A total of 100 includes is allowed.
 Duplicate includes are considered a configuration error.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/issues/28212) in GitLab 12.4.
