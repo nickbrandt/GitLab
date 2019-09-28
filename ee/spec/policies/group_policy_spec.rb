@@ -80,18 +80,13 @@ describe GroupPolicy do
 
     context 'with sso enforcement enabled' do
       let(:current_user) { guest }
-      let(:group) { create(:group, :private) }
-      let!(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+      let_it_be(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
 
       context 'when the session has been set globally' do
         around do |example|
           Gitlab::Session.with_session({}) do
             example.run
           end
-        end
-
-        before do
-          group.root_ancestor.reload
         end
 
         it 'prevents access without a SAML session' do
@@ -115,7 +110,6 @@ describe GroupPolicy do
 
   context 'with ip restriction' do
     let(:current_user) { developer }
-    let(:group) { create(:group, :public) }
 
     before do
       allow(Gitlab::IpAddressState).to receive(:current).and_return('192.168.0.2')
