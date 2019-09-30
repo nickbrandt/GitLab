@@ -22,11 +22,15 @@ export default {
     state.charts[chartKey].params.metricType = metricType;
   },
   [types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item }) {
-    const idx = state.charts[chartKey].selected.indexOf(item);
-    if (idx === -1) {
-      state.charts[chartKey].selected.push(item);
+    if (!item) {
+      state.charts[chartKey].selected = [];
     } else {
-      state.charts[chartKey].selected.splice(idx, 1);
+      const idx = state.charts[chartKey].selected.indexOf(item);
+      if (idx === -1) {
+        state.charts[chartKey].selected.push(item);
+      } else {
+        state.charts[chartKey].selected.splice(idx, 1);
+      }
     }
   },
   [types.SET_CHART_ENABLED](state, { chartKey, isEnabled }) {

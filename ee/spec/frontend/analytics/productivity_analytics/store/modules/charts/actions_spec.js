@@ -13,7 +13,7 @@ describe('Productivity analytics chart actions', () => {
   let mockedState;
   let mock;
 
-  const chartKey = 'main';
+  const chartKey = chartKeys.main;
   const globalParams = {
     group_id: 'gitlab-org',
     project_id: 'gitlab-org/gitlab-test',
@@ -212,17 +212,37 @@ describe('Productivity analytics chart actions', () => {
     });
   });
 
-  describe('chartItemClicked', () => {
-    const item = 5;
-    it('should commit selected chart item', done => {
-      testAction(
-        actions.chartItemClicked,
-        { chartKey, item },
-        mockedContext.state,
-        [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
-        [{ type: 'fetchSecondaryChartData' }, { type: 'table/setPage', payload: 0 }],
-        done,
-      );
+  describe('updateSelectedItems', () => {
+    describe('when skipReload is false (by default)', () => {
+      const item = 5;
+      it('should commit selected chart item and dispatch fetchSecondaryChartData and setPage', done => {
+        testAction(
+          actions.updateSelectedItems,
+          { chartKey, item },
+          mockedContext.state,
+          [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
+          [{ type: 'fetchSecondaryChartData' }, { type: 'table/setPage', payload: 0 }],
+          done,
+        );
+      });
+    });
+
+    describe('when skipReload is true', () => {
+      it('should commit selected chart and it should not dispatch any further actions', done => {
+        testAction(
+          actions.updateSelectedItems,
+          { chartKey, item: null, skipReload: true },
+          mockedContext.state,
+          [
+            {
+              type: types.UPDATE_SELECTED_CHART_ITEMS,
+              payload: { chartKey: chartKeys.main, item: null },
+            },
+          ],
+          [],
+          done,
+        );
+      });
     });
   });
 

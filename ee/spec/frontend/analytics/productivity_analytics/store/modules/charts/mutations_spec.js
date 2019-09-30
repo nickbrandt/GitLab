@@ -71,6 +71,12 @@ describe('Productivity analytics chart mutations', () => {
     chartKey = chartKeys.timeBasedHistogram;
     const item = 5;
 
+    it('sets the list of selected items to [] when the item is null', () => {
+      mutations[types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item: null });
+
+      expect(state.charts[chartKey].selected).toEqual([]);
+    });
+
     it('adds the item to the list of selected items when not included', () => {
       mutations[types.UPDATE_SELECTED_CHART_ITEMS](state, { chartKey, item });
 
