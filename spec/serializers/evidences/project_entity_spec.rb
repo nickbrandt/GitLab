@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EvidenceProjectEntity do
+describe Evidences::ProjectEntity do
   let(:entity) { described_class.new(build(:project)) }
 
   subject { entity.as_json }

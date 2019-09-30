@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EvidenceReleaseEntity do
+describe Evidences::ReleaseEntity do
   let(:release) { build(:release) }
   let(:entity) { described_class.new(release) }
 
@@ -20,8 +20,8 @@ describe EvidenceReleaseEntity do
 
     it 'exposes these milestones' do
       expect(subject[:milestones]).to contain_exactly(
-        EvidenceMilestoneEntity.new(milestone_1).as_json,
-        EvidenceMilestoneEntity.new(milestone_2).as_json
+        Evidences::MilestoneEntity.new(milestone_1).as_json,
+        Evidences::MilestoneEntity.new(milestone_2).as_json
       )
     end
   end
