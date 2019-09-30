@@ -13,6 +13,8 @@ module Gitlab
         @project = project
         @project_id = project.id
         @saved = true
+
+        @object_id_hash = {}
       end
 
 
@@ -258,13 +260,22 @@ module Gitlab
         # p relation_hash_list
         relation_array = [relation_hash_list].flatten.map do |relation_hash|
           if relation_hash.is_a?(Hash)
-            Gitlab::ImportExport::RelationFactory.create(
-              relation_sym: relation_key.to_sym,
-              relation_hash: relation_hash,
-              members_mapper: members_mapper,
-              user: @user,
-              project: @restored_project,
-              excluded_keys: excluded_keys_for_relation(relation_key))
+            if existing_obj_id = @object_id_hash[relation_hash.object_id]
+              ObjectSpace._id2ref(existing_obj_id)
+            else
+              new_obj =
+                Gitlab::ImportExport::RelationFactory.create(
+                  relation_sym: relation_key.to_sym,
+                  relation_hash: relation_hash,
+                  members_mapper: members_mapper,
+                  user: @user,
+                  project: @restored_project,
+                  excluded_keys: excluded_keys_for_relation(relation_key))
+
+              @object_id_hash[relation_hash.object_id] = new_obj.object_id
+
+              new_obj
+            end
           else
             # p relation_hash
             # p relation_key
