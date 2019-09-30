@@ -213,16 +213,6 @@ describe('security reports utils', () => {
       expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
-    it('uses message to generate sha1 when cve is undefined', () => {
-      const issuesWithoutCve = dependencyScanningIssuesOld.map(issue => ({
-        ...issue,
-        cve: undefined,
-      }));
-      const parsed = parseDependencyScanningIssues(issuesWithoutCve, [], 'path')[0];
-
-      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssuesOld[0].message));
-    });
-
     it('includes vulnerability feedbacks', () => {
       const parsed = parseDependencyScanningIssues(
         dependencyScanningIssuesOld,
@@ -333,11 +323,7 @@ describe('security reports utils', () => {
         },
       ]);
 
-      expect(parsed.project_fingerprint).toEqual(
-        sha1(
-          `${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`,
-        ),
-      );
+      expect(parsed.project_fingerprint).toEqual(sha1(issue.vulnerability));
     });
 
     it('includes vulnerability feedbacks', () => {
