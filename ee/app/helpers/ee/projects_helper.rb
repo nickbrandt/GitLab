@@ -44,6 +44,10 @@ module EE
         nav_tabs << :dependencies
       end
 
+      if can?(current_user, :read_licenses_list, project)
+        nav_tabs << :licenses
+      end
+
       if ::Gitlab.config.packages.enabled &&
           project.feature_available?(:packages) &&
           can?(current_user, :read_package, project)
@@ -138,6 +142,7 @@ module EE
       %w[
         projects/security/dashboard#show
         projects/dependencies#show
+        projects/licenses#show
       ]
     end
 
@@ -218,6 +223,10 @@ module EE
       if can_create_feedback?(project, :dismissal)
         project_vulnerability_feedback_index_path(project)
       end
+    end
+
+    def any_project_nav_tab?(tabs)
+      tabs.any? { |tab| project_nav_tab?(tab) }
     end
 
     def settings_operations_available?
