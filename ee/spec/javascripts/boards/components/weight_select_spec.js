@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import WeightSelect from 'ee/boards/components/weight_select.vue';
 import IssuableContext from '~/issuable_context';
+import { __ } from '~/locale';
 
 let vm;
 let board;
-const weights = ['Any Weight', 'No Weight', 1, 2, 3];
+const weights = [__('Any Weight'), __('No Weight'), 1, 2, 3];
 
 function getSelectedText() {
   return vm.$el.querySelector('.value').innerText.trim();

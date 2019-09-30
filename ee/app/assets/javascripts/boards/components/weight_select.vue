@@ -4,9 +4,10 @@
 
 import WeightSelect from 'ee/weight_select';
 import { GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 
-const ANY_WEIGHT = 'Any Weight';
-const NO_WEIGHT = 'No Weight';
+const ANY_WEIGHT = __('Any Weight');
+const NO_WEIGHT = __('No Weight');
 
 export default {
   components: {
