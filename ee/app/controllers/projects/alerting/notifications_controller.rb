@@ -5,6 +5,7 @@ module Projects
     class NotificationsController < Projects::ApplicationController
       respond_to :json
 
+      skip_before_action :verify_authenticity_token
       skip_before_action :project
 
       prepend_before_action :repository, :project_without_auth
