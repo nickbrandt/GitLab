@@ -3,8 +3,17 @@
 module Gitlab
   module Metrics
     class RequestsRackMiddleware
-      HTTP_METHODS = %w(delete get head options patch post put trace).freeze
-      STATUSES = %w(200 301 304 400 401 403 404 500).freeze
+      HTTP_METHODS = {
+        "delete" => %w(200 202 204 303 400 401 403 404 410 422 500 503),
+        "get" => %w(200 204 301 302 303 304 307 400 401 403 404 410 412 422 429 500 503),
+        "head" => %w(200 204 301 302 303 304 400 401 403 404 410 429 500 503),
+        "options" => %w(200 404),
+        "patch" => %w(200 202 204 400 403 404 409 416 422 500),
+        "post" => %w(200 201 202 204 301 302 303 304 400 401 403 404 406 409 410 412 413 415 422 429 500 503),
+        "propfind" => %w(404),
+        "put" => %w(200 202 204 400 401 403 404 405 406 409 410 415 422 500),
+        "report" =>  %w(404)
+      }.freeze
 
       def initialize(app)
         @app = app
@@ -24,8 +33,8 @@ module Gitlab
       end
 
       def self.initialize_http_request_duration_seconds
-        HTTP_METHODS.each do |method|
-          STATUSES.each do |status|
+        HTTP_METHODS.each do |method, statuses|
+          statuses.each do |status|
             http_request_duration_seconds.get({ method: method, status: status })
           end
         end
