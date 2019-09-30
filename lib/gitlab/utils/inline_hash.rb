@@ -11,13 +11,15 @@ module Gitlab
       #
       #  {
       #    'root_param' => 'Root',
+      #    12 => 'number',
+      #    symbol: 'symbol',
       #    nested_param: {
       #      key: 'Value'
       #    },
       #    'very' => {
       #      'deep' => {
       #        'nested' => {
-      #          'param' => 'Deep nested value'
+      #          12 => 'Deep nested value'
       #        }
       #      }
       #    }
@@ -28,15 +30,17 @@ module Gitlab
       #
       #  {
       #    'root_param' => 'Root',
+      #     12 => 'number',
+      #     symbol: symbol,
       #    'nested_param.key' => 'Value',
-      #    'very.deep.nested.param' => 'Deep nested value'
+      #    'very.deep.nested.12' => 'Deep nested value'
       #  }
       #
       def merge_keys(hash, prefix: nil, connector: '.')
         result = {}
-        base_prefix = prefix ? "#{prefix}#{connector}" : ''
         pairs =
           if prefix
+            base_prefix = "#{prefix}#{connector}"
             hash.map { |key, value| ["#{base_prefix}#{key}", value] }
           else
             hash.to_a
