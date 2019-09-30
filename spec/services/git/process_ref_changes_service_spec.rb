@@ -28,10 +28,42 @@ describe Git::ProcessRefChangesService do
     it "calls #{push_service_class}" do
       expect(push_service_class)
         .to receive(:new)
+        .with(project, project.owner, hash_including(execute_project_hooks: true))
         .exactly(changes.count).times
         .and_return(service)
 
       subject.execute
+    end
+
+    context 'changes exceed push_event_hooks_limit' do
+      def multiple_changes(change, count)
+        Array.new(count).map.with_index do |n, index|
+          { index: index, oldrev: change[:oldrev], newrev: change[:newrev], ref: "#{change[:ref]}#{n}" }
+        end
+      end
+
+      let(:push_event_hooks_limit) { 3 }
+
+      let(:changes) do
+        multiple_changes(
+          { oldrev: '123456', newrev: '789012', ref: "#{ref_prefix}/test" },
+          push_event_hooks_limit + 1
+        )
+      end
+
+      before do
+        stub_application_setting(push_event_hooks_limit: push_event_hooks_limit)
+      end
+
+      it "calls #{push_service_class} with execute_project_hooks set to false" do
+        expect(push_service_class)
+          .to receive(:new)
+          .with(project, project.owner, hash_including(execute_project_hooks: false))
+          .exactly(changes.count).times
+          .and_return(service)
+
+        subject.execute
+      end
     end
 
     context 'pipeline creation' do
