@@ -1,0 +1,12 @@
+= form_for @project, url: namespace_project_pages_path(@project.namespace.becomes(Namespace), @project), html: { class: 'inline', title: pages_https_only_title } do |f|
+  - if Gitlab.config.pages.external_http || Gitlab.config.pages.external_https
+    .form-group
+      = f.label :max_pages_size, class: 'label-bold' do
+        Maximum size of pages (MB)
+      = f.number_field :max_pages_size, value: f.object.max_pages_size.try(:to_mb), class: 'form-control', min: 0
+      %span.form-text.text-muted#repository_size_limit_help_block
+        The total size of deployed static content will be limited to this size.  0 for unlimited.  Leave empty to inherit the global value.
+
+  - unless pages_https_only_disabled?
+    .prepend-top-10
+      = f.submit s_('GitLabPages|Save'), class: 'btn btn-success'
