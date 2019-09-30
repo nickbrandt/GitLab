@@ -6,9 +6,13 @@ import RegionDropdown from './region_dropdown.vue';
 import RoleNameDropdown from './role_name_dropdown.vue';
 import SecurityGroupDropdown from './security_group_dropdown.vue';
 
-const { mapState: mapRegionsState } = createNamespacedHelpers('regions');
-const { mapState: mapVpcsState } = createNamespacedHelpers('vpcs');
-const { mapState: mapSubnetsState } = createNamespacedHelpers('subnets');
+const { mapState: mapRegionsState, mapActions: mapRegionsActions } = createNamespacedHelpers(
+  'regions',
+);
+const { mapState: mapVpcsState, mapActions: mapVpcActions } = createNamespacedHelpers('vpcs');
+const { mapState: mapSubnetsState, mapActions: mapSubnetActions } = createNamespacedHelpers(
+  'subnets',
+);
 
 export default {
   components: {
@@ -72,11 +76,9 @@ export default {
   },
   methods: {
     ...mapActions(['setRegion', 'setVpc', 'setSubnet']),
-    ...mapActions({
-      fetchRegions: 'regions/fetchItems',
-      fetchVpcs: 'vpcs/fetchItems',
-      fetchSubnets: 'subnets/fetchItems',
-    }),
+    ...mapRegionsActions({ fetchRegions: 'fetchItems' }),
+    ...mapVpcActions({ fetchVpcs: 'fetchItems' }),
+    ...mapSubnetActions({ fetchSubnets: 'fetchItems' }),
     setRegionAndFetchVpcs(region) {
       this.setRegion({ region });
       this.fetchVpcs({ region });
