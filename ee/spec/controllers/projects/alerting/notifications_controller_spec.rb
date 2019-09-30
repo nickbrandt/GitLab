@@ -10,6 +10,10 @@ describe Projects::Alerting::NotificationsController do
     let(:service_response) { ServiceResponse.success }
     let(:notify_service) { instance_double(Projects::Alerting::NotifyService, execute: service_response) }
 
+    around do |example|
+      ForgeryProtection.with_forgery_protection { example.run }
+    end
+
     before do
       allow(Projects::Alerting::NotifyService).to receive(:new).and_return(notify_service)
     end
