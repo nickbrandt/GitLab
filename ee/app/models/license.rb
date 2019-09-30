@@ -78,6 +78,7 @@ class License < ApplicationRecord
     jira_dev_panel_integration
     ldap_group_sync_filter
     marking_project_for_deletion
+    max_pages_size
     merge_pipelines
     merge_request_performance_metrics
     merge_trains
@@ -202,6 +203,7 @@ class License < ApplicationRecord
     external_authorization_service_api_management
     geo
     ldap_group_sync
+    max_pages_size
     ldap_group_sync_filter
     multiple_ldap_servers
     object_storage
