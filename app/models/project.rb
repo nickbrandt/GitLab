@@ -247,6 +247,7 @@ class Project < ApplicationRecord
   has_one :cluster_project, class_name: 'Clusters::Project'
   has_many :clusters, through: :cluster_project, class_name: 'Clusters::Cluster'
   has_many :kubernetes_namespaces, class_name: 'Clusters::KubernetesNamespace'
+  has_many :management_clusters, class_name: 'Clusters::Cluster', foreign_key: :management_project_id, inverse_of: :management_project
 
   has_many :prometheus_metrics
 
