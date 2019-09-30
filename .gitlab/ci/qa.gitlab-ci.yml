@@ -59,7 +59,7 @@ schedule:package-and-qa:notify-success:
     - .schedules
     - .notify
   script:
-    - bin/slack qa-master "🎉 Scheduled QA against `master` passed! 🎉 See $CI_PIPELINE_URL." ci_passing
+    - scripts/notify-slack qa-master "🎉 Scheduled QA against `master` passed! 🎉 See $CI_PIPELINE_URL." ci_passing
   when: on_success
 
 schedule:package-and-qa:notify-failure:
@@ -67,5 +67,5 @@ schedule:package-and-qa:notify-failure:
     - .schedules
     - .notify
   script:
-    - bin/slack qa-master "☠️ Scheduled QA against `master` failed! ☠️ See $CI_PIPELINE_URL." ci_failing
+    - scripts/notify-slack qa-master "☠️ Scheduled QA against `master` failed! ☠️ See $CI_PIPELINE_URL." ci_failing
   when: on_failure
