@@ -51,16 +51,16 @@ module Security
     end
 
     def find_jobs(job_types)
-      @pipeline.builds.with_secure_reports(job_types)
+      @pipeline.builds.with_secure_reports_from_config_options(job_types)
     end
 
     def find_jobs_legacy(job_types)
       # first job type is added as a WHERE statement
-      query = @pipeline.builds.with_secure_report_legacy(job_types.first)
+      query = @pipeline.builds.with_secure_reports_from_options(job_types.first)
 
       # following job types are added as OR statements
       jobs = job_types.drop(1).reduce(query) do |qry, job_type|
-        qry.or(@pipeline.builds.with_secure_report_legacy(job_type))
+        qry.or(@pipeline.builds.with_secure_reports_from_options(job_type))
       end
 
       # the query doesn't guarantee accuracy, so we verify it here
