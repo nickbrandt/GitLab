@@ -407,11 +407,10 @@ module Ci
 
     def legacy_stages_using_composite_status
       stages = statuses.latest
-        .group_by(&:stage_idx)
-        .sort_by(&:first)
+        .order(:stage_idx, :stage)
+        .group_by(&:stage)
 
-      stages.map do |stage_idx, jobs|
-        stage_name = jobs.first.stage
+      stages.map do |stage_name, jobs|
         jobs_statuses = jobs.pluck(:status, :allow_failure)
 
         composite_status = Gitlab::Ci::Status::Composite

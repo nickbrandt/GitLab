@@ -73,7 +73,7 @@ module Gitlab
 
         def only_of?(*names)
           matching = names.count { |name| @status_set.include?(name) }
-          matching > 0 && \
+          matching > 0 &&
             matching == @status_set.size
         end
 
