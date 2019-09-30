@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v8.12.0
+
+- Fix health checks routes incorrectly intercepting errors !424
+- Simplify badgateway RoundTripper !425
+
 v8.11.0
 
 - Accelerate GraphQL uploads !403
