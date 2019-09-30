@@ -83,7 +83,7 @@ module Gitlab
           columns[@allow_failure_key] = :allow_failure if @allow_failure_key
 
           all_statuses
-            .pluck(*columns)
+            .pluck(*columns) # rubocop: disable CodeReuse/ActiveRecord
             .each(&method(:consume_status))
         end
 
