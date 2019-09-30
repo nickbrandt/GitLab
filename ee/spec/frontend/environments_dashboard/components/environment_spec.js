@@ -81,4 +81,37 @@ describe('Environment', () => {
       });
     });
   });
+
+  it('renders an environment without a deployment', () => {
+    propsData = {
+      environment: {
+        ...environment,
+        last_deployment: null,
+      },
+    };
+    wrapper = shallowMount(Component, {
+      localVue,
+      propsData,
+    });
+
+    expect(wrapper.text()).toContain('This environment has no deployments yet.');
+  });
+
+  it('renders an environment with a deployment without a deployable', () => {
+    propsData = {
+      environment: {
+        ...environment,
+        last_deployment: {
+          ...environment.last_deployment,
+          deployable: null,
+        },
+      },
+    };
+    wrapper = shallowMount(Component, {
+      localVue,
+      propsData,
+    });
+
+    expect(wrapper.text()).toContain('This environment has no deployments yet.');
+  });
 });

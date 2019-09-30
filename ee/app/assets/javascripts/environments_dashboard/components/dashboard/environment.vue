@@ -70,7 +70,7 @@ export default {
       return !_.isEmpty(this.environment.last_deployment) ? this.environment.last_deployment : null;
     },
     deployable() {
-      return !_.isEmpty(this.lastDeployment.deployable) ? this.lastDeployment.deployable : null;
+      return this.lastDeployment ? this.lastDeployment.deployable : null;
     },
     commit() {
       return !_.isEmpty(this.lastDeployment.commit) ? this.lastDeployment.commit : {};
@@ -102,15 +102,7 @@ export default {
       );
     },
     buildName() {
-      if (
-        this.environment &&
-        this.environment.last_deployment &&
-        this.environment.last_deployment.deployable
-      ) {
-        const { deployable } = this.environment.last_deployment;
-        return `${deployable.name} #${deployable.id}`;
-      }
-      return '';
+      return this.deployable ? `${this.deployable.name} #${this.deployable.id}` : '';
     },
   },
 };
@@ -124,7 +116,7 @@ export default {
     />
 
     <div :class="cardClasses" class="dashboard-card-body card-body">
-      <div v-if="lastDeployment" class="row">
+      <div v-if="deployable" class="row">
         <div class="col-1 align-self-center">
           <user-avatar-link
             v-if="user"
