@@ -283,4 +283,17 @@ describe('Productivity analytics chart getters', () => {
       expect(getters.hasNoAccessError(state)).toEqual(false);
     });
   });
+
+  describe('isChartEnabled', () => {
+    const chartKey = chartKeys.scatterplot;
+    it('returns true if the chart is enabled', () => {
+      state.charts[chartKey].enabled = true;
+      expect(getters.isChartEnabled(state)(chartKey)).toBe(true);
+    });
+
+    it('returns false if the chart is disabled', () => {
+      state.charts[chartKey].enabled = false;
+      expect(getters.isChartEnabled(state)(chartKey)).toBe(false);
+    });
+  });
 });

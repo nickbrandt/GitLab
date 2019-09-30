@@ -5,6 +5,7 @@ export default () => ({
     [chartKeys.main]: {
       isLoading: false,
       errorCode: null,
+      enabled: true,
       data: {},
       selected: [],
       params: {
@@ -14,6 +15,7 @@ export default () => ({
     [chartKeys.timeBasedHistogram]: {
       isLoading: false,
       errorCode: null,
+      enabled: true,
       data: {},
       selected: [],
       params: {
@@ -24,6 +26,7 @@ export default () => ({
     [chartKeys.commitBasedHistogram]: {
       isLoading: false,
       errorCode: null,
+      enabled: true,
       data: {},
       selected: [],
       params: {
@@ -34,6 +37,7 @@ export default () => ({
     [chartKeys.scatterplot]: {
       isLoading: false,
       errorCode: null,
+      enabled: true,
       data: {},
       selected: [],
       params: {

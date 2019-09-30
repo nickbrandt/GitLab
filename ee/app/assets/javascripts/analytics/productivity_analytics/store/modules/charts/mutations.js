@@ -29,4 +29,7 @@ export default {
       state.charts[chartKey].selected.splice(idx, 1);
     }
   },
+  [types.SET_CHART_ENABLED](state, { chartKey, isEnabled }) {
+    state.charts[chartKey].enabled = isEnabled;
+  },
 };

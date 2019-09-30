@@ -47,62 +47,64 @@ describe('Productivity analytics chart actions', () => {
   });
 
   describe('fetchChartData', () => {
-    describe('success', () => {
-      beforeEach(() => {
-        mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
-      });
+    describe('when chart is enabled', () => {
+      describe('success', () => {
+        beforeEach(() => {
+          mock.onGet(mockedState.endpoint).replyOnce(200, mockHistogramData);
+        });
 
-      it('calls API with params', () => {
-        jest.spyOn(axios, 'get');
+        it('calls API with params', () => {
+          jest.spyOn(axios, 'get');
 
-        actions.fetchChartData(mockedContext, chartKey);
+          actions.fetchChartData(mockedContext, chartKey);
 
-        expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
-      });
+          expect(axios.get).toHaveBeenCalledWith(mockedState.endpoint, { params: globalParams });
+        });
 
-      it('dispatches success with received data', done =>
-        testAction(
-          actions.fetchChartData,
-          chartKey,
-          mockedState,
-          [],
-          [
-            { type: 'requestChartData', payload: chartKey },
-            {
-              type: 'receiveChartDataSuccess',
-              payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
-            },
-          ],
-          done,
-        ));
-    });
-
-    describe('error', () => {
-      beforeEach(() => {
-        mock.onGet(mockedState.endpoint).replyOnce(500);
-      });
-
-      it('dispatches error', done => {
-        testAction(
-          actions.fetchChartData,
-          chartKey,
-          mockedState,
-          [],
-          [
-            {
-              type: 'requestChartData',
-              payload: chartKey,
-            },
-            {
-              type: 'receiveChartDataError',
-              payload: {
-                chartKey,
-                error: new Error('Request failed with status code 500'),
+        it('dispatches success with received data', done =>
+          testAction(
+            actions.fetchChartData,
+            chartKey,
+            mockedState,
+            [],
+            [
+              { type: 'requestChartData', payload: chartKey },
+              {
+                type: 'receiveChartDataSuccess',
+                payload: expect.objectContaining({ chartKey, data: mockHistogramData }),
               },
-            },
-          ],
-          done,
-        );
+            ],
+            done,
+          ));
+      });
+
+      describe('error', () => {
+        beforeEach(() => {
+          mock.onGet(mockedState.endpoint).replyOnce(500);
+        });
+
+        it('dispatches error', done => {
+          testAction(
+            actions.fetchChartData,
+            chartKey,
+            mockedState,
+            [],
+            [
+              {
+                type: 'requestChartData',
+                payload: chartKey,
+              },
+              {
+                type: 'receiveChartDataError',
+                payload: {
+                  chartKey,
+                  error: new Error('Request failed with status code 500'),
+                },
+              },
+            ],
+            done,
+          );
+        });
       });
     });
   });
@@ -117,6 +119,24 @@ describe('Productivity analytics chart actions', () => {
         [],
         done,
       );
+    });
+
+    describe('when chart is disabled', () => {
+      const disabledChartKey = chartKeys.scatterplot;
+      beforeEach(() => {
+        mock.onGet(mockedState.endpoint).replyOnce(200);
+        mockedState.charts[disabledChartKey].enabled = false;
+      });
+
+      it('does not dispatch the requestChartData action', done => {
+        testAction(actions.fetchChartData, disabledChartKey, mockedState, [], [], done);
+      });
+
+      it('does not call the API', () => {
+        actions.fetchChartData(mockedContext, disabledChartKey);
+        jest.spyOn(axios, 'get');
+        expect(axios.get).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -201,6 +221,24 @@ describe('Productivity analytics chart actions', () => {
         mockedContext.state,
         [{ type: types.UPDATE_SELECTED_CHART_ITEMS, payload: { chartKey, item } }],
         [{ type: 'fetchSecondaryChartData' }, { type: 'table/setPage', payload: 0 }],
+        done,
+      );
+    });
+  });
+
+  describe('setChartEnabled', () => {
+    it('should commit enabled state', done => {
+      testAction(
+        actions.setChartEnabled,
+        { chartKey: chartKeys.scatterplot, isEnabled: false },
+        mockedContext.state,
+        [
+          {
+            type: types.SET_CHART_ENABLED,
+            payload: { chartKey: chartKeys.scatterplot, isEnabled: false },
+          },
+        ],
+        [],
         done,
       );
     });
