@@ -25,7 +25,7 @@ describe('ProductivityApp component', () => {
   };
 
   const actionSpies = {
-    chartItemClicked: jest.fn(),
+    updateSelectedItems: jest.fn(),
     setSortField: jest.fn(),
     setPage: jest.fn(),
     toggleSortOrder: jest.fn(),
@@ -170,8 +170,8 @@ describe('ProductivityApp component', () => {
                   .vm.$emit('chartItemClicked', data);
               });
 
-              it('dispatches chartItemClicked action', () => {
-                expect(actionSpies.chartItemClicked).toHaveBeenCalledWith({
+              it('dispatches updateSelectedItems action', () => {
+                expect(actionSpies.updateSelectedItems).toHaveBeenCalledWith({
                   chartKey: chartKeys.main,
                   item: 0,
                 });

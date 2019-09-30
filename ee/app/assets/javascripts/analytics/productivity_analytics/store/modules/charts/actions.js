@@ -50,14 +50,19 @@ export const setMetricType = ({ commit, dispatch }, { chartKey, metricType }) =>
   dispatch('fetchChartData', chartKey);
 };
 
-export const chartItemClicked = ({ commit, dispatch }, { chartKey, item }) => {
+export const updateSelectedItems = (
+  { commit, dispatch },
+  { chartKey, item, skipReload = false },
+) => {
   commit(types.UPDATE_SELECTED_CHART_ITEMS, { chartKey, item });
 
-  // update secondary charts
-  dispatch('fetchSecondaryChartData');
+  if (!skipReload) {
+    // update secondary charts
+    dispatch('fetchSecondaryChartData');
 
-  // let's reset the page on the MR table and fetch data
-  dispatch('table/setPage', 0, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
+  }
 };
 
 export const setChartEnabled = ({ commit }, { chartKey, isEnabled }) =>

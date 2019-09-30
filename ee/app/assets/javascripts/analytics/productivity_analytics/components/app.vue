@@ -102,13 +102,13 @@ export default {
     ...mapActions('charts', [
       'fetchChartData',
       'setMetricType',
-      'chartItemClicked',
+      'updateSelectedItems',
       'setChartEnabled',
     ]),
     ...mapActions('table', ['setSortField', 'setPage', 'toggleSortOrder', 'setColumnMetric']),
     onMainChartItemClicked({ params }) {
       const itemValue = params.data.value[0];
-      this.chartItemClicked({ chartKey: this.chartKeys.main, item: itemValue });
+      this.updateSelectedItems({ chartKey: this.chartKeys.main, item: itemValue });
     },
     getColumnChartOption(chartKey) {
       return {
