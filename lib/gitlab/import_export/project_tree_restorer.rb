@@ -15,6 +15,27 @@ module Gitlab
         @saved = true
       end
 
+
+      def dedup_hash(item, map = {})
+        return map[item] if map.key?(item)
+
+        new_item =
+          case item
+          when String
+            item
+          when Array
+            item.map { |a| dedup_hash(a, map) }
+          when Hash
+            item.map { |k, v| [dedup_hash(k, map), dedup_hash(v, map)] }.to_h
+          else
+            item
+          end
+
+        map[item] = new_item
+
+        new_item
+      end
+
       def restore
         begin
           json = IO.read(@path)
@@ -27,6 +48,8 @@ module Gitlab
         @project_members = @tree_hash.delete('project_members')
 
         RelationRenameService.rename(@tree_hash)
+
+        @tree_hash = dedup_hash(@tree_hash)
 
         ActiveRecord::Base.uncached do
           ActiveRecord::Base.no_touching do
@@ -211,20 +234,44 @@ module Gitlab
           # transform relation hash to actual object
           sub_relation_hash = relation_item[sub_relation_key_s]
           if sub_relation_hash.present?
+            # binding.pry if sub_relation_hash.first.is_a?(LabelPriority) && sub_relation_hash.first.id == 1
+            # if sub_relation_key_s == "priorities"
+            #   p 'A' * 50
+            #   p 'rel:'
+            #   p relation_key
+            #   p relation_definition
+            #   p relation_item
+            #   p '-' * 10
+            #   p 'sub:'
+            #   p sub_relation_key
+            #   p sub_relation_definition
+            #   p sub_relation_hash
+            # end
+
             relation_item[sub_relation_key_s] = create_relation(sub_relation_key, sub_relation_hash)
           end
         end
       end
 
       def create_relation(relation_key, relation_hash_list)
+        # binding.pry if relation_key.to_s == "priorities"
+        # p relation_hash_list
         relation_array = [relation_hash_list].flatten.map do |relation_hash|
-          Gitlab::ImportExport::RelationFactory.create(
-            relation_sym: relation_key.to_sym,
-            relation_hash: relation_hash,
-            members_mapper: members_mapper,
-            user: @user,
-            project: @restored_project,
-            excluded_keys: excluded_keys_for_relation(relation_key))
+          if relation_hash.is_a?(Hash)
+            Gitlab::ImportExport::RelationFactory.create(
+              relation_sym: relation_key.to_sym,
+              relation_hash: relation_hash,
+              members_mapper: members_mapper,
+              user: @user,
+              project: @restored_project,
+              excluded_keys: excluded_keys_for_relation(relation_key))
+          else
+            # p relation_hash
+            # p relation_key
+            # p relation_hash_list
+            # binding.pry
+            relation_hash
+          end
         end.compact
 
         relation_hash_list.is_a?(Array) ? relation_array : relation_array.first
