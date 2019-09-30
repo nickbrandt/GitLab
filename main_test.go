@@ -615,3 +615,67 @@ func assertNginxResponseBuffering(t *testing.T, expected string, resp *http.Resp
 	actual := resp.Header.Get(helper.NginxResponseBufferHeader)
 	assert.Equal(t, expected, actual, msgAndArgs...)
 }
+
+// TestHealthChecksNoStaticHTML verifies that health endpoints pass errors through and don't return the static html error pages
+func TestHealthChecksNoStaticHTML(t *testing.T) {
+	apiResponse := "API RESPONSE"
+	errorPageBody := `<html>
+<body>
+This is a static error page for code 503
+</body>
+</html>
+`
+	require.NoError(t, setupStaticFile("503.html", errorPageBody))
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("X-Gitlab-Custom-Error", "1")
+		w.WriteHeader(503)
+		_, err := w.Write([]byte(apiResponse))
+		require.NoError(t, err)
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/-/health",
+		"/-/readiness",
+		"/-/liveness",
+	} {
+		t.Run(resource, func(t *testing.T) {
+			resp, body := httpGet(t, ws.URL+resource, nil)
+
+			assert.Equal(t, 503, resp.StatusCode, "status code")
+			assert.Equal(t, apiResponse, body, "response body")
+			assertNginxResponseBuffering(t, "", resp, "nginx response buffering")
+		})
+	}
+}
+
+// TestHealthChecksUnreachable verifies that health endpoints return the correct content-type when the upstream is down
+func TestHealthChecksUnreachable(t *testing.T) {
+	ws := startWorkhorseServer("http://127.0.0.1:99999") // This url should point to nothing for the test to be accurate (equivalent to upstream being down)
+	defer ws.Close()
+
+	testCases := []struct {
+		path         string
+		content      string
+		responseType string
+	}{
+		{path: "/-/health", content: "Bad Gateway\n", responseType: "text/plain; charset=utf-8"},
+		{path: "/-/readiness", content: "{\"error\":\"Bad Gateway\",\"status\":502}\n", responseType: "application/json; charset=utf-8"},
+		{path: "/-/liveness", content: "{\"error\":\"Bad Gateway\",\"status\":502}\n", responseType: "application/json; charset=utf-8"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.path, func(t *testing.T) {
+			resp, body := httpGet(t, ws.URL+tc.path, nil)
+
+			assert.Equal(t, 502, resp.StatusCode, "status code")
+			assert.Equal(t, tc.responseType, resp.Header.Get("Content-Type"), "content-type")
+			assert.Equal(t, tc.content, body, "response body")
+			assertNginxResponseBuffering(t, "", resp, "nginx response buffering")
+		})
+	}
+}
