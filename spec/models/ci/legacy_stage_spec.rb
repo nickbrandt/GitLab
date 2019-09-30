@@ -232,15 +232,6 @@ describe Ci::LegacyStage do
             expect(stage).not_to have_warnings
           end
         end
-
-        context 'when number of warnings is not a valid value' do
-          let(:stage) { build(:ci_stage, warnings: 'aa') }
-
-          it 'calculates statuses using database queries' do
-            expect(stage).to receive(:statuses).and_call_original
-            expect(stage).not_to have_warnings
-          end
-        end
       end
 
       context 'when calculating warnings from statuses' do

@@ -14,11 +14,12 @@ describe Gitlab::Ci::Status::Composite do
   end
 
   describe '#status' do
-    subject { composite_status.status }
-
     shared_examples 'compares composite with SQL status' do
       it 'returns exactly the same result' do
-        is_expected.to eq(Ci::Build.where(id: all_statuses).legacy_status)
+        builds = Ci::Build.where(id: all_statuses)
+
+        expect(composite_status.status).to eq(builds.legacy_status)
+        expect(composite_status.warnings?).to eq(builds.failed_but_allowed.any?)
       end
     end
 
@@ -31,11 +32,7 @@ describe Gitlab::Ci::Status::Composite do
             end
 
             let(:composite_status) do
-              described_class.new(
-                all_statuses.pluck(:status),
-                status_key: 0,
-                allow_failure_key: nil
-              )
+              described_class.new(all_statuses)
             end
           end
 
@@ -48,11 +45,7 @@ describe Gitlab::Ci::Status::Composite do
                 end
 
                 let(:composite_status) do
-                  described_class.new(
-                    all_statuses.pluck(:status, :allow_failure),
-                    status_key: 0,
-                    allow_failure_key: 1
-                  )
+                  described_class.new(all_statuses)
                 end
               end
             end

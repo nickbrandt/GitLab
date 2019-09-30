@@ -6,15 +6,15 @@ module Gitlab
       class Composite
         include Gitlab::Utils::StrongMemoize
 
-        # This class accepts an array of arrays
-        # The `status_key` and `allow_failure_key` define an index
-        # or key in each entry
-        def initialize(all_statuses, status_key:, allow_failure_key:)
-          raise ArgumentError, "all_statuses needs to be an Array" unless all_statuses.is_a?(Array)
+        # This class accepts an array of arrays/hashes/or objects
+        def initialize(all_statuses, with_allow_failure: true)
+          unless all_statuses.respond_to?(:pluck)
+            raise ArgumentError, "all_statuses needs to respond to `.pluck`"
+          end
 
           @status_set = Set.new
-          @status_key = status_key
-          @allow_failure_key = allow_failure_key
+          @status_key = 0
+          @allow_failure_key = 1 if with_allow_failure
 
           consume_all_statuses(all_statuses)
         end
@@ -78,7 +78,13 @@ module Gitlab
         end
 
         def consume_all_statuses(all_statuses)
-          all_statuses.each(&method(:consume_status))
+          columns = []
+          columns[@status_key] = :status
+          columns[@allow_failure_key] = :allow_failure if @allow_failure_key
+
+          all_statuses
+            .pluck(*columns)
+            .each(&method(:consume_status))
         end
 
         def consume_status(description)

@@ -65,13 +65,8 @@ module HasStatus
     # 2. Or executes expensive SQL query
     def slow_composite_status
       if Feature.enabled?(:ci_composite_status, default_enabled: false)
-        columns = [:status]
-        columns << :allow_failure if column_names.include?('allow_failure')
-
-        all_statuses = all.pluck(*columns)
-
         Gitlab::Ci::Status::Composite
-          .new(all_statuses, status_key: 0, allow_failure_key: 1)
+          .new(all, with_allow_failure: columns_hash.key?('allow_failure'))
           .status
       else
         legacy_status

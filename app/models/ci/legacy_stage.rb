@@ -14,7 +14,8 @@ module Ci
       @pipeline = pipeline
       @name = name
       @status = status
-      @warnings = warnings
+      # support ints and booleans
+      @has_warnings = ActiveRecord::Type::Boolean.new.cast(warnings)
     end
 
     def groups
@@ -52,14 +53,12 @@ module Ci
     end
 
     def has_warnings?
-      case @warnings
-      when Integer
-        @warnings > 0
-      when TrueClass, FalseClass
-        @warnings
-      else
-        statuses.latest.failed_but_allowed.any?
+      # lazilly calculate the warnings
+      if @has_warnings.nil?
+        @has_warnings = statuses.latest.failed_but_allowed.any?
       end
+
+      @has_warnings
     end
 
     def manual_playable?

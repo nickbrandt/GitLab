@@ -24,13 +24,13 @@ module Ci
     def status
       strong_memoize(:status) do
         if Feature.enabled?(:ci_composite_status, default_enabled: false)
-          all_statuses = @jobs.pluck(:status, :allow_failure)
-
           Gitlab::Ci::Status::Composite
-            .new(all_statuses, status_key: 0, allow_failure_key: 1)
+            .new(@jobs)
             .status
         else
-          CommitStatus.where(id: @jobs).legacy_status
+          CommitStatus
+            .where(id: @jobs)
+            .legacy_status
         end
       end
     end

@@ -411,10 +411,8 @@ module Ci
         .group_by(&:stage)
 
       stages.map do |stage_name, jobs|
-        jobs_statuses = jobs.pluck(:status, :allow_failure)
-
         composite_status = Gitlab::Ci::Status::Composite
-          .new(jobs_statuses, status_key: 0, allow_failure_key: 1)
+          .new(jobs)
 
         Ci::LegacyStage.new(self,
           name: stage_name,
