@@ -3,38 +3,49 @@
 module Gitlab
   module Elastic
     class SnippetSearchResults < ::Gitlab::SnippetSearchResults
-      def initialize(user, query)
-        @user = user
-        @query = query
-      end
-
-      def objects(scope, page = nil)
+      def formatted_count(scope)
         case scope
         when 'snippet_titles'
-          snippet_titles.page(page).per(per_page).records
+          snippet_titles_count.to_s
         when 'snippet_blobs'
-          snippet_blobs.page(page).per(per_page).records
+          snippet_blobs_count.to_s
         else
           super
         end
       end
 
+      def snippet_titles_count
+        limited_snippet_titles_count
+      end
+
+      def snippet_blobs_count
+        limited_snippet_blobs_count
+      end
+
       private
 
       def snippet_titles
-        opt = {
-          user: @user
-        }
-
-        Snippet.elastic_search(query, options: opt)
+        Snippet.elastic_search(query, options: search_params)
       end
 
       def snippet_blobs
-        opt = {
-          user: @user
-        }
+        Snippet.elastic_search_code(query, options: search_params)
+      end
 
-        Snippet.elastic_search_code(query, options: opt)
+      def limited_snippet_titles_count
+        @limited_snippet_titles_count ||= snippet_titles.total_count
+      end
+
+      def limited_snippet_blobs_count
+        @limited_snippet_blobs_count ||= snippet_blobs.total_count
+      end
+
+      def paginated_objects(relation, page)
+        super.records
+      end
+
+      def search_params
+        { user: current_user }
       end
     end
   end
