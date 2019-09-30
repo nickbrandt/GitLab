@@ -12,6 +12,14 @@ describe DeploymentPlatform do
       it { is_expected.to be_nil }
     end
 
+    context 'when project is the cluster\'s management project ' do
+      let!(:cluster_with_management_project) { create(:cluster, :provided_by_user, management_project: project) }
+
+      it 'returns the managed cluster' do
+        is_expected.to eq(cluster_with_management_project.platform_kubernetes)
+      end
+    end
+
     context 'when project has configured kubernetes from CI/CD > Clusters' do
       let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
       let(:platform_kubernetes) { cluster.platform_kubernetes }
@@ -43,6 +51,23 @@ describe DeploymentPlatform do
 
       it 'returns the Kubernetes platform' do
         is_expected.to eq(group_cluster.platform_kubernetes)
+      end
+
+      context 'when project is the cluster\'s management project ' do
+        let!(:cluster_with_management_project) { create(:cluster, :provided_by_user, management_project: project) }
+
+        it 'returns the managed cluster' do
+          is_expected.to eq(cluster_with_management_project.platform_kubernetes)
+        end
+      end
+
+      context 'when project is not the cluster\'s management project' do
+        let(:another_project) { create(:project, group: group) }
+        let!(:cluster_with_management_project) { create(:cluster, :provided_by_user, management_project: another_project) }
+
+        it 'returns the group cluster' do
+          is_expected.to eq(group_cluster.platform_kubernetes)
+        end
       end
 
       context 'when child group has configured kubernetes cluster' do
