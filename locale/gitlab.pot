@@ -2323,9 +2323,6 @@ msgstr ""
 msgid "BillingPlans|Your GitLab.com trial will <strong>expire after %{expiration_date}</strong>. You can learn more about GitLab.com Gold by reading about our %{features_link}."
 msgstr ""
 
-msgid "BillingPlans|Your Gold trial will <strong>expire after %{expiration_date}</strong>. You can learn more about GitLab.com Gold by reading about our %{features_link}."
-msgstr ""
-
 msgid "BillingPlans|features"
 msgstr ""
 
