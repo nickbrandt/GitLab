@@ -4,6 +4,25 @@ require 'spec_helper'
 
 describe Clusters::Platforms::Kubernetes do
   include KubernetesHelpers
+  include ReactiveCachingHelpers
+
+  shared_examples 'resource not found error' do |message|
+    it 'raises error' do
+      result = subject
+
+      expect(result[:error]).to eq(message)
+      expect(result[:status]).to eq(:error)
+    end
+  end
+
+  shared_examples 'kubernetes API error' do |error_code|
+    it 'raises error' do
+      result = subject
+
+      expect(result[:error]).to eq("Kubernetes API returned status code: #{error_code}")
+      expect(result[:status]).to eq(:error)
+    end
+  end
 
   describe '#rollout_status' do
     let(:deployments) { [] }
@@ -120,51 +139,155 @@ describe Clusters::Platforms::Kubernetes do
     let(:service) { create(:cluster_platform_kubernetes, :configured) }
     let(:pod_name) { 'pod-1' }
     let(:namespace) { 'app' }
+    let(:container) { 'some-container' }
 
-    subject { service.read_pod_logs(pod_name, namespace) }
+    subject { service.read_pod_logs(pod_name, namespace, container: container) }
 
-    context 'when kubernetes responds with valid logs' do
+    shared_examples 'successful log request' do
+      it do
+        expect(subject[:logs]).to eq("\"Log 1\\nLog 2\\nLog 3\"")
+        expect(subject[:status]).to eq(:success)
+      end
+    end
+
+    shared_examples 'k8s responses' do
+      context 'when kubernetes responds with valid logs' do
+        before do
+          stub_kubeclient_logs(pod_name, namespace, container: container)
+        end
+
+        context 'on a project level cluster' do
+          let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
+
+          include_examples 'successful log request'
+        end
+
+        context 'on a group level cluster' do
+          let(:cluster) { create(:cluster, :group, platform_kubernetes: service) }
+
+          include_examples 'successful log request'
+        end
+
+        context 'on an instance level cluster' do
+          let(:cluster) { create(:cluster, :instance, platform_kubernetes: service) }
+
+          include_examples 'successful log request'
+        end
+      end
+
+      context 'when kubernetes responds with 500s' do
+        before do
+          stub_kubeclient_logs(pod_name, namespace, container: 'some-container', status: 500)
+        end
+
+        it_behaves_like 'kubernetes API error', 500
+      end
+
+      context 'when container does not exist' do
+        before do
+          container = 'some-container'
+
+          stub_kubeclient_logs(pod_name, namespace, container: container,
+            status: 400, message: "container #{container} is not valid for pod #{pod_name}")
+        end
+
+        it_behaves_like 'kubernetes API error', 400
+      end
+
+      context 'when kubernetes responds with 404s' do
+        before do
+          stub_kubeclient_logs(pod_name, namespace, container: 'some-container', status: 404)
+        end
+
+        it_behaves_like 'resource not found error', 'Pod not found'
+      end
+    end
+
+    context 'without pod_logs_reactive_cache feature flag' do
       before do
-        stub_kubeclient_logs(pod_name, namespace)
+        stub_feature_flags(pod_logs_reactive_cache: false)
       end
 
-      shared_examples 'successful log request' do
-        it { expect(subject.body).to eq("\"Log 1\\nLog 2\\nLog 3\"") }
-      end
+      it_behaves_like 'k8s responses'
 
-      context 'on a project level cluster' do
-        let(:cluster) { create(:cluster, :project, platform_kubernetes: service) }
+      context 'when container name is not specified' do
+        subject { service.read_pod_logs(pod_name, namespace) }
 
-        include_examples 'successful log request'
-      end
-
-      context 'on a group level cluster' do
-        let(:cluster) { create(:cluster, :group, platform_kubernetes: service) }
-
-        include_examples 'successful log request'
-      end
-
-      context 'on an instance level cluster' do
-        let(:cluster) { create(:cluster, :instance, platform_kubernetes: service) }
+        before do
+          stub_kubeclient_logs(pod_name, namespace, container: nil)
+        end
 
         include_examples 'successful log request'
       end
     end
 
-    context 'when kubernetes responds with 500s' do
+    context 'with pod_logs_reactive_cache feature flag' do
       before do
-        stub_kubeclient_logs(pod_name, namespace, status: 500)
+        stub_feature_flags(pod_logs_reactive_cache: true)
+
+        synchronous_reactive_cache(service)
       end
 
-      it { expect { subject }.to raise_error(::Kubeclient::HttpError) }
+      it_behaves_like 'k8s responses'
+
+      context 'when container name is not specified' do
+        subject { service.read_pod_logs(pod_name, namespace) }
+
+        before do
+          stub_kubeclient_pod_details(pod_name, namespace)
+          stub_kubeclient_logs(pod_name, namespace, container: 'container-0')
+        end
+
+        include_examples 'successful log request'
+      end
     end
 
-    context 'when kubernetes responds with 404s' do
-      before do
-        stub_kubeclient_logs(pod_name, namespace, status: 404)
+    context 'with caching', :use_clean_rails_memory_store_caching do
+      let(:opts) do
+        ['get_pod_log', { 'pod_name' => pod_name, 'namespace' => namespace, 'container' => container }]
       end
 
-      it { is_expected.to be_empty }
+      before do
+        stub_feature_flags(pod_logs_reactive_cache: true)
+      end
+
+      context 'result is cacheable' do
+        before do
+          stub_kubeclient_logs(pod_name, namespace, container: container)
+        end
+
+        it do
+          result = subject
+
+          expect { stub_reactive_cache(service, result, opts) }.not_to raise_error
+        end
+      end
+
+      context 'when value present in cache' do
+        let(:return_value) { { 'status' => :success, 'logs' => 'logs' } }
+
+        before do
+          stub_reactive_cache(service, return_value, opts)
+        end
+
+        it 'returns cached value' do
+          result = subject
+
+          expect(result).to eq(return_value)
+        end
+      end
+
+      context 'when value not present in cache' do
+        it 'returns nil' do
+          expect(ReactiveCachingWorker)
+            .to receive(:perform_async)
+            .with(service.class, service.id, *opts)
+
+          result = subject
+
+          expect(result).to eq(nil)
+        end
+      end
     end
   end
 

@@ -8937,6 +8937,9 @@ msgstr ""
 msgid "Kubernetes"
 msgstr ""
 
+msgid "Kubernetes API returned status code: %{error_code}"
+msgstr ""
+
 msgid "Kubernetes Cluster"
 msgstr ""
 
@@ -11515,6 +11518,9 @@ msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
+msgstr ""
+
+msgid "Pod not found"
 msgstr ""
 
 msgid "Pods in use"
@@ -14580,6 +14586,9 @@ msgid "Something went wrong on our end"
 msgstr ""
 
 msgid "Something went wrong on our end."
+msgstr ""
+
+msgid "Something went wrong on our end. %{message}"
 msgstr ""
 
 msgid "Something went wrong on our end. Please try again!"
@@ -18861,6 +18870,9 @@ msgstr ""
 msgid "connecting"
 msgstr ""
 
+msgid "container_name cannot be larger than %{max_length} chars"
+msgstr ""
+
 msgid "could not read private key, is the passphrase correct?"
 msgstr ""
 
@@ -19429,6 +19441,9 @@ msgid "pending comment"
 msgstr ""
 
 msgid "pipeline"
+msgstr ""
+
+msgid "pod_name cannot be larger than %{max_length} chars"
 msgstr ""
 
 msgid "point"
