@@ -93,17 +93,10 @@ export default {
   methods: {
     ...mapActions(['setEndpoint']),
     ...mapActions('charts', ['fetchChartData', 'setMetricType', 'chartItemClicked']),
-    ...mapActions('table', [
-      'setSortField',
-      'setMergeRequestsPage',
-      'toggleSortOrder',
-      'setColumnMetric',
-    ]),
+    ...mapActions('table', ['setSortField', 'setPage', 'toggleSortOrder', 'setColumnMetric']),
     onMainChartItemClicked({ params }) {
       const itemValue = params.data.value[0];
       this.chartItemClicked({ chartKey: this.chartKeys.main, item: itemValue });
-      // let's reset the page on the MR table
-      this.setMergeRequestsPage(0);
     },
     getColumnChartOption(chartKey) {
       return {
@@ -295,7 +288,7 @@ export default {
             :metric-type="columnMetric"
             :metric-label="columnMetricLabel"
             @columnMetricChange="setColumnMetric"
-            @pageChange="setMergeRequestsPage"
+            @pageChange="setPage"
           />
           <div v-if="showMergeRequestTableNoData" class="js-no-data bs-callout bs-callout-info">
             {{ __('There is no data available. Please change your selection.') }}

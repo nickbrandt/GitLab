@@ -8,7 +8,8 @@ export const setGroupNamespace = ({ commit, dispatch }, groupNamespace) => {
   // if there's no 403, then we fetch all remaining chart data and table data
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
-    dispatch('table/fetchMergeRequests', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
   });
 };
 
@@ -17,7 +18,8 @@ export const setProjectPath = ({ commit, dispatch }, projectPath) => {
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
-    dispatch('table/fetchMergeRequests', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
   });
 };
 
@@ -26,7 +28,8 @@ export const setPath = ({ commit, dispatch }, path) => {
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
-    dispatch('table/fetchMergeRequests', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
   });
 };
 
@@ -35,7 +38,8 @@ export const setDaysInPast = ({ commit, dispatch }, days) => {
 
   return dispatch('charts/fetchChartData', chartKeys.main, { root: true }).then(() => {
     dispatch('charts/fetchSecondaryChartData', null, { root: true });
-    dispatch('table/fetchMergeRequests', null, { root: true });
+    // let's reset the page on the MR table and fetch data
+    dispatch('table/setPage', 0, { root: true });
   });
 };
 

@@ -57,8 +57,8 @@ export const toggleSortOrder = ({ commit, dispatch }) => {
 
 export const setColumnMetric = ({ commit }, data) => commit(types.SET_COLUMN_METRIC, data);
 
-export const setMergeRequestsPage = ({ commit, dispatch }, data) => {
-  commit(types.SET_MERGE_REQUESTS_PAGE, data);
+export const setPage = ({ commit, dispatch }, data) => {
+  commit(types.SET_PAGE, data);
 
   dispatch('fetchMergeRequests');
 };
