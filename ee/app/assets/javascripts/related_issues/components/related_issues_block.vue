@@ -195,6 +195,7 @@ export default {
               class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
               :aria-label="__('Add an issue')"
               data-placement="top"
+              data-qa-selector="related_issues_plus_button"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
