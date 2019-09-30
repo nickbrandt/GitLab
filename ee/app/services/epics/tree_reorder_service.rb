@@ -39,11 +39,20 @@ module Epics
     end
 
     def validate_objects
-      unless moving_object.is_a?(EpicIssue) || moving_object.is_a?(Epic)
+      unless supported_type?(moving_object) && supported_type?(adjacent_reference)
         return 'Only epics and epic_issues are supported.'
       end
 
       return 'You don\'t have permissions to move the objects.' unless authorized?
+      return 'Both object have to belong to same parent epic.' unless same_parent?
+    end
+
+    def same_parent?
+      moving_object.parent == adjacent_reference.parent
+    end
+
+    def supported_type?(object)
+      object.is_a?(EpicIssue) || object.is_a?(Epic)
     end
 
     def authorized?

@@ -10,6 +10,7 @@ class EpicIssue < ApplicationRecord
   belongs_to :issue
 
   alias_attribute :parent_ids, :epic_id
+  alias_attribute :parent, :epic
 
   scope :in_epic, ->(epic_id) { where(epic_id: epic_id) }
 end

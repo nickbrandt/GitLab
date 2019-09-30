@@ -87,8 +87,22 @@ describe Epics::TreeReorderService do
             end
           end
 
+          context 'when object being moved is from of another epic' do
+            before do
+              other_epic = create(:epic, group: group)
+              epic_issue2.update(epic: other_epic)
+            end
+
+            it_behaves_like 'error for the tree update', 'Both object have to belong to same parent epic.'
+          end
+
           context 'when object being moved is not supported type' do
             let(:moving_object_id) { GitlabSchema.id_from_object(issue1) }
+
+            it_behaves_like 'error for the tree update', 'Only epics and epic_issues are supported.'
+          end
+
+          context 'when adjacent object is not supported type' do
             let(:adjacent_reference_id) { GitlabSchema.id_from_object(issue2) }
 
             it_behaves_like 'error for the tree update', 'Only epics and epic_issues are supported.'
@@ -129,6 +143,15 @@ describe Epics::TreeReorderService do
             end
 
             it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'
+          end
+
+          context 'when object being moved is from of another epic' do
+            before do
+              other_epic = create(:epic, group: group)
+              epic2.update(parent: other_epic)
+            end
+
+            it_behaves_like 'error for the tree update', 'Both object have to belong to same parent epic.'
           end
 
           context 'when moving is successful' do
