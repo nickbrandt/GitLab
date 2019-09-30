@@ -58,25 +58,32 @@ export default {
   [types.REQUEST_STAGE_DATA](state) {
     state.isLoadingStage = true;
   },
-  [types.RECEIVE_STAGE_DATA_SUCCESS](state, data) {
-    state.events = data.events.map(({ name = '', ...rest }) =>
+  [types.RECEIVE_STAGE_DATA_SUCCESS](state, data = {}) {
+    const { events = [] } = data;
+    state.currentStageEvents = events.map(({ name = '', ...rest }) =>
       convertObjectPropsToCamelCase({ title: name, ...rest }, { deep: true }),
     );
-    state.isEmptyStage = state.events.length === 0;
+    state.isEmptyStage = state.currentStageEvents.length === 0;
     state.isLoadingStage = false;
   },
   [types.RECEIVE_STAGE_DATA_ERROR](state) {
     state.isEmptyStage = true;
     state.isLoadingStage = false;
   },
-  [types.SHOW_CUSTOM_STAGE_FORM](state) {
+  [types.REQUEST_CUSTOM_STAGE_FORM_DATA](state) {
     state.isAddingCustomStage = true;
     state.isEmptyStage = false;
-    state.isLoadingStage = false;
+    state.isLoadingStageForm = true;
   },
   [types.HIDE_CUSTOM_STAGE_FORM](state) {
     state.isAddingCustomStage = false;
-    state.isEmptyStage = false;
-    state.isLoadingStage = false;
+  },
+  [types.RECEIVE_CUSTOM_STAGE_FORM_DATA_SUCCESS](state, data = []) {
+    state.labels = data.map(convertObjectPropsToCamelCase);
+    state.isLoadingStageForm = false;
+  },
+  [types.RECEIVE_CUSTOM_STAGE_FORM_DATA_ERROR](state) {
+    state.isLoadingStageForm = false;
+    state.labels = [];
   },
 };

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { shallowMount, mount } from '@vue/test-utils';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
-import { issueEvents, issueStage, allowedStages } from '../mock_data';
+import { issueEvents, issueStage, allowedStages, groupLabels } from '../mock_data';
 
 let wrapper = null;
 const $sel = {
@@ -25,14 +25,16 @@ function createComponent(props = {}, shallow = false) {
     propsData: {
       stages: allowedStages,
       currentStage: issueStage,
-      events: issueEvents,
-      isLoadingStage: false,
+      currentStageEvents: issueEvents,
+      labels: groupLabels,
+      isLoading: false,
       isEmptyStage: false,
       isUserAllowed: true,
       isAddingCustomStage: false,
       noDataSvgPath,
       noAccessSvgPath,
       canEditStages: false,
+      customStageFormEvents: [],
       ...props,
     },
     stubs: {
@@ -118,12 +120,10 @@ describe('StageTable', () => {
 
         selectStage(1);
 
-        Vue.nextTick()
-          .then(() => {
-            expect(wrapper.emitted().selectStage.length).toEqual(1);
-          })
-          .then(done)
-          .catch(done.fail);
+        Vue.nextTick(() => {
+          expect(wrapper.emitted().selectStage.length).toEqual(1);
+          done();
+        });
       });
 
       it('will emit `selectStage` with the new stage title', done => {
@@ -131,19 +131,17 @@ describe('StageTable', () => {
 
         selectStage(1);
 
-        Vue.nextTick()
-          .then(() => {
-            const [params] = wrapper.emitted('selectStage')[0];
-            expect(params).toMatchObject({ title: secondStage.title });
-          })
-          .then(done)
-          .catch(done.fail);
+        Vue.nextTick(() => {
+          const [params] = wrapper.emitted('selectStage')[0];
+          expect(params).toMatchObject({ title: secondStage.title });
+          done();
+        });
       });
     });
   });
 
-  it('isLoadingStage = true', () => {
-    wrapper = createComponent({ isLoadingStage: true }, true);
+  it('isLoading = true', () => {
+    wrapper = createComponent({ isLoading: true }, true);
     expect(wrapper.find('gl-loading-icon-stub').exists()).toEqual(true);
   });
 

@@ -2,9 +2,7 @@
 import { isEqual } from 'underscore';
 import { GlButton, GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
 import { s__ } from '~/locale';
-
 import LabelsSelector from './labels_selector.vue';
-
 import {
   isStartEvent,
   isLabelEvent,

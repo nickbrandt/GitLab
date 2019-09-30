@@ -4,10 +4,12 @@ import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'helpers/test_constants';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
-import { group, cycleAnalyticsData, allowedStages as stages } from '../mock_data';
+import { group, cycleAnalyticsData, allowedStages as stages, groupLabels } from '../mock_data';
 
 const stageData = { events: [] };
 const error = new Error('Request failed with status code 404');
+const groupPath = 'cool-group';
+const groupLabelsEndpoint = `/groups/${groupPath}/-/labels`;
 
 describe('Cycle analytics actions', () => {
   let state;
@@ -140,6 +142,59 @@ describe('Cycle analytics actions', () => {
       });
 
       shouldFlashAnError();
+    });
+  });
+
+  describe('fetchCustomStageFormData', () => {
+    beforeEach(() => {
+      mock.onGet(groupLabelsEndpoint).replyOnce(200, groupLabels);
+    });
+
+    it('dispatches receiveCustomStageFormData if the request succeeds', done => {
+      testAction(
+        actions.fetchCustomStageFormData,
+        groupPath,
+        state,
+        [],
+        [
+          { type: 'requestCustomStageFormData' },
+          {
+            type: 'receiveCustomStageFormDataSuccess',
+            payload: groupLabels,
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches receiveCustomStageFormDataError if the request fails', done => {
+      testAction(
+        actions.fetchCustomStageFormData,
+        'this-path-does-not-exist',
+        state,
+        [],
+        [
+          { type: 'requestCustomStageFormData' },
+          {
+            type: 'receiveCustomStageFormDataError',
+            payload: error,
+          },
+        ],
+        done,
+      );
+    });
+
+    describe('receiveCustomStageFormDataError', () => {
+      beforeEach(() => {
+        setFixtures('<div class="flash-container"></div>');
+      });
+      it('flashes an error message if the request fails', () => {
+        actions.receiveCustomStageFormDataError({
+          commit: () => {},
+        });
+
+        shouldFlashAnError('There was an error fetching data for the form');
+      });
     });
   });
 

@@ -2,9 +2,11 @@ import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
+import Api from '~/api';
 
 export const setCycleAnalyticsDataEndpoint = ({ commit }, groupPath) =>
   commit(types.SET_CYCLE_ANALYTICS_DATA_ENDPOINT, groupPath);
+
 export const setStageDataEndpoint = ({ commit }, stageSlug) =>
   commit(types.SET_STAGE_DATA_ENDPOINT, stageSlug);
 export const setSelectedGroup = ({ commit }, group) => commit(types.SET_SELECTED_GROUP, group);
@@ -50,6 +52,7 @@ export const receiveCycleAnalyticsDataSuccess = ({ state, commit, dispatch }, da
     createFlash(__('There was an error while fetching cycle analytics data.'));
   }
 };
+
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
   const { status } = response;
   commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
@@ -70,10 +73,21 @@ export const fetchCycleAnalyticsData = ({ state, dispatch }) => {
     .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
 };
 
-export const showCustomStageForm = ({ commit }) => {
-  commit(types.SHOW_CUSTOM_STAGE_FORM);
-};
+export const hideCustomStageForm = ({ commit }) => commit(types.HIDE_CUSTOM_STAGE_FORM);
 
-export const hideCustomStageForm = ({ commit }) => {
-  commit(types.HIDE_CUSTOM_STAGE_FORM);
+export const receiveCustomStageFormDataSuccess = ({ commit }, data) =>
+  commit(types.RECEIVE_CUSTOM_STAGE_FORM_DATA_SUCCESS, data);
+export const receiveCustomStageFormDataError = ({ commit }, error) => {
+  commit(types.RECEIVE_CUSTOM_STAGE_FORM_DATA_ERROR, error);
+  createFlash(__('There was an error fetching data for the form'));
+};
+export const requestCustomStageFormData = ({ commit }) =>
+  commit(types.REQUEST_CUSTOM_STAGE_FORM_DATA);
+
+export const fetchCustomStageFormData = ({ dispatch }, groupPath) => {
+  dispatch('requestCustomStageFormData');
+
+  return Api.groupLabels(groupPath)
+    .then(data => dispatch('receiveCustomStageFormDataSuccess', data))
+    .catch(error => dispatch('receiveCustomStageFormDataError', error));
 };

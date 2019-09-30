@@ -3,6 +3,9 @@ import { getJSONFixture } from 'helpers/fixtures';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { mockLabels } from '../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
+
+export const groupLabels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
 
 export const group = {
   id: 1,

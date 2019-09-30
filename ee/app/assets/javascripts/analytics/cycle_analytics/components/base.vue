@@ -2,6 +2,7 @@
 import { GlEmptyState } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import DateRangeDropdown from '../../shared/components/date_range_dropdown.vue';
@@ -18,6 +19,7 @@ export default {
     SummaryTable,
     StageTable,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -45,35 +47,38 @@ export default {
     ...mapState([
       'isLoading',
       'isLoadingStage',
+      'isLoadingStageForm',
       'isEmptyStage',
       'isAddingCustomStage',
       'selectedGroup',
       'selectedProjectIds',
       'selectedStageName',
-      'events',
       'stages',
       'summary',
       'dataTimeframe',
+      'labels',
+      'currentStageEvents',
+      'customStageFormEvents',
     ]),
     ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
     shouldRenderEmptyState() {
       return !this.selectedGroup;
     },
     hasCustomizableCycleAnalytics() {
-      return gon && gon.features ? gon.features.customizableCycleAnalytics : false;
+      return Boolean(this.glFeatures.customizableCycleAnalytics);
     },
   },
   methods: {
     ...mapActions([
+      'fetchCustomStageFormData',
+      'fetchCycleAnalyticsData',
+      'fetchStageData',
       'setCycleAnalyticsDataEndpoint',
       'setStageDataEndpoint',
       'setSelectedGroup',
-      'fetchCycleAnalyticsData',
       'setSelectedProjects',
       'setSelectedTimeframe',
-      'fetchStageData',
       'setSelectedStageName',
-      'showCustomStageForm',
       'hideCustomStageForm',
     ]),
     onGroupSelect(group) {
@@ -97,7 +102,7 @@ export default {
       this.fetchStageData(this.currentStage.name);
     },
     onShowAddStageForm() {
-      this.showCustomStageForm();
+      this.fetchCustomStageFormData(this.currentGroupPath);
     },
   },
 };
@@ -161,22 +166,26 @@ export default {
           )
         "
       />
-      <summary-table class="js-summary-table" :items="summary" />
-      <stage-table
-        v-if="currentStage"
-        class="js-stage-table"
-        :current-stage="currentStage"
-        :stages="stages"
-        :is-loading-stage="isLoadingStage"
-        :is-empty-stage="isEmptyStage"
-        :is-adding-custom-stage="isAddingCustomStage"
-        :events="events"
-        :no-data-svg-path="noDataSvgPath"
-        :no-access-svg-path="noAccessSvgPath"
-        :can-edit-stages="hasCustomizableCycleAnalytics"
-        @selectStage="onStageSelect"
-        @showAddStageForm="onShowAddStageForm"
-      />
+      <div v-else>
+        <summary-table class="js-summary-table" :items="summary" />
+        <stage-table
+          v-if="currentStage"
+          class="js-stage-table"
+          :current-stage="currentStage"
+          :stages="stages"
+          :is-loading="isLoadingStage || isLoadingStageForm"
+          :is-empty-stage="isEmptyStage"
+          :is-adding-custom-stage="isAddingCustomStage"
+          :current-stage-events="currentStageEvents"
+          :custom-stage-form-events="customStageFormEvents"
+          :labels="labels"
+          :no-data-svg-path="noDataSvgPath"
+          :no-access-svg-path="noAccessSvgPath"
+          :can-edit-stages="hasCustomizableCycleAnalytics"
+          @selectStage="onStageSelect"
+          @showAddStageForm="onShowAddStageForm"
+        />
+      </div>
     </div>
   </div>
 </template>
