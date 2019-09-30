@@ -12,7 +12,7 @@ schedule:package-and-qa:notify-success:
     - .notify
   stage: notification
   script:
-    - scripts/notify-slack qa-master "🎉 Scheduled QA against `master` passed! 🎉 See $CI_PIPELINE_URL." ci_passing
+    - "scripts/notify-slack qa-master \":tada: Scheduled QA against `master` passed! :tada: See $CI_PIPELINE_URL.\" ci_passing"
   needs: ["schedule:package-and-qa"]
   when: on_success
 
@@ -22,6 +22,6 @@ schedule:package-and-qa:notify-failure:
     - .notify
   stage: notification
   script:
-    - scripts/notify-slack qa-master "☠️ Scheduled QA against `master` failed! ☠️ See $CI_PIPELINE_URL." ci_failing
+    - "scripts/notify-slack qa-master \":skull_and_crossbones:️ Scheduled QA against `master` failed! :skull_and_crossbones:️ See $CI_PIPELINE_URL.\" ci_failing"
   needs: ["schedule:package-and-qa"]
   when: on_failure
