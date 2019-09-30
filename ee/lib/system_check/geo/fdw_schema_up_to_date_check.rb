@@ -30,15 +30,11 @@ module SystemCheck
 
       def show_error
         try_fixing_it(
-          'Follow Geo setup instructions to configure secondary nodes with FDW support',
-          'If you upgraded recently check for any new step required to enable FDW',
-          'If you are using Omnibus GitLab try running:',
-          'gitlab-ctl reconfigure',
-          'If installing from source, try running:',
-          'bundle exec rake geo:db:refresh_foreign_tables'
+          'Run the following command to refresh the FDW schema:',
+          'gitlab-rake geo:db:refresh_foreign_tables'
         )
 
-        for_more_information('doc/gitlab-geo/database.md')
+        for_more_information('doc/administration/geo/replication/troubleshooting.md#geo-database-has-an-outdated-fdw-remote-schema-error')
       end
     end
   end
