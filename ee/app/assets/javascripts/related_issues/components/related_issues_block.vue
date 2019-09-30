@@ -111,6 +111,13 @@ export default {
     qaClass() {
       return issuableQaClassMap[this.issuableType];
     },
+    validIssueWeight() {
+      if (this.issue) {
+        return this.issue.weight >= 0;
+      }
+
+      return false;
+    },
   },
   mounted() {
     if (this.canReorder) {
@@ -259,7 +266,7 @@ export default {
               class="qa-related-issuable-item"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             >
-              <span v-if="issue.weight" slot="weight" class="order-md-1">
+              <span v-if="validIssueWeight" slot="weight" class="order-md-1">
                 <issue-weight
                   :weight="issue.weight"
                   class="item-weight d-flex align-items-center"
