@@ -6,7 +6,7 @@ import StageNavItem from './stage_nav_item.vue';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
 import AddStageButton from './add_stage_button.vue';
-import CustomStageFormContainer from './custom_stage_form_container.vue';
+import CustomStageForm from './custom_stage_form.vue';
 
 export default {
   name: 'StageTable',
@@ -18,7 +18,7 @@ export default {
     StageNavItem,
     StageTableHeader,
     AddStageButton,
-    CustomStageFormContainer,
+    CustomStageForm,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -32,7 +32,7 @@ export default {
       type: Object,
       required: true,
     },
-    isLoadingStage: {
+    isLoading: {
       type: Boolean,
       required: true,
     },
@@ -44,7 +44,15 @@ export default {
       type: Boolean,
       required: true,
     },
-    events: {
+    currentStageEvents: {
+      type: Array,
+      required: true,
+    },
+    customStageFormEvents: {
+      type: Array,
+      required: true,
+    },
+    labels: {
       type: Array,
       required: true,
     },
@@ -60,19 +68,14 @@ export default {
       type: Boolean,
       required: true,
     },
-    groupPath: {
-      type: String,
-      required: false,
-      default: null,
-    },
   },
   computed: {
     stageName() {
       return this.currentStage ? this.currentStage.legend : __('Related Issues');
     },
     shouldDisplayStage() {
-      const { events = [], isLoadingStage, isEmptyStage } = this;
-      return events.length && !isLoadingStage && !isEmptyStage;
+      const { currentStageEvents = [], isLoading, isEmptyStage } = this;
+      return currentStageEvents.length && !isLoading && !isEmptyStage;
     },
     stageHeaders() {
       return [
@@ -147,20 +150,24 @@ export default {
           </ul>
         </nav>
         <div class="section stage-events">
-          <gl-loading-icon v-if="isLoadingStage" class="mt-4" size="md" />
+          <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
           <gl-empty-state
             v-else-if="currentStage && !currentStage.isUserAllowed"
             :title="__('You need permission.')"
             :description="__('Want to see the data? Please ask an administrator for access.')"
             :svg-path="noAccessSvgPath"
           />
-          <custom-stage-form-container
+          <custom-stage-form
             v-else-if="isAddingCustomStage"
-            :events="events"
-            :namespace="groupPath"
+            :events="customStageFormEvents"
+            :labels="labels"
           />
           <template v-else>
-            <stage-event-list v-if="shouldDisplayStage" :stage="currentStage" :events="events" />
+            <stage-event-list
+              v-if="shouldDisplayStage"
+              :stage="currentStage"
+              :events="currentStageEvents"
+            />
             <gl-empty-state
               v-if="isEmptyStage"
               :title="__('We don\'t have enough data to show this stage.')"

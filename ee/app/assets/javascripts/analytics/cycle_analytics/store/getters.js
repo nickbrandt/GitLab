@@ -9,4 +9,4 @@ export const defaultStage = state => (state.stages.length ? state.stages[0] : nu
 export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDEN;
 
 export const currentGroupPath = state =>
-  state.selectedGroup ? state.selectedGroup.full_path : null;
+  state.selectedGroup && state.selectedGroup.full_path ? state.selectedGroup.full_path : null;

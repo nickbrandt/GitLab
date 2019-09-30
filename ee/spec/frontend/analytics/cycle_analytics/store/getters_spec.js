@@ -89,4 +89,26 @@ describe('Cycle analytics getters', () => {
       expect(getters.hasNoAccessError(state)).toEqual(false);
     });
   });
+
+  describe('currentGroupPath', () => {
+    describe('with selectedGroup set', () => {
+      it('returns the `full_path` value of the group', () => {
+        const fullPath = 'cool-beans';
+        state = {
+          selectedGroup: {
+            full_path: fullPath,
+          },
+        };
+
+        expect(getters.currentGroupPath(state)).toEqual(fullPath);
+      });
+    });
+
+    describe('without a selectedGroup set', () => {
+      it.each([[''], [{}], [null]])('given %s will return null', value => {
+        state = { selectedGroup: value };
+        expect(getters.currentGroupPath(state)).toEqual(null);
+      });
+    });
+  });
 });

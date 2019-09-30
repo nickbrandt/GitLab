@@ -15839,7 +15839,7 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
-msgid "There was an error fetching the form data"
+msgid "There was an error fetching data for the form"
 msgstr ""
 
 msgid "There was an error gathering the chart data"

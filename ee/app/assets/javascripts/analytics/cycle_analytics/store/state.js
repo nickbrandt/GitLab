@@ -10,6 +10,7 @@ export default () => ({
 
   isLoading: false,
   isLoadingStage: false,
+  isLoadingStageForm: false,
 
   isEmptyStage: false,
   errorCode: null,
@@ -20,7 +21,11 @@ export default () => ({
   selectedProjectIds: [],
   selectedStageName: null,
 
-  events: [],
+  currentStageEvents: [],
+
   stages: [],
   summary: [],
+  labels: [],
+
+  customStageFormEvents: [],
 });

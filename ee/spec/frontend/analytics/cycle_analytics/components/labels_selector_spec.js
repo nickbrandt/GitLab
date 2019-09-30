@@ -1,16 +1,15 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import LabelsSelector from 'ee/analytics/cycle_analytics/components/labels_selector.vue';
-import { mockLabels } from '../../../../../../spec/javascripts/vue_shared/components/sidebar/labels_select/mock_data';
+import { groupLabels } from '../mock_data';
 
-const labels = mockLabels.map(({ title, ...rest }) => ({ ...rest, name: title }));
-const selectedLabel = labels[labels.length - 1];
+const selectedLabel = groupLabels[groupLabels.length - 1];
 
 describe('Cycle Analytics LabelsSelector', () => {
   function createComponent({ props = {}, shallow = true } = {}) {
     const func = shallow ? shallowMount : mount;
     return func(LabelsSelector, {
       propsData: {
-        labels,
+        labels: groupLabels,
         selectedLabelId: props.selectedLabelId || null,
       },
       sync: false,
@@ -18,6 +17,7 @@ describe('Cycle Analytics LabelsSelector', () => {
   }
 
   let wrapper = null;
+  const labelNames = groupLabels.map(({ name }) => name);
 
   describe('with no item selected', () => {
     beforeEach(() => {
@@ -27,13 +27,9 @@ describe('Cycle Analytics LabelsSelector', () => {
     afterEach(() => {
       wrapper.destroy();
     });
-    it('will generate the list of labels', () => {
-      // includes the blank option 'Select a label'
-      expect(wrapper.findAll('gldropdownitem-stub').length).toEqual(labels.length + 1);
 
-      labels.forEach(({ name }) => {
-        expect(wrapper.text()).toContain(name);
-      });
+    it.each(labelNames)('generate a label item for the label %s', name => {
+      expect(wrapper.text()).toContain(name);
     });
 
     it('will render with the default option selected', () => {
@@ -55,7 +51,7 @@ describe('Cycle Analytics LabelsSelector', () => {
         elem.trigger('click');
 
         expect(wrapper.emitted('selectLabel').length > 0).toBe(true);
-        expect(wrapper.emitted('selectLabel')[0]).toContain(mockLabels[1].id);
+        expect(wrapper.emitted('selectLabel')[0]).toContain(groupLabels[1].id);
       });
 
       it('will emit the "clearLabel" event if it is the default item', () => {
@@ -77,6 +73,7 @@ describe('Cycle Analytics LabelsSelector', () => {
     afterEach(() => {
       wrapper.destroy();
     });
+
     it('will set the active class', () => {
       const activeItem = wrapper.find('[active="true"]');
 
