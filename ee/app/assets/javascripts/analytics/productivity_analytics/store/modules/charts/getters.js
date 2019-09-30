@@ -169,5 +169,7 @@ export const scatterplotYaxisLabel = (_state, getters, rootState) => {
 export const hasNoAccessError = state =>
   state.charts[chartKeys.main].errorCode === httpStatus.FORBIDDEN;
 
+export const isChartEnabled = state => chartKey => state.charts[chartKey].enabled;
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

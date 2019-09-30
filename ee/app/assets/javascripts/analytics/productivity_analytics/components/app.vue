@@ -9,6 +9,7 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
+import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Icon from '~/vue_shared/components/icon.vue';
 import MetricChart from './metric_chart.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
@@ -31,6 +32,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [featureFlagsMixin()],
   props: {
     endpoint: {
       type: String,
@@ -65,6 +67,7 @@ export default {
       'getSelectedMetric',
       'scatterplotYaxisLabel',
       'hasNoAccessError',
+      'isChartEnabled',
     ]),
     ...mapGetters('table', [
       'sortFieldDropdownLabel',
@@ -89,10 +92,19 @@ export default {
   },
   mounted() {
     this.setEndpoint(this.endpoint);
+    this.setChartEnabled({
+      chartKey: chartKeys.scatterplot,
+      isEnabled: this.isScatterplotFeatureEnabled(),
+    });
   },
   methods: {
     ...mapActions(['setEndpoint']),
-    ...mapActions('charts', ['fetchChartData', 'setMetricType', 'chartItemClicked']),
+    ...mapActions('charts', [
+      'fetchChartData',
+      'setMetricType',
+      'chartItemClicked',
+      'setChartEnabled',
+    ]),
     ...mapActions('table', ['setSortField', 'setPage', 'toggleSortOrder', 'setColumnMetric']),
     onMainChartItemClicked({ params }) {
       const itemValue = params.data.value[0];
@@ -107,6 +119,9 @@ export default {
         },
         ...this.getColumnChartDatazoomOption(chartKey),
       };
+    },
+    isScatterplotFeatureEnabled() {
+      return this.glFeatures.productivityAnalyticsScatterplotEnabled;
     },
   },
 };
@@ -217,6 +232,7 @@ export default {
           </div>
 
           <metric-chart
+            v-if="isChartEnabled(chartKeys.scatterplot)"
             ref="scatterplot"
             class="mb-4"
             :title="s__('ProductivityAnalytics|Trendline')"

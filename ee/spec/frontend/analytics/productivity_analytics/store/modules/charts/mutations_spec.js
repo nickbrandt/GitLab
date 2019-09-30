@@ -85,4 +85,20 @@ describe('Productivity analytics chart mutations', () => {
       expect(state.charts[chartKey].selected).toEqual([]);
     });
   });
+
+  describe(types.SET_CHART_ENABLED, () => {
+    chartKey = chartKeys.scatterplot;
+
+    it('sets the enabled flag to true on the scatterplot chart', () => {
+      mutations[types.SET_CHART_ENABLED](state, { chartKey, isEnabled: true });
+
+      expect(state.charts[chartKey].enabled).toBe(true);
+    });
+
+    it('sets the enabled flag to false on the scatterplot chart', () => {
+      mutations[types.SET_CHART_ENABLED](state, { chartKey, isEnabled: false });
+
+      expect(state.charts[chartKey].enabled).toBe(false);
+    });
+  });
 });

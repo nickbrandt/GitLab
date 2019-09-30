@@ -16,18 +16,21 @@ export const fetchSecondaryChartData = ({ state, dispatch }) => {
 export const requestChartData = ({ commit }, chartKey) =>
   commit(types.REQUEST_CHART_DATA, chartKey);
 
-export const fetchChartData = ({ dispatch, getters, rootState }, chartKey) => {
-  dispatch('requestChartData', chartKey);
+export const fetchChartData = ({ dispatch, getters, state, rootState }, chartKey) => {
+  // let's fetch data for enabled charts only
+  if (state.charts[chartKey].enabled) {
+    dispatch('requestChartData', chartKey);
 
-  const params = getters.getFilterParams(chartKey);
+    const params = getters.getFilterParams(chartKey);
 
-  return axios
-    .get(rootState.endpoint, { params })
-    .then(response => {
-      const { data } = response;
-      dispatch('receiveChartDataSuccess', { chartKey, data });
-    })
-    .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
+    axios
+      .get(rootState.endpoint, { params })
+      .then(response => {
+        const { data } = response;
+        dispatch('receiveChartDataSuccess', { chartKey, data });
+      })
+      .catch(error => dispatch('receiveChartDataError', { chartKey, error }));
+  }
 };
 
 export const receiveChartDataSuccess = ({ commit }, { chartKey, data = {} }) => {
@@ -56,6 +59,9 @@ export const chartItemClicked = ({ commit, dispatch }, { chartKey, item }) => {
   // let's reset the page on the MR table and fetch data
   dispatch('table/setPage', 0, { root: true });
 };
+
+export const setChartEnabled = ({ commit }, { chartKey, isEnabled }) =>
+  commit(types.SET_CHART_ENABLED, { chartKey, isEnabled });
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
