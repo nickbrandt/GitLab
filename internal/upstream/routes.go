@@ -174,8 +174,10 @@ func (u *upstream) configureRoutes() {
 	defaultUpstream := static.ServeExisting(
 		u.URLPrefix,
 		staticpages.CacheDisabled,
-		static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, uploadAccelerateProxy)),
+		static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatHTML, uploadAccelerateProxy)),
 	)
+	probeUpstream := static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatJSON, proxy)
+	healthUpstream := static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatText, proxy)
 
 	u.Routes = []routeEntry{
 		// Git Clone
@@ -235,7 +237,13 @@ func (u *upstream) configureRoutes() {
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file
 		// from downloading it we make sure requests to /uploads/ do _not_ pass
 		// through static.ServeExisting.
-		route("", `^/uploads/`, static.ErrorPagesUnless(u.DevelopmentMode, proxy)),
+		route("", `^/uploads/`, static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatHTML, proxy)),
+
+		// health checks don't intercept errors and go straight to rails
+		// TODO: We should probably not return a HTML deploy page?
+		//       https://gitlab.com/gitlab-org/gitlab-workhorse/issues/230
+		route("", "^/-/(readiness|liveness)$", static.DeployPage(probeUpstream)),
+		route("", "^/-/health$", static.DeployPage(healthUpstream)),
 
 		// This route lets us filter out health checks from our metrics.
 		route("", "^/-/", defaultUpstream),

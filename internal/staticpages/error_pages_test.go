@@ -33,11 +33,12 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 		require.Equal(t, len(upstreamBody), n, "bytes written")
 	})
 	st := &Static{dir}
-	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
 	testhelper.AssertResponseCode(t, w, 404)
 	testhelper.AssertResponseBody(t, w, errorPage)
+	testhelper.AssertResponseHeader(t, w, "Content-Type", "text/html; charset=utf-8")
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -54,7 +55,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		fmt.Fprint(w, errorResponse)
 	})
 	st := &Static{dir}
-	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
 	testhelper.AssertResponseCode(t, w, 404)
@@ -78,7 +79,7 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 		fmt.Fprint(w, serverError)
 	})
 	st := &Static{dir}
-	st.ErrorPagesUnless(true, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(true, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 	testhelper.AssertResponseCode(t, w, 500)
 	testhelper.AssertResponseBody(t, w, serverError)
@@ -102,7 +103,7 @@ func TestIfErrorPageIsIgnoredIfCustomError(t *testing.T) {
 		fmt.Fprint(w, serverError)
 	})
 	st := &Static{dir}
-	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 	testhelper.AssertResponseCode(t, w, 500)
 	testhelper.AssertResponseBody(t, w, serverError)
@@ -137,7 +138,7 @@ func TestErrorPageInterceptedByContentType(t *testing.T) {
 			fmt.Fprint(w, serverError)
 		})
 		st := &Static{dir}
-		st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
+		st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 		w.Flush()
 		testhelper.AssertResponseCode(t, w, 500)
 
@@ -147,4 +148,44 @@ func TestErrorPageInterceptedByContentType(t *testing.T) {
 			testhelper.AssertResponseBody(t, w, serverError)
 		}
 	}
+}
+
+func TestIfErrorPageIsPresentedJSON(t *testing.T) {
+	errorPage := "{\"error\":\"Not Found\",\"status\":404}\n"
+
+	w := httptest.NewRecorder()
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(404)
+		upstreamBody := "This string is ignored"
+		n, err := fmt.Fprint(w, upstreamBody)
+		require.NoError(t, err)
+		require.Equal(t, len(upstreamBody), n, "bytes written")
+	})
+	st := &Static{""}
+	st.ErrorPagesUnless(false, ErrorFormatJSON, h).ServeHTTP(w, nil)
+	w.Flush()
+
+	testhelper.AssertResponseCode(t, w, 404)
+	testhelper.AssertResponseBody(t, w, errorPage)
+	testhelper.AssertResponseHeader(t, w, "Content-Type", "application/json; charset=utf-8")
+}
+
+func TestIfErrorPageIsPresentedText(t *testing.T) {
+	errorPage := "Not Found\n"
+
+	w := httptest.NewRecorder()
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(404)
+		upstreamBody := "This string is ignored"
+		n, err := fmt.Fprint(w, upstreamBody)
+		require.NoError(t, err)
+		require.Equal(t, len(upstreamBody), n, "bytes written")
+	})
+	st := &Static{""}
+	st.ErrorPagesUnless(false, ErrorFormatText, h).ServeHTTP(w, nil)
+	w.Flush()
+
+	testhelper.AssertResponseCode(t, w, 404)
+	testhelper.AssertResponseBody(t, w, errorPage)
+	testhelper.AssertResponseHeader(t, w, "Content-Type", "text/plain; charset=utf-8")
 }

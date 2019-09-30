@@ -1,6 +1,7 @@
 package staticpages
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,6 +22,14 @@ var (
 	)
 )
 
+type ErrorFormat int
+
+const (
+	ErrorFormatHTML ErrorFormat = iota
+	ErrorFormatJSON
+	ErrorFormatText
+)
+
 func init() {
 	prometheus.MustRegister(staticErrorResponses)
 }
@@ -30,6 +39,7 @@ type errorPageResponseWriter struct {
 	status   int
 	hijacked bool
 	path     string
+	format   ErrorFormat
 }
 
 func (s *errorPageResponseWriter) Header() http.Header {
@@ -53,41 +63,77 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 
 	s.status = status
 
-	if 400 <= s.status && s.status <= 599 &&
-		s.rw.Header().Get("X-GitLab-Custom-Error") == "" &&
-		s.rw.Header().Get("Content-Type") != "application/json" {
+	if s.status < 400 || s.status > 599 || s.rw.Header().Get("X-GitLab-Custom-Error") != "" {
+		s.rw.WriteHeader(status)
+		return
+	}
+
+	var contentType string
+	var data []byte
+	switch s.format {
+	case ErrorFormatText:
+		contentType, data = s.writeText()
+	case ErrorFormatJSON:
+		contentType, data = s.writeJSON()
+	default:
+		contentType, data = s.writeHTML()
+	}
+
+	if contentType == "" {
+		s.rw.WriteHeader(status)
+		return
+	}
+
+	s.hijacked = true
+	staticErrorResponses.WithLabelValues(fmt.Sprintf("%d", s.status)).Inc()
+
+	helper.SetNoCacheHeaders(s.rw.Header())
+	s.rw.Header().Set("Content-Type", contentType)
+	s.rw.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
+	s.rw.Header().Del("Transfer-Encoding")
+	s.rw.WriteHeader(s.status)
+	s.rw.Write(data)
+}
+
+func (s *errorPageResponseWriter) writeHTML() (string, []byte) {
+	if s.rw.Header().Get("Content-Type") != "application/json" {
 		errorPageFile := filepath.Join(s.path, fmt.Sprintf("%d.html", s.status))
 
 		// check if custom error page exists, serve this page instead
 		if data, err := ioutil.ReadFile(errorPageFile); err == nil {
-			s.hijacked = true
-			staticErrorResponses.WithLabelValues(fmt.Sprintf("%d", s.status)).Inc()
-
-			helper.SetNoCacheHeaders(s.rw.Header())
-			s.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
-			s.rw.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
-			s.rw.Header().Del("Transfer-Encoding")
-			s.rw.WriteHeader(s.status)
-			s.rw.Write(data)
-			return
+			return "text/html; charset=utf-8", data
 		}
 	}
 
-	s.rw.WriteHeader(status)
+	return "", nil
+}
+
+func (s *errorPageResponseWriter) writeJSON() (string, []byte) {
+	message, err := json.Marshal(map[string]interface{}{"error": http.StatusText(s.status), "status": s.status})
+	if err != nil {
+		return "", nil
+	}
+
+	return "application/json; charset=utf-8", append(message, "\n"...)
+}
+
+func (s *errorPageResponseWriter) writeText() (string, []byte) {
+	return "text/plain; charset=utf-8", []byte(http.StatusText(s.status) + "\n")
 }
 
 func (s *errorPageResponseWriter) flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func (st *Static) ErrorPagesUnless(disabled bool, handler http.Handler) http.Handler {
+func (st *Static) ErrorPagesUnless(disabled bool, format ErrorFormat, handler http.Handler) http.Handler {
 	if disabled {
 		return handler
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
-			rw:   w,
-			path: st.DocumentRoot,
+			rw:     w,
+			path:   st.DocumentRoot,
+			format: format,
 		}
 		defer rw.flush()
 		handler.ServeHTTP(&rw, r)
