@@ -13,15 +13,17 @@ module QA
         Resource::Repository::Commit.fabricate_via_api! do |commit|
           commit.project = project
           commit.commit_message = 'Add .gitlab/.gitlab-webide.yml'
-          commit.files = [
-            {
+          commit.add_files(
+            [
+              {
                 file_path: '.gitlab/.gitlab-webide.yml',
                 content: <<~YAML
                   terminal:
                     script: sleep 60
                 YAML
-            }
-          ]
+              }
+            ]
+          )
         end
 
         @runner = Resource::Runner.fabricate_via_api! do |runner|
