@@ -18,6 +18,8 @@ describe BillingPlansHelper do
   end
 
   describe '#subscription_plan_data_attributes' do
+    let(:customer_portal_url) { "https://customers.gitlab.com/subscriptions" }
+
     let(:group) { build(:group) }
     let(:plan) do
       Hashie::Mash.new(id: 'external-paid-plan-hash-code')
@@ -31,7 +33,8 @@ describe BillingPlansHelper do
         expect(helper.subscription_plan_data_attributes(group, plan))
           .to eq(namespace_id: group.id,
                  namespace_name: group.name,
-                 plan_upgrade_href: upgrade_href)
+                 plan_upgrade_href: upgrade_href,
+                 customer_portal_url: customer_portal_url)
       end
     end
 
@@ -50,6 +53,7 @@ describe BillingPlansHelper do
         expect(helper.subscription_plan_data_attributes(group, plan))
           .to eq(namespace_id: group.id,
                  namespace_name: group.name,
+                 customer_portal_url: customer_portal_url,
                  plan_upgrade_href: nil)
       end
     end

@@ -8,6 +8,7 @@ import SubscriptionTableRow from 'ee/billings/components/subscription_table_row.
 import mockDataSubscription from '../mock_data';
 
 const TEST_NAMESPACE_NAME = 'GitLab.com';
+const CUSTOMER_PORTAL_URL = 'https://customers.gitlab.com/subscriptions';
 
 describe('SubscriptionTable component', () => {
   let store;
@@ -40,6 +41,7 @@ describe('SubscriptionTable component', () => {
         propsData: {
           namespaceName: TEST_NAMESPACE_NAME,
           planUpgradeHref: '/url/',
+          customerPortalUrl: CUSTOMER_PORTAL_URL,
         },
       });
 
@@ -100,6 +102,7 @@ describe('SubscriptionTable component', () => {
         factory({
           propsData: {
             namespaceName: TEST_NAMESPACE_NAME,
+            customerPortalUrl: CUSTOMER_PORTAL_URL,
             planUpgradeHref,
           },
         });

@@ -11,6 +11,7 @@ describe('SubscriptionApp component', () => {
     namespaceId: '42',
     namespaceName: 'bronze',
     planUpgradeHref: '/url',
+    customerPortalUrl: 'https://customers.gitlab.com/subscriptions',
   };
 
   const factory = (props = appProps) => {
@@ -57,6 +58,7 @@ describe('SubscriptionApp component', () => {
       expectComponentWithProps(SubscriptionTable, {
         namespaceName: appProps.namespaceName,
         planUpgradeHref: appProps.planUpgradeHref,
+        customerPortalUrl: appProps.customerPortalUrl,
       });
     });
   });

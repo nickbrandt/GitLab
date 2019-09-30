@@ -2,6 +2,7 @@
 
 exports[`SubscriptionApp component on creation matches the snapshot 1`] = `
 <subscriptiontable-stub
+  customerportalurl="https://customers.gitlab.com/subscriptions"
   namespacename="bronze"
   planupgradehref="/url"
 />
