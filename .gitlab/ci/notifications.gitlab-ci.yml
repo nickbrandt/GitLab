@@ -1,0 +1,27 @@
+.notify:
+  image: alpine
+  stage: notification
+  dependencies: []
+  cache: {}
+  before_script:
+    - apk update && apk add git curl bash
+
+schedule:package-and-qa:notify-success:
+  extends:
+    - .only-canonical-schedules
+    - .notify
+  stage: notification
+  script:
+    - scripts/notify-slack qa-master "🎉 Scheduled QA against `master` passed! 🎉 See $CI_PIPELINE_URL." ci_passing
+  needs: ["schedule:package-and-qa"]
+  when: on_success
+
+schedule:package-and-qa:notify-failure:
+  extends:
+    - .only-canonical-schedules
+    - .notify
+  stage: notification
+  script:
+    - scripts/notify-slack qa-master "☠️ Scheduled QA against `master` failed! ☠️ See $CI_PIPELINE_URL." ci_failing
+  needs: ["schedule:package-and-qa"]
+  when: on_failure
