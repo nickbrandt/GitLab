@@ -15,8 +15,6 @@
 
 module Security
   class JobsFinder
-    include Gitlab::Utils::StrongMemoize
-
     attr_reader :pipeline
 
     JOB_TYPES = [:sast, :dast, :dependency_scanning, :container_scanning].freeze
@@ -39,15 +37,9 @@ module Security
     private
 
     def job_types_for_processing
-      strong_memoize(:job_types_for_processing) do
-        if @params[:all]
-          JOB_TYPES
-        else
-          JOB_TYPES.each_with_object([]) do |job_type, job_types|
-            job_types << job_type if @params[job_type]
-          end
-        end
-      end
+      return JOB_TYPES if @params[:all]
+
+      JOB_TYPES.select { |job_type| @params[job_type] }
     end
 
     def find_jobs(job_types)
