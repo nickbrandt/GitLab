@@ -32,11 +32,7 @@ describe('Productivity analytics filter actions', () => {
             { root: true },
           ]);
 
-          expect(store.dispatch.mock.calls[2]).toEqual([
-            'table/fetchMergeRequests',
-            null,
-            { root: true },
-          ]);
+          expect(store.dispatch.mock.calls[2]).toEqual(['table/setPage', 0, { root: true }]);
         })
         .then(done)
         .catch(done.fail);
@@ -67,11 +63,7 @@ describe('Productivity analytics filter actions', () => {
             { root: true },
           ]);
 
-          expect(store.dispatch.mock.calls[2]).toEqual([
-            'table/fetchMergeRequests',
-            null,
-            { root: true },
-          ]);
+          expect(store.dispatch.mock.calls[2]).toEqual(['table/setPage', 0, { root: true }]);
         })
         .then(done)
         .catch(done.fail);
@@ -102,11 +94,7 @@ describe('Productivity analytics filter actions', () => {
             { root: true },
           ]);
 
-          expect(store.dispatch.mock.calls[2]).toEqual([
-            'table/fetchMergeRequests',
-            null,
-            { root: true },
-          ]);
+          expect(store.dispatch.mock.calls[2]).toEqual(['table/setPage', 0, { root: true }]);
         })
         .then(done)
         .catch(done.fail);
@@ -137,11 +125,7 @@ describe('Productivity analytics filter actions', () => {
             { root: true },
           ]);
 
-          expect(store.dispatch.mock.calls[2]).toEqual([
-            'table/fetchMergeRequests',
-            null,
-            { root: true },
-          ]);
+          expect(store.dispatch.mock.calls[2]).toEqual(['table/setPage', 0, { root: true }]);
         })
         .then(done)
         .catch(done.fail);

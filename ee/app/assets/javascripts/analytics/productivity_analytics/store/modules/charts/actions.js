@@ -53,8 +53,8 @@ export const chartItemClicked = ({ commit, dispatch }, { chartKey, item }) => {
   // update secondary charts
   dispatch('fetchSecondaryChartData');
 
-  // update table
-  dispatch('table/fetchMergeRequests', null, { root: true });
+  // let's reset the page on the MR table and fetch data
+  dispatch('table/setPage', 0, { root: true });
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

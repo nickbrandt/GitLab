@@ -27,7 +27,7 @@ describe('ProductivityApp component', () => {
   const actionSpies = {
     chartItemClicked: jest.fn(),
     setSortField: jest.fn(),
-    setMergeRequestsPage: jest.fn(),
+    setPage: jest.fn(),
     toggleSortOrder: jest.fn(),
     setColumnMetric: jest.fn(),
   };
@@ -165,10 +165,6 @@ describe('ProductivityApp component', () => {
                   chartKey: chartKeys.main,
                   item: 0,
                 });
-              });
-
-              it('dispatches setMergeRequestsPage action', () => {
-                expect(actionSpies.setMergeRequestsPage).toHaveBeenCalledWith(0);
               });
             });
 
@@ -348,7 +344,7 @@ describe('ProductivityApp component', () => {
                   it('should change the page', () => {
                     const page = 2;
                     findMrTable().vm.$emit('pageChange', page);
-                    expect(actionSpies.setMergeRequestsPage).toHaveBeenCalledWith(page);
+                    expect(actionSpies.setPage).toHaveBeenCalledWith(page);
                   });
 
                   describe('sort controls', () => {
