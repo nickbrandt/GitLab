@@ -40,6 +40,7 @@
     "created_at": { "type": ["string", "null"] },
     "updated_at": { "type": ["string", "null"] },
     "web_edit_url": { "type":  "string" },
+    "web_url": { "type":  "string" },
     "reference": { "type":  "string" }
   },
   "required": [

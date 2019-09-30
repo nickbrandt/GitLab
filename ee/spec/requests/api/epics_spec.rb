@@ -65,6 +65,7 @@ describe API::Epics do
 
   describe 'GET /groups/:id/epics' do
     let(:url) { "/groups/#{group.path}/epics" }
+    let(:params) { { include_descendant_groups: true } }
 
     it_behaves_like 'error requests'
 
@@ -72,7 +73,7 @@ describe API::Epics do
       before do
         stub_licensed_features(epics: true)
 
-        get api(url, user)
+        get api(url, user), params: params
       end
 
       it 'returns 200 status' do
@@ -87,15 +88,19 @@ describe API::Epics do
         epic
         # Avoid polluting queries with inserts for personal access token
         pat = create(:personal_access_token, user: user)
+        subgroup_1 = create(:group, parent: group)
+        subgroup_2 = create(:group, parent: subgroup_1)
+        create(:epic, group: subgroup_1)
+        create(:epic, group: subgroup_2)
 
         control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
-          get api(url, personal_access_token: pat)
-        end
+          get api(url, personal_access_token: pat), params: params
+        end.count
 
         label_2 = create(:label)
         create_list(:labeled_epic, 2, group: group, labels: [label_2])
 
-        expect { get api(url, personal_access_token: pat) }.not_to exceed_all_query_limit(control)
+        expect { get api(url, personal_access_token: pat), params: params }.not_to exceed_all_query_limit(control)
         expect(response).to have_gitlab_http_status(200)
       end
     end

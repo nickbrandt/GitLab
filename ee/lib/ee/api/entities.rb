@@ -294,9 +294,8 @@ module EE
         expose :due_date_is_fixed?, as: :due_date_is_fixed, if: can_admin_epic
         expose :due_date_fixed, :due_date_from_milestones, if: can_admin_epic
         expose :state
-        expose :web_edit_url, if: can_admin_epic do |epic|
-          ::Gitlab::Routing.url_helpers.group_epic_path(epic.group, epic)
-        end
+        expose :web_url, as: :web_edit_url, if: can_admin_epic # @deprecated
+        expose :web_url
         expose :reference, if: { with_reference: true } do |epic|
           epic.to_reference(full: true)
         end
@@ -321,6 +320,10 @@ module EE
           else
             epic.downvotes
           end
+        end
+
+        def web_url
+          ::Gitlab::Routing.url_helpers.group_epic_path(object.group, object)
         end
       end
 
