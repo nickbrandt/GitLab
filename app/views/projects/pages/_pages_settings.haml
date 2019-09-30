@@ -8,5 +8,12 @@
         The total size of deployed static content will be limited to this size.  0 for unlimited.  Leave empty to inherit the global value.
 
   - unless pages_https_only_disabled?
-    .prepend-top-10
-      = f.submit s_('GitLabPages|Save'), class: 'btn btn-success'
+    - if Gitlab.config.pages.external_https
+      .form-group
+        .form-check
+          = f.check_box :pages_https_only, class: 'form-check-input', disabled: pages_https_only_disabled?
+          = f.label :pages_https_only, class: pages_https_only_label_class do
+            %strong Force HTTPS (requires valid certificates)
+
+  .prepend-top-10
+    = f.submit s_('GitLabPages|Save'), class: 'btn btn-success'
