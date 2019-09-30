@@ -11,21 +11,17 @@ export default {
       type: String,
       required: true,
     },
-    details: {
-      type: Object,
+    warnings: {
+      type: Array,
       required: true,
     },
   },
   computed: {
-    warnings() {
-      const {
-        details: { warnings },
-      } = this;
-
-      return warnings && warnings.length ? warnings : null;
+    hasWarnings() {
+      return this.warnings && this.warnings.length;
     },
     warningMessage() {
-      if (!this.warnings) {
+      if (!this.hasWarnings) {
         return '';
       }
 
@@ -38,7 +34,7 @@ export default {
 };
 </script>
 <template>
-  <span v-if="warnings">
+  <span v-if="hasWarnings">
     <span :id="htmlId" v-html="glEmojiTag('warning')"></span>
     <gl-popover :target="htmlId" :content="warningMessage" triggers="hover focus" />
   </span>
