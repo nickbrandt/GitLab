@@ -95,6 +95,10 @@ describe Gitlab::UsageData do
       expect(count_data.keys).to include(:epics_deepest_relationship_level)
     end
 
+    it 'has integer value for epic relationship level' do
+      expect(count_data[:epics_deepest_relationship_level]).to be_a_kind_of(Integer)
+    end
+
     it 'gathers security products usage data' do
       expect(count_data[:container_scanning_jobs]).to eq(1)
       expect(count_data[:dast_jobs]).to eq(1)
@@ -103,11 +107,9 @@ describe Gitlab::UsageData do
       expect(count_data[:sast_jobs]).to eq(1)
     end
 
-    it 'gathers group overview preferences usage data' do
-      expect(subject[:counts][:user_preferences]).to eq(
-        group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
-        group_overview_security_dashboard: 2
-      )
+    it 'gathers group overview preferences usage data', :aggregate_failures do
+      expect(subject[:counts][:user_preferences_group_overview_details]).to eq(User.active.count - 2) # we have exactly 2 active users with security dashboard set
+      expect(subject[:counts][:user_preferences_group_overview_security_dashboard]).to eq 2
     end
   end
 
@@ -217,14 +219,14 @@ describe Gitlab::UsageData do
 
     it 'gathers data on operations dashboard' do
       expect(subject.keys).to include(*%i(
-        default_dashboard
-        users_with_projects_added
+        operations_dashboard_default_dashboard
+        operations_dashboard_users_with_projects_added
       ))
     end
 
-    it 'bases counts on active users' do
-      expect(subject[:default_dashboard]).to eq(1)
-      expect(subject[:users_with_projects_added]).to eq(2)
+    it 'bases counts on active users', :aggregate_failures do
+      expect(subject[:operations_dashboard_default_dashboard]).to eq(1)
+      expect(subject[:operations_dashboard_users_with_projects_added]).to eq(2)
     end
   end
 
