@@ -350,6 +350,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_094625) do
     t.string "eks_access_key_id", limit: 128
     t.string "encrypted_eks_secret_access_key_iv", limit: 255
     t.text "encrypted_eks_secret_access_key"
+    t.datetime_with_timezone "productivity_analytics_start_date"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id"
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id"
     t.index ["instance_administration_project_id"], name: "index_applicationsettings_on_instance_administration_project_id"
