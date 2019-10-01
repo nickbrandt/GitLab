@@ -49,6 +49,8 @@ module Gitlab
             ActiveRecord::Base.connection.execute(sql)
           end
         end
+
+        Gitlab::Geo::Fdw.expire_cache!
       end
 
       def foreign_server_configured?
