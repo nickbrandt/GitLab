@@ -206,5 +206,14 @@ describe('feature flags helpers spec', () => {
 
       expect(actual).toEqual(expected);
     });
+
+    it('sets canUpdate and protected when called with featureFlagPermissions=true', () => {
+      expect(createNewEnvironmentScope({}, true)).toEqual(
+        expect.objectContaining({
+          canUpdate: true,
+          protected: false,
+        }),
+      );
+    });
   });
 });

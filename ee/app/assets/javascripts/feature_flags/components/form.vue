@@ -3,6 +3,7 @@ import Vue from 'vue';
 import _ from 'underscore';
 import { GlButton, GlBadge, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
+import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import EnvironmentsDropdown from './environments_dropdown.vue';
@@ -28,6 +29,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [featureFlagsMixin()],
   props: {
     name: {
       type: String,
@@ -98,7 +100,7 @@ export default {
       return !this.permissionsFlag || (this.formScopes || []).every(scope => scope.canUpdate);
     },
     permissionsFlag() {
-      return gon && gon.features && gon.features.featureFlagPermissions;
+      return this.glFeatures.featureFlagPermissions;
     },
 
     userIds() {
@@ -137,7 +139,7 @@ export default {
      * be used override the default scope options
      */
     createNewScope(overrides) {
-      this.formScopes.push(createNewEnvironmentScope(overrides));
+      this.formScopes.push(createNewEnvironmentScope(overrides, this.permissionsFlag));
       this.newScope = '';
     },
 
