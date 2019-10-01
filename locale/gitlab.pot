@@ -9990,7 +9990,9 @@ msgid "Migration successful."
 msgstr ""
 
 msgid "Milestone"
-msgstr ""
+msgid_plural "Milestones"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Milestone lists not available with your current license"
 msgstr ""
