@@ -12,9 +12,11 @@ module EE
       WEIGHT_NONE = 'None'.freeze
 
       include Elastic::ApplicationVersionedSearch
+      include UsageStatistics
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
+      scope :service_desk, -> { where(author: ::User.support_bot) }
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue

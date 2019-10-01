@@ -21,6 +21,7 @@ module EE
       include InsightsFeature
       include Vulnerable
       include DeprecatedApprovalsBeforeMerge
+      include UsageStatistics
 
       self.ignored_columns += %i[
         mirror_last_update_at
@@ -106,6 +107,11 @@ module EE
       scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
       scope :requiring_code_owner_approval,
             -> { where(merge_requests_require_code_owner_approval: true) }
+      scope :with_active_services, -> { joins(:services).merge(::Service.active) }
+      scope :with_active_jira_services, -> { joins(:services).merge(::JiraService.active) }
+      scope :with_jira_dvcs_cloud, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: true)) }
+      scope :with_jira_dvcs_server, -> { joins(:feature_usage).merge(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)) }
+      scope :service_desk_enabled, -> { where(service_desk_enabled: true) }
 
       scope :with_security_reports_stored, -> { where('EXISTS (?)', ::Vulnerabilities::Occurrence.scoped_project.select(1)) }
       scope :with_security_reports, -> { where('EXISTS (?)', ::Ci::JobArtifact.security_reports.scoped_project.select(1)) }

@@ -15,7 +15,11 @@ module EE
 
         override :uncached_data
         def uncached_data
-          return super unless ::Feature.enabled?(:usage_activity_by_stage, default_enabled: true)
+          # The `usage_activity_by_stage` queries are likely to time out on large instances, and are sure
+          # to time out on GitLab.com. Since we are mostly interested in gathering these statistics for
+          # self hosted instances, prevent them from running on GitLab.com and allow instance maintainers
+          # to disable them via a feature flag.
+          return super if ::Gitlab.com? || ::Feature.disabled?(:usage_activity_by_stage, default_enabled: true)
 
           super.merge(usage_activity_by_stage)
         end
@@ -179,16 +183,39 @@ module EE
         def usage_activity_by_stage
           {
             usage_activity_by_stage: {
-              manage: usage_activity_by_stage_manage
+              manage: usage_activity_by_stage_manage,
+              plan: usage_activity_by_stage_plan
             }
           }
         end
 
+        # Omitted because no user, creator or author associated: `campaigns_imported_from_github`, `ldap_group_links`
         def usage_activity_by_stage_manage
           {
             groups: ::GroupMember.distinct_count_by(:user_id),
             ldap_keys: ::LDAPKey.distinct_count_by(:user_id),
             ldap_users: ::GroupMember.of_ldap_type.distinct_count_by(:user_id)
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `boards`, `labels`, `milestones`, `uploads`
+        # Omitted because too expensive: `epics_deepest_relationship_level`
+        # Omitted because of encrypted properties: `projects_jira_cloud_active`, `projects_jira_server_active`
+        def usage_activity_by_stage_plan
+          {
+            assignee_lists: ::List.assignee.distinct_count_by(:user_id),
+            epics: ::Epic.distinct_count_by(:author_id),
+            issues: ::Issue.distinct_count_by(:author_id),
+            label_lists: ::List.label.distinct_count_by(:user_id),
+            milestone_lists: ::List.milestone.distinct_count_by(:user_id),
+            notes: ::Note.distinct_count_by(:author_id),
+            projects: ::Project.distinct_count_by(:creator_id),
+            projects_jira_active: ::Project.with_active_jira_services.distinct_count_by(:creator_id),
+            projects_jira_dvcs_cloud_active: ::Project.with_active_jira_services.with_jira_dvcs_cloud.distinct_count_by(:creator_id),
+            projects_jira_dvcs_server_active: ::Project.with_active_jira_services.with_jira_dvcs_server.distinct_count_by(:creator_id),
+            service_desk_enabled_projects: ::Project.with_active_services.service_desk_enabled.distinct_count_by(:creator_id),
+            service_desk_issues: ::Issue.service_desk.distinct_count_by,
+            todos: ::Todo.distinct_count_by(:author_id)
           }
         end
       end

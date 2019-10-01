@@ -2,7 +2,12 @@
 
 module EE
   module Todo
+    extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
+
+    prepended do
+      include UsageStatistics
+    end
 
     override :parent
     def parent

@@ -8,6 +8,7 @@ module EE
     prepended do
       include ::ObjectStorage::BackgroundMove
       include Elastic::ApplicationVersionedSearch
+      include UsageStatistics
 
       belongs_to :review, inverse_of: :notes
 

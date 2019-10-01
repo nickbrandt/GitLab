@@ -62,6 +62,56 @@ describe Project do
         expect(described_class.with_wiki_enabled).not_to include(project1)
       end
     end
+
+    describe '.with_active_services' do
+      it 'returns the correct project' do
+        active_service = create(:service, active: true)
+        inactive_service = create(:service, active: false)
+
+        expect(described_class.with_active_services).to include(active_service.project)
+        expect(described_class.with_active_services).not_to include(inactive_service.project)
+      end
+    end
+
+    describe '.with_active_jira_services' do
+      it 'returns the correct project' do
+        active_jira_service = create(:jira_service)
+        active_service = create(:service, active: true)
+
+        expect(described_class.with_active_jira_services).to include(active_jira_service.project)
+        expect(described_class.with_active_jira_services).not_to include(active_service.project)
+      end
+    end
+
+    describe '.service_desk_enabled' do
+      it 'returns the correct project' do
+        project_with_service_desk_enabled = create(:project)
+        project_with_service_desk_disabled = create(:project, :service_desk_disabled)
+
+        expect(described_class.service_desk_enabled).to include(project_with_service_desk_enabled)
+        expect(described_class.service_desk_enabled).not_to include(project_with_service_desk_disabled)
+      end
+    end
+
+    describe '.with_jira_dvcs_cloud' do
+      it 'returns the correct project' do
+        jira_dvcs_cloud_project = create(:project, :jira_dvcs_cloud)
+        jira_dvcs_server_project = create(:project, :jira_dvcs_server)
+
+        expect(described_class.with_jira_dvcs_cloud).to include(jira_dvcs_cloud_project)
+        expect(described_class.with_jira_dvcs_cloud).not_to include(jira_dvcs_server_project)
+      end
+    end
+
+    describe '.with_jira_dvcs_server' do
+      it 'returns the correct project' do
+        jira_dvcs_server_project = create(:project, :jira_dvcs_server)
+        jira_dvcs_cloud_project = create(:project, :jira_dvcs_cloud)
+
+        expect(described_class.with_jira_dvcs_server).to include(jira_dvcs_server_project)
+        expect(described_class.with_jira_dvcs_server).not_to include(jira_dvcs_cloud_project)
+      end
+    end
   end
 
   describe 'validations' do
