@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 12.3.3
+
+### Security (1 change)
+
+- Restrict access for security reports in MR widget.
+
+
 ## 12.3.2
 
 ### Security (2 changes)
