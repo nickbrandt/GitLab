@@ -501,6 +501,12 @@ To resolve this, run the following command:
 ```sh
 sudo gitlab-rake geo:db:refresh_foreign_tables
 ```
+NOTE: **Note:**
+Before running `rake geo:db:refresh_foreign_tables` command, it's important to make sure
+that all the migrations on primary have finished.
+You can check that by running `sudo gitlab-rake db:migrations:status` command. You also need to make sure that
+database replication lag does not prevent those database migrations to propagate
+to secondary so it has some reasonable value.
 
 ## Expired artifacts
 
