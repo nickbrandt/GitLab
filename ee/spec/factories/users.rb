@@ -3,7 +3,7 @@
 FactoryBot.modify do
   factory :user do
     trait :auditor do
-      auditor true
+      auditor { true }
     end
 
     trait :group_managed do
@@ -17,7 +17,7 @@ FactoryBot.modify do
 
   factory :omniauth_user do
     transient do
-      saml_provider nil
+      saml_provider { nil }
     end
   end
 end

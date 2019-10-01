@@ -4,7 +4,7 @@ FactoryBot.modify do
   factory :note do
     trait :on_epic do
       noteable { create(:epic) }
-      project nil
+      project { nil }
     end
 
     trait :with_review do

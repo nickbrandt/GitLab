@@ -11,12 +11,12 @@ FactoryBot.define do
     trait :resolved do
       status { PrometheusAlertEvent.status_value_for(:resolved) }
       ended_at { Time.now }
-      payload_key nil
+      payload_key { nil }
     end
 
     trait :none do
-      status nil
-      started_at nil
+      status { nil }
+      started_at { nil }
     end
   end
 end

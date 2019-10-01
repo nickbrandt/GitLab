@@ -7,7 +7,7 @@ FactoryBot.define do
 
     factory :draft_note_on_text_diff do
       transient do
-        line_number 14
+        line_number { 14 }
         diff_refs { merge_request.try(:diff_refs) }
       end
 

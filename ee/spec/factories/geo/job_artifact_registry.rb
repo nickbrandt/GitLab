@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :geo_job_artifact_registry, class: Geo::JobArtifactRegistry do
     sequence(:artifact_id)
-    success true
+    success { true }
 
     trait :with_artifact do
       transient do

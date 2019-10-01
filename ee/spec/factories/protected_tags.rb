@@ -3,13 +3,13 @@
 FactoryBot.modify do
   factory :protected_tag do
     transient do
-      authorize_user_to_create nil
-      authorize_group_to_create nil
+      authorize_user_to_create { nil }
+      authorize_group_to_create { nil }
     end
 
     trait :developers_can_create do
       transient do
-        default_access_level false
+        default_access_level { false }
       end
 
       after(:build) do |protected_tag|
@@ -19,7 +19,7 @@ FactoryBot.modify do
 
     trait :no_one_can_create do
       transient do
-        default_access_level false
+        default_access_level { false }
       end
 
       after(:build) do |protected_tag|
@@ -29,7 +29,7 @@ FactoryBot.modify do
 
     trait :maintainers_can_create do
       transient do
-        default_access_level false
+        default_access_level { false }
       end
 
       after(:build) do |protected_tag|
