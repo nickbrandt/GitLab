@@ -1,5 +1,4 @@
 - parent_group = local_assigns[:parent_group]
-- features_link = link_to s_("BillingPlans|features"), "https://about.gitlab.com/features", rel: "noreferrer noopener"
 
 .mb-2= render_billings_gold_trial(current_user, parent_group || namespace)
 
@@ -13,8 +12,6 @@
       .user-callout-copy
         %h4
           = s_("BillingPlans|Congratulations, your new trial is activated")
-        %p
-          = s_("BillingPlans|Your Gold trial will <strong>expire after %{expiration_date}</strong>. You can learn more about GitLab.com Gold by reading about our %{features_link}.").html_safe % { expiration_date: namespace.trial_ends_on, features_link: features_link }
 
 .billing-plan-header.content-block.center
   .billing-plan-logo
