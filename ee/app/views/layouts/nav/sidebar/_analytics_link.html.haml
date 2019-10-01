@@ -1,5 +1,5 @@
 - if dashboard_nav_link?(:analytics)
-  = nav_link(controller: analytics_controllers, html_options: { class: "d-none d-xl-block" }) do
+  = nav_link(controller: analytics_controllers) do
     = link_to analytics_root_path do
       = _('Analytics')
 
