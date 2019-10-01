@@ -112,6 +112,36 @@ describe Project do
         expect(described_class.with_jira_dvcs_server).not_to include(jira_dvcs_cloud_project)
       end
     end
+
+    describe '.github_imported' do
+      it 'returns the correct project' do
+        project_imported_from_github = create(:project, :github_imported)
+        project_not_imported_from_github = create(:project)
+
+        expect(described_class.github_imported).to include(project_imported_from_github)
+        expect(described_class.github_imported).not_to include(project_not_imported_from_github)
+      end
+    end
+
+    describe '.with_protected_branches' do
+      it 'returns the correct project' do
+        project_with_protected_branches = create(:project, protected_branches: [create(:protected_branch)])
+        project_without_protected_branches = create(:project)
+
+        expect(described_class.with_protected_branches).to include(project_with_protected_branches)
+        expect(described_class.with_protected_branches).not_to include(project_without_protected_branches)
+      end
+    end
+
+    describe '.with_repositories_enabled' do
+      it 'returns the correct project' do
+        project_with_repositories_enabled = create(:project, :repository_enabled)
+        project_with_repositories_disabled = create(:project, :repository_disabled)
+
+        expect(described_class.with_repositories_enabled).to include(project_with_repositories_enabled)
+        expect(described_class.with_repositories_enabled).not_to include(project_with_repositories_disabled)
+      end
+    end
   end
 
   describe 'validations' do

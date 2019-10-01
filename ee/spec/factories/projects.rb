@@ -81,5 +81,9 @@ FactoryBot.modify do
     trait :service_desk_disabled do
       service_desk_enabled nil
     end
+
+    trait :github_imported do
+      import_type 'github'
+    end
   end
 end
