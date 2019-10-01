@@ -51,6 +51,24 @@ describe EE::DeploymentPlatform do
       end
     end
 
+    context 'multiple clusters use the same management project' do
+      let(:management_project) { create(:project, group: group) }
+
+      let!(:default_cluster) do
+        create(:cluster_for_group, groups: [group], environment_scope: '*', management_project: management_project)
+      end
+
+      let!(:cluster) do
+        create(:cluster_for_group, groups: [group], environment_scope: 'review/*', management_project: management_project)
+      end
+
+      let(:environment) { 'review/name' }
+
+      subject { management_project.deployment_platform(environment: environment) }
+
+      it_behaves_like 'matching environment scope'
+    end
+
     context 'when project does not have a cluster but has group clusters' do
       let!(:default_cluster) do
         create(:cluster, :provided_by_user,

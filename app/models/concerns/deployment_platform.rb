@@ -17,6 +17,7 @@ module DeploymentPlatform
       find_instance_cluster_platform_kubernetes(environment: environment)
   end
 
+  # EE would override this and utilize environment argument
   def find_management_cluster(_environment)
     management_clusters.enabled.default_environment.first&.platform_kubernetes
   end
