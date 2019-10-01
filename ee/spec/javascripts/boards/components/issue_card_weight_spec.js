@@ -39,4 +39,21 @@ describe('IssueCardWeight component', () => {
     expect(vm.$el.querySelector('span.board-card-info')).toBeDefined();
     expect(vm.$el.querySelector('a.board-card-info')).toBeNull();
   });
+
+  describe('with weight=0', () => {
+    beforeEach(() => {
+      vm = mountComponent(Component, {
+        weight: 0,
+      });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
+    });
+
+    it('renders weight', () => {
+      expect(vm.$el.querySelector('.board-card-info-text')).toBeDefined();
+      expect(vm.$el.querySelector('.board-card-info-text')).toContainText(0);
+    });
+  });
 });

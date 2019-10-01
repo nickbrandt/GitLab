@@ -1,4 +1,15 @@
+import _ from 'underscore';
+
 export default {
+  computed: {
+    validIssueWeight() {
+      if (this.issue && _.isNumber(this.issue.weight)) {
+        return this.issue.weight >= 0;
+      }
+
+      return false;
+    },
+  },
   methods: {
     filterByWeight(weight) {
       if (!this.updateFilters) return;
