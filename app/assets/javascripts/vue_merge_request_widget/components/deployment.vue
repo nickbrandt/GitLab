@@ -1,28 +1,23 @@
 <script>
 import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import FilteredSearchDropdown from '~/vue_shared/components/filtered_search_dropdown.vue';
-import { __, sprintf } from '~/locale';
-import timeagoMixin from '../../vue_shared/mixins/timeago';
+import { __ } from '~/locale';
 import LoadingButton from '../../vue_shared/components/loading_button.vue';
 import { visitUrl } from '../../lib/utils/url_utility';
 import createFlash from '../../flash';
-import MemoryUsage from './memory_usage.vue';
-import StatusIcon from './mr_widget_status_icon.vue';
-import ReviewAppLink from './review_app_link.vue';
 import MRWidgetService from '../services/mr_widget_service';
+import DeploymentInfo from './deployment_info.vue'
+import ReviewAppLink from './review_app_link.vue';
 
 export default {
   // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
   // eslint-disable-next-line @gitlab/i18n/no-non-i18n-strings
   name: 'Deployment',
   components: {
+    DeploymentInfo,
     LoadingButton,
-    MemoryUsage,
-    StatusIcon,
     Icon,
-    TooltipOnTruncate,
     FilteredSearchDropdown,
     ReviewAppLink,
     VisualReviewAppLink: () =>
@@ -31,7 +26,6 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [timeagoMixin],
   props: {
     deployment: {
       type: Object,
@@ -57,22 +51,17 @@ export default {
       }),
     },
   },
-  deployedTextMap: {
-    manual_deploy:  __('Can deploy manually to'),
-    will_deploy: __('Will deploy to'),
-    running: __('Deploying to'),
-    success: __('Deployed to'),
-    failed: __('Failed to deploy to'),
-    canceled: __('Canceled deploy to'),
-  },
   data() {
     return {
       isStopping: false,
     };
   },
   computed: {
-    deployTimeago() {
-      return this.timeFormated(this.deployment.deployed_at);
+    computedDeploymentStatus() {
+      if (this.deployment.status === 'created') {
+        return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
+      }
+      return this.deployment.status
     },
     deploymentExternalUrl() {
       if (this.deployment.changes && this.deployment.changes.length === 1) {
@@ -82,24 +71,6 @@ export default {
     },
     hasExternalUrls() {
       return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
-    },
-    hasDeploymentTime() {
-      return Boolean(this.deployment.deployed_at && this.deployment.deployed_at_formatted);
-    },
-    hasDeploymentMeta() {
-      return Boolean(this.deployment.url && this.deployment.name);
-    },
-    hasMetrics() {
-      return Boolean(this.deployment.metrics_url);
-    },
-    computedDeploymentStatus() {
-      if (this.deployment.status === 'created') {
-        return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
-      }
-      return this.deployment.status
-    },
-    deployedText() {
-      return this.$options.deployedTextMap[this.computedDeploymentStatus];
     },
     isDeployInProgress() {
       return this.deployment.status === 'running';
@@ -111,9 +82,6 @@ export default {
     },
     shouldRenderDropdown() {
       return this.deployment.changes && this.deployment.changes.length > 1;
-    },
-    showMemoryUsage() {
-      return this.hasMetrics && this.showMetrics;
     },
   },
   methods: {
@@ -150,38 +118,11 @@ export default {
     <div class="ci-widget media">
       <div class="media-body">
         <div class="deploy-body">
-          <div class="js-deployment-info deployment-info">
-            <template v-if="hasDeploymentMeta">
-              <span> {{ deployedText }} </span>
-              <tooltip-on-truncate
-                :title="deployment.name"
-                truncate-target="child"
-                class="deploy-link label-truncate"
-              >
-                <a
-                  :href="deployment.url"
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  class="js-deploy-meta"
-                >
-                  {{ deployment.name }}
-                </a>
-              </tooltip-on-truncate>
-            </template>
-            <span
-              v-if="hasDeploymentTime"
-              v-gl-tooltip
-              :title="deployment.deployed_at_formatted"
-              class="js-deploy-time"
-            >
-              {{ deployTimeago }}
-            </span>
-            <memory-usage
-              v-if="showMemoryUsage"
-              :metrics-url="deployment.metrics_url"
-              :metrics-monitoring-url="deployment.metrics_monitoring_url"
-            />
-          </div>
+          <deployment-info
+            :computed-deployment-status="computedDeploymentStatus"
+            :deployment="deployment"
+            :show-metrics="showMetrics">
+          </deployment-info>
           <div>
             <template v-if="hasExternalUrls">
               <filtered-search-dropdown
