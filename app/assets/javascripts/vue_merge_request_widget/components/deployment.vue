@@ -61,7 +61,7 @@ export default {
       if (this.deployment.status === 'created') {
         return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
       }
-      return this.deployment.status
+      return this.deployment.status;
     },
     deploymentExternalUrl() {
       if (this.deployment.changes && this.deployment.changes.length === 1) {
@@ -71,6 +71,9 @@ export default {
     },
     hasExternalUrls() {
       return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
+    },
+    isCurrent() {
+      return Boolean(this.computedDeploymentStatus === 'success' && this.deployment.deployed_at);
     },
     isDeployInProgress() {
       return this.deployment.status === 'running';
@@ -134,6 +137,7 @@ export default {
               >
                 <template slot="mainAction" slot-scope="slotProps">
                   <review-app-link
+                    :is-curent="isCurrent"
                     :link="deploymentExternalUrl"
                     :css-class="`deploy-link js-deploy-url inline ${slotProps.className}`"
                   />
@@ -158,6 +162,7 @@ export default {
               </filtered-search-dropdown>
               <template v-else>
                 <review-app-link
+                  :is-current="isCurrent"
                   :link="deploymentExternalUrl"
                   css-class="js-deploy-url deploy-link btn btn-default btn-sm inline"
                 />
