@@ -61,13 +61,15 @@ module EE
 
         # rubocop: disable CodeReuse/ActiveRecord
         def projects_mirrored_with_pipelines_enabled
-          count(::Project.joins(:project_feature).where(
-                  mirror: true,
-                  mirror_trigger_builds: true,
-                  project_features: {
-                    builds_access_level: ::ProjectFeature::ENABLED
-                  }
-          ))
+          count(
+            ::Project.joins(:project_feature).where(
+              mirror: true,
+              mirror_trigger_builds: true,
+              project_features: {
+                builds_access_level: ::ProjectFeature::ENABLED
+              }
+            )
+          )
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -79,11 +81,13 @@ module EE
 
           {
             service_desk_enabled_projects: count(projects_with_service_desk),
-            service_desk_issues: count(::Issue.where(
-                                         project: projects_with_service_desk,
-                                         author: ::User.support_bot,
-                                         confidential: true
-            ))
+            service_desk_issues: count(
+              ::Issue.where(
+                project: projects_with_service_desk,
+                author: ::User.support_bot,
+                confidential: true
+              )
+            )
           }
         end
         # rubocop: enable CodeReuse/ActiveRecord
@@ -109,8 +113,8 @@ module EE
         def user_preferences_usage
           super.tap do |user_prefs_usage|
             user_prefs_usage.merge!(
-              group_overview_details: count(::User.active.group_view_details),
-              group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
+              user_preferences_group_overview_details: count(::User.active.group_view_details),
+              user_preferences_group_overview_security_dashboard: count(::User.active.group_view_security_dashboard)
             )
           end
         end
@@ -120,37 +124,37 @@ module EE
           users_with_projects_added = count(UsersOpsDashboardProject.distinct_users(::User.active))
 
           {
-            default_dashboard: users_with_ops_dashboard_as_default,
-            users_with_projects_added: users_with_projects_added
+            operations_dashboard_default_dashboard: users_with_ops_dashboard_as_default,
+            operations_dashboard_users_with_projects_added: users_with_projects_added
           }
         end
 
         override :system_usage_data
         def system_usage_data
-          usage_data = super
-
-          usage_data[:counts] = usage_data[:counts].merge({
-            dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
-            epics: count(::Epic),
-            feature_flags: count(Operations::FeatureFlag),
-            geo_nodes: count(::GeoNode),
-            incident_issues: count_incident_issues,
-            ldap_group_links: count(::LdapGroupLink),
-            ldap_keys: count(::LDAPKey),
-            ldap_users: count(::User.ldap),
-            operations_dashboard: operations_dashboard_usage,
-            pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
-            projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
-            projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
-            projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-            projects_with_packages: count(::Packages::Package.select('distinct project_id')),
-            projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
-            projects_with_tracing_enabled: count(ProjectTracingSetting)
-          }).merge(service_desk_counts)
-            .merge(security_products_usage)
-            .merge(epics_deepest_relationship_level)
-
-          usage_data
+          super.tap do |usage_data|
+            usage_data[:counts].merge!({
+                                         dependency_list_usages_total: ::Gitlab::UsageCounters::DependencyList.usage_totals[:total],
+                                         epics: count(::Epic),
+                                         feature_flags: count(Operations::FeatureFlag),
+                                         geo_nodes: count(::GeoNode),
+                                         incident_issues: count_incident_issues,
+                                         ldap_group_links: count(::LdapGroupLink),
+                                         ldap_keys: count(::LDAPKey),
+                                         ldap_users: count(::User.ldap),
+                                         operations_dashboard: operations_dashboard_usage,
+                                         pod_logs_usages_total: ::Gitlab::UsageCounters::PodLogs.usage_totals[:total],
+                                         projects_enforcing_code_owner_approval: count(::Project.without_deleted.non_archived.requiring_code_owner_approval),
+                                         projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
+                                         projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
+                                         projects_with_packages: count(::Packages::Package.select('distinct project_id')),
+                                         projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
+                                         projects_with_tracing_enabled: count(ProjectTracingSetting)
+                                       },
+                                       service_desk_counts,
+                                       security_products_usage,
+                                       epics_deepest_relationship_level,
+                                       operations_dashboard_usage)
+          end
         end
 
         override :jira_usage
@@ -162,7 +166,7 @@ module EE
         end
 
         def epics_deepest_relationship_level
-          { epics_deepest_relationship_level: ::Epic.deepest_relationship_level }
+          { epics_deepest_relationship_level: ::Epic.deepest_relationship_level.to_i }
         end
 
         def count_incident_issues
