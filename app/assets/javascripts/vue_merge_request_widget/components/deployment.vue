@@ -8,7 +8,7 @@ import { visitUrl } from '../../lib/utils/url_utility';
 import createFlash from '../../flash';
 import MRWidgetService from '../services/mr_widget_service';
 import DeploymentInfo from './deployment_info.vue'
-import ReviewAppLink from './review_app_link.vue';
+import DeploymentViewButton from './deployment_view_button.vue'
 
 export default {
   // name: 'Deployment' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
@@ -16,10 +16,10 @@ export default {
   name: 'Deployment',
   components: {
     DeploymentInfo,
+    DeploymentViewButton,
     LoadingButton,
     Icon,
     FilteredSearchDropdown,
-    ReviewAppLink,
     VisualReviewAppLink: () =>
       import('ee_component/vue_merge_request_widget/components/visual_review_app_link.vue'),
   },
@@ -72,8 +72,11 @@ export default {
     hasExternalUrls() {
       return Boolean(this.deployment.external_url && this.deployment.external_url_formatted);
     },
+    hasPreviousDeployment() {
+      return Boolean(!this.isCurrent && this.deployment.deployed_at);
+    },
     isCurrent() {
-      return Boolean(this.computedDeploymentStatus === 'success' && this.deployment.deployed_at);
+      return this.computedDeploymentStatus === 'success';
     },
     isDeployInProgress() {
       return this.deployment.status === 'running';
@@ -128,45 +131,10 @@ export default {
           </deployment-info>
           <div>
             <template v-if="hasExternalUrls">
-              <filtered-search-dropdown
-                v-if="shouldRenderDropdown"
-                class="js-mr-wigdet-deployment-dropdown inline"
-                :items="deployment.changes"
-                :main-action-link="deploymentExternalUrl"
-                filter-key="path"
-              >
-                <template slot="mainAction" slot-scope="slotProps">
-                  <review-app-link
-                    :is-curent="isCurrent"
-                    :link="deploymentExternalUrl"
-                    :css-class="`deploy-link js-deploy-url inline ${slotProps.className}`"
-                  />
-                </template>
-
-                <template slot="result" slot-scope="slotProps">
-                  <a
-                    :href="slotProps.result.external_url"
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    class="menu-item"
-                  >
-                    <strong class="str-truncated-100 append-bottom-0 d-block">
-                      {{ slotProps.result.path }}
-                    </strong>
-
-                    <p class="text-secondary str-truncated-100 append-bottom-0 d-block">
-                      {{ slotProps.result.external_url }}
-                    </p>
-                  </a>
-                </template>
-              </filtered-search-dropdown>
-              <template v-else>
-                <review-app-link
-                  :is-current="isCurrent"
-                  :link="deploymentExternalUrl"
-                  css-class="js-deploy-url deploy-link btn btn-default btn-sm inline"
-                />
-              </template>
+              <deployment-view-button
+                :is-current="isCurrent"
+                :deployment="deployment"
+              />
               <visual-review-app-link
                 v-if="showVisualReviewApp"
                 :link="deploymentExternalUrl"
