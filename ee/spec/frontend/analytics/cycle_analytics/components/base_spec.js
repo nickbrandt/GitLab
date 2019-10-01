@@ -62,6 +62,22 @@ describe('Cycle Analytics component', () => {
       .findAll('.stage-nav-item')
       .at(index);
 
+  const displaysProjectsDropdownFilter = flag => {
+    expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
+  };
+
+  const displaysDateRangeDropdown = flag => {
+    expect(wrapper.find(DateRangeDropdown).exists()).toBe(flag);
+  };
+
+  const displaysSummaryTable = flag => {
+    expect(wrapper.find(SummaryTable).exists()).toBe(flag);
+  };
+
+  const displaysStageTable = flag => {
+    expect(wrapper.find(StageTable).exists()).toBe(flag);
+  };
+
   beforeEach(() => {
     mock = new MockAdapter(axios);
     wrapper = createComponent();
@@ -85,9 +101,20 @@ describe('Cycle Analytics component', () => {
         expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
       });
 
-      it('does not display the projects or timeframe filters', () => {
-        expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(false);
-        expect(wrapper.find(DateRangeDropdown).exists()).toBe(false);
+      it('does not display the projects filter', () => {
+        displaysProjectsDropdownFilter(false);
+      });
+
+      it('does not display the date range dropdown', () => {
+        displaysDateRangeDropdown(false);
+      });
+
+      it('does not display the summary table', () => {
+        displaysSummaryTable(false);
+      });
+
+      it('does not display the stage table', () => {
+        displaysStageTable(false);
       });
     });
 
@@ -101,13 +128,20 @@ describe('Cycle Analytics component', () => {
           expect(wrapper.find(GlEmptyState).exists()).toBe(false);
         });
 
-        it('displays the projects and timeframe filters', () => {
-          expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(true);
-          expect(wrapper.find(DateRangeDropdown).exists()).toBe(true);
+        it('displays the projects filter', () => {
+          displaysProjectsDropdownFilter(true);
         });
 
-        it('displays summary table', () => {
-          expect(wrapper.find(SummaryTable).exists()).toBe(true);
+        it('displays the date range dropdown', () => {
+          displaysDateRangeDropdown(true);
+        });
+
+        it('displays the summary table', () => {
+          displaysSummaryTable(true);
+        });
+
+        it('displays the stage table', () => {
+          displaysStageTable(true);
         });
 
         it('does not display the add stage button', () => {
@@ -134,10 +168,6 @@ describe('Cycle Analytics component', () => {
           afterEach(() => {
             wrapper.destroy();
             mock.restore();
-          });
-
-          it('displays the stage table', () => {
-            expect(wrapper.find(StageTable).exists()).toBe(true);
           });
 
           it('has the first stage selected by default', () => {
@@ -179,12 +209,20 @@ describe('Cycle Analytics component', () => {
           expect(emptyState.props('svgPath')).toBe(noAccessSvgPath);
         });
 
-        it('will not render the summary table', () => {
-          expect(wrapper.find('.js-summary-table').exists()).toBe(false);
+        it('does not display the projects filter', () => {
+          displaysProjectsDropdownFilter(false);
         });
 
-        it('will not render the stage table', () => {
-          expect(wrapper.find('.js-stage-table').exists()).toBe(false);
+        it('does not display the date range dropdown', () => {
+          displaysDateRangeDropdown(false);
+        });
+
+        it('does not display the summary table', () => {
+          displaysSummaryTable(false);
+        });
+
+        it('does not display the stage table', () => {
+          displaysStageTable(false);
         });
 
         it('does not display the add stage button', () => {

@@ -323,14 +323,16 @@ describe('Cycle analytics actions', () => {
     beforeEach(() => {
       setFixtures('<div class="flash-container"></div>');
     });
-    it(`commits the ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR} mutation`, done => {
+    it(`commits the ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR} mutation on a 403 response`, done => {
+      const response = { status: 403 };
       testAction(
         actions.receiveCycleAnalyticsDataError,
-        { response: 403 },
+        { response },
         state,
         [
           {
             type: types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR,
+            payload: response.status,
           },
         ],
         [],
@@ -338,12 +340,30 @@ describe('Cycle analytics actions', () => {
       );
     });
 
-    it('will flash an error', () => {
+    it(`commits the ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR} mutation on a non 403 error response`, done => {
+      const response = { status: 500 };
+      testAction(
+        actions.receiveCycleAnalyticsDataError,
+        { response },
+        state,
+        [
+          {
+            type: types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR,
+            payload: response.status,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it('will flash an error when the response is not 403', () => {
+      const response = { status: 500 };
       actions.receiveCycleAnalyticsDataError(
         {
           commit: () => {},
         },
-        { response: 403 },
+        { response },
       );
 
       shouldFlashAnError();
