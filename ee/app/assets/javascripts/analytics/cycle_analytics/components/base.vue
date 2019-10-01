@@ -59,6 +59,7 @@ export default {
       'labels',
       'currentStageEvents',
       'customStageFormEvents',
+      'errorCode',
     ]),
     ...mapGetters(['currentStage', 'defaultStage', 'hasNoAccessError', 'currentGroupPath']),
     shouldRenderEmptyState() {
@@ -66,6 +67,9 @@ export default {
     },
     hasCustomizableCycleAnalytics() {
       return Boolean(this.glFeatures.customizableCycleAnalytics);
+    },
+    shouldDisplayFilters() {
+      return this.selectedGroup && !this.errorCode;
     },
   },
   methods: {
@@ -123,7 +127,7 @@ export default {
           @selected="onGroupSelect"
         />
         <projects-dropdown-filter
-          v-if="selectedGroup"
+          v-if="shouldDisplayFilters"
           :key="selectedGroup.id"
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
@@ -131,7 +135,7 @@ export default {
           @selected="onProjectsSelect"
         />
         <div
-          v-if="selectedGroup"
+          v-if="shouldDisplayFilters"
           class="ml-0 ml-md-auto mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center justify-content-md-end"
         >
           <label class="text-bold mb-0 mr-1">{{ __('Timeframe') }}</label>
@@ -166,7 +170,7 @@ export default {
           )
         "
       />
-      <div v-else>
+      <div v-else-if="!errorCode">
         <summary-table class="js-summary-table" :items="summary" />
         <stage-table
           v-if="currentStage"
