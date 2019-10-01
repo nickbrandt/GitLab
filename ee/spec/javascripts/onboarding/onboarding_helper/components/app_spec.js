@@ -229,18 +229,6 @@ describe('User onboarding helper app', () => {
         expect(vm.showExitTourContent).toHaveBeenCalledWith(true);
       });
 
-      it('quits the tour', () => {
-        spyOn(vm, 'handleExitTour');
-
-        const button = {
-          exitTour: true,
-        };
-
-        vm.handleClickPopoverButton(button);
-
-        expect(vm.handleExitTour).toHaveBeenCalled();
-      });
-
       it('sets dismissPopover to true when true/undefined on button config', () => {
         let button = {
           dismissPopover: true,
@@ -365,19 +353,19 @@ describe('User onboarding helper app', () => {
       });
     });
 
-    describe('handleExitTour', () => {
-      it('calls the "hideActionPopover" method', () => {
-        spyOn(vm, 'hideActionPopover');
+    describe('handleExitTourButton', () => {
+      it('emits the "onboardingHelper.hideActionPopover" event', () => {
+        spyOn(eventHub, '$emit');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
-        expect(vm.hideActionPopover).toHaveBeenCalled();
+        expect(eventHub.$emit).toHaveBeenCalledWith('onboardingHelper.hideActionPopover');
       });
 
       it('calls the "setDismissed" method with true', () => {
         spyOn(vm.$store, 'dispatch');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('setDismissed', true);
       });
@@ -385,7 +373,7 @@ describe('User onboarding helper app', () => {
       it('emits the "onboardingHelper.destroyActionPopover" event', () => {
         spyOn(eventHub, '$emit');
 
-        vm.handleExitTour();
+        vm.handleExitTourButton();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('onboardingHelper.destroyActionPopover');
       });

@@ -38,6 +38,9 @@ export default {
     callButtonAction(button) {
       this.$emit('clickActionButton', button);
     },
+    callExitTour() {
+      this.$emit('clickExitTourButton');
+    },
     submitFeedback(button) {
       this.$emit('clickFeedbackButton', button);
     },
@@ -71,6 +74,11 @@ export default {
             {{ button.text }}
           </span>
         </template>
+      </template>
+      <template v-if="helpContent.exitTour">
+        <gl-button class="btn btn-sm btn-primary mr-2" @click="callExitTour">
+          {{ s__("UserOnboardingTour|Close 'Learn GitLab'") }}
+        </gl-button>
       </template>
       <template v-if="helpContent.feedbackButtons">
         <gl-button-group>

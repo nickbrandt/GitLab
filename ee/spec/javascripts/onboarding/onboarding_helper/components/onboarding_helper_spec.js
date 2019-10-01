@@ -240,6 +240,14 @@ describe('User onboarding tour parts list', () => {
       });
     });
 
+    describe('callExitTour', () => {
+      it('emits the "clickExitTourButton" event when close Learn GitLab is clicked', () => {
+        wrapper.vm.callExitTour();
+
+        expect(wrapper.emittedByOrder()).toEqual([{ name: 'clickExitTourButton', args: [] }]);
+      });
+    });
+
     describe('submitFeedback', () => {
       it('emits the "clickFeedbackButton" event when feedback on tour is clicked', () => {
         const button = defaultProps.helpContent.buttons[0];
