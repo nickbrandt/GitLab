@@ -6,17 +6,17 @@ FactoryBot.define do
   end
 
   factory :vulnerabilities_occurrence, class: Vulnerabilities::Occurrence do
-    name 'Cipher with no integrity'
+    name { 'Cipher with no integrity' }
     project
     sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
     project_fingerprint { generate(:project_fingerprint) }
     primary_identifier factory: :vulnerabilities_identifier
-    location_fingerprint '4e5b6966dd100170b4b1ad599c7058cce91b57b4'
-    report_type :sast
-    severity :high
-    confidence :medium
+    location_fingerprint { '4e5b6966dd100170b4b1ad599c7058cce91b57b4' }
+    report_type { :sast }
+    severity { :high }
+    confidence { :medium }
     scanner factory: :vulnerabilities_scanner
-    metadata_version 'sast:1.0'
+    metadata_version { 'sast:1.0' }
     raw_metadata do
       {
         description: "The cipher does not provide data integrity update 1",

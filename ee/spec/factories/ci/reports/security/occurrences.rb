@@ -3,12 +3,12 @@
 FactoryBot.define do
   factory :ci_reports_security_occurrence, class: ::Gitlab::Ci::Reports::Security::Occurrence do
     compare_key { "#{identifiers.first.external_type}:#{identifiers.first.external_id}:#{location.fingerprint}" }
-    confidence :medium
+    confidence { :medium }
     identifiers { Array.new(1) { FactoryBot.build(:ci_reports_security_identifier) } }
     location factory: :ci_reports_security_locations_sast
-    metadata_version 'sast:1.0'
-    name 'Cipher with no integrity'
-    report_type :sast
+    metadata_version { 'sast:1.0' }
+    name { 'Cipher with no integrity' }
+    report_type { :sast }
     raw_metadata do
       {
         description: "The cipher does not provide data integrity update 1",
@@ -29,7 +29,7 @@ FactoryBot.define do
       }.to_json
     end
     scanner factory: :ci_reports_security_scanner
-    severity :high
+    severity { :high }
     sequence(:uuid) { generate(:vulnerability_occurrence_uuid) }
 
     skip_create

@@ -6,7 +6,7 @@ FactoryBot.define do
     payload { {} }
 
     transient do
-      metric_id nil
+      metric_id { nil }
 
       after(:build) do |alert, evaluator|
         unless alert.payload.key?('startsAt')

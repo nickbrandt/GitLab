@@ -9,9 +9,9 @@ FactoryBot.define do
 
   factory :group_with_ldap, parent: :group do
     transient do
-      cn 'group1'
-      group_access Gitlab::Access::GUEST
-      provider 'ldapmain'
+      cn { 'group1' }
+      group_access { Gitlab::Access::GUEST }
+      provider { 'ldapmain' }
     end
 
     factory :group_with_ldap_group_link do

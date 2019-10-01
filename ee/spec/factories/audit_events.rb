@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :audit_event, class: 'SecurityEvent', aliases: [:user_audit_event] do
     user
 
-    entity_type 'User'
+    entity_type { 'User' }
     entity_id   { user.id }
     details do
       {
@@ -21,7 +21,7 @@ FactoryBot.define do
     end
 
     trait :project_event do
-      entity_type 'Project'
+      entity_type { 'Project' }
       entity_id   { create(:project).id }
       details do
         {
@@ -38,7 +38,7 @@ FactoryBot.define do
     end
 
     trait :group_event do
-      entity_type 'Group'
+      entity_type { 'Group' }
       entity_id   { create(:group).id }
       details do
         {

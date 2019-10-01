@@ -10,17 +10,17 @@ FactoryBot.define do
       "node_name_#{n}"
     end
 
-    primary false
-    sync_object_storage true
+    primary { false }
+    sync_object_storage { true }
 
     trait :primary do
-      primary true
-      minimum_reverification_interval 7
-      sync_object_storage false
+      primary { true }
+      minimum_reverification_interval { 7 }
+      sync_object_storage { false }
     end
 
     trait :local_storage_only do
-      sync_object_storage false
+      sync_object_storage { false }
     end
   end
 end

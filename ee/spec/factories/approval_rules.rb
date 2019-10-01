@@ -8,15 +8,15 @@ FactoryBot.define do
 
   factory :code_owner_rule, parent: :approval_merge_request_rule do
     merge_request
-    rule_type :code_owner
-    code_owner true # deprecated, replaced with `rule_type: :code_owner`
+    rule_type { :code_owner }
+    code_owner { true } # deprecated, replaced with `rule_type: :code_owner`
     sequence(:name) { |n| "*-#{n}.js" }
   end
 
   factory :report_approver_rule, parent: :approval_merge_request_rule do
     merge_request
-    rule_type :report_approver
-    report_type :security
+    rule_type { :report_approver }
+    report_type { :security }
     sequence(:name) { |n| "*-#{n}.js" }
 
     trait :requires_approval do
@@ -24,23 +24,23 @@ FactoryBot.define do
     end
 
     trait :license_management do
-      name ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT
-      report_type :license_management
+      name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
+      report_type { :license_management }
     end
   end
 
   factory :approval_project_rule do
     project
     sequence(:name) { |n| "#{ApprovalRuleLike::DEFAULT_NAME}-#{n}" }
-    rule_type :regular
+    rule_type { :regular }
 
     trait :requires_approval do
       approvals_required { rand(1..ApprovalProjectRule::APPROVALS_REQUIRED_MAX) }
     end
 
     trait :security_report do
-      rule_type :report_approver
-      name ApprovalRuleLike::DEFAULT_NAME_FOR_SECURITY_REPORT
+      rule_type { :report_approver }
+      name { ApprovalRuleLike::DEFAULT_NAME_FOR_SECURITY_REPORT }
     end
 
     trait :security do
@@ -48,8 +48,8 @@ FactoryBot.define do
     end
 
     trait :license_management do
-      name ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT
-      rule_type :report_approver
+      name { ApprovalRuleLike::DEFAULT_NAME_FOR_LICENSE_REPORT }
+      rule_type { :report_approver }
     end
   end
 end

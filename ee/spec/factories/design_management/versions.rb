@@ -6,15 +6,15 @@ FactoryBot.define do
     issue { designs.first&.issue || create(:issue) }
 
     transient do
-      designs_count 1
-      created_designs []
-      modified_designs []
-      deleted_designs []
+      designs_count { 1 }
+      created_designs { [] }
+      modified_designs { [] }
+      deleted_designs { [] }
     end
 
     # Warning: this will intentionally result in an invalid version!
     trait :empty do
-      designs_count 0
+      designs_count { 0 }
     end
 
     after(:build) do |version, evaluator|
@@ -62,7 +62,7 @@ FactoryBot.define do
     trait :committed do
       transient do
         author { create(:user) }
-        file File.join(Rails.root, 'spec/fixtures/dk.png')
+        file { File.join(Rails.root, 'spec/fixtures/dk.png') }
       end
 
       after :create do |version, evaluator|

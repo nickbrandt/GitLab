@@ -3,17 +3,17 @@
 FactoryBot.define do
   factory :gitlab_slack_application_service do
     project
-    active true
-    type 'GitlabSlackApplicationService'
+    active { true }
+    type { 'GitlabSlackApplicationService' }
   end
 
   factory :alerts_service do
     project
-    type 'AlertsService'
-    active true
+    type { 'AlertsService' }
+    active { true }
 
     trait :inactive do
-      active false
+      active { false }
     end
   end
 end
