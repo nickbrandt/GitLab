@@ -1,5 +1,7 @@
 import { __ } from '~/locale';
 
+export const PROJECTS_PER_PAGE = 50;
+
 export const DEFAULT_DATA_TIME_FRAME = 30;
 
 export const EVENTS_LIST_ITEM_LIMIT = 50;

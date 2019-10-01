@@ -99,6 +99,9 @@ describe('Cycle Analytics component', () => {
 
       it('displays the groups filter', () => {
         expect(wrapper.find(GroupsDropdownFilter).exists()).toBe(true);
+        expect(wrapper.find(GroupsDropdownFilter).props('queryParams')).toEqual(
+          wrapper.vm.groupsQueryParams,
+        );
       });
 
       it('does not display the projects filter', () => {
@@ -130,6 +133,14 @@ describe('Cycle Analytics component', () => {
 
         it('displays the projects filter', () => {
           displaysProjectsDropdownFilter(true);
+
+          expect(wrapper.find(ProjectsDropdownFilter).props()).toEqual(
+            expect.objectContaining({
+              queryParams: wrapper.vm.projectsQueryParams,
+              groupId: mockData.group.id,
+              multiSelect: wrapper.vm.multiProjectSelect,
+            }),
+          );
         });
 
         it('displays the date range dropdown', () => {

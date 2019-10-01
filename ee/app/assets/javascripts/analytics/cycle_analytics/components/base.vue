@@ -3,6 +3,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { PROJECTS_PER_PAGE } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import DateRangeDropdown from '../../shared/components/date_range_dropdown.vue';
@@ -40,6 +41,11 @@ export default {
       dateOptions: [7, 30, 90],
       groupsQueryParams: {
         min_access_level: featureAccessLevel.EVERYONE,
+      },
+      projectsQueryParams: {
+        per_page: PROJECTS_PER_PAGE,
+        with_shared: false,
+        order_by: 'last_activity_at',
       },
     };
   },
@@ -131,6 +137,7 @@ export default {
           :key="selectedGroup.id"
           class="js-projects-dropdown-filter ml-md-1 mt-1 mt-md-0 dropdown-select"
           :group-id="selectedGroup.id"
+          :query-params="projectsQueryParams"
           :multi-select="multiProjectSelect"
           @selected="onProjectsSelect"
         />
