@@ -7,6 +7,8 @@ module EE
     # ActiveSupport::Concern does not prepend the ClassMethods,
     # so we cannot call `super` if we use it.
     def self.prepended(base)
+      base.include(UsageStatistics)
+
       class << base
         prepend ClassMethods
       end

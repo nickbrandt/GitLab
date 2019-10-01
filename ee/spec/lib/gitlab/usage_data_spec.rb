@@ -236,6 +236,7 @@ describe Gitlab::UsageData do
     subject { described_class.data.dig(:counts, :incident_issues) }
 
     before do
+      ::User.support_bot # create the support bot user beforehand, because otherwise it is created when gathering usage data.
       create(:issue, project: project) # non incident issue
     end
 

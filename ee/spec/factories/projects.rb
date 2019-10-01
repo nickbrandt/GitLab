@@ -65,5 +65,21 @@ FactoryBot.modify do
     trait :requiring_code_owner_approval do
       merge_requests_require_code_owner_approval true
     end
+
+    trait :jira_dvcs_cloud do
+      before(:create) do |project|
+        create(:project_feature_usage, :dvcs_cloud, project: project)
+      end
+    end
+
+    trait :jira_dvcs_server do
+      before(:create) do |project|
+        create(:project_feature_usage, :dvcs_server, project: project)
+      end
+    end
+
+    trait :service_desk_disabled do
+      service_desk_enabled nil
+    end
   end
 end
