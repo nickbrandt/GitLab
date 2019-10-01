@@ -99,10 +99,10 @@ class GitlabUploader < CarrierWave::Uploader::Base
     end
   end
 
-  # Used to replace an existing upload with the informed file without modifying stored metadata
+  # Used to replace an existing upload with another +file+ without modifying stored metadata
   # Use this method only to repair/replace an existing upload, or to upload to a Geo secondary node
   #
-  # @param [CarrierWave::SanitizedFile] file
+  # @param [CarrierWave::SanitizedFile] file that will replace existing upload
   # @return CarrierWave::SanitizedFile
   def replace_file_without_saving!(file)
     raise ArgumentError, 'should be a CarrierWave::SanitizedFile' unless file.is_a? CarrierWave::SanitizedFile

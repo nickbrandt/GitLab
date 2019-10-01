@@ -199,13 +199,10 @@ module Gitlab
             # Upload file to Object Storage
             uploader.replace_file_without_saving!(CarrierWave::SanitizedFile.new(temp_file))
 
-            log_info("Successful downloaded", filename: filename, file_size_bytes: file_size)
+            log_info("Successfully transferred", file_type: file_type, file_id: file_id,
+                     file_size_bytes: file_size)
           rescue => e
-            log_error("Error downloading file", error: e, filename: filename, url: url)
-
-            return failure_result
-          rescue Errno::EEXIST => e
-            log_error("Destination file is a directory", error: e, filename: filename)
+            log_error("Error transferring file", error: e, file_type: file_type, file_id: file_id, url: url)
 
             return failure_result
           ensure

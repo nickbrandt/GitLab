@@ -42,7 +42,7 @@ describe Geo::UploadRegistry, :geo, :geo_fdw do
       upload = create(:upload, :with_file)
       registry = create(:geo_upload_registry, :file, file_id: upload.id)
 
-      expect(registry.file).to eq("uploads/-/system/project/avatar/#{upload.id}/avatar.jpg")
+      expect(registry.file).to eq(upload.path)
     end
 
     it 'return "removed" message when the upload no longer exists' do

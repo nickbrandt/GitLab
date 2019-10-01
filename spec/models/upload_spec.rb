@@ -114,10 +114,22 @@ describe Upload do
 
       expect(uploader.upload).to eq(subject)
       expect(uploader.mounted_as).to eq(subject.send(:mount_point))
+      expect(uploader.file).to be_nil
     end
   end
 
-  describe '#needs_checksum??' do
+  describe '#retrieve_uploader' do
+    it 'returns a uploader object with current uploader associated with and cache retrieved' do
+      subject = build(:upload)
+      uploader = subject.retrieve_uploader
+
+      expect(uploader.upload).to eq(subject)
+      expect(uploader.mounted_as).to eq(subject.send(:mount_point))
+      expect(uploader.file).not_to be_nil
+    end
+  end
+
+  describe '#needs_checksum?' do
     context 'with local storage' do
       it 'returns true when no checksum exists' do
         subject = create(:upload, :with_file, checksum: nil)
