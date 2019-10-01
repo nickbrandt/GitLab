@@ -520,19 +520,20 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
     end
   end
 
-  describe '#restored_project' do
+  context 'Minimal JSON' do
     let(:project) { create(:project) }
     let(:tree_hash) { { 'visibility_level' => visibility } }
     let(:restorer) { described_class.new(user: nil, shared: shared, project: project) }
 
     before do
-      restorer.instance_variable_set(:@tree_hash, tree_hash)
+      expect(restorer).to receive(:read_tree_hash) { tree_hash }
     end
 
     context 'no group visibility' do
       let(:visibility) { Gitlab::VisibilityLevel::PRIVATE }
 
       it 'uses the project visibility' do
+        expect(restorer.restore).to eq(true)
         expect(restorer.restored_project.visibility_level).to eq(visibility)
       end
     end
@@ -544,6 +545,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         it 'uses private visibility' do
           stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::INTERNAL])
 
+          expect(restorer.restore).to eq(true)
           expect(restorer.restored_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
         end
       end
@@ -561,6 +563,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         let(:visibility) { Gitlab::VisibilityLevel::PUBLIC }
 
         it 'uses the group visibility' do
+          expect(restorer.restore).to eq(true)
           expect(restorer.restored_project.visibility_level).to eq(group_visibility)
         end
       end
@@ -570,6 +573,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         let(:visibility) { Gitlab::VisibilityLevel::PRIVATE }
 
         it 'uses the project visibility' do
+          expect(restorer.restore).to eq(true)
           expect(restorer.restored_project.visibility_level).to eq(visibility)
         end
       end
@@ -579,6 +583,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
         let(:visibility) { Gitlab::VisibilityLevel::PUBLIC }
 
         it 'uses the group visibility' do
+          expect(restorer.restore).to eq(true)
           expect(restorer.restored_project.visibility_level).to eq(group_visibility)
         end
 
@@ -586,6 +591,7 @@ describe Gitlab::ImportExport::ProjectTreeRestorer do
           it 'sets private visibility' do
             stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::INTERNAL])
 
+            expect(restorer.restore).to eq(true)
             expect(restorer.restored_project.visibility_level).to eq(Gitlab::VisibilityLevel::PRIVATE)
           end
         end
