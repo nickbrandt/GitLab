@@ -43,4 +43,23 @@ class ProductivityAnalyticsFinder < MergeRequestsFinder
     items
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def merged_at_between
+    @merged_at_between ||= begin
+      boundaries = if merged_at_period
+                     { from: Time.zone.now.ago(merged_at_period.days) }
+                   else
+                     { from: params[:merged_at_after], to: params[:merged_at_before] }
+                   end
+
+      boundaries[:from] = [boundaries[:from], ProductivityAnalytics.start_date].max
+      boundaries
+    end
+  end
+
+  def merged_at_period
+    matches = params[:merged_at_after]&.match(/^(?<days>\d+)days?$/)
+
+    matches && matches[:days].to_i
+  end
 end

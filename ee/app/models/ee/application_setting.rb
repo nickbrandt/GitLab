@@ -231,6 +231,12 @@ module EE
       users_count >= INSTANCE_REVIEW_MIN_USERS
     end
 
+    def productivity_analytics_start_date
+      super.tap do |value|
+        Analytics::ProductivityAnalyticsStartDateWorker.perform_async unless value
+      end
+    end
+
     private
 
     def mirror_max_delay_in_minutes

@@ -416,4 +416,24 @@ describe ApplicationSetting do
       end
     end
   end
+
+  describe '#productivity_analytics_start_date' do
+    context 'when value is not present' do
+      it 'schedules background calculation and returns nil value' do
+        expect(Analytics::ProductivityAnalyticsStartDateWorker).to receive(:perform_async)
+        expect(subject.productivity_analytics_start_date).to eq nil
+      end
+    end
+
+    context 'when value is present' do
+      before do
+        subject.update(productivity_analytics_start_date: Time.now)
+      end
+
+      it 'returns value and does not schedule recalculation' do
+        expect(Analytics::ProductivityAnalyticsStartDateWorker).not_to receive(:perform_async)
+        expect(subject.productivity_analytics_start_date).to be_like_time(Time.now)
+      end
+    end
+  end
 end

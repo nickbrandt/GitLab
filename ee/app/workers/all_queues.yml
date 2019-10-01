@@ -59,6 +59,7 @@
 - jira_connect:jira_connect_sync_merge_request
 
 - admin_emails
+- analytics:analytics_productivity_analytics_start_date
 - create_github_webhook
 - design_management_new_version
 - elastic_batch_project_indexer

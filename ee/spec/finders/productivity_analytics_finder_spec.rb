@@ -44,6 +44,12 @@ describe ProductivityAnalyticsFinder do
     end
 
     context 'allows to filter by merged_at' do
+      let(:pa_start_date) { 2.years.ago }
+
+      before do
+        allow(ProductivityAnalytics).to receive(:start_date).and_return(pa_start_date)
+      end
+
       around do |example|
         Timecop.freeze { example.run }
       end
@@ -74,6 +80,21 @@ describe ProductivityAnalyticsFinder do
           long_mr
           short_mr
           expect(subject.execute).to match_array([short_mr])
+        end
+      end
+
+      context 'with merged_at_after earlier than PA start date' do
+        let(:search_params) do
+          { merged_at_after: 3.years.ago.to_s }
+        end
+        let(:pa_start_date) { 2.months.ago }
+
+        it 'uses start_date as minimal value' do
+          metrics_data = { merged_at: 1.year.ago }
+          create(:merge_request, :merged, :with_productivity_metrics, created_at: 500.days.ago, metrics_data: metrics_data)
+          long_mr
+
+          expect(subject.execute).to match_array([long_mr])
         end
       end
     end
