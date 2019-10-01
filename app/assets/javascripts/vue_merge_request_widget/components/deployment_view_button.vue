@@ -74,7 +74,7 @@ export default {
       <review-app-link
         :is-current="isCurrent"
         :link="deploymentExternalUrl"
-        css-class="js-deploy-url js-deploy-url-feature-flag deploy-link btn btn-default btn-sm inline"
+        css-class="js-deploy-url deploy-link btn btn-default btn-sm inline"
       />
     </template>
   </span>
