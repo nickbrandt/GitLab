@@ -175,10 +175,10 @@ cpp:
 
 The [JunitXML.TestLogger](https://www.nuget.org/packages/JunitXml.TestLogger/) nuget
 package can generate test reports for .Net Framework and .Net Core applications. The following
-example expects a solution in the root folder of the repository, with one or more 
+example expects a solution in the root folder of the repository, with one or more
 project files in sub-folders. One result file is produced per test project, and each
 are placed in a new artifacts folder. This example includes optional formatting arguments, which
-improve the readability of test data in the test widget. A full .Net Core example is availble 
+improve the readability of test data in the test widget. A full .Net Core example is availble
 [here](https://gitlab.com/Siphonophora/dot-net-cicd-test-logging-demo).
 
 ```yaml
@@ -186,14 +186,14 @@ improve the readability of test data in the test widget. A full .Net Core exampl
 
 Test:
   stage: test
-  script: 
+  script:
     - 'dotnet test --test-adapter-path:. --logger:"junit;LogFilePath=..\artifacts\{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"'
   artifacts:
     when: always
-    paths: 
+    paths:
      - .\**\*test-result.xml
     reports:
-      junit: 
+      junit:
        - .\**\*test-result.xml
 ```
 
