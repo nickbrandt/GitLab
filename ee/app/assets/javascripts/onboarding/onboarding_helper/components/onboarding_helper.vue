@@ -138,6 +138,9 @@ export default {
     callButtonAction(button) {
       this.$emit('clickPopoverButton', button);
     },
+    callExitTour() {
+      this.$emit('clickExitTourButton');
+    },
     submitFeedback(button) {
       this.$emit('clickFeedbackButton', button);
     },
@@ -161,6 +164,7 @@ export default {
       :show="showPopover"
       :disabled="popoverDismissed"
       @clickActionButton="callButtonAction"
+      @clickExitTourButton="callExitTour"
       @clickFeedbackButton="submitFeedback"
     />
     <div class="d-flex align-items-center cursor-pointer">

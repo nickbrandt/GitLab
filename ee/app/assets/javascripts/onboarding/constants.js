@@ -57,11 +57,5 @@ export const EXIT_TOUR_CONTENT = {
     },
     false,
   ),
-  buttons: [
-    {
-      text: s__("UserOnboardingTour|Close 'Learn GitLab'"),
-      btnClass: 'btn-primary',
-      exitTour: true,
-    },
-  ],
+  exitTour: true,
 };
