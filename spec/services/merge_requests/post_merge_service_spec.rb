@@ -56,8 +56,9 @@ describe MergeRequests::PostMergeService do
 
       issue = create(:issue, project: project)
       allow(merge_request).to receive(:visible_closing_issues_for).and_return([issue])
-      allow_any_instance_of(Issues::CloseService).to receive(:execute)
-        .with(issue, commit: merge_request).and_raise(RuntimeError)
+      expect_next_instance_of(Issues::CloseService) do |service|
+        allow(service).to receive(:execute).with(issue, commit: merge_request).and_raise(RuntimeError)
+      end
 
       expect { described_class.new(project, user).execute(merge_request) }.to raise_error(RuntimeError)
 
