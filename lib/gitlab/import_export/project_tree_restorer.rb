@@ -184,18 +184,9 @@ module Gitlab
         return if tree_hash[relation_key].blank?
 
         tree_array = [tree_hash[relation_key]].flatten
-        null_iid_pipelines = []
 
         # Avoid keeping a possible heavy object in memory once we are done with it
-        while relation_item = (tree_array.shift || null_iid_pipelines.shift)
-          if nil_iid_pipeline?(relation_key, relation_item) && tree_array.any?
-            # Move pipelines with NULL IIDs to the end
-            # so they don't clash with existing IIDs.
-            null_iid_pipelines << relation_item
-
-            next
-          end
-
+        while relation_item = tree_array.shift
           remove_feature_dependent_sub_relations(relation_item)
 
           # The transaction at this level is less speedy than one single transaction
@@ -258,10 +249,6 @@ module Gitlab
 
       def excluded_keys_for_relation(relation)
         reader.attributes_finder.find_excluded_keys(relation)
-      end
-
-      def nil_iid_pipeline?(relation_key, relation_item)
-        relation_key == 'ci_pipelines' && relation_item['iid'].nil?
       end
     end
   end
