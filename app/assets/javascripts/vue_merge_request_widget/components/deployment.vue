@@ -3,7 +3,7 @@ import { GlTooltipDirective } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import FilteredSearchDropdown from '~/vue_shared/components/filtered_search_dropdown.vue';
-import { __ } from '~/locale';
+import { __, sprintf } from '~/locale';
 import timeagoMixin from '../../vue_shared/mixins/timeago';
 import LoadingButton from '../../vue_shared/components/loading_button.vue';
 import { visitUrl } from '../../lib/utils/url_utility';
@@ -58,11 +58,12 @@ export default {
     },
   },
   deployedTextMap: {
+    manual_deploy:  __('Can deploy manually to'),
+    will_deploy: __('Will deploy to'),
     running: __('Deploying to'),
     success: __('Deployed to'),
     failed: __('Failed to deploy to'),
-    created: __('Will deploy to'),
-    canceled: __('Failed to deploy to'),
+    canceled: __('Canceled deploy to'),
   },
   data() {
     return {
@@ -91,8 +92,14 @@ export default {
     hasMetrics() {
       return Boolean(this.deployment.metrics_url);
     },
+    computedDeploymentStatus() {
+      if (this.deployment.status === 'created') {
+        return this.deployment.isManual ? 'manual_deploy' : 'will_deploy';
+      }
+      return this.deployment.status
+    },
     deployedText() {
-      return this.$options.deployedTextMap[this.deployment.status];
+      return this.$options.deployedTextMap[this.computedDeploymentStatus];
     },
     isDeployInProgress() {
       return this.deployment.status === 'running';
