@@ -301,6 +301,7 @@ module EE
         end
         expose :created_at
         expose :updated_at
+        expose :closed_at
         expose :labels do |epic|
           # Avoids an N+1 query since labels are preloaded
           epic.labels.map(&:title).sort
