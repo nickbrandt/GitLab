@@ -5,6 +5,8 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
+      include ScimPaginatable
+
       belongs_to :saml_provider
 
       validates :name_id, presence: true, if: :saml_provider
@@ -49,10 +51,14 @@ module EE
         with_extern_uid(provider, extern_uid).take
       end
 
-      def find_by_group_saml_uid(saml_provider, extern_uid)
+      def where_group_saml_uid(saml_provider, extern_uid)
         where(provider: :group_saml,
               saml_provider: saml_provider,
-              extern_uid: extern_uid).take
+              extern_uid: extern_uid)
+      end
+
+      def find_by_group_saml_uid(saml_provider, extern_uid)
+        where_group_saml_uid(saml_provider, extern_uid).take
       end
 
       def preload_saml_group

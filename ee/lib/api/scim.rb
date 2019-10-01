@@ -12,6 +12,8 @@ module API
         requires :group, type: String
       end
 
+      helpers ::EE::API::Helpers::ScimPagination
+
       helpers do
         def logger
           API.logger
@@ -97,12 +99,14 @@ module API
           scim_error!(message: 'Missing filter params') unless params[:filter]
 
           group = find_and_authenticate_group!(params[:group])
-          parsed_hash = EE::Gitlab::Scim::ParamsParser.new(params).result
-          identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: parsed_hash[:extern_uid])
+
+          results = ScimFinder.new(group).search(params)
+          response_page = scim_paginate(results)
 
           status 200
 
-          present identity || {}, with: ::EE::Gitlab::Scim::Users
+          result_set = { resources: response_page, total_results: results.count, items_per_page: per_page(params[:count]), start_index: params[:startIndex] }
+          present result_set, with: ::EE::Gitlab::Scim::Users
         end
 
         desc 'Get a SAML user' do
