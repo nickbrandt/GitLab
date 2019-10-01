@@ -83,7 +83,7 @@ FactoryBot.modify do
     end
 
     trait :github_imported do
-      import_type 'github'
+      import_type { 'github' }
     end
   end
 end
