@@ -18,8 +18,8 @@ describe Projects::Alerting::NotificationsController do
       allow(Projects::Alerting::NotifyService).to receive(:new).and_return(notify_service)
     end
 
-    def make_request(opts = {})
-      post :create, params: project_params(opts), session: { as: :json }
+    def make_request(body = {})
+      post :create, params: project_params, body: body.to_json, as: :json
     end
 
     context 'when feature flag is on' do
