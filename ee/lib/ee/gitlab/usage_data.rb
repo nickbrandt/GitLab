@@ -183,9 +183,26 @@ module EE
         def usage_activity_by_stage
           {
             usage_activity_by_stage: {
+              create: usage_activity_by_stage_create,
               manage: usage_activity_by_stage_manage,
               plan: usage_activity_by_stage_plan
             }
+          }
+        end
+
+        # Omitted because no user, creator or author associated: `lfs_objects`, `pool_repositories`, `web_hooks`
+        def usage_activity_by_stage_create
+          {
+            deploy_keys: ::DeployKey.distinct_count_by(:user_id),
+            keys: ::Key.regular_keys.distinct_count_by(:user_id),
+            merge_requests: ::MergeRequest.distinct_count_by(:author_id),
+            projects_enforcing_code_owner_approval: ::Project.requiring_code_owner_approval.distinct_count_by(:creator_id),
+            projects_imported_from_github: ::Project.github_imported.distinct_count_by(:creator_id),
+            projects_with_repositories_enabled: ::Project.with_repositories_enabled.distinct_count_by(:creator_id),
+            protected_branches: ::Project.with_protected_branches.distinct_count_by(:creator_id),
+            remote_mirrors: ::Project.with_remote_mirrors.distinct_count_by(:creator_id),
+            snippets: ::Snippet.distinct_count_by(:author_id),
+            suggestions: ::Note.with_suggestions.distinct_count_by(:author_id)
           }
         end
 

@@ -14,6 +14,7 @@ module EE
 
       scope :searchable, -> { where(system: false).includes(:noteable) }
       scope :by_humans, -> { user.joins(:author).merge(::User.humans) }
+      scope :with_suggestions, -> { joins(:suggestions) }
 
       after_commit :notify_after_create, on: :create
       after_commit :notify_after_destroy, on: :destroy
