@@ -4,8 +4,8 @@ module QA
   context 'Plan' do
     describe 'Related issues' do
       let(:project) do
-        Resource::Project.fabricate_via_api! do |resource|
-          resource.name = 'project-to-test-related-issues'
+        Resource::Project.fabricate_via_api! do |project|
+          project.name = 'project-to-test-related-issues'
         end
       end
 
