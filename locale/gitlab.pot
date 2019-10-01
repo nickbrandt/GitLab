@@ -1892,6 +1892,9 @@ msgstr ""
 msgid "Arrange charts"
 msgstr ""
 
+msgid "Artifact"
+msgstr ""
+
 msgid "Artifact ID"
 msgstr ""
 
@@ -2587,6 +2590,12 @@ msgid "Browse artifacts"
 msgstr ""
 
 msgid "Browse files"
+msgstr ""
+
+msgid "BuildArtifacts|An error occurred while fetching the artifacts"
+msgstr ""
+
+msgid "BuildArtifacts|Loading artifacts"
 msgstr ""
 
 msgid "Built-in"
@@ -17937,6 +17946,11 @@ msgstr ""
 
 msgid "View epics list"
 msgstr ""
+
+msgid "View exposed artifact"
+msgid_plural "View %d exposed artifacts"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "View file @ "
 msgstr ""
