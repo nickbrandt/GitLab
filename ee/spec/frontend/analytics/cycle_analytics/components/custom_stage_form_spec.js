@@ -1,18 +1,20 @@
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
 import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
-import { apiResponse, groupLabels } from '../mock_data';
-
-const { events } = apiResponse;
-
-const startEvents = events.filter(ev => ev.canBeStartEvent);
-const stopEvents = events.filter(ev => !ev.canBeStartEvent);
+import {
+  groupLabels,
+  customStageEvents as events,
+  labelStartEvent,
+  labelStopEvent,
+  customStageStartEvents as startEvents,
+  customStageStopEvents as stopEvents,
+} from '../mock_data';
 
 const initData = {
   name: 'Cool stage pre',
-  startEvent: 'issue_label_added',
+  startEvent: labelStartEvent.identifier,
   startEventLabel: groupLabels[0].id,
-  stopEvent: 'issue_label_removed',
+  stopEvent: labelStopEvent.identifier,
   stopEventLabel: groupLabels[1].id,
 };
 
@@ -129,7 +131,7 @@ describe('CustomStageForm', () => {
         it('will display the start event label field if a label event is selected', done => {
           wrapper.setData({
             fields: {
-              startEvent: 'issue_label_added',
+              startEvent: labelStartEvent.identifier,
             },
           });
 
@@ -143,7 +145,7 @@ describe('CustomStageForm', () => {
           const selectedLabelId = groupLabels[0].id;
           expect(wrapper.vm.fields.startEventLabel).toEqual(null);
 
-          wrapper.find(sel.startEvent).setValue('issue_label_added');
+          wrapper.find(sel.startEvent).setValue(labelStartEvent.identifier);
           Vue.nextTick(() => {
             wrapper
               .find(sel.startEventLabel)
@@ -162,12 +164,7 @@ describe('CustomStageForm', () => {
 
     describe('Stop event', () => {
       beforeEach(() => {
-        wrapper = createComponent(
-          {
-            events,
-          },
-          false,
-        );
+        wrapper = createComponent({}, false);
       });
 
       it('notifies that a start event needs to be selected first', () => {
@@ -208,17 +205,24 @@ describe('CustomStageForm', () => {
 
       it('will only display valid stop events allowed for the selected start event', done => {
         let stopOptions = wrapper.find(sel.stopEvent).findAll('option');
+        const index = 2;
+        const selectedStopEventIdentifer = startEvents[index].allowedEndEvents[0];
+        const selectedStopEvent = stopEvents.find(
+          ev => ev.identifier === selectedStopEventIdentifer,
+        );
+
         expect(stopOptions.at(0).html()).toEqual('<option value="">Select stop event</option>');
 
-        selectDropdownOption(wrapper, sel.startEvent, 1);
+        selectDropdownOption(wrapper, sel.startEvent, index);
 
         Vue.nextTick(() => {
           stopOptions = wrapper.find(sel.stopEvent).findAll('option');
+
           [
             { name: 'Select stop event', identifier: '' },
             {
-              name: 'Issue first associated with a milestone or issue first added to a board',
-              identifier: 'issue_stage_end',
+              name: selectedStopEvent.name,
+              identifier: selectedStopEvent.identifier,
             },
           ].forEach(({ name, identifier }, i) => {
             expect(stopOptions.at(i).html()).toEqual(
@@ -307,8 +311,8 @@ describe('CustomStageForm', () => {
 
           wrapper.setData({
             fields: {
-              startEvent: 'issue_label_added',
-              stopEvent: 'issue_label_removed',
+              stopEvent: labelStopEvent.identifier,
+              startEvent: labelStartEvent.identifier,
             },
           });
 
@@ -324,8 +328,8 @@ describe('CustomStageForm', () => {
 
           wrapper.setData({
             fields: {
-              startEvent: 'issue_label_added',
-              stopEvent: 'issue_label_removed',
+              startEvent: labelStartEvent.identifier,
+              stopEvent: labelStopEvent.identifier,
             },
           });
 
@@ -373,10 +377,16 @@ describe('CustomStageForm', () => {
       });
 
       describe('with all fields set', () => {
+        const startEventIndex = 2;
+        const firstStopEventIdentifier = startEvents[startEventIndex].allowedEndEvents[0];
+        const stopEventIndex = stopEvents.findIndex(
+          ev => ev.identifier === firstStopEventIdentifier,
+        );
+
         beforeEach(() => {
           wrapper = createComponent({}, false);
 
-          selectDropdownOption(wrapper, sel.startEvent, 1);
+          selectDropdownOption(wrapper, sel.startEvent, startEventIndex);
 
           return Vue.nextTick(() => {
             selectDropdownOption(wrapper, sel.stopEvent, 1);
@@ -402,9 +412,9 @@ describe('CustomStageForm', () => {
           const res = [
             {
               name: 'Cool stage',
-              startEvent: 'issue_created',
+              startEvent: startEvents[startEventIndex].identifier,
               startEventLabel: null,
-              stopEvent: 'issue_stage_end',
+              stopEvent: stopEvents[stopEventIndex].identifier,
               stopEventLabel: null,
             },
           ];
@@ -440,8 +450,8 @@ describe('CustomStageForm', () => {
         wrapper.setData({
           fields: {
             name: 'Cool stage pre',
-            startEvent: 'issue_label_added',
-            stopEvent: 'issue_label_removed',
+            startEvent: labelStartEvent.identifier,
+            stopEvent: labelStopEvent.identifier,
           },
         });
 
@@ -512,8 +522,8 @@ describe('CustomStageForm', () => {
         wrapper.setData({
           fields: {
             name: 'Cool stage pre',
-            startEvent: 'issue_label_added',
-            stopEvent: 'issue_label_removed',
+            startEvent: labelStartEvent.identifier,
+            stopEvent: labelStopEvent.identifier,
           },
         });
 
