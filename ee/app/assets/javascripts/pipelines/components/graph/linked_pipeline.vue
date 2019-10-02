@@ -48,6 +48,7 @@ export default {
       v-gl-tooltip
       :title="tooltipText"
       class="js-linked-pipeline-content linked-pipeline-content"
+      data-qa-selector="linked_pipeline_button"
       :class="`js-pipeline-expand-${pipeline.id}`"
       @click="onClickLinkedPipeline"
     >
