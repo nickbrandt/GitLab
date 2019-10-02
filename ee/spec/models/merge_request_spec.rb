@@ -400,7 +400,7 @@ describe MergeRequest do
         end
 
         it 'returns status and data' do
-          expect_any_instance_of(Ci::CompareLicenseManagementReportsService)
+          expect_any_instance_of(Ci::CompareLicenseScanningReportsService)
               .to receive(:execute).with(base_pipeline, head_pipeline).and_call_original
 
           subject
@@ -408,7 +408,7 @@ describe MergeRequest do
 
         context 'when cached results is not latest' do
           before do
-            allow_any_instance_of(Ci::CompareLicenseManagementReportsService)
+            allow_any_instance_of(Ci::CompareLicenseScanningReportsService)
                 .to receive(:latest?).and_return(false)
           end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LicenseManagementReportHelper
+module LicenseScanningReportHelper
   def create_report(dependencies)
     Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |report|
       dependencies.each do |license_name, dependencies|
@@ -28,7 +28,7 @@ module LicenseManagementReportHelper
   end
 
   def create_comparer
-    Gitlab::Ci::Reports::LicenseManagement::ReportsComparer.new(create_report1, create_report2)
+    Gitlab::Ci::Reports::LicenseScanning::ReportsComparer.new(create_report1, create_report2)
   end
 
   def create_license

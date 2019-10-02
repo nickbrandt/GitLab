@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class LicenseManagementReportLicenseEntity < Grape::Entity
+class LicenseScanningReportLicenseEntity < Grape::Entity
   include RequestAwareEntity
 
   expose :name
   expose :classification
-  expose :dependencies, using: LicenseManagementReportDependencyEntity
+  expose :dependencies, using: LicenseScanningReportDependencyEntity
   expose :count
   expose :url
 
