@@ -31,7 +31,7 @@ describe PipelineDetailsEntity do
         expect(subject[:details])
           .to include :duration, :finished_at
         expect(subject[:details])
-          .to include :stages, :artifacts, :manual_actions, :scheduled_actions
+          .to include :stages, :artifacts, :test_reports, :manual_actions, :scheduled_actions
         expect(subject[:details][:status]).to include :icon, :favicon, :text, :label
       end
 
@@ -110,6 +110,16 @@ describe PipelineDetailsEntity do
         expect(subject).to include(:details)
         expect(subject[:details]).to include(:stages)
         expect(subject[:details][:stages].first).to include(name: 'test')
+      end
+    end
+
+    context 'when pipeline has test reports' do
+      let(:pipeline) { create(:ci_pipeline, :with_test_reports) }
+
+      it 'contains test reports' do
+        expect(subject).to include(:details)
+        expect(subject[:details]).to include(:test_reports)
+        expect(subject[:details][:test_reports][:total_time]).to eq(pipeline.test_reports.total_time)
       end
     end
 
