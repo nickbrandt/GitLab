@@ -14938,6 +14938,12 @@ msgstr ""
 msgid "SortOptions|Start soon"
 msgstr ""
 
+msgid "SortOptions|Type"
+msgstr ""
+
+msgid "SortOptions|Version"
+msgstr ""
+
 msgid "SortOptions|Weight"
 msgstr ""
 
