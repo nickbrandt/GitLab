@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Evidenceable do
   describe '#ensure_evidence' do
-    set(:project) { create(:project) }
+    let_it_be(:project) { create(:project) }
     let(:release) { create(:release, project: project) }
     let(:milestone) { create(:milestone, project: project) }
     let(:issue) { create(:issue, project: project) }

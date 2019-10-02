@@ -63,6 +63,10 @@ class Release < ApplicationRecord
     Array(evidences.last)
   end
 
+  def impacted_releases
+    Array(self)
+  end
+
   private
 
   def actual_sha

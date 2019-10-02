@@ -1392,9 +1392,9 @@ ActiveRecord::Schema.define(version: 2019_10_16_072826) do
 
   create_table "evidences", force: :cascade do |t|
     t.bigint "release_id", null: false
-    t.jsonb "summary", default: {}, null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.jsonb "summary", default: {}, null: false
     t.index ["release_id"], name: "index_evidences_on_release_id"
   end
 

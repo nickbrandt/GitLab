@@ -8,7 +8,12 @@ module Evidenceable
 
     # Overridden in Release, Milestone and Issue
     def latest_evidences
-      raise "Please implement 'latest_evidences' in the targetted class."
+      raise "Please implement 'latest_evidences' in the targeted class."
+    end
+
+    # Overridden in Release, Milestone and Issue
+    def impacted_releases
+      raise "Please implement 'impacted_releases' in the targeted class."
     end
 
     def evidence_summary_keys
@@ -20,13 +25,8 @@ module Evidenceable
     def ensure_evidence
       check_entity_class
 
-      saved_changes.keys.each do |key|
-        if evidence_summary_keys.include?(key.to_sym)
-          impacted_releases.each do |release|
-            Evidence.create!(release: release)
-          end
-          break
-        end
+      if (saved_changes.keys.map(&:to_sym) & evidence_summary_keys).any?
+        impacted_releases.each { |release| Evidence.create!(release: release) }
       end
     end
 
@@ -42,10 +42,6 @@ module Evidenceable
 
     def entity_class
       entity_class_name.safe_constantize
-    end
-
-    def impacted_releases
-      latest_evidences.map(&:release)
     end
   end
 end

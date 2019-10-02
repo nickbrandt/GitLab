@@ -910,11 +910,11 @@ describe Issue do
     end
 
     context 'when this issue it tied to one milestone' do
-      let(:project) { create(:project) }
+      let_it_be(:project) { create(:project) }
+      let_it_be(:release_1) { create(:release, project: project) }
+      let_it_be(:release_2) { create(:release, project: project) }
+      let_it_be(:milestone) { create(:milestone, project: project) }
       let(:issue) { create(:issue, project: project) }
-      let(:milestone) { create(:milestone, project: project) }
-      let(:release_1) { create(:release, project: project) }
-      let(:release_2) { create(:release, project: project) }
       let(:latest_evidence_2) { release_2.latest_evidences.first }
 
       before do
@@ -934,6 +934,27 @@ describe Issue do
 
           expect(issue.latest_evidences).to contain_exactly(latest_evidence_2, latest_evidence_3)
         end
+      end
+    end
+  end
+
+  describe '#impacted_releases' do
+    let_it_be(:project) { create(:project) }
+    let_it_be(:release_1) { create(:release, project: project) }
+    let_it_be(:release_2) { create(:release, project: project) }
+    let(:milestone) { create(:milestone, project: project, releases: [release_1, release_2]) }
+    let(:issue) { build(:issue, milestone: milestone) }
+
+    it 'returns the relevant releases' do
+      expect(issue.impacted_releases).to contain_exactly(release_1, release_2)
+    end
+
+    context 'when a release is not tied to an issue milestone' do
+      let(:milestone) { create(:milestone, project: project, releases: [release_1]) }
+
+      it 'does not return that release' do
+        expect(milestone.releases).not_to include(release_2)
+        expect(issue.impacted_releases).to contain_exactly(release_1)
       end
     end
   end

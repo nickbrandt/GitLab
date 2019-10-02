@@ -267,6 +267,10 @@ class Issue < ApplicationRecord
     milestone.latest_evidences
   end
 
+  def impacted_releases
+    milestone.releases
+  end
+
   private
 
   def ensure_metrics

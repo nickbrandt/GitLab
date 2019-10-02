@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Evidence do
-  set(:project) { create(:project) }
+  let_it_be(:project) { create(:project) }
   let(:release) { create(:release, project: project) }
   let(:schema_file) { 'evidences/evidence' }
   let(:summary_json) { described_class.last.summary.to_json }
@@ -46,6 +46,9 @@ describe Evidence do
       let(:milestone_2) { create(:milestone, project: project) }
       let(:release) { create(:release, project: project, milestones: [milestone_1, milestone_2]) }
 
+      before do
+        allow(subject).to receive(:milestones).and_return([milestone_1])
+      end
       context 'when a milestone does not have a title' do
         it 'is not valid' do
           allow(release.milestones.first).to receive(:title).and_return(nil)
@@ -65,9 +68,11 @@ describe Evidence do
       context 'when each milestone has associated issues' do
         let(:issue) { create(:issue, project: project, state: 'closed') }
 
+        before do
+          milestone_1.issues << issue
+        end
         context 'when an issue has a missing title' do
           it 'is not valid' do
-            milestone_1.issues << issue
             allow(release.milestones.first.issues.first).to receive(:title).and_return(nil)
 
             expect(subject).not_to be_valid
@@ -76,7 +81,6 @@ describe Evidence do
 
         context 'when an issue has a missing state' do
           it 'is not valid' do
-            milestone_1.issues << issue
             allow(release.milestones.first.issues.first).to receive(:state).and_return(nil)
 
             expect(subject).not_to be_valid

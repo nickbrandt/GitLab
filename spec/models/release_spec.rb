@@ -105,8 +105,15 @@ RSpec.describe Release do
         newer_evidence = create(:evidence, release: release)
 
         expect(release.evidences.count).to eq(2)
-        expect(release.latest_evidences).to eq(Array(newer_evidence))
+        expect(release.latest_evidences).to contain_exactly(newer_evidence)
       end
+    end
+  end
+
+  describe '#impacted_releases' do
+    it 'returns self in an array' do
+      release = build(:release)
+      expect(release.impacted_releases).to contain_exactly(release)
     end
   end
 

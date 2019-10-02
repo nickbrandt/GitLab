@@ -10,10 +10,16 @@ class Evidence < ApplicationRecord
   validate :milestone_fields
   validate :issue_fields
 
+  default_scope { order(created_at: :asc) }
+
   def sha
     return unless summary
 
     Gitlab::CryptoHelper.sha256(summary)
+  end
+
+  def milestones
+    @milestones ||= release.milestones.includes(:issues) || []
   end
 
   private
@@ -31,23 +37,19 @@ class Evidence < ApplicationRecord
   end
 
   def milestone_fields
-    return unless milestones.any?
+    return unless release && milestones.any?
 
     errors.add(:base, 'all milestones must have titles') if milestones.map(&:title).any?(&:blank?)
     errors.add(:base, 'all milestones must have states') if milestones.map(&:state).any?(&:blank?)
   end
 
   def issue_fields
-    return unless milestones.any?
+    return unless release && milestones.any?
 
-    issues = milestones.map(&:issues).flatten
+    issues = milestones.flat_map(&:issues)
     return unless issues.any?
 
     errors.add(:base, 'all issues must have titles') if issues.map(&:title).any?(&:blank?)
     errors.add(:base, 'all issues must have states') if issues.map(&:state).any?(&:blank?)
-  end
-
-  def milestones
-    @milestones ||= release&.milestones || []
   end
 end

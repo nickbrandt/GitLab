@@ -274,9 +274,13 @@ class Milestone < ApplicationRecord
   def latest_evidences
     return [] if releases.empty?
 
-    releases.map do |release|
+    releases.includes(:evidences).map do |release|
       release.evidences.last
     end
+  end
+
+  def impacted_releases
+    releases
   end
 
   private
