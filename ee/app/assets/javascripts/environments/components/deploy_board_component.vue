@@ -98,7 +98,7 @@ export default {
 </script>
 <template>
   <div class="js-deploy-board deploy-board">
-    <gl-loading-icon v-if="isLoading" />
+    <gl-loading-icon v-if="isLoading" class="loading-icon" />
     <template v-else>
       <div v-if="hasLegacyAppLabel" class="bs-callout bs-callout-warning mb-0 mt-0">
         <span v-html="legacyLabelWarningMessage"></span>
