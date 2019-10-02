@@ -7,7 +7,8 @@ describe Issue, :elastic do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
   end
 
-  let(:project) { create :project }
+  let(:project) { create :project, :public }
+  let(:admin) { create :user, :admin }
 
   context 'when limited indexing is on' do
     set(:project) { create :project, name: 'test1' }
@@ -71,7 +72,7 @@ describe Issue, :elastic do
 
     expect(described_class.elastic_search('(term1 | term2 | term3) +bla-bla', options: options).total_count).to eq(2)
     expect(described_class.elastic_search(Issue.last.to_reference, options: options).total_count).to eq(1)
-    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any }).total_count).to eq(3)
+    expect(described_class.elastic_search('bla-bla', options: { project_ids: :any, public_and_internal_projects: true }).total_count).to eq(3)
   end
 
   it "returns json with all needed elements" do
