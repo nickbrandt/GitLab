@@ -22,6 +22,7 @@ module EE
         data[:issueLinksEndpoint] = group_epic_issues_path(parent, issuable)
         data[:epicLinksEndpoint] = group_epic_links_path(parent, issuable)
         data[:fullPath] = parent.full_path
+        data[:projectsEndpoint] = expose_path(api_v4_groups_projects_path(id: parent.id))
       end
 
       data
