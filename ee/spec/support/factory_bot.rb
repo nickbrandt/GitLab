@@ -6,9 +6,5 @@ RSpec.configure do |config|
       Rails.root.join('ee', 'spec', 'factories')
     ]
     FactoryBot.find_definitions
-
-    # Use FactoryBot 4.x behavior:
-    # https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md#associations
-    FactoryBot.use_parent_strategy = false
   end
 end
