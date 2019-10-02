@@ -1947,6 +1947,9 @@ msgstr ""
 msgid "Archiving the project will make it entirely read-only. It is hidden from the dashboard and doesn't show up in searches. <strong>The repository cannot be committed to, and no issues, comments or other entities can be created.</strong>"
 msgstr ""
 
+msgid "Are you setting up GitLab for a company?"
+msgstr ""
+
 msgid "Are you sure that you want to archive this project?"
 msgstr ""
 

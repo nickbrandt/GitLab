@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
   before_action :active_user_check, unless: :devise_controller?
   before_action :set_usage_stats_consent_flag
   before_action :check_impersonation_availability
-  before_action :require_role
+  before_action :required_signup_info
 
   around_action :set_locale
   around_action :set_session_storage
@@ -536,10 +536,13 @@ class ApplicationController < ActionController::Base
     @current_user_mode ||= Gitlab::Auth::CurrentUserMode.new(current_user)
   end
 
-  # A user requires a role when they are part of the experimental signup flow (executed by the Growth team). Users
-  # are redirected to the welcome page when their role is required and the experiment is enabled for the current user.
-  def require_role
-    return unless current_user && current_user.role_required? && experiment_enabled?(:signup_flow)
+  # A user requires a role and have the setup_for_company attribute set when they are part of the experimental signup
+  # flow (executed by the Growth team). Users are redirected to the welcome page when their role is required and the
+  # experiment is enabled for the current user.
+  def required_signup_info
+    return unless current_user
+    return unless current_user.role_required? || current_user.setup_for_company.nil?
+    return unless experiment_enabled?(:signup_flow)
 
     store_location_for :user, request.fullpath
 

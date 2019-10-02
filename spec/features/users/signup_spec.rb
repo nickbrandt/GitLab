@@ -441,6 +441,7 @@ describe 'With experimental flow' do
 
       fill_in 'user_name', with: 'New name'
       select 'Software Developer', from: 'user_role'
+      choose 'user_setup_for_company_false'
       click_button 'Get started!'
       new_user = User.find_by_username(new_user.username)
 
