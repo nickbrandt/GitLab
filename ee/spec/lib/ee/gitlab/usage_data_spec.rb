@@ -54,7 +54,36 @@ describe Gitlab::UsageData do
         end
       end
 
-      context 'for Plan' do
+      context 'for create' do
+        it 'includes accurate usage_activity_by_stage data' do
+          user = create(:user)
+          project = create(:project, :repository_private, :requiring_code_owner_approval, :github_imported,
+                           :test_repo, :remote_mirror, creator: user)
+          create(:deploy_key, user: user)
+          create(:key, user: user)
+          create(:merge_request, source_project: project)
+          create(:project, creator: user)
+          create(:protected_branch, project: project)
+          create(:remote_mirror, project: project)
+          create(:snippet, author: user)
+          create(:suggestion, note: create(:note, project: project))
+
+          expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to eq(
+            deploy_keys: 1,
+            keys: 1,
+            merge_requests: 1,
+            projects_enforcing_code_owner_approval: 1,
+            projects_imported_from_github: 1,
+            projects_with_repositories_enabled: 1,
+            protected_branches: 1,
+            remote_mirrors: 1,
+            snippets: 1,
+            suggestions: 1
+          )
+        end
+      end
+
+      context 'for plan' do
         it 'includes accurate usage_activity_by_stage data' do
           stub_licensed_features(board_assignee_lists: true, board_milestone_lists: true)
 
@@ -89,31 +118,30 @@ describe Gitlab::UsageData do
         end
       end
 
-      context 'for create' do
+      context 'for verify' do
         it 'includes accurate usage_activity_by_stage data' do
           user = create(:user)
-          project = create(:project, :repository_private, :requiring_code_owner_approval, :github_imported,
-                           :test_repo, :remote_mirror, creator: user)
-          create(:deploy_key, user: user)
-          create(:key, user: user)
-          create(:merge_request, source_project: project)
-          create(:project, creator: user)
-          create(:protected_branch, project: project)
-          create(:remote_mirror, project: project)
-          create(:snippet, author: user)
-          create(:suggestion, note: create(:note, project: project))
+          create(:ci_build, user: user)
+          create(:ci_empty_pipeline, source: :external, user: user)
+          create(:ci_empty_pipeline, user: user)
+          create(:ci_pipeline, :auto_devops_source, user: user)
+          create(:ci_pipeline, :repository_source, user: user)
+          create(:ci_pipeline_schedule, owner: user)
+          create(:ci_trigger, owner: user)
+          create(:clusters_applications_runner, :installed)
+          create(:github_service)
 
-          expect(described_class.uncached_data[:usage_activity_by_stage][:create]).to eq(
-            deploy_keys: 1,
-            keys: 1,
-            merge_requests: 1,
-            projects_enforcing_code_owner_approval: 1,
-            projects_imported_from_github: 1,
-            projects_with_repositories_enabled: 1,
-            protected_branches: 1,
-            remote_mirrors: 1,
-            snippets: 1,
-            suggestions: 1
+          expect(described_class.uncached_data[:usage_activity_by_stage][:verify]).to eq(
+            ci_builds: 1,
+            ci_external_pipelines: 1,
+            ci_internal_pipelines: 1,
+            ci_pipeline_config_auto_devops: 1,
+            ci_pipeline_config_repository: 1,
+            ci_pipeline_schedules: 1,
+            ci_pipelines: 1,
+            ci_triggers: 1,
+            clusters_applications_runner: 1,
+            projects_reporting_ci_cd_back_to_github: 1
           )
         end
       end
