@@ -8,7 +8,6 @@ exports[`Design management pagination button component disables button when no d
   to="[object Object]"
 >
   <icon-stub
-    cssclasses=""
     name="angle-right"
     size="16"
   />
@@ -22,7 +21,6 @@ exports[`Design management pagination button component renders router-link 1`] =
   to="[object Object]"
 >
   <icon-stub
-    cssclasses=""
     name="angle-right"
     size="16"
   />

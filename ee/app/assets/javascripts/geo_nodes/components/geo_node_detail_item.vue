@@ -128,7 +128,7 @@ export default {
         v-if="hasHelpInfo"
         v-popover="popoverConfig"
         :size="12"
-        css-classes="node-detail-help-text prepend-left-5"
+        class="node-detail-help-text prepend-left-5"
         name="question"
       />
     </div>
@@ -148,7 +148,7 @@ export default {
         v-tooltip
         :title="itemValueStaleTooltip"
         name="time-out"
-        css-classes="prepend-left-10 detail-value-stale-icon"
+        class="prepend-left-10 detail-value-stale-icon"
         data-container="body"
       />
     </div>

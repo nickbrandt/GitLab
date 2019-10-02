@@ -25,7 +25,6 @@ exports[`DependenciesTableRow component when a dependency with no vulnerabilitie
         >
           <icon-stub
             class="align-middle mr-1"
-            cssclasses=""
             name="check-circle"
             size="16"
           />
@@ -160,7 +159,6 @@ exports[`DependenciesTableRow component when a dependency with vulnerabilities i
         >
           <icon-stub
             class="align-top text-secondary-700 d-none d-md-inline"
-            cssclasses=""
             name="arrow-down"
             size="16"
           />

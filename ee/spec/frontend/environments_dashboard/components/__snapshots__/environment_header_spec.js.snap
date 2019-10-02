@@ -119,7 +119,7 @@ exports[`Environment Header with environments grouped into a folder matches the 
   </div>
    
   <icon-stub
-    cssclasses="dashboard-card-icon"
+    class="dashboard-card-icon"
     data-original-title="You are looking at the last updated environment"
     name="information"
     size="16"

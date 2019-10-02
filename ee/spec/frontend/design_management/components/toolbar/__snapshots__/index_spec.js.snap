@@ -9,7 +9,6 @@ exports[`Design management toolbar component renders design and updated data 1`]
     class="mr-3 text-plain"
   >
     <icon-stub
-      cssclasses=""
       name="close"
       size="18"
     />

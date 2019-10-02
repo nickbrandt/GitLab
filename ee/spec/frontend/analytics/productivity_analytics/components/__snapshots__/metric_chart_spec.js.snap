@@ -34,7 +34,6 @@ exports[`MetricChart component template when isLoading is false and chartData is
         <icon-stub
           aria-label="Selected"
           class="flex-shrink-0 append-right-4 invisible"
-          cssclasses=""
           name="mobile-issue-close"
           size="16"
           title="Selected"
@@ -54,7 +53,6 @@ exports[`MetricChart component template when isLoading is false and chartData is
         <icon-stub
           aria-label="Selected"
           class="flex-shrink-0 append-right-4 invisible"
-          cssclasses=""
           name="mobile-issue-close"
           size="16"
           title="Selected"
