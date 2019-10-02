@@ -35,7 +35,8 @@ describe IssuablesHelper do
         initialTitleText: epic.title,
         initialDescriptionHtml: '<p dir="auto">epic text</p>',
         initialDescriptionText: 'epic text',
-        initialTaskStatus: '0 of 0 tasks completed'
+        initialTaskStatus: '0 of 0 tasks completed',
+        projectsEndpoint: "/api/v4/groups/#{@group.id}/projects"
       }
       expect(helper.issuable_initial_data(epic)).to eq(expected_data)
     end
