@@ -210,7 +210,7 @@ describe MarkupHelper do
     it 'replaces commit message with emoji to link' do
       actual = link_to_markdown(':book: Book', '/foo')
       expect(actual)
-        .to eq '<gl-emoji title="open book" data-name="book" data-unicode-version="6.0">📖</gl-emoji><a href="/foo"> Book</a>'
+        .to eq '<a href="/foo"><gl-emoji title="open book" data-name="book" data-unicode-version="6.0">📖</gl-emoji></a><a href="/foo"> Book</a>'
     end
   end
 
