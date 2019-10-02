@@ -1,5 +1,0 @@
----
-title: Fix replies to service desk emails for projects with issue access as Only Project Members
-merge_request: 17401
-author:
-type: fixed
