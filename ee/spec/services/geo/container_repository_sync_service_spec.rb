@@ -13,7 +13,7 @@ describe Geo::ContainerRepositorySyncService, :geo do
   end
 
   describe '#execute' do
-    let(:container_repository_registry) { create(:container_repository_registry, :started) }
+    let(:container_repository_registry) { create(:container_repository_registry, :sync_started) }
 
     it 'fails registry record if there was exception' do
       allow_any_instance_of(Geo::ContainerRepositorySync)

@@ -25,11 +25,8 @@ describe Geo::ContainerRepositoryRegistry, :geo do
     end
   end
 
-  describe '#start_sync!' do
-    it 'updates last_synced_at' do
-      expect { container_repository_registry.start_sync! }
-        .to change { container_repository_registry.reload.last_synced_at }
-    end
+  it_behaves_like 'a Geo registry' do
+    let(:registry) { create(:container_repository_registry) }
   end
 
   describe '#finish_sync!' do
@@ -44,31 +41,6 @@ describe Geo::ContainerRepositoryRegistry, :geo do
         last_sync_failure: nil,
         state: 'synced'
       )
-    end
-  end
-
-  describe '#fail_sync!' do
-    it 'fails registry record' do
-      error = StandardError.new('Something is wrong')
-
-      container_repository_registry.fail_sync!('Failed', error)
-
-      expect(container_repository_registry).to have_attributes(
-        retry_count: 1,
-        retry_at: be_present,
-        last_sync_failure: 'Failed: Something is wrong',
-        state: 'failed'
-      )
-    end
-  end
-
-  describe '#repository_updated!' do
-    set(:container_repository_registry) { create(:container_repository_registry, :synced) }
-
-    it 'resets the state of the sync' do
-      container_repository_registry.repository_updated!
-
-      expect(container_repository_registry.pending?).to be true
     end
   end
 end
