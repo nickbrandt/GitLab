@@ -199,8 +199,8 @@ export default {
         <icon
           v-popover="popoverOptions"
           name="question-o"
-          css-classes="help-icon append-right-5"
-          tab-index="0"
+          class="help-icon append-right-5"
+          tabindex="0"
         />
         <gl-button
           v-show="canUpdate && !editing"
@@ -244,8 +244,8 @@ export default {
               v-if="isDateInvalid && selectedDateIsFixed"
               v-popover="dateInvalidPopoverOptions"
               name="warning"
-              css-classes="date-warning-icon append-right-5 prepend-left-5"
-              tab-index="0"
+              class="date-warning-icon append-right-5 prepend-left-5"
+              tabindex="0"
             />
             <span v-if="selectedAndEditable" class="no-value d-flex">
               &nbsp;&ndash;&nbsp;
@@ -282,8 +282,8 @@ export default {
           v-if="isDateInvalid && !selectedDateIsFixed"
           v-popover="dateInvalidPopoverOptions"
           name="warning"
-          css-classes="date-warning-icon prepend-left-5"
-          tab-index="0"
+          class="date-warning-icon prepend-left-5"
+          tabindex="0"
         />
       </abbr>
     </div>

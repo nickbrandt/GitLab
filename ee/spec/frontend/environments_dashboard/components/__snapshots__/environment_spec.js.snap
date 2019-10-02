@@ -37,7 +37,6 @@ exports[`Environment matchs the snapshot 1`] = `
           class="branch-commit"
         >
           <icon-stub
-            cssclasses=""
             name="work"
             size="16"
           />

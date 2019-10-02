@@ -61,7 +61,7 @@ export default {
           :class="{ 'ml-2': index }"
           class="d-inline-flex align-items-center"
         >
-          <icon :size="16" :name="item.iconName" css-classes="text-secondary mr-1" />
+          <icon :size="16" :name="item.iconName" class="text-secondary mr-1" />
           {{ item.count }}
         </span>
       </div>

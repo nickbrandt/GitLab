@@ -7,7 +7,6 @@ exports[`HeaderCell renders an inflexible cell with a title with an icon through
   <template>
     <icon-stub
       class="icon"
-      cssclasses=""
       name="retry"
       size="16"
     />

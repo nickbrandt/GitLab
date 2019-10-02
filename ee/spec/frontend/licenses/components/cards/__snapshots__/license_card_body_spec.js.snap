@@ -203,7 +203,6 @@ exports[`LicenseCardBody renders a loading state if isRemoving 1`] = `
     class="p-5 d-flex justify-content-center align-items-center license-card-loading"
   >
     <icon-stub
-      cssclasses=""
       name="spinner"
       size="16"
     />

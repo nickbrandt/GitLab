@@ -68,7 +68,7 @@ export default {
       v-gl-tooltip
       :title="$options.tooltips.information"
       name="information"
-      css-classes="dashboard-card-icon"
+      class="dashboard-card-icon"
     />
     <review-app-link
       v-else-if="environment.external_url"
