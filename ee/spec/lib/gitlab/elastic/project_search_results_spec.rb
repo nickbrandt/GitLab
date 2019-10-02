@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   let(:user) { create(:user) }
-  let(:project) { create(:project, :repository) }
+  let(:project) { create(:project, :public, :repository) }
   let(:query) { 'hello world' }
 
   before do
