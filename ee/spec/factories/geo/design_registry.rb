@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :container_repository_registry, class: Geo::ContainerRepositoryRegistry do
-    container_repository
+  factory :geo_design_registry, class: Geo::DesignRegistry do
+    project
     last_sync_failure { nil }
     last_synced_at { nil }
     state { :pending }

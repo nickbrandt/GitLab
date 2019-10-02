@@ -43,6 +43,8 @@ describe Geo::RepositorySyncService do
         .and_return(nil)
     end
 
+    include_context 'lease handling'
+
     it 'fetches project repository with JWT credentials' do
       expect(repository).to receive(:with_config)
         .with("http.#{url_to_repo}.extraHeader" => anything)
@@ -64,34 +66,10 @@ describe Geo::RepositorySyncService do
       subject.execute
     end
 
-    it 'returns the lease when succeed' do
-      expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
-
-      subject.execute
-    end
-
     it 'voids the failure message when it succeeds after an error' do
       registry = create(:geo_project_registry, project: project, last_repository_sync_failure: 'error')
 
       expect { subject.execute }.to change { registry.reload.last_repository_sync_failure}.to(nil)
-    end
-
-    it 'returns the lease when sync fail' do
-      allow(repository).to receive(:fetch_as_mirror)
-        .with(url_to_repo, remote_name: 'geo', forced: true)
-        .and_raise(Gitlab::Shell::Error)
-
-      expect_to_cancel_exclusive_lease(lease_key, lease_uuid)
-
-      subject.execute
-    end
-
-    it 'does not fetch project repository if cannot obtain a lease' do
-      stub_exclusive_lease_taken(lease_key)
-
-      expect(repository).not_to receive(:fetch_as_mirror)
-
-      subject.execute
     end
 
     it 'rescues when Gitlab::Shell::Error is raised' do
@@ -425,6 +403,11 @@ describe Geo::RepositorySyncService do
 
     it_behaves_like 'sync retries use the snapshot RPC' do
       let(:repository) { project.repository }
+      let(:retry_count) { Geo::ProjectRegistry::RETRIES_BEFORE_REDOWNLOAD }
+
+      def registry_with_retry_count(retries)
+        create(:geo_project_registry, project: project, repository_retry_count: retries, wiki_retry_count: retries)
+      end
     end
   end
 
