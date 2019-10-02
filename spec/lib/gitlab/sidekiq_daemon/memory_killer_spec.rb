@@ -5,11 +5,23 @@ require 'spec_helper'
 describe Gitlab::SidekiqDaemon::MemoryKiller do
   let(:memory_killer) { described_class.new }
   let(:pid) { 12345 }
+  let(:current_rss_metric) { double('current rss metric') }
+  let(:soft_limit_rss_metric) { double('soft limit rss metric') }
+  let(:hard_limit_rss_metric) { double('hard limit rss metric') }
+  let(:current_phase_metric) { double('current phase metric') }
 
   before do
-    allow(memory_killer).to receive(:pid).and_return(pid)
     allow(Sidekiq.logger).to receive(:info)
     allow(Sidekiq.logger).to receive(:warn)
+    allow(Gitlab::Metrics).to receive(:gauge).with(:sidekiq_current_rss, anything).and_return(current_rss_metric)
+    allow(Gitlab::Metrics).to receive(:gauge).with(:sidekiq_memory_killer_soft_limit_rss, anything).and_return(soft_limit_rss_metric)
+    allow(Gitlab::Metrics).to receive(:gauge).with(:sidekiq_memory_killer_hard_limit_rss, anything).and_return(hard_limit_rss_metric)
+    allow(Gitlab::Metrics).to receive(:gauge).with(:sidekiq_memory_killer_phase, anything).and_return(current_phase_metric)
+    allow(memory_killer).to receive(:pid).and_return(pid)
+    allow(current_rss_metric).to receive(:set)
+    allow(soft_limit_rss_metric).to receive(:set)
+    allow(hard_limit_rss_metric).to receive(:set)
+    allow(current_phase_metric).to receive(:set)
   end
 
   describe '#run_thread' do
@@ -121,8 +133,10 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
 
     it 'return true when everything is within limit' do
       expect(memory_killer).to receive(:get_rss).and_return(100)
-      expect(memory_killer).to receive(:soft_limit_rss).and_return(200)
-      expect(memory_killer).to receive(:hard_limit_rss).and_return(300)
+      expect(memory_killer).to receive(:get_soft_limit_rss).and_return(200)
+      expect(memory_killer).to receive(:get_hard_limit_rss).and_return(300)
+
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:running], 100, 200, 300)
 
       expect(Gitlab::Metrics::System).to receive(:monotonic_time).and_call_original
       expect(memory_killer).not_to receive(:log_rss_out_of_range)
@@ -132,9 +146,10 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
 
     it 'return false when rss exceeds hard_limit_rss' do
       expect(memory_killer).to receive(:get_rss).and_return(400)
-      expect(memory_killer).to receive(:soft_limit_rss).at_least(:once).and_return(200)
-      expect(memory_killer).to receive(:hard_limit_rss).at_least(:once).and_return(300)
+      expect(memory_killer).to receive(:get_soft_limit_rss).at_least(:once).and_return(200)
+      expect(memory_killer).to receive(:get_hard_limit_rss).at_least(:once).and_return(300)
 
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:running], 400, 200, 300)
       expect(Gitlab::Metrics::System).to receive(:monotonic_time).and_call_original
 
       expect(memory_killer).to receive(:log_rss_out_of_range).with(400, 300, 200)
@@ -144,9 +159,11 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
 
     it 'return false when rss exceed hard_limit_rss after a while' do
       expect(memory_killer).to receive(:get_rss).and_return(250, 400)
-      expect(memory_killer).to receive(:soft_limit_rss).at_least(:once).and_return(200)
-      expect(memory_killer).to receive(:hard_limit_rss).at_least(:once).and_return(300)
+      expect(memory_killer).to receive(:get_soft_limit_rss).at_least(:once).and_return(200)
+      expect(memory_killer).to receive(:get_hard_limit_rss).at_least(:once).and_return(300)
 
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:running], 250, 200, 300)
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:above_soft_limit], 400, 200, 300)
       expect(Gitlab::Metrics::System).to receive(:monotonic_time).twice.and_call_original
       expect(memory_killer).to receive(:sleep).with(check_interval_seconds)
 
@@ -157,9 +174,11 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
 
     it 'return true when rss below soft_limit_rss after a while within GRACE_BALLOON_SECONDS' do
       expect(memory_killer).to receive(:get_rss).and_return(250, 100)
-      expect(memory_killer).to receive(:soft_limit_rss).and_return(200, 200)
-      expect(memory_killer).to receive(:hard_limit_rss).and_return(300, 300)
+      expect(memory_killer).to receive(:get_soft_limit_rss).and_return(200, 200)
+      expect(memory_killer).to receive(:get_hard_limit_rss).and_return(300, 300)
 
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:running], 250, 200, 300)
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:above_soft_limit], 100, 200, 300)
       expect(Gitlab::Metrics::System).to receive(:monotonic_time).twice.and_call_original
       expect(memory_killer).to receive(:sleep).with(check_interval_seconds)
 
@@ -170,9 +189,11 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
 
     it 'return false when rss exceed soft_limit_rss longer than GRACE_BALLOON_SECONDS' do
       expect(memory_killer).to receive(:get_rss).exactly(4).times.and_return(250)
-      expect(memory_killer).to receive(:soft_limit_rss).exactly(5).times.and_return(200)
-      expect(memory_killer).to receive(:hard_limit_rss).exactly(5).times.and_return(300)
+      expect(memory_killer).to receive(:get_soft_limit_rss).exactly(4).times.and_return(200)
+      expect(memory_killer).to receive(:get_hard_limit_rss).exactly(4).times.and_return(300)
 
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:running], 250, 200, 300)
+      expect(memory_killer).to receive(:update_metrics).exactly(3).times.with(described_class::PHASE[:above_soft_limit], 250, 200, 300)
       expect(Gitlab::Metrics::System).to receive(:monotonic_time).exactly(5).times.and_call_original
       expect(memory_killer).to receive(:sleep).exactly(3).times.with(check_interval_seconds).and_call_original
 
@@ -190,11 +211,17 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
     before do
       stub_const("#{described_class}::SHUTDOWN_TIMEOUT_SECONDS", shutdown_timeout_seconds)
       allow(Sidekiq).to receive(:options).and_return(timeout: 9)
+      allow(memory_killer).to receive(:get_rss).and_return(100)
+      allow(memory_killer).to receive(:get_soft_limit_rss).and_return(200)
+      allow(memory_killer).to receive(:get_hard_limit_rss).and_return(300)
     end
 
     it 'send signal' do
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:stop_fetching_new_jobs], 100, 200, 300).ordered
       expect(memory_killer).to receive(:signal_and_wait).with(shutdown_timeout_seconds, 'SIGTSTP', 'stop fetching new jobs').ordered
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:shutting_down], 100, 200, 300).ordered
       expect(memory_killer).to receive(:signal_and_wait).with(11, 'SIGTERM', 'gracefully shut down').ordered
+      expect(memory_killer).to receive(:update_metrics).with(described_class::PHASE[:killing_sidekiq], 100, 200, 300).ordered
       expect(memory_killer).to receive(:signal_pgroup).with('SIGKILL', 'die').ordered
 
       subject
@@ -399,6 +426,19 @@ describe Gitlab::SidekiqDaemon::MemoryKiller do
       expect(worker_class).to receive(:sidekiq_options).and_return({ key => 10 })
 
       expect(subject).to eq(10)
+    end
+  end
+
+  describe '#update_metrics' do
+    subject { memory_killer.send(:update_metrics, 2, 150, 200, 300) }
+
+    it 'calls gitlab metrics gauge set methods' do
+      expect(current_phase_metric).to receive(:set).with({}, 2)
+      expect(current_rss_metric).to receive(:set).with({}, 150)
+      expect(soft_limit_rss_metric).to receive(:set).with({}, 200)
+      expect(hard_limit_rss_metric).to receive(:set).with({}, 300)
+
+      subject
     end
   end
 end
