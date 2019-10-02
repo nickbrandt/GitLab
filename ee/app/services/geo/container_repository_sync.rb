@@ -5,6 +5,7 @@ require 'tempfile'
 module Geo
   class ContainerRepositorySync
     include ExclusiveLeaseGuard
+    include Gitlab::Utils::StrongMemoize
 
     LEASE_TIMEOUT = 1.hour.freeze
 
@@ -96,10 +97,12 @@ module Geo
 
     # The client for primary registry
     def client
-      ContainerRegistry::Client.new(
-        Gitlab.config.geo.registry_replication.primary_api_url,
-        token: ::Auth::ContainerRegistryAuthenticationService.pull_access_token(name)
-      )
+      strong_memoize(:client) do
+        ContainerRegistry::Client.new(
+          Gitlab.config.geo.registry_replication.primary_api_url,
+          token: ::Auth::ContainerRegistryAuthenticationService.pull_access_token(name)
+        )
+      end
     end
   end
 end
