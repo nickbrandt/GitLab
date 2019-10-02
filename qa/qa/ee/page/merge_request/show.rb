@@ -161,6 +161,12 @@ module QA
             approvals_content.match(/Requires (\d+) more approvals/)[1].to_i
           end
 
+          def merge_via_merge_train
+            raise ElementNotFound, "Not ready to merge" unless ready_to_merge?
+
+            click_element(:merge_button, text: "Start merge train")
+          end
+
           private
 
           def approvals_content
