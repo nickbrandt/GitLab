@@ -8,17 +8,38 @@ module Gitlab
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
       class JobArtifactTransfer < BaseTransfer
+        # Initialize a transfer service for a specified Ci::JobArtifact
+        #
+        # @param [Ci::JobArtifact] job_artifact
         def initialize(job_artifact)
-          super(
-            :job_artifact,
-            job_artifact.id,
-            job_artifact.file.path,
-            job_artifact.file_sha256,
-            job_artifact_request_data(job_artifact)
-          )
+          if job_artifact.local_store?
+            super(local_job_artifact_attributes(job_artifact))
+          else
+            super(remote_job_artifact_attributes(job_artifact))
+          end
         end
 
         private
+
+        def local_job_artifact_attributes(job_artifact)
+          {
+            file_type: :job_artifact,
+            file_id: job_artifact.id,
+            filename: job_artifact.file.path,
+            uploader: job_artifact.file,
+            expected_checksum: job_artifact.file_sha256,
+            request_data: job_artifact_request_data(job_artifact)
+          }
+        end
+
+        def remote_job_artifact_attributes(job_artifact)
+          {
+            file_type: :job_artifact,
+            file_id: job_artifact.id,
+            uploader: job_artifact.file,
+            request_data: job_artifact_request_data(job_artifact)
+          }
+        end
 
         def job_artifact_request_data(job_artifact)
           {

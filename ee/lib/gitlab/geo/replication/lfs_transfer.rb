@@ -8,17 +8,39 @@ module Gitlab
       #   * Saving it in the right place on successful download
       #   * Returning a detailed Result object
       class LfsTransfer < BaseTransfer
+        # Initialize a transfer service for a specified LfsObject
+        #
+        # @param [LfsObject] lfs_object
         def initialize(lfs_object)
-          super(
-            :lfs,
-            lfs_object.id,
-            lfs_object.file.path,
-            lfs_object.oid,
-            lfs_request_data(lfs_object)
-          )
+          if lfs_object.local_store?
+            super(local_lfs_object_attributes(lfs_object))
+          else
+            super(remote_lfs_object_attributes(lfs_object))
+          end
         end
 
         private
+
+        def local_lfs_object_attributes(lfs_object)
+          {
+            file_type: :lfs,
+            file_id: lfs_object.id,
+            filename: lfs_object.file.path,
+            uploader: lfs_object.file,
+            expected_checksum: lfs_object.oid,
+            request_data: lfs_request_data(lfs_object)
+          }
+        end
+
+        def remote_lfs_object_attributes(lfs_object)
+          {
+            file_type: :lfs,
+            file_id: lfs_object.id,
+            uploader: lfs_object.file,
+            expected_checksum: lfs_object.oid,
+            request_data: lfs_request_data(lfs_object)
+          }
+        end
 
         def lfs_request_data(lfs_object)
           {
