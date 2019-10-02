@@ -4,11 +4,15 @@ module Projects
   module Packages
     class PackagesController < ApplicationController
       include PackagesAccess
+      include SortingHelper
 
       before_action :authorize_destroy_package!, only: [:destroy]
 
       def index
-        @packages = project.packages.has_version.page(params[:page])
+        @packages = project.packages
+                      .has_version
+                      .sort_by_attribute(@sort = params[:sort] || 'created_desc')
+                      .page(params[:page])
       end
 
       def show

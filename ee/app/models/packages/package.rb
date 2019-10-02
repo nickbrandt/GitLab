@@ -24,6 +24,16 @@ class Packages::Package < ApplicationRecord
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
 
+  # Sorting
+  scope :order_created, -> { reorder('created_at ASC') }
+  scope :order_created_desc, -> { reorder('created_at DESC') }
+  scope :order_name, -> { reorder('name ASC') }
+  scope :order_name_desc, -> { reorder('name DESC') }
+  scope :order_version, -> { reorder('version ASC') }
+  scope :order_version_desc, -> { reorder('version DESC') }
+  scope :order_type, -> { reorder('package_type ASC') }
+  scope :order_type_desc, -> { reorder('package_type DESC') }
+
   def self.for_projects(projects)
     return none unless projects.any?
 
@@ -38,6 +48,20 @@ class Packages::Package < ApplicationRecord
     with_name(name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
+  end
+
+  def self.sort_by_attribute(method)
+    case method.to_s
+    when 'created_asc' then order_created
+    when 'name_asc' then order_name
+    when 'name_desc' then order_name_desc
+    when 'version_asc' then order_version
+    when 'version_desc' then order_version_desc
+    when 'type_asc' then order_type
+    when 'type_desc' then order_type_desc
+    else
+      order_created_desc
+    end
   end
 
   private
