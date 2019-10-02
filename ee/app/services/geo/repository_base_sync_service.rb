@@ -234,16 +234,12 @@ module Geo
 
       # Move the current canonical repository to the deleted path for reference
       if repository.exists?
-        ensure_repository_namespace(deleted_disk_path_temp)
-
         unless gitlab_shell.mv_repository(project.repository_storage, repository.disk_path, deleted_disk_path_temp)
           raise Gitlab::Shell::Error, 'Can not move original repository out of the way'
         end
       end
 
       # Move the temporary repository to the canonical path
-
-      ensure_repository_namespace(repository.disk_path)
 
       unless gitlab_shell.mv_repository(project.repository_storage, disk_path_temp, repository.disk_path)
         raise Gitlab::Shell::Error, 'Can not move temporary repository to canonical location'
@@ -253,13 +249,6 @@ module Geo
       unless gitlab_shell.remove_repository(project.repository_storage, deleted_disk_path_temp)
         raise Gitlab::Shell::Error, 'Can not remove outdated main repository'
       end
-    end
-
-    def ensure_repository_namespace(disk_path)
-      gitlab_shell.add_namespace(
-        project.repository_storage,
-        File.dirname(disk_path)
-      )
     end
 
     def new_repository?
