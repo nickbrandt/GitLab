@@ -437,4 +437,8 @@ describe GroupPolicy do
   describe 'view_productivity_analytics' do
     include_examples 'analytics policy', :view_productivity_analytics
   end
+
+  describe 'view_type_of_work_charts' do
+    include_examples 'analytics policy', :view_type_of_work_charts
+  end
 end

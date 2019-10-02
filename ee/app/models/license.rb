@@ -92,6 +92,7 @@ class License < ApplicationRecord
     scoped_labels
     service_desk
     smartcard_auth
+    type_of_work_analytics
     unprotection_restrictions
   ]
   EEP_FEATURES.freeze
