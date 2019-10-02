@@ -332,8 +332,8 @@ feature-report:
   stage: post-test
   script:
     - mkdir -p feature-report
-    - bundle exec rspec --dry-run -f html -- spec/ > feature-report/index.html
-    - bundle exec rspec --dry-run -f html -- ee/spec/ > feature-report/ee.html
+    - bin/rspec --dry-run -f html -- spec/ > feature-report/index.html
+    - bin/rspec --dry-run -f html -- ee/spec/ > feature-report/ee.html
   artifacts:
     name: feature-report
     expire_in: 31d
