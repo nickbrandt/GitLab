@@ -31,6 +31,8 @@ module Gitlab
 
       private
 
+      # Aware that the resulting hash needs to be pure-hash and
+      # does not include any AR objects anymore, only objects that run `.to_json`
       def fix_project_tree(project_tree)
         if @params[:description].present?
           project_tree['description'] = @params[:description]

@@ -79,6 +79,11 @@ module Gitlab
         @tree = tree
       end
 
+      # With the usage of `JSONBatchRelation`, it returns partially
+      # serialized hash which is not easily accessible.
+      # It means you can only manipulate and replace top-level objects.
+      # All future mutations of the hash (such as `fix_project_tree`)
+      # should be aware of that.
       def execute
         simple_serialize.merge(serialize_includes)
       end
@@ -131,7 +136,12 @@ module Gitlab
         data = []
 
         record.in_batches(of: @batch_size) do |batch| # rubocop:disable Cop/InBatches
-          data.append(JSONBatchRelation.new(batch, options, preloads[key]).tap(&:raw_json))
+          if Feature.enabled?(:export_fast_serialize_with_raw_json, default_enabled: true)
+            data.append(JSONBatchRelation.new(batch, options, preloads[key]).tap(&:raw_json))
+          else
+            batch = batch.preload(preloads[key]) if preloads&.key?(key)
+            data += batch.as_json(options)
+          end
         end
 
         data
