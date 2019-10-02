@@ -48,4 +48,22 @@ describe ScheduleMergeRequestAnyApprovalRuleMigration, :migration, :sidekiq do
       end
     end
   end
+
+  context 'for FOSS version' do
+    before do
+      allow(Gitlab).to receive(:ee?).and_return(false)
+    end
+
+    it 'does not schedule any jobs' do
+      create_merge_request(2)
+
+      Sidekiq::Testing.fake! do
+        Timecop.freeze do
+          migrate!
+
+          expect(BackgroundMigrationWorker.jobs.size).to eq(0)
+        end
+      end
+    end
+  end
 end

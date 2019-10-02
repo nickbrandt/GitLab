@@ -56,7 +56,10 @@ module Geo
           join_statement =
             arel_table
               .join(file_registry_table, Arel::Nodes::OuterJoin)
-              .on(arel_table[:id].eq(file_registry_table[:file_id]))
+              .on(
+                arel_table[:id].eq(file_registry_table[:file_id])
+                  .and(file_registry_table[:file_type].eq(:lfs))
+              )
 
           joins(join_statement.join_sources)
         end
