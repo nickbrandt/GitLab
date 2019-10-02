@@ -10,10 +10,8 @@ module EE
 
     private
 
-    def after_project_changes_hooks(post_received, user, refs, changes)
+    def after_project_changes_hooks(project, user, refs, changes)
       super
-
-      project = post_received.project
 
       if audit_push?(project)
         ::RepositoryPushAuditEventWorker.perform_async(changes, project.id, user.id)

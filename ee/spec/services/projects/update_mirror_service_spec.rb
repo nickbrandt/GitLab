@@ -65,7 +65,7 @@ describe Projects::UpdateMirrorService do
         stub_fetch_mirror(project)
 
         expect(Git::TagPushService).to receive(:new)
-          .with(project, project.owner, hash_including(ref: 'refs/tags/new-tag'))
+          .with(project, project.owner, change: hash_including(ref: 'refs/tags/new-tag'), mirror_update: true)
           .and_return(double(execute: true))
 
         service.execute

@@ -83,12 +83,12 @@ module Projects
         Git::TagPushService.new(
           project,
           current_user,
-          {
+          change: {
             oldrev: old_tag_target,
             newrev: tag_target,
-            ref: "#{Gitlab::Git::TAG_REF_PREFIX}#{tag.name}",
-            mirror_update: true
-          }
+            ref: "#{Gitlab::Git::TAG_REF_PREFIX}#{tag.name}"
+          },
+          mirror_update: true
         ).execute
       end
 
