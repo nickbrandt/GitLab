@@ -57,6 +57,8 @@ module EE
 
         if cluster&.group_type?
           ::Gitlab::Routing.url_helpers.environments_group_cluster_path(cluster.group, cluster)
+        elsif cluster&.instance_type?
+          ::Gitlab::Routing.url_helpers.environments_admin_cluster_path(cluster)
         end
       end
     end

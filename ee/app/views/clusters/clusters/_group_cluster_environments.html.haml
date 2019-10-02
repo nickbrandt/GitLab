@@ -1,8 +1,8 @@
 - is_configure_active = !params[:tab] || params[:tab] == 'configure'
-- is_group_type = @cluster.cluster_type.in? 'group_type'
+- is_project_type = @cluster.cluster_type.in? 'project_type'
 - is_creating = @cluster.status_name.in? %i/scheduled creating/
 
-- if is_group_type && !is_creating
+- if !is_project_type && !is_creating
   .js-toggle-container
     %ul.nav-links.mobile-separator.nav.nav-tabs{ role: 'tablist' }
       %li.nav-item{ role: 'presentation' }
