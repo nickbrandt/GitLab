@@ -140,6 +140,9 @@ module EE
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
 
+      validates :pull_mirror_branch_prefix, length: { maximum: 50 }
+      validate :check_pull_mirror_branch_prefix
+
       with_options if: :mirror? do
         validates :import_url, presence: true
         validates :mirror_user, presence: true
@@ -670,6 +673,15 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
+    end
+
+    def check_pull_mirror_branch_prefix
+      return if pull_mirror_branch_prefix.blank?
+      return unless pull_mirror_branch_prefix_changed?
+
+      unless ::Gitlab::GitRefValidator.validate("#{pull_mirror_branch_prefix}master")
+        errors.add(:pull_mirror_branch_prefix, _('Invalid Git ref'))
+      end
     end
   end
 end

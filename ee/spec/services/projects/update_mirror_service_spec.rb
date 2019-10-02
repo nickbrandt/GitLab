@@ -140,6 +140,38 @@ describe Projects::UpdateMirrorService do
     end
 
     context "updating branches" do
+      context 'when pull_mirror_branch_prefix is set' do
+        let(:pull_mirror_branch_prefix) { 'upstream/' }
+
+        before do
+          project.update(pull_mirror_branch_prefix: pull_mirror_branch_prefix)
+        end
+
+        it "creates new branches" do
+          stub_fetch_mirror(project)
+
+          service.execute
+
+          expect(project.repository.branch_names).to include("#{pull_mirror_branch_prefix}new-branch")
+          expect(project.repository.branch_names).not_to include('new-branch')
+        end
+
+        context 'when pull_mirror_branch_prefix feature flag is disabled' do
+          before do
+            stub_feature_flags(pull_mirror_branch_prefix: false)
+          end
+
+          it "creates new branches" do
+            stub_fetch_mirror(project)
+
+            service.execute
+
+            expect(project.repository.branch_names).not_to include("#{pull_mirror_branch_prefix}new-branch")
+            expect(project.repository.branch_names).to include('new-branch')
+          end
+        end
+      end
+
       context 'when mirror only protected branches option is set' do
         let(:new_protected_branch_name) { 'new-branch' }
         let(:protected_branch_name) { 'existing-branch' }
