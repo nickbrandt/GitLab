@@ -1258,4 +1258,4 @@ curl --data "value=true" --header "PRIVATE-TOKEN: personal_access_token" https:/
 
 ## Development guides
 
-Configuring [GDK for Auto DevOps](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/auto_devops.md).
+[Development guide for Auto DevOps](../../development/auto_devops.md)
