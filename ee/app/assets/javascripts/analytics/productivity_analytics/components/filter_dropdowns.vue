@@ -18,6 +18,7 @@ export default {
       projectsQueryParams: {
         per_page: projectsPerPage,
         with_shared: false, // exclude forks
+        order_by: 'last_activity_at',
       },
     };
   },
