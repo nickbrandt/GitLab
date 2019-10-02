@@ -18,7 +18,7 @@ module SystemNoteService
   #
   # Returns the created Note object
   def add_commits(noteable, project, author, new_commits, existing_commits = [], oldrev = nil)
-    ::SystemNotes::CommitService.new(noteable, project, author).add_commits(new_commits, existing_commits, oldrev)
+    ::SystemNotes::CommitService.new(noteable: noteable, project: project, author: author).add_commits(new_commits, existing_commits, oldrev)
   end
 
   # Called when a commit was tagged
@@ -30,7 +30,7 @@ module SystemNoteService
   #
   # Returns the created Note object
   def tag_commit(noteable, project, author, tag_name)
-    ::SystemNotes::CommitService.new(noteable, project, author).tag_commit(tag_name)
+    ::SystemNotes::CommitService.new(noteable: noteable, project: project, author: author).tag_commit(tag_name)
   end
 
   # Called when the assignee of a Noteable is changed or removed

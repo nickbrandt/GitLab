@@ -4,7 +4,7 @@ module SystemNotes
   class BaseService
     attr_reader :noteable, :project, :author
 
-    def initialize(noteable, project, author)
+    def initialize(noteable: nil, author: nil, project: nil)
       @noteable = noteable
       @project = project
       @author = author
