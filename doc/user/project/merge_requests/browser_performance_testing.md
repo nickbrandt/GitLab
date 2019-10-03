@@ -81,7 +81,7 @@ Add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
-  template: Browser-Performance.gitlab-ci.yml
+  template: Verify/Browser-Performance.gitlab-ci.yml
 
 performance:
   variables:
@@ -109,7 +109,7 @@ will make on the given URL:
 
 ```yaml
 include:
-  template: Browser-Performance.gitlab-ci.yml
+  template: Verify/Browser-Performance.gitlab-ci.yml
 
 performance:
   variables:
@@ -138,8 +138,8 @@ set this up:
    in your job's `script`.
 1. In the `performance` job, read the previous artifact into an environment
    variable, in this case `$URL` because this is what our sitespeed.io command
-   uses for the URL parameter. Notice that we are defining the `URL` variable
-   through `before_script` instead of `variables`.
+   uses for the URL parameter. Because Review App URLs are dynamic, we define
+   the `URL` variable through `before_script` instead of `variables`.
 1. You can now run the sitespeed.io container against the desired hostname and
    paths.
 
