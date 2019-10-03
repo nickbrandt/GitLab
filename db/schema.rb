@@ -4393,6 +4393,9 @@ ActiveRecord::Schema.define(version: 2019_11_25_140458) do
   add_foreign_key "epic_user_mentions", "epics", on_delete: :cascade
   add_foreign_key "epic_user_mentions", "notes", on_delete: :cascade
   add_foreign_key "epics", "epics", column: "due_date_sourcing_epic_id", name: "fk_013c9f36ca", on_delete: :nullify
+  add_foreign_key "epic_user_mentions", "epics", on_delete: :cascade
+  add_foreign_key "epic_user_mentions", "notes", on_delete: :cascade
+  add_foreign_key "epics", "epics", column: "due_date_sourcing_epic_id", name: "fk_013c9f36ca", on_delete: :nullify
   add_foreign_key "epics", "epics", column: "parent_id", name: "fk_25b99c1be3", on_delete: :cascade
   add_foreign_key "epics", "epics", column: "start_date_sourcing_epic_id", name: "fk_9d480c64b2", on_delete: :nullify
   add_foreign_key "epics", "milestones", on_delete: :nullify
