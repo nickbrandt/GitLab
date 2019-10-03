@@ -2,11 +2,16 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlButton } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
+import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
     Icon,
+    GlTooltipDirective,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   computed: {
     ...mapGetters('diffs', ['isInlineView', 'isParallelView']),
@@ -27,6 +32,8 @@ export default {
   <div class="dropdown">
     <button
       type="button"
+      v-gl-tooltip.hover
+      :title="__('Preferences')"
       class="btn btn-default js-show-diff-settings"
       data-toggle="dropdown"
       data-display="static"

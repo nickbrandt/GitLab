@@ -7,6 +7,7 @@ import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import MrWidgetIcon from './mr_widget_icon.vue';
+import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   name: 'MRWidgetHeader',
@@ -15,9 +16,11 @@ export default {
     clipboardButton,
     TooltipOnTruncate,
     MrWidgetIcon,
+    GlTooltipDirective,
   },
   directives: {
     tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     mr: {
@@ -137,6 +140,8 @@ export default {
         <span class="dropdown">
           <button
             type="button"
+            v-gl-tooltip.hover
+            :title="__('Download changes')"
             class="btn dropdown-toggle qa-dropdown-toggle"
             data-toggle="dropdown"
             :aria-label="__('Download as')"
