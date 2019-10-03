@@ -664,7 +664,7 @@ class Project < ApplicationRecord
   def emails_disabled?
     strong_memoize(:emails_disabled) do
       # disabling in the namespace overrides the project setting
-      Feature.enabled?(:emails_disabled, self, default_enabled: true) && (super || namespace.emails_disabled?)
+      super || namespace.emails_disabled?
     end
   end
 
