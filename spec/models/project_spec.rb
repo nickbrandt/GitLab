@@ -2387,29 +2387,6 @@ describe Project do
         expect(project.emails_disabled?).to be_truthy
       end
     end
-
-    context 'when :emails_disabled feature flag is off' do
-      before do
-        stub_feature_flags(emails_disabled: false)
-      end
-
-      context 'emails disabled in group' do
-        it 'returns false' do
-          allow(project.namespace).to receive(:emails_disabled?) { true }
-
-          expect(project.emails_disabled?).to be_falsey
-        end
-      end
-
-      context 'emails enabled in group' do
-        it 'returns false' do
-          allow(project.namespace).to receive(:emails_disabled?) { false }
-          project.update_attribute(:emails_disabled, true)
-
-          expect(project.emails_disabled?).to be_falsey
-        end
-      end
-    end
   end
 
   describe '#lfs_enabled?' do
