@@ -40,7 +40,7 @@ module Gitlab
           environment: job[:environment_name],
           coverage_regex: job[:coverage],
           yaml_variables: yaml_variables(name),
-          needs_attributes: job.dig(:needs, :pipeline)&.map { |need| { name: need } },
+          needs_attributes: job.dig(:needs, :pipeline),
           interruptible: job[:interruptible],
           rules: job[:rules],
           options: {

@@ -14,16 +14,12 @@ module Gitlab
               validates :config, presence: true
             end
 
-            def bridge?
-              false
-            end
-
-            def pipeline?
-              true
+            def type
+              :pipeline
             end
 
             def value
-              @config.to_s
+              { name: @config }
             end
           end
 

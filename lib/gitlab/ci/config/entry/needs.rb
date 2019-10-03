@@ -16,7 +16,7 @@ module Gitlab
 
           def compose!(deps = nil)
             super(deps) do
-              [].tap { |array| array.push(@config) }.flatten.each_with_index do |need, index|
+              [@config].flatten.each_with_index do |need, index|
                 @entries[index] = ::Gitlab::Config::Entry::Factory.new(Entry::Need)
                   .value(need)
                   .with(key: "need", parent: self, description: "need definition.") # rubocop:disable CodeReuse/ActiveRecord
@@ -30,20 +30,9 @@ module Gitlab
           end
 
           def value
-            {}.tap do |result_hash|
-              result_hash[:bridge] = bridge_values.first if bridge_values.any?
-              result_hash[:pipeline] = pipeline_values if pipeline_values.any?
+            @entries.values.group_by(&:type).transform_values do |values|
+              values.map(&:value)
             end
-          end
-
-          private
-
-          def bridge_values
-            @entries.values.select(&:bridge?).map(&:value)
-          end
-
-          def pipeline_values
-            @entries.values.select(&:pipeline?).map(&:value)
           end
         end
       end

@@ -25,12 +25,8 @@ module EE
                 validates :pipeline, type: String, presence: true
               end
 
-              def bridge?
-                true
-              end
-
-              def pipeline?
-                false
+              def type
+                :bridge
               end
             end
 
