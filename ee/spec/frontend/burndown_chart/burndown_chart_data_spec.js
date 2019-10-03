@@ -93,6 +93,7 @@ describe('BurndownChartData', () => {
           { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
           { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
           { created_at: '2017-03-01T00:00:00.000Z', weight: 2, action: 'closed' },
+          { created_at: '2017-03-02T00:00:00.000Z', weight: 2, action: 'created' },
         );
       });
 
@@ -100,7 +101,7 @@ describe('BurndownChartData', () => {
         expect(burndownChartData.generate()).toEqual([
           ['2017-03-01', 0, 0],
           ['2017-03-02', 0, 0],
-          ['2017-03-03', 1, 2],
+          ['2017-03-03', 2, 4],
         ]);
       });
     });
