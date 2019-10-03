@@ -35,13 +35,15 @@ module Gitlab
           @strategies ||= []
         end
 
+        # rubocop:disable Cop/ConstGetInheritFalse
         def self.entry_class(strategy)
           if strategy.present?
-            self.const_get(strategy.name, false)
+            self.const_get(strategy.name)
           else
             self::UnknownStrategy
           end
         end
+        # rubocop:enable Cop/ConstGetInheritFalse
 
         def self.default
         end

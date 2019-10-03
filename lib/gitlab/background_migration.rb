@@ -77,9 +77,11 @@ module Gitlab
       enqueued_job?([retry_set], migration_class)
     end
 
+    # rubocop:disable Cop/ConstGetInheritFalse
     def self.migration_class_for(class_name)
-      const_get(class_name, false)
+      const_get(class_name)
     end
+    # rubocop:enable Cop/ConstGetInheritFalse
 
     def self.enqueued_job?(queues, migration_class)
       queues.each do |queue|
