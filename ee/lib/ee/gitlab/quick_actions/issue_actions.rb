@@ -10,7 +10,6 @@ module EE
         included do
           desc _('Add to epic')
           explanation _('Adds an issue to an epic.')
-          execution_message _('Added an issue to an epic.')
           types Issue
           condition do
             quick_action_target.project.group&.feature_available?(:epics) &&
@@ -18,7 +17,16 @@ module EE
           end
           params '<&epic | group&epic | Epic URL>'
           command :epic do |epic_param|
-            @updates[:epic] = extract_epic(epic_param)
+            epic = extract_epic(epic_param)
+
+            if epic && current_user.can?(:read_epic, epic)
+              @updates[:epic] = epic
+              message = _('Added an issue to an epic.')
+            else
+              message = _("This epic does not exist or you don't have sufficient permission.")
+            end
+
+            @execution_message[:epic] = message
           end
 
           desc _('Remove from epic')

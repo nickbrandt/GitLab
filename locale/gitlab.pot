@@ -985,7 +985,7 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-msgid "Added %{epic_ref} as child epic."
+msgid "Added %{epic_ref} as a child epic."
 msgstr ""
 
 msgid "Added %{label_references} %{label_text}."
@@ -2932,6 +2932,12 @@ msgid "Cherry-pick this commit"
 msgstr ""
 
 msgid "Cherry-pick this merge request"
+msgstr ""
+
+msgid "Child epic does not exist."
+msgstr ""
+
+msgid "Child epic doesn't exist."
 msgstr ""
 
 msgid "Choose <strong>Create archive</strong> and wait for archiving to complete."
@@ -7700,6 +7706,9 @@ msgstr ""
 msgid "Given access %{time_ago}"
 msgstr ""
 
+msgid "Given epic is already related to this epic."
+msgstr ""
+
 msgid "Global Shortcuts"
 msgstr ""
 
@@ -11141,6 +11150,12 @@ msgstr ""
 msgid "Parameter"
 msgstr ""
 
+msgid "Parent epic doesn't exist."
+msgstr ""
+
+msgid "Parent epic is not present."
+msgstr ""
+
 msgid "Part of merge request changes"
 msgstr ""
 
@@ -14306,7 +14321,7 @@ msgstr ""
 msgid "Session expiration, projects limit and attachment size."
 msgstr ""
 
-msgid "Set %{epic_ref} as parent epic."
+msgid "Set %{epic_ref} as the parent epic."
 msgstr ""
 
 msgid "Set a default template for issue descriptions."
@@ -16144,6 +16159,9 @@ msgid "This domain is not verified. You will need to verify ownership before acc
 msgstr ""
 
 msgid "This environment has no deployments yet."
+msgstr ""
+
+msgid "This epic does not exist or you don't have sufficient permission."
 msgstr ""
 
 msgid "This feature requires local storage to be enabled"
@@ -18352,6 +18370,9 @@ msgid "You don't have any projects available."
 msgstr ""
 
 msgid "You don't have any recent searches"
+msgstr ""
+
+msgid "You don't have sufficient permission to perform this action."
 msgstr ""
 
 msgid "You don’t have access to Cycle Analytics for this group"

@@ -1,0 +1,5 @@
+---
+title: Add missing error handling for epic quick actions
+merge_request: 15648
+author:
+type: fixed
