@@ -87,6 +87,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       namespace :security do
         resources :dependencies, only: [:index]
+        resources :licenses, only: [:index]
         resources :vulnerabilities, only: [:index] do
           collection do
             get :summary

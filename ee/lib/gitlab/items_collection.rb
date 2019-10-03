@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Gitlab
-  class DependenciesCollection
+  class ItemsCollection
     include Enumerable
 
-    def initialize(dependencies)
-      @collection = dependencies
+    def initialize(items)
+      @collection = items
     end
 
     def each
