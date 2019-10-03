@@ -22,7 +22,7 @@ module EE
         validates :"#{type}_access_levels", length: { is: 1 }, if: -> { false }
 
         # Returns access levels that grant the specified access type to the given user / group.
-        access_level_class = const_get("#{type}_access_level".classify)
+        access_level_class = const_get("#{type}_access_level".classify, false)
         protected_type = self.model_name.singular
         scope(
           :"#{type}_access_by_user",
