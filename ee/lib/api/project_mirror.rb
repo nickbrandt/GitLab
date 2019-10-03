@@ -41,6 +41,22 @@ module API
       def project
         @project ||= github_webhook_signature ? find_project(params[:id]) : user_project
       end
+
+      def process_pull_request
+        external_pull_request = ProcessGithubPullRequestEventService.new(project, current_user).execute(params)
+
+        if external_pull_request
+          render_validation_error!(external_pull_request)
+        else
+          render_api_error!('The pull request event is not processable', 422)
+        end
+      end
+
+      def start_pull_mirroring
+        result = StartPullMirroringService.new(project, current_user).execute
+
+        render_api_error!(result[:message], result[:http_status]) if result[:status] == :error
+      end
     end
 
     params do
@@ -64,13 +80,9 @@ module API
         break render_api_error!('The project is not mirrored', 400) unless project.mirror?
 
         if params[:pull_request]
-          if external_pull_request = ProcessGithubPullRequestEventService.new(project, current_user).execute(params)
-            render_validation_error!(external_pull_request)
-          else
-            render_api_error!('The pull request event is not processable', 422)
-          end
+          process_pull_request
         else
-          project.import_state.force_import_job!
+          start_pull_mirroring
         end
 
         status 200
