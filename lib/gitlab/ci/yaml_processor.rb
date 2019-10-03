@@ -164,12 +164,14 @@ module Gitlab
         stage_index = @stages.index(job[:stage])
 
         job[:needs][:pipeline].each do |need|
-          raise ValidationError, "#{name} job: undefined need: #{need}" unless @jobs[need.to_sym]
+          need_job_name = need[:name]
 
-          needs_stage_index = @stages.index(@jobs[need.to_sym][:stage])
+          raise ValidationError, "#{name} job: undefined need: #{need_job_name}" unless @jobs[need_job_name.to_sym]
+
+          needs_stage_index = @stages.index(@jobs[need_job_name.to_sym][:stage])
 
           unless needs_stage_index.present? && needs_stage_index < stage_index
-            raise ValidationError, "#{name} job: need #{need} is not defined in prior stages"
+            raise ValidationError, "#{name} job: need #{need_job_name} is not defined in prior stages"
           end
         end
       end

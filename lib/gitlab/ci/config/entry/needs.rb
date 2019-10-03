@@ -12,6 +12,28 @@ module Gitlab
 
           validations do
             validates :config, presence: true
+
+            validate do
+              [config].flatten.each do |need|
+                if Needs.find_type(need).nil?
+                  errors.add(:need, 'has an unsupported type')
+                end
+              end
+            end
+          end
+
+          TYPES = [Entry::Need::Pipeline].freeze
+
+          private_constant :TYPES
+
+          def self.all_types
+            TYPES
+          end
+
+          def self.find_type(config)
+            self.all_types.find do |type|
+              type.matching?(config)
+            end
           end
 
           def compose!(deps = nil)
@@ -30,8 +52,12 @@ module Gitlab
           end
 
           def value
-            @entries.values.group_by(&:type).transform_values do |values|
+            values = @entries.values.group_by(&:type).transform_values do |values|
               values.map(&:value)
+            end
+
+            values.tap do |values_hash|
+              values_hash[:bridge] = values_hash[:bridge].first if values_hash[:bridge]
             end
           end
         end
@@ -39,3 +65,5 @@ module Gitlab
     end
   end
 end
+
+::Gitlab::Ci::Config::Entry::Needs.prepend_if_ee('::EE::Gitlab::Ci::Config::Entry::Needs')

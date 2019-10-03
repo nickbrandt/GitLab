@@ -27,10 +27,8 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#errors' do
         it 'returns error about incorrect type' do
-          error_message = Gitlab.ee? ? 'need has to be a string, symbol or hash' : 'need has to be a string or symbol'
-
           expect(needs.errors)
-            .to include error_message
+            .to contain_exactly('needs need has an unsupported type')
         end
       end
     end
@@ -46,7 +44,7 @@ describe ::Gitlab::Ci::Config::Entry::Needs do
 
       describe '#value' do
         it 'returns key value' do
-          expect(needs.value).to eq(pipeline: %w[first_job_name second_job_name])
+          expect(needs.value).to eq(pipeline: [{ name: 'first_job_name' }, { name: 'second_job_name' }])
         end
       end
 

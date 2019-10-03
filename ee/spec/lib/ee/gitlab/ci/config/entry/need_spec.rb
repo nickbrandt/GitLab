@@ -28,23 +28,8 @@ describe ::Gitlab::Ci::Config::Entry::Need do
 
     describe '#errors' do
       it 'is returns an error about an empty config' do
-        expect(subject.errors.first)
-          .to end_with("bridge config can't be blank")
-      end
-    end
-  end
-
-  context 'when need is the wrong type' do
-    let(:config) { 123 }
-
-    describe '#valid?' do
-      it { is_expected.not_to be_valid }
-    end
-
-    describe '#errors' do
-      it 'is returns an error about an empty config' do
-        expect(subject.errors.first)
-          .to end_with('has to be a string, symbol or hash')
+        expect(subject.errors)
+          .to include("bridge config can't be blank")
       end
     end
   end

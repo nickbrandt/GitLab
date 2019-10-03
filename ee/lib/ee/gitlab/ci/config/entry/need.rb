@@ -25,17 +25,12 @@ module EE
                 validates :pipeline, type: String, presence: true
               end
 
+              def self.matching?(config)
+                config.is_a?(Hash)
+              end
+
               def type
                 :bridge
-              end
-            end
-
-            module UnknownStrategy
-              extend ::Gitlab::Utils::Override
-
-              override :errors
-              def errors
-                ["#{location} has to be a string, symbol or hash"]
               end
             end
           end

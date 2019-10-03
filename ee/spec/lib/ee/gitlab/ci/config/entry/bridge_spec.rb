@@ -160,6 +160,38 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       end
     end
 
+    context 'when bridge has bridge and pipeline needs' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: ['some_job', { pipeline: 'some/other_project' }]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.to be_valid }
+      end
+    end
+
+    context 'when bridge has more than one valid bridge needs' do
+      let(:config) do
+        {
+          trigger: 'other-project',
+          needs: [{ pipeline: 'some/project' }, { pipeline: 'some/other_project' }]
+        }
+      end
+
+      describe '#valid?' do
+        it { is_expected.not_to be_valid }
+      end
+
+      describe '#errors' do
+        it 'returns an error about too many bridge needs' do
+          expect(subject.errors).to contain_exactly('bridge needs can only have one bridge type needs')
+        end
+      end
+    end
+
     context 'when bridge config contains unknown keys' do
       let(:config) { { unknown: 123 } }
 

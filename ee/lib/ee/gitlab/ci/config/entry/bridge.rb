@@ -29,6 +29,22 @@ module EE
                 end
               end
 
+              validate do
+                next unless needs.present?
+
+                if [needs].flatten.any? { |need| !(Entry::Need::Bridge.matching?(need) || ::Gitlab::Ci::Config::Entry::Need::Pipeline.matching?(need)) }
+                  errors.add(:needs, 'can only have bridge or pipeline type needs')
+                end
+              end
+
+              validate do
+                next unless needs.present?
+
+                if [needs].flatten.count { |need| Entry::Need::Bridge.matching?(need) } > 1
+                  errors.add(:needs, 'can only have one bridge type needs')
+                end
+              end
+
               with_options allow_nil: true do
                 validates :when,
                   inclusion: { in: %w[on_success on_failure always],

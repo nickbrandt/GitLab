@@ -14,7 +14,7 @@ describe ::Gitlab::Ci::Config::Entry::Need do
 
     describe '#value' do
       it 'returns job needs configuration' do
-        expect(need.value).to eq('job_name')
+        expect(need.value).to eq(name: 'job_name')
       end
     end
   end
@@ -28,7 +28,7 @@ describe ::Gitlab::Ci::Config::Entry::Need do
 
     describe '#value' do
       it 'returns job needs configuration' do
-        expect(need.value).to eq('job_name')
+        expect(need.value).to eq(name: :job_name)
       end
     end
   end
@@ -42,25 +42,8 @@ describe ::Gitlab::Ci::Config::Entry::Need do
 
     describe '#errors' do
       it 'is returns an error about an empty config' do
-        expect(need.errors.first)
-          .to end_with("pipeline config can't be blank")
-      end
-    end
-  end
-
-  context 'when need is not a string' do
-    let(:config) { 123 }
-
-    describe '#valid?' do
-      it { is_expected.not_to be_valid }
-    end
-
-    describe '#errors' do
-      it 'is returns an error about an empty config' do
-        error_message = Gitlab.ee? ? 'has to be a string, symbol or hash' : 'has to be a string or symbol'
-
-        expect(need.errors.first)
-          .to end_with(error_message)
+        expect(need.errors)
+          .to contain_exactly("pipeline config can't be blank")
       end
     end
   end

@@ -14,6 +14,10 @@ module Gitlab
               validates :config, presence: true
             end
 
+            def self.matching?(config)
+              config.is_a?(String) || config.is_a?(Symbol)
+            end
+
             def type
               :pipeline
             end
@@ -24,9 +28,6 @@ module Gitlab
           end
 
           class UnknownStrategy < ::Gitlab::Config::Entry::Node
-            def errors
-              ["#{location} has to be a string or symbol"]
-            end
           end
         end
       end
@@ -34,5 +35,4 @@ module Gitlab
   end
 end
 
-::Gitlab::Ci::Config::Entry::Need.prepend_if_ee('::EE::Gitlab::Ci::Config::Entry::Need') # rubocop: disable Cop/InjectEnterpriseEditionModule
-::Gitlab::Ci::Config::Entry::Need::UnknownStrategy.prepend_if_ee('::EE::Gitlab::Ci::Config::Entry::Need::UnknownStrategy')
+::Gitlab::Ci::Config::Entry::Need.prepend_if_ee('::EE::Gitlab::Ci::Config::Entry::Need')
