@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-describe Gitlab::DependenciesCollection do
-  let(:collection) { described_class.new(fake_dependencies) }
-  let(:fake_dependencies) { Array.new(42, :dependency) }
+describe Gitlab::ItemsCollection do
+  let(:collection) { described_class.new(items) }
+  let(:items) { Array.new(42, :dependency) }
 
   it 'responds to each' do
     expect(collection).to respond_to(:each)

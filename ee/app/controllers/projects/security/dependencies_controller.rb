@@ -19,7 +19,7 @@ module Projects
 
       def collect_dependencies
         found_dependencies = report_service.able_to_fetch? ? service.execute : []
-        ::Gitlab::DependenciesCollection.new(found_dependencies)
+        ::Gitlab::ItemsCollection.new(found_dependencies)
       end
 
       def authorize_read_dependency_list!
