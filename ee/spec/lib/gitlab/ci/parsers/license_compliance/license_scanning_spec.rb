@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement do
+describe Gitlab::Ci::Parsers::LicenseCompliance::LicenseScanning do
   describe '#parse!' do
     subject { described_class.new.parse!(data, report) }
 

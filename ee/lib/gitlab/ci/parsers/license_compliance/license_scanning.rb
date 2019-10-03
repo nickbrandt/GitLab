@@ -3,11 +3,11 @@
 module Gitlab
   module Ci
     module Parsers
-      module LicenseManagement
-        class LicenseManagement
-          LicenseManagementParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
+      module LicenseCompliance
+        class LicenseScanning
+          LicenseScanningParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
-          def parse!(json_data, license_management_report)
+          def parse!(json_data, license_scanning_report)
             root = JSON.parse(json_data)
 
             root['licenses'].each do |license_hash|
@@ -19,18 +19,18 @@ module Gitlab
                   uses_license?(dependency['license']['name'], license_name)
                 end
                 license_dependencies.each do |dependency|
-                  license_management_report.add_dependency(license_name,
-                                                           license_hash['count'],
-                                                           dependency['license']['url'],
-                                                           dependency['dependency']['name'])
+                  license_scanning_report.add_dependency(license_name,
+                                                         license_hash['count'],
+                                                         dependency['license']['url'],
+                                                         dependency['dependency']['name'])
                 end
               end
             end
           rescue JSON::ParserError
-            raise LicenseManagementParserError, 'JSON parsing failed'
+            raise LicenseScanningParserError, 'JSON parsing failed'
           rescue => e
             Gitlab::Sentry.track_exception(e)
-            raise LicenseManagementParserError, 'License management report parsing failed'
+            raise LicenseScanningParserError, 'License scanning report parsing failed'
           end
 
           def remove_suffix(name)
