@@ -73,7 +73,9 @@ module EE
         sort_value_version_desc      => sort_title_version,
         sort_value_version_asc       => sort_title_version,
         sort_value_type_desc         => sort_value_type_desc,
-        sort_value_type_asc          => sort_title_type
+        sort_value_type_asc          => sort_title_type,
+        sort_value_project_name_desc => sort_title_project_name,
+        sort_value_project_name_asc  => sort_title_project_name
       }
     end
 
@@ -86,7 +88,9 @@ module EE
         sort_value_version_desc      => sort_value_version_asc,
         sort_value_version_asc       => sort_value_version_desc,
         sort_value_type_desc         => sort_value_type_asc,
-        sort_value_type_asc          => sort_value_type_desc
+        sort_value_type_asc          => sort_value_type_desc,
+        sort_value_project_name_desc => sort_value_project_name_asc,
+        sort_value_project_name_asc  => sort_value_project_name_desc
       }
     end
 
@@ -132,6 +136,10 @@ module EE
       s_('SortOptions|Weight')
     end
 
+    def sort_title_project_name
+      s_('SortOptions|Project')
+    end
+
     def sort_title_version
       s_('SortOptions|Version')
     end
@@ -162,6 +170,14 @@ module EE
 
     def sort_value_weight
       'weight'
+    end
+
+    def sort_value_project_name_asc
+      'project_name_asc'
+    end
+
+    def sort_value_project_name_desc
+      'project_name_desc'
     end
 
     def sort_value_version_asc

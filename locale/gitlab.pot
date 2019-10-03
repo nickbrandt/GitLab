@@ -14944,6 +14944,9 @@ msgstr ""
 msgid "SortOptions|Priority"
 msgstr ""
 
+msgid "SortOptions|Project"
+msgstr ""
+
 msgid "SortOptions|Recent last activity"
 msgstr ""
 

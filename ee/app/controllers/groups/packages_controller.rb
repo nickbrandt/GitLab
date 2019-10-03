@@ -2,11 +2,14 @@
 
 module Groups
   class PackagesController < Groups::ApplicationController
+    include SortingHelper
+
     before_action :verify_packages_enabled!
 
     def index
       @packages = ::Packages::GroupPackagesFinder.new(current_user, group)
         .execute
+        .sort_by_attribute(@sort = params[:sort] || 'created_desc')
         .page(params[:page])
     end
 

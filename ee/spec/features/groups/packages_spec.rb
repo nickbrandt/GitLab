@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe 'Group Packages' do
+  include SortingHelper
+
   set(:user) { create(:user) }
   set(:group) { create(:group) }
   set(:project) { create(:project, group: group) }
@@ -56,7 +58,100 @@ describe 'Group Packages' do
     end
   end
 
+  context 'sorting when there are packages' do
+    let!(:second_project) { create(:project, name: 'second-project', group: group) }
+
+    let!(:aaa_package) do
+      create(
+        :maven_package,
+        name: 'aaa/company/app/my-app',
+        version: '1.0-SNAPSHOT',
+        project: project)
+    end
+
+    let!(:bbb_package) do
+      create(
+        :maven_package,
+        name: 'bbb/company/app/my-app',
+        version: '1.1-SNAPSHOT',
+        project: second_project)
+    end
+
+    it 'sorts by created date descending' do
+      visit group_packages_path(group, sort: sort_value_created_date)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
+    it 'sorts by created date ascending' do
+      visit group_packages_path(group, sort: sort_value_oldest_created)
+      expect(first_package).to include(aaa_package.name)
+      expect(last_package).to include(bbb_package.name)
+    end
+
+    it 'sorts by name descending' do
+      visit group_packages_path(group, sort: sort_value_name_desc)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
+    it 'sorts by name ascending' do
+      visit group_packages_path(group, sort: sort_value_name)
+      expect(first_package).to include(aaa_package.name)
+      expect(last_package).to include(bbb_package.name)
+    end
+
+    it 'sorts by version descending' do
+      visit group_packages_path(group, sort: sort_value_version_desc)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
+    it 'sorts by version ascending' do
+      visit group_packages_path(group, sort: sort_value_version_asc)
+      expect(first_package).to include(aaa_package.name)
+      expect(last_package).to include(bbb_package.name)
+    end
+
+    it 'sorts by project descending' do
+      visit group_packages_path(group, sort: sort_value_project_name_desc)
+      expect(first_package).to include(bbb_package.name)
+      expect(last_package).to include(aaa_package.name)
+    end
+
+    it 'sorts by project ascending' do
+      visit group_packages_path(group, sort: sort_value_project_name_asc)
+      expect(first_package).to include(aaa_package.name)
+      expect(last_package).to include(bbb_package.name)
+    end
+  end
+
+  context 'sorting different types of packages' do
+    let!(:maven_package) { create(:maven_package, project: project) }
+    let!(:npm_package) { create(:npm_package, project: project) }
+
+    it 'sorts by type descending' do
+      visit group_packages_path(group, sort: sort_value_type_desc)
+      expect(first_package).to include(npm_package.name)
+      expect(last_package).to include(maven_package.name)
+    end
+
+    it 'sorts by type ascending' do
+      visit group_packages_path(group, sort: sort_value_type_asc)
+      expect(first_package).to include(maven_package.name)
+      expect(last_package).to include(npm_package.name)
+    end
+  end
+
   def visit_group_packages
     visit group_packages_path(group)
+  end
+
+  def first_package
+    page.all('.table-holder .package-row').first.text
+  end
+
+  def last_package
+    page.all('.table-holder .package-row').last.text
   end
 end
